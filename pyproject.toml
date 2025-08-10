@@ -3,7 +3,7 @@ name = "vellum-ai"
 
 [tool.poetry]
 name = "vellum-ai"
-version = "1.1.3"
+version = "1.1.4"
 description = ""
 readme = "README.md"
 authors = []
@@ -54,7 +54,7 @@ requests = ">=2.31.0,<3.0.0"
 tomli = ">=2.0.0,<3.0.0"
 typing_extensions = ">= 4.0.0"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 mypy = "==1.13.0"
 pytest = "^7.4.0"
 pytest-asyncio = "^0.23.5"
@@ -76,7 +76,7 @@ pytest-cov = "^4.0.0"
 pytest-mock = "3.10.0"
 pytest-timeout = "2.3.1"
 requests-mock = "1.11.0"
-ruff = "^0.5.6"
+ruff = "==0.11.5"
 tomli_w = "1.1.0"
 types-PyYAML = "6.0.12.20240808"
 types-pytz = "2024.1.0.20240417"
@@ -104,6 +104,26 @@ overrides = [
 [tool.ruff]
 line-length = 120
 
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "F",  # pyflakes
+    "I",  # isort
+]
+ignore = [
+    "E402",  # Module level import not at top of file
+    "E501",  # Line too long
+    "E711",  # Comparison to `None` should be `cond is not None`
+    "E712",  # Avoid equality comparisons to `True`; use `if ...:` checks
+    "E721",  # Use `is` and `is not` for type comparisons, or `isinstance()` for insinstance checks
+    "E722",  # Do not use bare `except`
+    "E731",  # Do not assign a `lambda` expression, use a `def`
+    "F821",  # Undefined name
+    "F841"   # Local variable ... is assigned to but never used
+]
+
+[tool.ruff.lint.isort]
+section-order = ["future", "standard-library", "third-party", "first-party"]
 
 [build-system]
 requires = ["poetry-core"]
@@ -113,7 +133,7 @@ build-backend = "poetry.core.masonry.api"
 vellum = "vellum_cli:main"
 
 [tool.isort]
-skip = ["src/vellum/client", "tests/client", ".venv", "src/vellum/__init__.py", "examples/workflows", "src/vellum/client/raw_client.py", "ee/codegen/python_file_merging/tests/fixtures"]
+skip = ["src/vellum/client", "tests/client", ".venv", "src/vellum/__init__.py", "examples/workflows", "src/vellum/client/raw_client.py"]
 multi_line_output = 3
 force_grid_wrap = 0
 line_length = 120
@@ -139,7 +159,7 @@ exclude = "(.git|venv|src/vellum/client|tests/client|scripts|examples/workflows|
 
 [tool.flake8]
 max-line-length = 120
-exclude = ".git,.venv,ee/codegen/node_modules,ee/codegen_integration/fixtures,ee/codegen/python_file_merging/tests/fixtures,scripts,src/vellum/__init__.py,src/vellum/client,src/vellum/core,src/vellum/environment.py,src/vellum/errors,src/vellum/raw_client.py,src/vellum/resources,src/vellum/types,tests/client,examples/workflows"
+exclude = ".git,.venv,ee/codegen/node_modules,ee/codegen_integration/fixtures,scripts,src/vellum/__init__.py,src/vellum/client,src/vellum/core,src/vellum/environment.py,src/vellum/errors,src/vellum/raw_client.py,src/vellum/resources,src/vellum/types,tests/client,examples/workflows,ee/codegen/python_file_merging/tests/fixtures"
 ignore = "E203, W503, E704, U100, U101"
 
 [tool.coverage.run]

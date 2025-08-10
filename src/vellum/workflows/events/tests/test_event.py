@@ -1,5 +1,5 @@
 import pytest
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import UUID
 
 from deepdiff import DeepDiff
@@ -64,7 +64,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
         (
             WorkflowExecutionInitiatedEvent(
                 id=UUID("123e4567-e89b-12d3-a456-426614174000"),
-                timestamp=datetime(2024, 1, 1, 12, 0, 0),
+                timestamp=datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
                 trace_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
                 span_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
                 body=WorkflowExecutionInitiatedBody(
@@ -75,7 +75,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
             {
                 "id": "123e4567-e89b-12d3-a456-426614174000",
                 "api_version": "2024-10-25",
-                "timestamp": "2024-01-01T12:00:00",
+                "timestamp": "2024-01-01T12:00:00Z",
                 "trace_id": "123e4567-e89b-12d3-a456-426614174000",
                 "span_id": "123e4567-e89b-12d3-a456-426614174000",
                 "name": "workflow.execution.initiated",
@@ -97,7 +97,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
         (
             NodeExecutionInitiatedEvent(
                 id=UUID("123e4567-e89b-12d3-a456-426614174000"),
-                timestamp=datetime(2024, 1, 1, 12, 0, 0),
+                timestamp=datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
                 trace_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
                 span_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
                 body=NodeExecutionInitiatedBody(
@@ -119,7 +119,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
             {
                 "id": "123e4567-e89b-12d3-a456-426614174000",
                 "api_version": "2024-10-25",
-                "timestamp": "2024-01-01T12:00:00",
+                "timestamp": "2024-01-01T12:00:00Z",
                 "trace_id": "123e4567-e89b-12d3-a456-426614174000",
                 "span_id": "123e4567-e89b-12d3-a456-426614174000",
                 "name": "node.execution.initiated",
@@ -160,7 +160,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
         (
             WorkflowExecutionStreamingEvent(
                 id=UUID("123e4567-e89b-12d3-a456-426614174000"),
-                timestamp=datetime(2024, 1, 1, 12, 0, 0),
+                timestamp=datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
                 trace_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
                 span_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
                 body=WorkflowExecutionStreamingBody(
@@ -174,7 +174,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
             {
                 "id": "123e4567-e89b-12d3-a456-426614174000",
                 "api_version": "2024-10-25",
-                "timestamp": "2024-01-01T12:00:00",
+                "timestamp": "2024-01-01T12:00:00Z",
                 "trace_id": "123e4567-e89b-12d3-a456-426614174000",
                 "span_id": "123e4567-e89b-12d3-a456-426614174000",
                 "name": "workflow.execution.streaming",
@@ -195,7 +195,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
         (
             WorkflowExecutionFulfilledEvent(
                 id=UUID("123e4567-e89b-12d3-a456-426614174000"),
-                timestamp=datetime(2024, 1, 1, 12, 0, 0),
+                timestamp=datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
                 trace_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
                 span_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
                 body=WorkflowExecutionFulfilledBody(
@@ -208,7 +208,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
             {
                 "id": "123e4567-e89b-12d3-a456-426614174000",
                 "api_version": "2024-10-25",
-                "timestamp": "2024-01-01T12:00:00",
+                "timestamp": "2024-01-01T12:00:00Z",
                 "trace_id": "123e4567-e89b-12d3-a456-426614174000",
                 "span_id": "123e4567-e89b-12d3-a456-426614174000",
                 "name": "workflow.execution.fulfilled",
@@ -228,7 +228,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
         (
             WorkflowExecutionRejectedEvent(
                 id=UUID("123e4567-e89b-12d3-a456-426614174000"),
-                timestamp=datetime(2024, 1, 1, 12, 0, 0),
+                timestamp=datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
                 trace_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
                 span_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
                 body=WorkflowExecutionRejectedBody(
@@ -242,7 +242,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
             {
                 "id": "123e4567-e89b-12d3-a456-426614174000",
                 "api_version": "2024-10-25",
-                "timestamp": "2024-01-01T12:00:00",
+                "timestamp": "2024-01-01T12:00:00Z",
                 "trace_id": "123e4567-e89b-12d3-a456-426614174000",
                 "span_id": "123e4567-e89b-12d3-a456-426614174000",
                 "name": "workflow.execution.rejected",
@@ -263,7 +263,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
         (
             NodeExecutionStreamingEvent(
                 id=UUID("123e4567-e89b-12d3-a456-426614174000"),
-                timestamp=datetime(2024, 1, 1, 12, 0, 0),
+                timestamp=datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
                 trace_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
                 span_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
                 body=NodeExecutionStreamingBody(
@@ -277,7 +277,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
             {
                 "id": "123e4567-e89b-12d3-a456-426614174000",
                 "api_version": "2024-10-25",
-                "timestamp": "2024-01-01T12:00:00",
+                "timestamp": "2024-01-01T12:00:00Z",
                 "trace_id": "123e4567-e89b-12d3-a456-426614174000",
                 "span_id": "123e4567-e89b-12d3-a456-426614174000",
                 "name": "node.execution.streaming",
@@ -298,7 +298,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
         (
             NodeExecutionFulfilledEvent(
                 id=UUID("123e4567-e89b-12d3-a456-426614174000"),
-                timestamp=datetime(2024, 1, 1, 12, 0, 0),
+                timestamp=datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
                 trace_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
                 span_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
                 body=NodeExecutionFulfilledBody(
@@ -312,7 +312,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
             {
                 "id": "123e4567-e89b-12d3-a456-426614174000",
                 "api_version": "2024-10-25",
-                "timestamp": "2024-01-01T12:00:00",
+                "timestamp": "2024-01-01T12:00:00Z",
                 "trace_id": "123e4567-e89b-12d3-a456-426614174000",
                 "span_id": "123e4567-e89b-12d3-a456-426614174000",
                 "name": "node.execution.fulfilled",
@@ -338,7 +338,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
         (
             NodeExecutionFulfilledEvent(
                 id=UUID("123e4567-e89b-12d3-a456-426614174000"),
-                timestamp=datetime(2024, 1, 1, 12, 0, 0),
+                timestamp=datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
                 trace_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
                 span_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
                 body=NodeExecutionFulfilledBody(
@@ -352,7 +352,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
             {
                 "id": "123e4567-e89b-12d3-a456-426614174000",
                 "api_version": "2024-10-25",
-                "timestamp": "2024-01-01T12:00:00",
+                "timestamp": "2024-01-01T12:00:00Z",
                 "trace_id": "123e4567-e89b-12d3-a456-426614174000",
                 "span_id": "123e4567-e89b-12d3-a456-426614174000",
                 "name": "node.execution.fulfilled",
@@ -376,7 +376,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
         (
             NodeExecutionFulfilledEvent(
                 id=UUID("123e4567-e89b-12d3-a456-426614174000"),
-                timestamp=datetime(2024, 1, 1, 12, 0, 0),
+                timestamp=datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
                 trace_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
                 span_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
                 body=NodeExecutionFulfilledBody(
@@ -390,7 +390,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
             {
                 "id": "123e4567-e89b-12d3-a456-426614174000",
                 "api_version": "2024-10-25",
-                "timestamp": "2024-01-01T12:00:00",
+                "timestamp": "2024-01-01T12:00:00Z",
                 "trace_id": "123e4567-e89b-12d3-a456-426614174000",
                 "span_id": "123e4567-e89b-12d3-a456-426614174000",
                 "name": "node.execution.fulfilled",

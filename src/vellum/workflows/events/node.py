@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING, Any, Dict, Generic, List, Literal, Optional, Set, Type, Union
 
-from pydantic import SerializerFunctionWrapHandler, field_serializer, model_serializer
+from pydantic import field_serializer, model_serializer
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.errors import WorkflowError
@@ -23,15 +23,6 @@ class _BaseNodeExecutionBody(UniversalBaseModel):
     @field_serializer("node_definition")
     def serialize_node_definition(self, node_definition: Type, _info: Any) -> Dict[str, Any]:
         return serialize_type_encoder_with_id(node_definition)
-
-    # Couldn't get this to work with model_config.exclude_none or model_config.exclude_defaults
-    # so we're excluding null invoked_ports manually here for now
-    @model_serializer(mode="wrap", when_used="json")
-    def serialize_model(self, handler: SerializerFunctionWrapHandler) -> Any:
-        serialized = super().serialize_model(handler)  # type: ignore[call-arg, arg-type]
-        if "invoked_ports" in serialized and serialized["invoked_ports"] is None:
-            del serialized["invoked_ports"]
-        return serialized
 
 
 class _BaseNodeEvent(BaseEvent):
@@ -90,6 +81,18 @@ class NodeExecutionStreamingEvent(_BaseNodeEvent):
     def invoked_ports(self) -> InvokedPorts:
         return self.body.invoked_ports
 
+    @model_serializer(mode="plain", when_used="json")
+    def serialize_model(self) -> Any:
+        serialized = super().serialize_model()
+        if (
+            "body" in serialized
+            and isinstance(serialized["body"], dict)
+            and "invoked_ports" in serialized["body"]
+            and serialized["body"]["invoked_ports"] is None
+        ):
+            del serialized["body"]["invoked_ports"]
+        return serialized
+
 
 class NodeExecutionFulfilledBody(_BaseNodeExecutionBody, Generic[OutputsType]):
     outputs: OutputsType
@@ -122,6 +125,18 @@ class NodeExecutionFulfilledEvent(_BaseNodeEvent, Generic[OutputsType]):
     @property
     def mocked(self) -> Optional[bool]:
         return self.body.mocked
+
+    @model_serializer(mode="plain", when_used="json")
+    def serialize_model(self) -> Any:
+        serialized = super().serialize_model()
+        if (
+            "body" in serialized
+            and isinstance(serialized["body"], dict)
+            and "invoked_ports" in serialized["body"]
+            and serialized["body"]["invoked_ports"] is None
+        ):
+            del serialized["body"]["invoked_ports"]
+        return serialized
 
 
 class NodeExecutionRejectedBody(_BaseNodeExecutionBody):
