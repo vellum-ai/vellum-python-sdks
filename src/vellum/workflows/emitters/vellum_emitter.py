@@ -11,6 +11,8 @@ from vellum.workflows.state.base import BaseState
 
 logger = logging.getLogger(__name__)
 
+DISALLOWED_EVENTS = {"workflow.execution.streaming", "node.execution.streaming"}
+
 
 class VellumEmitter(BaseWorkflowEmitter):
     """
@@ -51,6 +53,9 @@ class VellumEmitter(BaseWorkflowEmitter):
             event: The workflow event to emit.
         """
         if not self._context:
+            return
+
+        if event.name in DISALLOWED_EVENTS:
             return
 
         try:

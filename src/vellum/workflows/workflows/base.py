@@ -241,7 +241,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
     ):
         self._parent_state = parent_state
         self._context = context or WorkflowContext()
-        self.emitters = emitters or self._context.get_emitters_for_workflow()
+        self.emitters = emitters or (self.emitters if hasattr(self, "emitters") else [])
         self.resolvers = resolvers or (self.resolvers if hasattr(self, "resolvers") else [])
         self._store = store or Store()
         self._execution_context = self._context.execution_context
