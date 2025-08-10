@@ -10,7 +10,9 @@ setup-python:
 	brew list python@3.9 || brew install python@3.9
 
 setup-poetry:
-	python3 -m scripts.install_poetry -y --version 1.8.3
+	python3 -m scripts.install_poetry -y --version 1.8.3 \
+	&& $(HOME)/.local/bin/poetry config virtualenvs.in-project true \
+	&& $(HOME)/.local/bin/poetry config virtualenvs.create true
 
 # We use the full path to poetry to avoid any issues with the shell configuration from the setup-poetry step
 install-deps:
