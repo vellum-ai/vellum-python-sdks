@@ -318,6 +318,7 @@ ${errors.slice(0, 3).map((err) => {
     originalArtifact: Record<string, string>
   ): Promise<void> {
     const pythonCodeMergeableNodeFiles = this.getPythonCodeMergeableNodeFiles();
+
     const shouldEnableCodeMerge = pythonCodeMergeableNodeFiles.size > 0;
 
     if (!shouldEnableCodeMerge) {
@@ -346,7 +347,9 @@ ${errors.slice(0, 3).map((err) => {
           generatedFileMap: generatedFiles,
         },
         command:
-          process.env.NODE_ENV === "development" ? "venv/bin/python" : "python",
+          process.env.NODE_ENV === "production"
+            ? "python"
+            : path.join(__dirname, "../../../.venv/bin/python"),
         args: ["python_file_merging/merge_cli.py"],
       });
 
