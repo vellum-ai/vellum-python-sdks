@@ -349,7 +349,11 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
     if is_workflow_class(value):
         from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
-        workflow_display = get_workflow_display(workflow_class=value)
+        # Pass the parent display context so the subworkflow can resolve parent workflow inputs
+        workflow_display = get_workflow_display(
+            workflow_class=value,
+            parent_display_context=display_context,
+        )
         serialized_value: dict = workflow_display.serialize()
         name = serialized_value["workflow_raw_data"]["definition"]["name"]
         description = value.__doc__ or ""

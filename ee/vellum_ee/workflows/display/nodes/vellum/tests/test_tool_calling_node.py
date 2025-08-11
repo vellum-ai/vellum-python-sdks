@@ -1,6 +1,7 @@
 from vellum.client.types.prompt_parameters import PromptParameters
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
+from vellum.workflows.nodes.displayable.code_execution_node.node import CodeExecutionNode
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
 from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
 from vellum.workflows.nodes.displayable.tool_calling_node.state import ToolCallingState
@@ -331,4 +332,76 @@ def test_serialize_tool_router_node():
         ],
         "trigger": {"id": "73a96f44-c2dd-40cc-96f6-49b9f914b166", "merge_behavior": "AWAIT_ATTRIBUTES"},
         "type": "GENERIC",
+    }
+
+
+def test_serialize_node__tool_calling_node__subworkflow_with_parent_input_reference():
+    """
+    Test that a tool calling node with a subworkflow that references parent inputs serializes correctly
+    """
+
+    # GIVEN a workflow inputs class
+    class MyInputs(BaseInputs):
+        text: str
+        greeting: str
+
+    # AND a code execution node that references parent inputs
+    class CodeExecution(CodeExecutionNode[BaseState, str]):
+        code = ""
+        code_inputs = {
+            "text": MyInputs.text,
+        }
+        runtime = "PYTHON_3_11_6"
+        packages = []
+
+    # AND a subworkflow that uses the code execution node
+    class FunctionSubworkflow(BaseWorkflow):
+        graph = CodeExecution
+
+        class Outputs(BaseWorkflow.Outputs):
+            output = CodeExecution.Outputs.result
+
+    # AND a tool calling node that uses the subworkflow
+    class MyToolCallingNode(ToolCallingNode):
+        ml_model = "gpt-4.1"
+        prompt_inputs = {
+            "text": MyInputs.text,
+        }
+        blocks = []
+        parameters = PromptParameters()
+        functions = [FunctionSubworkflow]
+
+    # AND a workflow with the tool calling node
+    class Workflow(BaseWorkflow[MyInputs, BaseState]):
+        graph = MyToolCallingNode
+
+    # WHEN the workflow is serialized
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the node should properly serialize the functions with parent input references
+    my_tool_calling_node = next(
+        node
+        for node in serialized_workflow["workflow_raw_data"]["nodes"]
+        if node["id"] == str(MyToolCallingNode.__id__)
+    )
+
+    functions_attribute = next(
+        attribute for attribute in my_tool_calling_node["attributes"] if attribute["name"] == "functions"
+    )
+
+    data = functions_attribute["value"]["value"]["value"][0]
+    nodes = data["exec_config"]["workflow_raw_data"]["nodes"]
+    code_exec_node = next((node for node in nodes if node["type"] == "CODE_EXECUTION"), None)
+
+    text_input = next((input for input in code_exec_node["inputs"] if input["key"] == "text"), None)
+    assert text_input == {
+        "id": "da92a1c4-d37c-4008-a1ab-c0bcc0cd20d0",
+        "key": "text",
+        "value": {
+            "rules": [
+                {"type": "INPUT_VARIABLE", "data": {"input_variable_id": "6f0c1889-3f08-4c5c-bb24-f7b94169105c"}}
+            ],
+            "combinator": "OR",
+        },
     }
