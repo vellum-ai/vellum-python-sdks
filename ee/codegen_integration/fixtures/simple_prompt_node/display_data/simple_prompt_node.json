@@ -167,6 +167,10 @@
             "type": "DEFAULT"
           }
         ],
+        "trigger": {
+          "id": "3feb7e71-ec63-4d58-82ba-c3df829a2948",
+          "merge_behavior": "AWAIT_ANY"
+        },
         "attributes": [
           {
             "id": "bb466968-7547-458c-8e8f-5d0fb1eb33f5",

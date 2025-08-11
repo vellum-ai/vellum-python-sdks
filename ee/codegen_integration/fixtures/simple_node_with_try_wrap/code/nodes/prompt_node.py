@@ -7,6 +7,7 @@ from vellum import (
 )
 from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.types.core import MergeBehavior
 
 
 @TryNode.wrap()
@@ -45,3 +46,6 @@ What is the origin of the following phrase
         logit_bias={},
         custom_parameters=None,
     )
+
+    class Trigger(InlinePromptNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ANY

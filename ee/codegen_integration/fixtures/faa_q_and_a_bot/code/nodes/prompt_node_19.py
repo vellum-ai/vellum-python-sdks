@@ -1,5 +1,6 @@
 from vellum import ChatMessagePromptBlock, PlainTextPromptBlock, PromptParameters, RichTextPromptBlock
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.types.core import MergeBehavior
 
 
 class PromptNode19(InlinePromptNode):
@@ -24,3 +25,6 @@ class PromptNode19(InlinePromptNode):
         logit_bias={},
         custom_parameters=None,
     )
+
+    class Trigger(InlinePromptNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ANY
