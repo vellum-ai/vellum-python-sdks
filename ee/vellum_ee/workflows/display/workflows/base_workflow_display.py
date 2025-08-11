@@ -72,6 +72,7 @@ IGNORE_PATTERNS = [
 class WorkflowSerializationResult(UniversalBaseModel):
     exec_config: Dict[str, Any]
     errors: List[str]
+    dataset: Optional[List[Dict[str, Any]]] = None
 
 
 class BaseWorkflowDisplay(Generic[WorkflowType]):
@@ -892,9 +893,26 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         if additional_files:
             exec_config["module_data"] = {"additional_files": cast(JsonObject, additional_files)}
 
+        dataset = None
+        try:
+            sandbox_module_path = f"{module}.sandbox"
+            sandbox_module = importlib.import_module(sandbox_module_path)
+            if hasattr(sandbox_module, "dataset"):
+                dataset_attr = getattr(sandbox_module, "dataset")
+                if dataset_attr:
+                    dataset = []
+                    for inputs_obj in dataset_attr:
+                        if hasattr(inputs_obj, "__dict__"):
+                            dataset.append(inputs_obj.__dict__)
+                        else:
+                            dataset.append(str(inputs_obj))
+        except (ImportError, AttributeError):
+            pass
+
         return WorkflowSerializationResult(
             exec_config=exec_config,
             errors=[str(error) for error in workflow_display.display_context.errors],
+            dataset=dataset,
         )
 
     def _gather_additional_module_files(self, module_path: str) -> Dict[str, str]:
