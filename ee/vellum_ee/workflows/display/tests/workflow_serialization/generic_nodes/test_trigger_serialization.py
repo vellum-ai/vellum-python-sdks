@@ -17,7 +17,7 @@ def test_serialize_node__basic(serialize_node):
     assert not DeepDiff(
         {
             "id": "8d7cbfe4-72ca-4367-a401-8d28723d2f00",
-            "label": "test_serialize_node__basic.<locals>.BasicGenericNode",
+            "label": "Basic Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -59,7 +59,7 @@ def test_serialize_node__await_any(serialize_node):
     assert not DeepDiff(
         {
             "id": "42e17f0e-8496-415f-9c72-f85250ba6f0b",
-            "label": "test_serialize_node__await_any.<locals>.AwaitAnyGenericNode",
+            "label": "Await Any Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -101,7 +101,7 @@ def test_serialize_node__await_all(serialize_node):
     assert not DeepDiff(
         {
             "id": "b3e1145a-5f41-456b-9382-6d0a1e828c2f",
-            "label": "test_serialize_node__await_all.<locals>.AwaitAllGenericNode",
+            "label": "Await All Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},

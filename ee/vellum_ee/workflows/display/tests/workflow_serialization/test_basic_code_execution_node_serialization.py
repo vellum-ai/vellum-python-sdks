@@ -591,7 +591,7 @@ def test_serialize_workflow__try_wrapped():
         "adornments": [
             {
                 "id": "3344083c-a32c-4a32-920b-0fb5093448fa",
-                "label": "TryNode",
+                "label": "Try Node",
                 "base": {"name": "TryNode", "module": ["vellum", "workflows", "nodes", "core", "try_node", "node"]},
                 "attributes": [
                     {

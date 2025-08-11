@@ -34,7 +34,7 @@ def test_serialize_node__constant_value(serialize_node):
     assert not DeepDiff(
         {
             "id": "67e07859-7f67-4287-9854-06ab4199e576",
-            "label": "test_serialize_node__constant_value.<locals>.ConstantValueGenericNode",
+            "label": "Constant Value Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -104,7 +104,7 @@ def test_serialize_node__constant_value_reference(serialize_node):
     assert not DeepDiff(
         {
             "id": "73643f17-e49e-47d2-bd01-bb9c3eab6ae9",
-            "label": "test_serialize_node__constant_value_reference.<locals>.ConstantValueReferenceGenericNode",
+            "label": "Constant Value Reference Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -146,7 +146,7 @@ def test_serialize_node__lazy_reference(serialize_node):
     assert not DeepDiff(
         {
             "id": "3d6bfe3b-263a-40a6-8a05-98288e9559a4",
-            "label": "test_serialize_node__lazy_reference.<locals>.LazyReferenceGenericNode",
+            "label": "Lazy Reference Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -229,7 +229,7 @@ def test_serialize_node__workflow_input(serialize_node):
     assert not DeepDiff(
         {
             "id": "30116483-6f38-40e0-baf2-32de0e14e9a3",
-            "label": "test_serialize_node__workflow_input.<locals>.WorkflowInputGenericNode",
+            "label": "Workflow Input Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -292,7 +292,7 @@ def test_serialize_node__workflow_input_as_nested_chat_history():
     assert not DeepDiff(
         {
             "id": "11be9d37-0069-4695-a317-14a3b6519d4e",
-            "label": "test_serialize_node__workflow_input_as_nested_chat_history.<locals>.GenericNode",
+            "label": "Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 200.0, "y": -50.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -362,7 +362,7 @@ def test_serialize_node__node_output(serialize_node):
     assert not DeepDiff(
         {
             "id": "7210742f-8c3e-4379-9800-8b4b7f5dd7ed",
-            "label": "test_serialize_node__node_output.<locals>.GenericNodeReferencingOutput",
+            "label": "Generic Node Referencing Output",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -412,7 +412,7 @@ def test_serialize_node__vellum_secret(serialize_node):
     assert not DeepDiff(
         {
             "id": "0e75bd8f-882e-4ab7-8348-061319b574f7",
-            "label": "test_serialize_node__vellum_secret.<locals>.VellumSecretGenericNode",
+            "label": "Vellum Secret Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -465,7 +465,7 @@ def test_serialize_node__node_execution(serialize_node):
     assert not DeepDiff(
         {
             "id": "f42dda6b-e856-49bd-b203-46c9dd66c08b",
-            "label": "test_serialize_node__node_execution.<locals>.GenericNodeReferencingExecutions",
+            "label": "Generic Node Referencing Executions",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -561,7 +561,7 @@ def test_serialize_node__coalesce(serialize_node):
     assert not DeepDiff(
         {
             "id": "bb99f326-7d2a-4b5e-95f3-6039114798da",
-            "label": "test_serialize_node__coalesce.<locals>.CoalesceNodeFinal",
+            "label": "Coalesce Node Final",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},

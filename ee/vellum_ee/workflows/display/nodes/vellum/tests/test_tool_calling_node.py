@@ -244,7 +244,7 @@ def test_serialize_tool_router_node():
         },
         "display_data": {"position": {"x": 0.0, "y": 0.0}},
         "id": "690c66e1-1e18-4984-b695-84beb0157541",
-        "label": "RouterNode",
+        "label": "Router Node",
         "outputs": [],
         "ports": [
             {
