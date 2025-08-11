@@ -40,7 +40,7 @@ def test_serialize_workflow():
     tool_calling_node = workflow_raw_data["nodes"][1]
     assert tool_calling_node == {
         "id": "21f29cac-da87-495f-bba1-093d423f4e46",
-        "label": "GetCurrentWeatherNode",
+        "label": "Get Current Weather Node",
         "type": "GENERIC",
         "display_data": {
             "position": {"x": 200.0, "y": -50.0},
