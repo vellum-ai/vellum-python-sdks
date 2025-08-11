@@ -30,6 +30,15 @@ export class WorkflowSandboxFile extends BasePersistedFile {
   }
 
   protected getFileStatements(): AstNode[] {
+    const datasetField = python.field({
+      name: "dataset",
+      initializer: python.TypeInstantiation.list(
+        this.sandboxInputs.map((input) => this.getWorkflowInput(input)),
+        { endWithComma: true }
+      ),
+    });
+    this.inheritReferences(datasetField);
+
     const sandboxRunnerField = python.field({
       name: "runner",
       initializer: python.instantiateClass({
@@ -50,11 +59,10 @@ export class WorkflowSandboxFile extends BasePersistedFile {
             }),
           }),
           python.methodArgument({
-            name: "inputs",
-            value: python.TypeInstantiation.list(
-              this.sandboxInputs.map((input) => this.getWorkflowInput(input)),
-              { endWithComma: true }
-            ),
+            name: "dataset",
+            value: python.reference({
+              name: "dataset",
+            }),
           }),
         ],
       }),
@@ -66,6 +74,7 @@ export class WorkflowSandboxFile extends BasePersistedFile {
 if __name__ != "__main__":
     raise Exception("This file is not meant to be imported")
 `),
+      datasetField,
       sandboxRunnerField,
       // Using code block instead of method invocation since the latter tries to import `runner.run` after
       // specifying as a reference, even though it's a locally defined variable.

@@ -10,13 +10,12 @@ if __name__ != "__main__":
     raise Exception("This file is not meant to be imported")
 
 
-runner = WorkflowSandboxRunner(
-    workflow=TestWorkflow(),
-    inputs=[
-        Inputs(someFoo="some-value"),
-        Inputs(someBar="some-value"),
-    ],
-)
+dataset = [
+    Inputs(someFoo="some-value"),
+    Inputs(someBar="some-value"),
+]
+
+runner = WorkflowSandboxRunner(workflow=TestWorkflow(), dataset=dataset)
 
 runner.run()
 "
@@ -32,13 +31,12 @@ if __name__ != "__main__":
     raise Exception("This file is not meant to be imported")
 
 
-runner = WorkflowSandboxRunner(
-    workflow=TestWorkflow(),
-    inputs=[
-        Inputs(some_foo="some-value"),
-        Inputs(some_bar="some-value"),
-    ],
-)
+dataset = [
+    Inputs(some_foo="some-value"),
+    Inputs(some_bar="some-value"),
+]
+
+runner = WorkflowSandboxRunner(workflow=TestWorkflow(), dataset=dataset)
 
 runner.run()
 "
@@ -54,13 +52,12 @@ if __name__ != "__main__":
     raise Exception("This file is not meant to be imported")
 
 
-runner = WorkflowSandboxRunner(
-    workflow=TestWorkflow(),
-    inputs=[
-        Inputs(some_foo="some-value"),
-        Inputs(some_bar="some-value"),
-    ],
-)
+dataset = [
+    Inputs(some_foo="some-value"),
+    Inputs(some_bar="some-value"),
+]
+
+runner = WorkflowSandboxRunner(workflow=TestWorkflow(), dataset=dataset)
 
 runner.run()
 "
@@ -76,12 +73,11 @@ if __name__ != "__main__":
     raise Exception("This file is not meant to be imported")
 
 
-runner = WorkflowSandboxRunner(
-    workflow=TestWorkflow(),
-    inputs=[
-        Inputs(),
-    ],
-)
+dataset = [
+    Inputs(),
+]
+
+runner = WorkflowSandboxRunner(workflow=TestWorkflow(), dataset=dataset)
 
 runner.run()
 "
@@ -97,12 +93,11 @@ if __name__ != "__main__":
     raise Exception("This file is not meant to be imported")
 
 
-runner = WorkflowSandboxRunner(
-    workflow=TestWorkflow(),
-    inputs=[
-        Inputs(special_characters_input='"special characters"'),
-    ],
-)
+dataset = [
+    Inputs(special_characters_input='"special characters"'),
+]
+
+runner = WorkflowSandboxRunner(workflow=TestWorkflow(), dataset=dataset)
 
 runner.run()
 "

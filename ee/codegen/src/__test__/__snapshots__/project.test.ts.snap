@@ -1268,36 +1268,35 @@ if __name__ != "__main__":
     raise Exception("This file is not meant to be imported")
 
 
-runner = WorkflowSandboxRunner(
-    workflow=Workflow(),
-    inputs=[
-        Inputs(
-            input="foo",
-            chat=[
-                ChatMessage(role="USER", text="foo"),
-            ],
-        ),
-        Inputs(
-            input="bar",
-            chat=[
-                ChatMessage(role="USER", content=StringChatMessageContent(value="bar")),
-            ],
-        ),
-        Inputs(
-            input="hello",
-            chat=[
-                ChatMessage(
-                    role="USER",
-                    content=ArrayChatMessageContent(
-                        value=[
-                            StringChatMessageContent(value="hello"),
-                        ]
-                    ),
+dataset = [
+    Inputs(
+        input="foo",
+        chat=[
+            ChatMessage(role="USER", text="foo"),
+        ],
+    ),
+    Inputs(
+        input="bar",
+        chat=[
+            ChatMessage(role="USER", content=StringChatMessageContent(value="bar")),
+        ],
+    ),
+    Inputs(
+        input="hello",
+        chat=[
+            ChatMessage(
+                role="USER",
+                content=ArrayChatMessageContent(
+                    value=[
+                        StringChatMessageContent(value="hello"),
+                    ]
                 ),
-            ],
-        ),
-    ],
-)
+            ),
+        ],
+    ),
+]
+
+runner = WorkflowSandboxRunner(workflow=Workflow(), dataset=dataset)
 
 runner.run()
 "

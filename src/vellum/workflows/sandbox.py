@@ -1,4 +1,4 @@
-from typing import Generic, Sequence
+from typing import Generic, Optional, Sequence
 
 import dotenv
 
@@ -10,12 +10,29 @@ from vellum.workflows.workflows.event_filters import root_workflow_event_filter
 
 
 class WorkflowSandboxRunner(Generic[WorkflowType]):
-    def __init__(self, workflow: WorkflowType, inputs: Sequence[BaseInputs]):
-        if not inputs:
-            raise ValueError("Inputs are required to have at least one defined inputs")
+    def __init__(
+        self,
+        workflow: WorkflowType,
+        inputs: Optional[Sequence[BaseInputs]] = None,  # DEPRECATED - remove in v2.0.0
+        dataset: Optional[Sequence[BaseInputs]] = None,
+    ):
+        if dataset is not None and inputs is not None:
+            raise ValueError(
+                "Cannot specify both 'dataset' and 'inputs' parameters. " "Use 'dataset' as 'inputs' is deprecated."
+            )
+
+        if dataset is not None:
+            actual_inputs = dataset
+        elif inputs is not None:
+            actual_inputs = inputs
+        else:
+            raise ValueError("Either 'dataset' or 'inputs' parameter is required")
+
+        if not actual_inputs:
+            raise ValueError("Dataset/inputs are required to have at least one defined input")
 
         self._workflow = workflow
-        self._inputs = inputs
+        self._inputs = actual_inputs
 
         dotenv.load_dotenv()
         self._logger = load_logger()
