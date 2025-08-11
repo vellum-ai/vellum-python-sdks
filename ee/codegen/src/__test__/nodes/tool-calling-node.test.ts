@@ -764,7 +764,9 @@ describe("ToolCallingNode", () => {
       node.getNodeFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
       expect(workflowContext.getErrors()).toHaveLength(1);
-      expect(workflowContext.getErrors()[0]?.message).toContain("Failed to parse block");
+      expect(workflowContext.getErrors()[0]?.message).toContain(
+        "Failed to parse block"
+      );
     });
   });
 });
