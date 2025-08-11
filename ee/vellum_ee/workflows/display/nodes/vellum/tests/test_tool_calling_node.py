@@ -373,9 +373,9 @@ def test_serialize_tool_prompt_node_inline_workflow():
         parameters=PromptParameters(),
     )
 
-    # THEN the tool prompt node should be created successfully without errors
-    assert tool_prompt_node is not None
-    assert hasattr(tool_prompt_node, "functions")
-
-    tool_prompt_node_display_class = get_node_display_class(tool_prompt_node)
-    assert tool_prompt_node_display_class is not None
+    # THEN the tool prompt node should match expected structure
+    assert tool_prompt_node.__dict__["ml_model"] == "gpt-4o-mini"
+    assert tool_prompt_node.__dict__["functions"] == [MyInlineWorkflow]
+    assert len(tool_prompt_node.__dict__["blocks"]) == 1
+    assert tool_prompt_node.__dict__["blocks"][0].block_type == "VARIABLE"
+    assert tool_prompt_node.__dict__["blocks"][0].input_variable == "chat_history"
