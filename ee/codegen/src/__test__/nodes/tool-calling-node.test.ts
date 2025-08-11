@@ -762,9 +762,7 @@ describe("ToolCallingNode", () => {
       });
 
       node.getNodeFile().write(writer);
-      const result = await writer.toStringFormatted();
-
-      expect(result).toContain("Valid template");
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
       expect(workflowContext.getErrors()).toHaveLength(1);
       expect(workflowContext.getErrors()[0]?.message).toContain("Failed to parse block");
     });
