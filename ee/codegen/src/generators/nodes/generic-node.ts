@@ -388,23 +388,26 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
             blocks.value?.type === "JSON"
           ) {
             const rawBlocks = blocks.value.value as PromptBlockSerializer.Raw[];
-            const deserializedBlocks: PromptBlockType[] = rawBlocks.map(
-              (block) => {
-                const parseResult = PromptBlockSerializer.parse(block, {
-                  unrecognizedObjectKeys: "strip",
-                });
-                if (parseResult.ok) {
-                  // TODO: Remove `as` once other types of blocks are supported
-                  return parseResult.value as PromptBlockType;
-                } else {
-                  throw new Error(
-                    `Failed to parse block ${JSON.stringify(
+            const deserializedBlocks: PromptBlockType[] = [];
+
+            rawBlocks.forEach((block, index) => {
+              const parseResult = PromptBlockSerializer.parse(block, {
+                unrecognizedObjectKeys: "strip",
+              });
+              if (parseResult.ok) {
+                // TODO: Remove `as` once other types of blocks are supported
+                deserializedBlocks.push(parseResult.value as PromptBlockType);
+              } else {
+                this.workflowContext.addError(
+                  new NodeDefinitionGenerationError(
+                    `Failed to parse block at index ${index}: ${JSON.stringify(
                       parseResult.errors
-                    )}`
-                  );
-                }
+                    )}`,
+                    "WARNING"
+                  )
+                );
               }
-            );
+            });
 
             // Build the mapping from input variable ID to key from prompt_inputs attribute
             const inputVariableNameById: Record<string, string> = {};
