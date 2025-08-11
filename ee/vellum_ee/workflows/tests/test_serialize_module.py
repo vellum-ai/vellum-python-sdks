@@ -12,6 +12,26 @@ def test_serialize_module_with_dataset():
     assert result.dataset is None
 
 
+def test_serialize_module_with_actual_dataset():
+    """Test that serialize_module correctly serializes dataset when sandbox has dataset attribute."""
+    module_path = "tests.workflows.test_dataset_serialization"
+
+    result = BaseWorkflowDisplay.serialize_module(module_path)
+
+    assert hasattr(result, "dataset")
+
+    assert result.dataset is not None
+    assert isinstance(result.dataset, list)
+    assert len(result.dataset) == 2
+
+    for i, item in enumerate(result.dataset):
+        assert "label" in item
+        assert "inputs" in item
+        assert item["label"] == f"Scenario {i + 1}"
+        assert isinstance(item["inputs"], dict)
+        assert "message" in item["inputs"]
+
+
 def test_serialize_module_happy_path():
     """Test that serialize_module works with a valid module path."""
     module_path = "tests.workflows.trivial"

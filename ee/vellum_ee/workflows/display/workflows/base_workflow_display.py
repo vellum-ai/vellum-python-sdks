@@ -907,7 +907,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                     for i, inputs_obj in enumerate(dataset_attr):
                         if isinstance(inputs_obj, BaseInputs):
                             serialized_inputs = json.loads(json.dumps(inputs_obj, cls=DefaultStateEncoder))
-                            dataset.append({"label": f"Dataset Item {i + 1}", "inputs": serialized_inputs})
+                            dataset.append({"label": f"Scenario {i + 1}", "inputs": serialized_inputs})
         except (ImportError, AttributeError):
             pass
 
