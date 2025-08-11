@@ -1,11 +1,15 @@
+from typing import Any, Dict, List, cast
+
 from vellum.client.types.prompt_parameters import PromptParameters
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
+from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.code_execution_node.node import CodeExecutionNode
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
 from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
 from vellum.workflows.nodes.displayable.tool_calling_node.state import ToolCallingState
 from vellum.workflows.nodes.displayable.tool_calling_node.utils import create_router_node, create_tool_prompt_node
+from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.definition import AuthorizationType, EnvironmentVariableReference, MCPServer
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
@@ -406,3 +410,130 @@ def test_serialize_node__tool_calling_node__subworkflow_with_parent_input_refere
             "combinator": "OR",
         },
     }
+
+
+def test_serialize_tool_prompt_node_with_inline_workflow():
+    """
+    Test that the tool prompt node created by create_tool_prompt_node serializes successfully with inline workflow.
+    """
+
+    # GIVEN a simple inline workflow for tool calling
+    class SimpleWorkflowInputs(BaseInputs):
+        message: str
+
+    class SimpleNode(BaseNode):
+        message = SimpleWorkflowInputs.message
+
+        class Outputs(BaseOutputs):
+            result: str
+
+        def run(self) -> Outputs:
+            return self.Outputs(result=f"Processed: {self.message}")
+
+    class SimpleInlineWorkflow(BaseWorkflow[SimpleWorkflowInputs, BaseState]):
+        """A simple workflow for testing inline tool serialization."""
+
+        graph = SimpleNode
+
+        class Outputs(BaseOutputs):
+            result = SimpleNode.Outputs.result
+
+    # WHEN we create a tool prompt node using create_tool_prompt_node with inline workflow
+    tool_prompt_node = create_tool_prompt_node(
+        ml_model="gpt-4o-mini",
+        blocks=[],
+        functions=[SimpleInlineWorkflow],
+        prompt_inputs=None,
+        parameters=PromptParameters(),
+    )
+
+    # AND we create a workflow that uses this tool prompt node
+    class TestWorkflow(BaseWorkflow[BaseInputs, ToolCallingState]):
+        graph = tool_prompt_node
+
+    # WHEN we serialize the entire workflow
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    serialized_workflow = workflow_display.serialize()
+
+    # THEN the workflow should serialize successfully
+    assert serialized_workflow is not None
+
+    workflow_raw_data = serialized_workflow["workflow_raw_data"]
+    tool_prompt_nodes = [
+        node
+        for node in workflow_raw_data["nodes"]
+        if node.get("type") == "PROMPT" and node.get("data", {}).get("variant") == "INLINE"
+    ]
+    assert len(tool_prompt_nodes) == 1
+
+    tool_prompt_node_data = tool_prompt_nodes[0]
+
+    # AND it should have the functions attribute with inline workflow
+    functions_attribute = next(
+        attribute for attribute in tool_prompt_node_data["attributes"] if attribute["name"] == "functions"
+    )
+
+    assert functions_attribute["value"]["type"] == "CONSTANT_VALUE"
+    assert functions_attribute["value"]["value"]["type"] == "JSON"
+    functions_list = functions_attribute["value"]["value"]["value"]
+    # WHEN we create a tool prompt node using create_tool_prompt_node with inline workflow
+    tool_prompt_node = create_tool_prompt_node(
+        ml_model="gpt-4o-mini",
+        blocks=[],
+        functions=[SimpleInlineWorkflow],
+        prompt_inputs=None,
+        parameters=PromptParameters(),
+    )
+
+    tool_prompt_node_display_class = get_node_display_class(tool_prompt_node)
+    tool_prompt_node_display = tool_prompt_node_display_class()
+
+    # AND we create a workflow that uses this tool prompt node
+    class TestWorkflow(BaseWorkflow[BaseInputs, ToolCallingState]):
+        graph = tool_prompt_node
+
+    # WHEN we serialize the entire workflow to get display context
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    display_context = workflow_display.display_context
+
+    # WHEN we serialize the tool prompt node directly
+    serialized_tool_prompt_node = tool_prompt_node_display.serialize(display_context)
+
+    # THEN the tool prompt node should serialize successfully
+    assert serialized_tool_prompt_node is not None
+    assert serialized_tool_prompt_node["type"] == "PROMPT"
+    assert serialized_tool_prompt_node["data"]["variant"] == "INLINE"
+    assert serialized_tool_prompt_node["data"]["ml_model_name"] == "gpt-4o-mini"
+
+    # AND it should have the functions attribute with inline workflow
+    attributes = serialized_tool_prompt_node["attributes"]
+    functions_attribute = next(
+        attribute for attribute in attributes if attribute["name"] == "functions"
+    )
+
+    assert functions_attribute["value"]["type"] == "CONSTANT_VALUE"
+    assert functions_attribute["value"]["value"]["type"] == "JSON"
+    functions_list = functions_attribute["value"]["value"]["value"]
+    assert len(functions_list) == 1
+
+    inline_workflow_function = functions_list[0]
+    assert inline_workflow_function["type"] == "INLINE_WORKFLOW"
+    assert inline_workflow_function["name"] == "SimpleInlineWorkflow"
+    assert inline_workflow_function["description"] == "A simple workflow for testing inline tool serialization."
+
+    # AND the inline workflow should have proper exec_config structure
+    exec_config = inline_workflow_function["exec_config"]
+    assert "workflow_raw_data" in exec_config
+    assert "input_variables" in exec_config
+    assert "output_variables" in exec_config
+
+    input_variables = exec_config["input_variables"]
+    output_variables = exec_config["output_variables"]
+
+    assert len(input_variables) == 1
+    assert input_variables[0]["key"] == "message"
+    assert input_variables[0]["type"] == "STRING"
+
+    assert len(output_variables) == 1
+    assert output_variables[0]["key"] == "result"
+    assert output_variables[0]["type"] == "STRING"

@@ -11,6 +11,7 @@ from vellum.workflows.expressions.and_ import AndExpression
 from vellum.workflows.expressions.begins_with import BeginsWithExpression
 from vellum.workflows.expressions.between import BetweenExpression
 from vellum.workflows.expressions.coalesce_expression import CoalesceExpression
+from vellum.workflows.expressions.concat import ConcatExpression
 from vellum.workflows.expressions.contains import ContainsExpression
 from vellum.workflows.expressions.does_not_begin_with import DoesNotBeginWithExpression
 from vellum.workflows.expressions.does_not_contain import DoesNotContainExpression
@@ -105,6 +106,8 @@ def convert_descriptor_to_operator(descriptor: BaseDescriptor) -> LogicalOperato
         return "+"
     elif isinstance(descriptor, MinusExpression):
         return "-"
+    elif isinstance(descriptor, ConcatExpression):
+        return "concat"
     else:
         raise ValueError(f"Unsupported descriptor type: {descriptor}")
 
@@ -171,6 +174,7 @@ def _serialize_condition(display_context: "WorkflowDisplayContext", condition: B
             AndExpression,
             BeginsWithExpression,
             CoalesceExpression,
+            ConcatExpression,
             ContainsExpression,
             DoesNotBeginWithExpression,
             DoesNotContainExpression,

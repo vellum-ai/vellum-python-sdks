@@ -4,8 +4,9 @@ from typing import Callable, Dict, Generic, List, Optional, Tuple, Type, TypeVar
 from vellum import FunctionDefinition, PromptBlock, RichTextChildBlock, VellumVariable
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.nodes import InlinePromptNode
-from vellum.workflows.types.core import JsonObject
-from vellum.workflows.utils.functions import compile_function_definition
+from vellum.workflows.types.core import JsonObject, Tool
+from vellum.workflows.types.generics import is_workflow_class
+from vellum.workflows.utils.functions import compile_function_definition, compile_inline_workflow_function_definition
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
@@ -145,10 +146,13 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
 
         return node_inputs, prompt_inputs
 
-    def _generate_function_tools(self, function: Union[FunctionDefinition, Callable], index: int) -> JsonObject:
-        normalized_functions = (
-            function if isinstance(function, FunctionDefinition) else compile_function_definition(function)
-        )
+    def _generate_function_tools(self, function: Union[FunctionDefinition, Tool], index: int) -> JsonObject:
+        if isinstance(function, FunctionDefinition):
+            normalized_functions = function
+        elif is_workflow_class(function):
+            normalized_functions = compile_inline_workflow_function_definition(function)
+        else:
+            normalized_functions = compile_function_definition(function)
         return {
             "id": str(uuid4_from_hash(f"{self.node_id}-FUNCTION_DEFINITION-{index}")),
             "block_type": "FUNCTION_DEFINITION",
