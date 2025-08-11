@@ -16,6 +16,9 @@ class WorkflowSandboxRunner(Generic[WorkflowType]):
         inputs: Optional[Sequence[BaseInputs]] = None,  # DEPRECATED - remove in v2.0.0
         dataset: Optional[Sequence[BaseInputs]] = None,
     ):
+        dotenv.load_dotenv()
+        self._logger = load_logger()
+
         if dataset is not None and inputs is not None:
             raise ValueError(
                 "Cannot specify both 'dataset' and 'inputs' parameters. " "Use 'dataset' as 'inputs' is deprecated."
@@ -36,9 +39,6 @@ class WorkflowSandboxRunner(Generic[WorkflowType]):
 
         self._workflow = workflow
         self._inputs = actual_inputs
-
-        dotenv.load_dotenv()
-        self._logger = load_logger()
 
     def run(self, index: int = 0):
         if index < 0:
