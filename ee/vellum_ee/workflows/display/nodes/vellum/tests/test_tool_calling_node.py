@@ -459,14 +459,28 @@ def test_serialize_tool_prompt_node_with_inline_workflow():
     assert serialized_workflow is not None
 
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
-    tool_prompt_nodes = [
+    tool_prompt_node_data = next(
         node
         for node in workflow_raw_data["nodes"]
         if node.get("type") == "PROMPT" and node.get("data", {}).get("variant") == "INLINE"
-    ]
-    assert len(tool_prompt_nodes) == 1
+    )
 
-    tool_prompt_node_data = tool_prompt_nodes[0]
+    # THEN it should match the expected serialized schema structure
+    expected_tool_prompt_node = {
+        "type": "PROMPT",
+        "data": {"label": "Tool Prompt Node", "variant": "INLINE", "ml_model_name": "gpt-4o-mini"},
+        "base": {
+            "name": "ToolPromptNode",
+            "module": ["vellum", "workflows", "nodes", "displayable", "tool_calling_node", "utils"],
+        },
+    }
+
+    # Validate core structure
+    assert tool_prompt_node_data["type"] == expected_tool_prompt_node["type"]
+    assert tool_prompt_node_data["data"]["label"] == expected_tool_prompt_node["data"]["label"]
+    assert tool_prompt_node_data["data"]["variant"] == expected_tool_prompt_node["data"]["variant"]
+    assert tool_prompt_node_data["data"]["ml_model_name"] == expected_tool_prompt_node["data"]["ml_model_name"]
+    assert tool_prompt_node_data["base"] == expected_tool_prompt_node["base"]
 
     # AND it should have the functions attribute with inline workflow
     functions_attribute = next(
