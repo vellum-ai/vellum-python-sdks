@@ -6,6 +6,7 @@ from vellum import (
     VariablePromptBlock,
 )
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.types.core import MergeBehavior
 
 from .formatted_search_results import FormattedSearchResults
 from .most_recent_message import MostRecentMessage
@@ -68,3 +69,6 @@ Limit your response to 250 words. Just use plain text, no special characters, no
         logit_bias={},
         custom_parameters=None,
     )
+
+    class Trigger(InlinePromptNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ANY

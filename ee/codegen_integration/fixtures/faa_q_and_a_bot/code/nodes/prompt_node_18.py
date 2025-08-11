@@ -6,6 +6,7 @@ from vellum import (
     VariablePromptBlock,
 )
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.types.core import MergeBehavior
 
 from .api_node import APINode
 
@@ -75,3 +76,6 @@ The flights that are on the ground are:
         logit_bias=None,
         custom_parameters=None,
     )
+
+    class Trigger(InlinePromptNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ANY

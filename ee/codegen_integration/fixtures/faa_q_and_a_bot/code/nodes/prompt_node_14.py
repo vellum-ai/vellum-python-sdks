@@ -6,6 +6,7 @@ from vellum import (
     VariablePromptBlock,
 )
 from vellum.workflows.nodes.displayable import InlinePromptNode
+from vellum.workflows.types.core import MergeBehavior
 
 from .subworkflow_node import SubworkflowNode
 
@@ -41,3 +42,6 @@ class PromptNode14(InlinePromptNode):
         logit_bias={},
         custom_parameters=None,
     )
+
+    class Trigger(InlinePromptNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ANY
