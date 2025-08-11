@@ -24,6 +24,9 @@ class WorkflowSandboxRunner(Generic[WorkflowType]):
         if dataset is not None:
             actual_inputs = dataset
         elif inputs is not None:
+            self._logger.warning(
+                "The 'inputs' parameter is deprecated and will be removed in v2.0.0. " "Please use 'dataset' instead."
+            )
             actual_inputs = inputs
         else:
             raise ValueError("Either 'dataset' or 'inputs' parameter is required")
