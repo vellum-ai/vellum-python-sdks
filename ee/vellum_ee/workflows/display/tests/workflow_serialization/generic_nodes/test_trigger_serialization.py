@@ -186,4 +186,4 @@ def test_serialize_node__inline_prompt_await_all():
     assert "ml_model_name" in prompt_node["data"]  # type: ignore
     assert prompt_node["data"]["ml_model_name"] == "gpt-4o"  # type: ignore
 
-    assert AwaitAllInlinePromptNode.Trigger.merge_behavior == MergeBehavior.AWAIT_ALL
+    assert prompt_node["trigger"]["merge_behavior"] == "AWAIT_ALL"  # type: ignore
