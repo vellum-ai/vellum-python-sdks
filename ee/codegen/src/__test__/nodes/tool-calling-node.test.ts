@@ -674,4 +674,46 @@ describe("ToolCallingNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+
+  describe("no tools with jinja blocks", () => {
+    it("should be resilient to extra keys in jinja blocks", async () => {
+      const nodePortData: NodePort[] = [
+        nodePortFactory({
+          id: "port-id",
+        }),
+      ];
+
+      const blocksAttribute = nodeAttributeFactory("blocks-attr-id", "blocks", {
+        type: "CONSTANT_VALUE",
+        value: {
+          type: "JSON",
+          value: [
+            {
+              block_type: "JINJA",
+              template: "Hello world",
+              blocks: [],
+            },
+          ],
+        },
+      });
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [blocksAttribute],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });

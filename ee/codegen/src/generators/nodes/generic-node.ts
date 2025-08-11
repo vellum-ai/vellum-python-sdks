@@ -390,7 +390,9 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
             const rawBlocks = blocks.value.value as PromptBlockSerializer.Raw[];
             const deserializedBlocks: PromptBlockType[] = rawBlocks.map(
               (block) => {
-                const parseResult = PromptBlockSerializer.parse(block);
+                const parseResult = PromptBlockSerializer.parse(block, {
+                  unrecognizedObjectKeys: "strip",
+                });
                 if (parseResult.ok) {
                   // TODO: Remove `as` once other types of blocks are supported
                   return parseResult.value as PromptBlockType;
