@@ -68,7 +68,7 @@ def test_serialize_node__retry(serialize_node):
             "adornments": [
                 {
                     "id": "5be7d260-74f7-4734-b31b-a46a94539586",
-                    "label": "RetryNode",
+                    "label": "Retry Node",
                     "base": {
                         "name": "RetryNode",
                         "module": ["vellum", "workflows", "nodes", "core", "retry_node", "node"],
@@ -175,7 +175,7 @@ def test_serialize_node__try(serialize_node):
             "adornments": [
                 {
                     "id": "3344083c-a32c-4a32-920b-0fb5093448fa",
-                    "label": "TryNode",
+                    "label": "Try Node",
                     "base": {
                         "name": "TryNode",
                         "module": ["vellum", "workflows", "nodes", "core", "try_node", "node"],
@@ -272,7 +272,7 @@ def test_serialize_node__stacked():
             "adornments": [
                 {
                     "id": "3344083c-a32c-4a32-920b-0fb5093448fa",
-                    "label": "TryNode",
+                    "label": "Try Node",
                     "base": {
                         "name": "TryNode",
                         "module": ["vellum", "workflows", "nodes", "core", "try_node", "node"],
@@ -287,7 +287,7 @@ def test_serialize_node__stacked():
                 },
                 {
                     "id": "5be7d260-74f7-4734-b31b-a46a94539586",
-                    "label": "RetryNode",
+                    "label": "Retry Node",
                     "base": {
                         "name": "RetryNode",
                         "module": ["vellum", "workflows", "nodes", "core", "retry_node", "node"],
@@ -351,5 +351,5 @@ def test_serialize_node__adornment_order_matches_decorator_order():
 
     adornments = cast(List[Dict[str, Any]], my_node["adornments"])
     assert len(adornments) == 2
-    assert adornments[0]["label"] == "TryNode"
-    assert adornments[1]["label"] == "RetryNode"
+    assert adornments[0]["label"] == "Try Node"
+    assert adornments[1]["label"] == "Retry Node"

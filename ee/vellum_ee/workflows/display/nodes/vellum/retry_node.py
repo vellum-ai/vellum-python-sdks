@@ -39,7 +39,7 @@ class BaseRetryNodeDisplay(BaseAdornmentNodeDisplay[_RetryNodeType], Generic[_Re
 
         adornment: JsonObject = {
             "id": str(node_id),
-            "label": node.__qualname__,
+            "label": self.label,
             "base": self.get_base().dict(),
             "attributes": attributes,
         }

@@ -29,7 +29,7 @@ def test_retry_node_parameters():
     )
 
     retry_adornment = next(
-        adornment for adornment in serialized_node["adornments"] if adornment["label"] == "RetryNode"
+        adornment for adornment in serialized_node["adornments"] if adornment["label"] == "Retry Node"
     )
 
     max_attempts_attribute = next(attr for attr in retry_adornment["attributes"] if attr["name"] == "max_attempts")

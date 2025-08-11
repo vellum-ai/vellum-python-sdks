@@ -43,7 +43,7 @@ class BaseTryNodeDisplay(BaseAdornmentNodeDisplay[_TryNodeType], Generic[_TryNod
 
         adornment: JsonObject = {
             "id": str(node_id),
-            "label": node.__qualname__,
+            "label": self.label,
             "base": self.get_base().dict(),
             "attributes": attributes,
         }
