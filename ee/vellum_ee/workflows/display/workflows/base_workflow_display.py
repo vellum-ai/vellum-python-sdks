@@ -3,6 +3,7 @@ import fnmatch
 from functools import cached_property
 import importlib
 import inspect
+import json
 import logging
 import os
 from uuid import UUID
@@ -15,12 +16,14 @@ from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.edges import Edge
 from vellum.workflows.events.workflow import NodeEventDisplayContext, WorkflowEventDisplayContext
+from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.nodes.displayable.final_output_node.node import FinalOutputNode
 from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port, get_wrapped_node
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, WorkflowInputReference
+from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.types.core import Json, JsonArray, JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.types.utils import get_original_base
@@ -72,6 +75,7 @@ IGNORE_PATTERNS = [
 class WorkflowSerializationResult(UniversalBaseModel):
     exec_config: Dict[str, Any]
     errors: List[str]
+    dataset: Optional[List[Dict[str, Any]]] = None
 
 
 class BaseWorkflowDisplay(Generic[WorkflowType]):
@@ -892,9 +896,25 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         if additional_files:
             exec_config["module_data"] = {"additional_files": cast(JsonObject, additional_files)}
 
+        dataset = None
+        try:
+            sandbox_module_path = f"{module}.sandbox"
+            sandbox_module = importlib.import_module(sandbox_module_path)
+            if hasattr(sandbox_module, "dataset"):
+                dataset_attr = getattr(sandbox_module, "dataset")
+                if dataset_attr and isinstance(dataset_attr, list):
+                    dataset = []
+                    for i, inputs_obj in enumerate(dataset_attr):
+                        if isinstance(inputs_obj, BaseInputs):
+                            serialized_inputs = json.loads(json.dumps(inputs_obj, cls=DefaultStateEncoder))
+                            dataset.append({"label": f"Scenario {i + 1}", "inputs": serialized_inputs})
+        except (ImportError, AttributeError):
+            pass
+
         return WorkflowSerializationResult(
             exec_config=exec_config,
             errors=[str(error) for error in workflow_display.display_context.errors],
+            dataset=dataset,
         )
 
     def _gather_additional_module_files(self, module_path: str) -> Dict[str, str]:
