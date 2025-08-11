@@ -1,6 +1,17 @@
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 
 
+def test_serialize_module_with_dataset():
+    """Test that serialize_module correctly serializes dataset from sandbox modules."""
+    module_path = "tests.workflows.basic_inputs_and_outputs"
+
+    result = BaseWorkflowDisplay.serialize_module(module_path)
+
+    assert hasattr(result, "dataset")
+
+    assert result.dataset is None
+
+
 def test_serialize_module_happy_path():
     """Test that serialize_module works with a valid module path."""
     module_path = "tests.workflows.trivial"

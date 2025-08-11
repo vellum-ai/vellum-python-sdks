@@ -3,6 +3,7 @@ import fnmatch
 from functools import cached_property
 import importlib
 import inspect
+import json
 import logging
 import os
 from uuid import UUID
@@ -15,12 +16,14 @@ from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.edges import Edge
 from vellum.workflows.events.workflow import NodeEventDisplayContext, WorkflowEventDisplayContext
+from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.nodes.displayable.final_output_node.node import FinalOutputNode
 from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port, get_wrapped_node
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, WorkflowInputReference
+from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.types.core import Json, JsonArray, JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.types.utils import get_original_base
@@ -899,13 +902,12 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             sandbox_module = importlib.import_module(sandbox_module_path)
             if hasattr(sandbox_module, "dataset"):
                 dataset_attr = getattr(sandbox_module, "dataset")
-                if dataset_attr:
+                if dataset_attr and isinstance(dataset_attr, list):
                     dataset = []
-                    for inputs_obj in dataset_attr:
-                        if hasattr(inputs_obj, "__dict__"):
-                            dataset.append(inputs_obj.__dict__)
-                        else:
-                            dataset.append(str(inputs_obj))
+                    for i, inputs_obj in enumerate(dataset_attr):
+                        if isinstance(inputs_obj, BaseInputs):
+                            serialized_inputs = json.loads(json.dumps(inputs_obj, cls=DefaultStateEncoder))
+                            dataset.append({"label": f"Dataset Item {i + 1}", "inputs": serialized_inputs})
         except (ImportError, AttributeError):
             pass
 
