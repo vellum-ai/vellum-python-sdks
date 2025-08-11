@@ -165,6 +165,10 @@ def test_serialize_workflow():
                 "name": "ExampleBaseInlinePromptNodeWithFunctions",
                 "module": ["tests", "workflows", "basic_inline_prompt_node_with_functions", "workflow"],
             },
+            "trigger": {
+                "id": "c2dccecb-8a41-40a8-95af-325d3ab8bfe5",
+                "merge_behavior": "AWAIT_ANY",
+            },
             "outputs": [
                 {"id": "9557bd86-702d-4b45-b8c1-c3980bffe28f", "name": "json", "type": "JSON", "value": None},
                 {"id": "ead0ccb5-092f-4d9b-a9ec-5eb83d498188", "name": "text", "type": "STRING", "value": None},

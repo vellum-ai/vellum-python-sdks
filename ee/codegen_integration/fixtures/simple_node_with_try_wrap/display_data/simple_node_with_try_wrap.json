@@ -119,6 +119,10 @@
           "width": 480,
           "height": 126
         },
+        "trigger": {
+          "id": "e31c38be-ef5a-4c20-ab8b-9315f3e75ff8",
+          "merge_behavior": "AWAIT_ANY"
+        },
         "attributes": [
           {
             "id": "38f60afe-cd5f-4950-8674-18e17567a784",

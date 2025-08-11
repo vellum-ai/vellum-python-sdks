@@ -238,6 +238,10 @@
           "width": 480,
           "height": 168
         },
+        "trigger": {
+          "id": "b14f0322-965d-43c9-96d4-7bce9fd87067",
+          "merge_behavior": "AWAIT_ANY"
+        },
         "attributes": [
           {
             "id": "3e918914-3f95-4404-8c98-3b66cda834cd",
@@ -1211,6 +1215,10 @@
           },
           "ml_model_name": "gpt-4o-mini"
         },
+        "trigger": {
+          "id": "785dc582-83b3-46d1-87ec-9e8a10f4b00f",
+          "merge_behavior": "AWAIT_ANY"
+        },
         "attributes": [
           {
             "id": "8ae0df7b-2d57-48d7-a396-37f3e3ef4c75",
@@ -1609,6 +1617,10 @@
           },
           "width": 480,
           "height": 168
+        },
+        "trigger": {
+          "id": "ba029d72-7fc2-4e82-a5ad-6f364c84d72f",
+          "merge_behavior": "AWAIT_ANY"
         },
         "base": {
           "name": "InlinePromptNode",
@@ -2113,6 +2125,10 @@
           "width": 480,
           "height": 168
         },
+        "trigger": {
+          "id": "371cc948-bf59-4eba-9356-b21649f76b5e",
+          "merge_behavior": "AWAIT_ANY"
+        },
         "attributes": [
           {
             "id": "268adb20-f526-4c8f-853d-aebf808925cb",
@@ -2473,6 +2489,10 @@
           "width": 480,
           "height": 170
         },
+        "trigger": {
+          "id": "35b77bfb-91d3-4e5b-8032-9786b9cc05c3",
+          "merge_behavior": "AWAIT_ANY"
+        },
         "base": {
           "name": "InlinePromptNode",
           "module": [
@@ -2792,6 +2812,10 @@
           },
           "width": 480,
           "height": 168
+        },
+        "trigger": {
+          "id": "3485b3fb-e4ee-47c9-b567-c5eab60c01f9",
+          "merge_behavior": "AWAIT_ANY"
         },
         "base": {
           "name": "InlinePromptNode",
