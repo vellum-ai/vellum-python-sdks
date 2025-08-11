@@ -153,7 +153,7 @@ def test_serialize_workflow():
                                             },
                                             {
                                                 "id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
-                                                "label": "StartNode",
+                                                "label": "Start Node",
                                                 "type": "GENERIC",
                                                 "display_data": {"position": {"x": 200.0, "y": -50.0}},
                                                 "base": {

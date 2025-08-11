@@ -47,7 +47,7 @@ def test_serialize_node__retry(serialize_node):
     assert not DeepDiff(
         {
             "id": "188b50aa-e518-4b7b-a5e0-e2585fb1d7b5",
-            "label": "test_serialize_node__retry.<locals>.InnerRetryGenericNode",
+            "label": "Inner Retry Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -154,7 +154,7 @@ def test_serialize_node__try(serialize_node):
     assert not DeepDiff(
         {
             "id": str(InnerTryGenericNode.__wrapped_node__.__id__),
-            "label": "test_serialize_node__try.<locals>.InnerTryGenericNode",
+            "label": "Inner Try Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -248,7 +248,7 @@ def test_serialize_node__stacked():
     assert not DeepDiff(
         {
             "id": "074833b0-e142-4bbc-8dec-209a35e178a3",
-            "label": "test_serialize_node__stacked.<locals>.InnerStackedGenericNode",
+            "label": "Inner Stacked Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 200.0, "y": -50.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},

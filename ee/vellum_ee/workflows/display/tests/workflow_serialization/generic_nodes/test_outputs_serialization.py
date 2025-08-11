@@ -23,7 +23,7 @@ def test_serialize_node__annotated_output(serialize_node):
     assert not DeepDiff(
         {
             "id": "e33ddf79-f48c-4057-ba17-d41a3a60ac98",
-            "label": "test_serialize_node__annotated_output.<locals>.AnnotatedOutputGenericNode",
+            "label": "Annotated Output Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -71,7 +71,7 @@ def test_serialize_node__workflow_input(serialize_node):
     assert not DeepDiff(
         {
             "id": "30116483-6f38-40e0-baf2-32de0e14e9a3",
-            "label": "test_serialize_node__workflow_input.<locals>.WorkflowInputGenericNode",
+            "label": "Workflow Input Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
@@ -134,7 +134,7 @@ def test_serialize_node__node_output_reference(serialize_node):
     assert not DeepDiff(
         {
             "id": "ac067acc-6a6f-44b1-ae84-428e965ce691",
-            "label": "test_serialize_node__node_output_reference.<locals>.GenericNodeReferencingOutput",
+            "label": "Generic Node Referencing Output",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},

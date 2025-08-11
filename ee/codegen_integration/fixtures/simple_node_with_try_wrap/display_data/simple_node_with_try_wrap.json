@@ -125,7 +125,10 @@
             "name": "ml_model",
             "value": {
               "type": "CONSTANT_VALUE",
-              "value": { "type": "STRING", "value": "gpt-4o-mini" }
+              "value": {
+                "type": "STRING",
+                "value": "gpt-4o-mini"
+              }
             }
           },
           {
@@ -176,7 +179,9 @@
               "type": "CONSTANT_VALUE",
               "value": {
                 "type": "JSON",
-                "value": { "text": "Hello, World!" }
+                "value": {
+                  "text": "Hello, World!"
+                }
               }
             }
           },
