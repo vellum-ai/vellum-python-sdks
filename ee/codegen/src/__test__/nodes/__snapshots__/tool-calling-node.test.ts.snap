@@ -251,6 +251,20 @@ class ToolCallingNode(BaseToolCallingNode):
 "
 `;
 
+exports[`ToolCallingNode > no tools with jinja blocks > should be resilient to extra keys in jinja blocks 1`] = `
+"from vellum import JinjaPromptBlock
+from vellum.workflows.nodes.displayable.tool_calling_node import (
+    ToolCallingNode as BaseToolCallingNode,
+)
+
+
+class ToolCallingNode(BaseToolCallingNode):
+    blocks = [
+        JinjaPromptBlock(template="""Hello world"""),
+    ]
+"
+`;
+
 exports[`ToolCallingNode > workflow deployment > should generate latest release tag if release_tag is null 1`] = `
 "from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,

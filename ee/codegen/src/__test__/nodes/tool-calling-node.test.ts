@@ -676,53 +676,30 @@ describe("ToolCallingNode", () => {
   });
 
   describe("no tools with jinja blocks", () => {
-    it("should reproduce codegen failure when tool calling node has no tools but has jinja blocks", async () => {
-      /**
-       * Tests that a tool calling node with empty functions array but jinja blocks causes codegen failure.
-       */
-
+    it("should be resilient to extra keys in jinja blocks", async () => {
       const nodePortData: NodePort[] = [
         nodePortFactory({
           id: "port-id",
         }),
       ];
 
-      const blocksAttribute = nodeAttributeFactory(
-        "blocks-attr-id",
-        "blocks",
-        {
-          type: "CONSTANT_VALUE",
-          value: {
-            type: "JSON",
-            value: [
-              {
-                id: "jinja-block-1",
-                blockType: "JINJA",
-                properties: {
-                  template: "Hello {{ name }}! Please help with: {{ question }}",
-                },
-                state: "ENABLED",
-              },
-            ],
-          },
-        }
-      );
-
-      const functionsAttribute = nodeAttributeFactory(
-        "functions-attr-id",
-        "functions",
-        {
-          type: "CONSTANT_VALUE",
-          value: {
-            type: "JSON",
-            value: [],
-          },
-        }
-      );
+      const blocksAttribute = nodeAttributeFactory("blocks-attr-id", "blocks", {
+        type: "CONSTANT_VALUE",
+        value: {
+          type: "JSON",
+          value: [
+            {
+              block_type: "JINJA",
+              template: "Hello world",
+              blocks: [],
+            },
+          ],
+        },
+      });
 
       const nodeData = toolCallingNodeFactory({
         nodePorts: nodePortData,
-        nodeAttributes: [blocksAttribute, functionsAttribute],
+        nodeAttributes: [blocksAttribute],
       });
 
       const nodeContext = (await createNodeContext({
@@ -735,9 +712,8 @@ describe("ToolCallingNode", () => {
         nodeContext,
       });
 
-      expect(() => {
-        node.getNodeFile().write(writer);
-      }).toThrow("Failed to parse block");
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
 });
