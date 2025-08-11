@@ -201,11 +201,14 @@ export class StatefulPromptBlock extends BasePromptBlock<PromptTemplateBlockExcl
     classArgs.push(
       new MethodArgument({
         name: "text",
-        value: python.TypeInstantiation.str(promptBlock.text, {
-          multiline: true,
-          startOnNewLine: true,
-          endWithNewLine: true,
-        }),
+        value:
+          promptBlock.text === ""
+            ? python.TypeInstantiation.str("")
+            : python.TypeInstantiation.str(promptBlock.text, {
+                multiline: true,
+                startOnNewLine: true,
+                endWithNewLine: true,
+              }),
       })
     );
 
