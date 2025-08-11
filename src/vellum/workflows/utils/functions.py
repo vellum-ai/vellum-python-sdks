@@ -97,6 +97,9 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
 
         return {"$ref": f"#/$defs/{annotation.__name__}"}
 
+    if hasattr(annotation, "__module__") and annotation.__module__ and "vellum.workflows" in annotation.__module__:
+        return {"type": "null", "description": f"Runtime workflow type {annotation.__name__} (automatically provided)"}
+
     return {"type": type_map[annotation]}
 
 
