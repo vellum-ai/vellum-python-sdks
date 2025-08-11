@@ -71,4 +71,22 @@ describe("StatefulPromptBlock", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+
+  describe("PLAIN_TEXT", () => {
+    it("should generate regular quotes for empty text", async () => {
+      const block = new StatefulPromptBlock({
+        workflowContext,
+        promptBlock: {
+          id: "1",
+          blockType: "PLAIN_TEXT",
+          state: "ENABLED",
+          text: "",
+        },
+        inputVariableNameById: {},
+      });
+
+      block.write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });

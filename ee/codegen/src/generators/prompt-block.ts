@@ -186,13 +186,14 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
       ...this.constructCommonClassArguments(promptBlock),
     ];
 
+    const nonEmpty = promptBlock.text !== "";
     classArgs.push(
       new MethodArgument({
         name: "text",
         value: python.TypeInstantiation.str(promptBlock.text, {
-          multiline: true,
-          startOnNewLine: true,
-          endWithNewLine: true,
+          multiline: nonEmpty,
+          startOnNewLine: nonEmpty,
+          endWithNewLine: nonEmpty,
         }),
       })
     );
