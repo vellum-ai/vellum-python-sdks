@@ -265,6 +265,20 @@ class ToolCallingNode(BaseToolCallingNode):
 "
 `;
 
+exports[`ToolCallingNode > no tools with jinja blocks > should handle invalid jinja blocks with missing template field 1`] = `
+"from vellum import JinjaPromptBlock
+from vellum.workflows.nodes.displayable.tool_calling_node import (
+    ToolCallingNode as BaseToolCallingNode,
+)
+
+
+class ToolCallingNode(BaseToolCallingNode):
+    blocks = [
+        JinjaPromptBlock(template="""Valid template"""),
+    ]
+"
+`;
+
 exports[`ToolCallingNode > workflow deployment > should generate latest release tag if release_tag is null 1`] = `
 "from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,

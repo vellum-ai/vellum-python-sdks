@@ -25,7 +25,7 @@ describe("ToolCallingNode", () => {
   let node: GenericNode;
 
   beforeEach(() => {
-    workflowContext = workflowContextFactory();
+    workflowContext = workflowContextFactory({ strict: false });
     writer = new Writer();
 
     workflowContext.addInputVariableContext(
@@ -714,6 +714,59 @@ describe("ToolCallingNode", () => {
 
       node.getNodeFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("should handle invalid jinja blocks with missing template field", async () => {
+      /**
+       * Tests that invalid blocks with missing template field are handled gracefully
+       * by adding errors to workflow context while preserving valid blocks.
+       */
+
+      const nodePortData: NodePort[] = [
+        nodePortFactory({
+          id: "port-id",
+        }),
+      ];
+
+      const blocksAttribute = nodeAttributeFactory("blocks-attr-id", "blocks", {
+        type: "CONSTANT_VALUE",
+        value: {
+          type: "JSON",
+          value: [
+            {
+              block_type: "JINJA",
+              blocks: [],
+            },
+            {
+              block_type: "JINJA",
+              template: "Valid template",
+              blocks: [],
+            },
+          ],
+        },
+      });
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [blocksAttribute],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+      expect(workflowContext.getErrors()).toHaveLength(1);
+      expect(workflowContext.getErrors()[0]?.message).toContain(
+        "Failed to parse block"
+      );
     });
   });
 });
