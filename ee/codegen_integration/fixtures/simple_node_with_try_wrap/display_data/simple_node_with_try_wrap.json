@@ -245,7 +245,7 @@
         "adornments": [
           {
             "id": "42823c15-2ba6-4c85-a0d7-74a4e0541a42",
-            "label": "TryNode",
+            "label": "Try Node",
             "base": {
               "name": "TryNode",
               "module": [
