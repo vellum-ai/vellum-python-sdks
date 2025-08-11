@@ -394,6 +394,7 @@ def test_serialize_node__tool_calling_node__subworkflow_with_parent_input_refere
     nodes = data["exec_config"]["workflow_raw_data"]["nodes"]
     code_exec_node = next((node for node in nodes if node["type"] == "CODE_EXECUTION"), None)
 
+    assert code_exec_node is not None
     text_input = next((input for input in code_exec_node["inputs"] if input["key"] == "text"), None)
     assert text_input == {
         "id": "da92a1c4-d37c-4008-a1ab-c0bcc0cd20d0",
