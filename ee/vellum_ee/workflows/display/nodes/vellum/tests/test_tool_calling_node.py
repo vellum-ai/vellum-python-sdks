@@ -1,10 +1,12 @@
 from vellum.client.types.prompt_parameters import PromptParameters
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
+from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
 from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
 from vellum.workflows.nodes.displayable.tool_calling_node.state import ToolCallingState
 from vellum.workflows.nodes.displayable.tool_calling_node.utils import create_router_node, create_tool_prompt_node
+from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.definition import AuthorizationType, EnvironmentVariableReference, MCPServer
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
@@ -332,3 +334,73 @@ def test_serialize_tool_router_node():
         "trigger": {"id": "73a96f44-c2dd-40cc-96f6-49b9f914b166", "merge_behavior": "AWAIT_ATTRIBUTES"},
         "type": "GENERIC",
     }
+
+
+def test_serialize_tool_router_node_inline_workflow():
+    """
+    Test that the tool router node created by create_router_node serializes successfully when using an inline workflow.
+    """
+
+    # GIVEN a simple inline workflow tool for tool calling
+    class MyInlineWorkflowInputs(BaseInputs):
+        arg1: str
+
+    class MyInlineWorkflowNode(BaseNode):
+        arg1 = MyInlineWorkflowInputs.arg1
+
+        class Outputs(BaseOutputs):
+            result: str
+
+        def run(self) -> Outputs:
+            return self.Outputs(result=f"Result: {self.arg1}")
+
+    class MyInlineWorkflow(BaseWorkflow[MyInlineWorkflowInputs, BaseState]):
+        """
+        A simple inline workflow that processes an argument.
+        """
+
+        graph = MyInlineWorkflowNode
+
+        class Outputs(BaseOutputs):
+            result = MyInlineWorkflowNode.Outputs.result
+
+    tool_prompt_node = create_tool_prompt_node(
+        ml_model="gpt-4o-mini",
+        blocks=[],
+        functions=[MyInlineWorkflow],
+        prompt_inputs=None,
+        parameters=PromptParameters(),
+    )
+
+    # WHEN we create a router node using create_router_node
+    router_node = create_router_node(
+        functions=[MyInlineWorkflow],
+        tool_prompt_node=tool_prompt_node,
+    )
+
+    router_node_display_class = get_node_display_class(router_node)
+    router_node_display = router_node_display_class()
+
+    class Workflow(BaseWorkflow[BaseInputs, ToolCallingState]):
+        graph = tool_prompt_node >> router_node
+
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+    display_context = workflow_display.display_context
+
+    # WHEN we serialize the router node
+    serialized_router_node = router_node_display.serialize(display_context)
+
+    # THEN the router node should serialize successfully
+    assert serialized_router_node is not None
+    assert isinstance(serialized_router_node, dict)
+    assert "ports" in serialized_router_node
+    assert "attributes" in serialized_router_node
+    assert serialized_router_node["type"] == "GENERIC"
+
+    ports = serialized_router_node["ports"]
+    assert isinstance(ports, list)
+    assert len(ports) == 2
+
+    function_port_names = [port["name"] for port in ports if isinstance(port, dict) and "name" in port]
+    assert "my_inline_workflow" in function_port_names
+    assert "default" in function_port_names
