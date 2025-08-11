@@ -17,3 +17,8 @@ exports[`StatefulPromptBlock > JINJA > should handle double quotes in jinja temp
 "JinjaPromptBlock(template="""\\"Hello\\" \\"World\\"""")
 "
 `;
+
+exports[`StatefulPromptBlock > PLAIN_TEXT > should generate regular quotes for empty text 1`] = `
+"PlainTextPromptBlock(text="")
+"
+`;
