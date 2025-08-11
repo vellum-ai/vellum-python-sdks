@@ -194,6 +194,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 serialized_node = node_display.serialize(self.display_context)
             except (NotImplementedError, NodeValidationError) as e:
                 self.display_context.add_error(e)
+                self.display_context.add_invalid_node(node)
                 continue
 
             serialized_nodes[node_display.node_id] = serialized_node
@@ -319,6 +320,10 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         # Add an edge for each edge in the workflow
         for target_node, entrypoint_display in self.display_context.entrypoint_displays.items():
             unadorned_target_node = get_unadorned_node(target_node)
+            # Skip edges to invalid nodes
+            if self._is_node_invalid(unadorned_target_node):
+                continue
+
             target_node_display = self.display_context.node_displays[unadorned_target_node]
             edges.append(
                 {
@@ -334,6 +339,12 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         for (source_node_port, target_node), edge_display in self.display_context.edge_displays.items():
             unadorned_source_node_port = get_unadorned_port(source_node_port)
             unadorned_target_node = get_unadorned_node(target_node)
+
+            # Skip edges that reference invalid nodes
+            if self._is_node_invalid(unadorned_target_node) or self._is_node_invalid(
+                unadorned_source_node_port.node_class
+            ):
+                continue
 
             source_node_port_display = self.display_context.port_displays[unadorned_source_node_port]
             target_node_display = self.display_context.node_displays[unadorned_target_node]
@@ -938,6 +949,10 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         is_optional = type(None) in reference.types
         is_required = not has_default and not is_optional
         return is_required
+
+    def _is_node_invalid(self, node: Type[BaseNode]) -> bool:
+        """Check if a node failed to serialize and should be considered invalid."""
+        return node in self.display_context.invalid_nodes
 
 
 register_workflow_display_class(workflow_class=BaseWorkflow, workflow_display_class=BaseWorkflowDisplay)
