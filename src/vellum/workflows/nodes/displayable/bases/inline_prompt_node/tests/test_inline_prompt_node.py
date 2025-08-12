@@ -662,3 +662,25 @@ def test_inline_prompt_node__dict_blocks_error(vellum_adhoc_prompt_client):
     # THEN the node should raise the correct NodeException
     assert excinfo.value.code == WorkflowErrorCode.INVALID_INPUTS
     assert "Failed to compile blocks" == str(excinfo.value)
+
+
+def test_inline_prompt_node__invalid_function_type():
+    """Test that the node raises an error when an invalid function type is passed."""
+
+    # GIVEN a node that has an invalid function type (not dict or callable)
+    class MyInlinePromptNode(InlinePromptNode):
+        ml_model = "gpt-4o"
+        blocks = []
+        prompt_inputs = {}
+        functions = ["not_a_function"]  # Invalid function types
+
+    # WHEN the node is created
+    node = MyInlinePromptNode()
+
+    # THEN the node should raise a NodeException with the correct error code
+    with pytest.raises(NodeException) as excinfo:
+        list(node.run())
+
+    # AND the error should have the correct code and message
+    assert excinfo.value.code == WorkflowErrorCode.INVALID_INPUTS
+    assert "`not_a_function` is not a valid function definition" == str(excinfo.value)
