@@ -1,3 +1,4 @@
+from uuid import UUID
 from typing import TYPE_CHECKING, Dict, Optional, Type
 
 from vellum.workflows.events.types import BaseEvent
@@ -18,7 +19,7 @@ _workflow_display_registry: Dict[Type[BaseWorkflow], Type["BaseWorkflowDisplay"]
 _node_display_registry: Dict[Type[BaseNode], Type["BaseNodeDisplay"]] = {}
 
 # Registry to store active workflow display contexts by span ID for nested workflow inheritance
-_active_workflow_display_contexts: Dict[str, "WorkflowDisplayContext"] = {}
+_active_workflow_display_contexts: Dict[UUID, "WorkflowDisplayContext"] = {}
 
 
 def get_from_workflow_display_registry(workflow_class: Type[BaseWorkflow]) -> Optional[Type["BaseWorkflowDisplay"]]:
@@ -43,12 +44,12 @@ def register_node_display_class(node_class: Type[BaseNode], node_display_class: 
     _node_display_registry[node_class] = node_display_class
 
 
-def register_workflow_display_context(span_id: str, display_context: "WorkflowDisplayContext") -> None:
+def register_workflow_display_context(span_id: UUID, display_context: "WorkflowDisplayContext") -> None:
     """Register a workflow display context by span ID for nested workflow inheritance."""
     _active_workflow_display_contexts[span_id] = display_context
 
 
-def get_parent_display_context_for_span(span_id: str) -> Optional["WorkflowDisplayContext"]:
+def _get_parent_display_context_for_span(span_id: UUID) -> Optional["WorkflowDisplayContext"]:
     """Get the parent display context for a given span ID."""
     return _active_workflow_display_contexts.get(span_id)
 
@@ -70,13 +71,13 @@ def get_parent_display_context_from_event(event: BaseEvent) -> Optional["Workflo
 
     current_parent: Optional["ParentContext"] = event.parent
     while current_parent:
-        if hasattr(current_parent, "type") and current_parent.type == "WORKFLOW":
+        if current_parent.type == "WORKFLOW":
             # Found a parent workflow, try to get its display context
-            parent_span_id = str(current_parent.span_id)
-            parent_display_context = get_parent_display_context_for_span(parent_span_id)
+            parent_span_id = current_parent.span_id
+            parent_display_context = _get_parent_display_context_for_span(parent_span_id)
             if parent_display_context:
                 return parent_display_context
         # Move up the parent chain
-        current_parent = getattr(current_parent, "parent", None)
+        current_parent = current_parent.parent
 
     return None

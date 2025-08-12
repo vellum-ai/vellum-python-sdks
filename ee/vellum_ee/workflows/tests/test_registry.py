@@ -87,7 +87,7 @@ def test_get_parent_display_context_from_event__nested_workflow_parents():
     # Top level workflow parent
     top_workflow_span_id = uuid4()
     top_context = MockWorkflowDisplayContext()
-    register_workflow_display_context(str(top_workflow_span_id), top_context)  # type: ignore[arg-type]
+    register_workflow_display_context(top_workflow_span_id, top_context)  # type: ignore[arg-type]
 
     top_workflow_parent = WorkflowParentContext(
         workflow_definition=MockWorkflow, span_id=top_workflow_span_id, parent=None
@@ -130,7 +130,7 @@ def test_get_parent_display_context_from_event__middle_workflow_has_context():
 
     top_workflow_span_id = uuid4()
     top_context = MockWorkflowDisplayContext()
-    register_workflow_display_context(str(top_workflow_span_id), top_context)  # type: ignore[arg-type]
+    register_workflow_display_context(top_workflow_span_id, top_context)  # type: ignore[arg-type]
 
     top_workflow_parent = WorkflowParentContext(
         workflow_definition=MockWorkflow, span_id=top_workflow_span_id, parent=None
@@ -142,7 +142,7 @@ def test_get_parent_display_context_from_event__middle_workflow_has_context():
     # AND middle workflow parent
     middle_workflow_span_id = uuid4()
     middle_context = MockWorkflowDisplayContext()
-    register_workflow_display_context(str(middle_workflow_span_id), middle_context)  # type: ignore[arg-type]
+    register_workflow_display_context(middle_workflow_span_id, middle_context)  # type: ignore[arg-type]
 
     middle_workflow_parent = WorkflowParentContext(
         workflow_definition=MockWorkflow, span_id=middle_workflow_span_id, parent=top_node_parent
