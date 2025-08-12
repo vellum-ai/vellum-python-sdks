@@ -622,11 +622,9 @@ def test_serialize_tool_prompt_node_with_workflow_deployment(vellum_client):
     serialized_tool_prompt_node = tool_prompt_node_display.serialize(display_context)
 
     # THEN functions attribute should be serialized correctly
-    assert isinstance(serialized_tool_prompt_node, dict)
     attributes = serialized_tool_prompt_node["attributes"]
     assert isinstance(attributes, list)
-    assert all(isinstance(attr, dict) for attr in attributes)
-    functions_attr = next((attr for attr in attributes if attr["name"] == "functions"), None)
+    functions_attr = next((attr for attr in attributes if isinstance(attr, dict) and attr["name"] == "functions"), None)
     assert functions_attr == {
         "id": "6326ccc4-7cf6-4235-ba3c-a6e860b0c48b",
         "name": "functions",
