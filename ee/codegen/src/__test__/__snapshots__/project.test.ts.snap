@@ -1235,7 +1235,7 @@ from vellum.workflows.types.definition import DeploymentDefinition
 class MyToolCallingNode(ToolCallingNode):
     ml_model = "gpt-4"
     blocks = []
-    functions = [DeploymentDefinition(deployment="deployment_1", release_tag="LATEST")]
+    functions = [DeploymentDefinition(deployment="add-code-exec", release_tag="LATEST")]
     prompt_inputs = {}
 
     class Outputs(ToolCallingNode.Outputs):

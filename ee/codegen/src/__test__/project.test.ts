@@ -5411,8 +5411,10 @@ baz = foo + bar
                       type: "JSON",
                       value: [
                         {
+                          name: "add_code_exec",
                           type: "WORKFLOW_DEPLOYMENT",
-                          deployment: "deployment_1",
+                          deployment: "add-code-exec",
+                          description: "",
                           release_tag: "LATEST",
                         },
                       ],

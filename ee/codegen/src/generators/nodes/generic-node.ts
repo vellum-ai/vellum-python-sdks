@@ -165,11 +165,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                     release_tag: f.release_tag,
                   };
                   deploymentWorkflowFunctions.push(workflowDeployment);
-                  const workflowDeploymentName = toPythonSafeSnakeCase(
-                    workflowDeployment.name ??
-                      workflowDeployment.deployment ??
-                      "workflow_deployment"
-                  );
+                  const workflowDeploymentName = workflowDeployment.deployment;
                   const args = [
                     python.methodArgument({
                       name: "deployment",
