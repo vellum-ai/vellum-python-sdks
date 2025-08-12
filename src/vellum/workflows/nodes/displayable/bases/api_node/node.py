@@ -14,6 +14,7 @@ from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.types.core import Json, MergeBehavior, VellumSecret
 from vellum.workflows.types.generics import StateType
+from vellum.workflows.utils.hmac import sign_request_with_env_secret
 
 
 class BaseAPINode(BaseNode, Generic[StateType]):
@@ -105,6 +106,9 @@ class BaseAPINode(BaseNode, Generic[StateType]):
                 prepped = Request(method=method, url=url, headers=headers).prepare()
         except Exception as e:
             raise NodeException(f"Failed to prepare HTTP request: {e}", code=WorkflowErrorCode.PROVIDER_ERROR)
+
+        sign_request_with_env_secret(prepped)
+
         try:
             with Session() as session:
                 response = session.send(prepped, timeout=timeout)
