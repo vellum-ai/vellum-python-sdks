@@ -1,10 +1,11 @@
 from uuid import UUID
-from typing import Callable, Dict, Generic, List, Optional, Tuple, Type, TypeVar, Union
+from typing import Dict, Generic, List, Optional, Tuple, Type, TypeVar, Union
 
 from vellum import FunctionDefinition, PromptBlock, RichTextChildBlock, VellumVariable
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.nodes import InlinePromptNode
 from vellum.workflows.types.core import JsonObject, Tool
+from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition, MCPServer
 from vellum.workflows.types.generics import is_workflow_class
 from vellum.workflows.utils.functions import compile_function_definition, compile_inline_workflow_function_definition
 from vellum.workflows.utils.uuids import uuid4_from_hash
@@ -151,8 +152,12 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
             normalized_functions = function
         elif is_workflow_class(function):
             normalized_functions = compile_inline_workflow_function_definition(function)
-        else:
+        elif callable(function):
             normalized_functions = compile_function_definition(function)
+        elif isinstance(function, (DeploymentDefinition, ComposioToolDefinition, MCPServer)):
+            raise NotImplementedError(f"Function tool generation for {type(function).__name__} not yet implemented")
+        else:
+            raise ValueError(f"Unsupported function type: {type(function)}")
         return {
             "id": str(uuid4_from_hash(f"{self.node_id}-FUNCTION_DEFINITION-{index}")),
             "block_type": "FUNCTION_DEFINITION",
