@@ -5,6 +5,7 @@ from vellum.workflows.nodes import BaseNode
 from vellum.workflows.workflows.base import BaseWorkflow
 
 if TYPE_CHECKING:
+    from vellum.workflows.events.types import ParentContext
     from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
     from vellum_ee.workflows.display.types import WorkflowDisplayContext
     from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
@@ -67,7 +68,7 @@ def get_parent_display_context_from_event(event: BaseEvent) -> Optional["Workflo
     if not event.parent:
         return None
 
-    current_parent = event.parent
+    current_parent: Optional["ParentContext"] = event.parent
     while current_parent:
         if hasattr(current_parent, "type") and current_parent.type == "WORKFLOW":
             # Found a parent workflow, try to get its display context
