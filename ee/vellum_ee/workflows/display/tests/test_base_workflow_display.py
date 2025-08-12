@@ -353,29 +353,63 @@ def test_global_propagation_deep_nested_subworkflows():
         graph = InnerNode
 
     class MiddleInlineSubworkflowNode(InlineSubworkflowNode):
-        subworkflow_inputs = {"inner_param": "x"}
+        subworkflow_inputs = {"inner_param": RootInputs.root_param}
         subworkflow = InnerWorkflow
 
     class MiddleWorkflow(BaseWorkflow[MiddleInputs, BaseState]):
         graph = MiddleInlineSubworkflowNode
 
     class OuterInlineSubworkflowNode(InlineSubworkflowNode):
-        subworkflow_inputs = {"middle_param": "y"}
+        subworkflow_inputs = {"middle_param": RootInputs.root_param}
         subworkflow = MiddleWorkflow
 
     class RootWorkflow(BaseWorkflow[RootInputs, BaseState]):
         graph = OuterInlineSubworkflowNode
 
-    # WHEN we build displays stepwise, passing parent contexts like runtime does
+    # WHEN we serialize the root workflow
     root_display = get_workflow_display(workflow_class=RootWorkflow)
-    middle_display = get_workflow_display(
-        workflow_class=MiddleWorkflow, parent_display_context=root_display.display_context
-    )
-    inner_display = get_workflow_display(
-        workflow_class=InnerWorkflow, parent_display_context=middle_display.display_context
+    serialized_data = root_display.serialize()
+
+    # THEN the serialized data should show that both subworkflows use root_param
+    workflow_raw_data = serialized_data["workflow_raw_data"]
+
+    outer_subworkflow_node = None
+    for node in workflow_raw_data["nodes"]:
+        if node.get("type") == "SUBWORKFLOW" and "OuterInlineSubworkflowNode" in str(node.get("definition", {})):
+            outer_subworkflow_node = node
+            break
+
+    assert outer_subworkflow_node is not None
+
+    # Verify the outer subworkflow references root_param
+    outer_input = outer_subworkflow_node["inputs"][0]  # type: ignore[index]
+    assert outer_input["key"] == "middle_param"  # type: ignore[index]
+    assert outer_input["value"]["rules"][0]["type"] == "INPUT_VARIABLE"  # type: ignore[index]
+    root_input_variable_id = outer_input["value"]["rules"][0]["data"]["input_variable_id"]  # type: ignore[index]
+
+    middle_workflow_data = outer_subworkflow_node["data"]["workflow_raw_data"]  # type: ignore[index]
+    middle_subworkflow_node = None
+    for node in middle_workflow_data["nodes"]:  # type: ignore[index]
+        if node.get("type") == "SUBWORKFLOW" and "MiddleInlineSubworkflowNode" in str(node.get("definition", {})):
+            middle_subworkflow_node = node
+            break
+
+    assert middle_subworkflow_node is not None
+
+    # Verify the middle subworkflow also references the same root input variable
+    middle_input = middle_subworkflow_node["inputs"][0]  # type: ignore[index]
+    assert middle_input["key"] == "inner_param"  # type: ignore[index]
+    assert middle_input["value"]["rules"][0]["type"] == "INPUT_VARIABLE"  # type: ignore[index]
+    assert (
+        middle_input["value"]["rules"][0]["data"]["input_variable_id"] == root_input_variable_id  # type: ignore[index]
     )
 
-    # THEN the deepest display must include root + middle + inner inputs in its GLOBAL view
-    inner_global_names = {ref.name for ref in inner_display.display_context.global_workflow_input_displays.keys()}
+    # Verify that the root input variable corresponds to root_param
+    root_input_variable = None
+    for input_var in serialized_data["input_variables"]:  # type: ignore[index]
+        if input_var["id"] == root_input_variable_id:  # type: ignore[index]
+            root_input_variable = input_var
+            break
 
-    assert inner_global_names == {"middle_param", "inner_param", "root_param"}
+    assert root_input_variable is not None
+    assert root_input_variable["key"] == "root_param"  # type: ignore[index]
