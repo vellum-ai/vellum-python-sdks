@@ -1,5 +1,3 @@
-from typing import Any, Dict, List, cast
-
 from vellum.client.types.prompt_parameters import PromptParameters
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
@@ -447,66 +445,347 @@ def test_serialize_tool_prompt_node_with_inline_workflow():
         parameters=PromptParameters(),
     )
 
+    tool_prompt_node_display_class = get_node_display_class(tool_prompt_node)
+    tool_prompt_node_display = tool_prompt_node_display_class()
+
     # AND we create a workflow that uses this tool prompt node
     class TestWorkflow(BaseWorkflow[BaseInputs, ToolCallingState]):
         graph = tool_prompt_node
 
     # WHEN we serialize the entire workflow
     workflow_display = get_workflow_display(workflow_class=TestWorkflow)
-    serialized_workflow = workflow_display.serialize()
+    display_context = workflow_display.display_context
+    serialized_tool_prompt_node = tool_prompt_node_display.serialize(display_context)
 
-    # THEN the workflow should serialize successfully
-    assert serialized_workflow is not None
-
-    workflow_raw_data = cast(Dict[str, Any], serialized_workflow["workflow_raw_data"])
-    nodes = cast(List[Dict[str, Any]], workflow_raw_data["nodes"])
-
-    tool_prompt_node_data = next(
-        node for node in nodes if node.get("type") == "PROMPT" and node.get("data", {}).get("variant") == "INLINE"
-    )
-
-    # THEN it should have the correct basic structure
-    assert tool_prompt_node_data["type"] == "PROMPT"
-    assert tool_prompt_node_data["data"]["variant"] == "INLINE"
-    assert tool_prompt_node_data["data"]["ml_model_name"] == "gpt-4o-mini"
-    assert tool_prompt_node_data["data"]["label"] == "Tool Prompt Node"
-
-    # AND it should have the functions attribute with inline workflow
-    attributes = cast(List[Dict[str, Any]], tool_prompt_node_data["attributes"])
-    functions_attribute = next(attribute for attribute in attributes if attribute["name"] == "functions")
-
-    assert functions_attribute["value"]["type"] == "CONSTANT_VALUE"
-    assert functions_attribute["value"]["value"]["type"] == "JSON"
-    functions_list = cast(List[Dict[str, Any]], functions_attribute["value"]["value"]["value"])
-    assert len(functions_list) == 1
-
-    # AND the inline workflow function should have the correct structure
-    inline_workflow_function = functions_list[0]
-    assert inline_workflow_function["type"] == "INLINE_WORKFLOW"
-    assert inline_workflow_function["name"] == "SimpleInlineWorkflow"
-    assert inline_workflow_function["description"] == "A simple workflow for testing inline tool serialization."
-
-    # AND the inline workflow should have proper exec_config structure
-    exec_config = cast(Dict[str, Any], inline_workflow_function["exec_config"])
-    assert "workflow_raw_data" in exec_config
-    assert "input_variables" in exec_config
-    assert "output_variables" in exec_config
-
-    input_variables = cast(List[Dict[str, Any]], exec_config["input_variables"])
-    output_variables = cast(List[Dict[str, Any]], exec_config["output_variables"])
-
-    assert len(input_variables) == 1
-    assert input_variables[0]["key"] == "message"
-    assert input_variables[0]["type"] == "STRING"
-
-    assert len(output_variables) == 1
-    assert output_variables[0]["key"] == "result"
-    assert output_variables[0]["type"] == "STRING"
-
-    # AND the workflow_raw_data should contain the serialized inline workflow
-    workflow_raw_data_inner = cast(Dict[str, Any], exec_config["workflow_raw_data"])
-    assert "nodes" in workflow_raw_data_inner
-    assert "edges" in workflow_raw_data_inner
-
-    inner_nodes = cast(List[Dict[str, Any]], workflow_raw_data_inner["nodes"])
-    assert len(inner_nodes) >= 2  # At least entrypoint and our simple node
+    assert serialized_tool_prompt_node == {
+        "id": "19e664fc-3b57-48d2-b47a-b143b475406a",
+        "type": "PROMPT",
+        "inputs": [
+            {
+                "id": "b65e6680-e92e-4013-a5d8-2761cb7f4b9d",
+                "key": "chat_history",
+                "value": {"rules": [], "combinator": "OR"},
+            }
+        ],
+        "data": {
+            "label": "Tool Prompt Node",
+            "output_id": "55dc4999-9b5c-4712-989e-d6fa41bccbc1",
+            "error_output_id": None,
+            "array_output_id": "c2a5a7f7-a234-45dc-adee-bc6fc0bd28dd",
+            "source_handle_id": "77ac827c-649c-41dc-bc6d-12f040dc7653",
+            "target_handle_id": "0517a108-372e-4b11-803b-d84f149a00f6",
+            "variant": "INLINE",
+            "exec_config": {
+                "parameters": {},
+                "input_variables": [
+                    {"id": "b65e6680-e92e-4013-a5d8-2761cb7f4b9d", "key": "chat_history", "type": "JSON"}
+                ],
+                "prompt_template_block_data": {
+                    "version": 1,
+                    "blocks": [
+                        {
+                            "block_type": "VARIABLE",
+                            "input_variable_id": "b65e6680-e92e-4013-a5d8-2761cb7f4b9d",
+                            "id": "4f3675aa-22e7-4682-a5b5-b383d74a3e96",
+                            "cache_config": None,
+                            "state": "ENABLED",
+                        },
+                        {
+                            "id": "d10a8727-8245-4fbf-813b-cd99d3a672b0",
+                            "block_type": "FUNCTION_DEFINITION",
+                            "properties": {
+                                "function_name": "simple_inline_workflow",
+                                "function_description": "A simple workflow for testing inline tool serialization.",
+                                "function_parameters": {
+                                    "type": "object",
+                                    "properties": {"message": {"type": "string"}},
+                                    "required": ["message"],
+                                },
+                                "function_forced": None,
+                                "function_strict": None,
+                            },
+                        },
+                    ],
+                },
+            },
+            "ml_model_name": "gpt-4o-mini",
+        },
+        "display_data": {"position": {"x": 0.0, "y": 0.0}},
+        "base": {
+            "name": "ToolPromptNode",
+            "module": ["vellum", "workflows", "nodes", "displayable", "tool_calling_node", "utils"],
+        },
+        "definition": {
+            "name": "ToolPromptNode",
+            "module": ["vellum", "workflows", "nodes", "displayable", "tool_calling_node", "utils"],
+        },
+        "trigger": {"id": "0517a108-372e-4b11-803b-d84f149a00f6", "merge_behavior": "AWAIT_ATTRIBUTES"},
+        "outputs": [
+            {"id": "d411ecf3-5f9a-4284-a565-3df28b9b042d", "name": "json", "type": "JSON", "value": None},
+            {"id": "55dc4999-9b5c-4712-989e-d6fa41bccbc1", "name": "text", "type": "STRING", "value": None},
+            {"id": "c2a5a7f7-a234-45dc-adee-bc6fc0bd28dd", "name": "results", "type": "ARRAY", "value": None},
+        ],
+        "ports": [{"id": "77ac827c-649c-41dc-bc6d-12f040dc7653", "name": "default", "type": "DEFAULT"}],
+        "attributes": [
+            {
+                "id": "7d009ef2-8590-4dbb-8ad3-c374b04fa52a",
+                "name": "ml_model",
+                "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "gpt-4o-mini"}},
+            },
+            {
+                "id": "60800868-2964-48bf-95da-466c3ced08cd",
+                "name": "blocks",
+                "value": {
+                    "type": "CONSTANT_VALUE",
+                    "value": {
+                        "type": "JSON",
+                        "value": [
+                            {
+                                "block_type": "VARIABLE",
+                                "state": None,
+                                "cache_config": None,
+                                "input_variable": "chat_history",
+                            }
+                        ],
+                    },
+                },
+            },
+            {
+                "id": "6326ccc4-7cf6-4235-ba3c-a6e860b0c48b",
+                "name": "functions",
+                "value": {
+                    "type": "CONSTANT_VALUE",
+                    "value": {
+                        "type": "JSON",
+                        "value": [
+                            {
+                                "type": "INLINE_WORKFLOW",
+                                "name": "SimpleInlineWorkflow",
+                                "description": "A simple workflow for testing inline tool serialization.",
+                                "exec_config": {
+                                    "workflow_raw_data": {
+                                        "nodes": [
+                                            {
+                                                "id": "eb62aff1-ed43-4ea8-8b25-044f2d821255",
+                                                "type": "ENTRYPOINT",
+                                                "inputs": [],
+                                                "data": {
+                                                    "label": "Entrypoint Node",
+                                                    "source_handle_id": "05cdfc6c-650b-48ab-9424-1068e8841671",
+                                                },
+                                                "display_data": {"position": {"x": 0.0, "y": -50.0}},
+                                                "base": None,
+                                                "definition": None,
+                                            },
+                                            {
+                                                "id": "9b4f1369-3b0b-436f-b5df-4fd7937c869a",
+                                                "label": "Simple Node",
+                                                "type": "GENERIC",
+                                                "display_data": {"position": {"x": 200.0, "y": -50.0}},
+                                                "base": {
+                                                    "name": "BaseNode",
+                                                    "module": ["vellum", "workflows", "nodes", "bases", "base"],
+                                                },
+                                                "definition": {
+                                                    "name": "SimpleNode",
+                                                    "module": [
+                                                        "vellum_ee",
+                                                        "workflows",
+                                                        "display",
+                                                        "nodes",
+                                                        "vellum",
+                                                        "tests",
+                                                        "test_tool_calling_node",
+                                                    ],
+                                                },
+                                                "trigger": {
+                                                    "id": "6da3b957-12ad-42d2-8e8f-9863c501c4b9",
+                                                    "merge_behavior": "AWAIT_ATTRIBUTES",
+                                                },
+                                                "ports": [
+                                                    {
+                                                        "id": "1e415563-e1d1-44cd-8d22-800e52919fbf",
+                                                        "name": "default",
+                                                        "type": "DEFAULT",
+                                                    }
+                                                ],
+                                                "adornments": None,
+                                                "attributes": [
+                                                    {
+                                                        "id": "6966b3a8-357d-4b26-ae17-1eea62a13e75",
+                                                        "name": "message",
+                                                        "value": {
+                                                            "type": "WORKFLOW_INPUT",
+                                                            "input_variable_id": "e122a424-0b2f-4015-87c0-9078417e2327",
+                                                        },
+                                                    }
+                                                ],
+                                                "outputs": [
+                                                    {
+                                                        "id": "11548929-fb45-4814-b6cd-0739ea08a60d",
+                                                        "name": "result",
+                                                        "type": "STRING",
+                                                        "value": None,
+                                                    }
+                                                ],
+                                            },
+                                            {
+                                                "id": "f05058f2-6ed4-457b-af41-a0baac0c59a2",
+                                                "type": "TERMINAL",
+                                                "data": {
+                                                    "label": "Final Output",
+                                                    "name": "result",
+                                                    "target_handle_id": "e21c107c-a732-493b-8c29-c2d334806324",
+                                                    "output_id": "08cf6636-e941-4882-826f-6e0e333397e6",
+                                                    "output_type": "STRING",
+                                                    "node_input_id": "b2145c9e-f43c-44c3-8b28-6b5c5d0c5d98",
+                                                },
+                                                "inputs": [
+                                                    {
+                                                        "id": "b2145c9e-f43c-44c3-8b28-6b5c5d0c5d98",
+                                                        "key": "node_input",
+                                                        "value": {
+                                                            "rules": [
+                                                                {
+                                                                    "type": "NODE_OUTPUT",
+                                                                    "data": {
+                                                                        "node_id": "9b4f1369-3b0b-436f-b5df-4fd7937c869a",  # noqa: E501
+                                                                        "output_id": "11548929-fb45-4814-b6cd-0739ea08a60d",  # noqa: E501
+                                                                    },
+                                                                }
+                                                            ],
+                                                            "combinator": "OR",
+                                                        },
+                                                    }
+                                                ],
+                                                "display_data": {"position": {"x": 400.0, "y": -50.0}},
+                                                "base": {
+                                                    "name": "FinalOutputNode",
+                                                    "module": [
+                                                        "vellum",
+                                                        "workflows",
+                                                        "nodes",
+                                                        "displayable",
+                                                        "final_output_node",
+                                                        "node",
+                                                    ],
+                                                },
+                                                "definition": None,
+                                            },
+                                        ],
+                                        "edges": [
+                                            {
+                                                "id": "647a5c21-838e-48ca-a0c2-b21acb9f37a3",
+                                                "source_node_id": "eb62aff1-ed43-4ea8-8b25-044f2d821255",
+                                                "source_handle_id": "05cdfc6c-650b-48ab-9424-1068e8841671",
+                                                "target_node_id": "9b4f1369-3b0b-436f-b5df-4fd7937c869a",
+                                                "target_handle_id": "6da3b957-12ad-42d2-8e8f-9863c501c4b9",
+                                                "type": "DEFAULT",
+                                            },
+                                            {
+                                                "id": "16e251e3-7651-4a85-b6d2-390229928301",
+                                                "source_node_id": "9b4f1369-3b0b-436f-b5df-4fd7937c869a",
+                                                "source_handle_id": "1e415563-e1d1-44cd-8d22-800e52919fbf",
+                                                "target_node_id": "f05058f2-6ed4-457b-af41-a0baac0c59a2",
+                                                "target_handle_id": "e21c107c-a732-493b-8c29-c2d334806324",
+                                                "type": "DEFAULT",
+                                            },
+                                        ],
+                                        "display_data": {"viewport": {"x": 0.0, "y": 0.0, "zoom": 1.0}},
+                                        "definition": {
+                                            "name": "SimpleInlineWorkflow",
+                                            "module": [
+                                                "vellum_ee",
+                                                "workflows",
+                                                "display",
+                                                "nodes",
+                                                "vellum",
+                                                "tests",
+                                                "test_tool_calling_node",
+                                            ],
+                                        },
+                                        "output_values": [
+                                            {
+                                                "output_variable_id": "08cf6636-e941-4882-826f-6e0e333397e6",
+                                                "value": {
+                                                    "type": "NODE_OUTPUT",
+                                                    "node_id": "9b4f1369-3b0b-436f-b5df-4fd7937c869a",
+                                                    "node_output_id": "11548929-fb45-4814-b6cd-0739ea08a60d",
+                                                },
+                                            }
+                                        ],
+                                    },
+                                    "input_variables": [
+                                        {
+                                            "id": "e122a424-0b2f-4015-87c0-9078417e2327",
+                                            "key": "message",
+                                            "type": "STRING",
+                                            "default": None,
+                                            "required": True,
+                                            "extensions": {"color": None},
+                                        }
+                                    ],
+                                    "state_variables": [],
+                                    "output_variables": [
+                                        {
+                                            "id": "08cf6636-e941-4882-826f-6e0e333397e6",
+                                            "key": "result",
+                                            "type": "STRING",
+                                        }
+                                    ],
+                                },
+                            }
+                        ],
+                    },
+                },
+            },
+            {
+                "id": "bc1320a2-23e4-4238-8b00-efbf88e91856",
+                "name": "prompt_inputs",
+                "value": {
+                    "type": "DICTIONARY_REFERENCE",
+                    "entries": [
+                        {
+                            "id": "76ceec7b-ec37-474f-ba38-2bfd27cecc5d",
+                            "key": "chat_history",
+                            "value": {
+                                "type": "BINARY_EXPRESSION",
+                                "lhs": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": []}},
+                                "operator": "concat",
+                                "rhs": {
+                                    "type": "WORKFLOW_STATE",
+                                    "state_variable_id": "7a1caaf5-99df-487a-8b2d-6512df2d871a",
+                                },
+                            },
+                        }
+                    ],
+                },
+            },
+            {
+                "id": "c9d7e2b9-9060-4589-a8da-36d75d410f57",
+                "name": "parameters",
+                "value": {
+                    "type": "CONSTANT_VALUE",
+                    "value": {
+                        "type": "JSON",
+                        "value": {
+                            "stop": None,
+                            "temperature": None,
+                            "max_tokens": None,
+                            "top_p": None,
+                            "top_k": None,
+                            "frequency_penalty": None,
+                            "presence_penalty": None,
+                            "logit_bias": None,
+                            "custom_parameters": None,
+                        },
+                    },
+                },
+            },
+            {
+                "id": "2777ccd1-8852-4075-acc7-d317e100dd6a",
+                "name": "max_prompt_iterations",
+                "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+            },
+        ],
+    }
