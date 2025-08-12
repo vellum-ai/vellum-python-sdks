@@ -2077,11 +2077,13 @@ export const GenericNodeDisplayDataSerializer: ObjectSchema<
   GenericNodeDisplayData
 > = objectSchema({
   position: NodeDisplayPositionSerializer.optional(),
+  comment: NodeDisplayCommentSerializer.optional(),
 });
 
 export declare namespace GenericNodeDisplayDataSerializer {
   interface Raw {
     position?: NodeDisplayPositionSerializer.Raw | null;
+    comment?: NodeDisplayCommentSerializer.Raw | null;
   }
 }
 

@@ -504,7 +504,7 @@ exports[`WorkflowProjectGenerator > function > should generate inline workflow t
 "from uuid import UUID
 from .weather_function.nodes import *
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayComment, NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 
@@ -533,7 +533,14 @@ class GetCurrentWeatherNodeDisplay(BaseNodeDisplay[GetCurrentWeatherNode]):
     port_displays = {
         GetCurrentWeatherNode.Ports.default: PortDisplayOverrides(id=UUID("3cd6d78c-9dad-42aa-ad38-31f67057c379"))
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), width=None, height=None)
+    display_data = NodeDisplayData(
+        position=NodeDisplayPosition(x=0, y=0),
+        width=None,
+        height=None,
+        comment=NodeDisplayComment(
+            value="\\n    A tool calling node that calls the get_current_weather function.\\n    "
+        ),
+    )
 "
 `;
 
@@ -695,6 +702,10 @@ from ...inputs import Inputs
 
 
 class GetCurrentWeatherNode(ToolCallingNode):
+    """
+    A tool calling node that calls the get_current_weather function.
+    """
+
     ml_model = "gpt-4o-mini"
     max_tool_calls = 3
     blocks = [
@@ -866,7 +877,7 @@ exports[`WorkflowProjectGenerator > function > should generate inline workflow t
 "from uuid import UUID
 from .weather_function.nodes import *
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayComment, NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 
@@ -895,7 +906,14 @@ class GetCurrentWeatherNodeDisplay(BaseNodeDisplay[GetCurrentWeatherNode]):
     port_displays = {
         GetCurrentWeatherNode.Ports.default: PortDisplayOverrides(id=UUID("3cd6d78c-9dad-42aa-ad38-31f67057c379"))
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), width=None, height=None)
+    display_data = NodeDisplayData(
+        position=NodeDisplayPosition(x=0, y=0),
+        width=None,
+        height=None,
+        comment=NodeDisplayComment(
+            value="\\n    A tool calling node that calls the get_current_weather function.\\n    "
+        ),
+    )
 "
 `;
 
@@ -1057,6 +1075,10 @@ from ...inputs import Inputs
 
 
 class GetCurrentWeatherNode(ToolCallingNode):
+    """
+    A tool calling node that calls the get_current_weather function.
+    """
+
     ml_model = "gpt-4o-mini"
     max_tool_calls = 3
     blocks = [

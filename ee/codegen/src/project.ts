@@ -349,10 +349,8 @@ ${errors.slice(0, 3).map((err) => {
         command:
           process.env.NODE_ENV === "production"
             ? "python"
-            : "poetry",
-        args: process.env.NODE_ENV === "production"
-            ? ["python_file_merging/merge_cli.py"]
-            : ["run", "python", "python_file_merging/merge_cli.py"],
+            : path.join(__dirname, "../../../.venv/bin/python"),
+        args: ["python_file_merging/merge_cli.py"],
       });
 
       if (typeof codeMergeResult !== "object") {

@@ -6,5 +6,49 @@
       "type": "STRING",
       "value": null
     }
+  ],
+  "attributes": [
+    {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "name": "test",
+      "type": "STRING",
+      "value": null
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000002",
+      "name": "new_attribute_1",
+      "type": "STRING",
+      "value": {
+        "type": "CONSTANT_VALUE",
+        "value": {
+          "type": "STRING",
+          "value": "hello"
+        }
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000003",
+      "name": "new_attribute_2",
+      "type": "STRING",
+      "value": {
+        "type": "CONSTANT_VALUE",
+        "value": {
+          "type": "STRING",
+          "value": "world"
+        }
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000004",
+      "name": "changed_attribute",
+      "type": "STRING",
+      "value": {
+        "type": "CONSTANT_VALUE",
+        "value": {
+          "type": "STRING",
+          "value": "new_value"
+        }
+      }
+    }
   ]
 }
