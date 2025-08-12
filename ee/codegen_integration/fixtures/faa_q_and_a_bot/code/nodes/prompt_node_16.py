@@ -6,7 +6,6 @@ from vellum import (
     VariablePromptBlock,
 )
 from vellum.workflows.nodes.displayable import InlinePromptNode
-from vellum.workflows.types.core import MergeBehavior
 
 from .most_recent_message import MostRecentMessage
 
@@ -46,6 +45,3 @@ Respond with the IATA airport name this incoming message is about. For example, 
         logit_bias={},
         custom_parameters=None,
     )
-
-    class Trigger(InlinePromptNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ANY
