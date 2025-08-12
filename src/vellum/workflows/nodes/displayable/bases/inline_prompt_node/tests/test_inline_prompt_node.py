@@ -672,7 +672,7 @@ def test_inline_prompt_node__invalid_function_type():
         ml_model = "gpt-4o"
         blocks = []
         prompt_inputs = {}
-        functions = ["not_a_function"]  # Invalid function types
+        functions = ["not_a_function"]  # type: ignore
 
     # WHEN the node is created
     node = MyInlinePromptNode()
