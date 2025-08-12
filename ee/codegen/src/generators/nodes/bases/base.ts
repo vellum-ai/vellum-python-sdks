@@ -58,6 +58,8 @@ export abstract class BaseNode<
 
   private readonly errorOutputId: string | undefined;
 
+  protected DEFAULT_TRIGGER = "AWAIT_ATTRIBUTES";
+
   constructor({ workflowContext, nodeContext }: BaseNode.Args<T, V>) {
     this.workflowContext = workflowContext;
     this.nodeContext = nodeContext;
@@ -518,7 +520,8 @@ export abstract class BaseNode<
   protected getNodeTrigger(): AstNode | undefined {
     if (
       this.nodeData.trigger &&
-      this.nodeData.trigger.mergeBehavior !== "AWAIT_ATTRIBUTES"
+      this.nodeData.trigger.mergeBehavior !== "AWAIT_ATTRIBUTES" &&
+      this.nodeData.trigger.mergeBehavior !== this.DEFAULT_TRIGGER
     ) {
       return new NodeTrigger({
         nodeTrigger: this.nodeData.trigger,

@@ -33,7 +33,6 @@ class InlinePromptNode(BaseInlinePromptNode):
 exports[`WorkflowProjectGenerator > LEGACY prompt node codegen > should properly handle legacy prompt node even if ml model name is not found > code/nodes/legacy_prompt_node.py 1`] = `
 "from vellum import ChatMessagePromptBlock, JinjaPromptBlock, PromptParameters
 from vellum.workflows.nodes.displayable import InlinePromptNode
-from vellum.workflows.types.core import MergeBehavior
 
 from ..inputs import Inputs
 
@@ -59,9 +58,6 @@ class LegacyPromptNode(InlinePromptNode):
         logit_bias=None,
         custom_parameters=None,
     )
-
-    class Trigger(InlinePromptNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ANY
 "
 `;
 
@@ -213,7 +209,6 @@ exports[`WorkflowProjectGenerator > adornments > should correctly generate code 
 )
 from vellum.workflows.nodes.core.retry_node.node import RetryNode
 from vellum.workflows.nodes.displayable import InlinePromptNode
-from vellum.workflows.types.core import MergeBehavior
 
 
 @RetryNode.wrap(max_attempts=5)
@@ -252,9 +247,6 @@ Summarize the following text: hello today is feb 7 bad weather
         logit_bias={},
         custom_parameters=None,
     )
-
-    class Trigger(InlinePromptNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ANY
 "
 `;
 

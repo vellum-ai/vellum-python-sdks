@@ -30,6 +30,7 @@ export class SearchNode extends BaseNode<
   SearchNodeType,
   TextSearchNodeContext
 > {
+  protected DEFAULT_TRIGGER = "AWAIT_ANY";
   getNodeClassBodyStatements(): AstNode[] {
     const bodyStatements: AstNode[] = [];
 

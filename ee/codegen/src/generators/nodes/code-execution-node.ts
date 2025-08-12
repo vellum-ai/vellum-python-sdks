@@ -20,6 +20,7 @@ export class CodeExecutionNode extends BaseNode<
   CodeExecutionNodeType,
   CodeExecutionContext
 > {
+  protected DEFAULT_TRIGGER = "AWAIT_ANY";
   public declare readonly nodeContext: CodeExecutionContext;
   private readonly scriptFileContents: string;
 

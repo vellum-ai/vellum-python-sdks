@@ -491,7 +491,7 @@ describe("InlinePromptNode", () => {
   });
 
   describe("with node trigger AWAIT_ANY", () => {
-    it("should generate Trigger class with AWAIT_ANY", async () => {
+    it("should not generate Trigger class with AWAIT_ANY", async () => {
       const nodeData = inlinePromptNodeDataInlineVariantFactory({})
         .withTrigger({
           id: uuidv4(),

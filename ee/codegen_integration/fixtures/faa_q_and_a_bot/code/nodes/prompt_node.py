@@ -6,7 +6,6 @@ from vellum import (
     VariablePromptBlock,
 )
 from vellum.workflows.nodes.displayable import InlinePromptNode
-from vellum.workflows.types.core import MergeBehavior
 
 from .most_recent_message import MostRecentMessage
 
@@ -68,6 +67,3 @@ You are an expert classifier. You will analyze the chat and output one of the fo
             },
         },
     )
-
-    class Trigger(InlinePromptNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ANY

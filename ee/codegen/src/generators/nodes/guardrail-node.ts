@@ -15,6 +15,7 @@ export class GuardrailNode extends BaseNode<
   GuardrailNodeType,
   GuardrailNodeContext
 > {
+  protected DEFAULT_TRIGGER = "AWAIT_ANY";
   protected getNodeAttributeNameByNodeInputKey(nodeInputKey: string): string {
     return `${INPUTS_PREFIX}.${nodeInputKey}`;
   }

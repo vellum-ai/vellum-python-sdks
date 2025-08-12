@@ -1547,10 +1547,9 @@ class PromptNode(InlinePromptNode):
 "
 `;
 
-exports[`InlinePromptNode > with node trigger AWAIT_ANY > should generate Trigger class with AWAIT_ANY 1`] = `
+exports[`InlinePromptNode > with node trigger AWAIT_ANY > should not generate Trigger class with AWAIT_ANY 1`] = `
 "from vellum import JinjaPromptBlock, PromptParameters
 from vellum.workflows.nodes.displayable import InlinePromptNode
-from vellum.workflows.types.core import MergeBehavior
 
 from ..inputs import Inputs
 
@@ -1574,8 +1573,5 @@ class PromptNode(InlinePromptNode):
         logit_bias={},
         custom_parameters={},
     )
-
-    class Trigger(InlinePromptNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ANY
 "
 `;

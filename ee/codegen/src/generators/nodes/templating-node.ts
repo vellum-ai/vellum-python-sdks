@@ -16,6 +16,7 @@ export class TemplatingNode extends BaseNode<
   TemplatingNodeType,
   TemplatingNodeContext
 > {
+  protected DEFAULT_TRIGGER = "AWAIT_ANY";
   protected getNodeAttributeNameByNodeInputKey(nodeInputKey: string): string {
     if (nodeInputKey === TEMPLATING_INPUT_KEY) {
       return nodeInputKey;
