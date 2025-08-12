@@ -2,7 +2,8 @@ from uuid import UUID
 from typing import Dict
 
 from vellum.workflows.inputs import BaseInputs
-from vellum.workflows.nodes import BaseNode
+from vellum.workflows.nodes import BaseNode, InlineSubworkflowNode
+from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.ports.port import Port
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.state import BaseState
@@ -327,3 +328,54 @@ def test_serialize__port_with_lazy_reference():
             },
         }
     ]
+
+
+def test_global_propagation_deep_nested_subworkflows():
+    # GIVEN the root workflow, a middle workflow, and an inner workflow
+
+    class RootInputs(BaseInputs):
+        root_param: str
+
+    class MiddleInputs(BaseInputs):
+        middle_param: str
+
+    class InnerInputs(BaseInputs):
+        inner_param: str
+
+    class InnerNode(BaseNode):
+        class Outputs(BaseOutputs):
+            done: bool
+
+        def run(self) -> Outputs:
+            return self.Outputs(done=True)
+
+    class InnerWorkflow(BaseWorkflow[InnerInputs, BaseState]):
+        graph = InnerNode
+
+    class MiddleInlineSubworkflowNode(InlineSubworkflowNode):
+        subworkflow_inputs = {"inner_param": "x"}
+        subworkflow = InnerWorkflow
+
+    class MiddleWorkflow(BaseWorkflow[MiddleInputs, BaseState]):
+        graph = MiddleInlineSubworkflowNode
+
+    class OuterInlineSubworkflowNode(InlineSubworkflowNode):
+        subworkflow_inputs = {"middle_param": "y"}
+        subworkflow = MiddleWorkflow
+
+    class RootWorkflow(BaseWorkflow[RootInputs, BaseState]):
+        graph = OuterInlineSubworkflowNode
+
+    # WHEN we build the displays
+    root_display = get_workflow_display(workflow_class=RootWorkflow)
+    middle_display = get_workflow_display(
+        workflow_class=MiddleWorkflow, parent_display_context=root_display.display_context
+    )
+    inner_display = get_workflow_display(
+        workflow_class=InnerWorkflow, parent_display_context=middle_display.display_context
+    )
+
+    # THEN the deepest display must include root + middle + inner inputs in its GLOBAL view
+    inner_global_names = {ref.name for ref in inner_display.display_context.global_workflow_input_displays.keys()}
+
+    assert inner_global_names == {"middle_param", "inner_param", "root_param"}
