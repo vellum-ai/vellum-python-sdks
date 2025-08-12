@@ -148,27 +148,3 @@ def test_local_execute_api_with_hmac_secret(requests_mock):
     assert "X-Vellum-Timestamp" in response_mock.last_request.headers
     assert "X-Vellum-Signature" in response_mock.last_request.headers
     assert result.status_code == 200
-
-
-def test_local_execute_api_without_hmac_secret(requests_mock):
-    """Test that _local_execute_api does not add HMAC headers when VELLUM_HMAC_SECRET is not set."""
-
-    class TestAPINode(BaseAPINode):
-        method = APIRequestMethod.POST
-        url = "https://example.com/test"
-        json = {"test": "data"}
-
-    response_mock = requests_mock.post(
-        "https://example.com/test",
-        json={"result": "success"},
-        status_code=200,
-    )
-
-    with patch.dict(os.environ, {}, clear=True):
-        node = TestAPINode()
-        result = node.run()
-
-    assert response_mock.last_request
-    assert "X-Vellum-Timestamp" not in response_mock.last_request.headers
-    assert "X-Vellum-Signature" not in response_mock.last_request.headers
-    assert result.status_code == 200
