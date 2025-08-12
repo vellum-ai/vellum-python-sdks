@@ -524,7 +524,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         workflow_input_displays: WorkflowInputsDisplays = {}
         # If we're dealing with a nested workflow, then it should have access to the inputs of its parents.
         global_workflow_input_displays = (
-            copy(self._parent_display_context.workflow_input_displays) if self._parent_display_context else {}
+            copy(self._parent_display_context.global_workflow_input_displays) if self._parent_display_context else {}
         )
         for workflow_input in self._workflow.get_inputs_class():
             workflow_input_display_overrides = self.inputs_display.get(workflow_input)
