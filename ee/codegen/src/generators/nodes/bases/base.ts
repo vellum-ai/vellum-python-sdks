@@ -518,9 +518,15 @@ export abstract class BaseNode<
   protected getNodeTrigger(): AstNode | undefined {
     if (
       this.nodeData.trigger &&
-      this.nodeData.trigger.mergeBehavior !== "AWAIT_ATTRIBUTES" &&
-      this.nodeData.trigger.mergeBehavior !== "AWAIT_ANY"
+      this.nodeData.trigger.mergeBehavior !== "AWAIT_ATTRIBUTES"
     ) {
+      if (
+        this.nodeData.trigger.mergeBehavior === "AWAIT_ANY" &&
+        this.isDisplayableNode()
+      ) {
+        return undefined;
+      }
+
       return new NodeTrigger({
         nodeTrigger: this.nodeData.trigger,
         nodeContext: this.nodeContext,
@@ -528,6 +534,15 @@ export abstract class BaseNode<
     }
 
     return undefined;
+  }
+
+  private isDisplayableNode(): boolean {
+    const displayableModulePath =
+      this.workflowContext.sdkModulePathNames.DISPLAYABLE_NODES_MODULE_PATH;
+    return (
+      this.nodeContext.baseNodeClassModulePath.join(".") ===
+      displayableModulePath.join(".")
+    );
   }
 
   public generateNodeClass(): python.Class {
