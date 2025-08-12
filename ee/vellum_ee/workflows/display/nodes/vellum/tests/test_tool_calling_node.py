@@ -185,6 +185,58 @@ def test_serialize_node__tool_calling_node__mcp_server_api_key():
     }
 
 
+def test_serialize_node__tool_calling_node__mcp_server_no_authorization():
+    # GIVEN a tool calling node with an mcp server
+    class MyToolCallingNode(ToolCallingNode):
+        functions = [
+            MCPServer(
+                name="my-mcp-server",
+                url="https://my-mcp-server.com",
+            )
+        ]
+
+    # AND a workflow with the tool calling node
+    class Workflow(BaseWorkflow):
+        graph = MyToolCallingNode
+
+    # WHEN the workflow is serialized
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the node should properly serialize the mcp server
+    my_tool_calling_node = next(
+        node
+        for node in serialized_workflow["workflow_raw_data"]["nodes"]
+        if node["id"] == str(MyToolCallingNode.__id__)
+    )
+
+    functions_attribute = next(
+        attribute for attribute in my_tool_calling_node["attributes"] if attribute["name"] == "functions"
+    )
+
+    assert functions_attribute == {
+        "id": "c8957551-cb3d-49af-8053-acd256c1d852",
+        "name": "functions",
+        "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+                "type": "JSON",
+                "value": [
+                    {
+                        "type": "MCP_SERVER",
+                        "name": "my-mcp-server",
+                        "url": "https://my-mcp-server.com",
+                        "authorization_type": None,
+                        "bearer_token_value": None,
+                        "api_key_header_key": None,
+                        "api_key_header_value": None,
+                    }
+                ],
+            },
+        },
+    }
+
+
 def test_serialize_tool_router_node():
     """
     Test that the tool router node created by create_router_node serializes successfully.
