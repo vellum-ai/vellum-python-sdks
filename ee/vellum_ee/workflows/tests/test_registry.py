@@ -82,7 +82,7 @@ def test_get_parent_display_context_from_event__non_workflow_parent():
 def test_get_parent_display_context_from_event__nested_workflow_parents():
     """Test event with nested workflow parents traverses correctly"""
     # GIVEN a chain of nested contexts:
-    # Event -> NodeParent -> WorkflowParent -> WorkflowParent
+    # Event -> WorkflowParent -> NodeParent -> MiddleWorkflowParent -> NodeParent
 
     # Top level workflow parent
     top_workflow_span_id = uuid4()
@@ -93,12 +93,15 @@ def test_get_parent_display_context_from_event__nested_workflow_parents():
         workflow_definition=MockWorkflow, span_id=top_workflow_span_id, parent=None
     )
 
-    # Middle workflow parent (no display context)
+    top_node_parent = NodeParentContext(node_definition=MockNode, span_id=uuid4(), parent=top_workflow_parent)
+
+    # AND middle workflow parent (no display context)
     middle_workflow_span_id = uuid4()
     middle_workflow_parent = WorkflowParentContext(
-        workflow_definition=MockWorkflow, span_id=middle_workflow_span_id, parent=top_workflow_parent
+        workflow_definition=MockWorkflow, span_id=middle_workflow_span_id, parent=top_node_parent
     )
 
+    # AND node parent between middle workflow and event
     node_parent = NodeParentContext(node_definition=MockNode, span_id=uuid4(), parent=middle_workflow_parent)
 
     event: WorkflowExecutionInitiatedEvent = WorkflowExecutionInitiatedEvent(
@@ -123,9 +126,8 @@ def test_get_parent_display_context_from_event__nested_workflow_parents():
 def test_get_parent_display_context_from_event__middle_workflow_has_context():
     """Test event returns middle workflow context when it's the first one with registered context"""
     # GIVEN a chain of nested contexts:
-    # Event -> NodeParent -> MiddleWorkflowParent
+    # Event -> WorkflowParent -> NodeParent -> MiddleWorkflowParent -> NodeParent
 
-    # Top level workflow parent
     top_workflow_span_id = uuid4()
     top_context = MockWorkflowDisplayContext()
     register_workflow_display_context(str(top_workflow_span_id), top_context)  # type: ignore[arg-type]
@@ -134,13 +136,16 @@ def test_get_parent_display_context_from_event__middle_workflow_has_context():
         workflow_definition=MockWorkflow, span_id=top_workflow_span_id, parent=None
     )
 
+    # AND node parent between top workflow and middle workflow
+    top_node_parent = NodeParentContext(node_definition=MockNode, span_id=uuid4(), parent=top_workflow_parent)
+
     # AND middle workflow parent
     middle_workflow_span_id = uuid4()
     middle_context = MockWorkflowDisplayContext()
     register_workflow_display_context(str(middle_workflow_span_id), middle_context)  # type: ignore[arg-type]
 
     middle_workflow_parent = WorkflowParentContext(
-        workflow_definition=MockWorkflow, span_id=middle_workflow_span_id, parent=top_workflow_parent
+        workflow_definition=MockWorkflow, span_id=middle_workflow_span_id, parent=top_node_parent
     )
 
     node_parent = NodeParentContext(node_definition=MockNode, span_id=uuid4(), parent=middle_workflow_parent)
