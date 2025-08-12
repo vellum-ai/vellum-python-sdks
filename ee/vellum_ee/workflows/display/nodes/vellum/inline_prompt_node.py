@@ -7,7 +7,11 @@ from vellum.workflows.nodes import InlinePromptNode
 from vellum.workflows.types.core import JsonObject, Tool
 from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition, MCPServer
 from vellum.workflows.types.generics import is_workflow_class
-from vellum.workflows.utils.functions import compile_function_definition, compile_inline_workflow_function_definition
+from vellum.workflows.utils.functions import (
+    compile_function_definition,
+    compile_inline_workflow_function_definition,
+    compile_workflow_deployment_function_definition,
+)
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
@@ -71,7 +75,10 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
             ]
 
         functions = (
-            [self._generate_function_tools(function, i) for i, function in enumerate(function_definitions)]
+            [
+                self._generate_function_tools(function, i, display_context)
+                for i, function in enumerate(function_definitions)
+            ]
             if isinstance(function_definitions, list)
             else []
         )
@@ -147,14 +154,20 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
 
         return node_inputs, prompt_inputs
 
-    def _generate_function_tools(self, function: Union[FunctionDefinition, Tool], index: int) -> JsonObject:
+    def _generate_function_tools(
+        self, function: Union[FunctionDefinition, Tool], index: int, display_context: WorkflowDisplayContext
+    ) -> JsonObject:
         if isinstance(function, FunctionDefinition):
             normalized_functions = function
         elif is_workflow_class(function):
             normalized_functions = compile_inline_workflow_function_definition(function)
         elif callable(function):
             normalized_functions = compile_function_definition(function)
-        elif isinstance(function, (DeploymentDefinition, ComposioToolDefinition, MCPServer)):
+        elif isinstance(function, DeploymentDefinition):
+            normalized_functions = compile_workflow_deployment_function_definition(
+                function.model_dump(), display_context.client
+            )
+        elif isinstance(function, (ComposioToolDefinition, MCPServer)):
             raise NotImplementedError(f"Function tool generation for {type(function).__name__} not yet implemented")
         else:
             raise ValueError(f"Unsupported function type: {type(function)}")
