@@ -14,6 +14,7 @@ export class PromptDeploymentNode extends BaseNode<
   PromptNode,
   PromptDeploymentNodeContext
 > {
+  protected DEFAULT_TRIGGER = "AWAIT_ANY";
   protected getNodeAttributeNameByNodeInputKey(nodeInputKey: string): string {
     return `${INPUTS_PREFIX}.${nodeInputKey}`;
   }

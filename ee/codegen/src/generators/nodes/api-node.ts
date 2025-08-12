@@ -14,6 +14,7 @@ const BODY_INPUT_KEY = "body";
 const JSON_ATTRIBUTE_NAME = "json";
 
 export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
+  protected DEFAULT_TRIGGER = "AWAIT_ANY";
   protected getNodeAttributeNameByNodeInputKey(nodeInputKey: string): string {
     if (nodeInputKey === BODY_INPUT_KEY) {
       // This field was renamed in the SDK for consistency with `requests` pip package

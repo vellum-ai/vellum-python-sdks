@@ -17,6 +17,7 @@ export class SubworkflowDeploymentNode extends BaseNode<
   SubworkflowNodeType,
   SubworkflowDeploymentNodeContext
 > {
+  protected DEFAULT_TRIGGER = "AWAIT_ANY";
   protected getNodeAttributeNameByNodeInputKey(nodeInputKey: string): string {
     return `${INPUTS_PREFIX}.${nodeInputKey}`;
   }

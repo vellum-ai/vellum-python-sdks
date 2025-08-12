@@ -593,10 +593,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
 
     statements.push(...this.nodeAttributes);
 
-    if (
-      this.nodeData.trigger.mergeBehavior !== "AWAIT_ATTRIBUTES" &&
-      this.nodeData.trigger.mergeBehavior !== "AWAIT_ANY"
-    ) {
+    if (this.nodeData.trigger.mergeBehavior !== "AWAIT_ATTRIBUTES") {
       statements.push(
         new NodeTrigger({
           nodeTrigger: this.nodeData.trigger,
