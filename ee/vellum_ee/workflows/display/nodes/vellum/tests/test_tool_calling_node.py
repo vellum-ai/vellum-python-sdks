@@ -458,11 +458,10 @@ def test_serialize_tool_prompt_node_with_inline_workflow():
     # THEN the workflow should serialize successfully
     assert serialized_workflow is not None
 
-    workflow_raw_data = serialized_workflow["workflow_raw_data"]
+    workflow_raw_data = cast(Dict[str, Any], serialized_workflow["workflow_raw_data"])
+    nodes = cast(List[Dict[str, Any]], workflow_raw_data["nodes"])
     tool_prompt_node_data = next(
-        node
-        for node in workflow_raw_data["nodes"]
-        if node.get("type") == "PROMPT" and node.get("data", {}).get("variant") == "INLINE"
+        node for node in nodes if node.get("type") == "PROMPT" and node.get("data", {}).get("variant") == "INLINE"
     )
 
     # THEN it should match the expected serialized schema structure
@@ -477,57 +476,21 @@ def test_serialize_tool_prompt_node_with_inline_workflow():
 
     # Validate core structure
     assert tool_prompt_node_data["type"] == expected_tool_prompt_node["type"]
-    assert tool_prompt_node_data["data"]["label"] == expected_tool_prompt_node["data"]["label"]
-    assert tool_prompt_node_data["data"]["variant"] == expected_tool_prompt_node["data"]["variant"]
-    assert tool_prompt_node_data["data"]["ml_model_name"] == expected_tool_prompt_node["data"]["ml_model_name"]
+
+    tool_prompt_data = cast(Dict[str, Any], tool_prompt_node_data["data"])
+    expected_data = cast(Dict[str, Any], expected_tool_prompt_node["data"])
+    assert tool_prompt_data["label"] == expected_data["label"]
+    assert tool_prompt_data["variant"] == expected_data["variant"]
+    assert tool_prompt_data["ml_model_name"] == expected_data["ml_model_name"]
     assert tool_prompt_node_data["base"] == expected_tool_prompt_node["base"]
 
     # AND it should have the functions attribute with inline workflow
-    functions_attribute = next(
-        attribute for attribute in tool_prompt_node_data["attributes"] if attribute["name"] == "functions"
-    )
+    attributes = cast(List[Dict[str, Any]], tool_prompt_node_data["attributes"])
+    functions_attribute = next(attribute for attribute in attributes if attribute["name"] == "functions")
 
     assert functions_attribute["value"]["type"] == "CONSTANT_VALUE"
     assert functions_attribute["value"]["value"]["type"] == "JSON"
-    functions_list = functions_attribute["value"]["value"]["value"]
-    # WHEN we create a tool prompt node using create_tool_prompt_node with inline workflow
-    tool_prompt_node = create_tool_prompt_node(
-        ml_model="gpt-4o-mini",
-        blocks=[],
-        functions=[SimpleInlineWorkflow],
-        prompt_inputs=None,
-        parameters=PromptParameters(),
-    )
-
-    tool_prompt_node_display_class = get_node_display_class(tool_prompt_node)
-    tool_prompt_node_display = tool_prompt_node_display_class()
-
-    # AND we create a workflow that uses this tool prompt node
-    class TestWorkflow(BaseWorkflow[BaseInputs, ToolCallingState]):
-        graph = tool_prompt_node
-
-    # WHEN we serialize the entire workflow to get display context
-    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
-    display_context = workflow_display.display_context
-
-    # WHEN we serialize the tool prompt node directly
-    serialized_tool_prompt_node = tool_prompt_node_display.serialize(display_context)
-
-    # THEN the tool prompt node should serialize successfully
-    assert serialized_tool_prompt_node is not None
-    assert serialized_tool_prompt_node["type"] == "PROMPT"
-    assert serialized_tool_prompt_node["data"]["variant"] == "INLINE"
-    assert serialized_tool_prompt_node["data"]["ml_model_name"] == "gpt-4o-mini"
-
-    # AND it should have the functions attribute with inline workflow
-    attributes = serialized_tool_prompt_node["attributes"]
-    functions_attribute = next(
-        attribute for attribute in attributes if attribute["name"] == "functions"
-    )
-
-    assert functions_attribute["value"]["type"] == "CONSTANT_VALUE"
-    assert functions_attribute["value"]["value"]["type"] == "JSON"
-    functions_list = functions_attribute["value"]["value"]["value"]
+    functions_list = cast(List[Dict[str, Any]], functions_attribute["value"]["value"]["value"])
     assert len(functions_list) == 1
 
     inline_workflow_function = functions_list[0]
@@ -536,13 +499,13 @@ def test_serialize_tool_prompt_node_with_inline_workflow():
     assert inline_workflow_function["description"] == "A simple workflow for testing inline tool serialization."
 
     # AND the inline workflow should have proper exec_config structure
-    exec_config = inline_workflow_function["exec_config"]
+    exec_config = cast(Dict[str, Any], inline_workflow_function["exec_config"])
     assert "workflow_raw_data" in exec_config
     assert "input_variables" in exec_config
     assert "output_variables" in exec_config
 
-    input_variables = exec_config["input_variables"]
-    output_variables = exec_config["output_variables"]
+    input_variables = cast(List[Dict[str, Any]], exec_config["input_variables"])
+    output_variables = cast(List[Dict[str, Any]], exec_config["output_variables"])
 
     assert len(input_variables) == 1
     assert input_variables[0]["key"] == "message"
