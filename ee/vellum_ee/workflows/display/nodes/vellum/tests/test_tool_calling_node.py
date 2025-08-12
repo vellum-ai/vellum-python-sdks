@@ -458,8 +458,10 @@ def test_serialize_tool_prompt_node_with_inline_workflow():
     serialized_tool_prompt_node = tool_prompt_node_display.serialize(display_context)
 
     # THEN prompt inputs should be serialized correctly
+    attributes = serialized_tool_prompt_node["attributes"]
+    assert isinstance(attributes, list)
     prompt_inputs_attr = next(
-        (attr for attr in serialized_tool_prompt_node["attributes"] if attr["name"] == "prompt_inputs"), None
+        (attr for attr in attributes if isinstance(attr, dict) and attr["name"] == "prompt_inputs"), None
     )
     assert prompt_inputs_attr == {
         "id": "bc1320a2-23e4-4238-8b00-efbf88e91856",
