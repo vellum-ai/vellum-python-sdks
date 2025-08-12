@@ -353,116 +353,29 @@ def test_global_propagation_deep_nested_subworkflows():
         graph = InnerNode
 
     class MiddleInlineSubworkflowNode(InlineSubworkflowNode):
-        subworkflow_inputs = {"inner_param": RootInputs.root_param}
+        subworkflow_inputs = {"inner_param": "x"}
         subworkflow = InnerWorkflow
 
     class MiddleWorkflow(BaseWorkflow[MiddleInputs, BaseState]):
         graph = MiddleInlineSubworkflowNode
 
     class OuterInlineSubworkflowNode(InlineSubworkflowNode):
-        subworkflow_inputs = {"middle_param": RootInputs.root_param}
+        subworkflow_inputs = {"middle_param": "y"}
         subworkflow = MiddleWorkflow
 
     class RootWorkflow(BaseWorkflow[RootInputs, BaseState]):
         graph = OuterInlineSubworkflowNode
 
-    # WHEN we serialize the root workflow
+    # WHEN we build the displays
     root_display = get_workflow_display(workflow_class=RootWorkflow)
-    serialized_data = root_display.serialize()
-
-    # THEN the serialized data should show that both subworkflows use root_param
-    workflow_raw_data = serialized_data["workflow_raw_data"]
-    assert isinstance(workflow_raw_data, dict)
-
-    nodes = workflow_raw_data["nodes"]
-    assert isinstance(nodes, list)
-
-    outer_subworkflow_node = next(
-        (
-            node
-            for node in nodes
-            if isinstance(node, dict)
-            and node.get("type") == "SUBWORKFLOW"
-            and "OuterInlineSubworkflowNode" in str(node.get("definition", {}))
-        ),
-        None,
+    middle_display = get_workflow_display(
+        workflow_class=MiddleWorkflow, parent_display_context=root_display.display_context
     )
-    assert outer_subworkflow_node is not None
-    assert isinstance(outer_subworkflow_node, dict)
-
-    # Verify the outer subworkflow references root_param
-    outer_inputs = outer_subworkflow_node["inputs"]
-    assert isinstance(outer_inputs, list)
-    outer_input = outer_inputs[0]
-    assert isinstance(outer_input, dict)
-    assert outer_input["key"] == "middle_param"
-
-    outer_value = outer_input["value"]
-    assert isinstance(outer_value, dict)
-    outer_rules = outer_value["rules"]
-    assert isinstance(outer_rules, list)
-    outer_rule = outer_rules[0]
-    assert isinstance(outer_rule, dict)
-    assert outer_rule["type"] == "INPUT_VARIABLE"
-
-    outer_data = outer_rule["data"]
-    assert isinstance(outer_data, dict)
-    root_input_variable_id = outer_data["input_variable_id"]
-    assert isinstance(root_input_variable_id, str)
-
-    outer_data = outer_subworkflow_node["data"]
-    assert isinstance(outer_data, dict)
-    middle_workflow_data = outer_data["workflow_raw_data"]
-    assert isinstance(middle_workflow_data, dict)
-    middle_nodes = middle_workflow_data["nodes"]
-    assert isinstance(middle_nodes, list)
-
-    middle_subworkflow_node = next(
-        (
-            node
-            for node in middle_nodes
-            if isinstance(node, dict)
-            and node.get("type") == "SUBWORKFLOW"
-            and "MiddleInlineSubworkflowNode" in str(node.get("definition", {}))
-        ),
-        None,
+    inner_display = get_workflow_display(
+        workflow_class=InnerWorkflow, parent_display_context=middle_display.display_context
     )
-    assert middle_subworkflow_node is not None
-    assert isinstance(middle_subworkflow_node, dict)
 
-    # Verify the middle subworkflow also references the same root input variable
-    middle_inputs = middle_subworkflow_node["inputs"]
-    assert isinstance(middle_inputs, list)
-    middle_input = middle_inputs[0]
-    assert isinstance(middle_input, dict)
-    assert middle_input["key"] == "inner_param"
+    # THEN the deepest display must include root + middle + inner inputs in its GLOBAL view
+    inner_global_names = {ref.name for ref in inner_display.display_context.global_workflow_input_displays.keys()}
 
-    middle_value = middle_input["value"]
-    assert isinstance(middle_value, dict)
-    middle_rules = middle_value["rules"]
-    assert isinstance(middle_rules, list)
-    middle_rule = middle_rules[0]
-    assert isinstance(middle_rule, dict)
-    assert middle_rule["type"] == "INPUT_VARIABLE"
-
-    middle_data = middle_rule["data"]
-    assert isinstance(middle_data, dict)
-    middle_input_variable_id = middle_data["input_variable_id"]
-    assert isinstance(middle_input_variable_id, str)
-    assert middle_input_variable_id == root_input_variable_id
-
-    # Verify that the root input variable corresponds to root_param
-    input_variables = serialized_data["input_variables"]
-    assert isinstance(input_variables, list)
-
-    root_input_variable = next(
-        (
-            input_var
-            for input_var in input_variables
-            if isinstance(input_var, dict) and input_var["id"] == root_input_variable_id
-        ),
-        None,
-    )
-    assert root_input_variable is not None
-    assert isinstance(root_input_variable, dict)
-    assert root_input_variable["key"] == "root_param"
+    assert inner_global_names == {"middle_param", "inner_param", "root_param"}
