@@ -8,6 +8,7 @@ from vellum.client.types.number_vellum_value import NumberVellumValue
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.state.context import WorkflowContext
+from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 from vellum_ee.workflows.server.virtual_file_loader import VirtualFileFinder
 
 
@@ -561,9 +562,7 @@ class Workflow(BaseWorkflow[Inputs, BaseState]):
     # AND the virtual file loader is registered
     sys.meta_path.append(VirtualFileFinder(files, namespace))
 
-    from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
-
     result = BaseWorkflowDisplay.serialize_module(namespace)
 
-    # THEN the serialization should complete (this test expects to fail)
+    # THEN the serialization should complete successfully
     assert result is not None
