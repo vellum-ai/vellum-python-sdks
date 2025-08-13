@@ -12,7 +12,6 @@ import { createNodeContext, WorkflowContext } from "src/context";
 import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { GenericNode } from "src/generators/nodes/generic-node";
 import {
-  ComposioToolFunctionArgs,
   FunctionArgs,
   MCPServerFunctionArgs,
   NodePort,
@@ -155,51 +154,67 @@ describe("ToolCallingNode", () => {
   });
 
   describe("composio tool", () => {
-    const composioToolFunction: ComposioToolFunctionArgs = {
-      type: "COMPOSIO",
-      name: "github_create_an_issue",
-      integration_name: "GITHUB",
-      tool_slug: "GITHUB_CREATE_AN_ISSUE",
-      description: "Create a new issue in a GitHub repository",
-    };
+    it.each([
+      {
+        name: "with integration_name and tool_slug",
+        composioToolFunction: {
+          type: "COMPOSIO",
+          name: "github_create_an_issue",
+          integration_name: "GITHUB", // legacy field, use toolkit
+          tool_slug: "GITHUB_CREATE_AN_ISSUE", // legacy field, use action
+          description: "Create a new issue in a GitHub repository",
+        },
+      },
+      {
+        name: "with toolkit and action",
+        composioToolFunction: {
+          type: "COMPOSIO",
+          name: "github_create_an_issue",
+          toolkit: "GITHUB",
+          action: "GITHUB_CREATE_AN_ISSUE",
+          description: "Create a new issue in a GitHub repository",
+        },
+      },
+    ])(
+      "should generate composio tool $name",
+      async ({ composioToolFunction }) => {
+        const nodePortData: NodePort[] = [
+          nodePortFactory({
+            id: "port-id",
+          }),
+        ];
 
-    it("should generate composio tool", async () => {
-      const nodePortData: NodePort[] = [
-        nodePortFactory({
-          id: "port-id",
-        }),
-      ];
+        const functionsAttribute = nodeAttributeFactory(
+          "functions-attr-id",
+          "functions",
+          {
+            type: "CONSTANT_VALUE",
+            value: {
+              type: "JSON",
+              value: [composioToolFunction],
+            },
+          }
+        );
 
-      const functionsAttribute = nodeAttributeFactory(
-        "functions-attr-id",
-        "functions",
-        {
-          type: "CONSTANT_VALUE",
-          value: {
-            type: "JSON",
-            value: [composioToolFunction],
-          },
-        }
-      );
+        const nodeData = toolCallingNodeFactory({
+          nodePorts: nodePortData,
+          nodeAttributes: [functionsAttribute],
+        });
 
-      const nodeData = toolCallingNodeFactory({
-        nodePorts: nodePortData,
-        nodeAttributes: [functionsAttribute],
-      });
+        const nodeContext = (await createNodeContext({
+          workflowContext,
+          nodeData,
+        })) as GenericNodeContext;
 
-      const nodeContext = (await createNodeContext({
-        workflowContext,
-        nodeData,
-      })) as GenericNodeContext;
+        const node = new GenericNode({
+          workflowContext,
+          nodeContext,
+        });
 
-      const node = new GenericNode({
-        workflowContext,
-        nodeContext,
-      });
-
-      node.getNodeFile().write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
-    });
+        node.getNodeFile().write(writer);
+        expect(await writer.toStringFormatted()).toMatchSnapshot();
+      }
+    );
 
     // TODO: Combine this with the test above once attributes are finalized
     // This test was written to repro a codegen bug that is now fixed

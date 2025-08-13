@@ -204,8 +204,13 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   const composioTool = f as ComposioToolFunctionArgs;
 
                   // Validate required fields and provide fallbacks for missing fields
-                  const toolkit = composioTool.integration_name || "UNKNOWN";
-                  const action = composioTool.tool_slug || "UNKNOWN";
+                  // Frontend sends integration_name and tool_slug, but backend sends toolkit and action
+                  const toolkit =
+                    composioTool.integration_name ||
+                    composioTool.toolkit ||
+                    "UNKNOWN";
+                  const action =
+                    composioTool.tool_slug || composioTool.action || "UNKNOWN";
                   const description = composioTool.description || "UNKNOWN";
 
                   const args = [
