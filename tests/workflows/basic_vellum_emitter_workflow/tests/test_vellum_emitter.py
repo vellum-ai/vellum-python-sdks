@@ -69,7 +69,7 @@ def test_vellum_emitter__happy_path(mock_workflow_context, mock_type_adapter):
     emitter.register_context(mock_workflow_context)
 
     # AND we have a test workflow event
-    workflow_initiated_event = WorkflowExecutionInitiatedEvent(
+    workflow_initiated_event: WorkflowExecutionInitiatedEvent = WorkflowExecutionInitiatedEvent(
         id=UUID("123e4567-e89b-12d3-a456-426614174000"),
         timestamp=datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
         trace_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
