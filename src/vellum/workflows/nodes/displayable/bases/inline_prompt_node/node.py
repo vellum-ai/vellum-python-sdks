@@ -122,8 +122,13 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                     )
                 elif is_workflow_class(function):
                     normalized_functions.append(compile_inline_workflow_function_definition(function))
-                else:
+                elif callable(function):
                     normalized_functions.append(compile_function_definition(function))
+                else:
+                    raise NodeException(
+                        message=f"`{function}` is not a valid function definition",
+                        code=WorkflowErrorCode.INVALID_INPUTS,
+                    )
 
         if self.settings and not self.settings.stream_enabled:
             # This endpoint is returning a single event, so we need to wrap it in a generator
