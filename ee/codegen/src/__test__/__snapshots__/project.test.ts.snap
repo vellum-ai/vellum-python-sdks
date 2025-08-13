@@ -3,6 +3,7 @@
 exports[`WorkflowProjectGenerator > Get inline prompt node files > should generate the function at top level of node file > inline_prompt_test/nodes/inline_prompt_node.py 1`] = `
 "from vellum import JinjaPromptBlock, PromptParameters
 from vellum.workflows.nodes.displayable import InlinePromptNode as BaseInlinePromptNode
+from vellum.workflows.types.core import MergeBehavior
 
 
 def my_test_function(arg1: str, arg2: str) -> str:
@@ -27,6 +28,9 @@ class InlinePromptNode(BaseInlinePromptNode):
         logit_bias=None,
         custom_parameters=None,
     )
+
+    class Trigger(BaseInlinePromptNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
