@@ -88,11 +88,8 @@ class VellumEmitter(BaseWorkflowEmitter):
         client = self._context.vellum_client
 
         try:
-            try:
-                client_event = self._type_adapter.validate_python(event)
-            except Exception:
-                event_dump = event.model_dump(mode="json")
-                client_event = self._type_adapter.validate_json(json.dumps(event_dump))
+            event_dump = event.model_dump(mode="json")
+            client_event = self._type_adapter.validate_json(json.dumps(event_dump))
 
             request_options = RequestOptions(timeout_in_seconds=self._timeout, max_retries=self._max_retries)
 

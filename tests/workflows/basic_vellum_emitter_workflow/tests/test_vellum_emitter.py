@@ -1,9 +1,22 @@
 import pytest
+from datetime import datetime, timezone
 from unittest.mock import Mock, patch
+from uuid import UUID
 
 from vellum.workflows.emitters.vellum_emitter import VellumEmitter
+from vellum.workflows.events.workflow import WorkflowExecutionInitiatedBody, WorkflowExecutionInitiatedEvent
+from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.context import WorkflowContext
+from vellum.workflows.workflows.base import BaseWorkflow
+
+
+class TestInputs(BaseInputs):
+    foo: str = "bar"
+
+
+class TestWorkflow(BaseWorkflow[TestInputs, BaseState]):
+    pass
 
 
 class TestState(BaseState):
@@ -47,7 +60,7 @@ def test_vellum_emitter__happy_path(mock_workflow_context, mock_type_adapter):
     # GIVEN a properly configured VellumEmitter with mocked TypeAdapter
     mock_client_event = Mock()
     mock_client_event.name = "workflow.execution.initiated"
-    mock_type_adapter.validate_python.return_value = mock_client_event
+    mock_type_adapter.validate_json.return_value = mock_client_event
 
     # AND a VellumEmitter initialized
     emitter = VellumEmitter()
@@ -56,27 +69,16 @@ def test_vellum_emitter__happy_path(mock_workflow_context, mock_type_adapter):
     emitter.register_context(mock_workflow_context)
 
     # AND we have a test workflow event
-    workflow_initiated_event = Mock()
-    workflow_initiated_event.name = "workflow.execution.initiated"
-    workflow_initiated_event.id = "test-event-id"
-    workflow_initiated_event.timestamp = "2024-01-01T12:00:00Z"
-    workflow_initiated_event.trace_id = "test-trace-id"
-    workflow_initiated_event.span_id = "test-span-id"
-    workflow_initiated_event.parent = None
-
-    # AND we add a model_dump method to the mock event for fallback conversion
-    workflow_initiated_event.model_dump.return_value = {
-        "name": "workflow.execution.initiated",
-        "id": "test-event-id",
-        "timestamp": "2024-01-01T12:00:00Z",
-        "trace_id": "test-trace-id",
-        "span_id": "test-span-id",
-        "parent": None,
-        "body": {
-            "workflow_definition": {"name": "TestWorkflow", "module": ["test", "module"], "id": "workflow-def-id"},
-            "inputs": {"input_key": "input_value"},
-        },
-    }
+    workflow_initiated_event = WorkflowExecutionInitiatedEvent(
+        id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+        timestamp=datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
+        trace_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+        span_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+        body=WorkflowExecutionInitiatedBody(
+            workflow_definition=TestWorkflow,
+            inputs=TestInputs(foo="test"),
+        ),
+    )
 
     # WHEN we emit the workflow event
     emitter.emit_event(workflow_initiated_event)
@@ -97,4 +99,4 @@ def test_vellum_emitter__happy_path(mock_workflow_context, mock_type_adapter):
     assert client_event.name == "workflow.execution.initiated"
 
     # AND the TypeAdapter should have been called for the event conversion
-    assert mock_type_adapter.validate_python.call_count == 1
+    assert mock_type_adapter.validate_json.call_count == 1
