@@ -178,6 +178,10 @@
           ],
           "name": "ConditionalNode"
         },
+        "trigger": {
+          "id": "842b9dda-7977-47ad-a322-eb15b4c7069d",
+          "merge_behavior": "AWAIT_ANY"
+        },
         "ports": [
           {
             "type": "IF",

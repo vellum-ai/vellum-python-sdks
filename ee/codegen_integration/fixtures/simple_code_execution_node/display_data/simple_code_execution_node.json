@@ -63,6 +63,10 @@
           ],
           "name": "CodeExecutionNode"
         },
+        "trigger": {
+          "id": "dba6c62b-8519-48ba-b888-ed2ca346fba8",
+          "merge_behavior": "AWAIT_ANY"
+        },
         "inputs": [
           {
             "id": "78da07ee-cc77-445e-af85-f60ab4f7a59f",

@@ -261,6 +261,10 @@
           ],
           "name": "ApiNode"
         },
+        "trigger": {
+          "id": "fd10e0db-0130-4fdc-8fc7-146eafe1b470",
+          "merge_behavior": "AWAIT_ANY"
+        },
         "ports": [
           {
             "id": "b8ad3fd2-c96c-4ae8-8eae-d234fb13a139",

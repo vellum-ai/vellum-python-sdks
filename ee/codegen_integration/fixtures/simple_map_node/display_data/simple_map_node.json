@@ -114,6 +114,10 @@
           ],
           "name": "CodeExecutionNode"
         },
+        "trigger": {
+          "id": "3a82ede9-4b1b-42fc-84a0-10e91de602dc",
+          "merge_behavior": "AWAIT_ANY"
+        },
         "ports": [
           {
             "id": "734e3a85-f96e-408e-89f1-703bcc486e8a",
@@ -240,6 +244,10 @@
                     "templating_node"
                   ],
                   "name": "TemplatingNode"
+                },
+                "trigger": {
+                  "id": "d1b8ef3d-1474-4cfb-8fb0-164f7b238a07",
+                  "merge_behavior": "AWAIT_ATTRIBUTES"
                 },
                 "ports": [
                   {
@@ -431,6 +439,10 @@
                     "nodes",
                     "search_node"
                   ]
+                },
+                "trigger": {
+                  "id": "df39e340-f66c-4f1c-b030-5437a2183414",
+                  "merge_behavior": "AWAIT_ANY"
                 },
                 "ports": [
                   {
@@ -665,6 +677,10 @@
             "nodes",
             "map_node"
           ]
+        },
+        "trigger": {
+          "id": "0d15cb2c-256e-423e-a489-c9f87e181280",
+          "merge_behavior": "AWAIT_ATTRIBUTES"
         },
         "ports": [
           {

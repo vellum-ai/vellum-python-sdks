@@ -80,6 +80,10 @@
           ],
           "name": "TemplatingNode"
         },
+        "trigger": {
+          "id": "3522e32d-6735-499b-8d45-c0c6488ae92f",
+          "merge_behavior": "AWAIT_ATTRIBUTES"
+        },
         "ports": [
           {
             "id": "9bce9d0a-3b0e-478e-8a97-f0510715a5a0",
