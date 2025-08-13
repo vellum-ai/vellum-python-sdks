@@ -1,12 +1,14 @@
 import json
 from uuid import uuid4
-from typing import Any, Iterator
+from typing import Any, Iterator, List
 
 from vellum import ChatMessage
+from vellum.client.types.execute_prompt_event import ExecutePromptEvent
 from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
 from vellum.client.types.function_call import FunctionCall
 from vellum.client.types.function_call_vellum_value import FunctionCallVellumValue
 from vellum.client.types.initiated_execute_prompt_event import InitiatedExecutePromptEvent
+from vellum.client.types.prompt_output import PromptOutput
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
 from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
@@ -25,6 +27,7 @@ from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState, StateMeta
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.definition import DeploymentDefinition
+from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 
 def first_function() -> str:
@@ -238,3 +241,84 @@ def test_tool_calling_node_with_generic_type_parameter():
     assert node is not None
     assert isinstance(node, TestToolCallingNode)
     assert node.state == state
+
+
+def test_tool_calling_node_workflow_is_dynamic(vellum_adhoc_prompt_client):
+    """
+    Test workflow_version_exec_config without any mocks to see if that's the issue.
+    """
+
+    def generate_prompt_events(*args, **kwargs) -> Iterator[ExecutePromptEvent]:
+        execution_id = str(uuid4())
+
+        call_count = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count
+        expected_outputs: List[PromptOutput]
+        if call_count == 1:
+            expected_outputs = [
+                FunctionCallVellumValue(
+                    value=FunctionCall(
+                        arguments={"var_1": 1, "var_2": 2},
+                        id="call_123",
+                        name="add_numbers_workflow",
+                        state="FULFILLED",
+                    ),
+                ),
+            ]
+        else:
+            expected_outputs = [StringVellumValue(value="The result is 3")]
+
+        events: List[ExecutePromptEvent] = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            FulfilledExecutePromptEvent(
+                execution_id=execution_id,
+                outputs=expected_outputs,
+            ),
+        ]
+        yield from events
+
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
+
+    class AddNode(BaseNode):
+
+        class Outputs(BaseNode.Outputs):
+            result: int
+
+        def run(self) -> Outputs:
+            return self.Outputs(result=1)
+
+    class AddNumbersWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        """
+        A simple workflow that adds two numbers.
+        """
+
+        graph = AddNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            result = AddNode.Outputs.result
+
+    class TestToolCallingNode(ToolCallingNode):
+        ml_model = "gpt-4o-mini"
+        blocks = []
+        functions = [AddNumbersWorkflow]
+        prompt_inputs = {}
+
+    # GIVEN a workflow with just a tool calling node
+    class ToolCallingWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = TestToolCallingNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            text: str = TestToolCallingNode.Outputs.text
+            chat_history: List[ChatMessage] = TestToolCallingNode.Outputs.chat_history
+
+    workflow = ToolCallingWorkflow()
+
+    # WHEN the workflow is executed and we capture all events
+    events = list(workflow.stream(event_filter=all_workflow_event_filter))
+
+    # AND we should find workflow execution initiated events
+    initiated_events = [event for event in events if event.name == "workflow.execution.initiated"]
+    assert len(initiated_events) == 3  # Main workflow + tool calling internal + inline workflow
+
+    assert initiated_events[0].body.is_dynamic is False  # Main workflow
+    assert initiated_events[1].body.is_dynamic is True  # Tool calling internal
+    assert initiated_events[2].body.is_dynamic is True  # Inline workflow

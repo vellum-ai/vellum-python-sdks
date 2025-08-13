@@ -9,6 +9,7 @@ from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.workflows.base import BaseWorkflow
+from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 
 class Inputs(BaseInputs):
@@ -143,3 +144,36 @@ def test_inline_subworkflow_node__with_adornment():
     outputs = list(node.run())
 
     assert outputs[-1].name == "final_output" and outputs[-1].value == "hello"
+
+
+def test_inline_subworkflow_node__is_dynamic_subworkflow():
+    """Test that InlineSubworkflowNode sets is_dynamic=True on the subworkflow class"""
+
+    # GIVEN a subworkflow class
+    class TestSubworkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = MyInnerNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            out = MyInnerNode.Outputs.out
+
+    # AND a node that uses this subworkflow
+    class TestNode(InlineSubworkflowNode):
+        subworkflow = TestSubworkflow
+
+    # AND a workflow that uses this node
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = TestNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            out = TestNode.Outputs.out
+
+    # WHEN the workflow is executed
+    workflow = TestWorkflow()
+    events = list(workflow.stream(event_filter=all_workflow_event_filter))
+
+    # AND we should find workflow execution initiated events
+    initiated_events = [event for event in events if event.name == "workflow.execution.initiated"]
+    assert len(initiated_events) == 2  # Main workflow + inline workflow
+
+    assert initiated_events[0].body.is_dynamic is False  # Main workflow
+    assert initiated_events[1].body.is_dynamic is True  # Inline workflow

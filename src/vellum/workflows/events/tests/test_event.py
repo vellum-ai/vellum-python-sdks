@@ -70,6 +70,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
                 body=WorkflowExecutionInitiatedBody(
                     workflow_definition=MockWorkflow,
                     inputs=MockInputs(foo="bar"),
+                    is_dynamic=False,
                 ),
             ),
             {
@@ -90,6 +91,8 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
                     },
                     "display_context": None,
                     "initial_state": None,
+                    "is_dynamic": False,
+                    "workflow_version_exec_config": None,
                 },
                 "parent": None,
             },

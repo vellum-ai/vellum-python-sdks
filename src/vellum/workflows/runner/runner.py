@@ -634,6 +634,7 @@ class WorkflowRunner(Generic[StateType]):
                 workflow_definition=self.workflow.__class__,
                 inputs=self._initial_state.meta.workflow_inputs,
                 initial_state=deepcopy(self._initial_state) if self._should_emit_initial_state else None,
+                is_dynamic=self.workflow.is_dynamic,
             ),
             parent=self._execution_context.parent_context,
         )

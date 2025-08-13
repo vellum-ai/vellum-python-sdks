@@ -76,6 +76,7 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
 
             class ToolCallingWorkflow(BaseWorkflow[BaseInputs, ToolCallingState]):
                 graph = self._graph
+                is_dynamic = True
 
                 class Outputs(BaseWorkflow.Outputs):
                     text: str = self.tool_prompt_node.Outputs.text
