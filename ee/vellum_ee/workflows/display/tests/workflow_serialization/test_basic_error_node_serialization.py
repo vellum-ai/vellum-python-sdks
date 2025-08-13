@@ -116,9 +116,9 @@ def test_serialize_workflow():
             },
             "trigger": {
                 "id": "70c19f1c-309c-4a5d-ba65-664c0bb2fedf",
-                "merge_behavior": "AWAIT_ALL",
+                "merge_behavior": "AWAIT_ATTRIBUTES",
             },
-            "ports": [],
+            "ports": [{"id": "ca17d318-a0f5-4f7c-be6c-59c9dc1dd7ed", "name": "default", "type": "DEFAULT"}],
         },
         error_node,
         ignore_order=True,
@@ -171,11 +171,6 @@ def test_serialize_workflow():
                 ],
             },
             "definition": None,
-            "trigger": {
-                "id": "b070e9bc-e9b7-46d3-8f5b-0b646bd25cf0",
-                "merge_behavior": "AWAIT_ALL",
-            },
-            "ports": [],
         },
         terminal_node,
     )
