@@ -109,9 +109,6 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
                 },
                 "ml_model_name": ml_model,
             },
-            "display_data": self.get_display_data().dict(),
-            "base": self.get_base().dict(),
-            "definition": self.get_definition().dict(),
             **self.serialize_generic_fields(display_context),
             "outputs": [
                 {"id": str(json_display.id), "name": "json", "type": "JSON", "value": None},

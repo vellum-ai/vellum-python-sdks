@@ -45,9 +45,7 @@ class BaseFinalOutputNodeDisplay(BaseNodeDisplay[_FinalOutputNodeType], Generic[
                 "node_input_id": str(node_input.id),
             },
             "inputs": [node_input.dict()],
-            "display_data": self.get_display_data().dict(),
-            "base": self.get_base().dict(),
-            "definition": self.get_definition().dict(),
+            **self.serialize_generic_fields(display_context),
             "outputs": [
                 {
                     "id": str(self._get_output_id()),
