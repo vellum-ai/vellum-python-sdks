@@ -160,8 +160,8 @@ describe("ToolCallingNode", () => {
         composioToolFunction: {
           type: "COMPOSIO",
           name: "github_create_an_issue",
-          integration_name: "GITHUB",
-          tool_slug: "GITHUB_CREATE_AN_ISSUE",
+          integration_name: "GITHUB", // legacy field, use toolkit
+          tool_slug: "GITHUB_CREATE_AN_ISSUE", // legacy field, use action
           description: "Create a new issue in a GitHub repository",
         },
       },
