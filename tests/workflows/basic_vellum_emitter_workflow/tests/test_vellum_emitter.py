@@ -1,6 +1,5 @@
-import pytest
 from datetime import datetime, timezone
-from unittest.mock import Mock, patch
+import json
 from uuid import UUID
 
 from vellum.workflows.emitters.vellum_emitter import VellumEmitter
@@ -19,56 +18,15 @@ class TestWorkflow(BaseWorkflow[TestInputs, BaseState]):
     pass
 
 
-class TestState(BaseState):
-    test_value: int = 0
-
-
-@pytest.fixture
-def mock_create_vellum_client():
-    """Fixture for mocking create_vellum_client."""
-    with patch("vellum.workflows.vellum_client.create_vellum_client") as mock:
-        mock_client = Mock()
-        mock.return_value = mock_client
-        mock_client._client_wrapper.get_environment.return_value.default = "https://api.vellum.ai"
-        mock_client._client_wrapper.get_headers.return_value = {"Authorization": "Bearer test"}
-
-        mock_response = Mock()
-        mock_response.raise_for_status.return_value = None
-        mock_client._client_wrapper.httpx_client.request.return_value = mock_response
-
-        yield mock_client
-
-
-@pytest.fixture
-def mock_type_adapter():
-    """Fixture for mocking TypeAdapter validation."""
-    with patch("vellum.workflows.emitters.vellum_emitter.pydantic.TypeAdapter") as mock:
-        mock_adapter = Mock()
-        mock.return_value = mock_adapter
-        yield mock_adapter
-
-
-@pytest.fixture
-def mock_workflow_context(mock_create_vellum_client):
-    """Fixture for creating a mock workflow context."""
-    context = WorkflowContext(vellum_client=mock_create_vellum_client)
-    return context
-
-
-def test_vellum_emitter__happy_path(mock_workflow_context, mock_type_adapter):
+def test_vellum_emitter__happy_path(mock_httpx_transport):
     """Test VellumEmitter happy path with event emission."""
-    # GIVEN a properly configured VellumEmitter with mocked TypeAdapter
-    mock_client_event = Mock()
-    mock_client_event.name = "workflow.execution.initiated"
-    mock_type_adapter.validate_json.return_value = mock_client_event
 
-    # AND a VellumEmitter initialized
+    # GIVEN a properly configured VellumEmitter
     emitter = VellumEmitter()
+    workflow_context = WorkflowContext()
+    emitter.register_context(workflow_context)
 
-    # AND the emitter is registered with a workflow context
-    emitter.register_context(mock_workflow_context)
-
-    # AND we have a test workflow event
+    # AND we have a test workflow event from the SDK
     workflow_initiated_event: WorkflowExecutionInitiatedEvent = WorkflowExecutionInitiatedEvent(
         id=UUID("123e4567-e89b-12d3-a456-426614174000"),
         timestamp=datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
@@ -84,19 +42,26 @@ def test_vellum_emitter__happy_path(mock_workflow_context, mock_type_adapter):
     emitter.emit_event(workflow_initiated_event)
 
     # THEN the emitter should have called client.events.create
-    assert mock_workflow_context.vellum_client.events.create.call_count == 1
+    assert mock_httpx_transport.handle_request.call_count == 1
 
-    # AND the call should be for the event emission via client.events.create
-    call_args = mock_workflow_context.vellum_client.events.create.call_args_list[0]
-    assert "request" in call_args[1]
-    assert "request_options" in call_args[1]
-
-    request_options = call_args[1]["request_options"]
-    assert request_options["timeout_in_seconds"] == 30.0
-    assert request_options["max_retries"] == 3
-
-    client_event = call_args[1]["request"]
-    assert client_event.name == "workflow.execution.initiated"
-
-    # AND the TypeAdapter should have been called for the event conversion
-    assert mock_type_adapter.validate_json.call_count == 1
+    # AND the call should be for the event emission
+    call_args = mock_httpx_transport.handle_request.call_args_list[0]
+    mocked_request = call_args[0][0]
+    assert mocked_request.method == "POST"
+    assert mocked_request.url == "https://api.vellum.ai/monitoring/v1/events"
+    assert json.loads(mocked_request.content) == {
+        "name": "workflow.execution.initiated",
+        "api_version": "2024-10-25",
+        "body": {
+            "inputs": {"foo": "test"},
+            "workflow_definition": {
+                "id": "898d564e-2ca3-4b4e-8ee4-51404b7d48bf",
+                "module": ["tests", "workflows", "basic_vellum_emitter_workflow", "tests", "test_vellum_emitter"],
+                "name": "TestWorkflow",
+            },
+        },
+        "id": "123e4567-e89b-12d3-a456-426614174000",
+        "span_id": "123e4567-e89b-12d3-a456-426614174000",
+        "timestamp": "2024-01-01T12:00:00Z",
+        "trace_id": "123e4567-e89b-12d3-a456-426614174000",
+    }

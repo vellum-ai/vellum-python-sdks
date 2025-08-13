@@ -1,10 +1,6 @@
-import json
 import logging
 from typing import Optional
 
-import pydantic
-
-from vellum.client.types import WorkflowEvent as ClientWorkflowEvent
 from vellum.core.request_options import RequestOptions
 from vellum.workflows.emitters.base import BaseWorkflowEmitter
 from vellum.workflows.events.workflow import WorkflowEvent as SDKWorkflowEvent
@@ -44,7 +40,6 @@ class VellumEmitter(BaseWorkflowEmitter):
         super().__init__()
         self._timeout = timeout
         self._max_retries = max_retries
-        self._type_adapter: pydantic.TypeAdapter[ClientWorkflowEvent] = pydantic.TypeAdapter(ClientWorkflowEvent)
 
     def emit_event(self, event: SDKWorkflowEvent) -> None:
         """
@@ -86,18 +81,11 @@ class VellumEmitter(BaseWorkflowEmitter):
             return
 
         client = self._context.vellum_client
-
-        try:
-            event_dump = event.model_dump(mode="json")
-            client_event = self._type_adapter.validate_json(json.dumps(event_dump))
-
-            request_options = RequestOptions(timeout_in_seconds=self._timeout, max_retries=self._max_retries)
-
-            client.events.create(request=client_event, request_options=request_options)
-
-            logger.debug("Event sent successfully via client.events.create")
-            return
-
-        except Exception as e:
-            logger.exception(f"Failed to send event via client.events.create: {e}")
-            return
+        request_options = RequestOptions(timeout_in_seconds=self._timeout, max_retries=self._max_retries)
+        client.events.create(
+            # The API accepts a ClientWorkflowEvent but our SDK emits an SDKWorkflowEvent. These shapes are
+            # meant to be identical, just with different helper methods. We may consolidate the two in the future.
+            # But for now, the type ignore allows us to avoid an additional Model -> json -> Model conversion.
+            request=event,  # type: ignore[arg-type]
+            request_options=request_options,
+        )
