@@ -2,7 +2,7 @@ from uuid import UUID
 
 from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseFinalOutputNodeDisplay
-from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
+from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 
 from ...nodes.final_output import FinalOutput
 
@@ -16,7 +16,6 @@ class FinalOutputDisplay(BaseFinalOutputNodeDisplay[FinalOutput]):
     output_display = {
         FinalOutput.Outputs.value: NodeOutputDisplay(id=UUID("aed7279d-59cd-4c15-b82c-21de48129ba3"), name="value")
     }
-    port_displays = {FinalOutput.Ports.default: PortDisplayOverrides(id=UUID("50191ab4-5d7e-4942-b76a-b707c1bf2c32"))}
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=2761.0242006615217, y=208.9757993384785), width=474, height=234
     )
