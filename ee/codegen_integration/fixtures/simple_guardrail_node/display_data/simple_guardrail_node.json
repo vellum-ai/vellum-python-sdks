@@ -175,6 +175,17 @@
               "node_output_id": "0e455862-ccc4-47a4-a9a5-061fadc94fd6"
             }
           }
+        ],
+        "trigger": {
+          "id": "0ef13a41-8905-45ad-9aee-09c201368981",
+          "merge_behavior": "AWAIT_ANY"
+        },
+        "ports": [
+          {
+            "id": "f7011a1b-feec-42e7-815d-085674f737ed",
+            "name": "default",
+            "type": "DEFAULT"
+          }
         ]
       }
     ],

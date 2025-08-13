@@ -160,6 +160,17 @@
               "node_id": "7dffcbb1-0a5c-4149-a6e9-f83095b0a871"
             }
           }
+        ],
+        "trigger": {
+          "id": "f3ad283c-d092-4973-91e0-996e5859002a",
+          "merge_behavior": "AWAIT_ANY"
+        },
+        "ports": [
+          {
+            "id": "591f193a-c76b-49ab-86df-7271ce5582c1",
+            "name": "default",
+            "type": "DEFAULT"
+          }
         ]
       }
     ],
