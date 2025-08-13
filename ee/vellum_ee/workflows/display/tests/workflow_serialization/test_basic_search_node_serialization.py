@@ -238,6 +238,10 @@ def test_serialize_workflow():
             "name": "SimpleSearchNode",
             "module": ["tests", "workflows", "basic_search_node", "workflow"],
         },
+        "trigger": {
+            "id": "6d50305f-588b-469f-a042-b0767d3f99b1",
+            "merge_behavior": "AWAIT_ANY",
+        },
         "ports": [{"id": "00ae06b3-f8d9-4ae6-9fbf-e4ff4d520e9b", "name": "default", "type": "DEFAULT"}],
     }
 

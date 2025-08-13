@@ -83,6 +83,10 @@ def test_serialize_workflow__await_all():
                 "module": ["tests", "workflows", "basic_merge_node", "await_all_workflow"],
                 "name": "AwaitAllMergeNode",
             },
+            "trigger": {
+                "id": "0efd256f-f5f6-45fe-9adb-651780f5e63d",
+                "merge_behavior": "AWAIT_ALL",
+            },
             "ports": [{"id": "3bbc469f-0fb0-4b3d-a28b-746fefec2818", "name": "default", "type": "DEFAULT"}],
         },
         merge_node,

@@ -67,7 +67,7 @@ class BasePromptDeploymentNodeDisplay(BaseNodeDisplay[_PromptDeploymentNodeType]
             "display_data": self.get_display_data().dict(),
             "base": self.get_base().dict(),
             "definition": self.get_definition().dict(),
-            "ports": self.serialize_ports(display_context),
+            **self.serialize_generic_fields(display_context),
             "outputs": [
                 {"id": str(json_display.id), "name": "json", "type": "JSON", "value": None},
                 {"id": str(output_display.id), "name": "text", "type": "STRING", "value": None},

@@ -110,6 +110,10 @@ def test_serialize_workflow_with_filepath():
             "module": ["tests", "workflows", "basic_code_execution_node", "workflow"],
             "name": "SimpleCodeExecutionNode",
         },
+        "trigger": {
+            "id": "e02a2701-22c0-4533-8b00-175998e7350a",
+            "merge_behavior": "AWAIT_ANY",
+        },
         "ports": [{"id": "832f81ec-427b-42a8-825c-e62c43c1f961", "name": "default", "type": "DEFAULT"}],
     }
     assert not DeepDiff(
@@ -341,6 +345,10 @@ def test_serialize_workflow_with_code():
         "definition": {
             "name": "SimpleCodeExecutionNode",
             "module": ["tests", "workflows", "basic_code_execution_node", "workflow_with_code"],
+        },
+        "trigger": {
+            "id": "e02a2701-22c0-4533-8b00-175998e7350a",
+            "merge_behavior": "AWAIT_ANY",
         },
         "ports": [{"id": "832f81ec-427b-42a8-825c-e62c43c1f961", "name": "default", "type": "DEFAULT"}],
     }
@@ -602,6 +610,10 @@ def test_serialize_workflow__try_wrapped():
                 ],
             }
         ],
+        "trigger": {
+            "id": "e02a2701-22c0-4533-8b00-175998e7350a",
+            "merge_behavior": "AWAIT_ANY",
+        },
         "ports": [{"id": "832f81ec-427b-42a8-825c-e62c43c1f961", "name": "default", "type": "DEFAULT"}],
     }
 
