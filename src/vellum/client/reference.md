@@ -1249,6 +1249,100 @@ client.submit_workflow_execution_actuals(
 </dl>
 </details>
 
+## Events
+<details><summary><code>client.events.<a href="src/vellum/resources/events/client.py">create</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Accept an event and publish it to ClickHouse for analytics processing.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+import datetime
+
+from vellum import (
+    NodeExecutionInitiatedBody,
+    NodeExecutionInitiatedEvent,
+    Vellum,
+    VellumCodeResourceDefinition,
+)
+
+client = Vellum(
+    api_version="YOUR_API_VERSION",
+    api_key="YOUR_API_KEY",
+)
+client.events.create(
+    request=NodeExecutionInitiatedEvent(
+        body=NodeExecutionInitiatedBody(
+            node_definition=VellumCodeResourceDefinition(
+                name="name",
+                module=["module", "module"],
+                id="id",
+            ),
+            inputs={"inputs": {"key": "value"}},
+        ),
+        id="id",
+        timestamp=datetime.datetime.fromisoformat(
+            "2024-01-15 09:30:00+00:00",
+        ),
+        trace_id="trace_id",
+        span_id="span_id",
+    ),
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**request:** `WorkflowEvent` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## AdHoc
 <details><summary><code>client.ad_hoc.<a href="src/vellum/resources/ad_hoc/client.py">adhoc_execute_prompt</a>(...)</code></summary>
 <dl>

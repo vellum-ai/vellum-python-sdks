@@ -107,9 +107,11 @@ from .entity_visibility import EntityVisibility
 from .environment_enum import EnvironmentEnum
 from .ephemeral_prompt_cache_config import EphemeralPromptCacheConfig
 from .ephemeral_prompt_cache_config_type_enum import EphemeralPromptCacheConfigTypeEnum
+from .error_detail_response import ErrorDetailResponse
 from .error_input import ErrorInput
 from .error_vellum_value import ErrorVellumValue
 from .error_vellum_value_request import ErrorVellumValueRequest
+from .event_create_response import EventCreateResponse
 from .execute_api_request_bearer_token import ExecuteApiRequestBearerToken
 from .execute_api_request_body import ExecuteApiRequestBody
 from .execute_api_request_headers_value import ExecuteApiRequestHeadersValue
@@ -567,6 +569,7 @@ from .workflow_deployment_release import WorkflowDeploymentRelease
 from .workflow_deployment_release_workflow_deployment import WorkflowDeploymentReleaseWorkflowDeployment
 from .workflow_deployment_release_workflow_version import WorkflowDeploymentReleaseWorkflowVersion
 from .workflow_error import WorkflowError
+from .workflow_event import WorkflowEvent
 from .workflow_event_error import WorkflowEventError
 from .workflow_event_execution_read import WorkflowEventExecutionRead
 from .workflow_execution_actual import WorkflowExecutionActual
@@ -739,9 +742,11 @@ __all__ = [
     "EnvironmentEnum",
     "EphemeralPromptCacheConfig",
     "EphemeralPromptCacheConfigTypeEnum",
+    "ErrorDetailResponse",
     "ErrorInput",
     "ErrorVellumValue",
     "ErrorVellumValueRequest",
+    "EventCreateResponse",
     "ExecuteApiRequestBearerToken",
     "ExecuteApiRequestBody",
     "ExecuteApiRequestHeadersValue",
@@ -1179,6 +1184,7 @@ __all__ = [
     "WorkflowDeploymentReleaseWorkflowDeployment",
     "WorkflowDeploymentReleaseWorkflowVersion",
     "WorkflowError",
+    "WorkflowEvent",
     "WorkflowEventError",
     "WorkflowEventExecutionRead",
     "WorkflowExecutionActual",

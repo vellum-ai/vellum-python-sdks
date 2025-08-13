@@ -4,22 +4,17 @@ import typing
 
 import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
-from .string_vellum_value import StringVellumValue
 
 
-class ExecutionThinkingVellumValue(UniversalBaseModel):
+class EventCreateResponse(UniversalBaseModel):
     """
-    A value representing Thinking mode output.
-    """
-
-    id: str = pydantic.Field()
-    """
-    The variable's uniquely identifying internal id.
+    Response serializer for successful event creation.
     """
 
-    name: str
-    type: typing.Literal["THINKING"] = "THINKING"
-    value: typing.Optional[StringVellumValue] = None
+    success: typing.Optional[bool] = pydantic.Field(default=None)
+    """
+    Indicates whether the event was published successfully.
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
