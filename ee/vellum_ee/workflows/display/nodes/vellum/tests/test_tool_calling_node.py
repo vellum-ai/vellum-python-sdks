@@ -1,4 +1,15 @@
+from datetime import datetime
+
 from vellum.client.types.prompt_parameters import PromptParameters
+from vellum.client.types.release_review_reviewer import ReleaseReviewReviewer
+from vellum.client.types.workflow_deployment_release import (
+    ReleaseEnvironment,
+    ReleaseReleaseTag,
+    SlimReleaseReview,
+    WorkflowDeploymentRelease,
+    WorkflowDeploymentReleaseWorkflowDeployment,
+    WorkflowDeploymentReleaseWorkflowVersion,
+)
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
@@ -9,7 +20,12 @@ from vellum.workflows.nodes.displayable.tool_calling_node.state import ToolCalli
 from vellum.workflows.nodes.displayable.tool_calling_node.utils import create_router_node, create_tool_prompt_node
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState
-from vellum.workflows.types.definition import AuthorizationType, EnvironmentVariableReference, MCPServer
+from vellum.workflows.types.definition import (
+    AuthorizationType,
+    DeploymentDefinition,
+    EnvironmentVariableReference,
+    MCPServer,
+)
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
@@ -535,5 +551,96 @@ def test_serialize_tool_prompt_node_with_inline_workflow():
                     },
                 }
             ],
+        },
+    }
+
+
+def test_serialize_tool_prompt_node_with_workflow_deployment(vellum_client):
+    """
+    Test that the tool prompt node serializes successfully with a workflow deployment.
+    """
+    vellum_client.workflow_deployments.retrieve_workflow_deployment_release.return_value = WorkflowDeploymentRelease(
+        id="test-id",
+        created=datetime.now(),
+        environment=ReleaseEnvironment(
+            id="test-id",
+            name="test-name",
+            label="test-label",
+        ),
+        created_by=None,
+        workflow_version=WorkflowDeploymentReleaseWorkflowVersion(
+            id="test-id",
+            input_variables=[],
+            output_variables=[],
+        ),
+        deployment=WorkflowDeploymentReleaseWorkflowDeployment(name="test-name"),
+        description="test-description",
+        release_tags=[
+            ReleaseReleaseTag(
+                name="test-name",
+                source="USER",
+            )
+        ],
+        reviews=[
+            SlimReleaseReview(
+                id="test-id",
+                created=datetime.now(),
+                reviewer=ReleaseReviewReviewer(
+                    id="test-id",
+                    full_name="test-name",
+                ),
+                state="APPROVED",
+            )
+        ],
+    )
+
+    # GIVEN a workflow deployment
+    workflow_deployment = DeploymentDefinition(
+        deployment="test-deployment",
+        release_tag="test-release-tag",
+    )
+
+    # WHEN we create a tool prompt node using create_tool_prompt_node with a workflow deployment
+    tool_prompt_node = create_tool_prompt_node(
+        ml_model="gpt-4o-mini",
+        blocks=[],
+        functions=[workflow_deployment],
+        prompt_inputs=None,
+        parameters=PromptParameters(),
+    )
+
+    tool_prompt_node_display_class = get_node_display_class(tool_prompt_node)
+    tool_prompt_node_display = tool_prompt_node_display_class()
+
+    # AND we create a workflow that uses this tool prompt node
+    class TestWorkflow(BaseWorkflow[BaseInputs, ToolCallingState]):
+        graph = tool_prompt_node
+
+    # WHEN we serialize the entire workflow
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    display_context = workflow_display.display_context
+    serialized_tool_prompt_node = tool_prompt_node_display.serialize(display_context)
+
+    # THEN functions attribute should be serialized correctly
+    attributes = serialized_tool_prompt_node["attributes"]
+    assert isinstance(attributes, list)
+    functions_attr = next((attr for attr in attributes if isinstance(attr, dict) and attr["name"] == "functions"), None)
+    assert functions_attr == {
+        "id": "6326ccc4-7cf6-4235-ba3c-a6e860b0c48b",
+        "name": "functions",
+        "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+                "type": "JSON",
+                "value": [
+                    {
+                        "type": "WORKFLOW_DEPLOYMENT",
+                        "name": "test-name",
+                        "description": "test-description",
+                        "deployment": "test-deployment",
+                        "release_tag": "test-release-tag",
+                    }
+                ],
+            },
         },
     }
