@@ -424,6 +424,10 @@ def test_serialize_workflow():
                 "name": "CategoryConditionalNode",
                 "module": ["tests", "workflows", "basic_conditional_node", "workflow"],
             },
+            "trigger": {
+                "id": "dd89e228-a23e-422b-80b2-34362c1c050e",
+                "merge_behavior": "AWAIT_ANY",
+            },
             "ports": [
                 {
                     "id": "3a45b81f-95e4-4cbd-8997-bfdbe30251e8",
@@ -952,6 +956,10 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
                 "name": "SimpleConditionalNode",
                 "module": ["tests", "workflows", "basic_conditional_node", "workflow_with_only_one_conditional_node"],
             },
+            "trigger": {
+                "id": "c6e99e94-bc8e-47a4-b75c-cc96c6bedbb0",
+                "merge_behavior": "AWAIT_ANY",
+            },
             "ports": [
                 {
                     "id": "2ff87aa6-37cf-43dd-af9d-13b9198ab70a",
@@ -1062,6 +1070,10 @@ def test_conditional_node_serialize_all_operators_with_expression(descriptor, op
             "definition": {
                 "name": "SimpleConditionalNode",
                 "module": ["tests", "workflows", "basic_conditional_node", "workflow_with_only_one_conditional_node"],
+            },
+            "trigger": {
+                "id": "c6e99e94-bc8e-47a4-b75c-cc96c6bedbb0",
+                "merge_behavior": "AWAIT_ANY",
             },
             "ports": [
                 {
@@ -1185,6 +1197,10 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
             "definition": {
                 "name": "SimpleConditionalNode",
                 "module": ["tests", "workflows", "basic_conditional_node", "workflow_with_only_one_conditional_node"],
+            },
+            "trigger": {
+                "id": "c6e99e94-bc8e-47a4-b75c-cc96c6bedbb0",
+                "merge_behavior": "AWAIT_ANY",
             },
             "ports": [
                 {

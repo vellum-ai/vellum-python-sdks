@@ -79,6 +79,10 @@
           ],
           "name": "SubworkflowDeployment"
         },
+        "trigger": {
+          "id": "30771282-5c0a-4a98-a3a8-4c7eeda30d23",
+          "merge_behavior": "AWAIT_ANY"
+        },
         "ports": [
           {
             "id": "fc38b3bd-5c08-4729-9e37-211c415637ad",

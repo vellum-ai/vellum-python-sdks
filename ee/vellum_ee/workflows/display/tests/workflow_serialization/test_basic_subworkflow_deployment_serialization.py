@@ -153,6 +153,10 @@ def test_serialize_workflow(vellum_client):
             "module": ["tests", "workflows", "basic_subworkflow_deployment", "workflow"],
             "name": "ExampleSubworkflowDeploymentNode",
         },
+        "trigger": {
+            "id": "e4d80502-9281-42c8-91e3-10817bcd7d9e",
+            "merge_behavior": "AWAIT_ANY",
+        },
         "ports": [{"id": "ab0db8a9-7b53-4d88-8667-273b31303273", "name": "default", "type": "DEFAULT"}],
     }
 

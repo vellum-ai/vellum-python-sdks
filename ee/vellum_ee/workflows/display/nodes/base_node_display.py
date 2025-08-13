@@ -183,8 +183,6 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             existing_adornments = adornments if adornments is not None else []
             return display_class().serialize(display_context, adornments=existing_adornments + [adornment])
 
-        ports = self.serialize_ports(display_context)
-
         outputs: JsonArray = []
         for output in node.Outputs:
             type = primitive_type_to_vellum_variable_type(output)
@@ -210,11 +208,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             "display_data": self.get_display_data().dict(),
             "base": self.get_base().dict(),
             "definition": self.get_definition().dict(),
-            "trigger": {
-                "id": str(self.get_target_handle_id()),
-                "merge_behavior": node.Trigger.merge_behavior.value,
-            },
-            "ports": ports,
+            **self.serialize_generic_fields(display_context),
             "adornments": adornments,
             "attributes": attributes,
             "outputs": outputs,
@@ -247,6 +241,14 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
         return ports
 
+    def serialize_trigger(self) -> JsonObject:
+        """Serialize the trigger of the node."""
+        node = self._node
+        return {
+            "id": str(self.get_target_handle_id()),
+            "merge_behavior": node.Trigger.merge_behavior.value,
+        }
+
     def _serialize_attributes(self, display_context: "WorkflowDisplayContext") -> JsonArray:
         """Serialize node attributes, skipping unserializable ones."""
         attributes: JsonArray = []
@@ -270,6 +272,13 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 raise ValueError(f"Failed to serialize attribute '{attribute.name}': {e}")
 
         return attributes
+
+    def serialize_generic_fields(self, display_context: "WorkflowDisplayContext") -> JsonObject:
+        """Serialize generic fields that are common to all nodes (trigger and ports)."""
+        return {
+            "trigger": self.serialize_trigger(),
+            "ports": self.serialize_ports(display_context),
+        }
 
     def get_base(self) -> CodeResourceDefinition:
         node = self._node

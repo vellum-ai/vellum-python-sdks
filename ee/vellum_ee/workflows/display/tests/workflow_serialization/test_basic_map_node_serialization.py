@@ -286,6 +286,10 @@ def test_serialize_workflow():
                 "name": "MapFruitsNode",
                 "module": ["tests", "workflows", "basic_map_node", "workflow"],
             },
+            "trigger": {
+                "id": "b5e8182e-20c5-482b-b4c5-4dde48c01472",
+                "merge_behavior": "AWAIT_ATTRIBUTES",
+            },
             "ports": [{"id": "a2171a61-0657-43ad-b6d9-cf93ce3270d0", "name": "default", "type": "DEFAULT"}],
         },
         map_node,

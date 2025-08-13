@@ -324,6 +324,10 @@ def test_serialize_workflow():
                 "name": "ExampleInlineSubworkflowNode",
                 "module": ["tests", "workflows", "basic_inline_subworkflow", "workflow"],
             },
+            "trigger": {
+                "id": "859a75a6-1bd2-4350-9509-4af66245e8e4",
+                "merge_behavior": "AWAIT_ATTRIBUTES",
+            },
             "ports": [{"id": "cfd831bc-ee7f-44d0-8d76-0ba0cd0277dc", "name": "default", "type": "DEFAULT"}],
         },
         subworkflow_node,

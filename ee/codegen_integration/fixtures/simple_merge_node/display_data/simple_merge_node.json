@@ -80,6 +80,10 @@
           ],
           "name": "TemplatingNode2"
         },
+        "trigger": {
+          "id": "f9a55e22-2cbd-4492-8755-36760320f0d9",
+          "merge_behavior": "AWAIT_ATTRIBUTES"
+        },
         "ports": [
           {
             "id": "a5ae5a5c-ad8a-4a19-a726-f3b8ed1fbb1b",
@@ -134,6 +138,10 @@
             "merge_node"
           ],
           "name": "MergeNode"
+        },
+        "trigger": {
+          "id": "3a91ba25-0dd0-4bc8-9f6d-c54ea4dccf64",
+          "merge_behavior": "AWAIT_ALL"
         },
         "ports": [
           {
@@ -234,6 +242,10 @@
             "templating_node_3"
           ],
           "name": "TemplatingNode3"
+        },
+        "trigger": {
+          "id": "2c1e39e0-ce3e-4c2d-8baf-c5d93b244997",
+          "merge_behavior": "AWAIT_ATTRIBUTES"
         },
         "ports": [
           {
@@ -374,6 +386,10 @@
             "templating_node_1"
           ],
           "name": "TemplatingNode1"
+        },
+        "trigger": {
+          "id": "2d2c5559-983f-469c-a1d0-c2fe9f8f3639",
+          "merge_behavior": "AWAIT_ATTRIBUTES"
         },
         "ports": [
           {

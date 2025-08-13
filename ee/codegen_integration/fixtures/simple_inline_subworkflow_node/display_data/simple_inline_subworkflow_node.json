@@ -228,6 +228,10 @@
                     "search_node"
                   ]
                 },
+                "trigger": {
+                  "id": "d2e2e4e4-a2a4-4a5d-a8fa-d51a1f9d9818",
+                  "merge_behavior": "AWAIT_ANY"
+                },
                 "ports": [
                   {
                     "id": "b2c00256-11db-43e4-9282-8f0265f72650",
@@ -403,6 +407,10 @@
             "nodes",
             "subworkflow_node"
           ]
+        },
+        "trigger": {
+          "id": "67ee54dc-2505-4368-8e67-70d89ac2a9e5",
+          "merge_behavior": "AWAIT_ATTRIBUTES"
         },
         "ports": [
           {

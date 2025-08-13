@@ -150,6 +150,10 @@ def test_serialize_workflow(vellum_client):
             "name": "ExamplePromptDeploymentNode",
             "module": ["tests", "workflows", "basic_text_prompt_deployment", "workflow"],
         },
+        "trigger": {
+            "id": "b7605c48-0937-4ecc-914e-0d1058130e65",
+            "merge_behavior": "AWAIT_ANY",
+        },
         "ports": [{"id": "2f26c7e0-283d-4f04-b639-adebb56bc679", "name": "default", "type": "DEFAULT"}],
         "outputs": [
             {"id": "180355a8-e67c-4ce6-9ac3-e5dbb75a6629", "name": "json", "type": "JSON", "value": None},
@@ -384,6 +388,10 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
                 "workflow_with_prompt_deployment_json_reference",
             ],
         },
+        "trigger": {
+            "id": "b7605c48-0937-4ecc-914e-0d1058130e65",
+            "merge_behavior": "AWAIT_ANY",
+        },
         "ports": [{"id": "2f26c7e0-283d-4f04-b639-adebb56bc679", "name": "default", "type": "DEFAULT"}],
         "outputs": [
             {"id": "180355a8-e67c-4ce6-9ac3-e5dbb75a6629", "name": "json", "type": "JSON", "value": None},
@@ -478,6 +486,10 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
                 "basic_text_prompt_deployment",
                 "workflow_with_prompt_deployment_json_reference",
             ],
+        },
+        "trigger": {
+            "id": "58427684-3848-498a-8299-c6b0fc70265d",
+            "merge_behavior": "AWAIT_ATTRIBUTES",
         },
         "ports": [{"id": "39317827-df43-4f5a-bfbc-20bffc839748", "name": "default", "type": "DEFAULT"}],
     }

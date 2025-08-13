@@ -95,6 +95,10 @@
             "most_recent_message"
           ]
         },
+        "trigger": {
+          "id": "157d01bd-441e-49fa-abce-7b991c9291da",
+          "merge_behavior": "AWAIT_ATTRIBUTES"
+        },
         "ports": [
           {
             "id": "ab8e97b4-4ee4-42bc-8f43-e2c9c457ad21",
@@ -504,6 +508,10 @@
             "templating_node"
           ]
         },
+        "trigger": {
+          "id": "73d41849-2a2d-4994-b220-b636c51fab42",
+          "merge_behavior": "AWAIT_ATTRIBUTES"
+        },
         "ports": [
           {
             "id": "0f8cbd50-1919-4c2e-8b1b-1ad741b5da35",
@@ -727,6 +735,10 @@
             "nodes",
             "conditional_node"
           ]
+        },
+        "trigger": {
+          "id": "91f3cff9-32b8-4cda-aae3-a2c69b9bf650",
+          "merge_behavior": "AWAIT_ANY"
         },
         "ports": [
           {
@@ -982,6 +994,10 @@
             "faa_document_store"
           ]
         },
+        "trigger": {
+          "id": "32346adc-40f3-49b5-aea8-5c64b88643ef",
+          "merge_behavior": "AWAIT_ANY"
+        },
         "ports": [
           {
             "id": "0b203edd-ed4c-4593-9e17-deaeb2780e14",
@@ -1065,6 +1081,10 @@
             "nodes",
             "formatted_search_results"
           ]
+        },
+        "trigger": {
+          "id": "815664ad-b42f-40ea-9607-b23643a224a8",
+          "merge_behavior": "AWAIT_ATTRIBUTES"
         },
         "ports": [
           {
@@ -1780,6 +1800,10 @@
             "templating_node_15"
           ]
         },
+        "trigger": {
+          "id": "ed213a6c-2573-431c-8736-b8f062869db7",
+          "merge_behavior": "AWAIT_ATTRIBUTES"
+        },
         "ports": [
           {
             "id": "8eaafb2e-a666-4dc9-96c3-52839df75632",
@@ -1951,6 +1975,10 @@
             "nodes",
             "api_node"
           ]
+        },
+        "trigger": {
+          "id": "8f6f1b95-dd80-46dd-b1f6-167196baf697",
+          "merge_behavior": "AWAIT_ANY"
         },
         "ports": [
           {
@@ -2601,6 +2629,10 @@
             "nodes",
             "subworkflow_node"
           ]
+        },
+        "trigger": {
+          "id": "d96bb2c2-1c6f-4e7d-9163-c6b16a67e1f2",
+          "merge_behavior": "AWAIT_ANY"
         },
         "ports": [
           {

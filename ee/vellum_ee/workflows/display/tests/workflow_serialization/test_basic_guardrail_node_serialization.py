@@ -117,6 +117,10 @@ def test_serialize_workflow():
             "module": ["tests", "workflows", "basic_guardrail_node", "workflow"],
             "name": "ExampleGuardrailNode",
         },
+        "trigger": {
+            "id": "ce5b85b1-eded-46dd-b4b7-020afcdc67ab",
+            "merge_behavior": "AWAIT_ANY",
+        },
         "ports": [{"id": "0ed87407-697e-4ae9-ab9b-6c5cc2e57cf7", "name": "default", "type": "DEFAULT"}],
     }
 

@@ -91,6 +91,10 @@
             "templating_node"
           ]
         },
+        "trigger": {
+          "id": "005e1cd2-5452-4e1f-be6a-ac9fe3c02b9b",
+          "merge_behavior": "AWAIT_ATTRIBUTES"
+        },
         "ports": [
           {
             "id": "8f4460f0-717b-4972-a6f4-ac164e5e204e",
@@ -200,6 +204,10 @@
             "nodes",
             "conditional_node"
           ]
+        },
+        "trigger": {
+          "id": "2b5617b4-5cc0-4f9a-9369-24982e2cd8c0",
+          "merge_behavior": "AWAIT_ANY"
         },
         "ports": [
           {
