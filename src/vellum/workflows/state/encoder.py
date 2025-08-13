@@ -2,8 +2,10 @@ from dataclasses import asdict, is_dataclass
 from datetime import datetime
 import enum
 import inspect
+from io import StringIO
 from json import JSONEncoder
 from queue import Queue
+import sys
 from uuid import UUID
 from typing import Any, Callable, Dict, Type
 
@@ -16,6 +18,22 @@ from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.ports.port import Port
 from vellum.workflows.state.base import BaseState, NodeExecutionCache
 from vellum.workflows.utils.functions import compile_function_definition
+
+
+def virtual_open(file_path: str, mode: str = "r"):
+    """
+    Open a file, checking VirtualFileFinder instances first before falling back to regular open().
+    """
+    for finder in sys.meta_path:
+        if hasattr(finder, "loader") and hasattr(finder.loader, "_get_code"):
+            namespace = finder.loader.namespace
+            if file_path.startswith(namespace + "/"):
+                relative_path = file_path[len(namespace) + 1 :]
+                content = finder.loader._get_code(relative_path)
+                if content is not None:
+                    return StringIO(content)
+
+    return open(file_path, mode)
 
 
 class DefaultStateEncoder(JSONEncoder):
@@ -66,7 +84,7 @@ class DefaultStateEncoder(JSONEncoder):
             function_definition = compile_function_definition(obj)
             source_path = inspect.getsourcefile(obj)
             if source_path is not None:
-                with open(source_path) as f:
+                with virtual_open(source_path) as f:
                     source_code = f.read()
             else:
                 source_code = f"# Error: Source code not available for {obj.__name__}"
