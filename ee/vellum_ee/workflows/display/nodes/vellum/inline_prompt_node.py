@@ -100,16 +100,12 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
             "display_data": self.get_display_data().dict(),
             "base": self.get_base().dict(),
             "definition": self.get_definition().dict(),
-            "trigger": {
-                "id": str(self.get_target_handle_id()),
-                "merge_behavior": node.Trigger.merge_behavior.value,
-            },
+            **self.serialize_generic_fields(display_context),
             "outputs": [
                 {"id": str(json_display.id), "name": "json", "type": "JSON", "value": None},
                 {"id": str(output_display.id), "name": "text", "type": "STRING", "value": None},
                 {"id": str(array_display.id), "name": "results", "type": "ARRAY", "value": None},
             ],
-            "ports": self.serialize_ports(display_context),
         }
         attributes = self._serialize_attributes(display_context)
         if attributes:

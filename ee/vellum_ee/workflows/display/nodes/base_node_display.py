@@ -208,7 +208,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             "display_data": self.get_display_data().dict(),
             "base": self.get_base().dict(),
             "definition": self.get_definition().dict(),
-            **self._serialize_generic_fields(display_context),
+            **self.serialize_generic_fields(display_context),
             "adornments": adornments,
             "attributes": attributes,
             "outputs": outputs,
@@ -273,7 +273,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
         return attributes
 
-    def _serialize_generic_fields(self, display_context: "WorkflowDisplayContext") -> JsonObject:
+    def serialize_generic_fields(self, display_context: "WorkflowDisplayContext") -> JsonObject:
         """Serialize generic fields that are common to all nodes (trigger and ports)."""
         return {
             "trigger": self.serialize_trigger(),
