@@ -251,6 +251,7 @@ def test_serialize_node__with_non_exist_code_input_path_with_dry_run():
                         ],
                     },
                     "ports": [{"id": "7afa3858-f50c-4116-936a-a401e3b2c60f", "name": "default", "type": "DEFAULT"}],
+                    "trigger": {"id": "3a39ea63-9f86-4891-a902-0216a7190720", "merge_behavior": "AWAIT_ANY"},
                 },
             ],
             "edges": [
