@@ -2,8 +2,7 @@ import logging
 import time
 from typing import Any, Dict, Optional
 
-import httpx
-
+from vellum.core.request_options import RequestOptions
 from vellum.workflows.emitters.base import BaseWorkflowEmitter
 from vellum.workflows.events.types import default_serializer
 from vellum.workflows.events.workflow import WorkflowEvent
@@ -43,7 +42,6 @@ class VellumEmitter(BaseWorkflowEmitter):
         super().__init__()
         self._timeout = timeout
         self._max_retries = max_retries
-        self._events_endpoint = "v1/events"  # TODO: make this configurable with the correct url
 
     def emit_event(self, event: WorkflowEvent) -> None:
         """
@@ -90,16 +88,20 @@ class VellumEmitter(BaseWorkflowEmitter):
 
         for attempt in range(self._max_retries + 1):
             try:
-                # Use the Vellum client's underlying HTTP client to make the request
-                # For proper authentication headers and configuration
-                base_url = client._client_wrapper.get_environment().default
+                # Use the Vellum client's events endpoint with proper SDK method
+                request_options = RequestOptions(timeout_in_seconds=self._timeout) if self._timeout else None
+
+                # Use the raw events client to send the already-serialized event data
                 response = client._client_wrapper.httpx_client.request(
+                    "monitoring/v1/events",
+                    base_url=client._client_wrapper.get_environment().default,
                     method="POST",
-                    base_url=base_url,
-                    path=self._events_endpoint,  # TODO: will be replaced with the correct url
                     json=event_data,
-                    headers=client._client_wrapper.get_headers(),
-                    request_options={"timeout_in_seconds": self._timeout},
+                    headers={
+                        "content-type": "application/json",
+                        **client._client_wrapper.get_headers(),
+                    },
+                    request_options=request_options,
                 )
 
                 response.raise_for_status()
@@ -108,37 +110,37 @@ class VellumEmitter(BaseWorkflowEmitter):
                     logger.info(f"Event sent successfully after {attempt + 1} attempts")
                 return
 
-            except httpx.HTTPStatusError as e:
-                if e.response.status_code >= 500:
+            except Exception as e:
+                status_code = getattr(e, "response", {}).get("status_code") or getattr(e, "status_code", None)
+
+                if status_code and status_code >= 500:
                     # Server errors might be transient, retry
                     if attempt < self._max_retries:
                         wait_time = min(2**attempt, 60)  # Exponential backoff, max 60s
                         logger.warning(
                             f"Server error emitting event (attempt {attempt + 1}/{self._max_retries + 1}): "
-                            f"{e.response.status_code}. Retrying in {wait_time}s..."
+                            f"{status_code}. Retrying in {wait_time}s..."
                         )
                         time.sleep(wait_time)
                         continue
                     else:
                         logger.exception(
-                            f"Server error emitting event after {self._max_retries + 1} attempts: "
-                            f"{e.response.status_code} {e.response.text}"
+                            f"Server error emitting event after {self._max_retries + 1} attempts: " f"{status_code}"
                         )
                         return
-                else:
+                elif status_code and 400 <= status_code < 500:
                     # Client errors (4xx) are not retriable
-                    logger.exception(f"Client error emitting event: {e.response.status_code} {e.response.text}")
+                    logger.exception(f"Client error emitting event: {status_code}")
                     return
-
-            except httpx.RequestError as e:
-                if attempt < self._max_retries:
-                    wait_time = min(2**attempt, 60)  # Exponential backoff, max 60s
-                    logger.warning(
-                        f"Network error emitting event (attempt {attempt + 1}/{self._max_retries + 1}): "
-                        f"{e}. Retrying in {wait_time}s..."
-                    )
-                    time.sleep(wait_time)
-                    continue
                 else:
-                    logger.exception(f"Network error emitting event after {self._max_retries + 1} attempts: {e}")
-                    return
+                    if attempt < self._max_retries:
+                        wait_time = min(2**attempt, 60)  # Exponential backoff, max 60s
+                        logger.warning(
+                            f"Network error emitting event (attempt {attempt + 1}/{self._max_retries + 1}): "
+                            f"{e}. Retrying in {wait_time}s..."
+                        )
+                        time.sleep(wait_time)
+                        continue
+                    else:
+                        logger.exception(f"Network error emitting event after {self._max_retries + 1} attempts: {e}")
+                        return

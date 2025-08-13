@@ -63,8 +63,8 @@ def test_vellum_emitter__happy_path(mock_workflow_context, mock_default_serializ
 
     # AND the call should be for the event emission
     call_args = mock_workflow_context.vellum_client._client_wrapper.httpx_client.request.call_args_list[0]
+    assert call_args[0][0] == "monitoring/v1/events"  # First positional argument is the path
     assert call_args[1]["method"] == "POST"
-    assert call_args[1]["path"] == "v1/events"
     assert "json" in call_args[1]
     assert call_args[1]["json"] == {"event": "workflow_initiated_data"}
 
