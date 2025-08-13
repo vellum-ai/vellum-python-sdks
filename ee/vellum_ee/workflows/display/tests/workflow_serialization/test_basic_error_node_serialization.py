@@ -118,7 +118,7 @@ def test_serialize_workflow():
                 "id": "70c19f1c-309c-4a5d-ba65-664c0bb2fedf",
                 "merge_behavior": "AWAIT_ATTRIBUTES",
             },
-            "ports": [{"id": "ca17d318-a0f5-4f7c-be6c-59c9dc1dd7ed", "name": "default", "type": "DEFAULT"}],
+            "ports": [],
         },
         error_node,
         ignore_order=True,

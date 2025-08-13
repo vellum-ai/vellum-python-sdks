@@ -85,7 +85,7 @@ def test_serialize_workflow__missing_final_output_node():
                     "id": "a0c2eb7a-398e-4f28-b63d-f3bae9b563ee",
                     "merge_behavior": "AWAIT_ANY",
                 },
-                "ports": [{"id": "167e46b7-4635-43e4-8ac4-182ac7b942f3", "name": "default", "type": "DEFAULT"}],
+                "ports": [],
             },
             {
                 "id": "bb88768d-472e-4997-b7ea-de09163d1b4c",

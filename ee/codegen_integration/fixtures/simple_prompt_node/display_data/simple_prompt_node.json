@@ -350,13 +350,7 @@
           "id": "77ab6d0c-7fea-441e-8e22-7afc62b3555b",
           "merge_behavior": "AWAIT_ANY"
         },
-        "ports": [
-          {
-            "id": "50191ab4-5d7e-4942-b76a-b707c1bf2c32",
-            "name": "default",
-            "type": "DEFAULT"
-          }
-        ]
+        "ports": []
       }
     ],
     "edges": [

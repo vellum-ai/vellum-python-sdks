@@ -305,13 +305,7 @@
                   "id": "20aa0107-742b-4662-941f-4f146b3c5565",
                   "merge_behavior": "AWAIT_ANY"
                 },
-                "ports": [
-                  {
-                    "id": "cb5c91f1-fd54-4c7d-90dc-18c13ec503f5",
-                    "name": "default",
-                    "type": "DEFAULT"
-                  }
-                ],
+                "ports": [],
                 "outputs": [
                   {
                     "id": "6ab3665f-881d-488b-9124-a6da40136c68",
@@ -494,13 +488,7 @@
           "id": "abf4fec7-4053-417c-bf17-21819155d4d1",
           "merge_behavior": "AWAIT_ANY"
         },
-        "ports": [
-          {
-            "id": "46b117ad-8185-42e5-b063-00a8b666d74b",
-            "name": "default",
-            "type": "DEFAULT"
-          }
-        ],
+        "ports": [],
         "outputs": [
           {
             "id": "b38e08c7-904d-4f49-b8fb-56e1eff254d6",

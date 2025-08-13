@@ -2983,13 +2983,7 @@
           "id": "87d73dc6-cafd-4f8b-b2fd-8367baba5d61",
           "merge_behavior": "AWAIT_ANY"
         },
-        "ports": [
-          {
-            "id": "c87fc72f-518b-4aa4-86e1-3ec5f5b6297e",
-            "name": "default",
-            "type": "DEFAULT"
-          }
-        ],
+        "ports": [],
         "outputs": [
           {
             "id": "8c6e5464-8916-4039-b911-cf707855d372",
