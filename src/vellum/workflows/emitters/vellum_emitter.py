@@ -1,5 +1,4 @@
 import logging
-import time
 from typing import Any, Dict, Optional
 
 from vellum.core.request_options import RequestOptions
@@ -58,7 +57,6 @@ class VellumEmitter(BaseWorkflowEmitter):
 
         try:
             event_data = default_serializer(event)
-
             self._send_event(event_data)
 
         except Exception as e:
@@ -75,7 +73,7 @@ class VellumEmitter(BaseWorkflowEmitter):
 
     def _send_event(self, event_data: Dict[str, Any]) -> None:
         """
-        Send event data to Vellum's events endpoint with retry logic.
+        Send event data to Vellum's events endpoint using the SDK client.
 
         Args:
             event_data: The serialized event data to send.
@@ -86,61 +84,26 @@ class VellumEmitter(BaseWorkflowEmitter):
 
         client = self._context.vellum_client
 
-        for attempt in range(self._max_retries + 1):
-            try:
-                # Use the Vellum client's events endpoint with proper SDK method
-                request_options = RequestOptions(timeout_in_seconds=self._timeout) if self._timeout else None
+        try:
+            # Use the SDK's built-in retry mechanism via RequestOptions
+            request_options = RequestOptions(timeout_in_seconds=self._timeout, max_retries=self._max_retries)
 
-                # Use the raw events client to send the already-serialized event data
-                response = client._client_wrapper.httpx_client.request(
-                    "monitoring/v1/events",
-                    base_url=client._client_wrapper.get_environment().default,
-                    method="POST",
-                    json=event_data,
-                    headers={
-                        "content-type": "application/json",
-                        **client._client_wrapper.get_headers(),
-                    },
-                    request_options=request_options,
-                )
+            # Use the SDK's underlying HTTP client with proper retry handling
+            client._client_wrapper.httpx_client.request(
+                "monitoring/v1/events",
+                base_url=client._client_wrapper.get_environment().default,
+                method="POST",
+                json=event_data,
+                headers={
+                    "content-type": "application/json",
+                    **client._client_wrapper.get_headers(),
+                },
+                request_options=request_options,
+            )
 
-                response.raise_for_status()
+            logger.debug("Event sent successfully via SDK client")
+            return
 
-                if attempt > 0:
-                    logger.info(f"Event sent successfully after {attempt + 1} attempts")
-                return
-
-            except Exception as e:
-                status_code = getattr(e, "response", {}).get("status_code") or getattr(e, "status_code", None)
-
-                if status_code and status_code >= 500:
-                    # Server errors might be transient, retry
-                    if attempt < self._max_retries:
-                        wait_time = min(2**attempt, 60)  # Exponential backoff, max 60s
-                        logger.warning(
-                            f"Server error emitting event (attempt {attempt + 1}/{self._max_retries + 1}): "
-                            f"{status_code}. Retrying in {wait_time}s..."
-                        )
-                        time.sleep(wait_time)
-                        continue
-                    else:
-                        logger.exception(
-                            f"Server error emitting event after {self._max_retries + 1} attempts: " f"{status_code}"
-                        )
-                        return
-                elif status_code and 400 <= status_code < 500:
-                    # Client errors (4xx) are not retriable
-                    logger.exception(f"Client error emitting event: {status_code}")
-                    return
-                else:
-                    if attempt < self._max_retries:
-                        wait_time = min(2**attempt, 60)  # Exponential backoff, max 60s
-                        logger.warning(
-                            f"Network error emitting event (attempt {attempt + 1}/{self._max_retries + 1}): "
-                            f"{e}. Retrying in {wait_time}s..."
-                        )
-                        time.sleep(wait_time)
-                        continue
-                    else:
-                        logger.exception(f"Network error emitting event after {self._max_retries + 1} attempts: {e}")
-                        return
+        except Exception as e:
+            logger.exception(f"Failed to send event via SDK client: {e}")
+            return

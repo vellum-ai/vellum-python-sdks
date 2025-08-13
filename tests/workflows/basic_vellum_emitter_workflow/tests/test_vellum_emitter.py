@@ -52,21 +52,24 @@ def test_vellum_emitter__happy_path(mock_workflow_context, mock_default_serializ
     emitter.register_context(mock_workflow_context)
 
     # AND we have a test workflow event
-    mock_event = Mock()
-    mock_event.name = "workflow.execution.initiated"
+    workflow_initiated_event = Mock()
+    workflow_initiated_event.name = "workflow.execution.initiated"
 
     # WHEN we emit the workflow event
-    emitter.emit_event(mock_event)
+    emitter.emit_event(workflow_initiated_event)
 
     # THEN the emitter should have made HTTP requests for the event
     assert mock_workflow_context.vellum_client._client_wrapper.httpx_client.request.call_count == 1
 
-    # AND the call should be for the event emission
+    # AND the call should be for the event emission with proper SDK patterns
     call_args = mock_workflow_context.vellum_client._client_wrapper.httpx_client.request.call_args_list[0]
-    assert call_args[0][0] == "monitoring/v1/events"  # First positional argument is the path
+    assert call_args[0][0] == "monitoring/v1/events"
     assert call_args[1]["method"] == "POST"
-    assert "json" in call_args[1]
     assert call_args[1]["json"] == {"event": "workflow_initiated_data"}
+    assert "request_options" in call_args[1]
+    request_options = call_args[1]["request_options"]
+    assert request_options["timeout_in_seconds"] == 30.0
+    assert request_options["max_retries"] == 3
 
     # AND the serializer should have been called for the event
     assert mock_default_serializer.call_count == 1
