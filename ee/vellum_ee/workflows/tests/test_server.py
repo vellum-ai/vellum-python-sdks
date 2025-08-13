@@ -494,3 +494,76 @@ class MapNodeWorkflow(BaseWorkflow):
 
     # AND we get the map node results as a list
     assert event.body.outputs == {"results": [1.0, 1.0, 1.0]}
+
+
+def test_serialize_module__tool_calling_node_with_single_tool():
+    """Test that serialize_module works with a tool calling node that has a single tool."""
+
+    # GIVEN a simple tool function
+    tool_function_code = '''def get_weather(location: str) -> str:
+    """Get the current weather for a location."""
+    return f"The weather in {location} is sunny."
+'''
+
+    # AND a workflow module with a tool calling node using that single tool
+    files = {
+        "__init__.py": "",
+        "workflow.py": """
+from vellum.workflows import BaseWorkflow
+from vellum.workflows.nodes.displayable.tool_calling_node import ToolCallingNode
+from vellum.workflows.state.base import BaseState
+from vellum.workflows.workflows.base import BaseInputs
+from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
+from vellum.client.types.plain_text_prompt_block import PlainTextPromptBlock
+from vellum.client.types.rich_text_prompt_block import RichTextPromptBlock
+from vellum.client.types.variable_prompt_block import VariablePromptBlock
+
+from .get_weather import get_weather
+
+
+class Inputs(BaseInputs):
+    location: str
+
+
+class WeatherNode(ToolCallingNode):
+    ml_model = "gpt-4o-mini"
+    blocks = [
+        ChatMessagePromptBlock(
+            chat_role="USER",
+            blocks=[
+                RichTextPromptBlock(
+                    blocks=[
+                        VariablePromptBlock(
+                            input_variable="location",
+                        ),
+                    ],
+                ),
+            ],
+        ),
+    ]
+    functions = [get_weather]
+    prompt_inputs = {
+        "location": Inputs.location,
+    }
+
+
+class Workflow(BaseWorkflow[Inputs, BaseState]):
+    graph = WeatherNode
+
+    class Outputs(BaseWorkflow.Outputs):
+        result = WeatherNode.Outputs.text
+""",
+        "get_weather.py": tool_function_code,
+    }
+
+    namespace = str(uuid4())
+
+    # AND the virtual file loader is registered
+    sys.meta_path.append(VirtualFileFinder(files, namespace))
+
+    from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
+
+    result = BaseWorkflowDisplay.serialize_module(namespace)
+
+    # THEN the serialization should complete (this test expects to fail)
+    assert result is not None
