@@ -27,10 +27,12 @@ def mock_create_vellum_client():
 
 
 @pytest.fixture
-def mock_default_serializer():
-    """Fixture for mocking default_serializer."""
-    with patch("vellum.workflows.emitters.vellum_emitter.default_serializer") as mock:
-        yield mock
+def mock_type_adapter():
+    """Fixture for mocking TypeAdapter validation."""
+    with patch("vellum.workflows.emitters.vellum_emitter.pydantic.TypeAdapter") as mock:
+        mock_adapter = Mock()
+        mock.return_value = mock_adapter
+        yield mock_adapter
 
 
 @pytest.fixture
@@ -40,10 +42,12 @@ def mock_workflow_context(mock_create_vellum_client):
     return context
 
 
-def test_vellum_emitter__happy_path(mock_workflow_context, mock_default_serializer):
+def test_vellum_emitter__happy_path(mock_workflow_context, mock_type_adapter):
     """Test VellumEmitter happy path with event emission."""
-    # GIVEN a properly configured VellumEmitter with mocked serialization
-    mock_default_serializer.return_value = {"event": "workflow_initiated_data"}
+    # GIVEN a properly configured VellumEmitter with mocked TypeAdapter
+    mock_client_event = Mock()
+    mock_client_event.name = "workflow.execution.initiated"
+    mock_type_adapter.validate_python.return_value = mock_client_event
 
     # AND a VellumEmitter initialized
     emitter = VellumEmitter()
@@ -60,22 +64,19 @@ def test_vellum_emitter__happy_path(mock_workflow_context, mock_default_serializ
     workflow_initiated_event.span_id = "test-span-id"
     workflow_initiated_event.parent = None
 
-    mock_body = Mock()
-    mock_workflow_definition = Mock()
-    mock_inputs = Mock()
-    mock_body.workflow_definition = mock_workflow_definition
-    mock_body.inputs = mock_inputs
-    workflow_initiated_event.body = mock_body
-
-    def mock_serializer_side_effect(obj):
-        if obj == mock_workflow_definition:
-            return {"name": "TestWorkflow", "module": ["test", "module"], "id": "workflow-def-id"}
-        elif obj == mock_inputs:
-            return {"input_key": "input_value"}
-        else:
-            return {"event": "workflow_initiated_data"}
-
-    mock_default_serializer.side_effect = mock_serializer_side_effect
+    # AND we add a model_dump method to the mock event for fallback conversion
+    workflow_initiated_event.model_dump.return_value = {
+        "name": "workflow.execution.initiated",
+        "id": "test-event-id",
+        "timestamp": "2024-01-01T12:00:00Z",
+        "trace_id": "test-trace-id",
+        "span_id": "test-span-id",
+        "parent": None,
+        "body": {
+            "workflow_definition": {"name": "TestWorkflow", "module": ["test", "module"], "id": "workflow-def-id"},
+            "inputs": {"input_key": "input_value"},
+        },
+    }
 
     # WHEN we emit the workflow event
     emitter.emit_event(workflow_initiated_event)
@@ -92,12 +93,8 @@ def test_vellum_emitter__happy_path(mock_workflow_context, mock_default_serializ
     assert request_options["timeout_in_seconds"] == 30.0
     assert request_options["max_retries"] == 3
 
-    sdk_event = call_args[1]["request"]
-    assert sdk_event.name == "workflow.execution.initiated"
-    assert hasattr(sdk_event, "id")
-    assert hasattr(sdk_event, "timestamp")
-    assert hasattr(sdk_event, "trace_id")
-    assert hasattr(sdk_event, "span_id")
+    client_event = call_args[1]["request"]
+    assert client_event.name == "workflow.execution.initiated"
 
-    # AND the serializer should have been called for the event conversion
-    assert mock_default_serializer.call_count >= 1
+    # AND the TypeAdapter should have been called for the event conversion
+    assert mock_type_adapter.validate_python.call_count == 1
