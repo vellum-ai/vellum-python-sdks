@@ -580,4 +580,5 @@ def get_function_name(function: ToolBase) -> str:
 
 
 def get_mcp_tool_name(tool_def: MCPToolDefinition) -> str:
-    return f"{tool_def.server.name}__{tool_def.name}"
+    server_name = snake_case(tool_def.server.name)
+    return f"{server_name}__{tool_def.name}"
