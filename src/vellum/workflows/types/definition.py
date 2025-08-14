@@ -4,7 +4,7 @@ from types import FrameType
 from uuid import UUID
 from typing import Annotated, Any, Dict, Literal, Optional, Union
 
-from pydantic import BeforeValidator, field_validator
+from pydantic import BeforeValidator
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.code_resource_definition import CodeResourceDefinition as ClientCodeResourceDefinition
