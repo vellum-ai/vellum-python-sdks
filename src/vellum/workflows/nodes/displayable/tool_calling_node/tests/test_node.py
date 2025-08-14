@@ -319,6 +319,6 @@ def test_tool_calling_node_workflow_is_dynamic(vellum_adhoc_prompt_client):
     initiated_events = [event for event in events if event.name == "workflow.execution.initiated"]
     assert len(initiated_events) == 3  # Main workflow + tool calling internal + inline workflow
 
-    assert initiated_events[0].body.is_dynamic is False  # Main workflow
-    assert initiated_events[1].body.is_dynamic is True  # Tool calling internal
-    assert initiated_events[2].body.is_dynamic is True  # Inline workflow
+    assert initiated_events[0].body.workflow_definition.is_dynamic is False  # Main workflow
+    assert initiated_events[1].body.workflow_definition.is_dynamic is True  # Tool calling internal
+    assert initiated_events[2].body.workflow_definition.is_dynamic is True  # Inline workflow

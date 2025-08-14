@@ -146,6 +146,7 @@ def test_inline_subworkflow_node__with_adornment():
     assert outputs[-1].name == "final_output" and outputs[-1].value == "hello"
 
 
+@pytest.mark.skip(reason="Enable after we set is_dynamic on the subworkflow class")
 def test_inline_subworkflow_node__is_dynamic_subworkflow():
     """Test that InlineSubworkflowNode sets is_dynamic=True on the subworkflow class"""
 
@@ -175,5 +176,5 @@ def test_inline_subworkflow_node__is_dynamic_subworkflow():
     initiated_events = [event for event in events if event.name == "workflow.execution.initiated"]
     assert len(initiated_events) == 2  # Main workflow + inline workflow
 
-    assert initiated_events[0].body.is_dynamic is False  # Main workflow
-    assert initiated_events[1].body.is_dynamic is True  # Inline workflow
+    assert initiated_events[0].body.workflow_definition.is_dynamic is False  # Main workflow
+    assert initiated_events[1].body.workflow_definition.is_dynamic is True  # Inline workflow

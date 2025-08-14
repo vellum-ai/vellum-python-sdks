@@ -505,6 +505,7 @@ def create_function_node(
         )
         return node
     elif is_workflow_class(function):
+        function.is_dynamic = True
         node = type(
             f"DynamicInlineSubworkflowNode_{function.__name__}",
             (DynamicInlineSubworkflowNode,),

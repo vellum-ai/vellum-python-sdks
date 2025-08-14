@@ -30,8 +30,6 @@ class _InlineSubworkflowNodeMeta(BaseNodeMeta):
         if not subworkflow_attribute:
             return node_class
 
-        subworkflow_attribute.is_dynamic = True
-
         if not issubclass(node_class, InlineSubworkflowNode):
             raise ValueError("_InlineSubworkflowNodeMeta can only be used on subclasses of InlineSubworkflowNode")
 

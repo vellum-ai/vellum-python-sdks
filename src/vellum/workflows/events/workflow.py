@@ -76,7 +76,6 @@ class WorkflowExecutionInitiatedBody(_BaseWorkflowExecutionBody, Generic[InputsT
     # It's conceivable in a future where all `id`s are agnostic to display and reside in a third location,
     # that the Workflow Runner can begin populating this field then.
     display_context: Optional[WorkflowEventDisplayContext] = None
-    is_dynamic: bool = False
 
     @field_serializer("inputs")
     def serialize_inputs(self, inputs: InputsType, _info: Any) -> Dict[str, Any]:
