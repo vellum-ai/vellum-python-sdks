@@ -2,7 +2,7 @@ from uuid import UUID
 from typing import TYPE_CHECKING, Any, Callable, Dict, Generic, Iterable, Literal, Optional, Type, Union
 from typing_extensions import TypeGuard
 
-from pydantic import field_serializer
+from pydantic import SerializationInfo, field_serializer
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.errors import WorkflowError
@@ -103,6 +103,17 @@ class WorkflowExecutionInitiatedEvent(_BaseWorkflowEvent, Generic[InputsType, St
     @property
     def initial_state(self) -> Optional[StateType]:
         return self.body.initial_state
+
+    @field_serializer("body")
+    def serialize_body(
+        self, body: WorkflowExecutionInitiatedBody[InputsType, StateType], info: SerializationInfo
+    ) -> WorkflowExecutionInitiatedBody[InputsType, StateType]:
+        context = info.context if info and hasattr(info, "context") else {}
+        if context and "event_enricher" in context and callable(context["event_enricher"]):
+            event = context["event_enricher"](self)
+            return event.body
+        else:
+            return body
 
 
 class WorkflowExecutionStreamingBody(_BaseWorkflowExecutionBody):

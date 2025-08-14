@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING, Any, Dict, Generic, List, Literal, Optional, Set, Type, Union
 
-from pydantic import field_serializer, model_serializer
+from pydantic import SerializationInfo, field_serializer, model_serializer
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.errors import WorkflowError
@@ -82,8 +82,8 @@ class NodeExecutionStreamingEvent(_BaseNodeEvent):
         return self.body.invoked_ports
 
     @model_serializer(mode="plain", when_used="json")
-    def serialize_model(self) -> Any:
-        serialized = super().serialize_model()
+    def serialize_model(self, info: SerializationInfo) -> Any:
+        serialized = super().serialize_model(info)
         if (
             "body" in serialized
             and isinstance(serialized["body"], dict)
@@ -127,8 +127,8 @@ class NodeExecutionFulfilledEvent(_BaseNodeEvent, Generic[OutputsType]):
         return self.body.mocked
 
     @model_serializer(mode="plain", when_used="json")
-    def serialize_model(self) -> Any:
-        serialized = super().serialize_model()
+    def serialize_model(self, info: SerializationInfo) -> Any:
+        serialized = super().serialize_model(info)
         if (
             "body" in serialized
             and isinstance(serialized["body"], dict)
