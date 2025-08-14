@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import TYPE_CHECKING, Any, Callable, Dict, Generic, Iterable, Literal, Optional, Type, Union
+from typing import TYPE_CHECKING, Any, Dict, Generic, Iterable, Literal, Optional, Type, Union
 from typing_extensions import TypeGuard
 
 from pydantic import field_serializer
@@ -84,9 +84,6 @@ class WorkflowExecutionInitiatedBody(_BaseWorkflowExecutionBody, Generic[InputsT
     @field_serializer("initial_state")
     def serialize_initial_state(self, initial_state: Optional[StateType], _info: Any) -> Optional[Dict[str, Any]]:
         return default_serializer(initial_state)
-
-
-EventEnricher = Callable[["_BaseWorkflowEvent"], dict]
 
 
 class WorkflowExecutionInitiatedEvent(_BaseWorkflowEvent, Generic[InputsType, StateType]):
