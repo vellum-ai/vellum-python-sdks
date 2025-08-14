@@ -930,7 +930,6 @@ export type ComposioToolFunctionArgs = {
   type: "COMPOSIO";
   toolkit?: string;
   action?: string;
-  description: string;
   tool_name?: string;
   tool_slug?: string;
   connection_id?: string;
