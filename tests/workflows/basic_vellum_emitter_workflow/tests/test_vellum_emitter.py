@@ -1,72 +1,67 @@
-import pytest
-from unittest.mock import Mock, patch
+from datetime import datetime, timezone
+import json
+from uuid import UUID
 
 from vellum.workflows.emitters.vellum_emitter import VellumEmitter
+from vellum.workflows.events.workflow import WorkflowExecutionInitiatedBody, WorkflowExecutionInitiatedEvent
+from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.context import WorkflowContext
+from vellum.workflows.workflows.base import BaseWorkflow
 
 
-class TestState(BaseState):
-    test_value: int = 0
+class TestInputs(BaseInputs):
+    foo: str = "bar"
 
 
-@pytest.fixture
-def mock_create_vellum_client():
-    """Fixture for mocking create_vellum_client."""
-    with patch("vellum.workflows.vellum_client.create_vellum_client") as mock:
-        mock_client = Mock()
-        mock.return_value = mock_client
-        mock_client._client_wrapper.get_environment.return_value.default = "https://api.vellum.ai"
-        mock_client._client_wrapper.get_headers.return_value = {"Authorization": "Bearer test"}
-
-        mock_response = Mock()
-        mock_response.raise_for_status.return_value = None
-        mock_client._client_wrapper.httpx_client.request.return_value = mock_response
-
-        yield mock_client
+class TestWorkflow(BaseWorkflow[TestInputs, BaseState]):
+    pass
 
 
-@pytest.fixture
-def mock_default_serializer():
-    """Fixture for mocking default_serializer."""
-    with patch("vellum.workflows.emitters.vellum_emitter.default_serializer") as mock:
-        yield mock
-
-
-@pytest.fixture
-def mock_workflow_context(mock_create_vellum_client):
-    """Fixture for creating a mock workflow context."""
-    context = WorkflowContext(vellum_client=mock_create_vellum_client)
-    return context
-
-
-def test_vellum_emitter__happy_path(mock_workflow_context, mock_default_serializer):
+def test_vellum_emitter__happy_path(mock_httpx_transport):
     """Test VellumEmitter happy path with event emission."""
-    # GIVEN a properly configured VellumEmitter with mocked serialization
-    mock_default_serializer.return_value = {"event": "workflow_initiated_data"}
 
-    # AND a VellumEmitter initialized
+    # GIVEN a properly configured VellumEmitter
     emitter = VellumEmitter()
+    workflow_context = WorkflowContext()
+    emitter.register_context(workflow_context)
 
-    # AND the emitter is registered with a workflow context
-    emitter.register_context(mock_workflow_context)
-
-    # AND we have a test workflow event
-    mock_event = Mock()
-    mock_event.name = "workflow.execution.initiated"
+    # AND we have a test workflow event from the SDK
+    workflow_initiated_event: WorkflowExecutionInitiatedEvent = WorkflowExecutionInitiatedEvent(
+        id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+        timestamp=datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
+        trace_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+        span_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+        body=WorkflowExecutionInitiatedBody(
+            workflow_definition=TestWorkflow,
+            inputs=TestInputs(foo="test"),
+        ),
+    )
 
     # WHEN we emit the workflow event
-    emitter.emit_event(mock_event)
+    emitter.emit_event(workflow_initiated_event)
 
-    # THEN the emitter should have made HTTP requests for the event
-    assert mock_workflow_context.vellum_client._client_wrapper.httpx_client.request.call_count == 1
+    # THEN the emitter should have called client.events.create
+    assert mock_httpx_transport.handle_request.call_count == 1
 
     # AND the call should be for the event emission
-    call_args = mock_workflow_context.vellum_client._client_wrapper.httpx_client.request.call_args_list[0]
-    assert call_args[1]["method"] == "POST"
-    assert call_args[1]["path"] == "v1/events"
-    assert "json" in call_args[1]
-    assert call_args[1]["json"] == {"event": "workflow_initiated_data"}
-
-    # AND the serializer should have been called for the event
-    assert mock_default_serializer.call_count == 1
+    call_args = mock_httpx_transport.handle_request.call_args_list[0]
+    mocked_request = call_args[0][0]
+    assert mocked_request.method == "POST"
+    assert mocked_request.url == "https://api.vellum.ai/monitoring/v1/events"
+    assert json.loads(mocked_request.content) == {
+        "name": "workflow.execution.initiated",
+        "api_version": "2024-10-25",
+        "body": {
+            "inputs": {"foo": "test"},
+            "workflow_definition": {
+                "id": "898d564e-2ca3-4b4e-8ee4-51404b7d48bf",
+                "module": ["tests", "workflows", "basic_vellum_emitter_workflow", "tests", "test_vellum_emitter"],
+                "name": "TestWorkflow",
+            },
+        },
+        "id": "123e4567-e89b-12d3-a456-426614174000",
+        "span_id": "123e4567-e89b-12d3-a456-426614174000",
+        "timestamp": "2024-01-01T12:00:00Z",
+        "trace_id": "123e4567-e89b-12d3-a456-426614174000",
+    }
