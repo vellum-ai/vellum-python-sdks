@@ -77,6 +77,9 @@ class WorkflowExecutionInitiatedBody(_BaseWorkflowExecutionBody, Generic[InputsT
     # that the Workflow Runner can begin populating this field then.
     display_context: Optional[WorkflowEventDisplayContext] = None
 
+    # This field will be populated during serialization by the serialize_body method
+    workflow_version_exec_config: Optional[Any] = None
+
     @field_serializer("inputs")
     def serialize_inputs(self, inputs: InputsType, _info: Any) -> Dict[str, Any]:
         return default_serializer(inputs)
