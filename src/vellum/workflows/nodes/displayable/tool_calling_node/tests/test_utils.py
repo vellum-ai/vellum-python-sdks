@@ -238,3 +238,15 @@ def test_create_tool_prompt_node_chat_history_block_dict(vellum_adhoc_prompt_cli
         ),
         VariablePromptBlock(block_type="VARIABLE", state=None, cache_config=None, input_variable="chat_history"),
     ]
+
+
+def test_get_mcp_tool_name_snake_case():
+    """Test MCPToolDefinition function name generation with snake case."""
+    mcp_tool = MCPToolDefinition(
+        name="create_repository",
+        server=MCPServer(name="Github Server", url="https://api.github.com"),
+        parameters={"repository_name": "string", "description": "string"},
+    )
+
+    result = get_mcp_tool_name(mcp_tool)
+    assert result == "github_server__create_repository"
