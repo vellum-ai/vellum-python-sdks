@@ -7,7 +7,7 @@ from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.exceptions import InvalidExpressionException
 from vellum.workflows.edges.edge import Edge
 from vellum.workflows.errors.types import WorkflowErrorCode
-from vellum.workflows.exceptions import NodeException, WorkflowInitializationException
+from vellum.workflows.exceptions import NodeException
 from vellum.workflows.graph import Graph, GraphTarget
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.core import ConditionType
@@ -107,13 +107,3 @@ class Port:
         cls, source_type: Type[Any], handler: GetCoreSchemaHandler
     ) -> core_schema.CoreSchema:
         return core_schema.is_instance_schema(cls)
-
-    def validate(self):
-        if (
-            not self.default
-            and self._condition_type in (ConditionType.IF, ConditionType.ELIF)
-            and self._condition is None
-        ):
-            raise WorkflowInitializationException(
-                f"Class {self.node_class.__name__}'s {self.name} should have a defined condition and cannot be empty."
-            )

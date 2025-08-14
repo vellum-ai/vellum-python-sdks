@@ -1,7 +1,6 @@
 import pytest
 
 from vellum.workflows import BaseWorkflow
-from vellum.workflows.exceptions import WorkflowInitializationException
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.ports import NodePorts, Port
@@ -42,19 +41,24 @@ def create_empty_elif_workflow():
 
 
 @pytest.mark.parametrize(
-    "workflow_factory,description,name",
+    "workflow_factory,port_name",
     [
-        (create_empty_if_workflow, "IF", "EmptyIfNode"),
-        (create_empty_elif_workflow, "ELIF", "EmptyElIfNode"),
+        (create_empty_if_workflow, "if_branch"),
+        (create_empty_elif_workflow, "elif_branch"),
     ],
     ids=["empty_if", "empty_elif"],
 )
-def test_empty_conditional_ports(workflow_factory, description, name):
-    with pytest.raises(WorkflowInitializationException) as exc_info:
-        workflow_cls = workflow_factory()
-        workflow_cls()
+def test_empty_conditional_ports(workflow_factory, port_name):
+    # GIVEN a workflow with an empty conditional port
+    workflow_cls = workflow_factory()
+    workflow = workflow_cls()
 
-    assert (
-        str(exc_info.value)
-        == f"Class {name}'s {description.lower()}_branch should have a defined condition and cannot be empty."  # noqa: E501
-    )
+    # THEN the workflow should be created successfully
+    assert workflow is not None
+
+    node_cls = workflow_cls.graph
+    test_state = BaseState()
+    empty_port = getattr(node_cls.Ports, port_name)
+
+    # THEN the port should resolve to False
+    assert empty_port.resolve_condition(test_state) is False
