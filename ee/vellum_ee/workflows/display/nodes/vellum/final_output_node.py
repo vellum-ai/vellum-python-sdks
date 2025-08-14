@@ -2,7 +2,7 @@ from uuid import UUID
 from typing import ClassVar, Generic, Optional, TypeVar
 
 from vellum.workflows.nodes.displayable.final_output_node import FinalOutputNode
-from vellum.workflows.types.core import JsonObject
+from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import to_kebab_case
@@ -18,6 +18,10 @@ NODE_INPUT_KEY = "node_input"
 
 class BaseFinalOutputNodeDisplay(BaseNodeDisplay[_FinalOutputNodeType], Generic[_FinalOutputNodeType]):
     output_name: ClassVar[Optional[str]] = None
+
+    def serialize_ports(self, display_context: "WorkflowDisplayContext") -> JsonArray:
+        """Final output nodes have no ports."""
+        return []
 
     def serialize(self, display_context: WorkflowDisplayContext, **_kwargs) -> JsonObject:
         node = self._node
@@ -45,9 +49,7 @@ class BaseFinalOutputNodeDisplay(BaseNodeDisplay[_FinalOutputNodeType], Generic[
                 "node_input_id": str(node_input.id),
             },
             "inputs": [node_input.dict()],
-            "display_data": self.get_display_data().dict(),
-            "base": self.get_base().dict(),
-            "definition": self.get_definition().dict(),
+            **self.serialize_generic_fields(display_context),
             "outputs": [
                 {
                     "id": str(self._get_output_id()),

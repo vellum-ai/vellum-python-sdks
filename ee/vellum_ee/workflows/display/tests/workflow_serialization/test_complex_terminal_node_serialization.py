@@ -81,6 +81,11 @@ def test_serialize_workflow__missing_final_output_node():
                         },
                     }
                 ],
+                "trigger": {
+                    "id": "a0c2eb7a-398e-4f28-b63d-f3bae9b563ee",
+                    "merge_behavior": "AWAIT_ANY",
+                },
+                "ports": [],
             },
             {
                 "id": "bb88768d-472e-4997-b7ea-de09163d1b4c",

@@ -353,7 +353,12 @@
               "node_output_id": "6a3c1704-7020-411d-a440-84b2a481691e"
             }
           }
-        ]
+        ],
+        "trigger": {
+          "id": "2d005e2b-e8bb-404a-9702-8faf10c2213d",
+          "merge_behavior": "AWAIT_ANY"
+        },
+        "ports": []
       }
     ],
     "edges": [

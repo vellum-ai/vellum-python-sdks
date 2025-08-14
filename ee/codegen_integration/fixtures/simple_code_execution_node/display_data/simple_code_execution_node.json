@@ -206,7 +206,12 @@
               "node_output_id": "9d1dae27-6e6a-40bf-a401-611c974d4143"
             }
           }
-        ]
+        ],
+        "trigger": {
+          "id": "ab9dd41a-5c7b-484a-bcd5-d55658ea849c",
+          "merge_behavior": "AWAIT_ANY"
+        },
+        "ports": []
       }
     ],
     "edges": [

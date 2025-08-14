@@ -55,9 +55,6 @@ class BaseInlineSubworkflowNodeDisplay(
                 "input_variables": [workflow_input.dict() for workflow_input in workflow_inputs],
                 "output_variables": [workflow_output.dict() for workflow_output in workflow_outputs],
             },
-            "display_data": self.get_display_data().dict(),
-            "base": self.get_base().dict(),
-            "definition": self.get_definition().dict(),
             **self.serialize_generic_fields(display_context),
         }
 

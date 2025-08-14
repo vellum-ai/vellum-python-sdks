@@ -213,9 +213,6 @@ class BaseAPINodeDisplay(BaseNodeDisplay[_APINodeType], Generic[_APINodeType]):
                 "json_output_id": str(json_output_display.id),
                 "status_code_output_id": str(status_code_output_display.id),
             },
-            "display_data": self.get_display_data().dict(),
-            "base": self.get_base().dict(),
-            "definition": self.get_definition().dict(),
             **self.serialize_generic_fields(display_context),
         }
 

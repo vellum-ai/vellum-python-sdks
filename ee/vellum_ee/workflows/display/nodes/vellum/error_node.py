@@ -2,7 +2,7 @@ from uuid import UUID
 from typing import Any, ClassVar, Generic, Optional, TypeVar
 
 from vellum.workflows.nodes import ErrorNode
-from vellum.workflows.types.core import JsonObject
+from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
@@ -19,6 +19,10 @@ class BaseErrorNodeDisplay(BaseNodeDisplay[_ErrorNodeType], Generic[_ErrorNodeTy
     name: ClassVar[Optional[str]] = None
 
     __serializable_inputs__ = {ErrorNode.error}
+
+    def serialize_ports(self, display_context: "WorkflowDisplayContext") -> JsonArray:
+        """Error nodes have no ports."""
+        return []
 
     def serialize(self, display_context: WorkflowDisplayContext, **_kwargs) -> JsonObject:
         node_id = self.node_id
@@ -47,9 +51,7 @@ class BaseErrorNodeDisplay(BaseNodeDisplay[_ErrorNodeType], Generic[_ErrorNodeTy
                 "target_handle_id": str(self.get_target_handle_id()),
                 "error_source_input_id": str(error_source_input_id),
             },
-            "display_data": self.get_display_data().dict(),
-            "base": self.get_base().dict(),
-            "definition": self.get_definition().dict(),
+            **self.serialize_generic_fields(display_context),
         }
 
         if self.name:

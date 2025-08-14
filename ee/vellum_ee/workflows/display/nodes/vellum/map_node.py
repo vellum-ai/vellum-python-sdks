@@ -79,8 +79,5 @@ class BaseMapNodeDisplay(BaseAdornmentNodeDisplay[_MapNodeType], Generic[_MapNod
                 "item_input_id": item_workflow_input_id,
                 "index_input_id": index_workflow_input_id,
             },
-            "display_data": self.get_display_data().dict(),
-            "base": self.get_base().dict(),
-            "definition": self.get_definition().dict(),
             **self.serialize_generic_fields(display_context),
         }

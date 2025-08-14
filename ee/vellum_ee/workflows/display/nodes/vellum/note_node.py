@@ -13,7 +13,7 @@ class BaseNoteNodeDisplay(BaseNodeDisplay[_NoteNodeType], Generic[_NoteNodeType]
     style: ClassVar[Union[Dict[str, Any], None]] = None
 
     def serialize(self, display_context: WorkflowDisplayContext, **kwargs: Any) -> JsonObject:
-        del display_context, kwargs  # Unused parameters
+        del kwargs  # Unused parameters
         node_id = self.node_id
 
         return {
@@ -25,7 +25,5 @@ class BaseNoteNodeDisplay(BaseNodeDisplay[_NoteNodeType], Generic[_NoteNodeType]
                 "text": self.text,
                 "style": self.style,
             },
-            "display_data": self.get_display_data().dict(),
-            "base": self.get_base().dict(),
-            "definition": self.get_definition().dict(),
+            **self.serialize_generic_fields(display_context),
         }

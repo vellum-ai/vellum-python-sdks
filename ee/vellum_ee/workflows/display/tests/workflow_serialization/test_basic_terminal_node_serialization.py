@@ -103,4 +103,9 @@ def test_serialize_workflow():
                 "value": {"type": "WORKFLOW_INPUT", "input_variable_id": "e39a7b63-de15-490a-ae9b-8112c767aea0"},
             }
         ],
+        "trigger": {
+            "id": "0173d3c6-11d1-44b7-b070-ca9ff5119046",
+            "merge_behavior": "AWAIT_ANY",
+        },
+        "ports": [],
     }

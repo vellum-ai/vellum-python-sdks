@@ -524,7 +524,12 @@
                       "node_output_id": "503aa2c1-6b99-43e8-98f7-1fef458a8d29"
                     }
                   }
-                ]
+                ],
+                "trigger": {
+                  "id": "8ff89a09-6ff0-4b02-bba7-eb8456a9c865",
+                  "merge_behavior": "AWAIT_ANY"
+                },
+                "ports": []
               }
             ],
             "edges": [
@@ -760,7 +765,12 @@
               "node_output_id": "bffc4749-00b8-44db-90ee-db655cbc7e62"
             }
           }
-        ]
+        ],
+        "trigger": {
+          "id": "8e19172a-4f87-4c21-8c91-ccdfb3e74c16",
+          "merge_behavior": "AWAIT_ANY"
+        },
+        "ports": []
       }
     ],
     "edges": [

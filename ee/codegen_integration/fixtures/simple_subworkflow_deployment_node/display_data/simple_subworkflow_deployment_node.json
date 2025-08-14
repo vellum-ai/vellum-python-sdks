@@ -149,6 +149,11 @@
           ],
           "name": "FinalOutput"
         },
+        "trigger": {
+          "id": "52b9ff71-e090-4c68-a713-fd72d194b992",
+          "merge_behavior": "AWAIT_ANY"
+        },
+        "ports": [],
         "outputs": [
           {
             "id": "4dc6e13e-92ba-436e-aa35-87e258f2f585",

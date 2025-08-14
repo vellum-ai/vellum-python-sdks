@@ -2979,6 +2979,11 @@
             "final_output_2"
           ]
         },
+        "trigger": {
+          "id": "87d73dc6-cafd-4f8b-b2fd-8367baba5d61",
+          "merge_behavior": "AWAIT_ANY"
+        },
+        "ports": [],
         "outputs": [
           {
             "id": "8c6e5464-8916-4039-b911-cf707855d372",

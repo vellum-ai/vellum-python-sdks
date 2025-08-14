@@ -74,7 +74,12 @@
             "nodes",
             "error_node"
           ]
-        }
+        },
+        "trigger": {
+          "id": "370d712d-3369-424e-bcf7-f4da1aef3928",
+          "merge_behavior": "AWAIT_ATTRIBUTES"
+        },
+        "ports": []
       }
     ],
     "edges": [

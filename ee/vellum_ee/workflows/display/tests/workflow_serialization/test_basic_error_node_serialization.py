@@ -114,6 +114,11 @@ def test_serialize_workflow():
                 "name": "FailNode",
                 "module": ["tests", "workflows", "basic_error_node", "workflow"],
             },
+            "trigger": {
+                "id": "70c19f1c-309c-4a5d-ba65-664c0bb2fedf",
+                "merge_behavior": "AWAIT_ATTRIBUTES",
+            },
+            "ports": [],
         },
         error_node,
         ignore_order=True,
