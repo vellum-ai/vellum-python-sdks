@@ -47,7 +47,7 @@ def test_event_enricher_static_workflow(is_dynamic: bool, expected_config: Optio
     # GIVEN a workflow class with the specified is_dynamic value
     TestWorkflow = type("TestWorkflow", (BaseWorkflow,), {"is_dynamic": is_dynamic})
 
-    event = WorkflowExecutionInitiatedEvent(
+    event: WorkflowExecutionInitiatedEvent = WorkflowExecutionInitiatedEvent(
         trace_id=uuid4(),
         span_id=uuid4(),
         body=WorkflowExecutionInitiatedBody(

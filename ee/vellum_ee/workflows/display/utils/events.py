@@ -1,4 +1,4 @@
-from vellum.workflows.events.types import BaseEvent
+from vellum.workflows.events.workflow import WorkflowExecutionInitiatedEvent
 from vellum_ee.workflows.display.utils.registry import (
     get_parent_display_context_from_event,
     register_workflow_display_class,
@@ -7,7 +7,7 @@ from vellum_ee.workflows.display.utils.registry import (
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 
-def event_enricher(event: BaseEvent) -> BaseEvent:
+def event_enricher(event: WorkflowExecutionInitiatedEvent) -> WorkflowExecutionInitiatedEvent:
     workflow_definition = event.body.workflow_definition
     workflow_display = get_workflow_display(
         workflow_class=workflow_definition,
