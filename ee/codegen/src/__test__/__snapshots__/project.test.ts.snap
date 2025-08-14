@@ -1260,10 +1260,6 @@ from vellum.workflows.sandbox import WorkflowSandboxRunner
 from .inputs import Inputs
 from .workflow import Workflow
 
-if __name__ != "__main__":
-    raise Exception("This file is not meant to be imported")
-
-
 dataset = [
     Inputs(
         input="foo",
@@ -1294,7 +1290,8 @@ dataset = [
 
 runner = WorkflowSandboxRunner(workflow=Workflow(), dataset=dataset)
 
-runner.run()
+if __name__ == "__main__":
+    runner.run()
 "
 `;
 

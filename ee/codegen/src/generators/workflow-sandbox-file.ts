@@ -70,15 +70,14 @@ export class WorkflowSandboxFile extends BasePersistedFile {
     this.inheritReferences(sandboxRunnerField);
 
     return [
-      python.codeBlock(`\
-if __name__ != "__main__":
-    raise Exception("This file is not meant to be imported")
-`),
       datasetField,
       sandboxRunnerField,
       // Using code block instead of method invocation since the latter tries to import `runner.run` after
       // specifying as a reference, even though it's a locally defined variable.
-      python.codeBlock(`runner.run()`),
+      python.codeBlock(`\
+if __name__ == "__main__":
+    runner.run()
+`),
     ];
   }
 
