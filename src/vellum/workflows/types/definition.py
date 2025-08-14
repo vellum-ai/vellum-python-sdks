@@ -4,7 +4,7 @@ from types import FrameType
 from uuid import UUID
 from typing import Annotated, Any, Dict, Literal, Optional, Union
 
-from pydantic import BeforeValidator
+from pydantic import BeforeValidator, field_validator
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.code_resource_definition import CodeResourceDefinition as ClientCodeResourceDefinition
@@ -111,12 +111,11 @@ class ComposioToolDefinition(UniversalBaseModel):
     action: str  # Specific action like "GITHUB_CREATE_AN_ISSUE"
     description: str
     user_id: Optional[str] = None
+    name: Optional[str] = None  # Optional name, defaults to action if not provided
 
-    @property
-    def name(self) -> str:
-        """Generate a function name for this tool"""
-        return self.action.lower()
-
+    def model_post_init(self, __context: Any):
+        if self.name is None:
+            self.name = self.action.lower()
 
 class MCPServer(UniversalBaseModel):
     type: Literal["MCP_SERVER"] = "MCP_SERVER"
