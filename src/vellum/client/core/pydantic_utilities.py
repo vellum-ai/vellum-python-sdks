@@ -6,6 +6,7 @@ from collections import defaultdict
 from typing import Any, Callable, ClassVar, Dict, List, Mapping, Optional, Set, Tuple, Type, TypeVar, Union, cast
 
 import pydantic
+from pydantic import SerializationInfo
 import logging
 
 logger = logging.getLogger(__name__)
@@ -70,8 +71,8 @@ class UniversalBaseModel(pydantic.BaseModel):
         )
 
         @pydantic.model_serializer(mode="plain", when_used="json")  # type: ignore[attr-defined]
-        def serialize_model(self) -> Any:  # type: ignore[name-defined]
-            serialized = self.model_dump()
+        def serialize_model(self, info: SerializationInfo) -> Any:  # type: ignore[name-defined]
+            serialized = self.model_dump(context=info.context)
             data = {k: serialize_datetime(v) if isinstance(v, dt.datetime) else v for k, v in serialized.items()}
             return data
 
