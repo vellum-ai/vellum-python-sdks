@@ -583,3 +583,20 @@ def test_graph__str_single_node():
     # THEN it shows the single node
     assert "SingleNode.default" in result
     assert "Graph:" in result
+
+
+def test_graph__from_node_with_empty_ports():
+    """
+    Tests that building a graph from a single node with empty Ports class generates 1 node.
+    """
+
+    # GIVEN a node with an empty Ports class
+    class NodeWithEmptyPorts(BaseNode):
+        class Ports(BaseNode.Ports):
+            pass
+
+    # WHEN we create a graph from the node
+    graph = Graph.from_node(NodeWithEmptyPorts)
+
+    # THEN the graph should have exactly 1 node
+    assert len(list(graph.nodes)) == 1
