@@ -575,7 +575,8 @@ def get_function_name(function: ToolBase) -> str:
         name = str(function.deployment_id or function.deployment_name)
         return name.replace("-", "")
     elif isinstance(function, ComposioToolDefinition):
-        return function.name
+        # model post init sets the name to the action if it's not set
+        return function.name  # type: ignore[return-value]
     else:
         return snake_case(function.__name__)
 

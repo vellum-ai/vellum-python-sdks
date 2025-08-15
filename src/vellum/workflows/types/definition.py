@@ -111,11 +111,11 @@ class ComposioToolDefinition(UniversalBaseModel):
     action: str  # Specific action like "GITHUB_CREATE_AN_ISSUE"
     description: str
     user_id: Optional[str] = None
+    name: str = ""
 
-    @property
-    def name(self) -> str:
-        """Generate a function name for this tool"""
-        return self.action.lower()
+    def model_post_init(self, __context: Any):
+        if self.name == "":
+            self.name = self.action.lower()
 
 
 class MCPServer(UniversalBaseModel):
