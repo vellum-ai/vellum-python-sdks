@@ -4,7 +4,7 @@ from uuid import uuid4
 from typing import TYPE_CHECKING, Dict, List, Optional, Type
 
 from vellum import Vellum
-from vellum.workflows.context import ExecutionContext, get_execution_context
+from vellum.workflows.context import ExecutionContext, get_execution_context, set_execution_context
 from vellum.workflows.events.types import ExternalParentContext
 from vellum.workflows.nodes.mocks import MockNodeExecution, MockNodeExecutionArg
 from vellum.workflows.outputs.base import BaseOutputs
@@ -36,8 +36,6 @@ class WorkflowContext:
         if self._execution_context.parent_context is None:
             self._execution_context.parent_context = ExternalParentContext(span_id=uuid4())
             # Propagate the updated context back to the global execution context
-            from vellum.workflows.context import set_execution_context
-
             set_execution_context(self._execution_context)
 
         self._generated_files = generated_files

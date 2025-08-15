@@ -4,22 +4,16 @@ import threading
 from uuid import UUID
 from typing import TYPE_CHECKING, Dict, Optional
 
-DEFAULT_TRACE_ID = UUID("00000000-0000-0000-0000-000000000000")
-
-# Thread-local storage for monitoring execution context
-_monitoring_execution_context: threading.local = threading.local()
-# Thread-local storage for current span_id
-_current_span_id: threading.local = threading.local()
-
 if TYPE_CHECKING:
     from vellum.workflows.context import ExecutionContext
+
+DEFAULT_TRACE_ID = UUID("00000000-0000-0000-0000-000000000000")
 
 
 class MonitoringContextStore:
     """
     thread-safe storage for monitoring contexts.
     handles context persistence and retrieval across threads.
-    leverages RelationalThread's parent-child relationships and trace tracking
     """
 
     def __init__(self):
@@ -33,41 +27,52 @@ class MonitoringContextStore:
             return current_context.trace_id if current_context else None
 
     def store_context(self, context: "ExecutionContext") -> None:
-        """Store monitoring parent context using simple thread-based keys."""
+        """Store monitoring parent context using thread_id:trace_id keys."""
         thread_id = threading.get_ident()
+        trace_id = context.trace_id
 
         with self._lock:
-            # Simple thread-based storage - RelationalThread handles the relationships
-            context_key = f"thread:{thread_id}"
+            # Always use thread_id:trace_id format
+            context_key = f"thread:{thread_id}:trace:{trace_id}"
             self._contexts[context_key] = context
 
     def retrieve_context(self) -> Optional["ExecutionContext"]:
-        """Retrieve monitoring parent context using RelationalThread relationships."""
+        """Retrieve monitoring parent context using trace_id from thread."""
         current_thread_id = threading.get_ident()
         current_thread = threading.current_thread()
 
-        with self._lock:
-            # Strategy 1: Try current thread
-            thread_key = f"thread:{current_thread_id}"
-            if thread_key in self._contexts:
-                return self._contexts[thread_key]
+        # Get trace_id directly from the thread if it's a RelationalThread
+        trace_id = None
+        if hasattr(current_thread, "get_trace_id"):
+            trace_id = current_thread.get_trace_id()
 
-            # Strategy 2: If this is a RelationalThread, try parent thread
+        # If no trace_id on current thread, try to get it from parent thread
+        if not trace_id and hasattr(current_thread, "get_parent_thread"):
+            parent_thread_id = current_thread.get_parent_thread()
+            if parent_thread_id:
+                # Find parent thread and get its trace_id
+                for t in threading.enumerate():
+                    if t.ident == parent_thread_id and hasattr(t, "get_trace_id"):
+                        trace_id = t.get_trace_id()
+                        if trace_id:
+                            break
+
+        if not trace_id:
+            return None
+
+        with self._lock:
+            # Try current thread with trace_id
+            current_key = f"thread:{current_thread_id}:trace:{trace_id}"
+            if current_key in self._contexts:
+                return self._contexts[current_key]
+
+            # Try parent thread with same trace_id (child inherits parent's trace)
             if hasattr(current_thread, "get_parent_thread"):
                 parent_thread_id = current_thread.get_parent_thread()
                 if parent_thread_id:
-                    parent_key = f"thread:{parent_thread_id}"
+                    parent_key = f"thread:{parent_thread_id}:trace:{trace_id}"
                     if parent_key in self._contexts:
                         return self._contexts[parent_key]
-
-            # Strategy 3: If RelationalThread has trace_id, find matching context
-            if hasattr(current_thread, "get_trace_id"):
-                thread_trace_id = current_thread.get_trace_id()
-                if thread_trace_id:
-                    # Find any context with matching trace_id
-                    for context in self._contexts.values():
-                        if context.trace_id == thread_trace_id:
-                            return context
 
         return None
 

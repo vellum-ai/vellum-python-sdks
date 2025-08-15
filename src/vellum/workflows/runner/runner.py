@@ -533,6 +533,7 @@ class WorkflowRunner(Generic[StateType]):
                     "node": node,
                     "span_id": node_span_id,
                 },
+                execution_context=execution,
             )
             worker_thread.start()
 

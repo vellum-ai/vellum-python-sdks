@@ -1,29 +1,25 @@
 import threading
 from uuid import UUID
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
+
+if TYPE_CHECKING:
+    from vellum.workflows.context import ExecutionContext
 
 
 class RelationalThread(threading.Thread):
     _parent_thread: Optional[int] = None
     _trace_id: Optional[UUID] = None
 
-    def __init__(self, *args, **kwargs):
-        self._collect_parent_context()
+    def __init__(self, *args, execution_context: Optional["ExecutionContext"] = None, **kwargs):
+        self._collect_parent_context(execution_context)
         threading.Thread.__init__(self, *args, **kwargs)
 
-    def _collect_parent_context(self) -> None:
-        """Collect parent thread ID and trace ID from current execution context."""
+    def _collect_parent_context(self, execution_context: Optional["ExecutionContext"] = None) -> None:
+        """Collect parent thread ID and trace ID from passed execution context."""
         self._parent_thread = threading.get_ident()
 
-        # Import here to avoid circular imports
-        from vellum.workflows.context import get_execution_context
-
-        try:
-            current_context = get_execution_context()
-            self._trace_id = current_context.trace_id if current_context else None
-        except Exception:
-            # If we can't get the execution context, that's okay - we'll fall back to None
-            self._trace_id = None
+        # Only use explicitly passed execution context
+        self._trace_id = execution_context.trace_id if execution_context else None
 
     def get_parent_thread(self) -> Optional[int]:
         return self._parent_thread
