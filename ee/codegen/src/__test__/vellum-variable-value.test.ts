@@ -275,4 +275,21 @@ describe("VellumValue", () => {
       expect(videoValue.getReferences()).toHaveLength(1);
     });
   });
+
+  describe("THINKING", () => {
+    it("should write a THINKING value correctly", async () => {
+      const thinkingValue = codegen.vellumValue({
+        vellumValue: {
+          type: "THINKING",
+          value: {
+            type: "STRING",
+            value: "Hello, World!",
+          },
+        },
+      });
+      thinkingValue.write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+      expect(thinkingValue.getReferences()).toHaveLength(1);
+    });
+  });
 });

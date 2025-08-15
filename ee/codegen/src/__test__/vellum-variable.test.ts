@@ -140,4 +140,12 @@ describe("VellumVariableField", () => {
     optionalVar.write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
+
+  test("ThinkingVellumVariable snapshot", async () => {
+    const thinkingVar = codegen.vellumVariable({
+      variable: { id: "1", name: "test", type: "THINKING", required: true },
+    });
+    thinkingVar.write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
 });

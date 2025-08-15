@@ -70,6 +70,11 @@ exports[`VellumVariableField > StringVellumVariable snapshot 1`] = `
 "
 `;
 
+exports[`VellumVariableField > ThinkingVellumVariable snapshot 1`] = `
+"test: StringVellumValue
+"
+`;
+
 exports[`VellumVariableField > VideoVellumVariable snapshot 1`] = `
 "test: VellumVideo
 "

@@ -90,6 +90,11 @@ exports[`VellumValue > STRING > should write a STRING value correctly 1`] = `
 "
 `;
 
+exports[`VellumValue > THINKING > should write a THINKING value correctly 1`] = `
+"StringVellumValue(value="Hello, World!")
+"
+`;
+
 exports[`VellumValue > VIDEO > should write a VIDEO value correctly 1`] = `
 "VellumVideo(src="https://example.com/video.mp4")
 "
