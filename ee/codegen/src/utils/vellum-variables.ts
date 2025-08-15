@@ -83,6 +83,13 @@ export function getVellumVariablePrimitiveType(
           modulePath: VELLUM_CLIENT_MODULE_PATH,
         })
       );
+    case "THINKING":
+      return python.Type.reference(
+        python.reference({
+          name: "StringVellumValue",
+          modulePath: VELLUM_CLIENT_MODULE_PATH,
+        })
+      );
     case "NULL":
       return python.Type.none();
     default: {

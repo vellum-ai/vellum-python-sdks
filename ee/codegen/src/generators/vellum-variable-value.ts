@@ -6,6 +6,7 @@ import {
   ChatMessageRequest,
   FunctionCall,
   SearchResult,
+  StringVellumValue as StringVellumValueType,
   VellumAudio,
   VellumDocument,
   VellumError,
@@ -527,6 +528,39 @@ class SearchResultsVellumValue extends AstNode {
   }
 }
 
+class ThinkingVellumValue extends AstNode {
+  private astNode: AstNode;
+
+  public constructor(value: StringVellumValueType) {
+    super();
+    this.astNode = this.generateAstNode(value);
+  }
+
+  private generateAstNode(value: StringVellumValueType): AstNode {
+    const arguments_ = [
+      python.methodArgument({
+        name: "value",
+        value: new StringVellumValue(value.value ?? ""),
+      }),
+    ];
+
+    const astNode = python.instantiateClass({
+      classReference: python.reference({
+        name: "StringVellumValue",
+        modulePath: VELLUM_CLIENT_MODULE_PATH,
+      }),
+      arguments_: arguments_,
+    });
+
+    this.inheritReferences(astNode);
+    return astNode;
+  }
+
+  public write(writer: Writer): void {
+    this.astNode.write(writer);
+  }
+}
+
 export namespace VellumValue {
   export type Args = {
     vellumValue: VellumVariableValueType;
@@ -600,8 +634,9 @@ export class VellumValue extends AstNode {
       case "FUNCTION_CALL":
         this.astNode = new FunctionCallVellumValue(vellumValue.value);
         break;
-      // TODO: Implement Document vellum variable type support
-      // https://linear.app/vellum/issue/APO-189/add-codegen-support-for-new-document-variable-type
+      case "THINKING":
+        this.astNode = new ThinkingVellumValue(vellumValue.value);
+        break;
       default:
         assertUnreachable(vellumValue);
     }
