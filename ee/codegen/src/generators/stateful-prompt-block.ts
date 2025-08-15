@@ -11,12 +11,15 @@ import {
   PromptTemplateBlockExcludingFunctionDefinition,
 } from "src/generators/base-prompt-block";
 import {
+  AudioPromptTemplateBlock,
   ChatMessagePromptTemplateBlock,
+  DocumentPromptTemplateBlock,
   ImagePromptTemplateBlock,
   JinjaPromptTemplateBlock,
   PlainTextPromptTemplateBlock,
   RichTextPromptTemplateBlock,
   VariablePromptTemplateBlock,
+  VideoPromptTemplateBlock,
 } from "src/types/vellum";
 
 // Flesh out unit tests for various prompt configurations
@@ -36,8 +39,14 @@ export class StatefulPromptBlock extends BasePromptBlock<PromptTemplateBlockExcl
         return this.generateRichTextPromptBlock(promptBlock);
       case "PLAIN_TEXT":
         return this.generatePlainTextPromptBlock(promptBlock);
+      case "AUDIO":
+        return this.generateAudioPromptBlock(promptBlock);
+      case "VIDEO":
+        return this.generateVideoPromptBlock(promptBlock);
       case "IMAGE":
         return this.generateImagePromptBlock(promptBlock);
+      case "DOCUMENT":
+        return this.generateDocumentPromptBlock(promptBlock);
     }
   }
 
@@ -61,8 +70,17 @@ export class StatefulPromptBlock extends BasePromptBlock<PromptTemplateBlockExcl
       case "PLAIN_TEXT":
         pathName = "PlainTextPromptBlock";
         break;
+      case "AUDIO":
+        pathName = "AudioPromptBlock";
+        break;
+      case "VIDEO":
+        pathName = "VideoPromptBlock";
+        break;
       case "IMAGE":
         pathName = "ImagePromptBlock";
+        break;
+      case "DOCUMENT":
+        pathName = "DocumentPromptBlock";
         break;
     }
     return python.reference({
@@ -258,12 +276,14 @@ export class StatefulPromptBlock extends BasePromptBlock<PromptTemplateBlockExcl
     return richBlock;
   }
 
-  private generateImagePromptBlock(
-    promptBlock: ImagePromptTemplateBlock
-  ): python.ClassInstantiation {
-    const classArgs: MethodArgument[] = [
-      ...this.constructCommonClassArguments(promptBlock),
-    ];
+  private generateCommonFileInputArguments(
+    promptBlock:
+      | AudioPromptTemplateBlock
+      | VideoPromptTemplateBlock
+      | ImagePromptTemplateBlock
+      | DocumentPromptTemplateBlock
+  ): MethodArgument[] {
+    const classArgs: MethodArgument[] = [];
 
     classArgs.push(
       new MethodArgument({
@@ -282,6 +302,51 @@ export class StatefulPromptBlock extends BasePromptBlock<PromptTemplateBlockExcl
       );
     }
 
+    return classArgs;
+  }
+
+  private generateAudioPromptBlock(
+    promptBlock: AudioPromptTemplateBlock
+  ): python.ClassInstantiation {
+    const classArgs: MethodArgument[] = [
+      ...this.constructCommonClassArguments(promptBlock),
+      ...this.generateCommonFileInputArguments(promptBlock),
+    ];
+
+    const audioBlock = python.instantiateClass({
+      classReference: this.getPromptBlockRef(promptBlock),
+      arguments_: classArgs,
+    });
+
+    this.inheritReferences(audioBlock);
+    return audioBlock;
+  }
+
+  private generateVideoPromptBlock(
+    promptBlock: VideoPromptTemplateBlock
+  ): python.ClassInstantiation {
+    const classArgs: MethodArgument[] = [
+      ...this.constructCommonClassArguments(promptBlock),
+      ...this.generateCommonFileInputArguments(promptBlock),
+    ];
+
+    const videoBlock = python.instantiateClass({
+      classReference: this.getPromptBlockRef(promptBlock),
+      arguments_: classArgs,
+    });
+
+    this.inheritReferences(videoBlock);
+    return videoBlock;
+  }
+
+  private generateImagePromptBlock(
+    promptBlock: ImagePromptTemplateBlock
+  ): python.ClassInstantiation {
+    const classArgs: MethodArgument[] = [
+      ...this.constructCommonClassArguments(promptBlock),
+      ...this.generateCommonFileInputArguments(promptBlock),
+    ];
+
     const imageBlock = python.instantiateClass({
       classReference: this.getPromptBlockRef(promptBlock),
       arguments_: classArgs,
@@ -289,5 +354,22 @@ export class StatefulPromptBlock extends BasePromptBlock<PromptTemplateBlockExcl
 
     this.inheritReferences(imageBlock);
     return imageBlock;
+  }
+
+  private generateDocumentPromptBlock(
+    promptBlock: DocumentPromptTemplateBlock
+  ): python.ClassInstantiation {
+    const classArgs: MethodArgument[] = [
+      ...this.constructCommonClassArguments(promptBlock),
+      ...this.generateCommonFileInputArguments(promptBlock),
+    ];
+
+    const documentBlock = python.instantiateClass({
+      classReference: this.getPromptBlockRef(promptBlock),
+      arguments_: classArgs,
+    });
+
+    this.inheritReferences(documentBlock);
+    return documentBlock;
   }
 }
