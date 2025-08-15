@@ -1,8 +1,9 @@
 import time
-from typing import Iterator
+from typing import ClassVar, Iterator, List, Set, Type
 
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
+from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.subworkflow_deployment_node.node import SubworkflowDeploymentNode
 from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.outputs.base import BaseOutput
@@ -10,7 +11,7 @@ from vellum.workflows.state import BaseState
 
 
 class State(BaseState):
-    execution_times = []
+    execution_times: List[float] = []
 
 
 class MockSubworkflowDeploymentNode(SubworkflowDeploymentNode[State]):
@@ -41,7 +42,7 @@ class FourthSubworkflowNode(MockSubworkflowDeploymentNode):
 
 
 class SubworkflowConcurrencyLimitWorkflow(BaseWorkflow[BaseInputs, State]):
-    graph = {
+    graph: ClassVar[Set[Type[BaseNode[State]]]] = {
         FirstSubworkflowNode,
         SecondSubworkflowNode,
         ThirdSubworkflowNode,
