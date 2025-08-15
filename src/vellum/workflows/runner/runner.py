@@ -63,6 +63,7 @@ from vellum.workflows.events.workflow import (
 from vellum.workflows.exceptions import NodeException, WorkflowInitializationException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.bases.base import NodeRunResponse
+from vellum.workflows.nodes.displayable.subworkflow_deployment_node.node import SubworkflowDeploymentNode
 from vellum.workflows.nodes.mocks import MockNodeExecutionArg
 from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.outputs.base import BaseOutput
@@ -163,6 +164,10 @@ class WorkflowRunner(Generic[StateType]):
 
         self._max_concurrency = max_concurrency
         self._concurrency_queue: Queue[Tuple[StateType, Type[BaseNode], Optional[UUID]]] = Queue()
+
+        self._max_subworkflow_concurrency = 2
+        self._subworkflow_concurrency_queue: Queue[Tuple[StateType, Type[BaseNode], Optional[UUID]]] = Queue()
+        self._active_subworkflow_nodes_by_execution_id: Dict[UUID, ActiveNode[StateType]] = {}
 
         # This queue is responsible for sending events from WorkflowRunner to the background thread
         # for user defined emitters
@@ -486,6 +491,11 @@ class WorkflowRunner(Generic[StateType]):
 
                 if self._max_concurrency:
                     self._concurrency_queue.put((next_state, edge.to_node, invoked_by))
+                elif issubclass(edge.to_node, SubworkflowDeploymentNode):
+                    if len(self._active_subworkflow_nodes_by_execution_id) < self._max_subworkflow_concurrency:
+                        self._run_node_if_ready(next_state, edge.to_node, invoked_by)
+                    else:
+                        self._subworkflow_concurrency_queue.put((next_state, edge.to_node, invoked_by))
                 else:
                     self._run_node_if_ready(next_state, edge.to_node, invoked_by)
 
@@ -496,6 +506,17 @@ class WorkflowRunner(Generic[StateType]):
                     break
 
                 next_state, node_class, invoked_by = self._concurrency_queue.get()
+                self._run_node_if_ready(next_state, node_class, invoked_by)
+
+        if not self._max_concurrency:
+            num_subworkflow_nodes_to_run = self._max_subworkflow_concurrency - len(
+                self._active_subworkflow_nodes_by_execution_id
+            )
+            for _ in range(num_subworkflow_nodes_to_run):
+                if self._subworkflow_concurrency_queue.empty():
+                    break
+
+                next_state, node_class, invoked_by = self._subworkflow_concurrency_queue.get()
                 self._run_node_if_ready(next_state, node_class, invoked_by)
 
     def _run_node_if_ready(
@@ -538,6 +559,8 @@ class WorkflowRunner(Generic[StateType]):
             node = node_class(state=state, context=self.workflow.context)
             state.meta.node_execution_cache.initiate_node_execution(node_class, node_span_id)
             self._active_nodes_by_execution_id[node_span_id] = ActiveNode(node=node)
+            if issubclass(node_class, SubworkflowDeploymentNode):
+                self._active_subworkflow_nodes_by_execution_id[node_span_id] = ActiveNode(node=node)
 
             worker_thread = Thread(
                 target=self._context_run_work_item,
@@ -558,6 +581,7 @@ class WorkflowRunner(Generic[StateType]):
         node = active_node.node
         if event.name == "node.execution.rejected":
             self._active_nodes_by_execution_id.pop(event.span_id)
+            self._active_subworkflow_nodes_by_execution_id.pop(event.span_id, None)
             return event.error
 
         if event.name == "node.execution.streaming":
@@ -600,6 +624,7 @@ class WorkflowRunner(Generic[StateType]):
 
         if event.name == "node.execution.fulfilled":
             self._active_nodes_by_execution_id.pop(event.span_id)
+            was_subworkflow_node = self._active_subworkflow_nodes_by_execution_id.pop(event.span_id, None) is not None
             if not active_node.was_outputs_streamed:
                 for event_node_output_descriptor, node_output_value in event.outputs:
                     for workflow_output_descriptor in self.workflow.Outputs:
@@ -621,6 +646,11 @@ class WorkflowRunner(Generic[StateType]):
                         )
 
             self._handle_invoked_ports(node.state, event.invoked_ports, event.span_id)
+
+            if not self._max_concurrency and was_subworkflow_node:
+                if not self._subworkflow_concurrency_queue.empty():
+                    next_state, node_class, invoked_by = self._subworkflow_concurrency_queue.get()
+                    self._run_node_if_ready(next_state, node_class, invoked_by)
 
             return None
 
@@ -704,11 +734,19 @@ class WorkflowRunner(Generic[StateType]):
         )
         for node_cls in self._entrypoints:
             try:
-                if not self._max_concurrency or len(self._active_nodes_by_execution_id) < self._max_concurrency:
+                if self._max_concurrency and len(self._active_nodes_by_execution_id) >= self._max_concurrency:
+                    self._concurrency_queue.put((self._initial_state, node_cls, None))
+                elif issubclass(node_cls, SubworkflowDeploymentNode):
+                    if len(self._active_subworkflow_nodes_by_execution_id) < self._max_subworkflow_concurrency:
+                        with execution_context(
+                            parent_context=current_parent, trace_id=self._execution_context.trace_id
+                        ):
+                            self._run_node_if_ready(self._initial_state, node_cls)
+                    else:
+                        self._subworkflow_concurrency_queue.put((self._initial_state, node_cls, None))
+                else:
                     with execution_context(parent_context=current_parent, trace_id=self._execution_context.trace_id):
                         self._run_node_if_ready(self._initial_state, node_cls)
-                else:
-                    self._concurrency_queue.put((self._initial_state, node_cls, None))
             except NodeException as e:
                 self._workflow_event_outer_queue.put(self._reject_workflow_event(e.error))
                 return
