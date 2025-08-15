@@ -42,6 +42,13 @@ class Graph:
     @staticmethod
     def from_node(node: Type["BaseNode"]) -> "Graph":
         ports = {port for port in node.Ports}
+        if not ports:
+            from vellum.workflows.ports.port import Port
+
+            default_port = Port(default=True)
+            default_port.name = "default"
+            default_port.node_class = node
+            ports = {default_port}
         return Graph(entrypoints=ports, edges=[], terminals=ports)
 
     @staticmethod
