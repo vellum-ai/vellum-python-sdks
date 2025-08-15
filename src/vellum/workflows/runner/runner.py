@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import logging
 from queue import Empty, Queue
 import sys
-from threading import Event as ThreadingEvent, Thread
+from threading import Event as ThreadingEvent
 import traceback
 from uuid import UUID, uuid4
 from typing import (
@@ -46,7 +46,8 @@ from vellum.workflows.events.node import (
     NodeExecutionRejectedBody,
     NodeExecutionStreamingBody,
 )
-from vellum.workflows.events.types import BaseEvent, NodeParentContext, ParentContext, WorkflowParentContext
+from vellum.workflows.events.relational_threads import RelationalThread as Thread
+from vellum.workflows.events.types import BaseEvent, NodeParentContext, WorkflowParentContext
 from vellum.workflows.events.workflow import (
     WorkflowEventStream,
     WorkflowExecutionFulfilledBody,
@@ -454,19 +455,6 @@ class WorkflowRunner(Generic[StateType]):
 
         return None
 
-    def _context_run_work_item(
-        self,
-        node: BaseNode[StateType],
-        span_id: UUID,
-        parent_context: ParentContext,
-        trace_id: UUID,
-    ) -> None:
-        with execution_context(
-            parent_context=parent_context,
-            trace_id=trace_id,
-        ):
-            self._run_work_item(node, span_id)
-
     def _handle_invoked_ports(
         self,
         state: StateType,
@@ -540,12 +528,10 @@ class WorkflowRunner(Generic[StateType]):
             self._active_nodes_by_execution_id[node_span_id] = ActiveNode(node=node)
 
             worker_thread = Thread(
-                target=self._context_run_work_item,
+                target=self._run_work_item,
                 kwargs={
                     "node": node,
                     "span_id": node_span_id,
-                    "parent_context": execution.parent_context,
-                    "trace_id": execution.trace_id,
                 },
             )
             worker_thread.start()

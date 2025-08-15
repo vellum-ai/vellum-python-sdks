@@ -35,6 +35,10 @@ class WorkflowContext:
 
         if self._execution_context.parent_context is None:
             self._execution_context.parent_context = ExternalParentContext(span_id=uuid4())
+            # Propagate the updated context back to the global execution context
+            from vellum.workflows.context import set_execution_context
+
+            set_execution_context(self._execution_context)
 
         self._generated_files = generated_files
 
