@@ -259,4 +259,20 @@ describe("VellumValue", () => {
       expect(searchResultsValue.getReferences()).toHaveLength(4);
     });
   });
+
+  describe("VIDEO", () => {
+    it("should write a VIDEO value correctly", async () => {
+      const videoValue = codegen.vellumValue({
+        vellumValue: {
+          type: "VIDEO",
+          value: {
+            src: "https://example.com/video.mp4",
+          },
+        },
+      });
+      videoValue.write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+      expect(videoValue.getReferences()).toHaveLength(1);
+    });
+  });
 });

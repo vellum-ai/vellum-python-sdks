@@ -33,6 +33,22 @@ describe("VellumVariableField", () => {
     expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
 
+  test("AudioVellumVariable snapshot", async () => {
+    const audioVar = codegen.vellumVariable({
+      variable: { id: "1", name: "test", type: "AUDIO", required: true },
+    });
+    audioVar.write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
+
+  test("VideoVellumVariable snapshot", async () => {
+    const videoVar = codegen.vellumVariable({
+      variable: { id: "1", name: "test", type: "VIDEO", required: true },
+    });
+    videoVar.write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
+
   test("ImageVellumVariable snapshot", async () => {
     const imageVar = codegen.vellumVariable({
       variable: { id: "1", name: "test", type: "IMAGE", required: true },
