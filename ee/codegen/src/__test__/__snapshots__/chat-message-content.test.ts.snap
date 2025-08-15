@@ -96,3 +96,15 @@ exports[`ChatMessageContent > IMAGE > should write an image content correctly 1`
 exports[`ChatMessageContent > STRING > should write a string content correctly 1`] = `"StringChatMessageContent(value="Hello, AI!")"`;
 
 exports[`ChatMessageContent > STRING > should write a string with nested quotes correctly 1`] = `"StringChatMessageContent(value="{\\"tool_calls\\":[{\\"id\\":\\"call_123\\",\\"type\\":\\"function\\",\\"function\\":{\\"name\\":\\"generate_query\\",\\"arguments\\":\\"{\\"query\\":\\"SELECT * FROM users WHERE id = 1\\"}\\"}}]}")"`;
+
+exports[`ChatMessageContent > VIDEO > should write a video content correctly 1`] = `
+"VideoChatMessageContent(
+    value=VellumVideo(
+        src="https://example.com/video.mp4",
+        metadata={
+            "key": "value",
+        },
+    )
+)
+"
+`;

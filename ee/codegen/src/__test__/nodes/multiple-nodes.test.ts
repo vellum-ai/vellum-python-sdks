@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { WorkflowDeploymentRelease } from "vellum-ai/api";
 import { Deployments as PromptDeploymentReleaseClient } from "vellum-ai/api/resources/deployments/client/Client";
 import { MetricDefinitions as MetricDefinitionsClient } from "vellum-ai/api/resources/metricDefinitions/client/Client";
-import { ReleaseReviews as WorkflowReleaseClient } from "vellum-ai/api/resources/releaseReviews/client/Client";
+import { WorkflowDeployments as WorkflowReleaseClient } from "vellum-ai/api/resources/workflowDeployments/client/Client";
 import { MetricDefinitionHistoryItem } from "vellum-ai/api/types/MetricDefinitionHistoryItem";
 import { PromptDeploymentRelease } from "vellum-ai/api/types/PromptDeploymentRelease";
 import { beforeEach, expect, vi } from "vitest";

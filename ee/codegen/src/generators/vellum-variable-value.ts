@@ -6,12 +6,13 @@ import {
   ChatMessageRequest,
   FunctionCall,
   SearchResult,
+  StringVellumValue as StringVellumValueType,
   VellumAudio,
   VellumDocument,
   VellumError,
   VellumImage,
   VellumValue as VellumVariableValueType,
-  // VellumVideo,
+  VellumVideo,
 } from "vellum-ai/api";
 
 import { ChatMessageContent } from "./chat-message-content";
@@ -241,28 +242,23 @@ class AudioVellumValue extends AstNode {
 class VideoVellumValue extends AstNode {
   private astNode: python.AstNode;
 
-  public constructor(value: unknown) {
-    // VellumVideo) {
+  public constructor(value: VellumVideo) {
     super();
     this.astNode = this.generateAstNode(value);
   }
 
-  private generateAstNode(value: unknown): AstNode {
-    // VellumVideo): AstNode {
+  private generateAstNode(value: VellumVideo): AstNode {
     const arguments_ = [
       python.methodArgument({
         name: "src",
-        // @ts-ignore
         value: python.TypeInstantiation.str(value.src),
       }),
     ];
 
-    // @ts-ignore
     if (!isNil(value.metadata)) {
       arguments_.push(
         python.methodArgument({
           name: "metadata",
-          // @ts-ignore
           value: new Json(value.metadata),
         })
       );
@@ -532,6 +528,39 @@ class SearchResultsVellumValue extends AstNode {
   }
 }
 
+class ThinkingVellumValue extends AstNode {
+  private astNode: AstNode;
+
+  public constructor(value: StringVellumValueType) {
+    super();
+    this.astNode = this.generateAstNode(value);
+  }
+
+  private generateAstNode(value: StringVellumValueType): AstNode {
+    const arguments_ = [
+      python.methodArgument({
+        name: "value",
+        value: new StringVellumValue(value.value ?? ""),
+      }),
+    ];
+
+    const astNode = python.instantiateClass({
+      classReference: python.reference({
+        name: "StringVellumValue",
+        modulePath: VELLUM_CLIENT_MODULE_PATH,
+      }),
+      arguments_: arguments_,
+    });
+
+    this.inheritReferences(astNode);
+    return astNode;
+  }
+
+  public write(writer: Writer): void {
+    this.astNode.write(writer);
+  }
+}
+
 export namespace VellumValue {
   export type Args = {
     vellumValue: VellumVariableValueType;
@@ -587,9 +616,7 @@ export class VellumValue extends AstNode {
       case "AUDIO":
         this.astNode = new AudioVellumValue(vellumValue.value);
         break;
-      // @ts-expect-error
       case "VIDEO":
-        // @ts-expect-error
         this.astNode = new VideoVellumValue(vellumValue.value);
         break;
       case "IMAGE":
@@ -607,8 +634,9 @@ export class VellumValue extends AstNode {
       case "FUNCTION_CALL":
         this.astNode = new FunctionCallVellumValue(vellumValue.value);
         break;
-      // TODO: Implement Document vellum variable type support
-      // https://linear.app/vellum/issue/APO-189/add-codegen-support-for-new-document-variable-type
+      case "THINKING":
+        this.astNode = new ThinkingVellumValue(vellumValue.value);
+        break;
       default:
         assertUnreachable(vellumValue);
     }

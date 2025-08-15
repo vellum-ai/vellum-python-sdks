@@ -16,8 +16,8 @@ import {
   VellumAudioRequest as VellumAudioRequestType,
   VellumDocument as VellumDocumentType,
   VellumDocumentRequest as VellumDocumentRequestType,
-  // VellumVideo as VellumVideoType,
-  // VellumVideoRequest as VellumVideoRequestType,
+  VellumVideo as VellumVideoType,
+  VellumVideoRequest as VellumVideoRequestType,
 } from "vellum-ai/api";
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
@@ -252,7 +252,7 @@ class VideoChatMessageContent extends AstNode {
   private astNode: AstNode;
 
   public constructor(
-    value: unknown, // VellumVideoType | VellumVideoRequestType,
+    value: VellumVideoType | VellumVideoRequestType,
     isRequestType: boolean
   ) {
     super();
@@ -260,7 +260,7 @@ class VideoChatMessageContent extends AstNode {
   }
 
   private generateAstNode(
-    value: unknown, // VellumVideoType | VellumVideoRequestType,
+    value: VellumVideoType | VellumVideoRequestType,
     isRequestType: boolean
   ): AstNode {
     const videoChatMessageContentRequestRef = python.reference({
@@ -271,14 +271,11 @@ class VideoChatMessageContent extends AstNode {
     const videoArgs = [
       python.methodArgument({
         name: "src",
-        // @ts-ignore
         value: python.TypeInstantiation.str(value.src),
       }),
     ];
 
-    // @ts-ignore
     if (!isNil(value.metadata)) {
-      // @ts-ignore
       const metadataJson = new Json(value.metadata);
       videoArgs.push(
         python.methodArgument({
@@ -494,10 +491,8 @@ export class ChatMessageContent extends AstNode {
         );
         break;
       }
-      // @ts-expect-error
       case "VIDEO": {
         astNode = new VideoChatMessageContent(
-          // @ts-expect-error
           chatMessageContent.value,
           isRequestType
         );

@@ -168,4 +168,21 @@ describe("ChatMessageContent", () => {
       expect(chatMessageContent.getReferences()).toHaveLength(2);
     });
   });
+
+  describe("VIDEO", () => {
+    it("should write a video content correctly", async () => {
+      const chatMessageContent = new ChatMessageContent({
+        chatMessageContent: {
+          type: "VIDEO",
+          value: {
+            src: "https://example.com/video.mp4",
+            metadata: { key: "value" },
+          },
+        },
+      });
+      chatMessageContent.write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+      expect(chatMessageContent.getReferences()).toHaveLength(2);
+    });
+  });
 });

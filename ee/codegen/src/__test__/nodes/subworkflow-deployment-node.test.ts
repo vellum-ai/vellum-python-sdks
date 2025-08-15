@@ -1,6 +1,6 @@
 import { Writer } from "@fern-api/python-ast/core/Writer";
 import { WorkflowDeploymentRelease } from "vellum-ai/api";
-import { ReleaseReviews as WorkflowReleaseClient } from "vellum-ai/api/resources/releaseReviews/client/Client";
+import { WorkflowDeployments as WorkflowReleaseClient } from "vellum-ai/api/resources/workflowDeployments/client/Client";
 import { VellumError } from "vellum-ai/errors";
 import { beforeEach, vi } from "vitest";
 

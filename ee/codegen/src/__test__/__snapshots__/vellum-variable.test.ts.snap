@@ -5,6 +5,11 @@ exports[`VellumVariableField > ArrayVellumVariable snapshot 1`] = `
 "
 `;
 
+exports[`VellumVariableField > AudioVellumVariable snapshot 1`] = `
+"test: VellumAudio
+"
+`;
+
 exports[`VellumVariableField > ChatHistoryVellumVariable snapshot 1`] = `
 "test: List[ChatMessage]
 "
@@ -62,5 +67,15 @@ exports[`VellumVariableField > SearchResultsVellumVariable snapshot 1`] = `
 
 exports[`VellumVariableField > StringVellumVariable snapshot 1`] = `
 "test: str
+"
+`;
+
+exports[`VellumVariableField > ThinkingVellumVariable snapshot 1`] = `
+"test: StringVellumValue
+"
+`;
+
+exports[`VellumVariableField > VideoVellumVariable snapshot 1`] = `
+"test: VellumVideo
 "
 `;

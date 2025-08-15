@@ -1,6 +1,6 @@
 import { MetricDefinitionHistoryItem } from "vellum-ai/api";
 import { MetricDefinitions as MetricDefinitionsClient } from "vellum-ai/api/resources/metricDefinitions/client/Client";
-import { ReleaseReviews as WorkflowReleaseClient } from "vellum-ai/api/resources/releaseReviews/client/Client";
+import { WorkflowDeployments as WorkflowReleaseClient } from "vellum-ai/api/resources/workflowDeployments/client/Client";
 import { MockInstance, vi } from "vitest";
 
 export class SpyMocks {
