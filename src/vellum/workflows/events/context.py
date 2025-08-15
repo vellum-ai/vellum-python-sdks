@@ -35,12 +35,12 @@ class MonitoringContextStore:
         with self._lock:
             # Get span_id from RelationalThread first
             span_id = None
-            if hasattr(current_thread, "get_parent_span_id"):
-                span_id = current_thread.get_parent_span_id()
 
-            # Fallback to getting span_id from context
-            if not span_id and context.parent_context and hasattr(context.parent_context, "span_id"):
+            if context.parent_context and hasattr(context.parent_context, "span_id"):
                 span_id = context.parent_context.span_id
+
+            if not span_id and hasattr(current_thread, "get_parent_span_id"):
+                span_id = current_thread.get_parent_span_id()
 
             # Always use trace:span:thread format - require span_id
             if span_id:
@@ -49,8 +49,8 @@ class MonitoringContextStore:
 
     def retrieve_context(self) -> Optional["ExecutionContext"]:
         """Retrieve monitoring parent context using trace:span:thread keys."""
-        current_thread_id = threading.get_ident()
         current_thread = threading.current_thread()
+        current_thread_id = current_thread.ident
 
         # Get trace_id and span_id directly from the thread if it's a RelationalThread
         trace_id = None
