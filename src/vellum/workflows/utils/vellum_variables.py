@@ -1,7 +1,7 @@
 import typing
 from typing import List, Tuple, Type, Union, get_args, get_origin
 
-from vellum import (  # VellumVideo,; VellumVideoRequest,
+from vellum import (
     ChatMessage,
     ChatMessageRequest,
     FunctionCall,
@@ -19,6 +19,8 @@ from vellum import (  # VellumVideo,; VellumVideoRequest,
     VellumValue,
     VellumValueRequest,
     VellumVariableType,
+    VellumVideo,
+    VellumVideoRequest,
 )
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.types.core import Json
@@ -67,8 +69,8 @@ def primitive_type_to_vellum_variable_type(type_: Union[Type, BaseDescriptor]) -
         return "FUNCTION_CALL"
     elif _is_type_optionally_in(type_, (VellumAudio, VellumAudioRequest)):
         return "AUDIO"
-    # elif _is_type_optionally_in(type_, (VellumVideo, VellumVideoRequest)):
-    #     return "VIDEO"
+    elif _is_type_optionally_in(type_, (VellumVideo, VellumVideoRequest)):
+        return "VIDEO"
     elif _is_type_optionally_in(type_, (VellumImage, VellumImageRequest)):
         return "IMAGE"
     elif _is_type_optionally_in(type_, (VellumDocument, VellumDocumentRequest)):
