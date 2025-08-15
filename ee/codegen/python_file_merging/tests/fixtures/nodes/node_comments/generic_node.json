@@ -1,0 +1,22 @@
+{
+  "attributes": [
+    {
+      "id": "00000000-0000-0000-0000-000000000000",
+      "name": "foo",
+      "type": "STRING",
+      "value": {
+        "type": "CONSTANT_VALUE",
+        "value": {
+          "type": "STRING",
+          "value": "bar"
+        }
+      }
+    }
+  ],
+  "display_data": {
+    "comment": {
+      "expanded": true,
+      "value": "This is a comment"
+    }
+  }
+}

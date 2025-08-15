@@ -15,34 +15,31 @@ const rootDir = join(
   "python_file_merging/tests/fixtures/nodes"
 );
 
-const fixtureFilter = /base_case/;
-
 const getFixturePaths = () => {
   const fixtureDirs = fs
     .readdirSync(rootDir, { withFileTypes: true })
     .filter((d) => d.isDirectory())
     .map((d) => join(rootDir, d.name));
 
-  return fixtureDirs
-    .filter((d) => fixtureFilter.test(d))
-    .map((d) => {
-      const originalFilePath = join(d, "original.py");
-      const generatedFilePath = join(d, "generic_node.json");
-      const expectedFilePath = join(d, "expected.py");
+  return fixtureDirs.map((d) => {
+    const originalFilePath = join(d, "original.py");
+    const generatedFilePath = join(d, "generic_node.json");
+    const expectedFilePath = join(d, "expected.py");
 
-      return {
-        originalFilePath,
-        generatedFilePath,
-        expectedFilePath,
-        label: d.split("/").pop() ?? "Unknown",
-      };
-    });
+    return {
+      originalFilePath,
+      generatedFilePath,
+      expectedFilePath,
+      label: d.split("/").pop() ?? "Unknown",
+    };
+  });
 };
 
 const nodeFileContents = getFixturePaths();
 
 const singleGenericNodeWorkflowFactory = (
-  genericNodeData: Record<string, string> = {}
+  genericNodeData: Record<string, string> = {},
+  input_variables: [] = []
 ) => {
   const entrypointNodeId = uuidv4();
   const entrypointSourceHandleId = uuidv4();
@@ -128,7 +125,7 @@ const singleGenericNodeWorkflowFactory = (
         },
       ],
     },
-    input_variables: [],
+    input_variables,
     state_variables: [],
     output_variables: [],
     runner_config: {},
@@ -159,9 +156,13 @@ describe("Python file merging", () => {
        */
 
       // GIVEN a temp directory and inline display data that yields at least one mergeable node file
-      const genericNodeData = fs.readFileSync(generatedFilePath, "utf-8");
+      const generatedData = JSON.parse(
+        fs.readFileSync(generatedFilePath, "utf-8")
+      );
+      const { input_variables, ...genericNodeData } = generatedData;
       const displayData = singleGenericNodeWorkflowFactory(
-        JSON.parse(genericNodeData)
+        genericNodeData,
+        input_variables
       );
 
       const initialProject = new WorkflowProjectGenerator({

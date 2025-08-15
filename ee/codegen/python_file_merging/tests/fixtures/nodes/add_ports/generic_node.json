@@ -1,0 +1,64 @@
+{
+  "outputs": [
+    {
+      "id": "00000000-0000-0000-0000-000000000000",
+      "name": "value",
+      "type": "STRING",
+      "value": null
+    }
+  ],
+  "ports": [
+    {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "name": "if_branch",
+      "type": "IF",
+      "expression": {
+        "type": "BINARY_EXPRESSION",
+        "operator": "beginsWith",
+        "lhs": {
+          "type": "WORKFLOW_INPUT",
+          "input_variable_id": "00000000-0000-0000-0000-000000000004"
+        },
+        "rhs": {
+          "type": "CONSTANT_VALUE",
+          "value": {
+            "type": "STRING",
+            "value": "hi"
+          }
+        }
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000002",
+      "name": "another_if_branch",
+      "type": "IF",
+      "expression": {
+        "type": "BINARY_EXPRESSION",
+        "operator": "endsWith",
+        "lhs": {
+          "type": "WORKFLOW_INPUT",
+          "input_variable_id": "00000000-0000-0000-0000-000000000004"
+        },
+        "rhs": {
+          "type": "CONSTANT_VALUE",
+          "value": {
+            "type": "STRING",
+            "value": "lol"
+          }
+        }
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000003",
+      "name": "else_branch",
+      "type": "ELSE"
+    }
+  ],
+  "input_variables": [
+    {
+      "id": "00000000-0000-0000-0000-000000000004",
+      "key": "value",
+      "type": "STRING"
+    }
+  ]
+}

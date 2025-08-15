@@ -664,6 +664,7 @@ export interface ErrorNode extends BaseDisplayableWorkflowNode {
 
 export interface GenericNodeDisplayData {
   position?: { x: number; y: number };
+  comment?: NodeDisplayComment;
 }
 
 export interface NodeOutput {
