@@ -1,5 +1,5 @@
 import { VellumVariableType, WorkflowDeploymentRelease } from "vellum-ai/api";
-import { ReleaseReviews as WorkflowReleaseClient } from "vellum-ai/api/resources/releaseReviews/client/Client";
+import { WorkflowDeployments as WorkflowReleaseClient } from "vellum-ai/api/resources/workflowDeployments/client/Client";
 
 import { BaseNodeContext } from "./base";
 
