@@ -62,13 +62,13 @@ export function getVellumVariablePrimitiveType(
           modulePath: VELLUM_CLIENT_MODULE_PATH,
         })
       );
-    // case "VIDEO":
-    //   return python.Type.reference(
-    //     python.reference({
-    //       name: "VellumVideo",
-    //       modulePath: VELLUM_CLIENT_MODULE_PATH,
-    //     })
-    //   );
+    case "VIDEO":
+      return python.Type.reference(
+        python.reference({
+          name: "VellumVideo",
+          modulePath: VELLUM_CLIENT_MODULE_PATH,
+        })
+      );
     case "IMAGE":
       return python.Type.reference(
         python.reference({
