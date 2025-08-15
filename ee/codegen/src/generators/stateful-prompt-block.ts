@@ -3,6 +3,8 @@ import { ClassInstantiation } from "@fern-api/python-ast/ClassInstantiation";
 import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
 import { isNil } from "lodash";
 
+import { Json } from "./json";
+
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import {
   BasePromptBlock,
@@ -10,6 +12,7 @@ import {
 } from "src/generators/base-prompt-block";
 import {
   ChatMessagePromptTemplateBlock,
+  ImagePromptTemplateBlock,
   JinjaPromptTemplateBlock,
   PlainTextPromptTemplateBlock,
   RichTextPromptTemplateBlock,
@@ -33,6 +36,8 @@ export class StatefulPromptBlock extends BasePromptBlock<PromptTemplateBlockExcl
         return this.generateRichTextPromptBlock(promptBlock);
       case "PLAIN_TEXT":
         return this.generatePlainTextPromptBlock(promptBlock);
+      case "IMAGE":
+        return this.generateImagePromptBlock(promptBlock);
     }
   }
 
@@ -55,6 +60,9 @@ export class StatefulPromptBlock extends BasePromptBlock<PromptTemplateBlockExcl
         break;
       case "PLAIN_TEXT":
         pathName = "PlainTextPromptBlock";
+        break;
+      case "IMAGE":
+        pathName = "ImagePromptBlock";
         break;
     }
     return python.reference({
@@ -248,5 +256,38 @@ export class StatefulPromptBlock extends BasePromptBlock<PromptTemplateBlockExcl
 
     this.inheritReferences(richBlock);
     return richBlock;
+  }
+
+  private generateImagePromptBlock(
+    promptBlock: ImagePromptTemplateBlock
+  ): python.ClassInstantiation {
+    const classArgs: MethodArgument[] = [
+      ...this.constructCommonClassArguments(promptBlock),
+    ];
+
+    classArgs.push(
+      new MethodArgument({
+        name: "src",
+        value: python.TypeInstantiation.str(promptBlock.src),
+      })
+    );
+
+    if (promptBlock.metadata) {
+      const metadataJson = new Json(promptBlock.metadata);
+      classArgs.push(
+        new MethodArgument({
+          name: "metadata",
+          value: metadataJson,
+        })
+      );
+    }
+
+    const imageBlock = python.instantiateClass({
+      classReference: this.getPromptBlockRef(promptBlock),
+      arguments_: classArgs,
+    });
+
+    this.inheritReferences(imageBlock);
+    return imageBlock;
   }
 }

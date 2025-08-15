@@ -326,12 +326,22 @@ export interface FunctionDefinitionPromptTemplateBlock {
   };
 }
 
+export interface ImagePromptTemplateBlock {
+  id: string;
+  blockType: "IMAGE";
+  state: PromptBlockState;
+  cacheConfig?: CacheConfig;
+  src: string;
+  metadata?: Record<string, unknown>;
+}
+
 export type PromptTemplateBlock =
   | JinjaPromptTemplateBlock
   | ChatMessagePromptTemplateBlock
   | VariablePromptTemplateBlock
   | RichTextPromptTemplateBlock
-  | FunctionDefinitionPromptTemplateBlock;
+  | FunctionDefinitionPromptTemplateBlock
+  | ImagePromptTemplateBlock;
 
 export interface PromptTemplateBlockData {
   version: number;
