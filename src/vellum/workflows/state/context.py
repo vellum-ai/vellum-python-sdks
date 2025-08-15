@@ -13,6 +13,7 @@ from vellum.workflows.vellum_client import create_vellum_client
 
 if TYPE_CHECKING:
     from vellum.workflows.events.workflow import WorkflowEvent
+    from vellum.workflows.workflows.base import BaseWorkflow
 
 
 class WorkflowContext:
@@ -130,6 +131,19 @@ class WorkflowContext:
 
     def _get_all_node_output_mocks(self) -> List[MockNodeExecution]:
         return [mock for mocks in self._node_output_mocks_map.values() for mock in mocks]
+
+    def resolve_workflow_deployment(self, deployment_name: str, release_tag: str) -> Optional["BaseWorkflow"]:
+        """
+        Resolve a workflow deployment by name and release tag.
+
+        Args:
+            deployment_name: The name of the workflow deployment
+            release_tag: The release tag to resolve
+
+        Returns:
+            BaseWorkflow instance if found, None otherwise
+        """
+        return None
 
     @classmethod
     def create_from(cls, context):

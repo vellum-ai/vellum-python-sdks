@@ -152,6 +152,15 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
                 message="Expected subworkflow deployment attribute to be either a UUID or STR, got None instead",
             )
 
+        if deployment_name:
+            resolved_workflow = self._context.resolve_workflow_deployment(
+                deployment_name=deployment_name, release_tag=self.release_tag
+            )
+            if resolved_workflow:
+                # TODO: Implement direct workflow invocation
+                # For now, fall back to API call
+                pass
+
         try:
             subworkflow_stream = self._context.vellum_client.execute_workflow_stream(
                 inputs=self._compile_subworkflow_inputs(),
