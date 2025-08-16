@@ -1,6 +1,6 @@
 import json
 from uuid import UUID
-from typing import Any, ClassVar, Dict, Generic, Iterator, List, Optional, Set, Union, cast
+from typing import TYPE_CHECKING, Any, ClassVar, Dict, Generic, Iterator, List, Optional, Set, Union, cast
 
 from vellum import (
     ChatMessage,
@@ -16,16 +16,21 @@ from vellum.client.core import RequestOptions
 from vellum.client.core.api_error import ApiError
 from vellum.client.types.chat_message_request import ChatMessageRequest
 from vellum.workflows.constants import LATEST_RELEASE_TAG, OMIT
-from vellum.workflows.context import get_execution_context
+from vellum.workflows.context import execution_context, get_execution_context, get_parent_context
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.errors.types import workflow_event_error_to_workflow_error
 from vellum.workflows.events.types import default_serializer
+from vellum.workflows.events.workflow import is_workflow_event
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior
 from vellum.workflows.types.generics import StateType
+from vellum.workflows.workflows.event_filters import all_workflow_event_filter
+
+if TYPE_CHECKING:
+    from vellum.workflows.workflows.base import BaseWorkflow
 
 
 class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
@@ -135,6 +140,74 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
                 )
             )
 
+    def _compile_subworkflow_inputs_for_direct_invocation(self, workflow: "BaseWorkflow") -> Any:
+        """Compile inputs for direct workflow invocation (similar to InlineSubworkflowNode)."""
+        inputs_class = workflow.get_inputs_class()
+
+        if isinstance(self.subworkflow_inputs, BaseInputs):
+            inputs_dict = {}
+            for input_descriptor, input_value in self.subworkflow_inputs:
+                if input_value is not None:
+                    inputs_dict[input_descriptor.name] = input_value
+            return inputs_class(**inputs_dict)
+        else:
+            # Filter out None values for direct invocation
+            filtered_inputs = {k: v for k, v in self.subworkflow_inputs.items() if v is not None}
+            return inputs_class(**filtered_inputs)
+
+    def _run_resolved_workflow(self, resolved_workflow: "BaseWorkflow") -> Iterator[BaseOutput]:
+        """Execute resolved workflow directly (similar to InlineSubworkflowNode)."""
+        with execution_context(parent_context=get_parent_context()):
+            subworkflow_stream = resolved_workflow.stream(
+                inputs=self._compile_subworkflow_inputs_for_direct_invocation(resolved_workflow),
+                event_filter=all_workflow_event_filter,
+                node_output_mocks=self._context._get_all_node_output_mocks(),
+            )
+
+        outputs = None
+        exception = None
+        fulfilled_output_names: Set[str] = set()
+
+        for event in subworkflow_stream:
+            self._context._emit_subworkflow_event(event)
+            if exception:
+                continue
+
+            if not is_workflow_event(event):
+                continue
+            if event.workflow_definition != resolved_workflow.__class__:
+                continue
+
+            if event.name == "workflow.execution.streaming":
+                if event.output.is_fulfilled:
+                    fulfilled_output_names.add(event.output.name)
+                yield event.output
+            elif event.name == "workflow.execution.fulfilled":
+                outputs = event.outputs
+            elif event.name == "workflow.execution.rejected":
+                exception = NodeException.of(event.error)
+            elif event.name == "workflow.execution.paused":
+                exception = NodeException(
+                    code=WorkflowErrorCode.INVALID_OUTPUTS,
+                    message="Subworkflow unexpectedly paused",
+                )
+
+        if exception:
+            raise exception
+
+        if outputs is None:
+            raise NodeException(
+                message="Expected to receive outputs from Workflow Deployment",
+                code=WorkflowErrorCode.INVALID_OUTPUTS,
+            )
+
+        for output_descriptor, output_value in outputs:
+            if output_descriptor.name not in fulfilled_output_names:
+                yield BaseOutput(
+                    name=output_descriptor.name,
+                    value=output_value,
+                )
+
     def run(self) -> Iterator[BaseOutput]:
         execution_context = get_execution_context()
         request_options = self.request_options or RequestOptions()
@@ -151,6 +224,19 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
                 code=WorkflowErrorCode.NODE_EXECUTION,
                 message="Expected subworkflow deployment attribute to be either a UUID or STR, got None instead",
             )
+
+        if not deployment_name:
+            raise NodeException(
+                code=WorkflowErrorCode.INVALID_INPUTS,
+                message="Expected deployment name to be provided for subworkflow execution.",
+            )
+
+        resolved_workflow = self._context.resolve_workflow_deployment(
+            deployment_name=deployment_name, release_tag=self.release_tag
+        )
+        if resolved_workflow:
+            yield from self._run_resolved_workflow(resolved_workflow)
+            return
 
         try:
             subworkflow_stream = self._context.vellum_client.execute_workflow_stream(
