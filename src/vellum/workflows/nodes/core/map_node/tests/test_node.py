@@ -283,8 +283,14 @@ def test_map_node__output_ids():
         class Outputs(BaseOutputs):
             value: str
 
+    class SimpleMapNodeWorkflow(BaseWorkflow[MapNode.SubworkflowInputs, BaseState]):
+        graph = TestNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_output = TestNode.Outputs.value
+
     class TestMapNode(MapNode):
         items = [1, 2, 3]
-        subworkflow = TestNode
+        subworkflow = SimpleMapNodeWorkflow
 
     assert len(TestMapNode.__output_ids__) == 1
