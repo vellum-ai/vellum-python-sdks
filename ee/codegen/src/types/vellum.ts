@@ -326,12 +326,52 @@ export interface FunctionDefinitionPromptTemplateBlock {
   };
 }
 
+export interface AudioPromptTemplateBlock {
+  id: string;
+  blockType: "AUDIO";
+  state: PromptBlockState;
+  cacheConfig?: CacheConfig;
+  src: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface VideoPromptTemplateBlock {
+  id: string;
+  blockType: "VIDEO";
+  state: PromptBlockState;
+  cacheConfig?: CacheConfig;
+  src: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface ImagePromptTemplateBlock {
+  id: string;
+  blockType: "IMAGE";
+  state: PromptBlockState;
+  cacheConfig?: CacheConfig;
+  src: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface DocumentPromptTemplateBlock {
+  id: string;
+  blockType: "DOCUMENT";
+  state: PromptBlockState;
+  cacheConfig?: CacheConfig;
+  src: string;
+  metadata?: Record<string, unknown>;
+}
+
 export type PromptTemplateBlock =
   | JinjaPromptTemplateBlock
   | ChatMessagePromptTemplateBlock
   | VariablePromptTemplateBlock
   | RichTextPromptTemplateBlock
-  | FunctionDefinitionPromptTemplateBlock;
+  | FunctionDefinitionPromptTemplateBlock
+  | AudioPromptTemplateBlock
+  | VideoPromptTemplateBlock
+  | ImagePromptTemplateBlock
+  | DocumentPromptTemplateBlock;
 
 export interface PromptTemplateBlockData {
   version: number;
