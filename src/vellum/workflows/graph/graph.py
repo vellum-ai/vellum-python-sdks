@@ -59,7 +59,7 @@ class Graph:
 
     @staticmethod
     def from_port(port: "Port") -> "Graph":
-        ports = {port}
+        ports: Set[Union["Port", "NoPortsNode"]] = {port}
         return Graph(entrypoints=ports, edges=[], terminals=ports)
 
     @staticmethod
@@ -68,7 +68,8 @@ class Graph:
         if not ports:
             no_ports_node = NoPortsNode(node)
             return Graph(entrypoints={no_ports_node}, edges=[], terminals={no_ports_node})
-        return Graph(entrypoints=ports, edges=[], terminals=ports)
+        ports_set: Set[Union["Port", "NoPortsNode"]] = set(ports)
+        return Graph(entrypoints=ports_set, edges=[], terminals=ports_set)
 
     @staticmethod
     def from_set(targets: GraphTargetOfSets) -> "Graph":

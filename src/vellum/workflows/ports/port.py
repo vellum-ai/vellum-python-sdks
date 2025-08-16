@@ -66,6 +66,14 @@ class Port:
         if isinstance(other, Port):
             return Graph.from_port(self) >> Graph.from_port(other)
 
+        from vellum.workflows.graph.graph import NoPortsNode
+
+        if isinstance(other, NoPortsNode):
+            raise ValueError(
+                f"Cannot create edge to {other.node_class.__name__} because it has no ports defined. "
+                f"Nodes with empty Ports classes cannot be connected to other nodes."
+            )
+
         edge = Edge(from_port=self, to_node=other)
         if edge not in self._edges:
             self._edges.append(edge)
