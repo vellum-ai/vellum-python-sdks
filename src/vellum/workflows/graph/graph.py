@@ -9,27 +9,50 @@ if TYPE_CHECKING:
     from vellum.workflows.nodes.bases.base import BaseNode
     from vellum.workflows.ports.port import Port
 
+
+class NoPortsNode:
+    """Wrapper for nodes that have no ports defined."""
+
+    def __init__(self, node_class: Type["BaseNode"]):
+        self.node_class = node_class
+
+    def __repr__(self) -> str:
+        return f"NoPortsNode({self.node_class.__name__})"
+
+    def __rshift__(self, other: "GraphTarget") -> "Graph":
+        raise ValueError(
+            f"Cannot create edges from {self.node_class.__name__} because it has no ports defined. "
+            f"Nodes with empty Ports classes cannot be connected to other nodes."
+        )
+
+
 GraphTargetOfSets = Union[
     Set[NodeType],
     Set["Graph"],
     Set["Port"],
-    Set[Union[Type["BaseNode"], "Graph", "Port"]],
+    Set[Union[Type["BaseNode"], "Graph", "Port", "NoPortsNode"]],
 ]
 
 GraphTarget = Union[
     Type["BaseNode"],
     "Port",
     "Graph",
+    "NoPortsNode",
     GraphTargetOfSets,
 ]
 
 
 class Graph:
-    _entrypoints: Set["Port"]
+    _entrypoints: Set[Union["Port", "NoPortsNode"]]
     _edges: List[Edge]
-    _terminals: Set["Port"]
+    _terminals: Set[Union["Port", "NoPortsNode"]]
 
-    def __init__(self, entrypoints: Set["Port"], edges: List[Edge], terminals: Set["Port"]):
+    def __init__(
+        self,
+        entrypoints: Set[Union["Port", "NoPortsNode"]],
+        edges: List[Edge],
+        terminals: Set[Union["Port", "NoPortsNode"]],
+    ):
         self._edges = edges
         self._entrypoints = entrypoints
         self._terminals = terminals
@@ -43,12 +66,8 @@ class Graph:
     def from_node(node: Type["BaseNode"]) -> "Graph":
         ports = {port for port in node.Ports}
         if not ports:
-            from vellum.workflows.ports.port import Port
-
-            default_port = Port(default=True)
-            default_port.name = "default"
-            default_port.node_class = node
-            ports = {default_port}
+            no_ports_node = NoPortsNode(node)
+            return Graph(entrypoints={no_ports_node}, edges=[], terminals={no_ports_node})
         return Graph(entrypoints=ports, edges=[], terminals=ports)
 
     @staticmethod
@@ -80,10 +99,19 @@ class Graph:
         if not self._edges and not self._entrypoints:
             raise ValueError("Graph instance can only create new edges from nodes within existing edges")
 
+        if self._terminals and all(isinstance(terminal, NoPortsNode) for terminal in self._terminals):
+            terminal_names = [terminal.node_class.__name__ for terminal in self._terminals]
+            raise ValueError(
+                f"Cannot create edges from graph because all terminal nodes have no ports defined: "
+                f"{', '.join(terminal_names)}. Nodes with empty Ports classes cannot be connected to other nodes."
+            )
+
         if isinstance(other, set):
             new_terminals = set()
             for elem in other:
                 for final_output_node in self._terminals:
+                    if isinstance(final_output_node, NoPortsNode):
+                        continue
                     if isinstance(elem, Graph):
                         midgraph = final_output_node >> set(elem.entrypoints)
                         self._extend_edges(midgraph.edges)
@@ -105,6 +133,8 @@ class Graph:
 
         if isinstance(other, Graph):
             for final_output_node in self._terminals:
+                if isinstance(final_output_node, NoPortsNode):
+                    continue
                 midgraph = final_output_node >> set(other.entrypoints)
                 self._extend_edges(midgraph.edges)
                 self._extend_edges(other.edges)
@@ -113,6 +143,8 @@ class Graph:
 
         if hasattr(other, "Ports"):
             for final_output_node in self._terminals:
+                if isinstance(final_output_node, NoPortsNode):
+                    continue
                 subgraph = final_output_node >> other
                 self._extend_edges(subgraph.edges)
             self._terminals = {port for port in other.Ports}
@@ -120,6 +152,8 @@ class Graph:
 
         # other is a Port
         for final_output_node in self._terminals:
+            if isinstance(final_output_node, NoPortsNode):
+                continue
             subgraph = final_output_node >> other
             self._extend_edges(subgraph.edges)
         self._terminals = {other}
@@ -133,7 +167,11 @@ class Graph:
 
     @property
     def entrypoints(self) -> Iterator[Type["BaseNode"]]:
-        return iter(e.node_class for e in self._entrypoints)
+        for e in self._entrypoints:
+            if isinstance(e, NoPortsNode):
+                yield e.node_class
+            else:
+                yield e.node_class
 
     @property
     def edges(self) -> Iterator[Edge]:
@@ -143,7 +181,11 @@ class Graph:
     def nodes(self) -> Iterator[Type["BaseNode"]]:
         nodes = set()
         if not self._edges:
-            for node in self.entrypoints:
+            for entrypoint in self._entrypoints:
+                if isinstance(entrypoint, NoPortsNode):
+                    node = entrypoint.node_class
+                else:
+                    node = entrypoint.node_class
                 if node not in nodes:
                     nodes.add(node)
                     yield node
@@ -203,7 +245,10 @@ class Graph:
 
         root_nodes = []
         for port in self._entrypoints:
-            node_name = port.node_class.__name__
+            if isinstance(port, NoPortsNode):
+                node_name = port.node_class.__name__
+            else:
+                node_name = port.node_class.__name__
             if node_name not in target_nodes:
                 root_nodes.append(node_name)
 
@@ -245,8 +290,10 @@ class Graph:
 
         return "\n".join(lines)
 
-    def _get_port_name(self, port: "Port") -> str:
+    def _get_port_name(self, port: Union["Port", "NoPortsNode"]) -> str:
         """Get a readable name for a port."""
+        if isinstance(port, NoPortsNode):
+            return f"{port.node_class.__name__} (no ports)"
         try:
             if hasattr(port, "node_class") and hasattr(port.node_class, "__name__"):
                 node_name = port.node_class.__name__
