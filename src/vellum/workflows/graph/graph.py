@@ -17,7 +17,7 @@ class NoPortsNode:
         self.node_class = node_class
 
     def __repr__(self) -> str:
-        return f"NoPortsNode({self.node_class.__name__})"
+        return self.node_class.__name__
 
     def __rshift__(self, other: "GraphTarget") -> "Graph":
         raise ValueError(
@@ -168,11 +168,7 @@ class Graph:
 
     @property
     def entrypoints(self) -> Iterator[Type["BaseNode"]]:
-        for e in self._entrypoints:
-            if isinstance(e, NoPortsNode):
-                yield e.node_class
-            else:
-                yield e.node_class
+        return iter(e.node_class for e in self._entrypoints)
 
     @property
     def edges(self) -> Iterator[Edge]:
@@ -182,11 +178,7 @@ class Graph:
     def nodes(self) -> Iterator[Type["BaseNode"]]:
         nodes = set()
         if not self._edges:
-            for entrypoint in self._entrypoints:
-                if isinstance(entrypoint, NoPortsNode):
-                    node = entrypoint.node_class
-                else:
-                    node = entrypoint.node_class
+            for node in self.entrypoints:
                 if node not in nodes:
                     nodes.add(node)
                     yield node
@@ -246,10 +238,7 @@ class Graph:
 
         root_nodes = []
         for port in self._entrypoints:
-            if isinstance(port, NoPortsNode):
-                node_name = port.node_class.__name__
-            else:
-                node_name = port.node_class.__name__
+            node_name = port.node_class.__name__
             if node_name not in target_nodes:
                 root_nodes.append(node_name)
 
