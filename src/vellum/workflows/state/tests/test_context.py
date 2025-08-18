@@ -70,12 +70,9 @@ class ResolvedWorkflow(BaseWorkflow):
     # THEN the method should return a workflow (not None)
     assert resolved_workflow is not None
 
-    assert resolved_workflow._context.generated_files is not None
-
+    assert context.generated_files is not None
     workflow_files = {
-        path: content
-        for path, content in resolved_workflow._context.generated_files.items()
-        if path.startswith(expected_prefix)
+        path: content for path, content in context.generated_files.items() if path.startswith(expected_prefix)
     }
     assert len(workflow_files) > 0
     assert f"{expected_prefix}/workflow.py" in workflow_files
@@ -120,7 +117,7 @@ def test_subworkflow_deployment_node__uses_resolved_workflow():
     node._context = context
 
     # WHEN we check if the node would resolve the deployment
-    resolved = node._context.resolve_workflow_deployment("test_deployment", "v1.0.0")
+    resolved = context.resolve_workflow_deployment("test_deployment", "v1.0.0")
 
     # THEN the context's resolve method should be called and return the mock workflow
     mock_resolve.assert_called_once_with("test_deployment", "v1.0.0")
