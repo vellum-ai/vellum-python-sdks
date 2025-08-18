@@ -18,12 +18,12 @@ from vellum_ee.workflows.display.utils.events import event_enricher
                 "workflow_raw_data": {
                     "nodes": [
                         {
-                            "id": "29e5fc36-a059-42e4-8480-246e83ee5444",
+                            "id": "86607b18-7872-49f3-a592-fda1428f70aa",
                             "type": "ENTRYPOINT",
                             "inputs": [],
                             "data": {
                                 "label": "Entrypoint Node",
-                                "source_handle_id": "584f2719-3a67-445d-a727-714c63e24424",
+                                "source_handle_id": "d1fe8f4c-53d7-43a0-b210-73ebdc60bf57",
                             },
                             "display_data": {"position": {"x": 0.0, "y": -50.0}},
                             "base": None,
@@ -32,7 +32,10 @@ from vellum_ee.workflows.display.utils.events import event_enricher
                     ],
                     "edges": [],
                     "display_data": {"viewport": {"x": 0.0, "y": 0.0, "zoom": 1.0}},
-                    "definition": {"name": "TestWorkflow", "module": ["vellum", "workflows", "workflows", "base"]},
+                    "definition": {
+                        "name": "TestWorkflow",
+                        "module": ["vellum_ee", "workflows", "display", "utils", "tests", "test_events"],
+                    },
                     "output_values": [],
                 },
                 "input_variables": [],
@@ -45,7 +48,10 @@ from vellum_ee.workflows.display.utils.events import event_enricher
 def test_event_enricher_static_workflow(is_dynamic: bool, expected_config: Optional[dict]):
     """Test event_enricher with a static workflow (is_dynamic=False)."""
     # GIVEN a workflow class with the specified is_dynamic value
-    TestWorkflow = type("TestWorkflow", (BaseWorkflow,), {"is_dynamic": is_dynamic})
+    _is_dynamic = is_dynamic
+
+    class TestWorkflow(BaseWorkflow):
+        is_dynamic = _is_dynamic
 
     event: WorkflowExecutionInitiatedEvent = WorkflowExecutionInitiatedEvent(
         trace_id=uuid4(),
