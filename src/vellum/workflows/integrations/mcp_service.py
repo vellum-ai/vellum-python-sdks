@@ -73,7 +73,7 @@ class MCPHttpClient:
         # Prepare headers
         headers = {
             "Content-Type": "application/json",
-            "Accept": "application/json",
+            "Accept": "application/json, text/event-stream",
         }
 
         # Include session ID if we have one
@@ -88,11 +88,41 @@ class MCPHttpClient:
         # Check for session ID in response headers
         if "Mcp-Session-Id" in response.headers:
             self.session_id = response.headers["Mcp-Session-Id"]
-            logger.debug(f"Received session ID: {self.session_id}")
 
-        # Handle JSON response
-        response_data = response.json()
-        logger.debug(f"Received response: {json.dumps(response_data, indent=2)}")
+        # Handle response based on content type
+        content_type = response.headers.get("content-type", "").lower()
+
+        if "text/event-stream" in content_type:
+            # Handle SSE response
+            response_text = response.text
+
+            # Parse SSE format to extract JSON data
+            lines = response_text.strip().split("\n")
+            json_data = None
+
+            for line in lines:
+                if line.startswith("data: "):
+                    data_content = line[6:]  # Remove 'data: ' prefix
+                    if data_content.strip() and data_content != "[DONE]":
+                        try:
+                            json_data = json.loads(data_content)
+                            break
+                        except json.JSONDecodeError:
+                            continue
+
+            if json_data is None:
+                raise Exception("No valid JSON data found in SSE response")
+
+            response_data = json_data
+        else:
+            # Handle regular JSON response
+            if not response.text.strip():
+                raise Exception("Empty response received from server")
+
+            try:
+                response_data = response.json()
+            except json.JSONDecodeError as e:
+                raise Exception(f"Invalid JSON response: {str(e)}")
 
         if "error" in response_data:
             raise Exception(f"MCP Error: {response_data['error']}")
