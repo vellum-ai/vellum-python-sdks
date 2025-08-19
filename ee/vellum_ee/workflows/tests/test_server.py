@@ -1,4 +1,3 @@
-import pytest
 import sys
 from uuid import uuid4
 from typing import Type, cast
@@ -570,7 +569,6 @@ class Workflow(BaseWorkflow[Inputs, BaseState]):
     assert result is not None
 
 
-@pytest.mark.skip(reason="Test will pass once resolve_workflow_deployment is implemented")
 def test_resolve_workflow_deployment__returns_workflow_with_generated_files():
     """
     Test that resolve_workflow_deployment returns a workflow with artifacts
@@ -578,7 +576,7 @@ def test_resolve_workflow_deployment__returns_workflow_with_generated_files():
     """
     # GIVEN a deployment name and release tag
     deployment_name = "test_deployment"
-    release_tag = "v1.0.0"
+    release_tag = "LATEST"
 
     expected_hash = str(uuid4_from_hash(f"{deployment_name}|{release_tag}")).replace("-", "_")
     expected_prefix = f"vellum_workflow_deployment_{expected_hash}"

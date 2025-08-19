@@ -1,5 +1,6 @@
 from functools import cached_property
 from queue import Queue
+import sys
 from uuid import uuid4
 from typing import TYPE_CHECKING, Dict, List, Optional, Type
 
@@ -9,6 +10,7 @@ from vellum.workflows.events.types import ExternalParentContext
 from vellum.workflows.nodes.mocks import MockNodeExecution, MockNodeExecutionArg
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.references.constant import ConstantValueReference
+from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.vellum_client import create_vellum_client
 
 if TYPE_CHECKING:
@@ -145,7 +147,32 @@ class WorkflowContext:
         Returns:
             BaseWorkflow instance if found, None otherwise
         """
-        return None
+        if not self.generated_files:
+            return None
+
+        expected_hash = str(uuid4_from_hash(f"{deployment_name}|{release_tag}")).replace("-", "_")
+        expected_prefix = f"vellum_workflow_deployment_{expected_hash}"
+
+        workflow_file_key = f"{expected_prefix}/workflow.py"
+        if workflow_file_key not in self.generated_files:
+            return None
+
+        from vellum_ee.workflows.server.virtual_file_loader import VirtualFileFinder
+
+        finder = VirtualFileFinder(self.generated_files, expected_prefix)
+        sys.meta_path.append(finder)
+
+        try:
+            from vellum.workflows.workflows.base import BaseWorkflow
+
+            WorkflowClass = BaseWorkflow.load_from_module(expected_prefix)
+            workflow_instance = WorkflowClass(context=self)
+            return workflow_instance
+        except Exception:
+            return None
+        finally:
+            if finder in sys.meta_path:
+                sys.meta_path.remove(finder)
 
     @classmethod
     def create_from(cls, context):
