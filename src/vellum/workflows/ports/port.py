@@ -9,6 +9,7 @@ from vellum.workflows.edges.edge import Edge
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.graph import Graph, GraphTarget
+from vellum.workflows.graph.graph import NoPortsNode
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.core import ConditionType
 
@@ -65,8 +66,6 @@ class Port:
 
         if isinstance(other, Port):
             return Graph.from_port(self) >> Graph.from_port(other)
-
-        from vellum.workflows.graph.graph import NoPortsNode
 
         if isinstance(other, NoPortsNode):
             raise ValueError(
