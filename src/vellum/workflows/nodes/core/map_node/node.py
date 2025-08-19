@@ -30,6 +30,7 @@ from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.generics import StateType
+from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 if TYPE_CHECKING:
@@ -212,3 +213,6 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
 
         previous_annotations = {prev: annotation for prev in outputs_class.__annotations__ if not prev.startswith("_")}
         outputs_class.__annotations__ = {**previous_annotations, reference.name: annotation}
+
+        output_id = uuid4_from_hash(f"{cls.__id__}|{reference.name}")
+        cls.__output_ids__[reference.name] = output_id

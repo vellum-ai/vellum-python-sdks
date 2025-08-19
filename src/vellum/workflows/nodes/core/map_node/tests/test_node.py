@@ -119,6 +119,7 @@ def test_map_node__inner_try():
     # THEN the workflow should succeed
     assert outputs[-1].name == "final_output"
     assert len(outputs[-1].value) == 2
+    assert len(SimpleMapNode.__output_ids__) == 1
 
 
 def test_map_node__nested_map_node():
@@ -275,3 +276,21 @@ def test_map_node__shared_state_race_condition():
         # AND all results should be in correct order
         expected_result = ["a!", "b!", "c!", "d!", "e!", "f!"]
         assert final_result == expected_result, f"Failed on run {index}"
+
+
+def test_map_node__output_ids():
+    class TestNode(BaseNode):
+        class Outputs(BaseOutputs):
+            value: str
+
+    class SimpleMapNodeWorkflow(BaseWorkflow[MapNode.SubworkflowInputs, BaseState]):
+        graph = TestNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_output = TestNode.Outputs.value
+
+    class TestMapNode(MapNode):
+        items = [1, 2, 3]
+        subworkflow = SimpleMapNodeWorkflow
+
+    assert len(TestMapNode.__output_ids__) == 1
