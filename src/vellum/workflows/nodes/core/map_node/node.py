@@ -212,6 +212,9 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
         annotation = List[parameter_type]  # type: ignore[valid-type]
 
         previous_annotations = {prev: annotation for prev in outputs_class.__annotations__ if not prev.startswith("_")}
+        # Map node output is a list of the same type so we use annotation=List[parameter_type] and not reference
+        # class Outputs(BaseOutputs):
+        #     value: List[str]
         outputs_class.__annotations__ = {**previous_annotations, reference.name: annotation}
 
         output_id = uuid4_from_hash(f"{cls.__id__}|{reference.name}")
