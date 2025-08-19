@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Any, Dict, Generic, List, Literal, Optional, S
 from pydantic import SerializationInfo, field_serializer, model_serializer
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
+from vellum.workflows.constants import undefined
 from vellum.workflows.errors import WorkflowError
 from vellum.workflows.expressions.accessor import AccessorExpression
 from vellum.workflows.outputs.base import BaseOutput
@@ -42,7 +43,22 @@ class NodeExecutionInitiatedBody(_BaseNodeExecutionBody):
 
     @field_serializer("inputs")
     def serialize_inputs(self, inputs: Dict[NodeInputName, Any], _info: Any) -> Dict[str, Any]:
-        return default_serializer({descriptor.name: value for descriptor, value in inputs.items()})
+        input_names_seen = {}
+        serialized_inputs = {}
+
+        for descriptor, value in inputs.items():
+            if value is undefined:
+                continue
+
+            original_name = descriptor.name
+            if original_name in input_names_seen:
+                fallback_name = repr(descriptor)
+                serialized_inputs[fallback_name] = value
+            else:
+                input_names_seen[original_name] = True
+                serialized_inputs[original_name] = value
+
+        return default_serializer(serialized_inputs)
 
 
 class NodeExecutionInitiatedEvent(_BaseNodeEvent):
@@ -101,7 +117,22 @@ class NodeExecutionFulfilledBody(_BaseNodeExecutionBody, Generic[OutputsType]):
 
     @field_serializer("outputs")
     def serialize_outputs(self, outputs: OutputsType, _info: Any) -> Dict[str, Any]:
-        return default_serializer(outputs)
+        output_names_seen = {}
+        serialized_outputs = {}
+
+        for output_descriptor, output_value in outputs:
+            if output_value is undefined:
+                continue
+
+            original_name = output_descriptor.name
+            if original_name in output_names_seen:
+                fallback_name = repr(output_descriptor)
+                serialized_outputs[fallback_name] = output_value
+            else:
+                output_names_seen[original_name] = True
+                serialized_outputs[original_name] = output_value
+
+        return default_serializer(serialized_outputs)
 
     @field_serializer("invoked_ports")
     def serialize_invoked_ports(self, invoked_ports: InvokedPorts, _info: Any) -> Optional[List[Dict[str, Any]]]:
