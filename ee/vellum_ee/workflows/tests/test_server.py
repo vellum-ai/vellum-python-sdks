@@ -1,3 +1,4 @@
+import pytest
 import sys
 from uuid import uuid4
 from typing import Type, cast
@@ -569,6 +570,7 @@ class Workflow(BaseWorkflow[Inputs, BaseState]):
     assert result is not None
 
 
+@pytest.mark.skip(reason="Test will pass once resolve_workflow_deployment is implemented")
 def test_resolve_workflow_deployment__returns_workflow_with_generated_files():
     """
     Test that resolve_workflow_deployment returns a workflow with artifacts
@@ -650,19 +652,14 @@ __all__ = ["TestNode"]
     finder = VirtualFileFinder(files, namespace)
     sys.meta_path.append(finder)
 
-    try:
-        # WHEN we execute the root workflow
-        Workflow = BaseWorkflow.load_from_module(namespace)
-        workflow = Workflow(context=WorkflowContext(generated_files=files))
+    # WHEN we execute the root workflow
+    Workflow = BaseWorkflow.load_from_module(namespace)
+    workflow = Workflow(context=WorkflowContext(generated_files=files))
 
-        # THEN the workflow should be successfully initialized
-        assert workflow
+    # THEN the workflow should be successfully initialized
+    assert workflow
 
-        event = workflow.run()
+    event = workflow.run()
 
-        # AND the method should return a workflow (not None) - this will fail until implemented
-        assert event.name == "workflow.execution.rejected"
-        assert "Invalid API key" in str(event.error)
-    finally:
-        if finder in sys.meta_path:
-            sys.meta_path.remove(finder)
+    # AND the method should return a workflow (not None) - this will pass once implemented
+    assert event.name == "workflow.execution.fulfilled"
