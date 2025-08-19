@@ -40,6 +40,9 @@ class NodePorts(metaclass=_NodePortsMeta):
 
         invoked_ports: Set[Port] = set()
         all_ports = [port for port in self.__class__]
+        if not all_ports:
+            return set()
+
         enforce_single_invoked_conditional_port = validate_ports(all_ports)
 
         for port in all_ports:

@@ -4,6 +4,7 @@ from vellum.client.types.vellum_error import VellumError
 from vellum.workflows.errors.types import WorkflowError, WorkflowErrorCode, vellum_error_to_workflow_error
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases.base import BaseNode
+from vellum.workflows.ports import NodePorts
 
 
 class ErrorNode(BaseNode):
@@ -14,6 +15,9 @@ class ErrorNode(BaseNode):
     """
 
     error: ClassVar[Union[str, WorkflowError, VellumError]]
+
+    class Ports(NodePorts):
+        pass
 
     def run(self) -> BaseNode.Outputs:
         if isinstance(self.error, str):
