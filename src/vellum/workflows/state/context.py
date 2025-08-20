@@ -1,6 +1,5 @@
 from functools import cached_property
 from queue import Queue
-import sys
 from uuid import uuid4
 from typing import TYPE_CHECKING, Dict, List, Optional, Type
 
@@ -163,18 +162,7 @@ class WorkflowContext:
         try:
             from vellum.workflows.workflows.base import BaseWorkflow
 
-            namespace = None
-            for finder in sys.meta_path:
-                if hasattr(finder, "loader") and hasattr(finder.loader, "files"):
-                    if f"{expected_prefix}/workflow.py" in finder.loader.files:
-                        namespace = finder.loader.namespace
-                        break
-
-            if not namespace:
-                return None
-
-            module_path = f"{namespace}.{expected_prefix}"
-            WorkflowClass = BaseWorkflow.load_from_module(module_path)
+            WorkflowClass = BaseWorkflow.load_from_module(f".{expected_prefix}")
             workflow_instance = WorkflowClass(context=WorkflowContext.create_from(self), parent_state=state)
             return workflow_instance
         except Exception:
