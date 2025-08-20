@@ -8,7 +8,7 @@ import { BaseNodeContext } from "src/context/node-context/base";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { WorkflowProjectGenerator } from "src/project";
 import { WorkflowDataNode, WorkflowRawData } from "src/types/vellum";
-import { createPythonClassName, toPythonSafeSnakeCase } from "src/utils/casing";
+import { createPythonClassName } from "src/utils/casing";
 
 export abstract class BaseNestedWorkflowNode<
   T extends WorkflowDataNode,
@@ -69,8 +69,6 @@ export abstract class BaseNestedWorkflowNode<
     const nestedWorkflowLabel = `${this.nodeContext.getNodeLabel()} Workflow`;
     const nestedWorkflowClassName = createPythonClassName(nestedWorkflowLabel);
 
-    const nestedWorkflowModuleName = toPythonSafeSnakeCase(this.nodeContext.getNodeLabel());
-
     const innerWorkflowData = this.getInnerWorkflowData();
 
     const nestedWorkflowContext =
@@ -79,7 +77,6 @@ export abstract class BaseNestedWorkflowNode<
         workflowClassName: nestedWorkflowClassName,
         workflowRawData: innerWorkflowData,
         classNames: this.workflowContext.classNames,
-        nestedWorkflowModuleName,
       });
 
     return new Map([
