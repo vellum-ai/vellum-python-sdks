@@ -1,4 +1,3 @@
-import json
 from typing import Generic, TypeVar, Union
 
 from vellum.workflows.constants import undefined
@@ -37,13 +36,14 @@ class ContainsExpression(BaseDescriptor[bool], Generic[LHS, RHS]):
 
         rhs = resolve_value(self._rhs, state)
 
-        if isinstance(lhs, str) and isinstance(rhs, dict):
-            rhs_json = json.dumps(rhs, sort_keys=True)
-            return rhs_json in lhs
-
         if isinstance(lhs, dict) and isinstance(rhs, dict):
-            lhs_json = json.dumps(lhs, sort_keys=True)
-            rhs_json = json.dumps(rhs, sort_keys=True)
-            return rhs_json in lhs_json
+            raise InvalidExpressionException(
+                "Cannot check if dict contains dict. Use dict keys/values or convert to strings for comparison."
+            )
+
+        if isinstance(lhs, str) and isinstance(rhs, dict):
+            raise InvalidExpressionException(
+                "Cannot check if string contains dict. Convert dict to string first or check for specific keys."
+            )
 
         return rhs in lhs

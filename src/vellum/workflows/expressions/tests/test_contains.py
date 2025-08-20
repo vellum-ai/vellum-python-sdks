@@ -13,63 +13,63 @@ class TestState(BaseState):
     string_value: str = "hello world"
 
 
-def test_dict_contains_identical_dict():
+def test_dict_contains_dict_raises_error():
     """
-    Tests that ContainsExpression handles dict-contains-dict scenarios.
+    Tests that ContainsExpression raises clear error for dict-contains-dict scenarios.
 
     This addresses Linear ticket APO-1025 where dict.contains(dict)
-    was failing with 'unhashable type' error.
+    was failing with unclear 'unhashable type' error.
     """
     state = TestState()
     lhs_dict = {"foo": "bar"}
     rhs_dict = {"foo": "bar"}
 
     expression = ContainsExpression(lhs=lhs_dict, rhs=rhs_dict)
-    result = expression.resolve(state)
 
-    assert result is True
+    with pytest.raises(InvalidExpressionException, match="Cannot check if dict contains dict"):
+        expression.resolve(state)
 
 
-def test_dict_contains_different_dict():
+def test_dict_contains_different_dict_raises_error():
     """
-    Tests that ContainsExpression returns False for different dicts.
+    Tests that ContainsExpression raises clear error for different dict-contains-dict scenarios.
     """
     state = TestState()
     lhs_dict = {"foo": "bar"}
     rhs_dict = {"hello": "world"}
 
     expression = ContainsExpression(lhs=lhs_dict, rhs=rhs_dict)
-    result = expression.resolve(state)
 
-    assert result is False
+    with pytest.raises(InvalidExpressionException, match="Cannot check if dict contains dict"):
+        expression.resolve(state)
 
 
-def test_string_contains_dict_as_json():
+def test_string_contains_dict_raises_error():
     """
-    Tests that ContainsExpression handles string-contains-dict scenarios.
+    Tests that ContainsExpression raises clear error for string-contains-dict scenarios.
     """
     state = TestState()
     lhs_string = 'Response: {"status": "success"} was returned'
     rhs_dict = {"status": "success"}
 
     expression = ContainsExpression(lhs=lhs_string, rhs=rhs_dict)
-    result = expression.resolve(state)
 
-    assert result is True
+    with pytest.raises(InvalidExpressionException, match="Cannot check if string contains dict"):
+        expression.resolve(state)
 
 
-def test_dict_contains_dict_key_order_independence():
+def test_nested_dict_contains_dict_raises_error():
     """
-    Tests that ContainsExpression handles different key orders correctly.
+    Tests that ContainsExpression raises clear error for nested dict scenarios.
     """
     state = TestState()
     lhs_dict = {"user": {"name": "john", "age": 30}}
     rhs_dict = {"age": 30, "name": "john"}
 
     expression = ContainsExpression(lhs=lhs_dict, rhs=rhs_dict)
-    result = expression.resolve(state)
 
-    assert result is True
+    with pytest.raises(InvalidExpressionException, match="Cannot check if dict contains dict"):
+        expression.resolve(state)
 
 
 def test_list_contains_string():
@@ -156,11 +156,11 @@ def test_undefined_lhs_returns_false():
 
 def test_contains_with_constant_value_reference():
     """
-    Tests ContainsExpression with ConstantValueReference (workflow pattern).
+    Tests ContainsExpression with ConstantValueReference for valid operations.
     """
     state = TestState()
-    lhs_ref = ConstantValueReference({"api": "response"})
-    rhs_ref = ConstantValueReference({"api": "response"})
+    lhs_ref = ConstantValueReference([1, 2, 3])
+    rhs_ref = ConstantValueReference(2)
 
     expression: ContainsExpression = ContainsExpression(lhs=lhs_ref, rhs=rhs_ref)
     result = expression.resolve(state)
