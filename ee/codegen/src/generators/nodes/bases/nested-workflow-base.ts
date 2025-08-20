@@ -8,7 +8,7 @@ import { BaseNodeContext } from "src/context/node-context/base";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { WorkflowProjectGenerator } from "src/project";
 import { WorkflowDataNode, WorkflowRawData } from "src/types/vellum";
-import { createPythonClassName } from "src/utils/casing";
+import { createPythonClassName, toPythonSafeSnakeCase } from "src/utils/casing";
 
 export abstract class BaseNestedWorkflowNode<
   T extends WorkflowDataNode,
@@ -71,13 +71,19 @@ export abstract class BaseNestedWorkflowNode<
 
     const innerWorkflowData = this.getInnerWorkflowData();
 
-    const nestedWorkflowContext =
-      this.workflowContext.createNestedWorkflowContext({
-        parentNode: this,
-        workflowClassName: nestedWorkflowClassName,
-        workflowRawData: innerWorkflowData,
-        classNames: this.workflowContext.classNames,
-      });
+    const shouldProvideModuleName = this.shouldProvideNestedWorkflowModuleName();
+    const contextArgs: any = {
+      parentNode: this,
+      workflowClassName: nestedWorkflowClassName,
+      workflowRawData: innerWorkflowData,
+      classNames: this.workflowContext.classNames,
+    };
+
+    if (shouldProvideModuleName) {
+      contextArgs.nestedWorkflowModuleName = toPythonSafeSnakeCase(this.nodeContext.getNodeLabel());
+    }
+
+    const nestedWorkflowContext = this.workflowContext.createNestedWorkflowContext(contextArgs);
 
     return new Map([
       [
@@ -85,6 +91,10 @@ export abstract class BaseNestedWorkflowNode<
         nestedWorkflowContext,
       ],
     ]);
+  }
+
+  protected shouldProvideNestedWorkflowModuleName(): boolean {
+    return false;
   }
 
   protected getOutputDisplay(): python.Field {
