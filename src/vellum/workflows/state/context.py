@@ -156,23 +156,63 @@ class WorkflowContext:
         Returns:
             BaseWorkflow instance if found, None otherwise
         """
-        if not self.generated_files or not self.namespace:
-            return None
+        if self.generated_files and self.namespace:
+            expected_prefix = generate_workflow_deployment_prefix(deployment_name, release_tag)
+            workflow_file_key = f"{expected_prefix}/workflow.py"
+            if workflow_file_key in self.generated_files:
+                try:
+                    from vellum.workflows.workflows.base import BaseWorkflow
 
-        expected_prefix = generate_workflow_deployment_prefix(deployment_name, release_tag)
+                    WorkflowClass = BaseWorkflow.load_from_module(f"{self.namespace}.{expected_prefix}")
+                    workflow_instance = WorkflowClass(context=WorkflowContext.create_from(self), parent_state=state)
+                    return workflow_instance
+                except Exception:
+                    pass
 
-        workflow_file_key = f"{expected_prefix}/workflow.py"
-        if workflow_file_key not in self.generated_files:
-            return None
-
+        # Try using the pull API to fetch the workflow deployment
         try:
-            from vellum.workflows.workflows.base import BaseWorkflow
+            import io
+            import zipfile
 
-            WorkflowClass = BaseWorkflow.load_from_module(f"{self.namespace}.{expected_prefix}")
-            workflow_instance = WorkflowClass(context=WorkflowContext.create_from(self), parent_state=state)
-            return workflow_instance
+            from vellum_ee.workflows.server.virtual_file_loader import VirtualFileFinder
+
+            response = self.vellum_client.workflows.pull(
+                deployment_name, request_options={"additional_query_parameters": {"release_tag": release_tag}}
+            )
+
+            zip_bytes = b"".join(response)
+            zip_buffer = io.BytesIO(zip_bytes)
+
+            pulled_files = {}
+            with zipfile.ZipFile(zip_buffer) as zip_file:
+                for file_name in zip_file.namelist():
+                    with zip_file.open(file_name) as source:
+                        content = source.read().decode("utf-8")
+                        pulled_files[file_name] = content
+
+            # Create a unique namespace for this deployment
+            expected_prefix = generate_workflow_deployment_prefix(deployment_name, release_tag)
+            deployment_namespace = f"deployment_{expected_prefix}"
+
+            finder = VirtualFileFinder(pulled_files, deployment_namespace)
+            import sys
+
+            sys.meta_path.append(finder)
+
+            try:
+                from vellum.workflows.workflows.base import BaseWorkflow
+
+                WorkflowClass = BaseWorkflow.load_from_module(deployment_namespace)
+                workflow_instance = WorkflowClass(context=WorkflowContext.create_from(self), parent_state=state)
+                return workflow_instance
+            finally:
+                if finder in sys.meta_path:
+                    sys.meta_path.remove(finder)
+
         except Exception:
             return None
+
+        return None
 
     @classmethod
     def create_from(cls, context):
