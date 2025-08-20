@@ -90,8 +90,8 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
                 field_annotation = field.annotation  # type: ignore[attr-defined]
                 properties[field_name] = compile_annotation(field_annotation, defs)
 
-                if field.description is not None:
-                    properties[field_name]["description"] = field.description
+                if hasattr(field, "description") and field.description is not None:
+                    properties[field_name]["description"] = field.description  # type: ignore[attr-defined]
 
                 if field.default is PydanticUndefined:
                     required.append(field_name)
