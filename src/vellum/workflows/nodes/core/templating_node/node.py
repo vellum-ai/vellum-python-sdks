@@ -8,6 +8,7 @@ from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.bases.base import BaseNodeMeta
 from vellum.workflows.nodes.utils import parse_type_from_str
+from vellum.workflows.types.code_execution_node_wrappers import wrap_inputs_for_backward_compatibility
 from vellum.workflows.types.core import EntityInputsInterface
 from vellum.workflows.types.generics import StateType
 from vellum.workflows.types.utils import get_original_base
@@ -86,9 +87,10 @@ class TemplatingNode(BaseNode[StateType], Generic[StateType, _OutputType], metac
 
     def _render_template(self) -> str:
         try:
+            wrapped_inputs = wrap_inputs_for_backward_compatibility(self.inputs)
             return render_sandboxed_jinja_template(
                 template=self.template,
-                input_values=self.inputs,
+                input_values=wrapped_inputs,
                 jinja_custom_filters={**self.jinja_custom_filters},
                 jinja_globals=self.jinja_globals,
             )
