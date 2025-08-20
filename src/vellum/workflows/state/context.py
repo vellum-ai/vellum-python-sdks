@@ -25,11 +25,13 @@ class WorkflowContext:
         vellum_client: Optional[Vellum] = None,
         execution_context: Optional[ExecutionContext] = None,
         generated_files: Optional[dict[str, str]] = None,
+        namespace: Optional[str] = None,
     ):
         self._vellum_client = vellum_client
         self._event_queue: Optional[Queue["WorkflowEvent"]] = None
         self._node_output_mocks_map: Dict[Type[BaseOutputs], List[MockNodeExecution]] = {}
         self._execution_context = get_execution_context()
+        self._namespace = namespace
 
         if execution_context is not None:
             self._execution_context.trace_id = execution_context.trace_id
@@ -57,6 +59,10 @@ class WorkflowContext:
     @cached_property
     def generated_files(self) -> Optional[dict[str, str]]:
         return self._generated_files
+
+    @cached_property
+    def namespace(self) -> Optional[str]:
+        return self._namespace
 
     @cached_property
     def node_output_mocks_map(self) -> Dict[Type[BaseOutputs], List[MockNodeExecution]]:
@@ -150,7 +156,7 @@ class WorkflowContext:
         Returns:
             BaseWorkflow instance if found, None otherwise
         """
-        if not self.generated_files:
+        if not self.generated_files or not self.namespace:
             return None
 
         expected_prefix = generate_workflow_deployment_prefix(deployment_name, release_tag)
@@ -162,7 +168,7 @@ class WorkflowContext:
         try:
             from vellum.workflows.workflows.base import BaseWorkflow
 
-            WorkflowClass = BaseWorkflow.load_from_module(f".{expected_prefix}")
+            WorkflowClass = BaseWorkflow.load_from_module(f"{self.namespace}.{expected_prefix}")
             workflow_instance = WorkflowClass(context=WorkflowContext.create_from(self), parent_state=state)
             return workflow_instance
         except Exception:
@@ -170,4 +176,6 @@ class WorkflowContext:
 
     @classmethod
     def create_from(cls, context):
-        return cls(vellum_client=context.vellum_client, generated_files=context.generated_files)
+        return cls(
+            vellum_client=context.vellum_client, generated_files=context.generated_files, namespace=context.namespace
+        )

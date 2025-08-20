@@ -652,7 +652,7 @@ __all__ = ["TestNode"]
 
     # WHEN we execute the root workflow
     Workflow = BaseWorkflow.load_from_module(namespace)
-    workflow = Workflow(context=WorkflowContext(generated_files=files))
+    workflow = Workflow(context=WorkflowContext(generated_files=files, namespace=namespace))
 
     # THEN the workflow should be successfully initialized
     assert workflow
