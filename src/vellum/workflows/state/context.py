@@ -156,51 +156,58 @@ class WorkflowContext:
         Returns:
             BaseWorkflow instance if found, None otherwise
         """
-        if not self.generated_files or not self.namespace:
-            return None
-
-        expected_prefix = generate_workflow_deployment_prefix(deployment_name, release_tag)
-        workflow_file_key = f"{expected_prefix}/workflow.py"
-        if workflow_file_key not in self.generated_files:
-            return None
-
-        try:
-            from vellum.workflows.workflows.base import BaseWorkflow
-
-            WorkflowClass = BaseWorkflow.load_from_module(f"{self.namespace}.{expected_prefix}")
-            workflow_instance = WorkflowClass(context=WorkflowContext.create_from(self), parent_state=state)
-            return workflow_instance
-        except Exception:
-            # Try using the pull API to fetch the workflow deployment only if we have a vellum_client
-            if hasattr(self, "_vellum_client") and self._vellum_client is not None:
+        if self.generated_files and self.namespace:
+            expected_prefix = generate_workflow_deployment_prefix(deployment_name, release_tag)
+            workflow_file_key = f"{expected_prefix}/workflow.py"
+            if workflow_file_key in self.generated_files:
                 try:
-                    from vellum_ee.workflows.display.utils.zip import extract_zip_files
+                    from vellum.workflows.workflows.base import BaseWorkflow
 
-                    response = self.vellum_client.workflows.pull(
-                        deployment_name, request_options={"additional_query_parameters": {"release_tag": release_tag}}
-                    )
-
-                    zip_bytes = b"".join(response)
-                    pulled_files = extract_zip_files(zip_bytes)
-
-                    expected_prefix = generate_workflow_deployment_prefix(deployment_name, release_tag)
-                    if self._generated_files is None:
-                        self._generated_files = {}
-                    for file_name, content in pulled_files.items():
-                        prefixed_file_name = f"{expected_prefix}/{file_name}"
-                        self._generated_files[prefixed_file_name] = content
-
-                    if self._namespace is None:
-                        self._namespace = f"pulled_workflow_{expected_prefix}"
-
-                    WorkflowClass = BaseWorkflow.load_from_module(f"{self._namespace}.{expected_prefix}")
+                    WorkflowClass = BaseWorkflow.load_from_module(f"{self.namespace}.{expected_prefix}")
                     workflow_instance = WorkflowClass(context=WorkflowContext.create_from(self), parent_state=state)
                     return workflow_instance
-
                 except Exception:
                     pass
 
-            return None
+        # Try using the pull API to fetch the workflow deployment if we have a vellum_client
+        if hasattr(self, "_vellum_client") and self._vellum_client is not None:
+            try:
+                import sys
+
+                from vellum_ee.workflows.display.utils.zip import extract_zip_files
+                from vellum_ee.workflows.server.virtual_file_loader import VirtualFileFinder
+
+                response = self.vellum_client.workflows.pull(
+                    deployment_name, request_options={"additional_query_parameters": {"release_tag": release_tag}}
+                )
+
+                zip_bytes = b"".join(response)
+                pulled_files = extract_zip_files(zip_bytes)
+
+                expected_prefix = generate_workflow_deployment_prefix(deployment_name, release_tag)
+                if self._generated_files is None:
+                    self._generated_files = {}
+                for file_name, content in pulled_files.items():
+                    prefixed_file_name = f"{expected_prefix}/{file_name}"
+                    self._generated_files[prefixed_file_name] = content
+
+                if self._namespace is None:
+                    self._namespace = f"pulled_workflow_{expected_prefix}"
+
+                pulled_namespace = f"pulled_{expected_prefix}"
+                finder = VirtualFileFinder(pulled_files, pulled_namespace)
+                sys.meta_path.append(finder)
+
+                from vellum.workflows.workflows.base import BaseWorkflow
+
+                WorkflowClass = BaseWorkflow.load_from_module(f"{pulled_namespace}")
+                workflow_instance = WorkflowClass(context=WorkflowContext.create_from(self), parent_state=state)
+                return workflow_instance
+
+            except Exception:
+                pass
+
+        return None
 
     @classmethod
     def create_from(cls, context):

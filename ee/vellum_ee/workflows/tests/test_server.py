@@ -8,6 +8,7 @@ from vellum.client.types.code_executor_response import CodeExecutorResponse
 from vellum.client.types.number_vellum_value import NumberVellumValue
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.nodes import BaseNode
+from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.utils.uuids import generate_workflow_deployment_prefix
 from vellum_ee.workflows.display.utils.zip import zip_file_map
@@ -670,8 +671,7 @@ def test_resolve_workflow_deployment__uses_pull_api_with_inputs_deployment_name(
     Test that resolve_workflow_deployment uses the pull API to fetch subworkflow files
     when the deployment name comes from Inputs.deployment_name.
     """
-    from vellum.workflows.events.types import WorkflowExecutionFulfilledEvent
-    from vellum.workflows.events.workflow import WorkflowExecutionFulfilledBody
+    from vellum.workflows.events.workflow import WorkflowExecutionFulfilledBody, WorkflowExecutionFulfilledEvent
 
     # GIVEN a deployment name and release tag
     deployment_name = "test_deployment"
@@ -761,10 +761,17 @@ __all__ = ["TestSubworkflowDeploymentNode"]
     mock_vellum_client = Mock()
     mock_vellum_client.workflows.pull.return_value = iter([zip_file_map(subworkflow_files)])
 
-    mock_fulfilled_event = WorkflowExecutionFulfilledEvent(
+    # Create a mock workflow class for the fulfilled event
+    class MockSubworkflow(BaseWorkflow):
+        class Outputs(BaseOutputs):
+            result: str
+
+    mock_fulfilled_event: WorkflowExecutionFulfilledEvent = WorkflowExecutionFulfilledEvent(
         trace_id=str(uuid4()),
         span_id=str(uuid4()),
-        body=WorkflowExecutionFulfilledBody(outputs={"result": "Hello, test"}),
+        body=WorkflowExecutionFulfilledBody(
+            workflow_definition=MockSubworkflow, outputs=MockSubworkflow.Outputs(result="Hello, test")
+        ),
     )
     mock_vellum_client.execute_workflow_stream.return_value = iter([mock_fulfilled_event])
 
