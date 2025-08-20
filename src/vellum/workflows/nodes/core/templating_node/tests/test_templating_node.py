@@ -317,3 +317,143 @@ def test_api_error_templating_node():
 
     # THEN the output should be empty string
     assert outputs.result == ""
+
+
+def test_templating_node__string_value_access():
+    # GIVEN a templating node that accesses string value
+    class TemplateNode(TemplatingNode[BaseState, str]):
+        template = "{{ text_input.value }}"
+        inputs = {"text_input": "hello world"}
+
+    # WHEN the node is run
+    node = TemplateNode()
+    outputs = node.run()
+
+    # THEN the value is accessible
+    assert outputs.result == "hello world"
+
+
+def test_templating_node__string_type_access():
+    # GIVEN a templating node that accesses string type
+    class TemplateNode(TemplatingNode[BaseState, str]):
+        template = "{{ text_input.type }}"
+        inputs = {"text_input": "hello world"}
+
+    # WHEN the node is run
+    node = TemplateNode()
+    outputs = node.run()
+
+    # THEN the type is accessible
+    assert outputs.result == "STRING"
+
+
+def test_templating_node__function_call_value_access():
+    # GIVEN a templating node that accesses function call value
+    class TemplateNode(TemplatingNode[BaseState, str]):
+        template = "{{ func.value.name }}"
+        inputs = {"func": FunctionCall(name="test_function", arguments={"key": "value"})}
+
+    # WHEN the node is run
+    node = TemplateNode()
+    outputs = node.run()
+
+    # THEN the function name is accessible
+    assert outputs.result == "test_function"
+
+
+def test_templating_node__function_call_type_access():
+    # GIVEN a templating node that accesses function call type
+    class TemplateNode(TemplatingNode[BaseState, str]):
+        template = "{{ func.type }}"
+        inputs = {"func": FunctionCall(name="test_function", arguments={"key": "value"})}
+
+    # WHEN the node is run
+    node = TemplateNode()
+    outputs = node.run()
+
+    # THEN the function type is accessible
+    assert outputs.result == "FUNCTION_CALL"
+
+
+def test_templating_node__array_item_value_access():
+    # GIVEN a templating node that accesses array item value
+    class TemplateNode(TemplatingNode[BaseState, str]):
+        template = "{{ items[0].value }}"
+        inputs = {"items": ["apple"]}
+
+    # WHEN the node is run
+    node = TemplateNode()
+    outputs = node.run()
+
+    # THEN the array item value is accessible
+    assert outputs.result == "apple"
+
+
+def test_templating_node__dict_value_access():
+    # GIVEN a templating node that accesses dict value
+    class TemplateNode(TemplatingNode[BaseState, Json]):
+        template = "{{ data.value }}"
+        inputs = {"data": {"name": "test", "score": 42}}
+
+    # WHEN the node is run
+    node = TemplateNode()
+    outputs = node.run()
+
+    # THEN the dict returns itself as value
+    assert outputs.result == {"name": "test", "score": 42}
+
+
+def test_templating_node__list_value_access():
+    # GIVEN a templating node that accesses list value
+    class TemplateNode(TemplatingNode[BaseState, Json]):
+        template = "{{ items.value }}"
+        inputs = {"items": ["item1", "item2", "item3"]}
+
+    # WHEN the node is run
+    node = TemplateNode()
+    outputs = node.run()
+
+    # THEN the list returns itself as value
+    assert outputs.result == ["item1", "item2", "item3"]
+
+
+def test_templating_node__nested_dict_access():
+    # GIVEN a templating node with nested dict access
+    class TemplateNode(TemplatingNode[BaseState, str]):
+        template = "{{ data.user.name }}"
+        inputs = {"data": {"user": {"name": "John Doe", "age": 30}, "status": "active"}}
+
+    # WHEN the node is run
+    node = TemplateNode()
+    outputs = node.run()
+
+    # THEN nested properties are accessible
+    assert outputs.result == "John Doe"
+
+
+def test_templating_node__list_iteration_wrapper_access():
+    # GIVEN a templating node that iterates over list with wrapper access
+    class TemplateNode(TemplatingNode[BaseState, str]):
+        template = "{% for item in items %}{{ item.value }}{% if not loop.last %},{% endif %}{% endfor %}"
+        inputs = {"items": ["apple", "banana", "cherry"]}
+
+    # WHEN the node is run
+    node = TemplateNode()
+    outputs = node.run()
+
+    # THEN list iteration with wrapper access works
+    assert outputs.result == "apple,banana,cherry"
+
+
+def test_templating_node__conditional_type_checking():
+    # GIVEN a templating node with conditional type checking
+    class TemplateNode(TemplatingNode[BaseState, str]):
+        template = "{% if input.type == 'STRING' %}{{ input.value }}{% else %}unknown{% endif %}"
+        inputs = {"input": "test string"}
+
+    # WHEN the node is run
+    node = TemplateNode()
+    outputs = node.run()
+
+    # THEN conditional type checking works
+    assert outputs.result == "test string"
