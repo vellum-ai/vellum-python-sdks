@@ -6172,6 +6172,22 @@ client.workflow_executions.retrieve_workflow_execution_detail(
 <dl>
 <dd>
 
+**prev_span_id:** `typing.Optional[str]` — Optional keyset cursor span_id to continue from (exclusive)
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**span_limit:** `typing.Optional[int]` — Maximum number of spans to return (for lazy loading)
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
     
 </dd>

@@ -2,8 +2,20 @@
 
 import typing
 
+from .audio_input_request import AudioInputRequest
 from .chat_history_input_request import ChatHistoryInputRequest
+from .document_input_request import DocumentInputRequest
+from .image_input_request import ImageInputRequest
 from .json_input_request import JsonInputRequest
 from .string_input_request import StringInputRequest
+from .video_input_request import VideoInputRequest
 
-PromptDeploymentInputRequest = typing.Union[StringInputRequest, JsonInputRequest, ChatHistoryInputRequest]
+PromptDeploymentInputRequest = typing.Union[
+    StringInputRequest,
+    JsonInputRequest,
+    ChatHistoryInputRequest,
+    AudioInputRequest,
+    VideoInputRequest,
+    ImageInputRequest,
+    DocumentInputRequest,
+]

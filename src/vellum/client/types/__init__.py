@@ -22,6 +22,7 @@ from .array_vellum_value import ArrayVellumValue
 from .array_vellum_value_request import ArrayVellumValueRequest
 from .audio_chat_message_content import AudioChatMessageContent
 from .audio_chat_message_content_request import AudioChatMessageContentRequest
+from .audio_input_request import AudioInputRequest
 from .audio_prompt_block import AudioPromptBlock
 from .audio_vellum_value import AudioVellumValue
 from .audio_vellum_value_request import AudioVellumValueRequest
@@ -80,6 +81,10 @@ from .container_image_build_config import ContainerImageBuildConfig
 from .container_image_container_image_tag import ContainerImageContainerImageTag
 from .container_image_read import ContainerImageRead
 from .create_test_suite_test_case_request import CreateTestSuiteTestCaseRequest
+from .delimiter_chunker_config import DelimiterChunkerConfig
+from .delimiter_chunker_config_request import DelimiterChunkerConfigRequest
+from .delimiter_chunking import DelimiterChunking
+from .delimiter_chunking_request import DelimiterChunkingRequest
 from .deployment_history_item import DeploymentHistoryItem
 from .deployment_provider_payload_response import DeploymentProviderPayloadResponse
 from .deployment_provider_payload_response_payload import DeploymentProviderPayloadResponsePayload
@@ -95,6 +100,7 @@ from .document_index_chunking_request import DocumentIndexChunkingRequest
 from .document_index_indexing_config import DocumentIndexIndexingConfig
 from .document_index_indexing_config_request import DocumentIndexIndexingConfigRequest
 from .document_index_read import DocumentIndexRead
+from .document_input_request import DocumentInputRequest
 from .document_processing_state import DocumentProcessingState
 from .document_prompt_block import DocumentPromptBlock
 from .document_read import DocumentRead
@@ -122,15 +128,19 @@ from .execute_prompt_response import ExecutePromptResponse
 from .execute_workflow_response import ExecuteWorkflowResponse
 from .execute_workflow_workflow_result_event import ExecuteWorkflowWorkflowResultEvent
 from .execution_array_vellum_value import ExecutionArrayVellumValue
+from .execution_audio_vellum_value import ExecutionAudioVellumValue
 from .execution_chat_history_vellum_value import ExecutionChatHistoryVellumValue
+from .execution_document_vellum_value import ExecutionDocumentVellumValue
 from .execution_error_vellum_value import ExecutionErrorVellumValue
 from .execution_function_call_vellum_value import ExecutionFunctionCallVellumValue
+from .execution_image_vellum_value import ExecutionImageVellumValue
 from .execution_json_vellum_value import ExecutionJsonVellumValue
 from .execution_number_vellum_value import ExecutionNumberVellumValue
 from .execution_search_results_vellum_value import ExecutionSearchResultsVellumValue
 from .execution_string_vellum_value import ExecutionStringVellumValue
 from .execution_thinking_vellum_value import ExecutionThinkingVellumValue
 from .execution_vellum_value import ExecutionVellumValue
+from .execution_video_vellum_value import ExecutionVideoVellumValue
 from .external_input_descriptor import ExternalInputDescriptor
 from .external_parent_context import ExternalParentContext
 from .external_test_case_execution import ExternalTestCaseExecution
@@ -193,6 +203,7 @@ from .hkunlp_instructor_xl_vectorizer import HkunlpInstructorXlVectorizer
 from .hkunlp_instructor_xl_vectorizer_request import HkunlpInstructorXlVectorizerRequest
 from .image_chat_message_content import ImageChatMessageContent
 from .image_chat_message_content_request import ImageChatMessageContentRequest
+from .image_input_request import ImageInputRequest
 from .image_prompt_block import ImagePromptBlock
 from .image_vellum_value import ImageVellumValue
 from .image_vellum_value_request import ImageVellumValueRequest
@@ -268,14 +279,18 @@ from .node_execution_span_attributes import NodeExecutionSpanAttributes
 from .node_execution_streaming_body import NodeExecutionStreamingBody
 from .node_execution_streaming_event import NodeExecutionStreamingEvent
 from .node_input_compiled_array_value import NodeInputCompiledArrayValue
+from .node_input_compiled_audio_value import NodeInputCompiledAudioValue
 from .node_input_compiled_chat_history_value import NodeInputCompiledChatHistoryValue
+from .node_input_compiled_document_value import NodeInputCompiledDocumentValue
 from .node_input_compiled_error_value import NodeInputCompiledErrorValue
 from .node_input_compiled_function_call_value import NodeInputCompiledFunctionCallValue
+from .node_input_compiled_image_value import NodeInputCompiledImageValue
 from .node_input_compiled_json_value import NodeInputCompiledJsonValue
 from .node_input_compiled_number_value import NodeInputCompiledNumberValue
 from .node_input_compiled_search_results_value import NodeInputCompiledSearchResultsValue
 from .node_input_compiled_secret_value import NodeInputCompiledSecretValue
 from .node_input_compiled_string_value import NodeInputCompiledStringValue
+from .node_input_compiled_video_value import NodeInputCompiledVideoValue
 from .node_input_variable_compiled_value import NodeInputVariableCompiledValue
 from .node_output_compiled_array_value import NodeOutputCompiledArrayValue
 from .node_output_compiled_chat_history_value import NodeOutputCompiledChatHistoryValue
@@ -335,10 +350,14 @@ from .prompt_node_result_data import PromptNodeResultData
 from .prompt_output import PromptOutput
 from .prompt_parameters import PromptParameters
 from .prompt_push_response import PromptPushResponse
+from .prompt_request_audio_input import PromptRequestAudioInput
 from .prompt_request_chat_history_input import PromptRequestChatHistoryInput
+from .prompt_request_document_input import PromptRequestDocumentInput
+from .prompt_request_image_input import PromptRequestImageInput
 from .prompt_request_input import PromptRequestInput
 from .prompt_request_json_input import PromptRequestJsonInput
 from .prompt_request_string_input import PromptRequestStringInput
+from .prompt_request_video_input import PromptRequestVideoInput
 from .prompt_settings import PromptSettings
 from .prompt_version_build_config_sandbox import PromptVersionBuildConfigSandbox
 from .raw_prompt_execution_overrides_request import RawPromptExecutionOverridesRequest
@@ -558,6 +577,7 @@ from .vellum_video_request import VellumVideoRequest
 from .vellum_workflow_execution_event import VellumWorkflowExecutionEvent
 from .video_chat_message_content import VideoChatMessageContent
 from .video_chat_message_content_request import VideoChatMessageContentRequest
+from .video_input_request import VideoInputRequest
 from .video_prompt_block import VideoPromptBlock
 from .video_vellum_value import VideoVellumValue
 from .video_vellum_value_request import VideoVellumValueRequest
@@ -665,6 +685,7 @@ __all__ = [
     "ArrayVellumValueRequest",
     "AudioChatMessageContent",
     "AudioChatMessageContentRequest",
+    "AudioInputRequest",
     "AudioPromptBlock",
     "AudioVellumValue",
     "AudioVellumValueRequest",
@@ -715,6 +736,10 @@ __all__ = [
     "ContainerImageContainerImageTag",
     "ContainerImageRead",
     "CreateTestSuiteTestCaseRequest",
+    "DelimiterChunkerConfig",
+    "DelimiterChunkerConfigRequest",
+    "DelimiterChunking",
+    "DelimiterChunkingRequest",
     "DeploymentHistoryItem",
     "DeploymentProviderPayloadResponse",
     "DeploymentProviderPayloadResponsePayload",
@@ -730,6 +755,7 @@ __all__ = [
     "DocumentIndexIndexingConfig",
     "DocumentIndexIndexingConfigRequest",
     "DocumentIndexRead",
+    "DocumentInputRequest",
     "DocumentProcessingState",
     "DocumentPromptBlock",
     "DocumentRead",
@@ -757,15 +783,19 @@ __all__ = [
     "ExecuteWorkflowResponse",
     "ExecuteWorkflowWorkflowResultEvent",
     "ExecutionArrayVellumValue",
+    "ExecutionAudioVellumValue",
     "ExecutionChatHistoryVellumValue",
+    "ExecutionDocumentVellumValue",
     "ExecutionErrorVellumValue",
     "ExecutionFunctionCallVellumValue",
+    "ExecutionImageVellumValue",
     "ExecutionJsonVellumValue",
     "ExecutionNumberVellumValue",
     "ExecutionSearchResultsVellumValue",
     "ExecutionStringVellumValue",
     "ExecutionThinkingVellumValue",
     "ExecutionVellumValue",
+    "ExecutionVideoVellumValue",
     "ExternalInputDescriptor",
     "ExternalParentContext",
     "ExternalTestCaseExecution",
@@ -824,6 +854,7 @@ __all__ = [
     "HkunlpInstructorXlVectorizerRequest",
     "ImageChatMessageContent",
     "ImageChatMessageContentRequest",
+    "ImageInputRequest",
     "ImagePromptBlock",
     "ImageVellumValue",
     "ImageVellumValueRequest",
@@ -899,14 +930,18 @@ __all__ = [
     "NodeExecutionStreamingBody",
     "NodeExecutionStreamingEvent",
     "NodeInputCompiledArrayValue",
+    "NodeInputCompiledAudioValue",
     "NodeInputCompiledChatHistoryValue",
+    "NodeInputCompiledDocumentValue",
     "NodeInputCompiledErrorValue",
     "NodeInputCompiledFunctionCallValue",
+    "NodeInputCompiledImageValue",
     "NodeInputCompiledJsonValue",
     "NodeInputCompiledNumberValue",
     "NodeInputCompiledSearchResultsValue",
     "NodeInputCompiledSecretValue",
     "NodeInputCompiledStringValue",
+    "NodeInputCompiledVideoValue",
     "NodeInputVariableCompiledValue",
     "NodeOutputCompiledArrayValue",
     "NodeOutputCompiledChatHistoryValue",
@@ -966,10 +1001,14 @@ __all__ = [
     "PromptOutput",
     "PromptParameters",
     "PromptPushResponse",
+    "PromptRequestAudioInput",
     "PromptRequestChatHistoryInput",
+    "PromptRequestDocumentInput",
+    "PromptRequestImageInput",
     "PromptRequestInput",
     "PromptRequestJsonInput",
     "PromptRequestStringInput",
+    "PromptRequestVideoInput",
     "PromptSettings",
     "PromptVersionBuildConfigSandbox",
     "RawPromptExecutionOverridesRequest",
@@ -1173,6 +1212,7 @@ __all__ = [
     "VellumWorkflowExecutionEvent",
     "VideoChatMessageContent",
     "VideoChatMessageContentRequest",
+    "VideoInputRequest",
     "VideoPromptBlock",
     "VideoVellumValue",
     "VideoVellumValueRequest",
