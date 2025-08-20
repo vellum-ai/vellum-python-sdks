@@ -1,0 +1,178 @@
+import pytest
+
+from vellum.workflows.constants import undefined
+from vellum.workflows.descriptors.exceptions import InvalidExpressionException
+from vellum.workflows.expressions.contains import ContainsExpression
+from vellum.workflows.references.constant import ConstantValueReference
+from vellum.workflows.state.base import BaseState
+
+
+class TestState(BaseState):
+    dict_value: dict = {"key": "value"}
+    list_value: list = [1, 2, 3]
+    string_value: str = "hello world"
+
+
+def test_dict_contains_identical_dict():
+    """
+    Tests that ContainsExpression handles dict-contains-dict scenarios.
+
+    This addresses Linear ticket APO-1025 where dict.contains(dict)
+    was failing with 'unhashable type' error.
+    """
+    state = TestState()
+    lhs_dict = {"foo": "bar"}
+    rhs_dict = {"foo": "bar"}
+
+    expression = ContainsExpression(lhs=lhs_dict, rhs=rhs_dict)
+    result = expression.resolve(state)
+
+    assert result is True
+
+
+def test_dict_contains_different_dict():
+    """
+    Tests that ContainsExpression returns False for different dicts.
+    """
+    state = TestState()
+    lhs_dict = {"foo": "bar"}
+    rhs_dict = {"hello": "world"}
+
+    expression = ContainsExpression(lhs=lhs_dict, rhs=rhs_dict)
+    result = expression.resolve(state)
+
+    assert result is False
+
+
+def test_string_contains_dict_as_json():
+    """
+    Tests that ContainsExpression handles string-contains-dict scenarios.
+    """
+    state = TestState()
+    lhs_string = 'Response: {"status": "success"} was returned'
+    rhs_dict = {"status": "success"}
+
+    expression = ContainsExpression(lhs=lhs_string, rhs=rhs_dict)
+    result = expression.resolve(state)
+
+    assert result is True
+
+
+def test_dict_contains_dict_key_order_independence():
+    """
+    Tests that ContainsExpression handles different key orders correctly.
+    """
+    state = TestState()
+    lhs_dict = {"user": {"name": "john", "age": 30}}
+    rhs_dict = {"age": 30, "name": "john"}
+
+    expression = ContainsExpression(lhs=lhs_dict, rhs=rhs_dict)
+    result = expression.resolve(state)
+
+    assert result is True
+
+
+def test_list_contains_string():
+    """
+    Tests that ContainsExpression preserves original list functionality.
+    """
+    state = TestState()
+
+    expression = TestState.list_value.contains(2)
+    result = expression.resolve(state)
+
+    assert result is True
+
+
+def test_string_contains_substring():
+    """
+    Tests that ContainsExpression preserves original string functionality.
+    """
+    state = TestState()
+
+    expression = TestState.string_value.contains("world")
+    result = expression.resolve(state)
+
+    assert result is True
+
+
+def test_set_contains_item():
+    """
+    Tests that ContainsExpression works with sets.
+    """
+    state = TestState()
+    lhs_set = {1, 2, 3}
+    rhs_item = 2
+
+    expression = ContainsExpression(lhs=lhs_set, rhs=rhs_item)
+    result = expression.resolve(state)
+
+    assert result is True
+
+
+def test_tuple_contains_item():
+    """
+    Tests that ContainsExpression works with tuples.
+    """
+    state = TestState()
+    lhs_tuple = (1, 2, 3)
+    rhs_item = 2
+
+    expression = ContainsExpression(lhs=lhs_tuple, rhs=rhs_item)
+    result = expression.resolve(state)
+
+    assert result is True
+
+
+def test_invalid_lhs_type():
+    """
+    Tests that ContainsExpression raises exception for invalid LHS types.
+    """
+
+    class NoContainsSupport:
+        pass
+
+    state = TestState()
+    no_contains_obj = NoContainsSupport()
+    expression = ContainsExpression(lhs=no_contains_obj, rhs="test")
+
+    with pytest.raises(
+        InvalidExpressionException, match="Expected a LHS that supported `contains`, got `NoContainsSupport`"
+    ):
+        expression.resolve(state)
+
+
+def test_undefined_lhs_returns_false():
+    """
+    Tests that ContainsExpression returns False for undefined LHS.
+    """
+    state = TestState()
+    expression = ContainsExpression(lhs=undefined, rhs="test")
+
+    result = expression.resolve(state)
+
+    assert result is False
+
+
+def test_contains_with_constant_value_reference():
+    """
+    Tests ContainsExpression with ConstantValueReference (workflow pattern).
+    """
+    state = TestState()
+    lhs_ref = ConstantValueReference({"api": "response"})
+    rhs_ref = ConstantValueReference({"api": "response"})
+
+    expression: ContainsExpression = ContainsExpression(lhs=lhs_ref, rhs=rhs_ref)
+    result = expression.resolve(state)
+
+    assert result is True
+
+
+def test_expression_metadata():
+    """
+    Tests that ContainsExpression has correct name and types properties.
+    """
+    expression = ContainsExpression(lhs=[1, 2, 3], rhs=2)
+
+    assert expression.name == "[1, 2, 3] contains 2"
+    assert expression.types == (bool,)
