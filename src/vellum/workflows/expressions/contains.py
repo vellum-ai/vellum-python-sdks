@@ -35,4 +35,11 @@ class ContainsExpression(BaseDescriptor[bool], Generic[LHS, RHS]):
             )
 
         rhs = resolve_value(self._rhs, state)
+
+        if isinstance(rhs, dict):
+            raise InvalidExpressionException(
+                "Cannot use dict as right-hand side of contains operation. "
+                "Use dict keys/values or convert to strings for comparison."
+            )
+
         return rhs in lhs
