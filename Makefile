@@ -23,8 +23,7 @@ setup-pre-commit:
 	&& $(HOME)/.local/bin/poetry run pre-commit install -t pre-push
 
 setup-node:
-	command -v nvm >/dev/null 2>&1 || (curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash) \
-	&& (nvm use $(cat ee/codegen/.nvmrc) || nvm install $(cat ee/codegen/.nvmrc))
+	$(HOME)/.nvm/nvm.sh use $$(cat ee/codegen/.nvmrc) || $(HOME)/.nvm/nvm.sh install $$(cat ee/codegen/.nvmrc)
 
 setup-fern:
 	which fern || npm install -g fern-api
