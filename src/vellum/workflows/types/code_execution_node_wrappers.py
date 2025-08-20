@@ -1,3 +1,7 @@
+from typing import Any, Dict
+
+from pydantic import BaseModel
+
 from vellum.client.types.function_call import FunctionCall
 
 
@@ -99,3 +103,23 @@ def clean_for_dict_wrapper(obj):
         return FunctionCallWrapper(obj)
 
     return obj
+
+
+def wrap_inputs_for_backward_compatibility(inputs: Dict[str, Any]) -> Dict[str, Any]:
+    """Wrap inputs with backward-compatible wrapper classes for legacy .value and .type support."""
+
+    def _wrap_single_value(value: Any) -> Any:
+        if isinstance(value, list):
+            return ListWrapper(
+                [
+                    (
+                        item.model_dump()
+                        if isinstance(item, BaseModel)
+                        else clean_for_dict_wrapper(item) if isinstance(item, (dict, list, str)) else item
+                    )
+                    for item in value
+                ]
+            )
+        return clean_for_dict_wrapper(value)
+
+    return {name: _wrap_single_value(value) for name, value in inputs.items()}
