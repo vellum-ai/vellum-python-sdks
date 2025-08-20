@@ -89,6 +89,10 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
                 # Mypy is incorrect here, the `annotation` attribute is defined on `FieldInfo`
                 field_annotation = field.annotation  # type: ignore[attr-defined]
                 properties[field_name] = compile_annotation(field_annotation, defs)
+
+                if field.description is not None:
+                    properties[field_name]["description"] = field.description
+
                 if field.default is PydanticUndefined:
                     required.append(field_name)
                 else:
