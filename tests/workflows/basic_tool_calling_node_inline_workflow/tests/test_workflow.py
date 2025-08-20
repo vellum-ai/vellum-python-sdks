@@ -102,7 +102,7 @@ def test_tool_calling_node_inline_subworkflow(vellum_adhoc_prompt_client, mock_u
                     id="call_7115tNTmEACTsQRGwKpJipJK",
                 ),
             ),
-            source="call_7115tNTmEACTsQRGwKpJipJK",
+            source=None,
         ),
         ChatMessage(
             text=None,
@@ -117,7 +117,7 @@ def test_tool_calling_node_inline_subworkflow(vellum_adhoc_prompt_client, mock_u
             text="Based on the function call, the current temperature in San Francisco is 70 degrees celsius.",
             role="ASSISTANT",
             content=None,
-            source="call_7115tNTmEACTsQRGwKpJipJK",
+            source=None,
         ),
     ]
 
@@ -231,7 +231,7 @@ def test_tool_calling_node_inline_subworkflow(vellum_adhoc_prompt_client, mock_u
                                 id="call_7115tNTmEACTsQRGwKpJipJK",
                             ),
                         ),
-                        source="call_7115tNTmEACTsQRGwKpJipJK",
+                        source=None,
                     ),
                     ChatMessage(
                         text=None,

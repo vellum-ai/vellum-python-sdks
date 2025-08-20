@@ -112,7 +112,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                     id="call_7115tNTmEACTsQRGwKpJipJK",
                 ),
             ),
-            source="call_7115tNTmEACTsQRGwKpJipJK",
+            source=None,
         ),
         ChatMessage(
             text=None,
@@ -136,7 +136,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                     id="call_7115tNTmEACTsQRGwKpJipJK",
                 ),
             ),
-            source="call_7115tNTmEACTsQRGwKpJipJK",
+            source=None,
         ),
         ChatMessage(
             text=None,
@@ -151,7 +151,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
             text="Based on the function call, the current temperature in San Francisco is 70 degrees celsius.",
             role="ASSISTANT",
             content=None,
-            source="call_7115tNTmEACTsQRGwKpJipJK",
+            source=None,
         ),
     ]
 
@@ -401,7 +401,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                                 id="call_7115tNTmEACTsQRGwKpJipJK",
                             ),
                         ),
-                        source="call_7115tNTmEACTsQRGwKpJipJK",
+                        source=None,
                     ),
                     ChatMessage(
                         text=None,
@@ -425,7 +425,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
                                 id="call_7115tNTmEACTsQRGwKpJipJK",
                             ),
                         ),
-                        source="call_7115tNTmEACTsQRGwKpJipJK",
+                        source=None,
                     ),
                     ChatMessage(
                         text=None,

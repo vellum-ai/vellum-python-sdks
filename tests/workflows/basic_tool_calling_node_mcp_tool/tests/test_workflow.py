@@ -130,7 +130,7 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, mock_uuid4_generat
                         id="call_7115tNTmEACTsQRGwKpJipJK",
                     ),
                 ),
-                source="call_7115tNTmEACTsQRGwKpJipJK",
+                source=None,
             ),
             ChatMessage(
                 text=None,
@@ -145,7 +145,7 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, mock_uuid4_generat
                 text="The repository new_test_repo has been successfully created.",
                 role="ASSISTANT",
                 content=None,
-                source="call_7115tNTmEACTsQRGwKpJipJK",
+                source=None,
             ),
         ]
 
@@ -299,7 +299,7 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, mock_uuid4_generat
                                     id="call_7115tNTmEACTsQRGwKpJipJK",
                                 ),
                             ),
-                            source="call_7115tNTmEACTsQRGwKpJipJK",
+                            source=None,
                         ),
                         ChatMessage(
                             text=None,
