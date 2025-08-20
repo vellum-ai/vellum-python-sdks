@@ -207,27 +207,9 @@ class WorkflowContext:
             return None
 
         try:
-            import sys
-
             from vellum.workflows.workflows.base import BaseWorkflow
-            from vellum_ee.workflows.server.virtual_file_loader import VirtualFileFinder
 
-            # Use pulled files if available, otherwise extract from generated_files
-            if hasattr(self, "_pulled_files") and self._pulled_files:
-                virtual_files = self._pulled_files
-            else:
-                virtual_files = {}
-                if self._generated_files:
-                    for file_key, content in self._generated_files.items():
-                        if file_key.startswith(f"{expected_prefix}/"):
-                            file_name = file_key[len(f"{expected_prefix}/") :]
-                            virtual_files[file_name] = content
-
-            finder = VirtualFileFinder(virtual_files, expected_prefix)
-            if finder not in sys.meta_path:
-                sys.meta_path.append(finder)
-
-            WorkflowClass = BaseWorkflow.load_from_module(expected_prefix)
+            WorkflowClass = BaseWorkflow.load_from_module(f"{self.namespace}.{expected_prefix}")
             workflow_instance = WorkflowClass(context=WorkflowContext.create_from(self), parent_state=state)
             return workflow_instance
         except Exception:

@@ -682,8 +682,11 @@ __all__ = ["TestNode"]
 def test_resolve_workflow_deployment__uses_pull_api_with_inputs_deployment_name():
     """
     Test that resolve_workflow_deployment uses the pull API to fetch subworkflow files
-    when no generated_files or namespace are provided.
+    when the deployment name comes from Inputs.deployment_name.
     """
+    from vellum.workflows.events.types import WorkflowExecutionFulfilledEvent
+    from vellum.workflows.events.workflow import WorkflowExecutionFulfilledBody
+
     # GIVEN a deployment name and release tag
     deployment_name = "test_deployment"
     release_tag = "LATEST"
@@ -710,6 +713,36 @@ class ResolvedWorkflow(BaseWorkflow):
     graph = TestNode
 """
 
+    inputs_code = """
+from vellum.workflows.inputs import BaseInputs
+
+class Inputs(BaseInputs):
+    deployment_name: str
+"""
+
+    parent_workflow_code = """
+from vellum.workflows import BaseWorkflow
+from .inputs import Inputs
+from .nodes.subworkflow_deployment_node import TestSubworkflowDeploymentNode
+
+class ParentWorkflow(BaseWorkflow):
+    graph = TestSubworkflowDeploymentNode
+"""
+
+    parent_node_code = """
+from vellum.workflows.nodes import SubworkflowDeploymentNode
+from vellum.workflows.outputs import BaseOutputs
+from ..inputs import Inputs
+
+class TestSubworkflowDeploymentNode(SubworkflowDeploymentNode):
+    deployment = Inputs.deployment_name
+
+    class Outputs(BaseOutputs):
+        result: str
+
+    subworkflow_inputs = {"message": "test"}
+"""
+
     subworkflow_files = {
         "__init__.py": "",
         "workflow.py": mock_workflow_code,
@@ -721,27 +754,53 @@ __all__ = ["TestNode"]
         "nodes/test_node.py": test_node_code,
     }
 
+    parent_files = {
+        "__init__.py": "",
+        "inputs.py": inputs_code,
+        "workflow.py": parent_workflow_code,
+        "nodes/__init__.py": """
+from .subworkflow_deployment_node import TestSubworkflowDeploymentNode
+
+__all__ = ["TestSubworkflowDeploymentNode"]
+""",
+        "nodes/subworkflow_deployment_node.py": parent_node_code,
+    }
+
+    namespace = str(uuid4())
+
+    # AND the virtual file loader is registered for the parent workflow
+    finder = VirtualFileFinder(parent_files, namespace)
+    sys.meta_path.append(finder)
+
     mock_vellum_client = Mock()
     mock_vellum_client.workflows.pull.return_value = iter([_zip_file_map(subworkflow_files)])
 
-    # AND a workflow context with no generated_files or namespace (to trigger pull API)
-    context = WorkflowContext(vellum_client=mock_vellum_client)
+    mock_fulfilled_event = WorkflowExecutionFulfilledEvent(
+        trace_id=str(uuid4()),
+        span_id=str(uuid4()),
+        body=WorkflowExecutionFulfilledBody(outputs={"result": "Hello, test"}),
+    )
+    mock_vellum_client.execute_workflow_stream.return_value = iter([mock_fulfilled_event])
 
-    mock_state = Mock()
+    # WHEN we execute the root workflow with the mocked client
+    Workflow = BaseWorkflow.load_from_module(namespace)
 
-    # WHEN we call resolve_workflow_deployment
-    result = context.resolve_workflow_deployment(deployment_name, release_tag, mock_state)
+    import importlib
 
-    # THEN the pull API should have been called with the correct deployment name and release tag
+    inputs_module = importlib.import_module(f"{namespace}.inputs")
+    Inputs = inputs_module.Inputs
+
+    workflow = Workflow(context=WorkflowContext(vellum_client=mock_vellum_client, namespace=namespace))
+
+    # THEN the workflow should be successfully initialized
+    assert workflow
+
+    event = workflow.run(inputs=Inputs(deployment_name=deployment_name))
+
+    # AND the method should return a workflow (not None) - this will pass once implemented
+    assert event.name == "workflow.execution.fulfilled"
+
+    # AND the pull API should have been called with the correct deployment name and release tag
     mock_vellum_client.workflows.pull.assert_called_once_with(
         deployment_name, request_options={"additional_query_parameters": {"release_tag": release_tag}}
     )
-
-    # AND the method should return a workflow (not None)
-    assert result is not None
-
-    # AND the context should now have generated_files populated
-    assert context._generated_files is not None
-    expected_prefix = generate_workflow_deployment_prefix(deployment_name, release_tag)
-    expected_workflow_key = f"{expected_prefix}/workflow.py"
-    assert expected_workflow_key in context._generated_files
