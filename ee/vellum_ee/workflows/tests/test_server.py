@@ -9,6 +9,7 @@ from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.code_executor_response import CodeExecutorResponse
 from vellum.client.types.number_vellum_value import NumberVellumValue
 from vellum.workflows import BaseWorkflow
+from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.utils.uuids import generate_workflow_deployment_prefix
@@ -710,13 +711,17 @@ class ResolvedWorkflow(BaseWorkflow):
     graph = TestNode
 """
 
-    parent_workflow_code = """
-from vellum.workflows import BaseWorkflow
+    inputs_code = """
 from vellum.workflows.inputs import BaseInputs
-from .nodes.subworkflow_deployment_node import TestSubworkflowDeploymentNode
 
 class Inputs(BaseInputs):
     deployment_name: str
+"""
+
+    parent_workflow_code = """
+from vellum.workflows import BaseWorkflow
+from .inputs import Inputs
+from .nodes.subworkflow_deployment_node import TestSubworkflowDeploymentNode
 
 class ParentWorkflow(BaseWorkflow):
     graph = TestSubworkflowDeploymentNode
@@ -725,9 +730,7 @@ class ParentWorkflow(BaseWorkflow):
     parent_node_code = """
 from vellum.workflows.nodes import SubworkflowDeploymentNode
 from vellum.workflows.outputs import BaseOutputs
-
-class Inputs:
-    deployment_name: str = "test_deployment"
+from ..inputs import Inputs
 
 class TestSubworkflowDeploymentNode(SubworkflowDeploymentNode):
     deployment = Inputs.deployment_name
@@ -751,6 +754,7 @@ __all__ = ["TestNode"]
 
     parent_files = {
         "__init__.py": "",
+        "inputs.py": inputs_code,
         "workflow.py": parent_workflow_code,
         "nodes/__init__.py": """
 from .subworkflow_deployment_node import TestSubworkflowDeploymentNode
@@ -771,12 +775,19 @@ __all__ = ["TestSubworkflowDeploymentNode"]
 
     # WHEN we execute the root workflow with the mocked client
     Workflow = BaseWorkflow.load_from_module(namespace)
+
+    InputsClass = getattr(Workflow, "Inputs", None)
+    if InputsClass is None:
+
+        class InputsClass(BaseInputs):
+            deployment_name: str
+
     workflow = Workflow(context=WorkflowContext(vellum_client=mock_vellum_client, namespace=namespace))
 
     # THEN the workflow should be successfully initialized
     assert workflow
 
-    event = workflow.run()
+    event = workflow.run(inputs=InputsClass(deployment_name=deployment_name))
 
     # AND the method should return a workflow (not None) - this will pass once implemented
     assert event.name == "workflow.execution.fulfilled"
