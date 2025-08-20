@@ -634,6 +634,7 @@ from .subworkflow_deployment_node import TestSubworkflowDeploymentNode
 __all__ = ["TestSubworkflowDeploymentNode"]
 """,
         "nodes/subworkflow_deployment_node.py": parent_node_code,
+        f"{expected_prefix}/__init__.py": "",
         f"{expected_prefix}/workflow.py": mock_workflow_code,
         f"{expected_prefix}/nodes/__init__.py": """
 from .test_node import TestNode
