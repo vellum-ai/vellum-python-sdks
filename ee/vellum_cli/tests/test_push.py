@@ -1042,6 +1042,45 @@ def test_push__deploy_with_release_tags_success(mock_module, vellum_client):
     assert "Updated vellum.lock.json file." in result.output
 
 
+@pytest.mark.usefixtures("info_log_level")
+def test_push__deploy_with_release_description_success(mock_module, vellum_client):
+    # GIVEN a single workflow configured
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+
+    # AND a workflow exists in the module successfully
+    _ensure_workflow_py(temp_dir, module)
+
+    # AND the push API call returns successfully
+    workflow_deployment_id = str(uuid4())
+    vellum_client.workflows.push.return_value = WorkflowPushResponse(
+        workflow_sandbox_id=str(uuid4()),
+        workflow_deployment_id=workflow_deployment_id,
+    )
+
+    # WHEN calling `vellum workflows push` with --deploy and --release-description
+    runner = CliRunner()
+    result = runner.invoke(
+        cli_main, ["workflows", "push", module, "--deploy", "--release-description", "This is a test release"]
+    )
+
+    # THEN it should succeed
+    assert result.exit_code == 0, result.output
+
+    # AND we should have called the push API with the correct deployment config
+    vellum_client.workflows.push.assert_called_once()
+    call_args = vellum_client.workflows.push.call_args.kwargs
+
+    # AND the deployment_config should contain the release description
+    deployment_config_str = call_args["deployment_config"]
+    deployment_config = json.loads(deployment_config_str)
+    assert deployment_config["release_description"] == "This is a test release"
+
+    # AND should show success message
+    assert "Successfully pushed" in result.output
+    assert "Updated vellum.lock.json file." in result.output
+
+
 def test_push__deploy_stores_deployment_config_in_lock_file(mock_module, vellum_client):
     # GIVEN a single workflow
     temp_dir = mock_module.temp_dir
