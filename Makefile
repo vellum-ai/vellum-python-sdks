@@ -4,7 +4,7 @@ SHELL := /bin/bash
 # Setup
 ################################
 
-setup: setup-python setup-poetry install-deps setup-pre-commit setup-fern
+setup: setup-python setup-poetry install-deps setup-pre-commit setup-node setup-fern
 
 setup-python:
 	brew list python@3.9 || brew install python@3.9
