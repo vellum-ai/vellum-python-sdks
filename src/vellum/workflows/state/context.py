@@ -1,6 +1,5 @@
 from functools import cached_property
 from queue import Queue
-import sys
 from uuid import uuid4
 from typing import TYPE_CHECKING, Dict, List, Optional, Type
 
@@ -10,11 +9,12 @@ from vellum.workflows.events.types import ExternalParentContext
 from vellum.workflows.nodes.mocks import MockNodeExecution, MockNodeExecutionArg
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.references.constant import ConstantValueReference
-from vellum.workflows.utils.uuids import uuid4_from_hash
+from vellum.workflows.utils.uuids import generate_workflow_deployment_prefix
 from vellum.workflows.vellum_client import create_vellum_client
 
 if TYPE_CHECKING:
     from vellum.workflows.events.workflow import WorkflowEvent
+    from vellum.workflows.state.base import BaseState
     from vellum.workflows.workflows.base import BaseWorkflow
 
 
@@ -136,13 +136,16 @@ class WorkflowContext:
     def _get_all_node_output_mocks(self) -> List[MockNodeExecution]:
         return [mock for mocks in self._node_output_mocks_map.values() for mock in mocks]
 
-    def resolve_workflow_deployment(self, deployment_name: str, release_tag: str) -> Optional["BaseWorkflow"]:
+    def resolve_workflow_deployment(
+        self, deployment_name: str, release_tag: str, state: "BaseState"
+    ) -> Optional["BaseWorkflow"]:
         """
         Resolve a workflow deployment by name and release tag.
 
         Args:
             deployment_name: The name of the workflow deployment
             release_tag: The release tag to resolve
+            state: The base state to pass to the workflow
 
         Returns:
             BaseWorkflow instance if found, None otherwise
@@ -150,29 +153,20 @@ class WorkflowContext:
         if not self.generated_files:
             return None
 
-        expected_hash = str(uuid4_from_hash(f"{deployment_name}|{release_tag}")).replace("-", "_")
-        expected_prefix = f"vellum_workflow_deployment_{expected_hash}"
+        expected_prefix = generate_workflow_deployment_prefix(deployment_name, release_tag)
 
         workflow_file_key = f"{expected_prefix}/workflow.py"
         if workflow_file_key not in self.generated_files:
             return None
 
-        from vellum_ee.workflows.server.virtual_file_loader import VirtualFileFinder
-
-        finder = VirtualFileFinder(self.generated_files, expected_prefix)
-        sys.meta_path.append(finder)
-
         try:
             from vellum.workflows.workflows.base import BaseWorkflow
 
-            WorkflowClass = BaseWorkflow.load_from_module(expected_prefix)
-            workflow_instance = WorkflowClass(context=self)
+            WorkflowClass = BaseWorkflow.load_from_module(f".{expected_prefix}")
+            workflow_instance = WorkflowClass(context=WorkflowContext.create_from(self), parent_state=state)
             return workflow_instance
         except Exception:
             return None
-        finally:
-            if finder in sys.meta_path:
-                sys.meta_path.remove(finder)
 
     @classmethod
     def create_from(cls, context):

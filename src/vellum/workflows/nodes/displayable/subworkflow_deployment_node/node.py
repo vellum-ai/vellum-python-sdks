@@ -232,7 +232,7 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
             )
 
         resolved_workflow = self._context.resolve_workflow_deployment(
-            deployment_name=deployment_name, release_tag=self.release_tag
+            deployment_name=deployment_name, release_tag=self.release_tag, state=self.state
         )
         if resolved_workflow:
             yield from self._run_resolved_workflow(resolved_workflow)

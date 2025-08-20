@@ -2,6 +2,21 @@ import hashlib
 from uuid import UUID
 
 
+def generate_workflow_deployment_prefix(deployment_name: str, release_tag: str) -> str:
+    """
+    Generate a workflow deployment prefix from deployment name and release tag.
+
+    Args:
+        deployment_name: The name of the workflow deployment
+        release_tag: The release tag to resolve
+
+    Returns:
+        The generated prefix in format vellum_workflow_deployment_{hash}
+    """
+    expected_hash = str(uuid4_from_hash(f"{deployment_name}|{release_tag}")).replace("-", "_")
+    return f"vellum_workflow_deployment_{expected_hash}"
+
+
 def uuid4_from_hash(input_str: str) -> UUID:
     # Create a SHA-256 hash of the input string
     hash_bytes = hashlib.sha256(input_str.encode()).digest()
