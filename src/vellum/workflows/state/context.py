@@ -156,65 +156,82 @@ class WorkflowContext:
         Returns:
             BaseWorkflow instance if found, None otherwise
         """
-        if self.generated_files and self.namespace:
-            expected_prefix = generate_workflow_deployment_prefix(deployment_name, release_tag)
-            workflow_file_key = f"{expected_prefix}/workflow.py"
-            if workflow_file_key in self.generated_files:
+        if not self.generated_files or not self.namespace:
+            # Try using the pull API to fetch the workflow deployment only if we have a vellum_client
+            if hasattr(self, "_vellum_client") and self._vellum_client is not None:
                 try:
-                    from vellum.workflows.workflows.base import BaseWorkflow
+                    import io
+                    import zipfile
 
-                    WorkflowClass = BaseWorkflow.load_from_module(f"{self.namespace}.{expected_prefix}")
-                    workflow_instance = WorkflowClass(context=WorkflowContext.create_from(self), parent_state=state)
-                    return workflow_instance
+                    response = self.vellum_client.workflows.pull(
+                        deployment_name, request_options={"additional_query_parameters": {"release_tag": release_tag}}
+                    )
+
+                    zip_bytes = b"".join(response)
+                    zip_buffer = io.BytesIO(zip_bytes)
+
+                    pulled_files = {}
+                    with zipfile.ZipFile(zip_buffer) as zip_file:
+                        for file_name in zip_file.namelist():
+                            with zip_file.open(file_name) as source:
+                                content = source.read().decode("utf-8")
+                                pulled_files[file_name] = content
+
+                    expected_prefix = generate_workflow_deployment_prefix(deployment_name, release_tag)
+                    if self._generated_files is None:
+                        self._generated_files = {}
+                    for file_name, content in pulled_files.items():
+                        prefixed_file_name = f"{expected_prefix}/{file_name}"
+                        self._generated_files[prefixed_file_name] = content
+
+                    if self._namespace is None:
+                        self._namespace = f"pulled_workflow_{expected_prefix}"
+
+                    self._pulled_files = pulled_files
+
+                    if hasattr(self, "generated_files"):
+                        delattr(self, "generated_files")
+                    if hasattr(self, "namespace"):
+                        delattr(self, "namespace")
+
                 except Exception:
                     pass
 
-        # Try using the pull API to fetch the workflow deployment only if we have a vellum_client
-        if hasattr(self, "_vellum_client") and self._vellum_client is not None:
-            try:
-                import io
-                import zipfile
+            # If we still don't have generated_files or namespace after trying pull API, return None
+            if not self._generated_files or not self._namespace:
+                return None
 
-                response = self.vellum_client.workflows.pull(
-                    deployment_name, request_options={"additional_query_parameters": {"release_tag": release_tag}}
-                )
+        expected_prefix = generate_workflow_deployment_prefix(deployment_name, release_tag)
+        workflow_file_key = f"{expected_prefix}/workflow.py"
+        if not self._generated_files or workflow_file_key not in self._generated_files:
+            return None
 
-                zip_bytes = b"".join(response)
-                zip_buffer = io.BytesIO(zip_bytes)
+        try:
+            import sys
 
-                pulled_files = {}
-                with zipfile.ZipFile(zip_buffer) as zip_file:
-                    for file_name in zip_file.namelist():
-                        with zip_file.open(file_name) as source:
-                            content = source.read().decode("utf-8")
-                            pulled_files[file_name] = content
+            from vellum.workflows.workflows.base import BaseWorkflow
+            from vellum_ee.workflows.server.virtual_file_loader import VirtualFileFinder
 
-                expected_prefix = generate_workflow_deployment_prefix(deployment_name, release_tag)
-                if self._generated_files is None:
-                    self._generated_files = {}
+            # Use pulled files if available, otherwise extract from generated_files
+            if hasattr(self, "_pulled_files") and self._pulled_files:
+                virtual_files = self._pulled_files
+            else:
+                virtual_files = {}
+                if self._generated_files:
+                    for file_key, content in self._generated_files.items():
+                        if file_key.startswith(f"{expected_prefix}/"):
+                            file_name = file_key[len(f"{expected_prefix}/") :]
+                            virtual_files[file_name] = content
 
-                for file_name, content in pulled_files.items():
-                    prefixed_file_name = f"{expected_prefix}/{file_name}"
-                    self._generated_files[prefixed_file_name] = content
+            finder = VirtualFileFinder(virtual_files, expected_prefix)
+            if finder not in sys.meta_path:
+                sys.meta_path.append(finder)
 
-                if self._namespace is None:
-                    self._namespace = f"pulled_workflow_{expected_prefix}"
-
-                workflow_file_key = f"{expected_prefix}/workflow.py"
-                if workflow_file_key in self._generated_files:
-                    try:
-                        from vellum.workflows.workflows.base import BaseWorkflow
-
-                        WorkflowClass = BaseWorkflow.load_from_module(f"{self._namespace}.{expected_prefix}")
-                        workflow_instance = WorkflowClass(context=WorkflowContext.create_from(self), parent_state=state)
-                        return workflow_instance
-                    except Exception:
-                        pass
-
-            except Exception:
-                pass
-
-        return None
+            WorkflowClass = BaseWorkflow.load_from_module(expected_prefix)
+            workflow_instance = WorkflowClass(context=WorkflowContext.create_from(self), parent_state=state)
+            return workflow_instance
+        except Exception:
+            return None
 
     @classmethod
     def create_from(cls, context):
