@@ -1,8 +1,6 @@
-import io
 import sys
 from unittest.mock import Mock
 from uuid import uuid4
-import zipfile
 from typing import Type, cast
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
@@ -12,21 +10,9 @@ from vellum.workflows import BaseWorkflow
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.utils.uuids import generate_workflow_deployment_prefix
+from vellum_ee.workflows.display.utils.zip import zip_file_map
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 from vellum_ee.workflows.server.virtual_file_loader import VirtualFileFinder
-
-
-def _zip_file_map(file_map: dict[str, str]) -> bytes:
-    zip_buffer = io.BytesIO()
-
-    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
-        for filename, content in file_map.items():
-            zip_file.writestr(filename, content)
-
-    zip_bytes = zip_buffer.getvalue()
-    zip_buffer.close()
-
-    return zip_bytes
 
 
 def test_load_workflow_event_display_context():
@@ -773,7 +759,7 @@ __all__ = ["TestSubworkflowDeploymentNode"]
     sys.meta_path.append(finder)
 
     mock_vellum_client = Mock()
-    mock_vellum_client.workflows.pull.return_value = iter([_zip_file_map(subworkflow_files)])
+    mock_vellum_client.workflows.pull.return_value = iter([zip_file_map(subworkflow_files)])
 
     mock_fulfilled_event = WorkflowExecutionFulfilledEvent(
         trace_id=str(uuid4()),
