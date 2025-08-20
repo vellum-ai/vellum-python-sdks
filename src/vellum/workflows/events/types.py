@@ -1,12 +1,13 @@
 from datetime import datetime
 import json
 from uuid import UUID, uuid4
-from typing import Annotated, Any, Literal, Optional, Union, get_args
+from typing import Annotated, Any, List, Literal, Optional, Union, get_args
 
 from pydantic import Field, GetCoreSchemaHandler, Tag, ValidationInfo
 from pydantic_core import CoreSchema, core_schema
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
+from vellum.client.types.span_link import SpanLink
 from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.types.definition import VellumCodeResourceDefinition
 from vellum.workflows.types.utils import datetime_now
@@ -164,3 +165,4 @@ class BaseEvent(UniversalBaseModel):
     trace_id: UUID
     span_id: UUID
     parent: Optional[ParentContext] = None
+    links: Optional[List[SpanLink]] = None
