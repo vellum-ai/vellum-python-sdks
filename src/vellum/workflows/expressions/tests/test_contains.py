@@ -16,9 +16,6 @@ class TestState(BaseState):
 def test_dict_contains_dict_raises_error():
     """
     Tests that ContainsExpression raises clear error for dict-contains-dict scenarios.
-
-    This addresses Linear ticket APO-1025 where dict.contains(dict)
-    was failing with unclear 'unhashable type' error.
     """
     state = TestState()
     lhs_dict = {"foo": "bar"}

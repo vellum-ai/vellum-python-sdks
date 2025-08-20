@@ -36,14 +36,14 @@ class ContainsExpression(BaseDescriptor[bool], Generic[LHS, RHS]):
 
         rhs = resolve_value(self._rhs, state)
 
-        if isinstance(lhs, dict) and isinstance(rhs, dict):
-            raise InvalidExpressionException(
-                "Cannot check if dict contains dict. Use dict keys/values or convert to strings for comparison."
-            )
-
-        if isinstance(lhs, str) and isinstance(rhs, dict):
-            raise InvalidExpressionException(
-                "Cannot check if string contains dict. Convert dict to string first or check for specific keys."
-            )
+        if isinstance(rhs, dict):
+            if isinstance(lhs, dict):
+                raise InvalidExpressionException(
+                    "Cannot check if dict contains dict. Use dict keys/values or convert to strings for comparison."
+                )
+            elif isinstance(lhs, str):
+                raise InvalidExpressionException(
+                    "Cannot check if string contains dict. Convert dict to string first or check for specific keys."
+                )
 
         return rhs in lhs
