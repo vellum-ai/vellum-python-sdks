@@ -1,4 +1,3 @@
-import pytest
 import sys
 from uuid import uuid4
 from typing import Type, cast
@@ -9,7 +8,7 @@ from vellum.client.types.number_vellum_value import NumberVellumValue
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.state.context import WorkflowContext
-from vellum.workflows.utils.uuids import uuid4_from_hash
+from vellum.workflows.utils.uuids import generate_workflow_deployment_prefix
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 from vellum_ee.workflows.server.virtual_file_loader import VirtualFileFinder
 
@@ -570,7 +569,6 @@ class Workflow(BaseWorkflow[Inputs, BaseState]):
     assert result is not None
 
 
-@pytest.mark.skip(reason="Test will pass once resolve_workflow_deployment is implemented")
 def test_resolve_workflow_deployment__returns_workflow_with_generated_files():
     """
     Test that resolve_workflow_deployment returns a workflow with artifacts
@@ -578,10 +576,9 @@ def test_resolve_workflow_deployment__returns_workflow_with_generated_files():
     """
     # GIVEN a deployment name and release tag
     deployment_name = "test_deployment"
-    release_tag = "v1.0.0"
+    release_tag = "LATEST"
 
-    expected_hash = str(uuid4_from_hash(f"{deployment_name}|{release_tag}")).replace("-", "_")
-    expected_prefix = f"vellum_workflow_deployment_{expected_hash}"
+    expected_prefix = generate_workflow_deployment_prefix(deployment_name, release_tag)
 
     # Create a simple test node for the resolved workflow
     test_node_code = """
@@ -637,6 +634,7 @@ from .subworkflow_deployment_node import TestSubworkflowDeploymentNode
 __all__ = ["TestSubworkflowDeploymentNode"]
 """,
         "nodes/subworkflow_deployment_node.py": parent_node_code,
+        f"{expected_prefix}/__init__.py": "",
         f"{expected_prefix}/workflow.py": mock_workflow_code,
         f"{expected_prefix}/nodes/__init__.py": """
 from .test_node import TestNode
@@ -654,7 +652,7 @@ __all__ = ["TestNode"]
 
     # WHEN we execute the root workflow
     Workflow = BaseWorkflow.load_from_module(namespace)
-    workflow = Workflow(context=WorkflowContext(generated_files=files))
+    workflow = Workflow(context=WorkflowContext(generated_files=files, namespace=namespace))
 
     # THEN the workflow should be successfully initialized
     assert workflow

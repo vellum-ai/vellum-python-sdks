@@ -9,10 +9,12 @@ from vellum.workflows.events.types import ExternalParentContext
 from vellum.workflows.nodes.mocks import MockNodeExecution, MockNodeExecutionArg
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.references.constant import ConstantValueReference
+from vellum.workflows.utils.uuids import generate_workflow_deployment_prefix
 from vellum.workflows.vellum_client import create_vellum_client
 
 if TYPE_CHECKING:
     from vellum.workflows.events.workflow import WorkflowEvent
+    from vellum.workflows.state.base import BaseState
     from vellum.workflows.workflows.base import BaseWorkflow
 
 
@@ -23,11 +25,13 @@ class WorkflowContext:
         vellum_client: Optional[Vellum] = None,
         execution_context: Optional[ExecutionContext] = None,
         generated_files: Optional[dict[str, str]] = None,
+        namespace: Optional[str] = None,
     ):
         self._vellum_client = vellum_client
         self._event_queue: Optional[Queue["WorkflowEvent"]] = None
         self._node_output_mocks_map: Dict[Type[BaseOutputs], List[MockNodeExecution]] = {}
         self._execution_context = get_execution_context()
+        self._namespace = namespace
 
         if execution_context is not None:
             self._execution_context.trace_id = execution_context.trace_id
@@ -55,6 +59,10 @@ class WorkflowContext:
     @cached_property
     def generated_files(self) -> Optional[dict[str, str]]:
         return self._generated_files
+
+    @cached_property
+    def namespace(self) -> Optional[str]:
+        return self._namespace
 
     @cached_property
     def node_output_mocks_map(self) -> Dict[Type[BaseOutputs], List[MockNodeExecution]]:
@@ -134,19 +142,40 @@ class WorkflowContext:
     def _get_all_node_output_mocks(self) -> List[MockNodeExecution]:
         return [mock for mocks in self._node_output_mocks_map.values() for mock in mocks]
 
-    def resolve_workflow_deployment(self, deployment_name: str, release_tag: str) -> Optional["BaseWorkflow"]:
+    def resolve_workflow_deployment(
+        self, deployment_name: str, release_tag: str, state: "BaseState"
+    ) -> Optional["BaseWorkflow"]:
         """
         Resolve a workflow deployment by name and release tag.
 
         Args:
             deployment_name: The name of the workflow deployment
             release_tag: The release tag to resolve
+            state: The base state to pass to the workflow
 
         Returns:
             BaseWorkflow instance if found, None otherwise
         """
-        return None
+        if not self.generated_files or not self.namespace:
+            return None
+
+        expected_prefix = generate_workflow_deployment_prefix(deployment_name, release_tag)
+
+        workflow_file_key = f"{expected_prefix}/workflow.py"
+        if workflow_file_key not in self.generated_files:
+            return None
+
+        try:
+            from vellum.workflows.workflows.base import BaseWorkflow
+
+            WorkflowClass = BaseWorkflow.load_from_module(f"{self.namespace}.{expected_prefix}")
+            workflow_instance = WorkflowClass(context=WorkflowContext.create_from(self), parent_state=state)
+            return workflow_instance
+        except Exception:
+            return None
 
     @classmethod
     def create_from(cls, context):
-        return cls(vellum_client=context.vellum_client, generated_files=context.generated_files)
+        return cls(
+            vellum_client=context.vellum_client, generated_files=context.generated_files, namespace=context.namespace
+        )
