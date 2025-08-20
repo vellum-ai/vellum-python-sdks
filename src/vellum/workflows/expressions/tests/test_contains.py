@@ -23,7 +23,7 @@ def test_dict_contains_dict_raises_error():
 
     expression = ContainsExpression(lhs=lhs_dict, rhs=rhs_dict)
 
-    with pytest.raises(InvalidExpressionException, match="Cannot check if dict contains dict"):
+    with pytest.raises(InvalidExpressionException, match="Cannot use dict as right-hand side"):
         expression.resolve(state)
 
 
@@ -37,7 +37,7 @@ def test_dict_contains_different_dict_raises_error():
 
     expression = ContainsExpression(lhs=lhs_dict, rhs=rhs_dict)
 
-    with pytest.raises(InvalidExpressionException, match="Cannot check if dict contains dict"):
+    with pytest.raises(InvalidExpressionException, match="Cannot use dict as right-hand side"):
         expression.resolve(state)
 
 
@@ -51,7 +51,7 @@ def test_string_contains_dict_raises_error():
 
     expression = ContainsExpression(lhs=lhs_string, rhs=rhs_dict)
 
-    with pytest.raises(InvalidExpressionException, match="Cannot check if string contains dict"):
+    with pytest.raises(InvalidExpressionException, match="Cannot use dict as right-hand side"):
         expression.resolve(state)
 
 
@@ -65,7 +65,7 @@ def test_nested_dict_contains_dict_raises_error():
 
     expression = ContainsExpression(lhs=lhs_dict, rhs=rhs_dict)
 
-    with pytest.raises(InvalidExpressionException, match="Cannot check if dict contains dict"):
+    with pytest.raises(InvalidExpressionException, match="Cannot use dict as right-hand side"):
         expression.resolve(state)
 
 

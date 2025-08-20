@@ -37,13 +37,9 @@ class ContainsExpression(BaseDescriptor[bool], Generic[LHS, RHS]):
         rhs = resolve_value(self._rhs, state)
 
         if isinstance(rhs, dict):
-            if isinstance(lhs, dict):
-                raise InvalidExpressionException(
-                    "Cannot check if dict contains dict. Use dict keys/values or convert to strings for comparison."
-                )
-            elif isinstance(lhs, str):
-                raise InvalidExpressionException(
-                    "Cannot check if string contains dict. Convert dict to string first or check for specific keys."
-                )
+            raise InvalidExpressionException(
+                "Cannot use dict as right-hand side of contains operation. "
+                "Use dict keys/values or convert to strings for comparison."
+            )
 
         return rhs in lhs
