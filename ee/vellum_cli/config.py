@@ -36,6 +36,7 @@ class WorkflowDeploymentConfig(UniversalBaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     release_tags: Optional[List[str]] = None
+    release_description: Optional[str] = None
 
     def merge(self, other: "WorkflowDeploymentConfig") -> "WorkflowDeploymentConfig":
         return WorkflowDeploymentConfig(
@@ -44,6 +45,7 @@ class WorkflowDeploymentConfig(UniversalBaseModel):
             name=self.name or other.name,
             description=self.description or other.description,
             release_tags=self.release_tags or other.release_tags,
+            release_description=self.release_description or other.release_description,
         )
 
 
