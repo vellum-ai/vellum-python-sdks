@@ -14,6 +14,7 @@ from vellum import (
     PromptRequestInput,
     PromptRequestJsonInput,
     PromptRequestStringInput,
+    StringVellumValue,
     VellumVariable,
 )
 from vellum.client import ApiError, RequestOptions
@@ -197,6 +198,18 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
             elif event.state == "STREAMING":
                 yield BaseOutput(name="results", delta=event.output.value)
             elif event.state == "FULFILLED":
+                if (
+                    event.meta
+                    and event.meta.finish_reason == "LENGTH"
+                    and len(event.outputs) == 1
+                    and isinstance(event.outputs[0], StringVellumValue)
+                    and event.outputs[0].value == ""
+                ):
+                    raise NodeException(
+                        message="Invalid output: empty string with LENGTH finish_reason",
+                        code=WorkflowErrorCode.INVALID_OUTPUTS,
+                    )
+
                 outputs = event.outputs
                 yield BaseOutput(name="results", value=event.outputs)
             elif event.state == "REJECTED":

@@ -689,7 +689,7 @@ def test_inline_prompt_node__invalid_function_type():
 
 def test_inline_prompt_node__empty_string_output_with_length_finish_reason(vellum_adhoc_prompt_client):
     """
-    Tests that InlinePromptNode handles empty string output with LENGTH finish_reason correctly.
+    Tests that InlinePromptNode raises NodeException for empty string output with LENGTH finish_reason.
     """
 
     # GIVEN an InlinePromptNode with basic configuration
@@ -718,17 +718,14 @@ def test_inline_prompt_node__empty_string_output_with_length_finish_reason(vellu
 
     # WHEN the node is run
     node = TestNode()
-    outputs = list(node.run())
 
-    # THEN the node should produce the expected outputs
-    results_output = outputs[0]
-    assert results_output.name == "results"
-    assert results_output.value == expected_outputs
+    # THEN it should raise a NodeException with INVALID_OUTPUTS error code
+    with pytest.raises(NodeException) as excinfo:
+        list(node.run())
 
-    # AND the text output should be an empty string
-    text_output = outputs[1]
-    assert text_output.name == "text"
-    assert text_output.value == ""
+    # AND the exception should have the correct error code and message
+    assert excinfo.value.code == WorkflowErrorCode.INVALID_OUTPUTS
+    assert "Invalid output: empty string with LENGTH finish_reason" in str(excinfo.value)
 
     # AND the prompt should have been executed correctly
     mock_api = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream
