@@ -2,7 +2,9 @@ import asyncio
 import json
 from unittest import mock
 
-from vellum.workflows.integrations.mcp_service import MCPHttpClient
+from vellum.workflows.constants import AuthorizationType
+from vellum.workflows.integrations.mcp_service import MCPHttpClient, MCPService
+from vellum.workflows.types.definition import MCPServer
 
 
 def test_mcp_http_client_sse_response():
@@ -79,3 +81,40 @@ def test_mcp_http_client_json_response():
 
         # THEN the JSON response should be returned as expected
         assert result == sample_json_response
+
+
+def test_mcp_service_bearer_token_auth():
+    """Test that bearer token auth headers are set correctly"""
+    # GIVEN an MCP server with bearer token auth
+    server = MCPServer(
+        name="test-server",
+        url="https://test.server.com",
+        authorization_type=AuthorizationType.BEARER_TOKEN,
+        bearer_token_value="test-token-123",
+    )
+
+    # WHEN we get auth headers
+    service = MCPService()
+    headers = service._get_auth_headers(server)
+
+    # THEN the Authorization header should be set correctly
+    assert headers == {"Authorization": "Bearer test-token-123"}
+
+
+def test_mcp_service_api_key_auth():
+    """Test that API key auth headers are set correctly"""
+    # GIVEN an MCP server with API key auth
+    server = MCPServer(
+        name="test-server",
+        url="https://test.server.com",
+        authorization_type=AuthorizationType.API_KEY,
+        api_key_header_key="X-API-Key",
+        api_key_header_value="api-key-123",
+    )
+
+    # WHEN we get auth headers
+    service = MCPService()
+    headers = service._get_auth_headers(server)
+
+    # THEN the custom API key header should be set correctly
+    assert headers == {"X-API-Key": "api-key-123"}
