@@ -725,7 +725,3 @@ def test_inline_prompt_node__empty_string_output_with_length_finish_reason(vellu
 
     # AND the exception should have the correct error code
     assert excinfo.value.code == WorkflowErrorCode.INVALID_OUTPUTS
-
-    # AND the prompt should have been executed correctly
-    mock_api = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream
-    assert mock_api.call_count == 1

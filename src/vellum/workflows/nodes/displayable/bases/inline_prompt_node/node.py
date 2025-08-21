@@ -28,6 +28,7 @@ from vellum.workflows.errors.types import vellum_error_to_workflow_error
 from vellum.workflows.events.types import default_serializer
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.bases.base_prompt_node import BasePromptNode
+from vellum.workflows.nodes.displayable.bases.utils import process_prompt_outputs_to_text
 from vellum.workflows.outputs import BaseOutput
 from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.definition import DeploymentDefinition
@@ -198,23 +199,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                 yield BaseOutput(name="results", delta=event.output.value)
             elif event.state == "FULFILLED":
                 if event.meta and event.meta.finish_reason == "LENGTH":
-                    string_outputs = []
-                    for output in event.outputs:
-                        if output.value is None:
-                            continue
-
-                        if output.type == "STRING":
-                            string_outputs.append(output.value)
-                        elif output.type == "JSON":
-                            string_outputs.append(json.dumps(output.value, indent=4))
-                        elif output.type == "FUNCTION_CALL":
-                            string_outputs.append(output.value.model_dump_json(indent=4))
-                        elif output.type == "THINKING":
-                            continue
-                        else:
-                            string_outputs.append(output.value.message)
-
-                    text_value = "\n".join(string_outputs)
+                    text_value = process_prompt_outputs_to_text(event.outputs)
                     if text_value == "":
                         raise NodeException(
                             message=(

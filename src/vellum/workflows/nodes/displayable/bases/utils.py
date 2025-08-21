@@ -2,6 +2,7 @@ import enum
 import json
 from typing import Any, List, Union, cast
 
+from vellum import PromptOutput
 from vellum.client.types.array_vellum_value import ArrayVellumValue
 from vellum.client.types.array_vellum_value_request import ArrayVellumValueRequest
 from vellum.client.types.audio_vellum_value import AudioVellumValue
@@ -123,3 +124,32 @@ def primitive_to_vellum_value_request(value: Any) -> VellumValueRequest:
         raise ValueError(f"Unsupported variable type: {vellum_value.__class__.__name__}")
 
     return vellum_value_request_class.model_validate(vellum_value.model_dump())
+
+
+def process_prompt_outputs_to_text(outputs: List[PromptOutput]) -> str:
+    """
+    Process prompt outputs using the same logic as prompt nodes to determine text output.
+
+    Args:
+        outputs: List of prompt outputs to process
+
+    Returns:
+        The text representation of the outputs joined with newlines
+    """
+    string_outputs = []
+    for output in outputs:
+        if output.value is None:
+            continue
+
+        if output.type == "STRING":
+            string_outputs.append(output.value)
+        elif output.type == "JSON":
+            string_outputs.append(json.dumps(output.value, indent=4))
+        elif output.type == "FUNCTION_CALL":
+            string_outputs.append(output.value.model_dump_json(indent=4))
+        elif output.type == "THINKING":
+            continue
+        else:
+            string_outputs.append(output.value.message)
+
+    return "\n".join(string_outputs)
