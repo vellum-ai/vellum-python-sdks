@@ -16,13 +16,13 @@ class VellumResolver(BaseWorkflowResolver):
     def get_state_snapshot_history(self) -> Iterator[BaseState]:
         return iter([])
 
-    def load_state(self, previous_execution_id: Optional[UUID] = None) -> BaseState:
+    def load_state(self, previous_execution_id: Optional[UUID] = None) -> Optional[BaseState]:
         if previous_execution_id is None:
-            return BaseState()
+            return None
 
         if not self._context:
             logger.warning("Cannot load state: No workflow context registered")
-            return BaseState()
+            return None
 
         client = self._context.vellum_client
         response = client.workflow_executions.retrieve_workflow_execution_detail(
@@ -32,4 +32,4 @@ class VellumResolver(BaseWorkflowResolver):
         if response.state:
             return BaseState(**response.state)
         else:
-            return BaseState()
+            return None
