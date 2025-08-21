@@ -4,7 +4,7 @@ from typing import Iterator, Optional
 
 from vellum.workflows.events.workflow import WorkflowEvent
 from vellum.workflows.resolvers.base import BaseWorkflowResolver
-from vellum.workflows.state.base import BaseState
+from vellum.workflows.state.base import BaseState, StateMeta
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +29,8 @@ class VellumResolver(BaseWorkflowResolver):
             execution_id=str(previous_execution_id),
         )
 
-        if response.state:
-            return BaseState(**response.state)
-        else:
+        if response.state is None:
             return None
+
+        meta = StateMeta.model_validate(response.state.pop("meta"))
+        return BaseState(**response.state, meta=meta)
