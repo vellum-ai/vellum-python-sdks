@@ -20,6 +20,7 @@ from vellum import (
 )
 from vellum.client.types.execute_prompt_event import ExecutePromptEvent
 from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
+from vellum.client.types.fulfilled_prompt_execution_meta import FulfilledPromptExecutionMeta
 from vellum.client.types.initiated_execute_prompt_event import InitiatedExecutePromptEvent
 from vellum.client.types.prompt_output import PromptOutput
 from vellum.client.types.prompt_request_string_input import PromptRequestStringInput
@@ -684,3 +685,51 @@ def test_inline_prompt_node__invalid_function_type():
     # AND the error should have the correct code and message
     assert excinfo.value.code == WorkflowErrorCode.INVALID_INPUTS
     assert "`not_a_function` is not a valid function definition" == str(excinfo.value)
+
+
+def test_inline_prompt_node__empty_string_output_with_length_finish_reason(vellum_adhoc_prompt_client):
+    """
+    Tests that InlinePromptNode handles empty string output with LENGTH finish_reason correctly.
+    """
+
+    # GIVEN an InlinePromptNode with basic configuration
+    class TestNode(InlinePromptNode):
+        ml_model = "test-model"
+        blocks = []
+        prompt_inputs = {}
+
+    expected_outputs: List[PromptOutput] = [
+        StringVellumValue(value=""),
+    ]
+
+    def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[ExecutePromptEvent]:
+        execution_id = str(uuid4())
+        events: List[ExecutePromptEvent] = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            FulfilledExecutePromptEvent(
+                execution_id=execution_id,
+                outputs=expected_outputs,
+                meta=FulfilledPromptExecutionMeta(finish_reason="LENGTH"),
+            ),
+        ]
+        yield from events
+
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
+
+    # WHEN the node is run
+    node = TestNode()
+    outputs = list(node.run())
+
+    # THEN the node should produce the expected outputs
+    results_output = outputs[0]
+    assert results_output.name == "results"
+    assert results_output.value == expected_outputs
+
+    # AND the text output should be an empty string
+    text_output = outputs[1]
+    assert text_output.name == "text"
+    assert text_output.value == ""
+
+    # AND the prompt should have been executed correctly
+    mock_api = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream
+    assert mock_api.call_count == 1
