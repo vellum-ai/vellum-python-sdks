@@ -4,13 +4,10 @@ import sys
 import traceback
 from typing import Any, Optional, Tuple, Union
 
-from pydantic import BaseModel
-
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
-from vellum.workflows.nodes.utils import cast_to_output_type
+from vellum.workflows.nodes.utils import cast_to_output_type, wrap_inputs_for_backward_compatibility
 from vellum.workflows.state.context import WorkflowContext
-from vellum.workflows.types.code_execution_node_wrappers import ListWrapper, clean_for_dict_wrapper
 from vellum.workflows.types.core import EntityInputsInterface
 
 
@@ -51,23 +48,9 @@ def run_code_inline(
         print_line = f"{' '.join(str_args)}\n"
         log_buffer.write(print_line)
 
-    def wrap_value(value):
-        if isinstance(value, list):
-            return ListWrapper(
-                [
-                    # Convert VellumValue to dict with its fields
-                    (
-                        item.model_dump()
-                        if isinstance(item, BaseModel)
-                        else clean_for_dict_wrapper(item) if isinstance(item, (dict, list, str)) else item
-                    )
-                    for item in value
-                ]
-            )
-        return clean_for_dict_wrapper(value)
-
+    wrapped_inputs = wrap_inputs_for_backward_compatibility(inputs)
     exec_globals = {
-        "__arg__inputs": {name: wrap_value(value) for name, value in inputs.items()},
+        "__arg__inputs": wrapped_inputs,
         "__arg__out": None,
         "print": _inline_print,
     }

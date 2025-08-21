@@ -15,7 +15,12 @@ from vellum.workflows.nodes import BaseNode
 from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
 from vellum.workflows.ports.port import Port
 from vellum.workflows.state.base import BaseState
-from vellum.workflows.types.code_execution_node_wrappers import DictWrapper, ListWrapper, StringValueWrapper
+from vellum.workflows.types.code_execution_node_wrappers import (
+    DictWrapper,
+    ListWrapper,
+    StringValueWrapper,
+    clean_for_dict_wrapper,
+)
 from vellum.workflows.types.core import Json
 from vellum.workflows.types.generics import NodeType
 
@@ -261,3 +266,23 @@ def cast_to_output_type(result: Any, output_type: Any) -> Any:
             code=WorkflowErrorCode.INVALID_OUTPUTS,
             message=f"Expected an output of type '{output_type_name}', but received '{result_type_name}'",
         )
+
+
+def wrap_inputs_for_backward_compatibility(inputs: Dict[str, Any]) -> Dict[str, Any]:
+    """Wrap inputs with backward-compatible wrapper classes for legacy .value and .type support."""
+
+    def _wrap_single_value(value: Any) -> Any:
+        if isinstance(value, list):
+            return ListWrapper(
+                [
+                    (
+                        item.model_dump()
+                        if isinstance(item, BaseModel)
+                        else clean_for_dict_wrapper(item) if isinstance(item, (dict, list, str)) else item
+                    )
+                    for item in value
+                ]
+            )
+        return clean_for_dict_wrapper(value)
+
+    return {name: _wrap_single_value(value) for name, value in inputs.items()}
