@@ -43,7 +43,7 @@ def test_load_state_with_context_success():
     result = resolver.load_state(previous_execution_id=execution_id)
 
     assert isinstance(result, BaseState)
-    assert result.test_key == "test_value"
+    assert result["test_key"] == "test_value"
 
     mock_client.workflow_executions.retrieve_workflow_execution_detail.assert_called_once_with(
         execution_id=str(execution_id)
