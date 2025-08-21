@@ -7,8 +7,7 @@ from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.bases.base import BaseNodeMeta
-from vellum.workflows.nodes.utils import parse_type_from_str
-from vellum.workflows.types.code_execution_node_wrappers import wrap_inputs_for_backward_compatibility
+from vellum.workflows.nodes.utils import parse_type_from_str, wrap_inputs_for_backward_compatibility
 from vellum.workflows.types.core import EntityInputsInterface
 from vellum.workflows.types.generics import StateType
 from vellum.workflows.types.utils import get_original_base

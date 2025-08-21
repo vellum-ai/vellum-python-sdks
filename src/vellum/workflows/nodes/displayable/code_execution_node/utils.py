@@ -6,9 +6,8 @@ from typing import Any, Optional, Tuple, Union
 
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
-from vellum.workflows.nodes.utils import cast_to_output_type
+from vellum.workflows.nodes.utils import cast_to_output_type, wrap_inputs_for_backward_compatibility
 from vellum.workflows.state.context import WorkflowContext
-from vellum.workflows.types.code_execution_node_wrappers import wrap_inputs_for_backward_compatibility
 from vellum.workflows.types.core import EntityInputsInterface
 
 
