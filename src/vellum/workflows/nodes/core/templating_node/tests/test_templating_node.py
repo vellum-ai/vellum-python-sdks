@@ -319,102 +319,69 @@ def test_api_error_templating_node():
     assert outputs.result == ""
 
 
-def test_templating_node__string_value_access():
-    # GIVEN a templating node that accesses string value
-    class TemplateNode(TemplatingNode[BaseState, str]):
-        template = "{{ text_input.value }}"
-        inputs = {"text_input": "hello world"}
+@pytest.mark.parametrize(
+    "template,inputs,expected_result,output_type",
+    [
+        # String value access
+        ("{{ text_input.value }}", {"text_input": "hello world"}, "hello world", str),
+        # Function call value access
+        (
+            "{{ func.value.name }}",
+            {"func": FunctionCall(name="test_function", arguments={"key": "value"})},
+            "test_function",
+            str,
+        ),
+        # Array item value access
+        ("{{ items[0].value }}", {"items": ["apple"]}, "apple", str),
+        # Dict value access
+        ("{{ data.value }}", {"data": {"name": "test", "score": 42}}, {"name": "test", "score": 42}, Json),
+        # List value access
+        ("{{ items.value }}", {"items": ["item1", "item2", "item3"]}, ["item1", "item2", "item3"], Json),
+    ],
+    ids=["string_value", "function_call_value", "array_item_value", "dict_value", "list_value"],
+)
+def test_templating_node__value_access_patterns(template, inputs, expected_result, output_type):
+    # GIVEN a templating node that accesses wrapper value properties
+    class TemplateNode(TemplatingNode[BaseState, output_type]):
+        pass
+
+    # Set template and inputs dynamically
+    TemplateNode.template = template
+    TemplateNode.inputs = inputs
 
     # WHEN the node is run
     node = TemplateNode()
     outputs = node.run()
 
     # THEN the value is accessible
-    assert outputs.result == "hello world"
+    assert outputs.result == expected_result
 
 
-def test_templating_node__string_type_access():
-    # GIVEN a templating node that accesses string type
+@pytest.mark.parametrize(
+    "template,inputs,expected_result",
+    [
+        # String type access
+        ("{{ text_input.type }}", {"text_input": "hello world"}, "STRING"),
+        # Function call type access
+        ("{{ func.type }}", {"func": FunctionCall(name="test_function", arguments={"key": "value"})}, "FUNCTION_CALL"),
+    ],
+    ids=["string_type", "function_call_type"],
+)
+def test_templating_node__type_access_patterns(template, inputs, expected_result):
+    # GIVEN a templating node that accesses wrapper type properties
     class TemplateNode(TemplatingNode[BaseState, str]):
-        template = "{{ text_input.type }}"
-        inputs = {"text_input": "hello world"}
+        pass
+
+    # Set template and inputs dynamically
+    TemplateNode.template = template
+    TemplateNode.inputs = inputs
 
     # WHEN the node is run
     node = TemplateNode()
     outputs = node.run()
 
     # THEN the type is accessible
-    assert outputs.result == "STRING"
-
-
-def test_templating_node__function_call_value_access():
-    # GIVEN a templating node that accesses function call value
-    class TemplateNode(TemplatingNode[BaseState, str]):
-        template = "{{ func.value.name }}"
-        inputs = {"func": FunctionCall(name="test_function", arguments={"key": "value"})}
-
-    # WHEN the node is run
-    node = TemplateNode()
-    outputs = node.run()
-
-    # THEN the function name is accessible
-    assert outputs.result == "test_function"
-
-
-def test_templating_node__function_call_type_access():
-    # GIVEN a templating node that accesses function call type
-    class TemplateNode(TemplatingNode[BaseState, str]):
-        template = "{{ func.type }}"
-        inputs = {"func": FunctionCall(name="test_function", arguments={"key": "value"})}
-
-    # WHEN the node is run
-    node = TemplateNode()
-    outputs = node.run()
-
-    # THEN the function type is accessible
-    assert outputs.result == "FUNCTION_CALL"
-
-
-def test_templating_node__array_item_value_access():
-    # GIVEN a templating node that accesses array item value
-    class TemplateNode(TemplatingNode[BaseState, str]):
-        template = "{{ items[0].value }}"
-        inputs = {"items": ["apple"]}
-
-    # WHEN the node is run
-    node = TemplateNode()
-    outputs = node.run()
-
-    # THEN the array item value is accessible
-    assert outputs.result == "apple"
-
-
-def test_templating_node__dict_value_access():
-    # GIVEN a templating node that accesses dict value
-    class TemplateNode(TemplatingNode[BaseState, Json]):
-        template = "{{ data.value }}"
-        inputs = {"data": {"name": "test", "score": 42}}
-
-    # WHEN the node is run
-    node = TemplateNode()
-    outputs = node.run()
-
-    # THEN the dict returns itself as value
-    assert outputs.result == {"name": "test", "score": 42}
-
-
-def test_templating_node__list_value_access():
-    # GIVEN a templating node that accesses list value
-    class TemplateNode(TemplatingNode[BaseState, Json]):
-        template = "{{ items.value }}"
-        inputs = {"items": ["item1", "item2", "item3"]}
-
-    # WHEN the node is run
-    node = TemplateNode()
-    outputs = node.run()
-
-    # THEN the list returns itself as value
-    assert outputs.result == ["item1", "item2", "item3"]
+    assert outputs.result == expected_result
 
 
 def test_templating_node__nested_dict_access():
