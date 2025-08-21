@@ -320,29 +320,51 @@ def test_api_error_templating_node():
 
 
 @pytest.mark.parametrize(
-    "template,inputs,expected_result,output_type",
+    "template,inputs,expected_result",
     [
         # String value access
-        ("{{ text_input.value }}", {"text_input": "hello world"}, "hello world", str),
+        ("{{ text_input.value }}", {"text_input": "hello world"}, "hello world"),
         # Function call value access
         (
             "{{ func.value.name }}",
             {"func": FunctionCall(name="test_function", arguments={"key": "value"})},
             "test_function",
-            str,
         ),
         # Array item value access
-        ("{{ items[0].value }}", {"items": ["apple"]}, "apple", str),
-        # Dict value access
-        ("{{ data.value }}", {"data": {"name": "test", "score": 42}}, {"name": "test", "score": 42}, Json),
-        # List value access
-        ("{{ items.value }}", {"items": ["item1", "item2", "item3"]}, ["item1", "item2", "item3"], Json),
+        ("{{ items[0].value }}", {"items": ["apple"]}, "apple"),
     ],
-    ids=["string_value", "function_call_value", "array_item_value", "dict_value", "list_value"],
+    ids=["string_value", "function_call_value", "array_item_value"],
 )
-def test_templating_node__value_access_patterns(template, inputs, expected_result, output_type):
+def test_templating_node__value_access_patterns_str(template, inputs, expected_result):
     # GIVEN a templating node that accesses wrapper value properties
-    class TemplateNode(TemplatingNode[BaseState, output_type]):
+    class TemplateNode(TemplatingNode[BaseState, str]):
+        pass
+
+    # Set template and inputs dynamically
+    TemplateNode.template = template
+    TemplateNode.inputs = inputs
+
+    # WHEN the node is run
+    node = TemplateNode()
+    outputs = node.run()
+
+    # THEN the value is accessible
+    assert outputs.result == expected_result
+
+
+@pytest.mark.parametrize(
+    "template,inputs,expected_result",
+    [
+        # Dict value access
+        ("{{ data.value }}", {"data": {"name": "test", "score": 42}}, {"name": "test", "score": 42}),
+        # List value access
+        ("{{ items.value }}", {"items": ["item1", "item2", "item3"]}, ["item1", "item2", "item3"]),
+    ],
+    ids=["dict_value", "list_value"],
+)
+def test_templating_node__value_access_patterns_json(template, inputs, expected_result):
+    # GIVEN a templating node that accesses wrapper value properties
+    class TemplateNode(TemplatingNode[BaseState, Json]):
         pass
 
     # Set template and inputs dynamically
