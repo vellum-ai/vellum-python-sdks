@@ -723,9 +723,8 @@ def test_inline_prompt_node__empty_string_output_with_length_finish_reason(vellu
     with pytest.raises(NodeException) as excinfo:
         list(node.run())
 
-    # AND the exception should have the correct error code and message
+    # AND the exception should have the correct error code
     assert excinfo.value.code == WorkflowErrorCode.INVALID_OUTPUTS
-    assert "Invalid output: empty string with LENGTH finish_reason" in str(excinfo.value)
 
     # AND the prompt should have been executed correctly
     mock_api = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream

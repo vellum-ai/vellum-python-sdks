@@ -14,7 +14,6 @@ from vellum import (
     PromptRequestInput,
     PromptRequestJsonInput,
     PromptRequestStringInput,
-    StringVellumValue,
     VellumVariable,
 )
 from vellum.client import ApiError, RequestOptions
@@ -198,17 +197,32 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
             elif event.state == "STREAMING":
                 yield BaseOutput(name="results", delta=event.output.value)
             elif event.state == "FULFILLED":
-                if (
-                    event.meta
-                    and event.meta.finish_reason == "LENGTH"
-                    and len(event.outputs) == 1
-                    and isinstance(event.outputs[0], StringVellumValue)
-                    and event.outputs[0].value == ""
-                ):
-                    raise NodeException(
-                        message="Invalid output: empty string with LENGTH finish_reason",
-                        code=WorkflowErrorCode.INVALID_OUTPUTS,
-                    )
+                if event.meta and event.meta.finish_reason == "LENGTH":
+                    string_outputs = []
+                    for output in event.outputs:
+                        if output.value is None:
+                            continue
+
+                        if output.type == "STRING":
+                            string_outputs.append(output.value)
+                        elif output.type == "JSON":
+                            string_outputs.append(json.dumps(output.value, indent=4))
+                        elif output.type == "FUNCTION_CALL":
+                            string_outputs.append(output.value.model_dump_json(indent=4))
+                        elif output.type == "THINKING":
+                            continue
+                        else:
+                            string_outputs.append(output.value.message)
+
+                    text_value = "\n".join(string_outputs)
+                    if text_value == "":
+                        raise NodeException(
+                            message=(
+                                "Maximum tokens reached before model could output any content. "
+                                "Consider increasing the max_tokens Prompt Parameter."
+                            ),
+                            code=WorkflowErrorCode.INVALID_OUTPUTS,
+                        )
 
                 outputs = event.outputs
                 yield BaseOutput(name="results", value=event.outputs)
