@@ -4,7 +4,7 @@ from enum import Enum
 from unittest.mock import Mock
 from typing import Annotated, Dict, List, Literal, Optional, Tuple, Union
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from vellum.client.types.function_definition import FunctionDefinition
 from vellum.client.types.string_vellum_value import StringVellumValue
@@ -206,7 +206,7 @@ def test_compile_function_definition__dataclasses():
 def test_compile_function_definition__pydantic():
     # GIVEN a function with a pydantic model
     class MyPydanticModel(BaseModel):
-        a: int
+        a: int = Field(description="The first number")
         b: str
 
     def my_function(c: MyPydanticModel):
@@ -225,7 +225,10 @@ def test_compile_function_definition__pydantic():
             "$defs": {
                 "MyPydanticModel": {
                     "type": "object",
-                    "properties": {"a": {"type": "integer"}, "b": {"type": "string"}},
+                    "properties": {
+                        "a": {"type": "integer", "description": "The first number"},
+                        "b": {"type": "string"},
+                    },
                     "required": ["a", "b"],
                 }
             },
