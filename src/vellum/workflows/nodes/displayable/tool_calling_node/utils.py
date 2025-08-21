@@ -54,12 +54,23 @@ class FunctionCallNodeMixin:
                 return function_call.value.arguments or {}
         return {}
 
+    def _extract_function_call_id(self) -> Optional[str]:
+        """Extract function call ID from function call output."""
+        current_index = getattr(self, "state").current_prompt_output_index
+        if self.function_call_output and len(self.function_call_output) > current_index:
+            function_call = self.function_call_output[current_index]
+            if function_call.type == "FUNCTION_CALL" and function_call.value is not None:
+                return function_call.value.id
+        return None
+
     def _add_function_result_to_chat_history(self, result: Any, state: ToolCallingState) -> None:
         """Add function execution result to chat history."""
+        function_call_id = self._extract_function_call_id()
         state.chat_history.append(
             ChatMessage(
                 role="FUNCTION",
                 content=StringChatMessageContent(value=json.dumps(result, cls=DefaultStateEncoder)),
+                source=function_call_id,
             )
         )
         with state.__quiet__():

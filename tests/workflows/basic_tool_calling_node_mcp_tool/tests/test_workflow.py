@@ -139,7 +139,7 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, mock_uuid4_generat
                     type="STRING",
                     value='{"content": [{"type": "text", "text": "{\\"id\\":1028555060,\\"name\\":\\"new_test_repo\\"}"}]}',  # noqa: E501
                 ),
-                source=None,
+                source="call_7115tNTmEACTsQRGwKpJipJK",
             ),
             ChatMessage(
                 text="The repository new_test_repo has been successfully created.",
@@ -308,7 +308,7 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, mock_uuid4_generat
                                 type="STRING",
                                 value='{"content": [{"type": "text", "text": "{\\"id\\":1028555060,\\"name\\":\\"new_test_repo\\"}"}]}',  # noqa: E501
                             ),
-                            source=None,
+                            source="call_7115tNTmEACTsQRGwKpJipJK",
                         ),
                     ],
                 ),

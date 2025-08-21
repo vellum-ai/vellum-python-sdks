@@ -111,7 +111,7 @@ def test_tool_calling_node_inline_subworkflow(vellum_adhoc_prompt_client, mock_u
                 type="STRING",
                 value='{"temperature": 70, "reasoning": "The weather in San Francisco on 2025-01-01 was hot"}',
             ),
-            source=None,
+            source="call_7115tNTmEACTsQRGwKpJipJK",
         ),
         ChatMessage(
             text="Based on the function call, the current temperature in San Francisco is 70 degrees celsius.",
@@ -240,7 +240,7 @@ def test_tool_calling_node_inline_subworkflow(vellum_adhoc_prompt_client, mock_u
                             type="STRING",
                             value='{"temperature": 70, "reasoning": "The weather in San Francisco on 2025-01-01 was hot"}',  # noqa: E501
                         ),
-                        source=None,
+                        source="call_7115tNTmEACTsQRGwKpJipJK",
                     ),
                 ],
             ),
