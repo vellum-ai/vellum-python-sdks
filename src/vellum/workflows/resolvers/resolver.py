@@ -33,4 +33,10 @@ class VellumResolver(BaseWorkflowResolver):
             return None
 
         meta = StateMeta.model_validate(response.state.pop("meta"))
-        return BaseState(**response.state, meta=meta)
+
+        if self._workflow_class:
+            state_class = self._workflow_class.get_state_class()
+            return state_class(**response.state, meta=meta)
+        else:
+            logger.warning("No workflow class registered, falling back to BaseState")
+            return BaseState(**response.state, meta=meta)

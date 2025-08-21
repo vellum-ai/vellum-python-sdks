@@ -3,6 +3,7 @@ from unittest.mock import Mock
 from uuid import uuid4
 
 from vellum.client.types.workflow_execution_detail import WorkflowExecutionDetail
+from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.resolvers.resolver import VellumResolver
 from vellum.workflows.state.base import BaseState, NodeExecutionCache
@@ -13,6 +14,12 @@ def test_load_state_with_context_success():
     """Test load_state successfully loads state when context and client are available."""
     resolver = VellumResolver()
     execution_id = uuid4()
+
+    class TestState(BaseState):
+        test_key: str = "test_value"
+
+    class TestWorkflow(BaseWorkflow[BaseInputs, TestState]):
+        pass
 
     # GIVEN a state dictionary that matches what the resolver expects
     state_dict = {
@@ -37,13 +44,15 @@ def test_load_state_with_context_success():
     mock_client = Mock()
     mock_client.workflow_executions.retrieve_workflow_execution_detail.return_value = mock_response
 
+    # Create context with the test workflow class
     context = WorkflowContext(vellum_client=mock_client)
-    resolver.register_context(context)
+    TestWorkflow(context=context, resolvers=[resolver])
 
     result = resolver.load_state(previous_execution_id=execution_id)
 
-    assert isinstance(result, BaseState)
-    assert result["test_key"] == "test_value"
+    # Should return an instance of TestWorkflow.State, not BaseState
+    assert isinstance(result, TestState)
+    assert result.test_key == "test_value"
 
     mock_client.workflow_executions.retrieve_workflow_execution_detail.assert_called_once_with(
         execution_id=str(execution_id)
