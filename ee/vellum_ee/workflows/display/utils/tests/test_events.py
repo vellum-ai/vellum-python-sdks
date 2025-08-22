@@ -2,8 +2,10 @@ import pytest
 from uuid import uuid4
 from typing import Optional
 
+from vellum.workflows.events.types import NodeParentContext, WorkflowDeploymentParentContext
 from vellum.workflows.events.workflow import WorkflowExecutionInitiatedBody, WorkflowExecutionInitiatedEvent
 from vellum.workflows.inputs.base import BaseInputs
+from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.utils.events import event_enricher
 
@@ -67,3 +69,43 @@ def test_event_enricher_static_workflow(is_dynamic: bool, expected_config: Optio
 
     # AND workflow_version_exec_config is set to the expected config
     assert event.body.workflow_version_exec_config == expected_config
+
+
+def test_event_enricher_marks_subworkflow_deployment_as_dynamic():
+    """Test that event_enricher treats subworkflow deployments as dynamic."""
+
+    class TestWorkflow(BaseWorkflow):
+        is_dynamic = False
+
+        class Outputs(BaseOutputs):
+            pass
+
+    event: WorkflowExecutionInitiatedEvent = WorkflowExecutionInitiatedEvent(
+        trace_id=uuid4(),
+        span_id=uuid4(),
+        parent=WorkflowDeploymentParentContext(
+            span_id=uuid4(),
+            deployment_id=uuid4(),
+            deployment_name="test-deployment",
+            deployment_history_item_id=uuid4(),
+            release_tag_id=uuid4(),
+            release_tag_name="test-tag",
+            workflow_version_id=uuid4(),
+            external_id=None,
+            metadata=None,
+            parent=NodeParentContext(
+                span_id=uuid4(),
+                node_definition=TestWorkflow,
+                parent=None,
+            ),
+        ),
+        body=WorkflowExecutionInitiatedBody(
+            workflow_definition=TestWorkflow,
+            inputs=BaseInputs(),
+        ),
+    )
+
+    enriched_event = event_enricher(event)
+
+    assert hasattr(enriched_event.body, "workflow_version_exec_config")
+    assert enriched_event.body.workflow_version_exec_config is not None
