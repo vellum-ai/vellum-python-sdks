@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from uuid import UUID
 from typing import TYPE_CHECKING, Iterator, Optional, Type
 
 from vellum.workflows.events.workflow import WorkflowEvent
