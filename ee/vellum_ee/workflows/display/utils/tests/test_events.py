@@ -2,6 +2,7 @@ import pytest
 from uuid import uuid4
 from typing import Optional
 
+from vellum.workflows.events.types import NodeParentContext, WorkflowDeploymentParentContext, WorkflowParentContext
 from vellum.workflows.events.workflow import WorkflowExecutionInitiatedBody, WorkflowExecutionInitiatedEvent
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.workflows.base import BaseWorkflow
@@ -67,3 +68,106 @@ def test_event_enricher_static_workflow(is_dynamic: bool, expected_config: Optio
 
     # AND workflow_version_exec_config is set to the expected config
     assert event.body.workflow_version_exec_config == expected_config
+
+
+class MockWorkflowDefinition(BaseWorkflow):
+    """Mock workflow definition for testing."""
+
+    pass
+
+
+@pytest.mark.parametrize(
+    "parent_context,expected_is_dynamic",
+    [
+        (None, False),
+        (
+            WorkflowDeploymentParentContext(
+                span_id=uuid4(),
+                deployment_id=uuid4(),
+                deployment_name="test-deployment",
+                deployment_history_item_id=uuid4(),
+                release_tag_id=uuid4(),
+                release_tag_name="test-tag",
+                workflow_version_id=uuid4(),
+                external_id=None,
+                metadata=None,
+                parent=None,
+            ),
+            False,
+        ),
+        (
+            WorkflowDeploymentParentContext(
+                span_id=uuid4(),
+                deployment_id=uuid4(),
+                deployment_name="test-deployment",
+                deployment_history_item_id=uuid4(),
+                release_tag_id=uuid4(),
+                release_tag_name="test-tag",
+                workflow_version_id=uuid4(),
+                external_id=None,
+                metadata=None,
+                parent=NodeParentContext(
+                    span_id=uuid4(),
+                    node_definition=MockWorkflowDefinition,
+                    parent=None,
+                ),
+            ),
+            True,
+        ),
+        (
+            NodeParentContext(
+                span_id=uuid4(),
+                node_definition=MockWorkflowDefinition,
+                parent=None,
+            ),
+            False,
+        ),
+        (
+            WorkflowDeploymentParentContext(
+                span_id=uuid4(),
+                deployment_id=uuid4(),
+                deployment_name="test-deployment",
+                deployment_history_item_id=uuid4(),
+                release_tag_id=uuid4(),
+                release_tag_name="test-tag",
+                workflow_version_id=uuid4(),
+                external_id=None,
+                metadata=None,
+                parent=WorkflowParentContext(
+                    span_id=uuid4(),
+                    workflow_definition=MockWorkflowDefinition,
+                    parent=None,
+                ),
+            ),
+            False,
+        ),
+    ],
+)
+def test_event_enricher_dynamic_marking_based_on_context(parent_context, expected_is_dynamic):
+    """Test that workflows are marked as dynamic based on execution context pattern."""
+
+    # GIVEN a workflow class that is initially not dynamic
+    class TestWorkflow(BaseWorkflow):
+        is_dynamic = False
+
+    event: WorkflowExecutionInitiatedEvent = WorkflowExecutionInitiatedEvent(
+        trace_id=uuid4(),
+        span_id=uuid4(),
+        parent=parent_context,
+        body=WorkflowExecutionInitiatedBody(
+            workflow_definition=TestWorkflow,
+            inputs=BaseInputs(),
+        ),
+    )
+
+    # WHEN the event_enricher is called
+    enriched_event = event_enricher(event)
+
+    assert enriched_event.body.workflow_definition.is_dynamic == expected_is_dynamic
+
+    if expected_is_dynamic:
+        assert hasattr(enriched_event.body, "workflow_version_exec_config")
+        assert enriched_event.body.workflow_version_exec_config is not None
+    else:
+        config_attr = getattr(enriched_event.body, "workflow_version_exec_config", None)
+        assert config_attr is None
