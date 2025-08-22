@@ -29,5 +29,5 @@ class BaseWorkflowResolver(ABC):
         pass
 
     @abstractmethod
-    def load_state(self, previous_execution_id: Optional[UUID] = None) -> LoadStateResult:
+    def load_state(self, previous_execution_id: Optional[str] = None) -> LoadStateResult:
         pass

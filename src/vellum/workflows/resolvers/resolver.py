@@ -20,7 +20,7 @@ class VellumResolver(BaseWorkflowResolver):
         return iter([])
 
     def _find_execution_events(
-        self, execution_id: UUID, spans: list
+        self, execution_id: str, spans: list
     ) -> Tuple[WorkflowExecutionInitiatedEvent, WorkflowExecutionInitiatedEvent]:
         previous_invocation: Optional[WorkflowExecutionInitiatedEvent] = None
         root_invocation: Optional[WorkflowExecutionInitiatedEvent] = None
@@ -32,7 +32,7 @@ class VellumResolver(BaseWorkflowResolver):
                 for event in span.events:
                     if isinstance(event, WorkflowExecutionInitiatedEvent):
                         # Check if this is the previous execution matches the execution_id
-                        if event.span_id == str(execution_id):
+                        if event.span_id == execution_id:
                             previous_invocation = event
 
                         if not event.links:
@@ -43,7 +43,7 @@ class VellumResolver(BaseWorkflowResolver):
 
         return previous_invocation, root_invocation
 
-    def load_state(self, previous_execution_id: Optional[UUID] = None) -> LoadStateResult:
+    def load_state(self, previous_execution_id: Optional[str] = None) -> LoadStateResult:
         if previous_execution_id is None:
             return LoadStateResult(state=None, span_link_info=None)
 
@@ -53,7 +53,7 @@ class VellumResolver(BaseWorkflowResolver):
 
         client = self._context.vellum_client
         response = client.workflow_executions.retrieve_workflow_execution_detail(
-            execution_id=str(previous_execution_id),
+            execution_id=previous_execution_id,
         )
 
         if response.state is None:
