@@ -1,5 +1,4 @@
 import logging
-from uuid import UUID
 from typing import Iterator, Optional, Tuple
 
 from vellum.client.types.workflow_execution_initiated_event import WorkflowExecutionInitiatedEvent
