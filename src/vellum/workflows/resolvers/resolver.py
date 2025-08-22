@@ -59,11 +59,11 @@ class VellumResolver(BaseWorkflowResolver):
             return LoadStateResult(state=None, span_link_info=None)
 
         previous_invocation, root_invocation = self._find_execution_events(previous_execution_id, response.spans)
-        
+
         if previous_invocation is None or root_invocation is None:
             logger.warning("Could not find required execution events for state loading")
             return LoadStateResult(state=None, span_link_info=None)
-            
+
         span_link_info = SpanLinkInfo(
             previous_trace_id=previous_invocation.trace_id,
             previous_span_id=previous_invocation.span_id,
