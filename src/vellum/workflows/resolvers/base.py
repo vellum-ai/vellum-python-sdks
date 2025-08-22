@@ -15,11 +15,9 @@ class BaseWorkflowResolver(ABC):
         self._context: Optional["WorkflowContext"] = None
         self._workflow_class: Optional[Type["BaseWorkflow"]] = None
 
-    def register_context(self, context: "WorkflowContext") -> None:
-        self._context = context
-
-    def register_workflow(self, workflow_class: Type["BaseWorkflow"]) -> None:
-        self._workflow_class = workflow_class
+    def register_workflow_instance(self, workflow_instance: "BaseWorkflow") -> None:
+        self._workflow_class = type(workflow_instance)
+        self._context = workflow_instance.context
 
     @abstractmethod
     def get_latest_execution_events(self) -> Iterator[WorkflowEvent]:
