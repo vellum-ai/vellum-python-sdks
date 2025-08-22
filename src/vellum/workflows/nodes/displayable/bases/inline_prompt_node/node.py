@@ -28,7 +28,7 @@ from vellum.workflows.errors.types import vellum_error_to_workflow_error
 from vellum.workflows.events.types import default_serializer
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.bases.base_prompt_node import BasePromptNode
-from vellum.workflows.nodes.displayable.bases.utils import process_prompt_outputs_to_text
+from vellum.workflows.nodes.displayable.bases.utils import process_additional_prompt_outputs
 from vellum.workflows.outputs import BaseOutput
 from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.definition import DeploymentDefinition
@@ -199,7 +199,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                 yield BaseOutput(name="results", delta=event.output.value)
             elif event.state == "FULFILLED":
                 if event.meta and event.meta.finish_reason == "LENGTH":
-                    text_value = process_prompt_outputs_to_text(event.outputs)
+                    text_value, json_value = process_additional_prompt_outputs(event.outputs)
                     if text_value == "":
                         raise NodeException(
                             message=(
