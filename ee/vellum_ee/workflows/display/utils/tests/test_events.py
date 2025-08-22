@@ -2,12 +2,10 @@ import pytest
 from uuid import uuid4
 from typing import Optional
 
-from vellum.workflows.context import ExecutionContext
 from vellum.workflows.events.types import NodeParentContext, WorkflowDeploymentParentContext
 from vellum.workflows.events.workflow import WorkflowExecutionInitiatedBody, WorkflowExecutionInitiatedEvent
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.outputs.base import BaseOutputs
-from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.utils.events import event_enricher
 
@@ -73,8 +71,8 @@ def test_event_enricher_static_workflow(is_dynamic: bool, expected_config: Optio
     assert event.body.workflow_version_exec_config == expected_config
 
 
-def test_workflow_marked_dynamic_for_subworkflow_deployment():
-    """Test that a workflow executed as a subworkflow deployment is marked as dynamic."""
+def test_event_enricher_marks_subworkflow_deployment_as_dynamic():
+    """Test that event_enricher treats subworkflow deployments as dynamic."""
 
     class TestWorkflow(BaseWorkflow):
         is_dynamic = False
@@ -82,9 +80,10 @@ def test_workflow_marked_dynamic_for_subworkflow_deployment():
         class Outputs(BaseOutputs):
             pass
 
-    execution_context = ExecutionContext(
+    event: WorkflowExecutionInitiatedEvent = WorkflowExecutionInitiatedEvent(
         trace_id=uuid4(),
-        parent_context=WorkflowDeploymentParentContext(
+        span_id=uuid4(),
+        parent=WorkflowDeploymentParentContext(
             span_id=uuid4(),
             deployment_id=uuid4(),
             deployment_name="test-deployment",
@@ -100,10 +99,13 @@ def test_workflow_marked_dynamic_for_subworkflow_deployment():
                 parent=None,
             ),
         ),
+        body=WorkflowExecutionInitiatedBody(
+            workflow_definition=TestWorkflow,
+            inputs=BaseInputs(),
+        ),
     )
 
-    workflow_context = WorkflowContext(execution_context=execution_context)
+    enriched_event = event_enricher(event)
 
-    TestWorkflow(context=workflow_context)
-
-    assert TestWorkflow.is_dynamic is True
+    assert hasattr(enriched_event.body, "workflow_version_exec_config")
+    assert enriched_event.body.workflow_version_exec_config is not None
