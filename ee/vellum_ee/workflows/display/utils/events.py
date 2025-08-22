@@ -7,30 +7,8 @@ from vellum_ee.workflows.display.utils.registry import (
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 
-def _should_mark_workflow_dynamic(event: WorkflowExecutionInitiatedEvent) -> bool:
-    """
-    Check if workflow should be marked as dynamic based on execution context.
-    Returns True if parent.type == WORKFLOW_RELEASE_TAG and parent.parent.type == WORKFLOW_NODE.
-    """
-    if not event.parent:
-        return False
-
-    parent = event.parent
-    if parent.type != "WORKFLOW_RELEASE_TAG":
-        return False
-
-    if not parent.parent or parent.parent.type != "WORKFLOW_NODE":
-        return False
-
-    return True
-
-
 def event_enricher(event: WorkflowExecutionInitiatedEvent) -> WorkflowExecutionInitiatedEvent:
     workflow_definition = event.body.workflow_definition
-
-    should_be_dynamic = _should_mark_workflow_dynamic(event)
-    if should_be_dynamic:
-        workflow_definition.is_dynamic = True
     workflow_display = get_workflow_display(
         workflow_class=workflow_definition,
         parent_display_context=get_parent_display_context_from_event(event),

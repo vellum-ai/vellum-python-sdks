@@ -247,6 +247,9 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         self._store = store or Store()
         self._execution_context = self._context.execution_context
 
+        if self._should_mark_workflow_dynamic():
+            self.__class__.is_dynamic = True
+
         # Register context with all emitters
         for emitter in self.emitters:
             emitter.register_context(self._context)
@@ -256,6 +259,23 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
     @property
     def context(self) -> WorkflowContext:
         return self._context
+
+    def _should_mark_workflow_dynamic(self) -> bool:
+        """
+        Check if workflow should be marked as dynamic based on execution context.
+        Returns True if parent.type == WORKFLOW_RELEASE_TAG and parent.parent.type == WORKFLOW_NODE.
+        """
+        if not self._execution_context.parent_context:
+            return False
+
+        parent = self._execution_context.parent_context
+        if parent.type != "WORKFLOW_RELEASE_TAG":
+            return False
+
+        if not parent.parent or parent.parent.type != "WORKFLOW_NODE":
+            return False
+
+        return True
 
     @staticmethod
     def _resolve_graph(graph: GraphAttribute) -> List[Graph]:
