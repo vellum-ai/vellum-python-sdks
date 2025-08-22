@@ -100,7 +100,7 @@ def test_load_state_with_context_success():
     context = WorkflowContext(vellum_client=mock_client)
     TestWorkflow(context=context, resolvers=[resolver])
 
-    result = resolver.load_state(previous_execution_id=execution_id)
+    result = resolver.load_state(previous_execution_id=str(execution_id))
 
     # THEN should return LoadStateResult with state and span_link_info
     assert isinstance(result, LoadStateResult)

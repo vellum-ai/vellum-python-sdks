@@ -149,8 +149,9 @@ class WorkflowRunner(Generic[StateType]):
             for resolver in self.workflow.resolvers:
                 try:
                     load_state_result = resolver.load_state(self.previous_execution_id)
-                    if load_state_result.state:
-                        self._initial_state = load_state_result.state
+                    if load_state_result.state is not None:
+                        # Type assertion since we know the state is not None at this point
+                        self._initial_state = load_state_result.state  # type: ignore[assignment]
                         self._span_link_info = load_state_result.span_link_info
                         break
                 except Exception as e:

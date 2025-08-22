@@ -15,6 +15,7 @@ from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.resolvers.base import BaseWorkflowResolver
+from vellum.workflows.resolvers.types import LoadStateResult
 from vellum.workflows.state.base import BaseState, StateMeta
 from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.workflows.base import BaseWorkflow
@@ -91,8 +92,8 @@ class MockFileResolver(BaseWorkflowResolver):
                 )
                 yield snapshot
 
-    def load_state(self, previous_execution_id: Optional[str] = None) -> Optional[BaseState]:
-        return None
+    def load_state(self, previous_execution_id: Optional[str] = None) -> LoadStateResult:
+        return LoadStateResult(state=None, span_link_info=None)
 
 
 class StartNode(BaseNode):
