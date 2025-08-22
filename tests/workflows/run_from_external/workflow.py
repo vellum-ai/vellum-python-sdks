@@ -5,7 +5,7 @@ import random
 import tempfile
 import threading
 from uuid import UUID, uuid4
-from typing import Iterator
+from typing import Iterator, Optional
 
 from vellum.workflows.emitters.base import BaseWorkflowEmitter
 from vellum.workflows.errors.types import WorkflowErrorCode
@@ -90,6 +90,9 @@ class MockFileResolver(BaseWorkflowResolver):
                     meta=meta,
                 )
                 yield snapshot
+
+    def load_state(self, previous_execution_id: Optional[UUID] = None) -> Optional[BaseState]:
+        return None
 
 
 class StartNode(BaseNode):

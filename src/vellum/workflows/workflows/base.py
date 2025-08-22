@@ -251,6 +251,9 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         for emitter in self.emitters:
             emitter.register_context(self._context)
 
+        for resolver in self.resolvers:
+            resolver.register_workflow_instance(self)
+
         self.validate()
 
     @property
