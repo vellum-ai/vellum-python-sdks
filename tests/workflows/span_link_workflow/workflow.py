@@ -15,7 +15,6 @@ class CounterNode(BaseNode[State]):
         current_count: int
 
     def run(self) -> Outputs:
-        # Increment the execution count
         self.state.execution_count += 1
         return self.Outputs(current_count=self.state.execution_count)
 
