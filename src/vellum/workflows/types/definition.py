@@ -121,6 +121,7 @@ class ComposioToolDefinition(UniversalBaseModel):
 class MCPServer(UniversalBaseModel):
     type: Literal["MCP_SERVER"] = "MCP_SERVER"
     name: str
+    description: str = ""  # We don't use this field, its for compatibility with UI
     url: str
     authorization_type: Optional[AuthorizationType] = None
     bearer_token_value: Optional[Union[str, EnvironmentVariableReference]] = None

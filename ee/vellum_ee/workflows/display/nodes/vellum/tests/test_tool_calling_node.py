@@ -191,6 +191,7 @@ def test_serialize_node__tool_calling_node__mcp_server_api_key():
                     {
                         "type": "MCP_SERVER",
                         "name": "my-mcp-server",
+                        "description": "",
                         "url": "https://my-mcp-server.com",
                         "authorization_type": "API_KEY",
                         "bearer_token_value": None,
@@ -243,6 +244,7 @@ def test_serialize_node__tool_calling_node__mcp_server_no_authorization():
                     {
                         "type": "MCP_SERVER",
                         "name": "my-mcp-server",
+                        "description": "",
                         "url": "https://my-mcp-server.com",
                         "authorization_type": None,
                         "bearer_token_value": None,
