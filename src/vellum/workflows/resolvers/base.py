@@ -3,6 +3,7 @@ from uuid import UUID
 from typing import TYPE_CHECKING, Iterator, Optional, Type
 
 from vellum.workflows.events.workflow import WorkflowEvent
+from vellum.workflows.resolvers.types import LoadStateResult
 from vellum.workflows.state.base import BaseState
 
 if TYPE_CHECKING:
@@ -28,5 +29,5 @@ class BaseWorkflowResolver(ABC):
         pass
 
     @abstractmethod
-    def load_state(self, previous_execution_id: Optional[UUID] = None) -> Optional[BaseState]:
+    def load_state(self, previous_execution_id: Optional[UUID] = None) -> LoadStateResult:
         pass

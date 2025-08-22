@@ -24,6 +24,7 @@ from typing import (
     Union,
 )
 
+from vellum.client.types.span_link import SpanLink
 from vellum.workflows.constants import undefined
 from vellum.workflows.context import ExecutionContext, execution_context, get_execution_context
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -69,6 +70,7 @@ from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.ports.port import Port
 from vellum.workflows.references import ExternalInputReference, OutputReference
 from vellum.workflows.references.state_value import StateValueReference
+from vellum.workflows.resolvers.types import SpanLinkInfo
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.delta import StateDelta
 from vellum.workflows.types.generics import InputsType, OutputsType, StateType
@@ -99,6 +101,7 @@ class WorkflowRunner(Generic[StateType]):
         state: Optional[StateType] = None,
         entrypoint_nodes: Optional[RunFromNodeArg] = None,
         external_inputs: Optional[ExternalInputsArg] = None,
+        previous_execution_id: Optional[Union[str, UUID]] = None,
         cancel_signal: Optional[ThreadingEvent] = None,
         node_output_mocks: Optional[MockNodeExecutionArg] = None,
         max_concurrency: Optional[int] = None,
@@ -110,6 +113,7 @@ class WorkflowRunner(Generic[StateType]):
         self.workflow = workflow
         self._is_resuming = False
         self._should_emit_initial_state = True
+        self._span_link_info: Optional[SpanLinkInfo] = None
         if entrypoint_nodes:
             if len(list(entrypoint_nodes)) > 1:
                 raise ValueError("Cannot resume from multiple nodes")
@@ -140,6 +144,19 @@ class WorkflowRunner(Generic[StateType]):
                 if issubclass(ei.inputs_class.__parent_class__, BaseNode)
             ]
             self._is_resuming = True
+        elif previous_execution_id:
+            self.previous_execution_id = str(previous_execution_id)
+            for resolver in self.workflow.resolvers:
+                try:
+                    load_state_result = resolver.load_state(self.previous_execution_id)
+                    if load_state_result.state:
+                        self._initial_state = load_state_result.state
+                        self._span_link_info = load_state_result.span_link_info
+                        break
+                except Exception as e:
+                    logger.warning(f"Failed to load state from resolver {type(resolver).__name__}: {e}")
+                    continue
+            self._entrypoints = self.workflow.get_entrypoints()
         else:
             normalized_inputs = deepcopy(inputs) if inputs else self.workflow.get_default_inputs()
             if state:
@@ -627,6 +644,38 @@ class WorkflowRunner(Generic[StateType]):
         return None
 
     def _initiate_workflow_event(self) -> WorkflowExecutionInitiatedEvent:
+        links: Optional[List[SpanLink]] = None
+
+        if self._span_link_info:
+            from vellum.client.types.vellum_code_resource_definition import (
+                VellumCodeResourceDefinition as ClientVellumCodeResourceDefinition,
+            )
+            from vellum.client.types.workflow_parent_context import WorkflowParentContext as ClientWorkflowParentContext
+
+            workflow_definition = ClientVellumCodeResourceDefinition(
+                name=self.workflow.__class__.__name__,
+                module=self.workflow.__class__.__module__.split("."),
+                id=str(self.workflow.__class__.__id__),
+            )
+            links = [
+                SpanLink(
+                    trace_id=self._span_link_info.previous_trace_id,
+                    type="PREVIOUS_SPAN",
+                    span_context=ClientWorkflowParentContext(
+                        workflow_definition=workflow_definition,
+                        span_id=self._span_link_info.previous_span_id,
+                    ),
+                ),
+                SpanLink(
+                    trace_id=self._span_link_info.root_trace_id,
+                    type="ROOT_SPAN",
+                    span_context=ClientWorkflowParentContext(
+                        workflow_definition=workflow_definition,
+                        span_id=self._span_link_info.root_span_id,
+                    ),
+                ),
+            ]
+
         return WorkflowExecutionInitiatedEvent(
             trace_id=self._execution_context.trace_id,
             span_id=self._initial_state.meta.span_id,
@@ -636,6 +685,7 @@ class WorkflowRunner(Generic[StateType]):
                 initial_state=deepcopy(self._initial_state) if self._should_emit_initial_state else None,
             ),
             parent=self._execution_context.parent_context,
+            links=links,
         )
 
     def _stream_workflow_event(self, output: BaseOutput) -> WorkflowExecutionStreamingEvent:

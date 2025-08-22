@@ -2,10 +2,18 @@ from datetime import datetime
 from unittest.mock import Mock
 from uuid import uuid4
 
+from vellum.client.types.span_link import SpanLink
+from vellum.client.types.vellum_code_resource_definition import VellumCodeResourceDefinition
 from vellum.client.types.workflow_execution_detail import WorkflowExecutionDetail
+from vellum.client.types.workflow_execution_initiated_body import WorkflowExecutionInitiatedBody
+from vellum.client.types.workflow_execution_initiated_event import WorkflowExecutionInitiatedEvent
+from vellum.client.types.workflow_execution_span import WorkflowExecutionSpan
+from vellum.client.types.workflow_execution_span_attributes import WorkflowExecutionSpanAttributes
+from vellum.client.types.workflow_parent_context import WorkflowParentContext
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.resolvers.resolver import VellumResolver
+from vellum.workflows.resolvers.types import LoadStateResult, SpanLinkInfo
 from vellum.workflows.state.base import BaseState, NodeExecutionCache
 from vellum.workflows.state.context import WorkflowContext
 
@@ -14,6 +22,7 @@ def test_load_state_with_context_success():
     """Test load_state successfully loads state when context and client are available."""
     resolver = VellumResolver()
     execution_id = uuid4()
+    root_execution_id = uuid4()
 
     class TestState(BaseState):
         test_key: str = "test_value"
@@ -37,8 +46,51 @@ def test_load_state_with_context_success():
         },
     }
 
+    mock_workflow_definition = VellumCodeResourceDefinition(
+        name="TestWorkflow", module=["test", "module"], id=str(uuid4())
+    )
+
+    mock_body = WorkflowExecutionInitiatedBody(workflow_definition=mock_workflow_definition, inputs={})
+
+    previous_invocation = WorkflowExecutionInitiatedEvent(
+        id=str(uuid4()),
+        timestamp=datetime.now(),
+        trace_id=str(uuid4()),
+        span_id=str(execution_id),
+        body=mock_body,
+        links=[
+            SpanLink(
+                trace_id=str(uuid4()),
+                type="PREVIOUS_SPAN",
+                span_context=WorkflowParentContext(workflow_definition=mock_workflow_definition, span_id=str(uuid4())),
+            ),
+            SpanLink(
+                trace_id=str(uuid4()),
+                type="ROOT_SPAN",
+                span_context=WorkflowParentContext(workflow_definition=mock_workflow_definition, span_id=str(uuid4())),
+            ),
+        ],
+    )
+
+    root_invocation = WorkflowExecutionInitiatedEvent(
+        id=str(uuid4()),
+        timestamp=datetime.now(),
+        trace_id=str(uuid4()),
+        span_id=str(root_execution_id),
+        body=mock_body,
+        links=None,  # Root invocation has no links
+    )
+
+    mock_span = WorkflowExecutionSpan(
+        span_id=str(uuid4()),
+        start_ts=datetime.now(),
+        end_ts=datetime.now(),
+        attributes=WorkflowExecutionSpanAttributes(label="Test Workflow", workflow_id=str(uuid4())),
+        events=[previous_invocation, root_invocation],
+    )
+
     mock_response = WorkflowExecutionDetail(
-        span_id="test-span-id", start=datetime.now(), inputs=[], outputs=[], spans=[], state=state_dict
+        span_id="test-span-id", start=datetime.now(), inputs=[], outputs=[], spans=[mock_span], state=state_dict
     )
 
     mock_client = Mock()
@@ -50,9 +102,19 @@ def test_load_state_with_context_success():
 
     result = resolver.load_state(previous_execution_id=execution_id)
 
-    # THEN should return an instance of TestWorkflow.State, not BaseState
-    assert isinstance(result, TestState)
-    assert result.test_key == "test_value"
+    # THEN should return LoadStateResult with state and span_link_info
+    assert isinstance(result, LoadStateResult)
+    assert result.state is not None
+    assert isinstance(result.state, TestState)
+    assert result.state.test_key == "test_value"
+
+    # AND should have span link info
+    assert result.span_link_info is not None
+    assert isinstance(result.span_link_info, SpanLinkInfo)
+    assert result.span_link_info.previous_trace_id == previous_invocation.trace_id
+    assert result.span_link_info.previous_span_id == previous_invocation.span_id
+    assert result.span_link_info.root_trace_id == root_invocation.trace_id
+    assert result.span_link_info.root_span_id == root_invocation.span_id
 
     mock_client.workflow_executions.retrieve_workflow_execution_detail.assert_called_once_with(
         execution_id=str(execution_id)

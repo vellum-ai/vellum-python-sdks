@@ -1,0 +1,28 @@
+from vellum.workflows import BaseWorkflow
+from vellum.workflows.inputs.base import BaseInputs
+from vellum.workflows.nodes.bases import BaseNode
+from vellum.workflows.outputs import BaseOutputs
+from vellum.workflows.resolvers.resolver import VellumResolver
+from vellum.workflows.state.base import BaseState
+
+
+class State(BaseState):
+    execution_count: int = 0
+
+
+class CounterNode(BaseNode[State]):
+    class Outputs(BaseOutputs):
+        current_count: int
+
+    def run(self) -> Outputs:
+        # Increment the execution count
+        self.state.execution_count += 1
+        return self.Outputs(current_count=self.state.execution_count)
+
+
+class SpanLinkWorkflow(BaseWorkflow[BaseInputs, State]):
+    graph = CounterNode
+    resolvers = [VellumResolver()]
+
+    class Outputs(BaseOutputs):
+        current_count = CounterNode.Outputs.current_count
