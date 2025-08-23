@@ -12,6 +12,11 @@ from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.utils.uuids import generate_workflow_deployment_prefix
 from vellum.workflows.vellum_client import create_vellum_client
 
+try:
+    from vellum_ee.workflows.display.utils.zip import extract_zip_files
+except ImportError:
+    extract_zip_files = None
+
 if TYPE_CHECKING:
     from vellum.workflows.events.workflow import WorkflowEvent
     from vellum.workflows.state.base import BaseState
@@ -156,7 +161,6 @@ class WorkflowContext:
         Returns:
             BaseWorkflow instance if found, None otherwise
         """
-        # If generated_files or namespace is falsy, return None
         if not self.generated_files or not self.namespace:
             return None
 
@@ -171,24 +175,24 @@ class WorkflowContext:
         except Exception:
             pass
 
-        if hasattr(self, "_vellum_client") and self._vellum_client is not None:
+        if hasattr(self, "_vellum_client") and self._vellum_client is not None and extract_zip_files is not None:
             try:
-                from vellum_ee.workflows.display.utils.zip import extract_zip_files
+                import vellum
+
+                current_version = vellum.__version__
+                major_version = current_version.split(".")[0]
+                version_range = f">={major_version}.0.0,<={current_version}"
 
                 response = self.vellum_client.workflows.pull(
-                    deployment_name, release_tag=release_tag, version=">=1.0.0,<=1.2.5"
+                    deployment_name, release_tag=release_tag, version=version_range
                 )
 
                 zip_bytes = b"".join(response)
                 pulled_files = extract_zip_files(zip_bytes)
 
-                if self._generated_files is None:
-                    self._generated_files = {}
                 for file_name, content in pulled_files.items():
                     prefixed_file_name = f"{expected_prefix}/{file_name}"
                     self._generated_files[prefixed_file_name] = content
-
-                from vellum.workflows.workflows.base import BaseWorkflow
 
                 WorkflowClass = BaseWorkflow.load_from_module(f"{self.namespace}.{expected_prefix}")
                 workflow_instance = WorkflowClass(context=WorkflowContext.create_from(self), parent_state=state)
@@ -197,7 +201,6 @@ class WorkflowContext:
             except Exception:
                 pass
 
-        # Otherwise, return None
         return None
 
     @classmethod

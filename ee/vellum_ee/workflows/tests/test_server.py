@@ -780,5 +780,5 @@ __all__ = ["TestSubworkflowDeploymentNode"]
 
     # AND the pull API should have been called with the correct deployment name, release tag, and version
     mock_vellum_client.workflows.pull.assert_called_once_with(
-        deployment_name, release_tag=release_tag, version=">=1.0.0,<=1.2.5"
+        deployment_name, release_tag=release_tag, version=">=1.0.0,<=1.2.2"
     )
