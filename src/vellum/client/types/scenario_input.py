@@ -2,10 +2,20 @@
 
 import typing
 
+from .scenario_input_audio_variable_value import ScenarioInputAudioVariableValue
 from .scenario_input_chat_history_variable_value import ScenarioInputChatHistoryVariableValue
+from .scenario_input_document_variable_value import ScenarioInputDocumentVariableValue
+from .scenario_input_image_variable_value import ScenarioInputImageVariableValue
 from .scenario_input_json_variable_value import ScenarioInputJsonVariableValue
 from .scenario_input_string_variable_value import ScenarioInputStringVariableValue
+from .scenario_input_video_variable_value import ScenarioInputVideoVariableValue
 
 ScenarioInput = typing.Union[
-    ScenarioInputStringVariableValue, ScenarioInputJsonVariableValue, ScenarioInputChatHistoryVariableValue
+    ScenarioInputStringVariableValue,
+    ScenarioInputJsonVariableValue,
+    ScenarioInputChatHistoryVariableValue,
+    ScenarioInputAudioVariableValue,
+    ScenarioInputVideoVariableValue,
+    ScenarioInputImageVariableValue,
+    ScenarioInputDocumentVariableValue,
 ]

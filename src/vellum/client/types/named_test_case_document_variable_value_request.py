@@ -4,12 +4,13 @@ import typing
 
 import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
+from .vellum_document_request import VellumDocumentRequest
 
 
-class NodeExecutionSpanAttributes(UniversalBaseModel):
-    label: str
-    filepath: typing.Optional[str] = None
-    node_id: str
+class NamedTestCaseDocumentVariableValueRequest(UniversalBaseModel):
+    type: typing.Literal["DOCUMENT"] = "DOCUMENT"
+    value: VellumDocumentRequest
+    name: str
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

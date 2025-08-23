@@ -11,7 +11,7 @@ from .span_link_type_enum import SpanLinkTypeEnum
 
 class SpanLink(UniversalBaseModel):
     trace_id: str
-    type: SpanLinkTypeEnum = "TRIGGERED_BY"
+    type: SpanLinkTypeEnum
     span_context: "ParentContext"
 
     if IS_PYDANTIC_V2:

@@ -4,12 +4,13 @@ import typing
 
 import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
+from .vellum_audio import VellumAudio
 
 
-class NodeExecutionSpanAttributes(UniversalBaseModel):
-    label: str
-    filepath: typing.Optional[str] = None
-    node_id: str
+class ScenarioInputAudioVariableValue(UniversalBaseModel):
+    type: typing.Literal["AUDIO"] = "AUDIO"
+    value: VellumAudio
+    input_variable_id: str
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

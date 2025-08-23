@@ -33,7 +33,9 @@ class RawWorkflowsClient:
         exclude_display: typing.Optional[bool] = None,
         include_json: typing.Optional[bool] = None,
         include_sandbox: typing.Optional[bool] = None,
+        release_tag: typing.Optional[str] = None,
         strict: typing.Optional[bool] = None,
+        version: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Iterator[HttpResponse[typing.Iterator[bytes]]]:
         """
@@ -50,7 +52,13 @@ class RawWorkflowsClient:
 
         include_sandbox : typing.Optional[bool]
 
+        release_tag : typing.Optional[str]
+            Release tag to use when pulling from deployment (implies deployment-only lookup)
+
         strict : typing.Optional[bool]
+
+        version : typing.Optional[str]
+            Semantic version range to validate against the Workflow SDK version (e.g., '>=1.0.0,<1.2.3')
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration. You can pass in configuration such as `chunk_size`, and more to customize the request and response.
@@ -69,7 +77,9 @@ class RawWorkflowsClient:
                 "exclude_display": exclude_display,
                 "include_json": include_json,
                 "include_sandbox": include_sandbox,
+                "release_tag": release_tag,
                 "strict": strict,
+                "version": version,
             },
             request_options=request_options,
         ) as _response:
@@ -185,7 +195,9 @@ class AsyncRawWorkflowsClient:
         exclude_display: typing.Optional[bool] = None,
         include_json: typing.Optional[bool] = None,
         include_sandbox: typing.Optional[bool] = None,
+        release_tag: typing.Optional[str] = None,
         strict: typing.Optional[bool] = None,
+        version: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[bytes]]]:
         """
@@ -202,7 +214,13 @@ class AsyncRawWorkflowsClient:
 
         include_sandbox : typing.Optional[bool]
 
+        release_tag : typing.Optional[str]
+            Release tag to use when pulling from deployment (implies deployment-only lookup)
+
         strict : typing.Optional[bool]
+
+        version : typing.Optional[str]
+            Semantic version range to validate against the Workflow SDK version (e.g., '>=1.0.0,<1.2.3')
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration. You can pass in configuration such as `chunk_size`, and more to customize the request and response.
@@ -221,7 +239,9 @@ class AsyncRawWorkflowsClient:
                 "exclude_display": exclude_display,
                 "include_json": include_json,
                 "include_sandbox": include_sandbox,
+                "release_tag": release_tag,
                 "strict": strict,
+                "version": version,
             },
             request_options=request_options,
         ) as _response:
