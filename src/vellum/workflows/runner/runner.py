@@ -22,6 +22,7 @@ from typing import (
     Tuple,
     Type,
     Union,
+    cast,
 )
 
 from vellum.client.types.span_link import SpanLink
@@ -150,8 +151,7 @@ class WorkflowRunner(Generic[StateType]):
                 try:
                     load_state_result = resolver.load_state(self.previous_execution_id)
                     if load_state_result.state is not None:
-                        # Type assertion since we know the state is not None at this point
-                        self._initial_state = load_state_result.state  # type: ignore[assignment]
+                        self._initial_state = cast(StateType, load_state_result.state)
                         self._span_link_info = load_state_result.span_link_info
                         break
                 except Exception as e:
