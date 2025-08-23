@@ -24,7 +24,7 @@ def test_span_linking_across_three_executions(vellum_client):
 
     # WHEN the first execution is run
     events1 = list(workflow1.stream(event_filter=all_workflow_event_filter))
-    terminal_event1 = events1[-1]  # Last event should be the terminal event
+    terminal_event1 = events1[-1]
 
     # THEN the first execution should be fulfilled with count 1
     assert terminal_event1.name == "workflow.execution.fulfilled"
@@ -38,6 +38,7 @@ def test_span_linking_across_three_executions(vellum_client):
     assert workflow_init_event.links is None  # No span links for first execution
 
     first_trace_id = str(workflow1.context.execution_context.trace_id)
+    assert workflow1.context.execution_context.parent_context is not None
     first_span_id = str(workflow1.context.execution_context.parent_context.span_id)
 
     first_execution_id = str(first_span_id)
@@ -138,6 +139,7 @@ def test_span_linking_across_three_executions(vellum_client):
     ]
 
     second_trace_id = str(workflow2.context.execution_context.trace_id)
+    assert workflow2.context.execution_context.parent_context is not None
     second_span_id = str(workflow2.context.execution_context.parent_context.span_id)
 
     second_execution_id = str(second_span_id)
