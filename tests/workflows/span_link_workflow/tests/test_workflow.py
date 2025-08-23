@@ -64,7 +64,7 @@ def test_span_linking_across_three_executions(vellum_client):
     workflow_init_event = workflow_initiated_events[0]
     assert workflow_init_event.links == [
         SpanLink(
-            trace_id="00000000-0000-0000-0000-000000000000",
+            trace_id=first_trace_id,
             type="PREVIOUS_SPAN",
             span_context=WorkflowParentContext(
                 parent=None,
@@ -79,7 +79,7 @@ def test_span_linking_across_three_executions(vellum_client):
             ),
         ),
         SpanLink(
-            trace_id="00000000-0000-0000-0000-000000000000",
+            trace_id=first_trace_id,
             type="ROOT_SPAN",
             span_context=WorkflowParentContext(
                 parent=None,
@@ -123,7 +123,7 @@ def test_span_linking_across_three_executions(vellum_client):
     workflow_init_event = workflow_initiated_events[0]
     assert workflow_init_event.links == [
         SpanLink(
-            trace_id=str(second_trace_id),
+            trace_id=second_trace_id,
             type="PREVIOUS_SPAN",
             span_context=WorkflowParentContext(
                 parent=None,
@@ -138,7 +138,7 @@ def test_span_linking_across_three_executions(vellum_client):
             ),
         ),
         SpanLink(
-            trace_id=str(first_trace_id),  # Root should always point to the first execution
+            trace_id=first_trace_id,  # Root should always point to the first execution
             type="ROOT_SPAN",
             span_context=WorkflowParentContext(
                 parent=None,
