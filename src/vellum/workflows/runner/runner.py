@@ -652,12 +652,11 @@ class WorkflowRunner(Generic[StateType]):
                 VellumCodeResourceDefinition as ClientVellumCodeResourceDefinition,
             )
             from vellum.client.types.workflow_parent_context import WorkflowParentContext as ClientWorkflowParentContext
+            from vellum.workflows.types.definition import serialize_type_encoder_with_id
 
-            workflow_definition = ClientVellumCodeResourceDefinition(
-                name=self.workflow.__class__.__name__,
-                module=self.workflow.__class__.__module__.split("."),
-                id=str(self.workflow.__class__.__id__),
-            )
+            serialized_data = serialize_type_encoder_with_id(self.workflow.__class__)
+            serialized_data["id"] = str(serialized_data["id"])
+            workflow_definition = ClientVellumCodeResourceDefinition(**serialized_data)
             links = [
                 SpanLink(
                     trace_id=self._span_link_info.previous_trace_id,
