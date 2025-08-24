@@ -71,7 +71,6 @@ from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.ports.port import Port
 from vellum.workflows.references import ExternalInputReference, OutputReference
 from vellum.workflows.references.state_value import StateValueReference
-from vellum.workflows.resolvers.types import SpanLinkInfo
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.delta import StateDelta
 from vellum.workflows.types.generics import InputsType, OutputsType, StateType
@@ -114,7 +113,7 @@ class WorkflowRunner(Generic[StateType]):
         self.workflow = workflow
         self._is_resuming = False
         self._should_emit_initial_state = True
-        self._span_link_info: Optional[SpanLinkInfo] = None
+        self._span_link_info: Optional[Tuple[str, str, str, str]] = None
         if entrypoint_nodes:
             if len(list(entrypoint_nodes)) > 1:
                 raise ValueError("Cannot resume from multiple nodes")
@@ -149,9 +148,14 @@ class WorkflowRunner(Generic[StateType]):
             for resolver in self.workflow.resolvers:
                 try:
                     load_state_result = resolver.load_state(previous_execution_id)
-                    if load_state_result.state is not None:
-                        self._initial_state = cast(StateType, load_state_result.state)
-                        self._span_link_info = load_state_result.span_link_info
+                    if load_state_result.state is not None and isinstance(load_state_result.state, StateType):
+                        self._initial_state = load_state_result.state
+                        self._span_link_info = (
+                            load_state_result.previous_trace_id,
+                            load_state_result.previous_span_id,
+                            load_state_result.root_trace_id,
+                            load_state_result.root_span_id
+                        )
                         break
                 except Exception as e:
                     logger.warning(f"Failed to load state from resolver {type(resolver).__name__}: {e}")
@@ -653,24 +657,25 @@ class WorkflowRunner(Generic[StateType]):
             from vellum.client.types.workflow_parent_context import WorkflowParentContext as ClientWorkflowParentContext
             from vellum.workflows.types.definition import serialize_type_encoder_with_id
 
+            previous_trace_id, previous_span_id, root_trace_id, root_span_id = self._span_link_info
             serialized_data = serialize_type_encoder_with_id(self.workflow.__class__)
             serialized_data["id"] = str(serialized_data["id"])
             workflow_definition = ClientVellumCodeResourceDefinition(**serialized_data)
             links = [
                 SpanLink(
-                    trace_id=self._span_link_info.previous_trace_id,
+                    trace_id=previous_trace_id,
                     type="PREVIOUS_SPAN",
                     span_context=ClientWorkflowParentContext(
                         workflow_definition=workflow_definition,
-                        span_id=self._span_link_info.previous_span_id,
+                        span_id=previous_span_id,
                     ),
                 ),
                 SpanLink(
-                    trace_id=self._span_link_info.root_trace_id,
+                    trace_id=root_trace_id,
                     type="ROOT_SPAN",
                     span_context=ClientWorkflowParentContext(
                         workflow_definition=workflow_definition,
-                        span_id=self._span_link_info.root_span_id,
+                        span_id=root_span_id,
                     ),
                 ),
             ]
