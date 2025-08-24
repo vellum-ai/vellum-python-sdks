@@ -189,6 +189,8 @@ class WorkflowContext:
                 prefixed_file_name = f"{expected_prefix}/{file_name}"
                 self._generated_files[prefixed_file_name] = content
 
+            from vellum.workflows.workflows.base import BaseWorkflow
+
             WorkflowClass = BaseWorkflow.load_from_module(f"{self.namespace}.{expected_prefix}")
             WorkflowClass.is_dynamic = True
             workflow_instance = WorkflowClass(context=WorkflowContext.create_from(self), parent_state=state)
