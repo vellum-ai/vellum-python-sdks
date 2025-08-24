@@ -22,7 +22,6 @@ from typing import (
     Tuple,
     Type,
     Union,
-    cast,
 )
 
 from vellum.client.types.span_link import SpanLink
