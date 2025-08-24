@@ -38,6 +38,7 @@ import {
   WorkflowVersionExecConfig,
 } from "src/types/vellum";
 import { createPythonClassName, toPythonSafeSnakeCase } from "src/utils/casing";
+import { isNilOrEmpty } from "src/utils/typing";
 
 export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
   private functionsToGenerate: Array<{
@@ -589,8 +590,47 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     );
   }
 
+  private isBareGenericNode(): boolean {
+    return (
+      isNilOrEmpty(this.nodeData.adornments) &&
+      isNilOrEmpty(this.nodeData.attributes) &&
+      isNilOrEmpty(this.nodeData.outputs) &&
+      this.nodeData.trigger.mergeBehavior === this.DEFAULT_TRIGGER &&
+      this.nodeData.ports?.length === 1 &&
+      this.nodeData.ports?.[0]?.type === "DEFAULT"
+    );
+  }
+
   getNodeClassBodyStatements(): AstNode[] {
     const statements: AstNode[] = [];
+
+    if (this.isBareGenericNode()) {
+      const outputsClass = python.class_({
+        name: OUTPUTS_CLASS_NAME,
+        extends_: [
+          python.reference({
+            name: this.nodeContext.baseNodeClassName,
+            modulePath: this.nodeContext.baseNodeClassModulePath,
+            attribute: [OUTPUTS_CLASS_NAME],
+          }),
+        ],
+      });
+
+      const runMethod = python.method({
+        name: "run",
+        parameters: [],
+        return_: python.Type.reference(
+          python.reference({
+            name: OUTPUTS_CLASS_NAME,
+          })
+        ),
+      });
+
+      statements.push(outputsClass);
+      statements.push(runMethod);
+
+      return statements;
+    }
 
     statements.push(...this.nodeAttributes);
 
