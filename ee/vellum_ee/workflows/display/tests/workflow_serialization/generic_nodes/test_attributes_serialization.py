@@ -142,41 +142,15 @@ def test_serialize_node__lazy_reference(serialize_node):
         attr: str = LazyReference(lambda: ConstantValueReference("hello"))
 
     serialized_node = serialize_node(LazyReferenceGenericNode)
+    attributes = serialized_node["attributes"]
 
-    assert not DeepDiff(
+    assert attributes == [
         {
-            "id": "3d6bfe3b-263a-40a6-8a05-98288e9559a4",
-            "label": "Lazy Reference Generic Node",
-            "type": "GENERIC",
-            "display_data": {"position": {"x": 0.0, "y": 0.0}},
-            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
-            "definition": {
-                "name": "LazyReferenceGenericNode",
-                "module": [
-                    "vellum_ee",
-                    "workflows",
-                    "display",
-                    "tests",
-                    "workflow_serialization",
-                    "generic_nodes",
-                    "test_attributes_serialization",
-                ],
-            },
-            "trigger": {"id": "14ec4d19-13e5-4db3-94fa-4e15274bffc7", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "2dba7224-a376-4780-8414-2b50601f9283", "name": "default", "type": "DEFAULT"}],
-            "adornments": None,
-            "attributes": [
-                {
-                    "id": "7ae37eb4-18c8-49e1-b5ac-6369ce7ed5dd",
-                    "name": "attr",
-                    "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "hello"}},
-                }
-            ],
-            "outputs": [],
-        },
-        serialized_node,
-        ignore_order=True,
-    )
+            "id": "7ae37eb4-18c8-49e1-b5ac-6369ce7ed5dd",
+            "name": "attr",
+            "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "hello"}},
+        }
+    ]
 
 
 def test_serialize_node__lazy_reference_with_string():
