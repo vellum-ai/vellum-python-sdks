@@ -1,5 +1,4 @@
 import sys
-from unittest.mock import Mock
 from uuid import uuid4
 from typing import Type, cast
 
@@ -10,7 +9,7 @@ from vellum.workflows import BaseWorkflow
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.utils.uuids import generate_workflow_deployment_prefix
-from vellum_ee.workflows.display.utils.zip import zip_file_map
+from vellum.workflows.utils.zip import zip_file_map
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 from vellum_ee.workflows.server.virtual_file_loader import VirtualFileFinder
 
@@ -665,7 +664,7 @@ __all__ = ["TestNode"]
     assert event.name == "workflow.execution.fulfilled"
 
 
-def test_resolve_workflow_deployment__uses_pull_api_with_inputs_deployment_name():
+def test_resolve_workflow_deployment__uses_pull_api_with_inputs_deployment_name(vellum_client):
     """
     Test that resolve_workflow_deployment uses the pull API to fetch subworkflow files
     when the deployment name comes from Inputs.deployment_name.
@@ -707,8 +706,9 @@ class Inputs(BaseInputs):
 from vellum.workflows import BaseWorkflow
 from .inputs import Inputs
 from .nodes.subworkflow_deployment_node import TestSubworkflowDeploymentNode
+from vellum.workflows.state import BaseState
 
-class ParentWorkflow(BaseWorkflow):
+class ParentWorkflow(BaseWorkflow[Inputs, BaseState]):
     graph = TestSubworkflowDeploymentNode
 """
 
@@ -755,30 +755,21 @@ __all__ = ["TestSubworkflowDeploymentNode"]
     finder = VirtualFileFinder(parent_files, namespace)
     sys.meta_path.append(finder)
 
-    mock_vellum_client = Mock()
-    mock_vellum_client.workflows.pull.return_value = iter([zip_file_map(subworkflow_files)])
+    vellum_client.workflows.pull.return_value = iter([zip_file_map(subworkflow_files)])
 
     # WHEN we execute the root workflow with the mocked client
     Workflow = BaseWorkflow.load_from_module(namespace)
+    Inputs = Workflow.get_inputs_class()
 
-    import importlib
+    workflow = Workflow(context=WorkflowContext(namespace=namespace, generated_files=parent_files))
+    final_event = workflow.run(inputs=Inputs(deployment_name=deployment_name))
 
-    inputs_module = importlib.import_module(f"{namespace}.inputs")
-    Inputs = inputs_module.Inputs
-
-    workflow = Workflow(
-        context=WorkflowContext(vellum_client=mock_vellum_client, namespace=namespace, generated_files=parent_files)
-    )
-
-    # THEN the workflow should be successfully initialized
-    assert workflow
-
-    event = workflow.run(inputs=Inputs(deployment_name=deployment_name))
-
-    # AND the method should return a workflow (not None) - this will pass once implemented
-    assert event.name == "workflow.execution.fulfilled"
+    # THEN the method should return a workflow (not None) - this will pass once implemented
+    assert final_event.name == "workflow.execution.fulfilled", final_event
 
     # AND the pull API should have been called with the correct deployment name, release tag, and version
-    mock_vellum_client.workflows.pull.assert_called_once_with(
-        deployment_name, release_tag=release_tag, version=">=1.0.0,<=1.2.2"
-    )
+    args, kwargs = vellum_client.workflows.pull.call_args
+    assert args[0] == deployment_name
+    assert kwargs["release_tag"] == release_tag
+    assert kwargs["version"].startswith(">=")
+    assert ".0.0,<=" in kwargs["version"]

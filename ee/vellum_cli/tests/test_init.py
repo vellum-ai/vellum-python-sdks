@@ -5,8 +5,8 @@ from unittest.mock import patch
 from click.testing import CliRunner
 from pydash import snake_case
 
+from vellum.workflows.utils.zip import zip_file_map
 from vellum_cli import main as cli_main
-from vellum_ee.workflows.display.utils.zip import zip_file_map
 
 
 class MockTemplate:

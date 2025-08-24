@@ -8,8 +8,8 @@ from uuid import uuid4
 from click.testing import CliRunner
 
 from vellum.client.core.api_error import ApiError
+from vellum.workflows.utils.zip import zip_file_map
 from vellum_cli import main as cli_main
-from vellum_ee.workflows.display.utils.zip import zip_file_map
 
 
 @pytest.mark.parametrize(
