@@ -5,7 +5,7 @@ import random
 import tempfile
 import threading
 from uuid import UUID, uuid4
-from typing import Iterator, Optional
+from typing import Iterator, Optional, Union
 
 from vellum.workflows.emitters.base import BaseWorkflowEmitter
 from vellum.workflows.errors.types import WorkflowErrorCode
@@ -92,7 +92,7 @@ class MockFileResolver(BaseWorkflowResolver):
                 )
                 yield snapshot
 
-    def load_state(self, previous_execution_id: Optional[str] = None) -> LoadStateResult:
+    def load_state(self, previous_execution_id: Optional[Union[UUID, str]] = None) -> LoadStateResult:
         return LoadStateResult(state=None, span_link_info=None)
 
 

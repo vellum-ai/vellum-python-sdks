@@ -1,5 +1,6 @@
 import logging
-from typing import Iterator, Optional, Tuple
+from uuid import UUID
+from typing import Iterator, Optional, Tuple, Union
 
 from vellum.client.types.workflow_execution_initiated_event import WorkflowExecutionInitiatedEvent
 from vellum.client.types.workflow_execution_span import WorkflowExecutionSpan
@@ -42,7 +43,10 @@ class VellumResolver(BaseWorkflowResolver):
 
         return previous_invocation, root_invocation
 
-    def load_state(self, previous_execution_id: Optional[str] = None) -> LoadStateResult:
+    def load_state(self, previous_execution_id: Optional[Union[UUID, str]] = None) -> LoadStateResult:
+        if isinstance(previous_execution_id, UUID):
+            previous_execution_id = str(previous_execution_id)
+
         if previous_execution_id is None:
             return LoadStateResult(state=None, span_link_info=None)
 

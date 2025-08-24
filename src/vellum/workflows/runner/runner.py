@@ -146,10 +146,9 @@ class WorkflowRunner(Generic[StateType]):
             ]
             self._is_resuming = True
         elif previous_execution_id:
-            self.previous_execution_id = str(previous_execution_id)
             for resolver in self.workflow.resolvers:
                 try:
-                    load_state_result = resolver.load_state(self.previous_execution_id)
+                    load_state_result = resolver.load_state(previous_execution_id)
                     if load_state_result.state is not None:
                         self._initial_state = cast(StateType, load_state_result.state)
                         self._span_link_info = load_state_result.span_link_info
