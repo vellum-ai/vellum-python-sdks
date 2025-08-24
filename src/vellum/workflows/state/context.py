@@ -3,13 +3,14 @@ from queue import Queue
 from uuid import uuid4
 from typing import TYPE_CHECKING, Dict, List, Optional, Type
 
-from vellum import Vellum
+from vellum import Vellum, __version__
 from vellum.workflows.context import ExecutionContext, get_execution_context, set_execution_context
 from vellum.workflows.events.types import ExternalParentContext
 from vellum.workflows.nodes.mocks import MockNodeExecution, MockNodeExecutionArg
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.utils.uuids import generate_workflow_deployment_prefix
+from vellum.workflows.utils.zip import extract_zip_files
 from vellum.workflows.vellum_client import create_vellum_client
 
 if TYPE_CHECKING:
@@ -156,23 +157,49 @@ class WorkflowContext:
         Returns:
             BaseWorkflow instance if found, None otherwise
         """
-        if not self.generated_files or not self.namespace:
+        if not self._generated_files or not self._namespace:
             return None
 
         expected_prefix = generate_workflow_deployment_prefix(deployment_name, release_tag)
-
-        workflow_file_key = f"{expected_prefix}/workflow.py"
-        if workflow_file_key not in self.generated_files:
-            return None
 
         try:
             from vellum.workflows.workflows.base import BaseWorkflow
 
             WorkflowClass = BaseWorkflow.load_from_module(f"{self.namespace}.{expected_prefix}")
+            WorkflowClass.is_dynamic = True
             workflow_instance = WorkflowClass(context=WorkflowContext.create_from(self), parent_state=state)
             return workflow_instance
         except Exception:
-            return None
+            pass
+
+        try:
+            major_version = __version__.split(".")[0]
+            version_range = f">={major_version}.0.0,<={__version__}"
+
+            response = self.vellum_client.workflows.pull(
+                deployment_name,
+                release_tag=release_tag,
+                version=version_range,
+            )
+
+            zip_bytes = b"".join(response)
+            pulled_files = extract_zip_files(zip_bytes)
+
+            for file_name, content in pulled_files.items():
+                prefixed_file_name = f"{expected_prefix}/{file_name}"
+                self._generated_files[prefixed_file_name] = content
+
+            from vellum.workflows.workflows.base import BaseWorkflow
+
+            WorkflowClass = BaseWorkflow.load_from_module(f"{self.namespace}.{expected_prefix}")
+            WorkflowClass.is_dynamic = True
+            workflow_instance = WorkflowClass(context=WorkflowContext.create_from(self), parent_state=state)
+            return workflow_instance
+
+        except Exception:
+            pass
+
+        return None
 
     @classmethod
     def create_from(cls, context):
