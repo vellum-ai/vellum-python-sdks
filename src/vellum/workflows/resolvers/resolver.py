@@ -52,15 +52,11 @@ class VellumResolver(BaseWorkflowResolver):
             previous_execution_id = str(previous_execution_id)
 
         if previous_execution_id is None:
-            return LoadStateResult(
-                state=None, previous_trace_id=None, previous_span_id=None, root_trace_id=None, root_span_id=None
-            )
+            return None
 
         if not self._context:
             logger.warning("Cannot load state: No workflow context registered")
-            return LoadStateResult(
-                state=None, previous_trace_id=None, previous_span_id=None, root_trace_id=None, root_span_id=None
-            )
+            return None
 
         client = self._context.vellum_client
         response = client.workflow_executions.retrieve_workflow_execution_detail(
@@ -68,19 +64,15 @@ class VellumResolver(BaseWorkflowResolver):
         )
 
         if response.state is None:
-            return LoadStateResult(
-                state=None, previous_trace_id=None, previous_span_id=None, root_trace_id=None, root_span_id=None
-            )
+            return None
 
         previous_trace_id, root_trace_id, previous_span_id, root_span_id = self._find_previous_and_root_span(
             previous_execution_id, response.spans
         )
 
-        if previous_trace_id is None or root_trace_id is None:
+        if previous_trace_id is None or root_trace_id is None or previous_span_id is None or root_span_id is None:
             logger.warning("Could not find required execution events for state loading")
-            return LoadStateResult(
-                state=None, previous_trace_id=None, previous_span_id=None, root_trace_id=None, root_span_id=None
-            )
+            return None
 
         meta = StateMeta.model_validate(response.state.pop("meta"))
 

@@ -148,13 +148,7 @@ class WorkflowRunner(Generic[StateType]):
             for resolver in self.workflow.resolvers:
                 try:
                     load_state_result = resolver.load_state(previous_execution_id)
-                    if (
-                        load_state_result.state is not None
-                        and load_state_result.previous_trace_id is not None
-                        and load_state_result.previous_span_id is not None
-                        and load_state_result.root_trace_id is not None
-                        and load_state_result.root_span_id is not None
-                    ):
+                    if load_state_result is not None:
                         state_class = self.workflow.get_state_class()
                         if isinstance(load_state_result.state, state_class):
                             self._initial_state = load_state_result.state
