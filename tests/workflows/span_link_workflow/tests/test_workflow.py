@@ -64,20 +64,32 @@ def test_span_linking_across_three_executions(vellum_client):
 
     mock_body = WorkflowExecutionInitiatedBody(workflow_definition=mock_workflow_definition, inputs={})
 
+    mock_root_span_link = SpanLink(
+        trace_id=str(first_trace_id),
+        type="ROOT_SPAN",
+        span_context=WorkflowParentContext(
+            parent=None,
+            links=None,
+            workflow_definition=mock_workflow_definition,
+            type="WORKFLOW",
+            span_id=str(first_span_id),
+        ),
+    )
+
     previous_invocation = WorkflowExecutionInitiatedEvent(
         id=str(uuid4()),
         timestamp=datetime.now(),
         trace_id=str(first_trace_id),
         span_id=str(first_span_id),
         body=mock_body,
-        links=[],  # Previous invocation has links but we don't need to set them here
+        links=[mock_root_span_link],  # Include the root span link
     )
 
     root_invocation = previous_invocation  # Root invocation is the same as the previous invocation
 
     mock_span = WorkflowExecutionSpan(
         name="workflow.execution",
-        span_id=str(uuid4()),
+        span_id=str(first_execution_id),
         start_ts=datetime.now(),
         end_ts=datetime.now(),
         events=[previous_invocation, root_invocation],
@@ -159,13 +171,37 @@ def test_span_linking_across_three_executions(vellum_client):
         },
     }
 
+    mock_previous_span_link = SpanLink(
+        trace_id=str(first_trace_id),
+        type="PREVIOUS_SPAN",
+        span_context=WorkflowParentContext(
+            parent=None,
+            links=None,
+            workflow_definition=mock_workflow_definition,
+            type="WORKFLOW",
+            span_id=str(first_span_id),
+        ),
+    )
+
+    mock_root_span_link_2 = SpanLink(
+        trace_id=str(first_trace_id),
+        type="ROOT_SPAN",
+        span_context=WorkflowParentContext(
+            parent=None,
+            links=None,
+            workflow_definition=mock_workflow_definition,
+            type="WORKFLOW",
+            span_id=str(first_span_id),
+        ),
+    )
+
     previous_invocation = WorkflowExecutionInitiatedEvent(
         id=str(uuid4()),
         timestamp=datetime.now(),
         trace_id=str(second_trace_id),
         span_id=str(second_span_id),
         body=mock_body,
-        links=[],  # Previous invocation has links but we don't need to set them here
+        links=[mock_previous_span_link, mock_root_span_link_2],  # Include both previous and root span links
     )
 
     root_invocation = WorkflowExecutionInitiatedEvent(
@@ -179,7 +215,7 @@ def test_span_linking_across_three_executions(vellum_client):
 
     mock_span = WorkflowExecutionSpan(
         name="workflow.execution",
-        span_id=str(uuid4()),
+        span_id=str(second_execution_id),  # Use the actual second execution ID
         start_ts=datetime.now(),
         end_ts=datetime.now(),
         events=[previous_invocation, root_invocation],

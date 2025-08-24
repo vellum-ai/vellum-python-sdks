@@ -92,8 +92,8 @@ class MockFileResolver(BaseWorkflowResolver):
                 )
                 yield snapshot
 
-    def load_state(self, previous_execution_id: Optional[Union[UUID, str]] = None) -> LoadStateResult:
-        return LoadStateResult(state=None, span_link_info=None)
+    def load_state(self, previous_execution_id: Optional[Union[UUID, str]] = None) -> Optional[LoadStateResult]:
+        return None
 
 
 class StartNode(BaseNode):
