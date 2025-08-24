@@ -2,4 +2,8 @@ from vellum.workflows.nodes import BaseNode
 
 
 class MyCustomNode(BaseNode):
-    pass
+    class Outputs(BaseNode.Outputs):
+        pass
+
+    def run(self) -> Outputs:
+        pass

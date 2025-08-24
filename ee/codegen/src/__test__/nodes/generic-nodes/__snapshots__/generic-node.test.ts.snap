@@ -358,7 +358,11 @@ exports[`GenericNode > basic with only \`pass\` > getNodeFile 1`] = `
 
 
 class MyCustomNode(BaseNode):
-    pass
+    class Outputs(BaseNode.Outputs):
+        pass
+
+    def run() -> Outputs:
+        pass
 "
 `;
 
