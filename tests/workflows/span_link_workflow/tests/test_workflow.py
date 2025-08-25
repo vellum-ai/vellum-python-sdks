@@ -81,21 +81,7 @@ def test_span_linking_across_three_executions(vellum_client):
         trace_id=str(first_trace_id),
         span_id=str(first_span_id),
         body=mock_body,
-        links=[
-            ClientSpanLink(
-                trace_id=str(first_trace_id),
-                type="ROOT_SPAN",
-                span_context=ClientWorkflowParentContext(
-                    workflow_definition=ClientVellumCodeResourceDefinition(
-                        name="SpanLinkWorkflow",
-                        module=["tests", "workflows", "span_link_workflow", "workflow"],
-                        id="d0cb6b18-2170-428b-8dc3-de75a9eb5c8d",
-                    ),
-                    type="WORKFLOW",
-                    span_id=first_span_id,
-                ),
-            )
-        ],
+        links=None,
     )
 
     mock_span = WorkflowExecutionSpan(
