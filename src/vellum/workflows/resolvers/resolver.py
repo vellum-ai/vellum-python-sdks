@@ -43,6 +43,10 @@ class VellumResolver(BaseWorkflowResolver):
                         if root_span:
                             root_trace_id = root_span.trace_id
                             root_span_id = root_span.span_context.span_id
+                    else:
+                        # no links means this is the first execution
+                        root_trace_id = initiated_event.trace_id
+                        root_span_id = initiated_event.span_id
                     break
 
         return previous_trace_id, root_trace_id, previous_span_id, root_span_id
