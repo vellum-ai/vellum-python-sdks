@@ -98,14 +98,12 @@ def test_span_linking_across_three_executions(vellum_client):
         links=[mock_root_span_link],  # Include the root span link
     )
 
-    root_invocation = previous_invocation  # Root invocation is the same as the previous invocation
-
     mock_span = WorkflowExecutionSpan(
         name="workflow.execution",
         span_id=str(first_execution_id),
         start_ts=datetime.now(),
         end_ts=datetime.now(),
-        events=[previous_invocation, root_invocation],
+        events=[previous_invocation],
         attributes=WorkflowExecutionSpanAttributes(label="Span Linking Workflow", workflow_id=str(uuid4())),
     )
 
@@ -221,21 +219,12 @@ def test_span_linking_across_three_executions(vellum_client):
         links=[mock_previous_span_link, mock_root_span_link_2],  # Include both previous and root span links
     )
 
-    root_invocation = ClientWorkflowExecutionInitiatedEvent(
-        id=str(uuid4()),
-        timestamp=datetime.now(),
-        trace_id=str(first_trace_id),
-        span_id=str(first_span_id),
-        body=mock_body,
-        links=None,  # Root invocation has no links
-    )
-
     mock_span = WorkflowExecutionSpan(
         name="workflow.execution",
         span_id=str(second_execution_id),  # Use the actual second execution ID
         start_ts=datetime.now(),
         end_ts=datetime.now(),
-        events=[previous_invocation, root_invocation],
+        events=[previous_invocation],
         attributes=WorkflowExecutionSpanAttributes(label="Span Linking Workflow", workflow_id=str(uuid4())),
     )
 
