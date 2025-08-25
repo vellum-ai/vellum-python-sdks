@@ -24,7 +24,6 @@ from typing import (
     Union,
 )
 
-from vellum.client.types.span_link import SpanLink
 from vellum.workflows.constants import undefined
 from vellum.workflows.context import ExecutionContext, execution_context, get_execution_context
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -47,7 +46,7 @@ from vellum.workflows.events.node import (
     NodeExecutionRejectedBody,
     NodeExecutionStreamingBody,
 )
-from vellum.workflows.events.types import BaseEvent, NodeParentContext, ParentContext, WorkflowParentContext
+from vellum.workflows.events.types import BaseEvent, NodeParentContext, ParentContext, SpanLink, WorkflowParentContext
 from vellum.workflows.events.workflow import (
     WorkflowEventStream,
     WorkflowExecutionFulfilledBody,
@@ -652,30 +651,21 @@ class WorkflowRunner(Generic[StateType]):
         links: Optional[List[SpanLink]] = None
 
         if self._span_link_info:
-            from vellum.client.types.vellum_code_resource_definition import (
-                VellumCodeResourceDefinition as ClientVellumCodeResourceDefinition,
-            )
-            from vellum.client.types.workflow_parent_context import WorkflowParentContext as ClientWorkflowParentContext
-            from vellum.workflows.types.definition import serialize_type_encoder_with_id
-
             previous_trace_id, previous_span_id, root_trace_id, root_span_id = self._span_link_info
-            serialized_data = serialize_type_encoder_with_id(self.workflow.__class__)
-            serialized_data["id"] = str(serialized_data["id"])
-            workflow_definition = ClientVellumCodeResourceDefinition(**serialized_data)
             links = [
                 SpanLink(
                     trace_id=previous_trace_id,
                     type="PREVIOUS_SPAN",
-                    span_context=ClientWorkflowParentContext(
-                        workflow_definition=workflow_definition,
+                    span_context=WorkflowParentContext(
+                        workflow_definition=self.workflow.__class__,
                         span_id=previous_span_id,
                     ),
                 ),
                 SpanLink(
                     trace_id=root_trace_id,
                     type="ROOT_SPAN",
-                    span_context=ClientWorkflowParentContext(
-                        workflow_definition=workflow_definition,
+                    span_context=WorkflowParentContext(
+                        workflow_definition=self.workflow.__class__,
                         span_id=root_span_id,
                     ),
                 ),

@@ -1,16 +1,24 @@
 from datetime import datetime
 from uuid import uuid4
 
-from vellum.client.types.span_link import SpanLink
-from vellum.client.types.vellum_code_resource_definition import VellumCodeResourceDefinition
+from vellum.client.types.span_link import SpanLink as ClientSpanLink
+from vellum.client.types.vellum_code_resource_definition import (
+    VellumCodeResourceDefinition as ClientVellumCodeResourceDefinition,
+)
 from vellum.client.types.workflow_execution_detail import WorkflowExecutionDetail
-from vellum.client.types.workflow_execution_initiated_body import WorkflowExecutionInitiatedBody
-from vellum.client.types.workflow_execution_initiated_event import WorkflowExecutionInitiatedEvent
+from vellum.client.types.workflow_execution_initiated_body import (
+    WorkflowExecutionInitiatedBody as ClientWorkflowExecutionInitiatedBody,
+)
+from vellum.client.types.workflow_execution_initiated_event import (
+    WorkflowExecutionInitiatedEvent as ClientWorkflowExecutionInitiatedEvent,
+)
 from vellum.client.types.workflow_execution_span import WorkflowExecutionSpan
 from vellum.client.types.workflow_execution_span_attributes import WorkflowExecutionSpanAttributes
-from vellum.client.types.workflow_parent_context import WorkflowParentContext
+from vellum.client.types.workflow_parent_context import WorkflowParentContext as ClientWorkflowParentContext
+from vellum.workflows.events.types import SpanLink, WorkflowParentContext
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.state.base import NodeExecutionCache
+from vellum.workflows.types.definition import VellumCodeResourceDefinition
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 from tests.workflows.span_link_workflow.workflow import SpanLinkWorkflow
@@ -58,25 +66,30 @@ def test_span_linking_across_three_executions(vellum_client):
         },
     }
 
-    mock_workflow_definition = VellumCodeResourceDefinition(
-        name="SpanLinkWorkflow", module=["tests", "workflows", "span_link_workflow"], id=str(uuid4())
+    mock_body = ClientWorkflowExecutionInitiatedBody(
+        workflow_definition=ClientVellumCodeResourceDefinition(
+            name="SpanLinkWorkflow",
+            module=["tests", "workflows", "span_link_workflow", "workflow"],
+            id="d0cb6b18-2170-428b-8dc3-de75a9eb5c8d",
+        ),
+        inputs={},
     )
 
-    mock_body = WorkflowExecutionInitiatedBody(workflow_definition=mock_workflow_definition, inputs={})
-
-    mock_root_span_link = SpanLink(
+    mock_root_span_link = ClientSpanLink(
         trace_id=str(first_trace_id),
         type="ROOT_SPAN",
-        span_context=WorkflowParentContext(
-            parent=None,
-            links=None,
-            workflow_definition=mock_workflow_definition,
+        span_context=ClientWorkflowParentContext(
+            workflow_definition=ClientVellumCodeResourceDefinition(
+                name="SpanLinkWorkflow",
+                module=["tests", "workflows", "span_link_workflow", "workflow"],
+                id="d0cb6b18-2170-428b-8dc3-de75a9eb5c8d",
+            ),
             type="WORKFLOW",
-            span_id=str(first_span_id),
+            span_id=first_span_id,
         ),
     )
 
-    previous_invocation = WorkflowExecutionInitiatedEvent(
+    previous_invocation = ClientWorkflowExecutionInitiatedEvent(
         id=str(uuid4()),
         timestamp=datetime.now(),
         trace_id=str(first_trace_id),
@@ -171,31 +184,35 @@ def test_span_linking_across_three_executions(vellum_client):
         },
     }
 
-    mock_previous_span_link = SpanLink(
+    mock_previous_span_link = ClientSpanLink(
         trace_id=str(first_trace_id),
         type="PREVIOUS_SPAN",
-        span_context=WorkflowParentContext(
-            parent=None,
-            links=None,
-            workflow_definition=mock_workflow_definition,
+        span_context=ClientWorkflowParentContext(
+            workflow_definition=ClientVellumCodeResourceDefinition(
+                name="SpanLinkWorkflow",
+                module=["tests", "workflows", "span_link_workflow", "workflow"],
+                id="d0cb6b18-2170-428b-8dc3-de75a9eb5c8d",
+            ),
             type="WORKFLOW",
             span_id=str(first_span_id),
         ),
     )
 
-    mock_root_span_link_2 = SpanLink(
+    mock_root_span_link_2 = ClientSpanLink(
         trace_id=str(first_trace_id),
         type="ROOT_SPAN",
-        span_context=WorkflowParentContext(
-            parent=None,
-            links=None,
-            workflow_definition=mock_workflow_definition,
+        span_context=ClientWorkflowParentContext(
+            workflow_definition=ClientVellumCodeResourceDefinition(
+                name="SpanLinkWorkflow",
+                module=["tests", "workflows", "span_link_workflow", "workflow"],
+                id="d0cb6b18-2170-428b-8dc3-de75a9eb5c8d",
+            ),
             type="WORKFLOW",
             span_id=str(first_span_id),
         ),
     )
 
-    previous_invocation = WorkflowExecutionInitiatedEvent(
+    previous_invocation = ClientWorkflowExecutionInitiatedEvent(
         id=str(uuid4()),
         timestamp=datetime.now(),
         trace_id=str(second_trace_id),
@@ -204,7 +221,7 @@ def test_span_linking_across_three_executions(vellum_client):
         links=[mock_previous_span_link, mock_root_span_link_2],  # Include both previous and root span links
     )
 
-    root_invocation = WorkflowExecutionInitiatedEvent(
+    root_invocation = ClientWorkflowExecutionInitiatedEvent(
         id=str(uuid4()),
         timestamp=datetime.now(),
         trace_id=str(first_trace_id),
