@@ -5,10 +5,13 @@ import {
   LogicalOperator,
 } from "vellum-ai/api";
 import {
+  AudioInputRequest,
   ChatHistoryInput,
   ChatMessageRequest,
   ChatMessageRole,
+  DocumentInputRequest,
   FunctionDefinition,
+  ImageInputRequest,
   JsonInput,
   NumberInput,
   PromptBlockState,
@@ -19,6 +22,7 @@ import {
   VellumValue,
   VellumVariable,
   VellumVariableType,
+  VideoInputRequest,
 } from "vellum-ai/api/types";
 
 export enum WorkflowNodeType {
@@ -800,7 +804,11 @@ type WorkflowSandboxInput =
   | StringInput
   | JsonInput
   | ChatHistoryInput
-  | NumberInput;
+  | NumberInput
+  | AudioInputRequest
+  | VideoInputRequest
+  | ImageInputRequest
+  | DocumentInputRequest;
 export type WorkflowSandboxInputs = WorkflowSandboxInput[];
 
 export interface UnaryWorkflowExpression {
