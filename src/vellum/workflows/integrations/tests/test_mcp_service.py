@@ -1,3 +1,4 @@
+import pytest
 import asyncio
 import json
 from unittest import mock
@@ -118,3 +119,49 @@ def test_mcp_service_api_key_auth():
 
     # THEN the custom API key header should be set correctly
     assert headers == {"X-API-Key": "api-key-123"}
+
+
+@pytest.mark.asyncio
+async def test_mcp_http_client_empty_response():
+    """Test that empty responses are handled gracefully"""
+    # GIVEN a mock response that returns empty content
+    mock_response = mock.Mock()
+    mock_response.headers = {"content-type": "application/json"}
+    mock_response.text = ""
+
+    # AND a mock httpx client that returns this response
+    with mock.patch("vellum.workflows.integrations.mcp_service.httpx.AsyncClient") as mock_client_class:
+        mock_client = mock.AsyncMock()
+        mock_client.post.return_value = mock_response
+        mock_client_class.return_value = mock_client
+
+        # WHEN we call initialize with an empty response
+        # THEN it should raise an exception about empty response
+        async with MCPHttpClient("https://test.server.com", {}) as client:
+            with pytest.raises(Exception, match="Empty response received from server"):
+                await client.initialize()
+
+
+@pytest.mark.asyncio
+async def test_mcp_http_client_invalid_sse_json():
+    """Test that invalid JSON in SSE data is handled"""
+    # GIVEN an SSE response with invalid JSON
+    invalid_sse = """event: message
+data: {invalid json}
+
+"""
+
+    mock_response = mock.Mock()
+    mock_response.headers = {"content-type": "text/event-stream"}
+    mock_response.text = invalid_sse
+
+    with mock.patch("vellum.workflows.integrations.mcp_service.httpx.AsyncClient") as mock_client_class:
+        mock_client = mock.AsyncMock()
+        mock_client.post.return_value = mock_response
+        mock_client_class.return_value = mock_client
+
+        # WHEN we call initialize with invalid SSE data
+        # THEN it should raise an exception about no valid JSON
+        async with MCPHttpClient("https://test.server.com", {}) as client:
+            with pytest.raises(Exception, match="No valid JSON data found in SSE response"):
+                await client.initialize()
