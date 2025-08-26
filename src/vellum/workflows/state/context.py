@@ -1,6 +1,6 @@
 from functools import cached_property
 from queue import Queue
-from uuid import uuid4
+from uuid import UUID, uuid4
 from typing import TYPE_CHECKING, Dict, List, Optional, Type
 
 from vellum import Vellum, __version__
@@ -41,7 +41,9 @@ class WorkflowContext:
 
         if self._execution_context.parent_context is None:
             self._execution_context.parent_context = ExternalParentContext(span_id=uuid4())
-            self._execution_context.trace_id = uuid4()
+            # Only generate a new trace_id if one wasn't explicitly provided (i.e., if it's the default zero UUID)
+            if self._execution_context.trace_id == UUID("00000000-0000-0000-0000-000000000000"):
+                self._execution_context.trace_id = uuid4()
             # Propagate the updated context back to the global execution context
             set_execution_context(self._execution_context)
 
