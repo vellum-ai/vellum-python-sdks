@@ -27,7 +27,6 @@ from vellum.workflows.nodes.displayable.subworkflow_deployment_node.node import 
 from vellum.workflows.nodes.displayable.tool_calling_node.state import ToolCallingState
 from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.ports.port import Port
-from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.state import BaseState
 from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior, Tool, ToolBase
@@ -410,19 +409,13 @@ def create_router_node(
         # and if the function_name is changed, the port_condition will also change.
         def create_port_condition(fn_name):
             return Port.on_if(
-                LazyReference(
-                    lambda: (
-                        ToolCallingState.current_prompt_output_index.less_than(
-                            tool_prompt_node.Outputs.results.length()
-                        )
-                        & tool_prompt_node.Outputs.results[ToolCallingState.current_prompt_output_index]["type"].equals(
-                            "FUNCTION_CALL"
-                        )
-                        & tool_prompt_node.Outputs.results[ToolCallingState.current_prompt_output_index]["value"][
-                            "name"
-                        ].equals(fn_name)
-                    )
+                ToolCallingState.current_prompt_output_index.less_than(tool_prompt_node.Outputs.results.length())
+                & tool_prompt_node.Outputs.results[ToolCallingState.current_prompt_output_index]["type"].equals(
+                    "FUNCTION_CALL"
                 )
+                & tool_prompt_node.Outputs.results[ToolCallingState.current_prompt_output_index]["value"][
+                    "name"
+                ].equals(fn_name)
             )
 
         for function in functions:
