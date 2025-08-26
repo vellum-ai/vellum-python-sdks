@@ -7,7 +7,7 @@ from vellum.client.types.workflow_execution_initiated_event import WorkflowExecu
 from vellum.workflows.events.workflow import WorkflowEvent
 from vellum.workflows.resolvers.base import BaseWorkflowResolver
 from vellum.workflows.resolvers.types import LoadStateResult
-from vellum.workflows.state.base import BaseState, StateMeta
+from vellum.workflows.state.base import BaseState
 
 logger = logging.getLogger(__name__)
 
@@ -78,14 +78,12 @@ class VellumResolver(BaseWorkflowResolver):
             logger.warning("Could not find required execution events for state loading")
             return None
 
-        meta = StateMeta.model_validate(response.state.pop("meta"))
-
         if self._workflow_class:
             state_class = self._workflow_class.get_state_class()
-            state = state_class(**response.state, meta=meta)
+            state = state_class(**response.state)
         else:
             logger.warning("No workflow class registered, falling back to BaseState")
-            state = BaseState(**response.state, meta=meta)
+            state = BaseState(**response.state)
 
         return LoadStateResult(
             state=state,

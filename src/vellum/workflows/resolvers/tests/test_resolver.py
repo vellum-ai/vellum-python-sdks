@@ -14,7 +14,7 @@ from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.resolvers.resolver import VellumResolver
 from vellum.workflows.resolvers.types import LoadStateResult
-from vellum.workflows.state.base import BaseState, NodeExecutionCache
+from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.context import WorkflowContext
 
 
@@ -33,17 +33,6 @@ def test_load_state_with_context_success():
     # GIVEN a state dictionary that matches what the resolver expects
     state_dict = {
         "test_key": "test_value",
-        "meta": {
-            "workflow_definition": "MockWorkflow",
-            "id": str(uuid4()),
-            "span_id": str(uuid4()),
-            "updated_ts": datetime.now().isoformat(),
-            "workflow_inputs": BaseInputs(),
-            "external_inputs": {},
-            "node_outputs": {},
-            "node_execution_cache": NodeExecutionCache(),
-            "parent": None,
-        },
     }
 
     mock_workflow_definition = VellumCodeResourceDefinition(

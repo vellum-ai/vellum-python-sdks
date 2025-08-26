@@ -150,6 +150,9 @@ class WorkflowRunner(Generic[StateType]):
                         state_class = self.workflow.get_state_class()
                         if isinstance(load_state_result.state, state_class):
                             self._initial_state = load_state_result.state
+                            normalized_inputs = deepcopy(inputs) if inputs else self.workflow.get_default_inputs()
+                            self._initial_state.meta.workflow_inputs = normalized_inputs
+                            self._initial_state.meta.workflow_definition = self.workflow.__class__
                             self._span_link_info = (
                                 load_state_result.previous_trace_id,
                                 load_state_result.previous_span_id,

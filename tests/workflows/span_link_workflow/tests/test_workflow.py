@@ -21,7 +21,7 @@ from vellum.workflows.state.base import NodeExecutionCache
 from vellum.workflows.types.definition import VellumCodeResourceDefinition
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
-from tests.workflows.span_link_workflow.workflow import SpanLinkWorkflow
+from tests.workflows.span_link_workflow.workflow import Inputs, SpanLinkWorkflow
 
 
 def test_span_linking_across_three_executions(vellum_client):
@@ -31,12 +31,14 @@ def test_span_linking_across_three_executions(vellum_client):
     workflow1 = SpanLinkWorkflow()
 
     # WHEN the first execution is run
-    events1 = list(workflow1.stream(event_filter=all_workflow_event_filter))
+    events1 = list(
+        workflow1.stream(inputs=Inputs(user_message="Hello, world!"), event_filter=all_workflow_event_filter)
+    )
     terminal_event1 = events1[-1]
 
     # THEN the first execution should be fulfilled with count 1
     assert terminal_event1.name == "workflow.execution.fulfilled"
-    assert terminal_event1.outputs == {"current_count": 1}
+    assert terminal_event1.outputs == {"current_count": 1, "user_message": "Hello, world!"}
 
     # AND the workflow initiation event should have NO span links
     workflow_initiated_events = [e for e in events1 if e.name == "workflow.execution.initiated"]
@@ -53,17 +55,6 @@ def test_span_linking_across_three_executions(vellum_client):
 
     state_dict = {
         "execution_count": 1,
-        "meta": {
-            "workflow_definition": "SpanLinkWorkflow",
-            "id": str(uuid4()),
-            "span_id": str(first_span_id),
-            "updated_ts": datetime.now().isoformat(),
-            "workflow_inputs": BaseInputs(),
-            "external_inputs": {},
-            "node_outputs": {},
-            "node_execution_cache": NodeExecutionCache(),
-            "parent": None,
-        },
     }
 
     mock_body = ClientWorkflowExecutionInitiatedBody(
@@ -101,13 +92,23 @@ def test_span_linking_across_three_executions(vellum_client):
 
     # WHEN the second execution is run with the previous execution ID
     workflow2 = SpanLinkWorkflow()
+    events2 = list(
+        workflow2.stream(
+            inputs=Inputs(user_message="Hello again!"),
+            previous_execution_id=first_execution_id,
+            event_filter=all_workflow_event_filter,
+        )
+    )
 
-    events2 = list(workflow2.stream(previous_execution_id=first_execution_id, event_filter=all_workflow_event_filter))
+    state2 = workflow2.get_most_recent_state()
+    assert state2.meta.workflow_definition == SpanLinkWorkflow
+    assert isinstance(state2.meta.workflow_inputs, Inputs)
+
     terminal_event2 = events2[-1]
 
     # THEN the second execution should be fulfilled with count 2
     assert terminal_event2.name == "workflow.execution.fulfilled"
-    assert terminal_event2.outputs == {"current_count": 2}
+    assert terminal_event2.outputs == {"current_count": 2, "user_message": "Hello again!"}
 
     # AND the workflow initiation event should have correct span links (previous and root)
     workflow_initiated_events = [e for e in events2 if e.name == "workflow.execution.initiated"]
@@ -155,17 +156,6 @@ def test_span_linking_across_three_executions(vellum_client):
 
     state_dict = {
         "execution_count": 2,
-        "meta": {
-            "workflow_definition": "SpanLinkWorkflow",
-            "id": str(uuid4()),
-            "span_id": str(second_span_id),
-            "updated_ts": datetime.now().isoformat(),
-            "workflow_inputs": BaseInputs(),
-            "external_inputs": {},
-            "node_outputs": {},
-            "node_execution_cache": NodeExecutionCache(),
-            "parent": None,
-        },
     }
 
     second_workflow_init_event = ClientWorkflowExecutionInitiatedEvent(
@@ -221,12 +211,22 @@ def test_span_linking_across_three_executions(vellum_client):
 
     workflow3 = SpanLinkWorkflow()
 
-    events3 = list(workflow3.stream(previous_execution_id=second_execution_id, event_filter=all_workflow_event_filter))
+    events3 = list(
+        workflow3.stream(
+            inputs=Inputs(user_message="Hello third time!"),
+            previous_execution_id=second_execution_id,
+            event_filter=all_workflow_event_filter,
+        )
+    )
     terminal_event3 = events3[-1]
+
+    state3 = workflow3.get_most_recent_state()
+    assert state3.meta.workflow_definition == SpanLinkWorkflow
+    assert isinstance(state3.meta.workflow_inputs, Inputs)
 
     # THEN third execution should be fulfilled with count 3
     assert terminal_event3.name == "workflow.execution.fulfilled"
-    assert terminal_event3.outputs == {"current_count": 3}
+    assert terminal_event3.outputs == {"current_count": 3, "user_message": "Hello third time!"}
 
     # AND the workflow initiation event should have correct span links
     workflow_initiated_events = [e for e in events3 if e.name == "workflow.execution.initiated"]
