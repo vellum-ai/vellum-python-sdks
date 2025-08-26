@@ -5,7 +5,7 @@ from unittest import mock
 
 from vellum.workflows.constants import AuthorizationType
 from vellum.workflows.integrations.mcp_service import MCPHttpClient, MCPService
-from vellum.workflows.types.definition import MCPServer
+from vellum.workflows.types.definition import MCPServer, MCPToolDefinition
 
 
 def test_mcp_http_client_sse_response():
@@ -165,3 +165,61 @@ data: {invalid json}
         async with MCPHttpClient("https://test.server.com", {}) as client:
             with pytest.raises(Exception, match="No valid JSON data found in SSE response"):
                 await client.initialize()
+
+
+def test_mcp_service_hydrate_tool_definitions():
+    """Test tool definition hydration with SSE responses"""
+    # GIVEN an MCP server configuration
+    sample_mcp_server = MCPServer(
+        name="test-server",
+        url="https://test.mcp.server.com/mcp",
+        authorization_type=AuthorizationType.BEARER_TOKEN,
+        bearer_token_value="test-token-123",
+    )
+
+    # AND a mock MCP service that returns tools via SSE
+    with mock.patch("vellum.workflows.integrations.mcp_service.asyncio.run") as mock_run:
+        mock_run.return_value = [
+            {
+                "name": "resolve-library-id",
+                "description": "Resolves library names to IDs",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {"libraryName": {"type": "string"}},
+                    "required": ["libraryName"],
+                },
+            }
+        ]
+
+        # WHEN we hydrate tool definitions
+        service = MCPService()
+        tool_definitions = service.hydrate_tool_definitions(sample_mcp_server)
+
+        # THEN we should get properly formatted MCPToolDefinition objects
+        assert len(tool_definitions) == 1
+        assert isinstance(tool_definitions[0], MCPToolDefinition)
+        assert tool_definitions[0].name == "resolve-library-id"
+        assert tool_definitions[0].description == "Resolves library names to IDs"
+        assert tool_definitions[0].server == sample_mcp_server
+        assert tool_definitions[0].parameters == {
+            "type": "object",
+            "properties": {"libraryName": {"type": "string"}},
+            "required": ["libraryName"],
+        }
+
+
+def test_mcp_service_list_tools_handles_errors():
+    """Test that SSE parsing errors are handled gracefully"""
+    # GIVEN an MCP server configuration
+    sample_mcp_server = MCPServer(name="test-server", url="https://test.mcp.server.com/mcp")
+
+    # AND a mock that raises an exception during SSE parsing
+    with mock.patch("vellum.workflows.integrations.mcp_service.asyncio.run") as mock_run:
+        mock_run.side_effect = Exception("SSE parsing failed")
+
+        # WHEN we try to list tools
+        service = MCPService()
+        tools = service.list_tools(sample_mcp_server)
+
+        # THEN we should get an empty list instead of crashing
+        assert tools == []
