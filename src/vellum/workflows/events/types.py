@@ -7,7 +7,6 @@ from pydantic import Field, GetCoreSchemaHandler, Tag, ValidationInfo
 from pydantic_core import CoreSchema, core_schema
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
-from vellum.client.types.span_link import SpanLink
 from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.types.definition import VellumCodeResourceDefinition
 from vellum.workflows.types.utils import datetime_now
@@ -84,6 +83,12 @@ class UnknownParentContext(BaseParentContext):
 # Setting external parent context for external workflows
 class ExternalParentContext(BaseParentContext):
     type: Literal["EXTERNAL"] = "EXTERNAL"
+
+
+class SpanLink(UniversalBaseModel):
+    trace_id: str
+    type: Literal["TRIGGERED_BY", "PREVIOUS_SPAN", "ROOT_SPAN"]
+    span_context: "ParentContext"
 
 
 def _cast_parent_context_discriminator(v: Any) -> Any:
