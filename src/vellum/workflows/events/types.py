@@ -87,7 +87,7 @@ class ExternalParentContext(BaseParentContext):
 
 class SpanLink(UniversalBaseModel):
     trace_id: str
-    type: Literal["PREVIOUS_SPAN", "ROOT_SPAN"]
+    type: Literal["TRIGGERED_BY", "PREVIOUS_SPAN", "ROOT_SPAN"]
     span_context: "ParentContext"
 
 
