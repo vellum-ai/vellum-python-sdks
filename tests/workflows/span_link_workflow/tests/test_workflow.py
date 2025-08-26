@@ -16,8 +16,6 @@ from vellum.client.types.workflow_execution_span import WorkflowExecutionSpan
 from vellum.client.types.workflow_execution_span_attributes import WorkflowExecutionSpanAttributes
 from vellum.client.types.workflow_parent_context import WorkflowParentContext as ClientWorkflowParentContext
 from vellum.workflows.events.types import SpanLink, WorkflowParentContext
-from vellum.workflows.inputs.base import BaseInputs
-from vellum.workflows.state.base import NodeExecutionCache
 from vellum.workflows.types.definition import VellumCodeResourceDefinition
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
