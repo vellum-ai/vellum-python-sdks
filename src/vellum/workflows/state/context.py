@@ -41,6 +41,7 @@ class WorkflowContext:
 
         if self._execution_context.parent_context is None:
             self._execution_context.parent_context = ExternalParentContext(span_id=uuid4())
+            self._execution_context.trace_id = uuid4()
             # Propagate the updated context back to the global execution context
             set_execution_context(self._execution_context)
 
