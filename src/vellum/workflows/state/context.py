@@ -180,6 +180,7 @@ class WorkflowContext:
                 deployment_name,
                 release_tag=release_tag,
                 version=version_range,
+                request_options={"additional_headers": {"X-Vellum-Always-Success": "true"}},
             )
 
             zip_bytes = b"".join(response)
