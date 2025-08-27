@@ -183,7 +183,11 @@ class WorkflowContext:
                 deployment_name,
                 release_tag=release_tag,
                 version=version_range,
+                request_options={"additional_headers": {"X-Vellum-Always-Success": "true"}},
             )
+
+            if isinstance(response, dict) and response.get("success") is False:
+                return None
 
             zip_bytes = b"".join(response)
             pulled_files = extract_zip_files(zip_bytes)
