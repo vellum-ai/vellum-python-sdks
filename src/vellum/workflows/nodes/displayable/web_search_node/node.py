@@ -49,7 +49,7 @@ class WebSearchNode(BaseNode[StateType]):
             )
 
         if self.api_key is None:
-            raise NodeException("API key is required for SerpAPI", code=WorkflowErrorCode.INVALID_INPUTS)
+            raise NodeException("API key is required", code=WorkflowErrorCode.INVALID_INPUTS)
 
         if not isinstance(self.num_results, int) or self.num_results <= 0:
             raise NodeException("num_results must be a positive integer", code=WorkflowErrorCode.INVALID_INPUTS)
@@ -58,7 +58,7 @@ class WebSearchNode(BaseNode[StateType]):
         """Run the WebSearchNode to perform web search via SerpAPI."""
         self._validate()
 
-        api_key_value = self.api_key.name if self.api_key and hasattr(self.api_key, "name") else str(self.api_key)
+        api_key_value = self.api_key
 
         params = {
             "q": self.query,
@@ -71,9 +71,8 @@ class WebSearchNode(BaseNode[StateType]):
             params["location"] = self.location
 
         headers = {}
-        if "User-Agent" not in headers:
-            client_headers = self._context.vellum_client._client_wrapper.get_headers()
-            headers["User-Agent"] = client_headers.get("User-Agent")
+        client_headers = self._context.vellum_client._client_wrapper.get_headers()
+        headers["User-Agent"] = client_headers.get("User-Agent")
 
         try:
             prepped = Request(method="GET", url="https://serpapi.com/search", params=params, headers=headers).prepare()
