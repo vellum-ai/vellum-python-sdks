@@ -11,6 +11,7 @@ from vellum.workflows.nodes.displayable import (
     PromptDeploymentNode,
     SearchNode,
     SubworkflowDeploymentNode,
+    WebSearchNode,
 )
 from vellum.workflows.nodes.displayable.bases import (
     BaseInlinePromptNode as BaseInlinePromptNode,
@@ -43,4 +44,5 @@ __all__ = [
     "PromptDeploymentNode",
     "SearchNode",
     "SubworkflowDeploymentNode",
+    "WebSearchNode",
 ]
