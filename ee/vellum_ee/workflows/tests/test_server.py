@@ -773,3 +773,6 @@ __all__ = ["TestSubworkflowDeploymentNode"]
     assert kwargs["release_tag"] == release_tag
     assert kwargs["version"].startswith(">=")
     assert ".0.0,<=" in kwargs["version"]
+
+    # AND the X-Vellum-Always-Success header should be included for graceful error handling
+    assert kwargs["request_options"]["additional_headers"]["X-Vellum-Always-Success"] == "true"
