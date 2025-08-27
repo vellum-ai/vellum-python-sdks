@@ -1,29 +1,12 @@
-import io
 import json
 import os
 from unittest.mock import patch
-import zipfile
 
 from click.testing import CliRunner
 from pydash import snake_case
 
+from vellum.workflows.utils.zip import zip_file_map
 from vellum_cli import main as cli_main
-
-
-def _zip_file_map(file_map: dict[str, str]) -> bytes:
-    # Create an in-memory bytes buffer to store the zip
-    zip_buffer = io.BytesIO()
-
-    # Create zip file and add files from file_map
-    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
-        for filename, content in file_map.items():
-            zip_file.writestr(filename, content)
-
-    # Get the bytes from the buffer
-    zip_bytes = zip_buffer.getvalue()
-    zip_buffer.close()
-
-    return zip_bytes
 
 
 class MockTemplate:
@@ -44,7 +27,7 @@ def test_init_command(vellum_client, mock_module):
     vellum_client.workflow_sandboxes.list_workflow_sandbox_examples.return_value.results = fake_templates
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+    vellum_client.workflows.pull.return_value = iter([zip_file_map({"workflow.py": "print('hello')"})])
 
     # WHEN the user runs the `init` command and selects the first template
     runner = CliRunner()
@@ -173,7 +156,7 @@ def test_init_command_target_directory_exists(vellum_client, mock_module):
     vellum_client.workflow_sandboxes.list_workflow_sandbox_examples.return_value.results = fake_templates
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+    vellum_client.workflows.pull.return_value = iter([zip_file_map({"workflow.py": "print('hello')"})])
 
     # WHEN the user runs the `init` command and selects the template
     runner = CliRunner()
@@ -214,7 +197,7 @@ def test_init_command_with_template_name(vellum_client, mock_module):
     vellum_client.workflow_sandboxes.list_workflow_sandbox_examples.return_value.results = fake_templates
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+    vellum_client.workflows.pull.return_value = iter([zip_file_map({"workflow.py": "print('hello')"})])
 
     # WHEN the user runs the `init` command with a specific template name
     template_name = snake_case("Another Workflow")
@@ -309,7 +292,7 @@ def test_init__with_target_dir(vellum_client, mock_module):
     vellum_client.workflow_sandboxes.list_workflow_sandbox_examples.return_value.results = fake_templates
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+    vellum_client.workflows.pull.return_value = iter([zip_file_map({"workflow.py": "print('hello')"})])
 
     # AND a target directory
     target_dir = os.path.join(temp_dir, "dir")
@@ -364,7 +347,7 @@ def test_init__with_nested_target_dir(vellum_client, mock_module):
     vellum_client.workflow_sandboxes.list_workflow_sandbox_examples.return_value.results = fake_templates
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+    vellum_client.workflows.pull.return_value = iter([zip_file_map({"workflow.py": "print('hello')"})])
 
     # AND a nested target directory that doesn't exist yet
     nested_target_dir = os.path.join(temp_dir, "dir-1", "dir-2")
@@ -422,7 +405,7 @@ def test_init__with_template_name_and_target_dir(vellum_client, mock_module):
     vellum_client.workflow_sandboxes.list_workflow_sandbox_examples.return_value.results = fake_templates
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+    vellum_client.workflows.pull.return_value = iter([zip_file_map({"workflow.py": "print('hello')"})])
 
     # AND a target directory
     target_dir = os.path.join(temp_dir, "dir")

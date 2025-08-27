@@ -3,14 +3,18 @@
 import typing
 
 from .array_input import ArrayInput
+from .audio_input import AudioInput
 from .chat_history_input import ChatHistoryInput
 from .code_executor_secret_input import CodeExecutorSecretInput
+from .document_input import DocumentInput
 from .error_input import ErrorInput
 from .function_call_input import FunctionCallInput
+from .image_input import ImageInput
 from .json_input import JsonInput
 from .number_input import NumberInput
 from .search_results_input import SearchResultsInput
 from .string_input import StringInput
+from .video_input import VideoInput
 
 CodeExecutorInput = typing.Union[
     StringInput,
@@ -21,5 +25,9 @@ CodeExecutorInput = typing.Union[
     ErrorInput,
     ArrayInput,
     FunctionCallInput,
+    AudioInput,
+    VideoInput,
+    ImageInput,
+    DocumentInput,
     CodeExecutorSecretInput,
 ]

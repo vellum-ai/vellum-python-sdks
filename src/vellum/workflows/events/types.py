@@ -1,7 +1,7 @@
 from datetime import datetime
 import json
 from uuid import UUID, uuid4
-from typing import Annotated, Any, Literal, Optional, Union, get_args
+from typing import Annotated, Any, List, Literal, Optional, Union, get_args
 
 from pydantic import Field, GetCoreSchemaHandler, Tag, ValidationInfo
 from pydantic_core import CoreSchema, core_schema
@@ -85,6 +85,12 @@ class ExternalParentContext(BaseParentContext):
     type: Literal["EXTERNAL"] = "EXTERNAL"
 
 
+class SpanLink(UniversalBaseModel):
+    trace_id: str
+    type: Literal["TRIGGERED_BY", "PREVIOUS_SPAN", "ROOT_SPAN"]
+    span_context: "ParentContext"
+
+
 def _cast_parent_context_discriminator(v: Any) -> Any:
     if v in PARENT_CONTEXT_TYPES:
         return v
@@ -164,3 +170,4 @@ class BaseEvent(UniversalBaseModel):
     trace_id: UUID
     span_id: UUID
     parent: Optional[ParentContext] = None
+    links: Optional[List[SpanLink]] = None

@@ -3,13 +3,17 @@
 import typing
 
 from .named_test_case_array_variable_value import NamedTestCaseArrayVariableValue
+from .named_test_case_audio_variable_value import NamedTestCaseAudioVariableValue
 from .named_test_case_chat_history_variable_value import NamedTestCaseChatHistoryVariableValue
+from .named_test_case_document_variable_value import NamedTestCaseDocumentVariableValue
 from .named_test_case_error_variable_value import NamedTestCaseErrorVariableValue
 from .named_test_case_function_call_variable_value import NamedTestCaseFunctionCallVariableValue
+from .named_test_case_image_variable_value import NamedTestCaseImageVariableValue
 from .named_test_case_json_variable_value import NamedTestCaseJsonVariableValue
 from .named_test_case_number_variable_value import NamedTestCaseNumberVariableValue
 from .named_test_case_search_results_variable_value import NamedTestCaseSearchResultsVariableValue
 from .named_test_case_string_variable_value import NamedTestCaseStringVariableValue
+from .named_test_case_video_variable_value import NamedTestCaseVideoVariableValue
 
 NamedTestCaseVariableValue = typing.Union[
     NamedTestCaseStringVariableValue,
@@ -20,4 +24,8 @@ NamedTestCaseVariableValue = typing.Union[
     NamedTestCaseErrorVariableValue,
     NamedTestCaseFunctionCallVariableValue,
     NamedTestCaseArrayVariableValue,
+    NamedTestCaseAudioVariableValue,
+    NamedTestCaseVideoVariableValue,
+    NamedTestCaseImageVariableValue,
+    NamedTestCaseDocumentVariableValue,
 ]

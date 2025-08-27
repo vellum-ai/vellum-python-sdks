@@ -68,6 +68,7 @@ with the provided module or be available for use. The Workflow Sandbox must also
 @click.option("--deployment-name", type=str, help="Unique name for the Deployment")
 @click.option("--deployment-description", type=str, help="Description for the Deployment")
 @click.option("--release-tag", help="Release Tag for the Deployment", multiple=True)
+@click.option("--release-description", type=str, help="Description for the Release")
 @click.option(
     "--dry-run",
     is_flag=True,
@@ -87,6 +88,7 @@ def workflows_push(
     deployment_name: Optional[str],
     deployment_description: Optional[str],
     release_tag: Optional[List[str]],
+    release_description: Optional[str],
     dry_run: Optional[bool],
     strict: Optional[bool],
     workspace: Optional[str],
@@ -104,6 +106,7 @@ def workflows_push(
         deployment_name=deployment_name,
         deployment_description=deployment_description,
         release_tags=release_tag,
+        release_description=release_description,
         dry_run=dry_run,
         strict=strict,
         workspace=workspace,
@@ -118,6 +121,7 @@ def workflows_push(
 @click.option("--deployment-name", type=str, help="Unique name for the Deployment")
 @click.option("--deployment-description", type=str, help="Description for the Deployment")
 @click.option("--release-tag", help="Release Tag for the Deployment", multiple=True)
+@click.option("--release-description", type=str, help="Description for the Release")
 @click.option(
     "--dry-run",
     is_flag=True,
@@ -137,6 +141,7 @@ def push_module(
     deployment_name: Optional[str],
     deployment_description: Optional[str],
     release_tag: Optional[List[str]],
+    release_description: Optional[str],
     dry_run: Optional[bool],
     strict: Optional[bool],
     workspace: Optional[str],
@@ -152,6 +157,7 @@ def push_module(
             deployment_name=deployment_name,
             deployment_description=deployment_description,
             release_tags=release_tag,
+            release_description=release_description,
             dry_run=dry_run,
             strict=strict,
             workspace=workspace,

@@ -8,7 +8,6 @@ from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.outputs import BaseOutputs
-from vellum.workflows.types.core import MergeBehavior, VellumSecret
 from vellum.workflows.types.generics import StateType
 
 logger = logging.getLogger(__name__)
@@ -19,18 +18,15 @@ class WebSearchNode(BaseNode[StateType]):
     Used to perform web search using SerpAPI.
 
     query: str - The search query to execute
-    api_key: VellumSecret - SerpAPI authentication key
+    api_key: str - SerpAPI authentication key
     num_results: int - Number of search results to return (default: 10)
     location: Optional[str] - Geographic location filter for search
     """
 
     query: ClassVar[str] = ""
-    api_key: ClassVar[Optional[VellumSecret]] = None
+    api_key: ClassVar[Optional[str]] = None
     num_results: ClassVar[int] = 10
     location: ClassVar[Optional[str]] = None
-
-    class Trigger(BaseNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ANY
 
     class Outputs(BaseOutputs):
         """

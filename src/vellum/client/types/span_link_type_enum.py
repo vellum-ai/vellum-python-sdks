@@ -2,4 +2,4 @@
 
 import typing
 
-SpanLinkTypeEnum = typing.Literal["TRIGGERED_BY"]
+SpanLinkTypeEnum = typing.Union[typing.Literal["TRIGGERED_BY", "PREVIOUS_SPAN", "ROOT_SPAN"], typing.Any]

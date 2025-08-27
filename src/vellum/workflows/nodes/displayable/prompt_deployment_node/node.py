@@ -1,10 +1,10 @@
-import json
 from typing import Any, Dict, Iterator, Type, Union
 
 from vellum.workflows.constants import undefined
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.bases import BasePromptDeploymentNode as BasePromptDeploymentNode
+from vellum.workflows.nodes.displayable.bases.utils import process_additional_prompt_outputs
 from vellum.workflows.outputs import BaseOutput
 from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.generics import StateType
@@ -48,30 +48,8 @@ class PromptDeploymentNode(BasePromptDeploymentNode[StateType]):
                 code=WorkflowErrorCode.INTERNAL_ERROR,
             )
 
-        string_outputs = []
-        json_output = None
-
-        for output in outputs:
-            if output.value is None:
-                continue
-
-            if output.type == "STRING":
-                string_outputs.append(output.value)
-                try:
-                    json_output = json.loads(output.value)
-                except (json.JSONDecodeError, TypeError):
-                    pass
-            elif output.type == "JSON":
-                string_outputs.append(json.dumps(output.value, indent=4))
-            elif output.type == "FUNCTION_CALL":
-                string_outputs.append(output.value.model_dump_json(indent=4))
-            elif output.type == "THINKING":
-                continue
-            else:
-                string_outputs.append(output.value.message)
-
-        value = "\n".join(string_outputs)
-        yield BaseOutput(name="text", value=value)
+        text_output, json_output = process_additional_prompt_outputs(outputs)
+        yield BaseOutput(name="text", value=text_output)
 
         if json_output:
             yield BaseOutput(name="json", value=json_output)

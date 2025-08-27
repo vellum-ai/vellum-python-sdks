@@ -1,32 +1,15 @@
 import pytest
-import io
 import json
 import os
 import tempfile
 from unittest import mock
 from uuid import uuid4
-import zipfile
 
 from click.testing import CliRunner
 
 from vellum.client.core.api_error import ApiError
+from vellum.workflows.utils.zip import zip_file_map
 from vellum_cli import main as cli_main
-
-
-def _zip_file_map(file_map: dict[str, str]) -> bytes:
-    # Create an in-memory bytes buffer to store the zip
-    zip_buffer = io.BytesIO()
-
-    # Create zip file and add files from file_map
-    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
-        for filename, content in file_map.items():
-            zip_file.writestr(filename, content)
-
-    # Get the bytes from the buffer
-    zip_bytes = zip_buffer.getvalue()
-    zip_buffer.close()
-
-    return zip_bytes
 
 
 @pytest.mark.parametrize(
@@ -44,7 +27,7 @@ def test_pull(vellum_client, mock_module, base_command):
     workflow_sandbox_id = mock_module.workflow_sandbox_id
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+    vellum_client.workflows.pull.return_value = iter([zip_file_map({"workflow.py": "print('hello')"})])
 
     # WHEN the user runs the pull command
     runner = CliRunner()
@@ -89,7 +72,7 @@ def test_pull__second_module(vellum_client, mock_module):
     set_pyproject_toml = mock_module.set_pyproject_toml
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+    vellum_client.workflows.pull.return_value = iter([zip_file_map({"workflow.py": "print('hello')"})])
 
     # AND the module we're about to pull is configured second
     set_pyproject_toml(
@@ -134,7 +117,7 @@ def test_pull__with_target_dir(vellum_client, mock_module, base_command):
     os.makedirs(target_dir, exist_ok=True)
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+    vellum_client.workflows.pull.return_value = iter([zip_file_map({"workflow.py": "print('hello')"})])
 
     # WHEN the user runs the pull command with target-dir
     runner = CliRunner()
@@ -195,7 +178,7 @@ def test_pull__with_nested_target_dir(vellum_client, mock_module, base_command):
     nested_target_dir = os.path.join(temp_dir, "dir-1", "dir-2")
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+    vellum_client.workflows.pull.return_value = iter([zip_file_map({"workflow.py": "print('hello')"})])
 
     # WHEN the user runs the pull command with nested target-dir
     runner = CliRunner()
@@ -250,11 +233,7 @@ def test_pull__sandbox_id_with_no_config(vellum_client):
 
     # AND the workflow pull API call returns a zip file
     vellum_client.workflows.pull.return_value = iter(
-        [
-            _zip_file_map(
-                {"workflow.py": "print('hello')", "metadata.json": json.dumps({"label": "Super Cool Workflow"})}
-            )
-        ]
+        [zip_file_map({"workflow.py": "print('hello')", "metadata.json": json.dumps({"label": "Super Cool Workflow"})})]
     )
 
     # AND we are currently in a new directory
@@ -309,11 +288,7 @@ def test_pull__sandbox_id_with_other_workflow_configured(vellum_client, mock_mod
 
     # AND the workflow pull API call returns a zip file
     vellum_client.workflows.pull.return_value = iter(
-        [
-            _zip_file_map(
-                {"workflow.py": "print('hello')", "metadata.json": json.dumps({"label": "Super Cool Workflow"})}
-            )
-        ]
+        [zip_file_map({"workflow.py": "print('hello')", "metadata.json": json.dumps({"label": "Super Cool Workflow"})})]
     )
 
     # WHEN the user runs the pull command with the new workflow sandbox id
@@ -343,7 +318,7 @@ def test_pull__workflow_deployment_with_no_config(vellum_client):
     # AND the workflow pull API call returns a zip file
     vellum_client.workflows.pull.return_value = iter(
         [
-            _zip_file_map(
+            zip_file_map(
                 {
                     "workflow.py": "print('hello')",
                     "metadata.json": json.dumps(
@@ -393,6 +368,7 @@ def test_pull__workflow_deployment_with_no_config(vellum_client):
                             "name": "my-deployment",
                             "description": None,
                             "release_tags": None,
+                            "release_description": None,
                         }
                     ],
                     "container_image_tag": None,
@@ -413,7 +389,7 @@ def test_pull__both_workflow_sandbox_id_and_deployment(vellum_client):
     workflow_deployment = "my-deployment"
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+    vellum_client.workflows.pull.return_value = iter([zip_file_map({"workflow.py": "print('hello')"})])
 
     # AND we are currently in a new directory
     current_dir = os.getcwd()
@@ -446,7 +422,7 @@ def test_pull__remove_missing_files(vellum_client, mock_module):
     module = mock_module.module
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+    vellum_client.workflows.pull.return_value = iter([zip_file_map({"workflow.py": "print('hello')"})])
 
     # AND there is already a different file in the module directory
     other_file_path = os.path.join(temp_dir, *module.split("."), "other_file.py")
@@ -477,7 +453,7 @@ def test_pull__remove_missing_files__ignore_pattern(vellum_client, mock_module):
     set_pyproject_toml = mock_module.set_pyproject_toml
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+    vellum_client.workflows.pull.return_value = iter([zip_file_map({"workflow.py": "print('hello')"})])
 
     # AND there is already a different file in the module directory
     other_file_path = os.path.join(temp_dir, *module.split("."), "other_file.py")
@@ -529,7 +505,7 @@ def test_pull__include_json(vellum_client, mock_module):
 
     # AND the workflow pull API call returns a zip file
     vellum_client.workflows.pull.return_value = iter(
-        [_zip_file_map({"workflow.py": "print('hello')", "workflow.json": "{}"})]
+        [zip_file_map({"workflow.py": "print('hello')", "workflow.json": "{}"})]
     )
 
     # WHEN the user runs the pull command
@@ -551,7 +527,7 @@ def test_pull__exclude_code(vellum_client, mock_module):
 
     # AND the workflow pull API call returns a zip file
     vellum_client.workflows.pull.return_value = iter(
-        [_zip_file_map({"workflow.py": "print('hello')", "workflow.json": "{}"})]
+        [zip_file_map({"workflow.py": "print('hello')", "workflow.json": "{}"})]
     )
 
     # WHEN the user runs the pull command
@@ -605,7 +581,7 @@ def test_pull__sandbox_id_with_other_workflow_deployment_in_lock(vellum_client, 
     # AND the workflow pull API call returns a zip file
     vellum_client.workflows.pull.return_value = iter(
         [
-            _zip_file_map(
+            zip_file_map(
                 {
                     "workflow.py": "print('hello')",
                     "metadata.json": json.dumps(
@@ -641,6 +617,7 @@ def test_pull__sandbox_id_with_other_workflow_deployment_in_lock(vellum_client, 
                         "name": None,
                         "description": None,
                         "release_tags": None,
+                        "release_description": None,
                     },
                 ],
                 "container_image_name": None,
@@ -669,7 +646,7 @@ def test_pull__handle_error_log(vellum_client, mock_module):
 
     # AND the workflow pull API call returns a zip file with an error log
     vellum_client.workflows.pull.return_value = iter(
-        [_zip_file_map({"workflow.py": "print('hello')", "error.log": "test error"})]
+        [zip_file_map({"workflow.py": "print('hello')", "error.log": "test error"})]
     )
 
     # WHEN the user runs the pull command with the new workflow sandbox id
@@ -691,7 +668,7 @@ def test_pull__strict__with_error(vellum_client, mock_module):
     workflow_sandbox_id = mock_module.workflow_sandbox_id
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+    vellum_client.workflows.pull.return_value = iter([zip_file_map({"workflow.py": "print('hello')"})])
 
     # WHEN the user runs the pull command with the new workflow sandbox id
     runner = CliRunner()
@@ -713,7 +690,7 @@ def test_pull__include_sandbox(vellum_client, mock_module):
 
     # AND the workflow pull API call returns a zip file
     vellum_client.workflows.pull.return_value = iter(
-        [_zip_file_map({"workflow.py": "print('hello')", "sandbox.py": "print('hello')"})]
+        [zip_file_map({"workflow.py": "print('hello')", "sandbox.py": "print('hello')"})]
     )
 
     # WHEN the user runs the pull command
@@ -742,7 +719,7 @@ def test_pull__same_pull_twice__one_entry_in_lockfile(vellum_client, mock_module
     workflow_sandbox_id = mock_module.workflow_sandbox_id
 
     # AND the workflow pull API call returns a zip file both times
-    zip_contents = _zip_file_map({"workflow.py": "print('hello')"})
+    zip_contents = zip_file_map({"workflow.py": "print('hello')"})
     responses = iter([zip_contents, zip_contents])
 
     def workflows_pull_side_effect(*_args, **_kwargs):
@@ -778,7 +755,7 @@ def test_pull__module_not_in_config(vellum_client, mock_module):
     set_pyproject_toml({"workflows": []})
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+    vellum_client.workflows.pull.return_value = iter([zip_file_map({"workflow.py": "print('hello')"})])
 
     # WHEN the user runs the pull command again with the workflow sandbox id and module
     runner = CliRunner()
@@ -831,7 +808,7 @@ def test_pull__multiple_instances_of_same_module__keep_when_pulling_another_modu
         json.dump(lock_data, f)
 
     # AND the workflow pull API call returns a zip file
-    vellum_client.workflows.pull.return_value = iter([_zip_file_map({"workflow.py": "print('hello')"})])
+    vellum_client.workflows.pull.return_value = iter([zip_file_map({"workflow.py": "print('hello')"})])
 
     # WHEN the user runs the pull command on the new module
     runner = CliRunner()
@@ -854,7 +831,7 @@ def test_pull__module_name_from_deployment_name(vellum_client):
     deployment_name = "Test Deployment"
     vellum_client.workflows.pull.return_value = iter(
         [
-            _zip_file_map(
+            zip_file_map(
                 {
                     "workflow.py": "print('hello')",
                     "metadata.json": json.dumps({"deployment_name": deployment_name, "label": "Some Label"}),
@@ -993,7 +970,7 @@ def test_pull__workflow_deployment_adds_deployment_to_config(vellum_client, work
     # AND the workflow pull API call returns a zip file with metadata
     vellum_client.workflows.pull.return_value = iter(
         [
-            _zip_file_map(
+            zip_file_map(
                 {
                     "workflow.py": "print('hello')",
                     "metadata.json": json.dumps(
@@ -1080,7 +1057,7 @@ def test_pull__workflow_deployment_name_is_uuid(vellum_client):
     updated_label = "Updated Label"
     vellum_client.workflows.pull.return_value = iter(
         [
-            _zip_file_map(
+            zip_file_map(
                 {
                     "workflow.py": "print('hello')",
                     "metadata.json": json.dumps(
@@ -1168,7 +1145,7 @@ def test_pull__workflow_deployment_updates_existing_deployment(vellum_client, ge
     updated_label = "Updated Label"
     vellum_client.workflows.pull.return_value = iter(
         [
-            _zip_file_map(
+            zip_file_map(
                 {
                     "workflow.py": "print('hello')",
                     "metadata.json": json.dumps(
@@ -1216,7 +1193,7 @@ def test_pull__workflow_deployment_with_name_and_id(vellum_client):
     # AND the workflow pull API call returns a zip file with metadata
     vellum_client.workflows.pull.return_value = iter(
         [
-            _zip_file_map(
+            zip_file_map(
                 {
                     "workflow.py": "print('hello')",
                     "metadata.json": json.dumps(
@@ -1262,7 +1239,7 @@ def test_pull__workflow_deployment_with_name_and_id(vellum_client):
     # AND pull with name will not add a new deployment to the config
     vellum_client.workflows.pull.return_value = iter(
         [
-            _zip_file_map(
+            zip_file_map(
                 {
                     "workflow.py": "print('hello')",
                     "metadata.json": json.dumps(
@@ -1321,7 +1298,7 @@ MY_OTHER_VELLUM_API_KEY=aaabbbcccddd
 
     # AND the workflow pull API call returns a zip file
     vellum_client_class.return_value.workflows.pull.return_value = iter(
-        [_zip_file_map({"workflow.py": "print('hello')"})]
+        [zip_file_map({"workflow.py": "print('hello')"})]
     )
 
     # WHEN calling `vellum pull` with --workspace

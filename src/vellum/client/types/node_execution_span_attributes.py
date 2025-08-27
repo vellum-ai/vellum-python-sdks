@@ -8,6 +8,7 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 
 class NodeExecutionSpanAttributes(UniversalBaseModel):
     label: str
+    filepath: typing.Optional[str] = None
     node_id: str
 
     if IS_PYDANTIC_V2:

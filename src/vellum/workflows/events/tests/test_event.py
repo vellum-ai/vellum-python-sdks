@@ -93,6 +93,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
                     "workflow_version_exec_config": None,
                 },
                 "parent": None,
+                "links": None,
             },
         ),
         (
@@ -156,6 +157,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
                     "type": "WORKFLOW_NODE",
                     "span_id": "123e4567-e89b-12d3-a456-426614174000",
                 },
+                "links": None,
             },
         ),
         (
@@ -191,6 +193,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
                     },
                 },
                 "parent": None,
+                "links": None,
             },
         ),
         (
@@ -224,6 +227,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
                     },
                 },
                 "parent": None,
+                "links": None,
             },
         ),
         (
@@ -259,6 +263,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
                     },
                 },
                 "parent": None,
+                "links": None,
             },
         ),
         (
@@ -294,6 +299,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
                     },
                 },
                 "parent": None,
+                "links": None,
             },
         ),
         (
@@ -334,6 +340,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
                     "mocked": None,
                 },
                 "parent": None,
+                "links": None,
             },
         ),
         (
@@ -372,6 +379,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
                     "mocked": None,
                 },
                 "parent": None,
+                "links": None,
             },
         ),
         (
@@ -405,6 +413,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
                     "mocked": True,
                 },
                 "parent": None,
+                "links": None,
             },
         ),
     ],

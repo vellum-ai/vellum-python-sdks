@@ -1,6 +1,6 @@
 {
   "name": "@vellum-ai/vellum-codegen",
-  "version": "1.2.3",
+  "version": "1.2.5",
   "main": "lib/src/index.js",
   "typings": "lib/src/index.d.ts",
   "files": [
@@ -36,7 +36,7 @@
     "@fern-fern/generator-exec-sdk": "file:./stubs/generator-exec-sdk",
     "lodash": "^4.17.21",
     "uuid": "^11.0.3",
-    "vellum-ai": "1.2.1"
+    "vellum-ai": "1.2.4"
   },
   "devDependencies": {
     "@octokit/auth-app": "^7.1.3",
