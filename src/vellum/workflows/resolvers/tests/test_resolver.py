@@ -14,7 +14,7 @@ from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.resolvers.resolver import VellumResolver
 from vellum.workflows.resolvers.types import LoadStateResult
-from vellum.workflows.state.base import BaseState
+from vellum.workflows.state.base import BaseState, NodeExecutionCache
 from vellum.workflows.state.context import WorkflowContext
 
 
@@ -31,8 +31,21 @@ def test_load_state_with_context_success():
         pass
 
     # GIVEN a state dictionary that matches what the resolver expects
+    prev_id = str(uuid4())
+    prev_span_id = str(uuid4())
     state_dict = {
         "test_key": "test_value",
+        "meta": {
+            "workflow_definition": "MockWorkflow",
+            "id": prev_id,
+            "span_id": prev_span_id,
+            "updated_ts": datetime.now().isoformat(),
+            "workflow_inputs": BaseInputs(),
+            "external_inputs": {},
+            "node_outputs": {},
+            "node_execution_cache": NodeExecutionCache(),
+            "parent": None,
+        },
     }
 
     mock_workflow_definition = VellumCodeResourceDefinition(
@@ -102,6 +115,10 @@ def test_load_state_with_context_success():
     assert result.state is not None
     assert isinstance(result.state, TestState)
     assert result.state.test_key == "test_value"
+
+    # AND the new state should have different meta IDs than those provided in the loaded state_dict
+    assert str(result.state.meta.id) != prev_id
+    assert str(result.state.meta.span_id) != prev_span_id
 
     # AND should have span link info
     assert result.previous_trace_id == previous_invocation.trace_id

@@ -78,6 +78,9 @@ class VellumResolver(BaseWorkflowResolver):
             logger.warning("Could not find required execution events for state loading")
             return None
 
+        if "meta" in response.state:
+            response.state.pop("meta")
+
         if self._workflow_class:
             state_class = self._workflow_class.get_state_class()
             state = state_class(**response.state)
