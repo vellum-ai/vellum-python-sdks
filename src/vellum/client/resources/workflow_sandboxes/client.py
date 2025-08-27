@@ -35,7 +35,6 @@ class WorkflowSandboxesClient:
     def deploy_workflow(
         self,
         id: str,
-        workflow_id: str,
         *,
         workflow_deployment_id: typing.Optional[str] = OMIT,
         workflow_deployment_name: typing.Optional[str] = OMIT,
@@ -49,9 +48,6 @@ class WorkflowSandboxesClient:
         ----------
         id : str
             A UUID string identifying this workflow sandbox.
-
-        workflow_id : str
-            An ID identifying the Workflow you'd like to deploy.
 
         workflow_deployment_id : typing.Optional[str]
             The Vellum-generated ID of the Workflow Deployment you'd like to update. Cannot specify both this and workflow_deployment_name. Leave null to create a new Workflow Deployment.
@@ -86,12 +82,10 @@ class WorkflowSandboxesClient:
         )
         client.workflow_sandboxes.deploy_workflow(
             id="id",
-            workflow_id="workflow_id",
         )
         """
         _response = self._raw_client.deploy_workflow(
             id,
-            workflow_id,
             workflow_deployment_id=workflow_deployment_id,
             workflow_deployment_name=workflow_deployment_name,
             label=label,
@@ -168,7 +162,6 @@ class AsyncWorkflowSandboxesClient:
     async def deploy_workflow(
         self,
         id: str,
-        workflow_id: str,
         *,
         workflow_deployment_id: typing.Optional[str] = OMIT,
         workflow_deployment_name: typing.Optional[str] = OMIT,
@@ -182,9 +175,6 @@ class AsyncWorkflowSandboxesClient:
         ----------
         id : str
             A UUID string identifying this workflow sandbox.
-
-        workflow_id : str
-            An ID identifying the Workflow you'd like to deploy.
 
         workflow_deployment_id : typing.Optional[str]
             The Vellum-generated ID of the Workflow Deployment you'd like to update. Cannot specify both this and workflow_deployment_name. Leave null to create a new Workflow Deployment.
@@ -224,7 +214,6 @@ class AsyncWorkflowSandboxesClient:
         async def main() -> None:
             await client.workflow_sandboxes.deploy_workflow(
                 id="id",
-                workflow_id="workflow_id",
             )
 
 
@@ -232,7 +221,6 @@ class AsyncWorkflowSandboxesClient:
         """
         _response = await self._raw_client.deploy_workflow(
             id,
-            workflow_id,
             workflow_deployment_id=workflow_deployment_id,
             workflow_deployment_name=workflow_deployment_name,
             label=label,

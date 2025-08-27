@@ -3,7 +3,7 @@
 [![fern shield](https://img.shields.io/badge/%F0%9F%8C%BF-Built%20with%20Fern-brightgreen)](https://buildwithfern.com?utm_source=github&utm_medium=github&utm_campaign=readme&utm_source=https%3A%2F%2Fgithub.com%2Fvellum-ai%2Fvellum-python-sdks)
 [![pypi](https://img.shields.io/pypi/v/vellum-ai)](https://pypi.python.org/pypi/vellum-ai)
 
-The Vellum Python library provides convenient access to the Vellum API from Python.
+The Vellum Python library provides convenient access to the Vellum APIs from Python.
 
 ## API Docs
 You can find Vellum's complete API docs at [docs.vellum.ai](https://docs.vellum.ai/api-reference/introduction/getting-started).

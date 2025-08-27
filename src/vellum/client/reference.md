@@ -6222,7 +6222,6 @@ client = Vellum(
 )
 client.workflow_sandboxes.deploy_workflow(
     id="id",
-    workflow_id="workflow_id",
 )
 
 ```
@@ -6240,14 +6239,6 @@ client.workflow_sandboxes.deploy_workflow(
 <dd>
 
 **id:** `str` — A UUID string identifying this workflow sandbox.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**workflow_id:** `str` — An ID identifying the Workflow you'd like to deploy.
     
 </dd>
 </dl>

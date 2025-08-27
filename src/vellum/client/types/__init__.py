@@ -667,11 +667,15 @@ from .workflow_push_exec_config import WorkflowPushExecConfig
 from .workflow_push_response import WorkflowPushResponse
 from .workflow_release_tag_read import WorkflowReleaseTagRead
 from .workflow_release_tag_workflow_deployment_history_item import WorkflowReleaseTagWorkflowDeploymentHistoryItem
+from .workflow_request_audio_input_request import WorkflowRequestAudioInputRequest
 from .workflow_request_chat_history_input_request import WorkflowRequestChatHistoryInputRequest
+from .workflow_request_document_input_request import WorkflowRequestDocumentInputRequest
+from .workflow_request_image_input_request import WorkflowRequestImageInputRequest
 from .workflow_request_input_request import WorkflowRequestInputRequest
 from .workflow_request_json_input_request import WorkflowRequestJsonInputRequest
 from .workflow_request_number_input_request import WorkflowRequestNumberInputRequest
 from .workflow_request_string_input_request import WorkflowRequestStringInputRequest
+from .workflow_request_video_input_request import WorkflowRequestVideoInputRequest
 from .workflow_result_event import WorkflowResultEvent
 from .workflow_result_event_output_data import WorkflowResultEventOutputData
 from .workflow_result_event_output_data_array import WorkflowResultEventOutputDataArray
@@ -1326,11 +1330,15 @@ __all__ = [
     "WorkflowPushResponse",
     "WorkflowReleaseTagRead",
     "WorkflowReleaseTagWorkflowDeploymentHistoryItem",
+    "WorkflowRequestAudioInputRequest",
     "WorkflowRequestChatHistoryInputRequest",
+    "WorkflowRequestDocumentInputRequest",
+    "WorkflowRequestImageInputRequest",
     "WorkflowRequestInputRequest",
     "WorkflowRequestJsonInputRequest",
     "WorkflowRequestNumberInputRequest",
     "WorkflowRequestStringInputRequest",
+    "WorkflowRequestVideoInputRequest",
     "WorkflowResultEvent",
     "WorkflowResultEventOutputData",
     "WorkflowResultEventOutputDataArray",

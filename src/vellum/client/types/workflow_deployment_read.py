@@ -13,6 +13,10 @@ from .vellum_variable import VellumVariable
 
 
 class WorkflowDeploymentRead(UniversalBaseModel):
+    """
+    A Workflow Deployment's full details.
+    """
+
     id: str
     name: str = pydantic.Field()
     """
@@ -34,11 +38,7 @@ class WorkflowDeploymentRead(UniversalBaseModel):
 
     environment: typing.Optional[EnvironmentEnum] = pydantic.Field(default=None)
     """
-    The environment this workflow deployment is used in
-    
-    * `DEVELOPMENT` - Development
-    * `STAGING` - Staging
-    * `PRODUCTION` - Production
+    Deprecated. The value returned will always be 'PRODUCTION'.
     """
 
     created: dt.datetime
