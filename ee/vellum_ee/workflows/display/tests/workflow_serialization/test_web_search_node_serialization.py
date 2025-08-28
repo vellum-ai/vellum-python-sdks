@@ -38,13 +38,14 @@ def test_serialize_web_search_workflow():
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
     nodes = workflow_raw_data["nodes"]
 
-    web_search_node = None
-    for node in nodes:
-        if node and node.get("type") == "GENERIC":
-            base_info = node.get("base", {})
-            if base_info and base_info.get("name") == "WebSearchNode":
-                web_search_node = node
-                break
+    web_search_node = next(
+        (
+            node
+            for node in nodes
+            if node and node.get("type") == "GENERIC" and node.get("base", {}).get("name") == "WebSearchNode"
+        ),
+        None,
+    )
 
     assert web_search_node is not None, "WebSearchNode should be serialized as GENERIC type"
 
