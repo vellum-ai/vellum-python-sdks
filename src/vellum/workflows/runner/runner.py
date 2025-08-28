@@ -709,12 +709,21 @@ class WorkflowRunner(Generic[StateType]):
         )
 
     def _reject_workflow_event(self, error: WorkflowError) -> WorkflowExecutionRejectedEvent:
+        captured_traceback = None
+        try:
+            captured_traceback = traceback.format_exc()
+            if captured_traceback.strip() == "NoneType: None":
+                captured_traceback = None
+        except Exception:
+            pass
+
         return WorkflowExecutionRejectedEvent(
             trace_id=self._execution_context.trace_id,
             span_id=self._initial_state.meta.span_id,
             body=WorkflowExecutionRejectedBody(
                 workflow_definition=self.workflow.__class__,
                 error=error,
+                traceback=captured_traceback,
             ),
             parent=self._execution_context.parent_context,
         )
