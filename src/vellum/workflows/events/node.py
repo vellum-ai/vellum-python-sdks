@@ -141,6 +141,7 @@ class NodeExecutionFulfilledEvent(_BaseNodeEvent, Generic[OutputsType]):
 
 class NodeExecutionRejectedBody(_BaseNodeExecutionBody):
     error: WorkflowError
+    traceback: Optional[str] = None
 
 
 class NodeExecutionRejectedEvent(_BaseNodeEvent):
