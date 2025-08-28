@@ -55,19 +55,17 @@ WorkflowOutputJson(id='...', name='response', value=['User: First Message', 'Use
 ## Running the Example
 
 ```bash
-python -m continuous_chatbot.chat
+python -m continuous_state.chat
 ```
 
 ## Example Conversation Flow
 
-First message:
 ```
-Hello! My name is vellum
-```
-
-Second message:
-```
-What is my name?
+First message
 ```
 
-You should see the response know your name is vellum
+```
+Second message
+```
+
+You should see the response include both message
