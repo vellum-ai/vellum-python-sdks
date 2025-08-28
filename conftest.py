@@ -91,6 +91,7 @@ def vellum_client(vellum_client_class) -> Any:
     vellum_client = vellum_client_class.return_value
     vellum_client._client_wrapper._environment = VellumEnvironment.PRODUCTION
     vellum_client._client_wrapper.api_key = ""
+    vellum_client._client_wrapper.get_headers.return_value = {"User-Agent": "vellum-python-sdk/1.0.0"}
     return vellum_client
 
 
