@@ -26,6 +26,9 @@ def _should_mark_workflow_dynamic(event: WorkflowExecutionInitiatedEvent) -> boo
 
 
 def event_enricher(event: WorkflowExecutionInitiatedEvent) -> WorkflowExecutionInitiatedEvent:
+    if event.name != "workflow.execution.initiated":
+        return event
+
     workflow_definition = event.body.workflow_definition
     workflow_display = get_workflow_display(
         workflow_class=workflow_definition,
