@@ -63,27 +63,19 @@ def test_serialize_web_search_workflow():
     attribute_names = {attr["name"] for attr in web_search_attributes}
 
     # AND the attributes should match exactly what we defined in __serializable_inputs__
-    expected_attribute_names = {"query", "api_key", "num_results", "location"}
-    assert (
-        expected_attribute_names == attribute_names
-    ), f"Attributes mismatch. Expected: {expected_attribute_names}, Found: {attribute_names}"
+    assert attribute_names == {"query", "api_key", "num_results", "location"}
 
     # AND it should have all three expected outputs from WebSearchNode
-    web_search_outputs = web_search_node["outputs"]
-    output_names = {output["name"] for output in web_search_outputs}
-    expected_output_names = {"text", "urls", "results"}
-    assert (
-        expected_output_names == output_names
-    ), f"Outputs mismatch. Expected: {expected_output_names}, Found: {output_names}"
+    assert {output["name"] for output in web_search_node["outputs"]} == {"text", "urls", "results"}
 
     # AND each attribute should have the correct value type based on its source
-    for attr in web_search_attributes:
-        if attr["name"] == "query":
-            # AND query should reference the workflow input
-            assert attr["value"]["type"] == "WORKFLOW_INPUT", "Query should be workflow input"
-        elif attr["name"] == "api_key":
-            # AND api_key should reference a Vellum secret
-            assert attr["value"]["type"] == "VELLUM_SECRET", "API key should be vellum secret"
-        elif attr["name"] in ["num_results", "location"]:
-            # AND num_results and location should be constant values
-            assert attr["value"]["type"] == "CONSTANT_VALUE", f"{attr['name']} should be constant value"
+    attr_types_by_name = {attr["name"]: attr["value"]["type"] for attr in web_search_attributes}
+
+    # AND query should reference the workflow input
+    assert attr_types_by_name["query"] == "WORKFLOW_INPUT"
+    # AND api_key should reference a Vellum secret
+    assert attr_types_by_name["api_key"] == "VELLUM_SECRET"
+    # AND num_results should be a constant value
+    assert attr_types_by_name["num_results"] == "CONSTANT_VALUE"
+    # AND location should be a constant value
+    assert attr_types_by_name["location"] == "CONSTANT_VALUE"
