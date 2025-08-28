@@ -112,7 +112,7 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
                 type="STRING",
                 value='"The current weather in San Francisco is sunny with a temperature of 70 degrees celsius."',
             ),
-            source=None,
+            source="call_7115tNTmEACTsQRGwKpJipJK",
         ),
         ChatMessage(
             text="Based on the function call, the current temperature in San Francisco is 70 degrees celsius.",
@@ -243,7 +243,7 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
                             type="STRING",
                             value='"The current weather in San Francisco is sunny with a temperature of 70 degrees celsius."',  # noqa: E501
                         ),
-                        source=None,
+                        source="call_7115tNTmEACTsQRGwKpJipJK",
                     ),
                 ],
             ),
@@ -440,7 +440,7 @@ def test_tool_router_node_emits_chat_history_in_prompt_inputs(
                 type="STRING",
                 value='"The current weather in San Francisco is sunny with a temperature of 70 degrees celsius."',
             ),
-            source=None,
+            source="call_7115tNTmEACTsQRGwKpJipJK",
         ),
     ]
 
@@ -468,7 +468,7 @@ def test_tool_router_node_emits_chat_history_in_prompt_inputs(
                 type="STRING",
                 value='"The current weather in San Francisco is sunny with a temperature of 70 degrees celsius."',
             ),
-            source=None,
+            source="call_7115tNTmEACTsQRGwKpJipJK",
         ),
         ChatMessage(
             text=None,
@@ -490,7 +490,7 @@ def test_tool_router_node_emits_chat_history_in_prompt_inputs(
                 type="STRING",
                 value='"The current weather in San Diego is sunny with a temperature of 70 degrees celsius."',
             ),
-            source=None,
+            source="call_7115tNTmEACTsQRGwKpJipJK",
         ),
     ]
 
@@ -574,7 +574,7 @@ def test_run_workflow__string_and_function_call_outputs(vellum_adhoc_prompt_clie
             content=StringChatMessageContent(
                 value='"The current weather in San Francisco is sunny with a temperature of 70 degrees celsius."'
             ),
-            source=None,
+            source="call_7115tNTmEACTsQRGwKpJipJK",
         ),
     ]
 
