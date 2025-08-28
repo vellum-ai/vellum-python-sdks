@@ -7,9 +7,4 @@ _WebSearchNodeType = TypeVar("_WebSearchNodeType", bound=WebSearchNode)
 
 
 class BaseWebSearchNodeDisplay(BaseNodeDisplay[_WebSearchNodeType], Generic[_WebSearchNodeType]):
-    __serializable_inputs__ = {
-        WebSearchNode.query,
-        WebSearchNode.api_key,
-        WebSearchNode.num_results,
-        WebSearchNode.location,
-    }
+    pass
