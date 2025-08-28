@@ -1,3 +1,4 @@
+import logging
 from uuid import UUID
 from typing import TYPE_CHECKING, Any, Dict, Generic, Iterable, Literal, Optional, Type, Union
 from typing_extensions import TypeGuard
@@ -24,6 +25,8 @@ from .types import BaseEvent, default_serializer
 
 if TYPE_CHECKING:
     from vellum.workflows.workflows.base import BaseWorkflow
+
+logger = logging.getLogger(__name__)
 
 
 class _BaseWorkflowExecutionBody(UniversalBaseModel):
@@ -107,8 +110,12 @@ class WorkflowExecutionInitiatedEvent(_BaseWorkflowEvent, Generic[InputsType, St
     ) -> WorkflowExecutionInitiatedBody[InputsType, StateType]:
         context = info.context if info and hasattr(info, "context") else {}
         if context and "event_enricher" in context and callable(context["event_enricher"]):
-            event = context["event_enricher"](self)
-            return event.body
+            try:
+                event = context["event_enricher"](self)
+                return event.body
+            except Exception as e:
+                logger.exception(f"Error in event_enricher: {e}")
+                return body
         else:
             return body
 
