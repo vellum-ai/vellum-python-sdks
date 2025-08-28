@@ -17,12 +17,23 @@ class RawWorkflowExecutionsClient:
         self._client_wrapper = client_wrapper
 
     def retrieve_workflow_execution_detail(
-        self, execution_id: str, *, request_options: typing.Optional[RequestOptions] = None
+        self,
+        execution_id: str,
+        *,
+        prev_span_id: typing.Optional[str] = None,
+        span_limit: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[WorkflowExecutionDetail]:
         """
         Parameters
         ----------
         execution_id : str
+
+        prev_span_id : typing.Optional[str]
+            Optional keyset cursor span_id to continue from (exclusive)
+
+        span_limit : typing.Optional[int]
+            Maximum number of spans to return (for lazy loading)
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -36,6 +47,10 @@ class RawWorkflowExecutionsClient:
             f"v1/workflow-executions/{jsonable_encoder(execution_id)}/detail",
             base_url=self._client_wrapper.get_environment().default,
             method="GET",
+            params={
+                "prev_span_id": prev_span_id,
+                "span_limit": span_limit,
+            },
             request_options=request_options,
         )
         try:
@@ -59,12 +74,23 @@ class AsyncRawWorkflowExecutionsClient:
         self._client_wrapper = client_wrapper
 
     async def retrieve_workflow_execution_detail(
-        self, execution_id: str, *, request_options: typing.Optional[RequestOptions] = None
+        self,
+        execution_id: str,
+        *,
+        prev_span_id: typing.Optional[str] = None,
+        span_limit: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[WorkflowExecutionDetail]:
         """
         Parameters
         ----------
         execution_id : str
+
+        prev_span_id : typing.Optional[str]
+            Optional keyset cursor span_id to continue from (exclusive)
+
+        span_limit : typing.Optional[int]
+            Maximum number of spans to return (for lazy loading)
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -78,6 +104,10 @@ class AsyncRawWorkflowExecutionsClient:
             f"v1/workflow-executions/{jsonable_encoder(execution_id)}/detail",
             base_url=self._client_wrapper.get_environment().default,
             method="GET",
+            params={
+                "prev_span_id": prev_span_id,
+                "span_limit": span_limit,
+            },
             request_options=request_options,
         )
         try:

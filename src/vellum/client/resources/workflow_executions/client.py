@@ -28,12 +28,23 @@ class WorkflowExecutionsClient:
         return self._raw_client
 
     def retrieve_workflow_execution_detail(
-        self, execution_id: str, *, request_options: typing.Optional[RequestOptions] = None
+        self,
+        execution_id: str,
+        *,
+        prev_span_id: typing.Optional[str] = None,
+        span_limit: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowExecutionDetail:
         """
         Parameters
         ----------
         execution_id : str
+
+        prev_span_id : typing.Optional[str]
+            Optional keyset cursor span_id to continue from (exclusive)
+
+        span_limit : typing.Optional[int]
+            Maximum number of spans to return (for lazy loading)
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -55,7 +66,9 @@ class WorkflowExecutionsClient:
             execution_id="execution_id",
         )
         """
-        _response = self._raw_client.retrieve_workflow_execution_detail(execution_id, request_options=request_options)
+        _response = self._raw_client.retrieve_workflow_execution_detail(
+            execution_id, prev_span_id=prev_span_id, span_limit=span_limit, request_options=request_options
+        )
         return _response.data
 
 
@@ -75,12 +88,23 @@ class AsyncWorkflowExecutionsClient:
         return self._raw_client
 
     async def retrieve_workflow_execution_detail(
-        self, execution_id: str, *, request_options: typing.Optional[RequestOptions] = None
+        self,
+        execution_id: str,
+        *,
+        prev_span_id: typing.Optional[str] = None,
+        span_limit: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowExecutionDetail:
         """
         Parameters
         ----------
         execution_id : str
+
+        prev_span_id : typing.Optional[str]
+            Optional keyset cursor span_id to continue from (exclusive)
+
+        span_limit : typing.Optional[int]
+            Maximum number of spans to return (for lazy loading)
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -111,6 +135,6 @@ class AsyncWorkflowExecutionsClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.retrieve_workflow_execution_detail(
-            execution_id, request_options=request_options
+            execution_id, prev_span_id=prev_span_id, span_limit=span_limit, request_options=request_options
         )
         return _response.data

@@ -28,6 +28,7 @@ def push_command(
     deployment_name: Optional[str] = None,
     deployment_description: Optional[str] = None,
     release_tags: Optional[List[str]] = None,
+    release_description: Optional[str] = None,
     dry_run: Optional[bool] = None,
     strict: Optional[bool] = None,
     workspace: Optional[str] = None,
@@ -142,6 +143,7 @@ def push_command(
                 name=deployment_name or cli_deployment_config.name or to_kebab_case(module_name),
                 description=deployment_description or cli_deployment_config.description,
                 release_tags=release_tags or cli_deployment_config.release_tags,
+                release_description=release_description or cli_deployment_config.release_description,
             )
         except ValidationError as e:
             for error in e.errors():
@@ -286,6 +288,7 @@ Visit at: {base_url}/workflow-sandboxes/{response.workflow_sandbox_id}"""
             name=deployment_config.name if deploy else None,
             description=deployment_config.description if deploy else None,
             release_tags=deployment_config.release_tags if deploy else None,
+            release_description=getattr(deployment_config, "release_description", None) if deploy else None,
         )
         workflow_config.deployments.append(stored_deployment_config)
 

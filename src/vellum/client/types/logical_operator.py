@@ -30,6 +30,7 @@ LogicalOperator = typing.Union[
         "and",
         "or",
         "isError",
+        "length",
     ],
     typing.Any,
 ]

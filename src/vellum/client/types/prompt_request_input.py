@@ -2,8 +2,20 @@
 
 import typing
 
+from .prompt_request_audio_input import PromptRequestAudioInput
 from .prompt_request_chat_history_input import PromptRequestChatHistoryInput
+from .prompt_request_document_input import PromptRequestDocumentInput
+from .prompt_request_image_input import PromptRequestImageInput
 from .prompt_request_json_input import PromptRequestJsonInput
 from .prompt_request_string_input import PromptRequestStringInput
+from .prompt_request_video_input import PromptRequestVideoInput
 
-PromptRequestInput = typing.Union[PromptRequestStringInput, PromptRequestJsonInput, PromptRequestChatHistoryInput]
+PromptRequestInput = typing.Union[
+    PromptRequestStringInput,
+    PromptRequestJsonInput,
+    PromptRequestChatHistoryInput,
+    PromptRequestAudioInput,
+    PromptRequestVideoInput,
+    PromptRequestImageInput,
+    PromptRequestDocumentInput,
+]

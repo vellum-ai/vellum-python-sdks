@@ -3,13 +3,17 @@
 import typing
 
 from .test_case_array_variable_value import TestCaseArrayVariableValue
+from .test_case_audio_variable_value import TestCaseAudioVariableValue
 from .test_case_chat_history_variable_value import TestCaseChatHistoryVariableValue
+from .test_case_document_variable_value import TestCaseDocumentVariableValue
 from .test_case_error_variable_value import TestCaseErrorVariableValue
 from .test_case_function_call_variable_value import TestCaseFunctionCallVariableValue
+from .test_case_image_variable_value import TestCaseImageVariableValue
 from .test_case_json_variable_value import TestCaseJsonVariableValue
 from .test_case_number_variable_value import TestCaseNumberVariableValue
 from .test_case_search_results_variable_value import TestCaseSearchResultsVariableValue
 from .test_case_string_variable_value import TestCaseStringVariableValue
+from .test_case_video_variable_value import TestCaseVideoVariableValue
 
 TestCaseVariableValue = typing.Union[
     TestCaseStringVariableValue,
@@ -20,4 +24,8 @@ TestCaseVariableValue = typing.Union[
     TestCaseErrorVariableValue,
     TestCaseFunctionCallVariableValue,
     TestCaseArrayVariableValue,
+    TestCaseAudioVariableValue,
+    TestCaseImageVariableValue,
+    TestCaseVideoVariableValue,
+    TestCaseDocumentVariableValue,
 ]

@@ -13,6 +13,10 @@ from .vellum_variable import VellumVariable
 
 
 class DeploymentRead(UniversalBaseModel):
+    """
+    A Prompt Deployment's full details.
+    """
+
     id: str
     created: dt.datetime
     label: str = pydantic.Field()
@@ -35,11 +39,7 @@ class DeploymentRead(UniversalBaseModel):
 
     environment: typing.Optional[EnvironmentEnum] = pydantic.Field(default=None)
     """
-    The environment this deployment is used in
-    
-    * `DEVELOPMENT` - Development
-    * `STAGING` - Staging
-    * `PRODUCTION` - Production
+    Deprecated. The value returned will always be 'PRODUCTION'.
     """
 
     last_deployed_on: dt.datetime

@@ -2,10 +2,11 @@
 
 import typing
 
+from .delimiter_chunking_request import DelimiterChunkingRequest
 from .reducto_chunking_request import ReductoChunkingRequest
 from .sentence_chunking_request import SentenceChunkingRequest
 from .token_overlapping_window_chunking_request import TokenOverlappingWindowChunkingRequest
 
 DocumentIndexChunkingRequest = typing.Union[
-    ReductoChunkingRequest, SentenceChunkingRequest, TokenOverlappingWindowChunkingRequest
+    ReductoChunkingRequest, SentenceChunkingRequest, TokenOverlappingWindowChunkingRequest, DelimiterChunkingRequest
 ]

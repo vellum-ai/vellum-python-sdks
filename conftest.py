@@ -12,7 +12,7 @@ from pytest_mock import MockerFixture
 import requests_mock
 
 from vellum.client.environment import VellumEnvironment
-from vellum.workflows.context import monitoring_context_store
+from vellum.workflows.context import clear_execution_context
 from vellum.workflows.logging import load_logger
 
 
@@ -20,12 +20,12 @@ from vellum.workflows.logging import load_logger
 def clear_monitoring_context():
     """Clear the global monitoring context store between tests to prevent collisions."""
     # Clear before test
-    monitoring_context_store.clear_context()
+    clear_execution_context()
 
     yield
 
     # Clear after test
-    monitoring_context_store.clear_context()
+    clear_execution_context()
 
 
 def pytest_collection_modifyitems(session, config, items):
@@ -91,6 +91,7 @@ def vellum_client(vellum_client_class) -> Any:
     vellum_client = vellum_client_class.return_value
     vellum_client._client_wrapper._environment = VellumEnvironment.PRODUCTION
     vellum_client._client_wrapper.api_key = ""
+    vellum_client._client_wrapper.get_headers.return_value = {"User-Agent": "vellum-python-sdk/1.0.0"}
     return vellum_client
 
 

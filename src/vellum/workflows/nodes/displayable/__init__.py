@@ -14,6 +14,7 @@ from .prompt_deployment_node import PromptDeploymentNode
 from .search_node import SearchNode
 from .subworkflow_deployment_node import SubworkflowDeploymentNode
 from .tool_calling_node import ToolCallingNode
+from .web_search_node import WebSearchNode
 
 __all__ = [
     "APINode",
@@ -31,5 +32,6 @@ __all__ = [
     "SearchNode",
     "TemplatingNode",
     "ToolCallingNode",
+    "WebSearchNode",
     "FinalOutputNode",
 ]

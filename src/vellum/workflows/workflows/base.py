@@ -251,6 +251,9 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         for emitter in self.emitters:
             emitter.register_context(self._context)
 
+        for resolver in self.resolvers:
+            resolver.register_workflow_instance(self)
+
         self.validate()
 
     @property
@@ -361,6 +364,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         state: Optional[StateType] = None,
         entrypoint_nodes: Optional[RunFromNodeArg] = None,
         external_inputs: Optional[ExternalInputsArg] = None,
+        previous_execution_id: Optional[Union[str, UUID]] = None,
         cancel_signal: Optional[ThreadingEvent] = None,
         node_output_mocks: Optional[MockNodeExecutionArg] = None,
         max_concurrency: Optional[int] = None,
@@ -386,6 +390,9 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         external_inputs: Optional[ExternalInputsArg] = None
             External inputs to pass to the Workflow. Useful for providing human-in-the-loop behavior to the Workflow.
 
+        previous_execution_id: Optional[Union[str, UUID]] = None
+            The execution ID of the previous execution to resume from.
+
         cancel_signal: Optional[ThreadingEvent] = None
             A threading event that can be used to cancel the Workflow Execution.
 
@@ -405,6 +412,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
             state=state,
             entrypoint_nodes=entrypoint_nodes,
             external_inputs=external_inputs,
+            previous_execution_id=previous_execution_id,
             cancel_signal=cancel_signal,
             node_output_mocks=node_output_mocks,
             max_concurrency=max_concurrency,
@@ -473,6 +481,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         state: Optional[StateType] = None,
         entrypoint_nodes: Optional[RunFromNodeArg] = None,
         external_inputs: Optional[ExternalInputsArg] = None,
+        previous_execution_id: Optional[Union[str, UUID]] = None,
         cancel_signal: Optional[ThreadingEvent] = None,
         node_output_mocks: Optional[MockNodeExecutionArg] = None,
         max_concurrency: Optional[int] = None,
@@ -499,6 +508,9 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
         external_inputs: Optional[ExternalInputsArg] = None
             External inputs to pass to the Workflow. Useful for providing human-in-the-loop behavior to the Workflow.
 
+        previous_execution_id: Optional[Union[str, UUID]] = None
+            The execution ID of the previous execution to resume from.
+
         cancel_signal: Optional[ThreadingEvent] = None
             A threading event that can be used to cancel the Workflow Execution.
 
@@ -519,6 +531,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
             state=state,
             entrypoint_nodes=entrypoint_nodes,
             external_inputs=external_inputs,
+            previous_execution_id=previous_execution_id,
             cancel_signal=cancel_signal,
             node_output_mocks=node_output_mocks,
             max_concurrency=max_concurrency,

@@ -52,6 +52,7 @@ def test_serialize_workflow():
                     {
                         "type": "MCP_SERVER",
                         "name": "github",
+                        "description": "",
                         "url": "https://api.githubcopilot.com/mcp/",
                         "authorization_type": "BEARER_TOKEN",
                         "bearer_token_value": "GITHUB_PERSONAL_ACCESS_TOKEN",

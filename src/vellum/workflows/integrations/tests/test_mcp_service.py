@@ -1,8 +1,11 @@
+import pytest
 import asyncio
 import json
 from unittest import mock
 
-from vellum.workflows.integrations.mcp_service import MCPHttpClient
+from vellum.workflows.constants import AuthorizationType
+from vellum.workflows.integrations.mcp_service import MCPHttpClient, MCPService
+from vellum.workflows.types.definition import MCPServer, MCPToolDefinition
 
 
 def test_mcp_http_client_sse_response():
@@ -79,3 +82,144 @@ def test_mcp_http_client_json_response():
 
         # THEN the JSON response should be returned as expected
         assert result == sample_json_response
+
+
+def test_mcp_service_bearer_token_auth():
+    """Test that bearer token auth headers are set correctly"""
+    # GIVEN an MCP server with bearer token auth
+    server = MCPServer(
+        name="test-server",
+        url="https://test.server.com",
+        authorization_type=AuthorizationType.BEARER_TOKEN,
+        bearer_token_value="test-token-123",
+    )
+
+    # WHEN we get auth headers
+    service = MCPService()
+    headers = service._get_auth_headers(server)
+
+    # THEN the Authorization header should be set correctly
+    assert headers == {"Authorization": "Bearer test-token-123"}
+
+
+def test_mcp_service_api_key_auth():
+    """Test that API key auth headers are set correctly"""
+    # GIVEN an MCP server with API key auth
+    server = MCPServer(
+        name="test-server",
+        url="https://test.server.com",
+        authorization_type=AuthorizationType.API_KEY,
+        api_key_header_key="X-API-Key",
+        api_key_header_value="api-key-123",
+    )
+
+    # WHEN we get auth headers
+    service = MCPService()
+    headers = service._get_auth_headers(server)
+
+    # THEN the custom API key header should be set correctly
+    assert headers == {"X-API-Key": "api-key-123"}
+
+
+@pytest.mark.asyncio
+async def test_mcp_http_client_empty_response():
+    """Test that empty responses are handled gracefully"""
+    # GIVEN a mock response that returns empty content
+    mock_response = mock.Mock()
+    mock_response.headers = {"content-type": "application/json"}
+    mock_response.text = ""
+
+    # AND a mock httpx client that returns this response
+    with mock.patch("vellum.workflows.integrations.mcp_service.httpx.AsyncClient") as mock_client_class:
+        mock_client = mock.AsyncMock()
+        mock_client.post.return_value = mock_response
+        mock_client_class.return_value = mock_client
+
+        # WHEN we call initialize with an empty response
+        # THEN it should raise an exception about empty response
+        async with MCPHttpClient("https://test.server.com", {}) as client:
+            with pytest.raises(Exception, match="Empty response received from server"):
+                await client.initialize()
+
+
+@pytest.mark.asyncio
+async def test_mcp_http_client_invalid_sse_json():
+    """Test that invalid JSON in SSE data is handled"""
+    # GIVEN an SSE response with invalid JSON
+    invalid_sse = """event: message
+data: {invalid json}
+
+"""
+
+    mock_response = mock.Mock()
+    mock_response.headers = {"content-type": "text/event-stream"}
+    mock_response.text = invalid_sse
+
+    with mock.patch("vellum.workflows.integrations.mcp_service.httpx.AsyncClient") as mock_client_class:
+        mock_client = mock.AsyncMock()
+        mock_client.post.return_value = mock_response
+        mock_client_class.return_value = mock_client
+
+        # WHEN we call initialize with invalid SSE data
+        # THEN it should raise an exception about no valid JSON
+        async with MCPHttpClient("https://test.server.com", {}) as client:
+            with pytest.raises(Exception, match="No valid JSON data found in SSE response"):
+                await client.initialize()
+
+
+def test_mcp_service_hydrate_tool_definitions():
+    """Test tool definition hydration with SSE responses"""
+    # GIVEN an MCP server configuration
+    sample_mcp_server = MCPServer(
+        name="test-server",
+        url="https://test.mcp.server.com/mcp",
+        authorization_type=AuthorizationType.BEARER_TOKEN,
+        bearer_token_value="test-token-123",
+    )
+
+    # AND a mock MCP service that returns tools via SSE
+    with mock.patch("vellum.workflows.integrations.mcp_service.asyncio.run") as mock_run:
+        mock_run.return_value = [
+            {
+                "name": "resolve-library-id",
+                "description": "Resolves library names to IDs",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {"libraryName": {"type": "string"}},
+                    "required": ["libraryName"],
+                },
+            }
+        ]
+
+        # WHEN we hydrate tool definitions
+        service = MCPService()
+        tool_definitions = service.hydrate_tool_definitions(sample_mcp_server)
+
+        # THEN we should get properly formatted MCPToolDefinition objects
+        assert len(tool_definitions) == 1
+        assert isinstance(tool_definitions[0], MCPToolDefinition)
+        assert tool_definitions[0].name == "resolve-library-id"
+        assert tool_definitions[0].description == "Resolves library names to IDs"
+        assert tool_definitions[0].server == sample_mcp_server
+        assert tool_definitions[0].parameters == {
+            "type": "object",
+            "properties": {"libraryName": {"type": "string"}},
+            "required": ["libraryName"],
+        }
+
+
+def test_mcp_service_list_tools_handles_errors():
+    """Test that SSE parsing errors are handled gracefully"""
+    # GIVEN an MCP server configuration
+    sample_mcp_server = MCPServer(name="test-server", url="https://test.mcp.server.com/mcp")
+
+    # AND a mock that raises an exception during SSE parsing
+    with mock.patch("vellum.workflows.integrations.mcp_service.asyncio.run") as mock_run:
+        mock_run.side_effect = Exception("SSE parsing failed")
+
+        # WHEN we try to list tools
+        service = MCPService()
+        tools = service.list_tools(sample_mcp_server)
+
+        # THEN we should get an empty list instead of crashing
+        assert tools == []

@@ -24,7 +24,6 @@ class RawWorkflowSandboxesClient:
     def deploy_workflow(
         self,
         id: str,
-        workflow_id: str,
         *,
         workflow_deployment_id: typing.Optional[str] = OMIT,
         workflow_deployment_name: typing.Optional[str] = OMIT,
@@ -38,9 +37,6 @@ class RawWorkflowSandboxesClient:
         ----------
         id : str
             A UUID string identifying this workflow sandbox.
-
-        workflow_id : str
-            An ID identifying the Workflow you'd like to deploy.
 
         workflow_deployment_id : typing.Optional[str]
             The Vellum-generated ID of the Workflow Deployment you'd like to update. Cannot specify both this and workflow_deployment_name. Leave null to create a new Workflow Deployment.
@@ -66,7 +62,7 @@ class RawWorkflowSandboxesClient:
 
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"v1/workflow-sandboxes/{jsonable_encoder(id)}/workflows/{jsonable_encoder(workflow_id)}/deploy",
+            f"v1/workflow-sandboxes/{jsonable_encoder(id)}/deploy",
             base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
@@ -165,7 +161,6 @@ class AsyncRawWorkflowSandboxesClient:
     async def deploy_workflow(
         self,
         id: str,
-        workflow_id: str,
         *,
         workflow_deployment_id: typing.Optional[str] = OMIT,
         workflow_deployment_name: typing.Optional[str] = OMIT,
@@ -179,9 +174,6 @@ class AsyncRawWorkflowSandboxesClient:
         ----------
         id : str
             A UUID string identifying this workflow sandbox.
-
-        workflow_id : str
-            An ID identifying the Workflow you'd like to deploy.
 
         workflow_deployment_id : typing.Optional[str]
             The Vellum-generated ID of the Workflow Deployment you'd like to update. Cannot specify both this and workflow_deployment_name. Leave null to create a new Workflow Deployment.
@@ -207,7 +199,7 @@ class AsyncRawWorkflowSandboxesClient:
 
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"v1/workflow-sandboxes/{jsonable_encoder(id)}/workflows/{jsonable_encoder(workflow_id)}/deploy",
+            f"v1/workflow-sandboxes/{jsonable_encoder(id)}/deploy",
             base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={

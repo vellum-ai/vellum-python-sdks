@@ -22,6 +22,8 @@ from .array_vellum_value import ArrayVellumValue
 from .array_vellum_value_request import ArrayVellumValueRequest
 from .audio_chat_message_content import AudioChatMessageContent
 from .audio_chat_message_content_request import AudioChatMessageContentRequest
+from .audio_input import AudioInput
+from .audio_input_request import AudioInputRequest
 from .audio_prompt_block import AudioPromptBlock
 from .audio_vellum_value import AudioVellumValue
 from .audio_vellum_value_request import AudioVellumValueRequest
@@ -80,6 +82,10 @@ from .container_image_build_config import ContainerImageBuildConfig
 from .container_image_container_image_tag import ContainerImageContainerImageTag
 from .container_image_read import ContainerImageRead
 from .create_test_suite_test_case_request import CreateTestSuiteTestCaseRequest
+from .delimiter_chunker_config import DelimiterChunkerConfig
+from .delimiter_chunker_config_request import DelimiterChunkerConfigRequest
+from .delimiter_chunking import DelimiterChunking
+from .delimiter_chunking_request import DelimiterChunkingRequest
 from .deployment_history_item import DeploymentHistoryItem
 from .deployment_provider_payload_response import DeploymentProviderPayloadResponse
 from .deployment_provider_payload_response_payload import DeploymentProviderPayloadResponsePayload
@@ -95,6 +101,8 @@ from .document_index_chunking_request import DocumentIndexChunkingRequest
 from .document_index_indexing_config import DocumentIndexIndexingConfig
 from .document_index_indexing_config_request import DocumentIndexIndexingConfigRequest
 from .document_index_read import DocumentIndexRead
+from .document_input import DocumentInput
+from .document_input_request import DocumentInputRequest
 from .document_processing_state import DocumentProcessingState
 from .document_prompt_block import DocumentPromptBlock
 from .document_read import DocumentRead
@@ -122,15 +130,19 @@ from .execute_prompt_response import ExecutePromptResponse
 from .execute_workflow_response import ExecuteWorkflowResponse
 from .execute_workflow_workflow_result_event import ExecuteWorkflowWorkflowResultEvent
 from .execution_array_vellum_value import ExecutionArrayVellumValue
+from .execution_audio_vellum_value import ExecutionAudioVellumValue
 from .execution_chat_history_vellum_value import ExecutionChatHistoryVellumValue
+from .execution_document_vellum_value import ExecutionDocumentVellumValue
 from .execution_error_vellum_value import ExecutionErrorVellumValue
 from .execution_function_call_vellum_value import ExecutionFunctionCallVellumValue
+from .execution_image_vellum_value import ExecutionImageVellumValue
 from .execution_json_vellum_value import ExecutionJsonVellumValue
 from .execution_number_vellum_value import ExecutionNumberVellumValue
 from .execution_search_results_vellum_value import ExecutionSearchResultsVellumValue
 from .execution_string_vellum_value import ExecutionStringVellumValue
 from .execution_thinking_vellum_value import ExecutionThinkingVellumValue
 from .execution_vellum_value import ExecutionVellumValue
+from .execution_video_vellum_value import ExecutionVideoVellumValue
 from .external_input_descriptor import ExternalInputDescriptor
 from .external_parent_context import ExternalParentContext
 from .external_test_case_execution import ExternalTestCaseExecution
@@ -193,6 +205,8 @@ from .hkunlp_instructor_xl_vectorizer import HkunlpInstructorXlVectorizer
 from .hkunlp_instructor_xl_vectorizer_request import HkunlpInstructorXlVectorizerRequest
 from .image_chat_message_content import ImageChatMessageContent
 from .image_chat_message_content_request import ImageChatMessageContentRequest
+from .image_input import ImageInput
+from .image_input_request import ImageInputRequest
 from .image_prompt_block import ImagePromptBlock
 from .image_vellum_value import ImageVellumValue
 from .image_vellum_value_request import ImageVellumValueRequest
@@ -230,18 +244,28 @@ from .metric_node_result import MetricNodeResult
 from .ml_model_read import MlModelRead
 from .ml_model_usage import MlModelUsage
 from .ml_model_usage_wrapper import MlModelUsageWrapper
+from .named_scenario_input_audio_variable_value_request import NamedScenarioInputAudioVariableValueRequest
 from .named_scenario_input_chat_history_variable_value_request import NamedScenarioInputChatHistoryVariableValueRequest
+from .named_scenario_input_document_variable_value_request import NamedScenarioInputDocumentVariableValueRequest
+from .named_scenario_input_image_variable_value_request import NamedScenarioInputImageVariableValueRequest
 from .named_scenario_input_json_variable_value_request import NamedScenarioInputJsonVariableValueRequest
 from .named_scenario_input_request import NamedScenarioInputRequest
 from .named_scenario_input_string_variable_value_request import NamedScenarioInputStringVariableValueRequest
+from .named_scenario_input_video_variable_value_request import NamedScenarioInputVideoVariableValueRequest
 from .named_test_case_array_variable_value import NamedTestCaseArrayVariableValue
 from .named_test_case_array_variable_value_request import NamedTestCaseArrayVariableValueRequest
+from .named_test_case_audio_variable_value import NamedTestCaseAudioVariableValue
+from .named_test_case_audio_variable_value_request import NamedTestCaseAudioVariableValueRequest
 from .named_test_case_chat_history_variable_value import NamedTestCaseChatHistoryVariableValue
 from .named_test_case_chat_history_variable_value_request import NamedTestCaseChatHistoryVariableValueRequest
+from .named_test_case_document_variable_value import NamedTestCaseDocumentVariableValue
+from .named_test_case_document_variable_value_request import NamedTestCaseDocumentVariableValueRequest
 from .named_test_case_error_variable_value import NamedTestCaseErrorVariableValue
 from .named_test_case_error_variable_value_request import NamedTestCaseErrorVariableValueRequest
 from .named_test_case_function_call_variable_value import NamedTestCaseFunctionCallVariableValue
 from .named_test_case_function_call_variable_value_request import NamedTestCaseFunctionCallVariableValueRequest
+from .named_test_case_image_variable_value import NamedTestCaseImageVariableValue
+from .named_test_case_image_variable_value_request import NamedTestCaseImageVariableValueRequest
 from .named_test_case_json_variable_value import NamedTestCaseJsonVariableValue
 from .named_test_case_json_variable_value_request import NamedTestCaseJsonVariableValueRequest
 from .named_test_case_number_variable_value import NamedTestCaseNumberVariableValue
@@ -252,6 +276,8 @@ from .named_test_case_string_variable_value import NamedTestCaseStringVariableVa
 from .named_test_case_string_variable_value_request import NamedTestCaseStringVariableValueRequest
 from .named_test_case_variable_value import NamedTestCaseVariableValue
 from .named_test_case_variable_value_request import NamedTestCaseVariableValueRequest
+from .named_test_case_video_variable_value import NamedTestCaseVideoVariableValue
+from .named_test_case_video_variable_value_request import NamedTestCaseVideoVariableValueRequest
 from .new_member_join_behavior_enum import NewMemberJoinBehaviorEnum
 from .node_execution_fulfilled_body import NodeExecutionFulfilledBody
 from .node_execution_fulfilled_event import NodeExecutionFulfilledEvent
@@ -268,14 +294,18 @@ from .node_execution_span_attributes import NodeExecutionSpanAttributes
 from .node_execution_streaming_body import NodeExecutionStreamingBody
 from .node_execution_streaming_event import NodeExecutionStreamingEvent
 from .node_input_compiled_array_value import NodeInputCompiledArrayValue
+from .node_input_compiled_audio_value import NodeInputCompiledAudioValue
 from .node_input_compiled_chat_history_value import NodeInputCompiledChatHistoryValue
+from .node_input_compiled_document_value import NodeInputCompiledDocumentValue
 from .node_input_compiled_error_value import NodeInputCompiledErrorValue
 from .node_input_compiled_function_call_value import NodeInputCompiledFunctionCallValue
+from .node_input_compiled_image_value import NodeInputCompiledImageValue
 from .node_input_compiled_json_value import NodeInputCompiledJsonValue
 from .node_input_compiled_number_value import NodeInputCompiledNumberValue
 from .node_input_compiled_search_results_value import NodeInputCompiledSearchResultsValue
 from .node_input_compiled_secret_value import NodeInputCompiledSecretValue
 from .node_input_compiled_string_value import NodeInputCompiledStringValue
+from .node_input_compiled_video_value import NodeInputCompiledVideoValue
 from .node_input_variable_compiled_value import NodeInputVariableCompiledValue
 from .node_output_compiled_array_value import NodeOutputCompiledArrayValue
 from .node_output_compiled_chat_history_value import NodeOutputCompiledChatHistoryValue
@@ -335,10 +365,14 @@ from .prompt_node_result_data import PromptNodeResultData
 from .prompt_output import PromptOutput
 from .prompt_parameters import PromptParameters
 from .prompt_push_response import PromptPushResponse
+from .prompt_request_audio_input import PromptRequestAudioInput
 from .prompt_request_chat_history_input import PromptRequestChatHistoryInput
+from .prompt_request_document_input import PromptRequestDocumentInput
+from .prompt_request_image_input import PromptRequestImageInput
 from .prompt_request_input import PromptRequestInput
 from .prompt_request_json_input import PromptRequestJsonInput
 from .prompt_request_string_input import PromptRequestStringInput
+from .prompt_request_video_input import PromptRequestVideoInput
 from .prompt_settings import PromptSettings
 from .prompt_version_build_config_sandbox import PromptVersionBuildConfigSandbox
 from .raw_prompt_execution_overrides_request import RawPromptExecutionOverridesRequest
@@ -364,9 +398,13 @@ from .rich_text_child_block import RichTextChildBlock
 from .rich_text_prompt_block import RichTextPromptBlock
 from .sandbox_scenario import SandboxScenario
 from .scenario_input import ScenarioInput
+from .scenario_input_audio_variable_value import ScenarioInputAudioVariableValue
 from .scenario_input_chat_history_variable_value import ScenarioInputChatHistoryVariableValue
+from .scenario_input_document_variable_value import ScenarioInputDocumentVariableValue
+from .scenario_input_image_variable_value import ScenarioInputImageVariableValue
 from .scenario_input_json_variable_value import ScenarioInputJsonVariableValue
 from .scenario_input_string_variable_value import ScenarioInputStringVariableValue
+from .scenario_input_video_variable_value import ScenarioInputVideoVariableValue
 from .search_filters_request import SearchFiltersRequest
 from .search_node_result import SearchNodeResult
 from .search_node_result_data import SearchNodeResultData
@@ -433,14 +471,18 @@ from .terminal_node_result_output import TerminalNodeResultOutput
 from .terminal_node_search_results_result import TerminalNodeSearchResultsResult
 from .terminal_node_string_result import TerminalNodeStringResult
 from .test_case_array_variable_value import TestCaseArrayVariableValue
+from .test_case_audio_variable_value import TestCaseAudioVariableValue
 from .test_case_chat_history_variable_value import TestCaseChatHistoryVariableValue
+from .test_case_document_variable_value import TestCaseDocumentVariableValue
 from .test_case_error_variable_value import TestCaseErrorVariableValue
 from .test_case_function_call_variable_value import TestCaseFunctionCallVariableValue
+from .test_case_image_variable_value import TestCaseImageVariableValue
 from .test_case_json_variable_value import TestCaseJsonVariableValue
 from .test_case_number_variable_value import TestCaseNumberVariableValue
 from .test_case_search_results_variable_value import TestCaseSearchResultsVariableValue
 from .test_case_string_variable_value import TestCaseStringVariableValue
 from .test_case_variable_value import TestCaseVariableValue
+from .test_case_video_variable_value import TestCaseVideoVariableValue
 from .test_suite_run_deployment_release_tag_exec_config import TestSuiteRunDeploymentReleaseTagExecConfig
 from .test_suite_run_deployment_release_tag_exec_config_data import TestSuiteRunDeploymentReleaseTagExecConfigData
 from .test_suite_run_deployment_release_tag_exec_config_data_request import (
@@ -558,6 +600,8 @@ from .vellum_video_request import VellumVideoRequest
 from .vellum_workflow_execution_event import VellumWorkflowExecutionEvent
 from .video_chat_message_content import VideoChatMessageContent
 from .video_chat_message_content_request import VideoChatMessageContentRequest
+from .video_input import VideoInput
+from .video_input_request import VideoInputRequest
 from .video_prompt_block import VideoPromptBlock
 from .video_vellum_value import VideoVellumValue
 from .video_vellum_value_request import VideoVellumValueRequest
@@ -623,11 +667,15 @@ from .workflow_push_exec_config import WorkflowPushExecConfig
 from .workflow_push_response import WorkflowPushResponse
 from .workflow_release_tag_read import WorkflowReleaseTagRead
 from .workflow_release_tag_workflow_deployment_history_item import WorkflowReleaseTagWorkflowDeploymentHistoryItem
+from .workflow_request_audio_input_request import WorkflowRequestAudioInputRequest
 from .workflow_request_chat_history_input_request import WorkflowRequestChatHistoryInputRequest
+from .workflow_request_document_input_request import WorkflowRequestDocumentInputRequest
+from .workflow_request_image_input_request import WorkflowRequestImageInputRequest
 from .workflow_request_input_request import WorkflowRequestInputRequest
 from .workflow_request_json_input_request import WorkflowRequestJsonInputRequest
 from .workflow_request_number_input_request import WorkflowRequestNumberInputRequest
 from .workflow_request_string_input_request import WorkflowRequestStringInputRequest
+from .workflow_request_video_input_request import WorkflowRequestVideoInputRequest
 from .workflow_result_event import WorkflowResultEvent
 from .workflow_result_event_output_data import WorkflowResultEventOutputData
 from .workflow_result_event_output_data_array import WorkflowResultEventOutputDataArray
@@ -665,6 +713,8 @@ __all__ = [
     "ArrayVellumValueRequest",
     "AudioChatMessageContent",
     "AudioChatMessageContentRequest",
+    "AudioInput",
+    "AudioInputRequest",
     "AudioPromptBlock",
     "AudioVellumValue",
     "AudioVellumValueRequest",
@@ -715,6 +765,10 @@ __all__ = [
     "ContainerImageContainerImageTag",
     "ContainerImageRead",
     "CreateTestSuiteTestCaseRequest",
+    "DelimiterChunkerConfig",
+    "DelimiterChunkerConfigRequest",
+    "DelimiterChunking",
+    "DelimiterChunkingRequest",
     "DeploymentHistoryItem",
     "DeploymentProviderPayloadResponse",
     "DeploymentProviderPayloadResponsePayload",
@@ -730,6 +784,8 @@ __all__ = [
     "DocumentIndexIndexingConfig",
     "DocumentIndexIndexingConfigRequest",
     "DocumentIndexRead",
+    "DocumentInput",
+    "DocumentInputRequest",
     "DocumentProcessingState",
     "DocumentPromptBlock",
     "DocumentRead",
@@ -757,15 +813,19 @@ __all__ = [
     "ExecuteWorkflowResponse",
     "ExecuteWorkflowWorkflowResultEvent",
     "ExecutionArrayVellumValue",
+    "ExecutionAudioVellumValue",
     "ExecutionChatHistoryVellumValue",
+    "ExecutionDocumentVellumValue",
     "ExecutionErrorVellumValue",
     "ExecutionFunctionCallVellumValue",
+    "ExecutionImageVellumValue",
     "ExecutionJsonVellumValue",
     "ExecutionNumberVellumValue",
     "ExecutionSearchResultsVellumValue",
     "ExecutionStringVellumValue",
     "ExecutionThinkingVellumValue",
     "ExecutionVellumValue",
+    "ExecutionVideoVellumValue",
     "ExternalInputDescriptor",
     "ExternalParentContext",
     "ExternalTestCaseExecution",
@@ -824,6 +884,8 @@ __all__ = [
     "HkunlpInstructorXlVectorizerRequest",
     "ImageChatMessageContent",
     "ImageChatMessageContentRequest",
+    "ImageInput",
+    "ImageInputRequest",
     "ImagePromptBlock",
     "ImageVellumValue",
     "ImageVellumValueRequest",
@@ -861,18 +923,28 @@ __all__ = [
     "MlModelRead",
     "MlModelUsage",
     "MlModelUsageWrapper",
+    "NamedScenarioInputAudioVariableValueRequest",
     "NamedScenarioInputChatHistoryVariableValueRequest",
+    "NamedScenarioInputDocumentVariableValueRequest",
+    "NamedScenarioInputImageVariableValueRequest",
     "NamedScenarioInputJsonVariableValueRequest",
     "NamedScenarioInputRequest",
     "NamedScenarioInputStringVariableValueRequest",
+    "NamedScenarioInputVideoVariableValueRequest",
     "NamedTestCaseArrayVariableValue",
     "NamedTestCaseArrayVariableValueRequest",
+    "NamedTestCaseAudioVariableValue",
+    "NamedTestCaseAudioVariableValueRequest",
     "NamedTestCaseChatHistoryVariableValue",
     "NamedTestCaseChatHistoryVariableValueRequest",
+    "NamedTestCaseDocumentVariableValue",
+    "NamedTestCaseDocumentVariableValueRequest",
     "NamedTestCaseErrorVariableValue",
     "NamedTestCaseErrorVariableValueRequest",
     "NamedTestCaseFunctionCallVariableValue",
     "NamedTestCaseFunctionCallVariableValueRequest",
+    "NamedTestCaseImageVariableValue",
+    "NamedTestCaseImageVariableValueRequest",
     "NamedTestCaseJsonVariableValue",
     "NamedTestCaseJsonVariableValueRequest",
     "NamedTestCaseNumberVariableValue",
@@ -883,6 +955,8 @@ __all__ = [
     "NamedTestCaseStringVariableValueRequest",
     "NamedTestCaseVariableValue",
     "NamedTestCaseVariableValueRequest",
+    "NamedTestCaseVideoVariableValue",
+    "NamedTestCaseVideoVariableValueRequest",
     "NewMemberJoinBehaviorEnum",
     "NodeExecutionFulfilledBody",
     "NodeExecutionFulfilledEvent",
@@ -899,14 +973,18 @@ __all__ = [
     "NodeExecutionStreamingBody",
     "NodeExecutionStreamingEvent",
     "NodeInputCompiledArrayValue",
+    "NodeInputCompiledAudioValue",
     "NodeInputCompiledChatHistoryValue",
+    "NodeInputCompiledDocumentValue",
     "NodeInputCompiledErrorValue",
     "NodeInputCompiledFunctionCallValue",
+    "NodeInputCompiledImageValue",
     "NodeInputCompiledJsonValue",
     "NodeInputCompiledNumberValue",
     "NodeInputCompiledSearchResultsValue",
     "NodeInputCompiledSecretValue",
     "NodeInputCompiledStringValue",
+    "NodeInputCompiledVideoValue",
     "NodeInputVariableCompiledValue",
     "NodeOutputCompiledArrayValue",
     "NodeOutputCompiledChatHistoryValue",
@@ -966,10 +1044,14 @@ __all__ = [
     "PromptOutput",
     "PromptParameters",
     "PromptPushResponse",
+    "PromptRequestAudioInput",
     "PromptRequestChatHistoryInput",
+    "PromptRequestDocumentInput",
+    "PromptRequestImageInput",
     "PromptRequestInput",
     "PromptRequestJsonInput",
     "PromptRequestStringInput",
+    "PromptRequestVideoInput",
     "PromptSettings",
     "PromptVersionBuildConfigSandbox",
     "RawPromptExecutionOverridesRequest",
@@ -995,9 +1077,13 @@ __all__ = [
     "RichTextPromptBlock",
     "SandboxScenario",
     "ScenarioInput",
+    "ScenarioInputAudioVariableValue",
     "ScenarioInputChatHistoryVariableValue",
+    "ScenarioInputDocumentVariableValue",
+    "ScenarioInputImageVariableValue",
     "ScenarioInputJsonVariableValue",
     "ScenarioInputStringVariableValue",
+    "ScenarioInputVideoVariableValue",
     "SearchFiltersRequest",
     "SearchNodeResult",
     "SearchNodeResultData",
@@ -1064,14 +1150,18 @@ __all__ = [
     "TerminalNodeSearchResultsResult",
     "TerminalNodeStringResult",
     "TestCaseArrayVariableValue",
+    "TestCaseAudioVariableValue",
     "TestCaseChatHistoryVariableValue",
+    "TestCaseDocumentVariableValue",
     "TestCaseErrorVariableValue",
     "TestCaseFunctionCallVariableValue",
+    "TestCaseImageVariableValue",
     "TestCaseJsonVariableValue",
     "TestCaseNumberVariableValue",
     "TestCaseSearchResultsVariableValue",
     "TestCaseStringVariableValue",
     "TestCaseVariableValue",
+    "TestCaseVideoVariableValue",
     "TestSuiteRunDeploymentReleaseTagExecConfig",
     "TestSuiteRunDeploymentReleaseTagExecConfigData",
     "TestSuiteRunDeploymentReleaseTagExecConfigDataRequest",
@@ -1173,6 +1263,8 @@ __all__ = [
     "VellumWorkflowExecutionEvent",
     "VideoChatMessageContent",
     "VideoChatMessageContentRequest",
+    "VideoInput",
+    "VideoInputRequest",
     "VideoPromptBlock",
     "VideoVellumValue",
     "VideoVellumValueRequest",
@@ -1238,11 +1330,15 @@ __all__ = [
     "WorkflowPushResponse",
     "WorkflowReleaseTagRead",
     "WorkflowReleaseTagWorkflowDeploymentHistoryItem",
+    "WorkflowRequestAudioInputRequest",
     "WorkflowRequestChatHistoryInputRequest",
+    "WorkflowRequestDocumentInputRequest",
+    "WorkflowRequestImageInputRequest",
     "WorkflowRequestInputRequest",
     "WorkflowRequestJsonInputRequest",
     "WorkflowRequestNumberInputRequest",
     "WorkflowRequestStringInputRequest",
+    "WorkflowRequestVideoInputRequest",
     "WorkflowResultEvent",
     "WorkflowResultEventOutputData",
     "WorkflowResultEventOutputDataArray",
