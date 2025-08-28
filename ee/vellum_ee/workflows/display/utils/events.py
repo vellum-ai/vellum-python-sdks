@@ -33,6 +33,7 @@ def event_enricher(event: WorkflowExecutionInitiatedEvent) -> WorkflowExecutionI
         dry_run=True,
     )
     register_workflow_display_context(event.span_id, workflow_display.display_context)
+    event.body.display_context = workflow_display.get_event_display_context()
 
     if event.body.workflow_definition.is_dynamic or _should_mark_workflow_dynamic(event):
         register_workflow_display_class(workflow_definition, workflow_display.__class__)
