@@ -16,7 +16,6 @@ from .search_node import BaseSearchNodeDisplay
 from .subworkflow_deployment_node import BaseSubworkflowDeploymentNodeDisplay
 from .templating_node import BaseTemplatingNodeDisplay
 from .try_node import BaseTryNodeDisplay
-from .web_search_node import BaseWebSearchNodeDisplay
 
 # All node display classes must be imported here to be registered in BaseNodeDisplay's node display registry
 __all__ = [
@@ -38,5 +37,4 @@ __all__ = [
     "BaseSubworkflowDeploymentNodeDisplay",
     "BaseTemplatingNodeDisplay",
     "BaseTryNodeDisplay",
-    "BaseWebSearchNodeDisplay",
 ]
