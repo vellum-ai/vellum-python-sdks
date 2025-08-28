@@ -11,8 +11,8 @@ from .state import State
 class Workflow(BaseWorkflow[Inputs, State]):
     graph = ChatbotNode >> FinalOutput
 
-    emitters = [VellumEmitter()]
-    resolvers = [VellumResolver()]
+    emitters = [VellumEmitter()]  # needed for sdk first
+    resolvers = [VellumResolver()]  # needed for sdk first
 
     class Outputs(BaseWorkflow.Outputs):
         response = FinalOutput.Outputs.value
