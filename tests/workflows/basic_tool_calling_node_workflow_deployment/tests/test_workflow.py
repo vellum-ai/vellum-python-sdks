@@ -304,7 +304,7 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, vellum_client,
                                 id="call_7115tNTmEACTsQRGwKpJipJK",
                             ),
                         ),
-                        source="call_7115tNTmEACTsQRGwKpJipJK",
+                        source=None,
                     ),
                     ChatMessage(
                         text=None,
