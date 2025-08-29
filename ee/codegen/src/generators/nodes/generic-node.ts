@@ -19,7 +19,6 @@ import { PromptBlock as PromptBlockType } from "src/generators/base-prompt-block
 import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { InitFile } from "src/generators/init-file";
 import { NodeOutputs } from "src/generators/node-outputs";
-import { NodeTrigger } from "src/generators/node-trigger";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { AttributeType, NODE_ATTRIBUTES } from "src/generators/nodes/constants";
 import { PromptBlock } from "src/generators/prompt-block";
@@ -593,15 +592,6 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     const statements: AstNode[] = [];
 
     statements.push(...this.nodeAttributes);
-
-    if (this.nodeData.trigger.mergeBehavior !== "AWAIT_ATTRIBUTES") {
-      statements.push(
-        new NodeTrigger({
-          nodeTrigger: this.nodeData.trigger,
-          nodeContext: this.nodeContext,
-        })
-      );
-    }
 
     if (this.nodeData.outputs.length > 0) {
       statements.push(

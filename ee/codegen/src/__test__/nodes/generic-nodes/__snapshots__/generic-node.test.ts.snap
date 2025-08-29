@@ -47,9 +47,6 @@ class MyCustomNode(BaseNode):
     default_attribute = "default-value"
     default_attribute_2 = Inputs.count
 
-    class Trigger(BaseNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ALL
-
     class Outputs(BaseNode.Outputs):
         output = "default-value"
 
@@ -131,9 +128,6 @@ class MyCustomNode(BaseNode):
     default_attribute = "default-value"
     default_attribute_2 = Inputs.count
 
-    class Trigger(BaseNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ALL
-
     class Outputs(BaseNode.Outputs):
         output = "default-value"
 
@@ -154,9 +148,6 @@ class MyCustomNode(MockNetworkingClient):
     default_attribute = "default-value"
     default_attribute_2 = Inputs.count
 
-    class Trigger(MockNetworkingClient.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ALL
-
     class Outputs(MockNetworkingClient.Outputs):
         output = "default-value"
 
@@ -172,9 +163,6 @@ from .mock_networking_client import MockNetworkingClient
 
 
 class MyCustomNode(MockNetworkingClient):
-    class Trigger(MockNetworkingClient.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ALL
-
     class Outputs(MockNetworkingClient.Outputs):
         output = "default-value"
 
@@ -207,9 +195,6 @@ from vellum.workflows.types.core import MergeBehavior
 class TestEnvironmentVariableNode(BaseNode):
     api_key_attribute = EnvironmentVariableReference(name="API_KEY")
 
-    class Trigger(BaseNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ALL
-
     class Outputs(BaseNode.Outputs):
         output = "default-value"
 
@@ -228,9 +213,6 @@ from .my_custom_node import ReferencedNode
 class MyCustomNode(BaseNode):
     default_attribute = ReferencedNode.Outputs.output
 
-    class Trigger(BaseNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ALL
-
     class Outputs(BaseNode.Outputs):
         output = "default-value"
 
@@ -247,9 +229,6 @@ from vellum.workflows.types.core import MergeBehavior
 
 class TestBlankNode(BaseNode):
     blank_attribute = ConstantValueReference(None).is_blank()
-
-    class Trigger(BaseNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ALL
 
     class Outputs(BaseNode.Outputs):
         output = "default-value"
@@ -268,9 +247,6 @@ from vellum.workflows.types.core import MergeBehavior
 class TestCoalesceNode(BaseNode):
     coalesce_attribute = ConstantValueReference(None).coalesce("fallback_value")
 
-    class Trigger(BaseNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ALL
-
     class Outputs(BaseNode.Outputs):
         output = "default-value"
 
@@ -287,9 +263,6 @@ from vellum.workflows.types.core import MergeBehavior
 
 class TestNotBlankNode(BaseNode):
     not_blank_attribute = ConstantValueReference(None).is_not_blank()
-
-    class Trigger(BaseNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ALL
 
     class Outputs(BaseNode.Outputs):
         output = "default-value"
@@ -342,9 +315,6 @@ from .prompt_node import PromptNode
 class MyCustomNode(BaseNode):
     default_attribute = PromptNode.Outputs.text
 
-    class Trigger(BaseNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ALL
-
     class Outputs(BaseNode.Outputs):
         output = "default-value"
 
@@ -375,9 +345,6 @@ class MyCustomNode(BaseNode):
     default_attribute = "default-value"
     default_attribute_2 = Inputs.count
 
-    class Trigger(BaseNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ALL
-
     class Outputs(BaseNode.Outputs):
         output = "default-value"
 
@@ -405,9 +372,6 @@ from ..inputs import Inputs
 class MyCustomNode(BaseNode):
     default_attribute = "default-value"
     default_attribute_2 = Inputs.count
-
-    class Trigger(BaseNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ALL
 
     class Trigger(BaseNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ALL
