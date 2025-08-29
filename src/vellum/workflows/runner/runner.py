@@ -22,6 +22,7 @@ from typing import (
     Tuple,
     Type,
     Union,
+    cast,
 )
 
 from vellum.workflows.constants import undefined
@@ -578,7 +579,7 @@ class WorkflowRunner(Generic[StateType]):
             )
             worker_thread.start()
 
-    def _handle_work_item_event(self, event: WorkflowEvent) -> Optional[tuple[WorkflowError, Optional[str]]]:
+    def _handle_work_item_event(self, event: WorkflowEvent) -> Optional[WorkflowEvent]:
         active_node = self._active_nodes_by_execution_id.get(event.span_id)
         if not active_node:
             return None
@@ -586,8 +587,7 @@ class WorkflowRunner(Generic[StateType]):
         node = active_node.node
         if event.name == "node.execution.rejected":
             self._active_nodes_by_execution_id.pop(event.span_id)
-            traceback = getattr(event.body, "traceback", None) if hasattr(event.body, "traceback") else None
-            return (event.error, traceback)
+            return event
 
         if event.name == "node.execution.streaming":
             for workflow_output_descriptor in self.workflow.Outputs:
@@ -793,7 +793,7 @@ class WorkflowRunner(Generic[StateType]):
                 )
                 return
 
-        rejection_result: Optional[tuple[WorkflowError, Optional[str]]] = None
+        rejection_event: Optional[WorkflowEvent] = None
 
         while True:
             if not self._active_nodes_by_execution_id:
@@ -804,9 +804,9 @@ class WorkflowRunner(Generic[StateType]):
             self._workflow_event_outer_queue.put(event)
 
             with execution_context(parent_context=current_parent, trace_id=self._execution_context.trace_id):
-                rejection_result = self._handle_work_item_event(event)
+                rejection_event = self._handle_work_item_event(event)
 
-            if rejection_result:
+            if rejection_event:
                 break
 
         # Handle any remaining events
@@ -815,9 +815,9 @@ class WorkflowRunner(Generic[StateType]):
                 self._workflow_event_outer_queue.put(event)
 
                 with execution_context(parent_context=current_parent, trace_id=self._execution_context.trace_id):
-                    rejection_result = self._handle_work_item_event(event)
+                    rejection_event = self._handle_work_item_event(event)
 
-                if rejection_result:
+                if rejection_event:
                     break
         except Empty:
             pass
@@ -837,9 +837,12 @@ class WorkflowRunner(Generic[StateType]):
             )
             return
 
-        if rejection_result:
-            rejection_error, rejection_traceback = rejection_result
-            self._workflow_event_outer_queue.put(self._reject_workflow_event(rejection_error, rejection_traceback))
+        if rejection_event:
+            rejected_event = cast(NodeExecutionRejectedEvent, rejection_event)
+            rejection_traceback = (
+                getattr(rejected_event.body, "traceback", None) if hasattr(rejected_event.body, "traceback") else None
+            )
+            self._workflow_event_outer_queue.put(self._reject_workflow_event(rejected_event.error, rejection_traceback))
             return
 
         fulfilled_outputs = self.workflow.Outputs()
