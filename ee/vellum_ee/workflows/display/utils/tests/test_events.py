@@ -67,8 +67,13 @@ def test_event_enricher_static_workflow(is_dynamic: bool, expected_config: Optio
     # WHEN the event_enricher is called with mocked dependencies
     event_enricher(event)
 
-    # AND workflow_version_exec_config is set to the expected config
+    # THEN workflow_version_exec_config is set to the expected config
     assert event.body.workflow_version_exec_config == expected_config
+
+    assert event.body.display_context is not None
+    assert hasattr(event.body.display_context, "node_displays")
+    assert hasattr(event.body.display_context, "workflow_inputs")
+    assert hasattr(event.body.display_context, "workflow_outputs")
 
 
 def test_event_enricher_marks_subworkflow_deployment_as_dynamic():
@@ -109,3 +114,8 @@ def test_event_enricher_marks_subworkflow_deployment_as_dynamic():
 
     assert hasattr(enriched_event.body, "workflow_version_exec_config")
     assert enriched_event.body.workflow_version_exec_config is not None
+
+    assert enriched_event.body.display_context is not None
+    assert hasattr(enriched_event.body.display_context, "node_displays")
+    assert hasattr(enriched_event.body.display_context, "workflow_inputs")
+    assert hasattr(enriched_event.body.display_context, "workflow_outputs")
