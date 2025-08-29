@@ -1,3 +1,5 @@
+import time
+
 from dotenv import load_dotenv
 
 from .workflow.inputs import Inputs
@@ -48,6 +50,8 @@ def main():
         previous_execution_id = current_execution_id
 
         iterations += 1
+
+        time.sleep(60)
 
 
 if __name__ == "__main__":
