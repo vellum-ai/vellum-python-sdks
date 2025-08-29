@@ -13,9 +13,9 @@ from ...errors.bad_request_error import BadRequestError
 from ...errors.forbidden_error import ForbiddenError
 from ...errors.too_many_requests_error import TooManyRequestsError
 from ...errors.unauthorized_error import UnauthorizedError
+from ...types.create_workflow_event_request import CreateWorkflowEventRequest
 from ...types.error_detail_response import ErrorDetailResponse
 from ...types.event_create_response import EventCreateResponse
-from ...types.workflow_event import WorkflowEvent
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -26,14 +26,14 @@ class RawEventsClient:
         self._client_wrapper = client_wrapper
 
     def create(
-        self, *, request: WorkflowEvent, request_options: typing.Optional[RequestOptions] = None
+        self, *, request: CreateWorkflowEventRequest, request_options: typing.Optional[RequestOptions] = None
     ) -> HttpResponse[EventCreateResponse]:
         """
-        Accept an event and publish it to ClickHouse for analytics processing.
+        Accept an event or list of events and publish them to ClickHouse for analytics processing.
 
         Parameters
         ----------
-        request : WorkflowEvent
+        request : CreateWorkflowEventRequest
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -47,7 +47,9 @@ class RawEventsClient:
             "monitoring/v1/events",
             base_url=self._client_wrapper.get_environment().default,
             method="POST",
-            json=convert_and_respect_annotation_metadata(object_=request, annotation=WorkflowEvent, direction="write"),
+            json=convert_and_respect_annotation_metadata(
+                object_=request, annotation=CreateWorkflowEventRequest, direction="write"
+            ),
             headers={
                 "content-type": "application/json",
             },
@@ -119,14 +121,14 @@ class AsyncRawEventsClient:
         self._client_wrapper = client_wrapper
 
     async def create(
-        self, *, request: WorkflowEvent, request_options: typing.Optional[RequestOptions] = None
+        self, *, request: CreateWorkflowEventRequest, request_options: typing.Optional[RequestOptions] = None
     ) -> AsyncHttpResponse[EventCreateResponse]:
         """
-        Accept an event and publish it to ClickHouse for analytics processing.
+        Accept an event or list of events and publish them to ClickHouse for analytics processing.
 
         Parameters
         ----------
-        request : WorkflowEvent
+        request : CreateWorkflowEventRequest
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -140,7 +142,9 @@ class AsyncRawEventsClient:
             "monitoring/v1/events",
             base_url=self._client_wrapper.get_environment().default,
             method="POST",
-            json=convert_and_respect_annotation_metadata(object_=request, annotation=WorkflowEvent, direction="write"),
+            json=convert_and_respect_annotation_metadata(
+                object_=request, annotation=CreateWorkflowEventRequest, direction="write"
+            ),
             headers={
                 "content-type": "application/json",
             },

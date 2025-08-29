@@ -605,6 +605,14 @@ client.execute_workflow(
 <dl>
 <dd>
 
+**previous_execution_id:** `typing.Optional[str]` — The ID of a previous Workflow Execution to reference for initial State loading.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
     
 </dd>
@@ -736,6 +744,14 @@ for chunk in response.data:
 <dd>
 
 **metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Arbitrary JSON metadata associated with this request. Can be used to capture additional monitoring data such as user id, session id, etc. for future analysis.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**previous_execution_id:** `typing.Optional[str]` — The ID of a previous Workflow Execution to reference for initial State loading.
     
 </dd>
 </dl>
@@ -1262,7 +1278,7 @@ client.submit_workflow_execution_actuals(
 <dl>
 <dd>
 
-Accept an event and publish it to ClickHouse for analytics processing.
+Accept an event or list of events and publish them to ClickHouse for analytics processing.
 </dd>
 </dl>
 </dd>
@@ -1291,22 +1307,40 @@ client = Vellum(
     api_key="YOUR_API_KEY",
 )
 client.events.create(
-    request=NodeExecutionInitiatedEvent(
-        body=NodeExecutionInitiatedBody(
-            node_definition=VellumCodeResourceDefinition(
-                name="name",
-                module=["module", "module"],
-                id="id",
+    request=[
+        NodeExecutionInitiatedEvent(
+            body=NodeExecutionInitiatedBody(
+                node_definition=VellumCodeResourceDefinition(
+                    name="name",
+                    module=["module", "module"],
+                    id="id",
+                ),
+                inputs={"inputs": {"key": "value"}},
             ),
-            inputs={"inputs": {"key": "value"}},
+            id="id",
+            timestamp=datetime.datetime.fromisoformat(
+                "2024-01-15 09:30:00+00:00",
+            ),
+            trace_id="trace_id",
+            span_id="span_id",
         ),
-        id="id",
-        timestamp=datetime.datetime.fromisoformat(
-            "2024-01-15 09:30:00+00:00",
+        NodeExecutionInitiatedEvent(
+            body=NodeExecutionInitiatedBody(
+                node_definition=VellumCodeResourceDefinition(
+                    name="name",
+                    module=["module", "module"],
+                    id="id",
+                ),
+                inputs={"inputs": {"key": "value"}},
+            ),
+            id="id",
+            timestamp=datetime.datetime.fromisoformat(
+                "2024-01-15 09:30:00+00:00",
+            ),
+            trace_id="trace_id",
+            span_id="span_id",
         ),
-        trace_id="trace_id",
-        span_id="span_id",
-    ),
+    ],
 )
 
 ```
@@ -1323,7 +1357,7 @@ client.events.create(
 <dl>
 <dd>
 
-**request:** `WorkflowEvent` 
+**request:** `CreateWorkflowEventRequest` 
     
 </dd>
 </dl>
@@ -1360,7 +1394,7 @@ client.events.create(
 from vellum import (
     JinjaPromptBlock,
     PromptParameters,
-    PromptRequestStringInput,
+    StringInput,
     Vellum,
     VellumVariable,
 )
@@ -1372,12 +1406,12 @@ client = Vellum(
 client.ad_hoc.adhoc_execute_prompt(
     ml_model="x",
     input_values=[
-        PromptRequestStringInput(
-            key="x",
+        StringInput(
+            name="x",
             value="value",
         ),
-        PromptRequestStringInput(
-            key="x",
+        StringInput(
+            name="x",
             value="value",
         ),
     ],
@@ -1426,7 +1460,7 @@ client.ad_hoc.adhoc_execute_prompt(
 <dl>
 <dd>
 
-**input_values:** `typing.Sequence[PromptRequestInput]` 
+**input_values:** `typing.Sequence[DeprecatedPromptRequestInput]` 
     
 </dd>
 </dl>
@@ -1510,7 +1544,7 @@ client.ad_hoc.adhoc_execute_prompt(
 from vellum import (
     JinjaPromptBlock,
     PromptParameters,
-    PromptRequestStringInput,
+    StringInput,
     Vellum,
     VellumVariable,
 )
@@ -1522,12 +1556,12 @@ client = Vellum(
 response = client.ad_hoc.adhoc_execute_prompt_stream(
     ml_model="x",
     input_values=[
-        PromptRequestStringInput(
-            key="x",
+        StringInput(
+            name="x",
             value="value",
         ),
-        PromptRequestStringInput(
-            key="x",
+        StringInput(
+            name="x",
             value="value",
         ),
     ],
@@ -1578,7 +1612,7 @@ for chunk in response.data:
 <dl>
 <dd>
 
-**input_values:** `typing.Sequence[PromptRequestInput]` 
+**input_values:** `typing.Sequence[DeprecatedPromptRequestInput]` 
     
 </dd>
 </dl>

@@ -6,10 +6,10 @@ from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.request_options import RequestOptions
 from ...types.ad_hoc_execute_prompt_event import AdHocExecutePromptEvent
 from ...types.ad_hoc_expand_meta import AdHocExpandMeta
+from ...types.deprecated_prompt_request_input import DeprecatedPromptRequestInput
 from ...types.function_definition import FunctionDefinition
 from ...types.prompt_block import PromptBlock
 from ...types.prompt_parameters import PromptParameters
-from ...types.prompt_request_input import PromptRequestInput
 from ...types.prompt_settings import PromptSettings
 from ...types.vellum_variable import VellumVariable
 from .raw_client import AsyncRawAdHocClient, RawAdHocClient
@@ -41,7 +41,7 @@ class AdHocClient:
         self,
         *,
         ml_model: str,
-        input_values: typing.Sequence[PromptRequestInput],
+        input_values: typing.Sequence[DeprecatedPromptRequestInput],
         input_variables: typing.Sequence[VellumVariable],
         parameters: PromptParameters,
         blocks: typing.Sequence[PromptBlock],
@@ -55,7 +55,7 @@ class AdHocClient:
         ----------
         ml_model : str
 
-        input_values : typing.Sequence[PromptRequestInput]
+        input_values : typing.Sequence[DeprecatedPromptRequestInput]
 
         input_variables : typing.Sequence[VellumVariable]
 
@@ -82,7 +82,7 @@ class AdHocClient:
         from vellum import (
             JinjaPromptBlock,
             PromptParameters,
-            PromptRequestStringInput,
+            StringInput,
             Vellum,
             VellumVariable,
         )
@@ -94,12 +94,12 @@ class AdHocClient:
         client.ad_hoc.adhoc_execute_prompt(
             ml_model="x",
             input_values=[
-                PromptRequestStringInput(
-                    key="x",
+                StringInput(
+                    name="x",
                     value="value",
                 ),
-                PromptRequestStringInput(
-                    key="x",
+                StringInput(
+                    name="x",
                     value="value",
                 ),
             ],
@@ -143,7 +143,7 @@ class AdHocClient:
         self,
         *,
         ml_model: str,
-        input_values: typing.Sequence[PromptRequestInput],
+        input_values: typing.Sequence[DeprecatedPromptRequestInput],
         input_variables: typing.Sequence[VellumVariable],
         parameters: PromptParameters,
         blocks: typing.Sequence[PromptBlock],
@@ -157,7 +157,7 @@ class AdHocClient:
         ----------
         ml_model : str
 
-        input_values : typing.Sequence[PromptRequestInput]
+        input_values : typing.Sequence[DeprecatedPromptRequestInput]
 
         input_variables : typing.Sequence[VellumVariable]
 
@@ -184,7 +184,7 @@ class AdHocClient:
         from vellum import (
             JinjaPromptBlock,
             PromptParameters,
-            PromptRequestStringInput,
+            StringInput,
             Vellum,
             VellumVariable,
         )
@@ -196,12 +196,12 @@ class AdHocClient:
         response = client.ad_hoc.adhoc_execute_prompt_stream(
             ml_model="x",
             input_values=[
-                PromptRequestStringInput(
-                    key="x",
+                StringInput(
+                    name="x",
                     value="value",
                 ),
-                PromptRequestStringInput(
-                    key="x",
+                StringInput(
+                    name="x",
                     value="value",
                 ),
             ],
@@ -263,7 +263,7 @@ class AsyncAdHocClient:
         self,
         *,
         ml_model: str,
-        input_values: typing.Sequence[PromptRequestInput],
+        input_values: typing.Sequence[DeprecatedPromptRequestInput],
         input_variables: typing.Sequence[VellumVariable],
         parameters: PromptParameters,
         blocks: typing.Sequence[PromptBlock],
@@ -277,7 +277,7 @@ class AsyncAdHocClient:
         ----------
         ml_model : str
 
-        input_values : typing.Sequence[PromptRequestInput]
+        input_values : typing.Sequence[DeprecatedPromptRequestInput]
 
         input_variables : typing.Sequence[VellumVariable]
 
@@ -307,7 +307,7 @@ class AsyncAdHocClient:
             AsyncVellum,
             JinjaPromptBlock,
             PromptParameters,
-            PromptRequestStringInput,
+            StringInput,
             VellumVariable,
         )
 
@@ -321,12 +321,12 @@ class AsyncAdHocClient:
             await client.ad_hoc.adhoc_execute_prompt(
                 ml_model="x",
                 input_values=[
-                    PromptRequestStringInput(
-                        key="x",
+                    StringInput(
+                        name="x",
                         value="value",
                     ),
-                    PromptRequestStringInput(
-                        key="x",
+                    StringInput(
+                        name="x",
                         value="value",
                     ),
                 ],
@@ -373,7 +373,7 @@ class AsyncAdHocClient:
         self,
         *,
         ml_model: str,
-        input_values: typing.Sequence[PromptRequestInput],
+        input_values: typing.Sequence[DeprecatedPromptRequestInput],
         input_variables: typing.Sequence[VellumVariable],
         parameters: PromptParameters,
         blocks: typing.Sequence[PromptBlock],
@@ -387,7 +387,7 @@ class AsyncAdHocClient:
         ----------
         ml_model : str
 
-        input_values : typing.Sequence[PromptRequestInput]
+        input_values : typing.Sequence[DeprecatedPromptRequestInput]
 
         input_variables : typing.Sequence[VellumVariable]
 
@@ -417,7 +417,7 @@ class AsyncAdHocClient:
             AsyncVellum,
             JinjaPromptBlock,
             PromptParameters,
-            PromptRequestStringInput,
+            StringInput,
             VellumVariable,
         )
 
@@ -431,12 +431,12 @@ class AsyncAdHocClient:
             response = await client.ad_hoc.adhoc_execute_prompt_stream(
                 ml_model="x",
                 input_values=[
-                    PromptRequestStringInput(
-                        key="x",
+                    StringInput(
+                        name="x",
                         value="value",
                     ),
-                    PromptRequestStringInput(
-                        key="x",
+                    StringInput(
+                        name="x",
                         value="value",
                     ),
                 ],

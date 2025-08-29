@@ -103,7 +103,7 @@ The SDK supports streaming responses, as well, the response will be a generator 
 from vellum import (
     JinjaPromptBlock,
     PromptParameters,
-    PromptRequestStringInput,
+    StringInput,
     Vellum,
     VellumVariable,
 )
@@ -115,12 +115,12 @@ client = Vellum(
 response = client.ad_hoc.adhoc_execute_prompt_stream(
     ml_model="x",
     input_values=[
-        PromptRequestStringInput(
-            key="x",
+        StringInput(
+            name="x",
             value="value",
         ),
-        PromptRequestStringInput(
-            key="x",
+        StringInput(
+            name="x",
             value="value",
         ),
     ],

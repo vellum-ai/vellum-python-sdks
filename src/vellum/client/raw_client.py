@@ -515,6 +515,7 @@ class RawVellum:
         release_tag: typing.Optional[str] = OMIT,
         external_id: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        previous_execution_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[ExecuteWorkflowResponse]:
         """
@@ -543,6 +544,9 @@ class RawVellum:
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Arbitrary JSON metadata associated with this request. Can be used to capture additional monitoring data such as user id, session id, etc. for future analysis.
 
+        previous_execution_id : typing.Optional[str]
+            The ID of a previous Workflow Execution to reference for initial State loading.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -567,6 +571,7 @@ class RawVellum:
                 "release_tag": release_tag,
                 "external_id": external_id,
                 "metadata": metadata,
+                "previous_execution_id": previous_execution_id,
             },
             headers={
                 "content-type": "application/json",
@@ -634,6 +639,7 @@ class RawVellum:
         external_id: typing.Optional[str] = OMIT,
         event_types: typing.Optional[typing.Sequence[WorkflowExecutionEventType]] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        previous_execution_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Iterator[HttpResponse[typing.Iterator[WorkflowStreamEvent]]]:
         """
@@ -665,6 +671,9 @@ class RawVellum:
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Arbitrary JSON metadata associated with this request. Can be used to capture additional monitoring data such as user id, session id, etc. for future analysis.
 
+        previous_execution_id : typing.Optional[str]
+            The ID of a previous Workflow Execution to reference for initial State loading.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -690,6 +699,7 @@ class RawVellum:
                 "external_id": external_id,
                 "event_types": event_types,
                 "metadata": metadata,
+                "previous_execution_id": previous_execution_id,
             },
             headers={
                 "content-type": "application/json",
@@ -1728,6 +1738,7 @@ class AsyncRawVellum:
         release_tag: typing.Optional[str] = OMIT,
         external_id: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        previous_execution_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[ExecuteWorkflowResponse]:
         """
@@ -1756,6 +1767,9 @@ class AsyncRawVellum:
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Arbitrary JSON metadata associated with this request. Can be used to capture additional monitoring data such as user id, session id, etc. for future analysis.
 
+        previous_execution_id : typing.Optional[str]
+            The ID of a previous Workflow Execution to reference for initial State loading.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -1780,6 +1794,7 @@ class AsyncRawVellum:
                 "release_tag": release_tag,
                 "external_id": external_id,
                 "metadata": metadata,
+                "previous_execution_id": previous_execution_id,
             },
             headers={
                 "content-type": "application/json",
@@ -1847,6 +1862,7 @@ class AsyncRawVellum:
         external_id: typing.Optional[str] = OMIT,
         event_types: typing.Optional[typing.Sequence[WorkflowExecutionEventType]] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        previous_execution_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[WorkflowStreamEvent]]]:
         """
@@ -1878,6 +1894,9 @@ class AsyncRawVellum:
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Arbitrary JSON metadata associated with this request. Can be used to capture additional monitoring data such as user id, session id, etc. for future analysis.
 
+        previous_execution_id : typing.Optional[str]
+            The ID of a previous Workflow Execution to reference for initial State loading.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -1903,6 +1922,7 @@ class AsyncRawVellum:
                 "external_id": external_id,
                 "event_types": event_types,
                 "metadata": metadata,
+                "previous_execution_id": previous_execution_id,
             },
             headers={
                 "content-type": "application/json",

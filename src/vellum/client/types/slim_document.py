@@ -39,6 +39,7 @@ class SlimDocument(UniversalBaseModel):
     
     * `EXCEEDED_CHARACTER_LIMIT` - Exceeded Character Limit
     * `INVALID_FILE` - Invalid File
+    * `INVALID_CREDENTIALS` - Invalid Credentials
     """
 
     status: typing.Optional[DocumentStatus] = pydantic.Field(default=None)

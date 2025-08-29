@@ -16,6 +16,11 @@ class EventCreateResponse(UniversalBaseModel):
     Indicates whether the event was published successfully.
     """
 
+    count: int = pydantic.Field()
+    """
+    Number of events processed
+    """
+
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
     else:

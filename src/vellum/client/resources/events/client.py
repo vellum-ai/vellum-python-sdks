@@ -4,8 +4,8 @@ import typing
 
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.request_options import RequestOptions
+from ...types.create_workflow_event_request import CreateWorkflowEventRequest
 from ...types.event_create_response import EventCreateResponse
-from ...types.workflow_event import WorkflowEvent
 from .raw_client import AsyncRawEventsClient, RawEventsClient
 
 # this is used as the default value for optional parameters
@@ -32,14 +32,14 @@ class EventsClient:
         return self._raw_client
 
     def create(
-        self, *, request: WorkflowEvent, request_options: typing.Optional[RequestOptions] = None
+        self, *, request: CreateWorkflowEventRequest, request_options: typing.Optional[RequestOptions] = None
     ) -> EventCreateResponse:
         """
-        Accept an event and publish it to ClickHouse for analytics processing.
+        Accept an event or list of events and publish them to ClickHouse for analytics processing.
 
         Parameters
         ----------
-        request : WorkflowEvent
+        request : CreateWorkflowEventRequest
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -65,22 +65,40 @@ class EventsClient:
             api_key="YOUR_API_KEY",
         )
         client.events.create(
-            request=NodeExecutionInitiatedEvent(
-                body=NodeExecutionInitiatedBody(
-                    node_definition=VellumCodeResourceDefinition(
-                        name="name",
-                        module=["module", "module"],
-                        id="id",
+            request=[
+                NodeExecutionInitiatedEvent(
+                    body=NodeExecutionInitiatedBody(
+                        node_definition=VellumCodeResourceDefinition(
+                            name="name",
+                            module=["module", "module"],
+                            id="id",
+                        ),
+                        inputs={"inputs": {"key": "value"}},
                     ),
-                    inputs={"inputs": {"key": "value"}},
+                    id="id",
+                    timestamp=datetime.datetime.fromisoformat(
+                        "2024-01-15 09:30:00+00:00",
+                    ),
+                    trace_id="trace_id",
+                    span_id="span_id",
                 ),
-                id="id",
-                timestamp=datetime.datetime.fromisoformat(
-                    "2024-01-15 09:30:00+00:00",
+                NodeExecutionInitiatedEvent(
+                    body=NodeExecutionInitiatedBody(
+                        node_definition=VellumCodeResourceDefinition(
+                            name="name",
+                            module=["module", "module"],
+                            id="id",
+                        ),
+                        inputs={"inputs": {"key": "value"}},
+                    ),
+                    id="id",
+                    timestamp=datetime.datetime.fromisoformat(
+                        "2024-01-15 09:30:00+00:00",
+                    ),
+                    trace_id="trace_id",
+                    span_id="span_id",
                 ),
-                trace_id="trace_id",
-                span_id="span_id",
-            ),
+            ],
         )
         """
         _response = self._raw_client.create(request=request, request_options=request_options)
@@ -103,14 +121,14 @@ class AsyncEventsClient:
         return self._raw_client
 
     async def create(
-        self, *, request: WorkflowEvent, request_options: typing.Optional[RequestOptions] = None
+        self, *, request: CreateWorkflowEventRequest, request_options: typing.Optional[RequestOptions] = None
     ) -> EventCreateResponse:
         """
-        Accept an event and publish it to ClickHouse for analytics processing.
+        Accept an event or list of events and publish them to ClickHouse for analytics processing.
 
         Parameters
         ----------
-        request : WorkflowEvent
+        request : CreateWorkflowEventRequest
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -140,22 +158,40 @@ class AsyncEventsClient:
 
         async def main() -> None:
             await client.events.create(
-                request=NodeExecutionInitiatedEvent(
-                    body=NodeExecutionInitiatedBody(
-                        node_definition=VellumCodeResourceDefinition(
-                            name="name",
-                            module=["module", "module"],
-                            id="id",
+                request=[
+                    NodeExecutionInitiatedEvent(
+                        body=NodeExecutionInitiatedBody(
+                            node_definition=VellumCodeResourceDefinition(
+                                name="name",
+                                module=["module", "module"],
+                                id="id",
+                            ),
+                            inputs={"inputs": {"key": "value"}},
                         ),
-                        inputs={"inputs": {"key": "value"}},
+                        id="id",
+                        timestamp=datetime.datetime.fromisoformat(
+                            "2024-01-15 09:30:00+00:00",
+                        ),
+                        trace_id="trace_id",
+                        span_id="span_id",
                     ),
-                    id="id",
-                    timestamp=datetime.datetime.fromisoformat(
-                        "2024-01-15 09:30:00+00:00",
+                    NodeExecutionInitiatedEvent(
+                        body=NodeExecutionInitiatedBody(
+                            node_definition=VellumCodeResourceDefinition(
+                                name="name",
+                                module=["module", "module"],
+                                id="id",
+                            ),
+                            inputs={"inputs": {"key": "value"}},
+                        ),
+                        id="id",
+                        timestamp=datetime.datetime.fromisoformat(
+                            "2024-01-15 09:30:00+00:00",
+                        ),
+                        trace_id="trace_id",
+                        span_id="span_id",
                     ),
-                    trace_id="trace_id",
-                    span_id="span_id",
-                ),
+                ],
             )
 
 

@@ -16,10 +16,10 @@ from ...errors.forbidden_error import ForbiddenError
 from ...errors.internal_server_error import InternalServerError
 from ...types.ad_hoc_execute_prompt_event import AdHocExecutePromptEvent
 from ...types.ad_hoc_expand_meta import AdHocExpandMeta
+from ...types.deprecated_prompt_request_input import DeprecatedPromptRequestInput
 from ...types.function_definition import FunctionDefinition
 from ...types.prompt_block import PromptBlock
 from ...types.prompt_parameters import PromptParameters
-from ...types.prompt_request_input import PromptRequestInput
 from ...types.prompt_settings import PromptSettings
 from ...types.vellum_variable import VellumVariable
 
@@ -35,7 +35,7 @@ class RawAdHocClient:
         self,
         *,
         ml_model: str,
-        input_values: typing.Sequence[PromptRequestInput],
+        input_values: typing.Sequence[DeprecatedPromptRequestInput],
         input_variables: typing.Sequence[VellumVariable],
         parameters: PromptParameters,
         blocks: typing.Sequence[PromptBlock],
@@ -49,7 +49,7 @@ class RawAdHocClient:
         ----------
         ml_model : str
 
-        input_values : typing.Sequence[PromptRequestInput]
+        input_values : typing.Sequence[DeprecatedPromptRequestInput]
 
         input_variables : typing.Sequence[VellumVariable]
 
@@ -78,7 +78,7 @@ class RawAdHocClient:
             json={
                 "ml_model": ml_model,
                 "input_values": convert_and_respect_annotation_metadata(
-                    object_=input_values, annotation=typing.Sequence[PromptRequestInput], direction="write"
+                    object_=input_values, annotation=typing.Sequence[DeprecatedPromptRequestInput], direction="write"
                 ),
                 "input_variables": convert_and_respect_annotation_metadata(
                     object_=input_variables, annotation=typing.Sequence[VellumVariable], direction="write"
@@ -160,7 +160,7 @@ class RawAdHocClient:
         self,
         *,
         ml_model: str,
-        input_values: typing.Sequence[PromptRequestInput],
+        input_values: typing.Sequence[DeprecatedPromptRequestInput],
         input_variables: typing.Sequence[VellumVariable],
         parameters: PromptParameters,
         blocks: typing.Sequence[PromptBlock],
@@ -174,7 +174,7 @@ class RawAdHocClient:
         ----------
         ml_model : str
 
-        input_values : typing.Sequence[PromptRequestInput]
+        input_values : typing.Sequence[DeprecatedPromptRequestInput]
 
         input_variables : typing.Sequence[VellumVariable]
 
@@ -203,7 +203,7 @@ class RawAdHocClient:
             json={
                 "ml_model": ml_model,
                 "input_values": convert_and_respect_annotation_metadata(
-                    object_=input_values, annotation=typing.Sequence[PromptRequestInput], direction="write"
+                    object_=input_values, annotation=typing.Sequence[DeprecatedPromptRequestInput], direction="write"
                 ),
                 "input_variables": convert_and_respect_annotation_metadata(
                     object_=input_variables, annotation=typing.Sequence[VellumVariable], direction="write"
@@ -306,7 +306,7 @@ class AsyncRawAdHocClient:
         self,
         *,
         ml_model: str,
-        input_values: typing.Sequence[PromptRequestInput],
+        input_values: typing.Sequence[DeprecatedPromptRequestInput],
         input_variables: typing.Sequence[VellumVariable],
         parameters: PromptParameters,
         blocks: typing.Sequence[PromptBlock],
@@ -320,7 +320,7 @@ class AsyncRawAdHocClient:
         ----------
         ml_model : str
 
-        input_values : typing.Sequence[PromptRequestInput]
+        input_values : typing.Sequence[DeprecatedPromptRequestInput]
 
         input_variables : typing.Sequence[VellumVariable]
 
@@ -349,7 +349,7 @@ class AsyncRawAdHocClient:
             json={
                 "ml_model": ml_model,
                 "input_values": convert_and_respect_annotation_metadata(
-                    object_=input_values, annotation=typing.Sequence[PromptRequestInput], direction="write"
+                    object_=input_values, annotation=typing.Sequence[DeprecatedPromptRequestInput], direction="write"
                 ),
                 "input_variables": convert_and_respect_annotation_metadata(
                     object_=input_variables, annotation=typing.Sequence[VellumVariable], direction="write"
@@ -431,7 +431,7 @@ class AsyncRawAdHocClient:
         self,
         *,
         ml_model: str,
-        input_values: typing.Sequence[PromptRequestInput],
+        input_values: typing.Sequence[DeprecatedPromptRequestInput],
         input_variables: typing.Sequence[VellumVariable],
         parameters: PromptParameters,
         blocks: typing.Sequence[PromptBlock],
@@ -445,7 +445,7 @@ class AsyncRawAdHocClient:
         ----------
         ml_model : str
 
-        input_values : typing.Sequence[PromptRequestInput]
+        input_values : typing.Sequence[DeprecatedPromptRequestInput]
 
         input_variables : typing.Sequence[VellumVariable]
 
@@ -474,7 +474,7 @@ class AsyncRawAdHocClient:
             json={
                 "ml_model": ml_model,
                 "input_values": convert_and_respect_annotation_metadata(
-                    object_=input_values, annotation=typing.Sequence[PromptRequestInput], direction="write"
+                    object_=input_values, annotation=typing.Sequence[DeprecatedPromptRequestInput], direction="write"
                 ),
                 "input_variables": convert_and_respect_annotation_metadata(
                     object_=input_variables, annotation=typing.Sequence[VellumVariable], direction="write"

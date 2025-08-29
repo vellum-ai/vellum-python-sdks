@@ -82,6 +82,7 @@ from .container_image_build_config import ContainerImageBuildConfig
 from .container_image_container_image_tag import ContainerImageContainerImageTag
 from .container_image_read import ContainerImageRead
 from .create_test_suite_test_case_request import CreateTestSuiteTestCaseRequest
+from .create_workflow_event_request import CreateWorkflowEventRequest
 from .delimiter_chunker_config import DelimiterChunkerConfig
 from .delimiter_chunker_config_request import DelimiterChunkerConfigRequest
 from .delimiter_chunking import DelimiterChunking
@@ -92,6 +93,7 @@ from .deployment_provider_payload_response_payload import DeploymentProviderPayl
 from .deployment_read import DeploymentRead
 from .deployment_release_tag_deployment_history_item import DeploymentReleaseTagDeploymentHistoryItem
 from .deployment_release_tag_read import DeploymentReleaseTagRead
+from .deprecated_prompt_request_input import DeprecatedPromptRequestInput
 from .docker_service_token import DockerServiceToken
 from .document_chat_message_content import DocumentChatMessageContent
 from .document_chat_message_content_request import DocumentChatMessageContentRequest
@@ -648,6 +650,7 @@ from .workflow_execution_view_online_eval_metric_result import WorkflowExecution
 from .workflow_execution_workflow_result_event import WorkflowExecutionWorkflowResultEvent
 from .workflow_expand_meta_request import WorkflowExpandMetaRequest
 from .workflow_initialization_error import WorkflowInitializationError
+from .workflow_input import WorkflowInput
 from .workflow_node_result_data import WorkflowNodeResultData
 from .workflow_node_result_event import WorkflowNodeResultEvent
 from .workflow_node_result_event_state import WorkflowNodeResultEventState
@@ -765,6 +768,7 @@ __all__ = [
     "ContainerImageContainerImageTag",
     "ContainerImageRead",
     "CreateTestSuiteTestCaseRequest",
+    "CreateWorkflowEventRequest",
     "DelimiterChunkerConfig",
     "DelimiterChunkerConfigRequest",
     "DelimiterChunking",
@@ -775,6 +779,7 @@ __all__ = [
     "DeploymentRead",
     "DeploymentReleaseTagDeploymentHistoryItem",
     "DeploymentReleaseTagRead",
+    "DeprecatedPromptRequestInput",
     "DockerServiceToken",
     "DocumentChatMessageContent",
     "DocumentChatMessageContentRequest",
@@ -1311,6 +1316,7 @@ __all__ = [
     "WorkflowExecutionWorkflowResultEvent",
     "WorkflowExpandMetaRequest",
     "WorkflowInitializationError",
+    "WorkflowInput",
     "WorkflowNodeResultData",
     "WorkflowNodeResultEvent",
     "WorkflowNodeResultEventState",

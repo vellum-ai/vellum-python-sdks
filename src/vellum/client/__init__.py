@@ -479,6 +479,7 @@ class Vellum:
         release_tag: typing.Optional[str] = OMIT,
         external_id: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        previous_execution_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ExecuteWorkflowResponse:
         """
@@ -506,6 +507,9 @@ class Vellum:
 
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Arbitrary JSON metadata associated with this request. Can be used to capture additional monitoring data such as user id, session id, etc. for future analysis.
+
+        previous_execution_id : typing.Optional[str]
+            The ID of a previous Workflow Execution to reference for initial State loading.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -544,6 +548,7 @@ class Vellum:
             release_tag=release_tag,
             external_id=external_id,
             metadata=metadata,
+            previous_execution_id=previous_execution_id,
             request_options=request_options,
         )
         return _response.data
@@ -559,6 +564,7 @@ class Vellum:
         external_id: typing.Optional[str] = OMIT,
         event_types: typing.Optional[typing.Sequence[WorkflowExecutionEventType]] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        previous_execution_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Iterator[WorkflowStreamEvent]:
         """
@@ -589,6 +595,9 @@ class Vellum:
 
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Arbitrary JSON metadata associated with this request. Can be used to capture additional monitoring data such as user id, session id, etc. for future analysis.
+
+        previous_execution_id : typing.Optional[str]
+            The ID of a previous Workflow Execution to reference for initial State loading.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -630,6 +639,7 @@ class Vellum:
             external_id=external_id,
             event_types=event_types,
             metadata=metadata,
+            previous_execution_id=previous_execution_id,
             request_options=request_options,
         ) as r:
             yield from r.data
@@ -1376,6 +1386,7 @@ class AsyncVellum:
         release_tag: typing.Optional[str] = OMIT,
         external_id: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        previous_execution_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ExecuteWorkflowResponse:
         """
@@ -1403,6 +1414,9 @@ class AsyncVellum:
 
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Arbitrary JSON metadata associated with this request. Can be used to capture additional monitoring data such as user id, session id, etc. for future analysis.
+
+        previous_execution_id : typing.Optional[str]
+            The ID of a previous Workflow Execution to reference for initial State loading.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1449,6 +1463,7 @@ class AsyncVellum:
             release_tag=release_tag,
             external_id=external_id,
             metadata=metadata,
+            previous_execution_id=previous_execution_id,
             request_options=request_options,
         )
         return _response.data
@@ -1464,6 +1479,7 @@ class AsyncVellum:
         external_id: typing.Optional[str] = OMIT,
         event_types: typing.Optional[typing.Sequence[WorkflowExecutionEventType]] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        previous_execution_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.AsyncIterator[WorkflowStreamEvent]:
         """
@@ -1494,6 +1510,9 @@ class AsyncVellum:
 
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Arbitrary JSON metadata associated with this request. Can be used to capture additional monitoring data such as user id, session id, etc. for future analysis.
+
+        previous_execution_id : typing.Optional[str]
+            The ID of a previous Workflow Execution to reference for initial State loading.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1543,6 +1562,7 @@ class AsyncVellum:
             external_id=external_id,
             event_types=event_types,
             metadata=metadata,
+            previous_execution_id=previous_execution_id,
             request_options=request_options,
         ) as r:
             async for _chunk in r.data:

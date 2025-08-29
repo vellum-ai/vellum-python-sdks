@@ -2,4 +2,6 @@
 
 import typing
 
-ProcessingFailureReasonEnum = typing.Union[typing.Literal["EXCEEDED_CHARACTER_LIMIT", "INVALID_FILE"], typing.Any]
+ProcessingFailureReasonEnum = typing.Union[
+    typing.Literal["EXCEEDED_CHARACTER_LIMIT", "INVALID_FILE", "INVALID_CREDENTIALS"], typing.Any
+]
