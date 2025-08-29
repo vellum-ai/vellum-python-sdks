@@ -446,3 +446,19 @@ def test_templating_node__conditional_type_checking():
 
     # THEN conditional type checking works
     assert outputs.result == "test string"
+
+
+def test_templating_node__dict_wrapper_nonexistent_attribute_is_none():
+    """Test that non-existent attributes on DictWrapper evaluate to None."""
+
+    # GIVEN a templating node with nonexistent attr in the template
+    class TemplateNode(TemplatingNode[BaseState, str]):
+        template = "{% if data.nonexistent_attr is none %}none_value{% else %}{{ data.nonexistent_attr }}{% endif %}"
+        inputs = {"data": {"existing_key": "existing_value"}}
+
+    # WHEN the node is run
+    node = TemplateNode()
+    outputs = node.run()
+
+    # THEN it should recognize the non-existent attribute as None
+    assert outputs.result == "none_value"

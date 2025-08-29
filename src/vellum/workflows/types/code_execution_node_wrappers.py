@@ -71,7 +71,7 @@ class DictWrapper(dict):
                 # several values as VellumValue objects, we use the "value" key to return itself
                 return self
 
-            raise AttributeError(f"dict has no key: '{attr}'")
+            return None
 
         item = super().__getitem__(attr)
         if not isinstance(item, DictWrapper) and not isinstance(item, ListWrapper):
