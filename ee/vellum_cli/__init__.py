@@ -5,6 +5,7 @@ import click
 from vellum_cli.aliased_group import ClickAliasedGroup
 from vellum_cli.image_push import image_push_command
 from vellum_cli.init import init_command
+from vellum_cli.move import move_command
 from vellum_cli.ping import ping_command
 from vellum_cli.pull import pull_command
 from vellum_cli.push import push_command
@@ -374,6 +375,26 @@ def image_push(
 ) -> None:
     """Push Docker image to Vellum"""
     image_push_command(image, tag, workspace, source)
+
+
+@workflows.command(name="move")
+@click.argument("old_module", required=True)
+@click.argument("new_module", required=True)
+@click.option("--workspace", type=str, help="The specific Workspace config to use when moving")
+def workflows_move(
+    old_module: str,
+    new_module: str,
+    workspace: Optional[str],
+) -> None:
+    """
+    Move/rename a Workflow module. Updates both the filesystem structure and configuration.
+    """
+
+    move_command(
+        old_module=old_module,
+        new_module=new_module,
+        workspace=workspace,
+    )
 
 
 @workflows.command(name="init")
