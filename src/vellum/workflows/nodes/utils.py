@@ -253,6 +253,16 @@ def cast_to_output_type(result: Any, output_type: Any) -> Any:
     if result is None:
         return _get_default_value(output_type)
 
+    # Attempt JSON parse if type is Any
+    if output_type is Any:
+        if isinstance(result, str):
+            try:
+                return json.loads(result)
+            except (json.JSONDecodeError, TypeError):
+                # If JSON parsing fails, fall back to original result
+                pass
+        return result
+
     clean_output_type = _clean_output_type(output_type)
     DynamicModel = create_model("Output", output_type=(clean_output_type, ...))
 
