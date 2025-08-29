@@ -150,3 +150,26 @@ def test_cast_to_output_type_none_value(output_type, expected_result):
     """Test that cast_to_output_type returns appropriate default values when None is provided."""
     result = cast_to_output_type(None, output_type)
     assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "input_value,expected_result",
+    [
+        ('{"name": "Alice", "age": 30}', {"name": "Alice", "age": 30}),
+        ("[1, 2, 3]", [1, 2, 3]),
+        ("invalid json", "invalid json"),
+        ([1, 2, 3], [1, 2, 3]),
+        ({"already": "dict"}, {"already": "dict"}),
+    ],
+    ids=[
+        "valid_json_object",
+        "valid_json_array",
+        "invalid_json_string",
+        "non_string_list",
+        "non_string_dict",
+    ],
+)
+def test_cast_to_output_type_any_json_parsing(input_value, expected_result):
+    """Test that cast_to_output_type attempts JSON parsing for Any type and falls back gracefully."""
+    result = cast_to_output_type(input_value, Any)
+    assert result == expected_result
