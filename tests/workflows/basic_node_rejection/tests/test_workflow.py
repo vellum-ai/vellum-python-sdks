@@ -19,6 +19,13 @@ def test_run_workflow__happy_path():
     assert terminal_event.error.code == WorkflowErrorCode.USER_DEFINED_ERROR
     assert terminal_event.error.message == "Node was rejected"
 
+    # AND the traceback should contain meaningful stack trace information
+    assert terminal_event.body.traceback is not None
+    assert "NodeException" in terminal_event.body.traceback
+    assert "Node was rejected" in terminal_event.body.traceback
+    assert "workflow.py" in terminal_event.body.traceback
+    assert "in run" in terminal_event.body.traceback
+
 
 def test_stream_workflow__parent_context():
     # GIVEN a workflow that references a node that will fail
