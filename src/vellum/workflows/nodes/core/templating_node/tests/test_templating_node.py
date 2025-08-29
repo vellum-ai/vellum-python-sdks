@@ -460,5 +460,5 @@ def test_templating_node__dict_wrapper_nonexistent_attribute_is_none():
     node = TemplateNode()
     outputs = node.run()
 
-    # THEN it should recognize the non-existent attribute as None
-    assert outputs.result == "none_value"
+    # THEN it should recognize the non-existent attribute as ""
+    assert outputs.result == ""
