@@ -847,21 +847,11 @@ def main(arg1: list) -> str:
         runtime = "PYTHON_3_11_6"
 
     # WHEN we run the node
-    with pytest.raises(NodeException) as exc_info:
-        node = ExampleCodeExecutionNode()
-        node.run()
+    node = ExampleCodeExecutionNode()
+    outputs = node.run()
 
     # AND the result should be the correct output
-    assert (
-        exc_info.value.message
-        == """\
-Traceback (most recent call last):
-  File "ExampleCodeExecutionNode.code.py", line 2, in main
-    return arg1["invalid"]
-
-AttributeError: dict has no key: 'invalid'
-"""
-    )
+    assert outputs == {"result": "", "log": ""}
 
 
 def test_run_node__execute_code__value_key_access():

@@ -22,6 +22,9 @@ class _UndefMeta(type):
 
         return super().__getattribute__(name)
 
+    def __str__(cls) -> str:
+        return ""
+
     def __bool__(cls) -> bool:
         return False
 

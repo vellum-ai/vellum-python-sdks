@@ -10,4 +10,4 @@ def test_workflow__happy_path():
 
     # THEN we should expect the workflow to succeed with the expected output
     assert terminal_event.name == "workflow.execution.fulfilled"
-    assert terminal_event.outputs == {"final_value": "hello undefined"}
+    assert terminal_event.outputs == {"final_value": "hello "}
