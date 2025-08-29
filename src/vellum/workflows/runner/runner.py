@@ -22,7 +22,6 @@ from typing import (
     Tuple,
     Type,
     Union,
-    cast,
 )
 
 from vellum.workflows.constants import undefined
@@ -579,7 +578,7 @@ class WorkflowRunner(Generic[StateType]):
             )
             worker_thread.start()
 
-    def _handle_work_item_event(self, event: WorkflowEvent) -> Optional[WorkflowEvent]:
+    def _handle_work_item_event(self, event: WorkflowEvent) -> Optional[NodeExecutionRejectedEvent]:
         active_node = self._active_nodes_by_execution_id.get(event.span_id)
         if not active_node:
             return None
@@ -793,7 +792,7 @@ class WorkflowRunner(Generic[StateType]):
                 )
                 return
 
-        rejection_event: Optional[WorkflowEvent] = None
+        rejection_event: Optional[NodeExecutionRejectedEvent] = None
 
         while True:
             if not self._active_nodes_by_execution_id:
@@ -838,11 +837,9 @@ class WorkflowRunner(Generic[StateType]):
             return
 
         if rejection_event:
-            rejected_event = cast(NodeExecutionRejectedEvent, rejection_event)
-            rejection_traceback = (
-                getattr(rejected_event.body, "traceback", None) if hasattr(rejected_event.body, "traceback") else None
+            self._workflow_event_outer_queue.put(
+                self._reject_workflow_event(rejection_event.error, rejection_event.body.traceback)
             )
-            self._workflow_event_outer_queue.put(self._reject_workflow_event(rejected_event.error, rejection_traceback))
             return
 
         fulfilled_outputs = self.workflow.Outputs()
