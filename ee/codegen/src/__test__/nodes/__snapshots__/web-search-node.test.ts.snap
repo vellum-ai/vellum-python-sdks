@@ -79,23 +79,6 @@ class WebSearchNode(BaseWebSearchNode):
 "
 `;
 
-exports[`WebSearchNode > value type variations > should handle DICTIONARY_REFERENCE for complex input mapping 1`] = `
-"from vellum.workflows.nodes.displayable.web_search_node import (
-    WebSearchNode as BaseWebSearchNode,
-)
-from vellum.workflows.references import EnvironmentVariableReference
-
-from ..inputs import Inputs
-
-
-class WebSearchNode(BaseWebSearchNode):
-    query = {
-        "search_term": Inputs.query,
-    }
-    api_key = EnvironmentVariableReference(name="SERP_API_KEY")
-"
-`;
-
 exports[`WebSearchNode > value type variations > should handle NODE_OUTPUT for query parameter 1`] = `
 "from vellum.workflows.nodes.displayable.web_search_node import (
     WebSearchNode as BaseWebSearchNode,

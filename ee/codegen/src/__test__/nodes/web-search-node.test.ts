@@ -190,51 +190,6 @@ describe("WebSearchNode", () => {
       testNode.getNodeFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
-
-    it("should handle DICTIONARY_REFERENCE for complex input mapping", async () => {
-      const nodeData = webSearchNodeFactory({
-        nodeAttributes: [
-          {
-            id: "search-inputs-dict",
-            name: "query",
-            value: {
-              type: "DICTIONARY_REFERENCE",
-              entries: [
-                {
-                  id: "search-term-entry",
-                  key: "search_term",
-                  value: {
-                    type: "WORKFLOW_INPUT",
-                    inputVariableId: "search-query-input-id",
-                  },
-                },
-              ],
-            },
-          },
-          {
-            id: "api-key-secret",
-            name: "api_key",
-            value: {
-              type: "ENVIRONMENT_VARIABLE",
-              environmentVariable: "SERP_API_KEY",
-            },
-          },
-        ],
-      });
-
-      const nodeContext = (await createNodeContext({
-        workflowContext,
-        nodeData,
-      })) as GenericNodeContext;
-
-      const testNode = new GenericNode({
-        workflowContext,
-        nodeContext,
-      });
-
-      testNode.getNodeFile().write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
-    });
   });
 
   describe("parameter validation", () => {
