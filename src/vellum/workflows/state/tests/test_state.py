@@ -4,11 +4,13 @@ import json
 from queue import Queue
 from typing import Dict, List, cast
 
+from vellum.workflows.constants import undefined
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.delta import SetStateDelta, StateDelta
 from vellum.workflows.state.encoder import DefaultStateEncoder
+from vellum.workflows.types.code_execution_node_wrappers import DictWrapper
 
 
 @pytest.fixture()
@@ -229,3 +231,15 @@ def test_state_snapshot__deepcopy_fails__logs_error(mock_deepcopy, mock_logger):
 
     # AND alert sentry once
     assert mock_logger.exception.call_count == 1
+
+
+def test_state_deepcopy_handles_undefined_values():
+    # GIVEN a state with undefined values in node outputs
+    state = MockState(foo="bar")
+    state.meta.node_outputs[MockNode.Outputs.baz] = DictWrapper({"foo": undefined})
+
+    # WHEN we deepcopy the state
+    deepcopied_state = deepcopy(state)
+
+    # THEN the undefined values are preserved
+    assert deepcopied_state.meta.node_outputs[MockNode.Outputs.baz] == {"foo": undefined}
