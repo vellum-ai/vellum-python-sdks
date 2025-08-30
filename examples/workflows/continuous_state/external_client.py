@@ -17,7 +17,7 @@ result = client.execute_workflow(
             value="First Message",
         ),
     ],
-    previous_execution_id="<previous_execution_id>",
+    # previous_execution_id="<previous_execution_id>",
 )
 
 if result.data.state == "REJECTED":
