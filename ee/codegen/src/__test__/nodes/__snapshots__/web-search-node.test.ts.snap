@@ -1,0 +1,112 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`WebSearchNode > basic > getNodeDisplayFile 1`] = `
+"from uuid import UUID
+
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.nodes import BaseNodeDisplay
+from vellum_ee.workflows.display.nodes.types import PortDisplayOverrides
+
+from ...nodes.web_search_node import WebSearchNode
+
+
+class WebSearchNodeDisplay(BaseNodeDisplay[WebSearchNode]):
+    label = "Web Search Node"
+    node_id = UUID("web-search-node-id")
+    attribute_ids_by_name = {
+        "query": UUID("query-attribute-id"),
+        "api_key": UUID("api-key-attribute-id"),
+        "num_results": UUID("num-results-attribute-id"),
+        "location": UUID("location-attribute-id"),
+    }
+    port_displays = {
+        WebSearchNode.Ports.default_port: PortDisplayOverrides(
+            id=UUID("web-search-port-id")
+        )
+    }
+    display_data = NodeDisplayData(
+        position=NodeDisplayPosition(x=0, y=0), width=None, height=None
+    )
+"
+`;
+
+exports[`WebSearchNode > basic > getNodeFile 1`] = `
+"from vellum.workflows.nodes.displayable.web_search_node import (
+    WebSearchNode as BaseWebSearchNode,
+)
+from vellum.workflows.references import EnvironmentVariableReference
+
+
+class WebSearchNode(BaseWebSearchNode):
+    query = "latest AI developments"
+    api_key = EnvironmentVariableReference(name="SERP_API_KEY")
+    num_results = 10
+    location = "United States"
+"
+`;
+
+exports[`WebSearchNode > edge cases > should handle minimal configuration with only required query 1`] = `
+"from vellum.workflows.nodes.displayable.web_search_node import (
+    WebSearchNode as BaseWebSearchNode,
+)
+
+
+class WebSearchNode(BaseWebSearchNode):
+    query = "minimal search"
+"
+`;
+
+exports[`WebSearchNode > edge cases > should handle special characters in query 1`] = `
+"from vellum.workflows.nodes.displayable.web_search_node import (
+    WebSearchNode as BaseWebSearchNode,
+)
+
+
+class WebSearchNode(BaseWebSearchNode):
+    query = 'AI & ML "deep learning" (2024)'
+"
+`;
+
+exports[`WebSearchNode > parameter validation > should handle string to number conversion for num_results 1`] = `
+"from vellum.workflows.nodes.displayable.web_search_node import (
+    WebSearchNode as BaseWebSearchNode,
+)
+
+
+class WebSearchNode(BaseWebSearchNode):
+    query = "AI news"
+    num_results = "15"
+"
+`;
+
+exports[`WebSearchNode > value type variations > should handle NODE_OUTPUT for query parameter 1`] = `
+"from vellum.workflows.nodes.displayable.web_search_node import (
+    WebSearchNode as BaseWebSearchNode,
+)
+from vellum.workflows.references import EnvironmentVariableReference
+
+
+class WebSearchNode(BaseWebSearchNode):
+    query = None
+    api_key = EnvironmentVariableReference(name="SERP_API_KEY")
+    num_results = 5
+    location = "New York"
+"
+`;
+
+exports[`WebSearchNode > with custom attributes > should generate a web search node with workflow input 1`] = `
+"from vellum.workflows.nodes.displayable.web_search_node import (
+    WebSearchNode as BaseWebSearchNode,
+)
+from vellum.workflows.references import EnvironmentVariableReference
+
+from ..inputs import Inputs
+
+
+class WebSearchNode(BaseWebSearchNode):
+    query = Inputs.query
+    api_key = EnvironmentVariableReference(name="CUSTOM_SERP_KEY")
+    num_results = 5
+    location = "California"
+"
+`;

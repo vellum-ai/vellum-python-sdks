@@ -47,4 +47,18 @@ export const NODE_ATTRIBUTES: Record<
       type: AttributeType.Parameters,
     },
   },
+  WebSearchNode: {
+    query: {
+      defaultValue: null,
+    },
+    api_key: {
+      defaultValue: null,
+    },
+    num_results: {
+      defaultValue: 10,
+    },
+    location: {
+      defaultValue: null,
+    },
+  },
 };
