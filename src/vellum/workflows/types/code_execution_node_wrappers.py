@@ -72,6 +72,12 @@ class DictWrapper(dict):
                 # several values as VellumValue objects, we use the "value" key to return itself
                 return self
 
+            if attr.startswith("__") and attr.endswith("__"):
+                raise AttributeError(
+                    f"'{type(self).__name__}' does not expose Python protocol attribute '{attr}'."
+                    f"Only non-dunder attributes fall back to `undefined`."
+                )
+
             return undefined
 
         item = super().__getitem__(attr)
