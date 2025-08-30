@@ -1941,3 +1941,87 @@ export function toolCallingNodeFactory({
   };
   return nodeData;
 }
+
+export function webSearchNodeFactory({
+  id,
+  label: _label,
+  nodeTrigger,
+  nodePorts,
+  nodeAttributes,
+  nodeOutputs,
+  adornments,
+}: {
+  id?: string;
+  label?: string;
+  nodeTrigger?: NodeTrigger;
+  nodePorts?: NodePort[];
+  nodeAttributes?: NodeAttribute[];
+  nodeOutputs?: NodeOutput[];
+  adornments?: AdornmentNode[];
+} = {}): GenericNode {
+  const label = _label ?? "Web Search Node";
+  const nodeData: GenericNode = {
+    id: id ?? "web-search-node-id",
+    label,
+    type: WorkflowNodeType.GENERIC,
+    base: {
+      name: "WebSearchNode",
+      module: [
+        "vellum",
+        "workflows",
+        "nodes",
+        "displayable",
+        "web_search_node",
+      ],
+    },
+    definition: undefined,
+    trigger: nodeTrigger ?? {
+      id: "trigger-id",
+      mergeBehavior: "AWAIT_ATTRIBUTES",
+    },
+    ports: nodePorts ?? [
+      {
+        id: "web-search-port-id",
+        name: "default",
+        type: "DEFAULT",
+      },
+    ],
+    attributes: nodeAttributes ?? [
+      {
+        id: "query-attribute-id",
+        name: "query",
+        value: {
+          type: "CONSTANT_VALUE",
+          value: { type: "STRING", value: "latest AI developments" },
+        },
+      },
+      {
+        id: "api-key-attribute-id",
+        name: "api_key",
+        value: {
+          type: "VELLUM_SECRET",
+          vellumSecretName: "SERP_API_KEY",
+        },
+      },
+      {
+        id: "num-results-attribute-id",
+        name: "num_results",
+        value: {
+          type: "CONSTANT_VALUE",
+          value: { type: "NUMBER", value: 10 },
+        },
+      },
+      {
+        id: "location-attribute-id",
+        name: "location",
+        value: {
+          type: "CONSTANT_VALUE",
+          value: { type: "STRING", value: "United States" },
+        },
+      },
+    ],
+    outputs: nodeOutputs ?? [],
+    adornments: adornments,
+  };
+  return nodeData;
+}
