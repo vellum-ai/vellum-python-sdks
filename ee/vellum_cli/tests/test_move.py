@@ -129,6 +129,7 @@ def test_move__preserves_workflow_metadata(mock_module):
 
     config = load_vellum_cli_config()
     original_config = next((w for w in config.workflows if w.module == old_module), None)
+    assert original_config is not None
     original_config.container_image_name = "test-image"
     original_config.container_image_tag = "v1.0"
     original_config.ignore = "sandbox.py"
