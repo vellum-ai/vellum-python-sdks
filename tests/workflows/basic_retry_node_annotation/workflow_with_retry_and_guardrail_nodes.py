@@ -5,7 +5,6 @@ from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes import InlinePromptNode
 from vellum.workflows.nodes.core.retry_node import RetryNode
 from vellum.workflows.nodes.displayable import GuardrailNode
-from vellum.workflows.references import LazyReference
 from vellum.workflows.state import BaseState
 
 

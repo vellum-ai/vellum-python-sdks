@@ -6,7 +6,6 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.core.retry_node.node import RetryNode
 from vellum.workflows.outputs import BaseOutputs
-from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.state.base import BaseState, StateMeta
 
 
