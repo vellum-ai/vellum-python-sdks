@@ -128,8 +128,10 @@ class VellumEmitter(BaseWorkflowEmitter):
         client = self._context.vellum_client
         request_options = RequestOptions(timeout_in_seconds=self._timeout, max_retries=self._max_retries)
 
-        request = events if len(events) > 1 else events[0]
         client.events.create(
-            request=request,  # type: ignore[arg-type]
+            # The API accepts a ClientWorkflowEvent but our SDK emits an SDKWorkflowEvent. These shapes are
+            # meant to be identical, just with different helper methods. We may consolidate the two in the future.
+            # But for now, the type ignore allows us to avoid an additional Model -> json -> Model conversion.
+            request=events,  # type: ignore[arg-type]
             request_options=request_options,
         )

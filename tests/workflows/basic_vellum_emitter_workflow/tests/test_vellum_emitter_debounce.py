@@ -90,7 +90,7 @@ def test_vellum_emitter_debounce_single_event():
 
     assert mock_client.events.create.call_count == 1
     call_args = mock_client.events.create.call_args
-    assert call_args.kwargs["request"] == event
+    assert call_args.kwargs["request"] == [event]
 
 
 def test_vellum_emitter_debounce_timer_reset():

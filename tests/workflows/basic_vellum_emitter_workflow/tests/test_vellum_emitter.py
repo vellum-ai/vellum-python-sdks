@@ -23,7 +23,7 @@ def test_vellum_emitter__happy_path(mock_httpx_transport):
     """Test VellumEmitter happy path with event emission."""
 
     # GIVEN a properly configured VellumEmitter
-    emitter = VellumEmitter()
+    emitter = VellumEmitter(debounce_timeout=0.01)
     workflow_context = WorkflowContext()
     emitter.register_context(workflow_context)
 
@@ -42,7 +42,7 @@ def test_vellum_emitter__happy_path(mock_httpx_transport):
     # WHEN we emit the workflow event
     emitter.emit_event(workflow_initiated_event)
 
-    time.sleep(0.15)
+    time.sleep(0.02)
 
     # THEN the emitter should have called client.events.create
     assert mock_httpx_transport.handle_request.call_count == 1
@@ -52,19 +52,21 @@ def test_vellum_emitter__happy_path(mock_httpx_transport):
     mocked_request = call_args[0][0]
     assert mocked_request.method == "POST"
     assert mocked_request.url == "https://api.vellum.ai/monitoring/v1/events"
-    assert json.loads(mocked_request.content) == {
-        "name": "workflow.execution.initiated",
-        "api_version": "2024-10-25",
-        "body": {
-            "inputs": {"foo": "test"},
-            "workflow_definition": {
-                "id": "898d564e-2ca3-4b4e-8ee4-51404b7d48bf",
-                "module": ["tests", "workflows", "basic_vellum_emitter_workflow", "tests", "test_vellum_emitter"],
-                "name": "TestWorkflow",
+    assert json.loads(mocked_request.content) == [
+        {
+            "name": "workflow.execution.initiated",
+            "api_version": "2024-10-25",
+            "body": {
+                "inputs": {"foo": "test"},
+                "workflow_definition": {
+                    "id": "898d564e-2ca3-4b4e-8ee4-51404b7d48bf",
+                    "module": ["tests", "workflows", "basic_vellum_emitter_workflow", "tests", "test_vellum_emitter"],
+                    "name": "TestWorkflow",
+                },
             },
-        },
-        "id": "123e4567-e89b-12d3-a456-426614174000",
-        "span_id": "123e4567-e89b-12d3-a456-426614174000",
-        "timestamp": "2024-01-01T12:00:00Z",
-        "trace_id": "123e4567-e89b-12d3-a456-426614174000",
-    }
+            "id": "123e4567-e89b-12d3-a456-426614174000",
+            "span_id": "123e4567-e89b-12d3-a456-426614174000",
+            "timestamp": "2024-01-01T12:00:00Z",
+            "trace_id": "123e4567-e89b-12d3-a456-426614174000",
+        }
+    ]
