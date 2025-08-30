@@ -6,7 +6,7 @@ import { inputVariableContextFactory } from "src/__test__/helpers/input-variable
 import {
   nodePortFactory,
   webSearchNodeFactory,
-} from "../helpers/node-data-factories";
+} from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { GenericNode } from "src/generators/nodes/generic-node";
@@ -87,8 +87,8 @@ describe("WebSearchNode", () => {
             id: "custom-api-key-id",
             name: "api_key",
             value: {
-              type: "VELLUM_SECRET",
-              vellumSecretName: "CUSTOM_SERP_KEY",
+              type: "ENVIRONMENT_VARIABLE",
+              environmentVariable: "CUSTOM_SERP_KEY",
             },
           },
           {
@@ -154,8 +154,8 @@ describe("WebSearchNode", () => {
             id: "api-key-secret",
             name: "api_key",
             value: {
-              type: "VELLUM_SECRET",
-              vellumSecretName: "SERP_API_KEY",
+              type: "ENVIRONMENT_VARIABLE",
+              environmentVariable: "SERP_API_KEY",
             },
           },
           {
@@ -215,8 +215,8 @@ describe("WebSearchNode", () => {
             id: "api-key-secret",
             name: "api_key",
             value: {
-              type: "VELLUM_SECRET",
-              vellumSecretName: "SERP_API_KEY",
+              type: "ENVIRONMENT_VARIABLE",
+              environmentVariable: "SERP_API_KEY",
             },
           },
         ],

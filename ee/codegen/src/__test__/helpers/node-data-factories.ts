@@ -1999,8 +1999,8 @@ export function webSearchNodeFactory({
         id: "api-key-attribute-id",
         name: "api_key",
         value: {
-          type: "VELLUM_SECRET",
-          vellumSecretName: "SERP_API_KEY",
+          type: "ENVIRONMENT_VARIABLE",
+          environmentVariable: "SERP_API_KEY",
         },
       },
       {

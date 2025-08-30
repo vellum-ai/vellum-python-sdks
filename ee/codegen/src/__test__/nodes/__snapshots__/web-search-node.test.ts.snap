@@ -34,71 +34,14 @@ exports[`WebSearchNode > basic > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable.web_search_node import (
     WebSearchNode as BaseWebSearchNode,
 )
+from vellum.workflows.references import EnvironmentVariableReference
 
 
 class WebSearchNode(BaseWebSearchNode):
     query = "latest AI developments"
-    api_key = None
+    api_key = EnvironmentVariableReference(name="SERP_API_KEY")
     num_results = 10
     location = "United States"
-"
-`;
-
-exports[`WebSearchNode > different secret configurations > should handle different VELLUM_SECRET key names 1`] = `
-"from vellum.workflows.nodes.displayable.web_search_node import (
-    WebSearchNode as BaseWebSearchNode,
-)
-
-
-class WebSearchNode(BaseWebSearchNode):
-    query = "search with custom key"
-    api_key = None
-"
-`;
-
-exports[`WebSearchNode > edge case values > should handle empty string query 1`] = `
-"from vellum.workflows.nodes.displayable.web_search_node import (
-    WebSearchNode as BaseWebSearchNode,
-)
-
-
-class WebSearchNode(BaseWebSearchNode):
-    query = ""
-    api_key = None
-"
-`;
-
-exports[`WebSearchNode > edge case values > should handle null values for optional parameters 1`] = `
-"from vellum.workflows.nodes.displayable.web_search_node import (
-    WebSearchNode as BaseWebSearchNode,
-)
-
-
-class WebSearchNode(BaseWebSearchNode):
-    query = "required search query"
-"
-`;
-
-exports[`WebSearchNode > edge case values > should handle special characters in query and location 1`] = `
-"from vellum.workflows.nodes.displayable.web_search_node import (
-    WebSearchNode as BaseWebSearchNode,
-)
-
-
-class WebSearchNode(BaseWebSearchNode):
-    query = 'AI & ML "deep learning" (2024)'
-    location = "San Francisco, CA - USA"
-"
-`;
-
-exports[`WebSearchNode > edge case values > should handle very long query string 1`] = `
-"from vellum.workflows.nodes.displayable.web_search_node import (
-    WebSearchNode as BaseWebSearchNode,
-)
-
-
-class WebSearchNode(BaseWebSearchNode):
-    query = "artificial intelligence machine learning deep learning natural language processing computer vision robotics automation data science big data analytics predictive modeling neural networksartificial intelligence machine learning deep learning natural language processing computer vision robotics automation data science big data analytics predictive modeling neural networksartificial intelligence machine learning deep learning natural language processing computer vision robotics automation data science big data analytics predictive modeling neural networks"
 "
 `;
 
@@ -124,29 +67,6 @@ class WebSearchNode(BaseWebSearchNode):
 "
 `;
 
-exports[`WebSearchNode > error scenarios > should handle invalid number casting gracefully 1`] = `
-"from vellum.workflows.nodes.displayable.web_search_node import (
-    WebSearchNode as BaseWebSearchNode,
-)
-
-
-class WebSearchNode(BaseWebSearchNode):
-    query = "test search"
-    num_results = "not-a-number"
-"
-`;
-
-exports[`WebSearchNode > multiple ports and outputs > should handle custom port configurations 1`] = `
-"from vellum.workflows.nodes.displayable.web_search_node import (
-    WebSearchNode as BaseWebSearchNode,
-)
-
-
-class WebSearchNode(BaseWebSearchNode):
-    query = "multi-port search"
-"
-`;
-
 exports[`WebSearchNode > parameter validation > should handle string to number conversion for num_results 1`] = `
 "from vellum.workflows.nodes.displayable.web_search_node import (
     WebSearchNode as BaseWebSearchNode,
@@ -159,46 +79,11 @@ class WebSearchNode(BaseWebSearchNode):
 "
 `;
 
-exports[`WebSearchNode > parameter validation - num_results > should cast string to number for num_results 1`] = `
-"from vellum.workflows.nodes.displayable.web_search_node import (
-    WebSearchNode as BaseWebSearchNode,
-)
-
-
-class WebSearchNode(BaseWebSearchNode):
-    query = "AI news"
-    num_results = "15"
-"
-`;
-
-exports[`WebSearchNode > parameter validation - num_results > should handle large num_results value 1`] = `
-"from vellum.workflows.nodes.displayable.web_search_node import (
-    WebSearchNode as BaseWebSearchNode,
-)
-
-
-class WebSearchNode(BaseWebSearchNode):
-    query = "comprehensive search"
-    num_results = 100
-"
-`;
-
-exports[`WebSearchNode > parameter validation - num_results > should handle zero num_results 1`] = `
-"from vellum.workflows.nodes.displayable.web_search_node import (
-    WebSearchNode as BaseWebSearchNode,
-)
-
-
-class WebSearchNode(BaseWebSearchNode):
-    query = "test query"
-    num_results = 0
-"
-`;
-
 exports[`WebSearchNode > value type variations > should handle DICTIONARY_REFERENCE for complex input mapping 1`] = `
 "from vellum.workflows.nodes.displayable.web_search_node import (
     WebSearchNode as BaseWebSearchNode,
 )
+from vellum.workflows.references import EnvironmentVariableReference
 
 from ..inputs import Inputs
 
@@ -207,7 +92,7 @@ class WebSearchNode(BaseWebSearchNode):
     query = {
         "search_term": Inputs.query,
     }
-    api_key = None
+    api_key = EnvironmentVariableReference(name="SERP_API_KEY")
 "
 `;
 
@@ -215,11 +100,12 @@ exports[`WebSearchNode > value type variations > should handle NODE_OUTPUT for q
 "from vellum.workflows.nodes.displayable.web_search_node import (
     WebSearchNode as BaseWebSearchNode,
 )
+from vellum.workflows.references import EnvironmentVariableReference
 
 
 class WebSearchNode(BaseWebSearchNode):
     query = None
-    api_key = None
+    api_key = EnvironmentVariableReference(name="SERP_API_KEY")
     num_results = 5
     location = "New York"
 "
@@ -229,13 +115,14 @@ exports[`WebSearchNode > with custom attributes > should generate a web search n
 "from vellum.workflows.nodes.displayable.web_search_node import (
     WebSearchNode as BaseWebSearchNode,
 )
+from vellum.workflows.references import EnvironmentVariableReference
 
 from ..inputs import Inputs
 
 
 class WebSearchNode(BaseWebSearchNode):
     query = Inputs.query
-    api_key = None
+    api_key = EnvironmentVariableReference(name="CUSTOM_SERP_KEY")
     num_results = 5
     location = "California"
 "
