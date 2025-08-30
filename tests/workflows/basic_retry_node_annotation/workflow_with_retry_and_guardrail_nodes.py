@@ -36,7 +36,7 @@ class RetryablePromptNode(InlinePromptNode):
 class ConsumerGuardrailNode(GuardrailNode):
     metric_definition = "e0869d84-1bb6-4e8c-85ad-67fd28ff8f59"
     metric_inputs = {
-        "actual": LazyReference("RetryablePromptNode.Outputs.text"),
+        "actual": RetryablePromptNode.Outputs.text,
     }
     release_tag = "LATEST"
 
