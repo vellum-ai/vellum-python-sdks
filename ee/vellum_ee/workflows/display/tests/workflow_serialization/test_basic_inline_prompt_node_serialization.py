@@ -47,17 +47,20 @@ def test_serialize_workflow():
 
     # AND its output variables should be what we expect
     output_variables = serialized_workflow["output_variables"]
-    assert len(output_variables) == 1
+    assert len(output_variables) == 2
     assert not DeepDiff(
-        [{"id": "15a0ab89-8ed4-43b9-afa2-3c0b29d4dc3e", "key": "results", "type": "JSON"}],
+        [
+            {"id": "15a0ab89-8ed4-43b9-afa2-3c0b29d4dc3e", "key": "results", "type": "JSON"},
+            {"id": "0ef1608e-1737-41cc-9b90-a8e124138f70", "key": "json", "type": "JSON"},
+        ],
         output_variables,
         ignore_order=True,
     )
 
     # AND its raw data should be what we expect
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
-    assert len(workflow_raw_data["edges"]) == 2
-    assert len(workflow_raw_data["nodes"]) == 3
+    assert len(workflow_raw_data["edges"]) == 3
+    assert len(workflow_raw_data["nodes"]) == 4
 
     # AND each node should be serialized correctly
     entrypoint_node = workflow_raw_data["nodes"][0]
@@ -305,7 +308,7 @@ def test_serialize_workflow():
                     },
                 }
             ],
-            "display_data": {"position": {"x": 400.0, "y": -50.0}},
+            "display_data": {"position": {"x": 400.0, "y": 75.0}},
             "base": {
                 "name": "FinalOutputNode",
                 "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
@@ -334,6 +337,14 @@ def test_serialize_workflow():
                 "source_handle_id": "d4a097ab-e22d-42f1-b6bc-2ed96856377a",
                 "target_node_id": "42318326-3ae8-417f-9609-f6d8ae47eafb",
                 "target_handle_id": "46c99277-2b4b-477d-851c-ea497aef6b16",
+                "type": "DEFAULT",
+            },
+            {
+                "id": "0b1a2960-4cd5-4045-844f-42b6c87487aa",
+                "source_node_id": "8450dd06-975a-41a4-a564-808ee8808fe6",
+                "source_handle_id": "d4a097ab-e22d-42f1-b6bc-2ed96856377a",
+                "target_node_id": "1f4e3b7b-6af1-42c8-ab33-05b0f01e2b62",
+                "target_handle_id": "7d94907f-c840-4ced-b813-ee3b17f2a8a9",
                 "type": "DEFAULT",
             },
         ],
