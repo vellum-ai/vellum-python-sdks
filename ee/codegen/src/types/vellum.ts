@@ -182,6 +182,7 @@ export interface NodeDisplayData {
   width?: number;
   height?: number;
   comment?: NodeDisplayComment;
+  z_index?: number;
 }
 
 export interface CodeResourceDefinition {

@@ -17,5 +17,5 @@ class FinalOutputDisplay(BaseFinalOutputNodeDisplay[FinalOutput]):
         FinalOutput.Outputs.value: NodeOutputDisplay(id=UUID("aed7279d-59cd-4c15-b82c-21de48129ba3"), name="value")
     }
     display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=2761.0242006615217, y=208.9757993384785), width=474, height=234
+        position=NodeDisplayPosition(x=2761.0242006615217, y=208.9757993384785), width=474, height=234, z_index=None
     )

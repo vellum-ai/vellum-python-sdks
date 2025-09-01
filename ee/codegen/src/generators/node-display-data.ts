@@ -67,6 +67,12 @@ export class NodeDisplayData extends AstNode {
         value: this.sourceNodeDisplayData?.height
           ? python.TypeInstantiation.int(this.sourceNodeDisplayData?.height)
           : python.TypeInstantiation.none(),
+      }),
+      python.methodArgument({
+        name: "z_index",
+        value: this.sourceNodeDisplayData?.z_index
+          ? python.TypeInstantiation.int(this.sourceNodeDisplayData.z_index)
+          : python.TypeInstantiation.none(),
       })
     );
 

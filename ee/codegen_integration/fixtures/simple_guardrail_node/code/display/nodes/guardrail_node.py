@@ -20,5 +20,5 @@ class GuardrailNodeDisplay(BaseGuardrailNodeDisplay[GuardrailNode]):
     }
     port_displays = {GuardrailNode.Ports.default: PortDisplayOverrides(id=UUID("92aafe31-101b-47d3-86f2-e261c7747c16"))}
     display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=1985.9562846580402, y=180.75743992606283), width=464, height=224
+        position=NodeDisplayPosition(x=1985.9562846580402, y=180.75743992606283), width=464, height=224, z_index=None
     )

@@ -24,5 +24,5 @@ class FormattedSearchResultsDisplay(BaseTemplatingNodeDisplay[FormattedSearchRes
         FormattedSearchResults.Ports.default: PortDisplayOverrides(id=UUID("886d79d2-2a97-4c15-8172-e9a157c9090d"))
     }
     display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=3923.3878883718644, y=-458.89620665696896), width=454, height=221
+        position=NodeDisplayPosition(x=3923.3878883718644, y=-458.89620665696896), width=454, height=221, z_index=None
     )

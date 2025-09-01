@@ -29,5 +29,5 @@ class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
     }
     port_displays = {PromptNode.Ports.default: PortDisplayOverrides(id=UUID("4e8bdb06-2adb-474f-9bd7-f6ee01fd4c2b"))}
     display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=2083.6598676957, y=288.95993689582167), width=480, height=126
+        position=NodeDisplayPosition(x=2083.6598676957, y=288.95993689582167), width=480, height=126, z_index=None
     )

@@ -43,5 +43,6 @@ class ApiNodeDisplay(BaseAPINodeDisplay[ApiNode]):
         position=NodeDisplayPosition(x=1889.865705614568, y=236.61265174506826),
         width=467,
         height=288,
+        z_index=None,
         comment=NodeDisplayComment(expanded=True, value="This is my API Node"),
     )

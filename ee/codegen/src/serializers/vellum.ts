@@ -655,6 +655,7 @@ export const NodeDisplayDataSerializer: ObjectSchema<
   width: numberSchema().optional(),
   height: numberSchema().optional(),
   comment: NodeDisplayCommentSerializer.optional(),
+  z_index: numberSchema().optional(),
 });
 
 export declare namespace NodeDisplayDataSerializer {
@@ -663,6 +664,7 @@ export declare namespace NodeDisplayDataSerializer {
     width?: number | null;
     height?: number | null;
     comment?: NodeDisplayCommentSerializer.Raw | null;
+    z_index?: number | null;
   }
 }
 
