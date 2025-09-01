@@ -14,7 +14,7 @@ Remote API client for calling deployed Vellum workflows from applications.
 
 ### 1. Deploy the Workflow
 ```bash
-vellum workflows push examples.workflows.continuous_chatbot_external --deploy
+vellum workflows push chatbot --deploy
 ```
 
 ### 2. First Execution
