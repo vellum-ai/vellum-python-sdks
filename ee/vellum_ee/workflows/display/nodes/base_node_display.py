@@ -431,6 +431,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             )
             return NodeDisplayData(
                 position=explicit_value.position,
+                z_index=explicit_value.z_index,
                 width=explicit_value.width,
                 height=explicit_value.height,
                 comment=comment,
