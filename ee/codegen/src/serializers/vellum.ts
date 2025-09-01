@@ -652,19 +652,19 @@ export const NodeDisplayDataSerializer: ObjectSchema<
   NodeDisplayData
 > = objectSchema({
   position: NodeDisplayPositionSerializer.optional(),
+  z_index: numberSchema().optional(),
   width: numberSchema().optional(),
   height: numberSchema().optional(),
   comment: NodeDisplayCommentSerializer.optional(),
-  z_index: numberSchema().optional(),
 });
 
 export declare namespace NodeDisplayDataSerializer {
   interface Raw {
     position?: NodeDisplayPositionSerializer.Raw | null;
+    z_index?: number | null;
     width?: number | null;
     height?: number | null;
     comment?: NodeDisplayCommentSerializer.Raw | null;
-    z_index?: number | null;
   }
 }
 

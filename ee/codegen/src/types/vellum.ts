@@ -179,10 +179,10 @@ export interface NodeDisplayComment {
 
 export interface NodeDisplayData {
   position?: NodeDisplayPosition;
+  z_index?: number;
   width?: number;
   height?: number;
   comment?: NodeDisplayComment;
-  z_index?: number;
 }
 
 export interface CodeResourceDefinition {

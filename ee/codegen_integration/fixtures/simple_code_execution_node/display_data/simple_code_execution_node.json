@@ -12,12 +12,13 @@
         "definition": null,
         "inputs": [],
         "display_data": {
-          "width": 124,
-          "height": 48,
           "position": {
             "x": 1545,
             "y": 330
-          }
+          },
+          "z_index": null,
+          "width": 124,
+          "height": 48
         }
       },
       {
@@ -117,12 +118,13 @@
           }
         ],
         "display_data": {
-          "width": 480,
-          "height": 224,
           "position": {
             "x": 1816.3157894736842,
             "y": 213.93599376731305
           },
+          "z_index": null,
+          "width": 480,
+          "height": 224,
           "comment": {
             "expanded": true,
             "value": "This is my code execution node"
@@ -188,12 +190,13 @@
           }
         ],
         "display_data": {
-          "width": 480,
-          "height": 234,
           "position": {
             "x": 2392.5396121883655,
             "y": 235.35180055401668
-          }
+          },
+          "z_index": null,
+          "width": 480,
+          "height": 234
         },
         "outputs": [
           {

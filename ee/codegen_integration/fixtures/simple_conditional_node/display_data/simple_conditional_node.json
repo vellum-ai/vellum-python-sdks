@@ -10,12 +10,13 @@
         },
         "inputs": [],
         "display_data": {
-          "width": 124,
-          "height": 48,
           "position": {
             "x": 1545,
             "y": 330
-          }
+          },
+          "z_index": null,
+          "width": 124,
+          "height": 48
         },
         "base": null,
         "definition": null
@@ -149,12 +150,13 @@
           }
         ],
         "display_data": {
-          "width": 480,
-          "height": 234,
           "position": {
             "x": 1943.4147273142412,
             "y": 292.2355134030261
-          }
+          },
+          "z_index": null,
+          "width": 480,
+          "height": 234
         },
         "base": {
           "module": [
@@ -260,12 +262,13 @@
           }
         ],
         "display_data": {
-          "width": 464,
-          "height": 234,
           "position": {
             "x": 2750,
             "y": 210
-          }
+          },
+          "z_index": null,
+          "width": 464,
+          "height": 234
         },
         "base": {
           "module": [
