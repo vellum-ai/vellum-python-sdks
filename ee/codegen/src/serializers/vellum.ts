@@ -112,6 +112,7 @@ import {
   WorkflowDisplayData,
   WorkflowDisplayDataViewport,
   WorkflowEdge,
+  WorkflowEdgeDisplayData,
   WorkflowInputWorkflowReference,
   WorkflowNode,
   WorkflowOutputValue,
@@ -665,6 +666,19 @@ export declare namespace NodeDisplayDataSerializer {
     width?: number | null;
     height?: number | null;
     comment?: NodeDisplayCommentSerializer.Raw | null;
+  }
+}
+
+export const WorkflowEdgeDisplayDataSerializer: ObjectSchema<
+  WorkflowEdgeDisplayDataSerializer.Raw,
+  WorkflowEdgeDisplayData
+> = objectSchema({
+  z_index: numberSchema().optional(),
+});
+
+export declare namespace WorkflowEdgeDisplayDataSerializer {
+  interface Raw {
+    z_index?: number | null;
   }
 }
 
@@ -2178,7 +2192,7 @@ const workflowEdgeSerializer: ObjectSchema<
   sourceHandleId: propertySchema("source_handle_id", stringSchema()),
   targetNodeId: propertySchema("target_node_id", stringSchema()),
   targetHandleId: propertySchema("target_handle_id", stringSchema()),
-  z_index: numberSchema().optional(),
+  display_data: propertySchema("display_data", WorkflowEdgeDisplayDataSerializer.optional()),
 });
 
 export declare namespace WorkflowEdgeSerializer {
@@ -2189,7 +2203,7 @@ export declare namespace WorkflowEdgeSerializer {
     source_handle_id: string;
     target_node_id: string;
     target_handle_id: string;
-    z_index?: number | null;
+    display_data?: WorkflowEdgeDisplayDataSerializer.Raw | null;
   }
 }
 
@@ -2303,7 +2317,7 @@ export const WorkflowEdgeSerializer: ObjectSchema<
   sourceHandleId: propertySchema("source_handle_id", stringSchema()),
   targetNodeId: propertySchema("target_node_id", stringSchema()),
   targetHandleId: propertySchema("target_handle_id", stringSchema()),
-  z_index: numberSchema().optional(),
+  display_data: propertySchema("display_data", WorkflowEdgeDisplayDataSerializer.optional()),
 });
 
 export declare namespace WorkflowEdgeSerializer {
@@ -2313,7 +2327,7 @@ export declare namespace WorkflowEdgeSerializer {
     source_handle_id: string;
     target_node_id: string;
     target_handle_id: string;
-    z_index?: number | null;
+    display_data?: WorkflowEdgeDisplayDataSerializer.Raw | null;
   }
 }
 

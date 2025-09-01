@@ -500,8 +500,8 @@ export class Workflow {
                   }),
                   python.methodArgument({
                     name: "z_index",
-                    value: edge.z_index
-                      ? python.TypeInstantiation.int(edge.z_index)
+                    value: edge.display_data?.z_index
+                      ? python.TypeInstantiation.int(edge.display_data.z_index)
                       : python.TypeInstantiation.none(),
                   }),
                 ],

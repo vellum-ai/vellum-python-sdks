@@ -185,6 +185,10 @@ export interface NodeDisplayData {
   comment?: NodeDisplayComment;
 }
 
+export interface WorkflowEdgeDisplayData {
+  z_index?: number;
+}
+
 export interface CodeResourceDefinition {
   name: string;
   module: string[];
@@ -758,7 +762,7 @@ export interface WorkflowEdge {
   sourceHandleId: string;
   targetNodeId: string;
   targetHandleId: string;
-  z_index?: number;
+  display_data?: WorkflowEdgeDisplayData;
 }
 
 export interface WorkflowDisplayDataViewport {
