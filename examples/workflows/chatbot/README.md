@@ -31,7 +31,7 @@ python -m chatbot.external_client
 3. Find your recent execution and copy the execution ID
 
 ### 3. Continue Conversation
-Use the execution ID from step 3 to continue the conversation:
+Use the execution ID from step 2 to continue the conversation:
 ```python
 result = client.execute_workflow(
     workflow_deployment_name="your-deployment-name",
