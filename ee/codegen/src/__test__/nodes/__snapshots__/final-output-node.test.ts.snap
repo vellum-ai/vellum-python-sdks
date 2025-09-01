@@ -27,6 +27,7 @@ class FinalOutputNodeDisplay(BaseFinalOutputNodeDisplay[FinalOutputNode]):
         position=NodeDisplayPosition(x=2075.7067885117494, y=234.65663468515768),
         width=462,
         height=288,
+        z_index=None,
     )
 "
 `;
@@ -69,6 +70,7 @@ class FinalOutputNodeDisplay(BaseFinalOutputNodeDisplay[FinalOutputNode]):
         position=NodeDisplayPosition(x=2075.7067885117494, y=234.65663468515768),
         width=462,
         height=288,
+        z_index=None,
     )
 "
 `;
@@ -108,6 +110,7 @@ class FinalOutputNodeDisplay(BaseFinalOutputNodeDisplay[FinalOutputNode]):
         position=NodeDisplayPosition(x=2075.7067885117494, y=234.65663468515768),
         width=462,
         height=288,
+        z_index=None,
     )
 "
 `;
@@ -150,6 +153,7 @@ class FinalOutputDisplay(BaseFinalOutputNodeDisplay[FinalOutput]):
         position=NodeDisplayPosition(x=2075.7067885117494, y=234.65663468515768),
         width=462,
         height=288,
+        z_index=None,
     )
 
 
@@ -179,6 +183,7 @@ class FinalOutput1Display(BaseFinalOutputNodeDisplay[FinalOutput1]):
         position=NodeDisplayPosition(x=2075.7067885117494, y=234.65663468515768),
         width=462,
         height=288,
+        z_index=None,
     )
 
 
@@ -208,6 +213,7 @@ class FinalOutput2Display(BaseFinalOutputNodeDisplay[FinalOutput2]):
         position=NodeDisplayPosition(x=2075.7067885117494, y=234.65663468515768),
         width=462,
         height=288,
+        z_index=None,
     )
 "
 `;

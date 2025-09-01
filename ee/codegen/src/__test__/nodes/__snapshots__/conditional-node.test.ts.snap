@@ -241,6 +241,7 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
         position=NodeDisplayPosition(x=2247.2797390213086, y=30.917121251477084),
         width=480,
         height=180,
+        z_index=None,
     )
 "
 `;
@@ -324,6 +325,7 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
         position=NodeDisplayPosition(x=2247.2797390213086, y=30.917121251477084),
         width=480,
         height=180,
+        z_index=None,
     )
 "
 `;
@@ -400,6 +402,7 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
         position=NodeDisplayPosition(x=2247.2797390213086, y=30.917121251477084),
         width=480,
         height=180,
+        z_index=None,
     )
 "
 `;

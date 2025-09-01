@@ -36,6 +36,7 @@ class PromptDeploymentNodeDisplay(
         position=NodeDisplayPosition(x=2470.8372576177285, y=219.71887984764544),
         width=480,
         height=170,
+        z_index=None,
     )
 "
 `;
@@ -135,6 +136,7 @@ class PromptDeploymentNodeDisplay(
         position=NodeDisplayPosition(x=2470.8372576177285, y=219.71887984764544),
         width=480,
         height=170,
+        z_index=None,
     )
 "
 `;

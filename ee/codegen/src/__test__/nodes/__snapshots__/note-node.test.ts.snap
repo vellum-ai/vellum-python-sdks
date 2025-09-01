@@ -19,7 +19,7 @@ class NoteNodeDisplay(BaseNoteNodeDisplay[NoteNode]):
         "fontWeight": "bold",
     }
     display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=0, y=0), width=None, height=None
+        position=NodeDisplayPosition(x=0, y=0), width=None, height=None, z_index=None
     )
 "
 `;

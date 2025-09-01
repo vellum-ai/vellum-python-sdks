@@ -17,7 +17,7 @@ class ErrorNodeDisplay(BaseErrorNodeDisplay[ErrorNode]):
         "error_source_input_id": UUID("d2287fee-98fb-421c-9464-e54d8f70f046")
     }
     display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=0, y=0), width=None, height=None
+        position=NodeDisplayPosition(x=0, y=0), width=None, height=None, z_index=None
     )
 "
 `;
@@ -46,7 +46,7 @@ class ErrorNodeDisplay(BaseErrorNodeDisplay[ErrorNode]):
     node_id = UUID("2cd960a3-cb8a-43ed-9e3f-f003fc480951")
     target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
     display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=0, y=0), width=None, height=None
+        position=NodeDisplayPosition(x=0, y=0), width=None, height=None, z_index=None
     )
 "
 `;
