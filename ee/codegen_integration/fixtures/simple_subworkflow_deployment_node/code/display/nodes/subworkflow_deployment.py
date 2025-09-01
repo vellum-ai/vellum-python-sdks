@@ -21,5 +21,5 @@ class SubworkflowDeploymentDisplay(BaseSubworkflowDeploymentNodeDisplay[Subworkf
         SubworkflowDeployment.Ports.default: PortDisplayOverrides(id=UUID("fc38b3bd-5c08-4729-9e37-211c415637ad"))
     }
     display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=1873.116343490305, y=239.74958448753466), width=None, height=None, z_index=None
+        position=NodeDisplayPosition(x=1873.116343490305, y=239.74958448753466), z_index=None, width=None, height=None
     )

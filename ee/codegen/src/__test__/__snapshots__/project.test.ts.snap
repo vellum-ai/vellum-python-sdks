@@ -155,7 +155,7 @@ class SecondNodeDisplay(BaseNodeDisplay[SecondNode]):
     output_display = {
         SecondNode.Outputs.output: NodeOutputDisplay(id=UUID("bd71c32b-0762-4556-a1bc-2c36b15f6428"), name="output")
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), width=None, height=None, z_index=None)
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None)
 "
 `;
 
@@ -400,7 +400,7 @@ class GetCurrentWeatherNodeDisplay(BaseNodeDisplay[GetCurrentWeatherNode]):
     port_displays = {
         GetCurrentWeatherNode.Ports.default: PortDisplayOverrides(id=UUID("7b97f998-4be5-478d-94c4-9423db5f6392"))
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), width=None, height=None, z_index=None)
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None)
 "
 `;
 
@@ -531,9 +531,9 @@ class GetCurrentWeatherNodeDisplay(BaseNodeDisplay[GetCurrentWeatherNode]):
     }
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=0, y=0),
+        z_index=None,
         width=None,
         height=None,
-        z_index=None,
         comment=NodeDisplayComment(
             value="\\n    A tool calling node that calls the get_current_weather function.\\n    "
         ),
@@ -592,7 +592,7 @@ class WeatherFunctionDisplay(BaseWorkflowDisplay[WeatherFunction]):
         entrypoint_node_id=UUID("d97d2a36-3347-487e-b915-3bc874aaded4"),
         entrypoint_node_source_handle_id=UUID("c55f8e1e-0422-4009-af54-86df5625ba71"),
         entrypoint_node_display=NodeDisplayData(
-            position=NodeDisplayPosition(x=0, y=0), width=None, height=None, z_index=None
+            position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None
         ),
         display_data=WorkflowDisplayData(viewport=WorkflowDisplayDataViewport(x=0, y=0, zoom=1)),
     )
@@ -607,9 +607,13 @@ class WeatherFunctionDisplay(BaseWorkflowDisplay[WeatherFunction]):
         )
     }
     edge_displays = {
-        (CodeExecutionNode.Ports.default, StartNode): EdgeDisplay(id=UUID("code-to-start-edge")),
-        (StartNode.Ports.default, FinalOutput3): EdgeDisplay(id=UUID("ab8c4a64-465d-4406-a407-9faa09d0326d")),
-        (StartNode.Ports.default, FinalOutput4): EdgeDisplay(id=UUID("f9dc12de-4284-419d-beb2-927452b80da0")),
+        (CodeExecutionNode.Ports.default, StartNode): EdgeDisplay(id=UUID("code-to-start-edge"), z_index=None),
+        (StartNode.Ports.default, FinalOutput3): EdgeDisplay(
+            id=UUID("ab8c4a64-465d-4406-a407-9faa09d0326d"), z_index=None
+        ),
+        (StartNode.Ports.default, FinalOutput4): EdgeDisplay(
+            id=UUID("f9dc12de-4284-419d-beb2-927452b80da0"), z_index=None
+        ),
     }
     output_displays = {
         WeatherFunction.Outputs.temperature: WorkflowOutputDisplay(
@@ -907,9 +911,9 @@ class GetCurrentWeatherNodeDisplay(BaseNodeDisplay[GetCurrentWeatherNode]):
     }
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=0, y=0),
+        z_index=None,
         width=None,
         height=None,
-        z_index=None,
         comment=NodeDisplayComment(
             value="\\n    A tool calling node that calls the get_current_weather function.\\n    "
         ),
@@ -968,7 +972,7 @@ class WeatherFunctionDisplay(BaseWorkflowDisplay[WeatherFunction]):
         entrypoint_node_id=UUID("d97d2a36-3347-487e-b915-3bc874aaded4"),
         entrypoint_node_source_handle_id=UUID("c55f8e1e-0422-4009-af54-86df5625ba71"),
         entrypoint_node_display=NodeDisplayData(
-            position=NodeDisplayPosition(x=0, y=0), width=None, height=None, z_index=None
+            position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None
         ),
         display_data=WorkflowDisplayData(viewport=WorkflowDisplayDataViewport(x=0, y=0, zoom=1)),
     )
@@ -983,9 +987,13 @@ class WeatherFunctionDisplay(BaseWorkflowDisplay[WeatherFunction]):
         )
     }
     edge_displays = {
-        (CodeExecutionNode.Ports.default, StartNode): EdgeDisplay(id=UUID("code-to-start-edge")),
-        (StartNode.Ports.default, FinalOutput3): EdgeDisplay(id=UUID("ab8c4a64-465d-4406-a407-9faa09d0326d")),
-        (StartNode.Ports.default, FinalOutput4): EdgeDisplay(id=UUID("f9dc12de-4284-419d-beb2-927452b80da0")),
+        (CodeExecutionNode.Ports.default, StartNode): EdgeDisplay(id=UUID("code-to-start-edge"), z_index=None),
+        (StartNode.Ports.default, FinalOutput3): EdgeDisplay(
+            id=UUID("ab8c4a64-465d-4406-a407-9faa09d0326d"), z_index=None
+        ),
+        (StartNode.Ports.default, FinalOutput4): EdgeDisplay(
+            id=UUID("f9dc12de-4284-419d-beb2-927452b80da0"), z_index=None
+        ),
     }
     output_displays = {
         WeatherFunction.Outputs.temperature: WorkflowOutputDisplay(
@@ -1426,7 +1434,7 @@ class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
         entrypoint_node_id=UUID("entry"),
         entrypoint_node_source_handle_id=UUID("entry_source"),
         entrypoint_node_display=NodeDisplayData(
-            position=NodeDisplayPosition(x=0, y=0), width=None, height=None, z_index=None
+            position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None
         ),
         display_data=WorkflowDisplayData(viewport=WorkflowDisplayDataViewport(x=0, y=0, zoom=0)),
     )

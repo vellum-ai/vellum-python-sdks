@@ -97,9 +97,9 @@ class TestWorkflowDisplay(BaseWorkflowDisplay[TestWorkflow]):
         entrypoint_node_source_handle_id=UUID("<source_handle_id>"),
         entrypoint_node_display=NodeDisplayData(
             position=NodeDisplayPosition(x=0, y=0),
+            z_index=None,
             width=None,
             height=None,
-            z_index=None,
         ),
         display_data=WorkflowDisplayData(
             viewport=WorkflowDisplayDataViewport(x=0, y=0, zoom=0)

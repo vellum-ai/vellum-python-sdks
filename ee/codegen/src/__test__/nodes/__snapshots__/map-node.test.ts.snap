@@ -25,7 +25,7 @@ class MapNodeDisplay(BaseMapNodeDisplay[MapNode]):
         )
     }
     port_displays = {MapNode.Ports.default: PortDisplayOverrides(id=UUID("4878f525-d4a3-4e3d-9221-e146f282a96a"))}
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), width=None, height=None, z_index=None)
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None)
 "
 `;
 
@@ -87,7 +87,7 @@ class MapNodeDisplay(BaseMapNodeDisplay[MapNode]):
         ),
     }
     port_displays = {MapNode.Ports.default: PortDisplayOverrides(id=UUID("4878f525-d4a3-4e3d-9221-e146f282a96a"))}
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), width=None, height=None, z_index=None)
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None)
 "
 `;
 

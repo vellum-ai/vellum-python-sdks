@@ -24,5 +24,5 @@ class MostRecentMessageDisplay(BaseTemplatingNodeDisplay[MostRecentMessage]):
         MostRecentMessage.Ports.default: PortDisplayOverrides(id=UUID("ab8e97b4-4ee4-42bc-8f43-e2c9c457ad21"))
     }
     display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=254, y=237.3190436953056), width=480, height=221, z_index=None
+        position=NodeDisplayPosition(x=254, y=237.3190436953056), z_index=None, width=480, height=221
     )

@@ -24,7 +24,7 @@ class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
         entrypoint_node_id=UUID("77325e35-b73e-4596-bfb0-3cf3ddf11a2e"),
         entrypoint_node_source_handle_id=UUID("f342d075-e79a-46ea-8de9-e40ed8152070"),
         entrypoint_node_display=NodeDisplayData(
-            position=NodeDisplayPosition(x=0, y=151.5), width=124, height=48, z_index=None
+            position=NodeDisplayPosition(x=0, y=151.5), z_index=None, width=124, height=48
         ),
         display_data=WorkflowDisplayData(
             viewport=WorkflowDisplayDataViewport(x=224.90864867521066, y=180.0534988628682, zoom=0.6573565995604552)
@@ -41,8 +41,12 @@ class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
         )
     }
     edge_displays = {
-        (CodeExecutionNode.Ports.default, MapNode): EdgeDisplay(id=UUID("c1ed7a7c-b278-4a4e-a8d0-53366bfa4a3d")),
-        (MapNode.Ports.default, FinalOutput): EdgeDisplay(id=UUID("2e2e5cdc-94be-4df2-9e00-23467e2ea209")),
+        (CodeExecutionNode.Ports.default, MapNode): EdgeDisplay(
+            id=UUID("c1ed7a7c-b278-4a4e-a8d0-53366bfa4a3d"), z_index=None
+        ),
+        (MapNode.Ports.default, FinalOutput): EdgeDisplay(
+            id=UUID("2e2e5cdc-94be-4df2-9e00-23467e2ea209"), z_index=None
+        ),
     }
     output_displays = {
         Workflow.Outputs.final_output: WorkflowOutputDisplay(

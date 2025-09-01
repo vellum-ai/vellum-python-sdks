@@ -10,12 +10,13 @@
         },
         "inputs": [],
         "display_data": {
-          "width": 124,
-          "height": 48,
           "position": {
             "x": 0,
             "y": 151.5
-          }
+          },
+          "z_index": null,
+          "width": 124,
+          "height": 48
         },
         "base": null,
         "definition": null
@@ -89,6 +90,7 @@
             "x": 1855.8380935218793,
             "y": 384.6100572199606
           },
+          "z_index": null,
           "width": 480,
           "height": 224
         },
@@ -142,12 +144,13 @@
                 },
                 "inputs": [],
                 "display_data": {
-                  "width": 124,
-                  "height": 48,
                   "position": {
                     "x": 1545,
                     "y": 330
-                  }
+                  },
+                  "z_index": null,
+                  "width": 124,
+                  "height": 48
                 },
                 "base": null,
                 "definition": null
@@ -218,6 +221,7 @@
                     "x": 1998.7584158889226,
                     "y": 241.3446029681764
                   },
+                  "z_index": null,
                   "width": 480,
                   "height": 278
                 },
@@ -409,12 +413,13 @@
                   }
                 ],
                 "display_data": {
-                  "width": 480,
-                  "height": 180,
                   "position": {
                     "x": 1909.9521341463415,
                     "y": 212.0475201437282
-                  }
+                  },
+                  "z_index": null,
+                  "width": 480,
+                  "height": 180
                 },
                 "base": {
                   "name": "SearchNode",
@@ -482,12 +487,13 @@
                   }
                 ],
                 "display_data": {
-                  "width": 463,
-                  "height": 234,
                   "position": {
                     "x": 2750,
                     "y": 210
-                  }
+                  },
+                  "z_index": null,
+                  "width": 463,
+                  "height": 234
                 },
                 "base": {
                   "name": "FinalOutputNode",
@@ -654,12 +660,13 @@
           }
         ],
         "display_data": {
-          "width": null,
-          "height": null,
           "position": {
             "x": 254,
             "y": 0
-          }
+          },
+          "z_index": null,
+          "width": null,
+          "height": null
         },
         "base": {
           "name": "MapNode",
@@ -725,12 +732,13 @@
           }
         ],
         "display_data": {
-          "width": 454,
-          "height": 234,
           "position": {
             "x": 864,
             "y": 58.5
-          }
+          },
+          "z_index": null,
+          "width": 454,
+          "height": 234
         },
         "base": {
           "name": "FinalOutputNode",

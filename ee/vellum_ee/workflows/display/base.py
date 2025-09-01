@@ -56,6 +56,7 @@ class StateValueDisplay:
 @dataclass
 class EdgeDisplay:
     id: UUID
+    z_index: Optional[int] = None
 
 
 @dataclass

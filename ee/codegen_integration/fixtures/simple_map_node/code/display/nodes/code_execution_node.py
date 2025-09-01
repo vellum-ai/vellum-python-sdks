@@ -28,5 +28,5 @@ class CodeExecutionNodeDisplay(BaseCodeExecutionNodeDisplay[CodeExecutionNode]):
         CodeExecutionNode.Ports.default: PortDisplayOverrides(id=UUID("734e3a85-f96e-408e-89f1-703bcc486e8a"))
     }
     display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=1855.8380935218793, y=384.6100572199606), width=480, height=224, z_index=None
+        position=NodeDisplayPosition(x=1855.8380935218793, y=384.6100572199606), z_index=None, width=480, height=224
     )

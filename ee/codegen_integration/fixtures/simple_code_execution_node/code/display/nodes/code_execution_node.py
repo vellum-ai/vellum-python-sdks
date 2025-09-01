@@ -29,8 +29,8 @@ class CodeExecutionNodeDisplay(BaseCodeExecutionNodeDisplay[CodeExecutionNode]):
     }
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=1816.3157894736842, y=213.93599376731305),
+        z_index=None,
         width=480,
         height=224,
-        z_index=None,
         comment=NodeDisplayComment(expanded=True, value="This is my code execution node"),
     )

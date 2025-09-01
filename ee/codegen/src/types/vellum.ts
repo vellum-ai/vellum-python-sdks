@@ -758,6 +758,7 @@ export interface WorkflowEdge {
   sourceHandleId: string;
   targetNodeId: string;
   targetHandleId: string;
+  z_index?: number;
 }
 
 export interface WorkflowDisplayDataViewport {

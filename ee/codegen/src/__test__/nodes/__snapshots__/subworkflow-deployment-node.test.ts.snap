@@ -32,9 +32,9 @@ class SubworkflowNodeDisplay(BaseSubworkflowDeploymentNodeDisplay[SubworkflowNod
     }
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=2239.986322714681, y=484.74458968144046),
+        z_index=None,
         width=None,
         height=None,
-        z_index=None,
     )
 "
 `;
@@ -78,9 +78,9 @@ class SubworkflowNodeDisplay(BaseSubworkflowDeploymentNodeDisplay[SubworkflowNod
     }
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=2239.986322714681, y=484.74458968144046),
+        z_index=None,
         width=None,
         height=None,
-        z_index=None,
     )
 "
 `;

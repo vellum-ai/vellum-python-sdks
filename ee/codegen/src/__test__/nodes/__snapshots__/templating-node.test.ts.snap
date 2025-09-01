@@ -29,7 +29,7 @@ class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
         )
     }
     display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=0, y=0), width=None, height=None, z_index=None
+        position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None
     )
 "
 `;
@@ -74,7 +74,7 @@ class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
         )
     }
     display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=0, y=0), width=None, height=None, z_index=None
+        position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None
     )
 "
 `;
@@ -123,7 +123,7 @@ class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
         ),
     }
     display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=0, y=0), width=None, height=None, z_index=None
+        position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None
     )
 "
 `;
@@ -177,7 +177,7 @@ class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
         )
     }
     display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=0, y=0), width=None, height=None, z_index=None
+        position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None
     )
 "
 `;
