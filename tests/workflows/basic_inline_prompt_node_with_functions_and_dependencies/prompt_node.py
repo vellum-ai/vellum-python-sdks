@@ -1,8 +1,8 @@
 from vellum import ChatMessagePromptBlock, JinjaPromptBlock
 from vellum.workflows.nodes import InlinePromptNode, TryNode
-from vellum.workflows.references import LazyReference
 
 from tests.workflows.basic_inline_prompt_node_with_functions_and_dependencies.inputs import WorkflowInputs
+from tests.workflows.basic_inline_prompt_node_with_functions_and_dependencies.node import StartNode
 
 
 @TryNode.wrap()
@@ -21,5 +21,5 @@ class ExampleBaseInlinePromptNodeWithFunctions(InlinePromptNode):
     ]
 
     prompt_inputs = {
-        "noun": LazyReference("StartNode.Outputs.final_noun").coalesce(WorkflowInputs.noun),
+        "noun": StartNode.Outputs.final_noun.coalesce(WorkflowInputs.noun),
     }

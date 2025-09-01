@@ -6,7 +6,6 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.core.retry_node.node import RetryNode
 from vellum.workflows.outputs import BaseOutputs
-from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.state.base import BaseState, StateMeta
 
 
@@ -102,7 +101,7 @@ def test_retry_node__condition_arg_successfully_retries():
     # AND a retry node that retries on a condition
     @RetryNode.wrap(
         max_attempts=5,
-        retry_on_condition=LazyReference(lambda: State.count.less_than(3)),
+        retry_on_condition=State.count.less_than(3),
     )
     class TestNode(BaseNode[State]):
         attempt_number = RetryNode.SubworkflowInputs.attempt_number
