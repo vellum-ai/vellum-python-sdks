@@ -72,6 +72,9 @@ class DictWrapper(dict):
                 # several values as VellumValue objects, we use the "value" key to return itself
                 return self
 
+            if attr.startswith("__") and attr.endswith("__"):
+                return super().__getattribute__(attr)
+
             return undefined
 
         item = super().__getitem__(attr)
