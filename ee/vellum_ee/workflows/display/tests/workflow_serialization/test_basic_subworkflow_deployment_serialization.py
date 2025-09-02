@@ -264,6 +264,7 @@ def test_serialize_workflow(vellum_client):
                 "target_handle_id": "e4d80502-9281-42c8-91e3-10817bcd7d9e",
                 "target_node_id": "d71f674e-8a6b-44ab-b552-7f4637a4e7a6",
                 "type": "DEFAULT",
+                "display_data": None,
             },
             {
                 "id": "69933897-e91e-4c6c-9ba3-ed3e3c265c73",
@@ -272,6 +273,7 @@ def test_serialize_workflow(vellum_client):
                 "target_handle_id": "c3aeba92-4faf-4814-9842-eec7436ee555",
                 "target_node_id": "94afd0ac-1ec4-486b-a6fb-fa1ec7029d19",
                 "type": "DEFAULT",
+                "display_data": None,
             },
             {
                 "id": "86a9af31-f78e-45ac-b170-f66bbba98f9d",
@@ -280,6 +282,7 @@ def test_serialize_workflow(vellum_client):
                 "target_handle_id": "23117248-df28-4519-bebc-abcb24f966b3",
                 "target_node_id": "18170041-1a70-4836-9fa0-adceba2a1f4f",
                 "type": "DEFAULT",
+                "display_data": None,
             },
         ],
         serialized_edges,

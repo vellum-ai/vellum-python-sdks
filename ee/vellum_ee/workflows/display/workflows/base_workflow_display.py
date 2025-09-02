@@ -290,6 +290,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                             "target_node_id": str(final_output_node_id),
                             "target_handle_id": synthetic_target_handle_id,
                             "type": "DEFAULT",
+                            "display_data": None,
                         }
                     )
 
@@ -337,6 +338,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                     "target_node_id": str(target_node_display.node_id),
                     "target_handle_id": str(target_node_display.get_trigger_id()),
                     "type": "DEFAULT",
+                    "display_data": self._serialize_edge_display_data(entrypoint_display.edge_display),
                 }
             )
 
@@ -363,6 +365,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                         target_node_display.get_target_handle_id_by_source_node_id(source_node_port_display.node_id)
                     ),
                     "type": "DEFAULT",
+                    "display_data": self._serialize_edge_display_data(edge_display),
                 }
             )
 
@@ -404,6 +407,12 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             "state_variables": state_variables,
             "output_variables": output_variables,
         }
+
+    def _serialize_edge_display_data(self, edge_display: EdgeDisplay) -> Optional[JsonObject]:
+        """Serialize edge display data, returning None if no display data is present."""
+        if edge_display.z_index is not None:
+            return {"z_index": edge_display.z_index}
+        return None
 
     def _apply_auto_layout(self, nodes_dict_list: List[Dict[str, Any]], edges: List[Json]) -> None:
         """Apply auto-layout to nodes that are all positioned at (0,0)."""

@@ -174,6 +174,7 @@ def test_serialize_workflow():
                 "target_node_id": "51cbe21d-0232-4362-bc54-5bc283297aa6",
                 "target_handle_id": "58427684-3848-498a-8299-c6b0fc70265d",
                 "type": "DEFAULT",
+                "display_data": None,
             },
             {
                 "id": "00cbff5c-5cce-4ef4-81b2-1a11d9b42597",
@@ -182,6 +183,7 @@ def test_serialize_workflow():
                 "target_node_id": "9f75228b-1d5b-4c30-a581-6087e6a1b738",
                 "target_handle_id": "16ba108e-61a8-4338-8a5b-4f1278d7fd7b",
                 "type": "DEFAULT",
+                "display_data": None,
             },
         ],
         serialized_edges,

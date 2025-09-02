@@ -339,6 +339,7 @@ def test_serialize_workflow(vellum_client):
                 "target_node_id": "facb80d7-ee08-42a0-82a9-ee26a9218185",
                 "target_handle_id": "14b538a5-aedb-41f3-b579-039956b7c7ed",
                 "type": "DEFAULT",
+                "display_data": None,
             },
             {
                 "id": "422bbbb7-38b2-4e19-ac95-24a86ed24100",
@@ -347,6 +348,7 @@ def test_serialize_workflow(vellum_client):
                 "target_node_id": "8f975ab1-aca6-4dc1-aa80-c596f4e13afa",
                 "target_handle_id": "06853542-e1a1-4a00-bd1e-4ac40f347b32",
                 "type": "DEFAULT",
+                "display_data": None,
             },
             {
                 "id": "73007fe0-5cc2-435e-b2e4-6fa734153fbd",
@@ -355,6 +357,7 @@ def test_serialize_workflow(vellum_client):
                 "target_node_id": "736f9bd0-f487-42af-bdb3-780b4941c61c",
                 "target_handle_id": "80d0894f-642e-4d2e-b43a-f236e7bedb3c",
                 "type": "DEFAULT",
+                "display_data": None,
             },
             {
                 "id": "4ac7d1c4-697b-440c-a35d-61ffb44a33b3",
@@ -363,6 +366,7 @@ def test_serialize_workflow(vellum_client):
                 "target_node_id": "3f3ffc50-b156-48ac-b5f3-f68cb05c2b90",
                 "target_handle_id": "0c98c306-b519-40d7-8b05-321b1dfd7f11",
                 "type": "DEFAULT",
+                "display_data": None,
             },
         ],
         serialized_edges,
