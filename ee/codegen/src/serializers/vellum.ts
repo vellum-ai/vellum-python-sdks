@@ -2192,7 +2192,10 @@ const workflowEdgeSerializer: ObjectSchema<
   sourceHandleId: propertySchema("source_handle_id", stringSchema()),
   targetNodeId: propertySchema("target_node_id", stringSchema()),
   targetHandleId: propertySchema("target_handle_id", stringSchema()),
-  display_data: propertySchema("display_data", WorkflowEdgeDisplayDataSerializer.optional()),
+  display_data: propertySchema(
+    "display_data",
+    WorkflowEdgeDisplayDataSerializer.optional()
+  ),
 });
 
 export declare namespace WorkflowEdgeSerializer {
@@ -2317,7 +2320,10 @@ export const WorkflowEdgeSerializer: ObjectSchema<
   sourceHandleId: propertySchema("source_handle_id", stringSchema()),
   targetNodeId: propertySchema("target_node_id", stringSchema()),
   targetHandleId: propertySchema("target_handle_id", stringSchema()),
-  display_data: propertySchema("display_data", WorkflowEdgeDisplayDataSerializer.optional()),
+  display_data: propertySchema(
+    "display_data",
+    WorkflowEdgeDisplayDataSerializer.optional()
+  ),
 });
 
 export declare namespace WorkflowEdgeSerializer {
