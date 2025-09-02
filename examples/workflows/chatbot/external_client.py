@@ -4,7 +4,7 @@ import os
 from vellum.client import Vellum
 import vellum.types as types
 
-# create your API key here: https://app.vellum.ai/organization?tab=workspaces&workspace-settings-tab=environments (important-comment)
+# create your API key here: https://app.vellum.ai/organization?tab=workspaces&workspace-settings-tab=environments
 client = Vellum(api_key="<your_api_key>")
 
 result = client.execute_workflow(
@@ -17,7 +17,7 @@ result = client.execute_workflow(
             value="First Message",
         ),
     ],
-    # previous_execution_id="<previous_execution_id>", (important-comment)
+    # previous_execution_id="<previous_execution_id>",
 )
 
 if result.data.state == "REJECTED":
