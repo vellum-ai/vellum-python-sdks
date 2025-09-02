@@ -10,12 +10,13 @@
         },
         "inputs": [],
         "display_data": {
-          "width": 124,
-          "height": 48,
           "position": {
             "x": 1545,
             "y": 330
-          }
+          },
+          "z_index": null,
+          "width": 124,
+          "height": 48
         },
         "base": null,
         "definition": null
@@ -64,12 +65,13 @@
           }
         ],
         "display_data": {
-          "width": 464,
-          "height": 224,
           "position": {
             "x": 1985.9562846580402,
             "y": 180.75743992606283
-          }
+          },
+          "z_index": null,
+          "width": 464,
+          "height": 224
         },
         "base": {
           "name": "GuardrailNode",
@@ -135,12 +137,13 @@
           }
         ],
         "display_data": {
-          "width": 458,
-          "height": 234,
           "position": {
             "x": 2750,
             "y": 210
-          }
+          },
+          "z_index": null,
+          "width": 458,
+          "height": 234
         },
         "base": {
           "name": "FinalOutputNode",

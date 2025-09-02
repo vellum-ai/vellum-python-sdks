@@ -22,4 +22,4 @@ class MapNodeDisplay(BaseMapNodeDisplay[MapNode]):
         )
     }
     port_displays = {MapNode.Ports.default: PortDisplayOverrides(id=UUID("239a1483-e4f5-4650-81a4-21c77d72cc5e"))}
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=254, y=0), width=None, height=None)
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=254, y=0), z_index=None, width=None, height=None)

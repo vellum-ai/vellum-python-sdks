@@ -31,7 +31,7 @@ class MyCustomNodeDisplay(BaseNodeDisplay[MyCustomNode]):
         )
     }
     display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=0, y=0), width=None, height=None
+        position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None
     )
 "
 `;
@@ -106,7 +106,7 @@ class MyCustomNodeDisplay(BaseNodeDisplay[MyCustomNode]):
         )
     }
     display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=0, y=0), width=None, height=None
+        position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None
     )
 "
 `;
@@ -300,7 +300,7 @@ class MyCustomNodeDisplay(BaseNodeDisplay[MyCustomNode]):
         )
     }
     display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=0, y=0), width=None, height=None
+        position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None
     )
 "
 `;

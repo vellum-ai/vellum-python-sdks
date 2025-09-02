@@ -498,6 +498,12 @@ export class Workflow {
                     name: "id",
                     value: python.TypeInstantiation.uuid(edge.id),
                   }),
+                  python.methodArgument({
+                    name: "z_index",
+                    value: !isNil(edge.display_data?.z_index)
+                      ? python.TypeInstantiation.int(edge.display_data.z_index)
+                      : python.TypeInstantiation.none(),
+                  }),
                 ],
               }),
             };

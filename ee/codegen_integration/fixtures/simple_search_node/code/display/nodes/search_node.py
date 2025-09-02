@@ -45,5 +45,5 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
     }
     port_displays = {SearchNode.Ports.default: PortDisplayOverrides(id=UUID("e4dedb66-0638-4f0c-9941-6420bfe353b2"))}
     display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=1966.960664819945, y=223.1684037396122), width=480, height=180
+        position=NodeDisplayPosition(x=1966.960664819945, y=223.1684037396122), z_index=None, width=480, height=180
     )

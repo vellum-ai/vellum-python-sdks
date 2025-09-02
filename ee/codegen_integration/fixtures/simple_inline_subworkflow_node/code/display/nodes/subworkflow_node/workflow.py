@@ -20,7 +20,9 @@ class SubworkflowNodeWorkflowDisplay(BaseWorkflowDisplay[SubworkflowNodeWorkflow
     workflow_display = WorkflowMetaDisplay(
         entrypoint_node_id=UUID("c48f318d-4d87-44da-be54-0ecf537608f6"),
         entrypoint_node_source_handle_id=UUID("cfec8bf4-d335-4681-a5c6-cbd53ffbd0d1"),
-        entrypoint_node_display=NodeDisplayData(position=NodeDisplayPosition(x=1545, y=330), width=124, height=48),
+        entrypoint_node_display=NodeDisplayData(
+            position=NodeDisplayPosition(x=1545, y=330), z_index=None, width=124, height=48
+        ),
         display_data=WorkflowDisplayData(
             viewport=WorkflowDisplayDataViewport(x=-1196.2209238684252, y=58.34576651524276, zoom=0.8182365497236056)
         ),
@@ -32,7 +34,9 @@ class SubworkflowNodeWorkflowDisplay(BaseWorkflowDisplay[SubworkflowNodeWorkflow
         )
     }
     edge_displays = {
-        (SearchNode.Ports.default, FinalOutput): EdgeDisplay(id=UUID("39582ae7-0a7b-4063-8d67-0e2e8ad45a1e"))
+        (SearchNode.Ports.default, FinalOutput): EdgeDisplay(
+            id=UUID("39582ae7-0a7b-4063-8d67-0e2e8ad45a1e"), z_index=None
+        )
     }
     output_displays = {
         SubworkflowNodeWorkflow.Outputs.final_output: WorkflowOutputDisplay(

@@ -17,6 +17,7 @@ class NodeDisplayComment(UniversalBaseModel):
 
 class NodeDisplayData(UniversalBaseModel):
     position: NodeDisplayPosition = Field(default_factory=NodeDisplayPosition)
+    z_index: Optional[int] = None
     width: Optional[int] = None
     height: Optional[int] = None
     comment: Optional[NodeDisplayComment] = None
