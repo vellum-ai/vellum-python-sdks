@@ -39,4 +39,3 @@ class BasicInlinePromptWithFunctionsWorkflow(BaseWorkflow[WorkflowInputs, BaseSt
 
     class Outputs(BaseWorkflow.Outputs):
         results = ExampleBaseInlinePromptNodeWithFunctions.Outputs.results
-        json = ExampleBaseInlinePromptNodeWithFunctions.Outputs.json

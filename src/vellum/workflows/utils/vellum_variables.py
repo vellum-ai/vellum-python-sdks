@@ -22,7 +22,6 @@ from vellum import (
     VellumVideo,
     VellumVideoRequest,
 )
-from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.types.core import Json
 
@@ -30,16 +29,8 @@ from vellum.workflows.types.core import Json
 def primitive_type_to_vellum_variable_type(type_: Union[Type, BaseDescriptor]) -> VellumVariableType:
     """Converts a python primitive to a VellumVariableType"""
     if isinstance(type_, BaseDescriptor):
-        # Ignore None and undefined because those just make types optional
-        types = []
-        for t in type_.types:
-            if t is type(None):
-                continue
-            if t is undefined or t is type(undefined):
-                continue
-            if get_origin(t) is type and len(get_args(t)) == 1 and get_args(t)[0] is undefined:
-                continue
-            types.append(t)
+        # Ignore None because those just make types optional
+        types = [t for t in type_.types if t is not type(None)]
 
         # default to JSON for typevars where the types is empty tuple
         if len(types) == 0:

@@ -25,6 +25,11 @@ python -m chatbot.external_client
 # WorkflowOutputJson(id='...', name='response', value=['First Message'])
 ```
 
+**To get the execution ID:**
+1. Go to your Vellum dashboard
+2. Navigate to **Workflows** → **Deployments** → **Executions**
+3. Find your recent execution and copy the execution ID
+
 ### 3. Continue Conversation
 Use the execution ID from step 2 to continue the conversation:
 ```python
