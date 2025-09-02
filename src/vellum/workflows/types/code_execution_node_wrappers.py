@@ -73,10 +73,7 @@ class DictWrapper(dict):
                 return self
 
             if attr.startswith("__") and attr.endswith("__"):
-                raise AttributeError(
-                    f"'{type(self).__name__}' does not expose Python protocol attribute '{attr}'."
-                    f"Only non-dunder attributes fall back to `undefined`."
-                )
+                return super().__getattribute__(attr)
 
             return undefined
 
