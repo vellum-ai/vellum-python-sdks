@@ -1,4 +1,3 @@
-# pip install vellum-ai
 import os
 import time
 
@@ -9,7 +8,6 @@ from vellum.client.types.workflow_request_string_input_request import WorkflowRe
 
 load_dotenv()
 
-# create your API key here: https://app.vellum.ai/organization?tab=workspaces&workspace-settings-tab=environments
 client = Vellum(api_key=os.getenv("VELLUM_API_KEY"))
 workflow_deployment_name = "<workflow_deployment_name>"
 release_tag = "LATEST"
