@@ -11,7 +11,35 @@ export class EnvironmentVariableWorkflowReference extends BaseNodeInputWorkflowR
       this.nodeInputWorkflowReferencePointer.environmentVariable;
 
     if (isNil(environmentVariable)) {
-      return python.TypeInstantiation.none();
+      // Return a LazyReference with error message instead of None to provide better error context
+      return python.instantiateClass({
+        classReference: python.reference({
+          name: "LazyReference",
+          modulePath: [
+            ...this.workflowContext.sdkModulePathNames.WORKFLOWS_MODULE_PATH,
+            "references",
+          ],
+        }),
+        arguments_: [
+          python.methodArgument({
+            value: python.lambda({
+              body: python.instantiateClass({
+                classReference: python.reference({
+                  name: "ValueError",
+                  modulePath: [],
+                }),
+                arguments_: [
+                  python.methodArgument({
+                    value: python.TypeInstantiation.str(
+                      "Unresolved environment variable reference: name is undefined"
+                    ),
+                  }),
+                ],
+              }),
+            }),
+          }),
+        ],
+      });
     }
     return python.instantiateClass({
       classReference: python.reference({
