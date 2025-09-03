@@ -1,5 +1,7 @@
 from dataclasses import asdict, is_dataclass
 import inspect
+from io import StringIO
+import sys
 from typing import TYPE_CHECKING, Any, Dict, List, cast
 
 from pydantic import BaseModel
@@ -46,7 +48,6 @@ from vellum.workflows.references.output import OutputReference
 from vellum.workflows.references.state_value import StateValueReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.references.workflow_input import WorkflowInputReference
-from vellum.workflows.state.encoder import virtual_open
 from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.types.definition import DeploymentDefinition
 from vellum.workflows.types.generics import is_workflow_class
@@ -56,6 +57,22 @@ from vellum_ee.workflows.display.utils.exceptions import UnsupportedSerializatio
 
 if TYPE_CHECKING:
     from vellum_ee.workflows.display.types import WorkflowDisplayContext
+
+
+def virtual_open(file_path: str, mode: str = "r"):
+    """
+    Open a file, checking VirtualFileFinder instances first before falling back to regular open().
+    """
+    for finder in sys.meta_path:
+        if hasattr(finder, "loader") and hasattr(finder.loader, "_get_code"):
+            namespace = finder.loader.namespace
+            if file_path.startswith(namespace + "/"):
+                relative_path = file_path[len(namespace) + 1 :]
+                content = finder.loader._get_code(relative_path)
+                if content is not None:
+                    return StringIO(content)
+
+    return open(file_path, mode)
 
 
 def convert_descriptor_to_operator(descriptor: BaseDescriptor) -> LogicalOperator:

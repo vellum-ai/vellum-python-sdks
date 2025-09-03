@@ -18,22 +18,6 @@ from vellum.workflows.ports.port import Port
 from vellum.workflows.state.base import BaseState, NodeExecutionCache
 
 
-def virtual_open(file_path: str, mode: str = "r"):
-    """
-    Open a file, checking VirtualFileFinder instances first before falling back to regular open().
-    """
-    for finder in sys.meta_path:
-        if hasattr(finder, "loader") and hasattr(finder.loader, "_get_code"):
-            namespace = finder.loader.namespace
-            if file_path.startswith(namespace + "/"):
-                relative_path = file_path[len(namespace) + 1 :]
-                content = finder.loader._get_code(relative_path)
-                if content is not None:
-                    return StringIO(content)
-
-    return open(file_path, mode)
-
-
 class DefaultStateEncoder(JSONEncoder):
     encoders: Dict[Type, Callable] = {}
 
