@@ -1,12 +1,11 @@
 import logging
 from uuid import UUID
-from typing import Iterator, List, Optional, Tuple, Union, get_args, get_origin
-
-from pydantic import BaseModel
+from typing import Iterator, List, Optional, Tuple, Type, Union
 
 from vellum.client.types.vellum_span import VellumSpan
 from vellum.client.types.workflow_execution_initiated_event import WorkflowExecutionInitiatedEvent
 from vellum.workflows.events.workflow import WorkflowEvent
+from vellum.workflows.nodes.utils import cast_to_output_type
 from vellum.workflows.resolvers.base import BaseWorkflowResolver
 from vellum.workflows.resolvers.types import LoadStateResult
 from vellum.workflows.state.base import BaseState
@@ -53,7 +52,7 @@ class VellumResolver(BaseWorkflowResolver):
 
         return previous_trace_id, root_trace_id, previous_span_id, root_span_id
 
-    def _deserialize_state(self, state_data: dict, state_class: type) -> BaseState:
+    def _deserialize_state(self, state_data: dict, state_class: Type[BaseState]) -> BaseState:
         """Deserialize state data with proper type conversion for complex types like List[ChatMessage]."""
         converted_data = {}
 
@@ -62,25 +61,11 @@ class VellumResolver(BaseWorkflowResolver):
         for field_name, field_value in state_data.items():
             if field_name in annotations:
                 field_type = annotations[field_name]
-                converted_data[field_name] = self._convert_field_value(field_value, field_type)
+                converted_data[field_name] = cast_to_output_type(field_value, field_type)
             else:
                 converted_data[field_name] = field_value
 
         return state_class(**converted_data)
-
-    def _convert_field_value(self, value, field_type):
-        """Convert a field value to the appropriate type."""
-        if get_origin(field_type) is list:
-            if isinstance(value, list):
-                inner_type = get_args(field_type)[0]
-                if issubclass(inner_type, BaseModel):
-                    return [inner_type.model_validate(item) if isinstance(item, dict) else item for item in value]
-            return value
-
-        if isinstance(value, dict) and hasattr(field_type, "model_validate"):
-            return field_type.model_validate(value)
-
-        return value
 
     def load_state(self, previous_execution_id: Optional[Union[UUID, str]] = None) -> Optional[LoadStateResult]:
         if isinstance(previous_execution_id, UUID):
