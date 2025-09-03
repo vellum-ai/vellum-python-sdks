@@ -329,7 +329,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 continue
 
             target_node_display = self.display_context.node_displays[unadorned_target_node]
-            edge_dict = {
+            entrypoint_edge_dict: Dict[str, Json] = {
                 "id": str(entrypoint_display.edge_display.id),
                 "source_node_id": str(entrypoint_node_id),
                 "source_handle_id": str(entrypoint_node_source_handle_id),
@@ -339,8 +339,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             }
             display_data = self._serialize_edge_display_data(entrypoint_display.edge_display)
             if display_data is not None:
-                edge_dict["display_data"] = display_data
-            edges.append(edge_dict)
+                entrypoint_edge_dict["display_data"] = display_data
+            edges.append(entrypoint_edge_dict)
 
         for (source_node_port, target_node), edge_display in self.display_context.edge_displays.items():
             unadorned_source_node_port = get_unadorned_port(source_node_port)
@@ -355,7 +355,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             source_node_port_display = self.display_context.port_displays[unadorned_source_node_port]
             target_node_display = self.display_context.node_displays[unadorned_target_node]
 
-            edge_dict = {
+            regular_edge_dict: Dict[str, Json] = {
                 "id": str(edge_display.id),
                 "source_node_id": str(source_node_port_display.node_id),
                 "source_handle_id": str(source_node_port_display.id),
@@ -367,8 +367,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             }
             display_data = self._serialize_edge_display_data(edge_display)
             if display_data is not None:
-                edge_dict["display_data"] = display_data
-            edges.append(edge_dict)
+                regular_edge_dict["display_data"] = display_data
+            edges.append(regular_edge_dict)
 
         edges.extend(synthetic_output_edges)
 
