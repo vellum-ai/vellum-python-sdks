@@ -1,7 +1,9 @@
 from datetime import datetime
 from unittest.mock import Mock
 from uuid import uuid4
+from typing import List
 
+from vellum import ChatMessage
 from vellum.client.types.span_link import SpanLink
 from vellum.client.types.vellum_code_resource_definition import VellumCodeResourceDefinition
 from vellum.client.types.workflow_execution_detail import WorkflowExecutionDetail
@@ -115,6 +117,142 @@ def test_load_state_with_context_success():
     assert result.state is not None
     assert isinstance(result.state, TestState)
     assert result.state.test_key == "test_value"
+
+    # AND the new state should have different meta IDs than those provided in the loaded state_dict
+    assert str(result.state.meta.id) != prev_id
+    assert str(result.state.meta.span_id) != prev_span_id
+
+    # AND should have span link info
+    assert result.previous_trace_id == previous_invocation.trace_id
+    assert result.previous_span_id == previous_invocation.span_id
+    assert result.root_trace_id == root_invocation.trace_id
+    assert result.root_span_id == root_invocation.span_id
+
+    mock_client.workflow_executions.retrieve_workflow_execution_detail.assert_called_once_with(
+        execution_id=str(execution_id)
+    )
+
+
+def test_load_state_with_chat_message_list():
+    """Test load_state successfully loads state with chat_history containing ChatMessage list."""
+    resolver = VellumResolver()
+    execution_id = uuid4()
+    root_execution_id = uuid4()
+
+    class TestStateWithChatHistory(BaseState):
+        test_key: str = "test_value"
+        chat_history: List[ChatMessage] = []
+
+        def __init__(self, **kwargs):
+            if "chat_history" in kwargs and isinstance(kwargs["chat_history"], list):
+                kwargs["chat_history"] = [
+                    ChatMessage(**item) if isinstance(item, dict) else item for item in kwargs["chat_history"]
+                ]
+            super().__init__(**kwargs)
+
+    class TestWorkflow(BaseWorkflow[BaseInputs, TestStateWithChatHistory]):
+        pass
+
+    # GIVEN a state dictionary with chat_history containing ChatMessage objects
+    prev_id = str(uuid4())
+    prev_span_id = str(uuid4())
+    state_dict = {
+        "test_key": "test_value",
+        "chat_history": [
+            {"role": "USER", "text": "Hello, how are you?"},
+            {"role": "ASSISTANT", "text": "I'm doing well, thank you!"},
+            {"role": "USER", "text": "What can you help me with?"},
+        ],
+        "meta": {
+            "workflow_definition": "MockWorkflow",
+            "id": prev_id,
+            "span_id": prev_span_id,
+            "updated_ts": datetime.now().isoformat(),
+            "workflow_inputs": BaseInputs(),
+            "external_inputs": {},
+            "node_outputs": {},
+            "node_execution_cache": NodeExecutionCache(),
+            "parent": None,
+        },
+    }
+
+    mock_workflow_definition = VellumCodeResourceDefinition(
+        name="TestWorkflow", module=["test", "module"], id=str(uuid4())
+    )
+
+    mock_body = WorkflowExecutionInitiatedBody(workflow_definition=mock_workflow_definition, inputs={})
+
+    previous_trace_id = str(uuid4())
+    root_trace_id = str(uuid4())
+
+    previous_invocation = WorkflowExecutionInitiatedEvent(
+        id=str(uuid4()),
+        timestamp=datetime.now(),
+        trace_id=previous_trace_id,
+        span_id=str(execution_id),
+        body=mock_body,
+        links=[
+            SpanLink(
+                trace_id=previous_trace_id,
+                type="PREVIOUS_SPAN",
+                span_context=WorkflowParentContext(workflow_definition=mock_workflow_definition, span_id=str(uuid4())),
+            ),
+            SpanLink(
+                trace_id=root_trace_id,
+                type="ROOT_SPAN",
+                span_context=WorkflowParentContext(
+                    workflow_definition=mock_workflow_definition, span_id=str(root_execution_id)
+                ),
+            ),
+        ],
+    )
+
+    root_invocation = WorkflowExecutionInitiatedEvent(
+        id=str(uuid4()),
+        timestamp=datetime.now(),
+        trace_id=root_trace_id,
+        span_id=str(root_execution_id),
+        body=mock_body,
+        links=None,
+    )
+
+    mock_span = WorkflowExecutionSpan(
+        span_id=str(execution_id),
+        start_ts=datetime.now(),
+        end_ts=datetime.now(),
+        attributes=WorkflowExecutionSpanAttributes(label="Test Workflow", workflow_id=str(uuid4())),
+        events=[previous_invocation, root_invocation],
+    )
+
+    mock_response = WorkflowExecutionDetail(
+        span_id="test-span-id", start=datetime.now(), inputs=[], outputs=[], spans=[mock_span], state=state_dict
+    )
+
+    mock_client = Mock()
+    mock_client.workflow_executions.retrieve_workflow_execution_detail.return_value = mock_response
+
+    # AND context with the test workflow class is set up
+    context = WorkflowContext(vellum_client=mock_client)
+    TestWorkflow(context=context, resolvers=[resolver])
+
+    # WHEN load_state is called
+    result = resolver.load_state(previous_execution_id=execution_id)
+
+    # THEN should return LoadStateResult with state containing chat_history
+    assert isinstance(result, LoadStateResult)
+    assert result.state is not None
+    assert isinstance(result.state, TestStateWithChatHistory)
+    assert result.state.test_key == "test_value"
+
+    # AND the chat_history should be properly deserialized as ChatMessage objects
+    assert len(result.state.chat_history) == 3
+    assert all(isinstance(msg, ChatMessage) for msg in result.state.chat_history)
+    assert result.state.chat_history[0].role == "USER"
+    assert result.state.chat_history[0].text == "Hello, how are you?"
+    assert result.state.chat_history[1].role == "ASSISTANT"
+    assert result.state.chat_history[1].text == "I'm doing well, thank you!"
+    assert result.state.chat_history[2].role == "USER"
+    assert result.state.chat_history[2].text == "What can you help me with?"
 
     # AND the new state should have different meta IDs than those provided in the loaded state_dict
     assert str(result.state.meta.id) != prev_id
