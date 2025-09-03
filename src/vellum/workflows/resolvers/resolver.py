@@ -1,10 +1,11 @@
 import logging
 from uuid import UUID
-from typing import Iterator, List, Optional, Tuple, Union
+from typing import Iterator, List, Optional, Tuple, Type, Union
 
 from vellum.client.types.vellum_span import VellumSpan
 from vellum.client.types.workflow_execution_initiated_event import WorkflowExecutionInitiatedEvent
 from vellum.workflows.events.workflow import WorkflowEvent
+from vellum.workflows.nodes.utils import cast_to_output_type
 from vellum.workflows.resolvers.base import BaseWorkflowResolver
 from vellum.workflows.resolvers.types import LoadStateResult
 from vellum.workflows.state.base import BaseState
@@ -51,6 +52,21 @@ class VellumResolver(BaseWorkflowResolver):
 
         return previous_trace_id, root_trace_id, previous_span_id, root_span_id
 
+    def _deserialize_state(self, state_data: dict, state_class: Type[BaseState]) -> BaseState:
+        """Deserialize state data with proper type conversion for complex types like List[ChatMessage]."""
+        converted_data = {}
+
+        annotations = getattr(state_class, "__annotations__", {})
+
+        for field_name, field_value in state_data.items():
+            if field_name in annotations:
+                field_type = annotations[field_name]
+                converted_data[field_name] = cast_to_output_type(field_value, field_type)
+            else:
+                converted_data[field_name] = field_value
+
+        return state_class(**converted_data)
+
     def load_state(self, previous_execution_id: Optional[Union[UUID, str]] = None) -> Optional[LoadStateResult]:
         if isinstance(previous_execution_id, UUID):
             previous_execution_id = str(previous_execution_id)
@@ -83,7 +99,7 @@ class VellumResolver(BaseWorkflowResolver):
 
         if self._workflow_class:
             state_class = self._workflow_class.get_state_class()
-            state = state_class(**response.state)
+            state = self._deserialize_state(response.state, state_class)
         else:
             logger.warning("No workflow class registered, falling back to BaseState")
             state = BaseState(**response.state)
