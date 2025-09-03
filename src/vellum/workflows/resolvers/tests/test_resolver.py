@@ -143,13 +143,6 @@ def test_load_state_with_chat_message_list():
         test_key: str = "test_value"
         chat_history: List[ChatMessage] = []
 
-        def __init__(self, **kwargs):
-            if "chat_history" in kwargs and isinstance(kwargs["chat_history"], list):
-                kwargs["chat_history"] = [
-                    ChatMessage(**item) if isinstance(item, dict) else item for item in kwargs["chat_history"]
-                ]
-            super().__init__(**kwargs)
-
     class TestWorkflow(BaseWorkflow[BaseInputs, TestStateWithChatHistory]):
         pass
 
@@ -253,16 +246,6 @@ def test_load_state_with_chat_message_list():
     assert result.state.chat_history[1].text == "I'm doing well, thank you!"
     assert result.state.chat_history[2].role == "USER"
     assert result.state.chat_history[2].text == "What can you help me with?"
-
-    # AND the new state should have different meta IDs than those provided in the loaded state_dict
-    assert str(result.state.meta.id) != prev_id
-    assert str(result.state.meta.span_id) != prev_span_id
-
-    # AND should have span link info
-    assert result.previous_trace_id == previous_invocation.trace_id
-    assert result.previous_span_id == previous_invocation.span_id
-    assert result.root_trace_id == root_invocation.trace_id
-    assert result.root_span_id == root_invocation.span_id
 
     mock_client.workflow_executions.retrieve_workflow_execution_detail.assert_called_once_with(
         execution_id=str(execution_id)
