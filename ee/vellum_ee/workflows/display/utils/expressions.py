@@ -412,11 +412,17 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
             source_code = f"Source code not available for {value.__name__}"
 
         return {
-            "type": "CODE_EXECUTION",
-            "name": function_definition.name,
-            "description": function_definition.description,
-            "definition": function_definition,
-            "src": source_code,
+            "type": "CONSTANT_VALUE",
+            "value": {
+                "type": "JSON",
+                "value": {
+                    "type": "CODE_EXECUTION",
+                    "name": function_definition.name,
+                    "description": function_definition.description,
+                    "definition": function_definition.model_dump(),
+                    "src": source_code,
+                },
+            },
         }
 
     if not isinstance(value, BaseDescriptor):
