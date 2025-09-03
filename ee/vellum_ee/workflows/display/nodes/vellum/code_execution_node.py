@@ -1,9 +1,9 @@
 import inspect
-import os
 from uuid import UUID
 from typing import ClassVar, Generic, Optional, TypeVar
 
 from vellum.workflows.nodes.displayable.code_execution_node import CodeExecutionNode
+from vellum.workflows.nodes.displayable.code_execution_node.utils import read_file_from_path
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
 from vellum_ee.workflows.display.exceptions import NodeValidationError
@@ -14,21 +14,6 @@ from vellum_ee.workflows.display.types import WorkflowDisplayContext
 from vellum_ee.workflows.display.utils.expressions import virtual_open
 
 _CodeExecutionNodeType = TypeVar("_CodeExecutionNodeType", bound=CodeExecutionNode)
-
-
-def _read_file_from_path_with_virtual_support(node_filepath: str, script_filepath: str) -> Optional[str]:
-    """
-    Read a file using virtual_open which handles VirtualFileFinder instances.
-    """
-    node_filepath_dir = os.path.dirname(node_filepath)
-    normalized_script_filepath = script_filepath.lstrip("./")
-    full_filepath = os.path.join(node_filepath_dir, normalized_script_filepath)
-
-    try:
-        with virtual_open(full_filepath, "r") as file:
-            return file.read()
-    except (FileNotFoundError, IsADirectoryError):
-        return None
 
 
 class BaseCodeExecutionNodeDisplay(BaseNodeDisplay[_CodeExecutionNodeType], Generic[_CodeExecutionNodeType]):
@@ -53,7 +38,7 @@ class BaseCodeExecutionNodeDisplay(BaseNodeDisplay[_CodeExecutionNodeType], Gene
             code_value = raw_code
         elif filepath:
             node_file_path = inspect.getfile(node)
-            file_code = _read_file_from_path_with_virtual_support(
+            file_code = read_file_from_path(
                 node_filepath=node_file_path,
                 script_filepath=filepath,
             )

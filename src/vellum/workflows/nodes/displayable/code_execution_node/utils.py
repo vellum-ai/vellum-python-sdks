@@ -8,16 +8,31 @@ from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.utils import cast_to_output_type, wrap_inputs_for_backward_compatibility
 from vellum.workflows.state.context import WorkflowContext
+from vellum.workflows.state.encoder import virtual_open
 from vellum.workflows.types.core import EntityInputsInterface
 
 
 def read_file_from_path(
     node_filepath: str, script_filepath: str, context: Optional[WorkflowContext] = None
 ) -> Union[str, None]:
+    """
+    Read a file, using virtual_open which handles VirtualFileFinder instances automatically.
+    Falls back to the original WorkflowContext.generated_files behavior for backward compatibility.
+    """
     node_filepath_dir = os.path.dirname(node_filepath)
-    full_filepath = os.path.join(node_filepath_dir, script_filepath)
 
-    # If dynamic file loader is present, try and read the code from there
+    # Normalize the script_filepath to remove ./ prefix (this was the key fix!)
+    normalized_script_filepath = script_filepath.lstrip("./")
+    full_filepath = os.path.join(node_filepath_dir, normalized_script_filepath)
+
+    # Try virtual_open first (handles both VirtualFileFinder and regular files)
+    try:
+        with virtual_open(full_filepath, "r") as file:
+            return file.read()
+    except (FileNotFoundError, IsADirectoryError):
+        pass
+
+    # Fallback to original context.generated_files behavior for backward compatibility
     if context and context.generated_files:
         # Strip out namespace
         normalized_path = os.path.normpath(full_filepath)
@@ -27,12 +42,7 @@ def read_file_from_path(
         if code is not None:
             return code
 
-    # Default logic for reading from filesystem
-    try:
-        with open(full_filepath) as file:
-            return file.read()
-    except (FileNotFoundError, IsADirectoryError):
-        return None
+    return None
 
 
 def run_code_inline(
