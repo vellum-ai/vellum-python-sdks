@@ -147,7 +147,8 @@
         "source_node_id": "39a5155a-d137-4a56-be36-d525802df463",
         "source_handle_id": "beddfefc-dc34-483d-b313-f6a2a2e0737e",
         "target_node_id": "d0538e54-b623-4a71-a5cd-24b1ed5ce223",
-        "target_handle_id": "62e924f8-3f80-475f-b6f0-bda3420a50bc"
+        "target_handle_id": "62e924f8-3f80-475f-b6f0-bda3420a50bc",
+        "display_data": null
       },
       {
         "type": "DEFAULT",
@@ -155,7 +156,8 @@
         "source_node_id": "d0538e54-b623-4a71-a5cd-24b1ed5ce223",
         "source_handle_id": "74e0d264-fed6-453f-8769-23f26b976fc2",
         "target_node_id": "eb72f89e-f831-4fc1-a54f-dec7f429fff9",
-        "target_handle_id": "52b9ff71-e090-4c68-a713-fd72d194b992"
+        "target_handle_id": "52b9ff71-e090-4c68-a713-fd72d194b992",
+        "display_data": null
       }
     ],
     "display_data": {
