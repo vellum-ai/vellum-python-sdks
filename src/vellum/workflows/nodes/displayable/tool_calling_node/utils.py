@@ -32,7 +32,6 @@ from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior, Tool, ToolBase
 from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition, MCPServer, MCPToolDefinition
 from vellum.workflows.types.generics import is_workflow_class
-from vellum.workflows.utils.functions import compile_function_definition
 
 CHAT_HISTORY_VARIABLE = "chat_history"
 
