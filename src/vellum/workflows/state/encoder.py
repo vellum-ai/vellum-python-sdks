@@ -1,7 +1,6 @@
 from dataclasses import asdict, is_dataclass
 from datetime import datetime
 import enum
-import inspect
 from io import StringIO
 from json import JSONEncoder
 from queue import Queue
@@ -17,7 +16,6 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.ports.port import Port
 from vellum.workflows.state.base import BaseState, NodeExecutionCache
-from vellum.workflows.utils.functions import compile_function_definition
 
 
 def virtual_open(file_path: str, mode: str = "r"):
