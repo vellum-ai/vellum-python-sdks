@@ -9,7 +9,7 @@ from .vellum_image import VellumImage
 
 class ScenarioInputImageVariableValue(UniversalBaseModel):
     type: typing.Literal["IMAGE"] = "IMAGE"
-    value: VellumImage
+    value: typing.Optional[VellumImage] = None
     input_variable_id: str
 
     if IS_PYDANTIC_V2:

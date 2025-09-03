@@ -9,7 +9,7 @@ from .vellum_video import VellumVideo
 
 class ScenarioInputVideoVariableValue(UniversalBaseModel):
     type: typing.Literal["VIDEO"] = "VIDEO"
-    value: VellumVideo
+    value: typing.Optional[VellumVideo] = None
     input_variable_id: str
 
     if IS_PYDANTIC_V2:

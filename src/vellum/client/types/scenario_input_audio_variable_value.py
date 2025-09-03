@@ -9,7 +9,7 @@ from .vellum_audio import VellumAudio
 
 class ScenarioInputAudioVariableValue(UniversalBaseModel):
     type: typing.Literal["AUDIO"] = "AUDIO"
-    value: VellumAudio
+    value: typing.Optional[VellumAudio] = None
     input_variable_id: str
 
     if IS_PYDANTIC_V2:

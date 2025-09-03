@@ -9,7 +9,7 @@ from .vellum_document import VellumDocument
 
 class ScenarioInputDocumentVariableValue(UniversalBaseModel):
     type: typing.Literal["DOCUMENT"] = "DOCUMENT"
-    value: VellumDocument
+    value: typing.Optional[VellumDocument] = None
     input_variable_id: str
 
     if IS_PYDANTIC_V2:

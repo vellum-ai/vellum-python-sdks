@@ -30,6 +30,11 @@ class FunctionDefinition(UniversalBaseModel):
     An OpenAPI specification of parameters that are supported by this function.
     """
 
+    inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
+    """
+    Optional user defined input mappings for this function.
+    """
+
     forced: typing.Optional[bool] = pydantic.Field(default=None)
     """
     Set this option to true to force the model to return a function call of this function.
