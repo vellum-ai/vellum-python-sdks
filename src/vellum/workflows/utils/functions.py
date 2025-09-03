@@ -132,9 +132,13 @@ def _compile_workflow_deployment_input(input_var: Any) -> dict[str, Any]:
     return input_schema
 
 
-def compile_function_definition(function: Callable) -> FunctionDefinition:
+def compile_function_definition(function: Callable, exclude_params: Optional[set] = None) -> FunctionDefinition:
     """
     Converts a Python function into our Vellum-native FunctionDefinition type.
+
+    Args:
+        function: The Python function to compile
+        exclude_params: Optional set of parameter names to exclude from the function definition
     """
 
     try:
@@ -142,10 +146,21 @@ def compile_function_definition(function: Callable) -> FunctionDefinition:
     except ValueError as e:
         raise ValueError(f"Failed to get signature for function {function.__name__}: {str(e)}")
 
+    # Get inputs from the decorator if present
+    inputs = getattr(function, "_inputs", {})
+    input_params = set(inputs.keys())
+
+    # Combine exclude_params with input_params
+    all_exclude_params = (exclude_params or set()) | input_params
+
     properties = {}
     required = []
     defs: dict[str, Any] = {}
     for param in signature.parameters.values():
+        # Skip parameters that are in the exclude_params set or tool_inputs
+        if all_exclude_params and param.name in all_exclude_params:
+            continue
+
         # Check if parameter uses Annotated type hint
         if get_origin(param.annotation) is Annotated:
             args = get_args(param.annotation)
@@ -248,3 +263,27 @@ def compile_workflow_deployment_function_definition(
         description=description,
         parameters=parameters,
     )
+
+
+def use_tool_inputs(**inputs):
+    """
+    Decorator to specify which parameters of a tool function should be provided
+    from the parent workflow inputs rather than from the LLM.
+
+    Args:
+        **inputs: Mapping of parameter names to parent input references
+
+    Example:
+        @use_tool_inputs(
+            parent_input=ParentInputs.parent_input,
+        )
+        def get_string(parent_input: str, user_query: str) -> str:
+            return f"Parent: {parent_input}, Query: {user_query}"
+    """
+
+    def decorator(func: Callable) -> Callable:
+        # Store the inputs mapping on the function for later use
+        func._inputs = inputs
+        return func
+
+    return decorator
