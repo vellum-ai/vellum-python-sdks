@@ -283,7 +283,7 @@ def use_tool_inputs(**inputs):
 
     def decorator(func: Callable) -> Callable:
         # Store the inputs mapping on the function for later use
-        func._inputs = inputs
+        func._inputs = inputs  # type: ignore[attr-defined]
         return func
 
     return decorator
