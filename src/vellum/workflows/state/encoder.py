@@ -1,10 +1,8 @@
 from dataclasses import asdict, is_dataclass
 from datetime import datetime
 import enum
-from io import StringIO
 from json import JSONEncoder
 from queue import Queue
-import sys
 from uuid import UUID
 from typing import Any, Callable, Dict, Type
 
@@ -16,22 +14,6 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.ports.port import Port
 from vellum.workflows.state.base import BaseState, NodeExecutionCache
-
-
-def virtual_open(file_path: str, mode: str = "r"):
-    """
-    Open a file, checking VirtualFileFinder instances first before falling back to regular open().
-    """
-    for finder in sys.meta_path:
-        if hasattr(finder, "loader") and hasattr(finder.loader, "_get_code"):
-            namespace = finder.loader.namespace
-            if file_path.startswith(namespace + "/"):
-                relative_path = file_path[len(namespace) + 1 :]
-                content = finder.loader._get_code(relative_path)
-                if content is not None:
-                    return StringIO(content)
-
-    return open(file_path, mode)
 
 
 class DefaultStateEncoder(JSONEncoder):
