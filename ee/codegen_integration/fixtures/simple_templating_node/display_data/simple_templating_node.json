@@ -178,8 +178,7 @@
         "source_handle_id": "b4f25dad-17c6-464d-b347-9945065f17e4",
         "target_node_id": "7dffcbb1-0a5c-4149-a6e9-f83095b0a871",
         "target_handle_id": "3522e32d-6735-499b-8d45-c0c6488ae92f",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       },
       {
         "id": "6deb7d8b-b4cc-488f-aa30-e3e5f0957882",
@@ -187,8 +186,7 @@
         "source_handle_id": "9bce9d0a-3b0e-478e-8a97-f0510715a5a0",
         "target_node_id": "f0347fdc-1611-446c-b1da-408511d4181b",
         "target_handle_id": "f3ad283c-d092-4973-91e0-996e5859002a",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       }
     ],
     "display_data": {

@@ -309,7 +309,6 @@ def test_serialize_workflow():
                                                 "target_node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
                                                 "target_handle_id": "6492efcf-4437-4af1-9ad7-269795ccb27a",
                                                 "type": "DEFAULT",
-                                                "display_data": None,
                                             },
                                             {
                                                 "id": "3c5d8990-48f5-42e1-893e-bc8308d2110a",
@@ -318,7 +317,6 @@ def test_serialize_workflow():
                                                 "target_node_id": "0779b232-82ab-4dbe-a340-6a85e6ab3368",
                                                 "target_handle_id": "9e077063-c394-4c7b-b0c6-e6686df67984",
                                                 "type": "DEFAULT",
-                                                "display_data": None,
                                             },
                                             {
                                                 "id": "de0b8090-a26e-4e09-9173-9f7400a5be4c",
@@ -327,7 +325,6 @@ def test_serialize_workflow():
                                                 "target_node_id": "31b74695-3f1c-47cf-8be8-a4d86cc589e8",
                                                 "target_handle_id": "8b525943-6c27-414b-a329-e29c0b217f72",
                                                 "type": "DEFAULT",
-                                                "display_data": None,
                                             },
                                         ],
                                         "display_data": {"viewport": {"x": 0.0, "y": 0.0, "zoom": 1.0}},

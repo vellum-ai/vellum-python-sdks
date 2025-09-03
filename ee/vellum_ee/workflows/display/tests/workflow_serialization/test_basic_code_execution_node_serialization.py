@@ -206,7 +206,6 @@ def test_serialize_workflow_with_filepath():
                 "target_node_id": "c07155b3-7d99-4d2d-9b29-b5298013aa46",
                 "target_handle_id": "e02a2701-22c0-4533-8b00-175998e7350a",
                 "type": "DEFAULT",
-                "display_data": None,
             },
             {
                 "id": "d1e66711-75b3-41c3-beb6-424894fdd307",
@@ -215,7 +214,6 @@ def test_serialize_workflow_with_filepath():
                 "target_node_id": "994d5c2e-00d2-4dff-9a9d-804766d03698",
                 "target_handle_id": "30fb0f4a-61c3-49de-a0aa-7dfdcee6ea07",
                 "type": "DEFAULT",
-                "display_data": None,
             },
             {
                 "id": "67d4c43e-80f9-4875-b6ab-9ecbba19fc7a",
@@ -224,7 +222,6 @@ def test_serialize_workflow_with_filepath():
                 "target_node_id": "c6e3aced-1fc9-48d2-ae55-d2a880e359cb",
                 "target_handle_id": "1e126004-9de7-42c0-b1e1-87f9eb0642e2",
                 "type": "DEFAULT",
-                "display_data": None,
             },
         ],
         serialized_edges,
@@ -445,7 +442,6 @@ def test_serialize_workflow_with_code():
                 "target_node_id": "c07155b3-7d99-4d2d-9b29-b5298013aa46",
                 "target_handle_id": "e02a2701-22c0-4533-8b00-175998e7350a",
                 "type": "DEFAULT",
-                "display_data": None,
             },
             {
                 "id": "2ac757e4-87c3-402c-928f-a3845df10c9f",
@@ -454,7 +450,6 @@ def test_serialize_workflow_with_code():
                 "target_node_id": "eccf97c7-e766-471f-9703-4d2595800e66",
                 "target_handle_id": "6b7d7f2c-5cc8-4005-9e66-cdb2c97b1998",
                 "type": "DEFAULT",
-                "display_data": None,
             },
             {
                 "id": "fcc6353a-265c-4a65-9e70-4eb92a04e4e1",
@@ -463,7 +458,6 @@ def test_serialize_workflow_with_code():
                 "target_node_id": "52f285fe-1f52-4920-b01b-499762b95220",
                 "target_handle_id": "de8f2cc2-8c32-4782-87d5-4eb5afcd42e3",
                 "type": "DEFAULT",
-                "display_data": None,
             },
         ],
         serialized_edges,
@@ -713,7 +707,6 @@ def test_serialize_workflow__try_wrapped():
                 "target_node_id": "c07155b3-7d99-4d2d-9b29-b5298013aa46",
                 "target_handle_id": "e02a2701-22c0-4533-8b00-175998e7350a",
                 "type": "DEFAULT",
-                "display_data": None,
             },
             {
                 "id": "ac96ad63-d91f-465c-9c52-629877e56492",
@@ -722,7 +715,6 @@ def test_serialize_workflow__try_wrapped():
                 "target_node_id": "af4fc1ef-7701-43df-b5e7-4f354f707db2",
                 "target_handle_id": "d243df8d-46f6-4928-ac31-7c775c5d73a9",
                 "type": "DEFAULT",
-                "display_data": None,
             },
             {
                 "id": "636f4540-e0e3-4740-af72-45f78b700cf9",
@@ -731,7 +723,6 @@ def test_serialize_workflow__try_wrapped():
                 "target_node_id": "4cbfa5f7-fc12-4ab2-81cb-168c5caef4f0",
                 "target_handle_id": "9c43709e-25cb-4548-b840-3fcf6a1c9f3e",
                 "type": "DEFAULT",
-                "display_data": None,
             },
         ],
         serialized_edges,

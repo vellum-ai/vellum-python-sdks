@@ -194,7 +194,6 @@ def test_serialize_workflow():
                 "target_node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
                 "target_handle_id": "6492efcf-4437-4af1-9ad7-269795ccb27a",
                 "type": "DEFAULT",
-                "display_data": None,
             },
             {
                 "id": "b0a57a5f-a1e4-4dc9-85dd-946f08304738",
@@ -203,7 +202,6 @@ def test_serialize_workflow():
                 "target_node_id": "ca8bb585-c9a8-4bf7-bf9d-534b600fe23b",
                 "target_handle_id": "8a4a7efd-0e18-43ed-ba32-803e22e3ba0a",
                 "type": "DEFAULT",
-                "display_data": None,
             },
             {
                 "id": "e4366583-94a5-40b0-9b6f-1e965695b1fe",
@@ -212,7 +210,6 @@ def test_serialize_workflow():
                 "target_node_id": "27fdaa45-b8ce-464d-be50-cf71cc56bc10",
                 "target_handle_id": "e7a09eb2-c9fb-4d57-b436-9cd9384c8960",
                 "type": "DEFAULT",
-                "display_data": None,
             },
         ],
         serialized_edges,

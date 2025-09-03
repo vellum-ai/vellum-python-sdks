@@ -545,8 +545,7 @@
                 "source_handle_id": "b4b974ea-716d-4187-a5fb-808284272fe2",
                 "target_node_id": "24153572-e27b-4cea-a541-4d9e82f28b4e",
                 "target_handle_id": "d1b8ef3d-1474-4cfb-8fb0-164f7b238a07",
-                "type": "DEFAULT",
-                "display_data": null
+                "type": "DEFAULT"
               },
               {
                 "id": "d9cc06ea-07fb-413e-b11d-619e29dfbf84",
@@ -554,8 +553,7 @@
                 "source_handle_id": "401d5aee-afc0-4b7c-88a6-faaa753fd5c6",
                 "target_node_id": "4b0a7578-e5ec-4d72-b396-62abdecbd101",
                 "target_handle_id": "df39e340-f66c-4f1c-b030-5437a2183414",
-                "type": "DEFAULT",
-                "display_data": null
+                "type": "DEFAULT"
               },
               {
                 "id": "41499fe7-2ec8-4f35-9fd7-34cb26e57464",
@@ -563,8 +561,7 @@
                 "source_handle_id": "7c8b42ff-7a21-4011-bf7b-44e06a5eb4c5",
                 "target_node_id": "d9d29911-dd45-45d5-9ac8-1a06bb596c2f",
                 "target_handle_id": "8ff89a09-6ff0-4b02-bba7-eb8456a9c865",
-                "type": "DEFAULT",
-                "display_data": null
+                "type": "DEFAULT"
               }
             ],
             "display_data": {
@@ -791,8 +788,7 @@
         "source_handle_id": "f342d075-e79a-46ea-8de9-e40ed8152070",
         "target_node_id": "cdec50ed-5cfc-418e-ad1f-45ef7a0abe4b",
         "target_handle_id": "3a82ede9-4b1b-42fc-84a0-10e91de602dc",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       },
       {
         "id": "c1ed7a7c-b278-4a4e-a8d0-53366bfa4a3d",
@@ -800,8 +796,7 @@
         "source_handle_id": "734e3a85-f96e-408e-89f1-703bcc486e8a",
         "target_node_id": "72cb9f1e-aedd-47af-861e-4f38d27053b6",
         "target_handle_id": "0d15cb2c-256e-423e-a489-c9f87e181280",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       },
       {
         "id": "2e2e5cdc-94be-4df2-9e00-23467e2ea209",
@@ -809,8 +804,7 @@
         "source_handle_id": "239a1483-e4f5-4650-81a4-21c77d72cc5e",
         "target_node_id": "fa0d5829-f259-4db8-a11a-b12fd7237ea5",
         "target_handle_id": "8e19172a-4f87-4c21-8c91-ccdfb3e74c16",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       }
     ],
     "display_data": {

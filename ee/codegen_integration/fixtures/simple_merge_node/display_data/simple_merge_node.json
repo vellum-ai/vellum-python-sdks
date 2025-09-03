@@ -418,8 +418,7 @@
         "source_handle_id": "1095ae85-1e2f-4433-aacf-fac30fe12ff3",
         "target_node_id": "5b7d7b3f-e10d-4334-a217-9099dececd8d",
         "target_handle_id": "f9a55e22-2cbd-4492-8755-36760320f0d9",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       },
       {
         "id": "2c4d2583-af8d-4fd8-972b-c850325d4158",
@@ -427,8 +426,7 @@
         "source_handle_id": "1095ae85-1e2f-4433-aacf-fac30fe12ff3",
         "target_node_id": "6c5017d1-9aa3-4f34-9a6a-fbe2f7029473",
         "target_handle_id": "2d2c5559-983f-469c-a1d0-c2fe9f8f3639",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       },
       {
         "id": "114b1eab-ad2a-4612-b590-35f6ebdd87bc",
@@ -436,8 +434,7 @@
         "source_handle_id": "a5ae5a5c-ad8a-4a19-a726-f3b8ed1fbb1b",
         "target_node_id": "7426f273-a43d-4448-a2d2-76d0ee0d069c",
         "target_handle_id": "dee0633e-0221-40c7-b179-aae1cf67de87",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       },
       {
         "id": "fba82107-15bc-4033-9b38-6a8b0094aa7f",
@@ -445,8 +442,7 @@
         "source_handle_id": "e0e666c4-a90b-4a95-928e-144bab251356",
         "target_node_id": "7f7823e9-b97a-4bbe-bfcf-40aed8db24c9",
         "target_handle_id": "2c1e39e0-ce3e-4c2d-8baf-c5d93b244997",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       },
       {
         "id": "0c6ddc01-1db6-4b0f-ac7c-8b43ca4cf3c2",
@@ -454,8 +450,7 @@
         "source_handle_id": "e51cd1b6-6c1f-4436-aaed-36cb38e7615d",
         "target_node_id": "7ea2c9ed-efb3-4d20-bf3d-7fafdaf6d842",
         "target_handle_id": "8a2df326-df6a-4a5e-81a3-12da082e468c",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       },
       {
         "id": "20c8d251-bcf1-497e-8d37-668e661ccabc",
@@ -463,8 +458,7 @@
         "source_handle_id": "e900aa36-b59e-4d13-bb66-21967eb02214",
         "target_node_id": "7426f273-a43d-4448-a2d2-76d0ee0d069c",
         "target_handle_id": "cf6974a6-1676-43ed-99a0-66bd3eac235f",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       }
     ],
     "display_data": {

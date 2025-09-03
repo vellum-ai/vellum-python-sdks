@@ -179,7 +179,6 @@ def test_serialize_workflow():
             "target_node_id": "5573f078-cced-48f3-bafd-782d48e260c7",
             "target_handle_id": "ce5b85b1-eded-46dd-b4b7-020afcdc67ab",
             "type": "DEFAULT",
-            "display_data": None,
         },
         {
             "id": "5c456a17-a92b-4dad-9569-306043707c9f",
@@ -188,7 +187,6 @@ def test_serialize_workflow():
             "target_node_id": "cbc7197e-67c9-4af5-b781-879c8fd3e4c9",
             "target_handle_id": "001b97f6-2bc8-4d1e-9572-028dcf17df4e",
             "type": "DEFAULT",
-            "display_data": None,
         },
     ]
 

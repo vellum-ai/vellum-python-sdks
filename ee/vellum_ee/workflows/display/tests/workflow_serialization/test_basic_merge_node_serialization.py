@@ -149,7 +149,6 @@ def test_serialize_workflow__await_all():
                 "target_node_id": "59243c65-053f-4ea6-9157-3f3edb1477bf",
                 "target_handle_id": "e622fe61-3bca-4aff-86e1-25dad7bdf9d4",
                 "type": "DEFAULT",
-                "display_data": None,
             },
             {
                 "id": "e5598f3c-fb00-4f25-a0a6-9fb6af9d69a8",
@@ -158,7 +157,6 @@ def test_serialize_workflow__await_all():
                 "target_node_id": "127ef456-91bc-43c6-bd8b-1772db5e3cb5",
                 "target_handle_id": "e5cc41cb-71db-43ec-b3f0-c78706af3351",
                 "type": "DEFAULT",
-                "display_data": None,
             },
             {
                 "id": "8ff20817-974e-4a3a-bb65-f0ad73557649",
@@ -167,7 +165,6 @@ def test_serialize_workflow__await_all():
                 "target_node_id": "37c10e8a-771b-432b-a767-31f5007851f0",
                 "target_handle_id": "42eeb66c-9792-4609-8c71-3a56f668f4dc",
                 "type": "DEFAULT",
-                "display_data": None,
             },
             {
                 "id": "0d8c801c-d76a-437a-831a-530885b75f96",
@@ -176,7 +173,6 @@ def test_serialize_workflow__await_all():
                 "target_node_id": "37c10e8a-771b-432b-a767-31f5007851f0",
                 "target_handle_id": "f40ff7fb-de1b-4aa4-ba3c-7630f7357cbf",
                 "type": "DEFAULT",
-                "display_data": None,
             },
             {
                 "id": "70c1005d-339a-41bc-b6c2-10bc30a0281c",
@@ -185,7 +181,6 @@ def test_serialize_workflow__await_all():
                 "target_node_id": "634f0202-9ea9-4c62-b152-1a58c595cffb",
                 "target_handle_id": "acd48f48-54fb-4b2b-ab37-96d336f6dfb3",
                 "type": "DEFAULT",
-                "display_data": None,
             },
             {
                 "id": "3d031c93-09b1-4937-9f98-c30a7ba6823d",
@@ -194,7 +189,6 @@ def test_serialize_workflow__await_all():
                 "target_node_id": "8187ce10-62b7-4a2c-8c0f-297387915467",
                 "target_handle_id": "ff55701c-16d3-4348-a633-6a298e71377d",
                 "type": "DEFAULT",
-                "display_data": None,
             },
         ],
         serialized_edges,

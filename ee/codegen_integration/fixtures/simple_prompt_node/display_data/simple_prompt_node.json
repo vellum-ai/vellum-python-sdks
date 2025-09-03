@@ -363,8 +363,7 @@
         "source_node_id": "fedbe8f4-aa63-405b-aefa-0e40e65d547e",
         "source_handle_id": "4d6a6de9-d3d6-4b8f-9a71-caf53c2f31c3",
         "target_node_id": "7e09927b-6d6f-4829-92c9-54e66bdcaf80",
-        "target_handle_id": "3feb7e71-ec63-4d58-82ba-c3df829a2948",
-        "display_data": null
+        "target_handle_id": "3feb7e71-ec63-4d58-82ba-c3df829a2948"
       },
       {
         "id": "6afd37dc-47f1-4b99-b1cc-47ff6128247b",
@@ -372,8 +371,7 @@
         "source_node_id": "7e09927b-6d6f-4829-92c9-54e66bdcaf80",
         "source_handle_id": "dd8397b1-5a41-4fa0-8c24-e5dffee4fb98",
         "target_node_id": "e39c8f13-d59b-49fc-8c59-03ee7997b9b6",
-        "target_handle_id": "77ab6d0c-7fea-441e-8e22-7afc62b3555b",
-        "display_data": null
+        "target_handle_id": "77ab6d0c-7fea-441e-8e22-7afc62b3555b"
       }
     ],
     "display_data": {

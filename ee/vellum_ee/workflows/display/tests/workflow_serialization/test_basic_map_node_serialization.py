@@ -214,7 +214,6 @@ def test_serialize_workflow():
                             "target_node_id": "baf6d316-dc75-41e8-96c0-015aede96309",
                             "target_handle_id": "551d5528-f4e1-42ea-bde0-9de4b4968253",
                             "type": "DEFAULT",
-                            "display_data": None,
                         },
                         {
                             "id": "14152688-6996-4d64-9231-a6e66a4827eb",
@@ -223,7 +222,6 @@ def test_serialize_workflow():
                             "target_node_id": "6f4883b2-70b1-4e1c-ae15-7d0f5aec810b",
                             "target_handle_id": "9d74571f-b7f5-4c1d-8b7c-b9c648738a4d",
                             "type": "DEFAULT",
-                            "display_data": None,
                         },
                     ],
                     "display_data": {"viewport": {"x": 0.0, "y": 0.0, "zoom": 1.0}},
@@ -359,7 +357,6 @@ def test_serialize_workflow():
                 "target_node_id": "bf83099a-40df-4445-b90d-1f6f1067ebe3",
                 "target_handle_id": "b5e8182e-20c5-482b-b4c5-4dde48c01472",
                 "type": "DEFAULT",
-                "display_data": None,
             },
             {
                 "id": "47a34f6e-d139-4702-aa46-6212bb8a150f",
@@ -368,7 +365,6 @@ def test_serialize_workflow():
                 "target_node_id": "bacc5d55-07d4-4a0a-a69e-831524480de5",
                 "target_handle_id": "720dd872-2f3d-47b9-8245-89387f04f300",
                 "type": "DEFAULT",
-                "display_data": None,
             },
         ],
         serialized_edges,

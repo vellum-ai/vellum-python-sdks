@@ -3048,8 +3048,7 @@
         "source_handle_id": "6888c8eb-9dba-42b4-94d4-52900edcfeea",
         "target_node_id": "e1aa5d7e-8e6e-471b-ad21-93fdb350d04c",
         "target_handle_id": "157d01bd-441e-49fa-abce-7b991c9291da",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       },
       {
         "id": "7ad283cf-0316-48f0-bc39-10ab3623ec7f",
@@ -3057,8 +3056,7 @@
         "source_handle_id": "ab8e97b4-4ee4-42bc-8f43-e2c9c457ad21",
         "target_node_id": "393c798a-111a-4f73-bfee-5efb93228dcb",
         "target_handle_id": "b14f0322-965d-43c9-96d4-7bce9fd87067",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       },
       {
         "id": "196807e4-b1f7-4286-b02b-5caf837f0362",
@@ -3066,8 +3064,7 @@
         "source_handle_id": "f743c0c0-8ced-445d-bf1c-bef1f2b26895",
         "target_node_id": "557f9b98-2229-437e-844b-cac7868a0534",
         "target_handle_id": "73d41849-2a2d-4994-b220-b636c51fab42",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       },
       {
         "id": "293a13ac-89c5-4fc6-a142-dd9a5e36d730",
@@ -3075,8 +3072,7 @@
         "source_handle_id": "0f8cbd50-1919-4c2e-8b1b-1ad741b5da35",
         "target_node_id": "903aa4b9-70b6-4d32-a12e-488926403836",
         "target_handle_id": "91f3cff9-32b8-4cda-aae3-a2c69b9bf650",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       },
       {
         "id": "2091a647-7342-4657-a713-55b34148862d",
@@ -3084,8 +3080,7 @@
         "source_handle_id": "a913cb88-261b-4fa8-9915-d215e19749ee",
         "target_node_id": "fbe1571c-e904-40f6-a414-55adf3b72817",
         "target_handle_id": "32346adc-40f3-49b5-aea8-5c64b88643ef",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       },
       {
         "id": "9713f09b-7515-459c-9681-2e72cc59cc81",
@@ -3093,8 +3088,7 @@
         "source_handle_id": "0b203edd-ed4c-4593-9e17-deaeb2780e14",
         "target_node_id": "5e23510e-ef40-4ee1-99ed-0e03f1796cfa",
         "target_handle_id": "815664ad-b42f-40ea-9607-b23643a224a8",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       },
       {
         "id": "bde304f6-a485-4e87-836a-6dcb897ed38a",
@@ -3102,8 +3096,7 @@
         "source_handle_id": "886d79d2-2a97-4c15-8172-e9a157c9090d",
         "target_node_id": "58e6c822-2d0d-4e81-9a00-0046a02741d4",
         "target_handle_id": "785dc582-83b3-46d1-87ec-9e8a10f4b00f",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       },
       {
         "id": "a90e7c00-ee9a-41d4-8339-f4bdd6b747b8",
@@ -3111,8 +3104,7 @@
         "source_handle_id": "d3489082-f03f-4121-ae60-877fd361c5fe",
         "target_node_id": "4e377068-94d3-4215-8366-261b7541ef37",
         "target_handle_id": "ba029d72-7fc2-4e82-a5ad-6f364c84d72f",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       },
       {
         "id": "094fccc2-855c-456e-a1db-0df57cd583c1",
@@ -3120,8 +3112,7 @@
         "source_handle_id": "aa013fc4-618d-4cf4-88ce-639c56588aa3",
         "target_node_id": "ed96d879-cb62-40c8-9f8c-b14016740a2f",
         "target_handle_id": "ed213a6c-2573-431c-8736-b8f062869db7",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       },
       {
         "id": "02b212d8-d6cc-4e02-99ea-dce5716cb73b",
@@ -3129,8 +3120,7 @@
         "source_handle_id": "8eaafb2e-a666-4dc9-96c3-52839df75632",
         "target_node_id": "81246ab6-153a-4c87-9f28-b6c28c915cf1",
         "target_handle_id": "8f6f1b95-dd80-46dd-b1f6-167196baf697",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       },
       {
         "id": "1e4489fd-62ee-4b2d-8abb-b3082485ef01",
@@ -3138,8 +3128,7 @@
         "source_handle_id": "5fd01b0b-f0fb-488b-a9c7-4ba1dd7df80e",
         "target_node_id": "9722b9da-0164-40fb-9270-a0fc9b87b1f9",
         "target_handle_id": "371cc948-bf59-4eba-9356-b21649f76b5e",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       },
       {
         "id": "a5d7013a-4ecb-4f35-8230-ef8fbfecda27",
@@ -3147,8 +3136,7 @@
         "source_handle_id": "fec240f8-8baf-40f9-87e7-f268bff4ed94",
         "target_node_id": "235b2e34-c6a3-48aa-b2cc-090571b41ea8",
         "target_handle_id": "35b77bfb-91d3-4e5b-8032-9786b9cc05c3",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       },
       {
         "id": "7e517fcd-b174-435f-b429-39a5230571b8",
@@ -3156,8 +3144,7 @@
         "source_handle_id": "d4f0db7d-b04a-4c4d-b9d3-aa3eb61fa3a2",
         "target_node_id": "ddb58eb1-f089-4bb0-b4b9-f630411c0acf",
         "target_handle_id": "d96bb2c2-1c6f-4e7d-9163-c6b16a67e1f2",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       },
       {
         "id": "84229185-fb0e-4f7f-bd11-1de423396872",
@@ -3165,8 +3152,7 @@
         "source_handle_id": "de5b0a72-e46f-4534-89a9-b78725694dd2",
         "target_node_id": "3f4ce7b7-8389-42e1-abab-a7afe9a142b5",
         "target_handle_id": "3485b3fb-e4ee-47c9-b567-c5eab60c01f9",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       },
       {
         "id": "f88c3cad-c845-41af-abe6-118e0606ac16",
@@ -3174,8 +3160,7 @@
         "source_handle_id": "7b6c38d1-907d-4074-935e-b84a2a02786b",
         "target_node_id": "f9c5254c-b86d-420d-811a-a1674df273cd",
         "target_handle_id": "87d73dc6-cafd-4f8b-b2fd-8367baba5d61",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       },
       {
         "id": "87051c37-8d28-4849-9c09-e6d243b744b6",
@@ -3183,8 +3168,7 @@
         "source_handle_id": "e80fd429-37ff-4054-9bd3-bd56568716e5",
         "target_node_id": "f9c5254c-b86d-420d-811a-a1674df273cd",
         "target_handle_id": "87d73dc6-cafd-4f8b-b2fd-8367baba5d61",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       },
       {
         "id": "9e19ee9e-24a6-47e7-8b10-44781a53018f",
@@ -3192,8 +3176,7 @@
         "source_handle_id": "ce8e3d37-4c41-4dce-aede-a343d2e1108a",
         "target_node_id": "f9c5254c-b86d-420d-811a-a1674df273cd",
         "target_handle_id": "87d73dc6-cafd-4f8b-b2fd-8367baba5d61",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       },
       {
         "id": "417f05e4-f73a-4d93-98ab-ada609062d38",
@@ -3201,8 +3184,7 @@
         "source_handle_id": "23556dd8-b9f8-4cf7-9c24-291f9d0a223a",
         "target_node_id": "f9c5254c-b86d-420d-811a-a1674df273cd",
         "target_handle_id": "87d73dc6-cafd-4f8b-b2fd-8367baba5d61",
-        "type": "DEFAULT",
-        "display_data": null
+        "type": "DEFAULT"
       }
     ],
     "display_data": {

@@ -259,7 +259,6 @@ def test_serialize_workflow():
                             "target_node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
                             "target_handle_id": "6492efcf-4437-4af1-9ad7-269795ccb27a",
                             "type": "DEFAULT",
-                            "display_data": None,
                         },
                         {
                             "id": "6f16dfb8-d794-4be8-8860-6ea34f0b9e7c",
@@ -268,7 +267,6 @@ def test_serialize_workflow():
                             "target_node_id": "a773c3a5-78cb-4250-8d29-7282e8a579d3",
                             "target_handle_id": "804bb543-9cf4-457f-acf1-fb4b8b7d9259",
                             "type": "DEFAULT",
-                            "display_data": None,
                         },
                         {
                             "id": "63b77ff0-5282-46ce-8da9-37ced05ac61c",
@@ -277,7 +275,6 @@ def test_serialize_workflow():
                             "target_node_id": "570f4d12-69ff-49f1-ba98-ade6283dd7c2",
                             "target_handle_id": "6d4c4a14-c388-4c7a-b223-eb39baf5c080",
                             "type": "DEFAULT",
-                            "display_data": None,
                         },
                     ],
                     "display_data": {"viewport": {"x": 0.0, "y": 0.0, "zoom": 1.0}},
@@ -442,7 +439,6 @@ def test_serialize_workflow():
                 "target_node_id": "080e4343-c7ce-4f82-b9dd-e94c8cc92239",
                 "target_handle_id": "859a75a6-1bd2-4350-9509-4af66245e8e4",
                 "type": "DEFAULT",
-                "display_data": None,
             },
             {
                 "id": "3c5d8990-48f5-42e1-893e-bc8308d2110a",
@@ -451,7 +447,6 @@ def test_serialize_workflow():
                 "target_node_id": "0779b232-82ab-4dbe-a340-6a85e6ab3368",
                 "target_handle_id": "9e077063-c394-4c7b-b0c6-e6686df67984",
                 "type": "DEFAULT",
-                "display_data": None,
             },
             {
                 "id": "de0b8090-a26e-4e09-9173-9f7400a5be4c",
@@ -460,7 +455,6 @@ def test_serialize_workflow():
                 "target_node_id": "31b74695-3f1c-47cf-8be8-a4d86cc589e8",
                 "target_handle_id": "8b525943-6c27-414b-a329-e29c0b217f72",
                 "type": "DEFAULT",
-                "display_data": None,
             },
         ],
         serialized_edges,
