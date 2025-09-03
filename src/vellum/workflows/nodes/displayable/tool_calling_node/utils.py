@@ -524,7 +524,7 @@ def create_function_node(
         def create_function_wrapper(func):
             def wrapper(self, **kwargs):
                 merged_kwargs = kwargs.copy()
-                inputs = getattr(func, "_inputs", {})
+                inputs = getattr(func, "__vellum_inputs__", {})
                 if inputs:
                     for param_name, param_ref in inputs.items():
                         resolved_value = param_ref.resolve(self.state)

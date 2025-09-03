@@ -146,7 +146,7 @@ def compile_function_definition(function: Callable) -> FunctionDefinition:
         raise ValueError(f"Failed to get signature for function {function.__name__}: {str(e)}")
 
     # Get inputs from the decorator if present
-    inputs = getattr(function, "_inputs", {})
+    inputs = getattr(function, "__vellum_inputs__", {})
     exclude_params = set(inputs.keys())
 
     properties = {}
@@ -279,7 +279,7 @@ def use_tool_inputs(**inputs):
 
     def decorator(func: Callable) -> Callable:
         # Store the inputs mapping on the function for later use
-        func._inputs = inputs  # type: ignore[attr-defined]
+        setattr(func, "__vellum_inputs__", inputs)
         return func
 
     return decorator
