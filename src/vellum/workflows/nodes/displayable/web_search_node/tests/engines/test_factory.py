@@ -1,6 +1,7 @@
 import pytest
 
 from ...engines.base import SearchEngineBase
+from ...engines.brave import BraveEngine
 from ...engines.factory import SearchEngineFactory
 from ...engines.serpapi import SerpAPIEngine
 
@@ -23,7 +24,19 @@ def test_create_invalid_engine():
 
     # THEN it should raise an appropriate error
     assert "Unsupported search engine: unsupported_engine" in str(exc_info.value)
-    assert "Available engines: ['serpapi']" in str(exc_info.value)
+    assert "Available engines:" in str(exc_info.value)
+    assert "serpapi" in str(exc_info.value)
+    assert "brave" in str(exc_info.value)
+
+
+def test_create_brave_engine():
+    """Test creating Brave engine via factory."""
+    # WHEN we create a Brave engine
+    engine = SearchEngineFactory.create_engine("brave")
+
+    # THEN it should be the correct type
+    assert isinstance(engine, BraveEngine)
+    assert isinstance(engine, SearchEngineBase)
 
 
 def test_get_available_engines():
@@ -32,7 +45,7 @@ def test_get_available_engines():
     engines = SearchEngineFactory.get_available_engines()
 
     # THEN it should return the correct list
-    assert engines == ["serpapi"]
+    assert set(engines) == {"serpapi", "brave"}
 
 
 def test_register_new_engine():

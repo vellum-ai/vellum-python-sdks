@@ -1,6 +1,7 @@
 from typing import Dict, List, Type
 
 from .base import SearchEngineBase
+from .brave import BraveEngine
 from .serpapi import SerpAPIEngine
 
 
@@ -14,6 +15,7 @@ class SearchEngineFactory:
 
     _engines: Dict[str, Type[SearchEngineBase]] = {
         "serpapi": SerpAPIEngine,
+        "brave": BraveEngine,
     }
 
     @classmethod
