@@ -54,6 +54,7 @@ from vellum.workflows.types.generics import is_workflow_class
 from vellum.workflows.utils.functions import compile_function_definition
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.utils.exceptions import UnsupportedSerializationException
+from vellum_ee.workflows.server.virtual_file_loader import VirtualFileLoader
 
 if TYPE_CHECKING:
     from vellum_ee.workflows.display.types import WorkflowDisplayContext
@@ -64,7 +65,7 @@ def virtual_open(file_path: str, mode: str = "r"):
     Open a file, checking VirtualFileFinder instances first before falling back to regular open().
     """
     for finder in sys.meta_path:
-        if hasattr(finder, "loader") and hasattr(finder.loader, "_get_code"):
+        if hasattr(finder, "loader") and isinstance(finder.loader, VirtualFileLoader):
             namespace = finder.loader.namespace
             if file_path.startswith(namespace + "/"):
                 relative_path = file_path[len(namespace) + 1 :]
