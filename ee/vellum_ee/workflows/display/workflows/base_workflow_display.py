@@ -329,16 +329,18 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 continue
 
             target_node_display = self.display_context.node_displays[unadorned_target_node]
-            edges.append(
-                {
-                    "id": str(entrypoint_display.edge_display.id),
-                    "source_node_id": str(entrypoint_node_id),
-                    "source_handle_id": str(entrypoint_node_source_handle_id),
-                    "target_node_id": str(target_node_display.node_id),
-                    "target_handle_id": str(target_node_display.get_trigger_id()),
-                    "type": "DEFAULT",
-                }
-            )
+            entrypoint_edge_dict: Dict[str, Json] = {
+                "id": str(entrypoint_display.edge_display.id),
+                "source_node_id": str(entrypoint_node_id),
+                "source_handle_id": str(entrypoint_node_source_handle_id),
+                "target_node_id": str(target_node_display.node_id),
+                "target_handle_id": str(target_node_display.get_trigger_id()),
+                "type": "DEFAULT",
+            }
+            display_data = self._serialize_edge_display_data(entrypoint_display.edge_display)
+            if display_data is not None:
+                entrypoint_edge_dict["display_data"] = display_data
+            edges.append(entrypoint_edge_dict)
 
         for (source_node_port, target_node), edge_display in self.display_context.edge_displays.items():
             unadorned_source_node_port = get_unadorned_port(source_node_port)
@@ -353,18 +355,20 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             source_node_port_display = self.display_context.port_displays[unadorned_source_node_port]
             target_node_display = self.display_context.node_displays[unadorned_target_node]
 
-            edges.append(
-                {
-                    "id": str(edge_display.id),
-                    "source_node_id": str(source_node_port_display.node_id),
-                    "source_handle_id": str(source_node_port_display.id),
-                    "target_node_id": str(target_node_display.node_id),
-                    "target_handle_id": str(
-                        target_node_display.get_target_handle_id_by_source_node_id(source_node_port_display.node_id)
-                    ),
-                    "type": "DEFAULT",
-                }
-            )
+            regular_edge_dict: Dict[str, Json] = {
+                "id": str(edge_display.id),
+                "source_node_id": str(source_node_port_display.node_id),
+                "source_handle_id": str(source_node_port_display.id),
+                "target_node_id": str(target_node_display.node_id),
+                "target_handle_id": str(
+                    target_node_display.get_target_handle_id_by_source_node_id(source_node_port_display.node_id)
+                ),
+                "type": "DEFAULT",
+            }
+            display_data = self._serialize_edge_display_data(edge_display)
+            if display_data is not None:
+                regular_edge_dict["display_data"] = display_data
+            edges.append(regular_edge_dict)
 
         edges.extend(synthetic_output_edges)
 
@@ -404,6 +408,12 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             "state_variables": state_variables,
             "output_variables": output_variables,
         }
+
+    def _serialize_edge_display_data(self, edge_display: EdgeDisplay) -> Optional[JsonObject]:
+        """Serialize edge display data, returning None if no display data is present."""
+        if edge_display.z_index is not None:
+            return {"z_index": edge_display.z_index}
+        return None
 
     def _apply_auto_layout(self, nodes_dict_list: List[Dict[str, Any]], edges: List[Json]) -> None:
         """Apply auto-layout to nodes that are all positioned at (0,0)."""
