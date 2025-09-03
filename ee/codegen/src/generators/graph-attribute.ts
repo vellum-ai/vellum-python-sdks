@@ -108,14 +108,17 @@ export class GraphAttribute extends AstNode {
 
       // If there's exactly one non-entrypoint node, make it the main graph
       if (nonEntrypointNodes.length === 1) {
-        const nodeContext = this.workflowContext.findLocalNodeContext(nonEntrypointNodes[0].id);
-        if (nodeContext) {
-          // Mark this node as used so it doesn't get marked as unused later
-          this.usedNodes.add(nonEntrypointNodes[0].id);
-          return {
-            type: "node_reference",
-            reference: nodeContext,
-          };
+        const singleNode = nonEntrypointNodes[0];
+        if (singleNode) {
+          const nodeContext = this.workflowContext.findLocalNodeContext(singleNode.id);
+          if (nodeContext) {
+            // Mark this node as used so it doesn't get marked as unused later
+            this.usedNodes.add(singleNode.id);
+            return {
+              type: "node_reference",
+              reference: nodeContext,
+            };
+          }
         }
       }
       // If we can't handle it, return empty
@@ -133,14 +136,17 @@ export class GraphAttribute extends AstNode {
 
       // If there's exactly one non-entrypoint node, make it the main graph
       if (nonEntrypointNodes.length === 1) {
-        const nodeContext = this.workflowContext.findLocalNodeContext(nonEntrypointNodes[0].id);
-        if (nodeContext) {
-          // Mark this node as used so it doesn't get marked as unused later
-          this.usedNodes.add(nonEntrypointNodes[0].id);
-          return {
-            type: "node_reference",
-            reference: nodeContext,
-          };
+        const singleNode = nonEntrypointNodes[0];
+        if (singleNode) {
+          const nodeContext = this.workflowContext.findLocalNodeContext(singleNode.id);
+          if (nodeContext) {
+            // Mark this node as used so it doesn't get marked as unused later
+            this.usedNodes.add(singleNode.id);
+            return {
+              type: "node_reference",
+              reference: nodeContext,
+            };
+          }
         }
       }
     }
