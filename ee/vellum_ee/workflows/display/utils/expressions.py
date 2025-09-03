@@ -432,7 +432,7 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
 
             model_data = function_definition.model_dump()
             model_data["inputs"] = serialized_inputs
-            function_definition = FunctionDefinition(**model_data)
+            function_definition = FunctionDefinition.model_validate(model_data)
 
         source_path = inspect.getsourcefile(value)
         if source_path is not None:
