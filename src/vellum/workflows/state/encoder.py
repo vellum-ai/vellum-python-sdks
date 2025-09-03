@@ -1,7 +1,6 @@
 from dataclasses import asdict, is_dataclass
 from datetime import datetime
 import enum
-import inspect
 from io import StringIO
 from json import JSONEncoder
 from queue import Queue
@@ -17,7 +16,6 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.ports.port import Port
 from vellum.workflows.state.base import BaseState, NodeExecutionCache
-from vellum.workflows.utils.functions import compile_function_definition
 
 
 def virtual_open(file_path: str, mode: str = "r"):
@@ -79,23 +77,6 @@ class DefaultStateEncoder(JSONEncoder):
 
         if isinstance(obj, type):
             return str(obj)
-
-        if callable(obj):
-            function_definition = compile_function_definition(obj)
-            source_path = inspect.getsourcefile(obj)
-            if source_path is not None:
-                with virtual_open(source_path) as f:
-                    source_code = f.read()
-            else:
-                source_code = f"# Error: Source code not available for {obj.__name__}"
-
-            return {
-                "type": "CODE_EXECUTION",
-                "name": function_definition.name,
-                "description": function_definition.description,
-                "definition": function_definition,
-                "src": source_code,
-            }
 
         if obj.__class__ in self.encoders:
             return self.encoders[obj.__class__](obj)

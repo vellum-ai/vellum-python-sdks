@@ -1,4 +1,5 @@
 from dataclasses import asdict, is_dataclass
+import inspect
 from typing import TYPE_CHECKING, Any, Dict, List, cast
 
 from pydantic import BaseModel
@@ -45,9 +46,11 @@ from vellum.workflows.references.output import OutputReference
 from vellum.workflows.references.state_value import StateValueReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.references.workflow_input import WorkflowInputReference
+from vellum.workflows.state.encoder import virtual_open
 from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.types.definition import DeploymentDefinition
 from vellum.workflows.types.generics import is_workflow_class
+from vellum.workflows.utils.functions import compile_function_definition
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.utils.exceptions import UnsupportedSerializationException
 
@@ -398,6 +401,29 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
     if isinstance(value, BaseModel):
         dict_value = value.model_dump()
         return serialize_value(display_context, dict_value)
+
+    if callable(value):
+        function_definition = compile_function_definition(value)
+        source_path = inspect.getsourcefile(value)
+        if source_path is not None:
+            with virtual_open(source_path) as f:
+                source_code = f.read()
+        else:
+            source_code = f"Source code not available for {value.__name__}"
+
+        return {
+            "type": "CONSTANT_VALUE",
+            "value": {
+                "type": "JSON",
+                "value": {
+                    "type": "CODE_EXECUTION",
+                    "name": function_definition.name,
+                    "description": function_definition.description,
+                    "definition": function_definition.model_dump(),
+                    "src": source_code,
+                },
+            },
+        }
 
     if not isinstance(value, BaseDescriptor):
         vellum_value = primitive_to_vellum_value(value)
