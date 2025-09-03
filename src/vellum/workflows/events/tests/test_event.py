@@ -261,7 +261,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
                         "message": "Workflow failed",
                         "code": "USER_DEFINED_ERROR",
                     },
-                    "traceback": None,
+                    "stacktrace": None,
                 },
                 "parent": None,
                 "links": None,

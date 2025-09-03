@@ -156,7 +156,7 @@ class WorkflowExecutionFulfilledEvent(_BaseWorkflowEvent, Generic[OutputsType]):
 
 class WorkflowExecutionRejectedBody(_BaseWorkflowExecutionBody):
     error: WorkflowError
-    traceback: Optional[str] = None
+    stacktrace: Optional[str] = None
 
 
 class WorkflowExecutionRejectedEvent(_BaseWorkflowEvent):
