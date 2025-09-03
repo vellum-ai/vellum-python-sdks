@@ -103,23 +103,9 @@ export class GraphAttribute extends AstNode {
       edgesQueue = this.workflowContext.getEntrypointNodeEdges();
     } catch (error) {
       // No entrypoint node exists - handle case where there are standalone nodes
-      const allNodes = this.workflowContext.workflowRawData.nodes;
-      const nonEntrypointNodes = allNodes.filter((node) => node.type !== "ENTRYPOINT");
-
-      // If there's exactly one non-entrypoint node, make it the main graph
-      if (nonEntrypointNodes.length === 1) {
-        const singleNode = nonEntrypointNodes[0];
-        if (singleNode) {
-          const nodeContext = this.workflowContext.findLocalNodeContext(singleNode.id);
-          if (nodeContext) {
-            // Mark this node as used so it doesn't get marked as unused later
-            this.usedNodes.add(singleNode.id);
-            return {
-              type: "node_reference",
-              reference: nodeContext,
-            };
-          }
-        }
+      const singleNodeResult = this.getSingleNodeReference();
+      if (singleNodeResult.type !== "empty") {
+        return singleNodeResult;
       }
       // If we can't handle it, return empty
       return graphMutableAst;
@@ -130,24 +116,9 @@ export class GraphAttribute extends AstNode {
 
     // Handle case where there are no edges from entrypoint but entrypoint exists
     if (edgesQueue.length === 0) {
-      // Check if there are any non-entrypoint nodes that should be in the main graph
-      const allNodes = this.workflowContext.workflowRawData.nodes;
-      const nonEntrypointNodes = allNodes.filter((node) => node.type !== "ENTRYPOINT");
-
-      // If there's exactly one non-entrypoint node, make it the main graph
-      if (nonEntrypointNodes.length === 1) {
-        const singleNode = nonEntrypointNodes[0];
-        if (singleNode) {
-          const nodeContext = this.workflowContext.findLocalNodeContext(singleNode.id);
-          if (nodeContext) {
-            // Mark this node as used so it doesn't get marked as unused later
-            this.usedNodes.add(singleNode.id);
-            return {
-              type: "node_reference",
-              reference: nodeContext,
-            };
-          }
-        }
+      const singleNodeResult = this.getSingleNodeReference();
+      if (singleNodeResult.type !== "empty") {
+        return singleNodeResult;
       }
     }
 
@@ -234,6 +205,34 @@ export class GraphAttribute extends AstNode {
     }
 
     return rootNode;
+  }
+
+  /**
+   * Attempts to find a single non-entrypoint node that should be used as the main graph.
+   * This is needed for single-node workflows (e.g., MapNode/RetryNode) that need proper
+   * graph references instead of Graph.empty() to support subworkflow input generation.
+   */
+  private getSingleNodeReference(): GraphMutableAst {
+    const allNodes = this.workflowContext.workflowRawData.nodes;
+    const nonEntrypointNodes = allNodes.filter((node) => node.type !== "ENTRYPOINT");
+
+    // If there's exactly one non-entrypoint node, make it the main graph
+    if (nonEntrypointNodes.length === 1) {
+      const singleNode = nonEntrypointNodes[0];
+      if (singleNode) {
+        const nodeContext = this.workflowContext.findLocalNodeContext(singleNode.id);
+        if (nodeContext) {
+          // Mark this node as used so it doesn't get marked as unused later
+          this.usedNodes.add(singleNode.id);
+          return {
+            type: "node_reference",
+            reference: nodeContext,
+          };
+        }
+      }
+    }
+
+    return { type: "empty" };
   }
 
   private findConnectedComponent(
