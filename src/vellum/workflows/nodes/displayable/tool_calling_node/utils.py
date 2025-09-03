@@ -520,12 +520,25 @@ def create_function_node(
             },
         )
     else:
-        # For regular functions, use FunctionNode
+
+        def create_function_wrapper(func):
+            def wrapper(self, **kwargs):
+                merged_kwargs = kwargs.copy()
+                inputs = getattr(func, "__vellum_inputs__", {})
+                if inputs:
+                    for param_name, param_ref in inputs.items():
+                        resolved_value = param_ref.resolve(self.state)
+                        merged_kwargs[param_name] = resolved_value
+
+                return func(**merged_kwargs)
+
+            return wrapper
+
         node = type(
             f"FunctionNode_{function.__name__}",
             (FunctionNode,),
             {
-                "function_definition": lambda self, **kwargs: function(**kwargs),  # ← Revert back to lambda
+                "function_definition": create_function_wrapper(function),
                 "function_call_output": tool_prompt_node.Outputs.results,
                 "__module__": __name__,
             },
