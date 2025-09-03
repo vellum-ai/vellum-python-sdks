@@ -132,13 +132,12 @@ def _compile_workflow_deployment_input(input_var: Any) -> dict[str, Any]:
     return input_schema
 
 
-def compile_function_definition(function: Callable, exclude_params: Optional[set] = None) -> FunctionDefinition:
+def compile_function_definition(function: Callable) -> FunctionDefinition:
     """
     Converts a Python function into our Vellum-native FunctionDefinition type.
 
     Args:
         function: The Python function to compile
-        exclude_params: Optional set of parameter names to exclude from the function definition
     """
 
     try:
@@ -148,17 +147,14 @@ def compile_function_definition(function: Callable, exclude_params: Optional[set
 
     # Get inputs from the decorator if present
     inputs = getattr(function, "_inputs", {})
-    input_params = set(inputs.keys())
-
-    # Combine exclude_params with input_params
-    all_exclude_params = (exclude_params or set()) | input_params
+    exclude_params = set(inputs.keys())
 
     properties = {}
     required = []
     defs: dict[str, Any] = {}
     for param in signature.parameters.values():
-        # Skip parameters that are in the exclude_params set or tool_inputs
-        if all_exclude_params and param.name in all_exclude_params:
+        # Skip parameters that are in the exclude_params set
+        if exclude_params and param.name in exclude_params:
             continue
 
         # Check if parameter uses Annotated type hint

@@ -350,17 +350,6 @@ def create_tool_prompt_node(
                             parameters=tool_function.parameters,
                         )
                     )
-            elif callable(function):
-                inputs = getattr(function, "_inputs", {})
-
-                # Use inputs from decorator if present
-                if inputs:
-                    params_to_filter = set(inputs.keys())
-
-                    filtered_function = compile_function_definition(function, exclude_params=params_to_filter)
-                    prompt_functions.append(filtered_function)
-                else:
-                    prompt_functions.append(function)
             else:
                 prompt_functions.append(function)
     else:
