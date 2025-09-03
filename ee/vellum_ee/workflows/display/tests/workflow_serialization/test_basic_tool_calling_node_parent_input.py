@@ -38,9 +38,9 @@ def test_serialize_workflow():
     # AND its raw data should be what we expect
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
     tool_calling_node = workflow_raw_data["nodes"][1]
+
     attributes = tool_calling_node["attributes"]
     function_attributes = next(attribute for attribute in attributes if attribute["name"] == "functions")
-    print(function_attributes)
     assert function_attributes == {
         "id": "cec9f5f2-7bb0-42e4-9c56-f215f07c5569",
         "name": "functions",
