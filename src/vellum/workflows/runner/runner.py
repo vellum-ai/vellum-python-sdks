@@ -404,7 +404,7 @@ class WorkflowRunner(Generic[StateType]):
             )
         except NodeException as e:
             logger.info(e)
-            captured_traceback = traceback.format_exc()
+            captured_stacktrace = traceback.format_exc()
 
             self._workflow_event_inner_queue.put(
                 NodeExecutionRejectedEvent(
@@ -413,14 +413,14 @@ class WorkflowRunner(Generic[StateType]):
                     body=NodeExecutionRejectedBody(
                         node_definition=node.__class__,
                         error=e.error,
-                        traceback=captured_traceback,
+                        stacktrace=captured_stacktrace,
                     ),
                     parent=execution.parent_context,
                 )
             )
         except WorkflowInitializationException as e:
             logger.info(e)
-            captured_traceback = traceback.format_exc()
+            captured_stacktrace = traceback.format_exc()
             self._workflow_event_inner_queue.put(
                 NodeExecutionRejectedEvent(
                     trace_id=execution.trace_id,
@@ -428,7 +428,7 @@ class WorkflowRunner(Generic[StateType]):
                     body=NodeExecutionRejectedBody(
                         node_definition=node.__class__,
                         error=e.error,
-                        traceback=captured_traceback,
+                        stacktrace=captured_stacktrace,
                     ),
                     parent=execution.parent_context,
                 )
@@ -713,13 +713,13 @@ class WorkflowRunner(Generic[StateType]):
         )
 
     def _reject_workflow_event(
-        self, error: WorkflowError, captured_traceback: Optional[str] = None
+        self, error: WorkflowError, captured_stacktrace: Optional[str] = None
     ) -> WorkflowExecutionRejectedEvent:
-        if captured_traceback is None:
+        if captured_stacktrace is None:
             try:
-                captured_traceback = traceback.format_exc()
-                if captured_traceback.strip() == "NoneType: None":
-                    captured_traceback = None
+                captured_stacktrace = traceback.format_exc()
+                if captured_stacktrace.strip() == "NoneType: None":
+                    captured_stacktrace = None
             except Exception:
                 pass
 
@@ -729,7 +729,7 @@ class WorkflowRunner(Generic[StateType]):
             body=WorkflowExecutionRejectedBody(
                 workflow_definition=self.workflow.__class__,
                 error=error,
-                traceback=captured_traceback,
+                stacktrace=captured_stacktrace,
             ),
             parent=self._execution_context.parent_context,
         )
@@ -773,21 +773,21 @@ class WorkflowRunner(Generic[StateType]):
                 else:
                     self._concurrency_queue.put((self._initial_state, node_cls, None))
             except NodeException as e:
-                captured_traceback = traceback.format_exc()
-                self._workflow_event_outer_queue.put(self._reject_workflow_event(e.error, captured_traceback))
+                captured_stacktrace = traceback.format_exc()
+                self._workflow_event_outer_queue.put(self._reject_workflow_event(e.error, captured_stacktrace))
                 return
             except WorkflowInitializationException as e:
-                captured_traceback = traceback.format_exc()
-                self._workflow_event_outer_queue.put(self._reject_workflow_event(e.error, captured_traceback))
+                captured_stacktrace = traceback.format_exc()
+                self._workflow_event_outer_queue.put(self._reject_workflow_event(e.error, captured_stacktrace))
                 return
             except Exception:
                 err_message = f"An unexpected error occurred while initializing node {node_cls.__name__}"
                 logger.exception(err_message)
-                captured_traceback = traceback.format_exc()
+                captured_stacktrace = traceback.format_exc()
                 self._workflow_event_outer_queue.put(
                     self._reject_workflow_event(
                         WorkflowError(code=WorkflowErrorCode.INTERNAL_ERROR, message=err_message),
-                        captured_traceback,
+                        captured_stacktrace,
                     )
                 )
                 return
@@ -838,7 +838,7 @@ class WorkflowRunner(Generic[StateType]):
 
         if rejection_event:
             self._workflow_event_outer_queue.put(
-                self._reject_workflow_event(rejection_event.error, rejection_event.body.traceback)
+                self._reject_workflow_event(rejection_event.error, rejection_event.body.stacktrace)
             )
             return
 
