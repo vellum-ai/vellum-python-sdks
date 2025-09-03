@@ -96,6 +96,11 @@ class Graph:
     def from_edge(edge: Edge) -> "Graph":
         return Graph(entrypoints={edge.from_port}, edges=[edge], terminals={port for port in edge.to_node.Ports})
 
+    @staticmethod
+    def empty() -> "Graph":
+        """Create an empty graph with no entrypoints, edges, or terminals."""
+        return Graph(entrypoints=set(), edges=[], terminals=set())
+
     def __rshift__(self, other: GraphTarget) -> "Graph":
         if not self._edges and not self._entrypoints:
             raise ValueError("Graph instance can only create new edges from nodes within existing edges")

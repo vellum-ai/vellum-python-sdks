@@ -49,6 +49,7 @@ export class GraphAttribute extends AstNode {
   private readonly astNode: python.AstNode;
   private readonly unusedEdges: Set<WorkflowEdge>;
   private readonly usedEdges = new Set<WorkflowEdge>();
+  private readonly usedNodes = new Set<string>();
 
   public constructor({
     workflowContext,
@@ -97,9 +98,52 @@ export class GraphAttribute extends AstNode {
       return graphMutableAst;
     }
 
-    const edgesQueue = this.workflowContext.getEntrypointNodeEdges();
+    let edgesQueue: WorkflowEdge[] = [];
+    try {
+      edgesQueue = this.workflowContext.getEntrypointNodeEdges();
+    } catch (error) {
+      // No entrypoint node exists - handle case where there are standalone nodes
+      const allNodes = this.workflowContext.workflowRawData.nodes;
+      const nonEntrypointNodes = allNodes.filter((node) => node.type !== "ENTRYPOINT");
+
+      // If there's exactly one non-entrypoint node, make it the main graph
+      if (nonEntrypointNodes.length === 1) {
+        const nodeContext = this.workflowContext.findLocalNodeContext(nonEntrypointNodes[0].id);
+        if (nodeContext) {
+          // Mark this node as used so it doesn't get marked as unused later
+          this.usedNodes.add(nonEntrypointNodes[0].id);
+          return {
+            type: "node_reference",
+            reference: nodeContext,
+          };
+        }
+      }
+      // If we can't handle it, return empty
+      return graphMutableAst;
+    }
+
     const edgesByPortId = this.workflowContext.getEdgesByPortId();
     const processedEdges = new Set<WorkflowEdge>();
+
+    // Handle case where there are no edges from entrypoint but entrypoint exists
+    if (edgesQueue.length === 0) {
+      // Check if there are any non-entrypoint nodes that should be in the main graph
+      const allNodes = this.workflowContext.workflowRawData.nodes;
+      const nonEntrypointNodes = allNodes.filter((node) => node.type !== "ENTRYPOINT");
+
+      // If there's exactly one non-entrypoint node, make it the main graph
+      if (nonEntrypointNodes.length === 1) {
+        const nodeContext = this.workflowContext.findLocalNodeContext(nonEntrypointNodes[0].id);
+        if (nodeContext) {
+          // Mark this node as used so it doesn't get marked as unused later
+          this.usedNodes.add(nonEntrypointNodes[0].id);
+          return {
+            type: "node_reference",
+            reference: nodeContext,
+          };
+        }
+      }
+    }
 
     while (edgesQueue.length > 0) {
       const edge = edgesQueue.shift();
@@ -140,6 +184,10 @@ export class GraphAttribute extends AstNode {
 
   public getUsedEdges(): Set<WorkflowEdge> {
     return this.usedEdges;
+  }
+
+  public getUsedNodes(): Set<string> {
+    return this.usedNodes;
   }
 
   /**
@@ -1137,7 +1185,18 @@ export class GraphAttribute extends AstNode {
     useWrap: boolean = false
   ): AstNode {
     if (mutableAst.type === "empty") {
-      return python.TypeInstantiation.none();
+      return python.accessAttribute({
+        lhs: python.reference({
+          name: "Graph",
+          modulePath: VELLUM_WORKFLOW_GRAPH_MODULE_PATH,
+        }),
+        rhs: python.invokeMethod({
+          methodReference: python.reference({
+            name: "empty",
+          }),
+          arguments_: [],
+        }),
+      });
     }
 
     if (mutableAst.type === "node_reference") {

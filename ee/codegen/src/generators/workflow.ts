@@ -588,6 +588,10 @@ export class Workflow {
       Array.from(usedEdges).flatMap((e) => [e.sourceNodeId, e.targetNodeId])
     );
 
+    // Also include nodes that were directly used in the graph (e.g., single-node graphs)
+    const directlyUsedNodeIds = graph.getUsedNodes();
+    directlyUsedNodeIds.forEach((nodeId) => usedNodeIds.add(nodeId));
+
     const nodeIds = this.getNodeIds();
 
     // Mark unused edges
@@ -630,16 +634,7 @@ export class Workflow {
     const nodes = this.getNodes();
     const edges = this.getEdges();
 
-    if (edges.length === 0) {
-      nodes.forEach((node) => {
-        if (node.type === "ENTRYPOINT") {
-          return;
-        }
-
-        this.unusedNodes.add(node);
-      });
-      return;
-    }
+    // Note: markUnusedNodesAndEdges() will handle determining which nodes are unused based on the generated graph
 
     try {
       const graph = new GraphAttribute({

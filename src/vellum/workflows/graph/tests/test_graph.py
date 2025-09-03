@@ -4,6 +4,23 @@ from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.ports.port import Port
 
 
+def test_graph__empty():
+    # WHEN we create an empty graph
+    graph = Graph.empty()
+
+    # THEN the graph has no entrypoints
+    assert len(list(graph.entrypoints)) == 0
+
+    # AND no nodes
+    assert len(list(graph.nodes)) == 0
+
+    # AND no edges
+    assert len(list(graph.edges)) == 0
+
+    # AND string representation indicates empty graph
+    assert str(graph) == "Graph(empty)"
+
+
 def test_graph__from_node():
     # GIVEN a node
     class MyNode(BaseNode):
