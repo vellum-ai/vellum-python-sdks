@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import Dict
+from typing import Any, Dict, List, cast
 
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes import BaseNode, InlineSubworkflowNode
@@ -8,7 +8,7 @@ from vellum.workflows.ports.port import Port
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.state import BaseState
 from vellum.workflows.workflows.base import BaseWorkflow
-from vellum_ee.workflows.display.base import WorkflowInputsDisplay
+from vellum_ee.workflows.display.base import EdgeDisplay, WorkflowInputsDisplay
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
@@ -379,3 +379,53 @@ def test_global_propagation_deep_nested_subworkflows():
     inner_global_names = {ref.name for ref in inner_display.display_context.global_workflow_input_displays.keys()}
 
     assert inner_global_names == {"middle_param", "inner_param", "root_param"}
+
+
+def test_serialize_workflow_with_edge_display_data():
+    """
+    Tests that edges with z_index values serialize display_data correctly.
+    """
+
+    # GIVEN a workflow with connected nodes
+    class StartNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result: str
+
+    class EndNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            final: str
+
+    class TestWorkflow(BaseWorkflow):
+        graph = StartNode >> EndNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_result = EndNode.Outputs.final
+
+    class TestWorkflowDisplay(BaseWorkflowDisplay[TestWorkflow]):
+        edge_displays = {
+            (StartNode.Ports.default, EndNode): EdgeDisplay(id=UUID("12345678-1234-5678-1234-567812345678"), z_index=5)
+        }
+
+    # WHEN we serialize the workflow with the custom display
+    display = get_workflow_display(
+        base_display_class=TestWorkflowDisplay,
+        workflow_class=TestWorkflow,
+    )
+    serialized_workflow = display.serialize()
+
+    # THEN the edge should include display_data with z_index
+    workflow_raw_data = cast(Dict[str, Any], serialized_workflow["workflow_raw_data"])
+    edges = cast(List[Dict[str, Any]], workflow_raw_data["edges"])
+
+    edge_with_display_data = None
+    for edge in edges:
+        if edge["id"] == "12345678-1234-5678-1234-567812345678":
+            edge_with_display_data = edge
+            break
+
+    assert edge_with_display_data is not None, "Edge with custom UUID not found"
+    assert edge_with_display_data["display_data"] == {"z_index": 5}
+
+    assert edge_with_display_data["type"] == "DEFAULT"
+    assert "source_node_id" in edge_with_display_data
+    assert "target_node_id" in edge_with_display_data

@@ -1,14 +1,9 @@
 from datetime import datetime
-from uuid import UUID, uuid4
-from typing import Any, Dict, List, cast
+from uuid import uuid4
 
 from deepdiff import DeepDiff
 
 from vellum import WorkspaceSecretRead
-from vellum.workflows.nodes.bases import BaseNode
-from vellum.workflows.workflows.base import BaseWorkflow
-from vellum_ee.workflows.display.base import EdgeDisplay
-from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 from tests.workflows.basic_api_node.workflow import SimpleAPIWorkflow
@@ -395,52 +390,3 @@ def test_serialize_workflow(vellum_client):
             "workflow",
         ],
     }
-
-
-def test_serialize_workflow_with_edge_display_data():
-    """
-    Tests that edges with z_index values serialize display_data correctly.
-    """
-
-    # GIVEN a workflow with connected nodes
-    class StartNode(BaseNode):
-        class Outputs(BaseNode.Outputs):
-            result: str
-
-    class EndNode(BaseNode):
-        class Outputs(BaseNode.Outputs):
-            final: str
-
-    class TestWorkflow(BaseWorkflow):
-        graph = StartNode >> EndNode
-
-        class Outputs(BaseWorkflow.Outputs):
-            final_result = EndNode.Outputs.final
-
-    class TestWorkflowDisplay(BaseWorkflowDisplay[TestWorkflow]):
-        edge_displays = {
-            (StartNode.Ports.default, EndNode): EdgeDisplay(id=UUID("12345678-1234-5678-1234-567812345678"), z_index=5)
-        }
-
-    # WHEN we serialize the workflow with the custom display
-    display = get_workflow_display(
-        base_display_class=TestWorkflowDisplay,
-        workflow_class=TestWorkflow,
-    )
-    serialized_workflow = display.serialize()
-
-    workflow_raw_data = cast(Dict[str, Any], serialized_workflow["workflow_raw_data"])
-    edges = cast(List[Dict[str, Any]], workflow_raw_data["edges"])
-
-    edge_with_display_data = None
-    for edge in edges:
-        if edge["id"] == "12345678-1234-5678-1234-567812345678":
-            edge_with_display_data = edge
-            break
-
-    assert edge_with_display_data is not None, "Edge with custom UUID not found"
-    assert edge_with_display_data["display_data"] == {"z_index": 5}
-
-    assert edge_with_display_data["type"] == "DEFAULT"
-    assert "source_node_id" in edge_with_display_data
-    assert "target_node_id" in edge_with_display_data
