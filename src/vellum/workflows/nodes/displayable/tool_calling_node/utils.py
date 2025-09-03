@@ -32,6 +32,7 @@ from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior, Tool, ToolBase
 from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition, MCPServer, MCPToolDefinition
 from vellum.workflows.types.generics import is_workflow_class
+from vellum.workflows.utils.functions import compile_function_definition
 
 CHAT_HISTORY_VARIABLE = "chat_history"
 
@@ -352,10 +353,8 @@ def create_tool_prompt_node(
             elif callable(function):
                 inputs = getattr(function, "_inputs", {})
 
-                # Use inputs from decorator if present, otherwise use functions_inputs
+                # Use inputs from decorator if present
                 if inputs:
-                    from vellum.workflows.utils.functions import compile_function_definition
-
                     params_to_filter = set(inputs.keys())
 
                     filtered_function = compile_function_definition(function, exclude_params=params_to_filter)
@@ -536,17 +535,12 @@ def create_function_node(
 
         def create_function_wrapper(func):
             def wrapper(self, **kwargs):
-                # Merge function call arguments with functions_inputs
                 merged_kwargs = kwargs.copy()
-
-                # Also merge with inputs from @use_tool_inputs decorator
                 inputs = getattr(func, "_inputs", {})
                 if inputs:
-                    # Resolve the inputs from the state
-                    for param_name, input_ref in inputs.items():
-                        if hasattr(self.state, "meta") and hasattr(self.state.meta, "workflow_inputs"):
-                            resolved_value = input_ref.resolve(self.state)
-                            merged_kwargs[param_name] = resolved_value
+                    for param_name, param_ref in inputs.items():
+                        resolved_value = param_ref.resolve(self.state)
+                        merged_kwargs[param_name] = resolved_value
 
                 return func(**merged_kwargs)
 
