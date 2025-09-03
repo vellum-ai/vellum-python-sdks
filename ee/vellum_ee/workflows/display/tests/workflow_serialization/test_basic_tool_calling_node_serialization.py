@@ -152,6 +152,7 @@ def test_serialize_workflow():
                                         },
                                         "required": ["location", "unit"],
                                     },
+                                    "inputs": None,
                                     "forced": None,
                                     "strict": None,
                                 },

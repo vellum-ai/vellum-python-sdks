@@ -243,6 +243,7 @@ def test_serialize_workflow():
                                     "name": "favorite_noun",
                                     "description": "Returns the favorite noun of the user",
                                     "parameters": {},
+                                    "inputs": None,
                                     "forced": None,
                                     "strict": None,
                                 }
