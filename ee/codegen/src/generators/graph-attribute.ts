@@ -214,13 +214,17 @@ export class GraphAttribute extends AstNode {
    */
   private getSingleNodeReference(): GraphMutableAst {
     const allNodes = this.workflowContext.workflowRawData.nodes;
-    const nonEntrypointNodes = allNodes.filter((node) => node.type !== "ENTRYPOINT");
+    const nonEntrypointNodes = allNodes.filter(
+      (node) => node.type !== "ENTRYPOINT"
+    );
 
     // If there's exactly one non-entrypoint node, make it the main graph
     if (nonEntrypointNodes.length === 1) {
       const singleNode = nonEntrypointNodes[0];
       if (singleNode) {
-        const nodeContext = this.workflowContext.findLocalNodeContext(singleNode.id);
+        const nodeContext = this.workflowContext.findLocalNodeContext(
+          singleNode.id
+        );
         if (nodeContext) {
           // Mark this node as used so it doesn't get marked as unused later
           this.usedNodes.add(singleNode.id);
