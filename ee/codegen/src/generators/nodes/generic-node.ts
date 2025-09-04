@@ -36,7 +36,7 @@ import {
   WorkflowRawData,
   WorkflowVersionExecConfig,
 } from "src/types/vellum";
-import { createPythonClassName, toPythonSafeSnakeCase } from "src/utils/casing";
+import { createPythonClassName, toPythonSafeSnakeCase, toValidPythonIdentifier } from "src/utils/casing";
 
 export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
   private functionsToGenerate: Array<{
@@ -97,9 +97,12 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   codeExecutionFunctions.push(f as FunctionArgs);
                   if (f.name) {
                     const snakeName = toPythonSafeSnakeCase(f.name);
+                    // Use toValidPythonIdentifier to ensure the name is safe for Python references
+                    // but preserve original casing when possible (see APO-1372)
+                    const safeName = toValidPythonIdentifier(f.name);
                     functionReferences.push(
                       python.reference({
-                        name: f.name, // Use original name to avoid casing conflicts (see APO-1372)
+                        name: safeName, // Use safe Python identifier that preserves original casing
                         modulePath: [`.${snakeName}`], // Import from snake_case module
                       })
                     );
