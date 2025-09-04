@@ -162,6 +162,5 @@ describe("Casing utility functions", () => {
         expect(toValidPythonIdentifier(input, safetyPrefix)).toBe(expected);
       }
     );
-
   });
 });
