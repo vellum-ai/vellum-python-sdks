@@ -463,7 +463,7 @@ exports[`WorkflowProjectGenerator > function > should generate <function_name>.p
 from ...inputs import Inputs
 
 
-@use_tool_inputs(parent_input=Inputs.parent_input)
+@use_tool_inputs(location=Inputs.location)
 def get_current_weather(location: str, unit: str) -> str:
     """
     Get the current weather in a given location.
