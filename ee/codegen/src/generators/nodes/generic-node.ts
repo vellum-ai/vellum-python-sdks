@@ -784,7 +784,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
       return f;
     }
 
-    const decorator = this.generateInputsDecorator(parsedInputs);
+    const decorator = this.getInputsDecorator(parsedInputs);
 
     const functionFile = new FunctionFile({
       workflowContext: this.workflowContext,
@@ -802,7 +802,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     };
   }
 
-  private generateInputsDecorator(
+  private getInputsDecorator(
     inputs: Record<string, WorkflowValueDescriptorType>
   ): python.Decorator {
     const inputMappings: python.MethodArgument[] = [];
