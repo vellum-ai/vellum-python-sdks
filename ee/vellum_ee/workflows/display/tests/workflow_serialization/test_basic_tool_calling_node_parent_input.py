@@ -77,7 +77,7 @@ def test_serialize_workflow():
                             "forced": None,
                             "strict": None,
                         },
-                        "src": 'from vellum.workflows.utils.functions import use_tool_inputs\n\nfrom .nodes.dummy_node import DummyNode\nfrom .inputs import ParentInputs\n\n\n@use_tool_inputs(\n    parent_input=ParentInputs.parent_input,\n    dummy_input=DummyNode.Outputs.text,\n)\ndef get_string(parent_input: str, dummy_input: str, populated_input: str) -> str:\n    """\n    Get a string with the parent input, dummy input, and the populated input.\n    """\n    return f"This is the parent input: {parent_input}, this is the dummy input: {dummy_input}, and this is the populated input: {populated_input}"\n',  # noqa: E501
+                        "src": 'from vellum.workflows.utils.functions import use_tool_inputs\n\nfrom .inputs import ParentInputs\nfrom .nodes.dummy_node import DummyNode\n\n\n@use_tool_inputs(\n    parent_input=ParentInputs.parent_input,\n    dummy_input=DummyNode.Outputs.text,\n)\ndef get_string(parent_input: str, dummy_input: str, populated_input: str) -> str:\n    """\n    Get a string with the parent input, dummy input, and the populated input.\n    """\n    return f"This is the parent input: {parent_input}, this is the dummy input: {dummy_input}, and this is the populated input: {populated_input}"  # noqa: E501\n',  # noqa: E501
                     }
                 ],
             },
