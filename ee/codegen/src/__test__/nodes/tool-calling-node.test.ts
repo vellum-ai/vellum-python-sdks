@@ -786,46 +786,39 @@ describe("ToolCallingNode", () => {
   });
 
   describe("function name casing", () => {
-    const testCases = [
-      ["parseJSON"],
-      ["123invalid"],
-      ["special-chars!"],
-    ];
+    const testCases = [["parseJSON"], ["123invalid"], ["special-chars!"]];
 
-    it.each(testCases)(
-      "preserves casing: %s",
-      async (name) => {
-        const functions = [
-          { type: "CODE_EXECUTION", name, src: `def ${name}(): pass` },
-        ];
+    it.each(testCases)("preserves casing: %s", async (name) => {
+      const functions = [
+        { type: "CODE_EXECUTION", name, src: `def ${name}(): pass` },
+      ];
 
-        const functionsAttribute = nodeAttributeFactory(
-          "functions-attr-id",
-          "functions",
-          {
-            type: "CONSTANT_VALUE",
-            value: { type: "JSON", value: functions },
-          }
-        );
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        {
+          type: "CONSTANT_VALUE",
+          value: { type: "JSON", value: functions },
+        }
+      );
 
-        const nodeData = toolCallingNodeFactory({
-          nodePorts: [nodePortFactory({ id: "port-id" })],
-          nodeAttributes: [functionsAttribute],
-          label: "CasingTestNode",
-        });
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: [nodePortFactory({ id: "port-id" })],
+        nodeAttributes: [functionsAttribute],
+        label: "CasingTestNode",
+      });
 
-        const nodeContext = (await createNodeContext({
-          workflowContext,
-          nodeData,
-        })) as GenericNodeContext;
-        const node = new GenericNode({ workflowContext, nodeContext });
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+      const node = new GenericNode({ workflowContext, nodeContext });
 
-        node.getNodeFile().write(writer);
-        const output = await writer.toStringFormatted();
+      node.getNodeFile().write(writer);
+      const output = await writer.toStringFormatted();
 
-        expect(output).toMatchSnapshot();
-      }
-    );
+      expect(output).toMatchSnapshot();
+    });
 
     it("skips null/empty function names", async () => {
       const functions = [
