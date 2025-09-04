@@ -399,7 +399,7 @@ def create_tool_prompt_node(
                 "prompt_inputs": node_prompt_inputs,
                 "parameters": parameters,
                 "max_prompt_iterations": max_prompt_iterations,
-                "process_parameters": process_parameters_method,
+                "process_parameters": process_parameters_method if process_parameters_method is not None else ToolPromptNode.process_parameters,
                 "__module__": __name__,
             },
         ),
