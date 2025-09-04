@@ -100,7 +100,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
         execution_context = get_execution_context()
         request_options = self.request_options or RequestOptions()
 
-        processed_parameters = self._process_parameters(self.parameters)
+        processed_parameters = self.process_parameters(self.parameters)
 
         request_options["additional_body_parameters"] = {
             "execution_context": execution_context.model_dump(mode="json"),
@@ -300,7 +300,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
 
         return input_variables, input_values
 
-    def _process_parameters(self, parameters: PromptParameters) -> PromptParameters:
+    def process_parameters(self, parameters: PromptParameters) -> PromptParameters:
         """
         Process parameters to recursively convert any Pydantic models to JSON schema dictionaries.
         """

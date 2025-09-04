@@ -195,7 +195,7 @@ def test_serialize_workflow():
                             "frequency_penalty": 0.0,
                             "presence_penalty": 0.0,
                             "logit_bias": None,
-                            "custom_parameters": None,
+                            "custom_parameters": {"mode": "initial"},
                         },
                     },
                 },

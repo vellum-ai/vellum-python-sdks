@@ -1,5 +1,6 @@
 from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
 from vellum.client.types.plain_text_prompt_block import PlainTextPromptBlock
+from vellum.client.types.prompt_parameters import PromptParameters
 from vellum.client.types.rich_text_prompt_block import RichTextPromptBlock
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows.nodes.displayable.tool_calling_node import ToolCallingNode
@@ -49,6 +50,26 @@ class GetCurrentWeatherNode(ToolCallingNode):
     prompt_inputs = {
         "question": Inputs.query,
     }
+    parameters = PromptParameters(
+        stop=[],
+        temperature=0.0,
+        max_tokens=4096,
+        top_p=1.0,
+        top_k=0,
+        frequency_penalty=0.0,
+        presence_penalty=0.0,
+        logit_bias=None,
+        custom_parameters={"mode": "initial"},
+    )
+
+    def process_parameters(self, parameters: PromptParameters) -> PromptParameters:
+        """
+        Override process_parameters to add custom parameter processing.
+        This demonstrates that ToolCallingNode can now override the process_parameters method.
+        """
+        parameters = parameters.model_copy(update={"custom_parameters": {"mode": "updated"}})
+
+        return parameters
 
 
 class BasicToolCallingNodeWorkflow(BaseWorkflow[Inputs, BaseState]):

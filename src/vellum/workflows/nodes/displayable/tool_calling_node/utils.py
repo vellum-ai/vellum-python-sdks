@@ -329,6 +329,7 @@ def create_tool_prompt_node(
     prompt_inputs: Optional[EntityInputsInterface],
     parameters: PromptParameters,
     max_prompt_iterations: Optional[int] = None,
+    process_parameters_method: Optional[Callable] = None,
 ) -> Type[ToolPromptNode]:
     if functions and len(functions) > 0:
         prompt_functions: List[Union[Tool, FunctionDefinition]] = []
@@ -398,6 +399,7 @@ def create_tool_prompt_node(
                 "prompt_inputs": node_prompt_inputs,
                 "parameters": parameters,
                 "max_prompt_iterations": max_prompt_iterations,
+                "process_parameters": process_parameters_method,
                 "__module__": __name__,
             },
         ),
