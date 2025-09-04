@@ -631,9 +631,6 @@ export class Workflow {
   }
 
   private addGraph(workflowClass: python.Class): void {
-    const nodes = this.getNodes();
-    const edges = this.getEdges();
-
     // Note: markUnusedNodesAndEdges() will handle determining which nodes are unused based on the generated graph
 
     try {

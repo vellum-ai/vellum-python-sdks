@@ -101,8 +101,9 @@ export class GraphAttribute extends AstNode {
     let edgesQueue: WorkflowEdge[] = [];
     try {
       edgesQueue = this.workflowContext.getEntrypointNodeEdges();
-    } catch (error) {
+    } catch {
       // No entrypoint node exists - handle case where there are standalone nodes
+      console.warn("No entrypoint node found, handling standalone nodes");
       const singleNodeResult = this.getSingleNodeReference();
       if (singleNodeResult.type !== "empty") {
         return singleNodeResult;
