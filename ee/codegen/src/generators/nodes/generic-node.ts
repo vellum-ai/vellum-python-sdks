@@ -36,7 +36,11 @@ import {
   WorkflowRawData,
   WorkflowVersionExecConfig,
 } from "src/types/vellum";
-import { createPythonClassName, toPythonSafeSnakeCase, toValidPythonIdentifier } from "src/utils/casing";
+import {
+  createPythonClassName,
+  toPythonSafeSnakeCase,
+  toValidPythonIdentifier,
+} from "src/utils/casing";
 
 export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
   private functionsToGenerate: Array<{

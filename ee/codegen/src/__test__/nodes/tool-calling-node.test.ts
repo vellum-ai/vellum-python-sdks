@@ -790,9 +790,21 @@ describe("ToolCallingNode", () => {
       beforeEach(async () => {
         const functions = [
           { type: "CODE_EXECUTION", name: "getCWD", src: "def getCWD(): pass" },
-          { type: "CODE_EXECUTION", name: "parseJSON", src: "def parseJSON(): pass" },
-          { type: "CODE_EXECUTION", name: "fetchData", src: "def fetchData(): pass" },
-          { type: "CODE_EXECUTION", name: "XMLHttpRequest", src: "def XMLHttpRequest(): pass" },
+          {
+            type: "CODE_EXECUTION",
+            name: "parseJSON",
+            src: "def parseJSON(): pass",
+          },
+          {
+            type: "CODE_EXECUTION",
+            name: "fetchData",
+            src: "def fetchData(): pass",
+          },
+          {
+            type: "CODE_EXECUTION",
+            name: "XMLHttpRequest",
+            src: "def XMLHttpRequest(): pass",
+          },
         ];
 
         const nodePortData: NodePort[] = [
@@ -851,11 +863,31 @@ describe("ToolCallingNode", () => {
     describe("should handle edge cases in function names safely", () => {
       beforeEach(async () => {
         const functions = [
-          { type: "CODE_EXECUTION", name: "valid_snake_case", src: "def valid_snake_case(): pass" },
-          { type: "CODE_EXECUTION", name: "123invalid", src: "def _123invalid(): pass" },
-          { type: "CODE_EXECUTION", name: "special-chars!", src: "def special_chars(): pass" },
-          { type: "CODE_EXECUTION", name: "_underscore_start", src: "def _underscore_start(): pass" },
-          { type: "CODE_EXECUTION", name: "normalFunction", src: "def normalFunction(): pass" },
+          {
+            type: "CODE_EXECUTION",
+            name: "valid_snake_case",
+            src: "def valid_snake_case(): pass",
+          },
+          {
+            type: "CODE_EXECUTION",
+            name: "123invalid",
+            src: "def _123invalid(): pass",
+          },
+          {
+            type: "CODE_EXECUTION",
+            name: "special-chars!",
+            src: "def special_chars(): pass",
+          },
+          {
+            type: "CODE_EXECUTION",
+            name: "_underscore_start",
+            src: "def _underscore_start(): pass",
+          },
+          {
+            type: "CODE_EXECUTION",
+            name: "normalFunction",
+            src: "def normalFunction(): pass",
+          },
         ];
 
         const nodePortData: NodePort[] = [
@@ -907,10 +939,14 @@ describe("ToolCallingNode", () => {
         expect(output).toContain("_underscore_start"); // Underscore start gets prefix
 
         // All should have corresponding snake_case module paths
-        expect(output).toContain("from .valid_snake_case import valid_snake_case");
+        expect(output).toContain(
+          "from .valid_snake_case import valid_snake_case"
+        );
         expect(output).toContain("from ._123invalid import _123invalid");
         expect(output).toContain("from .special_chars import special_chars");
-        expect(output).toContain("from ._underscore_start import _underscore_start");
+        expect(output).toContain(
+          "from ._underscore_start import _underscore_start"
+        );
         expect(output).toContain("from .normal_function import normalFunction");
       });
     });
@@ -918,10 +954,18 @@ describe("ToolCallingNode", () => {
     describe("should handle null/undefined function names gracefully", () => {
       it("should skip functions without names", async () => {
         const functions = [
-          { type: "CODE_EXECUTION", name: "validFunction", src: "def validFunction(): pass" },
+          {
+            type: "CODE_EXECUTION",
+            name: "validFunction",
+            src: "def validFunction(): pass",
+          },
           { type: "CODE_EXECUTION", name: null, src: "def unnamed(): pass" },
           { type: "CODE_EXECUTION", name: "", src: "def empty(): pass" },
-          { type: "CODE_EXECUTION", name: undefined, src: "def undefined(): pass" },
+          {
+            type: "CODE_EXECUTION",
+            name: undefined,
+            src: "def undefined(): pass",
+          },
         ];
 
         const nodePortData: NodePort[] = [
@@ -979,7 +1023,11 @@ describe("ToolCallingNode", () => {
       it("should not convert camelCase function names to snake_case in references", async () => {
         // This test specifically reproduces the original APO-1372 issue
         const functions = [
-          { type: "CODE_EXECUTION", name: "getCwd", src: "def getCwd(): return os.getcwd()" },
+          {
+            type: "CODE_EXECUTION",
+            name: "getCwd",
+            src: "def getCwd(): return os.getcwd()",
+          },
         ];
 
         const nodePortData: NodePort[] = [
