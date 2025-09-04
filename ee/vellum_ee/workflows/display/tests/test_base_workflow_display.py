@@ -9,6 +9,8 @@ from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.state import BaseState
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.base import EdgeDisplay, WorkflowInputsDisplay
+from vellum_ee.workflows.display.editor.types import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
@@ -429,3 +431,48 @@ def test_serialize_workflow_with_edge_display_data():
     assert edge_with_display_data["type"] == "DEFAULT"
     assert "source_node_id" in edge_with_display_data
     assert "target_node_id" in edge_with_display_data
+
+
+def test_serialize_workflow_with_node_display_data():
+    """
+    Tests that nodes with z_index values serialize display_data correctly.
+    """
+
+    # GIVEN a workflow with a node that has custom display data
+    class TestNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result: str
+
+    class TestWorkflow(BaseWorkflow):
+        graph = TestNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_result = TestNode.Outputs.result
+
+    class TestNodeDisplay(BaseNodeDisplay[TestNode]):
+        display_data = NodeDisplayData(position=NodeDisplayPosition(x=100, y=200), z_index=10, width=300, height=150)
+
+    class TestWorkflowDisplay(BaseWorkflowDisplay[TestWorkflow]):
+        pass
+
+    # WHEN we serialize the workflow with the custom node display
+    display = get_workflow_display(
+        base_display_class=TestWorkflowDisplay,
+        workflow_class=TestWorkflow,
+    )
+    serialized_workflow = display.serialize()
+
+    # THEN the node should include display_data with z_index
+    workflow_raw_data = cast(Dict[str, Any], serialized_workflow["workflow_raw_data"])
+    nodes = cast(List[Dict[str, Any]], workflow_raw_data["nodes"])
+
+    test_node = None
+    for node in nodes:
+        if node.get("type") == "GENERIC":
+            definition = node.get("definition")
+            if isinstance(definition, dict) and definition.get("name") == "TestNode":
+                test_node = node
+                break
+
+    assert test_node is not None, "TestNode not found in serialized nodes"
+    assert test_node["display_data"] == {"position": {"x": 100, "y": 200}, "z_index": 10, "width": 300, "height": 150}
