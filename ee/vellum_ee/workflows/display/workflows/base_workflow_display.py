@@ -375,6 +375,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         nodes_list = list(serialized_nodes.values())
         nodes_dict_list = [cast(Dict[str, Any], node) for node in nodes_list if isinstance(node, dict)]
 
+        has_generated_display_files = self._has_generated_display_files()
         all_nodes_at_zero = all(
             (
                 isinstance(node.get("display_data"), dict)
@@ -385,7 +386,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             for node in nodes_dict_list
         )
 
-        should_apply_auto_layout = all_nodes_at_zero and len(nodes_dict_list) > 0
+        should_apply_auto_layout = all_nodes_at_zero and len(nodes_dict_list) > 0 and not has_generated_display_files
 
         if should_apply_auto_layout:
             try:
@@ -983,6 +984,19 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
     def _is_node_invalid(self, node: Type[BaseNode]) -> bool:
         """Check if a node failed to serialize and should be considered invalid."""
         return node in self.display_context.invalid_nodes
+
+    def _has_generated_display_files(self) -> bool:
+        """
+        Check if this workflow has generated display files, indicating it was created
+        from codegen and should preserve its position data.
+        """
+        try:
+            workflow_module = self._workflow.__module__
+            display_module_path = f"{workflow_module}.display"
+            importlib.import_module(display_module_path)
+            return True
+        except ImportError:
+            return False
 
 
 register_workflow_display_class(workflow_class=BaseWorkflow, workflow_display_class=BaseWorkflowDisplay)
