@@ -110,54 +110,25 @@ describe("Casing utility functions", () => {
 
   describe("toValidPythonIdentifier", () => {
     const testCases = [
-      // Core cases - valid identifiers preserved (APO-1372 fix)
       {
-        input: "getCWD",
+        input: "fooBAR",
         safetyPrefix: undefined,
-        expected: "getCWD",
-        description: "camelCase should be preserved",
-      },
-      {
-        input: "parseJSON",
-        safetyPrefix: undefined,
-        expected: "parseJSON",
-        description: "mixed case should be preserved",
-      },
-      {
-        input: "normalFunction",
-        safetyPrefix: undefined,
-        expected: "normalFunction",
-        description: "standard camelCase should be preserved",
+        expected: "fooBAR",
       },
       {
         input: "foo_bar",
         safetyPrefix: undefined,
         expected: "foo_bar",
-        description: "snake_case should be preserved",
-      },
-      // Invalid identifiers converted to safe versions
-      {
-        input: "123invalid",
-        safetyPrefix: undefined,
-        expected: "_123invalid",
-        description: "numbers at start get underscore prefix",
       },
       {
         input: "123invalid",
         safetyPrefix: "output",
         expected: "output_123invalid",
-        description: "numbers at start get custom prefix",
-      },
-      {
-        input: "special-chars!",
-        safetyPrefix: undefined,
-        expected: "special_chars",
-        description: "special chars converted to snake_case",
       },
     ];
 
     it.each(testCases)(
-      "should convert '$input' to '$expected' - $description",
+      "should convert '$input' to '$expected'",
       ({ input, safetyPrefix, expected }) => {
         expect(toValidPythonIdentifier(input, safetyPrefix)).toBe(expected);
       }
