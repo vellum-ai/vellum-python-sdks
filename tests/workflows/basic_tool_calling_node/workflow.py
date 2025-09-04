@@ -65,7 +65,6 @@ class GetCurrentWeatherNode(ToolCallingNode):
     def process_parameters(self, parameters: PromptParameters) -> PromptParameters:
         """
         Override process_parameters to add custom parameter processing.
-        This demonstrates that ToolCallingNode can now override the process_parameters method.
         """
         parameters = parameters.model_copy(update={"custom_parameters": {"mode": "updated"}})
 
