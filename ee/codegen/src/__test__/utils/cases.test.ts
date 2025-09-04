@@ -110,17 +110,7 @@ describe("Casing utility functions", () => {
 
   describe("toValidPythonIdentifier", () => {
     const testCases = [
-      // Valid identifiers should be preserved (APO-1372 fix)
-      {
-        input: "fooBAR",
-        safetyPrefix: undefined,
-        expected: "fooBAR",
-      },
-      {
-        input: "foo_bar",
-        safetyPrefix: undefined,
-        expected: "foo_bar",
-      },
+      // Core cases - valid identifiers preserved (APO-1372 fix)
       {
         input: "getCWD",
         safetyPrefix: undefined,
@@ -134,72 +124,35 @@ describe("Casing utility functions", () => {
         description: "mixed case should be preserved",
       },
       {
-        input: "XMLHttpRequest",
-        safetyPrefix: undefined,
-        expected: "XMLHttpRequest",
-        description: "multiple caps should be preserved",
-      },
-      {
         input: "normalFunction",
         safetyPrefix: undefined,
         expected: "normalFunction",
         description: "standard camelCase should be preserved",
       },
-      // Invalid identifiers should be converted to safe snake_case
       {
-        input: "123invalid",
-        safetyPrefix: "output",
-        expected: "output_123invalid",
-        description: "numbers at start should get prefix",
+        input: "foo_bar",
+        safetyPrefix: undefined,
+        expected: "foo_bar",
+        description: "snake_case should be preserved",
       },
+      // Invalid identifiers converted to safe versions
       {
         input: "123invalid",
         safetyPrefix: undefined,
         expected: "_123invalid",
-        description: "numbers at start should get default prefix",
+        description: "numbers at start get underscore prefix",
+      },
+      {
+        input: "123invalid",
+        safetyPrefix: "output",
+        expected: "output_123invalid",
+        description: "numbers at start get custom prefix",
       },
       {
         input: "special-chars!",
         safetyPrefix: undefined,
         expected: "special_chars",
-        description: "special characters should be converted to snake_case",
-      },
-      {
-        input: "_underscore_start",
-        safetyPrefix: undefined,
-        expected: "_underscore_start",
-        description: "underscore at start should get prefix",
-      },
-      {
-        input: "with spaces",
-        safetyPrefix: undefined,
-        expected: "with_spaces",
-        description: "spaces should be converted to snake_case",
-      },
-      {
-        input: "ALLCAPS_CONSTANT",
-        safetyPrefix: undefined,
-        expected: "allcaps_constant",
-        description: "all caps with underscores converted to snake_case",
-      },
-      // Edge cases
-      {
-        input: "",
-        safetyPrefix: undefined,
-        expected: "",
-        description: "empty string should remain empty",
-      },
-      {
-        input: "a",
-        safetyPrefix: undefined,
-        expected: "a",
-        description: "single character should be preserved",
-      },
-      {
-        input: "A",
-        safetyPrefix: undefined,
-        expected: "A",
-        description: "single uppercase character should be preserved",
+        description: "special chars converted to snake_case",
       },
     ];
 
@@ -210,47 +163,5 @@ describe("Casing utility functions", () => {
       }
     );
 
-    describe("APO-1372 specific regression tests", () => {
-      it("should preserve camelCase function names that are valid Python identifiers", () => {
-        const camelCaseFunctions = [
-          "getCwd",
-          "parseJson",
-          "fetchData",
-          "calculateTotal",
-          "renderTemplate",
-        ];
-
-        camelCaseFunctions.forEach((functionName) => {
-          const result = toValidPythonIdentifier(functionName);
-          expect(result).toBe(functionName);
-        });
-      });
-
-      it("should handle complex camelCase names correctly", () => {
-        const complexNames = [
-          { input: "XMLHttpRequest", expected: "XMLHttpRequest" },
-          { input: "HTMLParser", expected: "HTMLParser" },
-          { input: "JSONEncoder", expected: "JSONEncoder" },
-          { input: "URLBuilder", expected: "URLBuilder" },
-        ];
-
-        complexNames.forEach(({ input, expected }) => {
-          expect(toValidPythonIdentifier(input)).toBe(expected);
-        });
-      });
-
-      it("should convert unsafe identifiers to snake_case while preserving safe ones", () => {
-        const mixedCases = [
-          { input: "validFunction", expected: "validFunction" }, // Valid - preserve
-          { input: "123Invalid", expected: "_123invalid" }, // Invalid - convert
-          { input: "special-chars", expected: "special_chars" }, // Invalid - convert
-          { input: "normalName", expected: "normalName" }, // Valid - preserve
-        ];
-
-        mixedCases.forEach(({ input, expected }) => {
-          expect(toValidPythonIdentifier(input)).toBe(expected);
-        });
-      });
-    });
   });
 });

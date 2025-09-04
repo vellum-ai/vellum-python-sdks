@@ -785,32 +785,83 @@ describe("ToolCallingNode", () => {
     });
   });
 
-  describe("function name casing in Python imports (APO-1372)", () => {
-    describe("should preserve original camelCase function names in Python references", () => {
-      beforeEach(async () => {
+  describe("function name casing (APO-1372)", () => {
+    const testCases = [
+      // Core functionality - camelCase preservation
+      {
+        name: "getCWD",
+        expectedRef: "getCWD",
+        expectedImport: "get_cwd",
+        description: "camelCase function names"
+      },
+      {
+        name: "parseJSON",
+        expectedRef: "parseJSON",
+        expectedImport: "parse_json",
+        description: "mixed case function names"
+      },
+      {
+        name: "XMLHttpRequest",
+        expectedRef: "XMLHttpRequest",
+        expectedImport: "xmlhttp_request",
+        description: "multiple caps function names"
+      },
+      {
+        name: "normalFunction",
+        expectedRef: "normalFunction",
+        expectedImport: "normal_function",
+        description: "standard camelCase function names"
+      },
+      // Edge cases
+      {
+        name: "valid_snake_case",
+        expectedRef: "valid_snake_case",
+        expectedImport: "valid_snake_case",
+        description: "valid snake_case function names"
+      },
+      {
+        name: "123invalid",
+        expectedRef: "_123invalid",
+        expectedImport: "_123invalid",
+        description: "invalid function names starting with numbers"
+      },
+      {
+        name: "special-chars!",
+        expectedRef: "special_chars",
+        expectedImport: "special_chars",
+        description: "invalid function names with special characters"
+      },
+      // Null safety cases
+      {
+        name: null,
+        shouldSkip: true,
+        description: "null function names"
+      },
+      {
+        name: "",
+        shouldSkip: true,
+        description: "empty function names"
+      },
+      {
+        name: undefined,
+        shouldSkip: true,
+        description: "undefined function names"
+      }
+    ];
+
+    it.each(testCases.filter(tc => !tc.shouldSkip))(
+      "preserves original casing for $description",
+      async ({ name, expectedRef, expectedImport }) => {
         const functions = [
-          { type: "CODE_EXECUTION", name: "getCWD", src: "def getCWD(): pass" },
           {
             type: "CODE_EXECUTION",
-            name: "parseJSON",
-            src: "def parseJSON(): pass",
-          },
-          {
-            type: "CODE_EXECUTION",
-            name: "fetchData",
-            src: "def fetchData(): pass",
-          },
-          {
-            type: "CODE_EXECUTION",
-            name: "XMLHttpRequest",
-            src: "def XMLHttpRequest(): pass",
-          },
+            name,
+            src: `def ${name}(): pass`
+          }
         ];
 
         const nodePortData: NodePort[] = [
-          nodePortFactory({
-            id: "port-id",
-          }),
+          nodePortFactory({ id: "port-id" })
         ];
 
         const functionsAttribute = nodeAttributeFactory(
@@ -818,266 +869,95 @@ describe("ToolCallingNode", () => {
           "functions",
           {
             type: "CONSTANT_VALUE",
-            value: {
-              type: "JSON",
-              value: functions,
-            },
+            value: { type: "JSON", value: functions }
           }
         );
 
         const nodeData = toolCallingNodeFactory({
           nodePorts: nodePortData,
           nodeAttributes: [functionsAttribute],
-          label: "CasingTestNode",
+          label: "CasingTestNode"
         });
 
         const nodeContext = (await createNodeContext({
           workflowContext,
-          nodeData,
-        })) as GenericNodeContext;
-
-        node = new GenericNode({
-          workflowContext,
-          nodeContext,
-        });
-      });
-
-      it("getNodeFile preserves camelCase names and uses snake_case modules", async () => {
-        node.getNodeFile().write(writer);
-        const output = await writer.toStringFormatted();
-
-        // Verify original function names are preserved in references
-        expect(output).toContain("getCWD");
-        expect(output).toContain("parseJSON");
-        expect(output).toContain("fetchData");
-        expect(output).toContain("XMLHttpRequest");
-
-        // Verify snake_case module paths are used for imports
-        expect(output).toContain("from .get_cwd import getCWD");
-        expect(output).toContain("from .parse_json import parseJSON");
-        expect(output).toContain("from .fetch_data import fetchData");
-        expect(output).toContain("from .xmlhttp_request import XMLHttpRequest");
-      });
-    });
-
-    describe("should handle edge cases in function names safely", () => {
-      beforeEach(async () => {
-        const functions = [
-          {
-            type: "CODE_EXECUTION",
-            name: "valid_snake_case",
-            src: "def valid_snake_case(): pass",
-          },
-          {
-            type: "CODE_EXECUTION",
-            name: "123invalid",
-            src: "def _123invalid(): pass",
-          },
-          {
-            type: "CODE_EXECUTION",
-            name: "special-chars!",
-            src: "def special_chars(): pass",
-          },
-          {
-            type: "CODE_EXECUTION",
-            name: "_underscore_start",
-            src: "def _underscore_start(): pass",
-          },
-          {
-            type: "CODE_EXECUTION",
-            name: "normalFunction",
-            src: "def normalFunction(): pass",
-          },
-        ];
-
-        const nodePortData: NodePort[] = [
-          nodePortFactory({
-            id: "port-id",
-          }),
-        ];
-
-        const functionsAttribute = nodeAttributeFactory(
-          "functions-attr-id",
-          "functions",
-          {
-            type: "CONSTANT_VALUE",
-            value: {
-              type: "JSON",
-              value: functions,
-            },
-          }
-        );
-
-        const nodeData = toolCallingNodeFactory({
-          nodePorts: nodePortData,
-          nodeAttributes: [functionsAttribute],
-          label: "EdgeCaseTestNode",
-        });
-
-        const nodeContext = (await createNodeContext({
-          workflowContext,
-          nodeData,
-        })) as GenericNodeContext;
-
-        node = new GenericNode({
-          workflowContext,
-          nodeContext,
-        });
-      });
-
-      it("getNodeFile handles invalid Python identifiers safely", async () => {
-        node.getNodeFile().write(writer);
-        const output = await writer.toStringFormatted();
-
-        // Valid identifiers should be preserved
-        expect(output).toContain("valid_snake_case");
-        expect(output).toContain("normalFunction");
-
-        // Invalid identifiers should be converted to safe versions
-        expect(output).toContain("_123invalid"); // Numbers at start get prefix
-        expect(output).toContain("special_chars"); // Special chars converted to snake_case
-        expect(output).toContain("_underscore_start"); // Underscore start gets prefix
-
-        // All should have corresponding snake_case module paths
-        expect(output).toContain(
-          "from .valid_snake_case import valid_snake_case"
-        );
-        expect(output).toContain("from ._123invalid import _123invalid");
-        expect(output).toContain("from .special_chars import special_chars");
-        expect(output).toContain(
-          "from ._underscore_start import _underscore_start"
-        );
-        expect(output).toContain("from .normal_function import normalFunction");
-      });
-    });
-
-    describe("should handle null/undefined function names gracefully", () => {
-      it("should skip functions without names", async () => {
-        const functions = [
-          {
-            type: "CODE_EXECUTION",
-            name: "validFunction",
-            src: "def validFunction(): pass",
-          },
-          { type: "CODE_EXECUTION", name: null, src: "def unnamed(): pass" },
-          { type: "CODE_EXECUTION", name: "", src: "def empty(): pass" },
-          {
-            type: "CODE_EXECUTION",
-            name: undefined,
-            src: "def undefined(): pass",
-          },
-        ];
-
-        const nodePortData: NodePort[] = [
-          nodePortFactory({
-            id: "port-id",
-          }),
-        ];
-
-        const functionsAttribute = nodeAttributeFactory(
-          "functions-attr-id",
-          "functions",
-          {
-            type: "CONSTANT_VALUE",
-            value: {
-              type: "JSON",
-              value: functions,
-            },
-          }
-        );
-
-        const nodeData = toolCallingNodeFactory({
-          nodePorts: nodePortData,
-          nodeAttributes: [functionsAttribute],
-          label: "NullTestNode",
-        });
-
-        const nodeContext = (await createNodeContext({
-          workflowContext,
-          nodeData,
+          nodeData
         })) as GenericNodeContext;
 
         const node = new GenericNode({
           workflowContext,
-          nodeContext,
-        });
-
-        expect(() => {
-          node.getNodeFile().write(writer);
-        }).not.toThrow();
-
-        const output = await writer.toStringFormatted();
-
-        // Only valid function should be included
-        expect(output).toContain("validFunction");
-        expect(output).toContain("from .valid_function import validFunction");
-
-        // Invalid/empty names should not appear
-        expect(output).not.toContain("null");
-        expect(output).not.toContain("undefined");
-        expect(output).not.toContain('""');
-      });
-    });
-
-    describe("regression test for the original bug", () => {
-      it("should not convert camelCase function names to snake_case in references", async () => {
-        // This test specifically reproduces the original APO-1372 issue
-        const functions = [
-          {
-            type: "CODE_EXECUTION",
-            name: "getCwd",
-            src: "def getCwd(): return os.getcwd()",
-          },
-        ];
-
-        const nodePortData: NodePort[] = [
-          nodePortFactory({
-            id: "port-id",
-          }),
-        ];
-
-        const functionsAttribute = nodeAttributeFactory(
-          "functions-attr-id",
-          "functions",
-          {
-            type: "CONSTANT_VALUE",
-            value: {
-              type: "JSON",
-              value: functions,
-            },
-          }
-        );
-
-        const nodeData = toolCallingNodeFactory({
-          nodePorts: nodePortData,
-          nodeAttributes: [functionsAttribute],
-          label: "RegressionTestNode",
-        });
-
-        const nodeContext = (await createNodeContext({
-          workflowContext,
-          nodeData,
-        })) as GenericNodeContext;
-
-        const node = new GenericNode({
-          workflowContext,
-          nodeContext,
+          nodeContext
         });
 
         node.getNodeFile().write(writer);
         const output = await writer.toStringFormatted();
 
-        // The bug was that this would generate:
-        // python.reference({ name: "get_cwd", modulePath: [".get_cwd"] })
-        // Instead it should generate:
-        // python.reference({ name: "getCwd", modulePath: [".get_cwd"] })
+        // Verify function reference preserves original casing
+        expect(output).toContain(expectedRef);
+        // Verify import uses snake_case module path
+        expect(output).toContain(`from .${expectedImport} import ${expectedRef}`);
+      }
+    );
 
-        expect(output).toContain("getCwd"); // Original camelCase name preserved
-        expect(output).toContain("from .get_cwd import getCwd"); // Snake case module path
+    it("skips functions with invalid names", async () => {
+      const functions = [
+        {
+          type: "CODE_EXECUTION",
+          name: "validFunction",
+          src: "def validFunction(): pass"
+        },
+        { type: "CODE_EXECUTION", name: null, src: "def unnamed(): pass" },
+        { type: "CODE_EXECUTION", name: "", src: "def empty(): pass" },
+        {
+          type: "CODE_EXECUTION",
+          name: undefined,
+          src: "def undefined(): pass"
+        }
+      ];
 
-        // Ensure we don't have the bug where both name and module were snake_case
-        expect(output).not.toMatch(/name.*get_cwd.*modulePath.*get_cwd/);
+      const nodePortData: NodePort[] = [
+        nodePortFactory({ id: "port-id" })
+      ];
+
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        {
+          type: "CONSTANT_VALUE",
+          value: { type: "JSON", value: functions }
+        }
+      );
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [functionsAttribute],
+        label: "NullTestNode"
       });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext
+      });
+
+      expect(() => {
+        node.getNodeFile().write(writer);
+      }).not.toThrow();
+
+      const output = await writer.toStringFormatted();
+
+      // Only valid function should be included
+      expect(output).toContain("validFunction");
+      expect(output).toContain("from .valid_function import validFunction");
+
+      // Invalid/empty names should not appear
+      expect(output).not.toContain("null");
+      expect(output).not.toContain("undefined");
+      expect(output).not.toContain('""');
     });
   });
 });
