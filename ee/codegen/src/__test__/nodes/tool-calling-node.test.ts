@@ -784,4 +784,80 @@ describe("ToolCallingNode", () => {
       );
     });
   });
+
+  describe("function name casing", () => {
+    const testCases = [["parseJSON"], ["123invalid"], ["special-chars!"]];
+
+    it.each(testCases)("preserves casing: %s", async (name) => {
+      const functions = [
+        { type: "CODE_EXECUTION", name, src: `def ${name}(): pass` },
+      ];
+
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        {
+          type: "CONSTANT_VALUE",
+          value: { type: "JSON", value: functions },
+        }
+      );
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: [nodePortFactory({ id: "port-id" })],
+        nodeAttributes: [functionsAttribute],
+        label: "CasingTestNode",
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+      const node = new GenericNode({ workflowContext, nodeContext });
+
+      node.getNodeFile().write(writer);
+      const output = await writer.toStringFormatted();
+
+      expect(output).toMatchSnapshot();
+    });
+
+    it("skips null/empty function names", async () => {
+      const functions = [
+        {
+          type: "CODE_EXECUTION",
+          name: "validFunction",
+          src: "def validFunction(): pass",
+        },
+        { type: "CODE_EXECUTION", name: null, src: "def unnamed(): pass" },
+        { type: "CODE_EXECUTION", name: "", src: "def empty(): pass" },
+      ];
+
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        {
+          type: "CONSTANT_VALUE",
+          value: { type: "JSON", value: functions },
+        }
+      );
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: [nodePortFactory({ id: "port-id" })],
+        nodeAttributes: [functionsAttribute],
+        label: "NullTestNode",
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+      const node = new GenericNode({ workflowContext, nodeContext });
+
+      expect(() => {
+        node.getNodeFile().write(writer);
+      }).not.toThrow();
+
+      const output = await writer.toStringFormatted();
+      expect(output).toMatchSnapshot();
+    });
+  });
 });
