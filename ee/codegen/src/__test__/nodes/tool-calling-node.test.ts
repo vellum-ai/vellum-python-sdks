@@ -825,7 +825,9 @@ describe("ToolCallingNode", () => {
         const output = await writer.toStringFormatted();
 
         expect(output).toContain(expectedRef);
-        expect(output).toContain(`from .${expectedImport} import ${expectedRef}`);
+        expect(output).toContain(
+          `from .${expectedImport} import ${expectedRef}`
+        );
       }
     );
 
