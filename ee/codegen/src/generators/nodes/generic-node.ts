@@ -99,8 +99,8 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                     const snakeName = toPythonSafeSnakeCase(f.name);
                     functionReferences.push(
                       python.reference({
-                        name: f.name,  // Use original name to avoid casing conflicts (see APO-1372)
-                        modulePath: [`.${snakeName}`],  // Import from snake_case module
+                        name: f.name, // Use original name to avoid casing conflicts (see APO-1372)
+                        modulePath: [`.${snakeName}`], // Import from snake_case module
                       })
                     );
                   }
