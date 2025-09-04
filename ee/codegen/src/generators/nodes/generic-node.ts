@@ -4,6 +4,7 @@ import { join } from "path";
 import { python } from "@fern-api/python-ast";
 import { Field } from "@fern-api/python-ast/Field";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
+import { Writer } from "@fern-api/python-ast/core/Writer";
 import {
   PromptBlock as PromptBlockSerializer,
   PromptParameters as PromptParametersSerializer,
@@ -17,6 +18,7 @@ import {
 import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { PromptBlock as PromptBlockType } from "src/generators/base-prompt-block";
 import { NodeDefinitionGenerationError } from "src/generators/errors";
+import { FunctionFile } from "src/generators/function-file";
 import { InitFile } from "src/generators/init-file";
 import { NodeOutputs } from "src/generators/node-outputs";
 import { BaseNode } from "src/generators/nodes/bases/base";
@@ -25,7 +27,10 @@ import { PromptBlock } from "src/generators/prompt-block";
 import { PromptParameters } from "src/generators/prompt-parameters-request";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { WorkflowProjectGenerator } from "src/project";
-import { WorkflowVersionExecConfigSerializer } from "src/serializers/vellum";
+import {
+  WorkflowValueDescriptorSerializer,
+  WorkflowVersionExecConfigSerializer,
+} from "src/serializers/vellum";
 import {
   ComposioToolFunctionArgs,
   FunctionArgs,
@@ -34,6 +39,7 @@ import {
   MCPServerFunctionArgs,
   WorkflowDeploymentFunctionArgs,
   WorkflowRawData,
+  WorkflowValueDescriptor as WorkflowValueDescriptorType,
   WorkflowVersionExecConfig,
 } from "src/types/vellum";
 import {
@@ -98,7 +104,8 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
             functions.forEach((f) => {
               switch (f.type) {
                 case "CODE_EXECUTION": {
-                  codeExecutionFunctions.push(f as FunctionArgs);
+                  f = this.getFunction(f);
+                  codeExecutionFunctions.push(f);
                   const snakeName = toPythonSafeSnakeCase(f.name);
                   // Use toValidPythonIdentifier to ensure the name is safe for Python references
                   // but preserve original casing when possible (see APO-1372)
@@ -756,6 +763,81 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
         await writeFile(filepath, funcFile.content);
       })
     );
+  }
+
+  private getFunction(f: FunctionArgs): FunctionArgs {
+    const inputs = f.definition.inputs;
+    if (!inputs) {
+      return f;
+    }
+
+    const parsedInputs: Record<string, WorkflowValueDescriptorType> = {};
+    Object.entries(inputs).forEach(([inputName, inputDef]) => {
+      const inputResult = WorkflowValueDescriptorSerializer.parse(inputDef);
+      if (inputResult.ok) {
+        parsedInputs[inputName] = inputResult.value;
+      } else {
+        this.workflowContext.addError(
+          new NodeDefinitionGenerationError(
+            `Failed to parse input '${inputName}': ${JSON.stringify(
+              inputResult.errors
+            )}`
+          )
+        );
+      }
+    });
+
+    if (Object.keys(parsedInputs).length === 0) {
+      return f;
+    }
+
+    const decorator = this.generateInputsDecorator(parsedInputs);
+
+    const functionFile = new FunctionFile({
+      workflowContext: this.workflowContext,
+      functionSrc: f.src,
+      decorator,
+      modulePath: [...this.nodeContext.nodeModulePath, f.name],
+    });
+
+    const writer = new Writer();
+    functionFile.write(writer);
+
+    return {
+      ...f,
+      src: writer.toString(),
+    };
+  }
+
+  private generateInputsDecorator(
+    inputs: Record<string, WorkflowValueDescriptorType>
+  ): python.Decorator {
+    const inputMappings: python.MethodArgument[] = [];
+    Object.entries(inputs).forEach(([inputName, inputDef]) => {
+      // Use WorkflowValueDescriptor to handle all types of workflow value descriptors
+      const workflowValueDescriptor = new WorkflowValueDescriptor({
+        workflowValueDescriptor: inputDef,
+        nodeContext: this.nodeContext,
+        workflowContext: this.workflowContext,
+      });
+
+      inputMappings.push(
+        python.methodArgument({
+          name: inputName,
+          value: workflowValueDescriptor,
+        })
+      );
+    });
+
+    return python.decorator({
+      callable: python.invokeMethod({
+        methodReference: python.reference({
+          name: "use_tool_inputs",
+          modulePath: ["vellum", "workflows", "utils", "functions"],
+        }),
+        arguments_: inputMappings,
+      }),
+    });
   }
 
   private async generateInlineWorkflowProjects(): Promise<void> {
