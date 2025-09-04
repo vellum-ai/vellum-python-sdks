@@ -785,16 +785,16 @@ describe("ToolCallingNode", () => {
     });
   });
 
-  describe("function name casing (APO-1372)", () => {
+  describe("function name casing", () => {
     const testCases = [
-      ["parseJSON", "parseJSON", "parse_json"],
-      ["123invalid", "_123invalid", "_123invalid"],
-      ["special-chars!", "special_chars", "special_chars"],
+      ["parseJSON"],
+      ["123invalid"],
+      ["special-chars!"],
     ];
 
     it.each(testCases)(
-      "preserves casing: %s -> ref: %s, import: %s",
-      async (name, expectedRef, expectedImport) => {
+      "preserves casing: %s",
+      async (name) => {
         const functions = [
           { type: "CODE_EXECUTION", name, src: `def ${name}(): pass` },
         ];
@@ -823,10 +823,7 @@ describe("ToolCallingNode", () => {
         node.getNodeFile().write(writer);
         const output = await writer.toStringFormatted();
 
-        expect(output).toContain(expectedRef);
-        expect(output).toContain(
-          `from .${expectedImport} import ${expectedRef}`
-        );
+        expect(output).toMatchSnapshot();
       }
     );
 

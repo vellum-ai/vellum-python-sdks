@@ -142,6 +142,39 @@ class ToolCallingNode(BaseToolCallingNode):
 "
 `;
 
+exports[`ToolCallingNode > function name casing > preserves casing: 123invalid 1`] = `
+"from ._123invalid import _123invalid
+
+from vellum.workflows.nodes.displayable.tool_calling_node import ToolCallingNode
+
+
+class CasingTestNode(ToolCallingNode):
+    functions = [_123invalid]
+"
+`;
+
+exports[`ToolCallingNode > function name casing > preserves casing: parseJSON 1`] = `
+"from .parse_json import parseJSON
+
+from vellum.workflows.nodes.displayable.tool_calling_node import ToolCallingNode
+
+
+class CasingTestNode(ToolCallingNode):
+    functions = [parseJSON]
+"
+`;
+
+exports[`ToolCallingNode > function name casing > preserves casing: special-chars! 1`] = `
+"from .special_chars import special_chars
+
+from vellum.workflows.nodes.displayable.tool_calling_node import ToolCallingNode
+
+
+class CasingTestNode(ToolCallingNode):
+    functions = [special_chars]
+"
+`;
+
 exports[`ToolCallingNode > function ordering > should preserve order: code-exec, workflow 1`] = `
 "from .add_numbers import add_numbers
 from .subtract_workflow.workflow import SubtractWorkflow
