@@ -95,15 +95,13 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
               switch (f.type) {
                 case "CODE_EXECUTION": {
                   codeExecutionFunctions.push(f as FunctionArgs);
-                  if (f.name) {
-                    const snakeName = toPythonSafeSnakeCase(f.name);
-                    functionReferences.push(
-                      python.reference({
-                        name: snakeName,
-                        modulePath: [`.${snakeName}`],
-                      })
-                    );
-                  }
+                  const snakeName = toPythonSafeSnakeCase(f.name);
+                  functionReferences.push(
+                    python.reference({
+                      name: snakeName,
+                      modulePath: [`.${snakeName}`],
+                    })
+                  );
                   break;
                 }
                 case "INLINE_WORKFLOW": {
@@ -675,12 +673,10 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     functions: Array<FunctionArgs>
   ): Promise<void> {
     functions.forEach((f) => {
-      if (f.name) {
-        this.functionsToGenerate.push({
-          functionName: f.name,
-          content: f.src,
-        });
-      }
+      this.functionsToGenerate.push({
+        functionName: f.name,
+        content: f.src,
+      });
     });
   }
 
