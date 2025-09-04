@@ -25,7 +25,6 @@ from vellum.client.types.string_chat_message_content import StringChatMessageCon
 from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.client.types.vellum_variable import VellumVariable
-from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
 from vellum.workflows.nodes.displayable.tool_calling_node.utils import ToolPromptNode
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
