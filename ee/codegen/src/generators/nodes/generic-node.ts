@@ -682,12 +682,10 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     functions: Array<FunctionArgs>
   ): Promise<void> {
     functions.forEach((f) => {
-      if (f.name) {
-        this.functionsToGenerate.push({
-          functionName: f.name,
-          content: f.src,
-        });
-      }
+      this.functionsToGenerate.push({
+        functionName: f.name,
+        content: f.src,
+      });
     });
   }
 
