@@ -857,9 +857,7 @@ describe("ToolCallingNode", () => {
       }).not.toThrow();
 
       const output = await writer.toStringFormatted();
-      expect(output).toContain("validFunction");
-      expect(output).not.toContain("null");
-      expect(output).not.toContain("undefined");
+      expect(output).toMatchSnapshot();
     });
   });
 });
