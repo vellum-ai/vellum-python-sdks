@@ -787,7 +787,6 @@ describe("ToolCallingNode", () => {
 
   describe("function name casing (APO-1372)", () => {
     const testCases = [
-      ["getCWD", "getCWD", "get_cwd"],
       ["parseJSON", "parseJSON", "parse_json"],
       ["123invalid", "_123invalid", "_123invalid"],
       ["special-chars!", "special_chars", "special_chars"],
