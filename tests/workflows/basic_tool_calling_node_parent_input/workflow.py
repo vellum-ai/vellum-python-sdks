@@ -6,6 +6,8 @@ from vellum.workflows.nodes.displayable.tool_calling_node import ToolCallingNode
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.workflows.base import BaseWorkflow
 
+from tests.workflows.basic_tool_calling_node_parent_input.nodes.dummy_node import DummyNode
+
 from .get_string import get_string
 from .inputs import ParentInputs
 
@@ -53,7 +55,7 @@ class BasicToolCallingNodeParentInputWorkflow(BaseWorkflow[ParentInputs, BaseSta
     A parent workflow that passes inputs to a tool calling node.
     """
 
-    graph = StringToolCallingNode
+    graph = DummyNode >> StringToolCallingNode
 
     class Outputs(BaseWorkflow.Outputs):
         text = StringToolCallingNode.Outputs.text
