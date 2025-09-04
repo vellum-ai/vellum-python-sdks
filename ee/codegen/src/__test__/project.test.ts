@@ -3830,7 +3830,7 @@ baz = foo + bar
                             forced: null,
                             strict: null,
                             inputs: {
-                              parent_input: {
+                              location: {
                                 type: "WORKFLOW_INPUT",
                                 input_variable_id:
                                   "4bf1f0e7-76c6-4204-9f8c-bd9c3b73a8db",
@@ -3899,7 +3899,7 @@ baz = foo + bar
         input_variables: [
           {
             id: "4bf1f0e7-76c6-4204-9f8c-bd9c3b73a8db",
-            key: "parent_input",
+            key: "location",
             type: "STRING",
           },
         ],
