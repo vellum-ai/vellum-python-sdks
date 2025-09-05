@@ -1,4 +1,4 @@
-# MCP Tool Calling Node Demo
+# MCP Toolbox Agent Node Demo
 
 This workflow demonstrates how to use the built-in `AgentNode` (ToolCallingNode) with [MCP Toolbox for databases](https://googleapis.github.io/genai-toolbox/getting-started/introduction/).
 
