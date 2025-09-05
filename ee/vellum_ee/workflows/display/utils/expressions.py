@@ -8,6 +8,7 @@ from pydantic import BaseModel
 
 from vellum.client.types.function_definition import FunctionDefinition
 from vellum.client.types.logical_operator import LogicalOperator
+from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.expressions.accessor import AccessorExpression
 from vellum.workflows.expressions.add import AddExpression
@@ -245,6 +246,15 @@ def serialize_key(key: Any) -> str:
 
 
 def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> JsonObject:
+    if value is undefined:
+        return {
+            "type": "CONSTANT_VALUE",
+            "value": {
+                "type": "JSON",
+                "value": None,
+            },
+        }
+
     if isinstance(value, ConstantValueReference):
         return serialize_value(display_context, value._value)
 
