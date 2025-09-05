@@ -16,6 +16,7 @@ from vellum.client.types.function_definition import FunctionDefinition
 from vellum.client.types.initiated_execute_prompt_event import InitiatedExecutePromptEvent
 from vellum.client.types.plain_text_prompt_block import PlainTextPromptBlock
 from vellum.client.types.prompt_output import PromptOutput
+from vellum.client.types.prompt_parameters import PromptParameters
 from vellum.client.types.prompt_request_chat_history_input import PromptRequestChatHistoryInput
 from vellum.client.types.prompt_request_json_input import PromptRequestJsonInput
 from vellum.client.types.prompt_request_string_input import PromptRequestStringInput
@@ -24,7 +25,6 @@ from vellum.client.types.string_chat_message_content import StringChatMessageCon
 from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.client.types.vellum_variable import VellumVariable
-from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
 from vellum.workflows.nodes.displayable.tool_calling_node.utils import ToolPromptNode
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
@@ -147,7 +147,17 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
                 extensions=None,
             ),
         ],
-        "parameters": DEFAULT_PROMPT_PARAMETERS,
+        "parameters": PromptParameters(
+            stop=[],
+            temperature=0.0,
+            max_tokens=4096,
+            top_p=1.0,
+            top_k=0,
+            frequency_penalty=0.0,
+            presence_penalty=0.0,
+            logit_bias=None,
+            custom_parameters={"mode": "updated"},
+        ),
         "blocks": [
             ChatMessagePromptBlock(
                 block_type="CHAT_MESSAGE",
@@ -266,7 +276,17 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
                 extensions=None,
             ),
         ],
-        "parameters": DEFAULT_PROMPT_PARAMETERS,
+        "parameters": PromptParameters(
+            stop=[],
+            temperature=0.0,
+            max_tokens=4096,
+            top_p=1.0,
+            top_k=0,
+            frequency_penalty=0.0,
+            presence_penalty=0.0,
+            logit_bias=None,
+            custom_parameters={"mode": "updated"},
+        ),
         "blocks": [
             ChatMessagePromptBlock(
                 block_type="CHAT_MESSAGE",
