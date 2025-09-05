@@ -3,6 +3,7 @@
 import pytest
 
 from vellum.workflows.constants import undefined
+from vellum_ee.workflows.display.types import WorkflowDisplayContext
 from vellum_ee.workflows.display.utils.expressions import serialize_value
 
 
@@ -12,7 +13,9 @@ class TestSerializeValue:
     @pytest.mark.parametrize("value", [undefined, None])
     def test_serialize_value(self, value):
         """Test that values are properly serialized"""
+        # GIVEN a display context
+        display_context = WorkflowDisplayContext()
         # WHEN we serialize a value
-        result = serialize_value(display_context=None, value=value)
+        result = serialize_value(display_context=display_context, value=value)
         # THEN it should match the expected serialization
         assert result == {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}}
