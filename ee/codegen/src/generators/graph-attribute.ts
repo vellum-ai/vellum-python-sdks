@@ -49,6 +49,7 @@ export class GraphAttribute extends AstNode {
   private readonly astNode: python.AstNode;
   private readonly unusedEdges: Set<WorkflowEdge>;
   private readonly usedEdges = new Set<WorkflowEdge>();
+  private readonly usedNodes = new Set<string>();
 
   public constructor({
     workflowContext,
@@ -97,9 +98,30 @@ export class GraphAttribute extends AstNode {
       return graphMutableAst;
     }
 
-    const edgesQueue = this.workflowContext.getEntrypointNodeEdges();
+    let edgesQueue: WorkflowEdge[] = [];
+    try {
+      edgesQueue = this.workflowContext.getEntrypointNodeEdges();
+    } catch {
+      // No entrypoint node exists - handle case where there are standalone nodes
+      console.warn("No entrypoint node found, handling standalone nodes");
+      const singleNodeResult = this.getSingleNodeReference();
+      if (singleNodeResult.type !== "empty") {
+        return singleNodeResult;
+      }
+      // If we can't handle it, return empty
+      return graphMutableAst;
+    }
+
     const edgesByPortId = this.workflowContext.getEdgesByPortId();
     const processedEdges = new Set<WorkflowEdge>();
+
+    // Handle case where there are no edges from entrypoint but entrypoint exists
+    if (edgesQueue.length === 0) {
+      const singleNodeResult = this.getSingleNodeReference();
+      if (singleNodeResult.type !== "empty") {
+        return singleNodeResult;
+      }
+    }
 
     while (edgesQueue.length > 0) {
       const edge = edgesQueue.shift();
@@ -142,6 +164,10 @@ export class GraphAttribute extends AstNode {
     return this.usedEdges;
   }
 
+  public getUsedNodes(): Set<string> {
+    return this.usedNodes;
+  }
+
   /**
    * findRootNodes is used to handle all orderings of the component
    *
@@ -180,6 +206,38 @@ export class GraphAttribute extends AstNode {
     }
 
     return rootNode;
+  }
+
+  /**
+   * Attempts to find a single non-entrypoint node that should be used as the main graph.
+   * This is needed for single-node workflows (e.g., MapNode/RetryNode) that need proper
+   * graph references instead of Graph.empty() to support subworkflow input generation.
+   */
+  private getSingleNodeReference(): GraphMutableAst {
+    const allNodes = this.workflowContext.workflowRawData.nodes;
+    const nonEntrypointNodes = allNodes.filter(
+      (node) => node.type !== "ENTRYPOINT"
+    );
+
+    // If there's exactly one non-entrypoint node, make it the main graph
+    if (nonEntrypointNodes.length === 1) {
+      const singleNode = nonEntrypointNodes[0];
+      if (singleNode) {
+        const nodeContext = this.workflowContext.findLocalNodeContext(
+          singleNode.id
+        );
+        if (nodeContext) {
+          // Mark this node as used so it doesn't get marked as unused later
+          this.usedNodes.add(singleNode.id);
+          return {
+            type: "node_reference",
+            reference: nodeContext,
+          };
+        }
+      }
+    }
+
+    return { type: "empty" };
   }
 
   private findConnectedComponent(
@@ -1137,7 +1195,18 @@ export class GraphAttribute extends AstNode {
     useWrap: boolean = false
   ): AstNode {
     if (mutableAst.type === "empty") {
-      return python.TypeInstantiation.none();
+      return python.accessAttribute({
+        lhs: python.reference({
+          name: "Graph",
+          modulePath: VELLUM_WORKFLOW_GRAPH_MODULE_PATH,
+        }),
+        rhs: python.invokeMethod({
+          methodReference: python.reference({
+            name: "empty",
+          }),
+          arguments_: [],
+        }),
+      });
     }
 
     if (mutableAst.type === "node_reference") {
