@@ -73,11 +73,15 @@ def test_serialize_workflow():
                                     "node_id": "8e89ae10-a709-45ec-89f8-242f92e4a83f",
                                     "node_output_id": "0cd09f0a-c142-4d5d-acc7-b93cd30ca58d",
                                 },
+                                "constant_input": {
+                                    "type": "CONSTANT_VALUE",
+                                    "value": {"type": "STRING", "value": "constant_input"},
+                                },
                             },
                             "forced": None,
                             "strict": None,
                         },
-                        "src": 'from vellum.workflows.utils.functions import use_tool_inputs\n\nfrom .inputs import ParentInputs\nfrom .nodes.dummy_node import DummyNode\n\n\n@use_tool_inputs(\n    parent_input=ParentInputs.parent_input,\n    dummy_input=DummyNode.Outputs.text,\n)\ndef get_string(parent_input: str, dummy_input: str, populated_input: str) -> str:\n    """\n    Get a string with the parent input, dummy input, and the populated input.\n    """\n    return f"This is the parent input: {parent_input}, this is the dummy input: {dummy_input}, and this is the populated input: {populated_input}"  # noqa: E501\n',  # noqa: E501
+                        "src": 'from vellum.workflows.utils.functions import use_tool_inputs\n\nfrom .inputs import ParentInputs\nfrom .nodes.dummy_node import DummyNode\n\n\n@use_tool_inputs(\n    parent_input=ParentInputs.parent_input,\n    dummy_input=DummyNode.Outputs.text,\n    constant_input="constant_input",\n)\ndef get_string(parent_input: str, dummy_input: str, constant_input: str, populated_input: str) -> str:\n    """\n    Get a string with the parent input, dummy input, and the populated input.\n    """\n    return f"parent input: {parent_input}, dummy input: {dummy_input}, constant input: {constant_input}, populated input: {populated_input}"  # noqa: E501\n',  # noqa: E501
                     }
                 ],
             },
