@@ -37,7 +37,7 @@ def test_serialize_workflow():
 
     # AND its raw data should be what we expect
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
-    tool_calling_node = workflow_raw_data["nodes"][1]
+    tool_calling_node = workflow_raw_data["nodes"][2]
 
     attributes = tool_calling_node["attributes"]
     function_attributes = next(attribute for attribute in attributes if attribute["name"] == "functions")
@@ -52,12 +52,12 @@ def test_serialize_workflow():
                     {
                         "type": "CODE_EXECUTION",
                         "name": "get_string",
-                        "description": "\n    Get a string with the parent input and the populated input.\n    ",
+                        "description": "\n    Get a string with the parent input, dummy input, and the populated input.\n    ",  # noqa: E501
                         "definition": {
                             "state": None,
                             "cache_config": None,
                             "name": "get_string",
-                            "description": "\n    Get a string with the parent input and the populated input.\n    ",
+                            "description": "\n    Get a string with the parent input, dummy input, and the populated input.\n    ",  # noqa: E501
                             "parameters": {
                                 "type": "object",
                                 "properties": {"populated_input": {"type": "string"}},
@@ -67,12 +67,17 @@ def test_serialize_workflow():
                                 "parent_input": {
                                     "type": "WORKFLOW_INPUT",
                                     "input_variable_id": "4bf1f0e7-76c6-4204-9f8c-bd9c3b73a8db",
-                                }
+                                },
+                                "dummy_input": {
+                                    "type": "NODE_OUTPUT",
+                                    "node_id": "8e89ae10-a709-45ec-89f8-242f92e4a83f",
+                                    "node_output_id": "0cd09f0a-c142-4d5d-acc7-b93cd30ca58d",
+                                },
                             },
                             "forced": None,
                             "strict": None,
                         },
-                        "src": 'from vellum.workflows.utils.functions import use_tool_inputs\n\nfrom .inputs import ParentInputs\n\n\n@use_tool_inputs(\n    parent_input=ParentInputs.parent_input,\n)\ndef get_string(parent_input: str, populated_input: str) -> str:\n    """\n    Get a string with the parent input and the populated input.\n    """\n    return f"This is the parent input: {parent_input} and this is the populated input: {populated_input}"\n',  # noqa: E501
+                        "src": 'from vellum.workflows.utils.functions import use_tool_inputs\n\nfrom .inputs import ParentInputs\nfrom .nodes.dummy_node import DummyNode\n\n\n@use_tool_inputs(\n    parent_input=ParentInputs.parent_input,\n    dummy_input=DummyNode.Outputs.text,\n)\ndef get_string(parent_input: str, dummy_input: str, populated_input: str) -> str:\n    """\n    Get a string with the parent input, dummy input, and the populated input.\n    """\n    return f"This is the parent input: {parent_input}, this is the dummy input: {dummy_input}, and this is the populated input: {populated_input}"  # noqa: E501\n',  # noqa: E501
                     }
                 ],
             },
