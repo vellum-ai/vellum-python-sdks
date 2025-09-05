@@ -57,7 +57,7 @@ def test_serialize_workflow():
                             "state": None,
                             "cache_config": None,
                             "name": "get_string",
-                            "description": "\n    Get a string with the parent input, dummy input, and the populated input.\n    ",
+                            "description": "\n    Get a string with the parent input, dummy input, and the populated input.\n    ",  # noqa: E501
                             "parameters": {
                                 "type": "object",
                                 "properties": {"populated_input": {"type": "string"}},
