@@ -3829,6 +3829,13 @@ baz = foo + bar
                             state: null,
                             forced: null,
                             strict: null,
+                            inputs: {
+                              location: {
+                                type: "WORKFLOW_INPUT",
+                                input_variable_id:
+                                  "4bf1f0e7-76c6-4204-9f8c-bd9c3b73a8db",
+                              },
+                            },
                             parameters: {
                               type: "object",
                               required: ["location", "unit"],
@@ -3852,6 +3859,7 @@ baz = foo + bar
                             state: null,
                             forced: null,
                             strict: null,
+                            inputs: null,
                             parameters: {
                               type: "object",
                               required: ["answer"],
@@ -3888,7 +3896,13 @@ baz = foo + bar
 
           output_values: [],
         },
-        input_variables: [],
+        input_variables: [
+          {
+            id: "4bf1f0e7-76c6-4204-9f8c-bd9c3b73a8db",
+            key: "location",
+            type: "STRING",
+          },
+        ],
         state_variables: [],
         output_variables: [],
       };
