@@ -1,5 +1,8 @@
+from typing import List
+
 from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
 from vellum.client.types.plain_text_prompt_block import PlainTextPromptBlock
+from vellum.client.types.prompt_block import PromptBlock
 from vellum.client.types.prompt_parameters import PromptParameters
 from vellum.client.types.rich_text_prompt_block import RichTextPromptBlock
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
@@ -69,6 +72,20 @@ class GetCurrentWeatherNode(ToolCallingNode):
         parameters = parameters.model_copy(update={"custom_parameters": {"mode": "updated"}})
 
         return parameters
+
+    def process_blocks(self, blocks: List[PromptBlock]) -> List[PromptBlock]:
+        """
+        Override process_blocks to add custom block processing.
+        """
+
+        # Add a new block to the list
+        blocks.append(
+            VariablePromptBlock(
+                block_type="VARIABLE", state=None, cache_config=None, input_variable="additional_blocks"
+            )
+        )
+
+        return blocks
 
 
 class BasicToolCallingNodeWorkflow(BaseWorkflow[Inputs, BaseState]):
