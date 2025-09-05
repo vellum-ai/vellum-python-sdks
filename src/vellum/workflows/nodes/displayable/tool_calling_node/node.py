@@ -140,6 +140,7 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
     def _build_graph(self) -> None:
         # Get the process_parameters method if it exists on this class
         process_parameters_method = getattr(self.__class__, "process_parameters", None)
+        process_blocks_method = getattr(self.__class__, "process_blocks", None)
 
         self.tool_prompt_node = create_tool_prompt_node(
             ml_model=self.ml_model,
@@ -149,6 +150,7 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
             parameters=self.parameters,
             max_prompt_iterations=self.max_prompt_iterations,
             process_parameters_method=process_parameters_method,
+            process_blocks_method=process_blocks_method,
         )
 
         # Create the router node (handles routing logic only)
