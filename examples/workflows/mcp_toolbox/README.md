@@ -8,11 +8,11 @@ This demo showcases the integration between Vellum's workflow and Google's MCP T
 
 ## Setup
 
-### 1. Database and CLI Setup
+### Database and CLI Setup
 
 Follow Step 1 and Step 2 in the instructions in [Setup](https://googleapis.github.io/genai-toolbox/getting-started/local_quickstart/#:~:text=aiplatform.googleapis.com-,Step%201%3A%20Set%20up%20your%20database,-In%20this%20section) to set up your database.
 
-### 3. Configure Tools
+### Configure Tools
 
 1. Modify the database configuration in `tools.yaml` according to your setup
 2. Run the toolbox server:
@@ -33,7 +33,7 @@ python -m examples.workflows.mcp_tool_calling_node_demo.chat
 
 ### Example Queries
 
-Once the demo is running, you can ask questions like:
+Once the workflow is running, you can ask questions like:
 
 ```
 Find hotels in Basel with Basel in its name.
