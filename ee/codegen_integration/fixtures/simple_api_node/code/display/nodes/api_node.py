@@ -41,7 +41,6 @@ class ApiNodeDisplay(BaseAPINodeDisplay[ApiNode]):
     port_displays = {ApiNode.Ports.default: PortDisplayOverrides(id=UUID("b8ad3fd2-c96c-4ae8-8eae-d234fb13a139"))}
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=1889.865705614568, y=236.61265174506826),
-        z_index=None,
         width=467,
         height=288,
         comment=NodeDisplayComment(expanded=True, value="This is my API Node"),

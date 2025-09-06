@@ -239,7 +239,6 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
     port_displays = {}
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=2247.2797390213086, y=30.917121251477084),
-        z_index=None,
         width=480,
         height=180,
     )
@@ -323,7 +322,6 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
     port_displays = {}
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=2247.2797390213086, y=30.917121251477084),
-        z_index=None,
         width=480,
         height=180,
     )
@@ -400,7 +398,6 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
     port_displays = {}
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=2247.2797390213086, y=30.917121251477084),
-        z_index=None,
         width=480,
         height=180,
     )

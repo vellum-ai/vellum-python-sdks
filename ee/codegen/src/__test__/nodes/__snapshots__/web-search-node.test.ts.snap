@@ -24,9 +24,7 @@ class WebSearchNodeDisplay(BaseNodeDisplay[WebSearchNode]):
             id=UUID("web-search-port-id")
         )
     }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None
-    )
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 
