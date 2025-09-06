@@ -95,7 +95,6 @@ export declare namespace WorkflowProjectGenerator {
     workflowVersionExecConfigData: unknown;
     vellumApiKey?: string;
     vellumApiEnvironment?: VellumEnvironmentUrls;
-    workspaceAuthHeader?: string;
     sandboxInputs?: WorkflowSandboxInputs[];
     options?: WorkflowProjectGeneratorOptions;
   }
@@ -164,7 +163,6 @@ ${errors.slice(0, 3).map((err) => {
         workflowClassName,
         vellumApiKey,
         vellumApiEnvironment: rest.vellumApiEnvironment,
-        workspaceAuthHeader: rest.workspaceAuthHeader,
         workflowRawData: this.workflowVersionExecConfig.workflowRawData,
         strict: rest.strict ?? false,
         pythonCodeMergeableNodeFiles: new Set<string>(),

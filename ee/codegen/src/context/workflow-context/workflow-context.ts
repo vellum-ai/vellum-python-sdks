@@ -60,7 +60,6 @@ export declare namespace WorkflowContext {
     portContextByName?: PortContextById;
     vellumApiKey: string;
     vellumApiEnvironment?: VellumEnvironmentUrls;
-    workspaceAuthHeader?: string;
     workflowRawData: WorkflowRawData;
     inputsClassDefinition?: CodeResourceDefinition;
     strict: boolean;
@@ -138,7 +137,6 @@ export class WorkflowContext {
   // Used by the vellum api client
   public readonly vellumApiKey: string;
   public readonly vellumApiEnvironment?: VellumEnvironmentUrls;
-  public readonly workspaceAuthHeader?: string;
   private readonly mlModelNamesById: Record<string, string> = {};
   private readonly errors: BaseCodegenError[] = [];
 
@@ -170,7 +168,6 @@ export class WorkflowContext {
     portContextByName,
     vellumApiKey,
     vellumApiEnvironment,
-    workspaceAuthHeader,
     workflowRawData,
     strict,
     classNames,
@@ -205,7 +202,6 @@ export class WorkflowContext {
     this.workflowClassDescription = workflowClassDescription;
     this.vellumApiKey = vellumApiKey;
     this.vellumApiEnvironment = vellumApiEnvironment;
-    this.workspaceAuthHeader = workspaceAuthHeader;
 
     this.inputVariableContextsById = new Map();
     this.globalInputVariableContextsById =
@@ -275,7 +271,6 @@ export class WorkflowContext {
       workflowsSdkModulePath: this.sdkModulePathNames.WORKFLOWS_MODULE_PATH,
       vellumApiKey: this.vellumApiKey,
       vellumApiEnvironment: this.vellumApiEnvironment,
-      workspaceAuthHeader: this.workspaceAuthHeader,
       workflowRawData,
       strict: this.strict,
       classNames,
