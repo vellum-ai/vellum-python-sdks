@@ -392,3 +392,50 @@ def test_serialize_workflow():
             "workflow",
         ],
     }
+
+
+def test_serialize_workflow__map_node_output_value_structure():
+    """
+    Test that map node subworkflow outputs have correct value structure instead of None.
+    """
+    # GIVEN a Workflow that uses a MapNode with outputs
+    workflow_display = get_workflow_display(workflow_class=SimpleMapExample)
+
+    # WHEN we serialize it
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the map node's subworkflow should have outputs with proper value references
+    workflow_raw_data = serialized_workflow["workflow_raw_data"]
+    map_nodes = [node for node in workflow_raw_data["nodes"] if node["type"] == "MAP"]
+
+    assert len(map_nodes) == 1
+    map_node = map_nodes[0]
+
+    # AND the map node should have subworkflow data
+    assert "data" in map_node
+    assert "workflow_raw_data" in map_node["data"]
+    subworkflow_data = map_node["data"]["workflow_raw_data"]
+
+    # AND the subworkflow should have nodes with outputs
+    nodes_with_outputs = [node for node in subworkflow_data["nodes"] if "outputs" in node]
+    assert len(nodes_with_outputs) == 1
+
+    node_with_outputs = nodes_with_outputs[0]
+    outputs = node_with_outputs["outputs"]
+    assert len(outputs) == 1
+
+    output = outputs[0]
+    # AND the output should have the correct structure with NODE_OUTPUT reference instead of None
+    assert not DeepDiff(
+        {
+            "id": "a7bcb362-a2b8-4476-b0de-a361efeec204",
+            "name": "count",
+            "type": "NUMBER",
+            "value": {
+                "type": "NODE_OUTPUT",
+                "node_id": "baf6d316-dc75-41e8-96c0-015aede96309",
+                "node_output_id": "a7bcb362-a2b8-4476-b0de-a361efeec204",
+            },
+        },
+        output,
+    )
