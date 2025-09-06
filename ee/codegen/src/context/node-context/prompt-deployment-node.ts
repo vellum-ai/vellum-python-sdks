@@ -52,12 +52,19 @@ export class PromptDeploymentNodeContext extends BaseNodeContext<PromptNode> {
     }
 
     try {
+      const requestOptions = {
+        headers: {
+          "X-Vellum-Is-Workspace-Auth": "true",
+        },
+      };
+
       this.promptDeploymentRelease = await new PromptDeploymentReleaseClient({
         apiKey: this.workflowContext.vellumApiKey,
         environment: this.workflowContext.vellumApiEnvironment,
       }).retrievePromptDeploymentRelease(
         this.nodeData.data.promptDeploymentId,
-        this.nodeData.data.releaseTag
+        this.nodeData.data.releaseTag,
+        requestOptions
       );
     } catch (error) {
       if (isVellumErrorWithDetail(error)) {
