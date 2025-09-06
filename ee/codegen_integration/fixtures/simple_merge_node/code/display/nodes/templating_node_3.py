@@ -25,5 +25,5 @@ class TemplatingNode3Display(BaseTemplatingNodeDisplay[TemplatingNode3]):
         TemplatingNode3.Ports.default: PortDisplayOverrides(id=UUID("e51cd1b6-6c1f-4436-aaed-36cb38e7615d"))
     }
     display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=2877.183015927978, y=185.8336045706372), z_index=None, width=480, height=278
+        position=NodeDisplayPosition(x=2877.183015927978, y=185.8336045706372), width=480, height=278
     )

@@ -26,9 +26,7 @@ class ToolCallingNodeDisplay(BaseNodeDisplay[ToolCallingNode]):
             id=UUID("2544f9e4-d6e6-4475-b6a9-13393115d77c")
         )
     }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None
-    )
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 

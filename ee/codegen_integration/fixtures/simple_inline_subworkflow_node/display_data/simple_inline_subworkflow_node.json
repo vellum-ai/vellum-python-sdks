@@ -14,7 +14,6 @@
             "x": 1545,
             "y": 330
           },
-          "z_index": null,
           "width": 124,
           "height": 48
         },
@@ -40,7 +39,6 @@
                     "x": 1545,
                     "y": 330
                   },
-                  "z_index": null,
                   "width": 124,
                   "height": 48
                 },
@@ -203,7 +201,6 @@
                     "x": 2053.3811695404584,
                     "y": 240.84267524293904
                   },
-                  "z_index": null,
                   "width": 480,
                   "height": 179
                 },
@@ -277,7 +274,6 @@
                     "x": 2750,
                     "y": 208.7778595317725
                   },
-                  "z_index": null,
                   "width": 456,
                   "height": 233
                 },
@@ -391,10 +387,7 @@
           "position": {
             "x": 1991.684833859175,
             "y": 178.94753425793772
-          },
-          "z_index": null,
-          "width": null,
-          "height": null
+          }
         },
         "base": {
           "name": "InlineSubworkflowNode",
@@ -464,7 +457,6 @@
             "x": 2750,
             "y": 210
           },
-          "z_index": null,
           "width": 480,
           "height": 233
         },

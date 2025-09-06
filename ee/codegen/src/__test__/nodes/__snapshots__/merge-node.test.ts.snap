@@ -17,9 +17,7 @@ class MergeNodeDisplay(BaseMergeNodeDisplay[MergeNode]):
     port_displays = {
         MergeNode.Ports.default: PortDisplayOverrides(id=UUID("source-handle-id"))
     }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None
-    )
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 

@@ -23,9 +23,7 @@ class MapNodeWorkflowDisplay(BaseWorkflowDisplay[MapNodeWorkflow]):
     workflow_display = WorkflowMetaDisplay(
         entrypoint_node_id=UUID("79145e96-23c3-4763-ad7e-f3c6529fe535"),
         entrypoint_node_source_handle_id=UUID("b4b974ea-716d-4187-a5fb-808284272fe2"),
-        entrypoint_node_display=NodeDisplayData(
-            position=NodeDisplayPosition(x=1545, y=330), z_index=None, width=124, height=48
-        ),
+        entrypoint_node_display=NodeDisplayData(position=NodeDisplayPosition(x=1545, y=330), width=124, height=48),
         display_data=WorkflowDisplayData(
             viewport=WorkflowDisplayDataViewport(x=-914.495748855461, y=126.402223675605, zoom=0.6256812731632875)
         ),

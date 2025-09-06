@@ -97,7 +97,6 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
     port_displays = {}
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=2247.2797390213086, y=30.917121251477084),
-        z_index=None,
         width=480,
         height=180,
     )
@@ -149,9 +148,7 @@ class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
             id=UUID("6ee2c814-d0a5-4ec9-83b6-45156e2f22c4")
         )
     }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None
-    )
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 
@@ -229,9 +226,7 @@ class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
             id=UUID("6ee2c814-d0a5-4ec9-83b6-45156e2f22c4")
         )
     }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None
-    )
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 
@@ -304,7 +299,6 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
     port_displays = {}
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=2247.2797390213086, y=30.917121251477084),
-        z_index=None,
         width=480,
         height=180,
     )
@@ -365,7 +359,6 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
     port_displays = {}
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=2247.2797390213086, y=30.917121251477084),
-        z_index=None,
         width=480,
         height=180,
     )
@@ -426,7 +419,6 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
     port_displays = {}
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=2247.2797390213086, y=30.917121251477084),
-        z_index=None,
         width=480,
         height=180,
     )
