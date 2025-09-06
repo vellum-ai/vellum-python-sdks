@@ -1,3 +1,4 @@
+from dataclasses import field
 from datetime import datetime
 from functools import lru_cache
 import importlib
@@ -199,6 +200,11 @@ class _BaseWorkflowMeta(type):
         if inputs_class is not BaseInputs and inputs_class.__parent_class__ is type(None):
             inputs_class.__parent_class__ = workflow_class
 
+        workflow_class.Outputs.__parent_class__ = workflow_class
+        workflow_class.__output_ids__ = {
+            ref.name: uuid4_from_hash(f"{workflow_class.__id__}|id|{ref.name}") for ref in workflow_class.Outputs
+        }
+
         return workflow_class
 
 
@@ -207,6 +213,7 @@ GraphAttribute = Union[Type[BaseNode], Graph, Set[Type[BaseNode]], Set[Graph]]
 
 class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
     __id__: UUID = uuid4_from_hash(__qualname__)
+    __output_ids__: Dict[str, UUID] = {}
     graph: ClassVar[GraphAttribute]
     unused_graphs: ClassVar[Set[GraphAttribute]]  # nodes or graphs that are defined but not used in the graph
     emitters: List[BaseWorkflowEmitter]
@@ -214,7 +221,7 @@ class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
     is_dynamic: ClassVar[bool] = False
 
     class Outputs(BaseOutputs):
-        pass
+        __parent_class__: Type["BaseWorkflow"] = field(init=False)
 
     WorkflowEvent = Union[  # type: ignore
         GenericWorkflowEvent,

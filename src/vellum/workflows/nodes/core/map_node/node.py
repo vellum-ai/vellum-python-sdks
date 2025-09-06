@@ -217,5 +217,7 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
         #     value: List[str]
         outputs_class.__annotations__ = {**previous_annotations, reference.name: annotation}
 
-        output_id = uuid4_from_hash(f"{cls.__id__}|{reference.name}")
+        output_id = cls.subworkflow.instance.__output_ids__.get(reference.name) or uuid4_from_hash(
+            f"{cls.__id__}|{reference.name}"
+        )
         cls.__output_ids__[reference.name] = output_id

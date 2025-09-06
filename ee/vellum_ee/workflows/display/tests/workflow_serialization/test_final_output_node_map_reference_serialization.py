@@ -64,10 +64,12 @@ def test_serialize_workflow__final_output_node_referencing_map_node():
 
     # THEN the final output node should have the correct outputs structure
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
-    final_output_nodes = [node for node in workflow_raw_data["nodes"] if node["type"] == "TERMINAL"]
+    map_node = next(node for node in workflow_raw_data["nodes"] if node["type"] == "MAP")
+    final_output_node = next(node for node in workflow_raw_data["nodes"] if node["type"] == "TERMINAL")
 
-    assert len(final_output_nodes) == 1
-    final_output_node = final_output_nodes[0]
+    # AND the map node's subworkflow should have the one output variable
+    output_variable = next(iter(map_node["data"]["output_variables"]))
+    map_node_output_id = output_variable["id"]
 
     # AND the final output node should have an outputs array with proper structure
     assert "outputs" in final_output_node
@@ -83,4 +85,4 @@ def test_serialize_workflow__final_output_node_referencing_map_node():
     assert output["value"] is not None, f"Expected NODE_OUTPUT reference but got None. Full output: {output}"
     assert output["value"]["type"] == "NODE_OUTPUT", f"Expected NODE_OUTPUT type but got {output['value']['type']}"
     assert "node_id" in output["value"], f"Missing node_id in output value: {output['value']}"
-    assert "node_output_id" in output["value"], f"Missing node_output_id in output value: {output['value']}"
+    assert output["value"]["node_output_id"] == map_node_output_id

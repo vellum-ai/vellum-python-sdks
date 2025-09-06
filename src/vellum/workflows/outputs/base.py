@@ -1,5 +1,5 @@
 import inspect
-from typing import TYPE_CHECKING, Any, Generic, Iterator, Set, Tuple, Type, TypeVar, Union, cast
+from typing import TYPE_CHECKING, Any, Generic, Iterator, Optional, Set, Tuple, Type, TypeVar, Union, cast
 from typing_extensions import dataclass_transform
 
 from pydantic import GetCoreSchemaHandler
@@ -115,15 +115,10 @@ class _BaseOutputsMeta(type):
         self_outputs_class = cast(Type["BaseNode.Outputs"], cls)
         other_outputs_class = cast(Type["BaseNode.Outputs"], other)
 
-        if not hasattr(self_outputs_class, "_node_class") or not hasattr(other_outputs_class, "_node_class"):
+        if self_outputs_class.__parent_class__ is None or other_outputs_class.__parent_class__ is None:
             return super().__eq__(other)
 
-        if self_outputs_class._node_class is None or other_outputs_class._node_class is None:
-            return super().__eq__(other)
-
-        return getattr(self_outputs_class._node_class, "__qualname__") == getattr(
-            other_outputs_class._node_class, "__qualname__"
-        )
+        return self_outputs_class.__parent_class__.__qualname__ == other_outputs_class.__parent_class__.__qualname__
 
     def __setattr__(cls, name: str, value: Any) -> None:
         if isinstance(value, OutputReference):
@@ -187,6 +182,8 @@ class _BaseOutputsMeta(type):
 
 
 class BaseOutputs(metaclass=_BaseOutputsMeta):
+    __parent_class__: Optional[Type] = None
+
     def __init__(self, **kwargs: Any) -> None:
         declared_fields = {descriptor.name for descriptor in self.__class__}
         provided_fields = set(kwargs.keys())
