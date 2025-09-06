@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, Any, Dict, List, cast
 
 from pydantic import BaseModel
 
-from vellum.client.types.function_definition import FunctionDefinition
 from vellum.client.types.logical_operator import LogicalOperator
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.expressions.accessor import AccessorExpression
@@ -423,6 +422,10 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
 
     if callable(value):
         function_definition = compile_function_definition(value)
+
+        name = function_definition.name
+        description = function_definition.description
+
         inputs = getattr(value, "__vellum_inputs__", {})
 
         if inputs:
@@ -432,7 +435,9 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
 
             model_data = function_definition.model_dump()
             model_data["inputs"] = serialized_inputs
-            function_definition = FunctionDefinition.model_validate(model_data)
+            function_definition_data = model_data
+        else:
+            function_definition_data = function_definition.model_dump()
 
         source_path = inspect.getsourcefile(value)
         if source_path is not None:
@@ -447,9 +452,9 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
                 "type": "JSON",
                 "value": {
                     "type": "CODE_EXECUTION",
-                    "name": function_definition.name,
-                    "description": function_definition.description,
-                    "definition": function_definition.model_dump(),
+                    "name": name,
+                    "description": description,
+                    "definition": function_definition_data,
                     "src": source_code,
                 },
             },
