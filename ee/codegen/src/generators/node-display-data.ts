@@ -55,19 +55,27 @@ export class NodeDisplayData extends AstNode {
             }),
           ],
         }),
-      }),
+      })
     );
 
-    if (this.sourceNodeDisplayData?.z_index !== undefined && this.sourceNodeDisplayData?.z_index !== null) {
+    if (
+      this.sourceNodeDisplayData?.z_index !== undefined &&
+      this.sourceNodeDisplayData?.z_index !== null
+    ) {
       args.push(
         python.methodArgument({
           name: "z_index",
-          value: python.TypeInstantiation.int(this.sourceNodeDisplayData.z_index),
+          value: python.TypeInstantiation.int(
+            this.sourceNodeDisplayData.z_index
+          ),
         })
       );
     }
 
-    if (this.sourceNodeDisplayData?.width !== undefined && this.sourceNodeDisplayData?.width !== null) {
+    if (
+      this.sourceNodeDisplayData?.width !== undefined &&
+      this.sourceNodeDisplayData?.width !== null
+    ) {
       args.push(
         python.methodArgument({
           name: "width",
@@ -76,11 +84,16 @@ export class NodeDisplayData extends AstNode {
       );
     }
 
-    if (this.sourceNodeDisplayData?.height !== undefined && this.sourceNodeDisplayData?.height !== null) {
+    if (
+      this.sourceNodeDisplayData?.height !== undefined &&
+      this.sourceNodeDisplayData?.height !== null
+    ) {
       args.push(
         python.methodArgument({
           name: "height",
-          value: python.TypeInstantiation.int(this.sourceNodeDisplayData.height),
+          value: python.TypeInstantiation.int(
+            this.sourceNodeDisplayData.height
+          ),
         })
       );
     }
