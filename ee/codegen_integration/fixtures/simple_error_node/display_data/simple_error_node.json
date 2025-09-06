@@ -4,17 +4,16 @@
       {
         "id": "27a1723c-e892-4303-bbf0-c1a0428af295",
         "type": "ENTRYPOINT",
+        "inputs": [],
         "data": {
           "label": "Entrypoint Node",
           "source_handle_id": "6cbf47ee-84ef-42cb-b1df-7b9e0fee2bee"
         },
-        "inputs": [],
         "display_data": {
           "position": {
-            "x": 1545,
-            "y": 330
+            "x": 1545.0,
+            "y": 330.0
           },
-          "z_index": null,
           "width": 124,
           "height": 48
         },
@@ -24,11 +23,6 @@
       {
         "id": "e5ff9360-a29c-437b-a9c1-05fc52df2834",
         "type": "ERROR",
-        "data": {
-          "label": "Error Node",
-          "target_handle_id": "370d712d-3369-424e-bcf7-f4da1aef3928",
-          "error_source_input_id": "f3a0d8b9-7772-4db6-8e28-f49f8c4d9e2a"
-        },
         "inputs": [
           {
             "id": "f3a0d8b9-7772-4db6-8e28-f49f8c4d9e2a",
@@ -46,12 +40,16 @@
             }
           }
         ],
+        "data": {
+          "label": "Error Node",
+          "target_handle_id": "370d712d-3369-424e-bcf7-f4da1aef3928",
+          "error_source_input_id": "f3a0d8b9-7772-4db6-8e28-f49f8c4d9e2a"
+        },
         "display_data": {
           "position": {
             "x": 1966.960664819945,
             "y": 223.1684037396122
           },
-          "z_index": null,
           "width": 480,
           "height": 180
         },
@@ -69,6 +67,7 @@
         "definition": {
           "name": "ErrorNode",
           "module": [
+            "ee",
             "codegen_integration",
             "fixtures",
             "simple_error_node",
@@ -87,11 +86,11 @@
     "edges": [
       {
         "id": "bcd998c4-0df4-4f59-8b15-ed1f64c5c157",
-        "type": "DEFAULT",
         "source_node_id": "27a1723c-e892-4303-bbf0-c1a0428af295",
         "source_handle_id": "6cbf47ee-84ef-42cb-b1df-7b9e0fee2bee",
         "target_node_id": "e5ff9360-a29c-437b-a9c1-05fc52df2834",
-        "target_handle_id": "370d712d-3369-424e-bcf7-f4da1aef3928"
+        "target_handle_id": "370d712d-3369-424e-bcf7-f4da1aef3928",
+        "type": "DEFAULT"
       }
     ],
     "display_data": {
@@ -104,6 +103,7 @@
     "definition": {
       "name": "Workflow",
       "module": [
+        "ee",
         "codegen_integration",
         "fixtures",
         "simple_error_node",

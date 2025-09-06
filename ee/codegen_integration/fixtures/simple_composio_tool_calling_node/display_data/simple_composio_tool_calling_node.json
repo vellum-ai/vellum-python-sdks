@@ -28,8 +28,8 @@
             "y": -50.0
           },
           "comment": {
-            "expanded": true,
-            "value": "\n    A tool calling node that uses a ComposioTool for GitHub issue creation.\n    "
+            "value": "\n    A tool calling node that uses a ComposioTool for GitHub issue creation.\n    ",
+            "expanded": true
           }
         },
         "base": {
@@ -46,6 +46,7 @@
         "definition": {
           "name": "ComposioToolCallingNode",
           "module": [
+            "ee",
             "codegen_integration",
             "fixtures",
             "simple_composio_tool_calling_node",
@@ -300,6 +301,7 @@
     "definition": {
       "name": "Workflow",
       "module": [
+        "ee",
         "codegen_integration",
         "fixtures",
         "simple_composio_tool_calling_node",

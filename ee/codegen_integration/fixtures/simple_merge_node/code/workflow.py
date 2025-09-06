@@ -10,8 +10,8 @@ from .nodes.templating_node_3 import TemplatingNode3
 class Workflow(BaseWorkflow):
     graph = (
         {
-            TemplatingNode2,
             TemplatingNode1,
+            TemplatingNode2,
         }
         >> MergeNode
         >> TemplatingNode3

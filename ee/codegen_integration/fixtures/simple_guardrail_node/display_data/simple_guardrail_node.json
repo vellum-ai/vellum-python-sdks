@@ -4,17 +4,16 @@
       {
         "id": "872c757c-9544-4ad6-ada5-5ee574f1fe5e",
         "type": "ENTRYPOINT",
+        "inputs": [],
         "data": {
           "label": "Entrypoint Node",
           "source_handle_id": "5751330f-60a8-4d6a-88aa-a35b968db364"
         },
-        "inputs": [],
         "display_data": {
           "position": {
-            "x": 1545,
-            "y": 330
+            "x": 1545.0,
+            "y": 330.0
           },
-          "z_index": null,
           "width": 124,
           "height": 48
         },
@@ -24,14 +23,6 @@
       {
         "id": "c207b440-6aac-4047-a37c-e25fcb5b9cfb",
         "type": "METRIC",
-        "data": {
-          "label": "Guardrail Node",
-          "source_handle_id": "92aafe31-101b-47d3-86f2-e261c7747c16",
-          "target_handle_id": "1817fbab-db21-4219-8b34-0e150ce78887",
-          "error_output_id": null,
-          "metric_definition_id": "589df5bd-8c0d-4797-9a84-9598ecd043de",
-          "release_tag": "LATEST"
-        },
         "inputs": [
           {
             "id": "3f917af8-03a4-4ca4-8d40-fa662417fe9c",
@@ -64,12 +55,19 @@
             }
           }
         ],
+        "data": {
+          "label": "Guardrail Node",
+          "source_handle_id": "92aafe31-101b-47d3-86f2-e261c7747c16",
+          "target_handle_id": "1817fbab-db21-4219-8b34-0e150ce78887",
+          "error_output_id": null,
+          "metric_definition_id": "589df5bd-8c0d-4797-9a84-9598ecd043de",
+          "release_tag": "LATEST"
+        },
         "display_data": {
           "position": {
             "x": 1985.9562846580402,
             "y": 180.75743992606283
           },
-          "z_index": null,
           "width": 464,
           "height": 224
         },
@@ -85,15 +83,16 @@
           ]
         },
         "definition": {
+          "name": "GuardrailNode",
           "module": [
+            "ee",
             "codegen_integration",
             "fixtures",
             "simple_guardrail_node",
             "code",
             "nodes",
             "guardrail_node"
-          ],
-          "name": "GuardrailNode"
+          ]
         },
         "trigger": {
           "id": "1817fbab-db21-4219-8b34-0e150ce78887",
@@ -138,10 +137,9 @@
         ],
         "display_data": {
           "position": {
-            "x": 2750,
-            "y": 210
+            "x": 2750.0,
+            "y": 210.0
           },
-          "z_index": null,
           "width": 458,
           "height": 234
         },
@@ -157,16 +155,22 @@
           ]
         },
         "definition": {
+          "name": "FinalOutput",
           "module": [
+            "ee",
             "codegen_integration",
             "fixtures",
             "simple_guardrail_node",
             "code",
             "nodes",
             "final_output"
-          ],
-          "name": "FinalOutput"
+          ]
         },
+        "trigger": {
+          "id": "0ef13a41-8905-45ad-9aee-09c201368981",
+          "merge_behavior": "AWAIT_ANY"
+        },
+        "ports": [],
         "outputs": [
           {
             "id": "493cfa4b-5235-4b71-99ef-270955f35fcb",
@@ -178,12 +182,7 @@
               "node_output_id": "0e455862-ccc4-47a4-a9a5-061fadc94fd6"
             }
           }
-        ],
-        "trigger": {
-          "id": "0ef13a41-8905-45ad-9aee-09c201368981",
-          "merge_behavior": "AWAIT_ANY"
-        },
-        "ports": []
+        ]
       }
     ],
     "edges": [
@@ -214,6 +213,7 @@
     "definition": {
       "name": "Workflow",
       "module": [
+        "ee",
         "codegen_integration",
         "fixtures",
         "simple_guardrail_node",
@@ -237,8 +237,8 @@
       "id": "a6ef8809-346e-469c-beed-2e5c4e9844c5",
       "key": "expected",
       "type": "STRING",
-      "required": true,
       "default": null,
+      "required": true,
       "extensions": {
         "color": null
       }
@@ -247,8 +247,8 @@
       "id": "1472503c-1662-4da9-beb9-73026be90c68",
       "key": "actual",
       "type": "STRING",
-      "required": true,
       "default": null,
+      "required": true,
       "extensions": {
         "color": null
       }

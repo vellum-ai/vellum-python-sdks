@@ -4,70 +4,25 @@
       {
         "id": "d49107fe-1424-42ba-9413-9ab5ce398077",
         "type": "ENTRYPOINT",
+        "inputs": [],
         "data": {
           "label": "Entrypoint Node",
           "source_handle_id": "08d78489-ce80-4743-a22d-2d5f62b575ac"
         },
-        "base": null,
-        "definition": null,
-        "inputs": [],
         "display_data": {
           "position": {
-            "x": 1545,
-            "y": 330
+            "x": 1545.0,
+            "y": 330.0
           },
-          "z_index": null,
           "width": 124,
           "height": 48
-        }
+        },
+        "base": null,
+        "definition": null
       },
       {
         "id": "97240cb9-94a0-4a1a-b69e-3c2d96ebb1e2",
         "type": "CODE_EXECUTION",
-        "data": {
-          "label": "Code Execution Node",
-          "output_id": "9d1dae27-6e6a-40bf-a401-611c974d4143",
-          "error_output_id": null,
-          "log_output_id": "b57399ac-93ce-4225-8543-10bac4fe82f4",
-          "source_handle_id": "7775a376-e408-406e-aa46-c6c87ab95bfd",
-          "target_handle_id": "dba6c62b-8519-48ba-b888-ed2ca346fba8",
-          "code_input_id": "19b05769-cee3-4659-80d1-66fcae4e27c3",
-          "runtime_input_id": "ebcd1dc6-b0cc-4e67-af67-a42993cf038b",
-          "output_type": "STRING",
-          "packages": [
-            {
-              "name": "requests",
-              "version": "2.26.0",
-              "repository": "test-repo"
-            }
-          ]
-        },
-        "base": {
-          "module": [
-            "vellum",
-            "workflows",
-            "nodes",
-            "displayable",
-            "code_execution_node",
-            "node"
-          ],
-          "name": "CodeExecutionNode"
-        },
-        "definition": {
-          "module": [
-            "codegen_integration",
-            "fixtures",
-            "simple_code_execution_node",
-            "code",
-            "nodes",
-            "code_execution_node"
-          ],
-          "name": "CodeExecutionNode"
-        },
-        "trigger": {
-          "id": "dba6c62b-8519-48ba-b888-ed2ca346fba8",
-          "merge_behavior": "AWAIT_ANY"
-        },
         "inputs": [
           {
             "id": "78da07ee-cc77-445e-af85-f60ab4f7a59f",
@@ -117,18 +72,62 @@
             }
           }
         ],
+        "data": {
+          "label": "Code Execution Node",
+          "error_output_id": null,
+          "source_handle_id": "7775a376-e408-406e-aa46-c6c87ab95bfd",
+          "target_handle_id": "dba6c62b-8519-48ba-b888-ed2ca346fba8",
+          "code_input_id": "19b05769-cee3-4659-80d1-66fcae4e27c3",
+          "runtime_input_id": "ebcd1dc6-b0cc-4e67-af67-a42993cf038b",
+          "output_type": "STRING",
+          "packages": [
+            {
+              "version": "2.26.0",
+              "name": "requests",
+              "repository": "test-repo"
+            }
+          ],
+          "output_id": "9d1dae27-6e6a-40bf-a401-611c974d4143",
+          "log_output_id": "b57399ac-93ce-4225-8543-10bac4fe82f4"
+        },
         "display_data": {
           "position": {
             "x": 1816.3157894736842,
             "y": 213.93599376731305
           },
-          "z_index": null,
           "width": 480,
           "height": 224,
           "comment": {
-            "expanded": true,
-            "value": "This is my code execution node"
+            "value": "This is my code execution node",
+            "expanded": true
           }
+        },
+        "base": {
+          "name": "CodeExecutionNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "code_execution_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "CodeExecutionNode",
+          "module": [
+            "ee",
+            "codegen_integration",
+            "fixtures",
+            "simple_code_execution_node",
+            "code",
+            "nodes",
+            "code_execution_node"
+          ]
+        },
+        "trigger": {
+          "id": "dba6c62b-8519-48ba-b888-ed2ca346fba8",
+          "merge_behavior": "AWAIT_ANY"
         },
         "ports": [
           {
@@ -148,28 +147,6 @@
           "output_id": "87760362-25b9-4dcb-8034-b49dc9e033ab",
           "output_type": "STRING",
           "node_input_id": "d3b9060a-40b5-492c-a628-f2d3c912cf44"
-        },
-        "base": {
-          "module": [
-            "vellum",
-            "workflows",
-            "nodes",
-            "displayable",
-            "final_output_node",
-            "node"
-          ],
-          "name": "FinalOutputNode"
-        },
-        "definition": {
-          "module": [
-            "codegen_integration",
-            "fixtures",
-            "simple_code_execution_node",
-            "code",
-            "nodes",
-            "final_output"
-          ],
-          "name": "FinalOutput"
         },
         "inputs": [
           {
@@ -194,10 +171,37 @@
             "x": 2392.5396121883655,
             "y": 235.35180055401668
           },
-          "z_index": null,
           "width": 480,
           "height": 234
         },
+        "base": {
+          "name": "FinalOutputNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "final_output_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "FinalOutput",
+          "module": [
+            "ee",
+            "codegen_integration",
+            "fixtures",
+            "simple_code_execution_node",
+            "code",
+            "nodes",
+            "final_output"
+          ]
+        },
+        "trigger": {
+          "id": "ab9dd41a-5c7b-484a-bcd5-d55658ea849c",
+          "merge_behavior": "AWAIT_ANY"
+        },
+        "ports": [],
         "outputs": [
           {
             "id": "87760362-25b9-4dcb-8034-b49dc9e033ab",
@@ -209,12 +213,7 @@
               "node_output_id": "9d1dae27-6e6a-40bf-a401-611c974d4143"
             }
           }
-        ],
-        "trigger": {
-          "id": "ab9dd41a-5c7b-484a-bcd5-d55658ea849c",
-          "merge_behavior": "AWAIT_ANY"
-        },
-        "ports": []
+        ]
       }
     ],
     "edges": [
@@ -245,6 +244,7 @@
     "definition": {
       "name": "Workflow",
       "module": [
+        "ee",
         "codegen_integration",
         "fixtures",
         "simple_code_execution_node",
@@ -268,8 +268,8 @@
       "id": "f55ef1d6-1d95-464c-adb1-11e3a19c2ed2",
       "key": "input",
       "type": "STRING",
-      "required": true,
       "default": null,
+      "required": true,
       "extensions": {
         "color": null
       }
