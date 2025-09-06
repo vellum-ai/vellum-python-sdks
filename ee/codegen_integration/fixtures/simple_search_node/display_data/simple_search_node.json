@@ -4,51 +4,25 @@
       {
         "id": "27a1723c-e892-4303-bbf0-c1a0428af295",
         "type": "ENTRYPOINT",
+        "inputs": [],
         "data": {
           "label": "Entrypoint Node",
           "source_handle_id": "6cbf47ee-84ef-42cb-b1df-7b9e0fee2bee"
         },
-        "definition": {
-          "bases": [],
-          "module": [
-            "vellum",
-            "workflows",
-            "nodes",
-            "bases",
-            "base"
-          ],
-          "name": "BaseNode"
-        },
-        "inputs": [],
         "display_data": {
           "position": {
             "x": 1545.0,
             "y": 330.0
           },
-          "z_index": null,
           "width": 124,
           "height": 48
-        }
+        },
+        "base": null,
+        "definition": null
       },
       {
         "id": "e5ff9360-a29c-437b-a9c1-05fc52df2834",
         "type": "SEARCH",
-        "data": {
-          "label": "Search Node",
-          "source_handle_id": "e4dedb66-0638-4f0c-9941-6420bfe353b2",
-          "target_handle_id": "370d712d-3369-424e-bcf7-f4da1aef3928",
-          "error_output_id": null,
-          "results_output_id": "77839b3c-fe1c-4dcb-9c61-2fac827f729b",
-          "text_output_id": "d56d7c49-7b45-4933-9779-2bd7f82c2141",
-          "query_node_input_id": "f3a0d8b9-7772-4db6-8e28-f49f8c4d9e2a",
-          "document_index_node_input_id": "b49bc1ab-2ad5-4cf2-8966-5cc87949900d",
-          "weights_node_input_id": "1daf3180-4b92-472a-8665-a7703c84a94e",
-          "limit_node_input_id": "161d264e-d04e-4c37-8e50-8bbb4c90c46e",
-          "separator_node_input_id": "4eddefc0-90d5-422a-aec2-bc94c8f1d83c",
-          "result_merging_enabled_node_input_id": "dc9f880b-81bc-4644-b025-8f7d5db23a48",
-          "external_id_filters_node_input_id": "61933e79-b0c2-4e3c-bf07-e2d93b9d9c54",
-          "metadata_filters_node_input_id": "fdc7256f-88ed-4a43-9b85-41c2961a1ac2"
-        },
         "inputs": [
           {
             "id": "f3a0d8b9-7772-4db6-8e28-f49f8c4d9e2a",
@@ -69,16 +43,16 @@
             "id": "b49bc1ab-2ad5-4cf2-8966-5cc87949900d",
             "key": "document_index_id",
             "value": {
-              "combinator": "OR",
               "rules": [
                 {
                   "type": "CONSTANT_VALUE",
                   "data": {
                     "type": "STRING",
-                    "value": "d5beca61-aacb-4b22-a70c-776a1e025aa4"
+                    "value": "my-sweet-document"
                   }
                 }
-              ]
+              ],
+              "combinator": "OR"
             }
           },
           {
@@ -109,7 +83,7 @@
                   "type": "CONSTANT_VALUE",
                   "data": {
                     "type": "NUMBER",
-                    "value": 8
+                    "value": 8.0
                   }
                 }
               ],
@@ -175,22 +149,22 @@
                     "type": "JSON",
                     "value": {
                       "type": "LOGICAL_CONDITION_GROUP",
-                      "negated": false,
                       "combinator": "AND",
                       "conditions": [
                         {
                           "type": "LOGICAL_CONDITION",
+                          "lhs_variable_id": "cf260613-02c4-49c1-8f47-3108844574eb",
                           "operator": "=",
-                          "lhs_variable_id": "a6322ca2-8b65-4d26-b3a1-f926dcada0fa",
-                          "rhs_variable_id": "c539a2e2-0873-43b0-ae21-81790bb1c4cb"
+                          "rhs_variable_id": "ca743725-be96-4e53-be8f-41656f3e0276"
                         },
                         {
                           "type": "LOGICAL_CONDITION",
+                          "lhs_variable_id": "440181e6-ef33-401e-9bc1-a44d82b1a6f5",
                           "operator": "=",
-                          "lhs_variable_id": "a89483b6-6850-4105-8c4e-ec0fd197cd43",
-                          "rhs_variable_id": "847b8ee0-2c37-4e41-9dea-b4ba3579e2c1"
+                          "rhs_variable_id": "227665ab-3c3c-4a6c-9869-72f134991867"
                         }
-                      ]
+                      ],
+                      "negated": false
                     }
                   }
                 }
@@ -199,8 +173,8 @@
             }
           },
           {
-            "id": "a6322ca2-8b65-4d26-b3a1-f926dcada0fa",
-            "key": "vellum-query-builder-variable-a6322ca2-8b65-4d26-b3a1-f926dcada0fa",
+            "id": "cf260613-02c4-49c1-8f47-3108844574eb",
+            "key": "vellum-query-builder-variable-cf260613-02c4-49c1-8f47-3108844574eb",
             "value": {
               "rules": [
                 {
@@ -214,8 +188,8 @@
             }
           },
           {
-            "id": "c539a2e2-0873-43b0-ae21-81790bb1c4cb",
-            "key": "vellum-query-builder-variable-c539a2e2-0873-43b0-ae21-81790bb1c4cb",
+            "id": "ca743725-be96-4e53-be8f-41656f3e0276",
+            "key": "vellum-query-builder-variable-ca743725-be96-4e53-be8f-41656f3e0276",
             "value": {
               "rules": [
                 {
@@ -229,8 +203,8 @@
             }
           },
           {
-            "id": "a89483b6-6850-4105-8c4e-ec0fd197cd43",
-            "key": "vellum-query-builder-variable-a89483b6-6850-4105-8c4e-ec0fd197cd43",
+            "id": "440181e6-ef33-401e-9bc1-a44d82b1a6f5",
+            "key": "vellum-query-builder-variable-440181e6-ef33-401e-9bc1-a44d82b1a6f5",
             "value": {
               "rules": [
                 {
@@ -244,8 +218,8 @@
             }
           },
           {
-            "id": "847b8ee0-2c37-4e41-9dea-b4ba3579e2c1",
-            "key": "vellum-query-builder-variable-847b8ee0-2c37-4e41-9dea-b4ba3579e2c1",
+            "id": "227665ab-3c3c-4a6c-9869-72f134991867",
+            "key": "vellum-query-builder-variable-227665ab-3c3c-4a6c-9869-72f134991867",
             "value": {
               "rules": [
                 {
@@ -259,46 +233,71 @@
             }
           }
         ],
+        "data": {
+          "label": "Search Node",
+          "results_output_id": "77839b3c-fe1c-4dcb-9c61-2fac827f729b",
+          "text_output_id": "d56d7c49-7b45-4933-9779-2bd7f82c2141",
+          "error_output_id": null,
+          "source_handle_id": "e4dedb66-0638-4f0c-9941-6420bfe353b2",
+          "target_handle_id": "370d712d-3369-424e-bcf7-f4da1aef3928",
+          "query_node_input_id": "f3a0d8b9-7772-4db6-8e28-f49f8c4d9e2a",
+          "document_index_node_input_id": "b49bc1ab-2ad5-4cf2-8966-5cc87949900d",
+          "weights_node_input_id": "1daf3180-4b92-472a-8665-a7703c84a94e",
+          "limit_node_input_id": "161d264e-d04e-4c37-8e50-8bbb4c90c46e",
+          "separator_node_input_id": "4eddefc0-90d5-422a-aec2-bc94c8f1d83c",
+          "result_merging_enabled_node_input_id": "dc9f880b-81bc-4644-b025-8f7d5db23a48",
+          "external_id_filters_node_input_id": "61933e79-b0c2-4e3c-bf07-e2d93b9d9c54",
+          "metadata_filters_node_input_id": "fdc7256f-88ed-4a43-9b85-41c2961a1ac2"
+        },
         "display_data": {
           "position": {
             "x": 1966.960664819945,
             "y": 223.1684037396122
           },
-          "z_index": null,
           "width": 480,
           "height": 180
         },
-        "definition": {
-          "bases": [
-            {
-              "module": [
-                "vellum",
-                "workflows",
-                "nodes",
-                "displayable",
-                "search_node",
-                "node"
-              ],
-              "name": "SearchNode"
-            }
-          ],
+        "base": {
+          "name": "SearchNode",
           "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "search_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "SearchNode",
+          "module": [
+            "ee",
             "codegen_integration",
             "fixtures",
             "simple_search_node",
             "code",
             "nodes",
             "search_node"
-          ],
-          "name": "SearchNode"
-        }
+          ]
+        },
+        "trigger": {
+          "id": "370d712d-3369-424e-bcf7-f4da1aef3928",
+          "merge_behavior": "AWAIT_ANY"
+        },
+        "ports": [
+          {
+            "id": "e4dedb66-0638-4f0c-9941-6420bfe353b2",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ]
       },
       {
         "id": "ed688426-1976-4d0c-9f3a-2a0b0fae161a",
         "type": "TERMINAL",
         "data": {
-          "name": "final-output",
           "label": "Final Output",
+          "name": "final-output",
           "target_handle_id": "b28439f6-0c1e-44c0-87b1-b7fa3c7408b2",
           "output_id": "43e128f4-24fe-4484-9d08-948a4a390707",
           "output_type": "STRING",
@@ -327,34 +326,37 @@
             "x": 2750.0,
             "y": 210.0
           },
-          "z_index": null,
           "width": 480,
           "height": 234
         },
-        "definition": {
-          "bases": [
-            {
-              "module": [
-                "vellum",
-                "workflows",
-                "nodes",
-                "displayable",
-                "final_output_node",
-                "node"
-              ],
-              "name": "FinalOutputNode"
-            }
-          ],
+        "base": {
+          "name": "FinalOutputNode",
           "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "final_output_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "FinalOutput",
+          "module": [
+            "ee",
             "codegen_integration",
             "fixtures",
             "simple_search_node",
             "code",
             "nodes",
             "final_output"
-          ],
-          "name": "FinalOutput"
+          ]
         },
+        "trigger": {
+          "id": "b28439f6-0c1e-44c0-87b1-b7fa3c7408b2",
+          "merge_behavior": "AWAIT_ANY"
+        },
+        "ports": [],
         "outputs": [
           {
             "id": "43e128f4-24fe-4484-9d08-948a4a390707",
@@ -372,19 +374,19 @@
     "edges": [
       {
         "id": "bcd998c4-0df4-4f59-8b15-ed1f64c5c157",
-        "type": "DEFAULT",
         "source_node_id": "27a1723c-e892-4303-bbf0-c1a0428af295",
         "source_handle_id": "6cbf47ee-84ef-42cb-b1df-7b9e0fee2bee",
         "target_node_id": "e5ff9360-a29c-437b-a9c1-05fc52df2834",
-        "target_handle_id": "370d712d-3369-424e-bcf7-f4da1aef3928"
+        "target_handle_id": "370d712d-3369-424e-bcf7-f4da1aef3928",
+        "type": "DEFAULT"
       },
       {
         "id": "2fb36bc6-ac91-4aad-bb58-fbc6c95ed6e3",
-        "type": "DEFAULT",
         "source_node_id": "e5ff9360-a29c-437b-a9c1-05fc52df2834",
         "source_handle_id": "e4dedb66-0638-4f0c-9941-6420bfe353b2",
         "target_node_id": "ed688426-1976-4d0c-9f3a-2a0b0fae161a",
-        "target_handle_id": "b28439f6-0c1e-44c0-87b1-b7fa3c7408b2"
+        "target_handle_id": "b28439f6-0c1e-44c0-87b1-b7fa3c7408b2",
+        "type": "DEFAULT"
       }
     ],
     "display_data": {
@@ -397,13 +399,24 @@
     "definition": {
       "name": "Workflow",
       "module": [
+        "ee",
         "codegen_integration",
         "fixtures",
         "simple_search_node",
         "code",
         "workflow"
       ]
-    }
+    },
+    "output_values": [
+      {
+        "output_variable_id": "43e128f4-24fe-4484-9d08-948a4a390707",
+        "value": {
+          "type": "NODE_OUTPUT",
+          "node_id": "ed688426-1976-4d0c-9f3a-2a0b0fae161a",
+          "node_output_id": "43e128f4-24fe-4484-9d08-948a4a390707"
+        }
+      }
+    ]
   },
   "input_variables": [
     {
@@ -414,7 +427,7 @@
         "type": "STRING",
         "value": "Search node query default"
       },
-      "required": true,
+      "required": false,
       "extensions": {
         "color": "someColor"
       }
@@ -423,19 +436,19 @@
       "id": "c95cccdc-8881-4528-bc63-97d9df6e1d87",
       "key": "var1",
       "type": "STRING",
-      "required": true,
       "default": null,
+      "required": true,
       "extensions": {
         "color": "someColor"
       }
     }
   ],
+  "state_variables": [],
   "output_variables": [
     {
       "id": "43e128f4-24fe-4484-9d08-948a4a390707",
       "key": "final-output",
       "type": "STRING"
     }
-  ],
-  "state_variables": []
+  ]
 }

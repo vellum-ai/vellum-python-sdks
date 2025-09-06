@@ -4,17 +4,16 @@
       {
         "id": "6b52893a-e649-434d-aedd-e8ad73d78dce",
         "type": "ENTRYPOINT",
+        "inputs": [],
         "data": {
           "label": "Entrypoint Node",
           "source_handle_id": "b4f25dad-17c6-464d-b347-9945065f17e4"
         },
-        "inputs": [],
         "display_data": {
           "position": {
-            "x": 1545,
-            "y": 330
+            "x": 1545.0,
+            "y": 330.0
           },
-          "z_index": null,
           "width": 124,
           "height": 48
         },
@@ -24,15 +23,6 @@
       {
         "id": "7dffcbb1-0a5c-4149-a6e9-f83095b0a871",
         "type": "TEMPLATING",
-        "data": {
-          "label": "Templating Node",
-          "output_id": "4d39036a-fd6d-4a51-b410-7c0623375ebd",
-          "error_output_id": null,
-          "source_handle_id": "9bce9d0a-3b0e-478e-8a97-f0510715a5a0",
-          "target_handle_id": "3522e32d-6735-499b-8d45-c0c6488ae92f",
-          "template_node_input_id": "5d2f0f48-4504-4979-8e24-92a8c08c23a4",
-          "output_type": "STRING"
-        },
         "inputs": [
           {
             "id": "5d2f0f48-4504-4979-8e24-92a8c08c23a4",
@@ -51,16 +41,25 @@
             }
           }
         ],
+        "data": {
+          "label": "Templating Node",
+          "output_id": "4d39036a-fd6d-4a51-b410-7c0623375ebd",
+          "error_output_id": null,
+          "source_handle_id": "9bce9d0a-3b0e-478e-8a97-f0510715a5a0",
+          "target_handle_id": "3522e32d-6735-499b-8d45-c0c6488ae92f",
+          "template_node_input_id": "5d2f0f48-4504-4979-8e24-92a8c08c23a4",
+          "output_type": "STRING"
+        },
         "display_data": {
           "position": {
             "x": 2001.775709833795,
             "y": 296.65438885041556
           },
-          "z_index": null,
           "width": 480,
           "height": 224
         },
         "base": {
+          "name": "TemplatingNode",
           "module": [
             "vellum",
             "workflows",
@@ -68,19 +67,19 @@
             "core",
             "templating_node",
             "node"
-          ],
-          "name": "TemplatingNode"
+          ]
         },
         "definition": {
+          "name": "TemplatingNode",
           "module": [
+            "ee",
             "codegen_integration",
             "fixtures",
             "simple_templating_node",
             "code",
             "nodes",
             "templating_node"
-          ],
-          "name": "TemplatingNode"
+          ]
         },
         "trigger": {
           "id": "3522e32d-6735-499b-8d45-c0c6488ae92f",
@@ -125,13 +124,13 @@
         "display_data": {
           "position": {
             "x": 2752.5214681440443,
-            "y": 210
+            "y": 210.0
           },
-          "z_index": null,
           "width": 478,
           "height": 234
         },
         "base": {
+          "name": "FinalOutputNode",
           "module": [
             "vellum",
             "workflows",
@@ -139,20 +138,25 @@
             "displayable",
             "final_output_node",
             "node"
-          ],
-          "name": "FinalOutputNode"
+          ]
         },
         "definition": {
+          "name": "FinalOutput",
           "module": [
+            "ee",
             "codegen_integration",
             "fixtures",
             "simple_templating_node",
             "code",
             "nodes",
             "final_output"
-          ],
-          "name": "FinalOutput"
+          ]
         },
+        "trigger": {
+          "id": "f3ad283c-d092-4973-91e0-996e5859002a",
+          "merge_behavior": "AWAIT_ANY"
+        },
+        "ports": [],
         "outputs": [
           {
             "id": "b0961a8d-f702-4922-b410-2aecf7d34b68",
@@ -163,12 +167,7 @@
               "node_id": "7dffcbb1-0a5c-4149-a6e9-f83095b0a871"
             }
           }
-        ],
-        "trigger": {
-          "id": "f3ad283c-d092-4973-91e0-996e5859002a",
-          "merge_behavior": "AWAIT_ANY"
-        },
-        "ports": []
+        ]
       }
     ],
     "edges": [
@@ -199,6 +198,7 @@
     "definition": {
       "name": "Workflow",
       "module": [
+        "ee",
         "codegen_integration",
         "fixtures",
         "simple_templating_node",

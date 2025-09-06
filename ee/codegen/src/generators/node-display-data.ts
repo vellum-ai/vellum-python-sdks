@@ -55,26 +55,48 @@ export class NodeDisplayData extends AstNode {
             }),
           ],
         }),
-      }),
-      python.methodArgument({
-        name: "z_index",
-        value: this.sourceNodeDisplayData?.z_index
-          ? python.TypeInstantiation.int(this.sourceNodeDisplayData.z_index)
-          : python.TypeInstantiation.none(),
-      }),
-      python.methodArgument({
-        name: "width",
-        value: this.sourceNodeDisplayData?.width
-          ? python.TypeInstantiation.int(this.sourceNodeDisplayData.width)
-          : python.TypeInstantiation.none(),
-      }),
-      python.methodArgument({
-        name: "height",
-        value: this.sourceNodeDisplayData?.height
-          ? python.TypeInstantiation.int(this.sourceNodeDisplayData?.height)
-          : python.TypeInstantiation.none(),
       })
     );
+
+    if (
+      this.sourceNodeDisplayData?.z_index !== undefined &&
+      this.sourceNodeDisplayData?.z_index !== null
+    ) {
+      args.push(
+        python.methodArgument({
+          name: "z_index",
+          value: python.TypeInstantiation.int(
+            this.sourceNodeDisplayData.z_index
+          ),
+        })
+      );
+    }
+
+    if (
+      this.sourceNodeDisplayData?.width !== undefined &&
+      this.sourceNodeDisplayData?.width !== null
+    ) {
+      args.push(
+        python.methodArgument({
+          name: "width",
+          value: python.TypeInstantiation.int(this.sourceNodeDisplayData.width),
+        })
+      );
+    }
+
+    if (
+      this.sourceNodeDisplayData?.height !== undefined &&
+      this.sourceNodeDisplayData?.height !== null
+    ) {
+      args.push(
+        python.methodArgument({
+          name: "height",
+          value: python.TypeInstantiation.int(
+            this.sourceNodeDisplayData.height
+          ),
+        })
+      );
+    }
 
     const commentArg = this.generateCommentArg();
     if (commentArg) {

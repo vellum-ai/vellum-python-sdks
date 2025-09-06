@@ -4,17 +4,16 @@
       {
         "id": "48134634-f654-4a45-9f00-4e9378ab1f32",
         "type": "ENTRYPOINT",
+        "inputs": [],
         "data": {
           "label": "Entrypoint Node",
           "source_handle_id": "c1eca197-d299-4feb-906b-a9f4647e759c"
         },
-        "inputs": [],
         "display_data": {
           "position": {
-            "x": 1545,
-            "y": 330
+            "x": 1545.0,
+            "y": 330.0
           },
-          "z_index": null,
           "width": 124,
           "height": 48
         },
@@ -24,23 +23,28 @@
       {
         "id": "8c6d5fe5-e955-4598-9c35-0cd6f5eca47e",
         "type": "SUBWORKFLOW",
+        "inputs": [],
         "data": {
+          "label": "Subworkflow Node",
+          "error_output_id": null,
+          "source_handle_id": "fa5c22bc-2499-43fa-880f-75fb20d0587f",
+          "target_handle_id": "67ee54dc-2505-4368-8e67-70d89ac2a9e5",
+          "variant": "INLINE",
           "workflow_raw_data": {
             "nodes": [
               {
                 "id": "c48f318d-4d87-44da-be54-0ecf537608f6",
                 "type": "ENTRYPOINT",
+                "inputs": [],
                 "data": {
                   "label": "Entrypoint Node",
                   "source_handle_id": "cfec8bf4-d335-4681-a5c6-cbd53ffbd0d1"
                 },
-                "inputs": [],
                 "display_data": {
                   "position": {
-                    "x": 1545,
-                    "y": 330
+                    "x": 1545.0,
+                    "y": 330.0
                   },
-                  "z_index": null,
                   "width": 124,
                   "height": 48
                 },
@@ -50,22 +54,6 @@
               {
                 "id": "e413adc6-40f8-4772-8b28-769954d68d26",
                 "type": "SEARCH",
-                "data": {
-                  "label": "Search Node",
-                  "results_output_id": "d3ed4bc8-8753-4dd1-bdbd-20d7f5919c31",
-                  "text_output_id": "240f117b-f47f-4cdf-8c1d-b5fba7f71310",
-                  "error_output_id": null,
-                  "source_handle_id": "b2c00256-11db-43e4-9282-8f0265f72650",
-                  "target_handle_id": "d2e2e4e4-a2a4-4a5d-a8fa-d51a1f9d9818",
-                  "query_node_input_id": "73c73ee1-3310-4376-8546-86c13de8ff15",
-                  "document_index_node_input_id": "eb40b4bd-2fe8-4f8b-868f-494679952220",
-                  "weights_node_input_id": "efd608f3-75bb-49b4-9f73-10ef9d63248f",
-                  "limit_node_input_id": "c923342a-eb17-4adf-a75a-a709c0ac9574",
-                  "separator_node_input_id": "1de070ea-7492-441f-bce0-52a482d8f6e4",
-                  "result_merging_enabled_node_input_id": "748343a7-241b-47b0-a1bc-4a27ef14c217",
-                  "external_id_filters_node_input_id": "428646ee-a21b-4f1f-807b-4b00f680ada7",
-                  "metadata_filters_node_input_id": "a46d1abc-f47e-4aee-b11b-196baa5273be"
-                },
                 "inputs": [
                   {
                     "id": "73c73ee1-3310-4376-8546-86c13de8ff15",
@@ -108,8 +96,8 @@
                           "data": {
                             "type": "JSON",
                             "value": {
-                              "keywords": 0.2,
-                              "semantic_similarity": 0.8
+                              "semantic_similarity": 0.8,
+                              "keywords": 0.2
                             }
                           }
                         }
@@ -126,7 +114,7 @@
                           "type": "CONSTANT_VALUE",
                           "data": {
                             "type": "NUMBER",
-                            "value": 8
+                            "value": 8.0
                           }
                         }
                       ],
@@ -198,12 +186,27 @@
                     }
                   }
                 ],
+                "data": {
+                  "label": "Search Node",
+                  "results_output_id": "d3ed4bc8-8753-4dd1-bdbd-20d7f5919c31",
+                  "text_output_id": "240f117b-f47f-4cdf-8c1d-b5fba7f71310",
+                  "error_output_id": null,
+                  "source_handle_id": "b2c00256-11db-43e4-9282-8f0265f72650",
+                  "target_handle_id": "d2e2e4e4-a2a4-4a5d-a8fa-d51a1f9d9818",
+                  "query_node_input_id": "73c73ee1-3310-4376-8546-86c13de8ff15",
+                  "document_index_node_input_id": "eb40b4bd-2fe8-4f8b-868f-494679952220",
+                  "weights_node_input_id": "efd608f3-75bb-49b4-9f73-10ef9d63248f",
+                  "limit_node_input_id": "c923342a-eb17-4adf-a75a-a709c0ac9574",
+                  "separator_node_input_id": "1de070ea-7492-441f-bce0-52a482d8f6e4",
+                  "result_merging_enabled_node_input_id": "748343a7-241b-47b0-a1bc-4a27ef14c217",
+                  "external_id_filters_node_input_id": "428646ee-a21b-4f1f-807b-4b00f680ada7",
+                  "metadata_filters_node_input_id": "a46d1abc-f47e-4aee-b11b-196baa5273be"
+                },
                 "display_data": {
                   "position": {
                     "x": 2053.3811695404584,
                     "y": 240.84267524293904
                   },
-                  "z_index": null,
                   "width": 480,
                   "height": 179
                 },
@@ -221,6 +224,7 @@
                 "definition": {
                   "name": "SearchNode",
                   "module": [
+                    "ee",
                     "codegen_integration",
                     "fixtures",
                     "simple_inline_subworkflow_node",
@@ -274,10 +278,9 @@
                 ],
                 "display_data": {
                   "position": {
-                    "x": 2750,
+                    "x": 2750.0,
                     "y": 208.7778595317725
                   },
-                  "z_index": null,
                   "width": 456,
                   "height": 233
                 },
@@ -295,6 +298,7 @@
                 "definition": {
                   "name": "FinalOutput",
                   "module": [
+                    "ee",
                     "codegen_integration",
                     "fixtures",
                     "simple_inline_subworkflow_node",
@@ -352,6 +356,7 @@
             "definition": {
               "name": "SubworkflowNodeWorkflow",
               "module": [
+                "ee",
                 "codegen_integration",
                 "fixtures",
                 "simple_inline_subworkflow_node",
@@ -379,22 +384,13 @@
               "key": "final-output",
               "type": "STRING"
             }
-          ],
-          "label": "Subworkflow Node",
-          "source_handle_id": "fa5c22bc-2499-43fa-880f-75fb20d0587f",
-          "target_handle_id": "67ee54dc-2505-4368-8e67-70d89ac2a9e5",
-          "error_output_id": null,
-          "variant": "INLINE"
+          ]
         },
-        "inputs": [],
         "display_data": {
           "position": {
             "x": 1991.684833859175,
             "y": 178.94753425793772
-          },
-          "z_index": null,
-          "width": null,
-          "height": null
+          }
         },
         "base": {
           "name": "InlineSubworkflowNode",
@@ -410,6 +406,7 @@
         "definition": {
           "name": "SubworkflowNode",
           "module": [
+            "ee",
             "codegen_integration",
             "fixtures",
             "simple_inline_subworkflow_node",
@@ -461,10 +458,9 @@
         ],
         "display_data": {
           "position": {
-            "x": 2750,
-            "y": 210
+            "x": 2750.0,
+            "y": 210.0
           },
-          "z_index": null,
           "width": 480,
           "height": 233
         },
@@ -482,6 +478,7 @@
         "definition": {
           "name": "FinalOutput",
           "module": [
+            "ee",
             "codegen_integration",
             "fixtures",
             "simple_inline_subworkflow_node",
@@ -537,6 +534,7 @@
     "definition": {
       "name": "Workflow",
       "module": [
+        "ee",
         "codegen_integration",
         "fixtures",
         "simple_inline_subworkflow_node",
@@ -560,8 +558,8 @@
       "id": "ffa88d81-4453-4cd6-a800-a35832c0aaa7",
       "key": "query",
       "type": "STRING",
-      "required": true,
       "default": null,
+      "required": true,
       "extensions": {
         "color": null
       }

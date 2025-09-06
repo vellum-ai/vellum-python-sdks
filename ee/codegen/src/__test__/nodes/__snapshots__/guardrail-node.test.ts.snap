@@ -35,9 +35,7 @@ class GuardrailNodeDisplay(BaseGuardrailNodeDisplay[GuardrailNode]):
             id=UUID("92aafe31-101b-47d3-86f2-e261c7747c16")
         )
     }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None
-    )
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 
@@ -72,9 +70,7 @@ class GuardrailNodeDisplay(BaseGuardrailNodeDisplay[GuardrailNode]):
             id=UUID("92aafe31-101b-47d3-86f2-e261c7747c16")
         )
     }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None
-    )
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 
@@ -163,9 +159,7 @@ class GuardrailNodeDisplay(BaseGuardrailNodeDisplay[GuardrailNode]):
             id=UUID("92aafe31-101b-47d3-86f2-e261c7747c16")
         )
     }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None
-    )
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 

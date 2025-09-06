@@ -19,8 +19,8 @@ class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
         "ml_model": UUID("38f60afe-cd5f-4950-8674-18e17567a784"),
         "blocks": UUID("35a10b43-ece9-40de-93a4-c1590cfa2c9f"),
         "prompt_inputs": UUID("91448235-24d7-4ee1-bba4-3bbce03ebdcb"),
-        "functions": UUID("6052c618-675a-4e6b-9276-498ab97deba7"),
         "parameters": UUID("29391062-4d86-4e67-ac46-f8a71237384b"),
+        "functions": UUID("6052c618-675a-4e6b-9276-498ab97deba7"),
     }
     output_display = {
         PromptNode.Outputs.text: NodeOutputDisplay(id=UUID("13e677d3-14e7-4b0c-ab36-834bb99c930c"), name="text"),
@@ -29,5 +29,5 @@ class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
     }
     port_displays = {PromptNode.Ports.default: PortDisplayOverrides(id=UUID("4e8bdb06-2adb-474f-9bd7-f6ee01fd4c2b"))}
     display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=2083.6598676957, y=288.95993689582167), z_index=None, width=480, height=126
+        position=NodeDisplayPosition(x=2083.6598676957, y=288.95993689582167), width=480, height=126
     )

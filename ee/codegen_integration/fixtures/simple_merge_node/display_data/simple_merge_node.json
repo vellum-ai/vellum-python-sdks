@@ -4,17 +4,16 @@
       {
         "id": "b8b9eb69-4af1-4953-b576-aa59eb138696",
         "type": "ENTRYPOINT",
+        "inputs": [],
         "data": {
           "label": "Entrypoint Node",
           "source_handle_id": "1095ae85-1e2f-4433-aacf-fac30fe12ff3"
         },
-        "inputs": [],
         "display_data": {
           "position": {
-            "x": 1545,
-            "y": 330
+            "x": 1545.0,
+            "y": 330.0
           },
-          "z_index": null,
           "width": 124,
           "height": 48
         },
@@ -22,17 +21,141 @@
         "definition": null
       },
       {
-        "id": "5b7d7b3f-e10d-4334-a217-9099dececd8d",
+        "id": "6c5017d1-9aa3-4f34-9a6a-fbe2f7029473",
         "type": "TEMPLATING",
+        "inputs": [
+          {
+            "id": "3981811f-6e33-48b6-b7c5-c32ba9a97dc8",
+            "key": "template",
+            "value": {
+              "rules": [
+                {
+                  "type": "CONSTANT_VALUE",
+                  "data": {
+                    "type": "STRING",
+                    "value": "Hello, world!"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          }
+        ],
         "data": {
           "label": "Templating Node",
-          "output_id": "b96fcdbd-7bd1-4cd1-b91a-49bb50ded865",
+          "output_id": "6a903b23-d66c-413b-996d-109f6a483056",
           "error_output_id": null,
-          "source_handle_id": "a5ae5a5c-ad8a-4a19-a726-f3b8ed1fbb1b",
-          "target_handle_id": "f9a55e22-2cbd-4492-8755-36760320f0d9",
-          "template_node_input_id": "6567617f-57e4-4c11-9175-557108fcf07e",
+          "source_handle_id": "e900aa36-b59e-4d13-bb66-21967eb02214",
+          "target_handle_id": "2d2c5559-983f-469c-a1d0-c2fe9f8f3639",
+          "template_node_input_id": "3981811f-6e33-48b6-b7c5-c32ba9a97dc8",
           "output_type": "STRING"
         },
+        "display_data": {
+          "position": {
+            "x": 1824.7678784335756,
+            "y": -124.21640253267435
+          },
+          "width": 480,
+          "height": 224
+        },
+        "base": {
+          "name": "TemplatingNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "core",
+            "templating_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "TemplatingNode1",
+          "module": [
+            "ee",
+            "codegen_integration",
+            "fixtures",
+            "simple_merge_node",
+            "code",
+            "nodes",
+            "templating_node_1"
+          ]
+        },
+        "trigger": {
+          "id": "2d2c5559-983f-469c-a1d0-c2fe9f8f3639",
+          "merge_behavior": "AWAIT_ATTRIBUTES"
+        },
+        "ports": [
+          {
+            "id": "e900aa36-b59e-4d13-bb66-21967eb02214",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ]
+      },
+      {
+        "id": "7426f273-a43d-4448-a2d2-76d0ee0d069c",
+        "type": "MERGE",
+        "inputs": [],
+        "data": {
+          "label": "Merge Node",
+          "merge_strategy": "AWAIT_ALL",
+          "target_handles": [
+            {
+              "id": "dee0633e-0221-40c7-b179-aae1cf67de87"
+            },
+            {
+              "id": "cf6974a6-1676-43ed-99a0-66bd3eac235f"
+            }
+          ],
+          "source_handle_id": "e0e666c4-a90b-4a95-928e-144bab251356"
+        },
+        "display_data": {
+          "position": {
+            "x": 2374.2549861495845,
+            "y": 205.20096952908594
+          },
+          "width": 476,
+          "height": 180
+        },
+        "base": {
+          "name": "MergeNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "merge_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "MergeNode",
+          "module": [
+            "ee",
+            "codegen_integration",
+            "fixtures",
+            "simple_merge_node",
+            "code",
+            "nodes",
+            "merge_node"
+          ]
+        },
+        "trigger": {
+          "id": "3a91ba25-0dd0-4bc8-9f6d-c54ea4dccf64",
+          "merge_behavior": "AWAIT_ALL"
+        },
+        "ports": [
+          {
+            "id": "e0e666c4-a90b-4a95-928e-144bab251356",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ]
+      },
+      {
+        "id": "5b7d7b3f-e10d-4334-a217-9099dececd8d",
+        "type": "TEMPLATING",
         "inputs": [
           {
             "id": "6567617f-57e4-4c11-9175-557108fcf07e",
@@ -51,16 +174,25 @@
             }
           }
         ],
+        "data": {
+          "label": "Templating Node",
+          "output_id": "b96fcdbd-7bd1-4cd1-b91a-49bb50ded865",
+          "error_output_id": null,
+          "source_handle_id": "a5ae5a5c-ad8a-4a19-a726-f3b8ed1fbb1b",
+          "target_handle_id": "f9a55e22-2cbd-4492-8755-36760320f0d9",
+          "template_node_input_id": "6567617f-57e4-4c11-9175-557108fcf07e",
+          "output_type": "STRING"
+        },
         "display_data": {
           "position": {
             "x": 1827.1240707957352,
             "y": 438.20962675410783
           },
-          "z_index": null,
           "width": 480,
           "height": 224
         },
         "base": {
+          "name": "TemplatingNode",
           "module": [
             "vellum",
             "workflows",
@@ -68,19 +200,19 @@
             "core",
             "templating_node",
             "node"
-          ],
-          "name": "TemplatingNode"
+          ]
         },
         "definition": {
+          "name": "TemplatingNode2",
           "module": [
+            "ee",
             "codegen_integration",
             "fixtures",
             "simple_merge_node",
             "code",
             "nodes",
             "templating_node_2"
-          ],
-          "name": "TemplatingNode2"
+          ]
         },
         "trigger": {
           "id": "f9a55e22-2cbd-4492-8755-36760320f0d9",
@@ -95,77 +227,8 @@
         ]
       },
       {
-        "id": "7426f273-a43d-4448-a2d2-76d0ee0d069c",
-        "type": "MERGE",
-        "data": {
-          "label": "Merge Node",
-          "merge_strategy": "AWAIT_ALL",
-          "target_handles": [
-            {
-              "id": "dee0633e-0221-40c7-b179-aae1cf67de87"
-            },
-            {
-              "id": "cf6974a6-1676-43ed-99a0-66bd3eac235f"
-            }
-          ],
-          "source_handle_id": "e0e666c4-a90b-4a95-928e-144bab251356"
-        },
-        "inputs": [],
-        "display_data": {
-          "position": {
-            "x": 2374.2549861495845,
-            "y": 205.20096952908594
-          },
-          "z_index": null,
-          "width": 476,
-          "height": 180
-        },
-        "base": {
-          "module": [
-            "vellum",
-            "workflows",
-            "nodes",
-            "displayable",
-            "merge_node",
-            "node"
-          ],
-          "name": "MergeNode"
-        },
-        "definition": {
-          "module": [
-            "codegen_integration",
-            "fixtures",
-            "simple_merge_node",
-            "code",
-            "nodes",
-            "merge_node"
-          ],
-          "name": "MergeNode"
-        },
-        "trigger": {
-          "id": "3a91ba25-0dd0-4bc8-9f6d-c54ea4dccf64",
-          "merge_behavior": "AWAIT_ALL"
-        },
-        "ports": [
-          {
-            "id": "e0e666c4-a90b-4a95-928e-144bab251356",
-            "name": "default",
-            "type": "DEFAULT"
-          }
-        ]
-      },
-      {
         "id": "7f7823e9-b97a-4bbe-bfcf-40aed8db24c9",
         "type": "TEMPLATING",
-        "data": {
-          "label": "Templating Node",
-          "output_id": "a18fbec8-4530-4ca9-a265-e9323dc45fc4",
-          "error_output_id": null,
-          "source_handle_id": "e51cd1b6-6c1f-4436-aaed-36cb38e7615d",
-          "target_handle_id": "2c1e39e0-ce3e-4c2d-8baf-c5d93b244997",
-          "template_node_input_id": "c1cc89c9-7cb7-498d-9dda-e9e5f36fe556",
-          "output_type": "STRING"
-        },
         "inputs": [
           {
             "id": "c1cc89c9-7cb7-498d-9dda-e9e5f36fe556",
@@ -216,16 +279,25 @@
             }
           }
         ],
+        "data": {
+          "label": "Templating Node",
+          "output_id": "a18fbec8-4530-4ca9-a265-e9323dc45fc4",
+          "error_output_id": null,
+          "source_handle_id": "e51cd1b6-6c1f-4436-aaed-36cb38e7615d",
+          "target_handle_id": "2c1e39e0-ce3e-4c2d-8baf-c5d93b244997",
+          "template_node_input_id": "c1cc89c9-7cb7-498d-9dda-e9e5f36fe556",
+          "output_type": "STRING"
+        },
         "display_data": {
           "position": {
             "x": 2877.183015927978,
             "y": 185.8336045706372
           },
-          "z_index": null,
           "width": 480,
           "height": 278
         },
         "base": {
+          "name": "TemplatingNode",
           "module": [
             "vellum",
             "workflows",
@@ -233,19 +305,19 @@
             "core",
             "templating_node",
             "node"
-          ],
-          "name": "TemplatingNode"
+          ]
         },
         "definition": {
+          "name": "TemplatingNode3",
           "module": [
+            "ee",
             "codegen_integration",
             "fixtures",
             "simple_merge_node",
             "code",
             "nodes",
             "templating_node_3"
-          ],
-          "name": "TemplatingNode3"
+          ]
         },
         "trigger": {
           "id": "2c1e39e0-ce3e-4c2d-8baf-c5d93b244997",
@@ -293,11 +365,11 @@
             "x": 3434.5298476454295,
             "y": 174.57146814404433
           },
-          "z_index": null,
           "width": 480,
           "height": 234
         },
         "base": {
+          "name": "FinalOutputNode",
           "module": [
             "vellum",
             "workflows",
@@ -305,19 +377,19 @@
             "displayable",
             "final_output_node",
             "node"
-          ],
-          "name": "FinalOutputNode"
+          ]
         },
         "definition": {
+          "name": "FinalOutput",
           "module": [
+            "ee",
             "codegen_integration",
             "fixtures",
             "simple_merge_node",
             "code",
             "nodes",
             "final_output"
-          ],
-          "name": "FinalOutput"
+          ]
         },
         "trigger": {
           "id": "8a2df326-df6a-4a5e-81a3-12da082e468c",
@@ -336,90 +408,9 @@
             }
           }
         ]
-      },
-      {
-        "id": "6c5017d1-9aa3-4f34-9a6a-fbe2f7029473",
-        "type": "TEMPLATING",
-        "data": {
-          "label": "Templating Node",
-          "output_id": "6a903b23-d66c-413b-996d-109f6a483056",
-          "error_output_id": null,
-          "source_handle_id": "e900aa36-b59e-4d13-bb66-21967eb02214",
-          "target_handle_id": "2d2c5559-983f-469c-a1d0-c2fe9f8f3639",
-          "template_node_input_id": "3981811f-6e33-48b6-b7c5-c32ba9a97dc8",
-          "output_type": "STRING"
-        },
-        "inputs": [
-          {
-            "id": "3981811f-6e33-48b6-b7c5-c32ba9a97dc8",
-            "key": "template",
-            "value": {
-              "rules": [
-                {
-                  "type": "CONSTANT_VALUE",
-                  "data": {
-                    "type": "STRING",
-                    "value": "Hello, world!"
-                  }
-                }
-              ],
-              "combinator": "OR"
-            }
-          }
-        ],
-        "display_data": {
-          "position": {
-            "x": 1824.7678784335756,
-            "y": -124.21640253267435
-          },
-          "z_index": null,
-          "width": 480,
-          "height": 224
-        },
-        "base": {
-          "module": [
-            "vellum",
-            "workflows",
-            "nodes",
-            "core",
-            "templating_node",
-            "node"
-          ],
-          "name": "TemplatingNode"
-        },
-        "definition": {
-          "module": [
-            "codegen_integration",
-            "fixtures",
-            "simple_merge_node",
-            "code",
-            "nodes",
-            "templating_node_1"
-          ],
-          "name": "TemplatingNode1"
-        },
-        "trigger": {
-          "id": "2d2c5559-983f-469c-a1d0-c2fe9f8f3639",
-          "merge_behavior": "AWAIT_ATTRIBUTES"
-        },
-        "ports": [
-          {
-            "id": "e900aa36-b59e-4d13-bb66-21967eb02214",
-            "name": "default",
-            "type": "DEFAULT"
-          }
-        ]
       }
     ],
     "edges": [
-      {
-        "id": "22106f5d-fd97-431d-9615-48278f7a954b",
-        "source_node_id": "b8b9eb69-4af1-4953-b576-aa59eb138696",
-        "source_handle_id": "1095ae85-1e2f-4433-aacf-fac30fe12ff3",
-        "target_node_id": "5b7d7b3f-e10d-4334-a217-9099dececd8d",
-        "target_handle_id": "f9a55e22-2cbd-4492-8755-36760320f0d9",
-        "type": "DEFAULT"
-      },
       {
         "id": "2c4d2583-af8d-4fd8-972b-c850325d4158",
         "source_node_id": "b8b9eb69-4af1-4953-b576-aa59eb138696",
@@ -429,11 +420,27 @@
         "type": "DEFAULT"
       },
       {
+        "id": "22106f5d-fd97-431d-9615-48278f7a954b",
+        "source_node_id": "b8b9eb69-4af1-4953-b576-aa59eb138696",
+        "source_handle_id": "1095ae85-1e2f-4433-aacf-fac30fe12ff3",
+        "target_node_id": "5b7d7b3f-e10d-4334-a217-9099dececd8d",
+        "target_handle_id": "f9a55e22-2cbd-4492-8755-36760320f0d9",
+        "type": "DEFAULT"
+      },
+      {
+        "id": "20c8d251-bcf1-497e-8d37-668e661ccabc",
+        "source_node_id": "6c5017d1-9aa3-4f34-9a6a-fbe2f7029473",
+        "source_handle_id": "e900aa36-b59e-4d13-bb66-21967eb02214",
+        "target_node_id": "7426f273-a43d-4448-a2d2-76d0ee0d069c",
+        "target_handle_id": "dee0633e-0221-40c7-b179-aae1cf67de87",
+        "type": "DEFAULT"
+      },
+      {
         "id": "114b1eab-ad2a-4612-b590-35f6ebdd87bc",
         "source_node_id": "5b7d7b3f-e10d-4334-a217-9099dececd8d",
         "source_handle_id": "a5ae5a5c-ad8a-4a19-a726-f3b8ed1fbb1b",
         "target_node_id": "7426f273-a43d-4448-a2d2-76d0ee0d069c",
-        "target_handle_id": "dee0633e-0221-40c7-b179-aae1cf67de87",
+        "target_handle_id": "cf6974a6-1676-43ed-99a0-66bd3eac235f",
         "type": "DEFAULT"
       },
       {
@@ -451,14 +458,6 @@
         "target_node_id": "7ea2c9ed-efb3-4d20-bf3d-7fafdaf6d842",
         "target_handle_id": "8a2df326-df6a-4a5e-81a3-12da082e468c",
         "type": "DEFAULT"
-      },
-      {
-        "id": "20c8d251-bcf1-497e-8d37-668e661ccabc",
-        "source_node_id": "6c5017d1-9aa3-4f34-9a6a-fbe2f7029473",
-        "source_handle_id": "e900aa36-b59e-4d13-bb66-21967eb02214",
-        "target_node_id": "7426f273-a43d-4448-a2d2-76d0ee0d069c",
-        "target_handle_id": "cf6974a6-1676-43ed-99a0-66bd3eac235f",
-        "type": "DEFAULT"
       }
     ],
     "display_data": {
@@ -471,6 +470,7 @@
     "definition": {
       "name": "Workflow",
       "module": [
+        "ee",
         "codegen_integration",
         "fixtures",
         "simple_merge_node",

@@ -23,9 +23,7 @@ class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
     workflow_display = WorkflowMetaDisplay(
         entrypoint_node_id=UUID("77325e35-b73e-4596-bfb0-3cf3ddf11a2e"),
         entrypoint_node_source_handle_id=UUID("f342d075-e79a-46ea-8de9-e40ed8152070"),
-        entrypoint_node_display=NodeDisplayData(
-            position=NodeDisplayPosition(x=0, y=151.5), z_index=None, width=124, height=48
-        ),
+        entrypoint_node_display=NodeDisplayData(position=NodeDisplayPosition(x=0, y=151.5), width=124, height=48),
         display_data=WorkflowDisplayData(
             viewport=WorkflowDisplayDataViewport(x=224.90864867521066, y=180.0534988628682, zoom=0.6573565995604552)
         ),

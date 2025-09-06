@@ -185,7 +185,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 "label": "Entrypoint Node",
                 "source_handle_id": str(entrypoint_node_source_handle_id),
             },
-            "display_data": self.display_context.workflow_display.entrypoint_node_display.dict(),
+            "display_data": self.display_context.workflow_display.entrypoint_node_display.dict_exclude_none_display_fields(),  # noqa: E501
             "base": None,
             "definition": None,
         }
@@ -258,7 +258,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 synthetic_target_handle_id = str(
                     uuid4_from_hash(f"{self.workflow_id}|target_handle_id|{workflow_output_display.name}")
                 )
-                synthetic_display_data = NodeDisplayData().dict()
+                synthetic_display_data = NodeDisplayData().dict_exclude_none_display_fields()
                 synthetic_node_label = "Final Output"
                 serialized_nodes[final_output_node_id] = {
                     "id": str(final_output_node_id),
@@ -397,7 +397,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             "workflow_raw_data": {
                 "nodes": cast(JsonArray, nodes_dict_list),
                 "edges": edges,
-                "display_data": self.display_context.workflow_display.display_data.dict(),
+                "display_data": self.display_context.workflow_display.display_data.dict_exclude_none_display_fields(),
                 "definition": {
                     "name": self._workflow.__name__,
                     "module": cast(JsonArray, self._workflow.__module__.split(".")),

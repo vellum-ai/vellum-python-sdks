@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from uuid import UUID
-from typing import Optional, Type
+from typing import Any, Dict, Optional, Type
 
 from pydantic import Field
 
@@ -18,6 +18,14 @@ class WorkflowDisplayDataViewport(UniversalBaseModel):
 
 class WorkflowDisplayData(UniversalBaseModel):
     viewport: WorkflowDisplayDataViewport = Field(default_factory=WorkflowDisplayDataViewport)
+
+    def dict_exclude_none_display_fields(self) -> Dict[str, Any]:
+        """
+        Serialize to dict, excluding z_index, width, and height when they are None.
+        Note: WorkflowDisplayData doesn't have these fields, but this method is needed
+        for compatibility with NodeDisplayData serialization pattern.
+        """
+        return self.dict()
 
 
 @dataclass

@@ -4,17 +4,16 @@
       {
         "id": "77325e35-b73e-4596-bfb0-3cf3ddf11a2e",
         "type": "ENTRYPOINT",
+        "inputs": [],
         "data": {
           "label": "Entrypoint Node",
           "source_handle_id": "f342d075-e79a-46ea-8de9-e40ed8152070"
         },
-        "inputs": [],
         "display_data": {
           "position": {
-            "x": 0,
+            "x": 0.0,
             "y": 151.5
           },
-          "z_index": null,
           "width": 124,
           "height": 48
         },
@@ -24,18 +23,6 @@
       {
         "id": "cdec50ed-5cfc-418e-ad1f-45ef7a0abe4b",
         "type": "CODE_EXECUTION",
-        "data": {
-          "label": "Code Execution Node",
-          "output_id": "98ef146c-6603-4930-85c2-8a637a58476c",
-          "error_output_id": null,
-          "log_output_id": "ce51ac26-1e30-4434-9915-429b55ed9f06",
-          "source_handle_id": "734e3a85-f96e-408e-89f1-703bcc486e8a",
-          "target_handle_id": "3a82ede9-4b1b-42fc-84a0-10e91de602dc",
-          "code_input_id": "e5a9379e-871d-4a8f-88cd-b3ea832577dc",
-          "runtime_input_id": "611d4cd9-dca8-4821-8d3b-899439c556bb",
-          "output_type": "STRING",
-          "packages": []
-        },
         "inputs": [
           {
             "id": "b7081865-838c-49e3-baa8-388272e359a4",
@@ -85,16 +72,28 @@
             }
           }
         ],
+        "data": {
+          "label": "Code Execution Node",
+          "error_output_id": null,
+          "source_handle_id": "734e3a85-f96e-408e-89f1-703bcc486e8a",
+          "target_handle_id": "3a82ede9-4b1b-42fc-84a0-10e91de602dc",
+          "code_input_id": "e5a9379e-871d-4a8f-88cd-b3ea832577dc",
+          "runtime_input_id": "611d4cd9-dca8-4821-8d3b-899439c556bb",
+          "output_type": "STRING",
+          "packages": [],
+          "output_id": "98ef146c-6603-4930-85c2-8a637a58476c",
+          "log_output_id": "ce51ac26-1e30-4434-9915-429b55ed9f06"
+        },
         "display_data": {
           "position": {
             "x": 1855.8380935218793,
             "y": 384.6100572199606
           },
-          "z_index": null,
           "width": 480,
           "height": 224
         },
         "base": {
+          "name": "CodeExecutionNode",
           "module": [
             "vellum",
             "workflows",
@@ -102,19 +101,19 @@
             "displayable",
             "code_execution_node",
             "node"
-          ],
-          "name": "CodeExecutionNode"
+          ]
         },
         "definition": {
+          "name": "CodeExecutionNode",
           "module": [
+            "ee",
             "codegen_integration",
             "fixtures",
             "simple_map_node",
             "code",
             "nodes",
             "code_execution_node"
-          ],
-          "name": "CodeExecutionNode"
+          ]
         },
         "trigger": {
           "id": "3a82ede9-4b1b-42fc-84a0-10e91de602dc",
@@ -131,24 +130,44 @@
       {
         "id": "72cb9f1e-aedd-47af-861e-4f38d27053b6",
         "type": "MAP",
+        "inputs": [
+          {
+            "id": "b8d66997-444e-4409-b315-5bef0c06192a",
+            "key": "items",
+            "value": {
+              "rules": [
+                {
+                  "type": "INPUT_VARIABLE",
+                  "data": {
+                    "input_variable_id": "cdc4468f-45e7-46ce-bbe7-d1aa9ad86514"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          }
+        ],
         "data": {
+          "label": "Map Node",
+          "error_output_id": null,
+          "source_handle_id": "239a1483-e4f5-4650-81a4-21c77d72cc5e",
+          "target_handle_id": "0d15cb2c-256e-423e-a489-c9f87e181280",
           "variant": "INLINE",
           "workflow_raw_data": {
             "nodes": [
               {
                 "id": "79145e96-23c3-4763-ad7e-f3c6529fe535",
                 "type": "ENTRYPOINT",
+                "inputs": [],
                 "data": {
                   "label": "Entrypoint Node",
                   "source_handle_id": "b4b974ea-716d-4187-a5fb-808284272fe2"
                 },
-                "inputs": [],
                 "display_data": {
                   "position": {
-                    "x": 1545,
-                    "y": 330
+                    "x": 1545.0,
+                    "y": 330.0
                   },
-                  "z_index": null,
                   "width": 124,
                   "height": 48
                 },
@@ -158,31 +177,7 @@
               {
                 "id": "24153572-e27b-4cea-a541-4d9e82f28b4e",
                 "type": "TEMPLATING",
-                "data": {
-                  "label": "Templating Node",
-                  "output_id": "2e275abe-4e00-443b-9898-2afed7c13826",
-                  "error_output_id": null,
-                  "source_handle_id": "401d5aee-afc0-4b7c-88a6-faaa753fd5c6",
-                  "target_handle_id": "d1b8ef3d-1474-4cfb-8fb0-164f7b238a07",
-                  "template_node_input_id": "1cfb8efb-ac81-478a-ab46-46ed5536bd6f",
-                  "output_type": "STRING"
-                },
                 "inputs": [
-                  {
-                    "id": "5ec0a342-0d78-4717-bda3-e70805234cad",
-                    "key": "example_var",
-                    "value": {
-                      "rules": [
-                        {
-                          "type": "INPUT_VARIABLE",
-                          "data": {
-                            "input_variable_id": "b8d66997-444e-4409-b315-5bef0c06192a"
-                          }
-                        }
-                      ],
-                      "combinator": "OR"
-                    }
-                  },
                   {
                     "id": "1cfb8efb-ac81-478a-ab46-46ed5536bd6f",
                     "key": "template",
@@ -193,6 +188,21 @@
                           "data": {
                             "type": "STRING",
                             "value": "{{ var_1 }}"
+                          }
+                        }
+                      ],
+                      "combinator": "OR"
+                    }
+                  },
+                  {
+                    "id": "5ec0a342-0d78-4717-bda3-e70805234cad",
+                    "key": "example_var",
+                    "value": {
+                      "rules": [
+                        {
+                          "type": "INPUT_VARIABLE",
+                          "data": {
+                            "input_variable_id": "b8d66997-444e-4409-b315-5bef0c06192a"
                           }
                         }
                       ],
@@ -216,16 +226,25 @@
                     }
                   }
                 ],
+                "data": {
+                  "label": "Templating Node",
+                  "output_id": "2e275abe-4e00-443b-9898-2afed7c13826",
+                  "error_output_id": null,
+                  "source_handle_id": "401d5aee-afc0-4b7c-88a6-faaa753fd5c6",
+                  "target_handle_id": "d1b8ef3d-1474-4cfb-8fb0-164f7b238a07",
+                  "template_node_input_id": "1cfb8efb-ac81-478a-ab46-46ed5536bd6f",
+                  "output_type": "STRING"
+                },
                 "display_data": {
                   "position": {
                     "x": 1998.7584158889226,
                     "y": 241.3446029681764
                   },
-                  "z_index": null,
                   "width": 480,
                   "height": 278
                 },
                 "base": {
+                  "name": "TemplatingNode",
                   "module": [
                     "vellum",
                     "workflows",
@@ -233,11 +252,12 @@
                     "core",
                     "templating_node",
                     "node"
-                  ],
-                  "name": "TemplatingNode"
+                  ]
                 },
                 "definition": {
+                  "name": "TemplatingNode",
                   "module": [
+                    "ee",
                     "codegen_integration",
                     "fixtures",
                     "simple_map_node",
@@ -246,8 +266,7 @@
                     "map_node",
                     "nodes",
                     "templating_node"
-                  ],
-                  "name": "TemplatingNode"
+                  ]
                 },
                 "trigger": {
                   "id": "d1b8ef3d-1474-4cfb-8fb0-164f7b238a07",
@@ -264,22 +283,6 @@
               {
                 "id": "4b0a7578-e5ec-4d72-b396-62abdecbd101",
                 "type": "SEARCH",
-                "data": {
-                  "label": "Search Node",
-                  "results_output_id": "8c06f794-38e3-42f0-b68f-d865e50f4f0a",
-                  "text_output_id": "503aa2c1-6b99-43e8-98f7-1fef458a8d29",
-                  "error_output_id": null,
-                  "source_handle_id": "7c8b42ff-7a21-4011-bf7b-44e06a5eb4c5",
-                  "target_handle_id": "df39e340-f66c-4f1c-b030-5437a2183414",
-                  "query_node_input_id": "eca53704-291f-419b-b69e-44ccb9791227",
-                  "document_index_node_input_id": "f5bdc71b-c100-4237-999f-14b97378da4d",
-                  "weights_node_input_id": "0e87177f-287f-459e-90a4-5037cf19e4dc",
-                  "limit_node_input_id": "95634b1a-862c-497f-a8d0-b3f10fd6bb76",
-                  "separator_node_input_id": "6a35c6d4-2d9f-4409-9313-723970561378",
-                  "result_merging_enabled_node_input_id": "ab4c55ed-31bb-46a0-8130-ce291bb89e0e",
-                  "external_id_filters_node_input_id": "f891d5bb-fb07-4038-92a9-7f8322f38742",
-                  "metadata_filters_node_input_id": "349dbcb2-a58a-46c7-8c61-c720aa9bca40"
-                },
                 "inputs": [
                   {
                     "id": "eca53704-291f-419b-b69e-44ccb9791227",
@@ -322,8 +325,8 @@
                           "data": {
                             "type": "JSON",
                             "value": {
-                              "keywords": 0.2,
-                              "semantic_similarity": 0.8
+                              "semantic_similarity": 0.8,
+                              "keywords": 0.2
                             }
                           }
                         }
@@ -340,7 +343,7 @@
                           "type": "CONSTANT_VALUE",
                           "data": {
                             "type": "NUMBER",
-                            "value": 8
+                            "value": 8.0
                           }
                         }
                       ],
@@ -412,12 +415,27 @@
                     }
                   }
                 ],
+                "data": {
+                  "label": "Search Node",
+                  "results_output_id": "8c06f794-38e3-42f0-b68f-d865e50f4f0a",
+                  "text_output_id": "503aa2c1-6b99-43e8-98f7-1fef458a8d29",
+                  "error_output_id": null,
+                  "source_handle_id": "7c8b42ff-7a21-4011-bf7b-44e06a5eb4c5",
+                  "target_handle_id": "df39e340-f66c-4f1c-b030-5437a2183414",
+                  "query_node_input_id": "eca53704-291f-419b-b69e-44ccb9791227",
+                  "document_index_node_input_id": "f5bdc71b-c100-4237-999f-14b97378da4d",
+                  "weights_node_input_id": "0e87177f-287f-459e-90a4-5037cf19e4dc",
+                  "limit_node_input_id": "95634b1a-862c-497f-a8d0-b3f10fd6bb76",
+                  "separator_node_input_id": "6a35c6d4-2d9f-4409-9313-723970561378",
+                  "result_merging_enabled_node_input_id": "ab4c55ed-31bb-46a0-8130-ce291bb89e0e",
+                  "external_id_filters_node_input_id": "f891d5bb-fb07-4038-92a9-7f8322f38742",
+                  "metadata_filters_node_input_id": "349dbcb2-a58a-46c7-8c61-c720aa9bca40"
+                },
                 "display_data": {
                   "position": {
                     "x": 1909.9521341463415,
                     "y": 212.0475201437282
                   },
-                  "z_index": null,
                   "width": 480,
                   "height": 180
                 },
@@ -435,6 +453,7 @@
                 "definition": {
                   "name": "SearchNode",
                   "module": [
+                    "ee",
                     "codegen_integration",
                     "fixtures",
                     "simple_map_node",
@@ -488,10 +507,9 @@
                 ],
                 "display_data": {
                   "position": {
-                    "x": 2750,
-                    "y": 210
+                    "x": 2750.0,
+                    "y": 210.0
                   },
-                  "z_index": null,
                   "width": 463,
                   "height": 234
                 },
@@ -509,6 +527,7 @@
                 "definition": {
                   "name": "FinalOutput",
                   "module": [
+                    "ee",
                     "codegen_integration",
                     "fixtures",
                     "simple_map_node",
@@ -519,6 +538,11 @@
                     "final_output"
                   ]
                 },
+                "trigger": {
+                  "id": "8ff89a09-6ff0-4b02-bba7-eb8456a9c865",
+                  "merge_behavior": "AWAIT_ANY"
+                },
+                "ports": [],
                 "outputs": [
                   {
                     "id": "bffc4749-00b8-44db-90ee-db655cbc7e62",
@@ -530,12 +554,7 @@
                       "node_output_id": "503aa2c1-6b99-43e8-98f7-1fef458a8d29"
                     }
                   }
-                ],
-                "trigger": {
-                  "id": "8ff89a09-6ff0-4b02-bba7-eb8456a9c865",
-                  "merge_behavior": "AWAIT_ANY"
-                },
-                "ports": []
+                ]
               }
             ],
             "edges": [
@@ -574,6 +593,7 @@
             "definition": {
               "name": "MapNodeWorkflow",
               "module": [
+                "ee",
                 "codegen_integration",
                 "fixtures",
                 "simple_map_node",
@@ -588,8 +608,8 @@
                 "output_variable_id": "bffc4749-00b8-44db-90ee-db655cbc7e62",
                 "value": {
                   "type": "NODE_OUTPUT",
-                  "node_id": "4b0a7578-e5ec-4d72-b396-62abdecbd101",
-                  "node_output_id": "503aa2c1-6b99-43e8-98f7-1fef458a8d29"
+                  "node_id": "d9d29911-dd45-45d5-9ac8-1a06bb596c2f",
+                  "node_output_id": "bffc4749-00b8-44db-90ee-db655cbc7e62"
                 }
               }
             ]
@@ -599,8 +619,8 @@
               "id": "b8d66997-444e-4409-b315-5bef0c06192a",
               "key": "items",
               "type": "JSON",
-              "required": true,
               "default": null,
+              "required": true,
               "extensions": {
                 "color": null
               }
@@ -609,8 +629,8 @@
               "id": "2619e147-870f-40ec-8f21-f3e131fcd65a",
               "key": "item",
               "type": "JSON",
-              "required": true,
               "default": null,
+              "required": true,
               "extensions": {
                 "color": null
               }
@@ -619,8 +639,8 @@
               "id": "edecf894-c35b-485a-998f-118833a4b045",
               "key": "index",
               "type": "NUMBER",
-              "required": true,
               "default": null,
+              "required": true,
               "extensions": {
                 "color": null
               }
@@ -634,39 +654,15 @@
             }
           ],
           "concurrency": 4,
-          "label": "Map Node",
-          "source_handle_id": "239a1483-e4f5-4650-81a4-21c77d72cc5e",
-          "target_handle_id": "0d15cb2c-256e-423e-a489-c9f87e181280",
-          "error_output_id": null,
           "items_input_id": "b8d66997-444e-4409-b315-5bef0c06192a",
           "item_input_id": "2619e147-870f-40ec-8f21-f3e131fcd65a",
           "index_input_id": "edecf894-c35b-485a-998f-118833a4b045"
         },
-        "inputs": [
-          {
-            "id": "b8d66997-444e-4409-b315-5bef0c06192a",
-            "key": "items",
-            "value": {
-              "rules": [
-                {
-                  "type": "INPUT_VARIABLE",
-                  "data": {
-                    "input_variable_id": "cdc4468f-45e7-46ce-bbe7-d1aa9ad86514"
-                  }
-                }
-              ],
-              "combinator": "OR"
-            }
-          }
-        ],
         "display_data": {
           "position": {
-            "x": 254,
-            "y": 0
-          },
-          "z_index": null,
-          "width": null,
-          "height": null
+            "x": 254.0,
+            "y": 0.0
+          }
         },
         "base": {
           "name": "MapNode",
@@ -682,6 +678,7 @@
         "definition": {
           "name": "MapNode",
           "module": [
+            "ee",
             "codegen_integration",
             "fixtures",
             "simple_map_node",
@@ -733,10 +730,9 @@
         ],
         "display_data": {
           "position": {
-            "x": 864,
+            "x": 864.0,
             "y": 58.5
           },
-          "z_index": null,
           "width": 454,
           "height": 234
         },
@@ -754,6 +750,7 @@
         "definition": {
           "name": "FinalOutput",
           "module": [
+            "ee",
             "codegen_integration",
             "fixtures",
             "simple_map_node",
@@ -762,6 +759,11 @@
             "final_output"
           ]
         },
+        "trigger": {
+          "id": "8e19172a-4f87-4c21-8c91-ccdfb3e74c16",
+          "merge_behavior": "AWAIT_ANY"
+        },
+        "ports": [],
         "outputs": [
           {
             "id": "d9269719-a7a2-4388-9b85-73e329a78d16",
@@ -773,12 +775,7 @@
               "node_output_id": "bffc4749-00b8-44db-90ee-db655cbc7e62"
             }
           }
-        ],
-        "trigger": {
-          "id": "8e19172a-4f87-4c21-8c91-ccdfb3e74c16",
-          "merge_behavior": "AWAIT_ANY"
-        },
-        "ports": []
+        ]
       }
     ],
     "edges": [
@@ -817,6 +814,7 @@
     "definition": {
       "name": "Workflow",
       "module": [
+        "ee",
         "codegen_integration",
         "fixtures",
         "simple_map_node",
@@ -840,8 +838,8 @@
       "id": "cdc4468f-45e7-46ce-bbe7-d1aa9ad86514",
       "key": "items",
       "type": "JSON",
-      "required": true,
       "default": null,
+      "required": true,
       "extensions": {
         "color": null
       }
@@ -850,8 +848,8 @@
       "id": "f245af7d-16af-4bdb-8602-e646cbff3407",
       "key": "test",
       "type": "STRING",
-      "required": true,
       "default": null,
+      "required": true,
       "extensions": {
         "color": null
       }

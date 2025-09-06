@@ -32,5 +32,5 @@ class APINodeDisplay(BaseAPINodeDisplay[APINode]):
     }
     port_displays = {APINode.Ports.default: PortDisplayOverrides(id=UUID("5fd01b0b-f0fb-488b-a9c7-4ba1dd7df80e"))}
     display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=3916.027261439447, y=917.3816601522587), z_index=None, width=455, height=230
+        position=NodeDisplayPosition(x=3916.027261439447, y=917.3816601522587), width=455, height=230
     )
