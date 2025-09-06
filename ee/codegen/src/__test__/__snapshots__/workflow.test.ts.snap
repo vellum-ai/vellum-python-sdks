@@ -2,30 +2,27 @@
 
 exports[`Workflow > write > should generate correct code when there are input variables 1`] = `
 "from vellum.workflows import BaseWorkflow
-from vellum.workflows.graph import Graph
 from vellum.workflows.state import BaseState
 
 from .inputs import Inputs
 
 
 class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
-    graph = Graph.empty()
+    pass
 "
 `;
 
 exports[`Workflow > write > should generate correct code when there are no input variables 1`] = `
 "from vellum.workflows import BaseWorkflow
-from vellum.workflows.graph import Graph
 
 
 class TestWorkflow(BaseWorkflow):
-    graph = Graph.empty()
+    pass
 "
 `;
 
 exports[`Workflow > write > should generate correct code with Search Results as an output variable 1`] = `
 "from vellum.workflows import BaseWorkflow
-from vellum.workflows.graph import Graph
 from vellum.workflows.state import BaseState
 
 from .inputs import Inputs
@@ -33,8 +30,6 @@ from .nodes.final_output import FinalOutput
 
 
 class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
-    graph = Graph.empty()
-
     class Outputs(BaseWorkflow.Outputs):
         query = FinalOutput.Outputs.value
 "
@@ -42,15 +37,12 @@ class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
 
 exports[`Workflow > write > should generate correct code with an output variable mapped to a non-existent node 1`] = `
 "from vellum.workflows import BaseWorkflow
-from vellum.workflows.graph import Graph
 from vellum.workflows.state import BaseState
 
 from .inputs import Inputs
 
 
 class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
-    graph = Graph.empty()
-
     class Outputs(BaseWorkflow.Outputs):
         passthrough = None
 "
@@ -58,15 +50,12 @@ class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
 
 exports[`Workflow > write > should generate correct code with an output variable mapped to an input variable 1`] = `
 "from vellum.workflows import BaseWorkflow
-from vellum.workflows.graph import Graph
 from vellum.workflows.state import BaseState
 
 from .inputs import Inputs
 
 
 class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
-    graph = Graph.empty()
-
     class Outputs(BaseWorkflow.Outputs):
         passthrough = Inputs.query
 "

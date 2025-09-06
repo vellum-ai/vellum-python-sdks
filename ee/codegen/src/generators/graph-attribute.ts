@@ -72,14 +72,12 @@ export class GraphAttribute extends AstNode {
    * adding a single edge to it will always produce another valid graph.
    */
   public generateGraphMutableAst(): GraphMutableAst {
-    let graphMutableAst: GraphMutableAst = { type: "empty" };
+    // Handle disconnected components first
     if (this.unusedEdges.size > 0) {
       const nextEdge = this.unusedEdges.values().next().value;
       if (!nextEdge) {
-        // this should never happen as we check the size of the set
         return { type: "empty" };
       }
-      // Group the unreachable edges into connected components
       const componentEdges = this.findConnectedComponent(
         nextEdge,
         this.unusedEdges
@@ -87,41 +85,42 @@ export class GraphAttribute extends AstNode {
       const rootNode = this.findRootNodes(componentEdges);
 
       try {
-        graphMutableAst = this.buildComponentGraph(rootNode, componentEdges);
+        return this.buildComponentGraph(rootNode, componentEdges);
       } catch (error) {
         console.warn(
           `Failed to build component graph for node ${rootNode}:`,
           error
         );
+        return { type: "empty" };
       }
-
-      return graphMutableAst;
     }
 
-    let edgesQueue: WorkflowEdge[] = [];
-    try {
-      edgesQueue = this.workflowContext.getEntrypointNodeEdges();
-    } catch {
-      // No entrypoint node exists - handle case where there are standalone nodes
-      console.warn("No entrypoint node found, handling standalone nodes");
-      const singleNodeResult = this.getSingleNodeReference();
-      if (singleNodeResult.type !== "empty") {
-        return singleNodeResult;
+    // Check if entrypoint exists and get its edges
+    const entrypointNode = this.workflowContext.tryGetEntrypointNode();
+    const edges = entrypointNode ? this.workflowContext.getEntrypointNodeEdges() : [];
+
+    // If no edges from entrypoint, check for single-node workflow
+    if (edges.length === 0) {
+      const nonEntrypointNodes = this.workflowContext.workflowRawData.nodes
+        .filter(node => node.type !== "ENTRYPOINT");
+
+      if (nonEntrypointNodes.length === 1) {
+        const nodeContext = this.workflowContext.findLocalNodeContext(nonEntrypointNodes[0].id);
+        if (nodeContext) {
+          this.usedNodes.add(nonEntrypointNodes[0].id);
+          return { type: "node_reference", reference: nodeContext };
+        }
       }
-      // If we can't handle it, return empty
-      return graphMutableAst;
+
+      // Return empty for truly empty workflows
+      return { type: "empty" };
     }
 
+    // Process normal workflow with edges
+    let graphMutableAst: GraphMutableAst = { type: "empty" };
     const edgesByPortId = this.workflowContext.getEdgesByPortId();
     const processedEdges = new Set<WorkflowEdge>();
-
-    // Handle case where there are no edges from entrypoint but entrypoint exists
-    if (edgesQueue.length === 0) {
-      const singleNodeResult = this.getSingleNodeReference();
-      if (singleNodeResult.type !== "empty") {
-        return singleNodeResult;
-      }
-    }
+    const edgesQueue = [...edges];
 
     while (edgesQueue.length > 0) {
       const edge = edgesQueue.shift();
@@ -208,37 +207,6 @@ export class GraphAttribute extends AstNode {
     return rootNode;
   }
 
-  /**
-   * Attempts to find a single non-entrypoint node that should be used as the main graph.
-   * This is needed for single-node workflows (e.g., MapNode/RetryNode) that need proper
-   * graph references instead of Graph.empty() to support subworkflow input generation.
-   */
-  private getSingleNodeReference(): GraphMutableAst {
-    const allNodes = this.workflowContext.workflowRawData.nodes;
-    const nonEntrypointNodes = allNodes.filter(
-      (node) => node.type !== "ENTRYPOINT"
-    );
-
-    // If there's exactly one non-entrypoint node, make it the main graph
-    if (nonEntrypointNodes.length === 1) {
-      const singleNode = nonEntrypointNodes[0];
-      if (singleNode) {
-        const nodeContext = this.workflowContext.findLocalNodeContext(
-          singleNode.id
-        );
-        if (nodeContext) {
-          // Mark this node as used so it doesn't get marked as unused later
-          this.usedNodes.add(singleNode.id);
-          return {
-            type: "node_reference",
-            reference: nodeContext,
-          };
-        }
-      }
-    }
-
-    return { type: "empty" };
-  }
 
   private findConnectedComponent(
     startEdge: WorkflowEdge,

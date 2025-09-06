@@ -638,12 +638,16 @@ export class Workflow {
         workflowContext: this.workflowContext,
       });
 
-      const graphField = python.field({
-        name: "graph",
-        initializer: graph,
-      });
+      // Only add graph attribute if it's not empty
+      const graphMutableAst = graph.generateGraphMutableAst();
+      if (graphMutableAst.type !== "empty") {
+        const graphField = python.field({
+          name: "graph",
+          initializer: graph,
+        });
 
-      workflowClass.add(graphField);
+        workflowClass.add(graphField);
+      }
 
       this.markUnusedNodesAndEdges(graph);
     } catch (error) {

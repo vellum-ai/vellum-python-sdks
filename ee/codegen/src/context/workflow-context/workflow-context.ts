@@ -279,7 +279,7 @@ export class WorkflowContext {
     });
   }
 
-  public getEntrypointNode(): EntrypointNode {
+  public tryGetEntrypointNode(): EntrypointNode | null {
     if (this.entrypointNode) {
       return this.entrypointNode;
     }
@@ -293,11 +293,19 @@ export class WorkflowContext {
 
     const entrypointNode = entrypointNodes[0];
     if (!entrypointNode) {
-      throw new WorkflowGenerationError("Entrypoint node not found");
+      return null;
     }
     this.entrypointNode = entrypointNode;
 
     return this.entrypointNode;
+  }
+
+  public getEntrypointNode(): EntrypointNode {
+    const entrypoint = this.tryGetEntrypointNode();
+    if (!entrypoint) {
+      throw new WorkflowGenerationError("Entrypoint node not found");
+    }
+    return entrypoint;
   }
 
   public getEntrypointNodeEdges(): WorkflowEdge[] {
