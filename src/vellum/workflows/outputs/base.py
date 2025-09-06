@@ -1,5 +1,6 @@
+from dataclasses import field
 import inspect
-from typing import TYPE_CHECKING, Any, Generic, Iterator, Optional, Set, Tuple, Type, TypeVar, Union, cast
+from typing import Any, Generic, Iterator, Set, Tuple, Type, TypeVar, Union, cast
 from typing_extensions import dataclass_transform
 
 from pydantic import GetCoreSchemaHandler
@@ -12,9 +13,6 @@ from vellum.workflows.exceptions import NodeException
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.types.generics import is_node_instance
 from vellum.workflows.types.utils import get_class_attr_names, infer_types
-
-if TYPE_CHECKING:
-    from vellum.workflows.nodes.bases.base import BaseNode
 
 _Delta = TypeVar("_Delta")
 _Accumulated = TypeVar("_Accumulated")
@@ -112,8 +110,11 @@ class _BaseOutputsMeta(type):
         if not cls.__qualname__.endswith(".Outputs") or not other.__qualname__.endswith(".Outputs"):
             return super().__eq__(other)
 
-        self_outputs_class = cast(Type["BaseNode.Outputs"], cls)
-        other_outputs_class = cast(Type["BaseNode.Outputs"], other)
+        self_outputs_class = cast(Type["BaseOutputs"], cls)
+        other_outputs_class = cast(Type["BaseOutputs"], other)
+
+        if not hasattr(self_outputs_class, "__parent_class__") or not hasattr(other_outputs_class, "__parent_class__"):
+            return super().__eq__(other)
 
         if self_outputs_class.__parent_class__ is None or other_outputs_class.__parent_class__ is None:
             return super().__eq__(other)
@@ -182,7 +183,9 @@ class _BaseOutputsMeta(type):
 
 
 class BaseOutputs(metaclass=_BaseOutputsMeta):
-    __parent_class__: Optional[Type] = None
+    # TODO: Uncomment once we figure out why this causes a failure in `infer_types`
+    # __parent_class__: Type[Union["BaseNode", "BaseWorkflow"]] = field(init=False)
+    __parent_class__: Type = field(init=False)
 
     def __init__(self, **kwargs: Any) -> None:
         declared_fields = {descriptor.name for descriptor in self.__class__}

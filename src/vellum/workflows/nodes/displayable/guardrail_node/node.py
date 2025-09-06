@@ -8,7 +8,6 @@ from vellum.workflows.constants import LATEST_RELEASE_TAG
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
-from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior
 from vellum.workflows.types.generics import StateType
 
@@ -33,7 +32,7 @@ class GuardrailNode(BaseNode[StateType], Generic[StateType]):
     class Trigger(BaseNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY
 
-    class Outputs(BaseOutputs):
+    class Outputs(BaseNode.Outputs):
         score: float
         normalized_score: Optional[float]
         log: Optional[str]
@@ -98,7 +97,13 @@ class GuardrailNode(BaseNode[StateType], Generic[StateType]):
         else:
             reason = None
 
-        return self.Outputs(score=score, normalized_score=normalized_score, log=log, reason=reason, **metric_outputs)
+        return self.Outputs(
+            score=score,
+            normalized_score=normalized_score,
+            log=log,
+            reason=reason,
+            **metric_outputs,  # type: ignore [arg-type]
+        )
 
     def _compile_metric_inputs(self) -> List[MetricDefinitionInput]:
         # TODO: We may want to consolidate with prompt deployment input compilation

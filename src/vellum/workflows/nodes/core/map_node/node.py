@@ -27,6 +27,7 @@ from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
 from vellum.workflows.nodes.utils import create_adornment
 from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.outputs.base import BaseOutput
+from vellum.workflows.references.node import NodeReference
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.generics import StateType
@@ -217,7 +218,11 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
         #     value: List[str]
         outputs_class.__annotations__ = {**previous_annotations, reference.name: annotation}
 
-        output_id = cls.subworkflow.instance.__output_ids__.get(reference.name) or uuid4_from_hash(
-            f"{cls.__id__}|{reference.name}"
-        )
+        subworkflow_class = cls.subworkflow.instance if isinstance(cls.subworkflow, NodeReference) else None
+        if subworkflow_class:
+            output_id = subworkflow_class.__output_ids__.get(reference.name) or uuid4_from_hash(
+                f"{cls.__id__}|{reference.name}"
+            )
+        else:
+            output_id = uuid4_from_hash(f"{cls.__id__}|{reference.name}")
         cls.__output_ids__[reference.name] = output_id
