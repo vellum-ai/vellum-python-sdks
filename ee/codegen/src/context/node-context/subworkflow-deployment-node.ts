@@ -60,12 +60,19 @@ export class SubworkflowDeploymentNodeContext extends BaseNodeContext<Subworkflo
     }
 
     try {
+      const requestOptions = {
+        headers: {
+          "X-Vellum-Is-Workspace-Auth": "true",
+        },
+      };
+
       this.workflowDeploymentRelease = await new WorkflowReleaseClient({
         apiKey: this.workflowContext.vellumApiKey,
         environment: this.workflowContext.vellumApiEnvironment,
       }).retrieveWorkflowDeploymentRelease(
         this.nodeData.data.workflowDeploymentId,
-        this.nodeData.data.releaseTag
+        this.nodeData.data.releaseTag,
+        requestOptions
       );
     } catch (error) {
       if (isVellumErrorWithDetail(error)) {
