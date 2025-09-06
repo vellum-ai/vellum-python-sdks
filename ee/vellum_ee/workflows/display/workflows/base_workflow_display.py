@@ -294,7 +294,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                     )
 
             elif isinstance(workflow_output.instance, OutputReference):
-                terminal_node_id = workflow_output.instance.outputs_class._node_class.__id__
+                terminal_node_id = workflow_output.instance.outputs_class.__parent_class__.__id__
                 serialized_terminal_node = serialized_nodes.get(terminal_node_id)
                 if serialized_terminal_node and isinstance(serialized_terminal_node["data"], dict):
                     serialized_terminal_node["data"]["name"] = workflow_output_display.name
@@ -599,7 +599,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
             workflow_output_display = self.output_displays.get(workflow_output)
             workflow_output_displays[workflow_output] = (
-                workflow_output_display or self._generate_workflow_output_display(workflow_output)
+                workflow_output_display or self._generate_workflow_output_display(workflow_output, self._workflow)
             )
 
         return WorkflowDisplayContext(
@@ -688,9 +688,13 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
         return EntrypointDisplay(id=entrypoint_id, edge_display=edge_display)
 
-    def _generate_workflow_output_display(self, output: BaseDescriptor) -> WorkflowOutputDisplay:
-        output_id = uuid4_from_hash(f"{self.workflow_id}|id|{output.name}")
-
+    def _generate_workflow_output_display(
+        self, output: OutputReference, workflow_class: Type[BaseWorkflow]
+    ) -> WorkflowOutputDisplay:
+        # TODO: use the output.id field instead once we add `__parent_class__` to BaseWorkflow.Outputs
+        output_id = workflow_class.__output_ids__.get(output.name) or uuid4_from_hash(
+            f"{self.workflow_id}|id|{output.name}"
+        )
         return WorkflowOutputDisplay(id=output_id, name=output.name)
 
     def __init_subclass__(cls, **kwargs: Any) -> None:

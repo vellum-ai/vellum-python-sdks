@@ -120,7 +120,7 @@ class BaseNodeMeta(ABCMeta):
         cls = super().__new__(mcs, name, bases, dct)
         node_class = cast(Type["BaseNode"], cls)
 
-        node_class.Outputs._node_class = node_class
+        node_class.Outputs.__parent_class__ = node_class
 
         # Add cls to relevant nested classes, since python should've been doing this by default
         for port in node_class.Ports:
@@ -270,11 +270,8 @@ class BaseNode(Generic[StateType], ABC, metaclass=BaseNodeMeta):
     class ExternalInputs(BaseInputs):
         __descriptor_class__ = ExternalInputReference
 
-    # TODO: Consider using metaclasses to prevent the need for users to specify that the
-    #   "Outputs" class inherits from "BaseOutputs" and do so automatically.
-    #   https://app.shortcut.com/vellum/story/4008/auto-inherit-basenodeoutputs-in-outputs-classes
     class Outputs(BaseOutputs):
-        _node_class: Type["BaseNode"] = field(init=False)
+        __parent_class__: Type["BaseNode"] = field(init=False)
 
     class Ports(NodePorts):
         default = Port(default=True)

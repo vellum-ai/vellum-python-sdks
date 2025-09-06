@@ -35,13 +35,11 @@ class OutputReference(BaseDescriptor[_OutputType], Generic[_OutputType]):
 
     @cached_property
     def id(self) -> UUID:
-        self._outputs_class = self._outputs_class
-
-        node_class = getattr(self._outputs_class, "_node_class", None)
-        if not node_class:
+        parent_class = self._outputs_class.__parent_class__
+        if not parent_class:
             return uuid4()
 
-        output_ids = getattr(node_class, "__output_ids__", {})
+        output_ids = getattr(parent_class, "__output_ids__", {})
         if not isinstance(output_ids, dict):
             return uuid4()
 
