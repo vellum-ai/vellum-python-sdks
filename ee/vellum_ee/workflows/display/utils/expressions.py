@@ -424,7 +424,7 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
         function_definition = compile_function_definition(value)
 
         name = function_definition.name
-        description = function_definition.description
+        description = function_definition.description or ""
 
         inputs = getattr(value, "__vellum_inputs__", {})
 
