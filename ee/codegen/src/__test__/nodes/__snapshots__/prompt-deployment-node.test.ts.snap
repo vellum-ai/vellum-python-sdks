@@ -34,7 +34,6 @@ class PromptDeploymentNodeDisplay(
     }
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=2470.8372576177285, y=219.71887984764544),
-        z_index=None,
         width=480,
         height=170,
     )
@@ -134,7 +133,6 @@ class PromptDeploymentNodeDisplay(
     }
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=2470.8372576177285, y=219.71887984764544),
-        z_index=None,
         width=480,
         height=170,
     )

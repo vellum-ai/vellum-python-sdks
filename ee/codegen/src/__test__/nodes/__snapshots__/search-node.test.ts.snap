@@ -92,9 +92,7 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
             id=UUID("e4dedb66-0638-4f0c-9941-6420bfe353b2")
         )
     }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None
-    )
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 
@@ -248,9 +246,7 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
             id=UUID("e4dedb66-0638-4f0c-9941-6420bfe353b2")
         )
     }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None
-    )
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 
@@ -350,9 +346,7 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
             id=UUID("e4dedb66-0638-4f0c-9941-6420bfe353b2")
         )
     }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None
-    )
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 
@@ -453,9 +447,7 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
             id=UUID("e4dedb66-0638-4f0c-9941-6420bfe353b2")
         )
     }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None
-    )
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 
@@ -544,9 +536,7 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
             id=UUID("e4dedb66-0638-4f0c-9941-6420bfe353b2")
         )
     }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None
-    )
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 
@@ -597,8 +587,6 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
             id=UUID("e4dedb66-0638-4f0c-9941-6420bfe353b2")
         )
     }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None
-    )
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;

@@ -121,7 +121,6 @@ class APINodeDisplay(BaseAPINodeDisplay[APINode]):
     }
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=2075.7067885117494, y=234.65663468515768),
-        z_index=None,
         width=462,
         height=288,
     )
@@ -311,7 +310,6 @@ class APINodeDisplay(BaseAPINodeDisplay[APINode]):
     }
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=2075.7067885117494, y=234.65663468515768),
-        z_index=None,
         width=462,
         height=288,
     )

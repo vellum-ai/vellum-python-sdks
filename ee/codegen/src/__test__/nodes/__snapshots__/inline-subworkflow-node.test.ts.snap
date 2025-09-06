@@ -39,7 +39,7 @@ class MyNodeDisplay(BaseInlineSubworkflowNodeDisplay[MyNode]):
         )
     }
     port_displays = {MyNode.Ports.default: PortDisplayOverrides(id=UUID("4878f525-d4a3-4e3d-9221-e146f282a96a"))}
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None)
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 
@@ -70,7 +70,7 @@ class InlineSubworkflowNodeDisplay(BaseInlineSubworkflowNodeDisplay[InlineSubwor
     port_displays = {
         InlineSubworkflowNode.Ports.default: PortDisplayOverrides(id=UUID("4878f525-d4a3-4e3d-9221-e146f282a96a"))
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None)
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 
@@ -121,7 +121,7 @@ class MyNodeDisplay(BaseInlineSubworkflowNodeDisplay[MyNode]):
         )
     }
     port_displays = {MyNode.Ports.default: PortDisplayOverrides(id=UUID("4878f525-d4a3-4e3d-9221-e146f282a96a"))}
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None)
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 
@@ -155,6 +155,6 @@ class MyNode1Display(BaseTemplatingNodeDisplay[MyNode1]):
         MyNode1.Outputs.result: NodeOutputDisplay(id=UUID("2d4f1826-de75-499a-8f84-0a690c8136ad"), name="result")
     }
     port_displays = {MyNode1.Ports.default: PortDisplayOverrides(id=UUID("6ee2c814-d0a5-4ec9-83b6-45156e2f22c4"))}
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0), z_index=None, width=None, height=None)
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
