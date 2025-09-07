@@ -99,18 +99,16 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
               switch (f.type) {
                 case "CODE_EXECUTION": {
                   codeExecutionFunctions.push(f as FunctionArgs);
-                  if (f.name) {
-                    const snakeName = toPythonSafeSnakeCase(f.name);
-                    // Use toValidPythonIdentifier to ensure the name is safe for Python references
-                    // but preserve original casing when possible (see APO-1372)
-                    const safeName = toValidPythonIdentifier(f.name);
-                    functionReferences.push(
-                      python.reference({
-                        name: safeName, // Use safe Python identifier that preserves original casing
-                        modulePath: [`.${snakeName}`], // Import from snake_case module
-                      })
-                    );
-                  }
+                  const snakeName = toPythonSafeSnakeCase(f.name);
+                  // Use toValidPythonIdentifier to ensure the name is safe for Python references
+                  // but preserve original casing when possible (see APO-1372)
+                  const safeName = toValidPythonIdentifier(f.name);
+                  functionReferences.push(
+                    python.reference({
+                      name: safeName, // Use safe Python identifier that preserves original casing
+                      modulePath: [`.${snakeName}`], // Import from snake_case module
+                    })
+                  );
                   break;
                 }
                 case "INLINE_WORKFLOW": {

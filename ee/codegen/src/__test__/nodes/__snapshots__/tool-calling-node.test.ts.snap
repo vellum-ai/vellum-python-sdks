@@ -173,17 +173,6 @@ class CasingTestNode(ToolCallingNode):
 "
 `;
 
-exports[`ToolCallingNode > function name casing > skips null/empty function names 1`] = `
-"from .valid_function import validFunction
-
-from vellum.workflows.nodes.displayable.tool_calling_node import ToolCallingNode
-
-
-class NullTestNode(ToolCallingNode):
-    functions = [validFunction]
-"
-`;
-
 exports[`ToolCallingNode > function ordering > should preserve order: code-exec, workflow 1`] = `
 "from .add_numbers import add_numbers
 from .subtract_workflow.workflow import SubtractWorkflow
