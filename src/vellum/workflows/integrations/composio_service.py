@@ -65,9 +65,9 @@ class ComposioService:
 
         try:
             if method == "GET":
-                response = requests.get(url, headers=headers, params=params or {}, timeout=30)
+                response = requests.get(url, headers=headers, params=params or {}, timeout=60)
             elif method == "POST":
-                response = requests.post(url, headers=headers, json=json_data or {}, timeout=30)
+                response = requests.post(url, headers=headers, json=json_data or {}, timeout=60)
             else:
                 raise ValueError(f"Unsupported HTTP method: {method}")
 

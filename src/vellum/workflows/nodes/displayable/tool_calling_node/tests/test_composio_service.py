@@ -99,7 +99,7 @@ class TestComposioAccountService:
             "https://backend.composio.dev/api/v3/connected_accounts",
             headers={"x-api-key": "test-key", "Content-Type": "application/json"},
             params={},
-            timeout=30,
+            timeout=60,
         )
 
     def test_get_user_connections_empty_response(self, composio_service, mock_requests):
@@ -137,7 +137,7 @@ class TestComposioCoreService:
             "https://backend.composio.dev/api/v3/tools/execute/HACKERNEWS_GET_USER",
             headers={"x-api-key": "test-key", "Content-Type": "application/json"},
             json={"arguments": complex_args},
-            timeout=30,
+            timeout=60,
         )
         assert result == {"items": [], "total": 0}
 
@@ -159,7 +159,7 @@ class TestComposioCoreService:
             "https://backend.composio.dev/api/v3/tools/execute/TEST_TOOL",
             headers={"x-api-key": "test-key", "Content-Type": "application/json"},
             json={"arguments": tool_args, "user_id": user_id},
-            timeout=30,
+            timeout=60,
         )
         assert result == {"items": [], "total": 0}
 
@@ -180,7 +180,7 @@ class TestComposioCoreService:
             "https://backend.composio.dev/api/v3/tools/execute/TEST_TOOL",
             headers={"x-api-key": "test-key", "Content-Type": "application/json"},
             json={"arguments": tool_args},
-            timeout=30,
+            timeout=60,
         )
         assert result == {"items": [], "total": 0}
 
