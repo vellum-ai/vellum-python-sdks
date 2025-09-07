@@ -458,11 +458,18 @@ exports[`WorkflowProjectGenerator > function > should generate <function_name>.p
 `;
 
 exports[`WorkflowProjectGenerator > function > should generate <function_name>.py file > code/nodes/tool_call/get_current_weather.py 1`] = `
-"def get_current_weather(location: str, unit: str) -> str:
+"from vellum.workflows.utils.functions import use_tool_inputs
+
+from ...inputs import Inputs
+
+
+@use_tool_inputs(location=Inputs.location)
+def get_current_weather(location: str, unit: str) -> str:
     """
     Get the current weather in a given location.
     """
     return f"The current weather in {location} is sunny with a temperature of 70 degrees {unit}."
+
 "
 `;
 
