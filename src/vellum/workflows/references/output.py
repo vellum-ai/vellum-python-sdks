@@ -76,7 +76,7 @@ class OutputReference(BaseDescriptor[_OutputType], Generic[_OutputType]):
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, type(self)):
             return False
-        return super().__eq__(other) and id(self._outputs_class) == id(other._outputs_class)
+        return super().__eq__(other) and self._outputs_class == other._outputs_class
 
     def __hash__(self) -> int:
         return hash((self._outputs_class, self._name))
