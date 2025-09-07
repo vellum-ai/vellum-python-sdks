@@ -105,10 +105,13 @@ export class GraphAttribute extends AstNode {
         .filter(node => node.type !== "ENTRYPOINT");
 
       if (nonEntrypointNodes.length === 1) {
-        const nodeContext = this.workflowContext.findLocalNodeContext(nonEntrypointNodes[0].id);
-        if (nodeContext) {
-          this.usedNodes.add(nonEntrypointNodes[0].id);
-          return { type: "node_reference", reference: nodeContext };
+        const singleNode = nonEntrypointNodes[0];
+        if (singleNode) {
+          const nodeContext = this.workflowContext.findLocalNodeContext(singleNode.id);
+          if (nodeContext) {
+            this.usedNodes.add(singleNode.id);
+            return { type: "node_reference", reference: nodeContext };
+          }
         }
       }
 
