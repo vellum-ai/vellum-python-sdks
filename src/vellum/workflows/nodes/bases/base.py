@@ -13,6 +13,7 @@ from vellum.workflows.descriptors.utils import is_unresolved, resolve_value
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.events.node import NodeExecutionStreamingEvent
 from vellum.workflows.exceptions import NodeException
+from vellum.workflows.executable import BaseExecutable
 from vellum.workflows.graph import Graph
 from vellum.workflows.graph.graph import GraphTarget
 from vellum.workflows.inputs.base import BaseInputs
@@ -260,9 +261,7 @@ class _BaseNodeExecutionMeta(type):
 NodeRunResponse = Union[BaseOutputs, Iterator[BaseOutput]]
 
 
-class BaseNode(Generic[StateType], ABC, metaclass=BaseNodeMeta):
-    __id__: UUID = uuid4_from_hash(__qualname__)
-    __output_ids__: Dict[str, UUID] = {}
+class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
     state: StateType
     _context: WorkflowContext
     _inputs: MappingProxyType[NodeReference, Any]

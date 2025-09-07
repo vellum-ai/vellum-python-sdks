@@ -20,6 +20,7 @@ from mypy.types import AnyType, CallableType, FunctionLike, Instance, Type as My
 
 TypeResolver = Callable[[str, List[MypyType]], MypyType]
 NODE_ATTRIBUTE_REGEX = r"^[a-z].*$"
+BASE_NODE_FULLNAME = "vellum.workflows.nodes.bases.base.BaseNode"
 
 DESCRIPTOR_PATHS: list[tuple[str, str, str]] = [
     (
@@ -28,12 +29,12 @@ DESCRIPTOR_PATHS: list[tuple[str, str, str]] = [
         r"^[^_].*$",
     ),
     (
-        "vellum.workflows.nodes.bases.base.BaseNode.ExternalInputs",
+        f"{BASE_NODE_FULLNAME}.ExternalInputs",
         "vellum.workflows.references.external_input.ExternalInputReference",
         r"^[^_].*$",
     ),
     (
-        "vellum.workflows.nodes.bases.base.BaseNode.Execution",
+        f"{BASE_NODE_FULLNAME}.Execution",
         "vellum.workflows.references.execution_count.ExecutionCountReference",
         r"^count$",
     ),
@@ -48,7 +49,7 @@ DESCRIPTOR_PATHS: list[tuple[str, str, str]] = [
         r"^[^_].*$",
     ),
     (
-        "vellum.workflows.nodes.bases.base.BaseNode",
+        BASE_NODE_FULLNAME,
         "vellum.workflows.references.node.NodeReference",
         NODE_ATTRIBUTE_REGEX,
     ),
@@ -163,7 +164,7 @@ class VellumMypyPlugin(Plugin):
         elif _is_subclass(ctx.cls.info, "vellum.workflows.nodes.displayable.final_output_node.node.FinalOutputNode"):
             self._dynamic_output_node_class_hook(ctx, "value")
 
-        if _is_subclass(ctx.cls.info, "vellum.workflows.nodes.bases.base.BaseNode"):
+        if _is_subclass(ctx.cls.info, BASE_NODE_FULLNAME):
             return self._base_node_class_hook(ctx)
 
         if _is_subclass(ctx.cls.info, "vellum.workflows.workflows.base.BaseWorkflow"):
@@ -241,6 +242,9 @@ class VellumMypyPlugin(Plugin):
         """
 
         for key, sym in ctx.cls.info.names.items():
+            if ctx.cls.info.fullname == BASE_NODE_FULLNAME:
+                continue
+
             if not isinstance(sym.node, Var):
                 continue
 
@@ -250,6 +254,7 @@ class VellumMypyPlugin(Plugin):
             type_ = sym.node.type
             if not type_:
                 continue
+
             sym.node.type = self._get_resolvable_type(
                 lambda fullname, types: ctx.api.named_type(fullname, types), type_
             )
@@ -301,7 +306,7 @@ class VellumMypyPlugin(Plugin):
                     and isinstance(arg.expr, MemberExpr)
                     and isinstance(arg.expr.expr, NameExpr)
                     and isinstance(arg.expr.expr.node, TypeInfo)
-                    and _is_subclass(arg.expr.expr.node, "vellum.workflows.nodes.bases.base.BaseNode")
+                    and _is_subclass(arg.expr.expr.node, BASE_NODE_FULLNAME)
                     and arg.expr.name == "Outputs"
                 ):
                     self._calls_with_nested_descriptor_expressions.add(call_expr)
@@ -548,7 +553,7 @@ class VellumMypyPlugin(Plugin):
         if not isinstance(ctx.default_return_type, Instance):
             return ctx.default_return_type
 
-        if not _is_subclass(ctx.default_return_type.type, "vellum.workflows.nodes.bases.base.BaseNode.Outputs"):
+        if not _is_subclass(ctx.default_return_type.type, f"{BASE_NODE_FULLNAME}.Outputs"):
             return ctx.default_return_type
 
         outputs_node = self._get_node_outputs_type_info(ctx)
@@ -677,9 +682,7 @@ class VellumMypyPlugin(Plugin):
 
         expr = ctx.context.callee.expr
         instance = ctx.api.get_expression_type(expr)
-        if not isinstance(instance, Instance) or not _is_subclass(
-            instance.type, "vellum.workflows.nodes.bases.base.BaseNode"
-        ):
+        if not isinstance(instance, Instance) or not _is_subclass(instance.type, BASE_NODE_FULLNAME):
             return None
 
         outputs_node = instance.type.names.get("Outputs")

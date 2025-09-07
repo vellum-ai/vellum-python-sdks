@@ -62,6 +62,7 @@ from vellum.workflows.events.workflow import (
     WorkflowExecutionStreamingBody,
     WorkflowExecutionStreamingEvent,
 )
+from vellum.workflows.executable import BaseExecutable
 from vellum.workflows.graph import Graph
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
@@ -200,8 +201,7 @@ class _BaseWorkflowMeta(type):
         if inputs_class is not BaseInputs and inputs_class.__parent_class__ is type(None):
             inputs_class.__parent_class__ = workflow_class
 
-        # TODO: Uncomment this once we figure out why it's causing the ipython reload test to fail
-        # workflow_class.Outputs.__parent_class__ = workflow_class
+        workflow_class.Outputs.__parent_class__ = workflow_class
         workflow_class.__output_ids__ = {
             ref.name: uuid4_from_hash(f"{workflow_class.__id__}|id|{ref.name}") for ref in workflow_class.Outputs
         }
@@ -212,9 +212,7 @@ class _BaseWorkflowMeta(type):
 GraphAttribute = Union[Type[BaseNode], Graph, Set[Type[BaseNode]], Set[Graph]]
 
 
-class BaseWorkflow(Generic[InputsType, StateType], metaclass=_BaseWorkflowMeta):
-    __id__: UUID = uuid4_from_hash(__qualname__)
-    __output_ids__: Dict[str, UUID] = {}
+class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_BaseWorkflowMeta):
     graph: ClassVar[GraphAttribute]
     unused_graphs: ClassVar[Set[GraphAttribute]]  # nodes or graphs that are defined but not used in the graph
     emitters: List[BaseWorkflowEmitter]
