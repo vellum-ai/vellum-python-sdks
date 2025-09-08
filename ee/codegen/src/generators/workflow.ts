@@ -588,6 +588,10 @@ export class Workflow {
       Array.from(usedEdges).flatMap((e) => [e.sourceNodeId, e.targetNodeId])
     );
 
+    // Also include nodes that were directly used in the graph (e.g., single-node graphs)
+    const directlyUsedNodeIds = graph.getUsedNodes();
+    directlyUsedNodeIds.forEach((nodeId) => usedNodeIds.add(nodeId));
+
     const nodeIds = this.getNodeIds();
 
     // Mark unused edges
@@ -627,31 +631,23 @@ export class Workflow {
   }
 
   private addGraph(workflowClass: python.Class): void {
-    const nodes = this.getNodes();
-    const edges = this.getEdges();
-
-    if (edges.length === 0) {
-      nodes.forEach((node) => {
-        if (node.type === "ENTRYPOINT") {
-          return;
-        }
-
-        this.unusedNodes.add(node);
-      });
-      return;
-    }
+    // Note: markUnusedNodesAndEdges() will handle determining which nodes are unused based on the generated graph
 
     try {
       const graph = new GraphAttribute({
         workflowContext: this.workflowContext,
       });
 
-      const graphField = python.field({
-        name: "graph",
-        initializer: graph,
-      });
+      // Only add graph attribute if it's not empty
+      const graphMutableAst = graph.generateGraphMutableAst();
+      if (graphMutableAst.type !== "empty") {
+        const graphField = python.field({
+          name: "graph",
+          initializer: graph,
+        });
 
-      workflowClass.add(graphField);
+        workflowClass.add(graphField);
+      }
 
       this.markUnusedNodesAndEdges(graph);
     } catch (error) {

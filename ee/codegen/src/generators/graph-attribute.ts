@@ -49,6 +49,7 @@ export class GraphAttribute extends AstNode {
   private readonly astNode: python.AstNode;
   private readonly unusedEdges: Set<WorkflowEdge>;
   private readonly usedEdges = new Set<WorkflowEdge>();
+  private readonly usedNodes = new Set<string>();
 
   public constructor({
     workflowContext,
@@ -71,7 +72,7 @@ export class GraphAttribute extends AstNode {
    * adding a single edge to it will always produce another valid graph.
    */
   public generateGraphMutableAst(): GraphMutableAst {
-    let graphMutableAst: GraphMutableAst = { type: "empty" };
+    // Handle disconnected components first
     if (this.unusedEdges.size > 0) {
       const nextEdge = this.unusedEdges.values().next().value;
       if (!nextEdge) {
@@ -86,20 +87,33 @@ export class GraphAttribute extends AstNode {
       const rootNode = this.findRootNodes(componentEdges);
 
       try {
-        graphMutableAst = this.buildComponentGraph(rootNode, componentEdges);
+        return this.buildComponentGraph(rootNode, componentEdges);
       } catch (error) {
         console.warn(
           `Failed to build component graph for node ${rootNode}:`,
           error
         );
+        return { type: "empty" };
       }
-
-      return graphMutableAst;
     }
 
-    const edgesQueue = this.workflowContext.getEntrypointNodeEdges();
+    // Check if entrypoint exists and get its edges
+    const entrypointNode = this.workflowContext.tryGetEntrypointNode();
+    const edges = entrypointNode
+      ? this.workflowContext.getEntrypointNodeEdges()
+      : [];
+
+    // If no edges from entrypoint, return empty
+    // Single disconnected nodes should be handled as unused_graphs, not main graph
+    if (edges.length === 0) {
+      return { type: "empty" };
+    }
+
+    // Process normal workflow with edges
+    let graphMutableAst: GraphMutableAst = { type: "empty" };
     const edgesByPortId = this.workflowContext.getEdgesByPortId();
     const processedEdges = new Set<WorkflowEdge>();
+    const edgesQueue = [...edges];
 
     while (edgesQueue.length > 0) {
       const edge = edgesQueue.shift();
@@ -140,6 +154,10 @@ export class GraphAttribute extends AstNode {
 
   public getUsedEdges(): Set<WorkflowEdge> {
     return this.usedEdges;
+  }
+
+  public getUsedNodes(): Set<string> {
+    return this.usedNodes;
   }
 
   /**
@@ -1137,7 +1155,18 @@ export class GraphAttribute extends AstNode {
     useWrap: boolean = false
   ): AstNode {
     if (mutableAst.type === "empty") {
-      return python.TypeInstantiation.none();
+      return python.accessAttribute({
+        lhs: python.reference({
+          name: "Graph",
+          modulePath: VELLUM_WORKFLOW_GRAPH_MODULE_PATH,
+        }),
+        rhs: python.invokeMethod({
+          methodReference: python.reference({
+            name: "empty",
+          }),
+          arguments_: [],
+        }),
+      });
     }
 
     if (mutableAst.type === "node_reference") {
