@@ -245,9 +245,13 @@ def serialize_key(key: Any) -> str:
         return str(key)
 
 
+# Sentinel value to indicate a value should be omitted from serialization
+_UNDEFINED_SENTINEL: JsonObject = {"__undefined__": True}
+
+
 def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> JsonObject:
     if value is undefined:
-        return undefined
+        return _UNDEFINED_SENTINEL
 
     if isinstance(value, ConstantValueReference):
         return serialize_value(display_context, value._value)
@@ -322,7 +326,7 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
         serialized_items = []
         for item in value:
             serialized_item = serialize_value(display_context, item)
-            if serialized_item is not undefined:
+            if serialized_item != _UNDEFINED_SENTINEL:
                 serialized_items.append(serialized_item)
 
         if all(isinstance(item, dict) and item["type"] == "CONSTANT_VALUE" for item in serialized_items):
@@ -358,7 +362,7 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
         serialized_entries: List[Dict[str, Any]] = []
         for key, val in value.items():
             serialized_val = serialize_value(display_context, val)
-            if serialized_val is not undefined:
+            if serialized_val != _UNDEFINED_SENTINEL:
                 serialized_entries.append(
                     {
                         "id": str(uuid4_from_hash(f"{key}|{val}")),

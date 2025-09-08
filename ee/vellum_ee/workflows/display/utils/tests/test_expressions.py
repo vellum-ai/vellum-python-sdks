@@ -14,8 +14,8 @@ class TestSerializeValue:
         display_context = WorkflowDisplayContext()
         # WHEN we serialize an undefined value
         result = serialize_value(display_context=display_context, value=undefined)
-        # THEN it should return undefined (to be filtered by parent serializers)
-        assert result is undefined
+        # THEN it should return a sentinel value to be filtered by parent serializers
+        assert result == {"__undefined__": True}
 
     def test_serialize_null(self):
         """Test that null values are properly serialized"""
