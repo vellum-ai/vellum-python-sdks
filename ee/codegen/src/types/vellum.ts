@@ -967,7 +967,7 @@ interface NameDescription {
 export type FunctionArgs = {
   type: "CODE_EXECUTION";
   src: string;
-  definition: FunctionDefinition; // legacy frontend does not send definition field
+  definition?: FunctionDefinition; // `legacy frontend` does not send definition field
 } & NameDescription;
 
 export type InlineWorkflowFunctionArgs = {
