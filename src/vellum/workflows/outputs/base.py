@@ -99,6 +99,10 @@ class BaseOutput(Generic[_Delta, _Accumulated]):
 
 @dataclass_transform(kw_only_default=True)
 class _BaseOutputsMeta(type):
+    def __new__(cls, name: str, bases: Tuple[Type, ...], dct: Dict[str, Any]) -> Any:
+        dct["__parent_class__"] = type(None)
+        return super().__new__(cls, name, bases, dct)
+
     def __eq__(cls, other: Any) -> bool:
         """
         We need to include custom eq logic to prevent infinite loops during ipython reloading.
