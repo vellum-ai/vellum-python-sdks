@@ -331,6 +331,7 @@ def create_tool_prompt_node(
     parameters: PromptParameters,
     max_prompt_iterations: Optional[int] = None,
     process_parameters_method: Optional[Callable] = None,
+    process_blocks_method: Optional[Callable] = None,
 ) -> Type[ToolPromptNode]:
     if functions and len(functions) > 0:
         prompt_functions: List[Union[Tool, FunctionDefinition]] = []
@@ -401,6 +402,7 @@ def create_tool_prompt_node(
                 "parameters": parameters,
                 "max_prompt_iterations": max_prompt_iterations,
                 **({"process_parameters": process_parameters_method} if process_parameters_method is not None else {}),
+                **({"process_blocks": process_blocks_method} if process_blocks_method is not None else {}),
                 "__module__": __name__,
             },
         ),

@@ -200,6 +200,9 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
                 ],
             ),
             VariablePromptBlock(block_type="VARIABLE", state=None, cache_config=None, input_variable="chat_history"),
+            VariablePromptBlock(
+                block_type="VARIABLE", state=None, cache_config=None, input_variable="additional_blocks"
+            ),
         ],
         "settings": None,
         "functions": [
@@ -329,6 +332,9 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
                 ],
             ),
             VariablePromptBlock(block_type="VARIABLE", state=None, cache_config=None, input_variable="chat_history"),
+            VariablePromptBlock(
+                block_type="VARIABLE", state=None, cache_config=None, input_variable="additional_blocks"
+            ),
         ],
         "settings": None,
         "functions": [

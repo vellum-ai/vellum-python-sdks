@@ -101,6 +101,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
         request_options = self.request_options or RequestOptions()
 
         processed_parameters = self.process_parameters(self.parameters)
+        processed_blocks = self.process_blocks(self.blocks)
 
         request_options["additional_body_parameters"] = {
             "execution_context": execution_context.model_dump(mode="json"),
@@ -139,7 +140,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                 input_values=input_values,
                 input_variables=input_variables,
                 parameters=processed_parameters,
-                blocks=self.blocks,
+                blocks=processed_blocks,
                 settings=self.settings,
                 functions=normalized_functions,
                 expand_meta=self.expand_meta,
@@ -152,7 +153,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                 input_values=input_values,
                 input_variables=input_variables,
                 parameters=processed_parameters,
-                blocks=self.blocks,
+                blocks=processed_blocks,
                 settings=self.settings,
                 functions=normalized_functions,
                 expand_meta=self.expand_meta,
@@ -310,3 +311,9 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
         processed_custom_params = normalize_json(parameters.custom_parameters)
 
         return parameters.model_copy(update={"custom_parameters": processed_custom_params})
+
+    def process_blocks(self, blocks: List[PromptBlock]) -> List[PromptBlock]:
+        """
+        Override this method to process the blocks before they are executed.
+        """
+        return blocks
