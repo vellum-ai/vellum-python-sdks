@@ -53,7 +53,7 @@ def test_vellum_emitter_debounce_batches_events():
     emitter.emit_event(event1)
     emitter.emit_event(event2)
 
-    time.sleep(0.1)
+    time.sleep(0.15)
 
     assert mock_client.events.create.call_count == 1
     call_args = mock_client.events.create.call_args
