@@ -97,17 +97,23 @@ export class GraphAttribute extends AstNode {
 
     // Check if entrypoint exists and get its edges
     const entrypointNode = this.workflowContext.tryGetEntrypointNode();
-    const edges = entrypointNode ? this.workflowContext.getEntrypointNodeEdges() : [];
+    const edges = entrypointNode
+      ? this.workflowContext.getEntrypointNodeEdges()
+      : [];
 
     // If no edges from entrypoint, check for single-node workflow
     if (edges.length === 0) {
-      const nonEntrypointNodes = this.workflowContext.workflowRawData.nodes
-        .filter(node => node.type !== "ENTRYPOINT");
+      const nonEntrypointNodes =
+        this.workflowContext.workflowRawData.nodes.filter(
+          (node) => node.type !== "ENTRYPOINT"
+        );
 
       if (nonEntrypointNodes.length === 1) {
         const singleNode = nonEntrypointNodes[0];
         if (singleNode) {
-          const nodeContext = this.workflowContext.findLocalNodeContext(singleNode.id);
+          const nodeContext = this.workflowContext.findLocalNodeContext(
+            singleNode.id
+          );
           if (nodeContext) {
             this.usedNodes.add(singleNode.id);
             return { type: "node_reference", reference: nodeContext };
@@ -209,7 +215,6 @@ export class GraphAttribute extends AstNode {
 
     return rootNode;
   }
-
 
   private findConnectedComponent(
     startEdge: WorkflowEdge,
