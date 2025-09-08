@@ -95,7 +95,7 @@ def test_tool_calling_node_with_parent_inputs(vellum_adhoc_prompt_client, mock_u
             role="FUNCTION",
             content=StringChatMessageContent(
                 type="STRING",
-                value='"This is the parent input: Hello from parent, this is the dummy input: dummy, and this is the populated input: Hello from user"',  # noqa: E501
+                value='"parent input: Hello from parent, dummy input: dummy, constant input: constant_input, populated input: Hello from user"',  # noqa: E501
             ),
             source="call_7115tNTmEACTsQRGwKpJipJK",
         ),

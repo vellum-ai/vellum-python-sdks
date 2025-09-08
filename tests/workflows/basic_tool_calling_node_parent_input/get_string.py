@@ -7,9 +7,10 @@ from .nodes.dummy_node import DummyNode
 @use_tool_inputs(
     parent_input=ParentInputs.parent_input,
     dummy_input=DummyNode.Outputs.text,
+    constant_input="constant_input",
 )
-def get_string(parent_input: str, dummy_input: str, populated_input: str) -> str:
+def get_string(parent_input: str, dummy_input: str, constant_input: str, populated_input: str) -> str:
     """
     Get a string with the parent input, dummy input, and the populated input.
     """
-    return f"This is the parent input: {parent_input}, this is the dummy input: {dummy_input}, and this is the populated input: {populated_input}"  # noqa: E501
+    return f"parent input: {parent_input}, dummy input: {dummy_input}, constant input: {constant_input}, populated input: {populated_input}"  # noqa: E501
