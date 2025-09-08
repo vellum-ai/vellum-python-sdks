@@ -29,7 +29,7 @@ from .workflow import *
 
 @BaseRetryNodeDisplay.wrap(node_id=UUID("ae49ef72-6ad7-441a-a20d-76c71ad851ef"))
 class MyNodeDisplay(BaseInlineSubworkflowNodeDisplay[MyNode]):
-    label = "My node"
+    label = "My Node"
     node_id = UUID("14fee4a0-ad25-402f-b942-104d3a5a0824")
     target_handle_id = UUID("3fe4b4a6-5ed2-4307-ac1c-02389337c4f2")
     workflow_input_ids_by_name = {}
@@ -111,7 +111,7 @@ from .workflow import *
 
 
 class MyNodeDisplay(BaseInlineSubworkflowNodeDisplay[MyNode]):
-    label = "My node"
+    label = "My Node"
     node_id = UUID("14fee4a0-ad25-402f-b942-104d3a5a0824")
     target_handle_id = UUID("3fe4b4a6-5ed2-4307-ac1c-02389337c4f2")
     workflow_input_ids_by_name = {}
@@ -147,7 +147,7 @@ from .....nodes.my_node.nodes.my_node import MyNode1
 
 
 class MyNode1Display(BaseTemplatingNodeDisplay[MyNode1]):
-    label = "My node"
+    label = "My Node"
     node_id = UUID("46e221ab-a749-41a2-9242-b1f5bf31f3a5")
     target_handle_id = UUID("3960c8e1-9baa-4b9c-991d-e399d16a45aa")
     node_input_ids_by_name = {"template": UUID("7b8af68b-cf60-4fca-9c57-868042b5b616")}

@@ -5,13 +5,14 @@ import {
   WorkflowNode,
   ToolArgs as FunctionsType,
 } from "src/types/vellum";
+import { pascalToTitleCase } from "src/utils/casing";
 
 export function getNodeLabel(nodeData: WorkflowNode): string {
   switch (nodeData.type) {
     case "GENERIC":
       return nodeData.definition?.name ?? nodeData.label ?? "Generic Node";
     default:
-      return nodeData.data.label;
+      return pascalToTitleCase(nodeData.data.label);
   }
 }
 

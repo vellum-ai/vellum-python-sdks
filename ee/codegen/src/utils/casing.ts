@@ -108,6 +108,16 @@ export function toValidPythonIdentifier(
   return toPythonSafeSnakeCase(str, safetyPrefix);
 }
 
+export function pascalToTitleCase(pascalStr: string): string {
+  if (pascalStr.includes(" ")) {
+    return pascalStr.replace(/\b\w/g, (char) => char.toUpperCase());
+  }
+
+  const titleCaseStr = pascalStr.replace(/(?<!^)(?=[A-Z][a-z])/g, " ");
+
+  return titleCaseStr.replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 export function removeEscapeCharacters(str: string): string {
   return str.replace(/\\"/g, '"');
 }
