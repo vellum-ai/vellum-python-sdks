@@ -21,3 +21,5 @@ class NodeDisplayData(UniversalBaseModel):
     width: Optional[int] = None
     height: Optional[int] = None
     comment: Optional[NodeDisplayComment] = None
+    icon: Optional[str] = None
+    color: Optional[str] = None

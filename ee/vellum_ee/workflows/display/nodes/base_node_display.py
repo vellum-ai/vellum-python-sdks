@@ -435,6 +435,8 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 width=explicit_value.width,
                 height=explicit_value.height,
                 comment=comment,
+                icon=explicit_value.icon,
+                color=explicit_value.color,
             )
 
         if explicit_value:
