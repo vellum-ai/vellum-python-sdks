@@ -100,3 +100,20 @@ def test_serialize_display_data():
         "position": {"x": 0.0, "y": 0.0},
         "comment": {"expanded": True, "value": "I hope this works"},
     }
+
+
+def test_serialize_node_label_with_pascal_case():
+    """
+    Tests that a node with PascalCase name serializes with proper title case label.
+    """
+
+    # GIVEN a node with a PascalCase name that includes common patterns
+    class MyCustomNode(BaseNode):
+        pass
+
+    # WHEN we serialize the node
+    node_display_class = get_node_display_class(MyCustomNode)
+    data = node_display_class().serialize(WorkflowDisplayContext())
+
+    # THEN the label should be converted to proper title case with spaces
+    assert data["label"] == "My Custom Node"
