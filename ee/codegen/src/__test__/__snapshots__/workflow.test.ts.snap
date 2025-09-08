@@ -68,7 +68,7 @@ from .nodes.final_output import FinalOutput
 
 
 class TestWorkflow(BaseWorkflow):
-    graph = FinalOutput
+    unused_graphs = {FinalOutput}
 
     class Outputs(BaseWorkflow.Outputs):
         passthrough = FinalOutput.Outputs.value

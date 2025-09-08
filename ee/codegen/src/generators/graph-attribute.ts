@@ -101,27 +101,9 @@ export class GraphAttribute extends AstNode {
       ? this.workflowContext.getEntrypointNodeEdges()
       : [];
 
-    // If no edges from entrypoint, check for single-node workflow
+    // If no edges from entrypoint, return empty
+    // Single disconnected nodes should be handled as unused_graphs, not main graph
     if (edges.length === 0) {
-      const nonEntrypointNodes =
-        this.workflowContext.workflowRawData.nodes.filter(
-          (node) => node.type !== "ENTRYPOINT"
-        );
-
-      if (nonEntrypointNodes.length === 1) {
-        const singleNode = nonEntrypointNodes[0];
-        if (singleNode) {
-          const nodeContext = this.workflowContext.findLocalNodeContext(
-            singleNode.id
-          );
-          if (nodeContext) {
-            this.usedNodes.add(singleNode.id);
-            return { type: "node_reference", reference: nodeContext };
-          }
-        }
-      }
-
-      // Return empty for truly empty workflows
       return { type: "empty" };
     }
 
