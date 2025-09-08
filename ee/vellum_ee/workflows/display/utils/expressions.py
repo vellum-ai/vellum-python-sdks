@@ -247,13 +247,7 @@ def serialize_key(key: Any) -> str:
 
 def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> JsonObject:
     if value is undefined:
-        return {
-            "type": "CONSTANT_VALUE",
-            "value": {
-                "type": "JSON",
-                "value": None,
-            },
-        }
+        return undefined
 
     if isinstance(value, ConstantValueReference):
         return serialize_value(display_context, value._value)
@@ -325,7 +319,12 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
         }
 
     if isinstance(value, list):
-        serialized_items = [serialize_value(display_context, item) for item in value]
+        serialized_items = []
+        for item in value:
+            serialized_item = serialize_value(display_context, item)
+            if serialized_item is not undefined:
+                serialized_items.append(serialized_item)
+
         if all(isinstance(item, dict) and item["type"] == "CONSTANT_VALUE" for item in serialized_items):
             constant_values = []
             for item in serialized_items:
@@ -356,14 +355,17 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
         return serialize_value(display_context, dict_value)
 
     if isinstance(value, dict):
-        serialized_entries: List[Dict[str, Any]] = [
-            {
-                "id": str(uuid4_from_hash(f"{key}|{val}")),
-                "key": serialize_key(key),
-                "value": serialize_value(display_context, val),
-            }
-            for key, val in value.items()
-        ]
+        serialized_entries: List[Dict[str, Any]] = []
+        for key, val in value.items():
+            serialized_val = serialize_value(display_context, val)
+            if serialized_val is not undefined:
+                serialized_entries.append(
+                    {
+                        "id": str(uuid4_from_hash(f"{key}|{val}")),
+                        "key": serialize_key(key),
+                        "value": serialized_val,
+                    }
+                )
 
         # Check if all entries have constant values
         if all(entry["value"]["type"] == "CONSTANT_VALUE" for entry in serialized_entries):

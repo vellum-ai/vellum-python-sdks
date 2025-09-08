@@ -1,7 +1,5 @@
 """Tests for expressions serialization utilities"""
 
-import pytest
-
 from vellum.workflows.constants import undefined
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
 from vellum_ee.workflows.display.utils.expressions import serialize_value
@@ -10,12 +8,20 @@ from vellum_ee.workflows.display.utils.expressions import serialize_value
 class TestSerializeValue:
     """Tests for the serialize_value function"""
 
-    @pytest.mark.parametrize("value", [undefined, None])
-    def test_serialize_value(self, value):
-        """Test that values are properly serialized"""
+    def test_serialize_undefined(self):
+        """Test that undefined values are properly handled"""
         # GIVEN a display context
         display_context = WorkflowDisplayContext()
-        # WHEN we serialize a value
-        result = serialize_value(display_context=display_context, value=value)
+        # WHEN we serialize an undefined value
+        result = serialize_value(display_context=display_context, value=undefined)
+        # THEN it should return undefined (to be filtered by parent serializers)
+        assert result is undefined
+
+    def test_serialize_null(self):
+        """Test that null values are properly serialized"""
+        # GIVEN a display context
+        display_context = WorkflowDisplayContext()
+        # WHEN we serialize a null value
+        result = serialize_value(display_context=display_context, value=None)
         # THEN it should match the expected serialization
         assert result == {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}}
