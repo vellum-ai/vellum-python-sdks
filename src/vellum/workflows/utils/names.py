@@ -2,11 +2,20 @@ import re
 
 
 def pascal_to_title_case(pascal_str: str) -> str:
-    # Insert space before each capital letter (except the first one)
-    title_case_str = re.sub(r"(?<!^)(?=[A-Z])", " ", pascal_str)
+    # Insert space before each capital letter that is followed by a lowercase letter
+    title_case_str = re.sub(r"(?<!^)(?=[A-Z][a-z])", " ", pascal_str)
 
-    # Return the result in title case
-    return title_case_str.title()
+    words = title_case_str.split()
+    result_words = []
+
+    for word in words:
+        if word.isupper():
+            result_words.append(word)
+        # Otherwise, apply title case
+        else:
+            result_words.append(word.capitalize())
+
+    return " ".join(result_words)
 
 
 def snake_to_title_case(snake_str: str) -> str:
