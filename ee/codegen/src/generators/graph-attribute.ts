@@ -76,8 +76,10 @@ export class GraphAttribute extends AstNode {
     if (this.unusedEdges.size > 0) {
       const nextEdge = this.unusedEdges.values().next().value;
       if (!nextEdge) {
+        // this should never happen as we check the size of the set
         return { type: "empty" };
       }
+      // Group the unreachable edges into connected components
       const componentEdges = this.findConnectedComponent(
         nextEdge,
         this.unusedEdges
