@@ -1,4 +1,3 @@
-from dataclasses import field
 import inspect
 from typing import Any, Generic, Iterator, Set, Tuple, Type, TypeVar, Union, cast
 from typing_extensions import dataclass_transform
@@ -187,7 +186,7 @@ class _BaseOutputsMeta(type):
 
 
 class BaseOutputs(metaclass=_BaseOutputsMeta):
-    __parent_class__: Type[BaseExecutable] = field(init=False)
+    __parent_class__: Type[BaseExecutable] = type(None)
 
     def __init__(self, **kwargs: Any) -> None:
         declared_fields = {descriptor.name for descriptor in self.__class__}
