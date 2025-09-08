@@ -2,8 +2,7 @@ import re
 
 
 def pascal_to_title_case(pascal_str: str) -> str:
-    # Insert space before each capital letter that is followed by a lowercase letter
-    title_case_str = re.sub(r"(?<!^)(?=[A-Z][a-z])", " ", pascal_str)
+    title_case_str = re.sub(r"(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])", " ", pascal_str)
 
     words = title_case_str.split()
     result_words = []
