@@ -476,3 +476,51 @@ def test_serialize_workflow_with_node_display_data():
 
     assert test_node is not None, "TestNode not found in serialized nodes"
     assert test_node["display_data"] == {"position": {"x": 100, "y": 200}, "z_index": 10, "width": 300, "height": 150}
+
+
+def test_serialize_workflow_with_node_icon_and_color():
+    """
+    Tests that nodes with icon and color serialize correctly in workflow context.
+    """
+
+    # GIVEN a workflow with a node that has icon and color
+    class TestNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result: str
+
+    class TestWorkflow(BaseWorkflow):
+        graph = TestNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_result = TestNode.Outputs.result
+
+    class TestNodeDisplay(BaseNodeDisplay[TestNode]):
+        display_data = NodeDisplayData(
+            position=NodeDisplayPosition(x=100, y=200), icon="vellum:icon:cog", color="#42A5F5"
+        )
+
+    class TestWorkflowDisplay(BaseWorkflowDisplay[TestWorkflow]):
+        pass
+
+    # WHEN we serialize the workflow
+    display = get_workflow_display(
+        base_display_class=TestWorkflowDisplay,
+        workflow_class=TestWorkflow,
+    )
+    serialized_workflow = display.serialize()
+
+    # THEN the node should include icon and color in display_data
+    workflow_raw_data = cast(Dict[str, Any], serialized_workflow["workflow_raw_data"])
+    nodes = cast(List[Dict[str, Any]], workflow_raw_data["nodes"])
+
+    test_node = None
+    for node in nodes:
+        if node.get("type") == "GENERIC":
+            definition = node.get("definition")
+            if isinstance(definition, dict) and definition.get("name") == "TestNode":
+                test_node = node
+                break
+
+    assert test_node is not None, "TestNode not found in serialized nodes"
+    assert test_node["display_data"]["icon"] == "vellum:icon:cog"
+    assert test_node["display_data"]["color"] == "#42A5F5"

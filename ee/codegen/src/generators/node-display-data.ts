@@ -98,6 +98,30 @@ export class NodeDisplayData extends AstNode {
       );
     }
 
+    if (
+      this.sourceNodeDisplayData?.icon !== undefined &&
+      this.sourceNodeDisplayData?.icon !== null
+    ) {
+      args.push(
+        python.methodArgument({
+          name: "icon",
+          value: python.TypeInstantiation.str(this.sourceNodeDisplayData.icon),
+        })
+      );
+    }
+
+    if (
+      this.sourceNodeDisplayData?.color !== undefined &&
+      this.sourceNodeDisplayData?.color !== null
+    ) {
+      args.push(
+        python.methodArgument({
+          name: "color",
+          value: python.TypeInstantiation.str(this.sourceNodeDisplayData.color),
+        })
+      );
+    }
+
     const commentArg = this.generateCommentArg();
     if (commentArg) {
       args.push(commentArg);
