@@ -1,5 +1,5 @@
 import inspect
-from typing import Any, Generic, Iterator, Set, Tuple, Type, TypeVar, Union, cast
+from typing import Any, Dict, Generic, Iterator, Optional, Set, Tuple, Type, TypeVar, Union, cast
 from typing_extensions import dataclass_transform
 
 from pydantic import GetCoreSchemaHandler
@@ -190,7 +190,7 @@ class _BaseOutputsMeta(type):
 
 
 class BaseOutputs(metaclass=_BaseOutputsMeta):
-    __parent_class__: Type[BaseExecutable] = type(None)
+    __parent_class__: Union[Type[BaseExecutable], Type[None]] = type(None)
 
     def __init__(self, **kwargs: Any) -> None:
         declared_fields = {descriptor.name for descriptor in self.__class__}
