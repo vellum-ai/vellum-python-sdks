@@ -42,6 +42,7 @@ def test_serialize_workflow():
         "id": "21f29cac-da87-495f-bba1-093d423f4e46",
         "label": "Get Current Weather Node",
         "type": "GENERIC",
+        "should_file_merge": True,
         "display_data": {
             "position": {"x": 200.0, "y": -50.0},
             "comment": {

@@ -272,13 +272,33 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
     def serialize_generic_fields(self, display_context: "WorkflowDisplayContext") -> JsonObject:
         """Serialize generic fields that are common to all nodes."""
-        return {
+        result = {
             "display_data": self.get_display_data().dict(),
             "base": self.get_base().dict(),
             "definition": self.get_definition().dict(),
             "trigger": self.serialize_trigger(),
             "ports": self.serialize_ports(display_context),
         }
+
+        # Only include should_file_merge if there are custom methods defined
+        try:
+            node_class = self.__class__.infer_node_class()
+
+            # Exclude BaseNode methods such as Ports, Trigger
+            base_node_methods = set(BaseNode.__dict__.keys())
+
+            has_custom_methods = any(
+                callable(getattr(node_class, name, None))
+                for name in node_class.__dict__.keys()
+                if not name.startswith("__") and name not in base_node_methods
+            )
+
+            if has_custom_methods:
+                result["should_file_merge"] = True
+        except Exception:
+            pass
+
+        return result
 
     def get_base(self) -> CodeResourceDefinition:
         node = self._node
