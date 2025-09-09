@@ -13,3 +13,4 @@ tsconfig.tsbuildinfo
 .idea
 .DS_Store
 htmlcov/
+# CI trigger comment
