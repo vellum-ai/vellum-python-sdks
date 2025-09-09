@@ -118,6 +118,7 @@ def test_serialize_workflow():
                             "id": "baf6d316-dc75-41e8-96c0-015aede96309",
                             "label": "Iteration",
                             "type": "GENERIC",
+                            "should_file_merge": True,
                             "display_data": {"position": {"x": 200.0, "y": -50.0}},
                             "base": {
                                 "name": "BaseNode",

@@ -283,14 +283,10 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
         # Only include should_file_merge if there are custom methods defined
         try:
             node_class = self.__class__.infer_node_class()
-
-            # Exclude BaseNode methods such as Ports, Trigger
-            base_node_methods = set(BaseNode.__dict__.keys())
-
             has_custom_methods = any(
-                callable(getattr(node_class, name, None))
+                callable(getattr(node_class, name, None)) and inspect.isfunction(getattr(node_class, name, None))
                 for name in node_class.__dict__.keys()
-                if not name.startswith("__") and name not in base_node_methods
+                if not name.startswith("__")
             )
 
             if has_custom_methods:
