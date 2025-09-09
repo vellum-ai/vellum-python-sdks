@@ -133,7 +133,7 @@ build-backend = "poetry.core.masonry.api"
 vellum = "vellum_cli:main"
 
 [tool.isort]
-skip = ["src/vellum/client", "tests/client", ".venv", "src/vellum/__init__.py", "examples/workflows", "src/vellum/client/raw_client.py"]
+skip = ["src/vellum/client", "tests/client", ".venv", "src/vellum/__init__.py", "examples/workflows", "src/vellum/client/raw_client.py", "ee/codegen/node_modules"]
 multi_line_output = 3
 force_grid_wrap = 0
 line_length = 120
@@ -155,7 +155,7 @@ target-version = [
     "py38",
 ]
 include = ".*\\.py$"
-exclude = "(.git|venv|src/vellum/client|tests/client|scripts|examples/workflows|ee/codegen/python_file_merging/tests/fixtures)"
+exclude = "(.git|venv|src/vellum/client|tests/client|scripts|examples/workflows|ee/codegen/python_file_merging/tests/fixtures|ee/codegen/node_modules)"
 
 [tool.flake8]
 max-line-length = 120

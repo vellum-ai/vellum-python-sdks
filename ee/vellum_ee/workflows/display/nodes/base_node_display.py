@@ -429,15 +429,20 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 if explicit_value.comment.expanded is not None
                 else NodeDisplayComment(value=docstring, expanded=True)
             )
-            return NodeDisplayData(
-                position=explicit_value.position,
-                z_index=explicit_value.z_index,
-                width=explicit_value.width,
-                height=explicit_value.height,
-                comment=comment,
-                icon=explicit_value.icon,
-                color=explicit_value.color,
-            )
+            from typing import Any, Dict
+
+            kwargs: Dict[str, Any] = {
+                "position": explicit_value.position,
+                "z_index": explicit_value.z_index,
+                "width": explicit_value.width,
+                "height": explicit_value.height,
+                "comment": comment,
+            }
+            if explicit_value.icon is not None:
+                kwargs["icon"] = explicit_value.icon
+            if explicit_value.color is not None:
+                kwargs["color"] = explicit_value.color
+            return NodeDisplayData(**kwargs)
 
         if explicit_value:
             return explicit_value
