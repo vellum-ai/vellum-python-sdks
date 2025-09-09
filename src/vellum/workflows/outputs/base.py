@@ -1,5 +1,5 @@
 import inspect
-from typing import Any, Dict, Generic, Iterator, Optional, Set, Tuple, Type, TypeVar, Union, cast
+from typing import Any, Dict, Generic, Iterator, Set, Tuple, Type, TypeVar, Union, cast
 from typing_extensions import dataclass_transform
 
 from pydantic import GetCoreSchemaHandler
