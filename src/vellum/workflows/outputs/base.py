@@ -190,7 +190,7 @@ class _BaseOutputsMeta(type):
 
 
 class BaseOutputs(metaclass=_BaseOutputsMeta):
-    __parent_class__: Union[Type[BaseExecutable], Type[None]] = type(None)
+    __parent_class__: Type[BaseExecutable] = field(init=False)
 
     def __init__(self, **kwargs: Any) -> None:
         declared_fields = {descriptor.name for descriptor in self.__class__}
