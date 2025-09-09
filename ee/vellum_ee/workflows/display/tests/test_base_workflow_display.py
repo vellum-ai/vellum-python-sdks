@@ -495,9 +495,7 @@ def test_serialize_workflow_with_node_icon_and_color():
             final_result = TestNode.Outputs.result
 
     class TestNodeDisplay(BaseNodeDisplay[TestNode]):
-        display_data = NodeDisplayData(
-            position=NodeDisplayPosition(x=100, y=200), icon="vellum:icon:cog", color="#42A5F5"
-        )
+        display_data = NodeDisplayData(position=NodeDisplayPosition(x=100, y=200), icon="vellum:icon:cog", color="navy")
 
     class TestWorkflowDisplay(BaseWorkflowDisplay[TestWorkflow]):
         pass
@@ -523,4 +521,4 @@ def test_serialize_workflow_with_node_icon_and_color():
 
     assert test_node is not None, "TestNode not found in serialized nodes"
     assert test_node["display_data"]["icon"] == "vellum:icon:cog"
-    assert test_node["display_data"]["color"] == "#42A5F5"
+    assert test_node["display_data"]["color"] == "navy"

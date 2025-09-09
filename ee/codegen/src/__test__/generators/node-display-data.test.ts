@@ -43,7 +43,7 @@ describe("NodeDisplayData", () => {
     it("should include color in generated code when color is provided", () => {
       const nodeDisplayData = {
         position: { x: 0, y: 0 },
-        color: "#FF5733",
+        color: "navy",
       };
       const generator = new NodeDisplayData({
         nodeDisplayData,
@@ -52,7 +52,7 @@ describe("NodeDisplayData", () => {
 
       const code = generator.toString();
 
-      expect(code).toContain('color="#FF5733"');
+      expect(code).toContain('color="navy"');
     });
 
     it("should not include color in generated code when color is undefined", () => {
@@ -75,7 +75,7 @@ describe("NodeDisplayData", () => {
       const nodeDisplayData = {
         position: { x: 0, y: 0 },
         icon: "vellum:icon:cog",
-        color: "#42A5F5",
+        color: "navy",
       };
       const generator = new NodeDisplayData({
         nodeDisplayData,
@@ -85,7 +85,7 @@ describe("NodeDisplayData", () => {
       const code = generator.toString();
 
       expect(code).toContain('icon="vellum:icon:cog"');
-      expect(code).toContain('color="#42A5F5"');
+      expect(code).toContain('color="navy"');
     });
   });
 });
