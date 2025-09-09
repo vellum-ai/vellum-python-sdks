@@ -1,3 +1,4 @@
+import copy
 from functools import cached_property
 import inspect
 from uuid import UUID
@@ -8,6 +9,7 @@ from typing import (
     Dict,
     ForwardRef,
     Generic,
+    List,
     Optional,
     Set,
     Tuple,
@@ -18,6 +20,7 @@ from typing import (
     get_origin,
 )
 
+from vellum import ChatMessagePromptBlock, RichTextPromptBlock, VariablePromptBlock
 from vellum.client.types.code_resource_definition import CodeResourceDefinition
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.constants import undefined
@@ -35,6 +38,7 @@ from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_var
 from vellum_ee.workflows.display.editor.types import NodeDisplayComment, NodeDisplayData
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
+from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.utils.expressions import serialize_value
 from vellum_ee.workflows.display.utils.registry import register_node_display_class
 
@@ -157,12 +161,18 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 if self.attribute_ids_by_name.get(attribute.name)
                 else str(uuid4_from_hash(f"{node_id}|{attribute.name}"))
             )
+
+            value = attribute.instance
+            if attribute.name == "blocks":
+                # Create a deep copy to avoid mutating the original blocks
+                blocks_copy = copy.deepcopy(value or [])
+                value = self._replace_input_variables_with_ids(blocks_copy, display_context)
             try:
                 attributes.append(
                     {
                         "id": id,
                         "name": attribute.name,
-                        "value": serialize_value(display_context, attribute.instance),
+                        "value": serialize_value(display_context, value),
                     }
                 )
             except ValueError as e:
@@ -269,6 +279,57 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 raise ValueError(f"Failed to serialize attribute '{attribute.name}': {e}")
 
         return attributes
+
+    def _replace_input_variables_with_ids(self, blocks: List, display_context: "WorkflowDisplayContext") -> List:
+        # Get the input variable ID mapping from the serialized prompt_inputs attribute
+        prompt_inputs_value = raise_if_descriptor(self._node.prompt_inputs)
+        if not prompt_inputs_value:
+            return blocks
+
+        serialized_prompt_inputs = serialize_value(display_context, prompt_inputs_value)
+
+        # Extract the mapping from the serialized result
+        input_variable_id_mapping = {}
+        if (
+            isinstance(serialized_prompt_inputs, dict)
+            and serialized_prompt_inputs.get("type") == "DICTIONARY_REFERENCE"
+            and "entries" in serialized_prompt_inputs
+        ):
+            entries = serialized_prompt_inputs["entries"]
+            if isinstance(entries, list):
+                for entry in entries:
+                    if isinstance(entry, dict):
+                        key = entry.get("key")
+                        entry_id = entry.get("id")
+                        if key and entry_id:
+                            input_variable_id_mapping[key] = entry_id
+
+        # Replace input variable names with IDs recursively
+        for i, block in enumerate(blocks):
+            if block.block_type == "VARIABLE":
+                input_variable_id = input_variable_id_mapping.get(block.input_variable)
+                if input_variable_id:
+                    blocks[i] = VariablePromptBlock(
+                        block_type="VARIABLE",
+                        input_variable=str(input_variable_id),
+                        state=getattr(block, "state", None),
+                        cache_config=getattr(block, "cache_config", None),
+                    )
+            elif block.block_type == "RICH_TEXT":
+                blocks[i] = RichTextPromptBlock(
+                    block_type="RICH_TEXT",
+                    blocks=self._replace_input_variables_with_ids(block.blocks, display_context),
+                    state=getattr(block, "state", None),
+                )
+            elif block.block_type == "CHAT_MESSAGE":
+                blocks[i] = ChatMessagePromptBlock(
+                    block_type="CHAT_MESSAGE",
+                    blocks=self._replace_input_variables_with_ids(block.blocks, display_context),
+                    state=getattr(block, "state", None),
+                    chat_role=getattr(block, "chat_role", None),
+                )
+
+        return blocks
 
     def serialize_generic_fields(self, display_context: "WorkflowDisplayContext") -> JsonObject:
         """Serialize generic fields that are common to all nodes."""
