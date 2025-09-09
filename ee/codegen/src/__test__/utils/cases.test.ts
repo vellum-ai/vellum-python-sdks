@@ -1,6 +1,5 @@
 import {
   createPythonClassName,
-  pascalToTitleCase,
   toKebabCase,
   toPythonSafeSnakeCase,
   toValidPythonIdentifier,
@@ -132,31 +131,6 @@ describe("Casing utility functions", () => {
       "should convert '$input' to '$expected'",
       ({ input, safetyPrefix, expected }) => {
         expect(toValidPythonIdentifier(input, safetyPrefix)).toBe(expected);
-      }
-    );
-  });
-
-  describe("pascalToTitleCase", () => {
-    const testCases = [
-      { input: "FetchDeploymentScheme", expected: "Fetch Deployment Scheme" },
-      { input: "CheckDeploymentExists", expected: "Check Deployment Exists" },
-      { input: "MyPascalCaseString", expected: "My Pascal Case String" },
-      {
-        input: "AnotherPascalCaseString",
-        expected: "Another Pascal Case String",
-      },
-      { input: "SimpleWord", expected: "Simple Word" },
-      { input: "A", expected: "A" },
-      { input: "APINode", expected: "API Node" },
-      { input: "API Node", expected: "API Node" },
-      { input: "My node", expected: "My Node" },
-      { input: "Templating Node", expected: "Templating Node" },
-    ];
-
-    it.each(testCases)(
-      "should convert '$input' to '$expected'",
-      ({ input, expected }) => {
-        expect(pascalToTitleCase(input)).toBe(expected);
       }
     );
   });
