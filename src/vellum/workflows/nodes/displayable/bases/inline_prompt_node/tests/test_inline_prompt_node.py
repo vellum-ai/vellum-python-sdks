@@ -9,22 +9,34 @@ from pydantic import BaseModel
 from vellum import (
     AdHocExecutePromptEvent,
     ChatMessagePromptBlock,
+    ExecutePromptEvent,
     FulfilledAdHocExecutePromptEvent,
+    FulfilledExecutePromptEvent,
+    FulfilledPromptExecutionMeta,
+    InitiatedExecutePromptEvent,
     JinjaPromptBlock,
     PlainTextPromptBlock,
     PromptBlock,
+    PromptOutput,
     PromptParameters,
+    PromptRequestAudioInput,
+    PromptRequestDocumentInput,
+    PromptRequestImageInput,
+    PromptRequestStringInput,
+    PromptRequestVideoInput,
     PromptSettings,
     RichTextPromptBlock,
+    StringVellumValue,
     VariablePromptBlock,
+    VellumAudio,
+    VellumAudioRequest,
+    VellumDocument,
+    VellumDocumentRequest,
+    VellumImage,
+    VellumImageRequest,
+    VellumVideo,
+    VellumVideoRequest,
 )
-from vellum.client.types.execute_prompt_event import ExecutePromptEvent
-from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
-from vellum.client.types.fulfilled_prompt_execution_meta import FulfilledPromptExecutionMeta
-from vellum.client.types.initiated_execute_prompt_event import InitiatedExecutePromptEvent
-from vellum.client.types.prompt_output import PromptOutput
-from vellum.client.types.prompt_request_string_input import PromptRequestStringInput
-from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs import BaseInputs
@@ -725,3 +737,71 @@ def test_inline_prompt_node__empty_string_output_with_length_finish_reason(vellu
 
     # AND the exception should have the correct error code
     assert excinfo.value.code == WorkflowErrorCode.INVALID_OUTPUTS
+
+
+@pytest.mark.parametrize(
+    [
+        "raw_input",
+        "expected_vellum_variable_type",
+        "expected_compiled_inputs",
+    ],
+    [
+        # Cast VellumX -> VellumXRequest
+        (
+            VellumAudio(src="data:audio/wav;base64,mockaudio"),
+            "AUDIO",
+            [PromptRequestAudioInput(key="file_input", value=VellumAudio(src="data:audio/wav;base64,mockaudio"))],
+        ),
+        (
+            VellumImage(src="data:image/png;base64,mockimage"),
+            "IMAGE",
+            [PromptRequestImageInput(key="file_input", value=VellumImage(src="data:image/png;base64,mockimage"))],
+        ),
+        (
+            VellumVideo(src="data:video/mp4;base64,mockvideo"),
+            "VIDEO",
+            [PromptRequestVideoInput(key="file_input", value=VellumVideo(src="data:video/mp4;base64,mockvideo"))],
+        ),
+        (
+            VellumDocument(src="mockdocument"),
+            "DOCUMENT",
+            [PromptRequestDocumentInput(key="file_input", value=VellumDocument(src="mockdocument"))],
+        ),
+        # No casting required
+        (
+            VellumAudioRequest(src="data:audio/wav;base64,mockaudio"),
+            "AUDIO",
+            [PromptRequestAudioInput(key="file_input", value=VellumAudio(src="data:audio/wav;base64,mockaudio"))],
+        ),
+        (
+            VellumImageRequest(src="data:image/png;base64,mockimage"),
+            "IMAGE",
+            [PromptRequestImageInput(key="file_input", value=VellumImage(src="data:image/png;base64,mockimage"))],
+        ),
+        (
+            VellumVideoRequest(src="data:video/mp4;base64,mockvideo"),
+            "VIDEO",
+            [PromptRequestVideoInput(key="file_input", value=VellumVideo(src="data:video/mp4;base64,mockvideo"))],
+        ),
+        (
+            VellumDocumentRequest(src="mockdocument"),
+            "DOCUMENT",
+            [PromptRequestDocumentInput(key="file_input", value=VellumDocument(src="mockdocument"))],
+        ),
+    ],
+)
+def test_file_input_compilation(raw_input, expected_vellum_variable_type, expected_compiled_inputs):
+    # GIVEN a prompt node with file input
+    class MyPromptDeploymentNode(InlinePromptNode):
+        ml_model = "test-model"
+        ml_model_fallbacks = None
+
+        prompt_inputs = {"file_input": raw_input}
+
+    # WHEN we compile the inputs
+    vellum_variables, compiled_inputs = MyPromptDeploymentNode()._compile_prompt_inputs()
+
+    # THEN we should get the correct input type
+    assert len(vellum_variables) == 1
+    assert vellum_variables[0].type == expected_vellum_variable_type
+    assert compiled_inputs == expected_compiled_inputs

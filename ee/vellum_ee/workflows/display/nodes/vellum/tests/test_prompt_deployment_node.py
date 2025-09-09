@@ -3,6 +3,20 @@ from datetime import datetime
 from uuid import UUID, uuid4
 from typing import Type
 
+from vellum import (
+    AudioInputRequest,
+    DocumentInputRequest,
+    ImageInputRequest,
+    VellumAudio,
+    VellumAudioRequest,
+    VellumDocument,
+    VellumDocumentRequest,
+    VellumImage,
+    VellumImageRequest,
+    VellumVideo,
+    VellumVideoRequest,
+    VideoInputRequest,
+)
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.nodes import PromptDeploymentNode
 from vellum_ee.workflows.display.nodes.vellum.prompt_deployment_node import BasePromptDeploymentNodeDisplay
@@ -105,3 +119,59 @@ def test_serialize_node__prompt_inputs(GetDisplayClass, expected_input_id, mock_
             },
         }
     ]
+
+
+@pytest.mark.parametrize(
+    [
+        "raw_input",
+        "expected_compiled_inputs",
+    ],
+    [
+        # Cast VellumX -> VellumXRequest
+        (
+            VellumAudio(src="data:audio/wav;base64,mockaudio"),
+            [AudioInputRequest(name="file_input", value=VellumAudioRequest(src="data:audio/wav;base64,mockaudio"))],
+        ),
+        (
+            VellumImage(src="data:image/png;base64,mockimage"),
+            [ImageInputRequest(name="file_input", value=VellumImageRequest(src="data:image/png;base64,mockimage"))],
+        ),
+        (
+            VellumVideo(src="data:video/mp4;base64,mockvideo"),
+            [VideoInputRequest(name="file_input", value=VellumVideoRequest(src="data:video/mp4;base64,mockvideo"))],
+        ),
+        (
+            VellumDocument(src="mockdocument"),
+            [DocumentInputRequest(name="file_input", value=VellumDocumentRequest(src="mockdocument"))],
+        ),
+        # No casting required
+        (
+            VellumAudioRequest(src="data:audio/wav;base64,mockaudio"),
+            [AudioInputRequest(name="file_input", value=VellumAudioRequest(src="data:audio/wav;base64,mockaudio"))],
+        ),
+        (
+            VellumImageRequest(src="data:image/png;base64,mockimage"),
+            [ImageInputRequest(name="file_input", value=VellumImageRequest(src="data:image/png;base64,mockimage"))],
+        ),
+        (
+            VellumVideoRequest(src="data:video/mp4;base64,mockvideo"),
+            [VideoInputRequest(name="file_input", value=VellumVideoRequest(src="data:video/mp4;base64,mockvideo"))],
+        ),
+        (
+            VellumDocumentRequest(src="mockdocument"),
+            [DocumentInputRequest(name="file_input", value=VellumDocumentRequest(src="mockdocument"))],
+        ),
+    ],
+)
+def test_file_input_compilation(raw_input, expected_compiled_inputs):
+    # GIVEN a prompt node with file input
+    class MyPromptDeploymentNode(PromptDeploymentNode):
+        deployment = "DEPLOYMENT"
+        prompt_inputs = {"file_input": raw_input}
+        ml_model_fallbacks = None
+
+    # WHEN we compile the inputs
+    compiled_inputs = MyPromptDeploymentNode()._compile_prompt_inputs()
+
+    # THEN we should get the correct input type
+    assert compiled_inputs == expected_compiled_inputs

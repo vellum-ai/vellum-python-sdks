@@ -3,15 +3,27 @@ from uuid import UUID
 from typing import Any, ClassVar, Dict, Generator, Generic, Iterator, List, Optional, Sequence, Set, Union
 
 from vellum import (
+    AudioInputRequest,
     ChatHistoryInputRequest,
     ChatMessage,
+    DocumentInputRequest,
     ExecutePromptEvent,
+    ImageInputRequest,
     JsonInputRequest,
     PromptDeploymentExpandMetaRequest,
     PromptDeploymentInputRequest,
     PromptOutput,
     RawPromptExecutionOverridesRequest,
     StringInputRequest,
+    VellumAudio,
+    VellumAudioRequest,
+    VellumDocument,
+    VellumDocumentRequest,
+    VellumImage,
+    VellumImageRequest,
+    VellumVideo,
+    VellumVideoRequest,
+    VideoInputRequest,
 )
 from vellum.client import ApiError, RequestOptions
 from vellum.client.types.chat_message_request import ChatMessageRequest
@@ -200,6 +212,54 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
                     ChatHistoryInputRequest(
                         name=input_name,
                         value=chat_history,
+                    )
+                )
+            elif isinstance(input_value, (VellumAudio, VellumAudioRequest)):
+                audio_value = (
+                    input_value
+                    if isinstance(input_value, VellumAudioRequest)
+                    else VellumAudioRequest.model_validate(input_value.model_dump())
+                )
+                compiled_inputs.append(
+                    AudioInputRequest(
+                        name=input_name,
+                        value=audio_value,
+                    )
+                )
+            elif isinstance(input_value, (VellumImage, VellumImageRequest)):
+                image_value = (
+                    input_value
+                    if isinstance(input_value, VellumImageRequest)
+                    else VellumImageRequest.model_validate(input_value.model_dump())
+                )
+                compiled_inputs.append(
+                    ImageInputRequest(
+                        name=input_name,
+                        value=image_value,
+                    )
+                )
+            elif isinstance(input_value, (VellumDocument, VellumDocumentRequest)):
+                document_value = (
+                    input_value
+                    if isinstance(input_value, VellumDocumentRequest)
+                    else VellumDocumentRequest.model_validate(input_value.model_dump())
+                )
+                compiled_inputs.append(
+                    DocumentInputRequest(
+                        name=input_name,
+                        value=document_value,
+                    )
+                )
+            elif isinstance(input_value, (VellumVideo, VellumVideoRequest)):
+                video_value = (
+                    input_value
+                    if isinstance(input_value, VellumVideoRequest)
+                    else VellumVideoRequest.model_validate(input_value.model_dump())
+                )
+                compiled_inputs.append(
+                    VideoInputRequest(
+                        name=input_name,
+                        value=video_value,
                     )
                 )
             else:
