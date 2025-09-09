@@ -1,7 +1,9 @@
 from uuid import uuid4
+from typing import cast
 
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.outputs.base import BaseOutputs
+from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 
@@ -38,15 +40,16 @@ class TestDuplicateDisplayNames:
 
         result = workflow_display.serialize()
 
-        input_variables = result["input_variables"]
+        input_variables = cast(JsonArray, result["input_variables"])
         assert len(input_variables) == 2
 
-        keys = [var["key"] for var in input_variables]
+        keys = [cast(JsonObject, var)["key"] for var in input_variables]
         assert len(set(keys)) == 2  # All keys should be unique
 
         for key in keys:
-            assert key.startswith("duplicate_name_")
-            assert len(key) > len("duplicate_name_")
+            key_str = cast(str, key)
+            assert key_str.startswith("duplicate_name_")
+            assert len(key_str) > len("duplicate_name_")
 
     def test_duplicate_output_names_get_unique_keys(self):
         """Test that duplicate output names get unique keys with appended IDs."""
@@ -77,15 +80,16 @@ class TestDuplicateDisplayNames:
 
         result = workflow_display.serialize()
 
-        output_variables = result["output_variables"]
+        output_variables = cast(JsonArray, result["output_variables"])
         assert len(output_variables) == 2
 
-        keys = [var["key"] for var in output_variables]
+        keys = [cast(JsonObject, var)["key"] for var in output_variables]
         assert len(set(keys)) == 2  # All keys should be unique
 
         for key in keys:
-            assert key.startswith("duplicate_output_")
-            assert len(key) > len("duplicate_output_")
+            key_str = cast(str, key)
+            assert key_str.startswith("duplicate_output_")
+            assert len(key_str) > len("duplicate_output_")
 
     def test_unique_names_remain_unchanged(self):
         """Test that unique names remain unchanged."""
@@ -120,13 +124,13 @@ class TestDuplicateDisplayNames:
 
         result = workflow_display.serialize()
 
-        input_variables = result["input_variables"]
+        input_variables = cast(JsonArray, result["input_variables"])
         assert len(input_variables) == 1
-        assert input_variables[0]["key"] == "unique_input_name"
+        assert cast(JsonObject, input_variables[0])["key"] == "unique_input_name"
 
-        output_variables = result["output_variables"]
+        output_variables = cast(JsonArray, result["output_variables"])
         assert len(output_variables) == 1
-        assert output_variables[0]["key"] == "unique_output_name"
+        assert cast(JsonObject, output_variables[0])["key"] == "unique_output_name"
 
     def test_mixed_duplicate_and_unique_names(self):
         """Test handling of mixed duplicate and unique names."""
@@ -160,14 +164,14 @@ class TestDuplicateDisplayNames:
 
         result = workflow_display.serialize()
 
-        input_variables = result["input_variables"]
+        input_variables = cast(JsonArray, result["input_variables"])
         assert len(input_variables) == 3
 
-        keys = [var["key"] for var in input_variables]
+        keys = [cast(JsonObject, var)["key"] for var in input_variables]
         assert len(set(keys)) == 3  # All keys should be unique
 
         unique_keys = [key for key in keys if key == "unique_name"]
         assert len(unique_keys) == 1
 
-        duplicate_keys = [key for key in keys if key.startswith("duplicate_name_")]
+        duplicate_keys = [key for key in keys if cast(str, key).startswith("duplicate_name_")]
         assert len(duplicate_keys) == 2
