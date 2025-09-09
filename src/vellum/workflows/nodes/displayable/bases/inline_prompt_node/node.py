@@ -17,6 +17,20 @@ from vellum import (
     VellumVariable,
 )
 from vellum.client import ApiError, RequestOptions
+from vellum.client.types import (
+    PromptRequestAudioInput,
+    PromptRequestDocumentInput,
+    PromptRequestImageInput,
+    PromptRequestVideoInput,
+    VellumAudio,
+    VellumAudioRequest,
+    VellumDocument,
+    VellumDocumentRequest,
+    VellumImage,
+    VellumImageRequest,
+    VellumVideo,
+    VellumVideoRequest,
+)
 from vellum.client.types.chat_message_request import ChatMessageRequest
 from vellum.client.types.prompt_exec_config import PromptExecConfig
 from vellum.client.types.prompt_settings import PromptSettings
@@ -271,6 +285,78 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                     PromptRequestChatHistoryInput(
                         key=input_name,
                         value=chat_history,
+                    )
+                )
+            elif isinstance(input_value, (VellumAudio, VellumAudioRequest)):
+                input_variables.append(
+                    VellumVariable(
+                        id=str(uuid4()),
+                        key=input_name,
+                        type="AUDIO",
+                    )
+                )
+                input_values.append(
+                    PromptRequestAudioInput(
+                        key=input_name,
+                        value=(
+                            input_value
+                            if isinstance(input_value, VellumAudio)
+                            else VellumAudio.model_validate(input_value.model_dump())
+                        ),
+                    )
+                )
+            elif isinstance(input_value, (VellumVideo, VellumVideoRequest)):
+                input_variables.append(
+                    VellumVariable(
+                        id=str(uuid4()),
+                        key=input_name,
+                        type="VIDEO",
+                    )
+                )
+                input_values.append(
+                    PromptRequestVideoInput(
+                        key=input_name,
+                        value=(
+                            input_value
+                            if isinstance(input_value, VellumVideo)
+                            else VellumVideo.model_validate(input_value.model_dump())
+                        ),
+                    )
+                )
+            elif isinstance(input_value, (VellumImage, VellumImageRequest)):
+                input_variables.append(
+                    VellumVariable(
+                        id=str(uuid4()),
+                        key=input_name,
+                        type="IMAGE",
+                    )
+                )
+                input_values.append(
+                    PromptRequestImageInput(
+                        key=input_name,
+                        value=(
+                            input_value
+                            if isinstance(input_value, VellumImage)
+                            else VellumImage.model_validate(input_value.model_dump())
+                        ),
+                    )
+                )
+            elif isinstance(input_value, (VellumDocument, VellumDocumentRequest)):
+                input_variables.append(
+                    VellumVariable(
+                        id=str(uuid4()),
+                        key=input_name,
+                        type="DOCUMENT",
+                    )
+                )
+                input_values.append(
+                    PromptRequestDocumentInput(
+                        key=input_name,
+                        value=(
+                            input_value
+                            if isinstance(input_value, VellumDocument)
+                            else VellumDocument.model_validate(input_value.model_dump())
+                        ),
                     )
                 )
             else:
