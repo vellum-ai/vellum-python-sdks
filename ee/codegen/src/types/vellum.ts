@@ -183,6 +183,8 @@ export interface NodeDisplayData {
   width?: number;
   height?: number;
   comment?: NodeDisplayComment;
+  icon?: string;
+  color?: string;
 }
 
 export interface WorkflowEdgeDisplayData {

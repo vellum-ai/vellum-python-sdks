@@ -4,6 +4,7 @@ from uuid import UUID
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.ports.port import Port
 from vellum.workflows.references.constant import ConstantValueReference
+from vellum_ee.workflows.display.editor.types import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
@@ -117,3 +118,66 @@ def test_serialize_node_label_with_pascal_case():
 
     # THEN the label should be converted to proper title case with spaces
     assert data["label"] == "My Custom Node"
+
+
+def test_serialize_display_data_with_icon_and_color():
+    """
+    Tests that nodes with icon and color serialize display_data correctly.
+    """
+
+    # GIVEN a node with icon and color in display data
+    class MyNode(BaseNode):
+        pass
+
+    class MyNodeDisplay(BaseNodeDisplay[MyNode]):
+        display_data = NodeDisplayData(
+            position=NodeDisplayPosition(x=100, y=200), icon="vellum:icon:star", color="navy"
+        )
+
+    # WHEN we serialize the node
+    data = MyNodeDisplay().serialize(WorkflowDisplayContext())
+
+    # THEN the display_data should include icon and color
+    assert data["display_data"] == {"position": {"x": 100, "y": 200}, "icon": "vellum:icon:star", "color": "navy"}
+
+
+def test_serialize_display_data_with_various_icon_formats():
+    """
+    Tests that different icon formats are serialized correctly.
+    """
+
+    # GIVEN a node with a vellum icon format
+    class MyNode(BaseNode):
+        pass
+
+    class MyNodeDisplay(BaseNodeDisplay[MyNode]):
+        display_data = NodeDisplayData(icon="vellum:icon:home")
+
+    # WHEN we serialize the node
+    data = MyNodeDisplay().serialize(WorkflowDisplayContext())
+
+    # THEN the icon should be preserved as-is
+    display_data = data["display_data"]
+    assert isinstance(display_data, dict)
+    assert display_data["icon"] == "vellum:icon:home"
+
+
+def test_serialize_display_data_with_navy_color():
+    """
+    Tests that navy color values are serialized correctly.
+    """
+
+    # GIVEN a node with a navy color
+    class MyNode(BaseNode):
+        pass
+
+    class MyNodeDisplay(BaseNodeDisplay[MyNode]):
+        display_data = NodeDisplayData(color="navy")
+
+    # WHEN we serialize the node
+    data = MyNodeDisplay().serialize(WorkflowDisplayContext())
+
+    # THEN the color should be preserved as-is
+    display_data = data["display_data"]
+    assert isinstance(display_data, dict)
+    assert display_data["color"] == "navy"
