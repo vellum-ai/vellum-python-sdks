@@ -74,6 +74,245 @@ describe("WorkflowProjectGenerator", () => {
     await rm(tempDir, { recursive: true, force: true });
   });
 
+  it("getNodeIdToFileMapping returns definitions for nodes with definition", async () => {
+    const displayData = {
+      workflow_raw_data: {
+        nodes: [
+          {
+            id: "9663d2e9-8e18-448b-b963-cac4539db9d7",
+            type: "ENTRYPOINT",
+            data: {
+              label: "Entrypoint",
+              source_handle_id: "entry_source",
+              target_handle_id: "entry_target",
+            },
+            inputs: [],
+          },
+          {
+            id: "4344baa3-cdfe-4c16-bb76-545e0f55dba9",
+            type: "GENERIC",
+            label: "Generic Node",
+            attributes: [],
+            trigger: {
+              id: "generic-node-trigger",
+              merge_behavior: "AWAIT_ATTRIBUTES",
+            },
+            ports: [
+              {
+                id: "generic-node-default-port",
+                name: "default",
+                type: "DEFAULT",
+              },
+            ],
+            base: {
+              name: "BaseNode",
+              module: ["vellum", "workflows", "nodes", "bases", "base"],
+            },
+            definition: {
+              name: "Generic Node",
+              module: ["my_nodes", "my_custom_node"],
+            },
+            outputs: [],
+          },
+          {
+            id: "e414b44b-3be6-4dd7-9e03-9ac86265b662",
+            type: "TEMPLATING",
+            data: {
+              label: "Templating Node",
+              output_id: "b25e40da-e2ec-4cc3-b75e-07d9ddf4d33c",
+              error_output_id: null,
+              source_handle_id: "templating-source",
+              target_handle_id: "templating-target",
+              template_node_input_id: "20ef17f3-2d6f-43c6-bece-ee2e7a23ddde",
+              output_type: "STRING",
+            },
+            inputs: [
+              {
+                id: "20ef17f3-2d6f-43c6-bece-ee2e7a23ddde",
+                key: "template",
+                value: {
+                  rules: [
+                    {
+                      type: "CONSTANT_VALUE",
+                      data: {
+                        type: "STRING",
+                        value: "{{ string }}",
+                      },
+                    },
+                  ],
+                  combinator: "OR",
+                },
+              },
+              {
+                id: "af4c1c22-b82a-4f43-ae0f-be4be61e4a0c",
+                key: "string",
+                value: {
+                  rules: [
+                    {
+                      type: "CONSTANT_VALUE",
+                      data: {
+                        type: "STRING",
+                        value: "Hello, World!",
+                      },
+                    },
+                  ],
+                  combinator: "OR",
+                },
+              },
+            ],
+            display_data: {
+              position: {
+                x: 254.0,
+                y: 103.0,
+              },
+              z_index: 1,
+              comment: {
+                value: "Templates the input string using Jinja.",
+                expanded: true,
+              },
+              width: 554.0,
+              height: 290.0,
+              icon: null,
+              color: null,
+            },
+            base: null,
+            definition: {
+              name: "TemplatingNode",
+              module: ["o2Xi6VWTNd1THb", "nodes", "templating_node"],
+            },
+            trigger: {
+              id: "templating-target",
+              merge_behavior: "AWAIT_ATTRIBUTES",
+            },
+            ports: [
+              {
+                id: "5a9d77e7-0f28-4e57-8f6f-3f96be444ed2",
+                name: "default",
+                type: "DEFAULT",
+              },
+            ],
+            adornments: null,
+            outputs: null,
+            attributes: null,
+          },
+          {
+            id: "b2439bcb-8dee-44b6-85f1-37f294b0e0cb",
+            type: "TERMINAL",
+            data: {
+              label: "Output",
+              name: "output",
+              target_handle_id: "final-target",
+              output_id: "99408c96-eb09-44ff-ab92-a8c362c13b6b",
+              output_type: "STRING",
+              node_input_id: "ca9f8d73-34df-41fd-8efc-16f11282e092",
+            },
+            inputs: [
+              {
+                id: "ca9f8d73-34df-41fd-8efc-16f11282e092",
+                key: "node_input",
+                value: {
+                  rules: [
+                    {
+                      type: "NODE_OUTPUT",
+                      data: {
+                        node_id: "e414b44b-3be6-4dd7-9e03-9ac86265b662",
+                        output_id: "b25e40da-e2ec-4cc3-b75e-07d9ddf4d33c",
+                      },
+                    },
+                  ],
+                  combinator: "OR",
+                },
+              },
+            ],
+            display_data: {
+              position: {
+                x: 1622.0,
+                y: 0.0,
+              },
+              z_index: 5,
+              comment: {
+                value: "Final output of the workflow.",
+                expanded: true,
+              },
+              width: 522.0,
+              height: 296.0,
+              icon: null,
+              color: null,
+            },
+            base: null,
+            definition: {
+              name: "Output",
+              module: ["o2Xi6VWTNd1THb", "nodes", "output"],
+            },
+            trigger: {
+              id: "final-target",
+              merge_behavior: "AWAIT_ANY",
+            },
+            outputs: [
+              {
+                id: "99408c96-eb09-44ff-ab92-a8c362c13b6b",
+                name: "value",
+                type: "STRING",
+                value: {
+                  type: "NODE_OUTPUT",
+                  node_id: "e414b44b-3be6-4dd7-9e03-9ac86265b662",
+                  node_output_id: "b25e40da-e2ec-4cc3-b75e-07d9ddf4d33c",
+                },
+              },
+            ],
+          },
+        ],
+        edges: [
+          {
+            source_node_id: "9663d2e9-8e18-448b-b963-cac4539db9d7",
+            source_handle_id: "entry_source",
+            target_node_id: "4344baa3-cdfe-4c16-bb76-545e0f55dba9",
+            target_handle_id: "generic-node-trigger",
+            type: "DEFAULT",
+            id: "edge_1",
+          },
+          {
+            source_node_id: "4344baa3-cdfe-4c16-bb76-545e0f55dba9",
+            source_handle_id: "generic-node-default-port",
+            target_node_id: "e414b44b-3be6-4dd7-9e03-9ac86265b662",
+            target_handle_id: "templating-target",
+            type: "DEFAULT",
+            id: "edge_2",
+          },
+        ],
+      },
+      input_variables: [],
+      state_variables: [],
+      output_variables: [],
+      packages: [],
+    };
+
+    const project = new WorkflowProjectGenerator({
+      absolutePathToOutputDirectory: tempDir,
+      workflowVersionExecConfigData: displayData,
+      moduleName: "code",
+      vellumApiKey: "<TEST_API_KEY>",
+    });
+
+    await project.generateCode();
+
+    const mapping = project.getNodeIdToFileMapping();
+    expect(mapping).toEqual({
+      "4344baa3-cdfe-4c16-bb76-545e0f55dba9": {
+        name: "Generic Node",
+        module: ["my_nodes", "my_custom_node"],
+      },
+      "e414b44b-3be6-4dd7-9e03-9ac86265b662": {
+        name: "TemplatingNode",
+        module: ["o2Xi6VWTNd1THb", "nodes", "templating_node"],
+      },
+      "b2439bcb-8dee-44b6-85f1-37f294b0e0cb": {
+        name: "Output",
+        module: ["o2Xi6VWTNd1THb", "nodes", "output"],
+      },
+    });
+  });
+
   describe("generateCode", () => {
     const excludeFilesAtPaths: RegExp[] = [/\.pyc$/];
     const ignoreContentsOfFilesAtPaths: RegExp[] = [];

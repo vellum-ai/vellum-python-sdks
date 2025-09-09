@@ -65,6 +65,7 @@ import { TemplatingNode } from "src/generators/nodes/templating-node";
 import { WorkflowSandboxFile } from "src/generators/workflow-sandbox-file";
 import { WorkflowVersionExecConfigSerializer } from "src/serializers/vellum";
 import {
+  CodeResourceDefinition,
   FinalOutputNode as FinalOutputNodeType,
   WorkflowDataNode,
   WorkflowNodeType as WorkflowNodeTypeEnum,
@@ -1010,5 +1011,19 @@ ${errors.slice(0, 3).map((err) => {
 
   public getPythonCodeMergeableNodeFiles(): Set<string> {
     return this.workflowContext.getPythonCodeMergeableNodeFiles();
+  }
+
+  public getNodeIdToFileMapping(): Record<string, CodeResourceDefinition> {
+    return Object.fromEntries(
+      Array.from(this.workflowContext.globalNodeContextsByNodeId.entries()).map(
+        ([nodeId, nodeContext]) => [
+          nodeId,
+          nodeContext.nodeData.definition ?? {
+            name: nodeContext.nodeClassName,
+            module: nodeContext.nodeModulePath,
+          },
+        ]
+      )
+    );
   }
 }
