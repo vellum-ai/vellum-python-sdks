@@ -146,7 +146,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             input_variable_data.append(
                 {
                     "id": str(workflow_input_display.id),
-                    "display_name": display_name,
+                    "key": display_name,
                     "type": infer_vellum_variable_type(workflow_input_reference),
                     "default": default.dict() if default else None,
                     "required": is_required,
@@ -154,18 +154,18 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 }
             )
 
-        display_name_counts: Dict[str, int] = {}
+        key_counts: Dict[str, int] = {}
         for item in input_variable_data:
-            display_name = str(item["display_name"])
-            display_name_counts[display_name] = display_name_counts.get(display_name, 0) + 1
+            key = str(item["key"])
+            key_counts[key] = key_counts.get(key, 0) + 1
 
         for item in input_variable_data:
-            display_name = str(item["display_name"])
-            if display_name_counts[display_name] > 1:
+            key = str(item["key"])
+            if key_counts[key] > 1:
                 item_id = str(item["id"])
-                unique_key = f"{display_name}_{item_id[:8]}"
+                unique_key = f"{key}_{item_id[:8]}"
             else:
-                unique_key = display_name
+                unique_key = key
 
             input_variables.append(
                 {
@@ -338,23 +338,23 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             output_variable_data.append(
                 {
                     "id": str(workflow_output_display.id),
-                    "display_name": workflow_output_display.name,
+                    "key": workflow_output_display.name,
                     "type": inferred_type,
                 }
             )
 
-        output_name_counts: Dict[str, int] = {}
+        output_key_counts: Dict[str, int] = {}
         for item in output_variable_data:
-            display_name = str(item["display_name"])
-            output_name_counts[display_name] = output_name_counts.get(display_name, 0) + 1
+            key = str(item["key"])
+            output_key_counts[key] = output_key_counts.get(key, 0) + 1
 
         for item in output_variable_data:
-            display_name = str(item["display_name"])
-            if output_name_counts[display_name] > 1:
+            key = str(item["key"])
+            if output_key_counts[key] > 1:
                 item_id = str(item["id"])
-                unique_key = f"{display_name}_{item_id[:8]}"
+                unique_key = f"{key}_{item_id[:8]}"
             else:
-                unique_key = display_name
+                unique_key = key
 
             output_variables.append(
                 {
