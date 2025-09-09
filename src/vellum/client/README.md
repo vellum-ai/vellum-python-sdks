@@ -232,3 +232,19 @@ client = Vellum(
 )
 ```
 
+## Contributing
+
+While we value open-source contributions to this SDK, this library is generated programmatically.
+Additions made directly to this library would have to be moved over to our generation code,
+otherwise they would be overwritten upon the next generated release. Feel free to open a PR as
+a proof of concept, but know that we will not be able to merge it as-is. We suggest opening
+an issue first to discuss with us!
+
+On the other hand, contributions to the README are always very welcome!
+## Open-Source vs. Paid
+
+This repo is available under the [MIT expat license](https://github.com/vellum-ai/vellum-python-sdks/blob/main/LICENSE), except
+for the `ee` directory (which has its [license here](https://github.com/vellum-ai/vellum-python-sdks/blob/main/ee/LICENSE)) if applicable.
+
+To learn more, [book a demo](https://www.vellum.ai/landing-pages/request-demo) or see our [pricing page](https://www.vellum.ai/pricing).
+
