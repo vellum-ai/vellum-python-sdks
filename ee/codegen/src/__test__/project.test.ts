@@ -6880,6 +6880,76 @@ baz = foo + bar
         "nodes/subworkflow/nodes/my_addition.py"
       ); // Nested generic node in subworkflow
     });
+    it("should get node with should_file_merge field", async () => {
+      const displayData = {
+        workflow_raw_data: {
+          edges: [],
+          nodes: [
+            {
+              id: "entrypoint",
+              base: null,
+              data: {
+                label: "Entrypoint Node",
+                source_handle_id: "d8144c82-8b1a-4181-b068-6aaf69d21b73",
+              },
+              type: "ENTRYPOINT",
+              inputs: [],
+            },
+            {
+              id: "tool-calling-node",
+              base: {
+                name: "ToolCallingNode",
+                module: [
+                  "vellum",
+                  "workflows",
+                  "nodes",
+                  "displayable",
+                  "tool_calling_node",
+                  "node",
+                ],
+              },
+              type: "GENERIC",
+              label: "GetCurrentWeatherNode",
+              ports: [
+                {
+                  id: "7b97f998-4be5-478d-94c4-9423db5f6392",
+                  name: "default",
+                  type: "DEFAULT",
+                },
+              ],
+              should_file_merge: true,
+              outputs: [],
+              trigger: {
+                id: "d8d60185-e88a-467b-84f4-e5fddd8b3209",
+                merge_behavior: "AWAIT_ATTRIBUTES",
+              },
+              adornments: null,
+              attributes: [],
+              definition: {
+                name: "GetCurrentWeatherNode",
+                module: ["testing", "nodes", "tool_calling_node"],
+              },
+            },
+          ],
+          output_values: [],
+        },
+        input_variables: [],
+        state_variables: [],
+        output_variables: [],
+      };
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "testing",
+        vellumApiKey: "<TEST_API_KEY>",
+      });
+      await project.generateCode();
+
+      const mergeableFiles = project.getPythonCodeMergeableNodeFiles();
+
+      expect(mergeableFiles.size).toBe(1);
+      expect(mergeableFiles).toContain("nodes/tool_calling_node.py");
+    });
   });
 
   describe("subworkflow with inner and outer generic nodes", () => {

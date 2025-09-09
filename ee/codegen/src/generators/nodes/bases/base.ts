@@ -74,6 +74,20 @@ export abstract class BaseNode<
   }
 
   public async persist(): Promise<void> {
+    if (
+      "should_file_merge" in this.nodeData &&
+      this.nodeData.should_file_merge === true
+    ) {
+      const modulePath = this.nodeContext.nodeModulePath;
+      const rootModulePath = this.workflowContext.getRootModulePath();
+
+      const relativePath = `${modulePath
+        .slice(rootModulePath.length - 1)
+        .join("/")}.py`;
+
+      this.workflowContext.addPythonCodeMergeableNodeFile(relativePath);
+    }
+
     await Promise.all([
       this.getNodeFile().persist(),
       this.getNodeDisplayFile().persist(),

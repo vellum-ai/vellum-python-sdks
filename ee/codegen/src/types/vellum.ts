@@ -240,6 +240,7 @@ export type NodePort =
 export interface BaseWorkflowNode {
   type: string;
   definition?: CodeResourceDefinition;
+  should_file_merge?: boolean;
 }
 
 export interface BaseDisplayableWorkflowNode extends BaseWorkflowNode {
