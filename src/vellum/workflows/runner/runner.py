@@ -27,6 +27,7 @@ from typing import (
 from vellum.workflows.constants import undefined
 from vellum.workflows.context import ExecutionContext, execution_context, get_execution_context
 from vellum.workflows.descriptors.base import BaseDescriptor
+from vellum.workflows.descriptors.exceptions import InvalidExpressionException
 from vellum.workflows.errors import WorkflowError, WorkflowErrorCode
 from vellum.workflows.events import (
     NodeExecutionFulfilledEvent,
@@ -419,6 +420,21 @@ class WorkflowRunner(Generic[StateType]):
                 )
             )
         except WorkflowInitializationException as e:
+            logger.info(e)
+            captured_stacktrace = traceback.format_exc()
+            self._workflow_event_inner_queue.put(
+                NodeExecutionRejectedEvent(
+                    trace_id=execution.trace_id,
+                    span_id=span_id,
+                    body=NodeExecutionRejectedBody(
+                        node_definition=node.__class__,
+                        error=e.error,
+                        stacktrace=captured_stacktrace,
+                    ),
+                    parent=execution.parent_context,
+                )
+            )
+        except InvalidExpressionException as e:
             logger.info(e)
             captured_stacktrace = traceback.format_exc()
             self._workflow_event_inner_queue.put(
