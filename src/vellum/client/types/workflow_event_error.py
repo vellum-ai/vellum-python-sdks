@@ -10,6 +10,7 @@ from .workflow_execution_event_error_code import WorkflowExecutionEventErrorCode
 class WorkflowEventError(UniversalBaseModel):
     message: str
     code: WorkflowExecutionEventErrorCode
+    stacktrace: typing.Optional[str] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
