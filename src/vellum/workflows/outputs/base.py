@@ -124,6 +124,9 @@ class _BaseOutputsMeta(type):
         if self_outputs_class.__parent_class__ is None or other_outputs_class.__parent_class__ is None:
             return super().__eq__(other)
 
+        if self_outputs_class.__parent_class__ is type(None) or other_outputs_class.__parent_class__ is type(None):
+            return super().__eq__(other)
+
         return (
             self_outputs_class.__parent_class__.__qualname__ == other_outputs_class.__parent_class__.__qualname__
             and self_outputs_class.__parent_class__.__module__ == other_outputs_class.__parent_class__.__module__
