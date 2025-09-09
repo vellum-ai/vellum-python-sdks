@@ -1,6 +1,6 @@
 from dataclasses import field
 import inspect
-from typing import Any, Generic, Iterator, Set, Tuple, Type, TypeVar, Union, cast
+from typing import Any, Dict, Generic, Iterator, Set, Tuple, Type, TypeVar, Union, cast
 from typing_extensions import dataclass_transform
 
 from pydantic import GetCoreSchemaHandler
@@ -100,6 +100,10 @@ class BaseOutput(Generic[_Delta, _Accumulated]):
 
 @dataclass_transform(kw_only_default=True)
 class _BaseOutputsMeta(type):
+    def __new__(cls, name: str, bases: Tuple[Type, ...], dct: Dict[str, Any]) -> Any:
+        dct["__parent_class__"] = type(None)
+        return super().__new__(cls, name, bases, dct)
+
     def __eq__(cls, other: Any) -> bool:
         """
         We need to include custom eq logic to prevent infinite loops during ipython reloading.
@@ -118,6 +122,9 @@ class _BaseOutputsMeta(type):
             return super().__eq__(other)
 
         if self_outputs_class.__parent_class__ is None or other_outputs_class.__parent_class__ is None:
+            return super().__eq__(other)
+
+        if self_outputs_class.__parent_class__ is type(None) or other_outputs_class.__parent_class__ is type(None):
             return super().__eq__(other)
 
         return (
