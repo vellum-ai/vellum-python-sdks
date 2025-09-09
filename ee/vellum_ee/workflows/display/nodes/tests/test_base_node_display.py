@@ -131,14 +131,14 @@ def test_serialize_display_data_with_icon_and_color():
 
     class MyNodeDisplay(BaseNodeDisplay[MyNode]):
         display_data = NodeDisplayData(
-            position=NodeDisplayPosition(x=100, y=200), icon="vellum:icon:star", color="#FF5733"
+            position=NodeDisplayPosition(x=100, y=200), icon="vellum:icon:star", color="navy"
         )
 
     # WHEN we serialize the node
     data = MyNodeDisplay().serialize(WorkflowDisplayContext())
 
     # THEN the display_data should include icon and color
-    assert data["display_data"] == {"position": {"x": 100, "y": 200}, "icon": "vellum:icon:star", "color": "#FF5733"}
+    assert data["display_data"] == {"position": {"x": 100, "y": 200}, "icon": "vellum:icon:star", "color": "navy"}
 
 
 def test_serialize_display_data_with_various_icon_formats():
@@ -162,17 +162,17 @@ def test_serialize_display_data_with_various_icon_formats():
     assert display_data["icon"] == "vellum:icon:home"
 
 
-def test_serialize_display_data_with_hex_color():
+def test_serialize_display_data_with_navy_color():
     """
-    Tests that hex color values are serialized correctly.
+    Tests that navy color values are serialized correctly.
     """
 
-    # GIVEN a node with a hex color
+    # GIVEN a node with a navy color
     class MyNode(BaseNode):
         pass
 
     class MyNodeDisplay(BaseNodeDisplay[MyNode]):
-        display_data = NodeDisplayData(color="#1A2B3C")
+        display_data = NodeDisplayData(color="navy")
 
     # WHEN we serialize the node
     data = MyNodeDisplay().serialize(WorkflowDisplayContext())
@@ -180,4 +180,4 @@ def test_serialize_display_data_with_hex_color():
     # THEN the color should be preserved as-is
     display_data = data["display_data"]
     assert isinstance(display_data, dict)
-    assert display_data["color"] == "#1A2B3C"
+    assert display_data["color"] == "navy"
