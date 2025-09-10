@@ -76,7 +76,7 @@ export abstract class BaseNode<
   public async persist(): Promise<void> {
     if (
       "should_file_merge" in this.nodeData &&
-      this.nodeData.should_file_merge === true
+      this.nodeData.should_file_merge
     ) {
       const modulePath = this.nodeContext.nodeModulePath;
       const rootModulePath = this.workflowContext.getRootModulePath();
