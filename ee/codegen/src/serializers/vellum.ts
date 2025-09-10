@@ -1064,6 +1064,7 @@ export declare namespace BaseWorkflowNodeSerializer {
   interface Raw {
     base?: CodeResourceDefinitionSerializer.Raw | null;
     definition?: CodeResourceDefinitionSerializer.Raw | null;
+    should_file_merge?: boolean | null;
   }
 }
 
@@ -2120,6 +2121,7 @@ export const GenericNodeSerializer: ObjectSchema<
   adornments: listSchema(AdornmentNodeSerializer).optional(),
   attributes: listSchema(NodeAttributeSerializer),
   outputs: listSchema(NodeOutputSerializer),
+  should_file_merge: booleanSchema().optional(),
 });
 
 export declare namespace GenericNodeSerializer {
