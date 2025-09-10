@@ -1380,7 +1380,6 @@ export const PromptNodeSerializer: ObjectSchema<
   attributes: listSchema(NodeAttributeSerializer).optional(),
   ports: listSchema(NodePortSerializer).optional(),
   trigger: NodeTriggerSerializer.optional(),
-  should_file_merge: booleanSchema().optional(),
 });
 
 export declare namespace PromptNodeSerializer {
