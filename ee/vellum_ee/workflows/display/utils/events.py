@@ -1,3 +1,4 @@
+from vellum import Vellum
 from vellum.workflows.events.workflow import WorkflowExecutionInitiatedEvent
 from vellum_ee.workflows.display.utils.registry import (
     get_parent_display_context_from_event,
@@ -25,7 +26,7 @@ def _should_mark_workflow_dynamic(event: WorkflowExecutionInitiatedEvent) -> boo
     return True
 
 
-def event_enricher(event: WorkflowExecutionInitiatedEvent) -> WorkflowExecutionInitiatedEvent:
+def event_enricher(event: WorkflowExecutionInitiatedEvent, client: Vellum = None) -> WorkflowExecutionInitiatedEvent:
     if event.name != "workflow.execution.initiated":
         return event
 
@@ -33,6 +34,7 @@ def event_enricher(event: WorkflowExecutionInitiatedEvent) -> WorkflowExecutionI
     workflow_display = get_workflow_display(
         workflow_class=workflow_definition,
         parent_display_context=get_parent_display_context_from_event(event),
+        client=client,
         dry_run=True,
     )
     register_workflow_display_context(event.span_id, workflow_display.display_context)
