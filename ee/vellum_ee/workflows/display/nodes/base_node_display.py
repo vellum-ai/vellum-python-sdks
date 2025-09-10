@@ -248,15 +248,17 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
     def _serialize_attributes(self, display_context: "WorkflowDisplayContext") -> JsonArray:
         """Serialize node attributes, skipping unserializable ones."""
+        node = self._node
+        node_id = self.node_id
         attributes: JsonArray = []
-        for attribute in self._node:
+        for attribute in node:
             if attribute in self.__unserializable_attributes__:
                 continue
 
             id = (
                 str(self.attribute_ids_by_name[attribute.name])
                 if self.attribute_ids_by_name.get(attribute.name)
-                else str(uuid4_from_hash(f"{self.node_id}|{attribute.name}"))
+                else str(uuid4_from_hash(f"{node_id}|{attribute.name}"))
             )
             try:
                 attribute_dict: JsonObject = {
