@@ -302,7 +302,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             output_values.append(
                 {
                     "output_variable_id": str(workflow_output_display.id),
-                    "value": serialize_value(self.display_context, workflow_output.instance),
+                    "value": serialize_value(self.workflow_id, self.display_context, workflow_output.instance),
                 }
             )
 
