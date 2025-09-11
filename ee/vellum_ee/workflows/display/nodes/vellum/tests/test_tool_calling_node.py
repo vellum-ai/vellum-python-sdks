@@ -92,7 +92,7 @@ def test_serialize_node__prompt_inputs__input_reference():
             "type": "DICTIONARY_REFERENCE",
             "entries": [
                 {
-                    "id": "ab7902ef-de14-4edc-835c-366d3ef6a70e",
+                    "id": "845009c8-03f8-4de4-b956-841309457d37",
                     "key": "foo",
                     "value": {"type": "WORKFLOW_INPUT", "input_variable_id": "e3657390-fd3c-4fea-8cdd-fc5ea79f3278"},
                 }
@@ -134,12 +134,12 @@ def test_serialize_node__prompt_inputs__mixed_values():
             "type": "DICTIONARY_REFERENCE",
             "entries": [
                 {
-                    "id": "0fc7e25e-075c-4849-b89b-9729d1aeada1",
+                    "id": "a4016385-3cab-4c01-b9d2-7865cd54bdb0",
                     "key": "foo",
                     "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "bar"}},
                 },
                 {
-                    "id": "bba42c89-fa7b-4cb7-bc16-0d21ce060a4b",
+                    "id": "828928b1-24e3-4457-9d6f-4f0692dfa355",
                     "key": "baz",
                     "value": {"type": "WORKFLOW_INPUT", "input_variable_id": "8d57cf1d-147c-427b-9a5e-e5f6ab76e2eb"},
                 },
@@ -540,7 +540,7 @@ def test_serialize_tool_prompt_node_with_inline_workflow():
             "type": "DICTIONARY_REFERENCE",
             "entries": [
                 {
-                    "id": "76ceec7b-ec37-474f-ba38-2bfd27cecc5d",
+                    "id": "b1dfaf2b-b9fb-4fea-ad04-a988e5223d06",
                     "key": "chat_history",
                     "value": {
                         "type": "BINARY_EXPRESSION",

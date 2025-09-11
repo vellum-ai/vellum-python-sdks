@@ -231,7 +231,7 @@
               "type": "DICTIONARY_REFERENCE",
               "entries": [
                 {
-                  "id": "25cad17f-83c9-47bf-ba11-37ce744275f4",
+                  "id": "aed15650-84e5-40cd-ae10-6a6b7d608f81",
                   "key": "text",
                   "value": {
                     "type": "WORKFLOW_INPUT",

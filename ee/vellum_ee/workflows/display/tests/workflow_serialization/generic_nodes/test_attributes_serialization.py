@@ -293,7 +293,7 @@ def test_serialize_node__workflow_input_as_nested_chat_history():
                         "type": "DICTIONARY_REFERENCE",
                         "entries": [
                             {
-                                "id": "52d98e78-5c2a-488e-be3e-f3b487d94ad3",
+                                "id": "07513ab1-cf47-490e-8b43-5da226332a00",
                                 "key": "hello",
                                 "value": {
                                     "type": "WORKFLOW_INPUT",
