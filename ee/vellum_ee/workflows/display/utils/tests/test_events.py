@@ -47,7 +47,7 @@ from vellum_ee.workflows.display.utils.events import event_enricher
         ),
     ],
 )
-def test_event_enricher_static_workflow(is_dynamic: bool, expected_config: Optional[dict]):
+def test_event_enricher_static_workflow(vellum_client, is_dynamic: bool, expected_config: Optional[dict]):
     """Test event_enricher with a static workflow (is_dynamic=False)."""
     # GIVEN a workflow class with the specified is_dynamic value
     _is_dynamic = is_dynamic
@@ -65,7 +65,7 @@ def test_event_enricher_static_workflow(is_dynamic: bool, expected_config: Optio
     )
 
     # WHEN the event_enricher is called with mocked dependencies
-    event_enricher(event)
+    event_enricher(event, vellum_client)
 
     # THEN workflow_version_exec_config is set to the expected config
     assert event.body.workflow_version_exec_config == expected_config
@@ -76,7 +76,7 @@ def test_event_enricher_static_workflow(is_dynamic: bool, expected_config: Optio
     assert hasattr(event.body.display_context, "workflow_outputs")
 
 
-def test_event_enricher_marks_subworkflow_deployment_as_dynamic():
+def test_event_enricher_marks_subworkflow_deployment_as_dynamic(vellum_client):
     """Test that event_enricher treats subworkflow deployments as dynamic."""
 
     class TestWorkflow(BaseWorkflow):
@@ -110,7 +110,7 @@ def test_event_enricher_marks_subworkflow_deployment_as_dynamic():
         ),
     )
 
-    enriched_event = event_enricher(event)
+    enriched_event = event_enricher(event, vellum_client)
 
     assert hasattr(enriched_event.body, "workflow_version_exec_config")
     assert enriched_event.body.workflow_version_exec_config is not None
