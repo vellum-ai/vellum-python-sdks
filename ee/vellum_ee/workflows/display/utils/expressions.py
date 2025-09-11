@@ -378,7 +378,7 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
             if serialized_val != _UNDEFINED_SENTINEL:
                 serialized_entries.append(
                     {
-                        "id": str(uuid4_from_hash(f"{key}|{val}")),
+                        "id": str(uuid4_from_hash(f"{executable_id}|{key}")),
                         "key": serialize_key(key),
                         "value": serialized_val,
                     }

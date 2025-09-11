@@ -401,7 +401,7 @@ def test_serialize_workflow():
                     "type": "DICTIONARY_REFERENCE",
                     "entries": [
                         {
-                            "id": "d5c4d578-6ef1-4786-88f6-1ab0892d0798",
+                            "id": "8eb8b551-9b48-43b3-861f-52adb5c585a8",
                             "key": "question",
                             "value": {
                                 "type": "WORKFLOW_INPUT",

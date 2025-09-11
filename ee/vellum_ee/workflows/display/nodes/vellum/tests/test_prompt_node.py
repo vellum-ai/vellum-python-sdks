@@ -197,7 +197,7 @@ def test_serialize_node__prompt_inputs__state_reference():
             "type": "DICTIONARY_REFERENCE",
             "entries": [
                 {
-                    "id": "feadab18-07c6-4790-adf0-28be20a5447a",
+                    "id": "52559b9e-4e8e-438a-8246-cfa30c98d5d1",
                     "key": "foo",
                     "value": {
                         "type": "WORKFLOW_STATE",
@@ -205,7 +205,7 @@ def test_serialize_node__prompt_inputs__state_reference():
                     },
                 },
                 {
-                    "id": "4f252277-d0a5-48ad-8cc5-be03bf0dbd19",
+                    "id": "3750feb9-5d5c-4150-b62d-a9924f466888",
                     "key": "bar",
                     "value": {
                         "type": "CONSTANT_VALUE",
@@ -325,52 +325,52 @@ def test_serialize_node__prompt_parameters__dynamic_references():
     assert parameters_attribute["value"]["type"] == "DICTIONARY_REFERENCE"
     assert parameters_attribute["value"]["entries"] == [
         {
-            "id": "6b63ff96-a2eb-4c6e-bad1-bde01605fa86",
+            "id": "24703d3a-ee6c-4b1b-80f8-6c19ef16723a",
             "key": "stop",
             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
         },
         {
-            "id": "265a1c17-2089-4ac1-b2ce-361b6b9a3335",
+            "id": "88a3bf5d-f42b-4895-850e-ad843945a003",
             "key": "temperature",
             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
         },
         {
-            "id": "699976ec-8ec2-476a-a011-7cf810a8a307",
+            "id": "ede3e0c2-3033-4d0a-bd72-e52595bdc916",
             "key": "max_tokens",
             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
         },
         {
-            "id": "a87e23da-9794-41ff-ba80-c3a77e976e75",
+            "id": "0013cd8f-7658-4908-80fc-b8995d8ca4cc",
             "key": "top_p",
             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
         },
         {
-            "id": "18eb53c2-ec1a-4115-9f21-083af430df67",
+            "id": "98eb2e57-d4ec-4c27-b39b-0b8086918a0f",
             "key": "top_k",
             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
         },
         {
-            "id": "295509a2-5837-452c-893d-f47b67c63c8a",
+            "id": "04accc66-888c-4145-8b4f-d8ff99e38172",
             "key": "frequency_penalty",
             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
         },
         {
-            "id": "5fc64379-5566-426a-a909-dd56c3305aa5",
+            "id": "9236d564-0637-48de-8423-cdf3617dd6b4",
             "key": "presence_penalty",
             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
         },
         {
-            "id": "5d326da0-c096-4425-8bf1-3a18764e96e3",
+            "id": "74f3e80a-3935-45af-a9b3-d49e310a4c03",
             "key": "logit_bias",
             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
         },
         {
-            "id": "cd1a0e1b-6667-48a0-9964-257e1ec8851d",
+            "id": "69a7ebf7-d21a-44e9-a0fa-43eb9b2815df",
             "key": "custom_parameters",
             "value": {
                 "entries": [
                     {
-                        "id": "a9a3092e-dd18-4533-b6b5-24588ebd8f7f",
+                        "id": "e709dc4d-f2db-4dc9-b912-401b52fbb7b4",
                         "key": "json_schema",
                         "value": {
                             "input_variable_id": "c02d1201-86d1-4364-b3b3-4fc6824db8a4",
