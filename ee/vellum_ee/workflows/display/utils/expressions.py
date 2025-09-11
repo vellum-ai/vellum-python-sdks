@@ -2,6 +2,7 @@ from dataclasses import asdict, is_dataclass
 import inspect
 from io import StringIO
 import sys
+from uuid import UUID
 from typing import TYPE_CHECKING, Any, Dict, List, cast
 
 from pydantic import BaseModel
@@ -157,7 +158,9 @@ def get_child_descriptor(value: LazyReference, display_context: "WorkflowDisplay
     return value._get()
 
 
-def _serialize_condition(display_context: "WorkflowDisplayContext", condition: BaseDescriptor) -> JsonObject:
+def _serialize_condition(
+    executable_id: UUID, display_context: "WorkflowDisplayContext", condition: BaseDescriptor
+) -> JsonObject:
     if isinstance(
         condition,
         (
@@ -171,16 +174,16 @@ def _serialize_condition(display_context: "WorkflowDisplayContext", condition: B
             ParseJsonExpression,
         ),
     ):
-        lhs = serialize_value(display_context, condition._expression)
+        lhs = serialize_value(executable_id, display_context, condition._expression)
         return {
             "type": "UNARY_EXPRESSION",
             "lhs": lhs,
             "operator": convert_descriptor_to_operator(condition),
         }
     elif isinstance(condition, (BetweenExpression, NotBetweenExpression)):
-        base = serialize_value(display_context, condition._value)
-        lhs = serialize_value(display_context, condition._start)
-        rhs = serialize_value(display_context, condition._end)
+        base = serialize_value(executable_id, display_context, condition._value)
+        lhs = serialize_value(executable_id, display_context, condition._start)
+        rhs = serialize_value(executable_id, display_context, condition._end)
 
         return {
             "type": "TERNARY_EXPRESSION",
@@ -214,8 +217,8 @@ def _serialize_condition(display_context: "WorkflowDisplayContext", condition: B
             OrExpression,
         ),
     ):
-        lhs = serialize_value(display_context, condition._lhs)
-        rhs = serialize_value(display_context, condition._rhs)
+        lhs = serialize_value(executable_id, display_context, condition._lhs)
+        rhs = serialize_value(executable_id, display_context, condition._rhs)
 
         return {
             "type": "BINARY_EXPRESSION",
@@ -226,9 +229,9 @@ def _serialize_condition(display_context: "WorkflowDisplayContext", condition: B
     elif isinstance(condition, AccessorExpression):
         return {
             "type": "BINARY_EXPRESSION",
-            "lhs": serialize_value(display_context, condition._base),
+            "lhs": serialize_value(executable_id, display_context, condition._base),
             "operator": "accessField",
-            "rhs": serialize_value(display_context, condition._field),
+            "rhs": serialize_value(executable_id, display_context, condition._field),
         }
 
     raise UnsupportedSerializationException(f"Unsupported condition type: {condition.__class__.__name__}")
@@ -248,16 +251,27 @@ def serialize_key(key: Any) -> str:
 _UNDEFINED_SENTINEL: JsonObject = {"__undefined__": True}
 
 
-def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> JsonObject:
+def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContext", value: Any) -> JsonObject:
+    """
+    Serialize a value to a JSON object.
+
+    Args:
+        executable_id: node id or workflow id
+        display_context: workflow display context
+        value: value to serialize
+
+    Returns:
+        serialized value
+    """
     if value is undefined:
         return _UNDEFINED_SENTINEL
 
     if isinstance(value, ConstantValueReference):
-        return serialize_value(display_context, value._value)
+        return serialize_value(executable_id, display_context, value._value)
 
     if isinstance(value, LazyReference):
         child_descriptor = get_child_descriptor(value, display_context)
-        return serialize_value(display_context, child_descriptor)
+        return serialize_value(executable_id, display_context, child_descriptor)
 
     if isinstance(value, WorkflowInputReference):
         try:
@@ -324,7 +338,7 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
     if isinstance(value, list):
         serialized_items = []
         for item in value:
-            serialized_item = serialize_value(display_context, item)
+            serialized_item = serialize_value(executable_id, display_context, item)
             if serialized_item != _UNDEFINED_SENTINEL:
                 serialized_items.append(serialized_item)
 
@@ -355,12 +369,12 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
 
     if is_dataclass(value) and not isinstance(value, type):
         dict_value = asdict(value)
-        return serialize_value(display_context, dict_value)
+        return serialize_value(executable_id, display_context, dict_value)
 
     if isinstance(value, dict):
         serialized_entries: List[Dict[str, Any]] = []
         for key, val in value.items():
-            serialized_val = serialize_value(display_context, val)
+            serialized_val = serialize_value(executable_id, display_context, val)
             if serialized_val != _UNDEFINED_SENTINEL:
                 serialized_entries.append(
                     {
@@ -434,7 +448,7 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
 
     if isinstance(value, BaseModel):
         dict_value = value.model_dump()
-        return serialize_value(display_context, dict_value)
+        return serialize_value(executable_id, display_context, dict_value)
 
     if callable(value):
         function_definition = compile_function_definition(value)
@@ -447,7 +461,7 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
         if inputs:
             serialized_inputs = {}
             for param_name, input_ref in inputs.items():
-                serialized_inputs[param_name] = serialize_value(display_context, input_ref)
+                serialized_inputs[param_name] = serialize_value(executable_id, display_context, input_ref)
 
             model_data = function_definition.model_dump()
             model_data["inputs"] = serialized_inputs
@@ -485,4 +499,4 @@ def serialize_value(display_context: "WorkflowDisplayContext", value: Any) -> Js
 
     # If it's not any of the references we know about,
     # then try to serialize it as a nested value
-    return _serialize_condition(display_context, value)
+    return _serialize_condition(executable_id, display_context, value)

@@ -51,7 +51,7 @@ class BaseFinalOutputNodeDisplay(BaseNodeDisplay[_FinalOutputNodeType], Generic[
                     "id": str(self._get_output_id()),
                     "name": node.Outputs.value.name,
                     "type": inferred_type,
-                    "value": serialize_value(display_context, node.Outputs.value.instance),
+                    "value": serialize_value(node_id, display_context, node.Outputs.value.instance),
                 }
             ],
         }

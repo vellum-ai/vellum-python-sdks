@@ -33,7 +33,7 @@ class BaseRetryNodeDisplay(BaseAdornmentNodeDisplay[_RetryNodeType], Generic[_Re
                 {
                     "id": id,
                     "name": attribute.name,
-                    "value": serialize_value(display_context, attribute.instance),
+                    "value": serialize_value(node_id, display_context, attribute.instance),
                 }
             )
 

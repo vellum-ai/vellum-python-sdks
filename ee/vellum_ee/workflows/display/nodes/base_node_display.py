@@ -162,7 +162,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                     {
                         "id": id,
                         "name": attribute.name,
-                        "value": serialize_value(display_context, attribute.instance),
+                        "value": serialize_value(node_id, display_context, attribute.instance),
                     }
                 )
             except ValueError as e:
@@ -187,7 +187,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
         for output in node.Outputs:
             type = primitive_type_to_vellum_variable_type(output)
             value = (
-                serialize_value(display_context, output.instance)
+                serialize_value(node_id, display_context, output.instance)
                 if output.instance is not None and output.instance != undefined
                 else None
             )
@@ -214,6 +214,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
     def serialize_ports(self, display_context: "WorkflowDisplayContext") -> JsonArray:
         """Serialize the ports of the node."""
         node = self._node
+        node_id = self.node_id
         ports: JsonArray = []
 
         for port in node.Ports:
@@ -224,7 +225,9 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                         "id": id,
                         "name": port.name,
                         "type": port._condition_type.value,
-                        "expression": (serialize_value(display_context, port._condition) if port._condition else None),
+                        "expression": (
+                            serialize_value(node_id, display_context, port._condition) if port._condition else None
+                        ),
                     }
                 )
             else:
@@ -264,7 +267,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 attribute_dict: JsonObject = {
                     "id": id,
                     "name": attribute.name,
-                    "value": serialize_value(display_context, attribute.instance),
+                    "value": serialize_value(node_id, display_context, attribute.instance),
                 }
                 attributes.append(attribute_dict)
             except ValueError as e:

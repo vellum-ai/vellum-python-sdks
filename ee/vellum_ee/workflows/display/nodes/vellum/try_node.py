@@ -37,7 +37,7 @@ class BaseTryNodeDisplay(BaseAdornmentNodeDisplay[_TryNodeType], Generic[_TryNod
                 {
                     "id": id,
                     "name": attribute.name,
-                    "value": serialize_value(display_context, attribute.instance),
+                    "value": serialize_value(node_id, display_context, attribute.instance),
                 }
             )
 
