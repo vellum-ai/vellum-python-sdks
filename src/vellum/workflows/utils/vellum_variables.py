@@ -1,5 +1,5 @@
 import typing
-from typing import List, Tuple, Type, Union, get_args, get_origin
+from typing import Any, List, Tuple, Type, Union, get_args, get_origin
 
 from vellum import (
     ChatMessage,
@@ -133,7 +133,7 @@ def vellum_variable_type_to_openapi_type(vellum_type: VellumVariableType) -> str
         return "object"
 
 
-def _is_type_optionally_equal(type_: Type, target_type: Type) -> bool:
+def _is_type_optionally_equal(type_: Type, target_type: Any) -> bool:
     if type_ == target_type:
         return True
 
@@ -152,7 +152,7 @@ def _is_type_optionally_equal(type_: Type, target_type: Type) -> bool:
     return _is_type_optionally_equal(source_type, target_type)
 
 
-def _is_type_optionally_in(type_: Type, target_types: Tuple[Type, ...]) -> bool:
+def _is_type_optionally_in(type_: Type, target_types: Tuple[Any, ...]) -> bool:
     return any(_is_type_optionally_equal(type_, target_type) for target_type in target_types)
 
 
