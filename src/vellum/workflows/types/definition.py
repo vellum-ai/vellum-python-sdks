@@ -122,7 +122,6 @@ class DeploymentDefinition(UniversalBaseModel):
             )
             self.name = release.deployment.name or self.deployment
             self.description = release.description or f"Workflow Deployment for {self.deployment}"
-            self.input_variables = release.workflow_version.input_variables
 
             return {
                 "type": "WORKFLOW_DEPLOYMENT",
