@@ -2,12 +2,14 @@ import importlib
 import inspect
 from types import FrameType
 from uuid import UUID
-from typing import Annotated, Any, Dict, Literal, Optional, Union
+from typing import Annotated, Any, Dict, List, Literal, Optional, Union, cast
 
-from pydantic import BeforeValidator
+from pydantic import BeforeValidator, SerializationInfo, model_serializer
 
+from vellum import Vellum
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.code_resource_definition import CodeResourceDefinition as ClientCodeResourceDefinition
+from vellum.client.types.vellum_variable import VellumVariable
 from vellum.workflows.constants import AuthorizationType
 from vellum.workflows.references.environment_variable import EnvironmentVariableReference
 
@@ -78,6 +80,11 @@ class DeploymentDefinition(UniversalBaseModel):
     deployment: str
     release_tag: str = "LATEST"
 
+    # hydrated fields
+    name: Optional[str] = None
+    description: Optional[str] = None
+    input_variables: Optional[List[VellumVariable]] = None
+
     def _is_uuid(self) -> bool:
         """Check if the deployment field is a valid UUID."""
         try:
@@ -99,6 +106,33 @@ class DeploymentDefinition(UniversalBaseModel):
         if not self._is_uuid():
             return self.deployment
         return None
+
+    @model_serializer(mode="wrap")
+    def _serialize(self, handler, info: SerializationInfo):
+        """Allow Pydantic to serialize directly given a `client` in context.
+
+        Falls back to the default serialization when client is not provided.
+        """
+        context = info.context if info and hasattr(info, "context") else {}
+        client = cast(Optional[Vellum], context.get("client") if context else None)
+
+        if client:
+            release = client.workflow_deployments.retrieve_workflow_deployment_release(
+                self.deployment, self.release_tag
+            )
+            self.name = release.deployment.name or self.deployment
+            self.description = release.description or f"Workflow Deployment for {self.deployment}"
+            self.input_variables = release.workflow_version.input_variables
+
+            return {
+                "type": "WORKFLOW_DEPLOYMENT",
+                "name": self.name,
+                "description": self.description,
+                "deployment": self.deployment,
+                "release_tag": self.release_tag,
+            }
+
+        return handler(self)
 
 
 class ComposioToolDefinition(UniversalBaseModel):

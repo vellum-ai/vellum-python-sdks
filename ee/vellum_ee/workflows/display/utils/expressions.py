@@ -51,7 +51,6 @@ from vellum.workflows.references.state_value import StateValueReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.references.workflow_input import WorkflowInputReference
 from vellum.workflows.types.core import JsonArray, JsonObject
-from vellum.workflows.types.definition import DeploymentDefinition
 from vellum.workflows.types.generics import is_workflow_class
 from vellum.workflows.utils.functions import compile_function_definition
 from vellum.workflows.utils.uuids import uuid4_from_hash
@@ -425,29 +424,9 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
             },
         }
 
-    if isinstance(value, DeploymentDefinition):
-        workflow_deployment_release = display_context.client.workflow_deployments.retrieve_workflow_deployment_release(
-            value.deployment, value.release_tag
-        )
-        name = workflow_deployment_release.deployment.name or value.deployment
-        description = workflow_deployment_release.description or f"Workflow Deployment for {name}"
-
-        return {
-            "type": "CONSTANT_VALUE",
-            "value": {
-                "type": "JSON",
-                "value": {
-                    "type": "WORKFLOW_DEPLOYMENT",
-                    "name": name,
-                    "description": description,
-                    "deployment": value.deployment,
-                    "release_tag": value.release_tag,
-                },
-            },
-        }
-
     if isinstance(value, BaseModel):
-        dict_value = value.model_dump()
+        context = {"executable_id": executable_id, "client": display_context.client}
+        dict_value = value.model_dump(context=context)
         return serialize_value(executable_id, display_context, dict_value)
 
     if callable(value):
