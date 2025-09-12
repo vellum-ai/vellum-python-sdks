@@ -111,8 +111,8 @@ class DeploymentDefinition(UniversalBaseModel):
 
         Falls back to the default serialization when client is not provided.
         """
-        context = getattr(info, "context", None) or {}  # context will always be a dict
-        client: Optional[Vellum] = context.get("client") if isinstance(context.get("client"), Vellum) else None
+        context = info.context if info and hasattr(info, "context") else {}
+        client: Optional[Vellum] = context.get("client") if context else None
 
         if client:
             release = client.workflow_deployments.retrieve_workflow_deployment_release(
