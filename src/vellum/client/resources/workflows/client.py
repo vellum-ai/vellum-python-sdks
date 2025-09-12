@@ -136,6 +136,42 @@ class WorkflowsClient:
         )
         return _response.data
 
+    def serialize_workflow_files(
+        self,
+        *,
+        files: typing.Dict[str, typing.Optional[typing.Any]],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.Dict[str, typing.Optional[typing.Any]]:
+        """
+        Serialize files
+
+        Parameters
+        ----------
+        files : typing.Dict[str, typing.Optional[typing.Any]]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.Dict[str, typing.Optional[typing.Any]]
+
+
+        Examples
+        --------
+        from vellum import Vellum
+
+        client = Vellum(
+            api_version="YOUR_API_VERSION",
+            api_key="YOUR_API_KEY",
+        )
+        client.workflows.serialize_workflow_files(
+            files={"files": {"key": "value"}},
+        )
+        """
+        _response = self._raw_client.serialize_workflow_files(files=files, request_options=request_options)
+        return _response.data
+
 
 class AsyncWorkflowsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
@@ -254,4 +290,48 @@ class AsyncWorkflowsClient:
             strict=strict,
             request_options=request_options,
         )
+        return _response.data
+
+    async def serialize_workflow_files(
+        self,
+        *,
+        files: typing.Dict[str, typing.Optional[typing.Any]],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.Dict[str, typing.Optional[typing.Any]]:
+        """
+        Serialize files
+
+        Parameters
+        ----------
+        files : typing.Dict[str, typing.Optional[typing.Any]]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.Dict[str, typing.Optional[typing.Any]]
+
+
+        Examples
+        --------
+        import asyncio
+
+        from vellum import AsyncVellum
+
+        client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.workflows.serialize_workflow_files(
+                files={"files": {"key": "value"}},
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.serialize_workflow_files(files=files, request_options=request_options)
         return _response.data

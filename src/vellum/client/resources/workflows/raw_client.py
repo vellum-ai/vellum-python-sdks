@@ -181,6 +181,55 @@ class RawWorkflowsClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
+    def serialize_workflow_files(
+        self,
+        *,
+        files: typing.Dict[str, typing.Optional[typing.Any]],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> HttpResponse[typing.Dict[str, typing.Optional[typing.Any]]]:
+        """
+        Serialize files
+
+        Parameters
+        ----------
+        files : typing.Dict[str, typing.Optional[typing.Any]]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[typing.Dict[str, typing.Optional[typing.Any]]]
+
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "v1/workflows/serialize",
+            base_url=self._client_wrapper.get_environment().default,
+            method="POST",
+            json={
+                "files": files,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    typing.Dict[str, typing.Optional[typing.Any]],
+                    parse_obj_as(
+                        type_=typing.Dict[str, typing.Optional[typing.Any]],  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
 
 class AsyncRawWorkflowsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
@@ -335,6 +384,55 @@ class AsyncRawWorkflowsClient:
                     WorkflowPushResponse,
                     parse_obj_as(
                         type_=WorkflowPushResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
+    async def serialize_workflow_files(
+        self,
+        *,
+        files: typing.Dict[str, typing.Optional[typing.Any]],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AsyncHttpResponse[typing.Dict[str, typing.Optional[typing.Any]]]:
+        """
+        Serialize files
+
+        Parameters
+        ----------
+        files : typing.Dict[str, typing.Optional[typing.Any]]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[typing.Dict[str, typing.Optional[typing.Any]]]
+
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "v1/workflows/serialize",
+            base_url=self._client_wrapper.get_environment().default,
+            method="POST",
+            json={
+                "files": files,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    typing.Dict[str, typing.Optional[typing.Any]],
+                    parse_obj_as(
+                        type_=typing.Dict[str, typing.Optional[typing.Any]],  # type: ignore
                         object_=_response.json(),
                     ),
                 )

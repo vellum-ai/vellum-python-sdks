@@ -6426,6 +6426,77 @@ client.workflow_sandboxes.list_workflow_sandbox_examples()
 </details>
 
 ## Workflows
+<details><summary><code>client.workflows.<a href="src/vellum/resources/workflows/client.py">serialize_workflow_files</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Serialize files
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import Vellum
+
+client = Vellum(
+    api_version="YOUR_API_VERSION",
+    api_key="YOUR_API_KEY",
+)
+client.workflows.serialize_workflow_files(
+    files={"files": {"key": "value"}},
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**files:** `typing.Dict[str, typing.Optional[typing.Any]]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## WorkspaceSecrets
 <details><summary><code>client.workspace_secrets.<a href="src/vellum/resources/workspace_secrets/client.py">retrieve</a>(...)</code></summary>
 <dl>
