@@ -10,8 +10,10 @@ from vellum import (
     JinjaPromptBlock,
     PromptOutput,
     PromptRequestStringInput,
+    RejectedAdHocExecutePromptEvent,
     StreamingAdHocExecutePromptEvent,
     StringVellumValue,
+    VellumError,
     VellumVariable,
 )
 from vellum.client.types.prompt_settings import PromptSettings
@@ -165,3 +167,46 @@ def test_stream_workflow__happy_path(vellum_adhoc_prompt_client):
     assert events[6].outputs == {
         "results": expected_outputs,
     }
+
+
+def test_run_workflow__rejected_has_raw_data(vellum_adhoc_prompt_client):
+    """Confirm that a rejected prompt event exposes `raw_data` on the error."""
+
+    # GIVEN a workflow that's set up to hit a Prompt
+    workflow = BasicInlinePromptWorkflow()
+
+    # AND the prompt will reject with an error that includes raw_data
+    expected_raw_data = {
+        "type": "error",
+        "error": {
+            "type": "not_found_error",
+            "message": "The requested resource could not be found!",
+        },
+        "request_id": "some-request-id",
+    }
+
+    def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[AdHocExecutePromptEvent]:
+        execution_id = str(uuid4())
+        events: List[AdHocExecutePromptEvent] = [
+            InitiatedAdHocExecutePromptEvent(execution_id=execution_id),
+            RejectedAdHocExecutePromptEvent(
+                execution_id=execution_id,
+                error=VellumError(
+                    code="PROVIDER_ERROR",
+                    message="Provider failed",
+                    raw_data=expected_raw_data,
+                ),
+            ),
+        ]
+        yield from events
+
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
+
+    # WHEN we run the workflow
+    terminal_event = workflow.run(inputs=WorkflowInputs(noun="color"))
+
+    # THEN the workflow should have a rejected terminal event
+    assert terminal_event.name == "workflow.execution.rejected"
+
+    # AND the error.raw_data should be present on the rejected event
+    assert terminal_event.error.raw_data == expected_raw_data

@@ -114,6 +114,7 @@ def test_inline_text_prompt_node__catch_provider_error(vellum_adhoc_prompt_clien
     expected_error = VellumError(
         message="OpenAI failed",
         code="PROVIDER_ERROR",
+        raw_data={"type": "ERROR", "error": {"message": "Something went wrong"}},
     )
 
     def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[ExecutePromptEvent]:
@@ -144,6 +145,7 @@ def test_inline_text_prompt_node__catch_provider_error(vellum_adhoc_prompt_clien
             value=SdkVellumError(
                 message="OpenAI failed",
                 code=WorkflowErrorCode.PROVIDER_ERROR,
+                raw_data={"type": "ERROR", "error": {"message": "Something went wrong"}},
             ),
         )
         in outputs
