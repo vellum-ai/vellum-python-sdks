@@ -2,7 +2,7 @@ import importlib
 import inspect
 from types import FrameType
 from uuid import UUID
-from typing import Annotated, Any, Dict, Literal, Optional, Union, cast
+from typing import Annotated, Any, Dict, List, Literal, Optional, Union
 
 from pydantic import BeforeValidator, SerializationInfo, model_serializer
 
@@ -111,8 +111,8 @@ class DeploymentDefinition(UniversalBaseModel):
 
         Falls back to the default serialization when client is not provided.
         """
-        context = info.context if info and hasattr(info, "context") else {}
-        client = cast(Optional[Vellum], context.get("client") if context else None)
+        context = getattr(info, "context", {}) if info else {}
+        client: Optional[Vellum] = context.get("client") if isinstance(context.get("client"), Vellum) else None
 
         if client:
             release = client.workflow_deployments.retrieve_workflow_deployment_release(
