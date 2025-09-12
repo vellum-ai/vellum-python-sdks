@@ -1,5 +1,5 @@
 import typing
-from typing import List, Tuple, Type, Union, get_args, get_origin
+from typing import Any, List, Tuple, Type, Union, get_args, get_origin
 
 from vellum import (
     ChatMessage,
@@ -86,6 +86,11 @@ def primitive_type_to_vellum_variable_type(type_: Union[Type, BaseDescriptor]) -
         return "DOCUMENT"
     elif _is_type_optionally_in(type_, (VellumError, VellumErrorRequest)):
         return "ERROR"
+
+    builtin_list_type = _builtin_list_to_vellum_type(type_)
+    if builtin_list_type:
+        return builtin_list_type
+
     elif _is_type_optionally_in(type_, (List[ChatMessage], List[ChatMessageRequest])):
         return "CHAT_HISTORY"
     elif _is_type_optionally_in(type_, (List[SearchResult], List[SearchResultRequest])):
@@ -128,7 +133,7 @@ def vellum_variable_type_to_openapi_type(vellum_type: VellumVariableType) -> str
         return "object"
 
 
-def _is_type_optionally_equal(type_: Type, target_type: Type) -> bool:
+def _is_type_optionally_equal(type_: Type, target_type: Any) -> bool:
     if type_ == target_type:
         return True
 
@@ -147,7 +152,7 @@ def _is_type_optionally_equal(type_: Type, target_type: Type) -> bool:
     return _is_type_optionally_equal(source_type, target_type)
 
 
-def _is_type_optionally_in(type_: Type, target_types: Tuple[Type, ...]) -> bool:
+def _is_type_optionally_in(type_: Type, target_types: Tuple[Any, ...]) -> bool:
     return any(_is_type_optionally_equal(type_, target_type) for target_type in target_types)
 
 
@@ -181,3 +186,37 @@ def _is_subtype(source_type: Type, target_type: Type) -> bool:
         return True
 
     return False
+
+
+def _unwrap_optional(type_: Type) -> Type:
+    origin = get_origin(type_)
+    if origin is typing.Union:
+        args = get_args(type_)
+        if len(args) == 2:
+            if args[1] is type(None):
+                return args[0]
+            if args[0] is type(None):
+                return args[1]
+    return type_
+
+
+def _builtin_list_to_vellum_type(type_: Type) -> Union[str, None]:
+    candidate = _unwrap_optional(type_)
+    origin = get_origin(candidate)
+    if origin in (list, typing.List):
+        args = get_args(candidate)
+        if len(args) == 1:
+            item_type = args[0]
+            if _is_type_optionally_equal(item_type, ChatMessage) or _is_type_optionally_equal(
+                item_type, ChatMessageRequest
+            ):
+                return "CHAT_HISTORY"
+            if _is_type_optionally_equal(item_type, SearchResult) or _is_type_optionally_equal(
+                item_type, SearchResultRequest
+            ):
+                return "SEARCH_RESULTS"
+            if _is_type_optionally_equal(item_type, VellumValue) or _is_type_optionally_equal(
+                item_type, VellumValueRequest
+            ):
+                return "ARRAY"
+    return None

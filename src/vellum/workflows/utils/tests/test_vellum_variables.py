@@ -1,7 +1,7 @@
 import pytest
 from typing import List, Optional
 
-from vellum import ChatMessage, SearchResult, VellumAudio, VellumDocument, VellumImage
+from vellum import ChatMessage, SearchResult, VellumAudio, VellumDocument, VellumImage, VellumValue
 from vellum.workflows.types.core import Json
 from vellum.workflows.utils.vellum_variables import (
     primitive_type_to_vellum_variable_type,
@@ -30,6 +30,12 @@ from vellum.workflows.utils.vellum_variables import (
         (Optional[VellumAudio], "AUDIO"),
         (VellumImage, "IMAGE"),
         (Optional[VellumImage], "IMAGE"),
+        (list[ChatMessage], "CHAT_HISTORY"),
+        (Optional[list[ChatMessage]], "CHAT_HISTORY"),
+        (list[SearchResult], "SEARCH_RESULTS"),
+        (Optional[list[SearchResult]], "SEARCH_RESULTS"),
+        (list[VellumValue], "ARRAY"),
+        (Optional[list[VellumValue]], "ARRAY"),
     ],
 )
 def test_primitive_type_to_vellum_variable_type(type_, expected):
