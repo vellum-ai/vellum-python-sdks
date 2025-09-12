@@ -2,14 +2,13 @@ import importlib
 import inspect
 from types import FrameType
 from uuid import UUID
-from typing import Annotated, Any, Dict, List, Literal, Optional, Union, cast
+from typing import Annotated, Any, Dict, Literal, Optional, Union, cast
 
 from pydantic import BeforeValidator, SerializationInfo, model_serializer
 
 from vellum import Vellum
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.code_resource_definition import CodeResourceDefinition as ClientCodeResourceDefinition
-from vellum.client.types.vellum_variable import VellumVariable
 from vellum.workflows.constants import AuthorizationType
 from vellum.workflows.references.environment_variable import EnvironmentVariableReference
 
