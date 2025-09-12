@@ -132,23 +132,49 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         ]
 
         input_variables: JsonArray = []
+
+        input_variable_data = []
         for workflow_input_reference, workflow_input_display in self.display_context.workflow_input_displays.items():
             default = (
                 primitive_to_vellum_value(workflow_input_reference.instance)
                 if workflow_input_reference.instance
                 else None
             )
-
             is_required = self._is_reference_required(workflow_input_reference)
 
-            input_variables.append(
+            display_name = workflow_input_display.name or workflow_input_reference.name
+            input_variable_data.append(
                 {
                     "id": str(workflow_input_display.id),
-                    "key": workflow_input_display.name or workflow_input_reference.name,
+                    "key": display_name,
                     "type": infer_vellum_variable_type(workflow_input_reference),
                     "default": default.dict() if default else None,
                     "required": is_required,
                     "extensions": {"color": workflow_input_display.color},
+                }
+            )
+
+        key_counts: Dict[str, int] = {}
+        for item in input_variable_data:
+            key = str(item["key"])
+            key_counts[key] = key_counts.get(key, 0) + 1
+
+        for item in input_variable_data:
+            key = str(item["key"])
+            if key_counts[key] > 1:
+                item_id = str(item["id"])
+                unique_key = f"{key}_{item_id[:8]}"
+            else:
+                unique_key = key
+
+            input_variables.append(
+                {
+                    "id": str(item["id"]),
+                    "key": unique_key,
+                    "type": cast(Json, item["type"]),
+                    "default": cast(Json, item["default"]),
+                    "required": bool(item["required"]),
+                    "extensions": cast(Json, item["extensions"]),
                 }
             )
 
@@ -306,11 +332,35 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 }
             )
 
-            output_variables.append(
+        output_variable_data = []
+        for workflow_output, workflow_output_display in self.display_context.workflow_output_displays.items():
+            inferred_type = infer_vellum_variable_type(workflow_output)
+            output_variable_data.append(
                 {
                     "id": str(workflow_output_display.id),
                     "key": workflow_output_display.name,
                     "type": inferred_type,
+                }
+            )
+
+        output_key_counts: Dict[str, int] = {}
+        for item in output_variable_data:
+            key = str(item["key"])
+            output_key_counts[key] = output_key_counts.get(key, 0) + 1
+
+        for item in output_variable_data:
+            key = str(item["key"])
+            if output_key_counts[key] > 1:
+                item_id = str(item["id"])
+                unique_key = f"{key}_{item_id[:8]}"
+            else:
+                unique_key = key
+
+            output_variables.append(
+                {
+                    "id": str(item["id"]),
+                    "key": unique_key,
+                    "type": cast(Json, item["type"]),
                 }
             )
 
