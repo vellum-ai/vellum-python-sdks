@@ -83,7 +83,6 @@ class DeploymentDefinition(UniversalBaseModel):
     # hydrated fields
     name: Optional[str] = None
     description: Optional[str] = None
-    input_variables: Optional[List[VellumVariable]] = None
 
     def _is_uuid(self) -> bool:
         """Check if the deployment field is a valid UUID."""
