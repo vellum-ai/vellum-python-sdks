@@ -2,7 +2,7 @@ import importlib
 import inspect
 from types import FrameType
 from uuid import UUID
-from typing import Annotated, Any, Dict, List, Literal, Optional, Union
+from typing import Annotated, Any, Dict, Literal, Optional, Union
 
 from pydantic import BeforeValidator, SerializationInfo, model_serializer
 
@@ -111,7 +111,7 @@ class DeploymentDefinition(UniversalBaseModel):
 
         Falls back to the default serialization when client is not provided.
         """
-        context = getattr(info, "context", {}) if info else {}
+        context = getattr(info, "context", None) or {}  # context will always be a dict
         client: Optional[Vellum] = context.get("client") if isinstance(context.get("client"), Vellum) else None
 
         if client:
