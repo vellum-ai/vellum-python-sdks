@@ -18,14 +18,13 @@ from vellum.workflows.nodes.displayable.tool_calling_node.utils import (
     create_router_node,
     create_tool_prompt_node,
     get_function_name,
-    get_mcp_tool_name,
-    hydrate_mcp_tool_definitions,
 )
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.core import EntityInputsInterface, Tool
 from vellum.workflows.types.definition import MCPServer
 from vellum.workflows.types.generics import StateType
+from vellum.workflows.utils.functions import compile_mcp_tool_definition, get_mcp_tool_name
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 
@@ -162,7 +161,7 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
         self._function_nodes = {}
         for function in self.functions:
             if isinstance(function, MCPServer):
-                tool_definitions = hydrate_mcp_tool_definitions(function)
+                tool_definitions = compile_mcp_tool_definition(function)
                 for tool_definition in tool_definitions:
                     function_name = get_mcp_tool_name(tool_definition)
 

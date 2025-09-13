@@ -1,6 +1,19 @@
 import dataclasses
 import inspect
-from typing import TYPE_CHECKING, Annotated, Any, Callable, Dict, Literal, Optional, Type, Union, get_args, get_origin
+from typing import (
+    TYPE_CHECKING,
+    Annotated,
+    Any,
+    Callable,
+    Dict,
+    List,
+    Literal,
+    Optional,
+    Type,
+    Union,
+    get_args,
+    get_origin,
+)
 
 from pydantic import BaseModel
 from pydantic_core import PydanticUndefined
@@ -8,6 +21,8 @@ from pydash import snake_case
 
 from vellum import Vellum
 from vellum.client.types.function_definition import FunctionDefinition
+from vellum.workflows.integrations.mcp_service import MCPService
+from vellum.workflows.types.definition import MCPServer, MCPToolDefinition
 from vellum.workflows.utils.vellum_variables import vellum_variable_type_to_openapi_type
 
 if TYPE_CHECKING:
@@ -259,6 +274,30 @@ def compile_workflow_deployment_function_definition(
         description=description,
         parameters=parameters,
     )
+
+
+def get_mcp_tool_name(tool_def: MCPToolDefinition) -> str:
+    """Generate a unique name for an MCP tool by combining server and tool names."""
+    server_name = snake_case(tool_def.server.name)
+    return f"{server_name}__{tool_def.name}"
+
+
+def compile_mcp_tool_definition(server_def: MCPServer) -> List[MCPToolDefinition]:
+    """Hydrate an MCPToolDefinition with detailed information from the MCP server.
+
+    We do tool discovery on the MCP server to get the tool definitions.
+
+    Args:
+        tool_def: The basic MCPToolDefinition to enhance
+
+    Returns:
+        MCPToolDefinition with detailed parameters and description
+    """
+    try:
+        mcp_service = MCPService()
+        return mcp_service.hydrate_tool_definitions(server_def)
+    except Exception:
+        return []
 
 
 def use_tool_inputs(**inputs):
