@@ -21,8 +21,9 @@ from pydash import snake_case
 
 from vellum import Vellum
 from vellum.client.types.function_definition import FunctionDefinition
+from vellum.workflows.integrations.composio_service import ComposioService
 from vellum.workflows.integrations.mcp_service import MCPService
-from vellum.workflows.types.definition import MCPServer, MCPToolDefinition
+from vellum.workflows.types.definition import ComposioToolDefinition, MCPServer, MCPToolDefinition
 from vellum.workflows.utils.vellum_variables import vellum_variable_type_to_openapi_type
 
 if TYPE_CHECKING:
@@ -298,6 +299,34 @@ def compile_mcp_tool_definition(server_def: MCPServer) -> List[MCPToolDefinition
         return mcp_service.hydrate_tool_definitions(server_def)
     except Exception:
         return []
+
+
+def compile_composio_tool_definition(tool_def: ComposioToolDefinition) -> FunctionDefinition:
+    """Hydrate a ComposioToolDefinition with detailed information from the Composio API.
+
+    Args:
+        tool_def: The basic ComposioToolDefinition to enhance
+
+    Returns:
+        FunctionDefinition with detailed parameters and description
+    """
+    try:
+        composio_service = ComposioService()
+        tool_details = composio_service.get_tool_by_slug(tool_def.action)
+
+        # Create a FunctionDefinition directly with proper field extraction
+        return FunctionDefinition(
+            name=tool_def.name,
+            description=tool_details.get("description", tool_def.description),
+            parameters=tool_details.get("input_parameters", {}),
+        )
+    except Exception:
+        # If hydration fails (including no API key), return basic function definition
+        return FunctionDefinition(
+            name=tool_def.name,
+            description=tool_def.description,
+            parameters={},
+        )
 
 
 def use_tool_inputs(**inputs):

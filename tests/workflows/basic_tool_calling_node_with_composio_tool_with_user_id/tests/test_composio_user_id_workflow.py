@@ -33,11 +33,14 @@ def test_run_workflow__with_user_id(vellum_adhoc_prompt_client, monkeypatch):
         "tags": [],
     }
 
-    with mock.patch("vellum.workflows.nodes.displayable.tool_calling_node.utils.ComposioService") as mock_service_class:
+    with mock.patch("vellum.workflows.utils.functions.ComposioService") as mock_service_class, mock.patch(
+        "vellum.workflows.nodes.displayable.tool_calling_node.utils.ComposioService"
+    ) as mock_service_class_utils:
         mock_service_instance = mock.Mock()
         mock_service_instance.execute_tool.return_value = mock_composio_result
         mock_service_instance.get_tool_by_slug.return_value = mock_tool_details
         mock_service_class.return_value = mock_service_instance
+        mock_service_class_utils.return_value = mock_service_instance
 
         def generate_prompt_events(*_args, **_kwargs) -> Iterator[ExecutePromptEvent]:
             execution_id = str(uuid4())
