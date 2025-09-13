@@ -277,7 +277,7 @@ class ElseNode(BaseNode[ToolCallingState]):
 def create_tool_prompt_node(
     ml_model: str,
     blocks: List[Union[PromptBlock, Dict[str, Any]]],
-    functions: List[Tool],
+    functions: List[Union[Tool, FunctionDefinition]],
     prompt_inputs: Optional[EntityInputsInterface],
     parameters: PromptParameters,
     max_prompt_iterations: Optional[int] = None,
