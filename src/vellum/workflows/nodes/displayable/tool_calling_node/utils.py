@@ -9,7 +9,6 @@ from vellum.client.types.array_chat_message_content import ArrayChatMessageConte
 from vellum.client.types.array_chat_message_content_item import ArrayChatMessageContentItem
 from vellum.client.types.function_call_chat_message_content import FunctionCallChatMessageContent
 from vellum.client.types.function_call_chat_message_content_value import FunctionCallChatMessageContentValue
-from vellum.client.types.function_definition import FunctionDefinition
 from vellum.client.types.prompt_output import PromptOutput
 from vellum.client.types.prompt_parameters import PromptParameters
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
