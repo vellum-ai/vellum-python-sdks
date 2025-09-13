@@ -277,7 +277,7 @@ class ElseNode(BaseNode[ToolCallingState]):
 def create_tool_prompt_node(
     ml_model: str,
     blocks: List[Union[PromptBlock, Dict[str, Any]]],
-    functions: List[Union[Tool, FunctionDefinition]],
+    functions: List[Tool],
     prompt_inputs: Optional[EntityInputsInterface],
     parameters: PromptParameters,
     max_prompt_iterations: Optional[int] = None,
@@ -285,7 +285,7 @@ def create_tool_prompt_node(
     process_blocks_method: Optional[Callable] = None,
 ) -> Type[ToolPromptNode]:
     if functions and len(functions) > 0:
-        prompt_functions: List[Union[Tool, FunctionDefinition]] = functions
+        prompt_functions: List[Tool] = functions
     else:
         prompt_functions = []
 
