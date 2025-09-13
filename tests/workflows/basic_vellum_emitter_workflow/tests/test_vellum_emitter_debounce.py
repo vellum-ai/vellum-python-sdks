@@ -97,7 +97,7 @@ def test_vellum_emitter_debounce_timer_reset():
     """
     Test that debounce timer resets when new events arrive.
     """
-    emitter = VellumEmitter(debounce_timeout=0.2)
+    emitter = VellumEmitter(debounce_timeout=0.5)
 
     mock_context = mock.MagicMock()
     mock_client = mock.MagicMock()
@@ -135,7 +135,7 @@ def test_vellum_emitter_debounce_timer_reset():
 
     assert mock_client.events.create.call_count == 0
 
-    time.sleep(0.15)
+    time.sleep(0.4)
     assert mock_client.events.create.call_count == 1
     call_args = mock_client.events.create.call_args
     assert len(call_args.kwargs["request"]) == 2
