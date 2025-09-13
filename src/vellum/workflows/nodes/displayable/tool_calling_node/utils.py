@@ -323,8 +323,6 @@ def create_tool_prompt_node(
                 enhanced_function = _hydrate_composio_tool_definition(function)
                 prompt_functions.append(enhanced_function)
             else:
-                # Pass all other functions (including MCPServer) directly to inline prompt node
-                # The inline prompt node will handle MCP server expansion
                 prompt_functions.append(function)
     else:
         prompt_functions = []
