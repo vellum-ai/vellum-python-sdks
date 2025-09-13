@@ -33,6 +33,7 @@ from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior, Tool, ToolBase
 from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition, MCPServer, MCPToolDefinition
 from vellum.workflows.types.generics import is_workflow_class
+from vellum.workflows.utils.functions import compile_mcp_tool_definition, get_mcp_tool_name
 
 CHAT_HISTORY_VARIABLE = "chat_history"
 
@@ -303,26 +304,6 @@ def _hydrate_composio_tool_definition(tool_def: ComposioToolDefinition) -> Funct
         )
 
 
-def hydrate_mcp_tool_definitions(server_def: MCPServer) -> List[MCPToolDefinition]:
-    """Hydrate an MCPToolDefinition with detailed information from the MCP server.
-
-    We do tool discovery on the MCP server to get the tool definitions.
-
-    Args:
-        tool_def: The basic MCPToolDefinition to enhance
-
-    Returns:
-        MCPToolDefinition with detailed parameters and description
-    """
-    try:
-        mcp_service = MCPService()
-        return mcp_service.hydrate_tool_definitions(server_def)
-    except Exception as e:
-        # If hydration fails, log and return original
-        logger.warning(f"Failed to enhance MCP server '{server_def.name}': {e}")
-        return []
-
-
 def create_tool_prompt_node(
     ml_model: str,
     blocks: List[Union[PromptBlock, Dict[str, Any]]],
@@ -341,18 +322,9 @@ def create_tool_prompt_node(
                 # Get Composio tool details and hydrate the function definition
                 enhanced_function = _hydrate_composio_tool_definition(function)
                 prompt_functions.append(enhanced_function)
-            elif isinstance(function, MCPServer):
-                tool_functions: List[MCPToolDefinition] = hydrate_mcp_tool_definitions(function)
-                for tool_function in tool_functions:
-                    name = get_mcp_tool_name(tool_function)
-                    prompt_functions.append(
-                        FunctionDefinition(
-                            name=name,
-                            description=tool_function.description,
-                            parameters=tool_function.parameters,
-                        )
-                    )
             else:
+                # Pass all other functions (including MCPServer) directly to inline prompt node
+                # The inline prompt node will handle MCP server expansion
                 prompt_functions.append(function)
     else:
         prompt_functions = []
@@ -440,7 +412,7 @@ def create_router_node(
                 port = create_port_condition(function_name)
                 setattr(Ports, function_name, port)
             elif isinstance(function, MCPServer):
-                tool_functions: List[MCPToolDefinition] = hydrate_mcp_tool_definitions(function)
+                tool_functions: List[MCPToolDefinition] = compile_mcp_tool_definition(function)
                 for tool_function in tool_functions:
                     name = get_mcp_tool_name(tool_function)
                     port = create_port_condition(name)
@@ -604,8 +576,3 @@ def get_function_name(function: ToolBase) -> str:
         return function.name  # type: ignore[return-value]
     else:
         return snake_case(function.__name__)
-
-
-def get_mcp_tool_name(tool_def: MCPToolDefinition) -> str:
-    server_name = snake_case(tool_def.server.name)
-    return f"{server_name}__{tool_def.name}"

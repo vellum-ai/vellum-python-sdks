@@ -30,7 +30,9 @@ from tests.workflows.basic_tool_calling_node_mcp_tool.workflow import BasicToolC
 
 
 def test_run_workflow__happy_path(vellum_adhoc_prompt_client, mock_uuid4_generator, monkeypatch):
-    with mock.patch("vellum.workflows.nodes.displayable.tool_calling_node.utils.MCPService") as mock_mcp_service:
+    with mock.patch("vellum.workflows.utils.functions.MCPService") as mock_mcp_service, mock.patch(
+        "vellum.workflows.nodes.displayable.tool_calling_node.utils.MCPService"
+    ) as mock_mcp_service_tool_calling:
         mock_service_instance = mock.Mock()
         mock_service_instance.execute_tool.return_value = {
             "content": [
@@ -65,6 +67,7 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, mock_uuid4_generat
             )
         ]
         mock_mcp_service.return_value = mock_service_instance
+        mock_mcp_service_tool_calling.return_value = mock_service_instance
 
         # Set the required environment variable
         monkeypatch.setenv("GITHUB_PERSONAL_ACCESS_TOKEN", "test_github_token_123")
