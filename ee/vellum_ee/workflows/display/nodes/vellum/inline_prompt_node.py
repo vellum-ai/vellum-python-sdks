@@ -163,9 +163,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
         elif callable(function):
             normalized_functions = compile_function_definition(function)
         elif isinstance(function, DeploymentDefinition):
-            normalized_functions = compile_workflow_deployment_function_definition(
-                function.model_dump(), display_context.client
-            )
+            normalized_functions = compile_workflow_deployment_function_definition(function, display_context.client)
         else:
             raise ValueError(f"Unsupported function type: {type(function)}")
         return {
