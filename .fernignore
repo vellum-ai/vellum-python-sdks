@@ -12,6 +12,8 @@ src/vellum/plugins
 src/vellum/prompts
 src/vellum/utils
 src/vellum/workflows
+src/vellum/client/utils.py
 scripts
 tests/workflows
+tests/client/utils/test_utils.py
 conftest.py
