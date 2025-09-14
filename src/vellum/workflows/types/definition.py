@@ -2,13 +2,14 @@ import importlib
 import inspect
 from types import FrameType
 from uuid import UUID
-from typing import Annotated, Any, Dict, Literal, Optional, Union
+from typing import Annotated, Any, Dict, List, Literal, Optional, Union
 
 from pydantic import BeforeValidator, SerializationInfo, model_serializer
 
 from vellum import Vellum
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.code_resource_definition import CodeResourceDefinition as ClientCodeResourceDefinition
+from vellum.client.types.vellum_variable import VellumVariable
 from vellum.workflows.constants import AuthorizationType
 from vellum.workflows.references.environment_variable import EnvironmentVariableReference
 
@@ -82,6 +83,7 @@ class DeploymentDefinition(UniversalBaseModel):
     # hydrated fields
     name: Optional[str] = None
     description: Optional[str] = None
+    input_variables: Optional[List[VellumVariable]] = None
 
     def _is_uuid(self) -> bool:
         """Check if the deployment field is a valid UUID."""
@@ -105,6 +107,25 @@ class DeploymentDefinition(UniversalBaseModel):
             return self.deployment
         return None
 
+    def get_release_info(self, client: Vellum):
+        try:
+            release = client.workflow_deployments.retrieve_workflow_deployment_release(
+                self.deployment, self.release_tag
+            )
+        except Exception:
+            # If we fail to get the release info, we'll use the deployment name and description
+            return {
+                "name": self.deployment,
+                "description": f"Workflow Deployment for {self.deployment}",
+                "input_variables": [],
+            }
+
+        return {
+            "name": release.deployment.name,
+            "description": release.description or f"Workflow Deployment for {self.deployment}",
+            "input_variables": release.workflow_version.input_variables,
+        }
+
     @model_serializer(mode="wrap")
     def _serialize(self, handler, info: SerializationInfo):
         """Allow Pydantic to serialize directly given a `client` in context.
@@ -115,16 +136,11 @@ class DeploymentDefinition(UniversalBaseModel):
         client: Optional[Vellum] = context.get("client") if context else None
 
         if client:
-            release = client.workflow_deployments.retrieve_workflow_deployment_release(
-                self.deployment, self.release_tag
-            )
-            self.name = release.deployment.name or self.deployment
-            self.description = release.description or f"Workflow Deployment for {self.deployment}"
-
+            release_info = self.get_release_info(client)
             return {
                 "type": "WORKFLOW_DEPLOYMENT",
-                "name": self.name,
-                "description": self.description,
+                "name": release_info["name"],
+                "description": release_info["description"],
                 "deployment": self.deployment,
                 "release_tag": self.release_tag,
             }
