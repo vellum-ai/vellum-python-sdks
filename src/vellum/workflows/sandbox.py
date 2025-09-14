@@ -2,9 +2,9 @@ from typing import Generic, Optional, Sequence, Union
 
 import dotenv
 
-from vellum.workflows.dataset_row import DatasetRow
 from vellum.workflows.events.workflow import WorkflowEventStream
 from vellum.workflows.inputs.base import BaseInputs
+from vellum.workflows.inputs.dataset_row import DatasetRow
 from vellum.workflows.logging import load_logger
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.workflows.event_filters import root_workflow_event_filter

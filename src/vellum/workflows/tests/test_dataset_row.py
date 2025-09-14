@@ -1,8 +1,8 @@
 from typing import Optional
 
 from vellum.client.types.chat_message import ChatMessage
-from vellum.workflows.dataset_row import DatasetRow
 from vellum.workflows.inputs.base import BaseInputs
+from vellum.workflows.inputs.dataset_row import DatasetRow
 
 
 def test_dataset_row_serialization():
