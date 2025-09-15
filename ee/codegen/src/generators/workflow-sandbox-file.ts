@@ -4,18 +4,18 @@ import { isNil } from "lodash";
 
 import { vellumValue } from "src/codegen";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
-import { WorkflowSandboxInputs } from "src/types/vellum";
+import { WorkflowSandboxInputs, WorkflowSandboxDatasetRow } from "src/types/vellum";
 import { removeEscapeCharacters } from "src/utils/casing";
 import { getGeneratedInputsModulePath } from "src/utils/paths";
 
 export declare namespace WorkflowSandboxFile {
   interface Args extends BasePersistedFile.Args {
-    sandboxInputs: WorkflowSandboxInputs[];
+    sandboxInputs: WorkflowSandboxDatasetRow[];
   }
 }
 
 export class WorkflowSandboxFile extends BasePersistedFile {
-  private readonly sandboxInputs: WorkflowSandboxInputs[];
+  private readonly sandboxInputs: WorkflowSandboxDatasetRow[];
 
   public constructor({
     workflowContext,
@@ -82,9 +82,12 @@ if __name__ == "__main__":
   }
 
   private getWorkflowInput(
-    inputs: WorkflowSandboxInputs,
+    row: WorkflowSandboxDatasetRow,
     index: number
   ): python.ClassInstantiation {
+    const inputs: WorkflowSandboxInputs = Array.isArray(row) ? row : row.inputs;
+    const label: string = Array.isArray(row) ? `Example ${index + 1}` : row.label;
+
     const inputsInstance = python.instantiateClass({
       classReference: python.reference({
         name: "Inputs",
@@ -119,12 +122,12 @@ if __name__ == "__main__":
     return python.instantiateClass({
       classReference: python.reference({
         name: "DatasetRow",
-        modulePath: this.workflowContext.sdkModulePathNames.WORKFLOWS_MODULE_PATH,
+        modulePath: ["vellum", "workflows", "inputs"],
       }),
       arguments_: [
         python.methodArgument({
           name: "label",
-          value: python.TypeInstantiation.str(`Example ${index + 1}`),
+          value: python.TypeInstantiation.str(label),
         }),
         python.methodArgument({
           name: "inputs",

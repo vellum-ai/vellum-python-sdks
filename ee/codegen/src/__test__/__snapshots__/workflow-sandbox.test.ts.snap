@@ -1,7 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`Workflow Sandbox > write > should generate correct code for camel case input names 1`] = `
-"from vellum.workflows import DatasetRow
+"from vellum.workflows.inputs import DatasetRow
 from vellum.workflows.sandbox import WorkflowSandboxRunner
 
 from .inputs import Inputs
@@ -20,7 +20,7 @@ if __name__ == "__main__":
 `;
 
 exports[`Workflow Sandbox > write > should generate correct code for snake case input names 1`] = `
-"from vellum.workflows import DatasetRow
+"from vellum.workflows.inputs import DatasetRow
 from vellum.workflows.sandbox import WorkflowSandboxRunner
 
 from .inputs import Inputs
@@ -39,7 +39,7 @@ if __name__ == "__main__":
 `;
 
 exports[`Workflow Sandbox > write > should generate correct code given inputs 1`] = `
-"from vellum.workflows import DatasetRow
+"from vellum.workflows.inputs import DatasetRow
 from vellum.workflows.sandbox import WorkflowSandboxRunner
 
 from .inputs import Inputs
@@ -58,7 +58,7 @@ if __name__ == "__main__":
 `;
 
 exports[`Workflow Sandbox > write > should generate correct code given optional input with default of null string value 1`] = `
-"from vellum.workflows import DatasetRow
+"from vellum.workflows.inputs import DatasetRow
 from vellum.workflows.sandbox import WorkflowSandboxRunner
 
 from .inputs import Inputs
@@ -76,7 +76,7 @@ if __name__ == "__main__":
 `;
 
 exports[`Workflow Sandbox > write > should properly handle special characters with escaped quotes 1`] = `
-"from vellum.workflows import DatasetRow
+"from vellum.workflows.inputs import DatasetRow
 from vellum.workflows.sandbox import WorkflowSandboxRunner
 
 from .inputs import Inputs

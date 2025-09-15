@@ -819,6 +819,7 @@ type WorkflowSandboxInput =
   | ImageInputRequest
   | DocumentInputRequest;
 export type WorkflowSandboxInputs = WorkflowSandboxInput[];
+export type WorkflowSandboxDatasetRow = WorkflowSandboxInputs | {label: string, inputs: WorkflowSandboxInputs};
 
 export interface UnaryWorkflowExpression {
   type: "UNARY_EXPRESSION";
