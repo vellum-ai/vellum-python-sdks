@@ -28,7 +28,7 @@ toolbox --tools-file "tools.yaml"
 We include a `chat.py` file with the module for running locally. Invoke it by running:
 
 ```bash
-python -m examples.workflows.mcp_tool_calling_node_demo.chat
+python -m examples.workflows.mcp_toolbox.chat
 ```
 
 ### Example Queries
