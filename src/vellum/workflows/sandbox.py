@@ -1,9 +1,10 @@
-from typing import Generic, Optional, Sequence
+from typing import Generic, Optional, Sequence, Union
 
 import dotenv
 
 from vellum.workflows.events.workflow import WorkflowEventStream
 from vellum.workflows.inputs.base import BaseInputs
+from vellum.workflows.inputs.dataset_row import DatasetRow
 from vellum.workflows.logging import load_logger
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.workflows.event_filters import root_workflow_event_filter
@@ -14,7 +15,7 @@ class WorkflowSandboxRunner(Generic[WorkflowType]):
         self,
         workflow: WorkflowType,
         inputs: Optional[Sequence[BaseInputs]] = None,  # DEPRECATED - remove in v2.0.0
-        dataset: Optional[Sequence[BaseInputs]] = None,
+        dataset: Optional[Sequence[Union[BaseInputs, DatasetRow]]] = None,
     ):
         dotenv.load_dotenv()
         self._logger = load_logger()
@@ -49,6 +50,9 @@ class WorkflowSandboxRunner(Generic[WorkflowType]):
             index = len(self._inputs) - 1
 
         selected_inputs = self._inputs[index]
+
+        if isinstance(selected_inputs, DatasetRow):
+            selected_inputs = selected_inputs.inputs
 
         events = self._workflow.stream(
             inputs=selected_inputs,
