@@ -129,11 +129,11 @@ def parse_type_from_str(result_as_str: str, output_type: Any) -> Any:
             # raise ValueError("Invalid JSON Array format for result_as_str")
             raise NodeException(
                 code=WorkflowErrorCode.INVALID_OUTPUTS,
-                message="Invalid JSON Array format for result_as_str",
+                message="Invalid JSON format: expected a valid JSON array",
             )
 
         if not isinstance(data, list):
-            raise ValueError(f"Expected a list of items for result_as_str, received {data.__class__.__name__}")
+            raise ValueError(f"Expected a list of items, but received {data.__class__.__name__}")
 
         inner_type = get_args(output_type)[0]
         if issubclass(inner_type, BaseModel):
@@ -151,7 +151,7 @@ def parse_type_from_str(result_as_str: str, output_type: Any) -> Any:
         except json.JSONDecodeError:
             raise NodeException(
                 code=WorkflowErrorCode.INVALID_OUTPUTS,
-                message="Invalid JSON format for result_as_str",
+                message="Invalid JSON format: unable to parse the provided data",
             )
 
     if get_origin(output_type) is Union:
@@ -177,7 +177,7 @@ def parse_type_from_str(result_as_str: str, output_type: Any) -> Any:
         except json.JSONDecodeError:
             raise NodeException(
                 code=WorkflowErrorCode.INVALID_OUTPUTS,
-                message="Invalid JSON format for result_as_str",
+                message="Invalid JSON format: unable to parse the provided data",
             )
 
     raise ValueError(f"Unsupported output type: {output_type}")
