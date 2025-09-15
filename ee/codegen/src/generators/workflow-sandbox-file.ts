@@ -33,7 +33,7 @@ export class WorkflowSandboxFile extends BasePersistedFile {
     const datasetField = python.field({
       name: "dataset",
       initializer: python.TypeInstantiation.list(
-        this.sandboxInputs.map((input) => this.getWorkflowInput(input)),
+        this.sandboxInputs.map((input, index) => this.getWorkflowInput(input, index)),
         { endWithComma: true }
       ),
     });
@@ -82,9 +82,10 @@ if __name__ == "__main__":
   }
 
   private getWorkflowInput(
-    inputs: WorkflowSandboxInputs
+    inputs: WorkflowSandboxInputs,
+    index: number
   ): python.ClassInstantiation {
-    return python.instantiateClass({
+    const inputsInstance = python.instantiateClass({
       classReference: python.reference({
         name: "Inputs",
         modulePath: getGeneratedInputsModulePath(this.workflowContext),
@@ -113,6 +114,23 @@ if __name__ == "__main__":
         .filter(
           (argument): argument is python.MethodArgument => !isNil(argument)
         ),
+    });
+
+    return python.instantiateClass({
+      classReference: python.reference({
+        name: "DatasetRow",
+        modulePath: this.workflowContext.sdkModulePathNames.WORKFLOWS_MODULE_PATH,
+      }),
+      arguments_: [
+        python.methodArgument({
+          name: "label",
+          value: python.TypeInstantiation.str(`Example ${index + 1}`),
+        }),
+        python.methodArgument({
+          name: "inputs",
+          value: inputsInstance,
+        }),
+      ],
     });
   }
 }
