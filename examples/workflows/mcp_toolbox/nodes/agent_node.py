@@ -9,10 +9,6 @@ from ..inputs import Inputs
 
 
 class Agent(ToolCallingNode):
-    """
-    A tool calling node that uses the GitHub MCP server to manage the user's GitHub account.
-    """
-
     ml_model = "gpt-4o-mini"
     blocks = [
         ChatMessagePromptBlock(
