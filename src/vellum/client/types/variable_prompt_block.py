@@ -3,6 +3,7 @@
 import typing
 
 import pydantic
+from vellum.client.utils import convert_input_variable_to_uuid
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 from .ephemeral_prompt_cache_config import EphemeralPromptCacheConfig
 from .prompt_block_state import PromptBlockState
@@ -26,3 +27,9 @@ class VariablePromptBlock(UniversalBaseModel):
             frozen = True
             smart_union = True
             extra = pydantic.Extra.allow
+
+
+    @pydantic.field_serializer("input_variable")
+    def serialize_input_variable(self, value: str, info: pydantic.SerializationInfo) -> str:
+        """Convert input_variable to UUID using executable_id from context."""
+        return convert_input_variable_to_uuid(value, info)

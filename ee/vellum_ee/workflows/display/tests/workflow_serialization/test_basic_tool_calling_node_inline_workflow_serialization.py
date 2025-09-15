@@ -114,7 +114,7 @@ def test_serialize_workflow():
                                                 "block_type": "VARIABLE",
                                                 "state": None,
                                                 "cache_config": None,
-                                                "input_variable": "question",
+                                                "input_variable": "8eb8b551-9b48-43b3-861f-52adb5c585a8",
                                             }
                                         ],
                                     }

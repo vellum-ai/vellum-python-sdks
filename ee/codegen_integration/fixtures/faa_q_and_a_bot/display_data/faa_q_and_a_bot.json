@@ -306,7 +306,7 @@
                             "block_type": "VARIABLE",
                             "state": null,
                             "cache_config": null,
-                            "input_variable": "var_1"
+                            "input_variable": "e4a7538b-707b-4d6e-b20c-f3d1e14e5520"
                           }
                         ]
                       }
@@ -1282,7 +1282,7 @@
                             "block_type": "VARIABLE",
                             "state": null,
                             "cache_config": null,
-                            "input_variable": "question"
+                            "input_variable": "f03c6b65-650e-4a0b-877a-cf01acb44fe1"
                           },
                           {
                             "block_type": "PLAIN_TEXT",
@@ -1294,7 +1294,7 @@
                             "block_type": "VARIABLE",
                             "state": null,
                             "cache_config": null,
-                            "input_variable": "context"
+                            "input_variable": "4003bfc5-8b05-4cf6-ae15-b9a1ef060dfc"
                           }
                         ]
                       },
@@ -1569,7 +1569,7 @@
                             "block_type": "VARIABLE",
                             "state": null,
                             "cache_config": null,
-                            "input_variable": "most_recent_message"
+                            "input_variable": "5c94d2a6-5790-491b-a2ee-f3cbee1eb12a"
                           }
                         ]
                       }
@@ -2200,7 +2200,7 @@
                             "block_type": "VARIABLE",
                             "state": null,
                             "cache_config": null,
-                            "input_variable": "text"
+                            "input_variable": "cf099d1e-7801-4b15-a669-a41ca84ef48a"
                           }
                         ]
                       }
@@ -2778,7 +2778,7 @@
                     "block_type": "VARIABLE",
                     "state": null,
                     "cache_config": null,
-                    "input_variable": "chat_history"
+                    "input_variable": "fc466727-654e-4bd9-93b1-8a9284e1ddff"
                   }
                 ]
               }
