@@ -4,7 +4,10 @@ import { isNil } from "lodash";
 
 import { vellumValue } from "src/codegen";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
-import { WorkflowSandboxInputs, WorkflowSandboxDatasetRow } from "src/types/vellum";
+import {
+  WorkflowSandboxInputs,
+  WorkflowSandboxDatasetRow,
+} from "src/types/vellum";
 import { removeEscapeCharacters } from "src/utils/casing";
 import { getGeneratedInputsModulePath } from "src/utils/paths";
 
@@ -33,7 +36,9 @@ export class WorkflowSandboxFile extends BasePersistedFile {
     const datasetField = python.field({
       name: "dataset",
       initializer: python.TypeInstantiation.list(
-        this.sandboxInputs.map((input, index) => this.getWorkflowInput(input, index)),
+        this.sandboxInputs.map((input, index) =>
+          this.getWorkflowInput(input, index)
+        ),
         { endWithComma: true }
       ),
     });
@@ -86,7 +91,9 @@ if __name__ == "__main__":
     index: number
   ): python.ClassInstantiation {
     const inputs: WorkflowSandboxInputs = Array.isArray(row) ? row : row.inputs;
-    const label: string = Array.isArray(row) ? `Example ${index + 1}` : row.label;
+    const label: string = Array.isArray(row)
+      ? `Example ${index + 1}`
+      : row.label;
 
     const inputsInstance = python.instantiateClass({
       classReference: python.reference({
