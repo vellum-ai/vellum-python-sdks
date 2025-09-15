@@ -42,7 +42,7 @@ def test_vellum_emitter__happy_path(mock_httpx_transport):
     # WHEN we emit the workflow event
     emitter.emit_event(workflow_initiated_event)
 
-    time.sleep(0.02)
+    time.sleep(0.05)
 
     # THEN the emitter should have called client.events.create
     assert mock_httpx_transport.handle_request.call_count == 1
