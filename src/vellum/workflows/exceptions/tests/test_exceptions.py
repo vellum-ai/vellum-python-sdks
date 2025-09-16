@@ -40,6 +40,7 @@ def test_workflow_initialization_exception_stream__with_inputs_and_state():
     assert initiated_event.name == "workflow.execution.initiated"
     assert initiated_event.body.workflow_definition == TestWorkflow
     assert initiated_event.body.inputs.test_input == "test_value"
+    assert initiated_event.body.initial_state is not None
     assert initiated_event.body.initial_state.test_field == "test_state"
 
     rejected_event = events[1]
