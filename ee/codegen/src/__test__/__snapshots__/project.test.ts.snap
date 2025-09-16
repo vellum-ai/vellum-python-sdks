@@ -1300,36 +1300,46 @@ class WeatherFunction(BaseWorkflow[Inputs, BaseState]):
 
 exports[`WorkflowProjectGenerator > include sandbox > should include a sandbox.py file when passed sandboxInputs > code/sandbox.py 1`] = `
 "from vellum import ArrayChatMessageContent, ChatMessage, StringChatMessageContent
+from vellum.workflows.inputs import DatasetRow
 from vellum.workflows.sandbox import WorkflowSandboxRunner
 
 from .inputs import Inputs
 from .workflow import Workflow
 
 dataset = [
-    Inputs(
-        input="foo",
-        chat=[
-            ChatMessage(role="USER", text="foo"),
-        ],
+    DatasetRow(
+        label="Example 1",
+        inputs=Inputs(
+            input="foo",
+            chat=[
+                ChatMessage(role="USER", text="foo"),
+            ],
+        ),
     ),
-    Inputs(
-        input="bar",
-        chat=[
-            ChatMessage(role="USER", content=StringChatMessageContent(value="bar")),
-        ],
+    DatasetRow(
+        label="Example 2",
+        inputs=Inputs(
+            input="bar",
+            chat=[
+                ChatMessage(role="USER", content=StringChatMessageContent(value="bar")),
+            ],
+        ),
     ),
-    Inputs(
-        input="hello",
-        chat=[
-            ChatMessage(
-                role="USER",
-                content=ArrayChatMessageContent(
-                    value=[
-                        StringChatMessageContent(value="hello"),
-                    ]
+    DatasetRow(
+        label="Example 3",
+        inputs=Inputs(
+            input="hello",
+            chat=[
+                ChatMessage(
+                    role="USER",
+                    content=ArrayChatMessageContent(
+                        value=[
+                            StringChatMessageContent(value="hello"),
+                        ]
+                    ),
                 ),
-            ),
-        ],
+            ],
+        ),
     ),
 ]
 
