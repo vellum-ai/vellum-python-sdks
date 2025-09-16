@@ -1,6 +1,9 @@
-from typing import Any, Dict, Optional
+from typing import TYPE_CHECKING, Any, Dict, Optional, Type
 
 from vellum.workflows.errors import WorkflowError, WorkflowErrorCode
+
+if TYPE_CHECKING:
+    from vellum.workflows.workflows.base import BaseWorkflow
 
 
 class NodeException(Exception):
@@ -29,9 +32,15 @@ class NodeException(Exception):
 
 
 class WorkflowInitializationException(Exception):
-    def __init__(self, message: str, code: WorkflowErrorCode = WorkflowErrorCode.INVALID_INPUTS):
+    def __init__(
+        self,
+        message: str,
+        workflow_definition: Type["BaseWorkflow"],
+        code: WorkflowErrorCode = WorkflowErrorCode.INVALID_INPUTS,
+    ):
         self.message = message
         self.code = code
+        self.definition = workflow_definition
         super().__init__(message)
 
     @property
@@ -40,7 +49,3 @@ class WorkflowInitializationException(Exception):
             message=self.message,
             code=self.code,
         )
-
-    @staticmethod
-    def of(workflow_error: WorkflowError) -> "WorkflowInitializationException":
-        return WorkflowInitializationException(message=workflow_error.message, code=workflow_error.code)

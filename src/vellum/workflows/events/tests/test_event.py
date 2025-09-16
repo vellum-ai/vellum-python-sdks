@@ -7,6 +7,7 @@ from deepdiff import DeepDiff
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.constants import undefined
 from vellum.workflows.errors.types import WorkflowError, WorkflowErrorCode
+from vellum.workflows.events.exception_handling import stream_initialization_exception
 from vellum.workflows.events.node import (
     NodeExecutionFulfilledBody,
     NodeExecutionFulfilledEvent,
@@ -26,6 +27,7 @@ from vellum.workflows.events.workflow import (
     WorkflowExecutionStreamingBody,
     WorkflowExecutionStreamingEvent,
 )
+from vellum.workflows.exceptions import WorkflowInitializationException
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.outputs.base import BaseOutput
@@ -460,3 +462,28 @@ def test_parent_context__deserialize_from_json__invalid_parent_context():
     assert event.parent.type == "UNKNOWN"
     assert event.parent.span_id == UUID("123e4567-e89b-12d3-a456-426614174000")
     assert event.parent.parent is None
+
+
+def test_workflow_event_generator_stream_initialization_exception():
+    """
+    Tests that stream_initialization_exception yields both initiated and rejected events with proper correlation.
+    """
+    exception = WorkflowInitializationException("Test initialization error", workflow_definition=MockWorkflow)
+
+    events = list(stream_initialization_exception(exception))
+
+    assert len(events) == 2
+
+    initiated_event = events[0]
+    assert initiated_event.name == "workflow.execution.initiated"
+    assert initiated_event.body.inputs is not None
+    assert initiated_event.body.initial_state is None
+    assert initiated_event.body.workflow_definition == MockWorkflow
+
+    rejected_event = events[1]
+    assert rejected_event.name == "workflow.execution.rejected"
+    assert rejected_event.body.error.message == "Test initialization error"
+    assert rejected_event.body.workflow_definition == MockWorkflow
+
+    assert initiated_event.trace_id == rejected_event.trace_id
+    assert initiated_event.span_id == rejected_event.span_id

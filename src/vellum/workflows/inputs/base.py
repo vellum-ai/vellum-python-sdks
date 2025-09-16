@@ -95,6 +95,7 @@ class BaseInputs(metaclass=_BaseInputsMeta):
                     raise WorkflowInitializationException(
                         message=f"Required input variables {name} should have defined value",
                         code=WorkflowErrorCode.INVALID_INPUTS,
+                        workflow_definition=self.__class__.__parent_class__,
                     )
 
             # If value provided in kwargs, set it on the instance
