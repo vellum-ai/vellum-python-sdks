@@ -460,3 +460,29 @@ def test_parent_context__deserialize_from_json__invalid_parent_context():
     assert event.parent.type == "UNKNOWN"
     assert event.parent.span_id == UUID("123e4567-e89b-12d3-a456-426614174000")
     assert event.parent.parent is None
+
+
+def test_workflow_event_generator_stream_initialization_exception():
+    """
+    Tests that stream_initialization_exception yields both initiated and rejected events with proper correlation.
+    """
+    from vellum.workflows.events.stream import WorkflowEventGenerator
+    from vellum.workflows.exceptions import WorkflowInitializationException
+
+    exception = WorkflowInitializationException("Test initialization error")
+
+    events = list(WorkflowEventGenerator.stream_initialization_exception(exception))
+
+    assert len(events) == 2
+
+    initiated_event = events[0]
+    assert initiated_event.name == "workflow.execution.initiated"
+    assert initiated_event.body.inputs is not None
+    assert initiated_event.body.initial_state is None
+
+    rejected_event = events[1]
+    assert rejected_event.name == "workflow.execution.rejected"
+    assert rejected_event.body.error.message == "Test initialization error"
+
+    assert initiated_event.trace_id == rejected_event.trace_id
+    assert initiated_event.span_id == rejected_event.span_id
