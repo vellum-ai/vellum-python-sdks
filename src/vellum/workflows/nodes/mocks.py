@@ -123,6 +123,7 @@ class MockNodeExecution(UniversalBaseModel):
             raise WorkflowInitializationException(
                 message="Failed to validate mock node executions",
                 code=WorkflowErrorCode.INVALID_INPUTS,
+                workflow_definition=workflow,
             ) from e
 
         nodes = {node.__id__: node for node in workflow.get_nodes()}
@@ -186,7 +187,10 @@ class MockNodeExecution(UniversalBaseModel):
             elif raw_logical_condition.operator == "!=":
                 return lhs.does_not_equal(rhs)
             else:
-                raise WorkflowInitializationException(f"Unsupported logical operator: {raw_logical_condition.operator}")
+                raise WorkflowInitializationException(
+                    message=f"Unsupported logical operator: {raw_logical_condition.operator}",
+                    workflow_definition=workflow,
+                )
 
         def _translate_raw_logical_expression_variable(
             raw_variable: _RawMockWorkflowNodeExecutionValuePointer,
@@ -197,7 +201,10 @@ class MockNodeExecution(UniversalBaseModel):
                 node = nodes[raw_variable.node_id]
                 return node.Execution.count
             else:
-                raise WorkflowInitializationException(f"Unsupported logical expression type: {raw_variable.type}")
+                raise WorkflowInitializationException(
+                    message=f"Unsupported logical expression type: {raw_variable.type}",
+                    workflow_definition=workflow,
+                )
 
         mock_node_executions = []
         for mock_workflow_node_config in mock_workflow_node_configs:
@@ -212,8 +219,10 @@ class MockNodeExecution(UniversalBaseModel):
                     for then_output in mock_execution.then_outputs:
                         node_output_name = node_output_name_by_id.get(then_output.output_id)
                         if node_output_name is None:
+                            node_id = mock_workflow_node_config.node_id
                             raise WorkflowInitializationException(
-                                f"Output {then_output.output_id} not found in node {mock_workflow_node_config.node_id}"
+                                message=f"Output {then_output.output_id} not found in node {node_id}",
+                                workflow_definition=workflow,
                             )
 
                         resolved_output_reference = _translate_raw_logical_expression_variable(then_output.value)
@@ -224,8 +233,10 @@ class MockNodeExecution(UniversalBaseModel):
                                 resolved_output_reference._value,
                             )
                         else:
+                            ref_type = type(resolved_output_reference)
                             raise WorkflowInitializationException(
-                                f"Unsupported resolved output reference type: {type(resolved_output_reference)}"
+                                message=f"Unsupported resolved output reference type: {ref_type}",
+                                workflow_definition=workflow,
                             )
 
                     mock_node_executions.append(

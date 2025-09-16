@@ -35,8 +35,8 @@ class WorkflowInitializationException(Exception):
     def __init__(
         self,
         message: str,
+        workflow_definition: Type["BaseWorkflow"],
         code: WorkflowErrorCode = WorkflowErrorCode.INVALID_INPUTS,
-        workflow_definition: Optional[Type["BaseWorkflow"]] = None,
     ):
         self.message = message
         self.code = code
@@ -48,12 +48,4 @@ class WorkflowInitializationException(Exception):
         return WorkflowError(
             message=self.message,
             code=self.code,
-        )
-
-    @staticmethod
-    def of(
-        workflow_error: WorkflowError, workflow_definition: Optional[Type["BaseWorkflow"]] = None
-    ) -> "WorkflowInitializationException":
-        return WorkflowInitializationException(
-            message=workflow_error.message, code=workflow_error.code, workflow_definition=workflow_definition
         )

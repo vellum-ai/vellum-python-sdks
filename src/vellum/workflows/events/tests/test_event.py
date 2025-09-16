@@ -7,6 +7,7 @@ from deepdiff import DeepDiff
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.constants import undefined
 from vellum.workflows.errors.types import WorkflowError, WorkflowErrorCode
+from vellum.workflows.events.exception_handling import stream_initialization_exception
 from vellum.workflows.events.node import (
     NodeExecutionFulfilledBody,
     NodeExecutionFulfilledEvent,
@@ -15,7 +16,6 @@ from vellum.workflows.events.node import (
     NodeExecutionStreamingBody,
     NodeExecutionStreamingEvent,
 )
-from vellum.workflows.events.stream import WorkflowEventGenerator
 from vellum.workflows.events.types import NodeParentContext, ParentContext, WorkflowParentContext
 from vellum.workflows.events.workflow import (
     WorkflowExecutionFulfilledBody,
@@ -470,7 +470,7 @@ def test_workflow_event_generator_stream_initialization_exception():
     """
     exception = WorkflowInitializationException("Test initialization error", workflow_definition=MockWorkflow)
 
-    events = list(WorkflowEventGenerator.stream_initialization_exception(exception))
+    events = list(stream_initialization_exception(exception))
 
     assert len(events) == 2
 
