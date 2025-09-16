@@ -6,7 +6,10 @@ import { workflowContextFactory } from "./helpers";
 import { inputVariableContextFactory } from "./helpers/input-variable-context-factory";
 
 import * as codegen from "src/codegen";
-import { WorkflowSandboxInputs, WorkflowSandboxDatasetRow } from "src/types/vellum";
+import {
+  WorkflowSandboxInputs,
+  WorkflowSandboxDatasetRow,
+} from "src/types/vellum";
 
 describe("Workflow Sandbox", () => {
   const generateSandboxFile = async (
