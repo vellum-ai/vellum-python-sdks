@@ -1,6 +1,7 @@
 import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
+import { isNil } from "lodash";
 
 import { VELLUM_WORKFLOW_EDITOR_TYPES_PATH } from "src/constants";
 import { WorkflowContext } from "src/context";
@@ -58,10 +59,7 @@ export class NodeDisplayData extends AstNode {
       })
     );
 
-    if (
-      this.sourceNodeDisplayData?.z_index !== undefined &&
-      this.sourceNodeDisplayData?.z_index !== null
-    ) {
+    if (!isNil(this.sourceNodeDisplayData?.z_index)) {
       args.push(
         python.methodArgument({
           name: "z_index",
@@ -72,10 +70,7 @@ export class NodeDisplayData extends AstNode {
       );
     }
 
-    if (
-      this.sourceNodeDisplayData?.width !== undefined &&
-      this.sourceNodeDisplayData?.width !== null
-    ) {
+    if (!isNil(this.sourceNodeDisplayData?.width)) {
       args.push(
         python.methodArgument({
           name: "width",
@@ -84,10 +79,7 @@ export class NodeDisplayData extends AstNode {
       );
     }
 
-    if (
-      this.sourceNodeDisplayData?.height !== undefined &&
-      this.sourceNodeDisplayData?.height !== null
-    ) {
+    if (!isNil(this.sourceNodeDisplayData?.height)) {
       args.push(
         python.methodArgument({
           name: "height",
@@ -98,10 +90,7 @@ export class NodeDisplayData extends AstNode {
       );
     }
 
-    if (
-      this.sourceNodeDisplayData?.icon !== undefined &&
-      this.sourceNodeDisplayData?.icon !== null
-    ) {
+    if (!isNil(this.sourceNodeDisplayData?.icon)) {
       args.push(
         python.methodArgument({
           name: "icon",
@@ -110,10 +99,7 @@ export class NodeDisplayData extends AstNode {
       );
     }
 
-    if (
-      this.sourceNodeDisplayData?.color !== undefined &&
-      this.sourceNodeDisplayData?.color !== null
-    ) {
+    if (!isNil(this.sourceNodeDisplayData?.color)) {
       args.push(
         python.methodArgument({
           name: "color",
