@@ -87,64 +87,53 @@ export class TemplatingNode extends BaseNode<
     );
     if (!templatingInput) {
       this.workflowContext.addError(
-        new NodeAttributeGenerationError("Templating input not found")
+        new NodeAttributeGenerationError(
+          "Templating input not found",
+          "WARNING"
+        )
       );
-      return python.TypeInstantiation.str("", {
-        multiline: true,
-        startOnNewLine: true,
-        endWithNewLine: true,
-      });
+      return python.TypeInstantiation.str("");
     }
 
     const templateRule = templatingInput.value.rules[0];
     if (!templateRule) {
       this.workflowContext.addError(
-        new NodeAttributeGenerationError("Templating input rule not found")
+        new NodeAttributeGenerationError(
+          "Templating input rule not found",
+          "WARNING"
+        )
       );
-      return python.TypeInstantiation.str("", {
-        multiline: true,
-        startOnNewLine: true,
-        endWithNewLine: true,
-      });
+      return python.TypeInstantiation.str("");
     }
 
     if (templateRule.type !== "CONSTANT_VALUE") {
       this.workflowContext.addError(
         new NodeAttributeGenerationError(
-          "Templating input rule is not a constant value"
+          "Templating input rule is not a constant value",
+          "WARNING"
         )
       );
-      return python.TypeInstantiation.str("", {
-        multiline: true,
-        startOnNewLine: true,
-        endWithNewLine: true,
-      });
+      return python.TypeInstantiation.str("");
     }
 
     if (templateRule.data.type !== "STRING") {
       this.workflowContext.addError(
         new NodeAttributeGenerationError(
-          "Templating input rule is not a string"
+          "Templating input rule is not a string",
+          "WARNING"
         )
       );
-      return python.TypeInstantiation.str("", {
-        multiline: true,
-        startOnNewLine: true,
-        endWithNewLine: true,
-      });
+      return python.TypeInstantiation.str("");
     }
 
     if (!templateRule.data.value) {
       this.workflowContext.addError(
         new NodeAttributeGenerationError(
-          "Templating input rule value must be defined and nonempty"
+          "Templating input rule value must be defined and nonempty",
+          "WARNING"
         )
       );
-      return python.TypeInstantiation.str("", {
-        multiline: true,
-        startOnNewLine: true,
-        endWithNewLine: true,
-      });
+      return python.TypeInstantiation.str("");
     }
 
     return python.TypeInstantiation.str(templateRule.data.value, {
