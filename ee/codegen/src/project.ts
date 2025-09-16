@@ -69,7 +69,6 @@ import {
   FinalOutputNode as FinalOutputNodeType,
   WorkflowDataNode,
   WorkflowNodeType as WorkflowNodeTypeEnum,
-  WorkflowSandboxInputs,
   WorkflowSandboxDatasetRow,
   WorkflowVersionExecConfig,
 } from "src/types/vellum";
