@@ -94,4 +94,46 @@ describe("GenericNode DisplayData Integration", () => {
     expect(result).not.toContain("icon=");
     expect(result).not.toContain("color=");
   });
+
+  it("should generate display data with z_index when provided in serialized JSON", async () => {
+    const nodeData = createGenericNodeWithDisplayData({
+      position: { x: 25, y: 50 },
+      z_index: 10,
+    });
+
+    const nodeContext = (await createNodeContext({
+      workflowContext,
+      nodeData,
+    })) as GenericNodeContext;
+
+    const node = new GenericNode({
+      workflowContext,
+      nodeContext,
+    });
+
+    node.getNodeDisplayFile().write(writer);
+    const result = await writer.toStringFormatted();
+
+    expect(result).toContain("z_index=10");
+  });
+
+  it("should not generate display_data field when no display data is provided", async () => {
+    const nodeData = createGenericNodeWithDisplayData(undefined);
+
+    const nodeContext = (await createNodeContext({
+      workflowContext,
+      nodeData,
+    })) as GenericNodeContext;
+
+    const node = new GenericNode({
+      workflowContext,
+      nodeContext,
+    });
+
+    node.getNodeDisplayFile().write(writer);
+    const result = await writer.toStringFormatted();
+
+    // Should not contain any display_data field at all
+    expect(result).not.toContain("display_data=");
+  });
 });

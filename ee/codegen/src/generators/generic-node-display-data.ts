@@ -19,7 +19,7 @@ export class GenericNodeDisplayData extends AstNode {
   private readonly sourceNodeDisplayData:
     | GenericNodeDisplayDataType
     | undefined;
-  private readonly nodeDisplayData: AstNode;
+  private readonly nodeDisplayData: AstNode | undefined;
   private readonly workflowContext: WorkflowContext;
 
   public constructor({
@@ -32,34 +32,56 @@ export class GenericNodeDisplayData extends AstNode {
     this.nodeDisplayData = this.generateNodeDisplayData();
   }
 
-  private generateNodeDisplayData(): python.ClassInstantiation {
+  private generateNodeDisplayData(): python.ClassInstantiation | undefined {
     const args: python.MethodArgument[] = [];
 
-    args.push(
-      python.methodArgument({
-        name: "position",
-        value: python.instantiateClass({
-          classReference: python.reference({
-            name: "NodeDisplayPosition",
-            modulePath: VELLUM_WORKFLOW_EDITOR_TYPES_PATH,
+    // Only add position if at least one coordinate is provided
+    if (
+      !isNil(this.sourceNodeDisplayData?.position?.x) ||
+      !isNil(this.sourceNodeDisplayData?.position?.y)
+    ) {
+      args.push(
+        python.methodArgument({
+          name: "position",
+          value: python.instantiateClass({
+            classReference: python.reference({
+              name: "NodeDisplayPosition",
+              modulePath: VELLUM_WORKFLOW_EDITOR_TYPES_PATH,
+            }),
+            arguments_: [
+              python.methodArgument({
+                name: "x",
+                value: python.TypeInstantiation.float(
+                  this.sourceNodeDisplayData?.position?.x ?? 0
+                ),
+              }),
+              python.methodArgument({
+                name: "y",
+                value: python.TypeInstantiation.float(
+                  this.sourceNodeDisplayData?.position?.y ?? 0
+                ),
+              }),
+            ],
           }),
-          arguments_: [
-            python.methodArgument({
-              name: "x",
-              value: python.TypeInstantiation.float(
-                this.sourceNodeDisplayData?.position?.x ?? 0
-              ),
-            }),
-            python.methodArgument({
-              name: "y",
-              value: python.TypeInstantiation.float(
-                this.sourceNodeDisplayData?.position?.y ?? 0
-              ),
-            }),
-          ],
-        }),
-      })
-    );
+        })
+      );
+    }
+
+    if (!isNil(this.sourceNodeDisplayData?.z_index)) {
+      args.push(
+        python.methodArgument({
+          name: "z_index",
+          value: python.TypeInstantiation.int(
+            this.sourceNodeDisplayData.z_index
+          ),
+        })
+      );
+    }
+
+    const commentArg = this.generateCommentArg();
+    if (commentArg) {
+      args.push(commentArg);
+    }
 
     if (!isNil(this.sourceNodeDisplayData?.icon)) {
       args.push(
@@ -79,14 +101,14 @@ export class GenericNodeDisplayData extends AstNode {
       );
     }
 
-    const commentArg = this.generateCommentArg();
-    if (commentArg) {
-      args.push(commentArg);
+    // Return undefined if no display data fields are provided
+    if (args.length === 0) {
+      return undefined;
     }
 
     const clazz = python.instantiateClass({
       classReference: python.reference({
-        name: "GenericNodeDisplayData",
+        name: "NodeDisplayData",
         modulePath: VELLUM_WORKFLOW_EDITOR_TYPES_PATH,
       }),
       arguments_: args,
@@ -137,7 +159,13 @@ export class GenericNodeDisplayData extends AstNode {
     });
   }
 
+  public hasContent(): boolean {
+    return this.nodeDisplayData !== undefined;
+  }
+
   public write(writer: Writer) {
-    this.nodeDisplayData.write(writer);
+    if (this.nodeDisplayData) {
+      this.nodeDisplayData.write(writer);
+    }
   }
 }

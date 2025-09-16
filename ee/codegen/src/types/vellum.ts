@@ -716,6 +716,7 @@ export interface ErrorNode extends BaseDisplayableWorkflowNode {
 
 export interface GenericNodeDisplayData {
   position?: { x: number; y: number };
+  z_index?: number;
   comment?: NodeDisplayComment;
   color?: string | null;
   icon?: string | null;

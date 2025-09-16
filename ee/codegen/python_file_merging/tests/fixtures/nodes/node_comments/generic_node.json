@@ -17,6 +17,8 @@
     "comment": {
       "expanded": true,
       "value": "This is a comment"
-    }
+    },
+    "color": null,
+    "icon": null
   }
 }

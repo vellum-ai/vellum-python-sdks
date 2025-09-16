@@ -629,13 +629,16 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
   getNodeDisplayClassBodyStatements(): AstNode[] {
     const statements: AstNode[] = [];
 
-    // Add display data with our custom GenericNodeDisplayData generator
-    statements.push(
-      python.field({
-        name: "display_data",
-        initializer: this.generateGenericNodeDisplayData(),
-      })
-    );
+    // Add display data with our custom GenericNodeDisplayData generator only if it has content
+    const displayDataGenerator = this.generateGenericNodeDisplayData();
+    if (displayDataGenerator.hasContent()) {
+      statements.push(
+        python.field({
+          name: "display_data",
+          initializer: displayDataGenerator,
+        })
+      );
+    }
 
     return statements;
   }
