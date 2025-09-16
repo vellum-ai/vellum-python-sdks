@@ -657,6 +657,8 @@ export const NodeDisplayDataSerializer: ObjectSchema<
   width: numberSchema().optional(),
   height: numberSchema().optional(),
   comment: NodeDisplayCommentSerializer.optional(),
+  color: stringSchema().optional().nullable(),
+  icon: stringSchema().optional().nullable(),
 });
 
 export declare namespace NodeDisplayDataSerializer {
@@ -666,6 +668,8 @@ export declare namespace NodeDisplayDataSerializer {
     width?: number | null;
     height?: number | null;
     comment?: NodeDisplayCommentSerializer.Raw | null;
+    color?: string | null;
+    icon?: string | null;
   }
 }
 
@@ -2095,12 +2099,16 @@ export const GenericNodeDisplayDataSerializer: ObjectSchema<
 > = objectSchema({
   position: NodeDisplayPositionSerializer.optional(),
   comment: NodeDisplayCommentSerializer.optional(),
+  color: stringSchema().optional().nullable(),
+  icon: stringSchema().optional().nullable(),
 });
 
 export declare namespace GenericNodeDisplayDataSerializer {
   interface Raw {
     position?: NodeDisplayPositionSerializer.Raw | null;
     comment?: NodeDisplayCommentSerializer.Raw | null;
+    color?: string | null;
+    icon?: string | null;
   }
 }
 
@@ -2129,12 +2137,7 @@ export declare namespace GenericNodeSerializer {
     id: string;
     label: string;
     base: CodeResourceDefinitionSerializer.Raw;
-    display_data?: {
-      position?: {
-        x: number;
-        y: number;
-      } | null;
-    } | null;
+    display_data?: GenericNodeDisplayDataSerializer.Raw | null;
     definition?: CodeResourceDefinitionSerializer.Raw | null;
     trigger: NodeTriggerSerializer.Raw;
     ports: NodePortSerializer.Raw[];
