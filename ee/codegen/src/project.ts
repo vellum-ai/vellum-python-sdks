@@ -70,6 +70,7 @@ import {
   WorkflowDataNode,
   WorkflowNodeType as WorkflowNodeTypeEnum,
   WorkflowSandboxInputs,
+  WorkflowSandboxDatasetRow,
   WorkflowVersionExecConfig,
 } from "src/types/vellum";
 import { getNodeLabel } from "src/utils/nodes";
@@ -96,7 +97,7 @@ export declare namespace WorkflowProjectGenerator {
     workflowVersionExecConfigData: unknown;
     vellumApiKey?: string;
     vellumApiEnvironment?: VellumEnvironmentUrls;
-    sandboxInputs?: WorkflowSandboxInputs[];
+    sandboxInputs?: WorkflowSandboxDatasetRow[];
     options?: WorkflowProjectGeneratorOptions;
   }
 
@@ -111,7 +112,7 @@ export declare namespace WorkflowProjectGenerator {
 export class WorkflowProjectGenerator {
   public readonly workflowVersionExecConfig: WorkflowVersionExecConfig;
   public readonly workflowContext: WorkflowContext;
-  private readonly sandboxInputs?: WorkflowSandboxInputs[];
+  private readonly sandboxInputs?: WorkflowSandboxDatasetRow[];
 
   constructor({ moduleName, ...rest }: WorkflowProjectGenerator.Args) {
     if ("workflowContext" in rest) {
