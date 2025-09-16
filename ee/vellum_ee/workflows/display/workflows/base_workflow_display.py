@@ -17,6 +17,7 @@ from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.edges import Edge
 from vellum.workflows.events.workflow import NodeEventDisplayContext, WorkflowEventDisplayContext
 from vellum.workflows.inputs.base import BaseInputs
+from vellum.workflows.inputs.dataset_row import DatasetRow
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.nodes.displayable.final_output_node.node import FinalOutputNode
@@ -913,7 +914,10 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 if dataset_attr and isinstance(dataset_attr, list):
                     dataset = []
                     for i, inputs_obj in enumerate(dataset_attr):
-                        if isinstance(inputs_obj, BaseInputs):
+                        if isinstance(inputs_obj, DatasetRow):
+                            serialized_inputs = json.loads(json.dumps(inputs_obj.inputs, cls=DefaultStateEncoder))
+                            dataset.append({"label": inputs_obj.label, "inputs": serialized_inputs})
+                        elif isinstance(inputs_obj, BaseInputs):
                             serialized_inputs = json.loads(json.dumps(inputs_obj, cls=DefaultStateEncoder))
                             dataset.append({"label": f"Scenario {i + 1}", "inputs": serialized_inputs})
         except (ImportError, AttributeError):
