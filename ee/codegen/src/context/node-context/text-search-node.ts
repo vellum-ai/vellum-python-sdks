@@ -5,7 +5,10 @@ import { VellumError } from "vellum-ai/errors";
 import { BaseNodeContext } from "./base";
 
 import { PortContext } from "src/context/port-context";
-import { EntityNotFoundError, NodeAttributeGenerationError } from "src/generators/errors";
+import {
+  EntityNotFoundError,
+  NodeAttributeGenerationError,
+} from "src/generators/errors";
 import { SearchNode } from "src/types/vellum";
 
 export class TextSearchNodeContext extends BaseNodeContext<SearchNode> {
@@ -67,9 +70,10 @@ export class TextSearchNodeContext extends BaseNodeContext<SearchNode> {
               )
             );
           } else if (e instanceof VellumError) {
-            const responseText = e.body && typeof e.body === 'object' && 'detail' in e.body
-              ? String(e.body.detail)
-              : e.message || 'Unknown error';
+            const responseText =
+              e.body && typeof e.body === "object" && "detail" in e.body
+                ? String(e.body.detail)
+                : e.message || "Unknown error";
             throw new NodeAttributeGenerationError(
               `DocumentIndexesClient failed with status ${e.statusCode}: ${responseText}`
             );
