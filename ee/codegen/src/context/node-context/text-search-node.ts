@@ -75,7 +75,7 @@ export class TextSearchNodeContext extends BaseNodeContext<SearchNode> {
                 ? String(e.body.detail)
                 : e.message || "Unknown error";
             throw new NodeAttributeGenerationError(
-              `DocumentIndexesClient failed with status ${e.statusCode}: ${responseText}`
+              `Failed to generate \`document_index\` attribute: Index resolution request failed with status ${e.statusCode}: ${responseText}`
             );
           } else {
             throw e;
