@@ -24,12 +24,11 @@ def test_serialize_module_with_actual_dataset():
     assert isinstance(result.dataset, list)
     assert len(result.dataset) == 2
 
-    for i, item in enumerate(result.dataset):
-        assert "label" in item
-        assert "inputs" in item
-        assert item["label"] == f"Scenario {i + 1}"
-        assert isinstance(item["inputs"], dict)
-        assert "message" in item["inputs"]
+    assert result.dataset[0]["label"] == "Scenario 1"
+    assert result.dataset[0]["inputs"]["message"] == "World"
+
+    assert result.dataset[1]["label"] == "Custom Test"
+    assert result.dataset[1]["inputs"]["message"] == "DatasetRow Test"
 
 
 def test_serialize_module_happy_path():
