@@ -6,7 +6,7 @@ import { workflowContextFactory } from "./helpers";
 import { inputVariableContextFactory } from "./helpers/input-variable-context-factory";
 
 import * as codegen from "src/codegen";
-import { WorkflowSandboxInputs } from "src/types/vellum";
+import { WorkflowSandboxDatasetRow } from "src/types/vellum";
 
 describe("Workflow Sandbox", () => {
   const generateSandboxFile = async (
@@ -25,7 +25,7 @@ describe("Workflow Sandbox", () => {
       );
     });
 
-    const sandboxInputs: WorkflowSandboxInputs[] = inputVariables.map(
+    const sandboxInputs: WorkflowSandboxDatasetRow[] = inputVariables.map(
       (inputVariableData) => {
         return generateSandboxInput
           ? [
@@ -116,7 +116,7 @@ describe("Workflow Sandbox", () => {
       );
 
       // Create sandbox input with a URL containing quotes that would normally be escaped
-      const sandboxInputs: WorkflowSandboxInputs[] = [
+      const sandboxInputs: WorkflowSandboxDatasetRow[] = [
         [
           {
             name: inputVariable.key,
