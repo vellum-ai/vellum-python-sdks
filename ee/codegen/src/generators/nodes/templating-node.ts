@@ -86,30 +86,54 @@ export class TemplatingNode extends BaseNode<
       (input) => input.id === this.nodeData.data.templateNodeInputId
     );
     if (!templatingInput) {
-      throw new NodeAttributeGenerationError(`Templating input not found`);
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          "Templating input not found",
+          "WARNING"
+        )
+      );
+      return python.TypeInstantiation.str("");
     }
 
     const templateRule = templatingInput.value.rules[0];
     if (!templateRule) {
-      throw new NodeAttributeGenerationError("Templating input rule not found");
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          "Templating input rule not found",
+          "WARNING"
+        )
+      );
+      return python.TypeInstantiation.str("");
     }
 
     if (templateRule.type !== "CONSTANT_VALUE") {
-      throw new NodeAttributeGenerationError(
-        "Templating input rule is not a constant value"
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          "Templating input rule is not a constant value",
+          "WARNING"
+        )
       );
+      return python.TypeInstantiation.str("");
     }
 
     if (templateRule.data.type !== "STRING") {
-      throw new NodeAttributeGenerationError(
-        "Templating input rule is not a string"
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          "Templating input rule is not a string",
+          "WARNING"
+        )
       );
+      return python.TypeInstantiation.str("");
     }
 
     if (!templateRule.data.value) {
-      throw new NodeAttributeGenerationError(
-        "Templating input rule value must be defined and nonempty"
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          "Templating input rule value must be defined and nonempty",
+          "WARNING"
+        )
       );
+      return python.TypeInstantiation.str("");
     }
 
     return python.TypeInstantiation.str(templateRule.data.value, {
