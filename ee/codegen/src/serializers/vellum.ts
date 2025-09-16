@@ -657,6 +657,8 @@ export const NodeDisplayDataSerializer: ObjectSchema<
   width: numberSchema().optional(),
   height: numberSchema().optional(),
   comment: NodeDisplayCommentSerializer.optional(),
+  color: stringSchema().nullable().optional(),
+  icon: stringSchema().nullable().optional(),
 });
 
 export declare namespace NodeDisplayDataSerializer {
@@ -666,6 +668,8 @@ export declare namespace NodeDisplayDataSerializer {
     width?: number | null;
     height?: number | null;
     comment?: NodeDisplayCommentSerializer.Raw | null;
+    color?: string | null;
+    icon?: string | null;
   }
 }
 
@@ -2089,18 +2093,24 @@ export declare namespace ErrorNodeSerializer {
   }
 }
 
-export const GenericNodeDisplayDataSerializer: ObjectSchema<
+export const GenericNodeDisplayDataSerializer = objectSchema({
+  position: NodeDisplayPositionSerializer.optional(),
+  z_index: numberSchema().optional(),
+  comment: NodeDisplayCommentSerializer.optional(),
+  color: stringSchema().nullable().optional(),
+  icon: stringSchema().nullable().optional(),
+}) as ObjectSchema<
   GenericNodeDisplayDataSerializer.Raw,
   GenericNodeDisplayData
-> = objectSchema({
-  position: NodeDisplayPositionSerializer.optional(),
-  comment: NodeDisplayCommentSerializer.optional(),
-});
+>;
 
 export declare namespace GenericNodeDisplayDataSerializer {
   interface Raw {
     position?: NodeDisplayPositionSerializer.Raw | null;
+    z_index?: number | null;
     comment?: NodeDisplayCommentSerializer.Raw | null;
+    color?: string | null;
+    icon?: string | null;
   }
 }
 
@@ -2129,12 +2139,7 @@ export declare namespace GenericNodeSerializer {
     id: string;
     label: string;
     base: CodeResourceDefinitionSerializer.Raw;
-    display_data?: {
-      position?: {
-        x: number;
-        y: number;
-      } | null;
-    } | null;
+    display_data?: GenericNodeDisplayDataSerializer.Raw | null;
     definition?: CodeResourceDefinitionSerializer.Raw | null;
     trigger: NodeTriggerSerializer.Raw;
     ports: NodePortSerializer.Raw[];

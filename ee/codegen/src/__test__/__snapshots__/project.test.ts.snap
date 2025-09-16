@@ -517,6 +517,12 @@ from ....nodes.tool_call_get_current_weather_node import GetCurrentWeatherNode
 class GetCurrentWeatherNodeDisplay(BaseNodeDisplay[GetCurrentWeatherNode]):
     label = "GetCurrentWeatherNode"
     node_id = UUID("21f29cac-da87-495f-bba1-093d423f4e46")
+    display_data = NodeDisplayData(
+        position=NodeDisplayPosition(x=0, y=0),
+        comment=NodeDisplayComment(
+            value="\\n    A tool calling node that calls the get_current_weather function.\\n    "
+        ),
+    )
     attribute_ids_by_name = {
         "ml_model": UUID("44420e39-966f-4c59-bdf8-6365a61c5d2a"),
         "max_tool_calls": UUID("5c041b7d-732c-4773-a93a-32211f2af0b3"),
@@ -892,6 +898,12 @@ from ....nodes.tool_call_get_current_weather_node import GetCurrentWeatherNode
 class GetCurrentWeatherNodeDisplay(BaseNodeDisplay[GetCurrentWeatherNode]):
     label = "GetCurrentWeatherNode"
     node_id = UUID("21f29cac-da87-495f-bba1-093d423f4e46")
+    display_data = NodeDisplayData(
+        position=NodeDisplayPosition(x=0, y=0),
+        comment=NodeDisplayComment(
+            value="\\n    A tool calling node that calls the get_current_weather function.\\n    "
+        ),
+    )
     attribute_ids_by_name = {
         "ml_model": UUID("44420e39-966f-4c59-bdf8-6365a61c5d2a"),
         "max_tool_calls": UUID("5c041b7d-732c-4773-a93a-32211f2af0b3"),

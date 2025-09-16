@@ -5,59 +5,67 @@ import { isNil } from "lodash";
 
 import { VELLUM_WORKFLOW_EDITOR_TYPES_PATH } from "src/constants";
 import { WorkflowContext } from "src/context";
-import { NodeDisplayData as NodeDisplayDataType } from "src/types/vellum";
+import { GenericNodeDisplayData as GenericNodeDisplayDataType } from "src/types/vellum";
 import { isNilOrEmpty } from "src/utils/typing";
 
-export namespace NodeDisplayData {
+export namespace GenericNodeDisplayData {
   export interface Args {
     workflowContext: WorkflowContext;
-    nodeDisplayData: NodeDisplayDataType | undefined;
+    nodeDisplayData: GenericNodeDisplayDataType | undefined;
   }
 }
 
-export class NodeDisplayData extends AstNode {
-  private readonly sourceNodeDisplayData: NodeDisplayDataType | undefined;
-  private readonly nodeDisplayData: AstNode;
+export class GenericNodeDisplayData extends AstNode {
+  private readonly sourceNodeDisplayData:
+    | GenericNodeDisplayDataType
+    | undefined;
+  private readonly nodeDisplayData: AstNode | undefined;
   private readonly workflowContext: WorkflowContext;
 
   public constructor({
     nodeDisplayData,
     workflowContext,
-  }: NodeDisplayData.Args) {
+  }: GenericNodeDisplayData.Args) {
     super();
     this.sourceNodeDisplayData = nodeDisplayData;
     this.workflowContext = workflowContext;
     this.nodeDisplayData = this.generateNodeDisplayData();
   }
 
-  private generateNodeDisplayData(): python.ClassInstantiation {
+  private generateNodeDisplayData(): python.ClassInstantiation | undefined {
     const args: python.MethodArgument[] = [];
 
-    args.push(
-      python.methodArgument({
-        name: "position",
-        value: python.instantiateClass({
-          classReference: python.reference({
-            name: "NodeDisplayPosition",
-            modulePath: VELLUM_WORKFLOW_EDITOR_TYPES_PATH,
+    // Only add position if at least one coordinate is provided
+    if (
+      !isNil(this.sourceNodeDisplayData?.position?.x) ||
+      !isNil(this.sourceNodeDisplayData?.position?.y)
+    ) {
+      args.push(
+        python.methodArgument({
+          name: "position",
+          value: python.instantiateClass({
+            classReference: python.reference({
+              name: "NodeDisplayPosition",
+              modulePath: VELLUM_WORKFLOW_EDITOR_TYPES_PATH,
+            }),
+            arguments_: [
+              python.methodArgument({
+                name: "x",
+                value: python.TypeInstantiation.float(
+                  this.sourceNodeDisplayData?.position?.x ?? 0
+                ),
+              }),
+              python.methodArgument({
+                name: "y",
+                value: python.TypeInstantiation.float(
+                  this.sourceNodeDisplayData?.position?.y ?? 0
+                ),
+              }),
+            ],
           }),
-          arguments_: [
-            python.methodArgument({
-              name: "x",
-              value: python.TypeInstantiation.float(
-                this.sourceNodeDisplayData?.position?.x ?? 0
-              ),
-            }),
-            python.methodArgument({
-              name: "y",
-              value: python.TypeInstantiation.float(
-                this.sourceNodeDisplayData?.position?.y ?? 0
-              ),
-            }),
-          ],
-        }),
-      })
-    );
+        })
+      );
+    }
 
     if (!isNil(this.sourceNodeDisplayData?.z_index)) {
       args.push(
@@ -70,24 +78,9 @@ export class NodeDisplayData extends AstNode {
       );
     }
 
-    if (!isNil(this.sourceNodeDisplayData?.width)) {
-      args.push(
-        python.methodArgument({
-          name: "width",
-          value: python.TypeInstantiation.int(this.sourceNodeDisplayData.width),
-        })
-      );
-    }
-
-    if (!isNil(this.sourceNodeDisplayData?.height)) {
-      args.push(
-        python.methodArgument({
-          name: "height",
-          value: python.TypeInstantiation.int(
-            this.sourceNodeDisplayData.height
-          ),
-        })
-      );
+    const commentArg = this.generateCommentArg();
+    if (commentArg) {
+      args.push(commentArg);
     }
 
     if (!isNil(this.sourceNodeDisplayData?.icon)) {
@@ -108,9 +101,9 @@ export class NodeDisplayData extends AstNode {
       );
     }
 
-    const commentArg = this.generateCommentArg();
-    if (commentArg) {
-      args.push(commentArg);
+    // Return undefined if no display data fields are provided
+    if (args.length === 0) {
+      return undefined;
     }
 
     const clazz = python.instantiateClass({
@@ -166,7 +159,13 @@ export class NodeDisplayData extends AstNode {
     });
   }
 
+  public hasContent(): boolean {
+    return this.nodeDisplayData !== undefined;
+  }
+
   public write(writer: Writer) {
-    this.nodeDisplayData.write(writer);
+    if (this.nodeDisplayData) {
+      this.nodeDisplayData.write(writer);
+    }
   }
 }

@@ -183,8 +183,8 @@ export interface NodeDisplayData {
   width?: number;
   height?: number;
   comment?: NodeDisplayComment;
-  icon?: string;
-  color?: string;
+  icon?: string | null;
+  color?: string | null;
 }
 
 export interface WorkflowEdgeDisplayData {
@@ -716,7 +716,10 @@ export interface ErrorNode extends BaseDisplayableWorkflowNode {
 
 export interface GenericNodeDisplayData {
   position?: { x: number; y: number };
+  z_index?: number;
   comment?: NodeDisplayComment;
+  color?: string | null;
+  icon?: string | null;
 }
 
 export interface NodeOutput {
