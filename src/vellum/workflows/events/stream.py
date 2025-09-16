@@ -53,16 +53,6 @@ class WorkflowEventGenerator(Generic[EventType]):
             WorkflowExecutionRejectedEvent,
         )
         from vellum.workflows.inputs import BaseInputs
-        from vellum.workflows.nodes.bases.base import BaseNode
-        from vellum.workflows.state import BaseState
-        from vellum.workflows.workflows.base import BaseWorkflow
-
-        class _PlaceholderNode(BaseNode):
-            def run(self):
-                return self.Outputs()
-
-        class _PlaceholderWorkflow(BaseWorkflow[BaseInputs, BaseState]):
-            graph = _PlaceholderNode
 
         execution_context = get_execution_context()
         span_id = uuid4()
@@ -72,7 +62,7 @@ class WorkflowEventGenerator(Generic[EventType]):
                 trace_id=execution_context.trace_id,
                 span_id=span_id,
                 body=WorkflowExecutionInitiatedBody(
-                    workflow_definition=_PlaceholderWorkflow,
+                    workflow_definition=exception.definition,
                     inputs=BaseInputs(),
                     initial_state=None,
                 ),
@@ -84,7 +74,7 @@ class WorkflowEventGenerator(Generic[EventType]):
                 trace_id=execution_context.trace_id,
                 span_id=span_id,
                 body=WorkflowExecutionRejectedBody(
-                    workflow_definition=_PlaceholderWorkflow,
+                    workflow_definition=exception.definition,
                     error=exception.error,
                 ),
                 parent=execution_context.parent_context,
