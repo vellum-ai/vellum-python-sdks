@@ -15,9 +15,17 @@ export class WorkflowInputReference extends BaseNodeInputWorkflowReference<Workf
       );
 
     if (!inputVariableContext) {
+      const pathInfo = this.nodeContext
+        ? `node: ${this.nodeContext.getNodeLabel()}`
+        : "workflow";
+      const attributeInfo = this.attributeConfig?.lhs?.name
+        ? `, attribute: ${this.attributeConfig.lhs.name}`
+        : "";
+
       this.workflowContext.addError(
         new NodeInputNotFoundError(
-          `Could not find input variable context with id ${workflowInputReference.inputVariableId}`
+          `Could not find input variable context with id ${workflowInputReference.inputVariableId} (${pathInfo}${attributeInfo})`,
+          "WARNING"
         )
       );
       return python.TypeInstantiation.none();
