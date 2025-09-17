@@ -29,8 +29,6 @@ class _FinalOutputNodeMeta(BaseNodeMeta):
             "value": parent.get_output_type(),
         }
 
-        mcs._validate_output_type_consistency(parent)
-
         return parent
 
     def get_output_type(cls) -> Type:
@@ -41,6 +39,9 @@ class _FinalOutputNodeMeta(BaseNodeMeta):
             return str
         else:
             return all_args[1]
+
+    def __validate__(cls) -> None:
+        cls._validate_output_type_consistency(cls)
 
     @classmethod
     def _validate_output_type_consistency(mcs, cls: Type) -> None:

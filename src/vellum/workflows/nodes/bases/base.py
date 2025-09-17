@@ -1,4 +1,4 @@
-from abc import ABC, ABCMeta
+from abc import ABC, ABCMeta, abstractmethod
 from dataclasses import field
 from functools import cached_property, reduce
 import inspect
@@ -214,6 +214,17 @@ class BaseNodeMeta(ABCMeta):
 
                 yield attr_value
                 yielded_attr_names.add(attr_name)
+
+    @abstractmethod
+    def __validate__(cls) -> None:
+        """
+        Validates the node.
+        Subclasses can override this method to implement their specific validation logic.
+        Called during serialization or explicit validation.
+
+        Default implementation performs no validation.
+        """
+        pass
 
 
 class _BaseNodeTriggerMeta(type):

@@ -23,6 +23,9 @@ class BaseFinalOutputNodeDisplay(BaseNodeDisplay[_FinalOutputNodeType], Generic[
         node = self._node
         node_id = self.node_id
 
+        # Validate node configuration before serialization
+        node.__validate__()
+
         node_input = create_node_input(
             node_id,
             NODE_INPUT_KEY,

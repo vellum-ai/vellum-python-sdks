@@ -23,15 +23,16 @@ def test_final_output_node__mismatched_output_type_should_raise_exception_when_r
 
 def test_final_output_node__mismatched_output_type_should_raise_exception():
     # GIVEN a FinalOutputNode declared with list output type but has a string value type
-    # WHEN attempting to create the class
-    # THEN a ValueError should be raised during class creation
+    class Output(FinalOutputNode[BaseState, list]):
+        """Output the extracted invoice line items as an array of objects."""
+
+        class Outputs(FinalOutputNode.Outputs):
+            value = InlinePromptNode.Outputs.text
+
+    # WHEN attempting to validate the node class
+    # THEN a ValueError should be raised during validation
     with pytest.raises(ValueError) as exc_info:
-
-        class Output(FinalOutputNode[BaseState, list]):
-            """Output the extracted invoice line items as an array of objects."""
-
-            class Outputs(FinalOutputNode.Outputs):
-                value = InlinePromptNode.Outputs.text
+        Output.__validate__()
 
     # AND the error message should indicate the type mismatch
     assert (
@@ -40,3 +41,19 @@ def test_final_output_node__mismatched_output_type_should_raise_exception():
         "the 'value' descriptor has type(s) ['str']. The output descriptor type must match the "
         "declared FinalOutputNode output type."
     )
+
+
+def test_final_output_node__matching_output_type_should_pass_validation():
+    # GIVEN a FinalOutputNode declared with correct matching types
+    class CorrectOutput(FinalOutputNode[BaseState, str]):
+        """Output with correct type matching."""
+
+        class Outputs(FinalOutputNode.Outputs):
+            value = InlinePromptNode.Outputs.text
+
+    # WHEN attempting to validate the node class
+    # THEN validation should pass without raising an exception
+    try:
+        CorrectOutput.__validate__()
+    except ValueError:
+        pytest.fail("Validation should not raise an exception for correct type matching")
