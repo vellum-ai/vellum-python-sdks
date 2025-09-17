@@ -10,7 +10,7 @@ from vellum import Vellum
 from vellum.client.types.function_definition import FunctionDefinition
 from vellum.workflows.integrations.composio_service import ComposioService
 from vellum.workflows.integrations.mcp_service import MCPService
-from vellum.workflows.types.definition import DeploymentDefinition, ComposioToolDefinition, MCPServer, MCPToolDefinition
+from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition, MCPServer, MCPToolDefinition
 from vellum.workflows.utils.vellum_variables import vellum_variable_type_to_openapi_type
 
 if TYPE_CHECKING:
