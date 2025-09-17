@@ -135,5 +135,42 @@ describe("Workflow Sandbox", () => {
       const result = await writer.toStringFormatted();
       expect(result).toMatchSnapshot();
     });
+
+    it("should generate DatasetRow without inputs parameter when dataset row has label but no inputs", async () => {
+      /**
+       * Tests that dataset rows with labels but no inputs generate DatasetRow(label="...") without inputs parameter.
+       */
+
+      const writer = new Writer();
+      const uniqueWorkflowContext = workflowContextFactory();
+      const inputVariable: VellumVariable = {
+        id: "1",
+        key: "test_input",
+        type: "STRING",
+      };
+
+      uniqueWorkflowContext.addInputVariableContext(
+        inputVariableContextFactory({
+          inputVariableData: inputVariable,
+          workflowContext: uniqueWorkflowContext,
+        })
+      );
+
+      const sandboxInputs: WorkflowSandboxDatasetRow[] = [
+        { label: "Test Label Only" },
+      ];
+
+      const sandbox = codegen.workflowSandboxFile({
+        workflowContext: uniqueWorkflowContext,
+        sandboxInputs,
+      });
+
+      sandbox.write(writer);
+      const result = await writer.toStringFormatted();
+
+      expect(result).toMatchSnapshot();
+      expect(result).toContain('DatasetRow(label="Test Label Only")');
+      expect(result).not.toContain("inputs=");
+    });
   });
 });

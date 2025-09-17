@@ -1,5 +1,22 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Workflow Sandbox > write > should generate DatasetRow without inputs parameter when dataset row has label but no inputs 1`] = `
+"from vellum.workflows.inputs import DatasetRow
+from vellum.workflows.sandbox import WorkflowSandboxRunner
+
+from .workflow import TestWorkflow
+
+dataset = [
+    DatasetRow(label="Test Label Only"),
+]
+
+runner = WorkflowSandboxRunner(workflow=TestWorkflow(), dataset=dataset)
+
+if __name__ == "__main__":
+    runner.run()
+"
+`;
+
 exports[`Workflow Sandbox > write > should generate correct code for camel case input names 1`] = `
 "from vellum.workflows.inputs import DatasetRow
 from vellum.workflows.sandbox import WorkflowSandboxRunner
