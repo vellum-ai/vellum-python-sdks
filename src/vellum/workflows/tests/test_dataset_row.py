@@ -97,3 +97,29 @@ def test_dataset_row_with_default_inputs():
     assert serialized_dict["label"] == "defaults_test"
     assert serialized_dict["inputs"]["required_field"] == "required_value"
     assert serialized_dict["inputs"]["optional_with_default"] == "default_value"
+
+
+def test_dataset_row_without_inputs():
+    """
+    Test that DatasetRow can be created with only a label (no inputs).
+    """
+
+    dataset_row = DatasetRow(label="test_label_only")
+
+    serialized_dict = dataset_row.model_dump()
+
+    assert serialized_dict["label"] == "test_label_only"
+    assert serialized_dict["inputs"] == {}
+
+
+def test_dataset_row_with_none_inputs():
+    """
+    Test that DatasetRow can be created with explicitly None inputs.
+    """
+
+    dataset_row = DatasetRow(label="test_label", inputs=None)
+
+    serialized_dict = dataset_row.model_dump()
+
+    assert serialized_dict["label"] == "test_label"
+    assert serialized_dict["inputs"] == {}
