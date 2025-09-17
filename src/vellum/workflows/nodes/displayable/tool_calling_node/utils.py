@@ -9,7 +9,6 @@ from vellum.client.types.array_chat_message_content import ArrayChatMessageConte
 from vellum.client.types.array_chat_message_content_item import ArrayChatMessageContentItem
 from vellum.client.types.function_call_chat_message_content import FunctionCallChatMessageContent
 from vellum.client.types.function_call_chat_message_content_value import FunctionCallChatMessageContentValue
-from vellum.client.types.function_definition import FunctionDefinition
 from vellum.client.types.prompt_output import PromptOutput
 from vellum.client.types.prompt_parameters import PromptParameters
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
@@ -274,36 +273,6 @@ class ElseNode(BaseNode[ToolCallingState]):
         return self.Outputs()
 
 
-def _hydrate_composio_tool_definition(tool_def: ComposioToolDefinition) -> FunctionDefinition:
-    """Hydrate a ComposioToolDefinition with detailed information from the Composio API.
-
-    Args:
-        tool_def: The basic ComposioToolDefinition to enhance
-
-    Returns:
-        FunctionDefinition with detailed parameters and description
-    """
-    try:
-        composio_service = ComposioService()
-        tool_details = composio_service.get_tool_by_slug(tool_def.action)
-
-        # Create a FunctionDefinition directly with proper field extraction
-        return FunctionDefinition(
-            name=tool_def.name,
-            description=tool_details.get("description", tool_def.description),
-            parameters=tool_details.get("input_parameters", {}),
-        )
-
-    except Exception as e:
-        # If hydration fails (including no API key), log and return basic function definition
-        logger.warning(f"Failed to enhance Composio tool '{tool_def.action}': {e}")
-        return FunctionDefinition(
-            name=tool_def.name,
-            description=tool_def.description,
-            parameters={},
-        )
-
-
 def create_tool_prompt_node(
     ml_model: str,
     blocks: List[Union[PromptBlock, Dict[str, Any]]],
@@ -315,15 +284,7 @@ def create_tool_prompt_node(
     process_blocks_method: Optional[Callable] = None,
 ) -> Type[ToolPromptNode]:
     if functions and len(functions) > 0:
-        prompt_functions: List[Union[Tool, FunctionDefinition]] = []
-
-        for function in functions:
-            if isinstance(function, ComposioToolDefinition):
-                # Get Composio tool details and hydrate the function definition
-                enhanced_function = _hydrate_composio_tool_definition(function)
-                prompt_functions.append(enhanced_function)
-            else:
-                prompt_functions.append(function)
+        prompt_functions: List[Tool] = functions
     else:
         prompt_functions = []
 

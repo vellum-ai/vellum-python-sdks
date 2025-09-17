@@ -45,9 +45,10 @@ from vellum.workflows.nodes.displayable.bases.base_prompt_node import BasePrompt
 from vellum.workflows.nodes.displayable.bases.utils import process_additional_prompt_outputs
 from vellum.workflows.outputs import BaseOutput
 from vellum.workflows.types import MergeBehavior
-from vellum.workflows.types.definition import DeploymentDefinition, MCPServer
+from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition, MCPServer
 from vellum.workflows.types.generics import StateType, is_workflow_class
 from vellum.workflows.utils.functions import (
+    compile_composio_tool_definition,
     compile_function_definition,
     compile_inline_workflow_function_definition,
     compile_mcp_tool_definition,
@@ -142,6 +143,8 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                     normalized_functions.append(compile_inline_workflow_function_definition(function))
                 elif callable(function):
                     normalized_functions.append(compile_function_definition(function))
+                elif isinstance(function, ComposioToolDefinition):
+                    normalized_functions.append(compile_composio_tool_definition(function))
                 elif isinstance(function, MCPServer):
                     tool_definitions = compile_mcp_tool_definition(function)
                     for tool_def in tool_definitions:

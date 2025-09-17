@@ -54,11 +54,14 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
         "tags": ["github", "issues"],
     }
 
-    with mock.patch("vellum.workflows.nodes.displayable.tool_calling_node.utils.ComposioService") as mock_service_class:
+    with mock.patch("vellum.workflows.utils.functions.ComposioService") as mock_service_class, mock.patch(
+        "vellum.workflows.nodes.displayable.tool_calling_node.utils.ComposioService"
+    ) as mock_service_class_utils:
         mock_service_instance = mock.Mock()
         mock_service_instance.execute_tool.return_value = mock_composio_result
         mock_service_instance.get_tool_by_slug.return_value = mock_tool_details
         mock_service_class.return_value = mock_service_instance
+        mock_service_class_utils.return_value = mock_service_instance
 
         # Set API key via monkeypatch
         monkeypatch.setenv("COMPOSIO_API_KEY", "test_api_key_123")
@@ -226,11 +229,14 @@ def test_run_workflow__composio_api_key_precedence(vellum_adhoc_prompt_client, m
         "tags": [],
     }
 
-    with mock.patch("vellum.workflows.nodes.displayable.tool_calling_node.utils.ComposioService") as mock_service_class:
+    with mock.patch("vellum.workflows.utils.functions.ComposioService") as mock_service_class, mock.patch(
+        "vellum.workflows.nodes.displayable.tool_calling_node.utils.ComposioService"
+    ) as mock_service_class_utils:
         mock_service_instance = mock.Mock()
         mock_service_instance.execute_tool.return_value = mock_composio_result
         mock_service_instance.get_tool_by_slug.return_value = mock_tool_details
         mock_service_class.return_value = mock_service_instance
+        mock_service_class_utils.return_value = mock_service_instance
 
         def generate_prompt_events(*_args, **_kwargs) -> Iterator[ExecutePromptEvent]:
             execution_id = str(uuid4())
@@ -289,11 +295,14 @@ def test_run_workflow__composio_key_fallback(vellum_adhoc_prompt_client, monkeyp
         "tags": [],
     }
 
-    with mock.patch("vellum.workflows.nodes.displayable.tool_calling_node.utils.ComposioService") as mock_service_class:
+    with mock.patch("vellum.workflows.utils.functions.ComposioService") as mock_service_class, mock.patch(
+        "vellum.workflows.nodes.displayable.tool_calling_node.utils.ComposioService"
+    ) as mock_service_class_utils:
         mock_service_instance = mock.Mock()
         mock_service_instance.execute_tool.return_value = mock_composio_result
         mock_service_instance.get_tool_by_slug.return_value = mock_tool_details
         mock_service_class.return_value = mock_service_instance
+        mock_service_class_utils.return_value = mock_service_instance
 
         def generate_prompt_events(*_args, **_kwargs) -> Iterator[ExecutePromptEvent]:
             execution_id = str(uuid4())
@@ -349,12 +358,15 @@ def test_run_workflow__composio_tool_execution_error(vellum_adhoc_prompt_client,
         "tags": [],
     }
 
-    with mock.patch("vellum.workflows.nodes.displayable.tool_calling_node.utils.ComposioService") as mock_service_class:
+    with mock.patch("vellum.workflows.utils.functions.ComposioService") as mock_service_class, mock.patch(
+        "vellum.workflows.nodes.displayable.tool_calling_node.utils.ComposioService"
+    ) as mock_service_class_utils:
         mock_service_instance = mock.Mock()
         # Simulate an API error
         mock_service_instance.execute_tool.side_effect = Exception("API rate limit exceeded")
         mock_service_instance.get_tool_by_slug.return_value = mock_tool_details
         mock_service_class.return_value = mock_service_instance
+        mock_service_class_utils.return_value = mock_service_instance
 
         def generate_prompt_events(*_args, **_kwargs) -> Iterator[ExecutePromptEvent]:
             execution_id = str(uuid4())
@@ -425,10 +437,13 @@ def test_workflow_prompt_structure_includes_composio_tool_as_function(vellum_adh
         "tags": [],
     }
 
-    with mock.patch("vellum.workflows.nodes.displayable.tool_calling_node.utils.ComposioService") as mock_service_class:
+    with mock.patch("vellum.workflows.utils.functions.ComposioService") as mock_service_class, mock.patch(
+        "vellum.workflows.nodes.displayable.tool_calling_node.utils.ComposioService"
+    ) as mock_service_class_utils:
         mock_service_instance = mock.Mock()
         mock_service_instance.get_tool_by_slug.return_value = mock_tool_details
         mock_service_class.return_value = mock_service_instance
+        mock_service_class_utils.return_value = mock_service_instance
 
         def generate_prompt_events(*_args, **_kwargs) -> Iterator[ExecutePromptEvent]:
             execution_id = str(uuid4())
