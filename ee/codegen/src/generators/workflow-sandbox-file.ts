@@ -92,7 +92,9 @@ if __name__ == "__main__":
   ): python.ClassInstantiation {
     const inputs: WorkflowSandboxInputs = Array.isArray(row)
       ? row
-      : ('inputs' in row ? row.inputs : []);
+      : "inputs" in row
+      ? row.inputs
+      : [];
     const label: string = Array.isArray(row)
       ? `Example ${index + 1}`
       : row.label;

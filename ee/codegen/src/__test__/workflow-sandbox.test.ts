@@ -170,7 +170,7 @@ describe("Workflow Sandbox", () => {
 
       expect(result).toMatchSnapshot();
       expect(result).toContain('DatasetRow(label="Test Label Only")');
-      expect(result).not.toContain('inputs=');
+      expect(result).not.toContain("inputs=");
     });
   });
 });
