@@ -108,7 +108,7 @@ describe("Inputs", () => {
       const inputs = codegen.inputs({ workflowContext });
 
       inputs.write(writer);
-      expect(await writer.toStringFormatted()).toBe("");
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
     it("should generate correct code for complex input variables", async () => {

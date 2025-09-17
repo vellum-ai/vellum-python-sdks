@@ -51,7 +51,14 @@ class CustomInputs(BaseInputs):
 "
 `;
 
-exports[`Inputs > write > should generate correct code when Inputs has no variables 1`] = `""`;
+exports[`Inputs > write > should generate correct code when Inputs has no variables 1`] = `
+"from vellum.workflows.inputs import BaseInputs
+
+
+class Inputs(BaseInputs):
+    pass
+"
+`;
 
 exports[`Inputs > write > should generate correct code when Inputs has variables 1`] = `
 "from typing import Union
@@ -210,5 +217,14 @@ exports[`Inputs > write > should generate correct code when default is a 'STRING
 
 class Inputs(BaseInputs):
     string_input: str = "Example String"
+"
+`;
+
+exports[`Inputs > write > should not generate any code when Inputs is empty 1`] = `
+"from vellum.workflows.inputs import BaseInputs
+
+
+class Inputs(BaseInputs):
+    pass
 "
 `;

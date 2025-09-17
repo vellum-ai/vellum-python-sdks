@@ -59,10 +59,6 @@ export class Inputs extends BasePersistedFile {
       })
     );
 
-    if (inputVariables.length === 0) {
-      return;
-    }
-
     const inputsClassName = name ?? "Inputs";
     const inputsClass = python.class_({
       name: inputsClassName,
@@ -70,32 +66,33 @@ export class Inputs extends BasePersistedFile {
     });
     this.addReference(this.baseInputsClassReference);
 
-    inputVariables.forEach((inputVariableContext) => {
-      const inputVariableData = inputVariableContext.getInputVariableData();
-      const inputVariableName = inputVariableContext.name;
-      const vellumVariableField = codegen.vellumVariable({
-        variable: {
-          id: inputVariableData.id,
-          // Use the sanitized name from the input variable context to ensure it's a valid
-          // attribute name (as opposed to the raw name from the input variable data).
-          name: inputVariableName,
-          type: inputVariableData.type,
-          required: inputVariableData.required,
-          default: inputVariableData.default,
-        },
-        defaultRequired: false,
-      });
+    // Only add fields if there are input variables
+    if (inputVariables.length > 0) {
+      inputVariables.forEach((inputVariableContext) => {
+        const inputVariableData = inputVariableContext.getInputVariableData();
+        const inputVariableName = inputVariableContext.name;
+        const vellumVariableField = codegen.vellumVariable({
+          variable: {
+            id: inputVariableData.id,
+            // Use the sanitized name from the input variable context to ensure it's a valid
+            // attribute name (as opposed to the raw name from the input variable data).
+            name: inputVariableName,
+            type: inputVariableData.type,
+            required: inputVariableData.required,
+            default: inputVariableData.default,
+          },
+          defaultRequired: false,
+        });
 
-      inputsClass.add(vellumVariableField);
-    });
+        inputsClass.add(vellumVariableField);
+      });
+    }
 
     return inputsClass;
   }
 
   public async persist(): Promise<void> {
-    if (!this.inputsClass) {
-      return;
-    }
+    // Always persist the inputs file, even if it's empty
     super.persist();
   }
 }
