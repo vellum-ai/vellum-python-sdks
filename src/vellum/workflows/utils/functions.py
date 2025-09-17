@@ -1,19 +1,6 @@
 import dataclasses
 import inspect
-from typing import (
-    TYPE_CHECKING,
-    Annotated,
-    Any,
-    Callable,
-    Dict,
-    List,
-    Literal,
-    Optional,
-    Type,
-    Union,
-    get_args,
-    get_origin,
-)
+from typing import TYPE_CHECKING, Annotated, Any, Callable, List, Literal, Optional, Type, Union, get_args, get_origin
 
 from pydantic import BaseModel
 from pydantic_core import PydanticUndefined
@@ -23,7 +10,7 @@ from vellum import Vellum
 from vellum.client.types.function_definition import FunctionDefinition
 from vellum.workflows.integrations.composio_service import ComposioService
 from vellum.workflows.integrations.mcp_service import MCPService
-from vellum.workflows.types.definition import ComposioToolDefinition, MCPServer, MCPToolDefinition
+from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition, MCPServer, MCPToolDefinition
 from vellum.workflows.utils.vellum_variables import vellum_variable_type_to_openapi_type
 
 if TYPE_CHECKING:
@@ -239,25 +226,21 @@ def compile_inline_workflow_function_definition(workflow_class: Type["BaseWorkfl
 
 
 def compile_workflow_deployment_function_definition(
-    deployment_config: Dict[str, str],
+    deployment_definition: DeploymentDefinition,
     vellum_client: Vellum,
 ) -> FunctionDefinition:
     """
     Converts a deployment workflow config into our Vellum-native FunctionDefinition type.
 
     Args:
-        deployment_config: Dict with 'deployment' and 'release_tag' keys
+        deployment_definition: DeploymentDefinition instance
         vellum_client: Vellum client instance
     """
-    deployment = deployment_config["deployment"]
-    release_tag = deployment_config["release_tag"]
+    release_info = deployment_definition.get_release_info(vellum_client)
 
-    workflow_deployment_release = vellum_client.workflow_deployments.retrieve_workflow_deployment_release(
-        deployment, release_tag
-    )
-
-    input_variables = workflow_deployment_release.workflow_version.input_variables
-    description = workflow_deployment_release.description
+    name = release_info["name"]
+    description = release_info["description"]
+    input_variables = release_info["input_variables"]
 
     properties = {}
     required = []
@@ -271,7 +254,7 @@ def compile_workflow_deployment_function_definition(
     parameters = {"type": "object", "properties": properties, "required": required}
 
     return FunctionDefinition(
-        name=deployment.replace("-", ""),
+        name=name.replace("-", ""),
         description=description,
         parameters=parameters,
     )

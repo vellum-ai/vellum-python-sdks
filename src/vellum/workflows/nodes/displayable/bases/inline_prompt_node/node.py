@@ -135,7 +135,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                 elif isinstance(function, DeploymentDefinition):
                     normalized_functions.append(
                         compile_workflow_deployment_function_definition(
-                            function.model_dump(),
+                            function,
                             vellum_client=self._context.vellum_client,
                         )
                     )
