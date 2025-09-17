@@ -90,57 +90,67 @@ if __name__ == "__main__":
     row: WorkflowSandboxDatasetRow,
     index: number
   ): python.ClassInstantiation {
-    const inputs: WorkflowSandboxInputs = Array.isArray(row) ? row : row.inputs;
+    const inputs: WorkflowSandboxInputs = Array.isArray(row)
+      ? row
+      : ('inputs' in row ? row.inputs : []);
     const label: string = Array.isArray(row)
       ? `Example ${index + 1}`
       : row.label;
 
-    const inputsInstance = python.instantiateClass({
-      classReference: python.reference({
-        name: "Inputs",
-        modulePath: getGeneratedInputsModulePath(this.workflowContext),
+    const hasInputs = inputs.length > 0;
+    const arguments_: python.MethodArgument[] = [
+      python.methodArgument({
+        name: "label",
+        value: python.TypeInstantiation.str(label),
       }),
-      arguments_: inputs
-        .map((input) => {
-          if (isNil(input.value)) {
-            return null;
-          }
+    ];
 
-          const rawName = removeEscapeCharacters(input.name);
-          const inputVariableContext =
-            this.workflowContext.findInputVariableContextByRawName(rawName);
+    if (hasInputs) {
+      const inputsInstance = python.instantiateClass({
+        classReference: python.reference({
+          name: "Inputs",
+          modulePath: getGeneratedInputsModulePath(this.workflowContext),
+        }),
+        arguments_: inputs
+          .map((input) => {
+            if (isNil(input.value)) {
+              return null;
+            }
 
-          if (isNil(inputVariableContext)) {
-            return null;
-          }
+            const rawName = removeEscapeCharacters(input.name);
+            const inputVariableContext =
+              this.workflowContext.findInputVariableContextByRawName(rawName);
 
-          return python.methodArgument({
-            name: inputVariableContext.name,
-            value: vellumValue({
-              vellumValue: input,
-            }),
-          });
+            if (isNil(inputVariableContext)) {
+              return null;
+            }
+
+            return python.methodArgument({
+              name: inputVariableContext.name,
+              value: vellumValue({
+                vellumValue: input,
+              }),
+            });
+          })
+          .filter(
+            (argument): argument is python.MethodArgument => !isNil(argument)
+          ),
+      });
+
+      arguments_.push(
+        python.methodArgument({
+          name: "inputs",
+          value: inputsInstance,
         })
-        .filter(
-          (argument): argument is python.MethodArgument => !isNil(argument)
-        ),
-    });
+      );
+    }
 
     return python.instantiateClass({
       classReference: python.reference({
         name: "DatasetRow",
         modulePath: ["vellum", "workflows", "inputs"],
       }),
-      arguments_: [
-        python.methodArgument({
-          name: "label",
-          value: python.TypeInstantiation.str(label),
-        }),
-        python.methodArgument({
-          name: "inputs",
-          value: inputsInstance,
-        }),
-      ],
+      arguments_,
     });
   }
 }
