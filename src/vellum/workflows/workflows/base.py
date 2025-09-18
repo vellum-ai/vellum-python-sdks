@@ -687,6 +687,14 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             raise ValueError(f"Multiple workflows found in {module_path}")
         return workflows[0]
 
+    def join(self) -> None:
+        """
+        Wait for all emitters to complete their background work.
+        This ensures all pending events are processed before the workflow terminates.
+        """
+        for emitter in self.emitters:
+            emitter.join()
+
 
 WorkflowExecutionInitiatedBody.model_rebuild()
 WorkflowExecutionFulfilledBody.model_rebuild()

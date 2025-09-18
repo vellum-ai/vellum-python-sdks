@@ -53,6 +53,9 @@ class ExampleEmitter(BaseWorkflowEmitter):
         json_state = json.loads(json.dumps(state, cls=DefaultStateEncoder))
         self._state_snapshots.append(json_state)
 
+    def join(self) -> None:
+        pass
+
     @property
     def events(self) -> Iterator[WorkflowEvent]:
         return iter(self._events)

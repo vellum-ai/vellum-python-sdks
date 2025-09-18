@@ -54,6 +54,9 @@ class MockFileEmitter(BaseWorkflowEmitter):
             with open(mock_file_store, "w") as f:
                 json.dump(data, f, cls=DefaultStateEncoder)
 
+    def join(self) -> None:
+        pass
+
 
 class MockFileResolver(BaseWorkflowResolver):
     def get_latest_execution_events(self) -> Iterator[WorkflowEvent]:

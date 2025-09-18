@@ -29,3 +29,11 @@ class BaseWorkflowEmitter(ABC):
     @abstractmethod
     def snapshot_state(self, state: BaseState) -> None:
         pass
+
+    @abstractmethod
+    def join(self) -> None:
+        """
+        Wait for any background threads or timers used by this emitter to complete.
+        This ensures all pending work is finished before the workflow terminates.
+        """
+        pass

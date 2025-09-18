@@ -29,6 +29,9 @@ class ExpensiveEmitter(BaseWorkflowEmitter):
     def snapshot_state(self, state: BaseState) -> None:
         self._sleep()
 
+    def join(self) -> None:
+        pass
+
 
 class StartNode(BaseNode):
     class Outputs(BaseNode.Outputs):
