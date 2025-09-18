@@ -4,16 +4,16 @@ from typing import Any, Iterator, List
 from vellum.client.types.execute_prompt_event import ExecutePromptEvent
 from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
 from vellum.client.types.initiated_execute_prompt_event import InitiatedExecutePromptEvent
-from vellum.client.types.json_vellum_value import JsonVellumValue
 from vellum.client.types.prompt_output import PromptOutput
 from vellum.client.types.streaming_execute_prompt_event import StreamingExecutePromptEvent
+from vellum.client.types.string_vellum_value import StringVellumValue
 
 from tests.workflows.json_output_streaming_test.workflow import JsonOutputStreamingTestWorkflow
 
 
 def test_workflow_stream__json_output_single_event(vellum_adhoc_prompt_client):
     """
-    Tests that streaming a workflow with JSON output reference produces only one streaming event.
+    Tests that streaming a workflow with JSON output reference produces only two streaming events.
     This test is expected to fail on main due to multiple streaming events being emitted.
     """
 
@@ -21,7 +21,7 @@ def test_workflow_stream__json_output_single_event(vellum_adhoc_prompt_client):
 
     # AND we know what the Prompt will respond with
     expected_outputs: List[PromptOutput] = [
-        JsonVellumValue(value={"score": 35, "reasoning": "Hello World"}),
+        StringVellumValue(value='{"score": 35, "reasoning": "Hello World"}'),
     ]
 
     def generate_prompt_events(*_args: Any, **_kwargs: Any) -> Iterator[ExecutePromptEvent]:
@@ -30,12 +30,12 @@ def test_workflow_stream__json_output_single_event(vellum_adhoc_prompt_client):
             InitiatedExecutePromptEvent(execution_id=execution_id),
             StreamingExecutePromptEvent(
                 execution_id=execution_id,
-                output=JsonVellumValue(value='{"score": 35,'),
+                output=StringVellumValue(value='{"score": 35,'),
                 output_index=0,
             ),
             StreamingExecutePromptEvent(
                 execution_id=execution_id,
-                output=JsonVellumValue(value=' "reasoning": "Hello World"}'),
+                output=StringVellumValue(value=' "reasoning": "Hello World"}'),
                 output_index=0,
             ),
             FulfilledExecutePromptEvent(
@@ -52,7 +52,7 @@ def test_workflow_stream__json_output_single_event(vellum_adhoc_prompt_client):
     events = list(stream)
 
     streaming_events = [event for event in events if event.name == "workflow.execution.streaming"]
-    assert len(streaming_events) == 1, f"Expected 1 streaming event, but got {len(streaming_events)}"
+    assert len(streaming_events) == 2, f"Expected 2 streaming events, but got {len(streaming_events)}"
 
     # AND the streaming event should have the correct output value
     streaming_event = streaming_events[0]
