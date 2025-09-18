@@ -62,6 +62,9 @@ class WorkflowDisplayContext:
 
         raise error
 
+    def add_validation_error(self, error: Exception) -> None:
+        self._errors.append(error)
+
     def add_invalid_node(self, node: Type[BaseNode]) -> None:
         """Track a node that failed to serialize."""
         if node not in self._invalid_nodes:
