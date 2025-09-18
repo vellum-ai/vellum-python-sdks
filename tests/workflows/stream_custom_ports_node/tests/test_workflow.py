@@ -101,4 +101,4 @@ def test_workflow__prompt_chunks_with_custom_ports(vellum_adhoc_prompt_client):
 
     streaming_event = streaming_events[4]
     assert streaming_event.output.is_fulfilled
-    assert streaming_event.output.value[0].value == "Hello, world!"
+    assert streaming_event.output.value == "Hello, world!"

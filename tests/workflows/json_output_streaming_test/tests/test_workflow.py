@@ -1,4 +1,3 @@
-import json
 from uuid import uuid4
 from typing import Any, Iterator, List
 
@@ -53,17 +52,11 @@ def test_workflow_stream__json_output_single_event(vellum_adhoc_prompt_client):
     events = list(stream)
 
     streaming_events = [event for event in events if event.name == "workflow.execution.streaming"]
-    assert len(streaming_events) == 2, f"Expected 2 streaming events, but got {len(streaming_events)}"
+    assert len(streaming_events) == 1, f"Expected 1 streaming event, but got {len(streaming_events)}"
 
     # AND the streaming events should have the correct output values
     first_streaming_event = streaming_events[0]
-    second_streaming_event = streaming_events[1]
 
-    assert first_streaming_event.output.is_initiated
+    assert first_streaming_event.output.is_fulfilled
     assert first_streaming_event.output.name == "final_score"
-    assert second_streaming_event.output.name == "final_score"
-    assert second_streaming_event.output.is_fulfilled
-
-    json_str = second_streaming_event.output.value[0].value
-    parsed_json = json.loads(json_str)
-    assert parsed_json["score"] == 35
+    assert first_streaming_event.output.value == 35

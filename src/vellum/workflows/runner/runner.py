@@ -605,15 +605,9 @@ class WorkflowRunner(Generic[StateType]):
             return event
 
         if event.name == "node.execution.streaming":
-            directly_emitted = False
             for workflow_output_descriptor in self.workflow.Outputs:
                 if node.__directly_emit_workflow_output__(event, workflow_output_descriptor):
                     active_node.was_outputs_streamed = True
-
-                    if not hasattr(self, "_directly_emitted_outputs"):
-                        self._directly_emitted_outputs = set()
-                    self._directly_emitted_outputs.add(workflow_output_descriptor.name)
-
                     self._workflow_event_outer_queue.put(
                         self._stream_workflow_event(
                             BaseOutput(
@@ -623,28 +617,26 @@ class WorkflowRunner(Generic[StateType]):
                             )
                         )
                     )
-                    directly_emitted = True
+                    return None
 
-            if not directly_emitted:
-                for workflow_output_descriptor in self.workflow.Outputs:
-                    node_output_descriptor = workflow_output_descriptor.instance
-                    if not isinstance(node_output_descriptor, OutputReference):
-                        continue
-                    if node_output_descriptor.outputs_class != event.node_definition.Outputs:
-                        continue
-                    if node_output_descriptor.name != event.output.name:
-                        continue
+                node_output_descriptor = workflow_output_descriptor.instance
+                if not isinstance(node_output_descriptor, OutputReference):
+                    continue
+                if node_output_descriptor.outputs_class != event.node_definition.Outputs:
+                    continue
+                if node_output_descriptor.name != event.output.name:
+                    continue
 
-                    active_node.was_outputs_streamed = True
-                    self._workflow_event_outer_queue.put(
-                        self._stream_workflow_event(
-                            BaseOutput(
-                                name=workflow_output_descriptor.name,
-                                value=event.output.value,
-                                delta=event.output.delta,
-                            )
+                active_node.was_outputs_streamed = True
+                self._workflow_event_outer_queue.put(
+                    self._stream_workflow_event(
+                        BaseOutput(
+                            name=workflow_output_descriptor.name,
+                            value=event.output.value,
+                            delta=event.output.delta,
                         )
                     )
+                )
 
             self._handle_invoked_ports(node.state, event.invoked_ports, event.span_id)
 
@@ -661,12 +653,6 @@ class WorkflowRunner(Generic[StateType]):
                         if node_output_descriptor.outputs_class != event.node_definition.Outputs:
                             continue
                         if node_output_descriptor.name != event_node_output_descriptor.name:
-                            continue
-
-                        if (
-                            hasattr(self, "_directly_emitted_outputs")
-                            and workflow_output_descriptor.name in self._directly_emitted_outputs
-                        ):
                             continue
 
                         self._workflow_event_outer_queue.put(

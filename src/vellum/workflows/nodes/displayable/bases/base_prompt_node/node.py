@@ -96,6 +96,9 @@ class BasePromptNode(BaseNode[StateType], Generic[StateType]):
         if event.output.name != "results":
             return False
 
+        if not isinstance(event.output.delta, str) and not event.output.is_initiated:
+            return False
+
         target_nodes = [e.to_node for port in self.Ports for e in port.edges if e.to_node.__simulates_workflow_output__]
         target_node_output = next(
             (
@@ -109,13 +112,10 @@ class BasePromptNode(BaseNode[StateType], Generic[StateType]):
         if not target_node_output:
             return False
 
-        is_json_field_reference = (
-            target_node_output.instance is not None
-            and hasattr(target_node_output.instance, "_name")
-            and hasattr(target_node_output.instance, "_field")
-            and target_node_output.instance._name.startswith("json.")
-        )
-        if is_json_field_reference:
-            return event.output.is_initiated or event.output.is_fulfilled
-        else:
-            return True
+        if not isinstance(target_node_output.instance, OutputReference):
+            return False
+
+        if target_node_output.instance.name != "text":
+            return False
+
+        return True
