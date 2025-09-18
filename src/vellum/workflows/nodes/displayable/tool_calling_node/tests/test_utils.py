@@ -5,6 +5,7 @@ from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
 from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
 from vellum.client.types.initiated_execute_prompt_event import InitiatedExecutePromptEvent
 from vellum.client.types.plain_text_prompt_block import PlainTextPromptBlock
+from vellum.client.types.prompt_settings import PromptSettings
 from vellum.client.types.rich_text_prompt_block import RichTextPromptBlock
 from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
@@ -250,3 +251,65 @@ def test_get_mcp_tool_name_snake_case():
 
     result = get_mcp_tool_name(mcp_tool)
     assert result == "github_server__create_repository"
+
+
+def test_create_tool_prompt_node_settings_dict_stream_disabled(vellum_adhoc_prompt_client):
+    # GIVEN settings provided as dict with stream disabled
+    tool_prompt_node = create_tool_prompt_node(
+        ml_model="gpt-4o-mini",
+        blocks=[],
+        functions=[],
+        prompt_inputs=None,
+        parameters=DEFAULT_PROMPT_PARAMETERS,
+        max_prompt_iterations=1,
+        settings={"stream_enabled": False},
+    )
+
+    # AND the API mocks
+    def generate_non_stream_response(*args, **kwargs):
+        return FulfilledExecutePromptEvent(execution_id=str(uuid4()), outputs=[StringVellumValue(value="ok")])
+
+    vellum_adhoc_prompt_client.adhoc_execute_prompt.side_effect = generate_non_stream_response
+
+    # WHEN we run the node
+    node_instance = tool_prompt_node()
+    list(node_instance.run())
+
+    # THEN the node should have produced the outputs we expect
+    assert node_instance.settings.stream_enabled is False
+    assert vellum_adhoc_prompt_client.adhoc_execute_prompt.call_count == 1
+    assert vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count == 0
+
+
+def test_create_tool_prompt_node_settings_model_stream_enabled(vellum_adhoc_prompt_client):
+    # GIVEN settings provided as PromptSettings with stream enabled
+    settings = PromptSettings(stream_enabled=True)
+    tool_prompt_node = create_tool_prompt_node(
+        ml_model="gpt-4o-mini",
+        blocks=[],
+        functions=[],
+        prompt_inputs=None,
+        parameters=DEFAULT_PROMPT_PARAMETERS,
+        max_prompt_iterations=1,
+        settings=settings,
+    )
+
+    # AND the API mocks
+    def generate_stream_events(*args, **kwargs):
+        execution_id = str(uuid4())
+        events = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            FulfilledExecutePromptEvent(execution_id=execution_id, outputs=[StringVellumValue(value="ok")]),
+        ]
+        yield from events
+
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_stream_events
+
+    # WHEN we run the node
+    node_instance = tool_prompt_node()
+    list(node_instance.run())
+
+    # THEN the node should have produced the outputs we expect
+    assert node_instance.settings.stream_enabled is True
+    assert vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count == 1
+    assert vellum_adhoc_prompt_client.adhoc_execute_prompt.call_count == 0

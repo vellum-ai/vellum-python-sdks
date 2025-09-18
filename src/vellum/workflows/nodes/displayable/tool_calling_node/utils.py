@@ -11,6 +11,7 @@ from vellum.client.types.function_call_chat_message_content import FunctionCallC
 from vellum.client.types.function_call_chat_message_content_value import FunctionCallChatMessageContentValue
 from vellum.client.types.prompt_output import PromptOutput
 from vellum.client.types.prompt_parameters import PromptParameters
+from vellum.client.types.prompt_settings import PromptSettings
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -282,6 +283,7 @@ def create_tool_prompt_node(
     max_prompt_iterations: Optional[int] = None,
     process_parameters_method: Optional[Callable] = None,
     process_blocks_method: Optional[Callable] = None,
+    settings: Optional[Union[PromptSettings, Dict[str, Any]]] = None,
 ) -> Type[ToolPromptNode]:
     if functions and len(functions) > 0:
         prompt_functions: List[Tool] = functions
@@ -320,6 +322,13 @@ def create_tool_prompt_node(
         ),
     }
 
+    # Normalize settings to PromptSettings if provided as a dict
+    normalized_settings: Optional[PromptSettings]
+    if isinstance(settings, dict):
+        normalized_settings = PromptSettings.model_validate(settings)
+    else:
+        normalized_settings = settings
+
     node = cast(
         Type[ToolPromptNode],
         type(
@@ -332,6 +341,7 @@ def create_tool_prompt_node(
                 "prompt_inputs": node_prompt_inputs,
                 "parameters": parameters,
                 "max_prompt_iterations": max_prompt_iterations,
+                "settings": normalized_settings,
                 **({"process_parameters": process_parameters_method} if process_parameters_method is not None else {}),
                 **({"process_blocks": process_blocks_method} if process_blocks_method is not None else {}),
                 "__module__": __name__,

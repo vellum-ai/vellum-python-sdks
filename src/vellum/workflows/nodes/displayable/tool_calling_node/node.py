@@ -2,6 +2,7 @@ from typing import Any, ClassVar, Dict, Generic, Iterator, List, Optional, Set, 
 
 from vellum import ChatMessage, PromptBlock
 from vellum.client.types.prompt_parameters import PromptParameters
+from vellum.client.types.prompt_settings import PromptSettings
 from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
 from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.errors.types import WorkflowErrorCode
@@ -47,6 +48,7 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
     prompt_inputs: ClassVar[Optional[EntityInputsInterface]] = None
     parameters: PromptParameters = DEFAULT_PROMPT_PARAMETERS
     max_prompt_iterations: ClassVar[Optional[int]] = 5
+    settings: ClassVar[Optional[Union[PromptSettings, Dict[str, Any]]]] = None
 
     class Outputs(BaseOutputs):
         """
@@ -150,6 +152,7 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
             max_prompt_iterations=self.max_prompt_iterations,
             process_parameters_method=process_parameters_method,
             process_blocks_method=process_blocks_method,
+            settings=self.settings,
         )
 
         # Create the router node (handles routing logic only)
