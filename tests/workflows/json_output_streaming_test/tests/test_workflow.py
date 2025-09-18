@@ -54,6 +54,9 @@ def test_workflow_stream__json_output_single_event(vellum_adhoc_prompt_client):
     streaming_events = [event for event in events if event.name == "workflow.execution.streaming"]
     assert len(streaming_events) == 2, f"Expected 2 streaming events, but got {len(streaming_events)}"
 
-    # AND the streaming event should have the correct output value
-    streaming_event = streaming_events[0]
-    assert streaming_event.output.value == 35
+    # AND the streaming events should have the correct output values
+    first_streaming_event = streaming_events[0]
+    second_streaming_event = streaming_events[1]
+
+    assert first_streaming_event.output.delta == '{"score": 35,'
+    assert second_streaming_event.output.delta == ' "reasoning": "Hello World"}'

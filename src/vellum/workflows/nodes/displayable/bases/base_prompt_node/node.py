@@ -112,4 +112,4 @@ class BasePromptNode(BaseNode[StateType], Generic[StateType]):
         if not target_node_output:
             return False
 
-        return True
+        return isinstance(event.output.delta, str) and len(event.output.delta.strip()) > 0
