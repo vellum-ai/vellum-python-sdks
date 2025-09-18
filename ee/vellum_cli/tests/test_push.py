@@ -721,6 +721,7 @@ MY_OTHER_VELLUM_API_KEY=aaabbbcccddd
     vellum_client_class.assert_called_once_with(
         api_key="aaabbbcccddd",
         environment=mock.ANY,
+        api_version=None,
     )
 
     # AND the vellum lock file should have been updated with the correct workspace
@@ -882,6 +883,7 @@ MY_OTHER_VELLUM_API_KEY=aaabbbcccddd
     vellum_client_class.assert_called_once_with(
         api_key="aaabbbcccddd",
         environment=mock.ANY,
+        api_version=None,
     )
 
     # AND the vellum lock file should have the same two workflows
