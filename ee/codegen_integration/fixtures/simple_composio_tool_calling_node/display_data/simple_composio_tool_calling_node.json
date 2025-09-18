@@ -150,6 +150,17 @@
                 "value": 5.0
               }
             }
+          },
+          {
+            "id": "ee141a5d-a680-4045-b6c2-7da0bf408779",
+            "name": "settings",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {
+                "type": "JSON",
+                "value": null
+              }
+            }
           }
         ],
         "outputs": [
