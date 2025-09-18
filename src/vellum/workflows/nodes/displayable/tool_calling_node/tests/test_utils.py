@@ -275,7 +275,7 @@ def test_create_tool_prompt_node_settings_dict_stream_disabled(vellum_adhoc_prom
     node_instance = tool_prompt_node()
     list(node_instance.run())
 
-    # THEN the node should have produced the outputs we expect
+    # THEN the node should have called the API correctly
     assert node_instance.settings.stream_enabled is False
     assert vellum_adhoc_prompt_client.adhoc_execute_prompt.call_count == 1
     assert vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count == 0
@@ -309,7 +309,7 @@ def test_create_tool_prompt_node_settings_model_stream_enabled(vellum_adhoc_prom
     node_instance = tool_prompt_node()
     list(node_instance.run())
 
-    # THEN the node should have produced the outputs we expect
+    # THEN the node should have called the API correctly
     assert node_instance.settings.stream_enabled is True
     assert vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count == 1
     assert vellum_adhoc_prompt_client.adhoc_execute_prompt.call_count == 0
