@@ -112,4 +112,10 @@ class BasePromptNode(BaseNode[StateType], Generic[StateType]):
         if not target_node_output:
             return False
 
+        if not isinstance(target_node_output.instance, OutputReference):
+            return False
+
+        if target_node_output.instance.name != "text":
+            return False
+
         return True
