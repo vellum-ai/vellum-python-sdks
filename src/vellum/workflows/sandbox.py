@@ -52,10 +52,7 @@ class WorkflowSandboxRunner(Generic[WorkflowType]):
         selected_inputs = self._inputs[index]
 
         if isinstance(selected_inputs, DatasetRow):
-            if selected_inputs.inputs is None:
-                raise ValueError(f"DatasetRow at index {index} has no inputs defined")
-            actual_inputs: BaseInputs = selected_inputs.inputs
-            selected_inputs = actual_inputs
+            selected_inputs = selected_inputs.inputs
 
         events = self._workflow.stream(
             inputs=selected_inputs,
