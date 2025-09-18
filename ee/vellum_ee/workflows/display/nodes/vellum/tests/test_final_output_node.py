@@ -1,5 +1,3 @@
-import pytest
-
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.nodes.displayable.final_output_node import FinalOutputNode
@@ -66,11 +64,15 @@ def test_final_output_node_display__serialize_with_invalid_types_should_raise_er
     # WHEN we attempt to serialize the workflow
     workflow_display = get_workflow_display(workflow_class=MyWorkflow)
 
-    # THEN a ValueError should be raised during serialization due to validation
-    with pytest.raises(ValueError) as exc_info:
-        workflow_display.serialize()
+    # THEN serialization should complete without raising an exception
+    serialized_workflow = workflow_display.serialize()
 
-    # AND the error message should indicate the type mismatch
-    assert "Output type mismatch" in str(exc_info.value)
-    assert "list" in str(exc_info.value)
-    assert "str" in str(exc_info.value)
+    # AND the error should be captured in workflow_display.errors
+    errors = list(workflow_display.display_context.errors)
+    assert len(errors) == 1
+    assert "Output type mismatch" in str(errors[0])
+    assert "list" in str(errors[0])
+    assert "str" in str(errors[0])
+
+    # AND the serialized workflow should still be created
+    assert "workflow_raw_data" in serialized_workflow

@@ -56,11 +56,7 @@ class WorkflowDisplayContext:
     _dry_run: bool = False
 
     def add_error(self, error: Exception, node: Optional[Type[BaseNode]] = None) -> None:
-        if self._dry_run:
-            self._errors.append(error)
-            return
-
-        raise error
+        self._errors.append(error)
 
     def add_invalid_node(self, node: Type[BaseNode]) -> None:
         """Track a node that failed to serialize."""

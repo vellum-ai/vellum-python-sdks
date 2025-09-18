@@ -196,8 +196,11 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             node_display = self.display_context.node_displays[node]
 
             try:
+                if hasattr(node, "__validate__"):
+                    node.__validate__()
+
                 serialized_node = node_display.serialize(self.display_context)
-            except (NotImplementedError, NodeValidationError) as e:
+            except (NotImplementedError, NodeValidationError, ValueError) as e:
                 self.display_context.add_error(e)
                 self.display_context.add_invalid_node(node)
                 continue
