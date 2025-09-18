@@ -206,6 +206,11 @@ def test_serialize_workflow():
                 "name": "max_prompt_iterations",
                 "value": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 5.0}},
             },
+            {
+                "id": "f92dc3ec-a19a-4491-a98a-2b2df322e2e3",
+                "name": "settings",
+                "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+            },
         ],
         "outputs": [
             {"id": "e62bc785-a914-4066-b79e-8c89a5d0ec6c", "name": "text", "type": "STRING", "value": None},
