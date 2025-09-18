@@ -135,3 +135,13 @@ class VellumEmitter(BaseWorkflowEmitter):
             request=events,  # type: ignore[arg-type]
             request_options=request_options,
         )
+
+    def join(self) -> None:
+        """
+        Wait for any background threads or timers used by this emitter to complete.
+        This ensures all pending work is finished before the workflow terminates.
+        """
+        self._flush_events()
+
+        if self._debounce_timer and self._debounce_timer.is_alive():
+            self._debounce_timer.join()

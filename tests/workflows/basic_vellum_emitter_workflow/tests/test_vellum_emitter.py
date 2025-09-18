@@ -1,6 +1,5 @@
 from datetime import datetime, timezone
 import json
-import time
 from uuid import UUID
 
 from vellum.workflows.emitters.vellum_emitter import VellumEmitter
@@ -27,6 +26,9 @@ def test_vellum_emitter__happy_path(mock_httpx_transport):
     workflow_context = WorkflowContext()
     emitter.register_context(workflow_context)
 
+    # AND we have a test workflow with the emitter
+    workflow = TestWorkflow(emitters=[emitter])
+
     # AND we have a test workflow event from the SDK
     workflow_initiated_event: WorkflowExecutionInitiatedEvent = WorkflowExecutionInitiatedEvent(
         id=UUID("123e4567-e89b-12d3-a456-426614174000"),
@@ -42,7 +44,7 @@ def test_vellum_emitter__happy_path(mock_httpx_transport):
     # WHEN we emit the workflow event
     emitter.emit_event(workflow_initiated_event)
 
-    time.sleep(0.05)
+    workflow.join()
 
     # THEN the emitter should have called client.events.create
     assert mock_httpx_transport.handle_request.call_count == 1
