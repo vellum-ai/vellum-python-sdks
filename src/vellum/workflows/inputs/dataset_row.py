@@ -1,6 +1,6 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
-from pydantic import field_serializer
+from pydantic import Field, field_serializer
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.inputs.base import BaseInputs
@@ -12,26 +12,23 @@ class DatasetRow(UniversalBaseModel):
 
     Attributes:
         label: String label for the dataset row
-        inputs: BaseInputs instance containing the input data (optional)
+        inputs: BaseInputs instance containing the input data
     """
 
     label: str
-    inputs: Optional[BaseInputs] = None
+    inputs: BaseInputs = Field(default_factory=BaseInputs)
 
     @field_serializer("inputs")
-    def serialize_inputs(self, inputs: Optional[BaseInputs]) -> Dict[str, Any]:
+    def serialize_inputs(self, inputs: BaseInputs) -> Dict[str, Any]:
         """
         Custom serializer for BaseInputs that converts it to a dictionary.
 
         Args:
-            inputs: BaseInputs instance to serialize (can be None)
+            inputs: BaseInputs instance to serialize
 
         Returns:
-            Dictionary representation of the inputs, or empty dict if None
+            Dictionary representation of the inputs
         """
-        if inputs is None:
-            return {}
-
         result = {}
 
         for input_descriptor, value in inputs:

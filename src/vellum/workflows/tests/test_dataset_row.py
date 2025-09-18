@@ -101,7 +101,7 @@ def test_dataset_row_with_default_inputs():
 
 def test_dataset_row_without_inputs():
     """
-    Test that DatasetRow can be created with only a label (no inputs).
+    Test that DatasetRow can be created with only a label (no inputs parameter).
     """
 
     dataset_row = DatasetRow(label="test_label_only")
@@ -111,13 +111,16 @@ def test_dataset_row_without_inputs():
     assert serialized_dict["label"] == "test_label_only"
     assert serialized_dict["inputs"] == {}
 
+    assert isinstance(dataset_row.inputs, BaseInputs)
 
-def test_dataset_row_with_none_inputs():
+
+def test_dataset_row_with_empty_inputs():
     """
-    Test that DatasetRow can be created with explicitly None inputs.
+    Test that DatasetRow can be created with explicitly empty BaseInputs.
     """
 
-    dataset_row = DatasetRow(label="test_label", inputs=None)
+    # GIVEN a DatasetRow with explicitly empty BaseInputs
+    dataset_row = DatasetRow(label="test_label", inputs=BaseInputs())
 
     serialized_dict = dataset_row.model_dump()
 
