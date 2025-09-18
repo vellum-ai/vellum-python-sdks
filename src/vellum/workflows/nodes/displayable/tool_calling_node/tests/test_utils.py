@@ -291,7 +291,7 @@ def test_create_tool_prompt_node_settings_model_stream_enabled(vellum_adhoc_prom
         prompt_inputs=None,
         parameters=DEFAULT_PROMPT_PARAMETERS,
         max_prompt_iterations=1,
-        settings=PromptSettings(stream_enabled=True)
+        settings=PromptSettings(stream_enabled=True),
     )
 
     # AND the API mocks
