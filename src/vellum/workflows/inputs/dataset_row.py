@@ -1,6 +1,6 @@
 from typing import Any, Dict
 
-from pydantic import field_serializer
+from pydantic import Field, field_serializer
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.inputs.base import BaseInputs
@@ -16,7 +16,7 @@ class DatasetRow(UniversalBaseModel):
     """
 
     label: str
-    inputs: BaseInputs
+    inputs: BaseInputs = Field(default_factory=BaseInputs)
 
     @field_serializer("inputs")
     def serialize_inputs(self, inputs: BaseInputs) -> Dict[str, Any]:
