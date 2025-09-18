@@ -29,7 +29,13 @@ from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.ports.port import Port
 from vellum.workflows.state import BaseState
 from vellum.workflows.state.encoder import DefaultStateEncoder
-from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior, Tool, ToolBase
+from vellum.workflows.types.core import (
+    EntityInputsInterface,
+    MergeBehavior,
+    Tool,
+    ToolBase,
+    VellumIntegrationToolDefinition,
+)
 from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition, MCPServer, MCPToolDefinition
 from vellum.workflows.types.generics import is_workflow_class
 from vellum.workflows.utils.functions import compile_mcp_tool_definition, get_mcp_tool_name
@@ -295,7 +301,9 @@ def create_tool_prompt_node(
             and (
                 block["input_variable"]
                 if isinstance(block, dict)
-                else block.input_variable if isinstance(block, VariablePromptBlock) else None
+                else block.input_variable
+                if isinstance(block, VariablePromptBlock)
+                else None
             )
             == CHAT_HISTORY_VARIABLE
         )
@@ -533,5 +541,7 @@ def get_function_name(function: ToolBase) -> str:
     elif isinstance(function, ComposioToolDefinition):
         # model post init sets the name to the action if it's not set
         return function.name  # type: ignore[return-value]
+    elif isinstance(function, VellumIntegrationToolDefinition):
+        return function.tool_name
     else:
         return snake_case(function.__name__)
