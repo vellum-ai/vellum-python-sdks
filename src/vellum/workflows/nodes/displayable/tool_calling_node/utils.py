@@ -550,6 +550,6 @@ def get_function_name(function: ToolBase) -> str:
         # model post init sets the name to the action if it's not set
         return function.name  # type: ignore[return-value]
     elif isinstance(function, VellumIntegrationToolDefinition):
-        return function.name  # type: ignore[return-value]
+        return function.name
     else:
         return snake_case(function.__name__)
