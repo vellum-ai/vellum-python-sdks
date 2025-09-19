@@ -321,7 +321,7 @@ def compile_composio_tool_definition(tool_def: ComposioToolDefinition) -> Functi
 def compile_vellum_integration_tool_definition(tool_def: VellumIntegrationToolDefinition) -> FunctionDefinition:
     """Compile a VellumIntegrationToolDefinition into a FunctionDefinition.
 
-    TODO: Implement in APO-1636 when VellumIntegrationService is created.
+    TODO: Implement when VellumIntegrationService is created.
 
     Args:
         tool_def: The VellumIntegrationToolDefinition to compile
@@ -329,10 +329,10 @@ def compile_vellum_integration_tool_definition(tool_def: VellumIntegrationToolDe
     Returns:
         FunctionDefinition with tool parameters and description
     """
-    # TODO: Implement in APO-1636
+    # TODO: Implement when VellumIntegrationService is available
     # This will eventually use VellumIntegrationService to fetch tool details
     raise NotImplementedError(
-        "VellumIntegrationToolDefinition compilation coming in APO-1636. "
+        "VellumIntegrationToolDefinition compilation coming soon. "
         "This will be implemented when the VellumIntegrationService is created."
     )
 

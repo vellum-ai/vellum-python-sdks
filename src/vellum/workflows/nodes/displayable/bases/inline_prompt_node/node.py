@@ -151,9 +151,9 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                 elif isinstance(function, ComposioToolDefinition):
                     normalized_functions.append(compile_composio_tool_definition(function))
                 elif isinstance(function, VellumIntegrationToolDefinition):
-                    # TODO: Implement compile_vellum_integration_tool_definition in APO-1636
+                    # TODO: Implement compile_vellum_integration_tool_definition
                     raise NotImplementedError(
-                        "VellumIntegrationToolDefinition support coming in APO-1636. "
+                        "VellumIntegrationToolDefinition support coming soon. "
                         "This will be implemented when compile_vellum_integration_tool_definition is created."
                     )
                 elif isinstance(function, MCPServer):

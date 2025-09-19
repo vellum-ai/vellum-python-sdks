@@ -377,7 +377,7 @@ def create_router_node(
                 port = create_port_condition(function_name)
                 setattr(Ports, function_name, port)
             elif isinstance(function, VellumIntegrationToolDefinition):
-                # TODO: Full implementation in APO-1636
+                # TODO: Full implementation
                 function_name = get_function_name(function)
                 port = create_port_condition(function_name)
                 setattr(Ports, function_name, port)
@@ -456,9 +456,9 @@ def create_function_node(
         )
         return node
     elif isinstance(function, VellumIntegrationToolDefinition):
-        # TODO: Implement VellumIntegrationNode in APO-1636
+        # TODO: Implement VellumIntegrationNode
         raise NotImplementedError(
-            "VellumIntegrationToolDefinition support coming in APO-1636. "
+            "VellumIntegrationToolDefinition support coming soon. "
             "This will be implemented when the VellumIntegrationService is created."
         )
     elif is_workflow_class(function):
