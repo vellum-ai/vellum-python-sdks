@@ -10,9 +10,8 @@ from vellum import Vellum
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.code_resource_definition import CodeResourceDefinition as ClientCodeResourceDefinition
 from vellum.client.types.vellum_variable import VellumVariable
-from vellum.workflows.constants import AuthorizationType
+from vellum.workflows.constants import AuthorizationType, VellumIntegrationProviderType
 from vellum.workflows.references.environment_variable import EnvironmentVariableReference
-from enum import StrEnum
 
 
 def serialize_type_encoder(obj: type) -> Dict[str, Any]:
@@ -166,10 +165,6 @@ class ComposioToolDefinition(UniversalBaseModel):
             self.name = self.action.lower()
 
 
-class VellumIntegrationProviderType(StrEnum):
-    COMPOSIO = "composio"
-
-
 class VellumIntegrationToolDefinition(UniversalBaseModel):
     type: Literal["INTEGRATION"] = "INTEGRATION"
 
@@ -177,6 +172,15 @@ class VellumIntegrationToolDefinition(UniversalBaseModel):
     provider: VellumIntegrationProviderType
     integration: str  # "GITHUB", "SLACK", etc.
     tool_name: str  # Specific action like "GITHUB_CREATE_AN_ISSUE"
+
+    # Fields for tool base consistency
+    description: str
+    name: str = ""
+
+    # copied from ComposioToolDefinition for convenience
+    def model_post_init(self, __context: Any):
+        if self.name == "":
+            self.name = self.tool_name.lower()
 
 
 class MCPServer(UniversalBaseModel):

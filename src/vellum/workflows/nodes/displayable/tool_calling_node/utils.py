@@ -29,14 +29,14 @@ from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.ports.port import Port
 from vellum.workflows.state import BaseState
 from vellum.workflows.state.encoder import DefaultStateEncoder
-from vellum.workflows.types.core import (
-    EntityInputsInterface,
-    MergeBehavior,
-    Tool,
-    ToolBase,
+from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior, Tool, ToolBase
+from vellum.workflows.types.definition import (
+    ComposioToolDefinition,
+    DeploymentDefinition,
+    MCPServer,
+    MCPToolDefinition,
     VellumIntegrationToolDefinition,
 )
-from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition, MCPServer, MCPToolDefinition
 from vellum.workflows.types.generics import is_workflow_class
 from vellum.workflows.utils.functions import compile_mcp_tool_definition, get_mcp_tool_name
 
@@ -301,9 +301,7 @@ def create_tool_prompt_node(
             and (
                 block["input_variable"]
                 if isinstance(block, dict)
-                else block.input_variable
-                if isinstance(block, VariablePromptBlock)
-                else None
+                else block.input_variable if isinstance(block, VariablePromptBlock) else None
             )
             == CHAT_HISTORY_VARIABLE
         )
@@ -375,6 +373,11 @@ def create_router_node(
 
         for function in functions:
             if isinstance(function, ComposioToolDefinition):
+                function_name = get_function_name(function)
+                port = create_port_condition(function_name)
+                setattr(Ports, function_name, port)
+            elif isinstance(function, VellumIntegrationToolDefinition):
+                # TODO: Full implementation in APO-1636
                 function_name = get_function_name(function)
                 port = create_port_condition(function_name)
                 setattr(Ports, function_name, port)
@@ -452,6 +455,12 @@ def create_function_node(
             },
         )
         return node
+    elif isinstance(function, VellumIntegrationToolDefinition):
+        # TODO: Implement VellumIntegrationNode in APO-1636
+        raise NotImplementedError(
+            "VellumIntegrationToolDefinition support coming in APO-1636. "
+            "This will be implemented when the VellumIntegrationService is created."
+        )
     elif is_workflow_class(function):
         function.is_dynamic = True
         node = type(

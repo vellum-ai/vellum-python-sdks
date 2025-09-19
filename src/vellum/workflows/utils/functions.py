@@ -10,7 +10,13 @@ from vellum import Vellum
 from vellum.client.types.function_definition import FunctionDefinition
 from vellum.workflows.integrations.composio_service import ComposioService
 from vellum.workflows.integrations.mcp_service import MCPService
-from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition, MCPServer, MCPToolDefinition
+from vellum.workflows.types.definition import (
+    ComposioToolDefinition,
+    DeploymentDefinition,
+    MCPServer,
+    MCPToolDefinition,
+    VellumIntegrationToolDefinition,
+)
 from vellum.workflows.utils.vellum_variables import vellum_variable_type_to_openapi_type
 
 if TYPE_CHECKING:
@@ -310,6 +316,25 @@ def compile_composio_tool_definition(tool_def: ComposioToolDefinition) -> Functi
             description=tool_def.description,
             parameters={},
         )
+
+
+def compile_vellum_integration_tool_definition(tool_def: VellumIntegrationToolDefinition) -> FunctionDefinition:
+    """Compile a VellumIntegrationToolDefinition into a FunctionDefinition.
+
+    TODO: Implement in APO-1636 when VellumIntegrationService is created.
+
+    Args:
+        tool_def: The VellumIntegrationToolDefinition to compile
+
+    Returns:
+        FunctionDefinition with tool parameters and description
+    """
+    # TODO: Implement in APO-1636
+    # This will eventually use VellumIntegrationService to fetch tool details
+    raise NotImplementedError(
+        "VellumIntegrationToolDefinition compilation coming in APO-1636. "
+        "This will be implemented when the VellumIntegrationService is created."
+    )
 
 
 def use_tool_inputs(**inputs):
