@@ -529,7 +529,6 @@ class GetCurrentWeatherNodeDisplay(BaseNodeDisplay[GetCurrentWeatherNode]):
         "blocks": UUID("669cfb4b-8c25-460e-8952-b63d91302cbc"),
         "functions": UUID("78324739-ff89-47a5-902b-10da0cb95c6d"),
         "prompt_inputs": UUID("0f6dc102-3460-4963-91fa-7ba85d65ef7a"),
-        "function_configs": UUID("a4e3bc9f-7112-4d2f-94fb-7362a85db27a"),
     }
     output_display = {
         GetCurrentWeatherNode.Outputs.text: NodeOutputDisplay(
@@ -744,7 +743,6 @@ class GetCurrentWeatherNode(ToolCallingNode):
         "city": Inputs.city,
         "date": Inputs.date,
     }
-    function_configs = None
 
     class Outputs(ToolCallingNode.Outputs):
         text: str
@@ -910,7 +908,6 @@ class GetCurrentWeatherNodeDisplay(BaseNodeDisplay[GetCurrentWeatherNode]):
         "blocks": UUID("669cfb4b-8c25-460e-8952-b63d91302cbc"),
         "functions": UUID("78324739-ff89-47a5-902b-10da0cb95c6d"),
         "prompt_inputs": UUID("0f6dc102-3460-4963-91fa-7ba85d65ef7a"),
-        "function_configs": UUID("a4e3bc9f-7112-4d2f-94fb-7362a85db27a"),
     }
     output_display = {
         GetCurrentWeatherNode.Outputs.text: NodeOutputDisplay(
@@ -1125,7 +1122,6 @@ class GetCurrentWeatherNode(ToolCallingNode):
         "city": Inputs.city,
         "date": Inputs.date,
     }
-    function_configs = None
 
     class Outputs(ToolCallingNode.Outputs):
         text: str

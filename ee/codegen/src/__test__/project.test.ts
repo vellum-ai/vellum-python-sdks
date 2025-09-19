@@ -4979,14 +4979,6 @@ baz = foo + bar
                     ],
                   },
                 },
-                {
-                  id: "a4e3bc9f-7112-4d2f-94fb-7362a85db27a",
-                  name: "function_configs",
-                  value: {
-                    type: "CONSTANT_VALUE",
-                    value: { type: "JSON", value: null },
-                  },
-                },
               ],
               definition: {
                 name: "GetCurrentWeatherNode",
