@@ -1,4 +1,4 @@
-from enum import Enum, StrEnum
+from enum import Enum
 from typing import Any, cast
 
 
@@ -60,5 +60,5 @@ class AuthorizationType(Enum):
     API_KEY = "API_KEY"
 
 
-class VellumIntegrationProviderType(StrEnum):
+class VellumIntegrationProviderType(Enum):
     COMPOSIO = "COMPOSIO"

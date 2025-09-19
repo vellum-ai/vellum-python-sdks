@@ -377,7 +377,6 @@ def create_router_node(
                 port = create_port_condition(function_name)
                 setattr(Ports, function_name, port)
             elif isinstance(function, VellumIntegrationToolDefinition):
-                # TODO: Full implementation
                 function_name = get_function_name(function)
                 port = create_port_condition(function_name)
                 setattr(Ports, function_name, port)
@@ -551,6 +550,6 @@ def get_function_name(function: ToolBase) -> str:
         # model post init sets the name to the action if it's not set
         return function.name  # type: ignore[return-value]
     elif isinstance(function, VellumIntegrationToolDefinition):
-        return function.tool_name
+        return function.name  # type: ignore[return-value]
     else:
         return snake_case(function.__name__)
