@@ -171,16 +171,10 @@ class VellumIntegrationToolDefinition(UniversalBaseModel):
     # Core identification
     provider: VellumIntegrationProviderType
     integration: str  # "GITHUB", "SLACK", etc.
-    tool_name: str  # Specific action like "GITHUB_CREATE_AN_ISSUE"
+    name: str  # Specific action like "GITHUB_CREATE_AN_ISSUE"
 
-    # Fields for tool base consistency
+    # Required for tool base consistency
     description: str
-    name: str = ""
-
-    # copied from ComposioToolDefinition for convenience
-    def model_post_init(self, __context: Any):
-        if self.name == "":
-            self.name = self.tool_name.lower()
 
 
 class MCPServer(UniversalBaseModel):
