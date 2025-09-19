@@ -58,3 +58,7 @@ class APIRequestMethod(Enum):
 class AuthorizationType(Enum):
     BEARER_TOKEN = "BEARER_TOKEN"
     API_KEY = "API_KEY"
+
+
+class VellumIntegrationProviderType(Enum):
+    COMPOSIO = "COMPOSIO"

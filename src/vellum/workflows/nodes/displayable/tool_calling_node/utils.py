@@ -30,7 +30,13 @@ from vellum.workflows.ports.port import Port
 from vellum.workflows.state import BaseState
 from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior, Tool, ToolBase
-from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition, MCPServer, MCPToolDefinition
+from vellum.workflows.types.definition import (
+    ComposioToolDefinition,
+    DeploymentDefinition,
+    MCPServer,
+    MCPToolDefinition,
+    VellumIntegrationToolDefinition,
+)
 from vellum.workflows.types.generics import is_workflow_class
 from vellum.workflows.utils.functions import compile_mcp_tool_definition, get_mcp_tool_name
 
@@ -370,6 +376,10 @@ def create_router_node(
                 function_name = get_function_name(function)
                 port = create_port_condition(function_name)
                 setattr(Ports, function_name, port)
+            elif isinstance(function, VellumIntegrationToolDefinition):
+                function_name = get_function_name(function)
+                port = create_port_condition(function_name)
+                setattr(Ports, function_name, port)
             elif isinstance(function, MCPServer):
                 tool_functions: List[MCPToolDefinition] = compile_mcp_tool_definition(function)
                 for tool_function in tool_functions:
@@ -444,6 +454,12 @@ def create_function_node(
             },
         )
         return node
+    elif isinstance(function, VellumIntegrationToolDefinition):
+        # TODO: Implement VellumIntegrationNode
+        raise NotImplementedError(
+            "VellumIntegrationToolDefinition support coming soon. "
+            "This will be implemented when the VellumIntegrationService is created."
+        )
     elif is_workflow_class(function):
         function.is_dynamic = True
         node = type(
@@ -533,5 +549,7 @@ def get_function_name(function: ToolBase) -> str:
     elif isinstance(function, ComposioToolDefinition):
         # model post init sets the name to the action if it's not set
         return function.name  # type: ignore[return-value]
+    elif isinstance(function, VellumIntegrationToolDefinition):
+        return function.name
     else:
         return snake_case(function.__name__)

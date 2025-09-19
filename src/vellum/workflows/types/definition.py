@@ -10,7 +10,7 @@ from vellum import Vellum
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.code_resource_definition import CodeResourceDefinition as ClientCodeResourceDefinition
 from vellum.client.types.vellum_variable import VellumVariable
-from vellum.workflows.constants import AuthorizationType
+from vellum.workflows.constants import AuthorizationType, VellumIntegrationProviderType
 from vellum.workflows.references.environment_variable import EnvironmentVariableReference
 
 
@@ -163,6 +163,18 @@ class ComposioToolDefinition(UniversalBaseModel):
     def model_post_init(self, __context: Any):
         if self.name == "":
             self.name = self.action.lower()
+
+
+class VellumIntegrationToolDefinition(UniversalBaseModel):
+    type: Literal["INTEGRATION"] = "INTEGRATION"
+
+    # Core identification
+    provider: VellumIntegrationProviderType
+    integration: str  # "GITHUB", "SLACK", etc.
+    name: str  # Specific action like "GITHUB_CREATE_AN_ISSUE"
+
+    # Required for tool base consistency
+    description: str
 
 
 class MCPServer(UniversalBaseModel):
