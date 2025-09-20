@@ -51,3 +51,6 @@ format:
 
 types:
 	poetry run mypy .
+
+generate-node-definitions:
+	poetry run generate_node_definitions

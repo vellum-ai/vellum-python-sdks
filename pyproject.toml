@@ -131,6 +131,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 vellum = "vellum_cli:main"
+generate_node_definitions = "vellum_ee.scripts.generate_node_definitions:main"
 
 [tool.isort]
 skip = ["src/vellum/client", "tests/client", ".venv", "src/vellum/__init__.py", "examples/workflows", "src/vellum/client/raw_client.py"]
