@@ -684,3 +684,23 @@ def test_base_workflow__deserialize_state_with_invalid_workflow_definition(raw_w
 
     # AND the workflow definition should be BaseWorkflow
     assert state.meta.workflow_definition == BaseWorkflow
+
+
+def test_base_workflow__join_calls_runner_join():
+    """
+    Test that BaseWorkflow.join() calls runner.join() when runner exists.
+    """
+
+    # GIVEN a test workflow
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        pass
+
+    workflow = TestWorkflow()
+
+    # WHEN we run the workflow to create a runner
+    workflow.run()
+
+    workflow.join()
+
+    # THEN the runner should have been joined (verified by no hanging threads)
+    assert workflow._current_runner is not None
