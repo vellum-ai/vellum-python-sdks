@@ -212,6 +212,10 @@ class WorkflowRunner(Generic[StateType]):
             descriptor for descriptor in self.workflow.Outputs if isinstance(descriptor.instance, StateValueReference)
         ]
 
+        self._background_thread: Optional[Thread] = None
+        self._cancel_thread: Optional[Thread] = None
+        self._stream_thread: Optional[Thread] = None
+
     def _snapshot_state(self, state: StateType, deltas: List[StateDelta]) -> StateType:
         self._workflow_event_inner_queue.put(
             WorkflowExecutionSnapshottedEvent(
@@ -911,20 +915,20 @@ class WorkflowRunner(Generic[StateType]):
         return False
 
     def _generate_events(self) -> Generator[WorkflowEvent, None, None]:
-        background_thread = Thread(
+        self._background_thread = Thread(
             target=self._run_background_thread,
             name=f"{self.workflow.__class__.__name__}.background_thread",
         )
-        background_thread.start()
+        self._background_thread.start()
 
         cancel_thread_kill_switch = ThreadingEvent()
         if self._cancel_signal:
-            cancel_thread = Thread(
+            self._cancel_thread = Thread(
                 target=self._run_cancel_thread,
                 name=f"{self.workflow.__class__.__name__}.cancel_thread",
                 kwargs={"kill_switch": cancel_thread_kill_switch},
             )
-            cancel_thread.start()
+            self._cancel_thread.start()
 
         event: WorkflowEvent
         if self._is_resuming:
@@ -935,13 +939,13 @@ class WorkflowRunner(Generic[StateType]):
         yield self._emit_event(event)
 
         # The extra level of indirection prevents the runner from waiting on the caller to consume the event stream
-        stream_thread = Thread(
+        self._stream_thread = Thread(
             target=self._stream,
             name=f"{self.workflow.__class__.__name__}.stream_thread",
         )
-        stream_thread.start()
+        self._stream_thread.start()
 
-        while stream_thread.is_alive():
+        while self._stream_thread.is_alive():
             try:
                 event = self._workflow_event_outer_queue.get(timeout=0.1)
             except Empty:
@@ -971,3 +975,17 @@ class WorkflowRunner(Generic[StateType]):
 
     def stream(self) -> WorkflowEventStream:
         return WorkflowEventGenerator(self._generate_events(), self._initial_state.meta.span_id)
+
+    def join(self) -> None:
+        """
+        Wait for all background threads to complete.
+        This ensures all pending work is finished before the runner terminates.
+        """
+        if self._stream_thread and self._stream_thread.is_alive():
+            self._stream_thread.join()
+
+        if self._background_thread and self._background_thread.is_alive():
+            self._background_thread.join()
+
+        if self._cancel_thread and self._cancel_thread.is_alive():
+            self._cancel_thread.join()

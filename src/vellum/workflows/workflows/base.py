@@ -252,6 +252,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         self.resolvers = resolvers or (self.resolvers if hasattr(self, "resolvers") else [])
         self._store = store or Store()
         self._execution_context = self._context.execution_context
+        self._current_runner: Optional[WorkflowRunner] = None
 
         # Register context with all emitters
         for emitter in self.emitters:
@@ -412,7 +413,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             subworkflows or nodes that utilizes threads.
         """
 
-        events = WorkflowRunner(
+        runner = WorkflowRunner(
             self,
             inputs=inputs,
             state=state,
@@ -423,7 +424,9 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             node_output_mocks=node_output_mocks,
             max_concurrency=max_concurrency,
             init_execution_context=self._execution_context,
-        ).stream()
+        )
+        self._current_runner = runner
+        events = runner.stream()
         first_event: Optional[Union[WorkflowExecutionInitiatedEvent, WorkflowExecutionResumedEvent]] = None
         last_event = None
         for event in events:
@@ -531,7 +534,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         """
 
         should_yield = event_filter or workflow_event_filter
-        runner_stream = WorkflowRunner(
+        runner = WorkflowRunner(
             self,
             inputs=inputs,
             state=state,
@@ -542,7 +545,9 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             node_output_mocks=node_output_mocks,
             max_concurrency=max_concurrency,
             init_execution_context=self._execution_context,
-        ).stream()
+        )
+        self._current_runner = runner
+        runner_stream = runner.stream()
 
         def _generate_filtered_events() -> Generator[BaseWorkflow.WorkflowEvent, None, None]:
             for event in runner_stream:
@@ -689,11 +694,14 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
 
     def join(self) -> None:
         """
-        Wait for all emitters to complete their background work.
+        Wait for all emitters and runner to complete their background work.
         This ensures all pending events are processed before the workflow terminates.
         """
         for emitter in self.emitters:
             emitter.join()
+
+        if self._current_runner:
+            self._current_runner.join()
 
 
 WorkflowExecutionInitiatedBody.model_rebuild()
