@@ -32,6 +32,14 @@ type_map = {
     None: "null",
     type(None): "null",
     inspect._empty: "null",
+    # Add string versions for __future__ import annotations support
+    "str": "string",
+    "int": "integer",
+    "float": "number",
+    "bool": "boolean",
+    "list": "array",
+    "dict": "object",
+    "None": "null",
 }
 
 
