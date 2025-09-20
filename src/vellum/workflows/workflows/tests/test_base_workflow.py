@@ -3,6 +3,7 @@ import logging
 from uuid import UUID, uuid4
 
 from vellum.workflows.edges.edge import Edge
+from vellum.workflows.events.node import NodeExecutionFulfilledEvent, NodeExecutionInitiatedEvent
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubworkflowNode
@@ -708,11 +709,6 @@ def test_base_workflow__join_calls_runner_join():
 
 def test_base_workflow__run_node_emits_correct_events():
     """Test that WorkflowRunner.run_node method emits the expected events."""
-    from uuid import uuid4
-
-    from vellum.workflows.events import NodeExecutionFulfilledEvent, NodeExecutionInitiatedEvent
-    from vellum.workflows.nodes.bases import BaseNode
-    from vellum.workflows.runner.runner import WorkflowRunner
 
     class TestInputs(BaseInputs):
         pass
@@ -733,18 +729,12 @@ def test_base_workflow__run_node_emits_correct_events():
         class Outputs(BaseWorkflow.Outputs):
             result: str
 
-    state = TestState()
-    node = TestNode(state=state)
-    span_id = uuid4()
-
     workflow = TestWorkflow()
-    runner = WorkflowRunner(workflow=workflow)
 
-    events = list(runner.run_node(node=node, span_id=span_id))
+    events = list(workflow.run_node(node=TestNode))
 
     assert len(events) == 2
     assert isinstance(events[0], NodeExecutionInitiatedEvent)
     assert isinstance(events[1], NodeExecutionFulfilledEvent)
-    assert events[0].span_id == span_id
-    assert events[1].span_id == span_id
+    assert events[0].span_id == events[1].span_id
     assert events[1].body.outputs.result == "test_output"
