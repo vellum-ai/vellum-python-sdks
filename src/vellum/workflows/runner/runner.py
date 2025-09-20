@@ -263,229 +263,14 @@ class WorkflowRunner(Generic[StateType]):
         return event
 
     def _run_work_item(self, node: BaseNode[StateType], span_id: UUID) -> None:
-        execution = get_execution_context()
-        self._workflow_event_inner_queue.put(
-            NodeExecutionInitiatedEvent(
-                trace_id=execution.trace_id,
-                span_id=span_id,
-                body=NodeExecutionInitiatedBody(
-                    node_definition=node.__class__,
-                    inputs=node._inputs,
-                ),
-                parent=execution.parent_context,
-            )
-        )
+        for event in self.run_node(node, span_id):
+            self._workflow_event_inner_queue.put(event)
 
-        logger.debug(f"Started running node: {node.__class__.__name__}")
-
-        try:
-            updated_parent_context = NodeParentContext(
-                span_id=span_id,
-                node_definition=node.__class__,
-                parent=execution.parent_context,
-            )
-            node_run_response: NodeRunResponse
-            was_mocked: Optional[bool] = None
-            mock_candidates = self.workflow.context.node_output_mocks_map.get(node.Outputs) or []
-            for mock_candidate in mock_candidates:
-                if mock_candidate.when_condition.resolve(node.state):
-                    node_run_response = mock_candidate.then_outputs
-                    was_mocked = True
-                    break
-
-            if not was_mocked:
-                with execution_context(parent_context=updated_parent_context, trace_id=execution.trace_id):
-                    node_run_response = node.run()
-
-            ports = node.Ports()
-            if not isinstance(node_run_response, (BaseOutputs, Iterator)):
-                raise NodeException(
-                    message=f"Node {node.__class__.__name__} did not return a valid node run response",
-                    code=WorkflowErrorCode.INVALID_OUTPUTS,
-                )
-
-            if isinstance(node_run_response, BaseOutputs):
-                if not isinstance(node_run_response, node.Outputs):
-                    raise NodeException(
-                        message=f"Node {node.__class__.__name__} did not return a valid outputs object",
-                        code=WorkflowErrorCode.INVALID_OUTPUTS,
-                    )
-
-                outputs = node_run_response
-            else:
-                streaming_output_queues: Dict[str, Queue] = {}
-                outputs = node.Outputs()
-
-                def initiate_node_streaming_output(output: BaseOutput) -> None:
-                    execution = get_execution_context()
-                    streaming_output_queues[output.name] = Queue()
-                    output_descriptor = OutputReference(
-                        name=output.name,
-                        types=(type(output.delta),),
-                        instance=None,
-                        outputs_class=node.Outputs,
-                    )
-                    with node.state.__quiet__():
-                        node.state.meta.node_outputs[output_descriptor] = streaming_output_queues[output.name]
-                    initiated_output: BaseOutput = BaseOutput(name=output.name)
-                    initiated_ports = initiated_output > ports
-                    self._workflow_event_inner_queue.put(
-                        NodeExecutionStreamingEvent(
-                            trace_id=execution.trace_id,
-                            span_id=span_id,
-                            body=NodeExecutionStreamingBody(
-                                node_definition=node.__class__,
-                                output=initiated_output,
-                                invoked_ports=initiated_ports,
-                            ),
-                            parent=execution.parent_context,
-                        ),
-                    )
-
-                with execution_context(parent_context=updated_parent_context, trace_id=execution.trace_id):
-                    for output in node_run_response:
-                        invoked_ports = output > ports
-                        if output.is_initiated:
-                            initiate_node_streaming_output(output)
-                        elif output.is_streaming:
-                            if output.name not in streaming_output_queues:
-                                initiate_node_streaming_output(output)
-
-                            streaming_output_queues[output.name].put(output.delta)
-                            self._workflow_event_inner_queue.put(
-                                NodeExecutionStreamingEvent(
-                                    trace_id=execution.trace_id,
-                                    span_id=span_id,
-                                    body=NodeExecutionStreamingBody(
-                                        node_definition=node.__class__,
-                                        output=output,
-                                        invoked_ports=invoked_ports,
-                                    ),
-                                    parent=execution.parent_context,
-                                ),
-                            )
-                        elif output.is_fulfilled:
-                            if output.name in streaming_output_queues:
-                                streaming_output_queues[output.name].put(undefined)
-
-                            setattr(outputs, output.name, output.value)
-                            self._workflow_event_inner_queue.put(
-                                NodeExecutionStreamingEvent(
-                                    trace_id=execution.trace_id,
-                                    span_id=span_id,
-                                    body=NodeExecutionStreamingBody(
-                                        node_definition=node.__class__,
-                                        output=output,
-                                        invoked_ports=invoked_ports,
-                                    ),
-                                    parent=execution.parent_context,
-                                )
-                            )
-
-            node.state.meta.node_execution_cache.fulfill_node_execution(node.__class__, span_id)
-
-            with node.state.__atomic__():
-                for descriptor, output_value in outputs:
-                    if output_value is undefined:
-                        if descriptor in node.state.meta.node_outputs:
-                            del node.state.meta.node_outputs[descriptor]
-                        continue
-
-                    node.state.meta.node_outputs[descriptor] = output_value
-
-            invoked_ports = ports(outputs, node.state)
-            self._workflow_event_inner_queue.put(
-                NodeExecutionFulfilledEvent(
-                    trace_id=execution.trace_id,
-                    span_id=span_id,
-                    body=NodeExecutionFulfilledBody(
-                        node_definition=node.__class__,
-                        outputs=outputs,
-                        invoked_ports=invoked_ports,
-                        mocked=was_mocked,
-                    ),
-                    parent=execution.parent_context,
-                )
-            )
-        except NodeException as e:
-            logger.info(e)
-            captured_stacktrace = traceback.format_exc()
-
-            self._workflow_event_inner_queue.put(
-                NodeExecutionRejectedEvent(
-                    trace_id=execution.trace_id,
-                    span_id=span_id,
-                    body=NodeExecutionRejectedBody(
-                        node_definition=node.__class__,
-                        error=e.error,
-                        stacktrace=captured_stacktrace,
-                    ),
-                    parent=execution.parent_context,
-                )
-            )
-        except WorkflowInitializationException as e:
-            logger.info(e)
-            captured_stacktrace = traceback.format_exc()
-            self._workflow_event_inner_queue.put(
-                NodeExecutionRejectedEvent(
-                    trace_id=execution.trace_id,
-                    span_id=span_id,
-                    body=NodeExecutionRejectedBody(
-                        node_definition=node.__class__,
-                        error=e.error,
-                        stacktrace=captured_stacktrace,
-                    ),
-                    parent=execution.parent_context,
-                )
-            )
-        except InvalidExpressionException as e:
-            logger.info(e)
-            captured_stacktrace = traceback.format_exc()
-            self._workflow_event_inner_queue.put(
-                NodeExecutionRejectedEvent(
-                    trace_id=execution.trace_id,
-                    span_id=span_id,
-                    body=NodeExecutionRejectedBody(
-                        node_definition=node.__class__,
-                        error=e.error,
-                        stacktrace=captured_stacktrace,
-                    ),
-                    parent=execution.parent_context,
-                )
-            )
-
-        except Exception as e:
-            error_message = self._parse_error_message(e)
-            if error_message is None:
-                logger.exception(f"An unexpected error occurred while running node {node.__class__.__name__}")
-                error_code = WorkflowErrorCode.INTERNAL_ERROR
-                error_message = "Internal error"
-            else:
-                error_code = WorkflowErrorCode.NODE_EXECUTION
-
-            self._workflow_event_inner_queue.put(
-                NodeExecutionRejectedEvent(
-                    trace_id=execution.trace_id,
-                    span_id=span_id,
-                    body=NodeExecutionRejectedBody(
-                        node_definition=node.__class__,
-                        error=WorkflowError(
-                            message=error_message,
-                            code=error_code,
-                        ),
-                    ),
-                    parent=execution.parent_context,
-                ),
-            )
-
-        logger.debug(f"Finished running node: {node.__class__.__name__}")
-
-    @staticmethod
     def run_node(
+        self,
         node: "BaseNode[StateType]",
         span_id: UUID,
-        execution_context: "ExecutionContext",
-        node_output_mocks: Optional[List[Any]] = None,
+        execution_context: Optional["ExecutionContext"] = None,
     ) -> Generator["WorkflowEvent", None, None]:
         """
         Execute a single node and yield workflow events.
@@ -496,8 +281,8 @@ class WorkflowRunner(Generic[StateType]):
         Args:
             node: The node instance to execute
             span_id: Unique identifier for this node execution
-            execution_context: Execution context for tracing and parent context
-            node_output_mocks: Optional mock configurations for testing
+            execution_context: Execution context for tracing and parent context.
+                              If None, will use get_execution_context()
 
         Yields:
             WorkflowEvent: Events emitted during node execution (initiated, streaming, fulfilled, rejected)
@@ -505,17 +290,10 @@ class WorkflowRunner(Generic[StateType]):
         from vellum.workflows.constants import undefined
         from vellum.workflows.context import execution_context as exec_context
 
-        node_output_mocks_map: Dict[Type, List[Any]] = {}
-        if node_output_mocks:
-            for mock in node_output_mocks:
-                outputs_class = (
-                    mock.then_outputs.__class__.__bases__[0]
-                    if mock.then_outputs.__class__.__bases__
-                    else mock.then_outputs.__class__
-                )
-                if outputs_class not in node_output_mocks_map:
-                    node_output_mocks_map[outputs_class] = []
-                node_output_mocks_map[outputs_class].append(mock)
+        if execution_context is None:
+            execution_context = get_execution_context()
+
+        node_output_mocks_map = self.workflow.context.node_output_mocks_map
 
         yield NodeExecutionInitiatedEvent(
             trace_id=execution_context.trace_id,
@@ -690,7 +468,7 @@ class WorkflowRunner(Generic[StateType]):
                 parent=execution_context.parent_context,
             )
         except Exception as e:
-            error_message = WorkflowRunner._parse_error_message_static(e)
+            error_message = self._parse_error_message(e)
             if error_message is None:
                 logger.exception(f"An unexpected error occurred while running node {node.__class__.__name__}")
                 error_code = WorkflowErrorCode.INTERNAL_ERROR
