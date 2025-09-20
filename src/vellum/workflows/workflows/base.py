@@ -697,11 +697,11 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         Wait for all emitters and runner to complete their background work.
         This ensures all pending events are processed before the workflow terminates.
         """
-        for emitter in self.emitters:
-            emitter.join()
-
         if self._current_runner:
             self._current_runner.join()
+
+        for emitter in self.emitters:
+            emitter.join()
 
 
 WorkflowExecutionInitiatedBody.model_rebuild()
