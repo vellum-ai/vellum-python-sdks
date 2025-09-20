@@ -77,6 +77,13 @@ from vellum.workflows.types.generics import InputsType, OutputsType, StateType
 if TYPE_CHECKING:
     from vellum.workflows import BaseWorkflow
 
+NodeExecutionEvent = Union[
+    NodeExecutionInitiatedEvent,
+    NodeExecutionStreamingEvent,
+    NodeExecutionFulfilledEvent,
+    NodeExecutionRejectedEvent,
+]
+
 logger = logging.getLogger(__name__)
 
 RunFromNodeArg = Sequence[Type[BaseNode]]
@@ -270,28 +277,21 @@ class WorkflowRunner(Generic[StateType]):
         self,
         node: "BaseNode[StateType]",
         span_id: UUID,
-        execution_context: Optional["ExecutionContext"] = None,
-    ) -> Generator["WorkflowEvent", None, None]:
+    ) -> Generator[NodeExecutionEvent, None, None]:
         """
         Execute a single node and yield workflow events.
-
-        This method extracts the core node execution logic from _run_work_item
-        to make it available for standalone node execution outside of full workflow runs.
 
         Args:
             node: The node instance to execute
             span_id: Unique identifier for this node execution
-            execution_context: Execution context for tracing and parent context.
-                              If None, will use get_execution_context()
 
         Yields:
-            WorkflowEvent: Events emitted during node execution (initiated, streaming, fulfilled, rejected)
+            NodeExecutionEvent: Events emitted during node execution (initiated, streaming, fulfilled, rejected)
         """
         from vellum.workflows.constants import undefined
         from vellum.workflows.context import execution_context as exec_context
 
-        if execution_context is None:
-            execution_context = get_execution_context()
+        execution_context = get_execution_context()
 
         node_output_mocks_map = self.workflow.context.node_output_mocks_map
 
@@ -345,7 +345,9 @@ class WorkflowRunner(Generic[StateType]):
                 streaming_output_queues: Dict[str, Queue] = {}
                 outputs = node.Outputs()
 
-                def initiate_node_streaming_output(output: BaseOutput) -> Generator["WorkflowEvent", None, None]:
+                def initiate_node_streaming_output(
+                    output: BaseOutput,
+                ) -> Generator[NodeExecutionStreamingEvent, None, None]:
                     streaming_output_queues[output.name] = Queue()
                     output_descriptor = OutputReference(
                         name=output.name,
@@ -491,9 +493,7 @@ class WorkflowRunner(Generic[StateType]):
 
         logger.debug(f"Finished running node: {node.__class__.__name__}")
 
-    @staticmethod
-    def _parse_error_message_static(exception: Exception) -> Optional[str]:
-        """Static version of _parse_error_message for use in run_node."""
+    def _parse_error_message(self, exception: Exception) -> Optional[str]:
         try:
             _, _, tb = sys.exc_info()
             if tb:
@@ -514,9 +514,6 @@ class WorkflowRunner(Generic[StateType]):
             pass
 
         return None
-
-    def _parse_error_message(self, exception: Exception) -> Optional[str]:
-        return self._parse_error_message_static(exception)
 
     def _context_run_work_item(
         self,
