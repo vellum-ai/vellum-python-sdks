@@ -22,7 +22,7 @@ from vellum.workflows.utils.vellum_variables import vellum_variable_type_to_open
 if TYPE_CHECKING:
     from vellum.workflows.workflows.base import BaseWorkflow
 
-type_map = {
+type_map: dict[Any, str] = {
     str: "string",
     int: "integer",
     float: "number",
