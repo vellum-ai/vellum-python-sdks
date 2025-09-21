@@ -3,6 +3,7 @@ import logging
 from uuid import UUID, uuid4
 
 from vellum.workflows.edges.edge import Edge
+from vellum.workflows.events.node import NodeExecutionFulfilledEvent, NodeExecutionInitiatedEvent
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubworkflowNode
@@ -704,3 +705,36 @@ def test_base_workflow__join_calls_runner_join():
 
     # THEN the runner should have been joined (verified by no hanging threads)
     assert workflow._current_runner is not None
+
+
+def test_base_workflow__run_node_emits_correct_events():
+    """Test that WorkflowRunner.run_node method emits the expected events."""
+
+    class TestInputs(BaseInputs):
+        pass
+
+    class TestState(BaseState):
+        pass
+
+    class TestNode(BaseNode[TestState]):
+        class Outputs(BaseNode.Outputs):
+            result: str
+
+        def run(self) -> "TestNode.Outputs":
+            return self.Outputs(result="test_output")
+
+    class TestWorkflow(BaseWorkflow[TestInputs, TestState]):
+        graph = TestNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            result: str
+
+    workflow = TestWorkflow()
+
+    events = list(workflow.run_node(node=TestNode))
+
+    assert len(events) == 2
+    assert isinstance(events[0], NodeExecutionInitiatedEvent)
+    assert isinstance(events[1], NodeExecutionFulfilledEvent)
+    assert events[0].span_id == events[1].span_id
+    assert events[1].body.outputs.result == "test_output"

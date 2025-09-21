@@ -31,6 +31,7 @@ from vellum.workflows.edges import Edge
 from vellum.workflows.emitters.base import BaseWorkflowEmitter
 from vellum.workflows.errors import WorkflowError, WorkflowErrorCode
 from vellum.workflows.events.node import (
+    NodeEvent,
     NodeExecutionFulfilledBody,
     NodeExecutionFulfilledEvent,
     NodeExecutionInitiatedBody,
@@ -563,6 +564,11 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         # TODO: Implement rule that all entrypoints are non empty
         # https://app.shortcut.com/vellum/story/4327
         pass
+
+    def run_node(self, node: Type[BaseNode]) -> Generator[NodeEvent, None, None]:
+        runner = WorkflowRunner(self)
+        span_id = uuid4()
+        return runner.run_node(node=node(state=self.get_default_state(), context=self._context), span_id=span_id)
 
     @classmethod
     @lru_cache
