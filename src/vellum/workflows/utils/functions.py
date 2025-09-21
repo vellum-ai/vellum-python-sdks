@@ -32,15 +32,13 @@ type_map = {
     None: "null",
     type(None): "null",
     inspect._empty: "null",
-    # Add string versions for __future__ import annotations support
-    "str": "string",
-    "int": "integer",
-    "float": "number",
-    "bool": "boolean",
-    "list": "array",
-    "dict": "object",
-    "None": "null",
 }
+
+for k, v in list(type_map.items()):
+    if isinstance(k, type):
+        type_map[k.__name__] = v
+    # None is not a type, but we want to map it to "null"
+    type_map["None"] = "null"
 
 
 def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
