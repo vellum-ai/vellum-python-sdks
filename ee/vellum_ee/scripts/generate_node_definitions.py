@@ -1,31 +1,15 @@
 import json
+import logging
 import os
 from typing import Any, Dict, List, Optional, Type
 
-from vellum.client import Vellum as VellumClient
 from vellum.workflows.nodes.bases.base import BaseNode
-from vellum.workflows.nodes.displayable import (
-    APINode,
-    CodeExecutionNode,
-    ConditionalNode,
-    ErrorNode,
-    FinalOutputNode,
-    GuardrailNode,
-    InlinePromptNode,
-    InlineSubworkflowNode,
-    MapNode,
-    MergeNode,
-    NoteNode,
-    PromptDeploymentNode,
-    SearchNode,
-    SubworkflowDeploymentNode,
-    TemplatingNode,
-    ToolCallingNode,
-    WebSearchNode,
-)
+import vellum.workflows.nodes.displayable as displayable_module
 from vellum.workflows.vellum_client import create_vellum_client
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
+
+logger = logging.getLogger(__name__)
 
 
 def create_display_context_with_client() -> WorkflowDisplayContext:
@@ -35,31 +19,17 @@ def create_display_context_with_client() -> WorkflowDisplayContext:
 
 
 def get_all_displayable_node_classes() -> List[Type[BaseNode]]:
-    """Get all displayable node classes."""
-    return [
-        APINode,
-        CodeExecutionNode,
-        ConditionalNode,
-        ErrorNode,
-        FinalOutputNode,
-        GuardrailNode,
-        InlinePromptNode,
-        InlineSubworkflowNode,
-        MapNode,
-        MergeNode,
-        NoteNode,
-        PromptDeploymentNode,
-        SearchNode,
-        SubworkflowDeploymentNode,
-        TemplatingNode,
-        ToolCallingNode,
-        WebSearchNode,
-    ]
+    """Get all displayable node classes dynamically from the displayable module."""
+    node_classes = []
+    for class_name in displayable_module.__all__:
+        node_class = getattr(displayable_module, class_name)
+        node_classes.append(node_class)
+    return node_classes
 
 
 def clean_node_definition(definition: Dict[str, Any]) -> Dict[str, Any]:
     """Remove unwanted fields from a successfully serialized node definition."""
-    fields_to_remove = ["inputs", "data", "type", "adornments"]
+    fields_to_remove = ["inputs", "data", "type", "adornments", "should_file_merge"]
     cleaned = {k: v for k, v in definition.items() if k not in fields_to_remove}
     return cleaned
 
@@ -74,13 +44,13 @@ def serialize_node_definition(
         definition = display_instance.serialize(display_context)
         return clean_node_definition(definition)
     except Exception as e:
-        print(f"Warning: Failed to serialize {node_class.__name__}: {e}")
+        logger.info(f"Warning: Failed to serialize {node_class.__name__}: {e}")
         return None
 
 
 def main() -> None:
     """Main function to generate node definitions."""
-    print("Generating node definitions...")
+    logger.info("Generating node definitions...")
 
     display_context = create_display_context_with_client()
     node_classes = get_all_displayable_node_classes()
@@ -89,7 +59,7 @@ def main() -> None:
     errors = []
 
     for node_class in node_classes:
-        print(f"Serializing {node_class.__name__}...")
+        logger.info(f"Serializing {node_class.__name__}...")
         definition = serialize_node_definition(node_class, display_context)
 
         if definition is not None:
@@ -110,7 +80,9 @@ def main() -> None:
     with open(output_path, "w") as f:
         json.dump(result, f, indent=2)
 
-    print(f"Generated {len(successful_nodes)} successful node definitions and {len(errors)} errors in {output_path}")
+    logger.info(
+        f"Generated {len(successful_nodes)} successful node definitions and {len(errors)} errors in {output_path}"
+    )
 
 
 if __name__ == "__main__":

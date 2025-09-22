@@ -76,58 +76,7 @@
         "id": "c1b30829-76af-4d99-bf83-b030c551a7cf",
         "merge_behavior": "AWAIT_ATTRIBUTES"
       },
-      "ports": [],
-      "should_file_merge": true
-    },
-    {
-      "id": "bf31cc42-b5e4-4191-a453-7191743ac200",
-      "display_data": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0
-        },
-        "comment": {
-          "value": "\n    Used to directly reference the output of another node.\n    This provides backward compatibility with Vellum's Final Output Node.\n    ",
-          "expanded": true
-        }
-      },
-      "base": {
-        "name": "BaseNode",
-        "module": [
-          "vellum",
-          "workflows",
-          "nodes",
-          "bases",
-          "base"
-        ]
-      },
-      "definition": {
-        "name": "FinalOutputNode",
-        "module": [
-          "vellum",
-          "workflows",
-          "nodes",
-          "displayable",
-          "final_output_node",
-          "node"
-        ]
-      },
-      "trigger": {
-        "id": "0b2da045-2a4c-4939-8b5c-661652c759d4",
-        "merge_behavior": "AWAIT_ANY"
-      },
-      "ports": [],
-      "should_file_merge": true,
-      "outputs": [
-        {
-          "id": "7f41909e-9ce1-4fde-ba77-a13dda301ece",
-          "name": "value",
-          "type": "STRING",
-          "value": {
-            "__undefined__": true
-          }
-        }
-      ]
+      "ports": []
     },
     {
       "id": "16b8d82d-458d-48d9-b57e-a447b19f311a",
@@ -172,8 +121,7 @@
           "name": "default",
           "type": "DEFAULT"
         }
-      ],
-      "should_file_merge": true
+      ]
     },
     {
       "id": "035842e0-34ed-43af-97de-a706e40912ae",
@@ -220,7 +168,6 @@
           "type": "DEFAULT"
         }
       ],
-      "should_file_merge": true,
       "attributes": [
         {
           "id": "df3761db-067a-4fe9-9fc3-ba270786fcf6",
@@ -370,7 +317,6 @@
           "type": "DEFAULT"
         }
       ],
-      "should_file_merge": true,
       "attributes": [
         {
           "id": "b5ba3c60-e02c-46c8-b470-d86c4f8f42af",
@@ -437,6 +383,55 @@
           "value": null
         }
       ]
+    },
+    {
+      "id": "bf31cc42-b5e4-4191-a453-7191743ac200",
+      "display_data": {
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "comment": {
+          "value": "\n    Used to directly reference the output of another node.\n    This provides backward compatibility with Vellum's Final Output Node.\n    ",
+          "expanded": true
+        }
+      },
+      "base": {
+        "name": "BaseNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
+      },
+      "definition": {
+        "name": "FinalOutputNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "displayable",
+          "final_output_node",
+          "node"
+        ]
+      },
+      "trigger": {
+        "id": "0b2da045-2a4c-4939-8b5c-661652c759d4",
+        "merge_behavior": "AWAIT_ANY"
+      },
+      "ports": [],
+      "outputs": [
+        {
+          "id": "7f41909e-9ce1-4fde-ba77-a13dda301ece",
+          "name": "value",
+          "type": "STRING",
+          "value": {
+            "__undefined__": true
+          }
+        }
+      ]
     }
   ],
   "errors": [
@@ -449,16 +444,16 @@
       "error": "vellum.workflows.nodes.displayable.code_execution_node.node.CodeExecutionNode.Ports.default"
     },
     {
-      "node": "GuardrailNode",
-      "error": "vellum.workflows.nodes.displayable.guardrail_node.node.GuardrailNode.Ports.default"
-    },
-    {
       "node": "InlinePromptNode",
       "error": "vellum.workflows.nodes.displayable.inline_prompt_node.node.InlinePromptNode.Ports.default"
     },
     {
       "node": "InlineSubworkflowNode",
       "error": "'NoneType' object has no attribute 'get_inputs_class'"
+    },
+    {
+      "node": "GuardrailNode",
+      "error": "vellum.workflows.nodes.displayable.guardrail_node.node.GuardrailNode.Ports.default"
     },
     {
       "node": "MapNode",
@@ -469,16 +464,16 @@
       "error": "vellum.workflows.nodes.displayable.merge_node.node.MergeNode.Ports.default"
     },
     {
+      "node": "SubworkflowDeploymentNode",
+      "error": "headers: {'server': 'gunicorn', 'date': 'Mon, 22 Sep 2025 14:24:17 GMT', 'content-type': 'application/json', 'allow': 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS', 'x-frame-options': 'DENY', 'content-length': '28', 'vary': 'Accept-Language, Origin', 'content-language': 'en', 'strict-transport-security': 'max-age=60; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'referrer-policy': 'same-origin', 'cross-origin-opener-policy': 'same-origin', 'via': '1.1 google', 'alt-svc': 'h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000'}, status_code: 403, body: {'detail': 'Invalid API key'}"
+    },
+    {
       "node": "PromptDeploymentNode",
-      "error": "headers: {'server': 'gunicorn', 'date': 'Sat, 20 Sep 2025 20:28:00 GMT', 'content-type': 'application/json', 'allow': 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS', 'x-frame-options': 'DENY', 'content-length': '28', 'vary': 'Accept-Language, Origin', 'content-language': 'en', 'strict-transport-security': 'max-age=60; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'referrer-policy': 'same-origin', 'cross-origin-opener-policy': 'same-origin', 'via': '1.1 google', 'alt-svc': 'h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000'}, status_code: 403, body: {'detail': 'Invalid API key'}"
+      "error": "headers: {'server': 'gunicorn', 'date': 'Mon, 22 Sep 2025 14:24:17 GMT', 'content-type': 'application/json', 'allow': 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS', 'x-frame-options': 'DENY', 'content-length': '28', 'vary': 'Accept-Language, Origin', 'content-language': 'en', 'strict-transport-security': 'max-age=60; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'referrer-policy': 'same-origin', 'cross-origin-opener-policy': 'same-origin', 'via': '1.1 google', 'alt-svc': 'h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000'}, status_code: 403, body: {'detail': 'Invalid API key'}"
     },
     {
       "node": "SearchNode",
       "error": "Expected NodeReference query to have an instance"
-    },
-    {
-      "node": "SubworkflowDeploymentNode",
-      "error": "headers: {'server': 'gunicorn', 'date': 'Sat, 20 Sep 2025 20:28:00 GMT', 'content-type': 'application/json', 'allow': 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS', 'x-frame-options': 'DENY', 'content-length': '28', 'vary': 'Accept-Language, Origin', 'content-language': 'en', 'strict-transport-security': 'max-age=60; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'referrer-policy': 'same-origin', 'cross-origin-opener-policy': 'same-origin', 'via': '1.1 google', 'alt-svc': 'h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000'}, status_code: 403, body: {'detail': 'Invalid API key'}"
     },
     {
       "node": "TemplatingNode",
