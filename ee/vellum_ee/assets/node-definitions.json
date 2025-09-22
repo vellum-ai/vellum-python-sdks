@@ -1,0 +1,483 @@
+{
+  "nodes": [
+    {
+      "id": "5d3c60ce-7acf-4d8b-a68d-65cc0b561ac5",
+      "display_data": {
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "comment": {
+          "value": "\n    Used to conditionally determine which port to invoke next. This node exists to be backwards compatible with\n    Vellum's Conditional Node, and for most cases, you should extend `BaseNode.Ports` directly.\n    ",
+          "expanded": true
+        }
+      },
+      "base": {
+        "name": "BaseNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
+      },
+      "definition": {
+        "name": "ConditionalNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "displayable",
+          "conditional_node",
+          "node"
+        ]
+      },
+      "trigger": {
+        "id": "2b5617b4-5cc0-4f9a-9369-24982e2cd8c0",
+        "merge_behavior": "AWAIT_ANY"
+      },
+      "ports": []
+    },
+    {
+      "id": "92e401f1-110f-4edc-8bb0-cad879e1ea08",
+      "display_data": {
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "comment": {
+          "value": "\n    Used to raise an error to reject the surrounding Workflow.\n\n    error: Union[str, VellumError] - The error to raise.\n    ",
+          "expanded": true
+        }
+      },
+      "base": {
+        "name": "BaseNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
+      },
+      "definition": {
+        "name": "ErrorNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "core",
+          "error_node",
+          "node"
+        ]
+      },
+      "trigger": {
+        "id": "c1b30829-76af-4d99-bf83-b030c551a7cf",
+        "merge_behavior": "AWAIT_ATTRIBUTES"
+      },
+      "ports": []
+    },
+    {
+      "id": "16b8d82d-458d-48d9-b57e-a447b19f311a",
+      "display_data": {
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "comment": {
+          "value": "\n    A no-op Node purely used to display a note in the Vellum UI.\n    ",
+          "expanded": true
+        }
+      },
+      "base": {
+        "name": "BaseNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
+      },
+      "definition": {
+        "name": "NoteNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "displayable",
+          "note_node",
+          "node"
+        ]
+      },
+      "trigger": {
+        "id": "2b6907b0-1adc-41e7-9d5b-3c6ccd9b973a",
+        "merge_behavior": "AWAIT_ANY"
+      },
+      "ports": [
+        {
+          "id": "22dac74c-7ad6-4a6f-97ae-0034124721ce",
+          "name": "default",
+          "type": "DEFAULT"
+        }
+      ]
+    },
+    {
+      "id": "035842e0-34ed-43af-97de-a706e40912ae",
+      "label": "Tool Calling Node",
+      "display_data": {
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "comment": {
+          "value": "\n    A Node that dynamically invokes the provided functions to the underlying Prompt\n\n    Attributes:\n        ml_model: str - The model to use for tool calling (e.g., \"gpt-4o-mini\")\n        blocks: List[PromptBlock] - The prompt blocks to use (same format as InlinePromptNode)\n        functions: List[Tool] - The functions that can be called\n        prompt_inputs: Optional[EntityInputsInterface] - Mapping of input variable names to values\n        parameters: PromptParameters - The parameters for the Prompt\n        max_prompt_iterations: Optional[int] - Maximum number of prompt iterations before stopping\n    ",
+          "expanded": true
+        }
+      },
+      "base": {
+        "name": "BaseNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
+      },
+      "definition": {
+        "name": "ToolCallingNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "displayable",
+          "tool_calling_node",
+          "node"
+        ]
+      },
+      "trigger": {
+        "id": "f9b4a4ce-68ae-45f4-9e29-38b588abdf97",
+        "merge_behavior": "AWAIT_ATTRIBUTES"
+      },
+      "ports": [
+        {
+          "id": "72157fce-fc16-44d8-a00d-506738a20730",
+          "name": "default",
+          "type": "DEFAULT"
+        }
+      ],
+      "attributes": [
+        {
+          "id": "df3761db-067a-4fe9-9fc3-ba270786fcf6",
+          "name": "ml_model",
+          "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+              "type": "STRING",
+              "value": "gpt-4o-mini"
+            }
+          }
+        },
+        {
+          "id": "66133945-f7fd-43bb-8b46-0761e2b58241",
+          "name": "blocks",
+          "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+              "type": "JSON",
+              "value": []
+            }
+          }
+        },
+        {
+          "id": "0079b429-3b1c-4f7c-9ccf-185ace4dcbb2",
+          "name": "functions",
+          "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+              "type": "JSON",
+              "value": []
+            }
+          }
+        },
+        {
+          "id": "ebda56e6-2ace-472c-a106-36cb69264e96",
+          "name": "prompt_inputs",
+          "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+              "type": "JSON",
+              "value": null
+            }
+          }
+        },
+        {
+          "id": "2534a586-5b37-41f3-a9a4-8162b8538df4",
+          "name": "parameters",
+          "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+              "type": "JSON",
+              "value": {
+                "stop": [],
+                "temperature": 0.0,
+                "max_tokens": 4096.0,
+                "top_p": 1.0,
+                "top_k": 0.0,
+                "frequency_penalty": 0.0,
+                "presence_penalty": 0.0,
+                "logit_bias": null,
+                "custom_parameters": null
+              }
+            }
+          }
+        },
+        {
+          "id": "118ef72a-0767-4659-8ddf-58a071f95988",
+          "name": "max_prompt_iterations",
+          "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+              "type": "NUMBER",
+              "value": 5.0
+            }
+          }
+        },
+        {
+          "id": "d7ef5296-1e48-4d05-b97a-77f16d46fd50",
+          "name": "settings",
+          "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+              "type": "JSON",
+              "value": null
+            }
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "id": "c18a8725-21e1-4736-a77c-76d0fc035176",
+          "name": "text",
+          "type": "STRING",
+          "value": null
+        },
+        {
+          "id": "5a9ad073-c670-43d2-9198-a08e9fdda7ad",
+          "name": "chat_history",
+          "type": "CHAT_HISTORY",
+          "value": null
+        }
+      ]
+    },
+    {
+      "id": "187ed9ed-ca2b-49e4-943d-ee8da5fad973",
+      "label": "Web Search Node",
+      "display_data": {
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "comment": {
+          "value": "\n    Used to perform web search using SerpAPI.\n\n    query: str - The search query to execute\n    api_key: str - SerpAPI authentication key\n    num_results: int - Number of search results to return (default: 10)\n    location: Optional[str] - Geographic location filter for search\n    ",
+          "expanded": true
+        }
+      },
+      "base": {
+        "name": "BaseNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
+      },
+      "definition": {
+        "name": "WebSearchNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "displayable",
+          "web_search_node",
+          "node"
+        ]
+      },
+      "trigger": {
+        "id": "036c7a0c-fff3-44f7-b49b-429d8f44f212",
+        "merge_behavior": "AWAIT_ATTRIBUTES"
+      },
+      "ports": [
+        {
+          "id": "ef824748-d00d-41e7-b7b4-d0edc536c3af",
+          "name": "default",
+          "type": "DEFAULT"
+        }
+      ],
+      "attributes": [
+        {
+          "id": "b5ba3c60-e02c-46c8-b470-d86c4f8f42af",
+          "name": "query",
+          "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+              "type": "STRING",
+              "value": ""
+            }
+          }
+        },
+        {
+          "id": "222408bc-7dae-4bb8-9aba-a1ac36bdc759",
+          "name": "api_key",
+          "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+              "type": "JSON",
+              "value": null
+            }
+          }
+        },
+        {
+          "id": "795a0bbc-bb98-4bc8-a9d9-88b0cb796d23",
+          "name": "num_results",
+          "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+              "type": "NUMBER",
+              "value": 10.0
+            }
+          }
+        },
+        {
+          "id": "e1648557-ca03-4a81-ab5b-86495284b325",
+          "name": "location",
+          "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+              "type": "JSON",
+              "value": null
+            }
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "id": "704a4ba3-1afe-482d-876a-91dcdbe90fb7",
+          "name": "text",
+          "type": "STRING",
+          "value": null
+        },
+        {
+          "id": "574b2ebe-f250-4024-b517-3cd47704c70e",
+          "name": "urls",
+          "type": "JSON",
+          "value": null
+        },
+        {
+          "id": "9798a067-3589-4a2a-a811-6019873cbbfe",
+          "name": "results",
+          "type": "JSON",
+          "value": null
+        }
+      ]
+    },
+    {
+      "id": "bf31cc42-b5e4-4191-a453-7191743ac200",
+      "display_data": {
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "comment": {
+          "value": "\n    Used to directly reference the output of another node.\n    This provides backward compatibility with Vellum's Final Output Node.\n    ",
+          "expanded": true
+        }
+      },
+      "base": {
+        "name": "BaseNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
+      },
+      "definition": {
+        "name": "FinalOutputNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "displayable",
+          "final_output_node",
+          "node"
+        ]
+      },
+      "trigger": {
+        "id": "0b2da045-2a4c-4939-8b5c-661652c759d4",
+        "merge_behavior": "AWAIT_ANY"
+      },
+      "ports": [],
+      "outputs": [
+        {
+          "id": "7f41909e-9ce1-4fde-ba77-a13dda301ece",
+          "name": "value",
+          "type": "STRING",
+          "value": {
+            "__undefined__": true
+          }
+        }
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "node": "APINode",
+      "error": "APINode.Outputs.text"
+    },
+    {
+      "node": "CodeExecutionNode",
+      "error": "vellum.workflows.nodes.displayable.code_execution_node.node.CodeExecutionNode.Ports.default"
+    },
+    {
+      "node": "InlinePromptNode",
+      "error": "vellum.workflows.nodes.displayable.inline_prompt_node.node.InlinePromptNode.Ports.default"
+    },
+    {
+      "node": "InlineSubworkflowNode",
+      "error": "'NoneType' object has no attribute 'get_inputs_class'"
+    },
+    {
+      "node": "GuardrailNode",
+      "error": "vellum.workflows.nodes.displayable.guardrail_node.node.GuardrailNode.Ports.default"
+    },
+    {
+      "node": "MapNode",
+      "error": "Expected NodeReference items to have an instance"
+    },
+    {
+      "node": "MergeNode",
+      "error": "vellum.workflows.nodes.displayable.merge_node.node.MergeNode.Ports.default"
+    },
+    {
+      "node": "SubworkflowDeploymentNode",
+      "error": "headers: {'server': 'gunicorn', 'date': 'Mon, 22 Sep 2025 14:24:17 GMT', 'content-type': 'application/json', 'allow': 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS', 'x-frame-options': 'DENY', 'content-length': '28', 'vary': 'Accept-Language, Origin', 'content-language': 'en', 'strict-transport-security': 'max-age=60; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'referrer-policy': 'same-origin', 'cross-origin-opener-policy': 'same-origin', 'via': '1.1 google', 'alt-svc': 'h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000'}, status_code: 403, body: {'detail': 'Invalid API key'}"
+    },
+    {
+      "node": "PromptDeploymentNode",
+      "error": "headers: {'server': 'gunicorn', 'date': 'Mon, 22 Sep 2025 14:24:17 GMT', 'content-type': 'application/json', 'allow': 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS', 'x-frame-options': 'DENY', 'content-length': '28', 'vary': 'Accept-Language, Origin', 'content-language': 'en', 'strict-transport-security': 'max-age=60; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'referrer-policy': 'same-origin', 'cross-origin-opener-policy': 'same-origin', 'via': '1.1 google', 'alt-svc': 'h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000'}, status_code: 403, body: {'detail': 'Invalid API key'}"
+    },
+    {
+      "node": "SearchNode",
+      "error": "Expected NodeReference query to have an instance"
+    },
+    {
+      "node": "TemplatingNode",
+      "error": "TemplatingNode.Outputs.result"
+    }
+  ]
+}
