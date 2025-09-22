@@ -32,13 +32,12 @@ type_map: dict[Any, str] = {
     None: "null",
     type(None): "null",
     inspect._empty: "null",
+    "None": "null",
 }
 
 for k, v in list(type_map.items()):
     if isinstance(k, type):
         type_map[k.__name__] = v
-    # None is not a type, but we want to map it to "null"
-    type_map["None"] = "null"
 
 
 def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
