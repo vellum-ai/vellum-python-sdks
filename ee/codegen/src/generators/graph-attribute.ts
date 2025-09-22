@@ -318,10 +318,11 @@ export class GraphAttribute extends AstNode {
     graphSourceNode: BaseNodeContext<WorkflowDataNode> | null;
   }): GraphMutableAst | undefined {
     this.usedEdges.add(edge);
-    const entrypointNodeId = this.workflowContext.getEntrypointNode().id;
+    const entrypointNode = this.workflowContext.tryGetEntrypointNode();
+    const entrypointNodeId = entrypointNode?.id;
 
     let sourceNode: BaseNodeContext<WorkflowDataNode> | null;
-    if (edge.sourceNodeId === entrypointNodeId) {
+    if (entrypointNodeId && edge.sourceNodeId === entrypointNodeId) {
       sourceNode = null;
     } else {
       sourceNode = this.resolveNodeId(edge.sourceNodeId);
