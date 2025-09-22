@@ -1,9 +1,7 @@
 from typing import Optional, Union
 
 from vellum.workflows.constants import AuthorizationType
-from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.displayable.bases.api_node import BaseAPINode
-from vellum.workflows.ports.port import Port
 from vellum.workflows.types.core import MergeBehavior, VellumSecret
 
 
@@ -32,22 +30,7 @@ class APINode(BaseAPINode):
     class Trigger(BaseAPINode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY
 
-    class Ports(BaseNode.Ports):
-        default = Port(default=True)
-
-    class Outputs(BaseAPINode.Outputs):
-        """
-        The outputs of the APINode.
-
-        json: Optional[Json] - The JSON response from the API call
-        headers: Dict[str, str] - The response headers
-        status_code: int - The HTTP status code
-        text: str - The response text
-        """
-
-        pass
-
-    def run(self) -> Outputs:
+    def run(self) -> BaseAPINode.Outputs:
         self._validate()
 
         headers = self.headers or {}
@@ -75,7 +58,7 @@ class APINode(BaseAPINode):
         ):
             final_headers["X-API-Key"] = vellum_client_wrapper.api_key
 
-        base_outputs = self._run(
+        return self._run(
             method=self.method,
             url=self.url,
             data=self.data,
@@ -83,10 +66,4 @@ class APINode(BaseAPINode):
             headers=final_headers,
             bearer_token=bearer_token,
             timeout=self.timeout,
-        )
-        return self.Outputs(
-            json=base_outputs.json,
-            headers=base_outputs.headers,
-            status_code=base_outputs.status_code,
-            text=base_outputs.text,
         )

@@ -178,11 +178,9 @@ class BaseAPINodeDisplay(BaseNodeDisplay[_APINodeType], Generic[_APINodeType]):
         ]
         inputs.extend(additional_header_inputs)
 
-        _, text_output_display = display_context.global_node_output_displays[cast(OutputReference, node.Outputs.text)]
-        _, json_output_display = display_context.global_node_output_displays[cast(OutputReference, node.Outputs.json)]
-        _, status_code_output_display = display_context.global_node_output_displays[
-            cast(OutputReference, node.Outputs.status_code)
-        ]
+        _, text_output_display = self.get_node_output_display(cast(OutputReference, node.Outputs.text))
+        _, json_output_display = self.get_node_output_display(cast(OutputReference, node.Outputs.json))
+        _, status_code_output_display = self.get_node_output_display(cast(OutputReference, node.Outputs.status_code))
 
         serialized_node: JsonObject = {
             "id": str(node_id),
@@ -191,7 +189,7 @@ class BaseAPINodeDisplay(BaseNodeDisplay[_APINodeType], Generic[_APINodeType]):
             "data": {
                 "label": self.label,
                 "error_output_id": str(error_output_id) if error_output_id else None,
-                "source_handle_id": str(self.get_source_handle_id(display_context.port_displays)),
+                "source_handle_id": str(self.get_source_handle_id({})),
                 "target_handle_id": str(self.get_target_handle_id()),
                 "url_input_id": url_node_input.id,
                 "method_input_id": method_node_input.id,

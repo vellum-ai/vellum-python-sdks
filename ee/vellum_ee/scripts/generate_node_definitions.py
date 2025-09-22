@@ -42,16 +42,6 @@ def serialize_node_definition(
         display_class = get_node_display_class(node_class)
         display_instance = display_class()
 
-        for node_output in node_class.Outputs:
-            if node_output not in display_context.global_node_output_displays:
-                display_context.global_node_output_displays[node_output] = display_instance.get_node_output_display(
-                    node_output
-                )
-
-        for port in node_class.Ports:
-            if port not in display_context.port_displays:
-                display_context.port_displays[port] = display_instance.get_node_port_display(port)
-
         definition = display_instance.serialize(display_context)
         return clean_node_definition(definition)
     except Exception as e:
