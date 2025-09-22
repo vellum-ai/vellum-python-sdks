@@ -300,18 +300,13 @@ export class WorkflowContext {
     return this.entrypointNode;
   }
 
-  public getEntrypointNode(): EntrypointNode {
-    const entrypoint = this.tryGetEntrypointNode();
-    if (!entrypoint) {
-      throw new WorkflowGenerationError("Entrypoint node not found");
-    }
-    return entrypoint;
-  }
-
   public getEntrypointNodeEdges(): WorkflowEdge[] {
-    const entrypointNodeId = this.getEntrypointNode().id;
+    const entrypointNode = this.tryGetEntrypointNode();
+    if (!entrypointNode) {
+      return [];
+    }
     return this.workflowRawData.edges.filter(
-      (edge) => edge.sourceNodeId === entrypointNodeId
+      (edge) => edge.sourceNodeId === entrypointNode.id
     );
   }
 

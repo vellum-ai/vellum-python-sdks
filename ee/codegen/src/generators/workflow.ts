@@ -184,7 +184,11 @@ export class Workflow {
     });
     workflowDisplayClass.inheritReferences(workflowClassRef);
 
-    const entrypointNode = this.workflowContext.getEntrypointNode();
+    const entrypointNode = this.workflowContext.tryGetEntrypointNode();
+    if (!entrypointNode) {
+      return workflowDisplayClass;
+    }
+
     workflowDisplayClass.add(
       python.field({
         name: "workflow_display",
@@ -435,8 +439,8 @@ export class Workflow {
         (acc, edge) => {
           // Stable id references of edges connected to entrypoint nodes are handles separately as part of
           // `entrypoint_displays` and don't need to be taken care of here.
-          const entrypointNode = this.workflowContext.getEntrypointNode();
-          if (edge.sourceNodeId === entrypointNode.id) {
+          const entrypointNode = this.workflowContext.tryGetEntrypointNode();
+          if (entrypointNode && edge.sourceNodeId === entrypointNode.id) {
             return acc;
           }
 
