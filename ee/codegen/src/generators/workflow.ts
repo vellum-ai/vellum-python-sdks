@@ -185,9 +185,6 @@ export class Workflow {
     workflowDisplayClass.inheritReferences(workflowClassRef);
 
     const entrypointNode = this.workflowContext.tryGetEntrypointNode();
-    if (!entrypointNode) {
-      return workflowDisplayClass;
-    }
 
     workflowDisplayClass.add(
       python.field({
@@ -198,23 +195,27 @@ export class Workflow {
             modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
           }),
           arguments_: [
-            python.methodArgument({
-              name: "entrypoint_node_id",
-              value: python.TypeInstantiation.uuid(entrypointNode.id),
-            }),
-            python.methodArgument({
-              name: "entrypoint_node_source_handle_id",
-              value: python.TypeInstantiation.uuid(
-                entrypointNode.data.sourceHandleId
-              ),
-            }),
-            python.methodArgument({
-              name: "entrypoint_node_display",
-              value: new NodeDisplayData({
-                workflowContext: this.workflowContext,
-                nodeDisplayData: entrypointNode.displayData,
-              }),
-            }),
+            ...(entrypointNode
+              ? [
+                  python.methodArgument({
+                    name: "entrypoint_node_id",
+                    value: python.TypeInstantiation.uuid(entrypointNode.id),
+                  }),
+                  python.methodArgument({
+                    name: "entrypoint_node_source_handle_id",
+                    value: python.TypeInstantiation.uuid(
+                      entrypointNode.data.sourceHandleId
+                    ),
+                  }),
+                  python.methodArgument({
+                    name: "entrypoint_node_display",
+                    value: new NodeDisplayData({
+                      workflowContext: this.workflowContext,
+                      nodeDisplayData: entrypointNode.displayData,
+                    }),
+                  }),
+                ]
+              : []),
             python.methodArgument({
               name: "display_data",
               value: python.instantiateClass({
@@ -408,7 +409,9 @@ export class Workflow {
                   arguments_: [
                     python.methodArgument({
                       name: "id",
-                      value: python.TypeInstantiation.uuid(entrypointNode.id),
+                      value: python.TypeInstantiation.uuid(
+                        entrypointNode?.id ?? ""
+                      ),
                     }),
                     python.methodArgument({
                       name: "edge_display",
