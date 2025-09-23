@@ -340,8 +340,8 @@ def compile_vellum_integration_tool_definition(tool_def: VellumIntegrationToolDe
 
         return FunctionDefinition(
             name=tool_def.name,
-            description=tool_details.get("description", tool_def.description),
-            parameters=tool_details.get("parameters", {}),
+            description=tool_details.description,
+            parameters=tool_details.parameters or {},
         )
     except Exception:
         # Fallback for service failures
