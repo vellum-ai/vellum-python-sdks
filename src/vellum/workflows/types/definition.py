@@ -4,7 +4,7 @@ from types import FrameType
 from uuid import UUID
 from typing import Annotated, Any, Dict, List, Literal, Optional, Union
 
-from pydantic import BeforeValidator, SerializationInfo, model_serializer
+from pydantic import BeforeValidator, Field, SerializationInfo, model_serializer
 
 from vellum import Vellum
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
@@ -175,6 +175,7 @@ class VellumIntegrationToolDefinition(UniversalBaseModel):
 
     # Required for tool base consistency
     description: str
+    parameters: Dict[str, Any] = Field(default_factory=dict)
 
 
 class MCPServer(UniversalBaseModel):

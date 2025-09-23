@@ -1,8 +1,9 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.vellum_client import create_vellum_client
+from vellum.workflows.types.definition import VellumIntegrationToolDefinition
 
 
 class VellumIntegrationService:
@@ -13,16 +14,16 @@ class VellumIntegrationService:
     own integration infrastructure.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, client: Optional[Any] = None) -> None:
         """Initialize the VellumIntegrationService with a Vellum client."""
-        self._client = create_vellum_client()
+        self._client = client or create_vellum_client()
 
     def get_tool_definition(
         self,
         integration: str,
         provider: str,
         tool_name: str,
-    ) -> Dict[str, Any]:
+    ) -> VellumIntegrationToolDefinition:
         """Retrieve a tool definition from Vellum integrations.
 
         Args:
@@ -43,13 +44,13 @@ class VellumIntegrationService:
                 tool_name=tool_name,
             )
 
-            # Convert the response to a dict format matching what's expected
-            return {
-                "name": response.name,
-                "description": response.description,
-                "parameters": response.parameters,
-                "provider": response.provider,
-            }
+            return VellumIntegrationToolDefinition(
+                provider=response.provider,
+                integration=integration,
+                name=response.name,
+                description=response.description,
+                parameters=getattr(response, "parameters", {}),
+            )
         except Exception as e:
             error_message = f"Failed to retrieve tool definition for {tool_name}: {str(e)}"
             raise NodeException(
