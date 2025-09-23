@@ -1,5 +1,6 @@
 from typing import Any, Dict, Optional
 
+from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.types.definition import VellumIntegrationToolDefinition
@@ -45,7 +46,7 @@ class VellumIntegrationService:
             )
 
             return VellumIntegrationToolDefinition(
-                provider=response.provider,
+                provider=VellumIntegrationProviderType(response.provider),
                 integration=integration,
                 name=response.name,
                 description=response.description,
