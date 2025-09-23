@@ -166,15 +166,21 @@ class ComposioToolDefinition(UniversalBaseModel):
 
 
 class VellumIntegrationToolDefinition(UniversalBaseModel):
-    type: Literal["INTEGRATION"] = "INTEGRATION"
+    """Represents a Vellum Integration tool that can be used in Tool Calling Node.
+
+    This tool type uses Vellum's native integration infrastructure to interact with
+    external services like GitHub, Slack, etc. through various providers.
+    """
+
+    type: Literal["VELLUM_INTEGRATION"] = "VELLUM_INTEGRATION"
 
     # Core identification
-    provider: VellumIntegrationProviderType
-    integration: str  # "GITHUB", "SLACK", etc.
+    provider: VellumIntegrationProviderType  # Provider for the integration (e.g., COMPOSIO)
+    integration: str  # Integration name like "GITHUB", "SLACK", etc.
     name: str  # Specific action like "GITHUB_CREATE_AN_ISSUE"
 
     # Required for tool base consistency
-    description: str
+    description: str  # Description of what the tool does
 
 
 class MCPServer(UniversalBaseModel):
