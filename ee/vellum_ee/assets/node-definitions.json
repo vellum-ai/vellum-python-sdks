@@ -1,6 +1,66 @@
 {
   "nodes": [
     {
+      "id": "55e74c90-9901-42fd-92c3-2dd0c5fd4876",
+      "display_data": {
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "comment": {
+          "value": "\n    Used to execute an API call. This node exists to be backwards compatible with Vellum's API Node, and for most cases,\n    you should extend from `BaseAPINode` directly.\n\n    url: str - The URL to send the request to.\n    method: APIRequestMethod - The HTTP method to use for the request.\n    data: Optional[str] - The data to send in the request body.\n    json: Optional[\"JsonObject\"] - The JSON data to send in the request body.\n    headers: Optional[Dict[str, Union[str, VellumSecret]]] - The headers to send in the request.\n\n    authorization_type: Optional[AuthorizationType] = None - The type of authorization to use for the API call.\n    api_key_header_key: Optional[str] = None - The header key to use for the API key authorization.\n    bearer_token_value: Optional[Union[str, VellumSecretReference]] = None - The bearer token value to use\n    for the bearer token authorization.\n    ",
+          "expanded": true
+        }
+      },
+      "base": {
+        "name": "BaseAPINode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "displayable",
+          "bases",
+          "api_node",
+          "node"
+        ]
+      },
+      "definition": {
+        "name": "APINode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "displayable",
+          "api_node",
+          "node"
+        ]
+      },
+      "trigger": {
+        "id": "c2aa7c83-7eba-4996-acb4-85cd4f5bbf58",
+        "merge_behavior": "AWAIT_ANY"
+      },
+      "ports": [
+        {
+          "id": "f165a94f-33f7-4c09-8896-9e683a39e11c",
+          "name": "default",
+          "type": "DEFAULT"
+        }
+      ],
+      "attributes": [
+        {
+          "id": "aacb36f1-c980-460d-8002-43bb57128e05",
+          "name": "timeout",
+          "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+              "type": "JSON",
+              "value": null
+            }
+          }
+        }
+      ]
+    },
+    {
       "id": "5d3c60ce-7acf-4d8b-a68d-65cc0b561ac5",
       "display_data": {
         "position": {
@@ -436,10 +496,6 @@
   ],
   "errors": [
     {
-      "node": "APINode",
-      "error": "vellum.workflows.nodes.displayable.api_node.node.APINode.Ports.default"
-    },
-    {
       "node": "CodeExecutionNode",
       "error": "vellum.workflows.nodes.displayable.code_execution_node.node.CodeExecutionNode.Ports.default"
     },
@@ -465,11 +521,11 @@
     },
     {
       "node": "SubworkflowDeploymentNode",
-      "error": "headers: {'server': 'gunicorn', 'date': 'Mon, 22 Sep 2025 20:50:26 GMT', 'content-type': 'application/json', 'allow': 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS', 'x-frame-options': 'DENY', 'content-length': '28', 'vary': 'Accept-Language, Origin', 'content-language': 'en', 'strict-transport-security': 'max-age=60; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'referrer-policy': 'same-origin', 'cross-origin-opener-policy': 'same-origin', 'via': '1.1 google', 'alt-svc': 'h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000'}, status_code: 403, body: {'detail': 'Invalid API key'}"
+      "error": "headers: {'server': 'gunicorn', 'date': 'Tue, 23 Sep 2025 13:03:27 GMT', 'content-type': 'application/json', 'allow': 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS', 'x-frame-options': 'DENY', 'content-length': '28', 'vary': 'Accept-Language, Origin', 'content-language': 'en', 'strict-transport-security': 'max-age=60; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'referrer-policy': 'same-origin', 'cross-origin-opener-policy': 'same-origin', 'via': '1.1 google', 'alt-svc': 'h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000'}, status_code: 403, body: {'detail': 'Invalid API key'}"
     },
     {
       "node": "PromptDeploymentNode",
-      "error": "headers: {'server': 'gunicorn', 'date': 'Mon, 22 Sep 2025 20:50:26 GMT', 'content-type': 'application/json', 'allow': 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS', 'x-frame-options': 'DENY', 'content-length': '28', 'vary': 'Accept-Language, Origin', 'content-language': 'en', 'strict-transport-security': 'max-age=60; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'referrer-policy': 'same-origin', 'cross-origin-opener-policy': 'same-origin', 'via': '1.1 google', 'alt-svc': 'h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000'}, status_code: 403, body: {'detail': 'Invalid API key'}"
+      "error": "headers: {'server': 'gunicorn', 'date': 'Tue, 23 Sep 2025 13:03:27 GMT', 'content-type': 'application/json', 'allow': 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS', 'x-frame-options': 'DENY', 'content-length': '28', 'vary': 'Accept-Language, Origin', 'content-language': 'en', 'strict-transport-security': 'max-age=60; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'referrer-policy': 'same-origin', 'cross-origin-opener-policy': 'same-origin', 'via': '1.1 google', 'alt-svc': 'h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000'}, status_code: 403, body: {'detail': 'Invalid API key'}"
     },
     {
       "node": "SearchNode",
