@@ -461,30 +461,26 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
 
         self._context = context or WorkflowContext()
         inputs_memo: Dict[str, Any] = inputs.copy() if inputs else {}
-        modified_attributes = {}
         if inputs:
             for input_key, input_value in inputs.items():
-                if "." in input_key:
-                    path_parts = input_key.split(".")
-                    attr_name = path_parts[0]
-                    if hasattr(self.__class__, attr_name):
-                        class_attr = getattr(self.__class__, attr_name)
-                        try:
-                            if isinstance(class_attr, dict):
-                                current_value = class_attr
-                            else:
-                                current_value = resolve_value(class_attr, self.state, path=attr_name)
-                            if isinstance(current_value, dict):
-                                if attr_name not in modified_attributes:
-                                    modified_attributes[attr_name] = current_value.copy()
-                                nested_key = path_parts[1]
-                                modified_attributes[attr_name][nested_key] = input_value
-                        except Exception:
-                            # If resolution fails, skip this nested attribute
-                            pass
+                path_parts = input_key.split(".")
+                dir_path = path_parts[:-1]
+                leaf = path_parts[-1]
+                base: Any = self.__class__
+
+                for attr_name in dir_path:
+                    if hasattr(base, attr_name):
+                        base = getattr(base, attr_name)
+                    elif isinstance(base, dict) and attr_name in base:
+                        base = base[attr_name]
+                    else:
+                        break
+
+                if isinstance(base, dict):
+                    base[leaf] = input_value
                 else:
-                    if hasattr(self.__class__, input_key):
-                        modified_attributes[input_key] = input_value
+                    setattr(base, leaf, input_value)
+
         for descriptor in self.__class__:
             if not descriptor.instance:
                 continue
