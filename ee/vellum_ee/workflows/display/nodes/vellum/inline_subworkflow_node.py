@@ -33,9 +33,16 @@ class BaseInlineSubworkflowNodeDisplay(
 
         node_inputs, workflow_inputs = self._generate_node_and_workflow_inputs(node_id, node, display_context)
 
+        try:
+            subworkflow_class = raise_if_descriptor(node.subworkflow)
+        except AttributeError:
+            raise ValueError("InlineSubworkflowNode requires a subworkflow to be defined for serialization")
+
+        if subworkflow_class is None:
+            raise ValueError("InlineSubworkflowNode requires a subworkflow to be defined for serialization")
         subworkflow_display = get_workflow_display(
             base_display_class=display_context.workflow_display_class,
-            workflow_class=raise_if_descriptor(node.subworkflow),
+            workflow_class=subworkflow_class,
             parent_display_context=display_context,
         )
         workflow_outputs = self._generate_workflow_outputs(node, subworkflow_display.display_context)
@@ -64,7 +71,13 @@ class BaseInlineSubworkflowNodeDisplay(
         node: Type[InlineSubworkflowNode],
         display_context: WorkflowDisplayContext,
     ) -> Tuple[List[NodeInput], List[VellumVariable]]:
-        subworkflow = raise_if_descriptor(node.subworkflow)
+        try:
+            subworkflow = raise_if_descriptor(node.subworkflow)
+        except AttributeError:
+            return [], []
+
+        if subworkflow is None:
+            return [], []
         subworkflow_inputs_class = subworkflow.get_inputs_class()
         subworkflow_inputs = raise_if_descriptor(node.subworkflow_inputs)
 
@@ -117,7 +130,14 @@ class BaseInlineSubworkflowNodeDisplay(
         display_context: WorkflowDisplayContext,
     ) -> List[VellumVariable]:
         workflow_outputs: List[VellumVariable] = []
-        for output_descriptor in raise_if_descriptor(node.subworkflow).Outputs:  # type: ignore[union-attr]
+        try:
+            subworkflow = raise_if_descriptor(node.subworkflow)
+        except AttributeError:
+            return workflow_outputs
+
+        if subworkflow is None:
+            return workflow_outputs
+        for output_descriptor in subworkflow.Outputs:  # type: ignore[union-attr]
             workflow_output_display = display_context.workflow_output_displays[output_descriptor]
             output_type = infer_vellum_variable_type(output_descriptor)
             workflow_outputs.append(
