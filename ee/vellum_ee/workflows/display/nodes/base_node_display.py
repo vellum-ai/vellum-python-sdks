@@ -347,6 +347,9 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
         if default_port in port_displays:
             return port_displays[default_port].id
 
+        if default_port:
+            return self.get_node_port_display(default_port).id
+
         first_port = next((port for port in unadorned_node.Ports), None)
         if not first_port:
             raise ValueError(f"Node {self._node.__name__} must have at least one port.")

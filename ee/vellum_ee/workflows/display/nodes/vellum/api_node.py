@@ -1,8 +1,7 @@
 from uuid import UUID
-from typing import ClassVar, Dict, Generic, Optional, TypeVar, cast
+from typing import ClassVar, Dict, Generic, Optional, TypeVar
 
 from vellum.workflows.nodes.displayable import APINode
-from vellum.workflows.references.output import OutputReference
 from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
@@ -178,11 +177,9 @@ class BaseAPINodeDisplay(BaseNodeDisplay[_APINodeType], Generic[_APINodeType]):
         ]
         inputs.extend(additional_header_inputs)
 
-        _, text_output_display = display_context.global_node_output_displays[cast(OutputReference, node.Outputs.text)]
-        _, json_output_display = display_context.global_node_output_displays[cast(OutputReference, node.Outputs.json)]
-        _, status_code_output_display = display_context.global_node_output_displays[
-            cast(OutputReference, node.Outputs.status_code)
-        ]
+        _, text_output_display = self.get_node_output_display(node.Outputs.text)
+        _, json_output_display = self.get_node_output_display(node.Outputs.json)
+        _, status_code_output_display = self.get_node_output_display(node.Outputs.status_code)
 
         serialized_node: JsonObject = {
             "id": str(node_id),
