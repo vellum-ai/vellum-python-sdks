@@ -61,6 +61,51 @@
       ]
     },
     {
+      "id": "43b3514f-3490-47d6-9b78-bbc4736f0159",
+      "display_data": {
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "comment": {
+          "value": "\n    Used to execute an arbitrary script. This node exists to be backwards compatible with\n    Vellum's Code Execution Node, and for most cases, you should extend from `BaseNode` directly.\n\n    filepath: str - The path to the script to execute.\n    code_inputs: EntityInputsInterface - The inputs for the custom script.\n    runtime: CodeExecutionRuntime = \"PYTHON_3_12\" - The runtime to use for the custom script.\n    packages: Optional[Sequence[CodeExecutionPackage]] = None - The packages to use for the custom script.\n    request_options: Optional[RequestOptions] = None - The request options to use for the custom script.\n    ",
+          "expanded": true
+        }
+      },
+      "base": {
+        "name": "BaseNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
+      },
+      "definition": {
+        "name": "CodeExecutionNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "displayable",
+          "code_execution_node",
+          "node"
+        ]
+      },
+      "trigger": {
+        "id": "fb1b8b44-5e7a-481b-a163-96e7e08219d5",
+        "merge_behavior": "AWAIT_ANY"
+      },
+      "ports": [
+        {
+          "id": "e66138d5-e50d-40d8-bc27-00545ce5e283",
+          "name": "default",
+          "type": "DEFAULT"
+        }
+      ]
+    },
+    {
       "id": "5d3c60ce-7acf-4d8b-a68d-65cc0b561ac5",
       "display_data": {
         "position": {
@@ -137,6 +182,230 @@
         "merge_behavior": "AWAIT_ATTRIBUTES"
       },
       "ports": []
+    },
+    {
+      "id": "55d0f8e9-acbd-4d33-85ba-c7527348f62a",
+      "display_data": {
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "comment": {
+          "value": "\n    Used to execute a Prompt defined inline.\n\n    prompt_inputs: EntityInputsInterface - The inputs for the Prompt\n    ml_model: str - Either the ML Model's UUID or its name.\n    blocks: List[PromptBlock] - The blocks that make up the Prompt\n    functions: Optional[List[FunctionDefinition]] - The functions to include in the Prompt\n    parameters: PromptParameters - The parameters for the Prompt\n    expand_meta: Optional[AdHocExpandMeta] - Expandable execution fields to include in the response\n    request_options: Optional[RequestOptions] - The request options to use for the Prompt Execution\n    ",
+          "expanded": true
+        }
+      },
+      "base": {
+        "name": "BaseInlinePromptNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "displayable",
+          "bases",
+          "inline_prompt_node",
+          "node"
+        ]
+      },
+      "definition": {
+        "name": "InlinePromptNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "displayable",
+          "inline_prompt_node",
+          "node"
+        ]
+      },
+      "trigger": {
+        "id": "d14ff235-9e0a-4496-9fd4-ae4cf39fa518",
+        "merge_behavior": "AWAIT_ANY"
+      },
+      "ports": [
+        {
+          "id": "66943bf3-3c32-42da-9d4f-faab541f4285",
+          "name": "default",
+          "type": "DEFAULT"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "af7d71b0-227c-4957-8234-d1dc76e62554",
+          "name": "json",
+          "type": "JSON",
+          "value": null
+        },
+        {
+          "id": "b283959e-b719-49d2-ab9a-15c804ab52e8",
+          "name": "text",
+          "type": "STRING",
+          "value": null
+        },
+        {
+          "id": "73c02172-2bd1-482d-b7fe-acc67135f7d0",
+          "name": "results",
+          "type": "ARRAY",
+          "value": null
+        }
+      ],
+      "attributes": [
+        {
+          "id": "e2455e77-82ad-460f-8735-10d427d4d448",
+          "name": "functions",
+          "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+              "type": "JSON",
+              "value": null
+            }
+          }
+        },
+        {
+          "id": "bd29a2cd-4965-4741-a3c2-9d0c753efdd9",
+          "name": "parameters",
+          "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+              "type": "JSON",
+              "value": {
+                "stop": [],
+                "temperature": 0.0,
+                "max_tokens": 4096.0,
+                "top_p": 1.0,
+                "top_k": 0.0,
+                "frequency_penalty": 0.0,
+                "presence_penalty": 0.0,
+                "logit_bias": null,
+                "custom_parameters": null
+              }
+            }
+          }
+        },
+        {
+          "id": "76f813d6-0025-4733-9d03-848c49c93d66",
+          "name": "ml_model",
+          "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+              "type": "JSON",
+              "value": null
+            }
+          }
+        },
+        {
+          "id": "1216ae32-e051-4c48-bd7d-69f2a4527f12",
+          "name": "blocks",
+          "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+              "type": "JSON",
+              "value": null
+            }
+          }
+        },
+        {
+          "id": "b66dc0b6-9e4d-4bbb-9b3c-b85e14071de0",
+          "name": "prompt_inputs",
+          "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+              "type": "JSON",
+              "value": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "2dded52f-a449-48fd-b58f-f59801c24bae",
+      "display_data": {
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "comment": {
+          "value": "\n    Used to execute a Metric Definition and surface a float output representing the score.\n\n    metric_definition: Union[UUID, str] - Either the Metric Definition's UUID or its name.\n    metric_inputs: EntityInputsInterface - The inputs for the Metric\n    release_tag: str - The release tag to use for the Metric\n    request_options: Optional[RequestOptions] - The request options to use for the Metric\n    ",
+          "expanded": true
+        }
+      },
+      "base": {
+        "name": "BaseNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
+      },
+      "definition": {
+        "name": "GuardrailNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "displayable",
+          "guardrail_node",
+          "node"
+        ]
+      },
+      "trigger": {
+        "id": "1560db25-a416-4ce6-b175-d7bdfbdb27d8",
+        "merge_behavior": "AWAIT_ANY"
+      },
+      "ports": [
+        {
+          "id": "94bc1403-af9f-4539-8208-1bbafbf09564",
+          "name": "default",
+          "type": "DEFAULT"
+        }
+      ]
+    },
+    {
+      "id": "7426f273-a43d-4448-a2d2-76d0ee0d069c",
+      "display_data": {
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "comment": {
+          "value": "\n    Used to merge the control flow of multiple nodes into a single node. This node exists to be backwards compatible\n    with Vellum's Merge Node, and for most cases, you should extend from `BaseNode.Trigger` directly.\n    ",
+          "expanded": true
+        }
+      },
+      "base": {
+        "name": "BaseNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
+      },
+      "definition": {
+        "name": "MergeNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "displayable",
+          "merge_node",
+          "node"
+        ]
+      },
+      "trigger": {
+        "id": "3a91ba25-0dd0-4bc8-9f6d-c54ea4dccf64",
+        "merge_behavior": "AWAIT_ANY"
+      },
+      "ports": [
+        {
+          "id": "50515fe3-4be8-43b9-8fc5-d52c1250115e",
+          "name": "default",
+          "type": "DEFAULT"
+        }
+      ]
     },
     {
       "id": "16b8d82d-458d-48d9-b57e-a447b19f311a",
@@ -496,36 +765,20 @@
   ],
   "errors": [
     {
-      "node": "CodeExecutionNode",
-      "error": "vellum.workflows.nodes.displayable.code_execution_node.node.CodeExecutionNode.Ports.default"
-    },
-    {
-      "node": "InlinePromptNode",
-      "error": "vellum.workflows.nodes.displayable.inline_prompt_node.node.InlinePromptNode.Ports.default"
-    },
-    {
       "node": "InlineSubworkflowNode",
       "error": "'NoneType' object has no attribute 'get_inputs_class'"
-    },
-    {
-      "node": "GuardrailNode",
-      "error": "vellum.workflows.nodes.displayable.guardrail_node.node.GuardrailNode.Ports.default"
     },
     {
       "node": "MapNode",
       "error": "Expected NodeReference items to have an instance"
     },
     {
-      "node": "MergeNode",
-      "error": "vellum.workflows.nodes.displayable.merge_node.node.MergeNode.Ports.default"
-    },
-    {
       "node": "SubworkflowDeploymentNode",
-      "error": "headers: {'server': 'gunicorn', 'date': 'Tue, 23 Sep 2025 13:03:27 GMT', 'content-type': 'application/json', 'allow': 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS', 'x-frame-options': 'DENY', 'content-length': '28', 'vary': 'Accept-Language, Origin', 'content-language': 'en', 'strict-transport-security': 'max-age=60; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'referrer-policy': 'same-origin', 'cross-origin-opener-policy': 'same-origin', 'via': '1.1 google', 'alt-svc': 'h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000'}, status_code: 403, body: {'detail': 'Invalid API key'}"
+      "error": "headers: {'server': 'gunicorn', 'date': 'Tue, 23 Sep 2025 14:15:03 GMT', 'content-type': 'application/json', 'allow': 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS', 'x-frame-options': 'DENY', 'content-length': '58', 'vary': 'Accept-Language, Origin', 'content-language': 'en', 'strict-transport-security': 'max-age=60; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'referrer-policy': 'same-origin', 'cross-origin-opener-policy': 'same-origin', 'via': '1.1 google', 'alt-svc': 'h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000'}, status_code: 403, body: {'detail': 'Authentication credentials were not provided.'}"
     },
     {
       "node": "PromptDeploymentNode",
-      "error": "headers: {'server': 'gunicorn', 'date': 'Tue, 23 Sep 2025 13:03:27 GMT', 'content-type': 'application/json', 'allow': 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS', 'x-frame-options': 'DENY', 'content-length': '28', 'vary': 'Accept-Language, Origin', 'content-language': 'en', 'strict-transport-security': 'max-age=60; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'referrer-policy': 'same-origin', 'cross-origin-opener-policy': 'same-origin', 'via': '1.1 google', 'alt-svc': 'h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000'}, status_code: 403, body: {'detail': 'Invalid API key'}"
+      "error": "headers: {'server': 'gunicorn', 'date': 'Tue, 23 Sep 2025 14:15:03 GMT', 'content-type': 'application/json', 'allow': 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS', 'x-frame-options': 'DENY', 'content-length': '58', 'vary': 'Accept-Language, Origin', 'content-language': 'en', 'strict-transport-security': 'max-age=60; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'referrer-policy': 'same-origin', 'cross-origin-opener-policy': 'same-origin', 'via': '1.1 google', 'alt-svc': 'h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000'}, status_code: 403, body: {'detail': 'Authentication credentials were not provided.'}"
     },
     {
       "node": "SearchNode",
