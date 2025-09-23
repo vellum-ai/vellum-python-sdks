@@ -786,7 +786,8 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
   }
 
   private getFunction(f: FunctionArgs): FunctionArgs {
-    const inputs = f.definition?.parameters;
+    // @ts-expect-error - FunctionDefinition type doesn't include inputs field but runtime data does
+    const inputs = f.definition?.inputs;
     if (!f.definition || !inputs) {
       return f;
     }
