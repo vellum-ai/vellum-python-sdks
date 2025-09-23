@@ -10,6 +10,7 @@ from vellum import Vellum
 from vellum.client.types.function_definition import FunctionDefinition
 from vellum.workflows.integrations.composio_service import ComposioService
 from vellum.workflows.integrations.mcp_service import MCPService
+from vellum.workflows.integrations.vellum_integration_service import VellumIntegrationService
 from vellum.workflows.types.definition import (
     ComposioToolDefinition,
     DeploymentDefinition,
@@ -95,22 +96,21 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
             defs[annotation.__name__] = {"type": "object", "properties": properties, "required": required}
         return {"$ref": f"#/$defs/{annotation.__name__}"}
 
-    if issubclass(annotation, BaseModel):
+    if inspect.isclass(annotation) and issubclass(annotation, BaseModel):
         if annotation.__name__ not in defs:
             properties = {}
             required = []
-            for field_name, field in annotation.model_fields.items():
-                # Mypy is incorrect here, the `annotation` attribute is defined on `FieldInfo`
-                field_annotation = field.annotation  # type: ignore[attr-defined]
-                properties[field_name] = compile_annotation(field_annotation, defs)
+            for field_name, field_info in annotation.model_fields.items():
+                # field_info is a FieldInfo object which has an annotation attribute
+                properties[field_name] = compile_annotation(field_info.annotation, defs)
 
-                if hasattr(field, "description") and field.description is not None:
-                    properties[field_name]["description"] = field.description  # type: ignore[attr-defined]
+                if field_info.description is not None:
+                    properties[field_name]["description"] = field_info.description
 
-                if field.default is PydanticUndefined:
+                if field_info.default is PydanticUndefined:
                     required.append(field_name)
                 else:
-                    properties[field_name]["default"] = _compile_default_value(field.default)
+                    properties[field_name]["default"] = _compile_default_value(field_info.default)
             defs[annotation.__name__] = {"type": "object", "properties": properties, "required": required}
 
         return {"$ref": f"#/$defs/{annotation.__name__}"}
@@ -326,20 +326,26 @@ def compile_composio_tool_definition(tool_def: ComposioToolDefinition) -> Functi
 def compile_vellum_integration_tool_definition(tool_def: VellumIntegrationToolDefinition) -> FunctionDefinition:
     """Compile a VellumIntegrationToolDefinition into a FunctionDefinition.
 
-    TODO: Implement when VellumIntegrationService is created.
-
     Args:
         tool_def: The VellumIntegrationToolDefinition to compile
 
     Returns:
         FunctionDefinition with tool parameters and description
     """
-    # TODO: Implement when VellumIntegrationService is available
-    # This will eventually use VellumIntegrationService to fetch tool details
-    raise NotImplementedError(
-        "VellumIntegrationToolDefinition compilation coming soon. "
-        "This will be implemented when the VellumIntegrationService is created."
-    )
+    try:
+        service = VellumIntegrationService()
+        tool_details = service.get_tool_definition(
+            integration=tool_def.integration, provider=tool_def.provider.value, tool_name=tool_def.name
+        )
+
+        return FunctionDefinition(
+            name=tool_def.name,
+            description=tool_details.get("description", tool_def.description),
+            parameters=tool_details.get("parameters", {}),
+        )
+    except Exception:
+        # Fallback for service failures
+        return FunctionDefinition(name=tool_def.name, description=tool_def.description, parameters={})
 
 
 def use_tool_inputs(**inputs):
