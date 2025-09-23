@@ -95,7 +95,7 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
             defs[annotation.__name__] = {"type": "object", "properties": properties, "required": required}
         return {"$ref": f"#/$defs/{annotation.__name__}"}
 
-    if issubclass(annotation, BaseModel):
+    if inspect.isclass(annotation) and issubclass(annotation, BaseModel):
         if annotation.__name__ not in defs:
             properties = {}
             required = []
@@ -326,20 +326,28 @@ def compile_composio_tool_definition(tool_def: ComposioToolDefinition) -> Functi
 def compile_vellum_integration_tool_definition(tool_def: VellumIntegrationToolDefinition) -> FunctionDefinition:
     """Compile a VellumIntegrationToolDefinition into a FunctionDefinition.
 
-    TODO: Implement when VellumIntegrationService is created.
-
     Args:
         tool_def: The VellumIntegrationToolDefinition to compile
 
     Returns:
         FunctionDefinition with tool parameters and description
     """
-    # TODO: Implement when VellumIntegrationService is available
-    # This will eventually use VellumIntegrationService to fetch tool details
-    raise NotImplementedError(
-        "VellumIntegrationToolDefinition compilation coming soon. "
-        "This will be implemented when the VellumIntegrationService is created."
-    )
+    try:
+        from vellum.workflows.integrations.vellum_integration_service import VellumIntegrationService
+
+        service = VellumIntegrationService()
+        tool_details = service.get_tool_definition(
+            integration=tool_def.integration, provider=tool_def.provider.value, tool_name=tool_def.name
+        )
+
+        return FunctionDefinition(
+            name=tool_def.name,
+            description=tool_details.get("description", tool_def.description),
+            parameters=tool_details.get("parameters", {}),
+        )
+    except Exception:
+        # Fallback for service failures
+        return FunctionDefinition(name=tool_def.name, description=tool_def.description, parameters={})
 
 
 def use_tool_inputs(**inputs):
