@@ -38,6 +38,7 @@ import {
   GenericNode as GenericNodeType,
   InlineWorkflowFunctionArgs,
   MCPServerFunctionArgs,
+  VellumIntegrationToolFunctionArgs,
   WorkflowDeploymentFunctionArgs,
   WorkflowRawData,
   WorkflowValueDescriptor as WorkflowValueDescriptorType,
@@ -101,6 +102,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
               | WorkflowDeploymentFunctionArgs
               | ComposioToolFunctionArgs
               | MCPServerFunctionArgs
+              | VellumIntegrationToolFunctionArgs
             > = value.value.value;
 
             const codeExecutionFunctions: FunctionArgs[] = [];
@@ -369,13 +371,46 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   );
                   break;
                 }
+                case "INTEGRATION": {
+                  const integrationTool = f as VellumIntegrationToolFunctionArgs;
+
+                  const args = [
+                    python.methodArgument({
+                      name: "provider",
+                      value: python.TypeInstantiation.str(integrationTool.provider),
+                    }),
+                    python.methodArgument({
+                      name: "integration",
+                      value: python.TypeInstantiation.str(integrationTool.integration),
+                    }),
+                    python.methodArgument({
+                      name: "name",
+                      value: python.TypeInstantiation.str(integrationTool.name),
+                    }),
+                    python.methodArgument({
+                      name: "description",
+                      value: python.TypeInstantiation.str(integrationTool.description),
+                    }),
+                  ];
+
+                  functionReferences.push(
+                    python.instantiateClass({
+                      classReference: python.reference({
+                        name: "VellumIntegrationToolDefinition",
+                        modulePath: VELLUM_WORKFLOW_DEFINITION_PATH,
+                      }),
+                      arguments_: args,
+                    })
+                  );
+                  break;
+                }
 
                 default:
                   this.workflowContext.addError(
                     new NodeDefinitionGenerationError(
                       `Unsupported function type: ${JSON.stringify(
                         f
-                      )}. Only CODE_EXECUTION, INLINE_WORKFLOW, WORKFLOW_DEPLOYMENT, and COMPOSIO are supported.`,
+                      )}. Only CODE_EXECUTION, INLINE_WORKFLOW, WORKFLOW_DEPLOYMENT, COMPOSIO, MCP_SERVER, and INTEGRATION are supported.`,
                       "WARNING"
                     )
                   );

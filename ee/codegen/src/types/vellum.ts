@@ -1012,10 +1012,18 @@ export type MCPServerFunctionArgs = {
   api_key_header_value?: string | null;
 };
 
+export type VellumIntegrationToolFunctionArgs = {
+  type: "INTEGRATION";
+  provider: string;
+  integration: string;
+  name: string;
+} & NameDescription;
+
 export type ToolArgs = (
   | FunctionArgs
   | InlineWorkflowFunctionArgs
   | WorkflowDeploymentFunctionArgs
   | ComposioToolFunctionArgs
   | MCPServerFunctionArgs
+  | VellumIntegrationToolFunctionArgs
 )[];

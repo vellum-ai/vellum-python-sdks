@@ -21,7 +21,6 @@ from vellum.workflows.expressions.concat import ConcatExpression
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.integrations.composio_service import ComposioService
 from vellum.workflows.integrations.mcp_service import MCPService
-from vellum.workflows.integrations.vellum_integration_service import VellumIntegrationService
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubworkflowNode
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
