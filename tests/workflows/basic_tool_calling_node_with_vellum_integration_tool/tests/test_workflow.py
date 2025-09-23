@@ -1,6 +1,6 @@
 from unittest import mock
 from uuid import uuid4
-from typing import Iterator, cast
+from typing import Iterator, List, Union, cast
 
 from vellum.client.types.execute_prompt_event import ExecutePromptEvent
 from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
@@ -90,7 +90,7 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
         def generate_prompt_events(*_args, **_kwargs) -> Iterator[ExecutePromptEvent]:
             call_count = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count
             if call_count == 1:
-                outputs = [
+                outputs: List[Union[FunctionCallVellumValue, StringVellumValue]] = [
                     FunctionCallVellumValue(
                         value=FunctionCall(
                             arguments={
@@ -248,7 +248,8 @@ def test_tool_definition_and_function_compilation():
         result = compile_vellum_integration_tool_definition(tool)
         assert result.name == "create_issue"
         assert result.description == "Enhanced description from service"
-        assert "title" in result.parameters["properties"]
+        assert result.parameters is not None and "properties" in result.parameters
+        assert result.parameters["properties"] is not None and "title" in result.parameters["properties"]
         mock_service_instance.get_tool_definition.assert_called_once_with(
             integration="GITHUB", provider="COMPOSIO", tool_name="create_issue"
         )
@@ -301,5 +302,6 @@ def test_workflow_prompt_structure_with_function_definition(vellum_adhoc_prompt_
         assert isinstance(function_def, FunctionDefinition)
         assert function_def.name == "create_issue"
         assert function_def.description == "Create a new issue in a GitHub repository"
-        assert "title" in function_def.parameters["properties"]
-        assert "body" in function_def.parameters["properties"]
+        assert function_def.parameters is not None and "properties" in function_def.parameters
+        assert function_def.parameters["properties"] is not None and "title" in function_def.parameters["properties"]
+        assert function_def.parameters["properties"] is not None and "body" in function_def.parameters["properties"]

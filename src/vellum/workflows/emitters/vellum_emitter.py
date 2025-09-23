@@ -126,7 +126,10 @@ class VellumEmitter(BaseWorkflowEmitter):
             return
 
         client = self._context.vellum_client
-        request_options = RequestOptions(timeout_in_seconds=self._timeout, max_retries=self._max_retries)
+        if self._timeout is not None:
+            request_options = RequestOptions(timeout_in_seconds=int(self._timeout), max_retries=self._max_retries)
+        else:
+            request_options = RequestOptions(max_retries=self._max_retries)
 
         client.events.create(
             # The API accepts a ClientWorkflowEvent but our SDK emits an SDKWorkflowEvent. These shapes are
