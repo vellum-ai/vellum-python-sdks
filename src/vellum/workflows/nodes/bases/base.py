@@ -439,6 +439,7 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
         *,
         state: Optional[StateType] = None,
         context: Optional[WorkflowContext] = None,
+        inputs: Optional[Dict[str, Any]] = None,
     ):
         if state:
             self.state = state
@@ -459,7 +460,27 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
             self.state = state_type()
 
         self._context = context or WorkflowContext()
-        inputs: Dict[str, Any] = {}
+        inputs_memo: Dict[str, Any] = inputs.copy() if inputs else {}
+        if inputs:
+            for input_key, input_value in inputs.items():
+                path_parts = input_key.split(".")
+                dir_path = path_parts[:-1]
+                leaf = path_parts[-1]
+                base: Any = self.__class__
+
+                for attr_name in dir_path:
+                    if hasattr(base, attr_name):
+                        base = getattr(base, attr_name)
+                    elif isinstance(base, dict) and attr_name in base:
+                        base = base[attr_name]
+                    else:
+                        break
+
+                if isinstance(base, dict):
+                    base[leaf] = input_value
+                else:
+                    setattr(base, leaf, input_value)
+
         for descriptor in self.__class__:
             if not descriptor.instance:
                 continue
@@ -468,12 +489,12 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
                 # We don't want to resolve attributes that are _meant_ to be descriptors
                 continue
 
-            resolved_value = resolve_value(descriptor.instance, self.state, path=descriptor.name, memo=inputs)
+            resolved_value = resolve_value(descriptor.instance, self.state, path=descriptor.name, memo=inputs_memo)
             setattr(self, descriptor.name, resolved_value)
 
         # We only want to store the attributes that were actually set as inputs, not every attribute that exists.
         all_inputs = {}
-        for key, value in inputs.items():
+        for key, value in inputs_memo.items():
             path_parts = key.split(".")
             node_attribute_descriptor = getattr(self.__class__, path_parts[0])
             inputs_key = reduce(lambda acc, part: acc[part], path_parts[1:], node_attribute_descriptor)
