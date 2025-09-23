@@ -1,8 +1,8 @@
 from uuid import UUID
-from typing import ClassVar, Dict, Generic, Optional, TypeVar, cast
+from typing import ClassVar, Dict, Generic, Optional, TypeVar
 
 from vellum.workflows.nodes.displayable import APINode
-from vellum.workflows.references.output import OutputReference
+from vellum.workflows.nodes.utils import get_unadorned_node
 from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
@@ -178,9 +178,9 @@ class BaseAPINodeDisplay(BaseNodeDisplay[_APINodeType], Generic[_APINodeType]):
         ]
         inputs.extend(additional_header_inputs)
 
-        _, text_output_display = self.get_node_output_display(cast(OutputReference, node.Outputs.text))
-        _, json_output_display = self.get_node_output_display(cast(OutputReference, node.Outputs.json))
-        _, status_code_output_display = self.get_node_output_display(cast(OutputReference, node.Outputs.status_code))
+        _, text_output_display = self.get_node_output_display(node.Outputs.text)
+        _, json_output_display = self.get_node_output_display(node.Outputs.json)
+        _, status_code_output_display = self.get_node_output_display(node.Outputs.status_code)
 
         serialized_node: JsonObject = {
             "id": str(node_id),
@@ -189,7 +189,9 @@ class BaseAPINodeDisplay(BaseNodeDisplay[_APINodeType], Generic[_APINodeType]):
             "data": {
                 "label": self.label,
                 "error_output_id": str(error_output_id) if error_output_id else None,
-                "source_handle_id": str(self.get_source_handle_id({})),
+                "source_handle_id": str(
+                    self.get_source_handle_id(self._get_port_displays_with_fallback(display_context))
+                ),
                 "target_handle_id": str(self.get_target_handle_id()),
                 "url_input_id": url_node_input.id,
                 "method_input_id": method_node_input.id,
@@ -219,3 +221,13 @@ class BaseAPINodeDisplay(BaseNodeDisplay[_APINodeType], Generic[_APINodeType]):
             serialized_node["attributes"] = attributes
 
         return serialized_node
+
+    def _get_port_displays_with_fallback(self, display_context: WorkflowDisplayContext):
+        """Get port displays with fallback logic for missing ports."""
+        port_displays = display_context.port_displays.copy()
+        unadorned_node = get_unadorned_node(self._node)
+        default_port = next((port for port in unadorned_node.Ports if port.default), None)
+        if default_port and default_port not in port_displays:
+            port_display = self.get_node_port_display(default_port)
+            port_displays[default_port] = port_display
+        return port_displays

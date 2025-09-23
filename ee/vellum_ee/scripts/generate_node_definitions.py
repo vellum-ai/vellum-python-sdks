@@ -41,7 +41,6 @@ def serialize_node_definition(
     try:
         display_class = get_node_display_class(node_class)
         display_instance = display_class()
-
         definition = display_instance.serialize(display_context)
         return clean_node_definition(definition)
     except Exception as e:
