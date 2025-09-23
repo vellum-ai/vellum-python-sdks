@@ -22,7 +22,7 @@ from vellum.workflows.utils.vellum_variables import vellum_variable_type_to_open
 if TYPE_CHECKING:
     from vellum.workflows.workflows.base import BaseWorkflow
 
-type_map = {
+type_map: dict[Any, str] = {
     str: "string",
     int: "integer",
     float: "number",
@@ -32,7 +32,12 @@ type_map = {
     None: "null",
     type(None): "null",
     inspect._empty: "null",
+    "None": "null",
 }
+
+for k, v in list(type_map.items()):
+    if isinstance(k, type):
+        type_map[k.__name__] = v
 
 
 def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
