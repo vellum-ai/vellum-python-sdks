@@ -7,6 +7,8 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes import InlineSubworkflowNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.types.core import JsonObject
+from vellum.workflows.workflows.base import BaseWorkflow
+from vellum_ee.workflows.display.exceptions import NodeValidationError
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
@@ -36,10 +38,16 @@ class BaseInlineSubworkflowNodeDisplay(
         try:
             subworkflow_class = raise_if_descriptor(node.subworkflow)
         except AttributeError:
-            raise ValueError("InlineSubworkflowNode requires a subworkflow to be defined for serialization")
+            display_context.add_error(
+                NodeValidationError("InlineSubworkflowNode requires a subworkflow to be defined", node.__name__)
+            )
+            subworkflow_class = BaseWorkflow
 
         if subworkflow_class is None:
-            raise ValueError("InlineSubworkflowNode requires a subworkflow to be defined for serialization")
+            display_context.add_error(
+                NodeValidationError("InlineSubworkflowNode requires a subworkflow to be defined", node.__name__)
+            )
+            subworkflow_class = BaseWorkflow
         subworkflow_display = get_workflow_display(
             base_display_class=display_context.workflow_display_class,
             workflow_class=subworkflow_class,
@@ -74,10 +82,10 @@ class BaseInlineSubworkflowNodeDisplay(
         try:
             subworkflow = raise_if_descriptor(node.subworkflow)
         except AttributeError:
-            return [], []
+            subworkflow = BaseWorkflow
 
         if subworkflow is None:
-            return [], []
+            subworkflow = BaseWorkflow
         subworkflow_inputs_class = subworkflow.get_inputs_class()
         subworkflow_inputs = raise_if_descriptor(node.subworkflow_inputs)
 
@@ -133,10 +141,10 @@ class BaseInlineSubworkflowNodeDisplay(
         try:
             subworkflow = raise_if_descriptor(node.subworkflow)
         except AttributeError:
-            return workflow_outputs
+            subworkflow = BaseWorkflow
 
         if subworkflow is None:
-            return workflow_outputs
+            subworkflow = BaseWorkflow
         for output_descriptor in subworkflow.Outputs:  # type: ignore[union-attr]
             workflow_output_display = display_context.workflow_output_displays[output_descriptor]
             output_type = infer_vellum_variable_type(output_descriptor)
