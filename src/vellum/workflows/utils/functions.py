@@ -96,21 +96,22 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
             defs[annotation.__name__] = {"type": "object", "properties": properties, "required": required}
         return {"$ref": f"#/$defs/{annotation.__name__}"}
 
-    if inspect.isclass(annotation) and issubclass(annotation, BaseModel):
+    if issubclass(annotation, BaseModel):
         if annotation.__name__ not in defs:
             properties = {}
             required = []
-            for field_name, field_info in annotation.model_fields.items():
-                # field_info is a FieldInfo object which has an annotation attribute
-                properties[field_name] = compile_annotation(field_info.annotation, defs)
+            for field_name, field in annotation.model_fields.items():
+                # Mypy is incorrect here, the `annotation` attribute is defined on `FieldInfo`
+                field_annotation = field.annotation  # type: ignore[attr-defined]
+                properties[field_name] = compile_annotation(field_annotation, defs)
 
-                if field_info.description is not None:
-                    properties[field_name]["description"] = field_info.description
+                if hasattr(field, "description") and field.description is not None:
+                    properties[field_name]["description"] = field.description  # type: ignore[attr-defined]
 
-                if field_info.default is PydanticUndefined:
+                if field.default is PydanticUndefined:
                     required.append(field_name)
                 else:
-                    properties[field_name]["default"] = _compile_default_value(field_info.default)
+                    properties[field_name]["default"] = _compile_default_value(field.default)
             defs[annotation.__name__] = {"type": "object", "properties": properties, "required": required}
 
         return {"$ref": f"#/$defs/{annotation.__name__}"}
@@ -326,6 +327,9 @@ def compile_composio_tool_definition(tool_def: ComposioToolDefinition) -> Functi
 def compile_vellum_integration_tool_definition(tool_def: VellumIntegrationToolDefinition) -> FunctionDefinition:
     """Compile a VellumIntegrationToolDefinition into a FunctionDefinition.
 
+    This function fetches the full tool definition from Vellum's integration API,
+    including parameters that are needed for function calling.
+
     Args:
         tool_def: The VellumIntegrationToolDefinition to compile
 
@@ -333,19 +337,26 @@ def compile_vellum_integration_tool_definition(tool_def: VellumIntegrationToolDe
         FunctionDefinition with tool parameters and description
     """
     try:
-        service = VellumIntegrationService()
-        tool_details = service.get_tool_definition(
-            integration=tool_def.integration, provider=tool_def.provider.value, tool_name=tool_def.name
+        vellum_service = VellumIntegrationService()
+        # Fetch the full tool definition from the API to get parameters
+        response = vellum_service._client.integrations.retrieve_integration_tool_definition(
+            integration=tool_def.integration,
+            provider=str(tool_def.provider),
+            tool_name=tool_def.name,
         )
 
         return FunctionDefinition(
             name=tool_def.name,
-            description=tool_details.get("description", tool_def.description),
-            parameters=tool_details.get("parameters", {}),
+            description=response.description,
+            parameters=getattr(response, "parameters", {}),
         )
     except Exception:
-        # Fallback for service failures
-        return FunctionDefinition(name=tool_def.name, description=tool_def.description, parameters={})
+        # If fetching fails, return basic function definition without parameters
+        return FunctionDefinition(
+            name=tool_def.name,
+            description=tool_def.description,
+            parameters={},
+        )
 
 
 def use_tool_inputs(**inputs):

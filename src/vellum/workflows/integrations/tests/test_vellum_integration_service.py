@@ -41,8 +41,8 @@ def test_vellum_integration_service_get_tool_definition_success(vellum_client):
     assert result.name == "GITHUB_CREATE_AN_ISSUE"
     assert result.description == "Create a new issue in a GitHub repository"
     assert result.provider == VellumIntegrationProviderType.COMPOSIO
-    assert "properties" in result.parameters
-    assert "repo" in result.parameters["properties"]
+    # Parameters should not be included in the tool definition itself
+    assert not hasattr(result, "parameters")
 
     # AND the API should have been called with the correct parameters
     mock_client.integrations.retrieve_integration_tool_definition.assert_called_once_with(

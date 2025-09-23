@@ -2,8 +2,8 @@ from typing import Any, Dict, Optional
 
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
-from vellum.workflows.vellum_client import create_vellum_client
 from vellum.workflows.types.definition import VellumIntegrationToolDefinition
+from vellum.workflows.vellum_client import create_vellum_client
 
 
 class VellumIntegrationService:
@@ -32,7 +32,7 @@ class VellumIntegrationService:
             tool_name: The tool's unique name as specified by the provider
 
         Returns:
-            Dict containing the tool definition with name, description, and parameters
+            VellumIntegrationToolDefinition containing the tool definition
 
         Raises:
             NodeException: If the tool definition cannot be retrieved
@@ -49,7 +49,6 @@ class VellumIntegrationService:
                 integration=integration,
                 name=response.name,
                 description=response.description,
-                parameters=getattr(response, "parameters", {}),
             )
         except Exception as e:
             error_message = f"Failed to retrieve tool definition for {tool_name}: {str(e)}"
