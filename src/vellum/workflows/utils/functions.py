@@ -10,6 +10,7 @@ from vellum import Vellum
 from vellum.client.types.function_definition import FunctionDefinition
 from vellum.workflows.integrations.composio_service import ComposioService
 from vellum.workflows.integrations.mcp_service import MCPService
+from vellum.workflows.integrations.vellum_integration_service import VellumIntegrationService
 from vellum.workflows.types.definition import (
     ComposioToolDefinition,
     DeploymentDefinition,
@@ -333,8 +334,6 @@ def compile_vellum_integration_tool_definition(tool_def: VellumIntegrationToolDe
         FunctionDefinition with tool parameters and description
     """
     try:
-        from vellum.workflows.integrations.vellum_integration_service import VellumIntegrationService
-
         service = VellumIntegrationService()
         tool_details = service.get_tool_definition(
             integration=tool_def.integration, provider=tool_def.provider.value, tool_name=tool_def.name
