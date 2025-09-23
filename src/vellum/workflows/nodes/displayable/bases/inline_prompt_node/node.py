@@ -57,6 +57,7 @@ from vellum.workflows.utils.functions import (
     compile_function_definition,
     compile_inline_workflow_function_definition,
     compile_mcp_tool_definition,
+    compile_vellum_integration_tool_definition,
     compile_workflow_deployment_function_definition,
     get_mcp_tool_name,
 )
@@ -151,11 +152,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                 elif isinstance(function, ComposioToolDefinition):
                     normalized_functions.append(compile_composio_tool_definition(function))
                 elif isinstance(function, VellumIntegrationToolDefinition):
-                    # TODO: Implement compile_vellum_integration_tool_definition
-                    raise NotImplementedError(
-                        "VellumIntegrationToolDefinition support coming soon. "
-                        "This will be implemented when compile_vellum_integration_tool_definition is created."
-                    )
+                    normalized_functions.append(compile_vellum_integration_tool_definition(function))
                 elif isinstance(function, MCPServer):
                     tool_definitions = compile_mcp_tool_definition(function)
                     for tool_def in tool_definitions:

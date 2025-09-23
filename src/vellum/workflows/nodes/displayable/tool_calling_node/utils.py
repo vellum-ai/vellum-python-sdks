@@ -240,6 +240,38 @@ class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
         yield from []
 
 
+class VellumIntegrationNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
+    """Node that executes a Vellum Integration tool with function call output."""
+
+    vellum_integration_tool: VellumIntegrationToolDefinition
+
+    def run(self) -> Iterator[BaseOutput]:
+        # Extract arguments from function call
+        arguments = self._extract_function_arguments()
+
+        try:
+            # Execute using VellumIntegrationService
+            from vellum.workflows.integrations.vellum_integration_service import VellumIntegrationService
+
+            vellum_integration_service = VellumIntegrationService()
+            result = vellum_integration_service.execute_tool(
+                provider=self.vellum_integration_tool.provider,
+                integration=self.vellum_integration_tool.integration,
+                action=self.vellum_integration_tool.name,
+                arguments=arguments,
+            )
+        except Exception as e:
+            raise NodeException(
+                message=f"Error executing Vellum Integration tool '{self.vellum_integration_tool.name}': {str(e)}",
+                code=WorkflowErrorCode.NODE_EXECUTION,
+            )
+
+        # Add result to chat history
+        self._add_function_result_to_chat_history(result, self.state)
+
+        yield from []
+
+
 class MCPNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
     """Node that executes an MCP tool with function call output."""
 
@@ -465,11 +497,16 @@ def create_function_node(
         )
         return node
     elif isinstance(function, VellumIntegrationToolDefinition):
-        # TODO: Implement VellumIntegrationNode
-        raise NotImplementedError(
-            "VellumIntegrationToolDefinition support coming soon. "
-            "This will be implemented when the VellumIntegrationService is created."
+        node = type(
+            f"VellumIntegrationNode_{function.name}",
+            (VellumIntegrationNode,),
+            {
+                "vellum_integration_tool": function,
+                "function_call_output": tool_prompt_node.Outputs.results,
+                "__module__": __name__,
+            },
         )
+        return node
     elif is_workflow_class(function):
         function.is_dynamic = True
         node = type(
