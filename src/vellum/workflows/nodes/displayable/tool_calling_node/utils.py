@@ -57,8 +57,13 @@ class FunctionCallNodeMixin:
         current_index = getattr(self, "state").current_prompt_output_index
         if self.function_call_output and len(self.function_call_output) > current_index:
             function_call = self.function_call_output[current_index]
-            if function_call.type == "FUNCTION_CALL" and function_call.value is not None:
-                return function_call.value.arguments or {}
+            if function_call.type == "FUNCTION_CALL":
+                # Handle case where arguments are directly on the function call
+                if hasattr(function_call, "arguments") and function_call.arguments is not None:
+                    return function_call.arguments
+                # Handle case where arguments are on the value
+                elif function_call.value is not None:
+                    return function_call.value.arguments or {}
         return {}
 
     def _extract_function_call_id(self) -> Optional[str]:
@@ -66,8 +71,13 @@ class FunctionCallNodeMixin:
         current_index = getattr(self, "state").current_prompt_output_index
         if self.function_call_output and len(self.function_call_output) > current_index:
             function_call = self.function_call_output[current_index]
-            if function_call.type == "FUNCTION_CALL" and function_call.value is not None:
-                return function_call.value.id
+            if function_call.type == "FUNCTION_CALL":
+                # Handle case where id is directly on the function call
+                if hasattr(function_call, "id") and function_call.id is not None:
+                    return function_call.id
+                # Handle case where id is on the value
+                elif function_call.value is not None:
+                    return function_call.value.id
         return None
 
     def _add_function_result_to_chat_history(self, result: Any, state: ToolCallingState) -> None:
@@ -231,6 +241,38 @@ class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
         except Exception as e:
             raise NodeException(
                 message=f"Error executing Composio tool '{self.composio_tool.action}': {str(e)}",
+                code=WorkflowErrorCode.NODE_EXECUTION,
+            )
+
+        # Add result to chat history
+        self._add_function_result_to_chat_history(result, self.state)
+
+        yield from []
+
+
+class VellumIntegrationNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
+    """Node that executes a Vellum Integration tool with function call output."""
+
+    vellum_integration_tool: VellumIntegrationToolDefinition
+
+    def run(self) -> Iterator[BaseOutput]:
+        # Extract arguments from function call
+        arguments = self._extract_function_arguments()
+
+        try:
+            # Execute using VellumIntegrationService
+            from vellum.workflows.integrations.vellum_integration_service import VellumIntegrationService
+
+            vellum_integration_service = VellumIntegrationService()
+            result = vellum_integration_service.execute_integration_tool(
+                provider=self.vellum_integration_tool.provider,
+                integration=self.vellum_integration_tool.integration,
+                name=self.vellum_integration_tool.name,
+                arguments=arguments,
+            )
+        except Exception as e:
+            raise NodeException(
+                message=f"Error executing Vellum Integration tool '{self.vellum_integration_tool.name}': {str(e)}",
                 code=WorkflowErrorCode.NODE_EXECUTION,
             )
 
@@ -465,11 +507,16 @@ def create_function_node(
         )
         return node
     elif isinstance(function, VellumIntegrationToolDefinition):
-        # TODO: Implement VellumIntegrationNode
-        raise NotImplementedError(
-            "VellumIntegrationToolDefinition support coming soon. "
-            "This will be implemented when the VellumIntegrationService is created."
+        node = type(
+            f"VellumIntegrationNode_{function.name}",
+            (VellumIntegrationNode,),
+            {
+                "vellum_integration_tool": function,
+                "function_call_output": tool_prompt_node.Outputs.results,
+                "__module__": __name__,
+            },
         )
+        return node
     elif is_workflow_class(function):
         function.is_dynamic = True
         node = type(

@@ -22,7 +22,7 @@ from vellum.workflows.utils.vellum_variables import vellum_variable_type_to_open
 if TYPE_CHECKING:
     from vellum.workflows.workflows.base import BaseWorkflow
 
-type_map: dict[Any, str] = {
+type_map = {
     str: "string",
     int: "integer",
     float: "number",
@@ -32,12 +32,7 @@ type_map: dict[Any, str] = {
     None: "null",
     type(None): "null",
     inspect._empty: "null",
-    "None": "null",
 }
-
-for k, v in list(type_map.items()):
-    if isinstance(k, type):
-        type_map[k.__name__] = v
 
 
 def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
@@ -326,20 +321,33 @@ def compile_composio_tool_definition(tool_def: ComposioToolDefinition) -> Functi
 def compile_vellum_integration_tool_definition(tool_def: VellumIntegrationToolDefinition) -> FunctionDefinition:
     """Compile a VellumIntegrationToolDefinition into a FunctionDefinition.
 
-    TODO: Implement when VellumIntegrationService is created.
-
     Args:
         tool_def: The VellumIntegrationToolDefinition to compile
 
     Returns:
         FunctionDefinition with tool parameters and description
     """
-    # TODO: Implement when VellumIntegrationService is available
-    # This will eventually use VellumIntegrationService to fetch tool details
-    raise NotImplementedError(
-        "VellumIntegrationToolDefinition compilation coming soon. "
-        "This will be implemented when the VellumIntegrationService is created."
-    )
+    from vellum.workflows.integrations.vellum_integration_service import VellumIntegrationService
+
+    try:
+        vellum_integration_service = VellumIntegrationService()
+        tool_details = vellum_integration_service.retrieve_integration_tool_definition(
+            provider=tool_def.provider, integration=tool_def.integration, name=tool_def.name
+        )
+
+        # Create a FunctionDefinition from the tool details
+        return FunctionDefinition(
+            name=tool_def.name,
+            description=tool_details.get("description", tool_def.description),
+            parameters=tool_details.get("input_parameters", {}),
+        )
+    except Exception:
+        # If hydration fails, return basic function definition
+        return FunctionDefinition(
+            name=tool_def.name,
+            description=tool_def.description,
+            parameters={},
+        )
 
 
 def use_tool_inputs(**inputs):
