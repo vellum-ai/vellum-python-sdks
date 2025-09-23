@@ -10,7 +10,6 @@ from .vellum_sdk_error_code_enum import VellumSdkErrorCodeEnum
 class VellumSdkError(UniversalBaseModel):
     message: str
     code: VellumSdkErrorCodeEnum
-    raw_data: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

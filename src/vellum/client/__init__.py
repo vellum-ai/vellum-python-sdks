@@ -15,8 +15,8 @@ from .resources.deployments.client import AsyncDeploymentsClient, DeploymentsCli
 from .resources.document_indexes.client import AsyncDocumentIndexesClient, DocumentIndexesClient
 from .resources.documents.client import AsyncDocumentsClient, DocumentsClient
 from .resources.events.client import AsyncEventsClient, EventsClient
-from .resources.folder_entities.client import AsyncFolderEntitiesClient, FolderEntitiesClient
 from .resources.integrations.client import AsyncIntegrationsClient, IntegrationsClient
+from .resources.folder_entities.client import AsyncFolderEntitiesClient, FolderEntitiesClient
 from .resources.metric_definitions.client import AsyncMetricDefinitionsClient, MetricDefinitionsClient
 from .resources.ml_models.client import AsyncMlModelsClient, MlModelsClient
 from .resources.organizations.client import AsyncOrganizationsClient, OrganizationsClient
@@ -122,16 +122,20 @@ class Vellum:
             api_version=api_version,
             api_key=api_key,
             headers=headers,
-            httpx_client=httpx_client
-            if httpx_client is not None
-            else httpx.Client(timeout=_defaulted_timeout, follow_redirects=follow_redirects)
-            if follow_redirects is not None
-            else httpx.Client(timeout=_defaulted_timeout),
+            httpx_client=(
+                httpx_client
+                if httpx_client is not None
+                else (
+                    httpx.Client(timeout=_defaulted_timeout, follow_redirects=follow_redirects)
+                    if follow_redirects is not None
+                    else httpx.Client(timeout=_defaulted_timeout)
+                )
+            ),
             timeout=_defaulted_timeout,
         )
         self._raw_client = RawVellum(client_wrapper=self._client_wrapper)
-        self.integrations = IntegrationsClient(client_wrapper=self._client_wrapper)
         self.events = EventsClient(client_wrapper=self._client_wrapper)
+        self.integrations = IntegrationsClient(client_wrapper=self._client_wrapper)
         self.ad_hoc = AdHocClient(client_wrapper=self._client_wrapper)
         self.container_images = ContainerImagesClient(client_wrapper=self._client_wrapper)
         self.deployments = DeploymentsClient(client_wrapper=self._client_wrapper)
@@ -997,16 +1001,20 @@ class AsyncVellum:
             api_version=api_version,
             api_key=api_key,
             headers=headers,
-            httpx_client=httpx_client
-            if httpx_client is not None
-            else httpx.AsyncClient(timeout=_defaulted_timeout, follow_redirects=follow_redirects)
-            if follow_redirects is not None
-            else httpx.AsyncClient(timeout=_defaulted_timeout),
+            httpx_client=(
+                httpx_client
+                if httpx_client is not None
+                else (
+                    httpx.AsyncClient(timeout=_defaulted_timeout, follow_redirects=follow_redirects)
+                    if follow_redirects is not None
+                    else httpx.AsyncClient(timeout=_defaulted_timeout)
+                )
+            ),
             timeout=_defaulted_timeout,
         )
         self._raw_client = AsyncRawVellum(client_wrapper=self._client_wrapper)
-        self.integrations = AsyncIntegrationsClient(client_wrapper=self._client_wrapper)
         self.events = AsyncEventsClient(client_wrapper=self._client_wrapper)
+        self.integrations = AsyncIntegrationsClient(client_wrapper=self._client_wrapper)
         self.ad_hoc = AsyncAdHocClient(client_wrapper=self._client_wrapper)
         self.container_images = AsyncContainerImagesClient(client_wrapper=self._client_wrapper)
         self.deployments = AsyncDeploymentsClient(client_wrapper=self._client_wrapper)
