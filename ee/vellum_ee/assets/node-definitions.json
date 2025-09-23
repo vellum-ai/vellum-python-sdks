@@ -318,6 +318,51 @@
       ]
     },
     {
+      "id": "9d62e15c-a640-4a65-b52c-ce0cbaa23a71",
+      "display_data": {
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "comment": {
+          "value": "\n    Used to execute a Subworkflow defined inline.\n\n    subworkflow: Type[\"BaseWorkflow[InputsType, InnerStateType]\"] - The Subworkflow to execute\n    subworkflow_inputs: ClassVar[EntityInputsInterface] = {}\n    ",
+          "expanded": true
+        }
+      },
+      "base": {
+        "name": "BaseNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
+      },
+      "definition": {
+        "name": "InlineSubworkflowNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "core",
+          "inline_subworkflow_node",
+          "node"
+        ]
+      },
+      "trigger": {
+        "id": "d7c92c2f-d761-43e7-a7e6-34fd74b3b8b3",
+        "merge_behavior": "AWAIT_ATTRIBUTES"
+      },
+      "ports": [
+        {
+          "id": "bb1e4a4f-60e7-4519-b127-80183008a3f7",
+          "name": "default",
+          "type": "DEFAULT"
+        }
+      ]
+    },
+    {
       "id": "2dded52f-a449-48fd-b58f-f59801c24bae",
       "display_data": {
         "position": {
@@ -765,20 +810,16 @@
   ],
   "errors": [
     {
-      "node": "InlineSubworkflowNode",
-      "error": "'NoneType' object has no attribute 'get_inputs_class'"
-    },
-    {
       "node": "MapNode",
       "error": "Expected NodeReference items to have an instance"
     },
     {
       "node": "SubworkflowDeploymentNode",
-      "error": "headers: {'server': 'gunicorn', 'date': 'Tue, 23 Sep 2025 14:15:03 GMT', 'content-type': 'application/json', 'allow': 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS', 'x-frame-options': 'DENY', 'content-length': '58', 'vary': 'Accept-Language, Origin', 'content-language': 'en', 'strict-transport-security': 'max-age=60; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'referrer-policy': 'same-origin', 'cross-origin-opener-policy': 'same-origin', 'via': '1.1 google', 'alt-svc': 'h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000'}, status_code: 403, body: {'detail': 'Authentication credentials were not provided.'}"
+      "error": "headers: {'server': 'gunicorn', 'date': 'Tue, 23 Sep 2025 21:40:16 GMT', 'content-type': 'application/json', 'allow': 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS', 'x-frame-options': 'DENY', 'content-length': '58', 'vary': 'Accept-Language, Origin', 'content-language': 'en', 'strict-transport-security': 'max-age=60; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'referrer-policy': 'same-origin', 'cross-origin-opener-policy': 'same-origin', 'via': '1.1 google', 'alt-svc': 'h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000'}, status_code: 403, body: {'detail': 'Authentication credentials were not provided.'}"
     },
     {
       "node": "PromptDeploymentNode",
-      "error": "headers: {'server': 'gunicorn', 'date': 'Tue, 23 Sep 2025 14:15:03 GMT', 'content-type': 'application/json', 'allow': 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS', 'x-frame-options': 'DENY', 'content-length': '58', 'vary': 'Accept-Language, Origin', 'content-language': 'en', 'strict-transport-security': 'max-age=60; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'referrer-policy': 'same-origin', 'cross-origin-opener-policy': 'same-origin', 'via': '1.1 google', 'alt-svc': 'h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000'}, status_code: 403, body: {'detail': 'Authentication credentials were not provided.'}"
+      "error": "headers: {'server': 'gunicorn', 'date': 'Tue, 23 Sep 2025 21:40:16 GMT', 'content-type': 'application/json', 'allow': 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS', 'x-frame-options': 'DENY', 'content-length': '58', 'vary': 'Accept-Language, Origin', 'content-language': 'en', 'strict-transport-security': 'max-age=60; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'referrer-policy': 'same-origin', 'cross-origin-opener-policy': 'same-origin', 'via': '1.1 google', 'alt-svc': 'h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000'}, status_code: 403, body: {'detail': 'Authentication credentials were not provided.'}"
     },
     {
       "node": "SearchNode",

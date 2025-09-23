@@ -130,6 +130,11 @@ class InlineSubworkflowNode(
                 )
 
     def _compile_subworkflow_inputs(self) -> InputsType:
+        if self.subworkflow is None:
+            raise NodeException(
+                message="InlineSubworkflowNode requires a subworkflow to be defined",
+                code=WorkflowErrorCode.INVALID_INPUTS,
+            )
         inputs_class = self.subworkflow.get_inputs_class()
         try:
             if self.subworkflow_inputs is undefined:

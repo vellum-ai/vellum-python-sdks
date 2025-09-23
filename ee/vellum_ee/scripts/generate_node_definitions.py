@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 def create_display_context_with_client() -> WorkflowDisplayContext:
     """Create a WorkflowDisplayContext with Vellum client for serialization."""
     client = create_vellum_client()
-    return WorkflowDisplayContext(client=client)
+    return WorkflowDisplayContext(client=client, dry_run=True)
 
 
 def get_all_displayable_node_classes() -> List[Type[BaseNode]]:

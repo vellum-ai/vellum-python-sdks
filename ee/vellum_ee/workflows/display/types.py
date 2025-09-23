@@ -51,12 +51,12 @@ class WorkflowDisplayContext:
     workflow_output_displays: WorkflowOutputDisplays = field(default_factory=dict)
     edge_displays: EdgeDisplays = field(default_factory=dict)
     port_displays: PortDisplays = field(default_factory=dict)
+    dry_run: bool = False
     _errors: List[Exception] = field(default_factory=list)
     _invalid_nodes: List[Type[BaseNode]] = field(default_factory=list)
-    _dry_run: bool = False
 
     def add_error(self, error: Exception, node: Optional[Type[BaseNode]] = None) -> None:
-        if self._dry_run:
+        if self.dry_run:
             self._errors.append(error)
             return
 
