@@ -565,10 +565,18 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         # https://app.shortcut.com/vellum/story/4327
         pass
 
-    def run_node(self, node: Type[BaseNode]) -> Generator[NodeEvent, None, None]:
+    def run_node(
+        self, node: Type[BaseNode], *, initial_attributes: Optional[Dict[str, Any]] = None
+    ) -> Generator[NodeEvent, None, None]:
         runner = WorkflowRunner(self)
         span_id = uuid4()
-        return runner.run_node(node=node(state=self.get_default_state(), context=self._context), span_id=span_id)
+        node_instance = node(state=self.get_default_state(), context=self._context)
+
+        if initial_attributes:
+            for attr_name, attr_value in initial_attributes.items():
+                setattr(node_instance, attr_name, attr_value)
+
+        return runner.run_node(node=node_instance, span_id=span_id)
 
     @classmethod
     @lru_cache
