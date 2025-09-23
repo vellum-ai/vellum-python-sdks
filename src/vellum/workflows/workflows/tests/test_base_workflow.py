@@ -740,8 +740,8 @@ def test_base_workflow__run_node_emits_correct_events():
     assert events[1].body.outputs.result == "test_output"
 
 
-def test_base_workflow__run_node_with_initial_attributes():
-    """Test that run_node method accepts and applies initial_attributes parameter."""
+def test_base_workflow__run_node_with_inputs():
+    """Test that run_node method accepts and applies inputs parameter with dot notation."""
 
     class TestInputs(BaseInputs):
         pass
@@ -750,14 +750,17 @@ def test_base_workflow__run_node_with_initial_attributes():
         pass
 
     class TestCodeNode(BaseNode[TestState]):
-        code_inputs: dict = {"input1": "default_value"}
+        code_inputs: dict = {"input1": "default_value", "input2": "default_value2"}
         test_attr: str = "default"
+        another_attr: str = "not_overridden"
 
         class Outputs(BaseNode.Outputs):
             result: str
 
         def run(self) -> "TestCodeNode.Outputs":
-            return self.Outputs(result=f"{self.test_attr}_{self.code_inputs['input1']}")
+            return self.Outputs(
+                result=f"{self.test_attr}_{self.code_inputs['input1']}_{self.code_inputs['input2']}_{self.another_attr}"
+            )
 
     class TestWorkflow(BaseWorkflow[TestInputs, TestState]):
         graph = TestCodeNode
@@ -767,52 +770,16 @@ def test_base_workflow__run_node_with_initial_attributes():
 
     workflow = TestWorkflow()
 
-    initial_attrs = {"test_attr": "overridden", "code_inputs": {"input1": "overridden_value"}}
+    inputs_data = {"test_attr": "overridden", "code_inputs.input1": "overridden_value"}
 
-    # WHEN we run the node with initial_attributes
-    events = list(workflow.run_node(node=TestCodeNode, initial_attributes=initial_attrs))
+    # WHEN we run the node with inputs
+    events = list(workflow.run_node(node=TestCodeNode, inputs=inputs_data))
 
     # THEN the node should execute with the overridden attributes
     assert len(events) == 2
     assert isinstance(events[0], NodeExecutionInitiatedEvent)
     assert isinstance(events[1], NodeExecutionFulfilledEvent)
 
-    # AND the execution result should use the overridden attributes
+    # AND the execution result should use the overridden and non-overridden attributes
     fulfilled_event = events[1]
-    assert fulfilled_event.body.outputs.result == "overridden_overridden_value"
-
-
-def test_base_workflow__run_node_without_initial_attributes():
-    """Test that run_node method works normally when initial_attributes is not provided."""
-
-    class TestInputs(BaseInputs):
-        pass
-
-    class TestState(BaseState):
-        pass
-
-    class TestNode(BaseNode[TestState]):
-        class Outputs(BaseNode.Outputs):
-            result: str
-
-        def run(self) -> "TestNode.Outputs":
-            return self.Outputs(result="test_output")
-
-    class TestWorkflow(BaseWorkflow[TestInputs, TestState]):
-        graph = TestNode
-
-        class Outputs(BaseWorkflow.Outputs):
-            result: str
-
-    workflow = TestWorkflow()
-
-    # GIVEN a workflow and node without initial_attributes
-
-    # WHEN we run the node without initial_attributes
-    events = list(workflow.run_node(node=TestNode))
-
-    # THEN it should work exactly as before
-    assert len(events) == 2
-    assert isinstance(events[0], NodeExecutionInitiatedEvent)
-    assert isinstance(events[1], NodeExecutionFulfilledEvent)
-    assert events[1].body.outputs.result == "test_output"
+    assert fulfilled_event.body.outputs.result == "overridden_overridden_value_default_value2_not_overridden"

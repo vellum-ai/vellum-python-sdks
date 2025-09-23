@@ -33,6 +33,9 @@ def resolve_value(
     from the `_T` generic.
     """
 
+    if memo is not None and path in memo:
+        return cast(_T, memo[path])
+
     if inspect.isclass(value):
         return cast(_T, value)
 

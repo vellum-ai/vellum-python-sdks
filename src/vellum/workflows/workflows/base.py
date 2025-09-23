@@ -566,15 +566,11 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         pass
 
     def run_node(
-        self, node: Type[BaseNode], *, initial_attributes: Optional[Dict[str, Any]] = None
+        self, node: Type[BaseNode], *, inputs: Optional[Dict[str, Any]] = None
     ) -> Generator[NodeEvent, None, None]:
         runner = WorkflowRunner(self)
         span_id = uuid4()
-        node_instance = node(state=self.get_default_state(), context=self._context)
-
-        if initial_attributes:
-            for attr_name, attr_value in initial_attributes.items():
-                setattr(node_instance, attr_name, attr_value)
+        node_instance = node(state=self.get_default_state(), context=self._context, inputs=inputs)
 
         return runner.run_node(node=node_instance, span_id=span_id)
 

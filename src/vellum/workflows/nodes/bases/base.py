@@ -439,6 +439,7 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
         *,
         state: Optional[StateType] = None,
         context: Optional[WorkflowContext] = None,
+        inputs: Optional[Dict[str, Any]] = None,
     ):
         if state:
             self.state = state
@@ -459,7 +460,31 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
             self.state = state_type()
 
         self._context = context or WorkflowContext()
-        inputs: Dict[str, Any] = {}
+        inputs_memo: Dict[str, Any] = inputs.copy() if inputs else {}
+        modified_attributes = {}
+        if inputs:
+            for input_key, input_value in inputs.items():
+                if "." in input_key:
+                    path_parts = input_key.split(".")
+                    attr_name = path_parts[0]
+                    if hasattr(self.__class__, attr_name):
+                        class_attr = getattr(self.__class__, attr_name)
+                        try:
+                            if isinstance(class_attr, dict):
+                                current_value = class_attr
+                            else:
+                                current_value = resolve_value(class_attr, self.state, path=attr_name)
+                            if isinstance(current_value, dict):
+                                if attr_name not in modified_attributes:
+                                    modified_attributes[attr_name] = current_value.copy()
+                                nested_key = path_parts[1]
+                                modified_attributes[attr_name][nested_key] = input_value
+                        except Exception:
+                            # If resolution fails, skip this nested attribute
+                            pass
+                else:
+                    if hasattr(self.__class__, input_key):
+                        modified_attributes[input_key] = input_value
         for descriptor in self.__class__:
             if not descriptor.instance:
                 continue
@@ -468,12 +493,12 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
                 # We don't want to resolve attributes that are _meant_ to be descriptors
                 continue
 
-            resolved_value = resolve_value(descriptor.instance, self.state, path=descriptor.name, memo=inputs)
+            resolved_value = resolve_value(descriptor.instance, self.state, path=descriptor.name, memo=inputs_memo)
             setattr(self, descriptor.name, resolved_value)
 
         # We only want to store the attributes that were actually set as inputs, not every attribute that exists.
         all_inputs = {}
-        for key, value in inputs.items():
+        for key, value in inputs_memo.items():
             path_parts = key.split(".")
             node_attribute_descriptor = getattr(self.__class__, path_parts[0])
             inputs_key = reduce(lambda acc, part: acc[part], path_parts[1:], node_attribute_descriptor)
