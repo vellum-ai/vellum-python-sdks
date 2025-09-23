@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 WorkflowInputsDisplays = Dict[WorkflowInputReference, WorkflowInputsDisplay]
 StateValueDisplays = Dict[StateValueReference, StateValueDisplay]
 NodeDisplays = Dict[Type[BaseNode], BaseNodeDisplay]
-NodeOutputDisplays = Dict[OutputReference, Tuple[Type[BaseNode], NodeOutputDisplay]]
+NodeOutputDisplays = Dict[OutputReference, NodeOutputDisplay]
 EntrypointDisplays = Dict[Type[BaseNode], EntrypointDisplay]
 WorkflowOutputDisplays = Dict[BaseDescriptor, WorkflowOutputDisplay]
 EdgeDisplays = Dict[Tuple[Port, Type[BaseNode]], EdgeDisplay]

@@ -292,7 +292,7 @@ def test_serialize_node__node_output_reference(serialize_node):
         global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=workflow_input_id)},
         global_node_displays={NodeWithOutput: NodeWithOutputDisplay()},
         global_node_output_displays={
-            NodeWithOutput.Outputs.output: (NodeWithOutput, NodeOutputDisplay(id=node_output_id, name="output"))
+            NodeWithOutput.Outputs.output: NodeOutputDisplay(id=node_output_id, name="output")
         },
     )
 

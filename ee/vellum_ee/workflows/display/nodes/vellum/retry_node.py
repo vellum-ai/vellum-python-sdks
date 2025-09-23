@@ -1,7 +1,6 @@
 import inspect
-from typing import Any, Generic, Tuple, Type, TypeVar
+from typing import Any, Generic, TypeVar
 
-from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.retry_node.node import RetryNode
 from vellum.workflows.nodes.utils import ADORNMENT_MODULE_NAME
 from vellum.workflows.references.output import OutputReference
@@ -66,7 +65,7 @@ class BaseRetryNodeDisplay(BaseAdornmentNodeDisplay[_RetryNodeType], Generic[_Re
 
         return serialized_node
 
-    def get_node_output_display(self, output: OutputReference) -> Tuple[Type[BaseNode], NodeOutputDisplay]:
+    def get_node_output_display(self, output: OutputReference) -> NodeOutputDisplay:
         inner_node = self._node.__wrapped_node__
         if not inner_node:
             return super().get_node_output_display(output)

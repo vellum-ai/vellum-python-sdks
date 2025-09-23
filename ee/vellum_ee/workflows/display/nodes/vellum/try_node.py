@@ -1,8 +1,7 @@
 import inspect
 from uuid import UUID
-from typing import Any, ClassVar, Generic, Optional, Tuple, Type, TypeVar
+from typing import Any, ClassVar, Generic, Optional, TypeVar
 
-from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.nodes.utils import ADORNMENT_MODULE_NAME
 from vellum.workflows.references.output import OutputReference
@@ -76,7 +75,7 @@ class BaseTryNodeDisplay(BaseAdornmentNodeDisplay[_TryNodeType], Generic[_TryNod
 
         return serialized_node
 
-    def get_node_output_display(self, output: OutputReference) -> Tuple[Type[BaseNode], NodeOutputDisplay]:
+    def get_node_output_display(self, output: OutputReference) -> NodeOutputDisplay:
         inner_node = self._node.__wrapped_node__
         if not inner_node:
             return super().get_node_output_display(output)
@@ -84,7 +83,7 @@ class BaseTryNodeDisplay(BaseAdornmentNodeDisplay[_TryNodeType], Generic[_TryNod
         node_display_class = get_node_display_class(inner_node)
         node_display = node_display_class()
         if output.name == "error":
-            return inner_node, NodeOutputDisplay(
+            return NodeOutputDisplay(
                 id=self.error_output_id or uuid4_from_hash(f"{node_display.node_id}|error_output_id"),
                 name="error",
             )
