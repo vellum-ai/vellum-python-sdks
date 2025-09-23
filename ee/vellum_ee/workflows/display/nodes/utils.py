@@ -22,6 +22,26 @@ def raise_if_descriptor(node_attr: Union[NodeReference[_T], _T]) -> Optional[_T]
     return node_attr.instance
 
 
+def get_descriptor_value(node_attr: Union[NodeReference[_T], _T]) -> Optional[_T]:
+    """
+    Safely get the value from a node attribute that can be either a direct value or a NodeReference.
+
+    Args:
+        node_attr: The attribute value, which can be either a direct value or a NodeReference
+
+    Returns:
+        The actual value, or None if it's a NodeReference without an instance
+
+    Raises:
+        ValueError: If it's a NodeReference but the instance is None
+    """
+    if isinstance(node_attr, NodeReference):
+        if node_attr.instance is None:
+            return None
+        return node_attr.instance
+    return node_attr
+
+
 def to_kebab_case(string: str) -> str:
     """Converts a string from Capital Case to kebab-case."""
     string = re.sub(r"(\s|_|-)+", " ", string)

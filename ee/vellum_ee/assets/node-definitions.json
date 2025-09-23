@@ -811,19 +811,19 @@
   "errors": [
     {
       "node": "MapNode",
-      "error": "Expected NodeReference items to have an instance"
+      "error": ""
     },
     {
       "node": "SubworkflowDeploymentNode",
-      "error": "headers: {'server': 'gunicorn', 'date': 'Tue, 23 Sep 2025 21:40:16 GMT', 'content-type': 'application/json', 'allow': 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS', 'x-frame-options': 'DENY', 'content-length': '58', 'vary': 'Accept-Language, Origin', 'content-language': 'en', 'strict-transport-security': 'max-age=60; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'referrer-policy': 'same-origin', 'cross-origin-opener-policy': 'same-origin', 'via': '1.1 google', 'alt-svc': 'h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000'}, status_code: 403, body: {'detail': 'Authentication credentials were not provided.'}"
+      "error": "headers: {'server': 'gunicorn', 'date': 'Tue, 23 Sep 2025 21:55:08 GMT', 'content-type': 'application/json', 'allow': 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS', 'x-frame-options': 'DENY', 'content-length': '28', 'vary': 'Accept-Language, Origin', 'content-language': 'en', 'strict-transport-security': 'max-age=60; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'referrer-policy': 'same-origin', 'cross-origin-opener-policy': 'same-origin', 'via': '1.1 google', 'alt-svc': 'h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000'}, status_code: 403, body: {'detail': 'Invalid API key'}"
     },
     {
       "node": "PromptDeploymentNode",
-      "error": "headers: {'server': 'gunicorn', 'date': 'Tue, 23 Sep 2025 21:40:16 GMT', 'content-type': 'application/json', 'allow': 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS', 'x-frame-options': 'DENY', 'content-length': '58', 'vary': 'Accept-Language, Origin', 'content-language': 'en', 'strict-transport-security': 'max-age=60; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'referrer-policy': 'same-origin', 'cross-origin-opener-policy': 'same-origin', 'via': '1.1 google', 'alt-svc': 'h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000'}, status_code: 403, body: {'detail': 'Authentication credentials were not provided.'}"
+      "error": "headers: {'server': 'gunicorn', 'date': 'Tue, 23 Sep 2025 21:55:08 GMT', 'content-type': 'application/json', 'allow': 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS', 'x-frame-options': 'DENY', 'content-length': '28', 'vary': 'Accept-Language, Origin', 'content-language': 'en', 'strict-transport-security': 'max-age=60; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'referrer-policy': 'same-origin', 'cross-origin-opener-policy': 'same-origin', 'via': '1.1 google', 'alt-svc': 'h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000'}, status_code: 403, body: {'detail': 'Invalid API key'}"
     },
     {
       "node": "SearchNode",
-      "error": "Expected NodeReference query to have an instance"
+      "error": "SearchNode.Outputs.results"
     },
     {
       "node": "TemplatingNode",
