@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, Literal, Optional, Union, cast
 
 from vellum.client.core.api_error import ApiError
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
@@ -108,7 +108,11 @@ def create_node_input_value_pointer_rule(
 
             raise ValueError(f"Reference to outputs '{value.outputs_class.__qualname__}' is invalid.")
 
-        upstream_node, output_display = display_context.global_node_output_displays[value]
+        output_display = display_context.global_node_output_displays[value]
+        upstream_node = cast(type[BaseNode], value.outputs_class.__parent_class__)
+
+        if hasattr(upstream_node, "__wrapped_node__") and upstream_node.__wrapped_node__:
+            upstream_node = upstream_node.__wrapped_node__
         upstream_node_display = display_context.global_node_displays[upstream_node]
         return NodeOutputPointer(
             data=NodeOutputData(node_id=str(upstream_node_display.node_id), output_id=str(output_display.id)),

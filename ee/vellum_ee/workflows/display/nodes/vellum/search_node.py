@@ -49,10 +49,10 @@ class BaseSearchNodeDisplay(BaseNodeDisplay[_SearchNodeType], Generic[_SearchNod
         node_id = self.node_id
         node_inputs = self._generate_search_node_inputs(node_id, node, display_context)
 
-        _, results_output_display = display_context.global_node_output_displays[
+        results_output_display = display_context.global_node_output_displays[
             cast(OutputReference, node.Outputs.results)
         ]
-        _, text_output_display = display_context.global_node_output_displays[cast(OutputReference, node.Outputs.text)]
+        text_output_display = display_context.global_node_output_displays[cast(OutputReference, node.Outputs.text)]
 
         return {
             "id": str(node_id),

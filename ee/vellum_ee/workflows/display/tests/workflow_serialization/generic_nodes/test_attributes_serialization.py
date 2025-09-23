@@ -329,7 +329,7 @@ def test_serialize_node__node_output(serialize_node):
         global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=workflow_input_id)},
         global_node_displays={NodeWithOutput: NodeWithOutputDisplay()},
         global_node_output_displays={
-            NodeWithOutput.Outputs.output: (NodeWithOutput, NodeOutputDisplay(id=node_output_id, name="output"))
+            NodeWithOutput.Outputs.output: NodeOutputDisplay(id=node_output_id, name="output")
         },
     )
 
@@ -521,14 +521,8 @@ def test_serialize_node__coalesce(serialize_node):
             CoalesceNodeFinal: CoalesceNodeFinalDisplay(),
         },
         global_node_output_displays={
-            CoalesceNodeA.Outputs.output: (
-                CoalesceNodeA,
-                NodeOutputDisplay(id=coalesce_node_a_output_id, name="output"),
-            ),
-            CoalesceNodeB.Outputs.output: (
-                CoalesceNodeB,
-                NodeOutputDisplay(id=coalesce_node_b_output_id, name="output"),
-            ),
+            CoalesceNodeA.Outputs.output: NodeOutputDisplay(id=coalesce_node_a_output_id, name="output"),
+            CoalesceNodeB.Outputs.output: NodeOutputDisplay(id=coalesce_node_b_output_id, name="output"),
         },
     )
 
@@ -602,7 +596,7 @@ def test_serialize_node__dataclass_with_node_output_reference(serialize_node):
         node_class=GenericNodeWithDataclass,
         global_node_displays={NodeWithOutput: NodeWithOutputDisplay()},
         global_node_output_displays={
-            NodeWithOutput.Outputs.result: (NodeWithOutput, NodeOutputDisplay(id=node_output_id, name="result"))
+            NodeWithOutput.Outputs.result: NodeOutputDisplay(id=node_output_id, name="result")
         },
     )
 
@@ -634,7 +628,7 @@ def test_serialize_node__pydantic_with_node_output_reference(serialize_node):
         node_class=GenericNodeWithPydantic,
         global_node_displays={NodeWithOutput: NodeWithOutputDisplay()},
         global_node_output_displays={
-            NodeWithOutput.Outputs.result: (NodeWithOutput, NodeOutputDisplay(id=node_output_id, name="result"))
+            NodeWithOutput.Outputs.result: NodeOutputDisplay(id=node_output_id, name="result")
         },
     )
 

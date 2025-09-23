@@ -121,9 +121,8 @@ def test_create_node_input_value_pointer_rules(
                 ),
             },
             global_node_output_displays={
-                MyNodeA.Outputs.output: (
-                    MyNodeA,
-                    NodeOutputDisplay(id=UUID("4b16a629-11a1-4b3f-a965-a57b872d13b8"), name="output"),
+                MyNodeA.Outputs.output: NodeOutputDisplay(
+                    id=UUID("4b16a629-11a1-4b3f-a965-a57b872d13b8"), name="output"
                 ),
             },
             global_node_displays={

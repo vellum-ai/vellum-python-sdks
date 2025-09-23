@@ -41,6 +41,7 @@ from vellum.workflows.expressions.not_between import NotBetweenExpression
 from vellum.workflows.expressions.not_in import NotInExpression
 from vellum.workflows.expressions.or_ import OrExpression
 from vellum.workflows.expressions.parse_json import ParseJsonExpression
+from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.references.environment_variable import EnvironmentVariableReference
@@ -296,7 +297,11 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
         }
 
     if isinstance(value, OutputReference):
-        upstream_node, output_display = display_context.global_node_output_displays[value]
+        output_display = display_context.global_node_output_displays[value]
+        upstream_node = cast("type[BaseNode]", value.outputs_class.__parent_class__)
+
+        if hasattr(upstream_node, "__wrapped_node__") and upstream_node.__wrapped_node__:
+            upstream_node = upstream_node.__wrapped_node__
         upstream_node_display = display_context.global_node_displays[upstream_node]
 
         return {

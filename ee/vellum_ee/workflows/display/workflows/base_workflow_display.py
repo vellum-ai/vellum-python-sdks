@@ -479,7 +479,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         self,
         node: Type[BaseNode],
         node_display: BaseNodeDisplay,
-        node_output_displays: Dict[OutputReference, Tuple[Type[BaseNode], NodeOutputDisplay]],
+        node_output_displays: Dict[OutputReference, NodeOutputDisplay],
     ):
         """This method recursively adds nodes wrapped in decorators to the node_output_displays dictionary."""
 

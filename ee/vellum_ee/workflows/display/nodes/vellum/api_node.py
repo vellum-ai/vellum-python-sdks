@@ -177,9 +177,9 @@ class BaseAPINodeDisplay(BaseNodeDisplay[_APINodeType], Generic[_APINodeType]):
         ]
         inputs.extend(additional_header_inputs)
 
-        _, text_output_display = self.get_node_output_display(node.Outputs.text)
-        _, json_output_display = self.get_node_output_display(node.Outputs.json)
-        _, status_code_output_display = self.get_node_output_display(node.Outputs.status_code)
+        text_output_display = self.get_node_output_display(node.Outputs.text)
+        json_output_display = self.get_node_output_display(node.Outputs.json)
+        status_code_output_display = self.get_node_output_display(node.Outputs.status_code)
 
         serialized_node: JsonObject = {
             "id": str(node_id),
