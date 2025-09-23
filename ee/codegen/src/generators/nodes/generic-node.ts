@@ -786,7 +786,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
   }
 
   private getFunction(f: FunctionArgs): FunctionArgs {
-    const inputs = f.definition?.inputs;
+    const inputs = f.definition?.parameters;
     if (!f.definition || !inputs) {
       return f;
     }
