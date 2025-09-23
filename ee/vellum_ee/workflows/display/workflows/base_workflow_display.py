@@ -624,7 +624,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             edge_displays=edge_displays,
             port_displays=port_displays,
             workflow_display_class=self.__class__,
-            _dry_run=self._dry_run,
+            dry_run=self._dry_run,
         )
 
     def _generate_workflow_meta_display(self) -> WorkflowMetaDisplay:
