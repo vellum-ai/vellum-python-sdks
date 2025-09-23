@@ -8,6 +8,7 @@ from vellum.client.types.vellum_variable_type import VellumVariableType
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
+from vellum.workflows.nodes.utils import get_unadorned_node
 from vellum.workflows.references import OutputReference, WorkflowInputReference
 from vellum.workflows.references.execution_count import ExecutionCountReference
 from vellum.workflows.references.lazy import LazyReference
@@ -109,8 +110,15 @@ def create_node_input_value_pointer_rule(
             raise ValueError(f"Reference to outputs '{value.outputs_class.__qualname__}' is invalid.")
 
         output_display = display_context.global_node_output_displays[value]
+
+        upstream_node_class = value.outputs_class.__parent_class__
+        if not issubclass(upstream_node_class, BaseNode):
+            raise ValueError(f"Output references must be to a node, not {upstream_node_class}")
+        unadorned_upstream_node_class = get_unadorned_node(upstream_node_class)
+        upstream_node_display = display_context.global_node_displays[unadorned_upstream_node_class]
+
         return NodeOutputPointer(
-            data=NodeOutputData(node_id="", output_id=str(output_display.id)),
+            data=NodeOutputData(node_id=str(upstream_node_display.node_id), output_id=str(output_display.id)),
         )
     if isinstance(value, LazyReference):
         child_descriptor = get_child_descriptor(value, display_context)
