@@ -72,9 +72,15 @@ from .code_executor_secret_input import CodeExecutorSecretInput
 from .code_resource_definition import CodeResourceDefinition
 from .compile_prompt_deployment_expand_meta_request import CompilePromptDeploymentExpandMetaRequest
 from .compile_prompt_meta import CompilePromptMeta
+from .components_schemas_composio_execute_tool_request import ComponentsSchemasComposioExecuteToolRequest
+from .components_schemas_composio_execute_tool_response import ComponentsSchemasComposioExecuteToolResponse
+from .components_schemas_composio_tool_definition import ComponentsSchemasComposioToolDefinition
 from .components_schemas_pdf_search_result_meta_source import ComponentsSchemasPdfSearchResultMetaSource
 from .components_schemas_pdf_search_result_meta_source_request import ComponentsSchemasPdfSearchResultMetaSourceRequest
 from .components_schemas_prompt_version_build_config_sandbox import ComponentsSchemasPromptVersionBuildConfigSandbox
+from .composio_execute_tool_request import ComposioExecuteToolRequest
+from .composio_execute_tool_response import ComposioExecuteToolResponse
+from .composio_tool_definition import ComposioToolDefinition
 from .condition_combinator import ConditionCombinator
 from .conditional_node_result import ConditionalNodeResult
 from .conditional_node_result_data import ConditionalNodeResultData
@@ -758,9 +764,15 @@ __all__ = [
     "CodeResourceDefinition",
     "CompilePromptDeploymentExpandMetaRequest",
     "CompilePromptMeta",
+    "ComponentsSchemasComposioExecuteToolRequest",
+    "ComponentsSchemasComposioExecuteToolResponse",
+    "ComponentsSchemasComposioToolDefinition",
     "ComponentsSchemasPdfSearchResultMetaSource",
     "ComponentsSchemasPdfSearchResultMetaSourceRequest",
     "ComponentsSchemasPromptVersionBuildConfigSandbox",
+    "ComposioExecuteToolRequest",
+    "ComposioExecuteToolResponse",
+    "ComposioToolDefinition",
     "ConditionCombinator",
     "ConditionalNodeResult",
     "ConditionalNodeResultData",

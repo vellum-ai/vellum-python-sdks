@@ -16,6 +16,7 @@ from .resources.document_indexes.client import AsyncDocumentIndexesClient, Docum
 from .resources.documents.client import AsyncDocumentsClient, DocumentsClient
 from .resources.events.client import AsyncEventsClient, EventsClient
 from .resources.folder_entities.client import AsyncFolderEntitiesClient, FolderEntitiesClient
+from .resources.integrations.client import AsyncIntegrationsClient, IntegrationsClient
 from .resources.metric_definitions.client import AsyncMetricDefinitionsClient, MetricDefinitionsClient
 from .resources.ml_models.client import AsyncMlModelsClient, MlModelsClient
 from .resources.organizations.client import AsyncOrganizationsClient, OrganizationsClient
@@ -129,6 +130,7 @@ class Vellum:
             timeout=_defaulted_timeout,
         )
         self._raw_client = RawVellum(client_wrapper=self._client_wrapper)
+        self.integrations = IntegrationsClient(client_wrapper=self._client_wrapper)
         self.events = EventsClient(client_wrapper=self._client_wrapper)
         self.ad_hoc = AdHocClient(client_wrapper=self._client_wrapper)
         self.container_images = ContainerImagesClient(client_wrapper=self._client_wrapper)
@@ -1003,6 +1005,7 @@ class AsyncVellum:
             timeout=_defaulted_timeout,
         )
         self._raw_client = AsyncRawVellum(client_wrapper=self._client_wrapper)
+        self.integrations = AsyncIntegrationsClient(client_wrapper=self._client_wrapper)
         self.events = AsyncEventsClient(client_wrapper=self._client_wrapper)
         self.ad_hoc = AsyncAdHocClient(client_wrapper=self._client_wrapper)
         self.container_images = AsyncContainerImagesClient(client_wrapper=self._client_wrapper)

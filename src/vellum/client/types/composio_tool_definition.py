@@ -4,13 +4,17 @@ import typing
 
 import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
-from .vellum_sdk_error_code_enum import VellumSdkErrorCodeEnum
 
 
-class VellumSdkError(UniversalBaseModel):
-    message: str
-    code: VellumSdkErrorCodeEnum
-    raw_data: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = None
+class ComposioToolDefinition(UniversalBaseModel):
+    """
+    Serializer for Composio tool definition response.
+    """
+
+    provider: typing.Literal["COMPOSIO"] = "COMPOSIO"
+    name: str
+    description: str
+    parameters: typing.Dict[str, typing.Optional[typing.Any]]
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

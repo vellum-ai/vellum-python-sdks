@@ -1265,6 +1265,166 @@ client.submit_workflow_execution_actuals(
 </dl>
 </details>
 
+## Integrations
+<details><summary><code>client.integrations.<a href="src/vellum/resources/integrations/client.py">retrieve_integration_tool_definition</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import Vellum
+
+client = Vellum(
+    api_version="YOUR_API_VERSION",
+    api_key="YOUR_API_KEY",
+)
+client.integrations.retrieve_integration_tool_definition(
+    integration="integration",
+    provider="provider",
+    tool_name="tool_name",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**integration:** `str` — The integration name
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**provider:** `str` — The integration provider name
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**tool_name:** `str` — The tool's unique name, as specified by the integration provider
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.integrations.<a href="src/vellum/resources/integrations/client.py">execute_integration_tool</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import Vellum
+
+client = Vellum(
+    api_version="YOUR_API_VERSION",
+    api_key="YOUR_API_KEY",
+)
+client.integrations.execute_integration_tool(
+    integration="integration",
+    provider="provider",
+    tool_name="tool_name",
+    arguments={"arguments": {"key": "value"}},
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**integration:** `str` — The integration name
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**provider:** `str` — The integration provider name
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**tool_name:** `str` — The tool's unique name, as specified by the integration provider
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**arguments:** `typing.Dict[str, typing.Optional[typing.Any]]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Events
 <details><summary><code>client.events.<a href="src/vellum/resources/events/client.py">create</a>(...)</code></summary>
 <dl>

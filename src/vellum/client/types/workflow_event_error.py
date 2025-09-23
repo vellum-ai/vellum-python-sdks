@@ -10,6 +10,7 @@ from .workflow_execution_event_error_code import WorkflowExecutionEventErrorCode
 class WorkflowEventError(UniversalBaseModel):
     message: str
     code: WorkflowExecutionEventErrorCode
+    raw_data: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = None
     stacktrace: typing.Optional[str] = None
 
     if IS_PYDANTIC_V2:
