@@ -1,9 +1,15 @@
 import pytest
 from uuid import UUID
 
-from vellum.workflows.constants import AuthorizationType
+from vellum.workflows.constants import AuthorizationType, VellumIntegrationProviderType
 from vellum.workflows.references.environment_variable import EnvironmentVariableReference
-from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition, MCPServer, MCPToolDefinition
+from vellum.workflows.types.definition import (
+    ComposioToolDefinition,
+    DeploymentDefinition,
+    MCPServer,
+    MCPToolDefinition,
+    VellumIntegrationToolDefinition,
+)
 
 
 @pytest.mark.parametrize(
@@ -143,3 +149,35 @@ def test_mcp_tool_definition_creation_no_authorization():
     assert mcp_tool.server.bearer_token_value is None
     assert mcp_tool.server.api_key_header_key is None
     assert mcp_tool.server.api_key_header_value is None
+
+
+def test_vellum_integration_tool_definition_creation():
+    """Test that VellumIntegrationToolDefinition can be created with required fields."""
+    vellum_tool = VellumIntegrationToolDefinition(
+        provider=VellumIntegrationProviderType.COMPOSIO,
+        integration="GITHUB",
+        name="create_issue",
+        description="Create a new issue in a GitHub repository",
+    )
+
+    assert vellum_tool.type == "INTEGRATION"
+    assert vellum_tool.provider == VellumIntegrationProviderType.COMPOSIO
+    assert vellum_tool.integration == "GITHUB"
+    assert vellum_tool.name == "create_issue"
+    assert vellum_tool.description == "Create a new issue in a GitHub repository"
+
+
+def test_vellum_integration_tool_definition_with_different_provider():
+    """Test VellumIntegrationToolDefinition with a different provider."""
+    vellum_tool = VellumIntegrationToolDefinition(
+        provider=VellumIntegrationProviderType.COMPOSIO,
+        integration="SLACK",
+        name="send_message",
+        description="Send a message to a Slack channel",
+    )
+
+    assert vellum_tool.type == "INTEGRATION"
+    assert vellum_tool.provider == VellumIntegrationProviderType.COMPOSIO
+    assert vellum_tool.integration == "SLACK"
+    assert vellum_tool.name == "send_message"
+    assert vellum_tool.description == "Send a message to a Slack channel"

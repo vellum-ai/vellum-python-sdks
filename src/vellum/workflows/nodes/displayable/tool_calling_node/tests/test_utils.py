@@ -11,6 +11,7 @@ from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
 from vellum.workflows import BaseWorkflow
+from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.tool_calling_node.utils import (
@@ -20,7 +21,13 @@ from vellum.workflows.nodes.displayable.tool_calling_node.utils import (
 )
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState
-from vellum.workflows.types.definition import ComposioToolDefinition, DeploymentDefinition, MCPServer, MCPToolDefinition
+from vellum.workflows.types.definition import (
+    ComposioToolDefinition,
+    DeploymentDefinition,
+    MCPServer,
+    MCPToolDefinition,
+    VellumIntegrationToolDefinition,
+)
 
 
 def test_get_function_name_callable():
@@ -101,6 +108,44 @@ def test_get_function_name_composio_tool_definition_various_toolkits(
     composio_tool = ComposioToolDefinition(toolkit=toolkit, action=action, description=description, user_id=None)
 
     result = get_function_name(composio_tool)
+
+    assert result == expected_result
+
+
+def test_get_function_name_vellum_integration_tool_definition():
+    """Test VellumIntegrationToolDefinition function name generation."""
+    vellum_tool = VellumIntegrationToolDefinition(
+        provider=VellumIntegrationProviderType.COMPOSIO,
+        integration="GITHUB",
+        name="create_issue",
+        description="Create a new issue in a GitHub repository",
+    )
+
+    result = get_function_name(vellum_tool)
+
+    assert result == "create_issue"
+
+
+@pytest.mark.parametrize(
+    "integration,name,description,expected_result",
+    [
+        ("GITHUB", "create_issue", "Create GitHub issue", "create_issue"),
+        ("SLACK", "send_message", "Send Slack message", "send_message"),
+        ("JIRA", "create_ticket", "Create JIRA ticket", "create_ticket"),
+    ],
+)
+def test_get_function_name_vellum_integration_various_integrations(
+    integration: str, name: str, description: str, expected_result: str
+):
+    """Test VellumIntegrationToolDefinition with various integrations."""
+    vellum_tool = VellumIntegrationToolDefinition(
+        provider=VellumIntegrationProviderType.COMPOSIO,
+        integration=integration,
+        name=name,
+        description=description,
+    )
+
+    result = get_function_name(vellum_tool)
 
     assert result == expected_result
 

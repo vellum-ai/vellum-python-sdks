@@ -382,7 +382,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   const args = [
                     python.methodArgument({
                       name: "provider",
-                      value: python.TypeInstantiation.str("VELLUM"),
+                      value: python.TypeInstantiation.str("COMPOSIO"),
                     }),
                     python.methodArgument({
                       name: "integration",
