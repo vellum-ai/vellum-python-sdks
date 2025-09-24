@@ -52,8 +52,6 @@ def main():
 
         iterations += 1
 
-        time.sleep(60)
-
 
 if __name__ == "__main__":
     main()
