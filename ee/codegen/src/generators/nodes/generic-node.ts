@@ -371,25 +371,30 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   );
                   break;
                 }
-                case "INTEGRATION": {
+                case "VELLUM_INTEGRATION": {
                   const integrationTool = f as VellumIntegrationToolFunctionArgs;
+
+                  // Map frontend field names to backend expectations
+                  const integrationName = integrationTool.integration_name?.toUpperCase() || "UNKNOWN";
+                  const toolSlug = integrationTool.tool_slug || integrationTool.name || "UNKNOWN";
+                  const description = integrationTool.description || "UNKNOWN";
 
                   const args = [
                     python.methodArgument({
                       name: "provider",
-                      value: python.TypeInstantiation.str(integrationTool.provider),
+                      value: python.TypeInstantiation.str("VELLUM"),
                     }),
                     python.methodArgument({
                       name: "integration",
-                      value: python.TypeInstantiation.str(integrationTool.integration),
+                      value: python.TypeInstantiation.str(integrationName),
                     }),
                     python.methodArgument({
                       name: "name",
-                      value: python.TypeInstantiation.str(integrationTool.name),
+                      value: python.TypeInstantiation.str(toolSlug),
                     }),
                     python.methodArgument({
                       name: "description",
-                      value: python.TypeInstantiation.str(integrationTool.description),
+                      value: python.TypeInstantiation.str(description),
                     }),
                   ];
 
@@ -410,7 +415,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                     new NodeDefinitionGenerationError(
                       `Unsupported function type: ${JSON.stringify(
                         f
-                      )}. Only CODE_EXECUTION, INLINE_WORKFLOW, WORKFLOW_DEPLOYMENT, COMPOSIO, MCP_SERVER, and INTEGRATION are supported.`,
+                      )}. Only CODE_EXECUTION, INLINE_WORKFLOW, WORKFLOW_DEPLOYMENT, COMPOSIO, MCP_SERVER, and VELLUM_INTEGRATION are supported.`,
                       "WARNING"
                     )
                   );

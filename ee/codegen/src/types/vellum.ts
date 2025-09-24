@@ -1013,10 +1013,13 @@ export type MCPServerFunctionArgs = {
 };
 
 export type VellumIntegrationToolFunctionArgs = {
-  type: "INTEGRATION";
+  type: "VELLUM_INTEGRATION";
   provider: string;
   integration: string;
   name: string;
+  tool_name: string;
+  tool_slug: string;
+  integration_name: string;
 } & NameDescription;
 
 export type ToolArgs = (
