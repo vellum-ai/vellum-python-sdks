@@ -1,4 +1,3 @@
-import time
 from typing import List
 
 from vellum.workflows import BaseWorkflow
@@ -17,9 +16,6 @@ class Iteration(BaseNode[BaseState]):
         new_fruit: str
 
     def run(self) -> Outputs:
-        if self.index == 0:
-            time.sleep(0.01)
-
         new_fruit = self.item + " " + self.item
         parent_state = self.state.meta.parent
         if not isinstance(parent_state, State):

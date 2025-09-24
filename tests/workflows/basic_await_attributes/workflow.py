@@ -1,5 +1,3 @@
-import time
-
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.core import MergeBehavior
@@ -19,7 +17,6 @@ class MiddleNode(BaseNode):
         total: int
 
     def run(self) -> Outputs:
-        time.sleep(0.01)
         return self.Outputs(total=1)
 
 
@@ -28,7 +25,6 @@ class BottomNode(BaseNode):
         total: int
 
     def run(self) -> Outputs:
-        time.sleep(0.02)
         return self.Outputs(total=1)
 
 

@@ -1,5 +1,4 @@
 from datetime import datetime, timezone
-import time
 from unittest import mock
 from uuid import UUID
 
@@ -53,7 +52,7 @@ def test_vellum_emitter_debounce_batches_events():
     emitter.emit_event(event1)
     emitter.emit_event(event2)
 
-    time.sleep(0.15)
+    emitter.join()
 
     assert mock_client.events.create.call_count == 1
     call_args = mock_client.events.create.call_args
@@ -86,7 +85,7 @@ def test_vellum_emitter_debounce_single_event():
 
     emitter.emit_event(event)
 
-    time.sleep(0.1)
+    emitter.join()
 
     assert mock_client.events.create.call_count == 1
     call_args = mock_client.events.create.call_args
@@ -126,17 +125,11 @@ def test_vellum_emitter_debounce_timer_reset():
     )
 
     emitter.emit_event(event1)
-
-    time.sleep(0.1)
-
     emitter.emit_event(event2)
-
-    time.sleep(0.1)
 
     assert mock_client.events.create.call_count == 0
 
-    # Sleep 0.4 with 0.1 + 0.1 above to ensure the total time is 0.6, which is greater than the debounce time of 0.4
-    time.sleep(0.4)
+    emitter.join()
     assert mock_client.events.create.call_count == 1
     call_args = mock_client.events.create.call_args
     assert len(call_args.kwargs["request"]) == 2
@@ -161,7 +154,7 @@ def test_vellum_emitter_debounce_no_context():
 
     emitter.emit_event(event)
 
-    time.sleep(0.1)
+    emitter.join()
 
     assert len(emitter._event_queue) == 0
 
@@ -182,7 +175,7 @@ def test_vellum_emitter_debounce_disallowed_events():
 
     emitter.emit_event(event)
 
-    time.sleep(0.1)
+    emitter.join()
 
     assert mock_client.events.create.call_count == 0
     assert len(emitter._event_queue) == 0

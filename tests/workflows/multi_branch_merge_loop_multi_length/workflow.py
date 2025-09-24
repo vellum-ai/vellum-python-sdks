@@ -1,5 +1,3 @@
-import time
-
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
@@ -23,9 +21,6 @@ class TopNode(BaseNode):
         value = "hello"
 
     def run(self) -> Outputs:
-        if self.counter >= 1:
-            time.sleep(0.03)
-
         return self.Outputs()
 
 
@@ -36,9 +31,6 @@ class BottomNode(BaseNode):
         value = "world"
 
     def run(self) -> Outputs:
-        if self.counter < 1:
-            time.sleep(0.02)
-
         return self.Outputs()
 
 

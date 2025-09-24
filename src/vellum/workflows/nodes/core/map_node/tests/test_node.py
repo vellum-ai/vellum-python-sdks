@@ -56,7 +56,6 @@ def test_map_node__use_parallelism():
             value: int
 
         def run(self) -> Outputs:
-            time.sleep(0.03)
             return self.Outputs(value=self.item + 1)
 
     # WHEN the node is run
@@ -80,7 +79,6 @@ def test_map_node__empty_list():
             value: int
 
         def run(self) -> Outputs:
-            time.sleep(0.03)
             return self.Outputs(value=self.item + 1)
 
     # WHEN the node is run

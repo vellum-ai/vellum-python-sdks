@@ -1,5 +1,3 @@
-import time
-
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.ports.port import Port
@@ -35,7 +33,6 @@ class EmitNode(BaseNode[State]):
     iteration = State.iteration
 
     def run(self) -> BaseNode.Outputs:
-        time.sleep(0.01)
         with open(self.external_data_source, "a") as f:
             f.write(f"Hello: {self.state.iteration}\n")
 
