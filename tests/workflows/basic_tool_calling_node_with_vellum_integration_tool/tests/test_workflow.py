@@ -10,6 +10,8 @@ from vellum.client.types.function_call_vellum_value import FunctionCallVellumVal
 from vellum.client.types.function_definition import FunctionDefinition
 from vellum.client.types.initiated_execute_prompt_event import InitiatedExecutePromptEvent
 from vellum.client.types.string_vellum_value import StringVellumValue
+from vellum.workflows.constants import VellumIntegrationProviderType
+from vellum.workflows.types.definition import VellumIntegrationToolDetails
 
 from tests.workflows.basic_tool_calling_node_with_vellum_integration_tool.workflow import (
     BasicToolCallingNodeWithVellumIntegrationToolWorkflow,
@@ -244,9 +246,6 @@ def test_tool_definition_and_function_compilation():
     from vellum.workflows.utils.functions import compile_vellum_integration_tool_definition
 
     with mock.patch("vellum.workflows.utils.functions.VellumIntegrationService") as mock_service_class:
-        from vellum.workflows.constants import VellumIntegrationProviderType
-        from vellum.workflows.types.definition import VellumIntegrationToolDetails
-
         mock_service_instance = mock.Mock()
         # Create a proper VellumIntegrationToolDetails object
         mock_tool_details_obj = VellumIntegrationToolDetails(
