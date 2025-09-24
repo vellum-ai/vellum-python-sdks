@@ -379,23 +379,23 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                     python.methodArgument({
                       name: "provider",
                       value: python.TypeInstantiation.str(
-                        integrationTool.provider
+                        integrationTool.provider || "COMPOSIO"
                       ),
                     }),
                     python.methodArgument({
                       name: "integration",
                       value: python.TypeInstantiation.str(
-                        integrationTool.integration
+                        integrationTool.integration || "UNKNOWN"
                       ),
                     }),
                     python.methodArgument({
                       name: "name",
-                      value: python.TypeInstantiation.str(integrationTool.name),
+                      value: python.TypeInstantiation.str(integrationTool.name || "UNKNOWN"),
                     }),
                     python.methodArgument({
                       name: "description",
                       value: python.TypeInstantiation.str(
-                        integrationTool.description
+                        integrationTool.description || "UNKNOWN"
                       ),
                     }),
                   ];
