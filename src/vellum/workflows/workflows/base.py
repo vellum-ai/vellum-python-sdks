@@ -680,27 +680,39 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
 
     @staticmethod
     def load_from_module(module_path: str) -> Type["BaseWorkflow"]:
-        workflow_path = f"{module_path}.workflow"
-        module = importlib.import_module(workflow_path)
-        workflows: List[Type[BaseWorkflow]] = []
-        for name in dir(module):
-            if name.startswith("__"):
-                continue
+        from vellum.workflows.exceptions import WorkflowInitializationException
 
-            attr = getattr(module, name)
-            if (
-                inspect.isclass(attr)
-                and issubclass(attr, BaseWorkflow)
-                and attr != BaseWorkflow
-                and attr.__module__ == workflow_path
-            ):
-                workflows.append(attr)
+        try:
+            workflow_path = f"{module_path}.workflow"
+            module = importlib.import_module(workflow_path)
+            workflows: List[Type[BaseWorkflow]] = []
+            for name in dir(module):
+                if name.startswith("__"):
+                    continue
 
-        if len(workflows) == 0:
-            raise ValueError(f"No workflows found in {module_path}")
-        elif len(workflows) > 1:
-            raise ValueError(f"Multiple workflows found in {module_path}")
-        return workflows[0]
+                attr = getattr(module, name)
+                if (
+                    inspect.isclass(attr)
+                    and issubclass(attr, BaseWorkflow)
+                    and attr != BaseWorkflow
+                    and attr.__module__ == workflow_path
+                ):
+                    workflows.append(attr)
+
+            if len(workflows) == 0:
+                raise ValueError(f"No workflows found in {module_path}")
+            elif len(workflows) > 1:
+                raise ValueError(f"Multiple workflows found in {module_path}")
+            return workflows[0]
+        except TypeError as e:
+            if "Unexpected graph type" in str(e) or "unhashable type: 'set'" in str(e):
+                raise WorkflowInitializationException(
+                    message="Invalid graph structure detected. Nested sets or unsupported graph types are not allowed. "
+                    "Please contact Vellum support for assistance with Workflow configuration.",
+                    workflow_definition=None,
+                ) from e
+            else:
+                raise
 
     def join(self) -> None:
         """

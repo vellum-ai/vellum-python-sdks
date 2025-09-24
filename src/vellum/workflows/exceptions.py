@@ -35,7 +35,7 @@ class WorkflowInitializationException(Exception):
     def __init__(
         self,
         message: str,
-        workflow_definition: Type["BaseWorkflow"],
+        workflow_definition: Optional[Type["BaseWorkflow"]],
         code: WorkflowErrorCode = WorkflowErrorCode.INVALID_INPUTS,
     ):
         self.message = message
