@@ -1,7 +1,8 @@
 from uuid import UUID
-from typing import Generic, Optional, TypeVar, cast
+from typing import Generic, Optional, Type, TypeVar, cast
 
 from vellum.workflows.nodes import MapNode
+from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
@@ -23,12 +24,18 @@ class BaseMapNodeDisplay(BaseAdornmentNodeDisplay[_MapNodeType], Generic[_MapNod
         node_id = self.node_id
 
         subworkflow_value = raise_if_descriptor(node.subworkflow)
-        subworkflow = cast(type[BaseWorkflow], subworkflow_value) if subworkflow_value is not None else BaseWorkflow
+        subworkflow = (
+            cast(type[BaseWorkflow], subworkflow_value)
+            if subworkflow_value is not None
+            else self._default_workflow_class()
+        )
+
+        items = raise_if_descriptor(node.items)
 
         items_node_input = create_node_input(
             node_id=node_id,
             input_name="items",
-            value=node.items or [],
+            value=items or [],
             display_context=display_context,
             input_id=self.node_input_ids_by_name.get("items"),
         )
@@ -82,3 +89,9 @@ class BaseMapNodeDisplay(BaseAdornmentNodeDisplay[_MapNodeType], Generic[_MapNod
             },
             **self.serialize_generic_fields(display_context),
         }
+
+    def _default_workflow_class(self) -> Type[BaseWorkflow]:
+        class MapNodeSubworkflow(BaseWorkflow[MapNode.SubworkflowInputs, BaseState]):
+            pass
+
+        return MapNodeSubworkflow

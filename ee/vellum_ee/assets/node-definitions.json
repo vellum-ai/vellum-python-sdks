@@ -408,6 +408,51 @@
       ]
     },
     {
+      "id": "527a10bc-30b2-4e36-91d6-91c8e865bac8",
+      "display_data": {
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "comment": {
+          "value": "\n    Used to map over a list of items and execute a Subworkflow on each iteration.\n\n    items: List[MapNodeItemType] - The items to map over\n    max_concurrency: Optional[int] = None - The maximum number of concurrent subworkflow executions\n    subworkflow: Type[\"BaseWorkflow\"] - The Subworkflow to execute\n    ",
+          "expanded": true
+        }
+      },
+      "base": {
+        "name": "BaseAdornmentNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base_adornment_node"
+        ]
+      },
+      "definition": {
+        "name": "MapNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "core",
+          "map_node",
+          "node"
+        ]
+      },
+      "trigger": {
+        "id": "3a702aac-7b68-47d3-92e1-264883e9532c",
+        "merge_behavior": "AWAIT_ATTRIBUTES"
+      },
+      "ports": [
+        {
+          "id": "0ae85239-a159-48af-b39c-2484eac901df",
+          "name": "default",
+          "type": "DEFAULT"
+        }
+      ]
+    },
+    {
       "id": "7426f273-a43d-4448-a2d2-76d0ee0d069c",
       "display_data": {
         "position": {
@@ -810,24 +855,20 @@
   ],
   "errors": [
     {
-      "node": "MapNode",
-      "error": ""
-    },
-    {
       "node": "SubworkflowDeploymentNode",
-      "error": "headers: {'server': 'gunicorn', 'date': 'Wed, 24 Sep 2025 02:52:27 GMT', 'content-type': 'application/json', 'allow': 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS', 'x-frame-options': 'DENY', 'content-length': '28', 'vary': 'Accept-Language, Origin', 'content-language': 'en', 'strict-transport-security': 'max-age=60; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'referrer-policy': 'same-origin', 'cross-origin-opener-policy': 'same-origin', 'via': '1.1 google', 'alt-svc': 'h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000'}, status_code: 403, body: {'detail': 'Invalid API key'}"
+      "error": "ApiError: headers: {'server': 'gunicorn', 'date': 'Wed, 24 Sep 2025 04:58:53 GMT', 'content-type': 'application/json', 'allow': 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS', 'x-frame-options': 'DENY', 'content-length': '58', 'vary': 'Accept-Language, Origin', 'content-language': 'en', 'strict-transport-security': 'max-age=60; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'referrer-policy': 'same-origin', 'cross-origin-opener-policy': 'same-origin', 'via': '1.1 google', 'alt-svc': 'h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000'}, status_code: 403, body: {'detail': 'Authentication credentials were not provided.'}"
     },
     {
       "node": "PromptDeploymentNode",
-      "error": "headers: {'server': 'gunicorn', 'date': 'Wed, 24 Sep 2025 02:52:27 GMT', 'content-type': 'application/json', 'allow': 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS', 'x-frame-options': 'DENY', 'content-length': '28', 'vary': 'Accept-Language, Origin', 'content-language': 'en', 'strict-transport-security': 'max-age=60; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'referrer-policy': 'same-origin', 'cross-origin-opener-policy': 'same-origin', 'via': '1.1 google', 'alt-svc': 'h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000'}, status_code: 403, body: {'detail': 'Invalid API key'}"
+      "error": "ApiError: headers: {'server': 'gunicorn', 'date': 'Wed, 24 Sep 2025 04:58:53 GMT', 'content-type': 'application/json', 'allow': 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS', 'x-frame-options': 'DENY', 'content-length': '58', 'vary': 'Accept-Language, Origin', 'content-language': 'en', 'strict-transport-security': 'max-age=60; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'referrer-policy': 'same-origin', 'cross-origin-opener-policy': 'same-origin', 'via': '1.1 google', 'alt-svc': 'h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000'}, status_code: 403, body: {'detail': 'Authentication credentials were not provided.'}"
     },
     {
       "node": "SearchNode",
-      "error": "SearchNode.Outputs.results"
+      "error": "ValueError: Expected NodeReference query to have an instance"
     },
     {
       "node": "TemplatingNode",
-      "error": "TemplatingNode.Outputs.result"
+      "error": "KeyError: TemplatingNode.Outputs.result"
     }
   ]
 }
