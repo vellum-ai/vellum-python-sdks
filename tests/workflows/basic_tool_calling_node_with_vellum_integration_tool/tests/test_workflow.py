@@ -34,9 +34,7 @@ def _setup_mock_service(
 
     if get_tool_error:
         mock_service_instance.get_tool_definition.side_effect = get_tool_error
-        mock_service_instance.get_tool_details.side_effect = get_tool_error
     elif tool_details:
-        mock_service_instance.get_tool_definition.return_value = tool_details
         # Create proper VellumIntegrationToolDetails object from dict
         tool_details_obj = VellumIntegrationToolDetails(
             provider=VellumIntegrationProviderType.COMPOSIO,
@@ -45,7 +43,7 @@ def _setup_mock_service(
             description=tool_details.get("description", "Mock description"),
             parameters=tool_details.get("parameters", {}),
         )
-        mock_service_instance.get_tool_details.return_value = tool_details_obj
+        mock_service_instance.get_tool_definition.return_value = tool_details_obj
 
     if execute_error:
         mock_service_instance.execute_tool.side_effect = execute_error
@@ -258,7 +256,7 @@ def test_tool_definition_and_function_compilation():
             description="Enhanced description from service",
             parameters={"type": "object", "properties": {"title": {"type": "string", "description": "Issue title"}}},
         )
-        mock_service_instance.get_tool_details.return_value = mock_tool_details_obj
+        mock_service_instance.get_tool_definition.return_value = mock_tool_details_obj
         mock_service_class.return_value = mock_service_instance
 
         result = compile_vellum_integration_tool_definition(tool)
@@ -266,14 +264,14 @@ def test_tool_definition_and_function_compilation():
         assert result.description == "Enhanced description from service"
         assert result.parameters is not None and "properties" in result.parameters
         assert result.parameters["properties"] is not None and "title" in result.parameters["properties"]
-        mock_service_instance.get_tool_details.assert_called_once_with(
+        mock_service_instance.get_tool_definition.assert_called_once_with(
             integration="GITHUB", provider="COMPOSIO", tool_name="create_issue"
         )
 
     # Test fallback on service failure
     with mock.patch("vellum.workflows.utils.functions.VellumIntegrationService") as mock_service_class:
         mock_service_instance = mock.Mock()
-        mock_service_instance.get_tool_details.side_effect = Exception("Service down")
+        mock_service_instance.get_tool_definition.side_effect = Exception("Service down")
         mock_service_class.return_value = mock_service_instance
 
         result = compile_vellum_integration_tool_definition(tool)

@@ -4,7 +4,7 @@ from unittest import mock
 from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.integrations.vellum_integration_service import VellumIntegrationService
-from vellum.workflows.types.definition import VellumIntegrationToolDefinition
+from vellum.workflows.types.definition import VellumIntegrationToolDetails
 
 
 def test_vellum_integration_service_get_tool_definition_success(vellum_client):
@@ -37,12 +37,16 @@ def test_vellum_integration_service_get_tool_definition_success(vellum_client):
     )
 
     # THEN the tool definition should be returned with all expected fields
-    assert isinstance(result, VellumIntegrationToolDefinition)
+    assert isinstance(result, VellumIntegrationToolDetails)
     assert result.name == "GITHUB_CREATE_AN_ISSUE"
     assert result.description == "Create a new issue in a GitHub repository"
     assert result.provider == VellumIntegrationProviderType.COMPOSIO
-    # Parameters should not be included in the tool definition itself
-    assert not hasattr(result, "parameters")
+    # Parameters should now be included in the tool details
+    assert result.parameters is not None
+    assert result.parameters["type"] == "object"
+    assert "properties" in result.parameters
+    assert "repo" in result.parameters["properties"]
+    assert "title" in result.parameters["properties"]
 
     # AND the API should have been called with the correct parameters
     mock_client.integrations.retrieve_integration_tool_definition.assert_called_once_with(
