@@ -3122,6 +3122,14 @@ client.document_indexes.retrieve(
 <dl>
 <dd>
 
+**mask_indexing_config:** `typing.Optional[bool]` — Whether to mask the indexing configuration in the response
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
     
 </dd>
@@ -5803,6 +5811,14 @@ client.workflow_deployments.list_workflow_deployment_event_executions(
 <dd>
 
 **offset:** `typing.Optional[int]` — The initial index from which to return the executions.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**ordering:** `typing.Optional[str]` 
     
 </dd>
 </dl>

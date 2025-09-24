@@ -127,6 +127,7 @@ class WorkflowDeploymentsClient:
         filters: typing.Optional[str] = None,
         limit: typing.Optional[int] = None,
         offset: typing.Optional[int] = None,
+        ordering: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowDeploymentEventExecutionsResponse:
         """
@@ -141,6 +142,8 @@ class WorkflowDeploymentsClient:
 
         offset : typing.Optional[int]
             The initial index from which to return the executions.
+
+        ordering : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -163,7 +166,7 @@ class WorkflowDeploymentsClient:
         )
         """
         _response = self._raw_client.list_workflow_deployment_event_executions(
-            id, filters=filters, limit=limit, offset=offset, request_options=request_options
+            id, filters=filters, limit=limit, offset=offset, ordering=ordering, request_options=request_options
         )
         return _response.data
 
@@ -546,6 +549,7 @@ class AsyncWorkflowDeploymentsClient:
         filters: typing.Optional[str] = None,
         limit: typing.Optional[int] = None,
         offset: typing.Optional[int] = None,
+        ordering: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> WorkflowDeploymentEventExecutionsResponse:
         """
@@ -560,6 +564,8 @@ class AsyncWorkflowDeploymentsClient:
 
         offset : typing.Optional[int]
             The initial index from which to return the executions.
+
+        ordering : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -590,7 +596,7 @@ class AsyncWorkflowDeploymentsClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.list_workflow_deployment_event_executions(
-            id, filters=filters, limit=limit, offset=offset, request_options=request_options
+            id, filters=filters, limit=limit, offset=offset, ordering=ordering, request_options=request_options
         )
         return _response.data
 

@@ -19,6 +19,7 @@ from .hkunlp_instructor_xl_vectorizer_request import HkunlpInstructorXlVectorize
 from .open_ai_vectorizer_text_embedding_3_large_request import OpenAiVectorizerTextEmbedding3LargeRequest
 from .open_ai_vectorizer_text_embedding_3_small_request import OpenAiVectorizerTextEmbedding3SmallRequest
 from .open_ai_vectorizer_text_embedding_ada_002_request import OpenAiVectorizerTextEmbeddingAda002Request
+from .private_vectorizer_request import PrivateVectorizerRequest
 
 IndexingConfigVectorizerRequest = typing.Union[
     OpenAiVectorizerTextEmbedding3SmallRequest,
@@ -32,4 +33,5 @@ IndexingConfigVectorizerRequest = typing.Union[
     GoogleVertexAiVectorizerTextMultilingualEmbedding002Request,
     GoogleVertexAiVectorizerGeminiEmbedding001Request,
     FastEmbedVectorizerBaaiBgeSmallEnV15Request,
+    PrivateVectorizerRequest,
 ]

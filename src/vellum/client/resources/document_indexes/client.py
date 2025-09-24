@@ -163,7 +163,13 @@ class DocumentIndexesClient:
         )
         return _response.data
 
-    def retrieve(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> DocumentIndexRead:
+    def retrieve(
+        self,
+        id: str,
+        *,
+        mask_indexing_config: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> DocumentIndexRead:
         """
         Used to retrieve a Document Index given its ID or name.
 
@@ -171,6 +177,9 @@ class DocumentIndexesClient:
         ----------
         id : str
             Either the Document Index's ID or its unique name
+
+        mask_indexing_config : typing.Optional[bool]
+            Whether to mask the indexing configuration in the response
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -192,7 +201,9 @@ class DocumentIndexesClient:
             id="id",
         )
         """
-        _response = self._raw_client.retrieve(id, request_options=request_options)
+        _response = self._raw_client.retrieve(
+            id, mask_indexing_config=mask_indexing_config, request_options=request_options
+        )
         return _response.data
 
     def update(
@@ -558,7 +569,13 @@ class AsyncDocumentIndexesClient:
         )
         return _response.data
 
-    async def retrieve(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> DocumentIndexRead:
+    async def retrieve(
+        self,
+        id: str,
+        *,
+        mask_indexing_config: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> DocumentIndexRead:
         """
         Used to retrieve a Document Index given its ID or name.
 
@@ -566,6 +583,9 @@ class AsyncDocumentIndexesClient:
         ----------
         id : str
             Either the Document Index's ID or its unique name
+
+        mask_indexing_config : typing.Optional[bool]
+            Whether to mask the indexing configuration in the response
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -595,7 +615,9 @@ class AsyncDocumentIndexesClient:
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.retrieve(id, request_options=request_options)
+        _response = await self._raw_client.retrieve(
+            id, mask_indexing_config=mask_indexing_config, request_options=request_options
+        )
         return _response.data
 
     async def update(

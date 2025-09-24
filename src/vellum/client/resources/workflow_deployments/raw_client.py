@@ -136,6 +136,7 @@ class RawWorkflowDeploymentsClient:
         filters: typing.Optional[str] = None,
         limit: typing.Optional[int] = None,
         offset: typing.Optional[int] = None,
+        ordering: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[WorkflowDeploymentEventExecutionsResponse]:
         """
@@ -150,6 +151,8 @@ class RawWorkflowDeploymentsClient:
 
         offset : typing.Optional[int]
             The initial index from which to return the executions.
+
+        ordering : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -167,6 +170,7 @@ class RawWorkflowDeploymentsClient:
                 "filters": filters,
                 "limit": limit,
                 "offset": offset,
+                "ordering": ordering,
             },
             request_options=request_options,
         )
@@ -589,6 +593,7 @@ class AsyncRawWorkflowDeploymentsClient:
         filters: typing.Optional[str] = None,
         limit: typing.Optional[int] = None,
         offset: typing.Optional[int] = None,
+        ordering: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[WorkflowDeploymentEventExecutionsResponse]:
         """
@@ -603,6 +608,8 @@ class AsyncRawWorkflowDeploymentsClient:
 
         offset : typing.Optional[int]
             The initial index from which to return the executions.
+
+        ordering : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -620,6 +627,7 @@ class AsyncRawWorkflowDeploymentsClient:
                 "filters": filters,
                 "limit": limit,
                 "offset": offset,
+                "ordering": ordering,
             },
             request_options=request_options,
         )

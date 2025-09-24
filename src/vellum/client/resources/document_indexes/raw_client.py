@@ -168,7 +168,11 @@ class RawDocumentIndexesClient:
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
     def retrieve(
-        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
+        self,
+        id: str,
+        *,
+        mask_indexing_config: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[DocumentIndexRead]:
         """
         Used to retrieve a Document Index given its ID or name.
@@ -177,6 +181,9 @@ class RawDocumentIndexesClient:
         ----------
         id : str
             Either the Document Index's ID or its unique name
+
+        mask_indexing_config : typing.Optional[bool]
+            Whether to mask the indexing configuration in the response
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -190,6 +197,9 @@ class RawDocumentIndexesClient:
             f"v1/document-indexes/{jsonable_encoder(id)}",
             base_url=self._client_wrapper.get_environment().default,
             method="GET",
+            params={
+                "mask_indexing_config": mask_indexing_config,
+            },
             request_options=request_options,
         )
         try:
@@ -580,7 +590,11 @@ class AsyncRawDocumentIndexesClient:
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
     async def retrieve(
-        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
+        self,
+        id: str,
+        *,
+        mask_indexing_config: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[DocumentIndexRead]:
         """
         Used to retrieve a Document Index given its ID or name.
@@ -589,6 +603,9 @@ class AsyncRawDocumentIndexesClient:
         ----------
         id : str
             Either the Document Index's ID or its unique name
+
+        mask_indexing_config : typing.Optional[bool]
+            Whether to mask the indexing configuration in the response
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -602,6 +619,9 @@ class AsyncRawDocumentIndexesClient:
             f"v1/document-indexes/{jsonable_encoder(id)}",
             base_url=self._client_wrapper.get_environment().default,
             method="GET",
+            params={
+                "mask_indexing_config": mask_indexing_config,
+            },
             request_options=request_options,
         )
         try:

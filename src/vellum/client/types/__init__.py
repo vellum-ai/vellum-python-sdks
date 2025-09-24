@@ -356,6 +356,8 @@ from .pdf_search_result_meta_source import PdfSearchResultMetaSource
 from .pdf_search_result_meta_source_request import PdfSearchResultMetaSourceRequest
 from .plain_text_prompt_block import PlainTextPromptBlock
 from .price import Price
+from .private_vectorizer import PrivateVectorizer
+from .private_vectorizer_request import PrivateVectorizerRequest
 from .processing_failure_reason_enum import ProcessingFailureReasonEnum
 from .prompt_block import PromptBlock
 from .prompt_block_state import PromptBlockState
@@ -1044,6 +1046,8 @@ __all__ = [
     "PdfSearchResultMetaSourceRequest",
     "PlainTextPromptBlock",
     "Price",
+    "PrivateVectorizer",
+    "PrivateVectorizerRequest",
     "ProcessingFailureReasonEnum",
     "PromptBlock",
     "PromptBlockState",
