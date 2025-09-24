@@ -898,23 +898,14 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         Returns:
             WorkflowSerializationResult containing exec_config and errors
         """
-        try:
-            workflow = BaseWorkflow.load_from_module(module)
-            workflow_display = get_workflow_display(
-                workflow_class=workflow,
-                client=client,
-                dry_run=dry_run,
-            )
+        workflow = BaseWorkflow.load_from_module(module)
+        workflow_display = get_workflow_display(
+            workflow_class=workflow,
+            client=client,
+            dry_run=dry_run,
+        )
 
-            exec_config = workflow_display.serialize()
-        except TypeError as e:
-            if "Unexpected graph type" in str(e) or "unhashable type: 'set'" in str(e):
-                raise TypeError(
-                    "Invalid graph structure detected. Nested sets or unsupported graph types are not allowed. "
-                    "Please contact Vellum support for assistance with workflow configuration."
-                ) from e
-            else:
-                raise
+        exec_config = workflow_display.serialize()
         additional_files = workflow_display._gather_additional_module_files(module)
 
         if additional_files:
