@@ -1564,6 +1564,7 @@ export function finalOutputNodeFactory({
   outputId,
   name,
   label,
+  outputType = "STRING",
 }: {
   includeInput?: boolean;
   id?: string;
@@ -1571,6 +1572,7 @@ export function finalOutputNodeFactory({
   outputId?: string;
   name?: string;
   label?: string;
+  outputType?: VellumVariableType;
 } = {}): NodeDataFactoryBuilder<FinalOutputNode> {
   const inputs: NodeInput[] = [];
   const outputs: NodeOutput[] = [];
@@ -1611,7 +1613,7 @@ export function finalOutputNodeFactory({
     type: "TERMINAL",
     data: {
       label: label ?? "Final Output Node",
-      outputType: "STRING",
+      outputType: outputType,
       name: name ?? "final-output",
       targetHandleId: targetHandleId ?? "<target-handle-id>",
       nodeInputId: "9bf086d4-feed-47ff-9736-a5a6aa3a11cc",
