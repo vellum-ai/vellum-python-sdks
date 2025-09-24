@@ -3,6 +3,7 @@ from pathlib import Path
 import sys
 import tempfile
 
+from vellum.workflows.exceptions import WorkflowInitializationException
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 
 
@@ -111,7 +112,7 @@ class InvalidWorkflow(BaseWorkflow):
         sys.path.insert(0, temp_dir)
 
         try:
-            with pytest.raises(TypeError) as exc_info:
+            with pytest.raises(WorkflowInitializationException) as exc_info:
                 BaseWorkflowDisplay.serialize_module("test_invalid_workflow")
 
             error_message = str(exc_info.value)
