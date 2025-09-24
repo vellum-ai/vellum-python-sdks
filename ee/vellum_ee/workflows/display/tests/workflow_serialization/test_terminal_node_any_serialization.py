@@ -42,8 +42,8 @@ def test_serialize_workflow_with_any_output_type():
 
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
     terminal_node = next(node for node in workflow_raw_data["nodes"] if node["type"] == "TERMINAL")
-    assert terminal_node["data"]["output_type"] == "JSON"
+    assert terminal_node["data"]["output_type"] == "STRING"
 
     output_variables = serialized_workflow["output_variables"]
     assert len(output_variables) == 1
-    assert output_variables[0]["type"] == "JSON"
+    assert output_variables[0]["type"] == "STRING"
