@@ -235,7 +235,7 @@ def test_tool_definition_and_function_compilation():
     """Test tool properties and function compilation with both success and failure scenarios."""
     # Test basic tool properties
     tool = github_create_issue_tool
-    assert tool.type == "INTEGRATION"
+    assert tool.type == "VELLUM_INTEGRATION"
     assert tool.provider.value == "COMPOSIO"
     assert tool.integration == "GITHUB"
     assert tool.name == "create_issue"

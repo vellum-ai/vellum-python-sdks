@@ -61,7 +61,7 @@ def test_serialize_workflow():
     assert len(functions_value) == 1
 
     function = functions_value[0]
-    assert function["type"] == "INTEGRATION"
+    assert function["type"] == "VELLUM_INTEGRATION"
     assert function["provider"] == "COMPOSIO"  # VellumIntegrationProviderType.COMPOSIO
     assert function["integration"] == "GITHUB"
     assert function["name"] == "create_issue"
