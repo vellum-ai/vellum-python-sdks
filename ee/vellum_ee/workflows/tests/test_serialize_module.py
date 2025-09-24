@@ -1,3 +1,8 @@
+import pytest
+from pathlib import Path
+import sys
+import tempfile
+
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 
 
@@ -75,3 +80,43 @@ def test_serialize_module_includes_additional_files():
     assert "def helper_function():" in additional_files["helper.py"]
     assert "sample data file" in additional_files["data.txt"]
     assert "CONSTANT_VALUE" in additional_files["utils/constants.py"]
+
+
+def test_serialize_module__with_invalid_nested_set_graph():
+    """
+    Tests that serialize_module raises a clear user-facing exception for workflows with nested sets in graph attribute.
+    """
+    with tempfile.TemporaryDirectory() as temp_dir:
+        module_dir = Path(temp_dir) / "test_invalid_workflow"
+        module_dir.mkdir()
+
+        (module_dir / "__init__.py").write_text("")
+
+        workflow_content = """
+from vellum.workflows import BaseWorkflow
+from vellum.workflows.nodes import BaseNode
+
+class TestNode(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        value = "test"
+
+class InvalidWorkflow(BaseWorkflow):
+    graph = {TestNode, {TestNode}}
+
+    class Outputs(BaseWorkflow.Outputs):
+        result = TestNode.Outputs.value
+"""
+        (module_dir / "workflow.py").write_text(workflow_content)
+
+        sys.path.insert(0, temp_dir)
+
+        try:
+            with pytest.raises(TypeError) as exc_info:
+                BaseWorkflowDisplay.serialize_module("test_invalid_workflow")
+
+            error_message = str(exc_info.value)
+            assert "Invalid graph structure detected" in error_message
+            assert "Nested sets or unsupported graph types are not allowed" in error_message
+            assert "contact Vellum support" in error_message
+        finally:
+            sys.path.remove(temp_dir)
