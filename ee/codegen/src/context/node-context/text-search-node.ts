@@ -60,7 +60,9 @@ export class TextSearchNodeContext extends BaseNodeContext<SearchNode> {
           documentIndex = await new DocumentIndexesClient({
             apiKey: this.workflowContext.vellumApiKey,
             environment: this.workflowContext.vellumApiEnvironment,
-          }).retrieve(rule.data.value?.toString());
+          }).retrieve(rule.data.value?.toString(), {
+            maskIndexingConfig: true,
+          });
         } catch (e) {
           if (e instanceof VellumError && e.statusCode === 404) {
             this.workflowContext.addError(
