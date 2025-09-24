@@ -50,7 +50,6 @@ class VellumIntegrationService:
                 integration=integration,
                 name=response.name,
                 description=response.description,
-                parameters=response.parameters,
             )
         except Exception as e:
             error_message = f"Failed to retrieve tool definition for {tool_name}: {str(e)}"

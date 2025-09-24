@@ -175,7 +175,6 @@ class VellumIntegrationToolDefinition(UniversalBaseModel):
 
     # Required for tool base consistency
     description: str
-    parameters: Optional[Dict[str, Any]] = None  # Tool parameters schema (hydrated at runtime)
 
 
 class MCPServer(UniversalBaseModel):
