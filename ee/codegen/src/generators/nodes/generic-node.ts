@@ -372,29 +372,31 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   break;
                 }
                 case "VELLUM_INTEGRATION": {
-                  const integrationTool = f as VellumIntegrationToolFunctionArgs;
-
-                  // Map frontend field names to backend expectations
-                  const integrationName = integrationTool.integration_name?.toUpperCase() || "UNKNOWN";
-                  const toolSlug = integrationTool.tool_slug || integrationTool.name || "UNKNOWN";
-                  const description = integrationTool.description || "UNKNOWN";
+                  const integrationTool =
+                    f as VellumIntegrationToolFunctionArgs;
 
                   const args = [
                     python.methodArgument({
                       name: "provider",
-                      value: python.TypeInstantiation.str("COMPOSIO"),
+                      value: python.TypeInstantiation.str(
+                        integrationTool.provider
+                      ),
                     }),
                     python.methodArgument({
                       name: "integration",
-                      value: python.TypeInstantiation.str(integrationName),
+                      value: python.TypeInstantiation.str(
+                        integrationTool.integration
+                      ),
                     }),
                     python.methodArgument({
                       name: "name",
-                      value: python.TypeInstantiation.str(toolSlug),
+                      value: python.TypeInstantiation.str(integrationTool.name),
                     }),
                     python.methodArgument({
                       name: "description",
-                      value: python.TypeInstantiation.str(description),
+                      value: python.TypeInstantiation.str(
+                        integrationTool.description
+                      ),
                     }),
                   ];
 

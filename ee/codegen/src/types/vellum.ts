@@ -1017,9 +1017,6 @@ export type VellumIntegrationToolFunctionArgs = {
   provider: string;
   integration: string;
   name: string;
-  tool_name: string;
-  tool_slug: string;
-  integration_name: string;
 } & NameDescription;
 
 export type ToolArgs = (
