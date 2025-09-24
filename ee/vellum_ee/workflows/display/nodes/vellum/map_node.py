@@ -4,7 +4,7 @@ from typing import Generic, Optional, TypeVar, cast
 from vellum.workflows.nodes import MapNode
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.workflows.base import BaseWorkflow
-from vellum_ee.workflows.display.nodes.utils import get_descriptor_value, raise_if_descriptor
+from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.base_adornment_node import BaseAdornmentNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
@@ -22,16 +22,13 @@ class BaseMapNodeDisplay(BaseAdornmentNodeDisplay[_MapNodeType], Generic[_MapNod
         node = self._node
         node_id = self.node_id
 
-        subworkflow_value = get_descriptor_value(node.subworkflow)
-        if subworkflow_value is None:
-            subworkflow = BaseWorkflow
-        else:
-            subworkflow = cast(type[BaseWorkflow], subworkflow_value)
+        subworkflow_value = raise_if_descriptor(node.subworkflow)
+        subworkflow = cast(type[BaseWorkflow], subworkflow_value) if subworkflow_value is not None else BaseWorkflow
 
         items_node_input = create_node_input(
             node_id=node_id,
             input_name="items",
-            value=get_descriptor_value(node.items),
+            value=node.items or [],
             display_context=display_context,
             input_id=self.node_input_ids_by_name.get("items"),
         )

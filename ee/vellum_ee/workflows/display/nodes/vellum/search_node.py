@@ -12,7 +12,7 @@ from vellum.workflows.nodes.displayable.search_node import SearchNode
 from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
-from vellum_ee.workflows.display.nodes.utils import get_descriptor_value, raise_if_descriptor
+from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
 from vellum_ee.workflows.display.utils.vellum import InputVariablePointer
@@ -111,8 +111,8 @@ class BaseSearchNodeDisplay(BaseNodeDisplay[_SearchNodeType], Generic[_SearchNod
         limit = raw_limit if raw_limit is not None else options.limit if options is not None else None
 
         node_input_names_and_values = [
-            ("query", get_descriptor_value(node.query)),
-            ("document_index_id", get_descriptor_value(node.document_index)),
+            ("query", node.query),
+            ("document_index_id", node.document_index),
             ("weights", weights.dict() if weights else None),
             ("limit", limit),
             ("separator", raise_if_descriptor(node.chunk_separator)),

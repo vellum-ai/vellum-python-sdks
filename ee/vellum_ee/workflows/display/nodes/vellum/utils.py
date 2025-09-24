@@ -55,7 +55,9 @@ def create_node_input_value_pointer_rules(
     if isinstance(value, BaseDescriptor):
         if isinstance(value, NodeReference):
             if value.instance is None:
-                raise ValueError(f"Expected NodeReference {value.name} to have an instance")
+                pointer = create_pointer(None, pointer_type)
+                node_input_value_pointer_rules.append(pointer)
+                return node_input_value_pointer_rules
             value = cast(BaseDescriptor, value.instance)
 
         if isinstance(value, LazyReference):
