@@ -1,11 +1,11 @@
 sources:
   my-pg-source:
     kind: postgres
-    host: <your-host>
+    host: 127.0.0.1
     port: 5432
     database: postgres
     user: postgres
-    password: <your-password>
+    password: postgres
 tools:
   search-hotels-by-name:
     kind: postgres-sql
