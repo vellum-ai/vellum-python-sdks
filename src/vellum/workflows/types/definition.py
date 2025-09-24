@@ -177,6 +177,17 @@ class VellumIntegrationToolDefinition(UniversalBaseModel):
     description: str
 
 
+class VellumIntegrationToolDetails(VellumIntegrationToolDefinition):
+    """Extended version of VellumIntegrationToolDefinition with runtime parameters.
+
+    This class includes the parameters field which is populated during compilation
+    from the Vellum integrations API response. It inherits all fields from the base
+    VellumIntegrationToolDefinition class.
+    """
+
+    parameters: Optional[Dict[str, Any]] = None
+
+
 class MCPServer(UniversalBaseModel):
     type: Literal["MCP_SERVER"] = "MCP_SERVER"
     name: str

@@ -334,8 +334,8 @@ def compile_vellum_integration_tool_definition(tool_def: VellumIntegrationToolDe
     """
     try:
         service = VellumIntegrationService()
-        # Get the raw response which includes parameters
-        response = service._client.integrations.retrieve_integration_tool_definition(
+        # Get the detailed tool information including parameters
+        tool_details = service.get_tool_details(
             integration=tool_def.integration,
             provider=tool_def.provider.value,
             tool_name=tool_def.name,
@@ -343,8 +343,8 @@ def compile_vellum_integration_tool_definition(tool_def: VellumIntegrationToolDe
 
         return FunctionDefinition(
             name=tool_def.name,
-            description=response.description,
-            parameters=response.parameters or {},
+            description=tool_details.description,
+            parameters=tool_details.parameters or {},
         )
     except Exception:
         # Fallback for service failures

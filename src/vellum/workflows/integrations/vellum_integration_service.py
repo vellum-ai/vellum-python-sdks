@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional
 from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
-from vellum.workflows.types.definition import VellumIntegrationToolDefinition
+from vellum.workflows.types.definition import VellumIntegrationToolDefinition, VellumIntegrationToolDetails
 from vellum.workflows.vellum_client import create_vellum_client
 
 
@@ -53,6 +53,49 @@ class VellumIntegrationService:
             )
         except Exception as e:
             error_message = f"Failed to retrieve tool definition for {tool_name}: {str(e)}"
+            raise NodeException(
+                message=error_message,
+                code=WorkflowErrorCode.INVALID_OUTPUTS,
+            ) from e
+
+    def get_tool_details(
+        self,
+        integration: str,
+        provider: str,
+        tool_name: str,
+    ) -> VellumIntegrationToolDetails:
+        """Retrieve detailed tool information including parameters from Vellum integrations.
+
+        This method returns the full tool details including parameters, which is used
+        during compilation to create FunctionDefinition objects.
+
+        Args:
+            integration: The integration name (e.g., "GITHUB", "SLACK")
+            provider: The integration provider name (e.g., "COMPOSIO")
+            tool_name: The tool's unique name as specified by the provider
+
+        Returns:
+            VellumIntegrationToolDetails containing the tool definition with parameters
+
+        Raises:
+            NodeException: If the tool details cannot be retrieved
+        """
+        try:
+            response = self._client.integrations.retrieve_integration_tool_definition(
+                integration=integration,
+                provider=provider,
+                tool_name=tool_name,
+            )
+
+            return VellumIntegrationToolDetails(
+                provider=VellumIntegrationProviderType(response.provider),
+                integration=integration,
+                name=response.name,
+                description=response.description,
+                parameters=response.parameters,
+            )
+        except Exception as e:
+            error_message = f"Failed to retrieve tool details for {tool_name}: {str(e)}"
             raise NodeException(
                 message=error_message,
                 code=WorkflowErrorCode.INVALID_OUTPUTS,
