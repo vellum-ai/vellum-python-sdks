@@ -70,7 +70,7 @@ def main() -> None:
                 display_instance = display_class()
                 display_instance.serialize(display_context)
             except Exception as e:
-                errors.append({"node": node_class.__name__, "error": str(e)})
+                errors.append({"node": node_class.__name__, "error": f"{e.__class__.__name__}: {str(e)}"})
 
     result = {"nodes": successful_nodes, "errors": errors}
 
