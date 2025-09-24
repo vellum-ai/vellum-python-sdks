@@ -160,7 +160,7 @@ def test_vellum_integration_tool_definition_creation():
         description="Create a new issue in a GitHub repository",
     )
 
-    assert vellum_tool.type == "INTEGRATION"
+    assert vellum_tool.type == "VELLUM_INTEGRATION"
     assert vellum_tool.provider == VellumIntegrationProviderType.COMPOSIO
     assert vellum_tool.integration == "GITHUB"
     assert vellum_tool.name == "create_issue"
@@ -176,7 +176,7 @@ def test_vellum_integration_tool_definition_with_different_provider():
         description="Send a message to a Slack channel",
     )
 
-    assert vellum_tool.type == "INTEGRATION"
+    assert vellum_tool.type == "VELLUM_INTEGRATION"
     assert vellum_tool.provider == VellumIntegrationProviderType.COMPOSIO
     assert vellum_tool.integration == "SLACK"
     assert vellum_tool.name == "send_message"
