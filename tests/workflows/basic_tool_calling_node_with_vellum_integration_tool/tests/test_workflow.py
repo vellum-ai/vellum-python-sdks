@@ -27,12 +27,23 @@ def _setup_mock_service(
     execute_error=None,
 ):
     """Helper to set up VellumIntegrationService mocks."""
+    from vellum.workflows.constants import VellumIntegrationProviderType
+    from vellum.workflows.types.definition import VellumIntegrationToolDetails
+
     mock_service_instance = mock.Mock()
 
     if get_tool_error:
         mock_service_instance.get_tool_definition.side_effect = get_tool_error
     elif tool_details:
-        mock_service_instance.get_tool_definition.return_value = tool_details
+        # Create proper VellumIntegrationToolDetails object from dict
+        tool_details_obj = VellumIntegrationToolDetails(
+            provider=VellumIntegrationProviderType.COMPOSIO,
+            integration="GITHUB",
+            name=tool_details.get("name", "create_issue"),
+            description=tool_details.get("description", "Mock description"),
+            parameters=tool_details.get("parameters", {}),
+        )
+        mock_service_instance.get_tool_definition.return_value = tool_details_obj
 
     if execute_error:
         mock_service_instance.execute_tool.side_effect = execute_error
@@ -232,17 +243,20 @@ def test_tool_definition_and_function_compilation():
 
     from vellum.workflows.utils.functions import compile_vellum_integration_tool_definition
 
-    # Test successful compilation
-    mock_tool_details = {
-        "name": "create_issue",
-        "description": "Enhanced description from service",
-        "parameters": {"type": "object", "properties": {"title": {"type": "string", "description": "Issue title"}}},
-        "provider": "COMPOSIO",
-    }
-
     with mock.patch("vellum.workflows.utils.functions.VellumIntegrationService") as mock_service_class:
+        from vellum.workflows.constants import VellumIntegrationProviderType
+        from vellum.workflows.types.definition import VellumIntegrationToolDetails
+
         mock_service_instance = mock.Mock()
-        mock_service_instance.get_tool_definition.return_value = mock_tool_details
+        # Create a proper VellumIntegrationToolDetails object
+        mock_tool_details_obj = VellumIntegrationToolDetails(
+            provider=VellumIntegrationProviderType.COMPOSIO,
+            integration="GITHUB",
+            name="create_issue",
+            description="Enhanced description from service",
+            parameters={"type": "object", "properties": {"title": {"type": "string", "description": "Issue title"}}},
+        )
+        mock_service_instance.get_tool_definition.return_value = mock_tool_details_obj
         mock_service_class.return_value = mock_service_instance
 
         result = compile_vellum_integration_tool_definition(tool)

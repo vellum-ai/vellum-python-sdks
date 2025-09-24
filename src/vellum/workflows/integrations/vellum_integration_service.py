@@ -1,7 +1,9 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
+from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
+from vellum.workflows.types.definition import VellumIntegrationToolDetails
 from vellum.workflows.vellum_client import create_vellum_client
 
 
@@ -13,16 +15,16 @@ class VellumIntegrationService:
     own integration infrastructure.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, client: Optional[Any] = None) -> None:
         """Initialize the VellumIntegrationService with a Vellum client."""
-        self._client = create_vellum_client()
+        self._client = client or create_vellum_client()
 
     def get_tool_definition(
         self,
         integration: str,
         provider: str,
         tool_name: str,
-    ) -> Dict[str, Any]:
+    ) -> VellumIntegrationToolDetails:
         """Retrieve a tool definition from Vellum integrations.
 
         Args:
@@ -31,7 +33,7 @@ class VellumIntegrationService:
             tool_name: The tool's unique name as specified by the provider
 
         Returns:
-            Dict containing the tool definition with name, description, and parameters
+            VellumIntegrationToolDetails containing the tool definition with parameters
 
         Raises:
             NodeException: If the tool definition cannot be retrieved
@@ -43,13 +45,13 @@ class VellumIntegrationService:
                 tool_name=tool_name,
             )
 
-            # Convert the response to a dict format matching what's expected
-            return {
-                "name": response.name,
-                "description": response.description,
-                "parameters": response.parameters,
-                "provider": response.provider,
-            }
+            return VellumIntegrationToolDetails(
+                provider=VellumIntegrationProviderType(response.provider),
+                integration=integration,
+                name=response.name,
+                description=response.description,
+                parameters=response.parameters,
+            )
         except Exception as e:
             error_message = f"Failed to retrieve tool definition for {tool_name}: {str(e)}"
             raise NodeException(
