@@ -97,9 +97,6 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
         exception: Optional[NodeException] = None
         fulfilled_output_names: Set[str] = set()
 
-        # Yield initiated event for chat_history
-        yield BaseOutput(name="chat_history")
-
         for event in subworkflow_stream:
             self._context._emit_subworkflow_event(event)
 
