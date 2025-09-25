@@ -3,6 +3,7 @@ from typing import Any, ClassVar, Dict, Generic, Iterator, List, Optional, Set, 
 from vellum import ChatMessage, PromptBlock, PromptOutput
 from vellum.client.types.prompt_parameters import PromptParameters
 from vellum.client.types.prompt_settings import PromptSettings
+from vellum.client.types.string_chat_message_content import StringChatMessageContent
 from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
 from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.errors.types import WorkflowErrorCode
@@ -101,20 +102,59 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
         for event in subworkflow_stream:
             self._context._emit_subworkflow_event(event)
 
+            # Handle streaming events from child nodes
+            if event.name == "node.execution.streaming":
+                if event.output.name == "results" and isinstance(event.output.delta, ChatMessage):
+                    yield BaseOutput(
+                        name="chat_history",
+                        delta=[event.output.delta],
+                    )
+                continue
+
             if not is_workflow_event(event):
                 continue
             if event.workflow_definition != ToolCallingWorkflow:
                 continue
 
             if event.name == "workflow.execution.streaming":
-                if event.output.name == "chat_history":
+                if event.output.name == "results":
+                    if event.output.is_streaming:
+                        # Stream text deltas and function calls as proper chat history
+                        if isinstance(event.output.delta, str):
+                            text_message = ChatMessage(
+                                text=event.output.delta,
+                                role="ASSISTANT",
+                                content=StringChatMessageContent(type="STRING", value=event.output.delta),
+                                source=None,
+                            )
+                            yield BaseOutput(
+                                name="chat_history",
+                                delta=[text_message],
+                            )
+                        elif isinstance(event.output.delta, FunctionCall):
+                            function_call_message = ChatMessage(
+                                text=None,
+                                role="ASSISTANT",
+                                content=FunctionCallChatMessageContent(
+                                    type="FUNCTION_CALL",
+                                    value=FunctionCallChatMessageContentValue.model_validate(
+                                        event.output.delta.model_dump()
+                                    ),
+                                ),
+                                source=None,
+                            )
+                            yield BaseOutput(
+                                name="chat_history",
+                                delta=[function_call_message],
+                            )
+                elif event.output.name == "chat_history":
                     if event.output.is_fulfilled:
                         fulfilled_output_names.add(event.output.name)
-                    yield event.output
+                        yield event.output
                 elif event.output.name == "text":
                     if event.output.is_fulfilled:
                         fulfilled_output_names.add(event.output.name)
-                    yield event.output
+                        yield event.output
             elif event.name == "workflow.execution.fulfilled":
                 outputs = event.outputs
             elif event.name == "workflow.execution.rejected":

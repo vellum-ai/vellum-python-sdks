@@ -186,6 +186,15 @@ class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode[ToolCallingStat
                 outputs[output.name] = output.value
             yield output
 
+        yield BaseOutput(
+            name="results",
+            delta=ChatMessage(
+                role="FUNCTION",
+                content=StringChatMessageContent(value=json.dumps(outputs, cls=DefaultStateEncoder)),
+                source=self._extract_function_call_id(),
+            ),
+        )
+
         # Add the result to the chat history
         self._add_function_result_to_chat_history(outputs, self.state)
 
@@ -225,10 +234,16 @@ class FunctionNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
         except Exception as e:
             self._handle_tool_exception(e, "function", self.function_definition.__name__)
 
-        # Add the result to the chat history
-        self._add_function_result_to_chat_history(result, self.state)
+        yield BaseOutput(
+            name="results",
+            delta=ChatMessage(
+                role="FUNCTION",
+                content=StringChatMessageContent(value=json.dumps(result, cls=DefaultStateEncoder)),
+                source=self._extract_function_call_id(),
+            ),
+        )
 
-        yield from []
+        self._add_function_result_to_chat_history(result, self.state)
 
 
 class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
@@ -252,10 +267,17 @@ class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
         except Exception as e:
             self._handle_tool_exception(e, "Composio tool", self.composio_tool.action)
 
+        yield BaseOutput(
+            name="results",
+            delta=ChatMessage(
+                role="FUNCTION",
+                content=StringChatMessageContent(value=json.dumps(result, cls=DefaultStateEncoder)),
+                source=self._extract_function_call_id(),
+            ),
+        )
+
         # Add result to chat history
         self._add_function_result_to_chat_history(result, self.state)
-
-        yield from []
 
 
 class MCPNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
@@ -272,10 +294,16 @@ class MCPNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
         except Exception as e:
             self._handle_tool_exception(e, "MCP tool", self.mcp_tool.name)
 
-        # Add result to chat history
-        self._add_function_result_to_chat_history(result, self.state)
+        yield BaseOutput(
+            name="results",
+            delta=ChatMessage(
+                role="FUNCTION",
+                content=StringChatMessageContent(value=json.dumps(result, cls=DefaultStateEncoder)),
+                source=self._extract_function_call_id(),
+            ),
+        )
 
-        yield from []
+        self._add_function_result_to_chat_history(result, self.state)
 
 
 class VellumIntegrationNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
