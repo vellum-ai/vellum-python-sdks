@@ -1,6 +1,6 @@
 from typing import Any, ClassVar, Dict, Generic, Iterator, List, Optional, Set, Union
 
-from vellum import ChatMessage, PromptBlock
+from vellum import ChatMessage, PromptBlock, PromptOutput
 from vellum.client.types.prompt_parameters import PromptParameters
 from vellum.client.types.prompt_settings import PromptSettings
 from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
@@ -82,7 +82,7 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
                 class Outputs(BaseWorkflow.Outputs):
                     text: str = self.tool_prompt_node.Outputs.text
                     chat_history: List[ChatMessage] = ToolCallingState.chat_history
-                    results: List[ChatMessage] = self.tool_prompt_node.Outputs.results
+                    results: List[PromptOutput] = self.tool_prompt_node.Outputs.results
 
             subworkflow = ToolCallingWorkflow(
                 parent_state=self.state,
