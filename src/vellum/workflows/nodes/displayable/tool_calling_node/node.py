@@ -82,6 +82,7 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
                 class Outputs(BaseWorkflow.Outputs):
                     text: str = self.tool_prompt_node.Outputs.text
                     chat_history: List[ChatMessage] = ToolCallingState.chat_history
+                    results = self.tool_prompt_node.Outputs.results
 
             subworkflow = ToolCallingWorkflow(
                 parent_state=self.state,
