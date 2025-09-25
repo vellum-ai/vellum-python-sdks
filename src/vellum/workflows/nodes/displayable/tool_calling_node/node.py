@@ -1,6 +1,9 @@
 from typing import Any, ClassVar, Dict, Generic, Iterator, List, Optional, Set, Union
 
 from vellum import ChatMessage, PromptBlock, PromptOutput
+from vellum.client.types.function_call import FunctionCall
+from vellum.client.types.function_call_chat_message_content import FunctionCallChatMessageContent
+from vellum.client.types.function_call_chat_message_content_value import FunctionCallChatMessageContentValue
 from vellum.client.types.prompt_parameters import PromptParameters
 from vellum.client.types.prompt_settings import PromptSettings
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
