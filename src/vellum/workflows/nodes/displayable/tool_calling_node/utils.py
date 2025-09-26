@@ -1,3 +1,4 @@
+import inspect
 import json
 import logging
 from typing import Any, Callable, Dict, Iterator, List, Optional, Type, Union, cast
@@ -522,12 +523,17 @@ def create_function_node(
                 merged_kwargs = kwargs.copy()
                 inputs = getattr(func, "__vellum_inputs__", {})
                 if inputs:
+                    signature = inspect.signature(func)
+                    func_params = set(signature.parameters.keys())
+
                     for param_name, param_ref in inputs.items():
-                        if isinstance(param_ref, BaseDescriptor):
-                            resolved_value = param_ref.resolve(self.state)
-                        else:
-                            resolved_value = param_ref
-                        merged_kwargs[param_name] = resolved_value
+                        # Only add the parameter if the function actually accepts it
+                        if param_name in func_params:
+                            if isinstance(param_ref, BaseDescriptor):
+                                resolved_value = param_ref.resolve(self.state)
+                            else:
+                                resolved_value = param_ref
+                            merged_kwargs[param_name] = resolved_value
 
                 return func(**merged_kwargs)
 
