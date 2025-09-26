@@ -42,8 +42,7 @@ def test_stream_workflow__happy_path(vellum_adhoc_prompt_client):
             ]
 
         if call_count == 1:
-            # First call: Stream function call
-            events: List[ExecutePromptEvent] = [
+            first_events: List[ExecutePromptEvent] = [
                 InitiatedExecutePromptEvent(execution_id=execution_id),
                 StreamingExecutePromptEvent(
                     execution_id=execution_id,
@@ -63,8 +62,7 @@ def test_stream_workflow__happy_path(vellum_adhoc_prompt_client):
                 ),
             ]
         else:
-            # Second call: Stream final response
-            events: List[ExecutePromptEvent] = [
+            second_events: List[ExecutePromptEvent] = [
                 InitiatedExecutePromptEvent(execution_id=execution_id),
                 StreamingExecutePromptEvent(
                     execution_id=execution_id,
@@ -78,7 +76,10 @@ def test_stream_workflow__happy_path(vellum_adhoc_prompt_client):
                     outputs=expected_outputs,
                 ),
             ]
-        yield from events
+        if call_count == 1:
+            yield from first_events
+        else:
+            yield from second_events
 
     vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
 
@@ -95,32 +96,40 @@ def test_stream_workflow__happy_path(vellum_adhoc_prompt_client):
 
     streaming_event_1 = chat_history_events[1]
     assert streaming_event_1.output.is_streaming
-    assert len(streaming_event_1.output.delta) == 1
-    assert streaming_event_1.output.delta[0].role == "ASSISTANT"
-    assert streaming_event_1.output.delta[0].content.type == "FUNCTION_CALL"
-    assert streaming_event_1.output.delta[0].content.value.name == "get_current_weather"
-    assert streaming_event_1.output.delta[0].content.value.arguments == {"location": "San Francisco", "unit": "celsius"}
-    assert streaming_event_1.output.delta[0].content.value.id == "call_7115tNTmEACTsQRGwKpJipJK"
-    assert streaming_event_1.output.delta[0].content.value.state == "FULFILLED"
+    assert streaming_event_1.output.delta is not None
+    delta_1 = streaming_event_1.output.delta
+    assert isinstance(delta_1, list)
+    assert len(delta_1) == 1
+    assert delta_1[0].role == "ASSISTANT"
+    assert delta_1[0].content.type == "FUNCTION_CALL"
+    assert delta_1[0].content.value.name == "get_current_weather"
+    assert delta_1[0].content.value.arguments == {"location": "San Francisco", "unit": "celsius"}
+    assert delta_1[0].content.value.id == "call_7115tNTmEACTsQRGwKpJipJK"
+    assert delta_1[0].content.value.state == "FULFILLED"
 
     streaming_event_2 = chat_history_events[2]
     assert streaming_event_2.output.is_streaming
-    assert len(streaming_event_2.output.delta) == 1
-    assert streaming_event_2.output.delta[0].role == "FUNCTION"
-    assert streaming_event_2.output.delta[0].content.type == "STRING"
+    assert streaming_event_2.output.delta is not None
+    delta_2 = streaming_event_2.output.delta
+    assert isinstance(delta_2, list)
+    assert len(delta_2) == 1
+    assert delta_2[0].role == "FUNCTION"
+    assert delta_2[0].content.type == "STRING"
     assert (
-        streaming_event_2.output.delta[0].content.value
+        delta_2[0].content.value
         == '"The current weather in San Francisco is sunny with a temperature of 70 degrees celsius."'
     )
 
     streaming_event_3 = chat_history_events[3]
     assert streaming_event_3.output.is_streaming
-    assert len(streaming_event_3.output.delta) == 1
+    assert streaming_event_3.output.delta is not None
+    delta_3 = streaming_event_3.output.delta
+    assert isinstance(delta_3, list)
+    assert len(delta_3) == 1
     assert (
-        streaming_event_3.output.delta[0].text
-        == "Based on the function call, the current temperature in San Francisco is 70 degrees celsius."
+        delta_3[0].text == "Based on the function call, the current temperature in San Francisco is 70 degrees celsius."
     )
-    assert streaming_event_3.output.delta[0].role == "ASSISTANT"
+    assert delta_3[0].role == "ASSISTANT"
 
     fulfilled_event = chat_history_events[4]
     assert fulfilled_event.output.is_fulfilled
@@ -141,7 +150,7 @@ def test_stream_chat_history_content__deltas_equal_final_value(vellum_adhoc_prom
         call_count = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count
 
         if call_count == 1:
-            events: List[ExecutePromptEvent] = [
+            first_events: List[ExecutePromptEvent] = [
                 InitiatedExecutePromptEvent(execution_id=execution_id),
                 StreamingExecutePromptEvent(
                     execution_id=execution_id, output=StringVellumValue(value="Let"), output_index=0
@@ -173,7 +182,7 @@ def test_stream_chat_history_content__deltas_equal_final_value(vellum_adhoc_prom
                 ),
             ]
         else:
-            events: List[ExecutePromptEvent] = [
+            second_events: List[ExecutePromptEvent] = [
                 InitiatedExecutePromptEvent(execution_id=execution_id),
                 StreamingExecutePromptEvent(
                     execution_id=execution_id, output=StringVellumValue(value="Based"), output_index=0
@@ -230,7 +239,10 @@ def test_stream_chat_history_content__deltas_equal_final_value(vellum_adhoc_prom
                 ),
             ]
 
-        yield from events
+        if call_count == 1:
+            yield from first_events
+        else:
+            yield from second_events
 
     vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
 
@@ -250,34 +262,56 @@ def test_stream_chat_history_content__deltas_equal_final_value(vellum_adhoc_prom
     first_chat_streaming_events = [e for e in first_chat_history_events if e.output.is_streaming]
     assert len(first_chat_streaming_events) == 5
 
+    first_chat_deltas = []
+
     assert first_chat_streaming_events[0].output.is_streaming
     assert first_chat_streaming_events[0].output.name == "chat_history"
-    assert first_chat_streaming_events[0].output.delta[0].text == "Let"
+    assert first_chat_streaming_events[0].output.delta is not None
+    delta_0 = first_chat_streaming_events[0].output.delta
+    assert isinstance(delta_0, list)
+    assert delta_0[0].text == "Let"
+    first_chat_deltas.append(delta_0[0].text)
 
     assert first_chat_streaming_events[1].output.is_streaming
     assert first_chat_streaming_events[1].output.name == "chat_history"
-    assert first_chat_streaming_events[1].output.delta[0].text == " me"
+    assert first_chat_streaming_events[1].output.delta is not None
+    delta_1 = first_chat_streaming_events[1].output.delta
+    assert isinstance(delta_1, list)
+    assert delta_1[0].text == " me"
+    first_chat_deltas.append(delta_1[0].text)
 
     assert first_chat_streaming_events[2].output.is_streaming
     assert first_chat_streaming_events[2].output.name == "chat_history"
-    assert first_chat_streaming_events[2].output.delta[0].text == " check"
+    assert first_chat_streaming_events[2].output.delta is not None
+    delta_2 = first_chat_streaming_events[2].output.delta
+    assert isinstance(delta_2, list)
+    assert delta_2[0].text == " check"
+    first_chat_deltas.append(delta_2[0].text)
 
     assert first_chat_streaming_events[3].output.is_streaming
     assert first_chat_streaming_events[3].output.name == "chat_history"
-    assert first_chat_streaming_events[3].output.delta[0].text == " the"
+    assert first_chat_streaming_events[3].output.delta is not None
+    delta_3 = first_chat_streaming_events[3].output.delta
+    assert isinstance(delta_3, list)
+    assert delta_3[0].text == " the"
+    first_chat_deltas.append(delta_3[0].text)
 
     assert first_chat_streaming_events[4].output.is_streaming
     assert first_chat_streaming_events[4].output.name == "chat_history"
-    assert first_chat_streaming_events[4].output.delta[0].text == " weather."
-
-    first_chat_deltas = [event.output.delta[0].text for event in first_chat_streaming_events]
+    assert first_chat_streaming_events[4].output.delta is not None
+    delta_4 = first_chat_streaming_events[4].output.delta
+    assert isinstance(delta_4, list)
+    assert delta_4[0].text == " weather."
+    first_chat_deltas.append(delta_4[0].text)
     first_combined_chat_text = "".join(first_chat_deltas)
     assert first_combined_chat_text == expected_first_chat_message
 
     assert function_result_event.output.name == "chat_history"
-    assert isinstance(function_result_event.output.delta, list)
-    assert len(function_result_event.output.delta) == 1
-    function_message = function_result_event.output.delta[0]
+    assert function_result_event.output.delta is not None
+    func_delta = function_result_event.output.delta
+    assert isinstance(func_delta, list)
+    assert len(func_delta) == 1
+    function_message = func_delta[0]
     assert function_message.role == "FUNCTION"
     assert function_message.source == "call_7115tNTmEACTsQRGwKpJipJK"
 
@@ -292,32 +326,129 @@ def test_stream_chat_history_content__deltas_equal_final_value(vellum_adhoc_prom
     second_chat_streaming_events = [e for e in second_chat_history_events if e.output.is_streaming]
     assert len(second_chat_streaming_events) == 15
 
+    second_chat_deltas = []
+
     assert second_chat_streaming_events[0].output.is_streaming
     assert second_chat_streaming_events[0].output.name == "chat_history"
-    assert second_chat_streaming_events[0].output.delta[0].text == "Based"
+    assert second_chat_streaming_events[0].output.delta is not None
+    second_delta_0 = second_chat_streaming_events[0].output.delta
+    assert isinstance(second_delta_0, list)
+    assert second_delta_0[0].text == "Based"
+    second_chat_deltas.append(second_delta_0[0].text)
 
     assert second_chat_streaming_events[1].output.is_streaming
     assert second_chat_streaming_events[1].output.name == "chat_history"
-    assert second_chat_streaming_events[1].output.delta[0].text == " on"
+    assert second_chat_streaming_events[1].output.delta is not None
+    second_delta_1 = second_chat_streaming_events[1].output.delta
+    assert isinstance(second_delta_1, list)
+    assert second_delta_1[0].text == " on"
+    second_chat_deltas.append(second_delta_1[0].text)
 
     assert second_chat_streaming_events[2].output.is_streaming
     assert second_chat_streaming_events[2].output.name == "chat_history"
-    assert second_chat_streaming_events[2].output.delta[0].text == " the"
+    assert second_chat_streaming_events[2].output.delta is not None
+    second_delta_2 = second_chat_streaming_events[2].output.delta
+    assert isinstance(second_delta_2, list)
+    assert second_delta_2[0].text == " the"
+    second_chat_deltas.append(second_delta_2[0].text)
 
     assert second_chat_streaming_events[3].output.is_streaming
     assert second_chat_streaming_events[3].output.name == "chat_history"
-    assert second_chat_streaming_events[3].output.delta[0].text == " function"
+    assert second_chat_streaming_events[3].output.delta is not None
+    second_delta_3 = second_chat_streaming_events[3].output.delta
+    assert isinstance(second_delta_3, list)
+    assert second_delta_3[0].text == " function"
+    second_chat_deltas.append(second_delta_3[0].text)
 
     assert second_chat_streaming_events[4].output.is_streaming
     assert second_chat_streaming_events[4].output.name == "chat_history"
-    assert second_chat_streaming_events[4].output.delta[0].text == " call,"
+    assert second_chat_streaming_events[4].output.delta is not None
+    second_delta_4 = second_chat_streaming_events[4].output.delta
+    assert isinstance(second_delta_4, list)
+    assert second_delta_4[0].text == " call,"
+    second_chat_deltas.append(second_delta_4[0].text)
 
-    second_chat_deltas = [event.output.delta[0].text for event in second_chat_streaming_events]
-    second_combined_chat_text = "".join(second_chat_deltas)
-    assert second_combined_chat_text == expected_second_chat_message
+    assert second_chat_streaming_events[5].output.is_streaming
+    assert second_chat_streaming_events[5].output.name == "chat_history"
+    assert second_chat_streaming_events[5].output.delta is not None
+    second_delta_5 = second_chat_streaming_events[5].output.delta
+    assert isinstance(second_delta_5, list)
+    assert second_delta_5[0].text == " the"
+    second_chat_deltas.append(second_delta_5[0].text)
 
-    all_chat_streaming_events = first_chat_streaming_events + second_chat_streaming_events
-    all_chat_deltas = [event.output.delta[0].text for event in all_chat_streaming_events]
+    assert second_chat_streaming_events[6].output.is_streaming
+    assert second_chat_streaming_events[6].output.name == "chat_history"
+    assert second_chat_streaming_events[6].output.delta is not None
+    second_delta_6 = second_chat_streaming_events[6].output.delta
+    assert isinstance(second_delta_6, list)
+    assert second_delta_6[0].text == " current"
+    second_chat_deltas.append(second_delta_6[0].text)
+
+    assert second_chat_streaming_events[7].output.is_streaming
+    assert second_chat_streaming_events[7].output.name == "chat_history"
+    assert second_chat_streaming_events[7].output.delta is not None
+    second_delta_7 = second_chat_streaming_events[7].output.delta
+    assert isinstance(second_delta_7, list)
+    assert second_delta_7[0].text == " temperature"
+    second_chat_deltas.append(second_delta_7[0].text)
+
+    assert second_chat_streaming_events[8].output.is_streaming
+    assert second_chat_streaming_events[8].output.name == "chat_history"
+    assert second_chat_streaming_events[8].output.delta is not None
+    second_delta_8 = second_chat_streaming_events[8].output.delta
+    assert isinstance(second_delta_8, list)
+    assert second_delta_8[0].text == " in"
+    second_chat_deltas.append(second_delta_8[0].text)
+
+    assert second_chat_streaming_events[9].output.is_streaming
+    assert second_chat_streaming_events[9].output.name == "chat_history"
+    assert second_chat_streaming_events[9].output.delta is not None
+    second_delta_9 = second_chat_streaming_events[9].output.delta
+    assert isinstance(second_delta_9, list)
+    assert second_delta_9[0].text == " San"
+    second_chat_deltas.append(second_delta_9[0].text)
+
+    assert second_chat_streaming_events[10].output.is_streaming
+    assert second_chat_streaming_events[10].output.name == "chat_history"
+    assert second_chat_streaming_events[10].output.delta is not None
+    second_delta_10 = second_chat_streaming_events[10].output.delta
+    assert isinstance(second_delta_10, list)
+    assert second_delta_10[0].text == " Francisco"
+    second_chat_deltas.append(second_delta_10[0].text)
+
+    assert second_chat_streaming_events[11].output.is_streaming
+    assert second_chat_streaming_events[11].output.name == "chat_history"
+    assert second_chat_streaming_events[11].output.delta is not None
+    second_delta_11 = second_chat_streaming_events[11].output.delta
+    assert isinstance(second_delta_11, list)
+    assert second_delta_11[0].text == " is"
+    second_chat_deltas.append(second_delta_11[0].text)
+
+    assert second_chat_streaming_events[12].output.is_streaming
+    assert second_chat_streaming_events[12].output.name == "chat_history"
+    assert second_chat_streaming_events[12].output.delta is not None
+    second_delta_12 = second_chat_streaming_events[12].output.delta
+    assert isinstance(second_delta_12, list)
+    assert second_delta_12[0].text == " 70"
+    second_chat_deltas.append(second_delta_12[0].text)
+
+    assert second_chat_streaming_events[13].output.is_streaming
+    assert second_chat_streaming_events[13].output.name == "chat_history"
+    assert second_chat_streaming_events[13].output.delta is not None
+    second_delta_13 = second_chat_streaming_events[13].output.delta
+    assert isinstance(second_delta_13, list)
+    assert second_delta_13[0].text == " degrees"
+    second_chat_deltas.append(second_delta_13[0].text)
+
+    assert second_chat_streaming_events[14].output.is_streaming
+    assert second_chat_streaming_events[14].output.name == "chat_history"
+    assert second_chat_streaming_events[14].output.delta is not None
+    second_delta_14 = second_chat_streaming_events[14].output.delta
+    assert isinstance(second_delta_14, list)
+    assert second_delta_14[0].text == " celsius."
+    second_chat_deltas.append(second_delta_14[0].text)
+
+    all_chat_deltas = first_chat_deltas + second_chat_deltas
     all_combined_chat_text = "".join(all_chat_deltas)
 
     expected_combined_text = expected_first_chat_message + expected_second_chat_message
