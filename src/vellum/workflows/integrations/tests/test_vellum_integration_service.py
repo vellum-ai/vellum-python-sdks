@@ -1,6 +1,7 @@
 import pytest
 from unittest import mock
 
+from vellum.client.types.components_schemas_composio_tool_definition import ComponentsSchemasComposioToolDefinition
 from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.integrations.vellum_integration_service import VellumIntegrationService
@@ -10,23 +11,21 @@ from vellum.workflows.types.definition import VellumIntegrationToolDetails
 def test_vellum_integration_service_get_tool_definition_success(vellum_client):
     """Test that tool definitions are successfully retrieved from Vellum API"""
     mock_client = vellum_client
-    mock_client.integrations = mock.MagicMock()
-
-    mock_response = mock.MagicMock()
-    mock_response.name = "GITHUB_CREATE_AN_ISSUE"
-    mock_response.description = "Create a new issue in a GitHub repository"
-    mock_response.parameters = {
-        "type": "object",
-        "properties": {
-            "repo": {"type": "string", "description": "Repository name"},
-            "title": {"type": "string", "description": "Issue title"},
-            "body": {"type": "string", "description": "Issue body"},
+    tool_definition_response = ComponentsSchemasComposioToolDefinition(
+        name="GITHUB_CREATE_AN_ISSUE",
+        description="Create a new issue in a GitHub repository",
+        parameters={
+            "type": "object",
+            "properties": {
+                "repo": {"type": "string", "description": "Repository name"},
+                "title": {"type": "string", "description": "Issue title"},
+                "body": {"type": "string", "description": "Issue body"},
+            },
+            "required": ["repo", "title"],
         },
-        "required": ["repo", "title"],
-    }
-    mock_response.provider = "COMPOSIO"
+    )
 
-    mock_client.integrations.retrieve_integration_tool_definition.return_value = mock_response
+    mock_client.integrations.retrieve_integration_tool_definition.return_value = tool_definition_response
 
     # WHEN we request a tool definition
     service = VellumIntegrationService(client=mock_client)

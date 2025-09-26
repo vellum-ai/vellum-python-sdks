@@ -166,7 +166,7 @@ class ComposioToolDefinition(UniversalBaseModel):
 
 
 class VellumIntegrationToolDefinition(UniversalBaseModel):
-    type: Literal["INTEGRATION"] = "INTEGRATION"
+    type: Literal["VELLUM_INTEGRATION"] = "VELLUM_INTEGRATION"
 
     # Core identification
     provider: VellumIntegrationProviderType
