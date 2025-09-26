@@ -87,7 +87,9 @@ class _SnapshottableDict(dict, _Snapshottable):
     def __deepcopy__(self, memo: Any) -> "_SnapshottableDict":
         y: dict = {}
         memo[id(self)] = y
-        for key, value in self.items():
+        # Create a snapshot to avoid "dictionary changed size during iteration"
+        items_snapshot = list(self.items())
+        for key, value in items_snapshot:
             y[deepcopy(key, memo)] = deepcopy(value, memo)
 
         y = _SnapshottableDict(y)
@@ -442,14 +444,18 @@ class StateMeta(UniversalBaseModel):
         if not memo:
             memo = {}
 
+        # Create snapshots to avoid "dictionary changed size during iteration"
+        node_outputs_snapshot = dict(self.node_outputs.items())
+        external_inputs_snapshot = dict(self.external_inputs.items())
+
         new_node_outputs = {
             descriptor: value if isinstance(value, Queue) else deepcopy(value, memo)
-            for descriptor, value in self.node_outputs.items()
+            for descriptor, value in node_outputs_snapshot.items()
         }
 
         new_external_inputs = {
             descriptor: value if isinstance(value, Queue) else deepcopy(value, memo)
-            for descriptor, value in self.external_inputs.items()
+            for descriptor, value in external_inputs_snapshot.items()
         }
 
         memo[id(self.node_outputs)] = new_node_outputs
@@ -536,14 +542,16 @@ class BaseState(metaclass=_BaseStateMeta):
         on an instance of this class.
         """
 
-        # If the user sets a default value on state (e.g. something = "foo"), it's not on `instance_attributes` below.
-        # So we need to include class_attributes here just in case
-        class_attributes = {key: value for key, value in self.__class__.__dict__.items() if not key.startswith("_")}
-        instance_attributes = {key: value for key, value in self.__dict__.items() if not key.startswith("__")}
+        # Use lock to create a consistent snapshot of the state
+        with self.__lock__:
+            # If the user sets a default value on state (e.g. something = "foo"),
+            # it's not on `instance_attributes` below. So we need to include class_attributes here just in case
+            class_attributes = {key: value for key, value in self.__class__.__dict__.items() if not key.startswith("_")}
+            instance_attributes = {key: value for key, value in self.__dict__.items() if not key.startswith("__")}
 
-        all_attributes = {**class_attributes, **instance_attributes}
-        items = [(key, value) for key, value in all_attributes.items() if key not in ["_lock"]]
-        return iter(items)
+            all_attributes = {**class_attributes, **instance_attributes}
+            items = [(key, value) for key, value in all_attributes.items() if key not in ["_lock"]]
+            return iter(items)
 
     def __getitem__(self, key: str) -> Any:
         return self.__dict__[key]
@@ -553,10 +561,12 @@ class BaseState(metaclass=_BaseStateMeta):
             super().__setattr__(name, delta)
             return
 
-        snapshottable_value = _make_snapshottable(name, delta, self.__snapshot__)
-        super().__setattr__(name, snapshottable_value)
-        self.meta.updated_ts = datetime_now()
-        self.__snapshot__(SetStateDelta(name=name, delta=delta))
+        # Use lock to prevent race conditions during attribute setting
+        with self.__lock__:
+            snapshottable_value = _make_snapshottable(name, delta, self.__snapshot__)
+            super().__setattr__(name, snapshottable_value)
+            self.meta.updated_ts = datetime_now()
+            self.__snapshot__(SetStateDelta(name=name, delta=delta))
 
     def __add__(self, other: StateType) -> StateType:
         """
@@ -569,19 +579,21 @@ class BaseState(metaclass=_BaseStateMeta):
         latest_state = self if self.meta.updated_ts >= other.meta.updated_ts else other
         oldest_state = other if latest_state == self else self
 
-        for descriptor, value in oldest_state.meta.node_outputs.items():
-            if descriptor not in latest_state.meta.node_outputs:
-                latest_state.meta.node_outputs[descriptor] = value
+        # Use locks to prevent race conditions during state merging
+        with latest_state.__lock__, oldest_state.__lock__:
+            for descriptor, value in oldest_state.meta.node_outputs.items():
+                if descriptor not in latest_state.meta.node_outputs:
+                    latest_state.meta.node_outputs[descriptor] = value
 
-        for key, value in oldest_state:
-            if not isinstance(key, str):
-                continue
+            for key, value in oldest_state:
+                if not isinstance(key, str):
+                    continue
 
-            if key.startswith("_"):
-                continue
+                if key.startswith("_"):
+                    continue
 
-            if getattr(latest_state, key, undefined) == undefined:
-                setattr(latest_state, key, value)
+                if getattr(latest_state, key, undefined) == undefined:
+                    setattr(latest_state, key, value)
 
         return cast(StateType, latest_state)
 
