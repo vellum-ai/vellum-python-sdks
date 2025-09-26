@@ -150,14 +150,30 @@ def deepcopy_with_exclusions(
 ) -> _T:
     cls = obj.__class__
     new_instance = cls.__new__(cls)
-    new_instance.__dict__.update(obj.__dict__)
 
     exclusions = exclusions or {}
 
-    for key, value in obj.__dict__.items():
-        if key in exclusions:
-            continue
-        new_instance.__dict__[key] = deepcopy(value, memo)
+    # Check if object has a lock for thread-safe copying
+    obj_lock = getattr(obj, "__lock__", None)
+    if obj_lock is not None:
+        with obj_lock:
+            # Create a snapshot of the dictionary to avoid "dictionary changed size during iteration"
+            obj_dict_snapshot = dict(obj.__dict__)
+            new_instance.__dict__.update(obj_dict_snapshot)
+
+            for key, value in obj_dict_snapshot.items():
+                if key in exclusions:
+                    continue
+                new_instance.__dict__[key] = deepcopy(value, memo)
+    else:
+        # Fallback for objects without locks - still create snapshot to be safe
+        obj_dict_snapshot = dict(obj.__dict__)
+        new_instance.__dict__.update(obj_dict_snapshot)
+
+        for key, value in obj_dict_snapshot.items():
+            if key in exclusions:
+                continue
+            new_instance.__dict__[key] = deepcopy(value, memo)
 
     for key, value in exclusions.items():
         new_instance.__dict__[key] = value
