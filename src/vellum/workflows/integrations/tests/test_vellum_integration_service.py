@@ -57,8 +57,8 @@ def test_vellum_integration_service_get_tool_definition_success(vellum_client):
 
     # AND the API should have been called with the correct parameters
     mock_client.integrations.retrieve_integration_tool_definition.assert_called_once_with(
-        integration="GITHUB",
-        provider="COMPOSIO",
+        integration_name="GITHUB",
+        integration_provider="COMPOSIO",
         tool_name="GITHUB_CREATE_AN_ISSUE",
     )
 
@@ -118,8 +118,8 @@ def test_vellum_integration_service_execute_tool_success(vellum_client):
 
     # AND the API should have been called with correct parameters
     mock_client.integrations.execute_integration_tool.assert_called_once_with(
-        integration="GITHUB",
-        provider="COMPOSIO",
+        integration_name="GITHUB",
+        integration_provider="COMPOSIO",
         tool_name="GITHUB_CREATE_AN_ISSUE",
         arguments={
             "repo": "user/repo",
