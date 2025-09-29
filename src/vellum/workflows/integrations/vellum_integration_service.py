@@ -113,12 +113,18 @@ class VellumIntegrationService:
                         raw_data=raw_data,
                     ) from e
                 else:
-                    # Fallback for legacy generic 403 responses
+                    # Fallback for generic 403 responses
                     raise NodeException(
                         message=e.body.get("detail", "You do not have permission to execute this tool."),
                         code=WorkflowErrorCode.PROVIDER_CREDENTIALS_UNAVAILABLE,
                     ) from e
+            # Generic server error
+            raise NodeException(
+                message=f"Failed to execute tool {tool_name}: {str(e)}",
+                code=WorkflowErrorCode.INTERNAL_ERROR,
+            ) from e
         except Exception as e:
+            # Catch-all for non-API errors
             error_message = f"Failed to execute tool {tool_name}: {str(e)}"
             raise NodeException(
                 message=error_message,
