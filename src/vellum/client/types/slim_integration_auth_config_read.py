@@ -4,6 +4,7 @@ import typing
 
 import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
+from .integration_auth_config_integration import IntegrationAuthConfigIntegration
 from .integration_auth_config_integration_credential import IntegrationAuthConfigIntegrationCredential
 from .integration_credential_access_type import IntegrationCredentialAccessType
 
@@ -13,7 +14,8 @@ class SlimIntegrationAuthConfigRead(UniversalBaseModel):
     A slim representation of an Integration Auth Config.
     """
 
-    id: typing.Optional[str] = None
+    id: str
+    integration: IntegrationAuthConfigIntegration
     integration_credentials: typing.Optional[typing.List[IntegrationAuthConfigIntegrationCredential]] = None
     default_access_type: typing.Optional[IntegrationCredentialAccessType] = None
 
