@@ -101,21 +101,12 @@ class VellumIntegrationService:
                     error_message = e.body["message"]
 
                     # Extract integration metadata for frontend display
+                    # Frontend will use integration_id to open a modal for auth config selection
                     raw_data = {
                         "integration_id": integration_details.get("id"),
                         "integration_name": integration_details.get("name"),
                         "integration_provider": integration_details.get("provider"),
                     }
-
-                    # If backend implements config_url field, include it
-                    if "config_url" in integration_details:
-                        raw_data["config_url"] = integration_details["config_url"]
-                    else:
-                        # Fallback: construct URL client-side if backend doesn't provide it
-                        # TODO: Remove this fallback once backend consistently provides config_url
-                        raw_data["config_url"] = (
-                            f"/integration-auth-configs?integration={integration_details.get('id')}"
-                        )
 
                     raise NodeException(
                         message=error_message,

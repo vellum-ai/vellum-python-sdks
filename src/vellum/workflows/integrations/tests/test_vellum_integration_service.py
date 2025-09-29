@@ -220,7 +220,6 @@ def test_vellum_integration_service_execute_tool_structured_403_error(vellum_cli
             "id": "550e8400-e29b-41d4-a716-446655440000",
             "provider": "COMPOSIO",
             "name": "GITHUB",
-            "config_url": "/integration-auth-configs?integration=550e8400-e29b-41d4-a716-446655440000",
         },
     }
 
@@ -246,55 +245,11 @@ def test_vellum_integration_service_execute_tool_structured_403_error(vellum_cli
     # AND the error message should match the backend response
     assert "You must authenticate with this integration" in exc_info.value.message
 
-    # AND raw_data should contain integration details for frontend display
+    # AND raw_data should contain integration details for frontend modal
     assert exc_info.value.raw_data is not None
     assert exc_info.value.raw_data["integration_id"] == "550e8400-e29b-41d4-a716-446655440000"
     assert exc_info.value.raw_data["integration_name"] == "GITHUB"
     assert exc_info.value.raw_data["integration_provider"] == "COMPOSIO"
-    assert (
-        exc_info.value.raw_data["config_url"]
-        == "/integration-auth-configs?integration=550e8400-e29b-41d4-a716-446655440000"
-    )
-
-
-def test_vellum_integration_service_execute_tool_structured_403_without_config_url(vellum_client):
-    """Test fallback URL construction when backend doesn't provide config_url"""
-    from vellum.client.core.api_error import ApiError
-
-    mock_client = vellum_client
-    mock_client.integrations = mock.MagicMock()
-
-    # Mock structured 403 without config_url field
-    structured_error_body = {
-        "message": "You must authenticate with this integration before you can execute this tool.",
-        "integration": {
-            "id": "550e8400-e29b-41d4-a716-446655440000",
-            "provider": "COMPOSIO",
-            "name": "GITHUB",
-            # NOTE: No config_url field
-        },
-    }
-
-    mock_client.integrations.execute_integration_tool.side_effect = ApiError(
-        status_code=403,
-        body=structured_error_body,
-    )
-
-    service = VellumIntegrationService(client=mock_client)
-
-    with pytest.raises(NodeException) as exc_info:
-        service.execute_tool(
-            integration="GITHUB",
-            provider="COMPOSIO",
-            tool_name="GITHUB_CREATE_AN_ISSUE",
-            arguments={"repo": "user/repo"},
-        )
-
-    # THEN raw_data should include client-constructed config_url
-    assert (
-        exc_info.value.raw_data["config_url"]
-        == "/integration-auth-configs?integration=550e8400-e29b-41d4-a716-446655440000"
-    )
 
 
 def test_vellum_integration_service_execute_tool_legacy_403_error(vellum_client):
