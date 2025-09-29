@@ -1,6 +1,8 @@
 import pytest
 from unittest import mock
+from uuid import uuid4
 
+from vellum import ToolDefinitionIntegration
 from vellum.client.types.components_schemas_composio_tool_definition import ComponentsSchemasComposioToolDefinition
 from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.exceptions import NodeException
@@ -12,9 +14,14 @@ def test_vellum_integration_service_get_tool_definition_success(vellum_client):
     """Test that tool definitions are successfully retrieved from Vellum API"""
     mock_client = vellum_client
     tool_definition_response = ComponentsSchemasComposioToolDefinition(
+        integration=ToolDefinitionIntegration(
+            id=str(uuid4()),
+            provider="COMPOSIO",
+            name="GITHUB",
+        ),
         name="GITHUB_CREATE_AN_ISSUE",
         description="Create a new issue in a GitHub repository",
-        parameters={
+        input_parameters={
             "type": "object",
             "properties": {
                 "repo": {"type": "string", "description": "Repository name"},
@@ -23,6 +30,7 @@ def test_vellum_integration_service_get_tool_definition_success(vellum_client):
             },
             "required": ["repo", "title"],
         },
+        output_parameters={},
     )
 
     mock_client.integrations.retrieve_integration_tool_definition.return_value = tool_definition_response
@@ -49,8 +57,8 @@ def test_vellum_integration_service_get_tool_definition_success(vellum_client):
 
     # AND the API should have been called with the correct parameters
     mock_client.integrations.retrieve_integration_tool_definition.assert_called_once_with(
-        integration="GITHUB",
-        provider="COMPOSIO",
+        integration_name="GITHUB",
+        integration_provider="COMPOSIO",
         tool_name="GITHUB_CREATE_AN_ISSUE",
     )
 
@@ -110,8 +118,8 @@ def test_vellum_integration_service_execute_tool_success(vellum_client):
 
     # AND the API should have been called with correct parameters
     mock_client.integrations.execute_integration_tool.assert_called_once_with(
-        integration="GITHUB",
-        provider="COMPOSIO",
+        integration_name="GITHUB",
+        integration_provider="COMPOSIO",
         tool_name="GITHUB_CREATE_AN_ISSUE",
         arguments={
             "repo": "user/repo",

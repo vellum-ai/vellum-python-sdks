@@ -6,6 +6,8 @@ from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.request_options import RequestOptions
 from ...types.components_schemas_composio_execute_tool_response import ComponentsSchemasComposioExecuteToolResponse
 from ...types.components_schemas_composio_tool_definition import ComponentsSchemasComposioToolDefinition
+from ...types.integration_read import IntegrationRead
+from ...types.paginated_slim_integration_read_list import PaginatedSlimIntegrationReadList
 from .raw_client import AsyncRawIntegrationsClient, RawIntegrationsClient
 
 # this is used as the default value for optional parameters
@@ -33,8 +35,8 @@ class IntegrationsClient:
 
     def retrieve_integration_tool_definition(
         self,
-        integration: str,
-        provider: str,
+        integration_name: str,
+        integration_provider: str,
         tool_name: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
@@ -42,10 +44,10 @@ class IntegrationsClient:
         """
         Parameters
         ----------
-        integration : str
+        integration_name : str
             The integration name
 
-        provider : str
+        integration_provider : str
             The integration provider name
 
         tool_name : str
@@ -68,20 +70,20 @@ class IntegrationsClient:
             api_key="YOUR_API_KEY",
         )
         client.integrations.retrieve_integration_tool_definition(
-            integration="integration",
-            provider="provider",
+            integration_name="integration_name",
+            integration_provider="integration_provider",
             tool_name="tool_name",
         )
         """
         _response = self._raw_client.retrieve_integration_tool_definition(
-            integration, provider, tool_name, request_options=request_options
+            integration_name, integration_provider, tool_name, request_options=request_options
         )
         return _response.data
 
     def execute_integration_tool(
         self,
-        integration: str,
-        provider: str,
+        integration_name: str,
+        integration_provider: str,
         tool_name: str,
         *,
         arguments: typing.Dict[str, typing.Optional[typing.Any]],
@@ -90,10 +92,10 @@ class IntegrationsClient:
         """
         Parameters
         ----------
-        integration : str
+        integration_name : str
             The integration name
 
-        provider : str
+        integration_provider : str
             The integration provider name
 
         tool_name : str
@@ -118,15 +120,105 @@ class IntegrationsClient:
             api_key="YOUR_API_KEY",
         )
         client.integrations.execute_integration_tool(
-            integration="integration",
-            provider="provider",
+            integration_name="integration_name",
+            integration_provider="integration_provider",
             tool_name="tool_name",
             arguments={"arguments": {"key": "value"}},
         )
         """
         _response = self._raw_client.execute_integration_tool(
-            integration, provider, tool_name, arguments=arguments, request_options=request_options
+            integration_name, integration_provider, tool_name, arguments=arguments, request_options=request_options
         )
+        return _response.data
+
+    def list(
+        self,
+        *,
+        integration_provider: typing.Optional[typing.Literal["COMPOSIO"]] = None,
+        limit: typing.Optional[int] = None,
+        offset: typing.Optional[int] = None,
+        ordering: typing.Optional[str] = None,
+        search: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> PaginatedSlimIntegrationReadList:
+        """
+        List all integrations
+
+        Parameters
+        ----------
+        integration_provider : typing.Optional[typing.Literal["COMPOSIO"]]
+            * `COMPOSIO` - Composio
+
+        limit : typing.Optional[int]
+            Number of results to return per page.
+
+        offset : typing.Optional[int]
+            The initial index from which to return the results.
+
+        ordering : typing.Optional[str]
+            Which field to use when ordering the results.
+
+        search : typing.Optional[str]
+            A search term.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        PaginatedSlimIntegrationReadList
+
+
+        Examples
+        --------
+        from vellum import Vellum
+
+        client = Vellum(
+            api_version="YOUR_API_VERSION",
+            api_key="YOUR_API_KEY",
+        )
+        client.integrations.list()
+        """
+        _response = self._raw_client.list(
+            integration_provider=integration_provider,
+            limit=limit,
+            offset=offset,
+            ordering=ordering,
+            search=search,
+            request_options=request_options,
+        )
+        return _response.data
+
+    def retrieve(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> IntegrationRead:
+        """
+        Retrieve an integration
+
+        Parameters
+        ----------
+        id : str
+            A UUID string identifying this integration.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        IntegrationRead
+
+
+        Examples
+        --------
+        from vellum import Vellum
+
+        client = Vellum(
+            api_version="YOUR_API_VERSION",
+            api_key="YOUR_API_KEY",
+        )
+        client.integrations.retrieve(
+            id="id",
+        )
+        """
+        _response = self._raw_client.retrieve(id, request_options=request_options)
         return _response.data
 
 
@@ -147,8 +239,8 @@ class AsyncIntegrationsClient:
 
     async def retrieve_integration_tool_definition(
         self,
-        integration: str,
-        provider: str,
+        integration_name: str,
+        integration_provider: str,
         tool_name: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
@@ -156,10 +248,10 @@ class AsyncIntegrationsClient:
         """
         Parameters
         ----------
-        integration : str
+        integration_name : str
             The integration name
 
-        provider : str
+        integration_provider : str
             The integration provider name
 
         tool_name : str
@@ -187,8 +279,8 @@ class AsyncIntegrationsClient:
 
         async def main() -> None:
             await client.integrations.retrieve_integration_tool_definition(
-                integration="integration",
-                provider="provider",
+                integration_name="integration_name",
+                integration_provider="integration_provider",
                 tool_name="tool_name",
             )
 
@@ -196,14 +288,14 @@ class AsyncIntegrationsClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.retrieve_integration_tool_definition(
-            integration, provider, tool_name, request_options=request_options
+            integration_name, integration_provider, tool_name, request_options=request_options
         )
         return _response.data
 
     async def execute_integration_tool(
         self,
-        integration: str,
-        provider: str,
+        integration_name: str,
+        integration_provider: str,
         tool_name: str,
         *,
         arguments: typing.Dict[str, typing.Optional[typing.Any]],
@@ -212,10 +304,10 @@ class AsyncIntegrationsClient:
         """
         Parameters
         ----------
-        integration : str
+        integration_name : str
             The integration name
 
-        provider : str
+        integration_provider : str
             The integration provider name
 
         tool_name : str
@@ -245,8 +337,8 @@ class AsyncIntegrationsClient:
 
         async def main() -> None:
             await client.integrations.execute_integration_tool(
-                integration="integration",
-                provider="provider",
+                integration_name="integration_name",
+                integration_provider="integration_provider",
                 tool_name="tool_name",
                 arguments={"arguments": {"key": "value"}},
             )
@@ -255,6 +347,112 @@ class AsyncIntegrationsClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.execute_integration_tool(
-            integration, provider, tool_name, arguments=arguments, request_options=request_options
+            integration_name, integration_provider, tool_name, arguments=arguments, request_options=request_options
         )
+        return _response.data
+
+    async def list(
+        self,
+        *,
+        integration_provider: typing.Optional[typing.Literal["COMPOSIO"]] = None,
+        limit: typing.Optional[int] = None,
+        offset: typing.Optional[int] = None,
+        ordering: typing.Optional[str] = None,
+        search: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> PaginatedSlimIntegrationReadList:
+        """
+        List all integrations
+
+        Parameters
+        ----------
+        integration_provider : typing.Optional[typing.Literal["COMPOSIO"]]
+            * `COMPOSIO` - Composio
+
+        limit : typing.Optional[int]
+            Number of results to return per page.
+
+        offset : typing.Optional[int]
+            The initial index from which to return the results.
+
+        ordering : typing.Optional[str]
+            Which field to use when ordering the results.
+
+        search : typing.Optional[str]
+            A search term.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        PaginatedSlimIntegrationReadList
+
+
+        Examples
+        --------
+        import asyncio
+
+        from vellum import AsyncVellum
+
+        client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.integrations.list()
+
+
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.list(
+            integration_provider=integration_provider,
+            limit=limit,
+            offset=offset,
+            ordering=ordering,
+            search=search,
+            request_options=request_options,
+        )
+        return _response.data
+
+    async def retrieve(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> IntegrationRead:
+        """
+        Retrieve an integration
+
+        Parameters
+        ----------
+        id : str
+            A UUID string identifying this integration.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        IntegrationRead
+
+
+        Examples
+        --------
+        import asyncio
+
+        from vellum import AsyncVellum
+
+        client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.integrations.retrieve(
+                id="id",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.retrieve(id, request_options=request_options)
         return _response.data

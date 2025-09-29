@@ -4,20 +4,16 @@ import typing
 
 import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
-from .tool_definition_integration import ToolDefinitionIntegration
+from .integration_name import IntegrationName
+from .integration_provider import IntegrationProvider
 
 
-class ComposioToolDefinition(UniversalBaseModel):
-    """
-    Serializer for Composio tool definition response.
-    """
-
-    provider: typing.Literal["COMPOSIO"] = "COMPOSIO"
-    integration: ToolDefinitionIntegration
-    name: str
-    description: str
-    input_parameters: typing.Dict[str, typing.Optional[typing.Any]]
-    output_parameters: typing.Dict[str, typing.Optional[typing.Any]]
+class SlimIntegrationRead(UniversalBaseModel):
+    id: typing.Optional[str] = None
+    label: typing.Optional[str] = None
+    icon_url: str
+    name: IntegrationName
+    provider: IntegrationProvider = "COMPOSIO"
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

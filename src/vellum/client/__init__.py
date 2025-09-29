@@ -16,6 +16,8 @@ from .resources.document_indexes.client import AsyncDocumentIndexesClient, Docum
 from .resources.documents.client import AsyncDocumentsClient, DocumentsClient
 from .resources.events.client import AsyncEventsClient, EventsClient
 from .resources.folder_entities.client import AsyncFolderEntitiesClient, FolderEntitiesClient
+from .resources.integration_auth_configs.client import AsyncIntegrationAuthConfigsClient, IntegrationAuthConfigsClient
+from .resources.integration_providers.client import AsyncIntegrationProvidersClient, IntegrationProvidersClient
 from .resources.integrations.client import AsyncIntegrationsClient, IntegrationsClient
 from .resources.metric_definitions.client import AsyncMetricDefinitionsClient, MetricDefinitionsClient
 from .resources.ml_models.client import AsyncMlModelsClient, MlModelsClient
@@ -138,6 +140,8 @@ class Vellum:
         self.document_indexes = DocumentIndexesClient(client_wrapper=self._client_wrapper)
         self.documents = DocumentsClient(client_wrapper=self._client_wrapper)
         self.folder_entities = FolderEntitiesClient(client_wrapper=self._client_wrapper)
+        self.integration_auth_configs = IntegrationAuthConfigsClient(client_wrapper=self._client_wrapper)
+        self.integration_providers = IntegrationProvidersClient(client_wrapper=self._client_wrapper)
         self.metric_definitions = MetricDefinitionsClient(client_wrapper=self._client_wrapper)
         self.ml_models = MlModelsClient(client_wrapper=self._client_wrapper)
         self.organizations = OrganizationsClient(client_wrapper=self._client_wrapper)
@@ -1013,6 +1017,8 @@ class AsyncVellum:
         self.document_indexes = AsyncDocumentIndexesClient(client_wrapper=self._client_wrapper)
         self.documents = AsyncDocumentsClient(client_wrapper=self._client_wrapper)
         self.folder_entities = AsyncFolderEntitiesClient(client_wrapper=self._client_wrapper)
+        self.integration_auth_configs = AsyncIntegrationAuthConfigsClient(client_wrapper=self._client_wrapper)
+        self.integration_providers = AsyncIntegrationProvidersClient(client_wrapper=self._client_wrapper)
         self.metric_definitions = AsyncMetricDefinitionsClient(client_wrapper=self._client_wrapper)
         self.ml_models = AsyncMlModelsClient(client_wrapper=self._client_wrapper)
         self.organizations = AsyncOrganizationsClient(client_wrapper=self._client_wrapper)

@@ -74,12 +74,15 @@ from .compile_prompt_deployment_expand_meta_request import CompilePromptDeployme
 from .compile_prompt_meta import CompilePromptMeta
 from .components_schemas_composio_execute_tool_request import ComponentsSchemasComposioExecuteToolRequest
 from .components_schemas_composio_execute_tool_response import ComponentsSchemasComposioExecuteToolResponse
+from .components_schemas_composio_integration_exec_config import ComponentsSchemasComposioIntegrationExecConfig
 from .components_schemas_composio_tool_definition import ComponentsSchemasComposioToolDefinition
 from .components_schemas_pdf_search_result_meta_source import ComponentsSchemasPdfSearchResultMetaSource
 from .components_schemas_pdf_search_result_meta_source_request import ComponentsSchemasPdfSearchResultMetaSourceRequest
 from .components_schemas_prompt_version_build_config_sandbox import ComponentsSchemasPromptVersionBuildConfigSandbox
+from .components_schemas_slim_composio_tool_definition import ComponentsSchemasSlimComposioToolDefinition
 from .composio_execute_tool_request import ComposioExecuteToolRequest
 from .composio_execute_tool_response import ComposioExecuteToolResponse
+from .composio_integration_exec_config import ComposioIntegrationExecConfig
 from .composio_tool_definition import ComposioToolDefinition
 from .condition_combinator import ConditionCombinator
 from .conditional_node_result import ConditionalNodeResult
@@ -227,6 +230,11 @@ from .initiated_prompt_execution_meta import InitiatedPromptExecutionMeta
 from .initiated_workflow_node_result_event import InitiatedWorkflowNodeResultEvent
 from .instructor_vectorizer_config import InstructorVectorizerConfig
 from .instructor_vectorizer_config_request import InstructorVectorizerConfigRequest
+from .integration_auth_config_integration_credential import IntegrationAuthConfigIntegrationCredential
+from .integration_credential_access_type import IntegrationCredentialAccessType
+from .integration_name import IntegrationName
+from .integration_provider import IntegrationProvider
+from .integration_read import IntegrationRead
 from .invoked_port import InvokedPort
 from .iteration_state_enum import IterationStateEnum
 from .jinja_prompt_block import JinjaPromptBlock
@@ -346,6 +354,9 @@ from .paginated_document_index_read_list import PaginatedDocumentIndexReadList
 from .paginated_folder_entity_list import PaginatedFolderEntityList
 from .paginated_slim_deployment_read_list import PaginatedSlimDeploymentReadList
 from .paginated_slim_document_list import PaginatedSlimDocumentList
+from .paginated_slim_integration_auth_config_read_list import PaginatedSlimIntegrationAuthConfigReadList
+from .paginated_slim_integration_read_list import PaginatedSlimIntegrationReadList
+from .paginated_slim_tool_definition_list import PaginatedSlimToolDefinitionList
 from .paginated_slim_workflow_deployment_list import PaginatedSlimWorkflowDeploymentList
 from .paginated_test_suite_run_execution_list import PaginatedTestSuiteRunExecutionList
 from .paginated_test_suite_test_case_list import PaginatedTestSuiteTestCaseList
@@ -436,9 +447,12 @@ from .sentence_chunker_config import SentenceChunkerConfig
 from .sentence_chunker_config_request import SentenceChunkerConfigRequest
 from .sentence_chunking import SentenceChunking
 from .sentence_chunking_request import SentenceChunkingRequest
+from .slim_composio_tool_definition import SlimComposioToolDefinition
 from .slim_deployment_read import SlimDeploymentRead
 from .slim_document import SlimDocument
 from .slim_document_document_to_document_index import SlimDocumentDocumentToDocumentIndex
+from .slim_integration_auth_config_read import SlimIntegrationAuthConfigRead
+from .slim_integration_read import SlimIntegrationRead
 from .slim_release_review import SlimReleaseReview
 from .slim_workflow_deployment import SlimWorkflowDeployment
 from .slim_workflow_execution_read import SlimWorkflowExecutionRead
@@ -578,6 +592,7 @@ from .token_overlapping_window_chunker_config import TokenOverlappingWindowChunk
 from .token_overlapping_window_chunker_config_request import TokenOverlappingWindowChunkerConfigRequest
 from .token_overlapping_window_chunking import TokenOverlappingWindowChunking
 from .token_overlapping_window_chunking_request import TokenOverlappingWindowChunkingRequest
+from .tool_definition_integration import ToolDefinitionIntegration
 from .unit_enum import UnitEnum
 from .upload_document_response import UploadDocumentResponse
 from .upsert_test_suite_test_case_request import UpsertTestSuiteTestCaseRequest
@@ -768,12 +783,15 @@ __all__ = [
     "CompilePromptMeta",
     "ComponentsSchemasComposioExecuteToolRequest",
     "ComponentsSchemasComposioExecuteToolResponse",
+    "ComponentsSchemasComposioIntegrationExecConfig",
     "ComponentsSchemasComposioToolDefinition",
     "ComponentsSchemasPdfSearchResultMetaSource",
     "ComponentsSchemasPdfSearchResultMetaSourceRequest",
     "ComponentsSchemasPromptVersionBuildConfigSandbox",
+    "ComponentsSchemasSlimComposioToolDefinition",
     "ComposioExecuteToolRequest",
     "ComposioExecuteToolResponse",
+    "ComposioIntegrationExecConfig",
     "ComposioToolDefinition",
     "ConditionCombinator",
     "ConditionalNodeResult",
@@ -917,6 +935,11 @@ __all__ = [
     "InitiatedWorkflowNodeResultEvent",
     "InstructorVectorizerConfig",
     "InstructorVectorizerConfigRequest",
+    "IntegrationAuthConfigIntegrationCredential",
+    "IntegrationCredentialAccessType",
+    "IntegrationName",
+    "IntegrationProvider",
+    "IntegrationRead",
     "InvokedPort",
     "IterationStateEnum",
     "JinjaPromptBlock",
@@ -1036,6 +1059,9 @@ __all__ = [
     "PaginatedFolderEntityList",
     "PaginatedSlimDeploymentReadList",
     "PaginatedSlimDocumentList",
+    "PaginatedSlimIntegrationAuthConfigReadList",
+    "PaginatedSlimIntegrationReadList",
+    "PaginatedSlimToolDefinitionList",
     "PaginatedSlimWorkflowDeploymentList",
     "PaginatedTestSuiteRunExecutionList",
     "PaginatedTestSuiteTestCaseList",
@@ -1126,9 +1152,12 @@ __all__ = [
     "SentenceChunkerConfigRequest",
     "SentenceChunking",
     "SentenceChunkingRequest",
+    "SlimComposioToolDefinition",
     "SlimDeploymentRead",
     "SlimDocument",
     "SlimDocumentDocumentToDocumentIndex",
+    "SlimIntegrationAuthConfigRead",
+    "SlimIntegrationRead",
     "SlimReleaseReview",
     "SlimWorkflowDeployment",
     "SlimWorkflowExecutionRead",
@@ -1252,6 +1281,7 @@ __all__ = [
     "TokenOverlappingWindowChunkerConfigRequest",
     "TokenOverlappingWindowChunking",
     "TokenOverlappingWindowChunkingRequest",
+    "ToolDefinitionIntegration",
     "UnitEnum",
     "UploadDocumentResponse",
     "UpsertTestSuiteTestCaseRequest",

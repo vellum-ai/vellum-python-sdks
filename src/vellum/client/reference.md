@@ -1286,8 +1286,8 @@ client = Vellum(
     api_key="YOUR_API_KEY",
 )
 client.integrations.retrieve_integration_tool_definition(
-    integration="integration",
-    provider="provider",
+    integration_name="integration_name",
+    integration_provider="integration_provider",
     tool_name="tool_name",
 )
 
@@ -1305,7 +1305,7 @@ client.integrations.retrieve_integration_tool_definition(
 <dl>
 <dd>
 
-**integration:** `str` — The integration name
+**integration_name:** `str` — The integration name
     
 </dd>
 </dl>
@@ -1313,7 +1313,7 @@ client.integrations.retrieve_integration_tool_definition(
 <dl>
 <dd>
 
-**provider:** `str` — The integration provider name
+**integration_provider:** `str` — The integration provider name
     
 </dd>
 </dl>
@@ -1361,8 +1361,8 @@ client = Vellum(
     api_key="YOUR_API_KEY",
 )
 client.integrations.execute_integration_tool(
-    integration="integration",
-    provider="provider",
+    integration_name="integration_name",
+    integration_provider="integration_provider",
     tool_name="tool_name",
     arguments={"arguments": {"key": "value"}},
 )
@@ -1381,7 +1381,7 @@ client.integrations.execute_integration_tool(
 <dl>
 <dd>
 
-**integration:** `str` — The integration name
+**integration_name:** `str` — The integration name
     
 </dd>
 </dl>
@@ -1389,7 +1389,7 @@ client.integrations.execute_integration_tool(
 <dl>
 <dd>
 
-**provider:** `str` — The integration provider name
+**integration_provider:** `str` — The integration provider name
     
 </dd>
 </dl>
@@ -1406,6 +1406,178 @@ client.integrations.execute_integration_tool(
 <dd>
 
 **arguments:** `typing.Dict[str, typing.Optional[typing.Any]]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.integrations.<a href="src/vellum/resources/integrations/client.py">list</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+List all integrations
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import Vellum
+
+client = Vellum(
+    api_version="YOUR_API_VERSION",
+    api_key="YOUR_API_KEY",
+)
+client.integrations.list()
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**integration_provider:** `typing.Optional[typing.Literal["COMPOSIO"]]` — * `COMPOSIO` - Composio
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**limit:** `typing.Optional[int]` — Number of results to return per page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**offset:** `typing.Optional[int]` — The initial index from which to return the results.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**ordering:** `typing.Optional[str]` — Which field to use when ordering the results.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**search:** `typing.Optional[str]` — A search term.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.integrations.<a href="src/vellum/resources/integrations/client.py">retrieve</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieve an integration
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import Vellum
+
+client = Vellum(
+    api_version="YOUR_API_VERSION",
+    api_key="YOUR_API_KEY",
+)
+client.integrations.retrieve(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — A UUID string identifying this integration.
     
 </dd>
 </dl>
@@ -4116,6 +4288,320 @@ directory. Supported root directories include:
 </dl>
 </details>
 
+## IntegrationAuthConfigs
+<details><summary><code>client.integration_auth_configs.<a href="src/vellum/resources/integration_auth_configs/client.py">list_integration_auth_configs</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+List Integration Auth Configs
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import Vellum
+
+client = Vellum(
+    api_version="YOUR_API_VERSION",
+    api_key="YOUR_API_KEY",
+)
+client.integration_auth_configs.list_integration_auth_configs()
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**expand:** `typing.Optional[typing.Union[str, typing.Sequence[str]]]` 
+
+The response fields to expand for more information.
+- 'integration_credentials' expands the list of integration credentials that the authenticated entity has access to for the auth config.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**integration_name:** `typing.Optional[str]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**integration_provider:** `typing.Optional[str]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**limit:** `typing.Optional[int]` — Number of results to return per page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**offset:** `typing.Optional[int]` — The initial index from which to return the results.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**ordering:** `typing.Optional[str]` — Which field to use when ordering the results.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**search:** `typing.Optional[str]` — A search term.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## IntegrationProviders
+<details><summary><code>client.integration_providers.<a href="src/vellum/resources/integration_providers/client.py">retrieve_integration_provider_tool_definition</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieve a specific integration tool definition.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import Vellum
+
+client = Vellum(
+    api_version="YOUR_API_VERSION",
+    api_key="YOUR_API_KEY",
+)
+client.integration_providers.retrieve_integration_provider_tool_definition(
+    integration_name="integration_name",
+    integration_provider="integration_provider",
+    tool_name="tool_name",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**integration_name:** `str` — The integration name
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**integration_provider:** `str` — The integration provider name
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**tool_name:** `str` — The tool's unique name, as specified by the integration provider
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.integration_providers.<a href="src/vellum/resources/integration_providers/client.py">list_integration_tools</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+List all integration tools for a given provider and integration.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import Vellum
+
+client = Vellum(
+    api_version="YOUR_API_VERSION",
+    api_key="YOUR_API_KEY",
+)
+client.integration_providers.list_integration_tools(
+    integration_provider="integration_provider",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**integration_provider:** `str` — The integration provider name
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**integration_name:** `typing.Optional[str]` — The Vellum Integration name
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**limit:** `typing.Optional[int]` — Number of results to return per page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**offset:** `typing.Optional[int]` — The initial index from which to return the results.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**search:** `typing.Optional[str]` — The search term to filter the tools by
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## MetricDefinitions
 <details><summary><code>client.metric_definitions.<a href="src/vellum/resources/metric_definitions/client.py">execute_metric_definition</a>(...)</code></summary>
 <dl>
@@ -5115,9 +5601,9 @@ client.test_suite_runs.list_executions(
 **expand:** `typing.Optional[typing.Union[str, typing.Sequence[str]]]` 
 
 The response fields to expand for more information.
-- 'results.metric_results.metric_label' expands the metric label for each metric result.
-- 'results.metric_results.metric_definition' expands the metric definition for each metric result.
-- 'results.metric_results.metric_definition.name' expands the metric definition name for each metric result.
+- 'metric_results.metric_label' expands the metric label for each metric result.
+- 'metric_results.metric_definition' expands the metric definition for each metric result.
+- 'metric_results.metric_definition.name' expands the metric definition name for each metric result.
     
 </dd>
 </dl>

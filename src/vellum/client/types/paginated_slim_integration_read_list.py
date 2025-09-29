@@ -4,20 +4,14 @@ import typing
 
 import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
-from .tool_definition_integration import ToolDefinitionIntegration
+from .slim_integration_read import SlimIntegrationRead
 
 
-class ComposioToolDefinition(UniversalBaseModel):
-    """
-    Serializer for Composio tool definition response.
-    """
-
-    provider: typing.Literal["COMPOSIO"] = "COMPOSIO"
-    integration: ToolDefinitionIntegration
-    name: str
-    description: str
-    input_parameters: typing.Dict[str, typing.Optional[typing.Any]]
-    output_parameters: typing.Dict[str, typing.Optional[typing.Any]]
+class PaginatedSlimIntegrationReadList(UniversalBaseModel):
+    count: typing.Optional[int] = None
+    next: typing.Optional[str] = None
+    previous: typing.Optional[str] = None
+    results: typing.Optional[typing.List[SlimIntegrationRead]] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

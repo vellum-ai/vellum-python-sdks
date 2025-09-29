@@ -43,7 +43,7 @@ def _setup_mock_service(
             integration="GITHUB",
             name=tool_details.get("name", "create_issue"),
             description=tool_details.get("description", "Mock description"),
-            parameters=tool_details.get("parameters", {}),
+            parameters=tool_details.get("input_parameters", {}),
         )
         mock_service_instance.get_tool_definition.return_value = tool_details_obj
 
@@ -196,7 +196,7 @@ def test_run_workflow__tool_execution_error(vellum_adhoc_prompt_client):
     mock_tool_details = {
         "name": "create_issue",
         "description": "Create a new issue",
-        "parameters": {},
+        "input_parameters": {},
         "provider": "COMPOSIO",
     }
 
@@ -284,7 +284,7 @@ def test_workflow_prompt_structure_with_function_definition(vellum_adhoc_prompt_
     mock_tool_details = {
         "name": "create_issue",
         "description": "Create a new issue in a GitHub repository",
-        "parameters": {
+        "input_parameters": {
             "type": "object",
             "properties": {
                 "title": {"type": "string", "description": "Issue title"},

@@ -10,8 +10,11 @@ from ...core.jsonable_encoder import jsonable_encoder
 from ...core.pydantic_utilities import parse_obj_as
 from ...core.request_options import RequestOptions
 from ...errors.bad_request_error import BadRequestError
+from ...errors.forbidden_error import ForbiddenError
 from ...types.components_schemas_composio_execute_tool_response import ComponentsSchemasComposioExecuteToolResponse
 from ...types.components_schemas_composio_tool_definition import ComponentsSchemasComposioToolDefinition
+from ...types.integration_read import IntegrationRead
+from ...types.paginated_slim_integration_read_list import PaginatedSlimIntegrationReadList
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -23,8 +26,8 @@ class RawIntegrationsClient:
 
     def retrieve_integration_tool_definition(
         self,
-        integration: str,
-        provider: str,
+        integration_name: str,
+        integration_provider: str,
         tool_name: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
@@ -32,10 +35,10 @@ class RawIntegrationsClient:
         """
         Parameters
         ----------
-        integration : str
+        integration_name : str
             The integration name
 
-        provider : str
+        integration_provider : str
             The integration provider name
 
         tool_name : str
@@ -50,7 +53,7 @@ class RawIntegrationsClient:
 
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"integrations/v1/providers/{jsonable_encoder(provider)}/integrations/{jsonable_encoder(integration)}/tools/{jsonable_encoder(tool_name)}",
+            f"integrations/v1/providers/{jsonable_encoder(integration_provider)}/integrations/{jsonable_encoder(integration_name)}/tools/{jsonable_encoder(tool_name)}",
             base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
@@ -72,8 +75,8 @@ class RawIntegrationsClient:
 
     def execute_integration_tool(
         self,
-        integration: str,
-        provider: str,
+        integration_name: str,
+        integration_provider: str,
         tool_name: str,
         *,
         arguments: typing.Dict[str, typing.Optional[typing.Any]],
@@ -82,10 +85,10 @@ class RawIntegrationsClient:
         """
         Parameters
         ----------
-        integration : str
+        integration_name : str
             The integration name
 
-        provider : str
+        integration_provider : str
             The integration provider name
 
         tool_name : str
@@ -102,7 +105,7 @@ class RawIntegrationsClient:
 
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"integrations/v1/providers/{jsonable_encoder(provider)}/integrations/{jsonable_encoder(integration)}/tools/{jsonable_encoder(tool_name)}/execute",
+            f"integrations/v1/providers/{jsonable_encoder(integration_provider)}/integrations/{jsonable_encoder(integration_name)}/tools/{jsonable_encoder(tool_name)}/execute",
             base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
@@ -136,6 +139,123 @@ class RawIntegrationsClient:
                         ),
                     ),
                 )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
+    def list(
+        self,
+        *,
+        integration_provider: typing.Optional[typing.Literal["COMPOSIO"]] = None,
+        limit: typing.Optional[int] = None,
+        offset: typing.Optional[int] = None,
+        ordering: typing.Optional[str] = None,
+        search: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> HttpResponse[PaginatedSlimIntegrationReadList]:
+        """
+        List all integrations
+
+        Parameters
+        ----------
+        integration_provider : typing.Optional[typing.Literal["COMPOSIO"]]
+            * `COMPOSIO` - Composio
+
+        limit : typing.Optional[int]
+            Number of results to return per page.
+
+        offset : typing.Optional[int]
+            The initial index from which to return the results.
+
+        ordering : typing.Optional[str]
+            Which field to use when ordering the results.
+
+        search : typing.Optional[str]
+            A search term.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[PaginatedSlimIntegrationReadList]
+
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "v1/integrations",
+            base_url=self._client_wrapper.get_environment().default,
+            method="GET",
+            params={
+                "integration_provider": integration_provider,
+                "limit": limit,
+                "offset": offset,
+                "ordering": ordering,
+                "search": search,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    PaginatedSlimIntegrationReadList,
+                    parse_obj_as(
+                        type_=PaginatedSlimIntegrationReadList,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
+    def retrieve(
+        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> HttpResponse[IntegrationRead]:
+        """
+        Retrieve an integration
+
+        Parameters
+        ----------
+        id : str
+            A UUID string identifying this integration.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[IntegrationRead]
+
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"v1/integrations/{jsonable_encoder(id)}",
+            base_url=self._client_wrapper.get_environment().default,
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    IntegrationRead,
+                    parse_obj_as(
+                        type_=IntegrationRead,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
@@ -148,8 +268,8 @@ class AsyncRawIntegrationsClient:
 
     async def retrieve_integration_tool_definition(
         self,
-        integration: str,
-        provider: str,
+        integration_name: str,
+        integration_provider: str,
         tool_name: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
@@ -157,10 +277,10 @@ class AsyncRawIntegrationsClient:
         """
         Parameters
         ----------
-        integration : str
+        integration_name : str
             The integration name
 
-        provider : str
+        integration_provider : str
             The integration provider name
 
         tool_name : str
@@ -175,7 +295,7 @@ class AsyncRawIntegrationsClient:
 
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"integrations/v1/providers/{jsonable_encoder(provider)}/integrations/{jsonable_encoder(integration)}/tools/{jsonable_encoder(tool_name)}",
+            f"integrations/v1/providers/{jsonable_encoder(integration_provider)}/integrations/{jsonable_encoder(integration_name)}/tools/{jsonable_encoder(tool_name)}",
             base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
@@ -197,8 +317,8 @@ class AsyncRawIntegrationsClient:
 
     async def execute_integration_tool(
         self,
-        integration: str,
-        provider: str,
+        integration_name: str,
+        integration_provider: str,
         tool_name: str,
         *,
         arguments: typing.Dict[str, typing.Optional[typing.Any]],
@@ -207,10 +327,10 @@ class AsyncRawIntegrationsClient:
         """
         Parameters
         ----------
-        integration : str
+        integration_name : str
             The integration name
 
-        provider : str
+        integration_provider : str
             The integration provider name
 
         tool_name : str
@@ -227,7 +347,7 @@ class AsyncRawIntegrationsClient:
 
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"integrations/v1/providers/{jsonable_encoder(provider)}/integrations/{jsonable_encoder(integration)}/tools/{jsonable_encoder(tool_name)}/execute",
+            f"integrations/v1/providers/{jsonable_encoder(integration_provider)}/integrations/{jsonable_encoder(integration_name)}/tools/{jsonable_encoder(tool_name)}/execute",
             base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
@@ -261,6 +381,123 @@ class AsyncRawIntegrationsClient:
                         ),
                     ),
                 )
+            if _response.status_code == 403:
+                raise ForbiddenError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
+    async def list(
+        self,
+        *,
+        integration_provider: typing.Optional[typing.Literal["COMPOSIO"]] = None,
+        limit: typing.Optional[int] = None,
+        offset: typing.Optional[int] = None,
+        ordering: typing.Optional[str] = None,
+        search: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AsyncHttpResponse[PaginatedSlimIntegrationReadList]:
+        """
+        List all integrations
+
+        Parameters
+        ----------
+        integration_provider : typing.Optional[typing.Literal["COMPOSIO"]]
+            * `COMPOSIO` - Composio
+
+        limit : typing.Optional[int]
+            Number of results to return per page.
+
+        offset : typing.Optional[int]
+            The initial index from which to return the results.
+
+        ordering : typing.Optional[str]
+            Which field to use when ordering the results.
+
+        search : typing.Optional[str]
+            A search term.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[PaginatedSlimIntegrationReadList]
+
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "v1/integrations",
+            base_url=self._client_wrapper.get_environment().default,
+            method="GET",
+            params={
+                "integration_provider": integration_provider,
+                "limit": limit,
+                "offset": offset,
+                "ordering": ordering,
+                "search": search,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    PaginatedSlimIntegrationReadList,
+                    parse_obj_as(
+                        type_=PaginatedSlimIntegrationReadList,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
+    async def retrieve(
+        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> AsyncHttpResponse[IntegrationRead]:
+        """
+        Retrieve an integration
+
+        Parameters
+        ----------
+        id : str
+            A UUID string identifying this integration.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[IntegrationRead]
+
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"v1/integrations/{jsonable_encoder(id)}",
+            base_url=self._client_wrapper.get_environment().default,
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    IntegrationRead,
+                    parse_obj_as(
+                        type_=IntegrationRead,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)

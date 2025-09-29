@@ -40,8 +40,8 @@ class VellumIntegrationService:
         """
         try:
             response = self._client.integrations.retrieve_integration_tool_definition(
-                integration=integration,
-                provider=provider,
+                integration_name=integration,
+                integration_provider=provider,
                 tool_name=tool_name,
             )
 
@@ -50,7 +50,7 @@ class VellumIntegrationService:
                 integration=integration,
                 name=response.name,
                 description=response.description,
-                parameters=response.parameters,
+                parameters=response.input_parameters,
             )
         except Exception as e:
             error_message = f"Failed to retrieve tool definition for {tool_name}: {str(e)}"
@@ -82,8 +82,8 @@ class VellumIntegrationService:
         """
         try:
             response = self._client.integrations.execute_integration_tool(
-                integration=integration,
-                provider=provider,
+                integration_name=integration,
+                integration_provider=provider,
                 tool_name=tool_name,
                 arguments=arguments,
             )
