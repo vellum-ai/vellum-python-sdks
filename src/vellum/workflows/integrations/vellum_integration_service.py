@@ -95,7 +95,6 @@ class VellumIntegrationService:
         except ApiError as e:
             # Handle structured 403 credential error responses
             if e.status_code == 403 and isinstance(e.body, dict):
-                # Check for new structured error format from PR #14857
                 if "integration" in e.body and "message" in e.body:
                     integration_details = e.body["integration"]
                     error_message = e.body["message"]
@@ -119,22 +118,7 @@ class VellumIntegrationService:
                         message=e.body.get("detail", "You do not have permission to execute this tool."),
                         code=WorkflowErrorCode.PROVIDER_CREDENTIALS_UNAVAILABLE,
                     ) from e
-
-            # Handle other API errors (4xx, 5xx)
-            elif e.status_code and e.status_code >= 400 and e.status_code < 500:
-                error_detail = e.body.get("detail", str(e)) if isinstance(e.body, dict) else str(e)
-                raise NodeException(
-                    message=f"Failed to execute tool {tool_name}: {error_detail}",
-                    code=WorkflowErrorCode.INVALID_INPUTS,
-                ) from e
-
-            # Generic server error
-            raise NodeException(
-                message=f"Failed to execute tool {tool_name}: {str(e)}",
-                code=WorkflowErrorCode.INTERNAL_ERROR,
-            ) from e
         except Exception as e:
-            # Catch-all for non-API errors
             error_message = f"Failed to execute tool {tool_name}: {str(e)}"
             raise NodeException(
                 message=error_message,
