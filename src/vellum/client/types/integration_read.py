@@ -10,7 +10,7 @@ from .integration_provider import IntegrationProvider
 
 
 class IntegrationRead(UniversalBaseModel):
-    id: typing.Optional[str] = None
+    id: str
     label: typing.Optional[str] = None
     icon_url: str
     name: IntegrationName

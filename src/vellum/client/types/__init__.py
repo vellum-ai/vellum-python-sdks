@@ -230,6 +230,7 @@ from .initiated_prompt_execution_meta import InitiatedPromptExecutionMeta
 from .initiated_workflow_node_result_event import InitiatedWorkflowNodeResultEvent
 from .instructor_vectorizer_config import InstructorVectorizerConfig
 from .instructor_vectorizer_config_request import InstructorVectorizerConfigRequest
+from .integration_auth_config_integration import IntegrationAuthConfigIntegration
 from .integration_auth_config_integration_credential import IntegrationAuthConfigIntegrationCredential
 from .integration_credential_access_type import IntegrationCredentialAccessType
 from .integration_name import IntegrationName
@@ -935,6 +936,7 @@ __all__ = [
     "InitiatedWorkflowNodeResultEvent",
     "InstructorVectorizerConfig",
     "InstructorVectorizerConfigRequest",
+    "IntegrationAuthConfigIntegration",
     "IntegrationAuthConfigIntegrationCredential",
     "IntegrationCredentialAccessType",
     "IntegrationName",

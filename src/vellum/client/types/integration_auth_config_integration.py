@@ -8,7 +8,7 @@ from .integration_name import IntegrationName
 from .integration_provider import IntegrationProvider
 
 
-class ToolDefinitionIntegration(UniversalBaseModel):
+class IntegrationAuthConfigIntegration(UniversalBaseModel):
     id: str
     provider: IntegrationProvider = "COMPOSIO"
     name: IntegrationName
