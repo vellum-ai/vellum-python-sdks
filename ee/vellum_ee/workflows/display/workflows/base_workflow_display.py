@@ -73,9 +73,21 @@ IGNORE_PATTERNS = [
 ]
 
 
+class SerializationError(UniversalBaseModel):
+    """Structured error information for workflow serialization failures."""
+
+    file: str
+    line: Optional[int] = None
+    error_type: str
+    message: str
+    code_snippet: Optional[str] = None
+    suggestion: Optional[str] = None
+    debug: Optional[Dict[str, Any]] = None
+
+
 class WorkflowSerializationResult(UniversalBaseModel):
     exec_config: Dict[str, Any]
-    errors: List[str]
+    errors: List[Union[SerializationError, str]]  # Support both structured and string errors for backwards compat
     dataset: Optional[List[Dict[str, Any]]] = None
 
 

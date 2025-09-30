@@ -251,7 +251,9 @@ def push_command(
 
     if dry_run:
         error_messages = serialization_result.errors
-        error_message = "\n".join(error_messages) if error_messages else "No errors found."
+        # Convert structured errors to strings
+        error_strings = [str(error) if not isinstance(error, str) else error for error in error_messages]
+        error_message = "\n".join(error_strings) if error_strings else "No errors found."
         logger.info(
             f"""\
 # Workflow Push Report
