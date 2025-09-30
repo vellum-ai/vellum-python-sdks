@@ -19,6 +19,7 @@ def test_vellum_integration_service_get_tool_definition_success(vellum_client):
             provider="COMPOSIO",
             name="GITHUB",
         ),
+        label="GITHUB_CREATE_AN_ISSUE",
         name="GITHUB_CREATE_AN_ISSUE",
         description="Create a new issue in a GitHub repository",
         input_parameters={
