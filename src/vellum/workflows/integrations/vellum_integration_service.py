@@ -1,5 +1,6 @@
 from typing import Any, Dict, Optional
 
+from vellum.client.core.api_error import ApiError
 from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
@@ -78,7 +79,8 @@ class VellumIntegrationService:
             Dict containing the execution result data
 
         Raises:
-            NodeException: If the tool execution fails
+            NodeException: If the tool execution fails, including credential errors
+                with integration details in raw_data
         """
         try:
             response = self._client.integrations.execute_integration_tool(
@@ -90,7 +92,37 @@ class VellumIntegrationService:
 
             # Return the data from the response
             return response.data
+        except ApiError as e:
+            # Handle structured 403 credential error responses
+            if e.status_code == 403 and isinstance(e.body, dict):
+                if "integration" in e.body and "message" in e.body:
+                    integration_details = e.body["integration"]
+                    error_message = e.body["message"]
+
+                    # Keep integration details nested under "integration" key to keep raw_data raw
+                    # and allow for future expansion
+                    raw_data = {
+                        "integration": integration_details,
+                    }
+
+                    raise NodeException(
+                        message=error_message,
+                        code=WorkflowErrorCode.INTEGRATION_CREDENTIALS_UNAVAILABLE,
+                        raw_data=raw_data,
+                    ) from e
+                else:
+                    # Fallback for generic 403 responses
+                    raise NodeException(
+                        message=e.body.get("detail", "You do not have permission to execute this tool."),
+                        code=WorkflowErrorCode.PROVIDER_CREDENTIALS_UNAVAILABLE,
+                    ) from e
+            # Generic server error
+            raise NodeException(
+                message=f"Failed to execute tool {tool_name}: {str(e)}",
+                code=WorkflowErrorCode.INTERNAL_ERROR,
+            ) from e
         except Exception as e:
+            # Catch-all for non-API errors
             error_message = f"Failed to execute tool {tool_name}: {str(e)}"
             raise NodeException(
                 message=error_message,

@@ -211,3 +211,86 @@ def test_vellum_integration_service_multiple_tool_executions(vellum_client):
 
     # AND the API should have been called twice
     assert mock_client.integrations.execute_integration_tool.call_count == 2
+
+
+def test_vellum_integration_service_execute_tool_structured_403_error(vellum_client):
+    """Test that structured 403 responses with integration details are properly parsed"""
+    from vellum.client.core.api_error import ApiError
+    from vellum.workflows.errors.types import WorkflowErrorCode
+
+    mock_client = vellum_client
+    mock_client.integrations = mock.MagicMock()
+
+    # Mock structured 403 response matching PR #14857 format
+    structured_error_body = {
+        "message": "You must authenticate with this integration before you can execute this tool.",
+        "integration": {
+            "id": "550e8400-e29b-41d4-a716-446655440000",
+            "provider": "COMPOSIO",
+            "name": "GITHUB",
+        },
+    }
+
+    mock_client.integrations.execute_integration_tool.side_effect = ApiError(
+        status_code=403,
+        body=structured_error_body,
+    )
+
+    service = VellumIntegrationService(client=mock_client)
+
+    # WHEN we attempt to execute a tool without credentials
+    with pytest.raises(NodeException) as exc_info:
+        service.execute_tool(
+            integration="GITHUB",
+            provider="COMPOSIO",
+            tool_name="GITHUB_CREATE_AN_ISSUE",
+            arguments={"repo": "user/repo"},
+        )
+
+    # THEN it should raise NodeException with INTEGRATION_CREDENTIALS_UNAVAILABLE code
+    assert exc_info.value.code == WorkflowErrorCode.INTEGRATION_CREDENTIALS_UNAVAILABLE
+
+    # AND the error message should match the backend response
+    assert "You must authenticate with this integration" in exc_info.value.message
+
+    # AND raw_data should contain integration details nested under "integration" key
+    assert exc_info.value.raw_data is not None
+    assert exc_info.value.raw_data["integration"]["id"] == "550e8400-e29b-41d4-a716-446655440000"
+    assert exc_info.value.raw_data["integration"]["name"] == "GITHUB"
+    assert exc_info.value.raw_data["integration"]["provider"] == "COMPOSIO"
+
+
+def test_vellum_integration_service_execute_tool_legacy_403_error(vellum_client):
+    """Test backward compatibility with legacy 403 responses (before PR #14857)"""
+    from vellum.client.core.api_error import ApiError
+    from vellum.workflows.errors.types import WorkflowErrorCode
+
+    mock_client = vellum_client
+    mock_client.integrations = mock.MagicMock()
+
+    # Mock legacy 403 response format (just detail field)
+    legacy_error_body = {"detail": "You do not have permission to execute this tool."}
+
+    mock_client.integrations.execute_integration_tool.side_effect = ApiError(
+        status_code=403,
+        body=legacy_error_body,
+    )
+
+    service = VellumIntegrationService(client=mock_client)
+
+    with pytest.raises(NodeException) as exc_info:
+        service.execute_tool(
+            integration="GITHUB",
+            provider="COMPOSIO",
+            tool_name="GITHUB_CREATE_AN_ISSUE",
+            arguments={"repo": "user/repo"},
+        )
+
+    # THEN it should use the generic PROVIDER_CREDENTIALS_UNAVAILABLE code
+    assert exc_info.value.code == WorkflowErrorCode.PROVIDER_CREDENTIALS_UNAVAILABLE
+
+    # AND the message should match the legacy format
+    assert "You do not have permission" in exc_info.value.message
+
+    # AND raw_data should be None (no integration details available)
+    assert exc_info.value.raw_data is None
