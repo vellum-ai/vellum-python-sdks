@@ -898,6 +898,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         *,
         client: Optional[VellumClient] = None,
         dry_run: bool = False,
+        files: Optional[Dict[str, str]] = None,
+        include_debug: bool = False,
     ) -> WorkflowSerializationResult:
         """
         Load a workflow from a module and serialize it to JSON.
@@ -906,44 +908,73 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             module: The module path to load the workflow from
             client: Optional Vellum client to use for serialization
             dry_run: Whether to run in dry-run mode
+            files: Optional dictionary of file paths to contents for error context
+            include_debug: Whether to include debug information in errors
 
         Returns:
             WorkflowSerializationResult containing exec_config and errors
         """
-        workflow = BaseWorkflow.load_from_module(module)
-        workflow_display = get_workflow_display(
-            workflow_class=workflow,
-            client=client,
-            dry_run=dry_run,
-        )
+        from vellum_ee.workflows.display.utils.error_parser import parse_exception_to_structured_error
 
-        exec_config = workflow_display.serialize()
-        additional_files = workflow_display._gather_additional_module_files(module)
+        all_errors: List[Union[SerializationError, str]] = []
+        exec_config: Dict[str, Any] = {}
+        dataset: Optional[List[Dict[str, Any]]] = None
 
-        if additional_files:
-            exec_config["module_data"] = {"additional_files": cast(JsonObject, additional_files)}
-
-        dataset = None
         try:
-            sandbox_module_path = f"{module}.sandbox"
-            sandbox_module = importlib.import_module(sandbox_module_path)
-            if hasattr(sandbox_module, "dataset"):
-                dataset_attr = getattr(sandbox_module, "dataset")
-                if dataset_attr and isinstance(dataset_attr, list):
-                    dataset = []
-                    for i, inputs_obj in enumerate(dataset_attr):
-                        if isinstance(inputs_obj, DatasetRow):
-                            serialized_inputs = json.loads(json.dumps(inputs_obj.inputs, cls=DefaultStateEncoder))
-                            dataset.append({"label": inputs_obj.label, "inputs": serialized_inputs})
-                        elif isinstance(inputs_obj, BaseInputs):
-                            serialized_inputs = json.loads(json.dumps(inputs_obj, cls=DefaultStateEncoder))
-                            dataset.append({"label": f"Scenario {i + 1}", "inputs": serialized_inputs})
-        except (ImportError, AttributeError):
-            pass
+            workflow = BaseWorkflow.load_from_module(module)
+            workflow_display = get_workflow_display(
+                workflow_class=workflow,
+                client=client,
+                dry_run=dry_run,
+            )
+
+            exec_config = workflow_display.serialize()
+            additional_files = workflow_display._gather_additional_module_files(module)
+
+            if additional_files:
+                exec_config["module_data"] = {"additional_files": cast(JsonObject, additional_files)}
+
+            # Collect errors from the display context
+            for error in workflow_display.display_context.errors:
+                if files:
+                    # Convert exception to structured error
+                    structured_error = parse_exception_to_structured_error(
+                        error, files, module, include_debug=include_debug
+                    )
+                    all_errors.append(structured_error)
+                else:
+                    # Fall back to string representation
+                    all_errors.append(str(error))
+
+            # Try to load dataset
+            try:
+                sandbox_module_path = f"{module}.sandbox"
+                sandbox_module = importlib.import_module(sandbox_module_path)
+                if hasattr(sandbox_module, "dataset"):
+                    dataset_attr = getattr(sandbox_module, "dataset")
+                    if dataset_attr and isinstance(dataset_attr, list):
+                        dataset = []
+                        for i, inputs_obj in enumerate(dataset_attr):
+                            if isinstance(inputs_obj, DatasetRow):
+                                serialized_inputs = json.loads(json.dumps(inputs_obj.inputs, cls=DefaultStateEncoder))
+                                dataset.append({"label": inputs_obj.label, "inputs": serialized_inputs})
+                            elif isinstance(inputs_obj, BaseInputs):
+                                serialized_inputs = json.loads(json.dumps(inputs_obj, cls=DefaultStateEncoder))
+                                dataset.append({"label": f"Scenario {i + 1}", "inputs": serialized_inputs})
+            except (ImportError, AttributeError):
+                pass
+
+        except Exception as e:
+            # Top-level exception during serialization
+            if files:
+                structured_error = parse_exception_to_structured_error(e, files, module, include_debug=include_debug)
+                all_errors.append(structured_error)
+            else:
+                all_errors.append(str(e))
 
         return WorkflowSerializationResult(
             exec_config=exec_config,
-            errors=[str(error) for error in workflow_display.display_context.errors],
+            errors=all_errors,
             dataset=dataset,
         )
 
