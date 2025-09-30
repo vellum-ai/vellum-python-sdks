@@ -245,11 +245,11 @@ def test_vellum_integration_service_execute_tool_structured_403_error(vellum_cli
     # AND the error message should match the backend response
     assert "You must authenticate with this integration" in exc_info.value.message
 
-    # AND raw_data should contain integration details for frontend modal
+    # AND raw_data should contain integration details nested under "integration" key
     assert exc_info.value.raw_data is not None
-    assert exc_info.value.raw_data["integration_id"] == "550e8400-e29b-41d4-a716-446655440000"
-    assert exc_info.value.raw_data["integration_name"] == "GITHUB"
-    assert exc_info.value.raw_data["integration_provider"] == "COMPOSIO"
+    assert exc_info.value.raw_data["integration"]["id"] == "550e8400-e29b-41d4-a716-446655440000"
+    assert exc_info.value.raw_data["integration"]["name"] == "GITHUB"
+    assert exc_info.value.raw_data["integration"]["provider"] == "COMPOSIO"
 
 
 def test_vellum_integration_service_execute_tool_legacy_403_error(vellum_client):

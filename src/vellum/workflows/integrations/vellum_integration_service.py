@@ -99,12 +99,10 @@ class VellumIntegrationService:
                     integration_details = e.body["integration"]
                     error_message = e.body["message"]
 
-                    # Extract integration metadata for frontend display
-                    # Frontend will use integration_id to open a modal for auth config selection
+                    # Keep integration details nested under "integration" key to keep raw_data raw
+                    # and allow for future expansion
                     raw_data = {
-                        "integration_id": integration_details.get("id"),
-                        "integration_name": integration_details.get("name"),
-                        "integration_provider": integration_details.get("provider"),
+                        "integration": integration_details,
                     }
 
                     raise NodeException(
