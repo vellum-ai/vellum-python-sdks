@@ -8,10 +8,10 @@ from .components_schemas_slim_composio_tool_definition import ComponentsSchemasS
 
 
 class PaginatedSlimToolDefinitionList(UniversalBaseModel):
-    count: typing.Optional[int] = None
+    count: int
     next: typing.Optional[str] = None
     previous: typing.Optional[str] = None
-    results: typing.Optional[typing.List[ComponentsSchemasSlimComposioToolDefinition]] = None
+    results: typing.List[ComponentsSchemasSlimComposioToolDefinition]
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
