@@ -335,7 +335,7 @@ def compile_vellum_integration_tool_definition(tool_def: VellumIntegrationToolDe
     try:
         service = VellumIntegrationService()
         tool_details = service.get_tool_definition(
-            integration=tool_def.integration,
+            integration=tool_def.integration_name,
             provider=tool_def.provider.value,
             tool_name=tool_def.name,
         )

@@ -170,7 +170,7 @@ class VellumIntegrationToolDefinition(UniversalBaseModel):
 
     # Core identification
     provider: VellumIntegrationProviderType
-    integration: str  # "GITHUB", "SLACK", etc.
+    integration_name: str  # "GITHUB", "SLACK", etc.
     name: str  # Specific action like "GITHUB_CREATE_AN_ISSUE"
 
     # Required for tool base consistency
