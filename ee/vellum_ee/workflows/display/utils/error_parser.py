@@ -61,24 +61,31 @@ def parse_exception_to_structured_error(
 
 def map_namespace_to_file(path: str, namespace: str) -> str:
     """
-    Convert namespace module path to actual file path.
+    Convert namespace-prefixed path to actual file path.
 
-    Example: "AtUlfaZJaEHC6U.nodes.tools" -> "nodes/tools.py"
+    Examples:
+        "AtUlfaZJaEHC6U.nodes.tools" -> "nodes/tools.py"
+        "AtUlfaZJaEHC6U/__init__.py" -> "__init__.py"
+        "AtUlfaZJaEHC6U/nodes/tools.py" -> "nodes/tools.py"
 
     Args:
-        path: The module path from the traceback
+        path: The module/file path from the traceback
         namespace: The random namespace prefix
 
     Returns:
         Relative file path
     """
-    if not path.startswith(namespace):
+    # Check if path starts with namespace (either as module or file path)
+    if path.startswith(namespace + "."):
+        # Module path format: "namespace.module.submodule"
+        rel = path[len(namespace) + 1 :]  # Remove "namespace."
+        return rel.replace(".", "/") + ".py"
+    elif path.startswith(namespace + "/"):
+        # File path format: "namespace/path/to/file.py"
+        return path[len(namespace) + 1 :]  # Remove "namespace/"
+    else:
+        # Not our namespace, return as-is
         return path
-
-    # Remove namespace prefix
-    rel = path[len(namespace) + 1 :]  # +1 for the dot
-    # Convert module path to file path
-    return rel.replace(".", "/") + ".py"
 
 
 def find_user_code_frame(tb: traceback.StackSummary, namespace: str) -> Optional[traceback.FrameSummary]:
