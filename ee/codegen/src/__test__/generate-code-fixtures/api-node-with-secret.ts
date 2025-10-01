@@ -318,8 +318,5 @@ export default {
       type: "JSON",
     },
   ],
-  assertions: [
-    "nodes/api_with_secret.py",
-    "nodes/use_api_with_secret.py",
-  ],
+  assertions: ["nodes/api_with_secret.py", "nodes/use_api_with_secret.py"],
 };
