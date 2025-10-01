@@ -9,7 +9,7 @@ from .vellum_image_request import VellumImageRequest
 
 class NamedTestCaseImageVariableValueRequest(UniversalBaseModel):
     type: typing.Literal["IMAGE"] = "IMAGE"
-    value: VellumImageRequest
+    value: typing.Optional[VellumImageRequest] = None
     name: str
 
     if IS_PYDANTIC_V2:

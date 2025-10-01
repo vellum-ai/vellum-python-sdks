@@ -11,6 +11,7 @@ class SlimComposioToolDefinition(UniversalBaseModel):
     provider: typing.Literal["COMPOSIO"] = "COMPOSIO"
     integration: ToolDefinitionIntegration
     name: str
+    label: str
     description: str
 
     if IS_PYDANTIC_V2:

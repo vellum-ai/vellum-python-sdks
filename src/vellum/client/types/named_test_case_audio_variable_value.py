@@ -13,7 +13,7 @@ class NamedTestCaseAudioVariableValue(UniversalBaseModel):
     """
 
     type: typing.Literal["AUDIO"] = "AUDIO"
-    value: VellumAudio
+    value: typing.Optional[VellumAudio] = None
     name: str
 
     if IS_PYDANTIC_V2:

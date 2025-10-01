@@ -9,7 +9,7 @@ from .vellum_document_request import VellumDocumentRequest
 
 class NamedTestCaseDocumentVariableValueRequest(UniversalBaseModel):
     type: typing.Literal["DOCUMENT"] = "DOCUMENT"
-    value: VellumDocumentRequest
+    value: typing.Optional[VellumDocumentRequest] = None
     name: str
 
     if IS_PYDANTIC_V2:

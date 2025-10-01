@@ -15,7 +15,7 @@ class TestCaseVideoVariableValue(UniversalBaseModel):
     variable_id: str
     name: typing.Optional[str] = None
     type: typing.Literal["VIDEO"] = "VIDEO"
-    value: VellumVideo
+    value: typing.Optional[VellumVideo] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

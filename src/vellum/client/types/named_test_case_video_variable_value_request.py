@@ -9,7 +9,7 @@ from .vellum_video_request import VellumVideoRequest
 
 class NamedTestCaseVideoVariableValueRequest(UniversalBaseModel):
     type: typing.Literal["VIDEO"] = "VIDEO"
-    value: VellumVideoRequest
+    value: typing.Optional[VellumVideoRequest] = None
     name: str
 
     if IS_PYDANTIC_V2:

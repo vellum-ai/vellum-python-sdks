@@ -15,6 +15,7 @@ class ComposioToolDefinition(UniversalBaseModel):
     provider: typing.Literal["COMPOSIO"] = "COMPOSIO"
     integration: ToolDefinitionIntegration
     name: str
+    label: str
     description: str
     input_parameters: typing.Dict[str, typing.Optional[typing.Any]]
     output_parameters: typing.Dict[str, typing.Optional[typing.Any]]
