@@ -3,7 +3,10 @@ import { VellumError } from "vellum-ai/errors";
 
 import { BaseNodeContext } from "src/context/node-context/base";
 import { PortContext } from "src/context/port-context";
-import { EntityNotFoundError } from "src/generators/errors";
+import {
+  EntityNotFoundError,
+  NodeAttributeGenerationError,
+} from "src/generators/errors";
 import {
   ApiNode as ApiNodeType,
   NodeInput,
@@ -65,7 +68,12 @@ export class ApiNodeContext extends BaseNodeContext<ApiNodeType> {
           )
         );
       } else {
-        throw e;
+        this.workflowContext.addError(
+          new NodeAttributeGenerationError(
+            `Failed to load workspace secret for attribute "${input.key}".`,
+            "WARNING"
+          )
+        );
       }
     }
   }
