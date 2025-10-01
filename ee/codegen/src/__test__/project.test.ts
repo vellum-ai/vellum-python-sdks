@@ -1517,6 +1517,10 @@ baz = foo + bar
             },
             base: {
               name: "BaseNode",
+              module: ["vellum", "workflows", "nodes", "bases", "base"],
+            },
+            definition: {
+              name: "Alpha",
               module: ["vellum", "workflows", "nodes", "alpha"],
             },
           },
@@ -1583,7 +1587,7 @@ baz = foo + bar
 
       await project.generateCode();
 
-      expectProjectFileToMatchSnapshot(["code", "nodes", "beta.py"]);
+      expectProjectFileToMatchSnapshot(["code", "nodes", "alpha.py"]);
       expectProjectFileToMatchSnapshot(["code", "nodes", "second_node.py"]);
     });
   });
