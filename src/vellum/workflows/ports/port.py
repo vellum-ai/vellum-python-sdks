@@ -96,7 +96,10 @@ class Port:
             if self._condition is None:
                 return False
 
-            value = self._condition.resolve(state)
+            if isinstance(self._condition, BaseDescriptor):
+                value = self._condition.resolve(state)
+            else:
+                value = self._condition
             return bool(value)
         except InvalidExpressionException as e:
             raise NodeException(
