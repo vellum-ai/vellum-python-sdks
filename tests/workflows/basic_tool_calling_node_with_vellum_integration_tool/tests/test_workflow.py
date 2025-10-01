@@ -40,7 +40,7 @@ def _setup_mock_service(
         # Create proper VellumIntegrationToolDetails object from dict
         tool_details_obj = VellumIntegrationToolDetails(
             provider=VellumIntegrationProviderType.COMPOSIO,
-            integration="GITHUB",
+            integration_name="GITHUB",
             name=tool_details.get("name", "create_issue"),
             description=tool_details.get("description", "Mock description"),
             parameters=tool_details.get("input_parameters", {}),
@@ -239,7 +239,7 @@ def test_tool_definition_and_function_compilation():
     tool = github_create_issue_tool
     assert tool.type == "VELLUM_INTEGRATION"
     assert tool.provider.value == "COMPOSIO"
-    assert tool.integration == "GITHUB"
+    assert tool.integration_name == "GITHUB"
     assert tool.name == "create_issue"
     assert tool.description == "Create a new issue in a GitHub repository"
 
@@ -250,7 +250,7 @@ def test_tool_definition_and_function_compilation():
         # Create a proper VellumIntegrationToolDetails object
         mock_tool_details_obj = VellumIntegrationToolDetails(
             provider=VellumIntegrationProviderType.COMPOSIO,
-            integration="GITHUB",
+            integration_name="GITHUB",
             name="create_issue",
             description="Enhanced description from service",
             parameters={"type": "object", "properties": {"title": {"type": "string", "description": "Issue title"}}},
