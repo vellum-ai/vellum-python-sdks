@@ -2,6 +2,10 @@ import fs from "fs";
 import os from "os";
 import path, { join } from "path";
 
+import { WorkspaceSecrets } from "vellum-ai/api/resources/workspaceSecrets/client/Client";
+import { VellumError } from "vellum-ai/errors/VellumError";
+import { vi } from "vitest";
+
 import { WorkflowProjectGenerator } from "src/project";
 import { getAllFilesInDir } from "src/utils/files";
 
@@ -10,20 +14,55 @@ const vellumApiKey = "<TEST_API_KEY>";
 const fixturesDir = path.join(__dirname, "generate-code-fixtures");
 
 describe("generateCode", () => {
+  beforeEach(() => {
+    vi.spyOn(WorkspaceSecrets.prototype, "retrieve").mockRejectedValue(
+      new VellumError({
+        message: "Workspace secret not found",
+        statusCode: 404,
+      })
+    );
+  });
+
   const fixtures = fs
     .readdirSync(fixturesDir, { withFileTypes: true })
-    .filter((file) => !file.isDirectory() && file.name.endsWith(".json"))
+    .filter(
+      (file) =>
+        !file.isDirectory() &&
+        (file.name.endsWith(".json") || file.name.endsWith(".ts"))
+    )
     .map((file) => file.name);
 
   it.each(fixtures)(`should generate code for %1`, async (fixture) => {
-    const { assertions, ...workflowVersionExecConfigData } = JSON.parse(
-      fs.readFileSync(path.join(fixturesDir, fixture), "utf8")
-    );
+    let workflowVersionExecConfigData: any;
+    let assertions: string[];
+
+    if (fixture.endsWith(".json")) {
+      const fixtureData = JSON.parse(
+        fs.readFileSync(path.join(fixturesDir, fixture), "utf8")
+      );
+      assertions = fixtureData.assertions;
+      workflowVersionExecConfigData = {
+        ...fixtureData,
+        assertions: undefined,
+      };
+      delete workflowVersionExecConfigData.assertions;
+    } else if (fixture.endsWith(".ts")) {
+      const fixtureModule = require(path.join(fixturesDir, fixture));
+      const fixtureData = fixtureModule.default;
+      assertions = fixtureData.assertions;
+      workflowVersionExecConfigData = {
+        ...fixtureData,
+        assertions: undefined,
+      };
+      delete workflowVersionExecConfigData.assertions;
+    } else {
+      throw new Error(`Unsupported fixture format: ${fixture}`);
+    }
 
     const tempDir = path.join(
       os.tmpdir(),
       "generate-code",
-      fixture.replace(".json", "")
+      fixture.replace(/\.(json|ts)$/, "")
     );
     fs.mkdirSync(tempDir, { recursive: true });
 

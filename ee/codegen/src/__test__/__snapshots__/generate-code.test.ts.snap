@@ -1,0 +1,39 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`generateCode > should generate code for %1 api-node-with-secret.ts > nodes/api_with_secret.py 1`] = `
+"from vellum.workflows.constants import APIRequestMethod, AuthorizationType
+from vellum.workflows.nodes.displayable import APINode
+from vellum.workflows.references import VellumSecretReference
+
+
+class ApiWithSecret(APINode):
+    url = "https://api.example.com/v1/test"
+    method = APIRequestMethod.POST
+    json = {
+        "input": "test-data",
+    }
+    headers = {
+        "Content-Type": "application/json",
+    }
+    api_key_header_key = "Authorization"
+    authorization_type = AuthorizationType.BEARER_TOKEN
+    api_key_header_value = ""
+    bearer_token_value = VellumSecretReference("test-workspace-secret-id")
+    timeout = 60
+"
+`;
+
+exports[`generateCode > should generate code for %1 api-node-with-secret.ts > nodes/use_api_with_secret.py 1`] = `
+"from typing import Any
+
+from vellum.workflows.nodes.displayable import FinalOutputNode
+from vellum.workflows.state import BaseState
+
+from .api_with_secret import ApiWithSecret
+
+
+class UseApiWithSecret(FinalOutputNode[BaseState, Any]):
+    class Outputs(FinalOutputNode.Outputs):
+        value = ApiWithSecret.Outputs.json
+"
+`;
