@@ -48,7 +48,7 @@ class VellumIntegrationService:
 
             return VellumIntegrationToolDetails(
                 provider=VellumIntegrationProviderType(response.provider),
-                integration=integration,
+                integration_name=integration,
                 name=response.name,
                 description=response.description,
                 parameters=response.input_parameters,

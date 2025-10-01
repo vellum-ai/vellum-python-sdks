@@ -1015,7 +1015,7 @@ export type MCPServerFunctionArgs = {
 export type VellumIntegrationToolFunctionArgs = {
   type: "VELLUM_INTEGRATION";
   provider: string;
-  integration: string;
+  integration_name: string;
   name: string;
 } & NameDescription;
 

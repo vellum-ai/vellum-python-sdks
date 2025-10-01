@@ -16,7 +16,7 @@ class Inputs(BaseInputs):
 # Create a VellumIntegrationToolDefinition for testing
 github_create_issue_tool = VellumIntegrationToolDefinition(
     provider=VellumIntegrationProviderType.COMPOSIO,
-    integration="GITHUB",
+    integration_name="GITHUB",
     name="create_issue",
     description="Create a new issue in a GitHub repository",
 )

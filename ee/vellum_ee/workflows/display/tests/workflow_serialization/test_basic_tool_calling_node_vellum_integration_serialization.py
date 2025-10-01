@@ -63,6 +63,6 @@ def test_serialize_workflow():
     function = functions_value[0]
     assert function["type"] == "VELLUM_INTEGRATION"
     assert function["provider"] == "COMPOSIO"  # VellumIntegrationProviderType.COMPOSIO
-    assert function["integration"] == "GITHUB"
+    assert function["integration_name"] == "GITHUB"
     assert function["name"] == "create_issue"
     assert function["description"] == "Create a new issue in a GitHub repository"

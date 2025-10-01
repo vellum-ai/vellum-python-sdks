@@ -155,14 +155,14 @@ def test_vellum_integration_tool_definition_creation():
     """Test that VellumIntegrationToolDefinition can be created with required fields."""
     vellum_tool = VellumIntegrationToolDefinition(
         provider=VellumIntegrationProviderType.COMPOSIO,
-        integration="GITHUB",
+        integration_name="GITHUB",
         name="create_issue",
         description="Create a new issue in a GitHub repository",
     )
 
     assert vellum_tool.type == "VELLUM_INTEGRATION"
     assert vellum_tool.provider == VellumIntegrationProviderType.COMPOSIO
-    assert vellum_tool.integration == "GITHUB"
+    assert vellum_tool.integration_name == "GITHUB"
     assert vellum_tool.name == "create_issue"
     assert vellum_tool.description == "Create a new issue in a GitHub repository"
 
@@ -171,13 +171,13 @@ def test_vellum_integration_tool_definition_with_different_provider():
     """Test VellumIntegrationToolDefinition with a different provider."""
     vellum_tool = VellumIntegrationToolDefinition(
         provider=VellumIntegrationProviderType.COMPOSIO,
-        integration="SLACK",
+        integration_name="SLACK",
         name="send_message",
         description="Send a message to a Slack channel",
     )
 
     assert vellum_tool.type == "VELLUM_INTEGRATION"
     assert vellum_tool.provider == VellumIntegrationProviderType.COMPOSIO
-    assert vellum_tool.integration == "SLACK"
+    assert vellum_tool.integration_name == "SLACK"
     assert vellum_tool.name == "send_message"
     assert vellum_tool.description == "Send a message to a Slack channel"
