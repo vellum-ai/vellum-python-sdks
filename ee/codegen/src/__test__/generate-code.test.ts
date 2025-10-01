@@ -2,10 +2,6 @@ import fs from "fs";
 import os from "os";
 import path, { join } from "path";
 
-import { WorkspaceSecrets } from "vellum-ai/api/resources/workspaceSecrets/client/Client";
-import { VellumError } from "vellum-ai/errors/VellumError";
-import { vi } from "vitest";
-
 import { WorkflowProjectGenerator } from "src/project";
 import { getAllFilesInDir } from "src/utils/files";
 
@@ -13,63 +9,43 @@ const moduleName = "testing";
 const vellumApiKey = "<TEST_API_KEY>";
 const fixturesDir = path.join(__dirname, "generate-code-fixtures");
 
+/**
+ * New pattern for testing project level codegen features and to start reducing the size of `projecte.test.ts`.
+ * - Create a new file within `__test__/generate-code-fixtures`
+ * - The file should export a default object with the following properties:
+ *   - assertions: an array of file paths to assert snapshots against
+ *   - workflow_raw_data: the raw workflow data to pass to the `WorkflowProjectGenerator`
+ *   - The rest of workflow version exec config data also top level.
+ */
 describe("generateCode", () => {
-  beforeEach(() => {
-    vi.spyOn(WorkspaceSecrets.prototype, "retrieve").mockRejectedValue(
-      new VellumError({
-        message: "Workspace secret not found",
-        statusCode: 404,
-      })
-    );
+  let tempDir: string;
+  beforeAll(() => {
+    tempDir = path.join(os.tmpdir(), "generate-code");
+    fs.mkdirSync(tempDir, { recursive: true });
+  });
+
+  afterAll(() => {
+    fs.rmSync(tempDir, { recursive: true });
   });
 
   const fixtures = fs
     .readdirSync(fixturesDir, { withFileTypes: true })
-    .filter(
-      (file) =>
-        !file.isDirectory() &&
-        (file.name.endsWith(".json") || file.name.endsWith(".ts"))
-    )
+    .filter((file) => !file.isDirectory() && file.name.endsWith(".ts"))
     .map((file) => file.name);
 
   it.each(fixtures)(`should generate code for %1`, async (fixture) => {
-    let workflowVersionExecConfigData: any;
-    let assertions: string[];
+    const fixtureModule = await import(path.join(fixturesDir, fixture));
+    const { assertions, ...workflowVersionExecConfigData } =
+      fixtureModule.default;
 
-    if (fixture.endsWith(".json")) {
-      const fixtureData = JSON.parse(
-        fs.readFileSync(path.join(fixturesDir, fixture), "utf8")
-      );
-      assertions = fixtureData.assertions;
-      workflowVersionExecConfigData = {
-        ...fixtureData,
-        assertions: undefined,
-      };
-      delete workflowVersionExecConfigData.assertions;
-    } else if (fixture.endsWith(".ts")) {
-      const fixtureModule = require(path.join(fixturesDir, fixture));
-      const fixtureData = fixtureModule.default;
-      assertions = fixtureData.assertions;
-      workflowVersionExecConfigData = {
-        ...fixtureData,
-        assertions: undefined,
-      };
-      delete workflowVersionExecConfigData.assertions;
-    } else {
-      throw new Error(`Unsupported fixture format: ${fixture}`);
-    }
-
-    const tempDir = path.join(
-      os.tmpdir(),
-      "generate-code",
-      fixture.replace(/\.(json|ts)$/, "")
-    );
-    fs.mkdirSync(tempDir, { recursive: true });
+    const fixtureDir = path.join(tempDir, fixture.replace(/\.ts$/, ""));
+    fs.mkdirSync(fixtureDir, { recursive: true });
 
     async function expectProjectFileToMatchSnapshot(filePath: string[]) {
       const moduleRoot = join(tempDir, moduleName);
       const completeFilePath = join(moduleRoot, ...filePath);
       const snapshotName = filePath.join("/");
+
       expect(
         fs.existsSync(completeFilePath),
         `File does not exist: ${snapshotName}. Files generated:\n${Object.keys(
