@@ -323,17 +323,21 @@ def compile_composio_tool_definition(tool_def: ComposioToolDefinition) -> Functi
         )
 
 
-def compile_vellum_integration_tool_definition(tool_def: VellumIntegrationToolDefinition) -> FunctionDefinition:
+def compile_vellum_integration_tool_definition(
+    tool_def: VellumIntegrationToolDefinition,
+    vellum_client: Vellum,
+) -> FunctionDefinition:
     """Compile a VellumIntegrationToolDefinition into a FunctionDefinition.
 
     Args:
         tool_def: The VellumIntegrationToolDefinition to compile
+        vellum_client: Vellum client instance
 
     Returns:
         FunctionDefinition with tool parameters and description
     """
     try:
-        service = VellumIntegrationService()
+        service = VellumIntegrationService(vellum_client)
         tool_details = service.get_tool_definition(
             integration=tool_def.integration_name,
             provider=tool_def.provider.value,

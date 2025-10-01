@@ -1,11 +1,11 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from vellum.client.core.api_error import ApiError
 from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.types.definition import VellumIntegrationToolDetails
-from vellum.workflows.vellum_client import create_vellum_client
+from vellum.workflows.vellum_client import Vellum
 
 
 class VellumIntegrationService:
@@ -16,9 +16,9 @@ class VellumIntegrationService:
     own integration infrastructure.
     """
 
-    def __init__(self, client: Optional[Any] = None) -> None:
+    def __init__(self, client: Vellum) -> None:
         """Initialize the VellumIntegrationService with a Vellum client."""
-        self._client = client or create_vellum_client()
+        self._client = client
 
     def get_tool_definition(
         self,
