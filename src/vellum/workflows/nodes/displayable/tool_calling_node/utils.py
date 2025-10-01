@@ -271,9 +271,10 @@ class VellumIntegrationNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
 
     def run(self) -> Iterator[BaseOutput]:
         arguments = self._extract_function_arguments()
+        vellum_client = self._context.vellum_client
 
         try:
-            vellum_service = VellumIntegrationService()
+            vellum_service = VellumIntegrationService(vellum_client)
             result = vellum_service.execute_tool(
                 integration=self.vellum_integration_tool.integration_name,
                 provider=self.vellum_integration_tool.provider.value,

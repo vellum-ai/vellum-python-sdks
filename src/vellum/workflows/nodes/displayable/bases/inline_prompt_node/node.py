@@ -152,7 +152,9 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                 elif isinstance(function, ComposioToolDefinition):
                     normalized_functions.append(compile_composio_tool_definition(function))
                 elif isinstance(function, VellumIntegrationToolDefinition):
-                    normalized_functions.append(compile_vellum_integration_tool_definition(function))
+                    normalized_functions.append(
+                        compile_vellum_integration_tool_definition(function, self._context.vellum_client)
+                    )
                 elif isinstance(function, MCPServer):
                     tool_definitions = compile_mcp_tool_definition(function)
                     for tool_def in tool_definitions:

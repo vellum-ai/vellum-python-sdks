@@ -233,7 +233,7 @@ def test_run_workflow__tool_execution_error(vellum_adhoc_prompt_client):
         assert "API rate limit exceeded" in str(terminal_event.error.message)
 
 
-def test_tool_definition_and_function_compilation():
+def test_tool_definition_and_function_compilation(vellum_client):
     """Test tool properties and function compilation with both success and failure scenarios."""
     # Test basic tool properties
     tool = github_create_issue_tool
@@ -258,7 +258,7 @@ def test_tool_definition_and_function_compilation():
         mock_service_instance.get_tool_definition.return_value = mock_tool_details_obj
         mock_service_class.return_value = mock_service_instance
 
-        result = compile_vellum_integration_tool_definition(tool)
+        result = compile_vellum_integration_tool_definition(tool, vellum_client)
         assert result.name == "create_issue"
         assert result.description == "Enhanced description from service"
         assert result.parameters is not None and "properties" in result.parameters
@@ -273,7 +273,7 @@ def test_tool_definition_and_function_compilation():
         mock_service_instance.get_tool_definition.side_effect = Exception("Service down")
         mock_service_class.return_value = mock_service_instance
 
-        result = compile_vellum_integration_tool_definition(tool)
+        result = compile_vellum_integration_tool_definition(tool, vellum_client)
         assert result.name == "create_issue"
         assert result.description == "Create a new issue in a GitHub repository"
         assert result.parameters == {}

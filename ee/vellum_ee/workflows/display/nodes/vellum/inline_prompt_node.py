@@ -5,11 +5,12 @@ from vellum import FunctionDefinition, PromptBlock, RichTextChildBlock, VellumVa
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.nodes import InlinePromptNode
 from vellum.workflows.types.core import JsonObject
-from vellum.workflows.types.definition import DeploymentDefinition
+from vellum.workflows.types.definition import DeploymentDefinition, VellumIntegrationToolDefinition
 from vellum.workflows.types.generics import is_workflow_class
 from vellum.workflows.utils.functions import (
     compile_function_definition,
     compile_inline_workflow_function_definition,
+    compile_vellum_integration_tool_definition,
     compile_workflow_deployment_function_definition,
 )
 from vellum.workflows.utils.uuids import uuid4_from_hash
@@ -164,6 +165,8 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
             normalized_functions = compile_function_definition(function)
         elif isinstance(function, DeploymentDefinition):
             normalized_functions = compile_workflow_deployment_function_definition(function, display_context.client)
+        elif isinstance(function, VellumIntegrationToolDefinition):
+            normalized_functions = compile_vellum_integration_tool_definition(function, display_context.client)
         else:
             raise ValueError(f"Unsupported function type: {type(function)}")
         return {
