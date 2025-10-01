@@ -193,6 +193,27 @@ class Workflow(BaseWorkflow):
 "
 `;
 
+exports[`WorkflowProjectGenerator > Nodes with custom module ending in alpha and node reference > should generate nodes with correct module path and output references > code/nodes/beta.py 1`] = `
+"from vellum.workflows.nodes.alpha import BaseNode
+
+
+class Beta(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        output: str
+"
+`;
+
+exports[`WorkflowProjectGenerator > Nodes with custom module ending in alpha and node reference > should generate nodes with correct module path and output references > code/nodes/second_node.py 1`] = `
+"from vellum.workflows.nodes import BaseNode
+
+from .beta import Beta
+
+
+class SecondNode(BaseNode):
+    referenced_output = Beta.Outputs.output
+"
+`;
+
 exports[`WorkflowProjectGenerator > Nodes with forward references > should generate a proper Lazy Reference for the first node > code/nodes/first_node.py 1`] = `
 "from vellum.workflows.nodes import BaseNode
 from vellum.workflows.references import LazyReference

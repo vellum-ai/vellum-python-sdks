@@ -1471,6 +1471,124 @@ baz = foo + bar
       expectProjectFileToMatchSnapshot(["code", "nodes", "first_node.py"]);
     });
   });
+  describe("Nodes with custom module ending in alpha and node reference", () => {
+    const firstNodeId = uuidv4();
+    const secondNodeId = uuidv4();
+    const firstNodeOutputId = uuidv4();
+    const firstNodeDefaultPortId = uuidv4();
+    const firstNodeTriggerId = uuidv4();
+    const secondNodeTriggerId = uuidv4();
+
+    const displayData = {
+      workflow_raw_data: {
+        nodes: [
+          {
+            id: "entry",
+            type: "ENTRYPOINT",
+            data: {
+              label: "Entrypoint",
+              source_handle_id: "entry_source",
+              target_handle_id: "entry_target",
+            },
+            inputs: [],
+          },
+          {
+            id: firstNodeId,
+            type: "GENERIC",
+            label: "beta",
+            attributes: [],
+            outputs: [
+              {
+                id: firstNodeOutputId,
+                name: "output",
+                type: "STRING",
+              },
+            ],
+            ports: [
+              {
+                id: firstNodeDefaultPortId,
+                name: "default",
+                type: "DEFAULT",
+              },
+            ],
+            trigger: {
+              id: firstNodeTriggerId,
+              merge_behavior: "AWAIT_ATTRIBUTES",
+            },
+            base: {
+              name: "BaseNode",
+              module: ["vellum", "workflows", "nodes", "alpha"],
+            },
+          },
+          {
+            id: secondNodeId,
+            type: "GENERIC",
+            label: "SecondNode",
+            attributes: [
+              {
+                id: uuidv4(),
+                name: "referenced_output",
+                value: {
+                  type: "NODE_OUTPUT",
+                  node_id: firstNodeId,
+                  node_output_id: firstNodeOutputId,
+                },
+              },
+            ],
+            outputs: [],
+            ports: [],
+            trigger: {
+              id: secondNodeTriggerId,
+              merge_behavior: "AWAIT_ATTRIBUTES",
+            },
+            base: {
+              name: "BaseNode",
+              module: ["vellum", "workflows", "nodes", "bases", "base"],
+            },
+          },
+        ],
+        edges: [
+          {
+            source_node_id: "entry",
+            source_handle_id: "entry_source",
+            target_node_id: firstNodeId,
+            target_handle_id: firstNodeTriggerId,
+            type: "DEFAULT",
+            id: "edge_1",
+          },
+          {
+            source_node_id: firstNodeId,
+            source_handle_id: firstNodeDefaultPortId,
+            target_node_id: secondNodeId,
+            target_handle_id: secondNodeTriggerId,
+            type: "DEFAULT",
+            id: "edge_2",
+          },
+        ],
+      },
+      input_variables: [],
+      state_variables: [],
+      output_variables: [],
+      runner_config: {},
+    };
+
+    it("should generate nodes with correct module path and output references", async () => {
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+        strict: false,
+      });
+
+      await project.generateCode();
+
+      expectProjectFileToMatchSnapshot(["code", "nodes", "beta.py"]);
+      expectProjectFileToMatchSnapshot(["code", "nodes", "second_node.py"]);
+    });
+  });
+
+
 
   // TODO: Remove this once we move away completely from terminal nodes
   describe("nodes with output values", () => {
