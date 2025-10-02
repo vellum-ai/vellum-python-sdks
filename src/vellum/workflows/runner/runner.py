@@ -145,6 +145,14 @@ class WorkflowRunner(Generic[StateType]):
             ]
             self._is_resuming = True
         elif previous_execution_id:
+            if not self.workflow.resolvers:
+                raise WorkflowInitializationException(
+                    message=f"No resolvers configured to load initial state for execution ID: {previous_execution_id}",
+                    workflow_definition=self.workflow.__class__,
+                    code=WorkflowErrorCode.INVALID_INPUTS,
+                )
+
+            resolver_failed = True
             for resolver in self.workflow.resolvers:
                 try:
                     load_state_result = resolver.load_state(previous_execution_id)
@@ -161,10 +169,19 @@ class WorkflowRunner(Generic[StateType]):
                                 load_state_result.root_trace_id,
                                 load_state_result.root_span_id,
                             )
+                            resolver_failed = False
                             break
                 except Exception as e:
                     logger.warning(f"Failed to load state from resolver {type(resolver).__name__}: {e}")
                     continue
+
+            if resolver_failed:
+                raise WorkflowInitializationException(
+                    message=f"All resolvers failed to load initial state for execution ID: {previous_execution_id}",
+                    workflow_definition=self.workflow.__class__,
+                    code=WorkflowErrorCode.INVALID_INPUTS,
+                )
+
             self._entrypoints = self.workflow.get_entrypoints()
         else:
             normalized_inputs = deepcopy(inputs) if inputs else self.workflow.get_default_inputs()
