@@ -35,12 +35,14 @@ class WorkflowInitializationException(Exception):
     def __init__(
         self,
         message: str,
-        workflow_definition: Optional[Type["BaseWorkflow"]],
+        workflow_definition: Optional[Type["BaseWorkflow"]] = None,
         code: WorkflowErrorCode = WorkflowErrorCode.INVALID_INPUTS,
     ):
+        from vellum.workflows.types.generics import import_workflow_class
+
         self.message = message
         self.code = code
-        self.definition = workflow_definition
+        self.definition = workflow_definition if workflow_definition is not None else import_workflow_class()
         super().__init__(message)
 
     @property

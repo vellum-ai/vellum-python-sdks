@@ -1,10 +1,23 @@
 import pytest
 from pathlib import Path
+import shutil
 import sys
 import tempfile
 
 from vellum.workflows.exceptions import WorkflowInitializationException
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
+
+
+@pytest.fixture
+def temp_module_path():
+    """Fixture to manage sys.path for temporary modules."""
+    temp_dir = tempfile.mkdtemp()
+    sys.path.insert(0, temp_dir)
+    try:
+        yield temp_dir
+    finally:
+        sys.path.remove(temp_dir)
+        shutil.rmtree(temp_dir)
 
 
 def test_serialize_module_with_dataset():
@@ -83,17 +96,16 @@ def test_serialize_module_includes_additional_files():
     assert "CONSTANT_VALUE" in additional_files["utils/constants.py"]
 
 
-def test_serialize_module__with_invalid_nested_set_graph():
+def test_serialize_module__with_invalid_nested_set_graph(temp_module_path):
     """
     Tests that serialize_module raises a clear user-facing exception for workflows with nested sets in graph attribute.
     """
-    with tempfile.TemporaryDirectory() as temp_dir:
-        module_dir = Path(temp_dir) / "test_invalid_workflow"
-        module_dir.mkdir()
+    module_dir = Path(temp_module_path) / "test_invalid_workflow"
+    module_dir.mkdir()
 
-        (module_dir / "__init__.py").write_text("")
+    (module_dir / "__init__.py").write_text("")
 
-        workflow_content = """
+    workflow_content = """
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.nodes import BaseNode
 
@@ -107,17 +119,12 @@ class InvalidWorkflow(BaseWorkflow):
     class Outputs(BaseWorkflow.Outputs):
         result = TestNode.Outputs.value
 """
-        (module_dir / "workflow.py").write_text(workflow_content)
+    (module_dir / "workflow.py").write_text(workflow_content)
 
-        sys.path.insert(0, temp_dir)
+    with pytest.raises(WorkflowInitializationException) as exc_info:
+        BaseWorkflowDisplay.serialize_module("test_invalid_workflow")
 
-        try:
-            with pytest.raises(WorkflowInitializationException) as exc_info:
-                BaseWorkflowDisplay.serialize_module("test_invalid_workflow")
-
-            error_message = str(exc_info.value)
-            assert "Invalid graph structure detected" in error_message
-            assert "Nested sets or unsupported graph types are not allowed" in error_message
-            assert "contact Vellum support" in error_message
-        finally:
-            sys.path.remove(temp_dir)
+    error_message = str(exc_info.value)
+    assert "Invalid graph structure detected" in error_message
+    assert "Nested sets or unsupported graph types are not allowed" in error_message
+    assert "contact Vellum support" in error_message
