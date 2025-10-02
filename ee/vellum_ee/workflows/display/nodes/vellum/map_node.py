@@ -56,7 +56,7 @@ class BaseMapNodeDisplay(BaseAdornmentNodeDisplay[_MapNodeType], Generic[_MapNod
             input_name="items",
             value=items or [],
             display_context=display_context,
-            input_id=items_workflow_input_id,
+            input_id=str(items_workflow_input_id),
         )
         node_inputs = [items_node_input]
         item_workflow_input_id = next(
