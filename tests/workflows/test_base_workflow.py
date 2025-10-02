@@ -117,16 +117,32 @@ def test_workflow_initialization_exception_when_multiple_resolvers_fail():
     assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
 
 
-def test_no_exception_when_no_resolvers_configured():
+def test_workflow_initialization_exception_when_no_resolvers_and_previous_execution_id():
     """
-    Tests that no exception is raised when workflow has no resolvers configured.
+    Tests that WorkflowInitializationException is raised when no resolvers are configured
+    but previous_execution_id is provided.
     """
 
     workflow = TestWorkflowWithNoResolvers()
 
     previous_execution_id = str(uuid4())
 
-    runner = WorkflowRunner(workflow=workflow, previous_execution_id=previous_execution_id)
+    with pytest.raises(WorkflowInitializationException) as exc_info:
+        WorkflowRunner(workflow=workflow, previous_execution_id=previous_execution_id)
+
+    assert "No resolvers configured to load initial state" in str(exc_info.value)
+
+    assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
+
+
+def test_no_exception_when_no_resolvers_configured():
+    """
+    Tests that no exception is raised when workflow has no resolvers configured and no previous_execution_id.
+    """
+
+    workflow = TestWorkflowWithNoResolvers()
+
+    runner = WorkflowRunner(workflow=workflow)
 
     assert runner is not None
 
