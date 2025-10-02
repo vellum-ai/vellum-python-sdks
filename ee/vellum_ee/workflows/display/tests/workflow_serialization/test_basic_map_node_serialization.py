@@ -79,10 +79,10 @@ def test_serialize_workflow():
         {
             "id": "bf83099a-40df-4445-b90d-1f6f1067ebe3",
             "type": "MAP",
-            "inputs": [
-                {
-                    "id": "4c0a109f-599e-4d04-a396-a51474fc2996",
-                    "key": "items",
+                "inputs": [
+                    {
+                        "id": "0acef1e7-caa1-4d9f-bb69-6981729af18d",
+                        "key": "items",
                     "value": {
                         "rules": [
                             {
@@ -393,3 +393,7 @@ def test_serialize_workflow():
             "workflow",
         ],
     }
+
+    # AND the map node's items input ID should match the subworkflow's items input ID
+    items_input_id = map_node["data"]["items_input_id"]
+    assert map_node['inputs'][0]['id'] == items_input_id
