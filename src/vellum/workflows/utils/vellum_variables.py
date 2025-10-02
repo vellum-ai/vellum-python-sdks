@@ -87,6 +87,9 @@ def primitive_type_to_vellum_variable_type(type_: Union[Type, BaseDescriptor]) -
     elif _is_type_optionally_in(type_, (VellumError, VellumErrorRequest)):
         return "ERROR"
 
+    if type_ is typing.Any:
+        return "JSON"
+
     builtin_list_type = _builtin_list_to_vellum_type(type_)
     if builtin_list_type:
         return builtin_list_type
