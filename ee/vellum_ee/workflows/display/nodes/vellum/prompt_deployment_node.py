@@ -43,9 +43,13 @@ class BasePromptDeploymentNodeDisplay(BaseNodeDisplay[_PromptDeploymentNodeType]
         array_display = self.output_display[node.Outputs.results]
         json_display = self.output_display[node.Outputs.json]
 
-        deployment = display_context.client.deployments.retrieve(
-            id=str(raise_if_descriptor(node.deployment)),
-        )
+        if display_context.dry_run:
+            deployment_id = str(raise_if_descriptor(node.deployment))
+        else:
+            deployment = display_context.client.deployments.retrieve(
+                id=str(raise_if_descriptor(node.deployment)),
+            )
+            deployment_id = str(deployment.id)
         ml_model_fallbacks = raise_if_descriptor(node.ml_model_fallbacks)
 
         return {
@@ -60,7 +64,7 @@ class BasePromptDeploymentNodeDisplay(BaseNodeDisplay[_PromptDeploymentNodeType]
                 "source_handle_id": str(self.get_source_handle_id(display_context.port_displays)),
                 "target_handle_id": str(self.get_target_handle_id()),
                 "variant": "DEPLOYMENT",
-                "prompt_deployment_id": str(deployment.id),
+                "prompt_deployment_id": deployment_id,
                 "release_tag": raise_if_descriptor(node.release_tag),
                 "ml_model_fallbacks": list(ml_model_fallbacks) if ml_model_fallbacks else None,
             },

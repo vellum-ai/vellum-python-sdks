@@ -44,9 +44,13 @@ class BaseSubworkflowDeploymentNodeDisplay(
             for variable_name, variable_value in input_items
         ]
 
-        deployment = display_context.client.workflow_deployments.retrieve(
-            id=str(raise_if_descriptor(node.deployment)),
-        )
+        if display_context.dry_run:
+            deployment_id = str(raise_if_descriptor(node.deployment))
+        else:
+            deployment = display_context.client.workflow_deployments.retrieve(
+                id=str(raise_if_descriptor(node.deployment)),
+            )
+            deployment_id = str(deployment.id)
 
         return {
             "id": str(node_id),
@@ -58,7 +62,7 @@ class BaseSubworkflowDeploymentNodeDisplay(
                 "source_handle_id": str(self.get_source_handle_id(display_context.port_displays)),
                 "target_handle_id": str(self.get_target_handle_id()),
                 "variant": "DEPLOYMENT",
-                "workflow_deployment_id": str(deployment.id),
+                "workflow_deployment_id": deployment_id,
                 "release_tag": raise_if_descriptor(node.release_tag),
             },
             **self.serialize_generic_fields(display_context),

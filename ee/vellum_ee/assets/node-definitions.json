@@ -543,6 +543,117 @@
       ]
     },
     {
+      "id": "3ae7366b-28ce-4d6b-8ec1-c6366b1e1a8b",
+      "display_data": {
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "comment": {
+          "value": "\n    Used to execute a Workflow Deployment.\n\n    subworkflow_inputs: EntityInputsInterface - The inputs for the Subworkflow\n    deployment: Union[UUID, str] - Either the Workflow Deployment's UUID or its name.\n    release_tag: str = LATEST_RELEASE_TAG - The release tag to use for the Workflow Execution\n    external_id: Optional[str] = OMIT - Optionally include a unique identifier for tracking purposes.\n        Must be unique within a given Workflow Deployment.\n    expand_meta: Optional[WorkflowExpandMetaRequest] = OMIT - Expandable execution fields to include in the response\n    metadata: Optional[Dict[str, Optional[Any]]] = OMIT - The metadata to use for the Workflow Execution\n    request_options: Optional[RequestOptions] = None - The request options to use for the Workflow Execution\n    ",
+          "expanded": true
+        }
+      },
+      "base": {
+        "name": "BaseNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
+      },
+      "definition": {
+        "name": "SubworkflowDeploymentNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "displayable",
+          "subworkflow_deployment_node",
+          "node"
+        ]
+      },
+      "trigger": {
+        "id": "a6eecf28-5c21-4406-80bb-917c6de84050",
+        "merge_behavior": "AWAIT_ANY"
+      },
+      "ports": [
+        {
+          "id": "8fc8d25b-c9b5-4db7-a632-d4eb1eb3e9fd",
+          "name": "default",
+          "type": "DEFAULT"
+        }
+      ]
+    },
+    {
+      "id": "d2f9a8ec-3023-46bb-aca3-dd67ffb61e18",
+      "display_data": {
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "comment": {
+          "value": "\n    Used to execute a Prompt Deployment and surface a string output and json output if applicable for convenience.\n\n    prompt_inputs: EntityInputsInterface - The inputs for the Prompt\n    deployment: Union[UUID, str] - Either the Prompt Deployment's UUID or its name.\n    release_tag: str - The release tag to use for the Prompt Execution\n    external_id: Optional[str] - Optionally include a unique identifier for tracking purposes.\n        Must be unique within a given Prompt Deployment.\n    expand_meta: Optional[PromptDeploymentExpandMetaRequest] - Expandable execution fields to include in the response\n    raw_overrides: Optional[RawPromptExecutionOverridesRequest] - The raw overrides to use for the Prompt Execution\n    expand_raw: Optional[Sequence[str]] - Expandable raw fields to include in the response\n    metadata: Optional[Dict[str, Optional[Any]]] - The metadata to use for the Prompt Execution\n    request_options: Optional[RequestOptions] - The request options to use for the Prompt Execution\n    ",
+          "expanded": true
+        }
+      },
+      "base": {
+        "name": "BasePromptDeploymentNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "displayable",
+          "bases",
+          "prompt_deployment_node"
+        ]
+      },
+      "definition": {
+        "name": "PromptDeploymentNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "displayable",
+          "prompt_deployment_node",
+          "node"
+        ]
+      },
+      "trigger": {
+        "id": "7d209a9c-14a5-4b74-949c-d3e681750049",
+        "merge_behavior": "AWAIT_ANY"
+      },
+      "ports": [
+        {
+          "id": "d51b7c72-3e1f-400c-ba1c-1125b1047d9a",
+          "name": "default",
+          "type": "DEFAULT"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "09c6ba90-4d69-4848-aa0b-74bdfcdd5a97",
+          "name": "json",
+          "type": "JSON",
+          "value": null
+        },
+        {
+          "id": "5ef5e3c6-1578-46da-89f6-6da3dd01fb5f",
+          "name": "text",
+          "type": "STRING",
+          "value": null
+        },
+        {
+          "id": "48513658-a72b-4db4-ad49-75a48a6cd084",
+          "name": "results",
+          "type": "ARRAY",
+          "value": null
+        }
+      ]
+    },
+    {
       "id": "035842e0-34ed-43af-97de-a706e40912ae",
       "label": "Tool Calling Node",
       "display_data": {
@@ -854,14 +965,6 @@
     }
   ],
   "errors": [
-    {
-      "node": "SubworkflowDeploymentNode",
-      "error": "ApiError: headers: {'server': 'gunicorn', 'date': 'Wed, 24 Sep 2025 04:58:53 GMT', 'content-type': 'application/json', 'allow': 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS', 'x-frame-options': 'DENY', 'content-length': '58', 'vary': 'Accept-Language, Origin', 'content-language': 'en', 'strict-transport-security': 'max-age=60; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'referrer-policy': 'same-origin', 'cross-origin-opener-policy': 'same-origin', 'via': '1.1 google', 'alt-svc': 'h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000'}, status_code: 403, body: {'detail': 'Authentication credentials were not provided.'}"
-    },
-    {
-      "node": "PromptDeploymentNode",
-      "error": "ApiError: headers: {'server': 'gunicorn', 'date': 'Wed, 24 Sep 2025 04:58:53 GMT', 'content-type': 'application/json', 'allow': 'GET, PUT, PATCH, DELETE, HEAD, OPTIONS', 'x-frame-options': 'DENY', 'content-length': '58', 'vary': 'Accept-Language, Origin', 'content-language': 'en', 'strict-transport-security': 'max-age=60; includeSubDomains; preload', 'x-content-type-options': 'nosniff', 'referrer-policy': 'same-origin', 'cross-origin-opener-policy': 'same-origin', 'via': '1.1 google', 'alt-svc': 'h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000'}, status_code: 403, body: {'detail': 'Authentication credentials were not provided.'}"
-    },
     {
       "node": "SearchNode",
       "error": "ValueError: Expected NodeReference query to have an instance"
