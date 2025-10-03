@@ -63,6 +63,7 @@ from vellum.workflows.events.workflow import (
     WorkflowExecutionStreamingBody,
     WorkflowExecutionStreamingEvent,
 )
+from vellum.workflows.exceptions import WorkflowInitializationException
 from vellum.workflows.executable import BaseExecutable
 from vellum.workflows.graph import Graph
 from vellum.workflows.inputs.base import BaseInputs
@@ -681,7 +682,16 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
     @staticmethod
     def load_from_module(module_path: str) -> Type["BaseWorkflow"]:
         workflow_path = f"{module_path}.workflow"
-        module = importlib.import_module(workflow_path)
+        try:
+            module = importlib.import_module(workflow_path)
+        except TypeError as e:
+            if "Unexpected graph type" in str(e) or "unhashable type: 'set'" in str(e):
+                raise WorkflowInitializationException(
+                    message="Invalid graph structure detected. Nested sets or unsupported graph types are not allowed. "
+                    "Please contact Vellum support for assistance with Workflow configuration."
+                ) from e
+            else:
+                raise
         workflows: List[Type[BaseWorkflow]] = []
         for name in dir(module):
             if name.startswith("__"):
