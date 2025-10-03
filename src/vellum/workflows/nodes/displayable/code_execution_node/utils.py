@@ -55,9 +55,7 @@ def run_code_inline(
         "__arg__out": None,
         "print": _inline_print,
     }
-    run_args = [
-        f"{name}=__arg__inputs['{name}']" for name, value in inputs.items() if not isinstance(value, type(undefined))
-    ]
+    run_args = [f"{name}=__arg__inputs['{name}']" for name, value in inputs.items() if value is not undefined]
     execution_code = f"""\
 {code}
 

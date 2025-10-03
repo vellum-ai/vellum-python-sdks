@@ -148,7 +148,7 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
         compiled_inputs: List[CodeExecutorInput] = []
 
         for input_name, input_value in self.code_inputs.items():
-            if isinstance(input_value, type(undefined)):
+            if input_value is undefined:
                 continue
             if isinstance(input_value, str):
                 compiled_inputs.append(

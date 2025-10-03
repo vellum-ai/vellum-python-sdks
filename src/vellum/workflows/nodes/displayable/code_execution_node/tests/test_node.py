@@ -1284,6 +1284,7 @@ def main(secret: str) -> str:
 def test_run_node__undefined_input_skipped():
     """
     Confirm that when an undefined value is passed as an input, it is skipped rather than raising an error.
+    The function should use the default parameter value when undefined input is skipped.
     """
 
     # GIVEN a node with both a valid input and an undefined input that runs inline
@@ -1292,8 +1293,8 @@ def test_run_node__undefined_input_skipped():
 
     class ExampleCodeExecutionNode(CodeExecutionNode[State, int]):
         code = """\
-def main(word: str) -> int:
-    return len(word)
+def main(word: str, undefined_input: str = "default") -> int:
+    return len(word) + len(undefined_input)
 """
         runtime = "PYTHON_3_11_6"
         packages = []
@@ -1308,4 +1309,55 @@ def main(word: str) -> int:
     outputs = node.run()
 
     # THEN the node should run successfully without raising an error
+    assert outputs == {"result": 12, "log": ""}  # len("hello") + len("default") = 5 + 7 = 12
+
+
+def test_run_node__undefined_input_skipped_api_execution(vellum_client):
+    """
+    Confirm that when an undefined value is passed as an input in API execution mode,
+    it is skipped rather than raising an error.
+    """
+
+    # GIVEN a node with both a valid input and an undefined input that forces API execution
+    class State(BaseState):
+        pass
+
+    class ExampleCodeExecutionNode(CodeExecutionNode[State, int]):
+        code = """\
+def main(word: str) -> int:
+    return len(word)
+"""
+        runtime = "PYTHON_3_11_6"
+        packages = [CodeExecutionPackage(name="requests", version="2.0.0")]
+
+        code_inputs = {
+            "word": "hello",
+            "undefined_input": undefined,
+        }
+
+    # AND we know what the Code Execution Node will respond with
+    mock_code_execution = CodeExecutorResponse(
+        log="",
+        output=NumberVellumValue(value=5),
+    )
+    vellum_client.execute_code.return_value = mock_code_execution
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode(state=State())
+    outputs = node.run()
+
+    # THEN the node should run successfully without raising an error
     assert outputs == {"result": 5, "log": ""}
+
+    # AND the API should be called with only the non-undefined input
+    vellum_client.execute_code.assert_called_once_with(
+        input_values=[StringInput(name="word", value="hello")],
+        code="""\
+def main(word: str) -> int:
+    return len(word)
+""",
+        runtime="PYTHON_3_11_6",
+        output_type="NUMBER",
+        packages=[CodeExecutionPackage(name="requests", version="2.0.0")],
+        request_options=None,
+    )
