@@ -4,6 +4,7 @@ from typing import Generic, Optional, TypeVar
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes import SubworkflowDeploymentNode
 from vellum.workflows.types.core import JsonObject
+from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
@@ -44,9 +45,15 @@ class BaseSubworkflowDeploymentNodeDisplay(
             for variable_name, variable_value in input_items
         ]
 
-        deployment = display_context.client.workflow_deployments.retrieve(
-            id=str(raise_if_descriptor(node.deployment)),
-        )
+        deployment_descriptor_id = str(raise_if_descriptor(node.deployment))
+        try:
+            deployment = display_context.client.workflow_deployments.retrieve(
+                id=deployment_descriptor_id,
+            )
+            deployment_id = str(deployment.id)
+        except Exception as e:
+            display_context.add_error(e)
+            deployment_id = str(uuid4_from_hash(deployment_descriptor_id))
 
         return {
             "id": str(node_id),
@@ -58,7 +65,7 @@ class BaseSubworkflowDeploymentNodeDisplay(
                 "source_handle_id": str(self.get_source_handle_id(display_context.port_displays)),
                 "target_handle_id": str(self.get_target_handle_id()),
                 "variant": "DEPLOYMENT",
-                "workflow_deployment_id": str(deployment.id),
+                "workflow_deployment_id": deployment_id,
                 "release_tag": raise_if_descriptor(node.release_tag),
             },
             **self.serialize_generic_fields(display_context),
