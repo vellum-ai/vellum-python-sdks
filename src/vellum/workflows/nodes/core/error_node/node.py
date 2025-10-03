@@ -1,13 +1,14 @@
-from typing import ClassVar, Union
+from typing import ClassVar, Generic, Union
 
 from vellum.client.types.vellum_error import VellumError
 from vellum.workflows.errors.types import WorkflowError, WorkflowErrorCode, vellum_error_to_workflow_error
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.ports import NodePorts
+from vellum.workflows.types.generics import StateType
 
 
-class ErrorNode(BaseNode):
+class ErrorNode(BaseNode[StateType], Generic[StateType]):
     """
     Used to raise an error to reject the surrounding Workflow.
 
