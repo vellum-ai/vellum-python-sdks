@@ -203,7 +203,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                     self.display_context.add_validation_error(validation_error)
 
                 serialized_node = node_display.serialize(self.display_context)
-            except (NotImplementedError, NodeValidationError) as e:
+            except (NotImplementedError, NodeValidationError, ValueError) as e:
                 self.display_context.add_error(e)
                 self.display_context.add_invalid_node(node)
                 continue

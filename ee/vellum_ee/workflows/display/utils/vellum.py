@@ -124,6 +124,11 @@ def create_node_input_value_pointer_rule(
         child_descriptor = get_child_descriptor(value, display_context)
         return create_node_input_value_pointer_rule(child_descriptor, display_context)
     if isinstance(value, WorkflowInputReference):
+        if value not in display_context.global_workflow_input_displays:
+            raise ValueError(
+                f"Serialization failed: type object '{value.inputs_class.__qualname__}' "
+                f"has no attribute '{value.name}'"
+            )
         workflow_input_display = display_context.global_workflow_input_displays[value]
         return InputVariablePointer(data=InputVariableData(input_variable_id=str(workflow_input_display.id)))
     if isinstance(value, VellumSecretReference):

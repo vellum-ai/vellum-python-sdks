@@ -997,3 +997,46 @@ def test_serialize_workflow__with_complete_node_failure_prunes_edges():
     node_types = [node["type"] for node in data["workflow_raw_data"]["nodes"]]
     assert "ENTRYPOINT" in node_types
     assert "GENERIC" in node_types  # This is the WorkingNode that should still be serialized
+
+
+def test_serialize_workflow__node_with_invalid_input_reference():
+    """Test that serialization captures errors when a node references a non-existent input attribute."""
+
+    # GIVEN a workflow with defined inputs
+    class Inputs(BaseInputs):
+        valid_input: str
+
+    from vellum.workflows.references.workflow_input import WorkflowInputReference
+
+    invalid_ref = WorkflowInputReference(
+        name="pricing_page_url",
+        types=(str,),
+        instance=None,
+        inputs_class=Inputs,
+    )
+
+    class MyNode(TemplatingNode):
+        template = "Hello {{ my_input }} {{ invalid_input }}"
+        inputs = {
+            "my_input": Inputs.valid_input,
+            "invalid_input": invalid_ref,
+        }
+
+    # WHEN we create a workflow and serialize with dry_run=True
+    class MyWorkflow(BaseWorkflow[Inputs, BaseState]):
+        graph = MyNode
+
+    workflow_display = get_workflow_display(workflow_class=MyWorkflow, dry_run=True)
+    serialized = workflow_display.serialize()
+
+    # THEN the serialization should succeed without raising an exception
+    assert serialized is not None
+    assert "workflow_raw_data" in serialized
+
+    # AND the error should be captured in the errors field
+    errors = list(workflow_display.display_context.errors)
+    assert len(errors) > 0
+
+    # AND the error message should reference the missing attribute
+    error_messages = [str(e) for e in errors]
+    assert any("pricing_page_url" in msg for msg in error_messages)
