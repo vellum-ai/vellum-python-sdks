@@ -14,7 +14,7 @@ from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.editor.types import NodeDisplayData, NodeDisplayPosition
-from vellum_ee.workflows.display.nodes import BaseNodeDisplay
+from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.retry_node import BaseRetryNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.try_node import BaseTryNodeDisplay
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
@@ -1006,21 +1006,18 @@ def test_serialize_workflow__node_with_invalid_input_reference():
     class Inputs(BaseInputs):
         valid_input: str
 
-    from vellum.workflows.references.workflow_input import WorkflowInputReference
+    # AND a node that references a non-existent input
+    class MyNode(BaseNode):
+        invalid_input = Inputs.invalid_ref
 
-    invalid_ref = WorkflowInputReference(
-        name="pricing_page_url",
-        types=(str,),
-        instance=None,
-        inputs_class=Inputs,
-    )
+        class Outputs(BaseNode.Outputs):
+            result: str
 
-    class MyNode(TemplatingNode):
-        template = "Hello {{ my_input }} {{ invalid_input }}"
-        inputs = {
-            "my_input": Inputs.valid_input,
-            "invalid_input": invalid_ref,
-        }
+        def run(self) -> BaseNode.Outputs:
+            return self.Outputs(result="done")
+
+    class MyNodeDisplay(BaseNodeDisplay[MyNode]):
+        __serializable_inputs__ = {MyNode.invalid_input}
 
     # WHEN we create a workflow and serialize with dry_run=True
     class MyWorkflow(BaseWorkflow[Inputs, BaseState]):
@@ -1039,4 +1036,4 @@ def test_serialize_workflow__node_with_invalid_input_reference():
 
     # AND the error message should reference the missing attribute
     error_messages = [str(e) for e in errors]
-    assert any("pricing_page_url" in msg for msg in error_messages)
+    assert any("invalid_ref" in msg for msg in error_messages)
