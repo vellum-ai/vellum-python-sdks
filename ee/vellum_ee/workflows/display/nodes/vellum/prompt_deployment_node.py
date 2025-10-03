@@ -3,6 +3,7 @@ from typing import Generic, Optional, TypeVar
 
 from vellum.workflows.nodes.displayable.prompt_deployment_node import PromptDeploymentNode
 from vellum.workflows.types.core import JsonObject
+from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
@@ -43,13 +44,14 @@ class BasePromptDeploymentNodeDisplay(BaseNodeDisplay[_PromptDeploymentNodeType]
         array_display = self.output_display[node.Outputs.results]
         json_display = self.output_display[node.Outputs.json]
 
-        if display_context.dry_run:
-            deployment_id = str(raise_if_descriptor(node.deployment))
-        else:
+        try:
             deployment = display_context.client.deployments.retrieve(
                 id=str(raise_if_descriptor(node.deployment)),
             )
             deployment_id = str(deployment.id)
+        except Exception as e:
+            display_context.add_error(e)
+            deployment_id = str(uuid4_from_hash(str(raise_if_descriptor(node.deployment))))
         ml_model_fallbacks = raise_if_descriptor(node.ml_model_fallbacks)
 
         return {
