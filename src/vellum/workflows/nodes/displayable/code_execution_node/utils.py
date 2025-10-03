@@ -4,6 +4,7 @@ import sys
 import traceback
 from typing import Any, Optional, Tuple, Union
 
+from vellum.workflows.constants import undefined
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.utils import cast_to_output_type, wrap_inputs_for_backward_compatibility
@@ -54,7 +55,9 @@ def run_code_inline(
         "__arg__out": None,
         "print": _inline_print,
     }
-    run_args = [f"{name}=__arg__inputs['{name}']" for name in inputs.keys()]
+    run_args = [
+        f"{name}=__arg__inputs['{name}']" for name, value in inputs.items() if not isinstance(value, type(undefined))
+    ]
     execution_code = f"""\
 {code}
 

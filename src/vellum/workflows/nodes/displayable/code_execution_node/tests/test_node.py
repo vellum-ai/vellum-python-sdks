@@ -13,6 +13,7 @@ from vellum.client.types.code_executor_secret_input import CodeExecutorSecretInp
 from vellum.client.types.function_call import FunctionCall
 from vellum.client.types.number_input import NumberInput
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
+from vellum.workflows.constants import undefined
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
@@ -1278,3 +1279,33 @@ def main(secret: str) -> str:
         packages=[],
         request_options=None,
     )
+
+
+def test_run_node__undefined_input_skipped():
+    """
+    Confirm that when an undefined value is passed as an input, it is skipped rather than raising an error.
+    """
+
+    # GIVEN a node with both a valid input and an undefined input that runs inline
+    class State(BaseState):
+        pass
+
+    class ExampleCodeExecutionNode(CodeExecutionNode[State, int]):
+        code = """\
+def main(word: str) -> int:
+    return len(word)
+"""
+        runtime = "PYTHON_3_11_6"
+        packages = []
+
+        code_inputs = {
+            "word": "hello",
+            "undefined_input": undefined,
+        }
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode(state=State())
+    outputs = node.run()
+
+    # THEN the node should run successfully without raising an error
+    assert outputs == {"result": 5, "log": ""}

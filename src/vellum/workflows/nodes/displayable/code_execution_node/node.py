@@ -23,6 +23,7 @@ from vellum import (
 from vellum.client.core import RequestOptions
 from vellum.client.core.api_error import ApiError
 from vellum.client.types.code_executor_secret_input import CodeExecutorSecretInput
+from vellum.workflows.constants import undefined
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
@@ -147,6 +148,8 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
         compiled_inputs: List[CodeExecutorInput] = []
 
         for input_name, input_value in self.code_inputs.items():
+            if isinstance(input_value, type(undefined)):
+                continue
             if isinstance(input_value, str):
                 compiled_inputs.append(
                     StringInput(
