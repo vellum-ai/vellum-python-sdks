@@ -6,6 +6,19 @@ if TYPE_CHECKING:
     from vellum.workflows.workflows.base import BaseWorkflow
 
 
+def import_workflow_class() -> Type["BaseWorkflow"]:
+    """
+    Helper function to help avoid circular imports.
+
+    Ideally, we use the one in types.generics, but _that_ causes circular imports
+    due to the `src/vellum/workflows/types/definition.py` module's import of `EnvironmentVariableReference`
+    """
+
+    from vellum.workflows.workflows import BaseWorkflow
+
+    return BaseWorkflow
+
+
 class NodeException(Exception):
     def __init__(
         self,
@@ -38,7 +51,6 @@ class WorkflowInitializationException(Exception):
         workflow_definition: Optional[Type["BaseWorkflow"]] = None,
         code: WorkflowErrorCode = WorkflowErrorCode.INVALID_INPUTS,
     ):
-        from vellum.workflows.types.generics import import_workflow_class
 
         self.message = message
         self.code = code
