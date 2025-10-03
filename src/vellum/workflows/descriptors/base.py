@@ -135,6 +135,9 @@ class BaseDescriptor(Generic[_T]):
 
         return AccessorExpression(base=self, field=field)
 
+    def __iter__(self) -> None:
+        raise TypeError(f"'{type(self).__name__}' object is not iterable")
+
     @overload
     def equals(self, other: "BaseDescriptor[_O]") -> "EqualsExpression[_T, _O]": ...
 

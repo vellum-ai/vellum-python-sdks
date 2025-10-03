@@ -62,3 +62,24 @@ def test_base_inputs__supports_inherited_inputs():
     assert BottomInputs.first.name == "first"
     assert BottomInputs.second.name == "second"
     assert len([ref for ref in BottomInputs]) == 2
+
+
+def test_base_inputs__iterating_over_descriptor_is_finite():
+    """
+    Tests that iterating over a descriptor (like Inputs.image_url) creates a finite generator.
+    This was the bug reported in Slack where AB sometimes generates code that iterates over descriptors.
+    """
+
+    class Inputs(BaseInputs):
+        image_url: str
+
+    iteration_count = 0
+    try:
+        for idx, x in enumerate(Inputs.image_url):  # type: ignore[arg-type,var-annotated]
+            iteration_count += 1
+            if idx > 100:
+                break
+    except (TypeError, IndexError):
+        pass
+
+    assert iteration_count < 100
