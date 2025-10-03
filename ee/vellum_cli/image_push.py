@@ -123,6 +123,13 @@ def image_push_command(
                     suggestion="Make sure your VELLUM_API_KEY environment variable is set correctly.",
                 )
                 return
+            elif e.status_code == 400 and isinstance(e.body, dict) and "detail" in e.body:
+                handle_cli_error(
+                    logger,
+                    title="API request failed",
+                    message=e.body["detail"],
+                )
+                return
             elif e.status_code == 500:
                 handle_cli_error(
                     logger,
@@ -213,6 +220,13 @@ def image_push_command(
                 title="Authentication failed",
                 message="Unable to push container image metadata to Vellum API. Please check your API key.",
                 suggestion="Make sure your VELLUM_API_KEY environment variable is set correctly.",
+            )
+            return
+        elif e.status_code == 400 and isinstance(e.body, dict) and "detail" in e.body:
+            handle_cli_error(
+                logger,
+                title="API request failed",
+                message=e.body["detail"],
             )
             return
         elif e.status_code == 500:
