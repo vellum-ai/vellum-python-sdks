@@ -52,7 +52,6 @@ class BaseDescriptor(Generic[_T]):
         self._name = name
         self._types = types
         self._instance = instance
-        self._iteration_access_count = 0
 
     @property
     def name(self) -> str:
@@ -134,15 +133,10 @@ class BaseDescriptor(Generic[_T]):
     def __getitem__(self, field: Union[str, int, "BaseDescriptor[str]", "BaseDescriptor[int]"]) -> "AccessorExpression":
         from vellum.workflows.expressions.accessor import AccessorExpression
 
-        if isinstance(field, int):
-            if field == self._iteration_access_count:
-                self._iteration_access_count += 1
-                if self._iteration_access_count > 10:
-                    raise IndexError("Iteration over descriptor not supported")
-            else:
-                self._iteration_access_count = 0
-
         return AccessorExpression(base=self, field=field)
+
+    def __iter__(self) -> None:
+        raise TypeError(f"'{type(self).__name__}' object is not iterable")
 
     @overload
     def equals(self, other: "BaseDescriptor[_O]") -> "EqualsExpression[_T, _O]": ...

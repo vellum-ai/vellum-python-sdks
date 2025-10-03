@@ -79,7 +79,7 @@ def test_base_inputs__iterating_over_descriptor_is_finite():
             iteration_count += 1
             if idx > 100:
                 break
-    except IndexError:
+    except (TypeError, IndexError):
         pass
 
     assert iteration_count < 100
