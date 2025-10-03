@@ -45,14 +45,15 @@ class BaseSubworkflowDeploymentNodeDisplay(
             for variable_name, variable_value in input_items
         ]
 
+        deployment_descriptor_id = str(raise_if_descriptor(node.deployment))
         try:
             deployment = display_context.client.workflow_deployments.retrieve(
-                id=str(raise_if_descriptor(node.deployment)),
+                id=deployment_descriptor_id,
             )
             deployment_id = str(deployment.id)
         except Exception as e:
             display_context.add_error(e)
-            deployment_id = str(uuid4_from_hash(str(raise_if_descriptor(node.deployment))))
+            deployment_id = str(uuid4_from_hash(deployment_descriptor_id))
 
         return {
             "id": str(node_id),

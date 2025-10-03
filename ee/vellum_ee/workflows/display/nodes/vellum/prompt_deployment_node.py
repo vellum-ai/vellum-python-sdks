@@ -44,14 +44,15 @@ class BasePromptDeploymentNodeDisplay(BaseNodeDisplay[_PromptDeploymentNodeType]
         array_display = self.output_display[node.Outputs.results]
         json_display = self.output_display[node.Outputs.json]
 
+        deployment_descriptor_id = str(raise_if_descriptor(node.deployment))
         try:
             deployment = display_context.client.deployments.retrieve(
-                id=str(raise_if_descriptor(node.deployment)),
+                id=deployment_descriptor_id,
             )
             deployment_id = str(deployment.id)
         except Exception as e:
             display_context.add_error(e)
-            deployment_id = str(uuid4_from_hash(str(raise_if_descriptor(node.deployment))))
+            deployment_id = str(uuid4_from_hash(deployment_descriptor_id))
         ml_model_fallbacks = raise_if_descriptor(node.ml_model_fallbacks)
 
         return {
