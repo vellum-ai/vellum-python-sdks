@@ -32,15 +32,6 @@ class BaseMapNodeDisplay(BaseAdornmentNodeDisplay[_MapNodeType], Generic[_MapNod
 
         items = raise_if_descriptor(node.items)
 
-        items_node_input = create_node_input(
-            node_id=node_id,
-            input_name="items",
-            value=items or [],
-            display_context=display_context,
-            input_id=self.node_input_ids_by_name.get("items"),
-        )
-        node_inputs = [items_node_input]
-
         subworkflow_display = get_workflow_display(
             base_display_class=display_context.workflow_display_class,
             workflow_class=subworkflow,
@@ -58,6 +49,16 @@ class BaseMapNodeDisplay(BaseAdornmentNodeDisplay[_MapNodeType], Generic[_MapNod
             for input_variable in input_variables
             if isinstance(input_variable, dict) and input_variable["key"] == "items"
         )
+
+        # Use the same ID for the map node's items input as the subworkflow's items input
+        items_node_input = create_node_input(
+            node_id=node_id,
+            input_name="items",
+            value=items or [],
+            display_context=display_context,
+            input_id=str(items_workflow_input_id),
+        )
+        node_inputs = [items_node_input]
         item_workflow_input_id = next(
             input_variable["id"]
             for input_variable in input_variables
