@@ -1,5 +1,4 @@
 import os
-import time
 
 from dotenv import load_dotenv
 
@@ -11,6 +10,7 @@ load_dotenv()
 client = Vellum(api_key=os.getenv("VELLUM_API_KEY"))
 workflow_deployment_name = "<workflow_deployment_name>"
 release_tag = "LATEST"
+
 
 def main():
     previous_execution_id = None
@@ -68,8 +68,6 @@ def main():
         previous_execution_id = current_execution_id
 
         iterations += 1
-
-        time.sleep(60)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,3 @@
-import time
-
 from dotenv import load_dotenv
 
 from vellum.workflows.emitters.vellum_emitter import VellumEmitter
@@ -51,8 +49,6 @@ def main():
         previous_execution_id = current_execution_id
 
         iterations += 1
-
-        time.sleep(60)
 
 
 if __name__ == "__main__":

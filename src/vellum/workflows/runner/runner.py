@@ -1,6 +1,8 @@
 from collections import defaultdict
 from copy import deepcopy
 from dataclasses import dataclass
+import hashlib
+import json
 import logging
 from queue import Empty, Queue
 import sys
@@ -233,19 +235,43 @@ class WorkflowRunner(Generic[StateType]):
         self._background_thread: Optional[Thread] = None
         self._cancel_thread: Optional[Thread] = None
         self._stream_thread: Optional[Thread] = None
+        self._last_emitted_state_hash: Optional[str] = None
 
     def _snapshot_state(self, state: StateType, deltas: List[StateDelta]) -> StateType:
-        self._workflow_event_inner_queue.put(
-            WorkflowExecutionSnapshottedEvent(
-                trace_id=self._execution_context.trace_id,
-                span_id=state.meta.span_id,
-                body=WorkflowExecutionSnapshottedBody(
-                    workflow_definition=self.workflow.__class__,
-                    state=state,
-                ),
-                parent=self._execution_context.parent_context,
+        # Calculate hash of state for deduplication
+        # Only hash the actual state variables (conversation_history, message_count, etc.)
+        # Exclude meta.node_outputs as those are intermediate execution artifacts
+        state_dict = {k: v for k, v in vars(state).items() if not k.startswith("_") and k not in ("meta",)}
+        # Include only external_inputs from meta (not node_outputs which are runtime artifacts)
+        state_dict["meta"] = {
+            "external_inputs": {str(k): v for k, v in state.meta.external_inputs.items()},
+        }
+
+        try:
+            state_json = json.dumps(state_dict, sort_keys=True, default=str)
+            state_hash = hashlib.sha256(state_json.encode()).hexdigest()
+        except Exception as e:
+            # If serialization fails, log warning and emit anyway
+            logger.warning(f"Failed to serialize state for deduplication: {e}")
+            state_hash = None
+
+        # Only emit snapshot if state has changed
+        if state_hash is None or state_hash != self._last_emitted_state_hash:
+            self._workflow_event_inner_queue.put(
+                WorkflowExecutionSnapshottedEvent(
+                    trace_id=self._execution_context.trace_id,
+                    span_id=state.meta.span_id,
+                    body=WorkflowExecutionSnapshottedBody(
+                        workflow_definition=self.workflow.__class__,
+                        state=state,
+                    ),
+                    parent=self._execution_context.parent_context,
+                )
             )
-        )
+            if state_hash is not None:
+                self._last_emitted_state_hash = state_hash
+        else:
+            logger.debug(f"Skipping duplicate state snapshot for span {state.meta.span_id}")
 
         delta_names = [d.name for d in deltas]
         for descriptor in self._outputs_listening_to_state:
