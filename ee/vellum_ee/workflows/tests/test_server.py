@@ -1,3 +1,4 @@
+import pytest
 import sys
 from uuid import uuid4
 from typing import Type, cast
@@ -6,6 +7,7 @@ from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.code_executor_response import CodeExecutorResponse
 from vellum.client.types.number_vellum_value import NumberVellumValue
 from vellum.workflows import BaseWorkflow
+from vellum.workflows.exceptions import WorkflowInitializationException
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.utils.uuids import generate_workflow_deployment_prefix
@@ -497,6 +499,45 @@ class MapNodeWorkflow(BaseWorkflow):
 
     # AND we get the map node results as a list
     assert event.body.outputs == {"results": [1.0, 1.0, 1.0]}
+
+
+def test_load_from_module__syntax_error_in_node_file():
+    """
+    Tests that a syntax error in a node file raises WorkflowInitializationException with user-facing message.
+    """
+    # GIVEN a workflow module with a node file containing a syntax error (missing colon)
+    files = {
+        "__init__.py": "",
+        "workflow.py": """\
+from vellum.workflows import BaseWorkflow
+from .nodes.broken_node import BrokenNode
+
+class Workflow(BaseWorkflow):
+    graph = BrokenNode
+""",
+        "nodes/__init__.py": "",
+        "nodes/broken_node.py": """\
+from vellum.workflows.nodes import BaseNode
+
+class BrokenNode(BaseNode)  # Missing colon
+    \"\"\"This node has a syntax error.\"\"\"
+""",
+    }
+
+    namespace = str(uuid4())
+
+    # AND the virtual file loader is registered
+    sys.meta_path.append(VirtualFileFinder(files, namespace))
+
+    # WHEN we attempt to load the workflow
+    # THEN it should raise WorkflowInitializationException
+    with pytest.raises(WorkflowInitializationException) as exc_info:
+        BaseWorkflow.load_from_module(namespace)
+
+    # AND the error message should be user-friendly
+    error_message = str(exc_info.value)
+    assert "Failed to load workflow module:" in error_message
+    assert "invalid syntax" in error_message or "expected ':'" in error_message
 
 
 def test_serialize_module__tool_calling_node_with_single_tool():
