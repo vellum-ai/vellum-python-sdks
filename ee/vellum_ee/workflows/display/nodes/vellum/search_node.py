@@ -48,8 +48,19 @@ class BaseSearchNodeDisplay(BaseNodeDisplay[_SearchNodeType], Generic[_SearchNod
         node_id = self.node_id
         node_inputs = self._generate_search_node_inputs(node_id, node, display_context)
 
-        results_output_display = display_context.global_node_output_displays[node.Outputs.results]
-        text_output_display = display_context.global_node_output_displays[node.Outputs.text]
+        try:
+            results_output_display = display_context.global_node_output_displays[node.Outputs.results]
+            results_output_id = str(results_output_display.id)
+        except KeyError as e:
+            display_context.add_error(e)
+            results_output_id = str(uuid4_from_hash(f"{node_id}|results"))
+
+        try:
+            text_output_display = display_context.global_node_output_displays[node.Outputs.text]
+            text_output_id = str(text_output_display.id)
+        except KeyError as e:
+            display_context.add_error(e)
+            text_output_id = str(uuid4_from_hash(f"{node_id}|text"))
 
         return {
             "id": str(node_id),
@@ -57,8 +68,8 @@ class BaseSearchNodeDisplay(BaseNodeDisplay[_SearchNodeType], Generic[_SearchNod
             "inputs": [node_input.dict() for node_input in node_inputs.values()],
             "data": {
                 "label": self.label,
-                "results_output_id": str(results_output_display.id),
-                "text_output_id": str(text_output_display.id),
+                "results_output_id": results_output_id,
+                "text_output_id": text_output_id,
                 "error_output_id": str(error_output_id) if error_output_id else None,
                 "source_handle_id": str(self.get_source_handle_id(display_context.port_displays)),
                 "target_handle_id": str(self.get_target_handle_id()),
@@ -111,8 +122,8 @@ class BaseSearchNodeDisplay(BaseNodeDisplay[_SearchNodeType], Generic[_SearchNod
         limit = raw_limit if raw_limit is not None else options.limit if options is not None else None
 
         node_input_names_and_values = [
-            ("query", node.query),
-            ("document_index_id", node.document_index),
+            ("query", raise_if_descriptor(node.query)),
+            ("document_index_id", raise_if_descriptor(node.document_index)),
             ("weights", weights.dict() if weights else None),
             ("limit", limit),
             ("separator", raise_if_descriptor(node.chunk_separator)),
