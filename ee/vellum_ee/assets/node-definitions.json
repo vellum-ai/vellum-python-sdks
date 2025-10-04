@@ -700,6 +700,51 @@
       ]
     },
     {
+      "id": "ee9b5234-247b-49d1-bed4-490312f18838",
+      "display_data": {
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "comment": {
+          "value": "Used to render a Jinja template.\n\n    Useful for lightweight data transformations and complex string templating.\n    ",
+          "expanded": true
+        }
+      },
+      "base": {
+        "name": "BaseNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
+      },
+      "definition": {
+        "name": "TemplatingNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "core",
+          "templating_node",
+          "node"
+        ]
+      },
+      "trigger": {
+        "id": "005e1cd2-5452-4e1f-be6a-ac9fe3c02b9b",
+        "merge_behavior": "AWAIT_ATTRIBUTES"
+      },
+      "ports": [
+        {
+          "id": "8f4460f0-717b-4972-a6f4-ac164e5e204e",
+          "name": "default",
+          "type": "DEFAULT"
+        }
+      ]
+    },
+    {
       "id": "035842e0-34ed-43af-97de-a706e40912ae",
       "label": "Tool Calling Node",
       "display_data": {
@@ -1010,10 +1055,5 @@
       ]
     }
   ],
-  "errors": [
-    {
-      "node": "TemplatingNode",
-      "error": "KeyError: TemplatingNode.Outputs.result"
-    }
-  ]
+  "errors": []
 }
