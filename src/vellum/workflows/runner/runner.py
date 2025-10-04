@@ -847,6 +847,7 @@ class WorkflowRunner(Generic[StateType]):
                 rejection_event = self._handle_work_item_event(event)
 
             if rejection_event:
+                failed_node_name = rejection_event.body.node_definition.__name__
                 for active_span_id, active_node_data in list(self._active_nodes_by_execution_id.items()):
                     cancellation_event = NodeExecutionRejectedEvent(
                         trace_id=self._execution_context.trace_id,
@@ -854,7 +855,7 @@ class WorkflowRunner(Generic[StateType]):
                         body=NodeExecutionRejectedBody(
                             node_definition=active_node_data.node.__class__,
                             error=WorkflowError(
-                                message="Node execution cancelled due to sibling node failure",
+                                message=f"Node execution cancelled due to {failed_node_name} failure",
                                 code=WorkflowErrorCode.NODE_CANCELLED,
                             ),
                         ),
