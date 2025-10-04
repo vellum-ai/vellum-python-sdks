@@ -1,4 +1,4 @@
-import { existsSync, copyFileSync, mkdirSync } from "fs";
+import { existsSync, copyFileSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -21,8 +21,6 @@ const main = async () => {
     console.log("Source file does not exist, skipping postinstall copy");
     return;
   }
-
-  mkdirSync(targetDir, { recursive: true });
 
   try {
     copyFileSync(sourceFile, targetFile);
