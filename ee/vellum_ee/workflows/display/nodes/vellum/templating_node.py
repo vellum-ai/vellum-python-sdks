@@ -50,7 +50,7 @@ class BaseTemplatingNodeDisplay(BaseNodeDisplay[_TemplatingNodeType], Generic[_T
         # Misc type ignore is due to `node.Outputs` being generic
         # https://app.shortcut.com/vellum/story/4784
         output_descriptor = node.Outputs.result  # type: ignore [misc]
-        output_display = display_context.global_node_output_displays[output_descriptor]
+        output_display = self.get_node_output_display(output_descriptor)
         inferred_output_type = primitive_type_to_vellum_variable_type(output_descriptor)
 
         return {
