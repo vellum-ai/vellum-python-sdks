@@ -24,9 +24,7 @@ const main = async () => {
 
   try {
     copyFileSync(sourceFile, targetFile);
-    console.log(
-      "Successfully copied node-definitions.json to src/assets"
-    );
+    console.log("Successfully copied node-definitions.json to src/assets");
   } catch (error) {
     console.error("Error copying node-definitions.json:", error);
   }
