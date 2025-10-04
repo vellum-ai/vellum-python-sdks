@@ -21,7 +21,7 @@
     "format:check": "prettier --check . '!integration/**' '!lib/**'",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "postinstall": "test -f ../vellum_ee/assets/node-definitions.json && mkdir -p node_modules/vellum-ai && cp ../vellum_ee/assets/node-definitions.json node_modules/vellum-ai/node-definitions.json || true",
+    "postinstall": "node --loader ts-node/esm --experimental-specifier-resolution=node scripts/postinstall.mts",
     "test": "vitest --run",
     "prepublishOnly": "npm run build && npm run gar-login",
     "test:update": "vitest --run -u",
