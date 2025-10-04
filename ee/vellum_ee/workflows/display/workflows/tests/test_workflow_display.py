@@ -14,7 +14,7 @@ from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.editor.types import NodeDisplayData, NodeDisplayPosition
-from vellum_ee.workflows.display.nodes import BaseNodeDisplay
+from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.retry_node import BaseRetryNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.try_node import BaseTryNodeDisplay
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
@@ -997,3 +997,56 @@ def test_serialize_workflow__with_complete_node_failure_prunes_edges():
     node_types = [node["type"] for node in data["workflow_raw_data"]["nodes"]]
     assert "ENTRYPOINT" in node_types
     assert "GENERIC" in node_types  # This is the WorkingNode that should still be serialized
+
+
+def test_serialize_workflow__node_with_invalid_input_reference():
+    """Test that serialization captures errors when nodes reference a non-existent input attribute."""
+
+    # GIVEN a workflow with defined inputs
+    class Inputs(BaseInputs):
+        valid_input: str
+
+    # AND a templating node that references a non-existent input
+    class MyTemplatingNode(TemplatingNode):
+        class Outputs(TemplatingNode.Outputs):
+            pass
+
+        template = "valid: {{ valid_input }}, invalid: {{ invalid_ref }}"
+        inputs = {
+            "valid_input": Inputs.valid_input,
+            "invalid_ref": Inputs.invalid_ref,
+        }
+
+    # AND a base node that also references the non-existent input
+    class MyBaseNode(BaseNode):
+        invalid_ref = Inputs.invalid_ref
+
+        class Outputs(BaseNode.Outputs):
+            result: str
+
+        def run(self) -> BaseNode.Outputs:
+            return self.Outputs(result="done")
+
+    class MyBaseNodeDisplay(BaseNodeDisplay[MyBaseNode]):
+        __serializable_inputs__ = {MyBaseNode.invalid_ref}
+
+    # WHEN we create a workflow with both nodes and serialize with dry_run=True
+    class MyWorkflow(BaseWorkflow[Inputs, BaseState]):
+        graph = MyTemplatingNode >> MyBaseNode
+
+    workflow_display = get_workflow_display(workflow_class=MyWorkflow, dry_run=True)
+    serialized = workflow_display.serialize()
+
+    # THEN the serialization should succeed without raising an exception
+    assert serialized is not None
+    assert "workflow_raw_data" in serialized
+
+    errors = list(workflow_display.display_context.errors)
+    assert len(errors) > 0
+
+    # AND the error messages should reference the missing attribute
+    error_messages = [str(e) for e in errors]
+    assert any("invalid_ref" in msg for msg in error_messages)
+
+    invalid_nodes = list(workflow_display.display_context.invalid_nodes)
+    assert len(invalid_nodes) >= 2
