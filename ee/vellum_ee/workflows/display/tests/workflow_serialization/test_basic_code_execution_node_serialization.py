@@ -1,6 +1,8 @@
 from deepdiff import DeepDiff
 
+from vellum.workflows.nodes.displayable.code_execution_node import CodeExecutionNode
 from vellum.workflows.nodes.utils import ADORNMENT_MODULE_NAME
+from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 from tests.workflows.basic_code_execution_node.try_workflow import TrySimpleCodeExecutionWorkflow
@@ -750,3 +752,30 @@ def test_serialize_workflow__try_wrapped():
             "try_workflow",
         ],
     }
+
+
+def test_serialize_workflow__code_execution_node_with_non_existent_filepath():
+    """
+    Tests that a CodeExecutionNode with a non-existent filepath
+    still appears in serialized JSON with an error captured.
+    """
+
+    # GIVEN a workflow with a CodeExecutionNode that has a non-existent filepath
+    class MyCodeNode(CodeExecutionNode):
+        filepath = "non_existent_file.py"
+
+    class MyWorkflow(BaseWorkflow):
+        graph = MyCodeNode
+
+    # WHEN we serialize the workflow (without dry_run)
+    workflow_display = get_workflow_display(workflow_class=MyWorkflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    code_execution_nodes = [
+        node for node in serialized_workflow["workflow_raw_data"]["nodes"] if node["type"] == "CODE_EXECUTION"
+    ]
+    assert len(code_execution_nodes) == 1
+
+    errors = list(workflow_display.display_context.errors)
+    assert len(errors) == 1
+    assert "Filepath 'non_existent_file.py' does not exist" in str(errors[0])
