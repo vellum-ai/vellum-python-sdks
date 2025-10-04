@@ -1,2 +1,5 @@
 # Ignore snapshots
 *.ts.snap
+
+# Ignore generated assets
+src/assets/node-definitions.json

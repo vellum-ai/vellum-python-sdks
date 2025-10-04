@@ -7,6 +7,7 @@ poetry.toml
 .env
 .npmrc
 ee/codegen/lib/
+ee/codegen/src/assets/node-definitions.json
 examples/.ipynb_checkpoints/
 node_modules/
 tsconfig.tsbuildinfo

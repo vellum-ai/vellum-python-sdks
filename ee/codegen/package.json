@@ -16,7 +16,7 @@
   "scripts": {
     "gar-login": "npx google-artifactregistry-auth",
     "clean": "rm -rf lib && rm -f tsconfig.tsbuildinfo",
-    "build": "tsc && tsc-alias",
+    "build": "node --loader ts-node/esm --experimental-specifier-resolution=node scripts/build.mts",
     "format": "prettier --write .",
     "format:check": "prettier --check . '!integration/**' '!lib/**'",
     "lint": "eslint .",
