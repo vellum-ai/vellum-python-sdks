@@ -34,7 +34,8 @@ export class SubworkflowDeploymentNode extends BaseNode<
     if (!this.nodeContext.workflowDeploymentRelease) {
       this.workflowContext.addError(
         new NodeAttributeGenerationError(
-          `Failed to generate attribute: ${this.nodeData.data.label}.deployment`
+          `Failed to generate attribute: ${this.nodeData.data.label}.deployment`,
+          "WARNING"
         )
       );
     } else {
@@ -84,7 +85,8 @@ export class SubworkflowDeploymentNode extends BaseNode<
     if (!this.nodeContext.workflowDeploymentRelease) {
       this.workflowContext.addError(
         new NodeAttributeGenerationError(
-          `Failed to generate ${this.nodeData.data.label}.Outputs class`
+          `Failed to generate ${this.nodeData.data.label}.Outputs class`,
+          "WARNING"
         )
       );
       return null;
