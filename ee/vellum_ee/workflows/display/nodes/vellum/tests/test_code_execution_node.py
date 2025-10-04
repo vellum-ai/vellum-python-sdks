@@ -6,8 +6,8 @@ from vellum.client.core.api_error import ApiError
 from vellum.workflows.nodes.displayable.code_execution_node.node import CodeExecutionNode
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.workflows.base import BaseWorkflow
-from vellum_ee.workflows.display.exceptions import NodeValidationError
 from vellum_ee.workflows.display.nodes.vellum.code_execution_node import BaseCodeExecutionNodeDisplay
+from vellum_ee.workflows.display.utils.exceptions import NodeValidationError
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 

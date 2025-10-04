@@ -15,7 +15,7 @@ from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.references.node import NodeReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
-from vellum_ee.workflows.display.utils.exceptions import UnsupportedSerializationException
+from vellum_ee.workflows.display.utils.exceptions import InvalidInputReferenceError, UnsupportedSerializationException
 from vellum_ee.workflows.display.utils.expressions import get_child_descriptor
 
 if TYPE_CHECKING:
@@ -124,6 +124,12 @@ def create_node_input_value_pointer_rule(
         child_descriptor = get_child_descriptor(value, display_context)
         return create_node_input_value_pointer_rule(child_descriptor, display_context)
     if isinstance(value, WorkflowInputReference):
+        if value not in display_context.global_workflow_input_displays:
+            raise InvalidInputReferenceError(
+                message=f"type object '{value.inputs_class.__qualname__}' has no attribute '{value.name}'",
+                inputs_class_name=value.inputs_class.__qualname__,
+                attribute_name=value.name,
+            )
         workflow_input_display = display_context.global_workflow_input_displays[value]
         return InputVariablePointer(data=InputVariableData(input_variable_id=str(workflow_input_display.id)))
     if isinstance(value, VellumSecretReference):

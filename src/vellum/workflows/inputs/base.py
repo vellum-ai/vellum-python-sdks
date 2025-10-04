@@ -41,24 +41,16 @@ class _BaseInputsMeta(type):
             else:
                 return WorkflowInputReference(name=name, types=types, instance=instance, inputs_class=cls)
 
-        return super().__getattribute__(name)
+        try:
+            return super().__getattribute__(name)
+        except AttributeError:
+            if name.startswith("model_") or cls.__name__ in ("BaseInputs", "ExternalInputs"):
+                raise
 
-    def __getattr__(cls, name: str) -> Any:
-        if name.startswith("_") or name.startswith("model_"):
-            raise AttributeError(f"type object '{cls.__name__}' has no attribute '{name}'")
-
-        if cls.__name__ == "BaseInputs" or cls.__name__ == "ExternalInputs":
-            raise AttributeError(f"type object '{cls.__name__}' has no attribute '{name}'")
-
-        descriptor_class = vars(cls).get("__descriptor_class__")
-        if descriptor_class is ExternalInputReference:
-            return ExternalInputReference(  # type: ignore[arg-type]
-                name=name, types=(), instance=None, inputs_class=cls
-            )
-        else:
-            return WorkflowInputReference(  # type: ignore[arg-type]
-                name=name, types=(), instance=None, inputs_class=cls
-            )
+            if getattr(cls, "__descriptor_class__", None) is ExternalInputReference:
+                return ExternalInputReference(name=name, types=(), instance=None, inputs_class=cls)
+            else:
+                return WorkflowInputReference(name=name, types=(), instance=None, inputs_class=cls)
 
     def __iter__(cls) -> Iterator[InputReference]:
         # We iterate through the inheritance hierarchy to find all the WorkflowInputReference attached to this

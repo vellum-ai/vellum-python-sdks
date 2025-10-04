@@ -56,8 +56,7 @@ from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.types.generics import is_workflow_class
 from vellum.workflows.utils.functions import compile_function_definition
 from vellum.workflows.utils.uuids import uuid4_from_hash
-from vellum_ee.workflows.display.exceptions import InvalidInputReferenceError
-from vellum_ee.workflows.display.utils.exceptions import UnsupportedSerializationException
+from vellum_ee.workflows.display.utils.exceptions import InvalidInputReferenceError, UnsupportedSerializationException
 from vellum_ee.workflows.server.virtual_file_loader import VirtualFileLoader
 
 if TYPE_CHECKING:
@@ -277,23 +276,23 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
 
     if isinstance(value, WorkflowInputReference):
         if value not in display_context.global_workflow_input_displays:
-            # Check if this is a non-existent attribute (empty types) vs unparameterized inputs (non-empty types)
             if not value.types:
-                # Non-existent input attribute - raise InvalidInputReferenceError
                 raise InvalidInputReferenceError(
                     message=f"type object '{value.inputs_class.__qualname__}' has no attribute '{value.name}'",
                     inputs_class_name=value.inputs_class.__qualname__,
                     attribute_name=value.name,
                 )
             else:
-                # Valid input from unparameterized Inputs class - raise UnsupportedSerializationException
-                inputs_class_name = value.inputs_class.__name__
-                workflow_class_name = display_context.workflow_display_class.infer_workflow_class().__name__
-                raise UnsupportedSerializationException(
-                    f"Inputs class '{inputs_class_name}' referenced during serialization of '{workflow_class_name}' "
-                    f"without parameterizing this Workflow with this Inputs definition. Update your Workflow "
-                    f"definition to '{workflow_class_name}(BaseWorkflow[{inputs_class_name}, BaseState])'."
-                )
+                workflow_inputs_class = display_context.workflow_display_class.infer_workflow_class().get_inputs_class()
+                if value.inputs_class != workflow_inputs_class:
+                    inputs_class_name = value.inputs_class.__name__
+                    workflow_class_name = display_context.workflow_display_class.infer_workflow_class().__name__
+                    raise UnsupportedSerializationException(
+                        f"Inputs class '{inputs_class_name}' referenced during serialization of "
+                        f"'{workflow_class_name}' without parameterizing this Workflow with this Inputs definition. "
+                        f"Update your Workflow definition to "
+                        f"'{workflow_class_name}(BaseWorkflow[{inputs_class_name}, BaseState])'."
+                    )
         workflow_input_display = display_context.global_workflow_input_displays[value]
         return {
             "type": "WORKFLOW_INPUT",
