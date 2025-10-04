@@ -3,7 +3,6 @@ from typing import Any, Dict, List, cast
 
 from deepdiff import DeepDiff
 
-from vellum.client.types.code_execution_package import CodeExecutionPackage
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.retry_node.node import RetryNode
@@ -365,14 +364,9 @@ def test_serialize_workflow__retry_node_edges():
 
     @RetryNode.wrap(max_attempts=3, delay=60)
     class FirstNode(CodeExecutionNode[BaseState, str]):
-        filepath = "./tests/code.py"
+        filepath = "./fixtures/code.py"
         code_inputs = {}
-        packages = [
-            CodeExecutionPackage(
-                name="openai",
-                version="1.0.0",
-            )
-        ]
+        packages = []
 
     class SecondNode(BaseNode):
         pass
