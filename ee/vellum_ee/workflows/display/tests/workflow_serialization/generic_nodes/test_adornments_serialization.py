@@ -353,3 +353,33 @@ def test_serialize_node__adornment_order_matches_decorator_order():
     assert len(adornments) == 2
     assert adornments[0]["label"] == "Try Node"
     assert adornments[1]["label"] == "Retry Node"
+
+
+def test_serialize_workflow__retry_node_edges():
+    """
+    Tests that both retry-adorned nodes are correctly serialized in the nodes array.
+    """
+
+    @RetryNode.wrap(max_attempts=3, delay=60)
+    class FirstNode(BaseNode):
+        class Outputs(BaseOutputs):
+            value: str
+
+    @RetryNode.wrap(max_attempts=5, delay=120)
+    class SecondNode(BaseNode):
+        class Outputs(BaseOutputs):
+            result: str
+
+    class MyWorkflow(BaseWorkflow):
+        graph = FirstNode >> SecondNode
+
+    workflow_display = get_workflow_display(workflow_class=MyWorkflow)
+    exec_config = cast(Dict[str, Any], workflow_display.serialize())
+
+    assert isinstance(exec_config["workflow_raw_data"], dict)
+    assert isinstance(exec_config["workflow_raw_data"]["nodes"], list)
+
+    nodes = cast(List[Dict[str, Any]], exec_config["workflow_raw_data"]["nodes"])
+
+    generic_nodes = [node for node in nodes if node["type"] == "GENERIC"]
+    assert len(generic_nodes) == 2
