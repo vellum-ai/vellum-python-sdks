@@ -1,20 +1,6 @@
 from datetime import datetime
-from uuid import uuid4
 
-from vellum.client.types.span_link import SpanLink as ClientSpanLink
-from vellum.client.types.vellum_code_resource_definition import (
-    VellumCodeResourceDefinition as ClientVellumCodeResourceDefinition,
-)
-from vellum.client.types.workflow_execution_detail import WorkflowExecutionDetail
-from vellum.client.types.workflow_execution_initiated_body import (
-    WorkflowExecutionInitiatedBody as ClientWorkflowExecutionInitiatedBody,
-)
-from vellum.client.types.workflow_execution_initiated_event import (
-    WorkflowExecutionInitiatedEvent as ClientWorkflowExecutionInitiatedEvent,
-)
-from vellum.client.types.workflow_execution_span import WorkflowExecutionSpan
-from vellum.client.types.workflow_execution_span_attributes import WorkflowExecutionSpanAttributes
-from vellum.client.types.workflow_parent_context import WorkflowParentContext as ClientWorkflowParentContext
+from vellum.client.types.workflow_resolved_state import WorkflowResolvedState
 from vellum.workflows.events.types import SpanLink, WorkflowParentContext
 from vellum.workflows.types.definition import VellumCodeResourceDefinition
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
@@ -55,38 +41,18 @@ def test_span_linking_across_three_executions(vellum_client):
         "execution_count": 1,
     }
 
-    mock_body = ClientWorkflowExecutionInitiatedBody(
-        workflow_definition=ClientVellumCodeResourceDefinition(
-            name="SpanLinkWorkflow",
-            module=["tests", "workflows", "span_link_workflow", "workflow"],
-            id="d0cb6b18-2170-428b-8dc3-de75a9eb5c8d",
-        ),
-        inputs={},
-    )
-
-    first_workflow_init_event = ClientWorkflowExecutionInitiatedEvent(
-        id=str(uuid4()),
+    mock_resolved_state = WorkflowResolvedState(
+        trace_id=first_trace_id,
         timestamp=datetime.now(),
-        trace_id=str(first_trace_id),
-        span_id=str(first_span_id),
-        body=mock_body,
-        links=None,
+        span_id=first_execution_id,
+        state=state_dict,
+        previous_trace_id=first_trace_id,
+        previous_span_id=first_span_id,
+        root_trace_id=first_trace_id,
+        root_span_id=first_span_id,
     )
 
-    mock_span = WorkflowExecutionSpan(
-        name="workflow.execution",
-        span_id=str(first_execution_id),
-        start_ts=datetime.now(),
-        end_ts=datetime.now(),
-        events=[first_workflow_init_event],
-        attributes=WorkflowExecutionSpanAttributes(label="Span Linking Workflow", workflow_id=str(uuid4())),
-    )
-
-    mock_execution_detail = WorkflowExecutionDetail(
-        span_id="test-span-id", start=datetime.now(), inputs=[], outputs=[], spans=[mock_span], state=state_dict
-    )
-
-    vellum_client.workflow_executions.retrieve_workflow_execution_detail.return_value = mock_execution_detail
+    vellum_client.workflows.retrieve_state.return_value = mock_resolved_state
 
     # WHEN the second execution is run with the previous execution ID
     workflow2 = SpanLinkWorkflow()
@@ -156,56 +122,18 @@ def test_span_linking_across_three_executions(vellum_client):
         "execution_count": 2,
     }
 
-    second_workflow_init_event = ClientWorkflowExecutionInitiatedEvent(
-        id=str(uuid4()),
+    mock_resolved_state = WorkflowResolvedState(
+        trace_id=second_trace_id,
         timestamp=datetime.now(),
-        trace_id=str(second_trace_id),
-        span_id=str(second_span_id),
-        body=mock_body,
-        links=[
-            ClientSpanLink(
-                trace_id=str(first_trace_id),
-                type="PREVIOUS_SPAN",
-                span_context=ClientWorkflowParentContext(
-                    workflow_definition=ClientVellumCodeResourceDefinition(
-                        name="SpanLinkWorkflow",
-                        module=["tests", "workflows", "span_link_workflow", "workflow"],
-                        id="d0cb6b18-2170-428b-8dc3-de75a9eb5c8d",
-                    ),
-                    type="WORKFLOW",
-                    span_id=str(first_span_id),
-                ),
-            ),
-            ClientSpanLink(
-                trace_id=str(first_trace_id),
-                type="ROOT_SPAN",
-                span_context=ClientWorkflowParentContext(
-                    workflow_definition=ClientVellumCodeResourceDefinition(
-                        name="SpanLinkWorkflow",
-                        module=["tests", "workflows", "span_link_workflow", "workflow"],
-                        id="d0cb6b18-2170-428b-8dc3-de75a9eb5c8d",
-                    ),
-                    type="WORKFLOW",
-                    span_id=str(first_span_id),
-                ),
-            ),
-        ],
+        span_id=second_execution_id,
+        state=state_dict,
+        previous_trace_id=second_trace_id,
+        previous_span_id=second_span_id,
+        root_trace_id=first_trace_id,
+        root_span_id=first_span_id,
     )
 
-    mock_span = WorkflowExecutionSpan(
-        name="workflow.execution",
-        span_id=str(second_execution_id),  # Use the actual second execution ID
-        start_ts=datetime.now(),
-        end_ts=datetime.now(),
-        events=[second_workflow_init_event],
-        attributes=WorkflowExecutionSpanAttributes(label="Span Linking Workflow", workflow_id=str(uuid4())),
-    )
-
-    mock_execution_detail = WorkflowExecutionDetail(
-        span_id="test-span-id", start=datetime.now(), inputs=[], outputs=[], spans=[mock_span], state=state_dict
-    )
-
-    vellum_client.workflow_executions.retrieve_workflow_execution_detail.return_value = mock_execution_detail
+    vellum_client.workflows.retrieve_state.return_value = mock_resolved_state
 
     workflow3 = SpanLinkWorkflow()
 
