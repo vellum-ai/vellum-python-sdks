@@ -7,7 +7,9 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.retry_node.node import RetryNode
 from vellum.workflows.nodes.core.try_node.node import TryNode
+from vellum.workflows.nodes.displayable.code_execution_node import CodeExecutionNode
 from vellum.workflows.outputs.base import BaseOutputs
+from vellum.workflows.state.base import BaseState
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.base import WorkflowInputsDisplay
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
@@ -353,3 +355,44 @@ def test_serialize_node__adornment_order_matches_decorator_order():
     assert len(adornments) == 2
     assert adornments[0]["label"] == "Try Node"
     assert adornments[1]["label"] == "Retry Node"
+
+
+def test_serialize_workflow__retry_node_edges():
+    """
+    Tests that edges are correctly serialized for a workflow with a retry-adorned CodeExecutionNode and a regular node.
+    """
+
+    @RetryNode.wrap(max_attempts=3, delay=60)
+    class FirstNode(CodeExecutionNode[BaseState, str]):
+        filepath = "./fixtures/code.py"
+        code_inputs = {}
+        packages = []
+
+    class SecondNode(BaseNode):
+        pass
+
+    class MyWorkflow(BaseWorkflow):
+        graph = FirstNode >> SecondNode
+
+    workflow_display = get_workflow_display(workflow_class=MyWorkflow)
+    exec_config = cast(Dict[str, Any], workflow_display.serialize())
+
+    assert isinstance(exec_config["workflow_raw_data"], dict)
+    assert isinstance(exec_config["workflow_raw_data"]["edges"], list)
+
+    edges = cast(List[Dict[str, Any]], exec_config["workflow_raw_data"]["edges"])
+    nodes = cast(List[Dict[str, Any]], exec_config["workflow_raw_data"]["nodes"])
+
+    entrypoint_node = [node for node in nodes if node["type"] == "ENTRYPOINT"][0]
+    code_execution_node = [node for node in nodes if node["type"] == "CODE_EXECUTION"][0]
+
+    assert len(edges) >= 1
+
+    first_edge = edges[0]
+    assert first_edge["source_node_id"] == entrypoint_node["id"]
+    assert first_edge["target_node_id"] == code_execution_node["id"]
+    assert first_edge["type"] == "DEFAULT"
+
+    second_edge_candidates = [edge for edge in edges if edge["source_node_id"] == code_execution_node["id"]]
+    assert len(second_edge_candidates) >= 1
+    assert second_edge_candidates[0]["type"] == "DEFAULT"
