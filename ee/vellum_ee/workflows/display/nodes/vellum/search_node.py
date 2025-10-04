@@ -48,19 +48,8 @@ class BaseSearchNodeDisplay(BaseNodeDisplay[_SearchNodeType], Generic[_SearchNod
         node_id = self.node_id
         node_inputs = self._generate_search_node_inputs(node_id, node, display_context)
 
-        try:
-            results_output_display = display_context.global_node_output_displays[node.Outputs.results]
-            results_output_id = str(results_output_display.id)
-        except KeyError as e:
-            display_context.add_error(e)
-            results_output_id = str(uuid4_from_hash(f"{node_id}|results"))
-
-        try:
-            text_output_display = display_context.global_node_output_displays[node.Outputs.text]
-            text_output_id = str(text_output_display.id)
-        except KeyError as e:
-            display_context.add_error(e)
-            text_output_id = str(uuid4_from_hash(f"{node_id}|text"))
+        results_output_display = self.get_node_output_display(node.Outputs.results)
+        text_output_display = self.get_node_output_display(node.Outputs.text)
 
         return {
             "id": str(node_id),
@@ -68,8 +57,8 @@ class BaseSearchNodeDisplay(BaseNodeDisplay[_SearchNodeType], Generic[_SearchNod
             "inputs": [node_input.dict() for node_input in node_inputs.values()],
             "data": {
                 "label": self.label,
-                "results_output_id": results_output_id,
-                "text_output_id": text_output_id,
+                "results_output_id": str(results_output_display.id),
+                "text_output_id": str(text_output_display.id),
                 "error_output_id": str(error_output_id) if error_output_id else None,
                 "source_handle_id": str(self.get_source_handle_id(display_context.port_displays)),
                 "target_handle_id": str(self.get_target_handle_id()),
