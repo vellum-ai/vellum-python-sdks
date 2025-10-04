@@ -208,7 +208,15 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 self.display_context.add_invalid_node(node)
                 continue
 
-            serialized_nodes[node_display.node_id] = serialized_node
+            # Use wrapped node's ID as dict key for adornment wrappers to prevent overwrites
+            wrapped_node = get_wrapped_node(node)
+            if wrapped_node:
+                wrapped_node_display = self.display_context.node_displays[wrapped_node]
+                dict_key = wrapped_node_display.node_id
+            else:
+                dict_key = node_display.node_id
+
+            serialized_nodes[dict_key] = serialized_node
 
         synthetic_output_edges: JsonArray = []
         output_variables: JsonArray = []

@@ -271,7 +271,7 @@ def test_serialize_node__stacked():
             "ports": [{"id": "408cd5fb-3a3e-4eb2-9889-61111bd6a129", "name": "default", "type": "DEFAULT"}],
             "adornments": [
                 {
-                    "id": "5be7d260-74f7-4734-b31b-a46a94539586",
+                    "id": "3344083c-a32c-4a32-920b-0fb5093448fa",
                     "label": "Try Node",
                     "base": {
                         "name": "TryNode",
@@ -279,14 +279,14 @@ def test_serialize_node__stacked():
                     },
                     "attributes": [
                         {
-                            "id": "c33d5d98-c2f4-4c5f-950e-7cf482cea22a",
+                            "id": "ab2fbab0-e2a0-419b-b1ef-ce11ecf11e90",
                             "name": "on_error_code",
                             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
                         }
                     ],
                 },
                 {
-                    "id": "074833b0-e142-4bbc-8dec-209a35e178a3",
+                    "id": "5be7d260-74f7-4734-b31b-a46a94539586",
                     "label": "Retry Node",
                     "base": {
                         "name": "RetryNode",
@@ -294,22 +294,22 @@ def test_serialize_node__stacked():
                     },
                     "attributes": [
                         {
-                            "id": "6c8f09bb-ee9e-4b30-afdf-aa292add49d7",
+                            "id": "f388e93b-8c68-4f54-8577-bbd0c9091557",
                             "name": "max_attempts",
                             "value": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 5.0}},
                         },
                         {
-                            "id": "41b3b4d1-c3a9-4d0e-91b7-acc5c7304639",
+                            "id": "8a07dc58-3fed-41d4-8ca6-31ee0bb86c61",
                             "name": "delay",
                             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
                         },
                         {
-                            "id": "3556b4c0-ed47-4ea0-ba02-e28d77fbb7d6",
+                            "id": "c91782e3-140f-4938-9c23-d2a7b85dcdd8",
                             "name": "retry_on_error_code",
                             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
                         },
                         {
-                            "id": "871699ca-e7af-4f7f-8c10-959fddf431bd",
+                            "id": "73a02e62-4535-4e1f-97b5-1264ca8b1d71",
                             "name": "retry_on_condition",
                             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
                         },
