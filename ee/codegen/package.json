@@ -16,7 +16,7 @@
   "scripts": {
     "gar-login": "npx google-artifactregistry-auth",
     "clean": "rm -rf lib && rm -f tsconfig.tsbuildinfo",
-    "build": "tsc && tsc-alias",
+    "build": "tsc && tsc-alias && mkdir -p lib/src/assets && cp -r src/assets/*.json lib/src/assets/ 2>/dev/null || true",
     "format": "prettier --write .",
     "format:check": "prettier --check . '!integration/**' '!lib/**'",
     "lint": "eslint .",
