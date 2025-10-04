@@ -23,4 +23,4 @@ class InvalidInputReferenceError(UserFacingException):
         self.message = message
         self.inputs_class_name = inputs_class_name
         self.attribute_name = attribute_name
-        super().__init__(f"Invalid input reference in {inputs_class_name}: {message}")
+        super().__init__(f"Invalid input reference in {inputs_class_name}.{attribute_name}: {message}")

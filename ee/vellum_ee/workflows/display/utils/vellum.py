@@ -126,7 +126,7 @@ def create_node_input_value_pointer_rule(
     if isinstance(value, WorkflowInputReference):
         if value not in display_context.global_workflow_input_displays:
             raise InvalidInputReferenceError(
-                message=f"type object '{value.inputs_class.__qualname__}' has no attribute '{value.name}'",
+                message=f"Inputs class '{value.inputs_class.__qualname__}' has no attribute '{value.name}'",
                 inputs_class_name=value.inputs_class.__qualname__,
                 attribute_name=value.name,
             )
