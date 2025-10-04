@@ -353,3 +353,41 @@ def test_serialize_node__adornment_order_matches_decorator_order():
     assert len(adornments) == 2
     assert adornments[0]["label"] == "Try Node"
     assert adornments[1]["label"] == "Retry Node"
+
+
+def test_serialize_workflow__retry_node_edges():
+    """
+    Tests that edges are correctly serialized for a workflow with a retry-adorned node and a regular node.
+    """
+
+    @RetryNode.wrap(max_attempts=3)
+    class FirstNode(BaseNode):
+        pass
+
+    class SecondNode(BaseNode):
+        pass
+
+    class MyWorkflow(BaseWorkflow):
+        graph = FirstNode >> SecondNode
+
+    workflow_display = get_workflow_display(workflow_class=MyWorkflow)
+    exec_config = cast(Dict[str, Any], workflow_display.serialize())
+
+    assert isinstance(exec_config["workflow_raw_data"], dict)
+    assert isinstance(exec_config["workflow_raw_data"]["edges"], list)
+
+    edges = cast(List[Dict[str, Any]], exec_config["workflow_raw_data"]["edges"])
+    assert len(edges) == 2
+
+    nodes = cast(List[Dict[str, Any]], exec_config["workflow_raw_data"]["nodes"])
+    entrypoint_node = [node for node in nodes if node["type"] == "ENTRYPOINT"][0]
+    first_node = [node for node in nodes if node.get("label") == "First Node"][0]
+    second_node = [node for node in nodes if node.get("label") == "Second Node"][0]
+
+    entrypoint_edge = [edge for edge in edges if edge["source_node_id"] == entrypoint_node["id"]][0]
+    assert entrypoint_edge["target_node_id"] == first_node["id"]
+    assert entrypoint_edge["type"] == "DEFAULT"
+
+    first_to_second_edge = [edge for edge in edges if edge["source_node_id"] == first_node["id"]][0]
+    assert first_to_second_edge["target_node_id"] == second_node["id"]
+    assert first_to_second_edge["type"] == "DEFAULT"
