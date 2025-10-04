@@ -140,6 +140,7 @@ class ContainerImagesClient:
         name: str,
         sha: str,
         tags: typing.Sequence[str],
+        force: typing.Optional[bool] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContainerImageRead:
         """
@@ -150,6 +151,8 @@ class ContainerImagesClient:
         sha : str
 
         tags : typing.Sequence[str]
+
+        force : typing.Optional[bool]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -174,7 +177,7 @@ class ContainerImagesClient:
         )
         """
         _response = self._raw_client.push_container_image(
-            name=name, sha=sha, tags=tags, request_options=request_options
+            name=name, sha=sha, tags=tags, force=force, request_options=request_options
         )
         return _response.data
 
@@ -328,6 +331,7 @@ class AsyncContainerImagesClient:
         name: str,
         sha: str,
         tags: typing.Sequence[str],
+        force: typing.Optional[bool] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContainerImageRead:
         """
@@ -338,6 +342,8 @@ class AsyncContainerImagesClient:
         sha : str
 
         tags : typing.Sequence[str]
+
+        force : typing.Optional[bool]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -370,6 +376,6 @@ class AsyncContainerImagesClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.push_container_image(
-            name=name, sha=sha, tags=tags, request_options=request_options
+            name=name, sha=sha, tags=tags, force=force, request_options=request_options
         )
         return _response.data

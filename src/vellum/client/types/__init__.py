@@ -703,6 +703,7 @@ from .workflow_request_json_input_request import WorkflowRequestJsonInputRequest
 from .workflow_request_number_input_request import WorkflowRequestNumberInputRequest
 from .workflow_request_string_input_request import WorkflowRequestStringInputRequest
 from .workflow_request_video_input_request import WorkflowRequestVideoInputRequest
+from .workflow_resolved_state import WorkflowResolvedState
 from .workflow_result_event import WorkflowResultEvent
 from .workflow_result_event_output_data import WorkflowResultEventOutputData
 from .workflow_result_event_output_data_array import WorkflowResultEventOutputDataArray
@@ -1393,6 +1394,7 @@ __all__ = [
     "WorkflowRequestNumberInputRequest",
     "WorkflowRequestStringInputRequest",
     "WorkflowRequestVideoInputRequest",
+    "WorkflowResolvedState",
     "WorkflowResultEvent",
     "WorkflowResultEventOutputData",
     "WorkflowResultEventOutputDataArray",

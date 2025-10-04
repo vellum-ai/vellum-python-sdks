@@ -158,6 +158,7 @@ class RawContainerImagesClient:
         name: str,
         sha: str,
         tags: typing.Sequence[str],
+        force: typing.Optional[bool] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[ContainerImageRead]:
         """
@@ -168,6 +169,8 @@ class RawContainerImagesClient:
         sha : str
 
         tags : typing.Sequence[str]
+
+        force : typing.Optional[bool]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -185,6 +188,7 @@ class RawContainerImagesClient:
                 "name": name,
                 "sha": sha,
                 "tags": tags,
+                "force": force,
             },
             headers={
                 "content-type": "application/json",
@@ -349,6 +353,7 @@ class AsyncRawContainerImagesClient:
         name: str,
         sha: str,
         tags: typing.Sequence[str],
+        force: typing.Optional[bool] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[ContainerImageRead]:
         """
@@ -359,6 +364,8 @@ class AsyncRawContainerImagesClient:
         sha : str
 
         tags : typing.Sequence[str]
+
+        force : typing.Optional[bool]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -376,6 +383,7 @@ class AsyncRawContainerImagesClient:
                 "name": name,
                 "sha": sha,
                 "tags": tags,
+                "force": force,
             },
             headers={
                 "content-type": "application/json",

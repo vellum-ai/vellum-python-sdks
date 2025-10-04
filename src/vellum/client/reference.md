@@ -2279,6 +2279,14 @@ client.container_images.push_container_image(
 <dl>
 <dd>
 
+**force:** `typing.Optional[bool]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
     
 </dd>
@@ -7088,6 +7096,79 @@ client.workflow_sandboxes.list_workflow_sandbox_examples()
 </details>
 
 ## Workflows
+<details><summary><code>client.workflows.<a href="src/vellum/resources/workflows/client.py">retrieve_state</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieve the current state of a workflow execution.
+
+**Note:** Uses a base url of `https://predict.vellum.ai`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import Vellum
+
+client = Vellum(
+    api_version="YOUR_API_VERSION",
+    api_key="YOUR_API_KEY",
+)
+client.workflows.retrieve_state(
+    span_id="span_id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**span_id:** `str` — The span ID of the workflow execution to retrieve state for
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.workflows.<a href="src/vellum/resources/workflows/client.py">serialize_workflow_files</a>(...)</code></summary>
 <dl>
 <dd>

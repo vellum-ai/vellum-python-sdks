@@ -8,6 +8,7 @@ from ...core.request_options import RequestOptions
 from ...types.workflow_push_deployment_config_request import WorkflowPushDeploymentConfigRequest
 from ...types.workflow_push_exec_config import WorkflowPushExecConfig
 from ...types.workflow_push_response import WorkflowPushResponse
+from ...types.workflow_resolved_state import WorkflowResolvedState
 from .raw_client import AsyncRawWorkflowsClient, RawWorkflowsClient
 
 # this is used as the default value for optional parameters
@@ -88,6 +89,42 @@ class WorkflowsClient:
             request_options=request_options,
         ) as r:
             yield from r.data
+
+    def retrieve_state(
+        self, span_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> WorkflowResolvedState:
+        """
+        Retrieve the current state of a workflow execution.
+
+        **Note:** Uses a base url of `https://predict.vellum.ai`.
+
+        Parameters
+        ----------
+        span_id : str
+            The span ID of the workflow execution to retrieve state for
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        WorkflowResolvedState
+
+
+        Examples
+        --------
+        from vellum import Vellum
+
+        client = Vellum(
+            api_version="YOUR_API_VERSION",
+            api_key="YOUR_API_KEY",
+        )
+        client.workflows.retrieve_state(
+            span_id="span_id",
+        )
+        """
+        _response = self._raw_client.retrieve_state(span_id, request_options=request_options)
+        return _response.data
 
     def push(
         self,
@@ -244,6 +281,50 @@ class AsyncWorkflowsClient:
         ) as r:
             async for _chunk in r.data:
                 yield _chunk
+
+    async def retrieve_state(
+        self, span_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> WorkflowResolvedState:
+        """
+        Retrieve the current state of a workflow execution.
+
+        **Note:** Uses a base url of `https://predict.vellum.ai`.
+
+        Parameters
+        ----------
+        span_id : str
+            The span ID of the workflow execution to retrieve state for
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        WorkflowResolvedState
+
+
+        Examples
+        --------
+        import asyncio
+
+        from vellum import AsyncVellum
+
+        client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.workflows.retrieve_state(
+                span_id="span_id",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.retrieve_state(span_id, request_options=request_options)
+        return _response.data
 
     async def push(
         self,

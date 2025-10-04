@@ -15,6 +15,7 @@ from ...errors.bad_request_error import BadRequestError
 from ...types.workflow_push_deployment_config_request import WorkflowPushDeploymentConfigRequest
 from ...types.workflow_push_exec_config import WorkflowPushExecConfig
 from ...types.workflow_push_response import WorkflowPushResponse
+from ...types.workflow_resolved_state import WorkflowResolvedState
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -111,6 +112,48 @@ class RawWorkflowsClient:
                 raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
             yield _stream()
+
+    def retrieve_state(
+        self, span_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> HttpResponse[WorkflowResolvedState]:
+        """
+        Retrieve the current state of a workflow execution.
+
+        **Note:** Uses a base url of `https://predict.vellum.ai`.
+
+        Parameters
+        ----------
+        span_id : str
+            The span ID of the workflow execution to retrieve state for
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[WorkflowResolvedState]
+
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"v1/workflows/{jsonable_encoder(span_id)}/state",
+            base_url=self._client_wrapper.get_environment().predict,
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    WorkflowResolvedState,
+                    parse_obj_as(
+                        type_=WorkflowResolvedState,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
     def push(
         self,
@@ -323,6 +366,48 @@ class AsyncRawWorkflowsClient:
                 raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
             yield await _stream()
+
+    async def retrieve_state(
+        self, span_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> AsyncHttpResponse[WorkflowResolvedState]:
+        """
+        Retrieve the current state of a workflow execution.
+
+        **Note:** Uses a base url of `https://predict.vellum.ai`.
+
+        Parameters
+        ----------
+        span_id : str
+            The span ID of the workflow execution to retrieve state for
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[WorkflowResolvedState]
+
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"v1/workflows/{jsonable_encoder(span_id)}/state",
+            base_url=self._client_wrapper.get_environment().predict,
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    WorkflowResolvedState,
+                    parse_obj_as(
+                        type_=WorkflowResolvedState,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
     async def push(
         self,
