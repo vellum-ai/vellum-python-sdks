@@ -275,3 +275,32 @@ def test_serialize_node__with_non_exist_code_input_path_with_dry_run():
         "state_variables": [],
         "output_variables": [],
     }
+
+
+def test_serialize_node__with_non_exist_code_input_path_with_dry_run__error_captured():
+    """
+    Tests that a CodeExecutionNode with a non-existent filepath
+    still appears in serialized JSON with an error captured when dry_run=True.
+    """
+
+    # GIVEN a code node with a non-existent code input path
+    class MyNode(CodeExecutionNode):
+        filepath = "non_existent_file.py"
+
+    # AND a workflow with the code node
+    class Workflow(BaseWorkflow):
+        graph = MyNode
+
+    # WHEN we serialize the workflow with dry_run=True
+    workflow_display = get_workflow_display(workflow_class=Workflow, dry_run=True)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the node should be present in the serialized JSON
+    code_execution_nodes = [
+        node for node in serialized_workflow["workflow_raw_data"]["nodes"] if node["type"] == "CODE_EXECUTION"
+    ]
+    assert len(code_execution_nodes) == 1
+
+    errors = list(workflow_display.display_context.errors)
+    assert len(errors) == 1
+    assert "Filepath 'non_existent_file.py' does not exist" in str(errors[0])

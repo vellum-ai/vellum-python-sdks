@@ -58,9 +58,7 @@ class BaseCodeExecutionNodeDisplay(BaseNodeDisplay[_CodeExecutionNodeType], Gene
                 script_filepath=filepath,
             )
             if not file_code:
-                display_context.add_validation_error(
-                    NodeValidationError(f"Filepath '{filepath}' does not exist", node.__name__)
-                )
+                display_context.add_error(NodeValidationError(f"Filepath '{filepath}' does not exist", node.__name__))
             code_value = file_code
         else:
             code_value = ""
