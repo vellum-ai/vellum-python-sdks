@@ -654,6 +654,52 @@
       ]
     },
     {
+      "id": "0ac6bdba-dbae-4ce5-b815-3d670aae0572",
+      "display_data": {
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "comment": {
+          "value": "\n    Used to perform a hybrid search against a Document Index in Vellum.\n\n    document_index: Union[UUID, str] - Either the UUID or name of the Vellum Document Index that you'd like to search\n        against\n    query: str - The query to search for\n    options: Optional[SearchRequestOptionsRequest] = None - Runtime configuration for the search\n    request_options: Optional[RequestOptions] = None - The request options to use for the search\n    chunk_separator: str = \"\n\n#####\n\n\" - The separator to use when joining the text of each search result\n    ",
+          "expanded": true
+        }
+      },
+      "base": {
+        "name": "BaseSearchNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "displayable",
+          "bases",
+          "search_node"
+        ]
+      },
+      "definition": {
+        "name": "SearchNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "displayable",
+          "search_node",
+          "node"
+        ]
+      },
+      "trigger": {
+        "id": "37e64cf0-e604-4045-b8a0-d17e68c037e1",
+        "merge_behavior": "AWAIT_ANY"
+      },
+      "ports": [
+        {
+          "id": "8dea61c3-107c-4f17-bcba-dbbdc1185360",
+          "name": "default",
+          "type": "DEFAULT"
+        }
+      ]
+    },
+    {
       "id": "035842e0-34ed-43af-97de-a706e40912ae",
       "label": "Tool Calling Node",
       "display_data": {
@@ -965,10 +1011,6 @@
     }
   ],
   "errors": [
-    {
-      "node": "SearchNode",
-      "error": "ValueError: Expected NodeReference query to have an instance"
-    },
     {
       "node": "TemplatingNode",
       "error": "KeyError: TemplatingNode.Outputs.result"

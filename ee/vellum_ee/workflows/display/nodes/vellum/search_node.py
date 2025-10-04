@@ -48,8 +48,8 @@ class BaseSearchNodeDisplay(BaseNodeDisplay[_SearchNodeType], Generic[_SearchNod
         node_id = self.node_id
         node_inputs = self._generate_search_node_inputs(node_id, node, display_context)
 
-        results_output_display = display_context.global_node_output_displays[node.Outputs.results]
-        text_output_display = display_context.global_node_output_displays[node.Outputs.text]
+        results_output_display = self.get_node_output_display(node.Outputs.results)
+        text_output_display = self.get_node_output_display(node.Outputs.text)
 
         return {
             "id": str(node_id),
@@ -111,8 +111,8 @@ class BaseSearchNodeDisplay(BaseNodeDisplay[_SearchNodeType], Generic[_SearchNod
         limit = raw_limit if raw_limit is not None else options.limit if options is not None else None
 
         node_input_names_and_values = [
-            ("query", node.query),
-            ("document_index_id", node.document_index),
+            ("query", raise_if_descriptor(node.query)),
+            ("document_index_id", raise_if_descriptor(node.document_index)),
             ("weights", weights.dict() if weights else None),
             ("limit", limit),
             ("separator", raise_if_descriptor(node.chunk_separator)),
