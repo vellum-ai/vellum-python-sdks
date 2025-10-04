@@ -379,6 +379,9 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
     @cached_property
     def node_id(self) -> UUID:
         """Can be overridden as a class attribute to specify a custom node id."""
+        wrapped_node = get_wrapped_node(self._node)
+        if wrapped_node:
+            return uuid4_from_hash(wrapped_node.__qualname__)
         return uuid4_from_hash(self._node.__qualname__)
 
     @cached_property
