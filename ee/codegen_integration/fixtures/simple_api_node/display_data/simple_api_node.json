@@ -282,6 +282,26 @@
               "value": { "type": "JSON", "value": null }
             }
           }
+        ],
+        "outputs": [
+          {
+            "id": "6a3c1704-7020-411d-a440-84b2a481691e",
+            "name": "text",
+            "type": "STRING",
+            "value": null
+          },
+          {
+            "id": "f6f469ae-3f50-4276-a294-43d8d0fcf477",
+            "name": "json",
+            "type": "JSON",
+            "value": null
+          },
+          {
+            "id": "6ab9d555-7007-43e1-9f90-d2ca21ea99cf",
+            "name": "status_code",
+            "type": "NUMBER",
+            "value": null
+          }
         ]
       },
       {

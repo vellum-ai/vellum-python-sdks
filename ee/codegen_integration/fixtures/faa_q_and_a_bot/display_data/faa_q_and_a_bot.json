@@ -1996,6 +1996,26 @@
               "value": { "type": "JSON", "value": null }
             }
           }
+        ],
+        "outputs": [
+          {
+            "id": "0c945315-0607-4ef6-8051-f4b6498e9526",
+            "name": "text",
+            "type": "STRING",
+            "value": null
+          },
+          {
+            "id": "c3c38fac-f413-4dad-863d-3d388231ba22",
+            "name": "json",
+            "type": "JSON",
+            "value": null
+          },
+          {
+            "id": "4d3e2c1d-ac9f-43a4-81fc-b652239986a0",
+            "name": "status_code",
+            "type": "NUMBER",
+            "value": null
+          }
         ]
       },
       {

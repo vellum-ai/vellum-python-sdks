@@ -29,3 +29,37 @@ def test_serialize_node__api_node_with_timeout():
     assert timeout_attribute["value"]["type"] == "CONSTANT_VALUE"
     assert timeout_attribute["value"]["value"]["type"] == "NUMBER"
     assert timeout_attribute["value"]["value"]["value"] == 30.0
+
+
+def test_serialize_node__api_node_outputs():
+    """
+    Tests that API node serialization includes the outputs array.
+    """
+
+    class MyAPINode(APINode):
+        url = "https://api.example.com"
+        method = APIRequestMethod.GET
+
+    class Workflow(BaseWorkflow):
+        graph = MyAPINode
+
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    my_api_node = next(node for node in serialized_workflow["workflow_raw_data"]["nodes"] if node["type"] == "API")
+
+    assert "outputs" in my_api_node
+    outputs = my_api_node["outputs"]
+    assert len(outputs) == 3
+
+    text_output = next(output for output in outputs if output["name"] == "text")
+    assert text_output["type"] == "STRING"
+    assert text_output["value"] is None
+
+    json_output = next(output for output in outputs if output["name"] == "json")
+    assert json_output["type"] == "JSON"
+    assert json_output["value"] is None
+
+    status_code_output = next(output for output in outputs if output["name"] == "status_code")
+    assert status_code_output["type"] == "NUMBER"
+    assert status_code_output["value"] is None

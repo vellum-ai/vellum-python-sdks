@@ -208,6 +208,11 @@ def test_serialize_workflow(vellum_client):
                 "merge_behavior": "AWAIT_ANY",
             },
             "ports": [{"id": "7c33b4d3-9204-4bd5-9371-80ee34f83073", "name": "default", "type": "DEFAULT"}],
+            "outputs": [
+                {"id": "17342c21-12bb-49ab-88ce-f144e0376b32", "name": "text", "type": "STRING", "value": None},
+                {"id": "12e4a99d-883d-4da5-aa51-35817d94013e", "name": "json", "type": "JSON", "value": None},
+                {"id": "fecc16c3-400e-4fd3-8223-08366070e3b1", "name": "status_code", "type": "NUMBER", "value": None},
+            ],
         },
         api_node,
     )

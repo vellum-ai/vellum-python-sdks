@@ -211,6 +211,11 @@ class BaseAPINodeDisplay(BaseNodeDisplay[_APINodeType], Generic[_APINodeType]):
                 "status_code_output_id": str(status_code_output_display.id),
             },
             **self.serialize_generic_fields(display_context),
+            "outputs": [
+                {"id": str(text_output_display.id), "name": "text", "type": "STRING", "value": None},
+                {"id": str(json_output_display.id), "name": "json", "type": "JSON", "value": None},
+                {"id": str(status_code_output_display.id), "name": "status_code", "type": "NUMBER", "value": None},
+            ],
         }
 
         attributes = self._serialize_attributes(display_context)

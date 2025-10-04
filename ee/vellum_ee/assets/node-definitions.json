@@ -46,6 +46,26 @@
           "type": "DEFAULT"
         }
       ],
+      "outputs": [
+        {
+          "id": "baa40ce0-35e7-4439-b280-085aaf4f54da",
+          "name": "text",
+          "type": "STRING",
+          "value": null
+        },
+        {
+          "id": "c5737084-f688-4695-ab81-5f97a6b1a5c2",
+          "name": "json",
+          "type": "JSON",
+          "value": null
+        },
+        {
+          "id": "a2a63a64-75f1-49ba-8743-4db660179ab3",
+          "name": "status_code",
+          "type": "NUMBER",
+          "value": null
+        }
+      ],
       "attributes": [
         {
           "id": "aacb36f1-c980-460d-8002-43bb57128e05",
