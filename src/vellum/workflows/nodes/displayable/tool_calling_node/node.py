@@ -22,8 +22,8 @@ from vellum.workflows.nodes.displayable.tool_calling_node.utils import (
 )
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.state.context import WorkflowContext
-from vellum.workflows.types.core import EntityInputsInterface, Tool
-from vellum.workflows.types.definition import MCPServer
+from vellum.workflows.types.core import EntityInputsInterface
+from vellum.workflows.types.definition import MCPServer, Tool
 from vellum.workflows.types.generics import StateType
 from vellum.workflows.utils.functions import compile_mcp_tool_definition, get_mcp_tool_name
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter

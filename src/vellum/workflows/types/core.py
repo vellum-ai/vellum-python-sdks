@@ -1,11 +1,8 @@
 from enum import Enum
 from typing import (  # type: ignore[attr-defined]
-    TYPE_CHECKING,
     Any,
-    Callable,
     Dict,
     List,
-    Type,
     Union,
     _GenericAlias,
     _SpecialGenericAlias,
@@ -13,16 +10,6 @@ from typing import (  # type: ignore[attr-defined]
 )
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
-from vellum.workflows.types.definition import (
-    ComposioToolDefinition,
-    DeploymentDefinition,
-    MCPServer,
-    VellumIntegrationToolDefinition,
-)
-
-if TYPE_CHECKING:
-    from vellum.workflows.workflows.base import BaseWorkflow
-
 
 JsonArray = List["Json"]
 JsonObject = Dict[str, "Json"]
@@ -53,14 +40,3 @@ class ConditionType(Enum):
     IF = "IF"
     ELIF = "ELIF"
     ELSE = "ELSE"
-
-
-# Type alias for functions that can be called in tool calling nodes
-ToolBase = Union[
-    Callable[..., Any],
-    DeploymentDefinition,
-    Type["BaseWorkflow"],
-    ComposioToolDefinition,
-    VellumIntegrationToolDefinition,
-]
-Tool = Union[ToolBase, MCPServer]
