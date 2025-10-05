@@ -31,12 +31,14 @@ from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.ports.port import Port
 from vellum.workflows.state import BaseState
 from vellum.workflows.state.encoder import DefaultStateEncoder
-from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior, Tool, ToolBase
+from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior
 from vellum.workflows.types.definition import (
     ComposioToolDefinition,
     DeploymentDefinition,
     MCPServer,
     MCPToolDefinition,
+    Tool,
+    ToolBase,
     VellumIntegrationToolDefinition,
 )
 from vellum.workflows.types.generics import is_workflow_class

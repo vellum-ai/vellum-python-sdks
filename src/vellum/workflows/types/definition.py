@@ -2,7 +2,7 @@ import importlib
 import inspect
 from types import FrameType
 from uuid import UUID
-from typing import Annotated, Any, Dict, List, Literal, Optional, Union
+from typing import TYPE_CHECKING, Annotated, Any, Callable, Dict, List, Literal, Optional, Type, Union
 
 from pydantic import BeforeValidator, SerializationInfo, model_serializer
 
@@ -12,6 +12,9 @@ from vellum.client.types.code_resource_definition import CodeResourceDefinition 
 from vellum.client.types.vellum_variable import VellumVariable
 from vellum.workflows.constants import AuthorizationType, VellumIntegrationProviderType
 from vellum.workflows.references.environment_variable import EnvironmentVariableReference
+
+if TYPE_CHECKING:
+    from vellum.workflows.workflows.base import BaseWorkflow
 
 
 def serialize_type_encoder(obj: type) -> Dict[str, Any]:
@@ -216,3 +219,14 @@ class MCPToolDefinition(UniversalBaseModel):
     server: MCPServer
     description: Optional[str] = None
     parameters: Dict[str, Any] = {}
+
+
+# Type alias for functions that can be called in tool calling nodes
+ToolBase = Union[
+    Callable[..., Any],
+    DeploymentDefinition,
+    Type["BaseWorkflow"],
+    ComposioToolDefinition,
+    VellumIntegrationToolDefinition,
+]
+Tool = Union[ToolBase, MCPServer]
