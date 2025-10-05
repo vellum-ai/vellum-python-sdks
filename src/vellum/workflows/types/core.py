@@ -1,5 +1,13 @@
 from enum import Enum
-from typing import Any, Dict, List, Union, _GenericAlias, _SpecialGenericAlias, _UnionGenericAlias
+from typing import (  # type: ignore[attr-defined]
+    Any,
+    Dict,
+    List,
+    Union,
+    _GenericAlias,
+    _SpecialGenericAlias,
+    _UnionGenericAlias,
+)
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 
