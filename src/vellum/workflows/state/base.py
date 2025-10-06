@@ -442,14 +442,24 @@ class StateMeta(UniversalBaseModel):
         if not memo:
             memo = {}
 
+        node_output_keys = list(self.node_outputs.keys())
         new_node_outputs = {
-            descriptor: value if isinstance(value, Queue) else deepcopy(value, memo)
-            for descriptor, value in self.node_outputs.items()
+            descriptor: (
+                self.node_outputs[descriptor]
+                if isinstance(self.node_outputs[descriptor], Queue)
+                else deepcopy(self.node_outputs[descriptor], memo)
+            )
+            for descriptor in node_output_keys
         }
 
+        external_input_keys = list(self.external_inputs.keys())
         new_external_inputs = {
-            descriptor: value if isinstance(value, Queue) else deepcopy(value, memo)
-            for descriptor, value in self.external_inputs.items()
+            descriptor: (
+                self.external_inputs[descriptor]
+                if isinstance(self.external_inputs[descriptor], Queue)
+                else deepcopy(self.external_inputs[descriptor], memo)
+            )
+            for descriptor in external_input_keys
         }
 
         memo[id(self.node_outputs)] = new_node_outputs
