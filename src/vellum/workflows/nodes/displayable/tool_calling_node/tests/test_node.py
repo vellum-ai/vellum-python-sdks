@@ -24,6 +24,7 @@ from vellum.workflows.nodes.displayable.tool_calling_node.utils import (
     create_tool_prompt_node,
 )
 from vellum.workflows.outputs.base import BaseOutputs
+from vellum.workflows.ports.utils import validate_ports
 from vellum.workflows.state.base import BaseState, StateMeta
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.definition import DeploymentDefinition
@@ -36,6 +37,55 @@ def first_function() -> str:
 
 def second_function() -> str:
     return "second_function"
+
+
+def test_router_node_port_ordering_with_multiple_tools():
+    """
+    Test that router node ports are created in the correct order: on_if, on_elif, ..., on_else.
+
+    This test validates the fix for the bug where multiple tools would create multiple on_if
+    ports instead of on_if followed by on_elif ports, which violates port validation rules.
+    """
+
+    # GIVEN three functions to ensure we test multiple elif cases
+    def third_function() -> str:
+        return "third_function"
+
+    # AND a tool prompt node
+    tool_prompt_node = create_tool_prompt_node(
+        ml_model="test-model",
+        blocks=[],
+        functions=[first_function, second_function, third_function],
+        prompt_inputs=None,
+        parameters=DEFAULT_PROMPT_PARAMETERS,
+    )
+
+    # WHEN a router node is created with multiple functions
+    router_node = create_router_node(
+        functions=[first_function, second_function, third_function],
+        tool_prompt_node=tool_prompt_node,
+    )
+
+    # THEN the first function port should be an on_if port
+    first_function_port = getattr(router_node.Ports, "first_function")
+    assert first_function_port._condition_type.value == "IF"
+
+    # AND the second function port should be an on_elif port
+    second_function_port = getattr(router_node.Ports, "second_function")
+    assert second_function_port._condition_type.value == "ELIF"
+
+    # AND the third function port should also be an on_elif port
+    third_function_port = getattr(router_node.Ports, "third_function")
+    assert third_function_port._condition_type.value == "ELIF"
+
+    # AND the default port should be an on_else port
+    default_port = getattr(router_node.Ports, "default")
+    assert default_port._condition_type.value == "ELSE"
+
+    # AND the ports should pass validation
+    ports = [first_function_port, second_function_port, third_function_port, default_port]
+    # This should not raise an exception
+    validate_ports(ports)
 
 
 def test_port_condition_match_function_name():

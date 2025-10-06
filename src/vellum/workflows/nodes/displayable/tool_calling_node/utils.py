@@ -409,8 +409,8 @@ def create_router_node(
         # Avoid using lambda to capture function_name
         # lambda will capture the function_name by reference,
         # and if the function_name is changed, the port_condition will also change.
-        def create_port_condition(fn_name):
-            return Port.on_if(
+        def create_port_condition(fn_name, is_first):
+            condition = (
                 ToolCallingState.current_prompt_output_index.less_than(tool_prompt_node.Outputs.results.length())
                 & tool_prompt_node.Outputs.results[ToolCallingState.current_prompt_output_index]["type"].equals(
                     "FUNCTION_CALL"
@@ -419,26 +419,33 @@ def create_router_node(
                     "name"
                 ].equals(fn_name)
             )
+            # First port should be on_if, subsequent ports should be on_elif
+            return Port.on_if(condition) if is_first else Port.on_elif(condition)
 
+        is_first_port = True
         for function in functions:
             if isinstance(function, ComposioToolDefinition):
                 function_name = get_function_name(function)
-                port = create_port_condition(function_name)
+                port = create_port_condition(function_name, is_first_port)
                 setattr(Ports, function_name, port)
+                is_first_port = False
             elif isinstance(function, VellumIntegrationToolDefinition):
                 function_name = get_function_name(function)
-                port = create_port_condition(function_name)
+                port = create_port_condition(function_name, is_first_port)
                 setattr(Ports, function_name, port)
+                is_first_port = False
             elif isinstance(function, MCPServer):
                 tool_functions: List[MCPToolDefinition] = compile_mcp_tool_definition(function)
                 for tool_function in tool_functions:
                     name = get_mcp_tool_name(tool_function)
-                    port = create_port_condition(name)
+                    port = create_port_condition(name, is_first_port)
                     setattr(Ports, name, port)
+                    is_first_port = False
             else:
                 function_name = get_function_name(function)
-                port = create_port_condition(function_name)
+                port = create_port_condition(function_name, is_first_port)
                 setattr(Ports, function_name, port)
+                is_first_port = False
 
         # Add the else port for when no function conditions match
         setattr(Ports, "default", Port.on_else())
