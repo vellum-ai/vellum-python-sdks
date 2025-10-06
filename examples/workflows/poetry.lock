@@ -1655,13 +1655,13 @@ standard = ["colorama (>=0.4)", "httptools (>=0.6.3)", "python-dotenv (>=0.13)",
 
 [[package]]
 name = "vellum-ai"
-version = "1.6.2"
+version = "1.7.3"
 description = ""
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "vellum_ai-1.6.2-py3-none-any.whl", hash = "sha256:28ea1acb5636cb117cecd1a6bfc9a63652756ba9b0739c830174833210df297d"},
-    {file = "vellum_ai-1.6.2.tar.gz", hash = "sha256:2c863f8a023013ecb19f0a84b9d09aa6f70227ff90744c3df89d9c61d9c63014"},
+    {file = "vellum_ai-1.7.3-py3-none-any.whl", hash = "sha256:8ee01062acf12610fc62067169d3e3fe7a71cb17da62c5774e7adf0ce805b4db"},
+    {file = "vellum_ai-1.7.3.tar.gz", hash = "sha256:516546ba90d0f4d8071c519666b4f6fa6f8def2dd7c0ed8795a7d8f4705211f9"},
 ]
 
 [package.dependencies]
@@ -1697,4 +1697,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<4.0"
-content-hash = "24f3dfef6d8c9cdff1ed340853f31b0281d2ec392980128f8b4abbe17b3203ef"
+content-hash = "7598b3fa4fbabe8b0e0559691ce14bf976c57627ed732987fb5549e45193b139"
