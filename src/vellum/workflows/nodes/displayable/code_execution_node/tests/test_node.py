@@ -6,7 +6,11 @@ from typing import Any, List, Union
 from pydantic import BaseModel
 
 from vellum import ArrayInput, CodeExecutorResponse, NumberVellumValue, StringInput, StringVellumValue
+from vellum.client.core.api_error import ApiError
 from vellum.client.errors.bad_request_error import BadRequestError
+from vellum.client.errors.forbidden_error import ForbiddenError
+from vellum.client.errors.internal_server_error import InternalServerError
+from vellum.client.errors.not_found_error import NotFoundError
 from vellum.client.types.chat_message import ChatMessage
 from vellum.client.types.code_execution_package import CodeExecutionPackage
 from vellum.client.types.code_executor_secret_input import CodeExecutorSecretInput
@@ -790,6 +794,103 @@ Node.js v21.7.3
 
     # AND the error should contain the execution error details
     assert exc_info.value.message == message
+
+
+def test_run_node__execute_code_api_fails_403__provider_credentials_unavailable(vellum_client):
+    """
+    Tests that a 403 error from the API is handled with PROVIDER_CREDENTIALS_UNAVAILABLE error code.
+    """
+
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, str]):
+        code = "def main(): return 'test'"
+        runtime = "PYTHON_3_11_6"
+        packages = [CodeExecutionPackage(name="requests", version="2.28.0")]
+
+    vellum_client.execute_code.side_effect = ForbiddenError(
+        body={
+            "detail": "Provider credentials is missing or unavailable",
+        }
+    )
+
+    node = ExampleCodeExecutionNode()
+    with pytest.raises(NodeException) as exc_info:
+        node.run()
+
+    assert exc_info.value.code == WorkflowErrorCode.PROVIDER_CREDENTIALS_UNAVAILABLE
+    assert "Provider credentials is missing or unavailable" in exc_info.value.message
+
+
+def test_run_node__execute_code_api_fails_404__invalid_inputs(vellum_client):
+    """
+    Tests that a 404 error from the API is handled with INVALID_INPUTS error code.
+    """
+
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, str]):
+        code = "def main(): return 'test'"
+        runtime = "PYTHON_3_11_6"
+        packages = [CodeExecutionPackage(name="requests", version="2.28.0")]
+
+    vellum_client.execute_code.side_effect = NotFoundError(
+        body={
+            "detail": "Resource not found",
+        }
+    )
+
+    node = ExampleCodeExecutionNode()
+    with pytest.raises(NodeException) as exc_info:
+        node.run()
+
+    assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
+    assert "Resource not found" in exc_info.value.message
+
+
+def test_run_node__execute_code_api_fails_500__internal_error(vellum_client):
+    """
+    Tests that a 500 error from the API is handled with INTERNAL_ERROR error code.
+    """
+
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, str]):
+        code = "def main(): return 'test'"
+        runtime = "PYTHON_3_11_6"
+        packages = [CodeExecutionPackage(name="requests", version="2.28.0")]
+
+    vellum_client.execute_code.side_effect = InternalServerError(
+        body={
+            "detail": "Internal server error occurred",
+        }
+    )
+
+    node = ExampleCodeExecutionNode()
+    with pytest.raises(NodeException) as exc_info:
+        node.run()
+
+    assert exc_info.value.code == WorkflowErrorCode.INTERNAL_ERROR
+    assert exc_info.value.message == "Failed to execute code"
+
+
+def test_run_node__execute_code_api_fails_4xx_no_message__uses_detail(vellum_client):
+    """
+    Tests that a 4xx error without a 'message' field falls back to 'detail' field.
+    """
+
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, str]):
+        code = "def main(): return 'test'"
+        runtime = "PYTHON_3_11_6"
+        packages = [CodeExecutionPackage(name="requests", version="2.28.0")]
+
+    vellum_client.execute_code.side_effect = ApiError(
+        status_code=422,
+        body={
+            "detail": "Invalid request parameters",
+        },
+    )
+
+    node = ExampleCodeExecutionNode()
+    with pytest.raises(NodeException) as exc_info:
+        node.run()
+
+    assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
+    assert "Invalid request parameters" in exc_info.value.message
 
 
 def test_run_node__execute_code__list_extends():
