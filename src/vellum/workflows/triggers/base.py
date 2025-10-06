@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, ABCMeta
 from uuid import UUID
 from typing import TYPE_CHECKING, Any, Dict
 
@@ -8,7 +8,51 @@ if TYPE_CHECKING:
     from vellum.workflows.graph.graph import Graph, GraphTarget
 
 
-class BaseTrigger(ABC):
+class BaseTriggerMeta(ABCMeta):
+    """
+    Metaclass for BaseTrigger that enables class-level >> operator.
+
+    This allows triggers to be used without instantiation, similar to nodes:
+        ManualTrigger >> MyNode  # Class-level, creates default instance
+        SlackTrigger(channel="alerts") >> MyNode  # Instance-level, uses configured instance
+    """
+
+    def __rshift__(cls, other: "GraphTarget") -> "Graph":
+        """
+        Enable Trigger class >> Node syntax (without instantiation).
+
+        Creates a default instance of the trigger and delegates to instance __rshift__.
+
+        Args:
+            other: The target to connect to - can be a Node, Graph, or set of Nodes
+
+        Returns:
+            Graph: A graph object with trigger edges
+
+        Examples:
+            ManualTrigger >> MyNode
+            ManualTrigger >> {NodeA, NodeB}
+            ManualTrigger >> (NodeA >> NodeB)
+        """
+        # Create a default instance and use its __rshift__
+        instance = cls()
+        return instance >> other
+
+    def __rrshift__(cls, other: Any) -> "Graph":
+        """
+        Prevent Node >> Trigger class syntax.
+
+        Raises:
+            TypeError: Always, as this operation is not allowed
+        """
+        raise TypeError(
+            f"Cannot create edge targeting trigger {cls.__name__}. "
+            f"Triggers must be at the start of a graph path, not as targets. "
+            f"Did you mean: {cls.__name__} >> {other.__name__ if hasattr(other, '__name__') else other}?"
+        )
+
+
+class BaseTrigger(ABC, metaclass=BaseTriggerMeta):
     """
     Base class for workflow triggers - first-class graph elements.
 
@@ -16,8 +60,12 @@ class BaseTrigger(ABC):
     into the workflow graph using the >> operator and can connect to nodes.
 
     Examples:
-        ManualTrigger() >> MyNode  # Explicit manual invocation
-        ScheduledTrigger(cron="0 * * * *") >> MyNode  # Scheduled execution
+        # Class-level usage (no instantiation needed for simple triggers)
+        ManualTrigger >> MyNode
+
+        # Instance-level usage (for configured triggers)
+        ScheduledTrigger(cron="0 * * * *") >> MyNode
+        SlackTrigger(channel="alerts") >> MyNode
 
     Subclass Hierarchy:
         - ManualTrigger: Explicit workflow invocation (default)

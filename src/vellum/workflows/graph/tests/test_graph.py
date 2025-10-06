@@ -627,8 +627,8 @@ def test_graph__manual_trigger_to_node():
     class MyNode(BaseNode):
         pass
 
-    # WHEN we create graph with ManualTrigger >> Node
-    graph = ManualTrigger() >> MyNode
+    # WHEN we create graph with ManualTrigger >> Node (class-level, no instantiation)
+    graph = ManualTrigger >> MyNode
 
     # THEN the graph has one trigger edge
     trigger_edges = list(graph.trigger_edges)
@@ -655,7 +655,7 @@ def test_graph__manual_trigger_to_set_of_nodes():
         pass
 
     # WHEN we create graph with ManualTrigger >> {NodeA, NodeB}
-    graph = ManualTrigger() >> {NodeA, NodeB}
+    graph = ManualTrigger >> {NodeA, NodeB}
 
     # THEN the graph has two trigger edges
     trigger_edges = list(graph.trigger_edges)
@@ -687,7 +687,7 @@ def test_graph__manual_trigger_to_graph():
     node_graph = NodeA >> NodeB
 
     # WHEN we create graph with ManualTrigger >> Graph
-    graph = ManualTrigger() >> node_graph
+    graph = ManualTrigger >> node_graph
 
     # THEN the graph has a trigger edge to the entrypoint
     trigger_edges = list(graph.trigger_edges)
@@ -711,8 +711,13 @@ def test_graph__node_to_trigger_raises():
     class MyNode(BaseNode):
         pass
 
-    # WHEN we try to create Node >> Trigger
+    # WHEN we try to create Node >> Trigger (class-level)
     # THEN it raises TypeError
+    with pytest.raises(TypeError, match="Cannot create edge targeting trigger"):
+        MyNode >> ManualTrigger
+
+    # WHEN we try to create Node >> Trigger (instance-level)
+    # THEN it also raises TypeError
     with pytest.raises(TypeError, match="Cannot create edge targeting trigger"):
         MyNode >> ManualTrigger()
 
@@ -726,7 +731,7 @@ def test_graph__trigger_then_graph_then_node():
         pass
 
     # WHEN we create Trigger >> Node >> Node
-    graph = ManualTrigger() >> StartNode >> EndNode
+    graph = ManualTrigger >> StartNode >> EndNode
 
     # THEN the graph has one trigger edge
     trigger_edges = list(graph.trigger_edges)

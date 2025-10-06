@@ -2,6 +2,8 @@
 Example demonstrating BaseTrigger and ManualTrigger usage.
 
 This example shows how triggers integrate with the workflow graph system.
+Triggers can be used at the class level (no instantiation) just like nodes:
+    ManualTrigger >> MyNode
 """
 
 from vellum.workflows import BaseWorkflow
@@ -29,7 +31,7 @@ class ProcessNode(BaseNode):
 class ExplicitTriggerWorkflow(BaseWorkflow[Inputs, BaseState]):
     """Workflow with explicit ManualTrigger - same as default behavior."""
 
-    graph = ManualTrigger() >> ProcessNode
+    graph = ManualTrigger >> ProcessNode
 
     class Outputs(BaseWorkflow.Outputs):
         result = ProcessNode.Outputs.result
@@ -70,7 +72,7 @@ class MergeNode(BaseNode):
 class MultiEntrypointWorkflow(BaseWorkflow[Inputs, BaseState]):
     """Workflow where trigger activates multiple nodes simultaneously."""
 
-    graph = ManualTrigger() >> {TopNode, BottomNode} >> MergeNode
+    graph = ManualTrigger >> {TopNode, BottomNode} >> MergeNode
 
     class Outputs(BaseWorkflow.Outputs):
         result = MergeNode.Outputs.combined
@@ -110,7 +112,7 @@ class EndNode(BaseNode):
 class ChainedWorkflow(BaseWorkflow[Inputs, BaseState]):
     """Workflow with trigger followed by a chain of nodes."""
 
-    graph = ManualTrigger() >> StartNode >> MiddleNode >> EndNode
+    graph = ManualTrigger >> StartNode >> MiddleNode >> EndNode
 
     class Outputs(BaseWorkflow.Outputs):
         result = EndNode.Outputs.final
