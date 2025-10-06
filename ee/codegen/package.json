@@ -16,20 +16,20 @@
   "scripts": {
     "gar-login": "npx google-artifactregistry-auth",
     "clean": "rm -rf lib && rm -f tsconfig.tsbuildinfo",
-    "build": "node --loader ts-node/esm --experimental-specifier-resolution=node scripts/build.mts",
+    "build": "tsx scripts/build.mts",
     "format": "prettier --write .",
     "format:check": "prettier --check . '!integration/**' '!lib/**'",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "postinstall": "node --loader ts-node/esm --experimental-specifier-resolution=node scripts/postinstall.mts",
+    "postinstall": "tsx scripts/postinstall.mts",
     "test": "vitest --run",
     "prepublishOnly": "npm run build && npm run gar-login",
     "test:update": "vitest --run -u",
     "test:debug": "vitest --run --inspect-brk --no-file-parallelism",
     "types": "tsc --noEmit",
-    "start": "node --loader ts-node/esm --experimental-specifier-resolution=node src/index.ts",
+    "start": "tsx src/index.ts",
     "version:codegen": "node scripts/version.js",
-    "upgrade-codegen-service": "node --loader ts-node/esm --experimental-specifier-resolution=node  scripts/upgrade-codegen-service.mts"
+    "upgrade-codegen-service": "tsx scripts/upgrade-codegen-service.mts"
   },
   "dependencies": {
     "@fern-api/python-ast": "^0.0.24",
@@ -55,7 +55,7 @@
     "eslint-plugin-unused-imports": "^4.1.4",
     "google-artifactregistry-auth": "3.2.0",
     "prettier": "^2.8.6",
-    "ts-node": "^10.9.2",
+    "tsx": "^4.20.6",
     "tsc-alias": "1.8.10",
     "tsconfig-paths": "4.2.0",
     "typescript": "^5.6.3",
