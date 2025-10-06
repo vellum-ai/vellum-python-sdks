@@ -21,7 +21,7 @@
     "format:check": "prettier --check . '!integration/**' '!lib/**'",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "postinstall": "tsx scripts/postinstall.mts",
+    "postinstall": "tsx scripts/postinstall.mts || true",
     "test": "vitest --run",
     "prepublishOnly": "npm run build && npm run gar-login",
     "test:update": "vitest --run -u",
