@@ -205,7 +205,7 @@ class FunctionNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
             raise NodeException(
                 message=f"Error executing function '{function_name}': {str(e)}",
                 code=WorkflowErrorCode.NODE_EXECUTION,
-            ) from e
+            )
 
         # Add the result to the chat history
         self._add_function_result_to_chat_history(result, self.state)
@@ -235,7 +235,7 @@ class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
             raise NodeException(
                 message=f"Error executing Composio tool '{self.composio_tool.action}': {str(e)}",
                 code=WorkflowErrorCode.NODE_EXECUTION,
-            ) from e
+            )
 
         # Add result to chat history
         self._add_function_result_to_chat_history(result, self.state)
@@ -258,7 +258,7 @@ class MCPNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
             raise NodeException(
                 message=f"Error executing MCP tool '{self.mcp_tool.name}': {str(e)}",
                 code=WorkflowErrorCode.NODE_EXECUTION,
-            ) from e
+            )
 
         # Add result to chat history
         self._add_function_result_to_chat_history(result, self.state)
