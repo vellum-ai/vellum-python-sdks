@@ -95,17 +95,17 @@ class VellumIntegrationService:
         except ApiError as e:
             # Handle structured 403 credential error responses
             if e.status_code == 403 and isinstance(e.body, dict):
-                # Check for backend structure with raw_data
-                raw_data_from_backend = e.body.get("raw_data")
-                if raw_data_from_backend and "integration" in raw_data_from_backend:
+                # Check if backend sent integration details (indicating auth is needed)
+                if "integration" in e.body:
                     error_message = e.body.get(
                         "message", "You must authenticate with this integration before you can execute this tool."
                     )
 
+                    # Wrap integration details in raw_data for frontend consumption
                     raise NodeException(
                         message=error_message,
                         code=WorkflowErrorCode.INTEGRATION_CREDENTIALS_UNAVAILABLE,
-                        raw_data=raw_data_from_backend,
+                        raw_data={"integration": e.body["integration"]},
                     ) from e
                 else:
                     # Fallback for generic 403 responses

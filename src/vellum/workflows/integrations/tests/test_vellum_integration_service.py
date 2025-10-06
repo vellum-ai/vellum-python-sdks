@@ -218,24 +218,22 @@ def test_vellum_integration_service_multiple_tool_executions(vellum_client):
 
 
 def test_vellum_integration_service_execute_tool_structured_403_with_raw_data(vellum_client):
-    """Test structured 403 responses with raw_data (current backend format)"""
+    """Test structured 403 responses with integration details (current backend format)"""
     from vellum.client.core.api_error import ApiError
     from vellum.workflows.errors.types import WorkflowErrorCode
 
-    # GIVEN a mock client configured to raise a structured 403 error with raw_data
+    # GIVEN a mock client configured to raise a structured 403 error with integration details
     mock_client = vellum_client
     mock_client.integrations = mock.MagicMock()
 
-    # Mock current backend structure with raw_data
+    # Mock current backend structure with integration at root level
     structured_error_body = {
         "code": "INTEGRATION_CREDENTIALS_UNAVAILABLE",
         "message": "You must authenticate with this integration before you can execute this tool.",
-        "raw_data": {
-            "integration": {
-                "id": "550e8400-e29b-41d4-a716-446655440000",
-                "provider": "COMPOSIO",
-                "name": "GITHUB",
-            }
+        "integration": {
+            "id": "550e8400-e29b-41d4-a716-446655440000",
+            "provider": "COMPOSIO",
+            "name": "GITHUB",
         },
     }
     mock_client.integrations.execute_integration_tool.side_effect = ApiError(
