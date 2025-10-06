@@ -1,7 +1,10 @@
+import pytest
+
 from vellum.workflows.edges.edge import Edge
 from vellum.workflows.graph.graph import Graph
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.ports.port import Port
+from vellum.workflows.triggers import ManualTrigger
 
 
 def test_graph__empty():
@@ -617,3 +620,124 @@ def test_graph__from_node_with_empty_ports():
 
     # THEN the graph should have exactly 1 node
     assert len(list(graph.nodes)) == 1
+
+
+def test_graph__manual_trigger_to_node():
+    # GIVEN a node
+    class MyNode(BaseNode):
+        pass
+
+    # WHEN we create graph with ManualTrigger >> Node
+    graph = ManualTrigger() >> MyNode
+
+    # THEN the graph has one trigger edge
+    trigger_edges = list(graph.trigger_edges)
+    assert len(trigger_edges) == 1
+    assert isinstance(trigger_edges[0].trigger, ManualTrigger)
+    assert trigger_edges[0].to_node == MyNode
+
+    # AND the graph has one trigger
+    triggers = list(graph.triggers)
+    assert len(triggers) == 1
+    assert isinstance(triggers[0], ManualTrigger)
+
+    # AND the graph has one node
+    assert len(list(graph.nodes)) == 1
+    assert MyNode in list(graph.nodes)
+
+
+def test_graph__manual_trigger_to_set_of_nodes():
+    # GIVEN two nodes
+    class NodeA(BaseNode):
+        pass
+
+    class NodeB(BaseNode):
+        pass
+
+    # WHEN we create graph with ManualTrigger >> {NodeA, NodeB}
+    graph = ManualTrigger() >> {NodeA, NodeB}
+
+    # THEN the graph has two trigger edges
+    trigger_edges = list(graph.trigger_edges)
+    assert len(trigger_edges) == 2
+
+    # AND both edges connect to the same ManualTrigger
+    assert all(isinstance(edge.trigger, ManualTrigger) for edge in trigger_edges)
+
+    # AND edges connect to both nodes
+    target_nodes = {edge.to_node for edge in trigger_edges}
+    assert target_nodes == {NodeA, NodeB}
+
+    # AND the graph has one unique trigger
+    triggers = list(graph.triggers)
+    assert len(triggers) == 1
+
+    # AND the graph has two nodes
+    assert len(list(graph.nodes)) == 2
+
+
+def test_graph__manual_trigger_to_graph():
+    # GIVEN a graph of nodes
+    class NodeA(BaseNode):
+        pass
+
+    class NodeB(BaseNode):
+        pass
+
+    node_graph = NodeA >> NodeB
+
+    # WHEN we create graph with ManualTrigger >> Graph
+    graph = ManualTrigger() >> node_graph
+
+    # THEN the graph has a trigger edge to the entrypoint
+    trigger_edges = list(graph.trigger_edges)
+    assert len(trigger_edges) == 1
+    assert trigger_edges[0].to_node == NodeA
+
+    # AND the graph preserves the original edges
+    edges = list(graph.edges)
+    assert len(edges) == 1
+    assert edges[0].to_node == NodeB
+
+    # AND the graph has both nodes
+    nodes = list(graph.nodes)
+    assert len(nodes) == 2
+    assert NodeA in nodes
+    assert NodeB in nodes
+
+
+def test_graph__node_to_trigger_raises():
+    # GIVEN a node and trigger
+    class MyNode(BaseNode):
+        pass
+
+    # WHEN we try to create Node >> Trigger
+    # THEN it raises TypeError
+    with pytest.raises(TypeError, match="Cannot create edge targeting trigger"):
+        MyNode >> ManualTrigger()
+
+
+def test_graph__trigger_then_graph_then_node():
+    # GIVEN a trigger, a node, and another node
+    class StartNode(BaseNode):
+        pass
+
+    class EndNode(BaseNode):
+        pass
+
+    # WHEN we create Trigger >> Node >> Node
+    graph = ManualTrigger() >> StartNode >> EndNode
+
+    # THEN the graph has one trigger edge
+    trigger_edges = list(graph.trigger_edges)
+    assert len(trigger_edges) == 1
+    assert trigger_edges[0].to_node == StartNode
+
+    # AND the graph has one regular edge
+    edges = list(graph.edges)
+    assert len(edges) == 1
+    assert edges[0].to_node == EndNode
+
+    # AND the graph has both nodes
+    nodes = list(graph.nodes)
+    assert len(nodes) == 2
