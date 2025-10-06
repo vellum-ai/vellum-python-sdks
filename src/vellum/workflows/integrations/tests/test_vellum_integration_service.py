@@ -262,6 +262,55 @@ def test_vellum_integration_service_execute_tool_structured_403_error(vellum_cli
     assert exc_info.value.raw_data["integration"]["provider"] == "COMPOSIO"
 
 
+def test_vellum_integration_service_execute_tool_structured_403_with_raw_data(vellum_client):
+    """Test structured 403 responses with raw_data (current backend format)"""
+    from vellum.client.core.api_error import ApiError
+    from vellum.workflows.errors.types import WorkflowErrorCode
+
+    # GIVEN a mock client configured to raise a structured 403 error with raw_data
+    mock_client = vellum_client
+    mock_client.integrations = mock.MagicMock()
+
+    # Mock current backend structure with raw_data
+    structured_error_body = {
+        "code": "INTEGRATION_CREDENTIALS_UNAVAILABLE",
+        "message": "You must authenticate with this integration before you can execute this tool.",
+        "raw_data": {
+            "integration": {
+                "id": "550e8400-e29b-41d4-a716-446655440000",
+                "provider": "COMPOSIO",
+                "name": "GITHUB",
+            }
+        },
+    }
+    mock_client.integrations.execute_integration_tool.side_effect = ApiError(
+        status_code=403,
+        body=structured_error_body,
+    )
+
+    # WHEN we attempt to execute a tool without credentials
+    service = VellumIntegrationService(client=mock_client)
+    with pytest.raises(NodeException) as exc_info:
+        service.execute_tool(
+            integration="GITHUB",
+            provider="COMPOSIO",
+            tool_name="GITHUB_CREATE_AN_ISSUE",
+            arguments={"repo": "user/repo"},
+        )
+
+    # THEN it should raise NodeException with INTEGRATION_CREDENTIALS_UNAVAILABLE code
+    assert exc_info.value.code == WorkflowErrorCode.INTEGRATION_CREDENTIALS_UNAVAILABLE
+
+    # AND the error message should match the backend response
+    assert "You must authenticate with this integration" in exc_info.value.message
+
+    # AND raw_data should contain integration details nested under "integration" key
+    assert exc_info.value.raw_data is not None
+    assert exc_info.value.raw_data["integration"]["id"] == "550e8400-e29b-41d4-a716-446655440000"
+    assert exc_info.value.raw_data["integration"]["name"] == "GITHUB"
+    assert exc_info.value.raw_data["integration"]["provider"] == "COMPOSIO"
+
+
 def test_vellum_integration_service_execute_tool_legacy_403_error(vellum_client):
     """Test backward compatibility with legacy 403 responses (before PR #14857)"""
     from vellum.client.core.api_error import ApiError
