@@ -24,6 +24,7 @@ from vellum.workflows.nodes.displayable.tool_calling_node.utils import (
     create_tool_prompt_node,
 )
 from vellum.workflows.outputs.base import BaseOutputs
+from vellum.workflows.ports.utils import validate_ports
 from vellum.workflows.state.base import BaseState, StateMeta
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.definition import DeploymentDefinition
@@ -81,9 +82,7 @@ def test_router_node_port_ordering_with_multiple_tools():
     default_port = getattr(router_node.Ports, "default")
     assert default_port._condition_type.value == "ELSE"
 
-    # AND the ports should pass validation (this would fail without the fix)
-    from vellum.workflows.ports.utils import validate_ports
-
+    # AND the ports should pass validation
     ports = [first_function_port, second_function_port, third_function_port, default_port]
     # This should not raise an exception
     validate_ports(ports)
