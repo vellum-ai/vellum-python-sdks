@@ -26,9 +26,5 @@
     "noImplicitReturns": true,
     "types": ["node", "vitest/globals"]
   },
-  "include": ["./src/**/*"],
-  "ts-node": {
-    "esm": true,
-    "experimentalSpecifierResolution": "node"
-  }
+  "include": ["./src/**/*"]
 }
