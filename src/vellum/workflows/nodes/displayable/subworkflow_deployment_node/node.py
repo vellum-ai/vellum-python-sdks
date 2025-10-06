@@ -21,7 +21,7 @@ from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.errors.types import workflow_event_error_to_workflow_error
 from vellum.workflows.events.types import default_serializer
 from vellum.workflows.events.workflow import is_workflow_event
-from vellum.workflows.exceptions import NodeException
+from vellum.workflows.exceptions import NodeException, WorkflowInitializationException
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.outputs.base import BaseOutput
@@ -155,14 +155,36 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
             filtered_inputs = {k: v for k, v in self.subworkflow_inputs.items() if v is not None}
             return inputs_class(**filtered_inputs)
 
+    def _get_release_id(self, deployment_name: str, release_tag: str) -> Optional[str]:
+        """Fetch the release ID for a given deployment name and release tag."""
+        try:
+            release = self._context.vellum_client.workflow_deployments.retrieve_workflow_deployment_release(
+                id=deployment_name, release_id_or_release_tag=release_tag
+            )
+            return str(release.id)
+        except Exception:
+            return None
+
     def _run_resolved_workflow(self, resolved_workflow: "BaseWorkflow") -> Iterator[BaseOutput]:
         """Execute resolved workflow directly (similar to InlineSubworkflowNode)."""
-        with execution_context(parent_context=get_parent_context()):
-            subworkflow_stream = resolved_workflow.stream(
-                inputs=self._compile_subworkflow_inputs_for_direct_invocation(resolved_workflow),
-                event_filter=all_workflow_event_filter,
-                node_output_mocks=self._context._get_all_node_output_mocks(),
-            )
+        try:
+            with execution_context(parent_context=get_parent_context()):
+                subworkflow_stream = resolved_workflow.stream(
+                    inputs=self._compile_subworkflow_inputs_for_direct_invocation(resolved_workflow),
+                    event_filter=all_workflow_event_filter,
+                    node_output_mocks=self._context._get_all_node_output_mocks(),
+                )
+        except WorkflowInitializationException as e:
+            deployment_name = self.deployment if isinstance(self.deployment, str) else None
+            release_id = None
+            if deployment_name:
+                release_id = self._get_release_id(deployment_name, self.release_tag)
+
+            raise NodeException(
+                message=e.message,
+                code=e.code,
+                raw_data={"release_id": release_id} if release_id else None,
+            ) from e
 
         outputs = None
         exception = None
@@ -252,44 +274,68 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
         except ApiError as e:
             self._handle_api_error(e)
 
-        # We don't use the INITIATED event anyway, so we can just skip it
-        # and use the exception handling to catch other api level errors
+        release_id = None
         try:
-            next(subworkflow_stream)
+            initiated_event = next(subworkflow_stream)
+            if hasattr(initiated_event, "parent") and initiated_event.parent:
+                from vellum.client.types import WorkflowDeploymentParentContext
+
+                if isinstance(initiated_event.parent, WorkflowDeploymentParentContext):
+                    release_id = initiated_event.parent.deployment_history_item_id
         except ApiError as e:
             self._handle_api_error(e)
+        except WorkflowInitializationException as e:
+            if not release_id:
+                release_id = self._get_release_id(deployment_name, self.release_tag)
+
+            raise NodeException(
+                message=e.message,
+                code=e.code,
+                raw_data={"release_id": release_id} if release_id else None,
+            ) from e
 
         outputs: Optional[List[WorkflowOutput]] = None
         fulfilled_output_names: Set[str] = set()
-        for event in subworkflow_stream:
-            if event.type != "WORKFLOW":
-                continue
-            if event.data.state == "INITIATED":
-                continue
-            elif event.data.state == "STREAMING":
-                if event.data.output:
-                    if event.data.output.state == "STREAMING":
-                        yield BaseOutput(
-                            name=event.data.output.name,
-                            delta=event.data.output.delta,
+
+        try:
+            for event in subworkflow_stream:
+                if event.type != "WORKFLOW":
+                    continue
+                if event.data.state == "INITIATED":
+                    continue
+                elif event.data.state == "STREAMING":
+                    if event.data.output:
+                        if event.data.output.state == "STREAMING":
+                            yield BaseOutput(
+                                name=event.data.output.name,
+                                delta=event.data.output.delta,
+                            )
+                        elif event.data.output.state == "FULFILLED":
+                            yield BaseOutput(
+                                name=event.data.output.name,
+                                value=event.data.output.value,
+                            )
+                            fulfilled_output_names.add(event.data.output.name)
+                elif event.data.state == "FULFILLED":
+                    outputs = event.data.outputs
+                elif event.data.state == "REJECTED":
+                    error = event.data.error
+                    if not error:
+                        raise NodeException(
+                            message="Expected to receive an error from REJECTED event",
+                            code=WorkflowErrorCode.INTERNAL_ERROR,
                         )
-                    elif event.data.output.state == "FULFILLED":
-                        yield BaseOutput(
-                            name=event.data.output.name,
-                            value=event.data.output.value,
-                        )
-                        fulfilled_output_names.add(event.data.output.name)
-            elif event.data.state == "FULFILLED":
-                outputs = event.data.outputs
-            elif event.data.state == "REJECTED":
-                error = event.data.error
-                if not error:
-                    raise NodeException(
-                        message="Expected to receive an error from REJECTED event",
-                        code=WorkflowErrorCode.INTERNAL_ERROR,
-                    )
-                workflow_error = workflow_event_error_to_workflow_error(error)
-                raise NodeException.of(workflow_error)
+                    workflow_error = workflow_event_error_to_workflow_error(error)
+                    raise NodeException.of(workflow_error)
+        except WorkflowInitializationException as e:
+            if not release_id:
+                release_id = self._get_release_id(deployment_name, self.release_tag)
+
+            raise NodeException(
+                message=e.message,
+                code=e.code,
+                raw_data={"release_id": release_id} if release_id else None,
+            ) from e
 
         if outputs is None:
             raise NodeException(
