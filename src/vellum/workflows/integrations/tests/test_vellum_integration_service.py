@@ -12,6 +12,7 @@ from vellum.workflows.types.definition import VellumIntegrationToolDetails
 
 def test_vellum_integration_service_get_tool_definition_success(vellum_client):
     """Test that tool definitions are successfully retrieved from Vellum API"""
+    # GIVEN a mock client configured to return a tool definition
     mock_client = vellum_client
     tool_definition_response = ComponentsSchemasComposioToolDefinition(
         integration=ToolDefinitionIntegration(
@@ -33,7 +34,6 @@ def test_vellum_integration_service_get_tool_definition_success(vellum_client):
         },
         output_parameters={},
     )
-
     mock_client.integrations.retrieve_integration_tool_definition.return_value = tool_definition_response
 
     # WHEN we request a tool definition
@@ -66,6 +66,7 @@ def test_vellum_integration_service_get_tool_definition_success(vellum_client):
 
 def test_vellum_integration_service_get_tool_definition_api_error(vellum_client):
     """Test that API errors are properly handled when retrieving tool definitions"""
+    # GIVEN a mock client configured to raise an exception
     mock_client = vellum_client
     mock_client.integrations = mock.MagicMock()
     mock_client.integrations.retrieve_integration_tool_definition.side_effect = Exception("Tool not found")
@@ -87,6 +88,7 @@ def test_vellum_integration_service_get_tool_definition_api_error(vellum_client)
 
 def test_vellum_integration_service_execute_tool_success(vellum_client):
     """Test that tools are successfully executed via Vellum API"""
+    # GIVEN a mock client configured to return a successful response
     mock_client = vellum_client
     mock_client.integrations = mock.MagicMock()
 
@@ -96,7 +98,6 @@ def test_vellum_integration_service_execute_tool_success(vellum_client):
         "issue_id": 123,
         "issue_url": "https://github.com/user/repo/issues/123",
     }
-
     mock_client.integrations.execute_integration_tool.return_value = mock_response
 
     # WHEN we execute a tool with valid arguments
@@ -132,6 +133,7 @@ def test_vellum_integration_service_execute_tool_success(vellum_client):
 
 def test_vellum_integration_service_execute_tool_api_error(vellum_client):
     """Test that execution errors are properly handled"""
+    # GIVEN a mock client configured to raise an exception
     mock_client = vellum_client
     mock_client.integrations = mock.MagicMock()
     mock_client.integrations.execute_integration_tool.side_effect = Exception("Authentication failed")
@@ -154,12 +156,12 @@ def test_vellum_integration_service_execute_tool_api_error(vellum_client):
 
 def test_vellum_integration_service_execute_tool_empty_response(vellum_client):
     """Test that empty response data is handled gracefully"""
+    # GIVEN a mock client configured to return an empty response
     mock_client = vellum_client
     mock_client.integrations = mock.MagicMock()
 
     mock_response = mock.MagicMock()
     mock_response.data = {}
-
     mock_client.integrations.execute_integration_tool.return_value = mock_response
 
     # WHEN we execute a tool that returns empty data
@@ -180,6 +182,7 @@ def test_vellum_integration_service_execute_tool_empty_response(vellum_client):
 
 def test_vellum_integration_service_multiple_tool_executions(vellum_client):
     """Test that the service handles multiple sequential tool executions"""
+    # GIVEN a mock client configured to return different responses for multiple calls
     mock_client = vellum_client
     mock_client.integrations = mock.MagicMock()
 
@@ -214,32 +217,34 @@ def test_vellum_integration_service_multiple_tool_executions(vellum_client):
     assert mock_client.integrations.execute_integration_tool.call_count == 2
 
 
-def test_vellum_integration_service_execute_tool_structured_403_error(vellum_client):
-    """Test that structured 403 responses with integration details are properly parsed"""
+def test_vellum_integration_service_execute_tool_structured_403_with_raw_data(vellum_client):
+    """Test structured 403 responses with raw_data (current backend format)"""
     from vellum.client.core.api_error import ApiError
     from vellum.workflows.errors.types import WorkflowErrorCode
 
+    # GIVEN a mock client configured to raise a structured 403 error with raw_data
     mock_client = vellum_client
     mock_client.integrations = mock.MagicMock()
 
-    # Mock structured 403 response matching PR #14857 format
+    # Mock current backend structure with raw_data
     structured_error_body = {
+        "code": "INTEGRATION_CREDENTIALS_UNAVAILABLE",
         "message": "You must authenticate with this integration before you can execute this tool.",
-        "integration": {
-            "id": "550e8400-e29b-41d4-a716-446655440000",
-            "provider": "COMPOSIO",
-            "name": "GITHUB",
+        "raw_data": {
+            "integration": {
+                "id": "550e8400-e29b-41d4-a716-446655440000",
+                "provider": "COMPOSIO",
+                "name": "GITHUB",
+            }
         },
     }
-
     mock_client.integrations.execute_integration_tool.side_effect = ApiError(
         status_code=403,
         body=structured_error_body,
     )
 
-    service = VellumIntegrationService(client=mock_client)
-
     # WHEN we attempt to execute a tool without credentials
+    service = VellumIntegrationService(client=mock_client)
     with pytest.raises(NodeException) as exc_info:
         service.execute_tool(
             integration="GITHUB",
@@ -266,19 +271,18 @@ def test_vellum_integration_service_execute_tool_legacy_403_error(vellum_client)
     from vellum.client.core.api_error import ApiError
     from vellum.workflows.errors.types import WorkflowErrorCode
 
+    # GIVEN a mock client configured to raise a legacy 403 error
     mock_client = vellum_client
     mock_client.integrations = mock.MagicMock()
 
-    # Mock legacy 403 response format (just detail field)
     legacy_error_body = {"detail": "You do not have permission to execute this tool."}
-
     mock_client.integrations.execute_integration_tool.side_effect = ApiError(
         status_code=403,
         body=legacy_error_body,
     )
 
+    # WHEN we attempt to execute a tool that returns a legacy 403 error
     service = VellumIntegrationService(client=mock_client)
-
     with pytest.raises(NodeException) as exc_info:
         service.execute_tool(
             integration="GITHUB",
