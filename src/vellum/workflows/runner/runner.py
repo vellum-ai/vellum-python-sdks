@@ -313,8 +313,6 @@ class WorkflowRunner(Generic[StateType]):
             parent=execution.parent_context,
         )
 
-        logger.debug(f"Started running node: {node.__class__.__name__}")
-
         try:
             updated_parent_context = NodeParentContext(
                 span_id=span_id,
@@ -498,8 +496,6 @@ class WorkflowRunner(Generic[StateType]):
                 ),
                 parent=execution.parent_context,
             )
-
-        logger.debug(f"Finished running node: {node.__class__.__name__}")
 
     def _parse_error_message(self, exception: Exception) -> Optional[str]:
         try:
@@ -930,8 +926,29 @@ class WorkflowRunner(Generic[StateType]):
         if not self._cancel_signal:
             return
 
-        while not kill_switch.wait(timeout=0.1):
+        while not kill_switch.wait(timeout=0.001):
             if self._cancel_signal.is_set():
+                for span_id, active_node in list(self._active_nodes_by_execution_id.items()):
+                    parent_context = WorkflowParentContext(
+                        span_id=self._initial_state.meta.span_id,
+                        workflow_definition=self.workflow.__class__,
+                        parent=self._execution_context.parent_context,
+                    )
+
+                    node_rejection = NodeExecutionRejectedEvent(
+                        trace_id=self._execution_context.trace_id,
+                        span_id=span_id,
+                        body=NodeExecutionRejectedBody(
+                            node_definition=active_node.node.__class__,
+                            error=WorkflowError(
+                                code=WorkflowErrorCode.NODE_CANCELLED,
+                                message="Workflow run cancelled",
+                            ),
+                        ),
+                        parent=parent_context,
+                    )
+                    self._workflow_event_outer_queue.put(node_rejection)
+
                 self._workflow_event_outer_queue.put(
                     self._reject_workflow_event(
                         WorkflowError(

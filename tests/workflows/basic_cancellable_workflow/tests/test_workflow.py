@@ -2,6 +2,7 @@ from threading import Event as ThreadingEvent, Thread
 import time
 
 from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.workflows.event_filters import root_workflow_event_filter
 
 from tests.workflows.basic_cancellable_workflow.workflow import BasicCancellableWorkflow
 
@@ -54,7 +55,7 @@ def test_workflow__cancel_stream():
     cancel_thread.start()
 
     # WHEN we run the workflow
-    result = workflow.stream(cancel_signal=cancel_signal)
+    result = workflow.stream(cancel_signal=cancel_signal, event_filter=root_workflow_event_filter)
 
     # THEN we should get the expected initiated and rejected events
     events = list(result)
@@ -62,6 +63,12 @@ def test_workflow__cancel_stream():
     assert events[-1].name == "workflow.execution.rejected"
     assert events[-1].error.message == "Workflow run cancelled"
     assert events[-1].error.code == WorkflowErrorCode.WORKFLOW_CANCELLED
+
+    # AND the second-to-last event should be a node rejection with NODE_CANCELLED
+    node_rejected_event = events[-2]
+    assert node_rejected_event.name == "node.execution.rejected"
+    assert node_rejected_event.error.code == WorkflowErrorCode.NODE_CANCELLED
+    assert node_rejected_event.error.message == "Workflow run cancelled"
 
 
 def test_workflow__cancel_signal_not_set__run():
