@@ -25,10 +25,12 @@ class NodeException(Exception):
         message: str,
         code: WorkflowErrorCode = WorkflowErrorCode.INTERNAL_ERROR,
         raw_data: Optional[Dict[str, Any]] = None,
+        stacktrace: Optional[str] = None,
     ):
         self.message = message
         self.code = code
         self.raw_data = raw_data
+        self.stacktrace = stacktrace
         super().__init__(message)
 
     @property
@@ -37,11 +39,17 @@ class NodeException(Exception):
             message=self.message,
             code=self.code,
             raw_data=self.raw_data,
+            stacktrace=self.stacktrace,
         )
 
     @staticmethod
     def of(workflow_error: WorkflowError) -> "NodeException":
-        return NodeException(message=workflow_error.message, code=workflow_error.code, raw_data=workflow_error.raw_data)
+        return NodeException(
+            message=workflow_error.message,
+            code=workflow_error.code,
+            raw_data=workflow_error.raw_data,
+            stacktrace=workflow_error.stacktrace,
+        )
 
 
 class WorkflowInitializationException(Exception):

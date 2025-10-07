@@ -164,6 +164,16 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
                 node_output_mocks=self._context._get_all_node_output_mocks(),
             )
 
+        try:
+            next(subworkflow_stream)
+        except WorkflowInitializationException as e:
+            hashed_module = e.definition.__module__
+            raise NodeException(
+                message=e.message,
+                code=e.code,
+                raw_data={"hashed_module": hashed_module},
+            ) from e
+
         outputs = None
         exception = None
         fulfilled_output_names: Set[str] = set()
@@ -231,18 +241,9 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
                 message="Expected deployment name to be provided for subworkflow execution.",
             )
 
-        try:
-            resolved_workflow = self._context.resolve_workflow_deployment(
-                deployment_name=deployment_name, release_tag=self.release_tag, state=self.state
-            )
-        except WorkflowInitializationException as e:
-            hashed_module = e.definition.__module__
-            raise NodeException(
-                message=e.message,
-                code=e.code,
-                raw_data={"hashed_module": hashed_module},
-            ) from e
-
+        resolved_workflow = self._context.resolve_workflow_deployment(
+            deployment_name=deployment_name, release_tag=self.release_tag, state=self.state
+        )
         if resolved_workflow:
             yield from self._run_resolved_workflow(resolved_workflow)
             return
@@ -270,7 +271,6 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
 
         outputs: Optional[List[WorkflowOutput]] = None
         fulfilled_output_names: Set[str] = set()
-
         for event in subworkflow_stream:
             if event.type != "WORKFLOW":
                 continue
