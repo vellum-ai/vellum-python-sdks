@@ -52,15 +52,6 @@ class VellumResolver(BaseWorkflowResolver):
         if response.state is None:
             return None
 
-        if (
-            response.previous_trace_id is None
-            or response.root_trace_id is None
-            or response.previous_span_id is None
-            or response.root_span_id is None
-        ):
-            logger.warning("Could not find required execution events for state loading")
-            return None
-
         if "meta" in response.state:
             response.state.pop("meta")
 
@@ -70,6 +61,20 @@ class VellumResolver(BaseWorkflowResolver):
         else:
             logger.warning("No workflow class registered, falling back to BaseState")
             state = BaseState(**response.state)
+
+        if (
+            response.previous_trace_id is None
+            or response.root_trace_id is None
+            or response.previous_span_id is None
+            or response.root_span_id is None
+        ):
+            return LoadStateResult(
+                state=state,
+                previous_trace_id=response.trace_id,
+                previous_span_id=response.span_id,
+                root_trace_id=response.trace_id,
+                root_span_id=response.span_id,
+            )
 
         return LoadStateResult(
             state=state,
