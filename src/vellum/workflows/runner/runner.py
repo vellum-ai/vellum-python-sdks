@@ -74,6 +74,7 @@ from vellum.workflows.references import ExternalInputReference, OutputReference
 from vellum.workflows.references.state_value import StateValueReference
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.delta import StateDelta
+from vellum.workflows.types.core import CancelSignal
 from vellum.workflows.types.generics import InputsType, OutputsType, StateType
 
 if TYPE_CHECKING:
@@ -103,7 +104,7 @@ class WorkflowRunner(Generic[StateType]):
         entrypoint_nodes: Optional[RunFromNodeArg] = None,
         external_inputs: Optional[ExternalInputsArg] = None,
         previous_execution_id: Optional[Union[str, UUID]] = None,
-        cancel_signal: Optional[ThreadingEvent] = None,
+        cancel_signal: Optional[CancelSignal] = None,
         node_output_mocks: Optional[MockNodeExecutionArg] = None,
         max_concurrency: Optional[int] = None,
         init_execution_context: Optional[ExecutionContext] = None,

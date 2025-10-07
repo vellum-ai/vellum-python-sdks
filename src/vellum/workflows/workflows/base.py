@@ -4,7 +4,6 @@ from functools import lru_cache
 import importlib
 import inspect
 import logging
-from threading import Event as ThreadingEvent
 from uuid import UUID, uuid4
 from typing import (
     Any,
@@ -76,6 +75,7 @@ from vellum.workflows.runner.runner import ExternalInputsArg, RunFromNodeArg
 from vellum.workflows.state.base import BaseState, StateMeta
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.state.store import Store
+from vellum.workflows.types import CancelSignal
 from vellum.workflows.types.generics import InputsType, StateType
 from vellum.workflows.types.utils import get_original_base
 from vellum.workflows.utils.uuids import uuid4_from_hash
@@ -374,7 +374,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         entrypoint_nodes: Optional[RunFromNodeArg] = None,
         external_inputs: Optional[ExternalInputsArg] = None,
         previous_execution_id: Optional[Union[str, UUID]] = None,
-        cancel_signal: Optional[ThreadingEvent] = None,
+        cancel_signal: Optional[CancelSignal] = None,
         node_output_mocks: Optional[MockNodeExecutionArg] = None,
         max_concurrency: Optional[int] = None,
     ) -> TerminalWorkflowEvent:
@@ -402,8 +402,8 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         previous_execution_id: Optional[Union[str, UUID]] = None
             The execution ID of the previous execution to resume from.
 
-        cancel_signal: Optional[ThreadingEvent] = None
-            A threading event that can be used to cancel the Workflow Execution.
+        cancel_signal: Optional[CancelSignal] = None
+            A cancel signal that can be used to cancel the Workflow Execution.
 
         node_output_mocks: Optional[MockNodeExecutionArg] = None
             A list of Outputs to mock for Nodes during Workflow Execution. Each mock can include a `when_condition`
@@ -493,7 +493,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         entrypoint_nodes: Optional[RunFromNodeArg] = None,
         external_inputs: Optional[ExternalInputsArg] = None,
         previous_execution_id: Optional[Union[str, UUID]] = None,
-        cancel_signal: Optional[ThreadingEvent] = None,
+        cancel_signal: Optional[CancelSignal] = None,
         node_output_mocks: Optional[MockNodeExecutionArg] = None,
         max_concurrency: Optional[int] = None,
     ) -> WorkflowEventStream:
@@ -522,8 +522,8 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         previous_execution_id: Optional[Union[str, UUID]] = None
             The execution ID of the previous execution to resume from.
 
-        cancel_signal: Optional[ThreadingEvent] = None
-            A threading event that can be used to cancel the Workflow Execution.
+        cancel_signal: Optional[CancelSignal] = None
+            A cancel signal that can be used to cancel the Workflow Execution.
 
         node_output_mocks: Optional[MockNodeExecutionArg] = None
             A list of Outputs to mock for Nodes during Workflow Execution. Each mock can include a `when_condition`
