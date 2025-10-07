@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from enum import Enum
 from uuid import UUID
 from typing import Optional, Type
 
@@ -8,6 +9,10 @@ from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.editor.types import NodeDisplayData
+
+
+class WorkflowTriggerType(Enum):
+    MANUAL = "MANUAL"
 
 
 class WorkflowDisplayDataViewport(UniversalBaseModel):

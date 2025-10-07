@@ -37,6 +37,7 @@ from vellum_ee.workflows.display.base import (
     WorkflowInputsDisplay,
     WorkflowMetaDisplay,
     WorkflowOutputDisplay,
+    WorkflowTriggerType,
 )
 from vellum_ee.workflows.display.editor.types import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
@@ -448,55 +449,16 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             # No workflow-level trigger defined
             return None
 
-        # For now, we only support a single trigger type per workflow
-        # Get the first trigger (all should be the same type)
+        # Get the trigger class from the first edge
         trigger_class = trigger_edges[0].trigger_class
 
-        # Verify all trigger edges use the same trigger class
-        for trigger_edge in trigger_edges:
-            if trigger_edge.trigger_class != trigger_class:
-                self.display_context.add_error(
-                    ValueError(
-                        "Multiple trigger types found in workflow. "
-                        "Only one trigger type is currently supported per workflow."
-                    )
-                )
-                return None
-
-        # Determine trigger type based on class name
-        trigger_type = self._get_trigger_type(trigger_class)
-
         return {
-            "type": trigger_type,
+            "type": WorkflowTriggerType.MANUAL.value,
             "definition": {
                 "name": trigger_class.__name__,
                 "module": cast(JsonArray, trigger_class.__module__.split(".")),
             },
         }
-
-    def _get_trigger_type(self, trigger_class: Type) -> str:
-        """
-        Determine the trigger type string from the trigger class.
-
-        Args:
-            trigger_class: The trigger class
-
-        Returns:
-            String representing the trigger type (e.g., "MANUAL", "INTEGRATION", "SCHEDULED")
-        """
-        trigger_name = trigger_class.__name__
-
-        # Map trigger class names to type strings
-        # This will be expanded as more trigger types are added
-        if "Manual" in trigger_name:
-            return "MANUAL"
-        elif "Integration" in trigger_name:
-            return "INTEGRATION"
-        elif "Scheduled" in trigger_name:
-            return "SCHEDULED"
-        else:
-            # Default/fallback
-            return "MANUAL"
 
     def _serialize_edge_display_data(self, edge_display: EdgeDisplay) -> Optional[JsonObject]:
         """Serialize edge display data, returning None if no display data is present."""
