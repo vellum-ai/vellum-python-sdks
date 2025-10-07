@@ -48,7 +48,7 @@ def test_workflow__cancel_stream():
 
     # AND some other thread triggers the cancel signal
     def cancel_target():
-        time.sleep(0.01)
+        time.sleep(0.15)
         cancel_signal.set()
 
     cancel_thread = Thread(target=cancel_target)

@@ -313,6 +313,8 @@ class WorkflowRunner(Generic[StateType]):
             parent=execution.parent_context,
         )
 
+        logger.debug(f"Started running node: {node.__class__.__name__}")
+
         try:
             updated_parent_context = NodeParentContext(
                 span_id=span_id,
@@ -496,6 +498,8 @@ class WorkflowRunner(Generic[StateType]):
                 ),
                 parent=execution.parent_context,
             )
+
+        logger.debug(f"Finished running node: {node.__class__.__name__}")
 
     def _parse_error_message(self, exception: Exception) -> Optional[str]:
         try:
@@ -691,6 +695,38 @@ class WorkflowRunner(Generic[StateType]):
 
         return None
 
+    def _emit_node_rejection_events(
+        self,
+        error_message: str,
+        parent_context: Optional[ParentContext],
+        pop_nodes: bool = False,
+    ) -> None:
+        """
+        Emit node rejection events for all active nodes.
+
+        Args:
+            error_message: The error message to include in the rejection events
+            parent_context: The parent context for the rejection events
+            pop_nodes: Whether to remove nodes from the active nodes dictionary after emitting events
+        """
+        for span_id, active_node in list(self._active_nodes_by_execution_id.items()):
+            rejection_event = NodeExecutionRejectedEvent(
+                trace_id=self._execution_context.trace_id,
+                span_id=span_id,
+                body=NodeExecutionRejectedBody(
+                    node_definition=active_node.node.__class__,
+                    error=WorkflowError(
+                        code=WorkflowErrorCode.NODE_CANCELLED,
+                        message=error_message,
+                    ),
+                ),
+                parent=parent_context,
+            )
+            self._workflow_event_outer_queue.put(rejection_event)
+
+            if pop_nodes:
+                self._active_nodes_by_execution_id.pop(span_id)
+
     def _initiate_workflow_event(self) -> WorkflowExecutionInitiatedEvent:
         links: Optional[List[SpanLink]] = None
 
@@ -844,21 +880,11 @@ class WorkflowRunner(Generic[StateType]):
 
             if rejection_event:
                 failed_node_name = rejection_event.body.node_definition.__name__
-                for active_span_id, active_node_data in list(self._active_nodes_by_execution_id.items()):
-                    cancellation_event = NodeExecutionRejectedEvent(
-                        trace_id=self._execution_context.trace_id,
-                        span_id=active_span_id,
-                        body=NodeExecutionRejectedBody(
-                            node_definition=active_node_data.node.__class__,
-                            error=WorkflowError(
-                                message=f"Node execution cancelled due to {failed_node_name} failure",
-                                code=WorkflowErrorCode.NODE_CANCELLED,
-                            ),
-                        ),
-                        parent=self._execution_context.parent_context,
-                    )
-                    self._workflow_event_outer_queue.put(cancellation_event)
-                    self._active_nodes_by_execution_id.pop(active_span_id)
+                self._emit_node_rejection_events(
+                    error_message=f"Node execution cancelled due to {failed_node_name} failure",
+                    parent_context=self._execution_context.parent_context,
+                    pop_nodes=True,
+                )
                 break
 
         # Handle any remaining events
@@ -926,28 +952,19 @@ class WorkflowRunner(Generic[StateType]):
         if not self._cancel_signal:
             return
 
-        while not kill_switch.wait(timeout=0.001):
+        while not kill_switch.wait(timeout=0.1):
             if self._cancel_signal.is_set():
-                for span_id, active_node in list(self._active_nodes_by_execution_id.items()):
-                    parent_context = WorkflowParentContext(
-                        span_id=self._initial_state.meta.span_id,
-                        workflow_definition=self.workflow.__class__,
-                        parent=self._execution_context.parent_context,
-                    )
+                parent_context = WorkflowParentContext(
+                    span_id=self._initial_state.meta.span_id,
+                    workflow_definition=self.workflow.__class__,
+                    parent=self._execution_context.parent_context,
+                )
 
-                    node_rejection = NodeExecutionRejectedEvent(
-                        trace_id=self._execution_context.trace_id,
-                        span_id=span_id,
-                        body=NodeExecutionRejectedBody(
-                            node_definition=active_node.node.__class__,
-                            error=WorkflowError(
-                                code=WorkflowErrorCode.NODE_CANCELLED,
-                                message="Workflow run cancelled",
-                            ),
-                        ),
-                        parent=parent_context,
-                    )
-                    self._workflow_event_outer_queue.put(node_rejection)
+                self._emit_node_rejection_events(
+                    error_message="Workflow run cancelled",
+                    parent_context=parent_context,
+                    pop_nodes=False,
+                )
 
                 self._workflow_event_outer_queue.put(
                     self._reject_workflow_event(
