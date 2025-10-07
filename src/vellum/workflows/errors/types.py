@@ -79,9 +79,13 @@ _WORKFLOW_EVENT_ERROR_CODE_TO_WORKFLOW_ERROR_CODE: Dict[WorkflowExecutionEventEr
 
 
 def workflow_event_error_to_workflow_error(error: WorkflowEventError) -> WorkflowError:
+    raw_data = error.raw_data or {}
+    if error.stacktrace:
+        raw_data = {**raw_data, "stacktrace": error.stacktrace}
     return WorkflowError(
         message=error.message,
         code=_WORKFLOW_EVENT_ERROR_CODE_TO_WORKFLOW_ERROR_CODE.get(error.code, WorkflowErrorCode.INTERNAL_ERROR),
+        raw_data=raw_data if raw_data else None,
     )
 
 
