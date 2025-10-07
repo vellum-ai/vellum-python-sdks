@@ -707,6 +707,7 @@ class WorkflowRunner(Generic[StateType]):
             error_message: The error message to include in the cancellation events
             parent_context: The parent context for the cancellation events
         """
+        captured_stacktrace = "".join(traceback.format_stack())
         for span_id, active_node in list(self._active_nodes_by_execution_id.items()):
             rejection_event = NodeExecutionRejectedEvent(
                 trace_id=self._execution_context.trace_id,
@@ -717,6 +718,7 @@ class WorkflowRunner(Generic[StateType]):
                         code=WorkflowErrorCode.NODE_CANCELLED,
                         message=error_message,
                     ),
+                    stacktrace=captured_stacktrace,
                 ),
                 parent=parent_context,
             )
@@ -960,12 +962,14 @@ class WorkflowRunner(Generic[StateType]):
                     parent_context=parent_context,
                 )
 
+                captured_stacktrace = "".join(traceback.format_stack())
                 self._workflow_event_outer_queue.put(
                     self._reject_workflow_event(
                         WorkflowError(
                             code=WorkflowErrorCode.WORKFLOW_CANCELLED,
                             message="Workflow run cancelled",
-                        )
+                        ),
+                        captured_stacktrace,
                     )
                 )
                 return
