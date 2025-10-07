@@ -435,7 +435,7 @@ def test_serialize_workflow():
             {
                 "id": "1668419e-a193-43a5-8a97-3394e89bf278",
                 "name": "max_prompt_iterations",
-                "value": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 5.0}},
+                "value": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 25.0}},
             },
             {
                 "id": "f92dc3ec-a19a-4491-a98a-2b2df322e2e3",

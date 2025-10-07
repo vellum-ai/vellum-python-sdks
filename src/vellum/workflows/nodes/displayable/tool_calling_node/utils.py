@@ -89,7 +89,7 @@ class FunctionCallNodeMixin:
 
 
 class ToolPromptNode(InlinePromptNode[ToolCallingState]):
-    max_prompt_iterations: Optional[int] = 5
+    max_prompt_iterations: Optional[int] = 25
 
     class Trigger(InlinePromptNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
