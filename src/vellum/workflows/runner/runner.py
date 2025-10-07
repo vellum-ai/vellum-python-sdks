@@ -799,13 +799,14 @@ class WorkflowRunner(Generic[StateType]):
             parent=self._execution_context.parent_context,
         )
 
-    def _fulfill_workflow_event(self, outputs: OutputsType) -> WorkflowExecutionFulfilledEvent:
+    def _fulfill_workflow_event(self, outputs: OutputsType, final_state: StateType) -> WorkflowExecutionFulfilledEvent:
         return WorkflowExecutionFulfilledEvent(
             trace_id=self._execution_context.trace_id,
             span_id=self._initial_state.meta.span_id,
             body=WorkflowExecutionFulfilledBody(
                 workflow_definition=self.workflow.__class__,
                 outputs=outputs,
+                final_state=final_state,
             ),
             parent=self._execution_context.parent_context,
         )
@@ -961,7 +962,7 @@ class WorkflowRunner(Generic[StateType]):
                     descriptor.instance.resolve(final_state),
                 )
 
-        self._workflow_event_outer_queue.put(self._fulfill_workflow_event(fulfilled_outputs))
+        self._workflow_event_outer_queue.put(self._fulfill_workflow_event(fulfilled_outputs, final_state))
 
     def _run_background_thread(self) -> None:
         state_class = self.workflow.get_state_class()

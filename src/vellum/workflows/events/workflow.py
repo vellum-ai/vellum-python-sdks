@@ -137,21 +137,30 @@ class WorkflowExecutionStreamingEvent(_BaseWorkflowEvent):
         return self.body.output
 
 
-class WorkflowExecutionFulfilledBody(_BaseWorkflowExecutionBody, Generic[OutputsType]):
+class WorkflowExecutionFulfilledBody(_BaseWorkflowExecutionBody, Generic[OutputsType, StateType]):
     outputs: OutputsType
+    final_state: Optional[StateType] = None
 
     @field_serializer("outputs")
     def serialize_outputs(self, outputs: OutputsType, _info: Any) -> Dict[str, Any]:
         return default_serializer(outputs)
 
+    @field_serializer("final_state")
+    def serialize_final_state(self, final_state: Optional[StateType], _info: Any) -> Optional[Dict[str, Any]]:
+        return default_serializer(final_state)
 
-class WorkflowExecutionFulfilledEvent(_BaseWorkflowEvent, Generic[OutputsType]):
+
+class WorkflowExecutionFulfilledEvent(_BaseWorkflowEvent, Generic[OutputsType, StateType]):
     name: Literal["workflow.execution.fulfilled"] = "workflow.execution.fulfilled"
-    body: WorkflowExecutionFulfilledBody[OutputsType]
+    body: WorkflowExecutionFulfilledBody[OutputsType, StateType]
 
     @property
     def outputs(self) -> OutputsType:
         return self.body.outputs
+
+    @property
+    def final_state(self) -> Optional[StateType]:
+        return self.body.final_state
 
 
 class WorkflowExecutionRejectedBody(_BaseWorkflowExecutionBody):
