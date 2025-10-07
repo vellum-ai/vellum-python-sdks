@@ -279,6 +279,40 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
 "
 `;
 
+exports[`CodeExecutionNode > with node trigger AWAIT_ALL > should generate Trigger class with AWAIT_ALL 1`] = `
+"from vellum.workflows.nodes.displayable import (
+    CodeExecutionNode as BaseCodeExecutionNode,
+)
+from vellum.workflows.state import BaseState
+from vellum.workflows.types.core import MergeBehavior
+
+
+class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+    filepath = "./script.py"
+    code_inputs = {}
+    runtime = "PYTHON_3_11_6"
+    packages = None
+
+    class Trigger(BaseCodeExecutionNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ALL
+"
+`;
+
+exports[`CodeExecutionNode > with node trigger AWAIT_ANY > should not generate Trigger class with AWAIT_ANY 1`] = `
+"from vellum.workflows.nodes.displayable import (
+    CodeExecutionNode as BaseCodeExecutionNode,
+)
+from vellum.workflows.state import BaseState
+
+
+class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
+    filepath = "./script.py"
+    code_inputs = {}
+    runtime = "PYTHON_3_11_6"
+    packages = None
+"
+`;
+
 exports[`CodeExecutionNode > with runtime set > should generate the correct standalone file PYTHON_3_11_6 1`] = `
 "from vellum.workflows.nodes.displayable import (
     CodeExecutionNode as BaseCodeExecutionNode,
