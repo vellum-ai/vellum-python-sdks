@@ -8,6 +8,7 @@ from typing import (
     Dict,
     ForwardRef,
     Generic,
+    List,
     Optional,
     Set,
     Tuple,
@@ -205,7 +206,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             "id": str(node_id),
             "label": self.label,
             "type": "GENERIC",
-            **self.serialize_generic_fields(display_context),
+            **self.serialize_generic_fields(display_context, exclude=["outputs"]),
             "adornments": adornments,
             "attributes": attributes,
             "outputs": outputs,
@@ -275,8 +276,32 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
         return attributes
 
-    def serialize_generic_fields(self, display_context: "WorkflowDisplayContext") -> JsonObject:
+    def _generate_outputs(self) -> JsonArray:
+        """Generate outputs array from node output displays."""
+        outputs: JsonArray = []
+
+        sorted_outputs = sorted(self.output_display.items(), key=lambda x: x[1].name)
+
+        for output_ref, output_display in sorted_outputs:
+            vellum_type = primitive_type_to_vellum_variable_type(output_ref)
+
+            outputs.append(
+                {
+                    "id": str(output_display.id),
+                    "name": output_display.name,
+                    "type": vellum_type,
+                    "value": None,
+                }
+            )
+
+        return outputs
+
+    def serialize_generic_fields(
+        self, display_context: "WorkflowDisplayContext", exclude: Optional[List[str]] = None
+    ) -> JsonObject:
         """Serialize generic fields that are common to all nodes."""
+        exclude = exclude or []
+
         result: JsonObject = {
             "display_data": self.get_display_data().dict(),
             "base": self.get_base().dict(),
@@ -298,6 +323,12 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 result["should_file_merge"] = True
         except Exception:
             pass
+
+        if self.output_display:
+            result["outputs"] = self._generate_outputs()
+
+        for key in exclude:
+            result.pop(key, None)
 
         return result
 

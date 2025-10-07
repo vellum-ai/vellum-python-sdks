@@ -71,7 +71,7 @@ class BaseSearchNodeDisplay(BaseNodeDisplay[_SearchNodeType], Generic[_SearchNod
                 "external_id_filters_node_input_id": str(node_inputs["external_id_filters"].id),
                 "metadata_filters_node_input_id": str(node_inputs["metadata_filters"].id),
             },
-            **self.serialize_generic_fields(display_context),
+            **self.serialize_generic_fields(display_context, exclude=["outputs"]),
         }
 
     def _generate_search_node_inputs(

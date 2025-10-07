@@ -50,7 +50,7 @@ def test_serialize_node__api_node_outputs():
 
     assert "outputs" in my_api_node
     outputs = my_api_node["outputs"]
-    assert len(outputs) == 3
+    assert len(outputs) == 4
 
     text_output = next(output for output in outputs if output["name"] == "text")
     assert text_output["type"] == "STRING"

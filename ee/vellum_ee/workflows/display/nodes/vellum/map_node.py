@@ -88,7 +88,7 @@ class BaseMapNodeDisplay(BaseAdornmentNodeDisplay[_MapNodeType], Generic[_MapNod
                 "item_input_id": item_workflow_input_id,
                 "index_input_id": index_workflow_input_id,
             },
-            **self.serialize_generic_fields(display_context),
+            **self.serialize_generic_fields(display_context, exclude=["outputs"]),
         }
 
     def _default_workflow_class(self) -> Type[BaseWorkflow]:

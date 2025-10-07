@@ -45,5 +45,5 @@ class BaseGuardrailNodeDisplay(BaseNodeDisplay[_GuardrailNodeType], Generic[_Gua
                 "metric_definition_id": str(raise_if_descriptor(node.metric_definition)),
                 "release_tag": raise_if_descriptor(node.release_tag),
             },
-            **self.serialize_generic_fields(display_context),
+            **self.serialize_generic_fields(display_context, exclude=["outputs"]),
         }

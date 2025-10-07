@@ -47,7 +47,7 @@ class BaseErrorNodeDisplay(BaseNodeDisplay[_ErrorNodeType], Generic[_ErrorNodeTy
                 "target_handle_id": str(self.get_target_handle_id()),
                 "error_source_input_id": str(error_source_input_id),
             },
-            **self.serialize_generic_fields(display_context),
+            **self.serialize_generic_fields(display_context, exclude=["outputs"]),
         }
 
         if self.name:

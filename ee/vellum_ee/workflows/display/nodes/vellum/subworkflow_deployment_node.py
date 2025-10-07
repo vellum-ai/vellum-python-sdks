@@ -68,5 +68,5 @@ class BaseSubworkflowDeploymentNodeDisplay(
                 "workflow_deployment_id": deployment_id,
                 "release_tag": raise_if_descriptor(node.release_tag),
             },
-            **self.serialize_generic_fields(display_context),
+            **self.serialize_generic_fields(display_context, exclude=["outputs"]),
         }
