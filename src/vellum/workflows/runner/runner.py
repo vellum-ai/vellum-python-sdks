@@ -1,4 +1,5 @@
 from collections import defaultdict
+from contextlib import contextmanager
 from copy import deepcopy
 from dataclasses import dataclass
 import logging
@@ -232,7 +233,33 @@ class WorkflowRunner(Generic[StateType]):
 
         self._background_thread: Optional[Thread] = None
         self._cancel_thread: Optional[Thread] = None
-        self._stream_thread: Optional[Thread] = None
+
+    @contextmanager
+    def _httpx_logger_with_span_id(self) -> Iterator[None]:
+        """
+        Context manager to append the current execution's span ID to httpx logger messages.
+
+        This is used when making API requests via the Vellum client to include
+        the execution's span ID in the httpx request logs for better traceability.
+        """
+        httpx_logger = logging.getLogger("httpx")
+
+        class SpanIdFilter(logging.Filter):
+            def filter(self, record: logging.LogRecord) -> bool:
+                if record.name == "httpx" and "[span_id=" not in record.msg:
+                    context = get_execution_context()
+                    if context.parent_context:
+                        span_id = str(context.parent_context.span_id)
+                        record.msg = f"{record.msg} [span_id={span_id}]"
+                return True
+
+        span_filter = SpanIdFilter()
+        httpx_logger.addFilter(span_filter)
+
+        try:
+            yield
+        finally:
+            httpx_logger.removeFilter(span_filter)
 
     def _snapshot_state(self, state: StateType, deltas: List[StateDelta]) -> StateType:
         self._workflow_event_inner_queue.put(
@@ -824,6 +851,11 @@ class WorkflowRunner(Generic[StateType]):
             parent=self._execution_context.parent_context,
         )
 
+    def _wrapped_stream(self) -> None:
+        """Wrapper for _stream that adds httpx logger span ID context."""
+        with self._httpx_logger_with_span_id():
+            self._stream()
+
     def _stream(self) -> None:
         for edge in self.workflow.get_edges():
             self._dependencies[edge.to_node].add(edge.from_port.node_class)
@@ -1005,7 +1037,7 @@ class WorkflowRunner(Generic[StateType]):
 
         # The extra level of indirection prevents the runner from waiting on the caller to consume the event stream
         self._stream_thread = Thread(
-            target=self._stream,
+            target=self._wrapped_stream,
             name=f"{self.workflow.__class__.__name__}.stream_thread",
         )
         self._stream_thread.start()
