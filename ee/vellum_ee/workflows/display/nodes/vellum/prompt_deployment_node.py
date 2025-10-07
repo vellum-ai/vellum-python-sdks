@@ -42,6 +42,7 @@ class BasePromptDeploymentNodeDisplay(BaseNodeDisplay[_PromptDeploymentNodeType]
 
         output_display = self.output_display[node.Outputs.text]
         array_display = self.output_display[node.Outputs.results]
+        json_display = self.output_display[node.Outputs.json]
 
         deployment_descriptor_id = str(raise_if_descriptor(node.deployment))
         try:
@@ -70,5 +71,10 @@ class BasePromptDeploymentNodeDisplay(BaseNodeDisplay[_PromptDeploymentNodeType]
                 "release_tag": raise_if_descriptor(node.release_tag),
                 "ml_model_fallbacks": list(ml_model_fallbacks) if ml_model_fallbacks else None,
             },
-            **self.serialize_generic_fields(display_context),
+            **self.serialize_generic_fields(display_context, exclude=["outputs"]),
+            "outputs": [
+                {"id": str(json_display.id), "name": "json", "type": "JSON", "value": None},
+                {"id": str(output_display.id), "name": "text", "type": "STRING", "value": None},
+                {"id": str(array_display.id), "name": "results", "type": "ARRAY", "value": None},
+            ],
         }

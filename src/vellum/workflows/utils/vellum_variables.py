@@ -222,5 +222,4 @@ def _builtin_list_to_vellum_type(type_: Type) -> Union[str, None]:
                 item_type, VellumValueRequest
             ):
                 return "ARRAY"
-            return "ARRAY"
     return None

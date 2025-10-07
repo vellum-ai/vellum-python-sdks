@@ -21,7 +21,6 @@ from typing import (
 
 from vellum.client.types.code_resource_definition import CodeResourceDefinition
 from vellum.workflows import BaseWorkflow
-from vellum.workflows.constants import undefined
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.utils import get_unadorned_node, get_wrapped_node
 from vellum.workflows.ports import Port
@@ -184,32 +183,13 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             existing_adornments = adornments if adornments is not None else []
             return display_class().serialize(display_context, adornments=existing_adornments + [adornment])
 
-        outputs: JsonArray = []
-        for output in node.Outputs:
-            type = primitive_type_to_vellum_variable_type(output)
-            value = (
-                serialize_value(node_id, display_context, output.instance)
-                if output.instance is not None and output.instance is not undefined
-                else None
-            )
-
-            outputs.append(
-                {
-                    "id": str(uuid4_from_hash(f"{node_id}|{output.name}")),
-                    "name": output.name,
-                    "type": type,
-                    "value": value,
-                }
-            )
-
         return {
             "id": str(node_id),
             "label": self.label,
             "type": "GENERIC",
-            **self.serialize_generic_fields(display_context, exclude=["outputs"]),
             "adornments": adornments,
             "attributes": attributes,
-            "outputs": outputs,
+            **self.serialize_generic_fields(display_context),
         }
 
     def serialize_ports(self, display_context: "WorkflowDisplayContext") -> JsonArray:
@@ -280,9 +260,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
         """Generate outputs array from node output displays."""
         outputs: JsonArray = []
 
-        sorted_outputs = sorted(self.output_display.items(), key=lambda x: x[1].name)
-
-        for output_ref, output_display in sorted_outputs:
+        for output_ref, output_display in self.output_display.items():
             vellum_type = primitive_type_to_vellum_variable_type(output_ref)
 
             outputs.append(

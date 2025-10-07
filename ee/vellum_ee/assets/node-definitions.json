@@ -48,14 +48,14 @@
       ],
       "outputs": [
         {
-          "id": "99a8d2c4-080f-4605-810e-f5084a52f019",
-          "name": "headers",
+          "id": "c5737084-f688-4695-ab81-5f97a6b1a5c2",
+          "name": "json",
           "type": "JSON",
           "value": null
         },
         {
-          "id": "c5737084-f688-4695-ab81-5f97a6b1a5c2",
-          "name": "json",
+          "id": "99a8d2c4-080f-4605-810e-f5084a52f019",
+          "name": "headers",
           "type": "JSON",
           "value": null
         },
@@ -263,15 +263,15 @@
           "value": null
         },
         {
-          "id": "73c02172-2bd1-482d-b7fe-acc67135f7d0",
-          "name": "results",
-          "type": "JSON",
-          "value": null
-        },
-        {
           "id": "b283959e-b719-49d2-ab9a-15c804ab52e8",
           "name": "text",
           "type": "STRING",
+          "value": null
+        },
+        {
+          "id": "73c02172-2bd1-482d-b7fe-acc67135f7d0",
+          "name": "results",
+          "type": "ARRAY",
           "value": null
         }
       ],
@@ -666,15 +666,15 @@
           "value": null
         },
         {
-          "id": "48513658-a72b-4db4-ad49-75a48a6cd084",
-          "name": "results",
-          "type": "JSON",
-          "value": null
-        },
-        {
           "id": "5ef5e3c6-1578-46da-89f6-6da3dd01fb5f",
           "name": "text",
           "type": "STRING",
+          "value": null
+        },
+        {
+          "id": "48513658-a72b-4db4-ad49-75a48a6cd084",
+          "name": "results",
+          "type": "ARRAY",
           "value": null
         }
       ]
@@ -773,62 +773,6 @@
     {
       "id": "035842e0-34ed-43af-97de-a706e40912ae",
       "label": "Tool Calling Node",
-      "display_data": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0
-        },
-        "comment": {
-          "value": "\n    A Node that dynamically invokes the provided functions to the underlying Prompt\n\n    Attributes:\n        ml_model: str - The model to use for tool calling (e.g., \"gpt-4o-mini\")\n        blocks: List[PromptBlock] - The prompt blocks to use (same format as InlinePromptNode)\n        functions: List[Tool] - The functions that can be called\n        prompt_inputs: Optional[EntityInputsInterface] - Mapping of input variable names to values\n        parameters: PromptParameters - The parameters for the Prompt\n        max_prompt_iterations: Optional[int] - Maximum number of prompt iterations before stopping\n    ",
-          "expanded": true
-        }
-      },
-      "base": {
-        "name": "BaseNode",
-        "module": [
-          "vellum",
-          "workflows",
-          "nodes",
-          "bases",
-          "base"
-        ]
-      },
-      "definition": {
-        "name": "ToolCallingNode",
-        "module": [
-          "vellum",
-          "workflows",
-          "nodes",
-          "displayable",
-          "tool_calling_node",
-          "node"
-        ]
-      },
-      "trigger": {
-        "id": "f9b4a4ce-68ae-45f4-9e29-38b588abdf97",
-        "merge_behavior": "AWAIT_ATTRIBUTES"
-      },
-      "ports": [
-        {
-          "id": "72157fce-fc16-44d8-a00d-506738a20730",
-          "name": "default",
-          "type": "DEFAULT"
-        }
-      ],
-      "outputs": [
-        {
-          "id": "c18a8725-21e1-4736-a77c-76d0fc035176",
-          "name": "text",
-          "type": "STRING",
-          "value": null
-        },
-        {
-          "id": "5a9ad073-c670-43d2-9198-a08e9fdda7ad",
-          "name": "chat_history",
-          "type": "CHAT_HISTORY",
-          "value": null
-        }
-      ],
       "attributes": [
         {
           "id": "df3761db-067a-4fe9-9fc3-ba270786fcf6",
@@ -917,11 +861,113 @@
             }
           }
         }
+      ],
+      "display_data": {
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "comment": {
+          "value": "\n    A Node that dynamically invokes the provided functions to the underlying Prompt\n\n    Attributes:\n        ml_model: str - The model to use for tool calling (e.g., \"gpt-4o-mini\")\n        blocks: List[PromptBlock] - The prompt blocks to use (same format as InlinePromptNode)\n        functions: List[Tool] - The functions that can be called\n        prompt_inputs: Optional[EntityInputsInterface] - Mapping of input variable names to values\n        parameters: PromptParameters - The parameters for the Prompt\n        max_prompt_iterations: Optional[int] - Maximum number of prompt iterations before stopping\n    ",
+          "expanded": true
+        }
+      },
+      "base": {
+        "name": "BaseNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
+      },
+      "definition": {
+        "name": "ToolCallingNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "displayable",
+          "tool_calling_node",
+          "node"
+        ]
+      },
+      "trigger": {
+        "id": "f9b4a4ce-68ae-45f4-9e29-38b588abdf97",
+        "merge_behavior": "AWAIT_ATTRIBUTES"
+      },
+      "ports": [
+        {
+          "id": "72157fce-fc16-44d8-a00d-506738a20730",
+          "name": "default",
+          "type": "DEFAULT"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "c18a8725-21e1-4736-a77c-76d0fc035176",
+          "name": "text",
+          "type": "STRING",
+          "value": null
+        },
+        {
+          "id": "5a9ad073-c670-43d2-9198-a08e9fdda7ad",
+          "name": "chat_history",
+          "type": "CHAT_HISTORY",
+          "value": null
+        }
       ]
     },
     {
       "id": "187ed9ed-ca2b-49e4-943d-ee8da5fad973",
       "label": "Web Search Node",
+      "attributes": [
+        {
+          "id": "b5ba3c60-e02c-46c8-b470-d86c4f8f42af",
+          "name": "query",
+          "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+              "type": "STRING",
+              "value": ""
+            }
+          }
+        },
+        {
+          "id": "222408bc-7dae-4bb8-9aba-a1ac36bdc759",
+          "name": "api_key",
+          "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+              "type": "JSON",
+              "value": null
+            }
+          }
+        },
+        {
+          "id": "795a0bbc-bb98-4bc8-a9d9-88b0cb796d23",
+          "name": "num_results",
+          "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+              "type": "NUMBER",
+              "value": 10.0
+            }
+          }
+        },
+        {
+          "id": "e1648557-ca03-4a81-ab5b-86495284b325",
+          "name": "location",
+          "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+              "type": "JSON",
+              "value": null
+            }
+          }
+        }
+      ],
       "display_data": {
         "position": {
           "x": 0.0,
@@ -982,52 +1028,6 @@
           "name": "results",
           "type": "JSON",
           "value": null
-        }
-      ],
-      "attributes": [
-        {
-          "id": "b5ba3c60-e02c-46c8-b470-d86c4f8f42af",
-          "name": "query",
-          "value": {
-            "type": "CONSTANT_VALUE",
-            "value": {
-              "type": "STRING",
-              "value": ""
-            }
-          }
-        },
-        {
-          "id": "222408bc-7dae-4bb8-9aba-a1ac36bdc759",
-          "name": "api_key",
-          "value": {
-            "type": "CONSTANT_VALUE",
-            "value": {
-              "type": "JSON",
-              "value": null
-            }
-          }
-        },
-        {
-          "id": "795a0bbc-bb98-4bc8-a9d9-88b0cb796d23",
-          "name": "num_results",
-          "value": {
-            "type": "CONSTANT_VALUE",
-            "value": {
-              "type": "NUMBER",
-              "value": 10.0
-            }
-          }
-        },
-        {
-          "id": "e1648557-ca03-4a81-ab5b-86495284b325",
-          "name": "location",
-          "value": {
-            "type": "CONSTANT_VALUE",
-            "value": {
-              "type": "JSON",
-              "value": null
-            }
-          }
         }
       ]
     },
