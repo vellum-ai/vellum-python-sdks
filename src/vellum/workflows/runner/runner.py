@@ -246,12 +246,11 @@ class WorkflowRunner(Generic[StateType]):
 
         class SpanIdFilter(logging.Filter):
             def filter(self, record: logging.LogRecord) -> bool:
-                if not hasattr(record, "_span_id_appended"):
+                if record.name == "httpx" and "[span_id=" not in record.msg:
                     context = get_execution_context()
                     if context.parent_context:
                         span_id = str(context.parent_context.span_id)
                         record.msg = f"{record.msg} [span_id={span_id}]"
-                    record._span_id_appended = True
                 return True
 
         span_filter = SpanIdFilter()
@@ -261,8 +260,6 @@ class WorkflowRunner(Generic[StateType]):
             yield
         finally:
             httpx_logger.removeFilter(span_filter)
-
-        self._stream_thread: Optional[Thread] = None
 
     def _snapshot_state(self, state: StateType, deltas: List[StateDelta]) -> StateType:
         self._workflow_event_inner_queue.put(
