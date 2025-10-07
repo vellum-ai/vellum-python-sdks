@@ -12,6 +12,7 @@ export class FinalOutputNode extends BaseNode<
   FinalOutputNodeType,
   FinalOutputNodeContext
 > {
+  protected DEFAULT_TRIGGER = "AWAIT_ANY";
   protected getNodeBaseGenericTypes(): AstNode[] {
     const stateType = this.getStateTypeOrBaseState();
     const primitiveOutputType = getVellumVariablePrimitiveType(
