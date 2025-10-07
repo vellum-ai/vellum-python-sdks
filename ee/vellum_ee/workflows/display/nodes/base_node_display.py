@@ -21,6 +21,7 @@ from typing import (
 
 from vellum.client.types.code_resource_definition import CodeResourceDefinition
 from vellum.workflows import BaseWorkflow
+from vellum.workflows.constants import undefined
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.utils import get_unadorned_node, get_wrapped_node
 from vellum.workflows.ports import Port
@@ -256,19 +257,31 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
         return attributes
 
-    def _generate_outputs(self) -> JsonArray:
-        """Generate outputs array from node output displays."""
+    def _generate_outputs(self, node_id: UUID, display_context: "WorkflowDisplayContext") -> JsonArray:
+        """Generate outputs array from node output displays or node.Outputs."""
         outputs: JsonArray = []
+        node = self._node
 
-        for output_ref, output_display in self.output_display.items():
-            vellum_type = primitive_type_to_vellum_variable_type(output_ref)
+        for output in node.Outputs:
+            output_type = primitive_type_to_vellum_variable_type(output)
+            value = (
+                serialize_value(node_id, display_context, output.instance)
+                if output.instance is not None and output.instance != undefined
+                else None
+            )
+
+            output_id = (
+                str(self.output_display[output].id)
+                if output in self.output_display
+                else str(uuid4_from_hash(f"{node_id}|{output.name}"))
+            )
 
             outputs.append(
                 {
-                    "id": str(output_display.id),
-                    "name": output_display.name,
-                    "type": vellum_type,
-                    "value": None,
+                    "id": output_id,
+                    "name": output.name,
+                    "type": output_type,
+                    "value": value,
                 }
             )
 
@@ -302,8 +315,8 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
         except Exception:
             pass
 
-        if self.output_display:
-            result["outputs"] = self._generate_outputs()
+        if "outputs" not in exclude:
+            result["outputs"] = self._generate_outputs(self.node_id, display_context)
 
         for key in exclude:
             result.pop(key, None)

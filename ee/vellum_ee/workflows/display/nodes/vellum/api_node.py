@@ -180,6 +180,7 @@ class BaseAPINodeDisplay(BaseNodeDisplay[_APINodeType], Generic[_APINodeType]):
         text_output_display = self.get_node_output_display(node.Outputs.text)
         json_output_display = self.get_node_output_display(node.Outputs.json)
         status_code_output_display = self.get_node_output_display(node.Outputs.status_code)
+        headers_output_display = self.get_node_output_display(node.Outputs.headers)
 
         serialized_node: JsonObject = {
             "id": str(node_id),
@@ -210,7 +211,13 @@ class BaseAPINodeDisplay(BaseNodeDisplay[_APINodeType], Generic[_APINodeType]):
                 "json_output_id": str(json_output_display.id),
                 "status_code_output_id": str(status_code_output_display.id),
             },
-            **self.serialize_generic_fields(display_context),
+            **self.serialize_generic_fields(display_context, exclude=["outputs"]),
+            "outputs": [
+                {"id": str(headers_output_display.id), "name": "headers", "type": "JSON", "value": None},
+                {"id": str(json_output_display.id), "name": "json", "type": "JSON", "value": None},
+                {"id": str(status_code_output_display.id), "name": "status_code", "type": "NUMBER", "value": None},
+                {"id": str(text_output_display.id), "name": "text", "type": "STRING", "value": None},
+            ],
         }
 
         attributes = self._serialize_attributes(display_context)

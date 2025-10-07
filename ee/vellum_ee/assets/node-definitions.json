@@ -48,14 +48,14 @@
       ],
       "outputs": [
         {
-          "id": "c5737084-f688-4695-ab81-5f97a6b1a5c2",
-          "name": "json",
+          "id": "99a8d2c4-080f-4605-810e-f5084a52f019",
+          "name": "headers",
           "type": "JSON",
           "value": null
         },
         {
-          "id": "99a8d2c4-080f-4605-810e-f5084a52f019",
-          "name": "headers",
+          "id": "c5737084-f688-4695-ab81-5f97a6b1a5c2",
+          "name": "json",
           "type": "JSON",
           "value": null
         },
