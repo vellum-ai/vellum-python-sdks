@@ -33,6 +33,7 @@ class WorkflowError:
     message: str
     code: WorkflowErrorCode
     raw_data: Optional[Dict[str, Any]] = None
+    stacktrace: Optional[str] = None
 
     def __contains__(self, item: Any) -> bool:
         return item in self.message
@@ -82,6 +83,8 @@ def workflow_event_error_to_workflow_error(error: WorkflowEventError) -> Workflo
     return WorkflowError(
         message=error.message,
         code=_WORKFLOW_EVENT_ERROR_CODE_TO_WORKFLOW_ERROR_CODE.get(error.code, WorkflowErrorCode.INTERNAL_ERROR),
+        raw_data=error.raw_data,
+        stacktrace=error.stacktrace,
     )
 
 

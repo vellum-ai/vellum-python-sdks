@@ -21,7 +21,7 @@ from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.errors.types import workflow_event_error_to_workflow_error
 from vellum.workflows.events.types import default_serializer
 from vellum.workflows.events.workflow import is_workflow_event
-from vellum.workflows.exceptions import NodeException
+from vellum.workflows.exceptions import NodeException, WorkflowInitializationException
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.outputs.base import BaseOutput
@@ -163,6 +163,16 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
                 event_filter=all_workflow_event_filter,
                 node_output_mocks=self._context._get_all_node_output_mocks(),
             )
+
+        try:
+            next(subworkflow_stream)
+        except WorkflowInitializationException as e:
+            hashed_module = e.definition.__module__
+            raise NodeException(
+                message=e.message,
+                code=e.code,
+                raw_data={"hashed_module": hashed_module},
+            ) from e
 
         outputs = None
         exception = None
