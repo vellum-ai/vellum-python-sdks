@@ -70,6 +70,16 @@ def test_workflow__cancel_stream():
     assert node_rejected_event.error.code == WorkflowErrorCode.NODE_CANCELLED
     assert node_rejected_event.error.message == "Workflow run cancelled"
 
+    # AND the node rejection should have a stacktrace
+    assert node_rejected_event.body.stacktrace is not None
+    assert "runner.py" in node_rejected_event.body.stacktrace
+    assert "_emit_node_cancellation_events" in node_rejected_event.body.stacktrace
+
+    # AND the workflow rejection should have a stacktrace
+    assert events[-1].body.stacktrace is not None
+    assert "runner.py" in events[-1].body.stacktrace
+    assert "_run_cancel_thread" in events[-1].body.stacktrace
+
 
 def test_workflow__cancel_signal_not_set__run():
     """
