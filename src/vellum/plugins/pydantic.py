@@ -48,6 +48,7 @@ class OnValidatePython(ValidatePythonHandlerProtocol):
         from_attributes: Optional[bool] = None,
         context: Optional[Dict[str, Any]] = None,
         self_instance: Optional[Any] = None,
+        extra: Optional[Literal["allow", "ignore", "forbid"]] = None,
         allow_partial: Union[bool, Literal["off", "on", "trailing-strings"]] = False,
         by_alias: Optional[bool] = None,
         by_name: Optional[bool] = None,
