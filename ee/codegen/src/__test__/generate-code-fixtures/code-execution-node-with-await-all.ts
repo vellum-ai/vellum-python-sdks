@@ -35,7 +35,8 @@ export default {
                   type: "CONSTANT_VALUE",
                   data: {
                     type: "STRING",
-                    value: "def main() -> str:\n    return 'Hello from AWAIT_ALL'\n",
+                    value:
+                      "def main() -> str:\n    return 'Hello from AWAIT_ALL'\n",
                   },
                 },
               ],
