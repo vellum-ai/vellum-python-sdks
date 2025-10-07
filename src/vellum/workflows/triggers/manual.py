@@ -1,5 +1,3 @@
-from typing import Any, Dict
-
 from vellum.workflows.triggers.base import BaseTrigger
 
 
@@ -25,7 +23,7 @@ class ManualTrigger(BaseTrigger):
             graph = MyNode
 
     Characteristics:
-        - Provides no trigger-specific inputs (empty dict from get_trigger_inputs)
+        - Provides no trigger-specific inputs
         - Always ready to execute when invoked
         - Simplest trigger type with no configuration
         - Default behavior for backward compatibility
@@ -36,16 +34,4 @@ class ManualTrigger(BaseTrigger):
         - ManualTrigger: Executes when explicitly called
     """
 
-    def get_trigger_inputs(self) -> Dict[str, Any]:
-        """
-        ManualTrigger provides no trigger-specific inputs.
-
-        All inputs come from the workflow's Inputs class passed to run()/stream().
-
-        Returns:
-            Empty dictionary
-        """
-        return {}
-
-    def __repr__(self) -> str:
-        return "ManualTrigger"
+    pass

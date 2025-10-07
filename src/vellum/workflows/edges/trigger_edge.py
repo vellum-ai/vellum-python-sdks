@@ -18,19 +18,19 @@ class TriggerEdge:
         SlackTrigger >> ProcessNode  # Creates TriggerEdge(SlackTrigger, ProcessNode)
 
     Attributes:
-        trigger: The trigger that initiates execution
+        trigger_class: The trigger class that initiates execution
         to_node: The node that should execute when the trigger fires
     """
 
-    def __init__(self, trigger: "BaseTrigger", to_node: Type["BaseNode"]):
+    def __init__(self, trigger_class: Type["BaseTrigger"], to_node: Type["BaseNode"]):
         """
         Initialize a TriggerEdge.
 
         Args:
-            trigger: The trigger that initiates execution
+            trigger_class: The trigger class that initiates execution
             to_node: The node class that should execute when triggered
         """
-        self.trigger = trigger
+        self.trigger_class = trigger_class
         self.to_node = to_node
 
     def __eq__(self, other: Any) -> bool:
@@ -46,7 +46,7 @@ class TriggerEdge:
         if not isinstance(other, TriggerEdge):
             return False
 
-        return self.trigger == other.trigger and self.to_node == other.to_node
+        return self.trigger_class == other.trigger_class and self.to_node == other.to_node
 
     def __hash__(self) -> int:
         """
@@ -55,7 +55,7 @@ class TriggerEdge:
         Returns:
             Hash value for this edge
         """
-        return hash((self.trigger, self.to_node))
+        return hash((self.trigger_class, self.to_node))
 
     def __repr__(self) -> str:
         """
@@ -64,4 +64,4 @@ class TriggerEdge:
         Returns:
             String in format "TriggerName >> NodeName"
         """
-        return f"{self.trigger!r} >> {self.to_node.__name__}"
+        return f"{self.trigger_class.__name__} >> {self.to_node.__name__}"

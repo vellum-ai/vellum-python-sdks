@@ -61,7 +61,7 @@ class Port:
         return iter(self._edges)
 
     def __rshift__(self, other: GraphTarget) -> Graph:
-        # Check for trigger target first (both class and instance)
+        # Check for trigger target (class-level only)
         from vellum.workflows.triggers.base import BaseTrigger
 
         # Check if other is a trigger class
@@ -70,14 +70,6 @@ class Port:
                 f"Cannot create edge targeting trigger {other.__name__}. "
                 f"Triggers must be at the start of a graph path, not as targets. "
                 f"Did you mean: {other.__name__} >> {self.node_class.__name__}?"
-            )
-
-        # Check if other is a trigger instance
-        if isinstance(other, BaseTrigger):
-            raise TypeError(
-                f"Cannot create edge targeting trigger {other.__class__.__name__}. "
-                f"Triggers must be at the start of a graph path, not as targets. "
-                f"Did you mean: {other.__class__.__name__}() >> {self.node_class.__name__}?"
             )
 
         if isinstance(other, set) or isinstance(other, Graph):

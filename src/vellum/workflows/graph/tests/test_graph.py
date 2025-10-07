@@ -633,13 +633,13 @@ def test_graph__manual_trigger_to_node():
     # THEN the graph has one trigger edge
     trigger_edges = list(graph.trigger_edges)
     assert len(trigger_edges) == 1
-    assert isinstance(trigger_edges[0].trigger, ManualTrigger)
+    assert trigger_edges[0].trigger_class == ManualTrigger
     assert trigger_edges[0].to_node == MyNode
 
     # AND the graph has one trigger
     triggers = list(graph.triggers)
     assert len(triggers) == 1
-    assert isinstance(triggers[0], ManualTrigger)
+    assert triggers[0] == ManualTrigger
 
     # AND the graph has one node
     assert len(list(graph.nodes)) == 1
@@ -661,8 +661,8 @@ def test_graph__manual_trigger_to_set_of_nodes():
     trigger_edges = list(graph.trigger_edges)
     assert len(trigger_edges) == 2
 
-    # AND both edges connect to the same ManualTrigger
-    assert all(isinstance(edge.trigger, ManualTrigger) for edge in trigger_edges)
+    # AND both edges connect to the same ManualTrigger class
+    assert all(edge.trigger_class == ManualTrigger for edge in trigger_edges)
 
     # AND edges connect to both nodes
     target_nodes = {edge.to_node for edge in trigger_edges}

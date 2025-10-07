@@ -40,7 +40,6 @@ GraphTarget = Union[
     "Port",
     "Graph",
     "NoPortsNode",
-    "BaseTrigger",
     GraphTargetOfSets,
 ]
 
@@ -166,12 +165,12 @@ class Graph:
         return Graph(entrypoints=set(), edges=[], terminals=set())
 
     def __rshift__(self, other: GraphTarget) -> "Graph":
-        # Check for trigger target first
+        # Check for trigger target (class-level only)
         from vellum.workflows.triggers.base import BaseTrigger
 
-        if isinstance(other, BaseTrigger):
+        if isinstance(other, type) and issubclass(other, BaseTrigger):
             raise TypeError(
-                f"Cannot create edge targeting trigger {other.__class__.__name__}. "
+                f"Cannot create edge targeting trigger {other.__name__}. "
                 f"Triggers must be at the start of a graph path, not as targets."
             )
 
@@ -258,13 +257,13 @@ class Graph:
         return iter(self._trigger_edges)
 
     @property
-    def triggers(self) -> Iterator["BaseTrigger"]:
-        """Get all unique triggers in this graph."""
+    def triggers(self) -> Iterator[Type["BaseTrigger"]]:
+        """Get all unique trigger classes in this graph."""
         seen_triggers = set()
         for trigger_edge in self._trigger_edges:
-            if trigger_edge.trigger not in seen_triggers:
-                seen_triggers.add(trigger_edge.trigger)
-                yield trigger_edge.trigger
+            if trigger_edge.trigger_class not in seen_triggers:
+                seen_triggers.add(trigger_edge.trigger_class)
+                yield trigger_edge.trigger_class
 
     @property
     def nodes(self) -> Iterator[Type["BaseNode"]]:
