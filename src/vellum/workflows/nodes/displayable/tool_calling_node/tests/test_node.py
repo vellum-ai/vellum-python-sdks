@@ -1,3 +1,4 @@
+import pytest
 import json
 from uuid import uuid4
 from typing import Any, Iterator, List
@@ -17,6 +18,7 @@ from vellum.workflows import BaseWorkflow
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
+from vellum.workflows.integrations import mcp_service
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
 from vellum.workflows.nodes.displayable.tool_calling_node.state import ToolCallingState
@@ -430,10 +432,9 @@ def test_function_node_preserves_node_exception():
     function_node = function_node_class(state=state)
 
     # THEN it should raise a NodeException
-    try:
+    with pytest.raises(NodeException) as exc_info:
         list(function_node.run())
-        assert False, "Expected NodeException to be raised"
-    except NodeException as e:
+        e = exc_info.value
         # AND the error code should be preserved
         assert e.code == WorkflowErrorCode.INVALID_INPUTS
         # AND the raw_data should be preserved
@@ -504,19 +505,15 @@ def test_mcp_node_preserves_node_exception(monkeypatch):
             raw_data={"mcp_error": "connection_failed"},
         )
 
-    from vellum.workflows.integrations import mcp_service
-
     monkeypatch.setattr(mcp_service.MCPService, "execute_tool", mock_execute_tool)
 
     # WHEN the MCP node runs
     mcp_node = mcp_node_class(state=state)
 
     # THEN it should raise a NodeException
-    try:
+    with pytest.raises(NodeException) as exc_info:
         list(mcp_node.run())
-        assert False, "Expected NodeException to be raised"
-    except NodeException as e:
-        # AND the error code should be preserved
+        e = exc_info.value
         assert e.code == WorkflowErrorCode.INVALID_INPUTS
         # AND the raw_data should be preserved
         assert e.raw_data == {"mcp_error": "connection_failed"}
