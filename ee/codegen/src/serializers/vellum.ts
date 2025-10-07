@@ -1628,6 +1628,7 @@ export const CodeExecutionNodeSerializer: ObjectSchema<
   definition: CodeResourceDefinitionSerializer.optional(),
   adornments: listSchema(AdornmentNodeSerializer).optional(),
   ports: listSchema(NodePortSerializer).optional(),
+  trigger: NodeTriggerSerializer.optional(),
 });
 
 export declare namespace CodeExecutionNodeSerializer {

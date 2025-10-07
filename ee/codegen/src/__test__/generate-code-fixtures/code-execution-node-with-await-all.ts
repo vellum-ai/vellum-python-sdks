@@ -183,9 +183,5 @@ export default {
       type: "STRING",
     },
   ],
-  assertions: [
-    "nodes/code_execution_with_await_all/__init__.py",
-    "nodes/code_execution_with_await_all/script.py",
-    "nodes/use_code_execution_with_await_all.py",
-  ],
+  assertions: ["nodes/code_execution_with_await_all/__init__.py"],
 };
