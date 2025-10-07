@@ -1407,6 +1407,7 @@ export const SubworkflowNodeSerializer: ObjectSchema<
   definition: CodeResourceDefinitionSerializer.optional(),
   adornments: listSchema(AdornmentNodeSerializer).optional(),
   ports: listSchema(NodePortSerializer).optional(),
+  trigger: NodeTriggerSerializer.optional(),
 });
 
 export declare namespace SubworkflowNodeSerializer {
@@ -1520,6 +1521,7 @@ export const MapNodeSerializer: ObjectSchema<
   definition: CodeResourceDefinitionSerializer.optional(),
   adornments: listSchema(AdornmentNodeSerializer).optional(),
   ports: listSchema(NodePortSerializer).optional(),
+  trigger: NodeTriggerSerializer.optional(),
 });
 
 export declare namespace MapNodeSerializer {
@@ -1550,6 +1552,7 @@ export const GuardrailNodeSerializer: ObjectSchema<
   definition: CodeResourceDefinitionSerializer.optional(),
   adornments: listSchema(AdornmentNodeSerializer).optional(),
   ports: listSchema(NodePortSerializer).optional(),
+  trigger: NodeTriggerSerializer.optional(),
 });
 
 export declare namespace GuardrailNodeSerializer {
@@ -1706,6 +1709,7 @@ export const SearchNodeSerializer: ObjectSchema<
   definition: CodeResourceDefinitionSerializer.optional(),
   adornments: listSchema(AdornmentNodeSerializer).optional(),
   ports: listSchema(NodePortSerializer).optional(),
+  trigger: NodeTriggerSerializer.optional(),
 });
 
 export declare namespace SearchNodeSerializer {
@@ -1798,6 +1802,7 @@ export const ConditionalNodeSerializer: ObjectSchema<
   definition: CodeResourceDefinitionSerializer.optional(),
   adornments: listSchema(AdornmentNodeSerializer).optional(),
   ports: listSchema(NodePortSerializer).optional(),
+  trigger: NodeTriggerSerializer.optional(),
 });
 
 export declare namespace ConditionalNodeSerializer {
@@ -1832,6 +1837,7 @@ export const TemplatingNodeSerializer: ObjectSchema<
   definition: CodeResourceDefinitionSerializer.optional(),
   adornments: listSchema(AdornmentNodeSerializer).optional(),
   ports: listSchema(NodePortSerializer).optional(),
+  trigger: NodeTriggerSerializer.optional(),
 });
 
 export declare namespace TemplatingNodeSerializer {
@@ -1871,6 +1877,7 @@ export const FinalOutputNodeSerializer: ObjectSchema<
   adornments: listSchema(AdornmentNodeSerializer).optional(),
   outputs: listSchema(NodeOutputSerializer).optional(),
   ports: listSchema(NodePortSerializer).optional(),
+  trigger: NodeTriggerSerializer.optional(),
 });
 
 export declare namespace FinalOutputNodeSerializer {
@@ -2002,6 +2009,7 @@ export const ApiNodeSerializer: ObjectSchema<
   definition: CodeResourceDefinitionSerializer.optional(),
   adornments: listSchema(AdornmentNodeSerializer).optional(),
   ports: listSchema(NodePortSerializer).optional(),
+  trigger: NodeTriggerSerializer.optional(),
   attributes: listSchema(NodeAttributeSerializer).optional(),
 });
 
@@ -2046,6 +2054,7 @@ export const NoteNodeSerializer: ObjectSchema<
   definition: CodeResourceDefinitionSerializer.optional(),
   adornments: listSchema(AdornmentNodeSerializer).optional(),
   ports: listSchema(NodePortSerializer).optional(),
+  trigger: NodeTriggerSerializer.optional(),
 });
 
 export declare namespace NoteNodeSerializer {
@@ -2080,6 +2089,7 @@ export const ErrorNodeSerializer: ObjectSchema<
   definition: CodeResourceDefinitionSerializer.optional(),
   adornments: listSchema(AdornmentNodeSerializer).optional(),
   ports: listSchema(NodePortSerializer).optional(),
+  trigger: NodeTriggerSerializer.optional(),
 });
 
 export declare namespace ErrorNodeSerializer {

@@ -18,6 +18,7 @@ export class ConditionalNode extends BaseNode<
   ConditionalNodeType,
   ConditionalNodeContext
 > {
+  protected DEFAULT_TRIGGER = "AWAIT_ANY";
   protected getNodeClassBodyStatements(): AstNode[] {
     const statements: AstNode[] = [];
 
