@@ -103,19 +103,31 @@ class BaseTrigger(ABC, metaclass=BaseTriggerMeta):
 
         if isinstance(other, set):
             # Trigger >> {NodeA, NodeB}
-            edges = []
+            trigger_edges = []
+            graph_items = []
             for item in other:
                 if isinstance(item, type) and issubclass(item, BaseNodeClass):
-                    edges.append(TriggerEdge(self, item))
+                    trigger_edges.append(TriggerEdge(self, item))
                 elif isinstance(item, Graph):
                     # Trigger >> {Graph1, Graph2}
+                    graph_items.append(item)
                     for entrypoint in item.entrypoints:
-                        edges.append(TriggerEdge(self, entrypoint))
+                        trigger_edges.append(TriggerEdge(self, entrypoint))
                 else:
                     raise TypeError(
                         f"Cannot connect trigger to {type(item).__name__}. " f"Expected BaseNode or Graph in set."
                     )
-            return Graph.from_trigger_edges(edges)
+
+            result_graph = Graph.from_trigger_edges(trigger_edges)
+
+            for graph_item in graph_items:
+                result_graph._extend_edges(graph_item.edges)
+                result_graph._terminals.update(graph_item._terminals)
+                for existing_trigger_edge in graph_item._trigger_edges:
+                    if existing_trigger_edge not in result_graph._trigger_edges:
+                        result_graph._trigger_edges.append(existing_trigger_edge)
+
+            return result_graph
 
         elif isinstance(other, Graph):
             # Trigger >> Graph

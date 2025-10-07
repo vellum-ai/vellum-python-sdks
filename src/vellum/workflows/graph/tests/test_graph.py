@@ -706,6 +706,44 @@ def test_graph__manual_trigger_to_graph():
     assert NodeB in nodes
 
 
+def test_graph__manual_trigger_to_set_of_graphs_preserves_edges():
+    # GIVEN two graphs of nodes
+    class NodeA(BaseNode):
+        pass
+
+    class NodeB(BaseNode):
+        pass
+
+    class NodeC(BaseNode):
+        pass
+
+    class NodeD(BaseNode):
+        pass
+
+    graph_one = NodeA >> NodeB
+    graph_two = NodeC >> NodeD
+
+    # WHEN we create a graph with ManualTrigger() >> {Graph1, Graph2}
+    combined_graph = ManualTrigger() >> {graph_one, graph_two}
+
+    # THEN the combined graph has trigger edges to both entrypoints
+    trigger_edges = list(combined_graph.trigger_edges)
+    assert len(trigger_edges) == 2
+    assert {edge.to_node for edge in trigger_edges} == {NodeA, NodeC}
+
+    # AND the combined graph preserves all downstream edges
+    edges = list(combined_graph.edges)
+    assert len(edges) == 2
+    assert {(edge.from_port.node_class, edge.to_node) for edge in edges} == {
+        (NodeA, NodeB),
+        (NodeC, NodeD),
+    }
+
+    # AND the combined graph still exposes all nodes
+    nodes = list(combined_graph.nodes)
+    assert {NodeA, NodeB, NodeC, NodeD}.issubset(nodes)
+
+
 def test_graph__node_to_trigger_raises():
     # GIVEN a node and trigger
     class MyNode(BaseNode):
