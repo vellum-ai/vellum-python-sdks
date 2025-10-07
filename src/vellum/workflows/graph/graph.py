@@ -3,11 +3,13 @@ from typing import TYPE_CHECKING, Iterator, List, Optional, Set, Type, Union
 from orderly_set import OrderedSet
 
 from vellum.workflows.edges.edge import Edge
+from vellum.workflows.edges.trigger_edge import TriggerEdge
 from vellum.workflows.types.generics import NodeType
 
 if TYPE_CHECKING:
     from vellum.workflows.nodes.bases.base import BaseNode
     from vellum.workflows.ports.port import Port
+    from vellum.workflows.triggers.base import BaseTrigger
 
 
 class NoPortsNode:
@@ -46,16 +48,19 @@ class Graph:
     _entrypoints: Set[Union["Port", "NoPortsNode"]]
     _edges: List[Edge]
     _terminals: Set[Union["Port", "NoPortsNode"]]
+    _trigger_edges: List[TriggerEdge]
 
     def __init__(
         self,
         entrypoints: Set[Union["Port", "NoPortsNode"]],
         edges: List[Edge],
         terminals: Set[Union["Port", "NoPortsNode"]],
+        trigger_edges: Optional[List[TriggerEdge]] = None,
     ):
         self._edges = edges
         self._entrypoints = entrypoints
         self._terminals = terminals
+        self._trigger_edges = trigger_edges or []
 
     @staticmethod
     def from_port(port: "Port") -> "Graph":
@@ -97,11 +102,78 @@ class Graph:
         return Graph(entrypoints={edge.from_port}, edges=[edge], terminals={port for port in edge.to_node.Ports})
 
     @staticmethod
+    def from_trigger_edge(edge: TriggerEdge) -> "Graph":
+        """
+        Create a graph from a single TriggerEdge (Trigger >> Node).
+
+        Args:
+            edge: TriggerEdge connecting a trigger to a node
+
+        Returns:
+            Graph with the trigger edge and the target node's ports as terminals
+        """
+        ports = {port for port in edge.to_node.Ports}
+        if not ports:
+            no_ports_node = NoPortsNode(edge.to_node)
+            return Graph(
+                entrypoints={no_ports_node},
+                edges=[],
+                terminals={no_ports_node},
+                trigger_edges=[edge],
+            )
+        return Graph(
+            entrypoints=set(ports),
+            edges=[],
+            terminals=set(ports),
+            trigger_edges=[edge],
+        )
+
+    @staticmethod
+    def from_trigger_edges(edges: List[TriggerEdge]) -> "Graph":
+        """
+        Create a graph from multiple TriggerEdges (e.g., Trigger >> {NodeA, NodeB}).
+
+        Args:
+            edges: List of TriggerEdges
+
+        Returns:
+            Graph with all trigger edges and target nodes' ports as entrypoints/terminals
+        """
+        entrypoints: Set[Union["Port", NoPortsNode]] = set()
+        terminals: Set[Union["Port", NoPortsNode]] = set()
+
+        for edge in edges:
+            ports = {port for port in edge.to_node.Ports}
+            if not ports:
+                no_ports_node = NoPortsNode(edge.to_node)
+                entrypoints.add(no_ports_node)
+                terminals.add(no_ports_node)
+            else:
+                entrypoints.update(ports)
+                terminals.update(ports)
+
+        return Graph(
+            entrypoints=entrypoints,
+            edges=[],
+            terminals=terminals,
+            trigger_edges=edges,
+        )
+
+    @staticmethod
     def empty() -> "Graph":
         """Create an empty graph with no entrypoints, edges, or terminals."""
         return Graph(entrypoints=set(), edges=[], terminals=set())
 
     def __rshift__(self, other: GraphTarget) -> "Graph":
+        # Check for trigger target (class-level only)
+        from vellum.workflows.triggers.base import BaseTrigger
+
+        if isinstance(other, type) and issubclass(other, BaseTrigger):
+            raise TypeError(
+                f"Cannot create edge targeting trigger {other.__name__}. "
+                f"Triggers must be at the start of a graph path, not as targets."
+            )
+
         if not self._edges and not self._entrypoints:
             raise ValueError("Graph instance can only create new edges from nodes within existing edges")
 
@@ -180,8 +252,29 @@ class Graph:
         return iter(self._edges)
 
     @property
+    def trigger_edges(self) -> Iterator[TriggerEdge]:
+        """Get all trigger edges in this graph."""
+        return iter(self._trigger_edges)
+
+    @property
+    def triggers(self) -> Iterator[Type["BaseTrigger"]]:
+        """Get all unique trigger classes in this graph."""
+        seen_triggers = set()
+        for trigger_edge in self._trigger_edges:
+            if trigger_edge.trigger_class not in seen_triggers:
+                seen_triggers.add(trigger_edge.trigger_class)
+                yield trigger_edge.trigger_class
+
+    @property
     def nodes(self) -> Iterator[Type["BaseNode"]]:
         nodes = set()
+
+        # Include nodes from trigger edges
+        for trigger_edge in self._trigger_edges:
+            if trigger_edge.to_node not in nodes:
+                nodes.add(trigger_edge.to_node)
+                yield trigger_edge.to_node
+
         if not self._edges:
             for node in self.entrypoints:
                 if node not in nodes:
