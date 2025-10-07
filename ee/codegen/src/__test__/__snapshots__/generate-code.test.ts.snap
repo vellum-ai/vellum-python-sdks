@@ -37,3 +37,35 @@ class UseApiWithSecret(FinalOutputNode[BaseState, Any]):
         value = ApiWithSecret.Outputs.json
 "
 `;
+
+exports[`generateCode > should generate code for %1 code-execution-node-with-await-all.ts > nodes/code_execution_with_await_all/__init__.py 1`] = `
+"from vellum.workflows.nodes.displayable import CodeExecutionNode
+from vellum.workflows.state import BaseState
+
+
+class CodeExecutionWithAwaitAll(CodeExecutionNode[BaseState, str]):
+    filepath = "./script.py"
+    code_inputs = {}
+    runtime = "PYTHON_3_11_6"
+    packages = None
+"
+`;
+
+exports[`generateCode > should generate code for %1 code-execution-node-with-await-all.ts > nodes/code_execution_with_await_all/script.py 1`] = `
+"def main() -> str:
+    return 'Hello from AWAIT_ALL'
+"
+`;
+
+exports[`generateCode > should generate code for %1 code-execution-node-with-await-all.ts > nodes/use_code_execution_with_await_all.py 1`] = `
+"from vellum.workflows.nodes.displayable import FinalOutputNode
+from vellum.workflows.state import BaseState
+
+from .code_execution_with_await_all import CodeExecutionWithAwaitAll
+
+
+class UseCodeExecutionWithAwaitAll(FinalOutputNode[BaseState, str]):
+    class Outputs(FinalOutputNode.Outputs):
+        value = CodeExecutionWithAwaitAll.Outputs.result
+"
+`;
