@@ -527,4 +527,54 @@ describe("CodeExecutionNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+
+  describe("with node trigger AWAIT_ALL", () => {
+    it("should generate Trigger class with AWAIT_ALL", async () => {
+      const nodeData = codeExecutionNodeFactory()
+        .withTrigger({
+          id: uuid(),
+          mergeBehavior: "AWAIT_ALL",
+        })
+        .build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as CodeExecutionContext;
+
+      node = new CodeExecutionNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("with node trigger AWAIT_ANY", () => {
+    it("should not generate Trigger class with AWAIT_ANY", async () => {
+      const nodeData = codeExecutionNodeFactory()
+        .withTrigger({
+          id: uuid(),
+          mergeBehavior: "AWAIT_ANY",
+        })
+        .build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as CodeExecutionContext;
+
+      node = new CodeExecutionNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });
