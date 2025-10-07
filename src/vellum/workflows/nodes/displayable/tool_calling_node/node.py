@@ -47,7 +47,7 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
     functions: ClassVar[List[Tool]] = []
     prompt_inputs: ClassVar[Optional[EntityInputsInterface]] = None
     parameters: PromptParameters = DEFAULT_PROMPT_PARAMETERS
-    max_prompt_iterations: ClassVar[Optional[int]] = 5
+    max_prompt_iterations: ClassVar[Optional[int]] = 25
     settings: ClassVar[Optional[Union[PromptSettings, Dict[str, Any]]]] = None
 
     class Outputs(BaseOutputs):
