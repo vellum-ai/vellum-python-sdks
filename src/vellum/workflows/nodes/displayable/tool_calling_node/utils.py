@@ -200,6 +200,14 @@ class FunctionNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
 
         try:
             result = self.function_definition(**arguments)
+        except NodeException as e:
+            function_name = self.function_definition.__name__
+            # Preserve original error code and raw_data while adding context
+            raise NodeException(
+                message=f"Error executing function '{function_name}': {e.message}",
+                code=e.code,
+                raw_data=e.raw_data,
+            ) from e
         except Exception as e:
             function_name = self.function_definition.__name__
             raise NodeException(
@@ -254,6 +262,13 @@ class MCPNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
         try:
             mcp_service = MCPService()
             result = mcp_service.execute_tool(tool_def=self.mcp_tool, arguments=arguments)
+        except NodeException as e:
+            # Preserve original error code and raw_data while adding context
+            raise NodeException(
+                message=f"Error executing MCP tool '{self.mcp_tool.name}': {e.message}",
+                code=e.code,
+                raw_data=e.raw_data,
+            ) from e
         except Exception as e:
             raise NodeException(
                 message=f"Error executing MCP tool '{self.mcp_tool.name}': {str(e)}",
