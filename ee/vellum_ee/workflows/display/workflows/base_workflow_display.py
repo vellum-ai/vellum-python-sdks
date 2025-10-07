@@ -408,21 +408,95 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             except Exception as e:
                 self.display_context.add_error(e)
 
-        return {
-            "workflow_raw_data": {
-                "nodes": cast(JsonArray, nodes_dict_list),
-                "edges": edges,
-                "display_data": self.display_context.workflow_display.display_data.dict(),
-                "definition": {
-                    "name": self._workflow.__name__,
-                    "module": cast(JsonArray, self._workflow.__module__.split(".")),
-                },
-                "output_values": output_values,
+        # Serialize workflow-level trigger if present
+        trigger_data: Optional[JsonObject] = self._serialize_workflow_trigger()
+
+        workflow_raw_data: JsonObject = {
+            "nodes": cast(JsonArray, nodes_dict_list),
+            "edges": edges,
+            "display_data": self.display_context.workflow_display.display_data.dict(),
+            "definition": {
+                "name": self._workflow.__name__,
+                "module": cast(JsonArray, self._workflow.__module__.split(".")),
             },
+            "output_values": output_values,
+        }
+
+        if trigger_data is not None:
+            workflow_raw_data["trigger"] = trigger_data
+
+        return {
+            "workflow_raw_data": workflow_raw_data,
             "input_variables": input_variables,
             "state_variables": state_variables,
             "output_variables": output_variables,
         }
+
+    def _serialize_workflow_trigger(self) -> Optional[JsonObject]:
+        """
+        Serialize workflow-level trigger information.
+
+        Returns:
+            JsonObject with trigger data if a trigger is present, None otherwise
+        """
+        # Get all trigger edges from the workflow's subgraphs
+        trigger_edges = []
+        for subgraph in self._workflow.get_subgraphs():
+            trigger_edges.extend(list(subgraph.trigger_edges))
+
+        if not trigger_edges:
+            # No workflow-level trigger defined
+            return None
+
+        # For now, we only support a single trigger type per workflow
+        # Get the first trigger (all should be the same type)
+        trigger_class = trigger_edges[0].trigger_class
+
+        # Verify all trigger edges use the same trigger class
+        for trigger_edge in trigger_edges:
+            if trigger_edge.trigger_class != trigger_class:
+                self.display_context.add_error(
+                    ValueError(
+                        "Multiple trigger types found in workflow. "
+                        "Only one trigger type is currently supported per workflow."
+                    )
+                )
+                return None
+
+        # Determine trigger type based on class name
+        trigger_type = self._get_trigger_type(trigger_class)
+
+        return {
+            "type": trigger_type,
+            "definition": {
+                "name": trigger_class.__name__,
+                "module": cast(JsonArray, trigger_class.__module__.split(".")),
+            },
+        }
+
+    def _get_trigger_type(self, trigger_class: Type) -> str:
+        """
+        Determine the trigger type string from the trigger class.
+
+        Args:
+            trigger_class: The trigger class
+
+        Returns:
+            String representing the trigger type (e.g., "MANUAL", "INTEGRATION", "SCHEDULED")
+        """
+        trigger_name = trigger_class.__name__
+
+        # Map trigger class names to type strings
+        # This will be expanded as more trigger types are added
+        if "Manual" in trigger_name:
+            return "MANUAL"
+        elif "Integration" in trigger_name:
+            return "INTEGRATION"
+        elif "Scheduled" in trigger_name:
+            return "SCHEDULED"
+        else:
+            # Default/fallback
+            return "MANUAL"
 
     def _serialize_edge_display_data(self, edge_display: EdgeDisplay) -> Optional[JsonObject]:
         """Serialize edge display data, returning None if no display data is present."""
