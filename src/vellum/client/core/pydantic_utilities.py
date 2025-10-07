@@ -158,9 +158,9 @@ class UniversalBaseModel(pydantic.BaseModel):
 
             dict_dump = super().dict(**kwargs_with_defaults_exclude_unset_include_fields)
 
-        # return convert_and_respect_annotation_metadata(object_=dict_dump, annotation=self.__class__, direction="write")
-        # TODO: also need to update postprocessing.ts in vellum-client-generator look for prior art in this file there
-        # SDK preview should show no diffs
+        # Skip expensive annotation metadata conversion for types that don't require it.
+        # This optimization dramatically improves serialization performance for large nested
+        # structures by avoiding repeated typing.get_origin checks on every element.
         if self.__class__.__name__ in annotated_types:
             return convert_and_respect_annotation_metadata(
                 object_=dict_dump, annotation=self.__class__, direction="write"
