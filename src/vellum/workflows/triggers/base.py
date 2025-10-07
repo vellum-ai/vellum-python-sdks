@@ -93,9 +93,9 @@ class BaseTrigger(ABC, metaclass=BaseTriggerMeta):
             Graph: A graph object with trigger edges connecting this trigger to the target(s)
 
         Examples:
-            ManualTrigger() >> MyNode
-            ManualTrigger() >> {NodeA, NodeB}
-            ManualTrigger() >> (NodeA >> NodeB)
+            ManualTrigger >> MyNode
+            ManualTrigger >> {NodeA, NodeB}
+            ManualTrigger >> (NodeA >> NodeB)
         """
         from vellum.workflows.edges.trigger_edge import TriggerEdge
         from vellum.workflows.graph.graph import Graph

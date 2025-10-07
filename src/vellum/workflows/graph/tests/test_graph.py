@@ -723,8 +723,8 @@ def test_graph__manual_trigger_to_set_of_graphs_preserves_edges():
     graph_one = NodeA >> NodeB
     graph_two = NodeC >> NodeD
 
-    # WHEN we create a graph with ManualTrigger() >> {Graph1, Graph2}
-    combined_graph = ManualTrigger() >> {graph_one, graph_two}
+    # WHEN we create a graph with ManualTrigger >> {Graph1, Graph2}
+    combined_graph = ManualTrigger >> {graph_one, graph_two}
 
     # THEN the combined graph has trigger edges to both entrypoints
     trigger_edges = list(combined_graph.trigger_edges)
@@ -757,7 +757,7 @@ def test_graph__node_to_trigger_raises():
     # WHEN we try to create Node >> Trigger (instance-level)
     # THEN it also raises TypeError
     with pytest.raises(TypeError, match="Cannot create edge targeting trigger"):
-        MyNode >> ManualTrigger()
+        MyNode >> ManualTrigger
 
 
 def test_graph__trigger_then_graph_then_node():

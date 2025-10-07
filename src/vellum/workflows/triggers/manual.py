@@ -18,7 +18,7 @@ class ManualTrigger(BaseTrigger):
     Examples:
         # Explicit ManualTrigger (equivalent to implicit)
         class MyWorkflow(BaseWorkflow):
-            graph = ManualTrigger() >> MyNode
+            graph = ManualTrigger >> MyNode
 
         # Implicit ManualTrigger (normalized to above)
         class MyWorkflow(BaseWorkflow):
@@ -48,4 +48,4 @@ class ManualTrigger(BaseTrigger):
         return {}
 
     def __repr__(self) -> str:
-        return "ManualTrigger()"
+        return "ManualTrigger"

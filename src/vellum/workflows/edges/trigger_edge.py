@@ -14,8 +14,8 @@ class TriggerEdge:
     particular trigger fires.
 
     Examples:
-        ManualTrigger() >> MyNode  # Creates TriggerEdge(ManualTrigger(), MyNode)
-        SlackTrigger() >> ProcessNode  # Creates TriggerEdge(SlackTrigger(), ProcessNode)
+        ManualTrigger >> MyNode  # Creates TriggerEdge(ManualTrigger, MyNode)
+        SlackTrigger >> ProcessNode  # Creates TriggerEdge(SlackTrigger, ProcessNode)
 
     Attributes:
         trigger: The trigger that initiates execution
@@ -62,6 +62,6 @@ class TriggerEdge:
         String representation showing the trigger-to-node connection.
 
         Returns:
-            String in format "TriggerName() >> NodeName"
+            String in format "TriggerName >> NodeName"
         """
         return f"{self.trigger!r} >> {self.to_node.__name__}"
