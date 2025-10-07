@@ -1,4 +1,5 @@
 from enum import Enum
+from multiprocessing.synchronize import Event as MultiprocessingEvent
 from threading import Event as ThreadingEvent
 from typing import (  # type: ignore[attr-defined]
     Any,
@@ -16,7 +17,7 @@ JsonArray = List["Json"]
 JsonObject = Dict[str, "Json"]
 Json = Union[None, bool, int, float, str, JsonArray, JsonObject]
 
-CancelSignal = ThreadingEvent
+CancelSignal = Union[ThreadingEvent, MultiprocessingEvent]
 
 # Unions and Generics inherit from `_GenericAlias` instead of `type`
 # In future versions of python, we'll see `_UnionGenericAlias`
