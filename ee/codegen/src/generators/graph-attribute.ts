@@ -50,6 +50,7 @@ export class GraphAttribute extends AstNode {
   private readonly unusedEdges: Set<WorkflowEdge>;
   private readonly usedEdges = new Set<WorkflowEdge>();
   private readonly usedNodes = new Set<string>();
+  private readonly mutableAst: GraphMutableAst;
 
   public constructor({
     workflowContext,
@@ -59,6 +60,7 @@ export class GraphAttribute extends AstNode {
     this.workflowContext = workflowContext;
     this.unusedEdges = unusedEdges; // This will only have value after used graph is generated
 
+    this.mutableAst = this.generateGraphMutableAst();
     this.astNode = this.generateGraphAttribute();
   }
 
@@ -158,6 +160,23 @@ export class GraphAttribute extends AstNode {
 
   public getUsedNodes(): Set<string> {
     return this.usedNodes;
+  }
+
+  /**
+   * Returns an array of Python AST nodes. If the GraphAttribute represents a set,
+   * returns the individual elements. Otherwise, returns an array with a single element.
+   */
+  public getAstNodesForUnusedGraphs(): python.AstNode[] {
+    if (this.mutableAst.type === "set") {
+      // Convert each set member to a Python AST node
+      return this.mutableAst.values.map((value) => {
+        const astNode = this.getGraphAttributeAstNode(value);
+        this.inheritReferences(astNode);
+        return astNode;
+      });
+    }
+    // For non-set types, return the whole thing as a single node
+    return [this.astNode];
   }
 
   /**
@@ -1231,8 +1250,7 @@ export class GraphAttribute extends AstNode {
   }
 
   private generateGraphAttribute(): AstNode {
-    const graphMutableAst = this.generateGraphMutableAst();
-    const astNode = this.getGraphAttributeAstNode(graphMutableAst);
+    const astNode = this.getGraphAttributeAstNode(this.mutableAst);
     this.inheritReferences(astNode);
     return astNode;
   }
