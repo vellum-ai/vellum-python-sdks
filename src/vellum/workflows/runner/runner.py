@@ -695,19 +695,17 @@ class WorkflowRunner(Generic[StateType]):
 
         return None
 
-    def _emit_node_rejection_events(
+    def _emit_node_cancellation_events(
         self,
         error_message: str,
         parent_context: Optional[ParentContext],
-        pop_nodes: bool = False,
     ) -> None:
         """
-        Emit node rejection events for all active nodes.
+        Emit node cancellation events for all active nodes.
 
         Args:
-            error_message: The error message to include in the rejection events
-            parent_context: The parent context for the rejection events
-            pop_nodes: Whether to remove nodes from the active nodes dictionary after emitting events
+            error_message: The error message to include in the cancellation events
+            parent_context: The parent context for the cancellation events
         """
         for span_id, active_node in list(self._active_nodes_by_execution_id.items()):
             rejection_event = NodeExecutionRejectedEvent(
@@ -723,9 +721,7 @@ class WorkflowRunner(Generic[StateType]):
                 parent=parent_context,
             )
             self._workflow_event_outer_queue.put(rejection_event)
-
-            if pop_nodes:
-                self._active_nodes_by_execution_id.pop(span_id)
+            self._active_nodes_by_execution_id.pop(span_id)
 
     def _initiate_workflow_event(self) -> WorkflowExecutionInitiatedEvent:
         links: Optional[List[SpanLink]] = None
@@ -880,10 +876,9 @@ class WorkflowRunner(Generic[StateType]):
 
             if rejection_event:
                 failed_node_name = rejection_event.body.node_definition.__name__
-                self._emit_node_rejection_events(
+                self._emit_node_cancellation_events(
                     error_message=f"Node execution cancelled due to {failed_node_name} failure",
                     parent_context=self._execution_context.parent_context,
-                    pop_nodes=True,
                 )
                 break
 
@@ -960,10 +955,9 @@ class WorkflowRunner(Generic[StateType]):
                     parent=self._execution_context.parent_context,
                 )
 
-                self._emit_node_rejection_events(
+                self._emit_node_cancellation_events(
                     error_message="Workflow run cancelled",
                     parent_context=parent_context,
-                    pop_nodes=False,
                 )
 
                 self._workflow_event_outer_queue.put(
