@@ -706,9 +706,20 @@ export class Workflow {
     this.addRemainingUnusedNodes(remainingUnusedNodes, unusedGraphs);
 
     if (unusedGraphs.length > 0) {
+      // Flatten any GraphAttributes that contain sets into their individual elements
+      const flattenedUnusedGraphs: python.AstNode[] = [];
+      for (const graph of unusedGraphs) {
+        if (graph instanceof GraphAttribute) {
+          const astNodes = graph.getAstNodesForUnusedGraphs();
+          flattenedUnusedGraphs.push(...astNodes);
+        } else {
+          flattenedUnusedGraphs.push(graph);
+        }
+      }
+
       const unusedGraphsField = python.field({
         name: "unused_graphs",
-        initializer: python.TypeInstantiation.set(unusedGraphs),
+        initializer: python.TypeInstantiation.set(flattenedUnusedGraphs),
       });
 
       workflowClass.add(unusedGraphsField);

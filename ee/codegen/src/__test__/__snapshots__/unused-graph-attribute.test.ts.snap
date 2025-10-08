@@ -29,6 +29,24 @@ class TestWorkflow(BaseWorkflow):
 "
 `;
 
+exports[`Workflow > unused_graphs > should handle conditional node with prompt nodes in different ports in unused graphs 1`] = `
+"from vellum.workflows import BaseWorkflow
+
+from .nodes.conditional_node import ConditionalNode
+from .nodes.my_custom_node import ConnectedNode
+from .nodes.prompt_node import PromptNode
+from .nodes.prompt_node_1 import PromptNode1
+
+
+class TestWorkflow(BaseWorkflow):
+    graph = ConnectedNode
+    unused_graphs = {
+        ConditionalNode.Ports.if_1 >> PromptNode,
+        ConditionalNode.Ports.else_1 >> PromptNode1,
+    }
+"
+`;
+
 exports[`Workflow > unused_graphs > should identify multiple disconnected graphs 1`] = `
 "from vellum.workflows import BaseWorkflow
 
