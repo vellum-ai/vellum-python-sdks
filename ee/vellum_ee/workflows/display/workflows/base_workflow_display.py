@@ -6,7 +6,7 @@ import inspect
 import json
 import logging
 import os
-from uuid import UUID
+from uuid import UUID, uuid4
 from typing import Any, Dict, ForwardRef, Generic, List, Optional, Tuple, Type, TypeVar, Union, cast, get_args
 
 from vellum.client import Vellum as VellumClient
@@ -410,7 +410,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 self.display_context.add_error(e)
 
         # Serialize workflow-level trigger if present
-        trigger_data: Optional[JsonObject] = self._serialize_workflow_trigger()
+        triggers: Optional[JsonArray] = self._serialize_workflow_trigger()
 
         workflow_raw_data: JsonObject = {
             "nodes": cast(JsonArray, nodes_dict_list),
@@ -423,22 +423,25 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             "output_values": output_values,
         }
 
-        if trigger_data is not None:
-            workflow_raw_data["trigger"] = trigger_data
-
-        return {
+        result: JsonObject = {
             "workflow_raw_data": workflow_raw_data,
             "input_variables": input_variables,
             "state_variables": state_variables,
             "output_variables": output_variables,
         }
 
-    def _serialize_workflow_trigger(self) -> Optional[JsonObject]:
+        if triggers is not None:
+            result["triggers"] = triggers
+
+        return result
+
+    def _serialize_workflow_trigger(self) -> Optional[JsonArray]:
         """
         Serialize workflow-level trigger information.
 
         Returns:
-            JsonObject with trigger data if a trigger is present, None otherwise
+            JsonArray with trigger data if a trigger is present, None otherwise.
+            Each trigger in the array has: id (UUID), type (str), attributes (list)
         """
         # Get all trigger edges from the workflow's subgraphs
         trigger_edges = []
@@ -469,13 +472,17 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 f"Please add it to the trigger type mapping in get_trigger_type_mapping()."
             )
 
-        return {
-            "type": trigger_type.value,
-            "definition": {
-                "name": trigger_class.__name__,
-                "module": cast(JsonArray, trigger_class.__module__.split(".")),
-            },
-        }
+        # Return as a list with a single trigger object matching Django schema
+        return cast(
+            JsonArray,
+            [
+                {
+                    "id": str(uuid4()),
+                    "type": trigger_type.value,
+                    "attributes": [],
+                }
+            ],
+        )
 
     def _serialize_edge_display_data(self, edge_display: EdgeDisplay) -> Optional[JsonObject]:
         """Serialize edge display data, returning None if no display data is present."""

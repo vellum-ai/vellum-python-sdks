@@ -3,8 +3,6 @@
 import pytest
 from typing import cast
 
-from deepdiff import DeepDiff
-
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
@@ -42,27 +40,24 @@ def serialize(workflow_class) -> JsonObject:
 
 
 def test_manual_trigger_serialization():
-    """Workflow with ManualTrigger serializes with trigger field."""
+    """Workflow with ManualTrigger serializes with triggers field."""
     result = serialize(create_workflow(ManualTrigger))
-    workflow_raw_data = cast(JsonObject, result["workflow_raw_data"])
-    trigger = cast(JsonObject, workflow_raw_data["trigger"])
+    triggers = cast(JsonArray, result["triggers"])
+
+    assert len(triggers) == 1
+    trigger = cast(JsonObject, triggers[0])
 
     assert trigger["type"] == "MANUAL"
-    assert not DeepDiff(
-        {
-            "type": "MANUAL",
-            "definition": {"name": "ManualTrigger", "module": ["vellum", "workflows", "triggers", "manual"]},
-        },
-        trigger,
-        ignore_order=True,
-    )
+    assert "id" in trigger
+    assert "attributes" in trigger
+    assert trigger["attributes"] == []
+    assert "definition" not in trigger
 
 
 def test_no_trigger_serialization():
-    """Workflow without trigger has no trigger field."""
+    """Workflow without trigger has no triggers field."""
     result = serialize(create_workflow())
-    workflow_raw_data = cast(JsonObject, result["workflow_raw_data"])
-    assert "trigger" not in workflow_raw_data
+    assert "triggers" not in result
 
 
 def test_manual_trigger_multiple_entrypoints():
@@ -84,10 +79,12 @@ def test_manual_trigger_multiple_entrypoints():
             output_b = NodeB.Outputs.output
 
     result = serialize(MultiWorkflow)
+    triggers = cast(JsonArray, result["triggers"])
     workflow_data = cast(JsonObject, result["workflow_raw_data"])
-    trigger = cast(JsonObject, workflow_data["trigger"])
     nodes = cast(JsonArray, workflow_data["nodes"])
 
+    assert len(triggers) == 1
+    trigger = cast(JsonObject, triggers[0])
     assert trigger["type"] == "MANUAL"
     assert len([n for n in nodes if cast(JsonObject, n)["type"] == "GENERIC"]) >= 2
 
@@ -98,8 +95,8 @@ def test_serialized_workflow_structure():
     workflow_raw_data = cast(JsonObject, result["workflow_raw_data"])
     definition = cast(JsonObject, workflow_raw_data["definition"])
 
-    assert result.keys() == {"workflow_raw_data", "input_variables", "state_variables", "output_variables"}
-    assert workflow_raw_data.keys() == {"nodes", "edges", "display_data", "definition", "output_values", "trigger"}
+    assert result.keys() == {"workflow_raw_data", "input_variables", "state_variables", "output_variables", "triggers"}
+    assert workflow_raw_data.keys() == {"nodes", "edges", "display_data", "definition", "output_values"}
     assert definition["name"] == "TestWorkflow"
 
 
