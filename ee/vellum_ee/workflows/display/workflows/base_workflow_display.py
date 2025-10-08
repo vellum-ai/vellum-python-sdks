@@ -37,7 +37,7 @@ from vellum_ee.workflows.display.base import (
     WorkflowInputsDisplay,
     WorkflowMetaDisplay,
     WorkflowOutputDisplay,
-    WorkflowTriggerType,
+    get_trigger_type_mapping,
 )
 from vellum_ee.workflows.display.editor.types import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
@@ -452,8 +452,25 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         # Get the trigger class from the first edge
         trigger_class = trigger_edges[0].trigger_class
 
+        # Validate that all trigger edges use the same trigger type
+        trigger_type_mapping = get_trigger_type_mapping()
+        for edge in trigger_edges:
+            if edge.trigger_class != trigger_class:
+                raise ValueError(
+                    f"Mixed trigger types not supported. Found {trigger_class.__name__} and "
+                    f"{edge.trigger_class.__name__} in the same workflow."
+                )
+
+        # Get the trigger type from the mapping
+        trigger_type = trigger_type_mapping.get(trigger_class)
+        if trigger_type is None:
+            raise ValueError(
+                f"Unknown trigger type: {trigger_class.__name__}. "
+                f"Please add it to the trigger type mapping in get_trigger_type_mapping()."
+            )
+
         return {
-            "type": WorkflowTriggerType.MANUAL.value,
+            "type": trigger_type.value,
             "definition": {
                 "name": trigger_class.__name__,
                 "module": cast(JsonArray, trigger_class.__module__.split(".")),

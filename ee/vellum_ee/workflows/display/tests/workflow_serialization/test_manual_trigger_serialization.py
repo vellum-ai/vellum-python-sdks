@@ -1,11 +1,14 @@
 """Tests for serialization of workflows with ManualTrigger."""
 
+import pytest
+
 from deepdiff import DeepDiff
 
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.state.base import BaseState
+from vellum.workflows.triggers.base import BaseTrigger
 from vellum.workflows.triggers.manual import ManualTrigger
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
@@ -140,3 +143,26 @@ def test_serialize_workflow_full_structure():
     definition = workflow_raw_data["definition"]
     assert definition["name"] == "ManualTriggerWorkflow"
     assert "workflow_serialization" in ".".join(definition["module"])
+
+
+def test_serialize_workflow_with_unknown_trigger_type():
+    """Test that serialization fails gracefully with unknown trigger types."""
+
+    class UnknownTrigger(BaseTrigger):
+        """A trigger not registered in the mapping."""
+
+        pass
+
+    class UnknownTriggerWorkflow(BaseWorkflow[Inputs, BaseState]):
+        graph = UnknownTrigger >> SimpleNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            output = SimpleNode.Outputs.output
+
+    # GIVEN a Workflow with an unknown trigger type
+    # WHEN we try to serialize it
+    workflow_display = get_workflow_display(workflow_class=UnknownTriggerWorkflow)
+
+    # THEN it should raise a ValueError with a helpful message
+    with pytest.raises(ValueError, match="Unknown trigger type: UnknownTrigger"):
+        workflow_display.serialize()
