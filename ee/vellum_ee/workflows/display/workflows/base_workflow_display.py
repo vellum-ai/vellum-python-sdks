@@ -37,6 +37,7 @@ from vellum_ee.workflows.display.base import (
     WorkflowInputsDisplay,
     WorkflowMetaDisplay,
     WorkflowOutputDisplay,
+    get_trigger_type_mapping,
 )
 from vellum_ee.workflows.display.editor.types import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
@@ -408,20 +409,72 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             except Exception as e:
                 self.display_context.add_error(e)
 
-        return {
-            "workflow_raw_data": {
-                "nodes": cast(JsonArray, nodes_dict_list),
-                "edges": edges,
-                "display_data": self.display_context.workflow_display.display_data.dict(),
-                "definition": {
-                    "name": self._workflow.__name__,
-                    "module": cast(JsonArray, self._workflow.__module__.split(".")),
-                },
-                "output_values": output_values,
+        # Serialize workflow-level trigger if present
+        trigger_data: Optional[JsonObject] = self._serialize_workflow_trigger()
+
+        workflow_raw_data: JsonObject = {
+            "nodes": cast(JsonArray, nodes_dict_list),
+            "edges": edges,
+            "display_data": self.display_context.workflow_display.display_data.dict(),
+            "definition": {
+                "name": self._workflow.__name__,
+                "module": cast(JsonArray, self._workflow.__module__.split(".")),
             },
+            "output_values": output_values,
+        }
+
+        if trigger_data is not None:
+            workflow_raw_data["trigger"] = trigger_data
+
+        return {
+            "workflow_raw_data": workflow_raw_data,
             "input_variables": input_variables,
             "state_variables": state_variables,
             "output_variables": output_variables,
+        }
+
+    def _serialize_workflow_trigger(self) -> Optional[JsonObject]:
+        """
+        Serialize workflow-level trigger information.
+
+        Returns:
+            JsonObject with trigger data if a trigger is present, None otherwise
+        """
+        # Get all trigger edges from the workflow's subgraphs
+        trigger_edges = []
+        for subgraph in self._workflow.get_subgraphs():
+            trigger_edges.extend(list(subgraph.trigger_edges))
+
+        if not trigger_edges:
+            # No workflow-level trigger defined
+            return None
+
+        # Get the trigger class from the first edge
+        trigger_class = trigger_edges[0].trigger_class
+
+        # Validate that all trigger edges use the same trigger type
+        trigger_type_mapping = get_trigger_type_mapping()
+        for edge in trigger_edges:
+            if edge.trigger_class != trigger_class:
+                raise ValueError(
+                    f"Mixed trigger types not supported. Found {trigger_class.__name__} and "
+                    f"{edge.trigger_class.__name__} in the same workflow."
+                )
+
+        # Get the trigger type from the mapping
+        trigger_type = trigger_type_mapping.get(trigger_class)
+        if trigger_type is None:
+            raise ValueError(
+                f"Unknown trigger type: {trigger_class.__name__}. "
+                f"Please add it to the trigger type mapping in get_trigger_type_mapping()."
+            )
+
+        return {
+            "type": trigger_type.value,
+            "definition": {
+                "name": trigger_class.__name__,
+                "module": cast(JsonArray, trigger_class.__module__.split(".")),
+            },
         }
 
     def _serialize_edge_display_data(self, edge_display: EdgeDisplay) -> Optional[JsonObject]:
