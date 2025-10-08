@@ -473,9 +473,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             )
 
         # Return as a list with a single trigger object matching Django schema
-        trigger_id = uuid4_from_hash(
-            f"{trigger_class.__module__} | {trigger_class.__qualname__}"
-        )
+        trigger_id = uuid4_from_hash(f"{trigger_class.__module__} | {trigger_class.__qualname__}")
 
         return cast(
             JsonArray,
