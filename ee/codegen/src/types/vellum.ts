@@ -786,12 +786,18 @@ export interface WorkflowOutputValue {
   value?: WorkflowValueDescriptor;
 }
 
+export interface WorkflowTrigger {
+  type: string;
+  definition: CodeResourceDefinition;
+}
+
 export interface WorkflowRawData {
   nodes: WorkflowNode[];
   edges: WorkflowEdge[];
   displayData?: WorkflowDisplayData;
   definition?: CodeResourceDefinition;
   outputValues?: WorkflowOutputValue[];
+  trigger?: WorkflowTrigger;
 }
 
 export interface RunnerConfig {
