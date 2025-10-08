@@ -1,3 +1,4 @@
+import pytest
 import json
 from uuid import uuid4
 from typing import Any, Iterator, List
@@ -14,6 +15,8 @@ from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
 from vellum.workflows import BaseWorkflow
+from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
@@ -372,3 +375,54 @@ def test_tool_calling_node_workflow_is_dynamic(vellum_adhoc_prompt_client):
     assert initiated_events[0].body.workflow_definition.is_dynamic is False  # Main workflow
     assert initiated_events[1].body.workflow_definition.is_dynamic is True  # Tool calling internal
     assert initiated_events[2].body.workflow_definition.is_dynamic is True  # Inline workflow
+
+
+def test_tool_node_preserves_node_exception():
+    """Test that tool nodes preserve NodeException error codes and raw_data."""
+
+    def failing_function() -> str:
+        raise NodeException(
+            message="Custom error",
+            code=WorkflowErrorCode.INVALID_INPUTS,
+            raw_data={"key": "value"},
+        )
+
+    tool_prompt_node = create_tool_prompt_node(
+        ml_model="test-model",
+        blocks=[],
+        functions=[failing_function],
+        prompt_inputs=None,
+        parameters=DEFAULT_PROMPT_PARAMETERS,
+    )
+
+    function_node_class = create_function_node(
+        function=failing_function,
+        tool_prompt_node=tool_prompt_node,
+    )
+
+    state = ToolCallingState(
+        meta=StateMeta(
+            node_outputs={
+                tool_prompt_node.Outputs.results: [
+                    FunctionCallVellumValue(
+                        value=FunctionCall(
+                            arguments={},
+                            id="call_123",
+                            name="failing_function",
+                            state="FULFILLED",
+                        ),
+                    )
+                ],
+            },
+        )
+    )
+
+    function_node = function_node_class(state=state)
+
+    with pytest.raises(NodeException) as exc_info:
+        list(function_node.run())
+
+    e = exc_info.value
+    assert e.code == WorkflowErrorCode.INVALID_INPUTS
+    assert e.raw_data == {"key": "value"}
+    assert "Custom error" in e.message
