@@ -77,11 +77,7 @@ def push_command(
 
     logger.info(f"Loading workflow from {workflow_config.module}")
     resolved_workspace = workspace or workflow_config.workspace or DEFAULT_WORKSPACE_CONFIG.name
-    workspace_config = (
-        next((w for w in config.workspaces if w.name == resolved_workspace), DEFAULT_WORKSPACE_CONFIG)
-        if workspace
-        else DEFAULT_WORKSPACE_CONFIG
-    )
+    workspace_config = next((w for w in config.workspaces if w.name == resolved_workspace), DEFAULT_WORKSPACE_CONFIG)
     api_key = os.getenv(workspace_config.api_key)
     if not api_key:
         raise ValueError(f"No API key value found in environment for workspace '{workspace_config.name}'.")
