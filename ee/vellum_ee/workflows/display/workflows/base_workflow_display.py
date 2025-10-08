@@ -480,8 +480,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             trigger_class.__name__,
         ]
         trigger_target_identifiers = sorted(
-            f"{edge.to_node.__module__}.{edge.to_node.__name__}"
-            for edge in trigger_edges
+            f"{edge.to_node.__module__}.{edge.to_node.__name__}" for edge in trigger_edges
         )
         trigger_identifier_parts.extend(trigger_target_identifiers)
 
