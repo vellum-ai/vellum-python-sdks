@@ -147,7 +147,10 @@ class WorkflowExecutionFulfilledBody(_BaseWorkflowExecutionBody, Generic[Outputs
 
     @field_serializer("final_state")
     def serialize_final_state(self, final_state: Optional[StateType], _info: Any) -> Optional[Dict[str, Any]]:
-        return default_serializer(final_state)
+        if final_state is None:
+            return None
+        state_dict = {k: v for k, v in final_state if k != "meta"}
+        return default_serializer(state_dict)
 
 
 class WorkflowExecutionFulfilledEvent(_BaseWorkflowEvent, Generic[OutputsType, StateType]):
