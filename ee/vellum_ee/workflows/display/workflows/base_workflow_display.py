@@ -6,7 +6,7 @@ import inspect
 import json
 import logging
 import os
-from uuid import UUID, uuid4
+from uuid import UUID
 from typing import Any, Dict, ForwardRef, Generic, List, Optional, Tuple, Type, TypeVar, Union, cast, get_args
 
 from vellum.client import Vellum as VellumClient
@@ -473,11 +473,25 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             )
 
         # Return as a list with a single trigger object matching Django schema
+        trigger_identifier_parts: List[str] = [
+            str(self.workflow_id),
+            "trigger",
+            trigger_class.__module__,
+            trigger_class.__name__,
+        ]
+        trigger_target_identifiers = sorted(
+            f"{edge.to_node.__module__}.{edge.to_node.__name__}"
+            for edge in trigger_edges
+        )
+        trigger_identifier_parts.extend(trigger_target_identifiers)
+
+        trigger_id = uuid4_from_hash("|".join(trigger_identifier_parts))
+
         return cast(
             JsonArray,
             [
                 {
-                    "id": str(uuid4()),
+                    "id": str(trigger_id),
                     "type": trigger_type.value,
                     "attributes": [],
                 }
