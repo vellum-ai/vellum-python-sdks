@@ -157,18 +157,24 @@ export class GraphAttribute extends AstNode {
       });
     }
 
-    const trigger = this.workflowContext.workflowRawData.trigger;
-    if (trigger && graphMutableAst.type !== "empty") {
-      const triggerReference: GraphTriggerReference = {
-        type: "trigger_reference",
-        triggerClassName: trigger.definition.name,
-        triggerModulePath: trigger.definition.module,
-      };
-      graphMutableAst = {
-        type: "right_shift",
-        lhs: triggerReference,
-        rhs: graphMutableAst,
-      };
+    const triggers = this.workflowContext.triggers;
+    if (triggers && triggers.length > 0 && graphMutableAst.type !== "empty") {
+      const trigger = triggers[0];
+      if (trigger) {
+        const triggerInfo = this.getTriggerClassInfo(trigger.type);
+        if (triggerInfo) {
+          const triggerReference: GraphTriggerReference = {
+            type: "trigger_reference",
+            triggerClassName: triggerInfo.className,
+            triggerModulePath: triggerInfo.modulePath,
+          };
+          graphMutableAst = {
+            type: "right_shift",
+            lhs: triggerReference,
+            rhs: graphMutableAst,
+          };
+        }
+      }
     }
 
     return graphMutableAst;
@@ -333,6 +339,20 @@ export class GraphAttribute extends AstNode {
     nodeId: string
   ): BaseNodeContext<WorkflowDataNode> | null {
     return this.workflowContext.findLocalNodeContext(nodeId) ?? null;
+  }
+
+  private getTriggerClassInfo(
+    triggerType: string
+  ): { className: string; modulePath: string[] } | null {
+    switch (triggerType) {
+      case "MANUAL":
+        return {
+          className: "ManualTrigger",
+          modulePath: ["vellum", "workflows", "triggers", "manual"],
+        };
+      default:
+        return null;
+    }
   }
 
   /**

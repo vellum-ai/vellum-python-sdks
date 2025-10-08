@@ -8,6 +8,7 @@ export function workflowContextFactory({
   workflowClassName,
   workflowRawData,
   strict = true,
+  triggers,
 }: Partial<WorkflowContext.Args> = {}): WorkflowContext {
   return new WorkflowContext({
     absolutePathToOutputDirectory:
@@ -20,5 +21,6 @@ export function workflowContextFactory({
       edges: [],
     },
     strict,
+    triggers,
   });
 }

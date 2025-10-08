@@ -2248,14 +2248,16 @@ export const WorkflowTriggerSerializer: ObjectSchema<
   WorkflowTriggerSerializer.Raw,
   WorkflowTrigger
 > = objectSchema({
+  id: stringSchema(),
   type: stringSchema(),
-  definition: CodeResourceDefinitionSerializer,
+  attributes: listSchema(NodeAttributeSerializer),
 });
 
 export declare namespace WorkflowTriggerSerializer {
   interface Raw {
+    id: string;
     type: string;
-    definition: CodeResourceDefinitionSerializer.Raw;
+    attributes: NodeAttributeSerializer.Raw[];
   }
 }
 
@@ -2271,7 +2273,6 @@ export const WorkflowRawDataSerializer: ObjectSchema<
     "output_values",
     listSchema(WorkflowOutputValueSerializer).optional()
   ),
-  trigger: WorkflowTriggerSerializer.optional(),
 });
 
 export declare namespace WorkflowRawDataSerializer {
@@ -2282,7 +2283,6 @@ export declare namespace WorkflowRawDataSerializer {
     display_data?: any;
     definition?: CodeResourceDefinitionSerializer.Raw | null;
     output_values?: WorkflowOutputValueSerializer.Raw[] | null;
-    trigger?: WorkflowTriggerSerializer.Raw | null;
   }
 }
 
@@ -2330,6 +2330,7 @@ export const WorkflowVersionExecConfigSerializer = objectSchema({
     }).optional()
   ),
   moduleData: propertySchema("module_data", ModuleDataSerializer.optional()),
+  triggers: listSchema(WorkflowTriggerSerializer).optional(),
 });
 
 export declare namespace WorkflowVersionExecConfigSerializer {
@@ -2343,6 +2344,7 @@ export declare namespace WorkflowVersionExecConfigSerializer {
       container_image_tag?: string | null;
     } | null;
     module_data?: ModuleDataSerializer.Raw | null;
+    triggers?: WorkflowTriggerSerializer.Raw[] | null;
   }
 }
 

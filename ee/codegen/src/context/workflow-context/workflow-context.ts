@@ -31,6 +31,7 @@ import {
   WorkflowDataNode,
   WorkflowEdge,
   WorkflowRawData,
+  WorkflowTrigger,
 } from "src/types/vellum";
 import { createPythonClassName } from "src/utils/casing";
 
@@ -66,6 +67,7 @@ export declare namespace WorkflowContext {
     classNames?: Set<string>;
     nestedWorkflowModuleName?: string;
     workflowClassDescription?: string;
+    triggers?: WorkflowTrigger[];
   };
 }
 
@@ -154,6 +156,8 @@ export class WorkflowContext {
     WorkspaceSecretRead
   > = {};
 
+  public readonly triggers?: WorkflowTrigger[];
+
   constructor({
     absolutePathToOutputDirectory,
     moduleName,
@@ -173,6 +177,7 @@ export class WorkflowContext {
     classNames,
     nestedWorkflowModuleName,
     pythonCodeMergeableNodeFiles,
+    triggers,
   }: WorkflowContext.Args) {
     this.absolutePathToOutputDirectory = absolutePathToOutputDirectory;
     this.moduleName = moduleName;
@@ -220,6 +225,7 @@ export class WorkflowContext {
 
     this.sdkModulePathNames = generateSdkModulePaths(workflowsSdkModulePath);
     this.workflowRawData = workflowRawData;
+    this.triggers = triggers;
 
     this.strict = strict;
     this.errors = [];

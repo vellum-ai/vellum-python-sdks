@@ -1070,14 +1070,14 @@ describe("Workflow", () => {
         workflowRawData: {
           nodes: [entrypointNode, firstNode, secondNode],
           edges,
-          trigger: {
-            type: "MANUAL",
-            definition: {
-              name: "ManualTrigger",
-              module: ["vellum", "workflows", "triggers", "manual"],
-            },
-          },
         },
+        triggers: [
+          {
+            id: "trigger-1",
+            type: "MANUAL",
+            attributes: [],
+          },
+        ],
       });
 
       await Promise.all([
