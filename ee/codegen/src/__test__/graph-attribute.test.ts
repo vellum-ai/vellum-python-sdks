@@ -1097,7 +1097,9 @@ describe("Workflow", () => {
 
       graphAttribute.write(writer);
 
-      expect(writer.toString()).toMatchInlineSnapshot(`"ManualTrigger >> FirstNode >> SecondNode"`);
+      expect(writer.toString()).toMatchInlineSnapshot(
+        `"ManualTrigger >> FirstNode >> SecondNode"`
+      );
     });
   });
 });
