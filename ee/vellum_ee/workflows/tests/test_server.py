@@ -540,6 +540,45 @@ class BrokenNode(BaseNode)  # Missing colon
     assert "invalid syntax" in error_message or "expected ':'" in error_message
 
 
+def test_load_from_module__name_error_in_node_file():
+    """
+    Tests that a NameError in a node file raises WorkflowInitializationException with user-facing message.
+    """
+    # GIVEN a workflow module with a node file containing a NameError (undefined class reference)
+    files = {
+        "__init__.py": "",
+        "workflow.py": """\
+from vellum.workflows import BaseWorkflow
+from .nodes.broken_node import BrokenNode
+
+class Workflow(BaseWorkflow):
+    graph = BrokenNode
+""",
+        "nodes/__init__.py": "",
+        "nodes/broken_node.py": """\
+from vellum.workflows.nodes import BaseNode
+
+class BrokenNode(BaseNode):
+    some_attribute = UndefinedClass()
+""",
+    }
+
+    namespace = str(uuid4())
+
+    # AND the virtual file loader is registered
+    sys.meta_path.append(VirtualFileFinder(files, namespace))
+
+    # WHEN we attempt to load the workflow
+    # THEN it should raise WorkflowInitializationException
+    with pytest.raises(WorkflowInitializationException) as exc_info:
+        BaseWorkflow.load_from_module(namespace)
+
+    # AND the error message should be user-friendly
+    error_message = str(exc_info.value)
+    assert "Failed to load workflow module:" in error_message
+    assert "UndefinedClass" in error_message or "not defined" in error_message
+
+
 def test_serialize_module__tool_calling_node_with_single_tool():
     """Test that serialize_module works with a tool calling node that has a single tool."""
 

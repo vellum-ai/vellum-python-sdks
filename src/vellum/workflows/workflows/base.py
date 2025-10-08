@@ -695,7 +695,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         except (SyntaxError, ImportError, ModuleNotFoundError, NameError) as e:
             raise WorkflowInitializationException(message=f"Failed to load workflow module: {e}") from e
         except Exception as e:
-            raise WorkflowInitializationException(message=f"Failed to load workflow module: {e}") from e
+            raise WorkflowInitializationException(message=f"Unexpected failure while loading module: {e}") from e
         workflows: List[Type[BaseWorkflow]] = []
         for name in dir(module):
             if name.startswith("__"):
