@@ -1,0 +1,226 @@
+{
+  "workflow_raw_data": {
+    "nodes": [
+      {
+        "id": "63884a7b-c01c-4cbc-b8d4-abe0a8796f6b",
+        "type": "ENTRYPOINT",
+        "inputs": [],
+        "data": {
+          "label": "Entrypoint Node",
+          "source_handle_id": "eba8fd73-57ab-4d7b-8f75-b54dbe5fc8ba"
+        },
+        "display_data": {
+          "position": {
+            "x": 0.0,
+            "y": -50.0
+          }
+        },
+        "base": null,
+        "definition": null
+      },
+      {
+        "id": "3669684e-500e-4034-be4a-7ee70824b272",
+        "label": "Simple Node",
+        "type": "GENERIC",
+        "display_data": {
+          "position": {
+            "x": 200.0,
+            "y": -50.0
+          }
+        },
+        "base": {
+          "name": "BaseNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "bases",
+            "base"
+          ]
+        },
+        "definition": {
+          "name": "SimpleNode",
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "simple_manual_trigger_workflow",
+            "code",
+            "nodes",
+            "simple_node"
+          ]
+        },
+        "trigger": {
+          "id": "7da60409-5790-43fa-80b2-ad88da2812df",
+          "merge_behavior": "AWAIT_ATTRIBUTES"
+        },
+        "ports": [
+          {
+            "id": "ab742d8d-e6d6-4ef0-832c-712d3844a62a",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ],
+        "adornments": null,
+        "attributes": [],
+        "outputs": [
+          {
+            "id": "96af83b6-30b3-4ce3-8a8a-2bd245df9a8b",
+            "name": "result",
+            "type": "STRING",
+            "value": {
+              "type": "WORKFLOW_INPUT",
+              "input_variable_id": "2dc164d7-9512-4b68-8003-9439ea326249"
+            }
+          }
+        ]
+      },
+      {
+        "id": "2c368766-015e-4d2f-8f57-01937038a4b2",
+        "type": "TERMINAL",
+        "data": {
+          "label": "Final Output",
+          "name": "final_output",
+          "target_handle_id": "af15d1e2-2ea2-485c-933a-142db6f9b2d4",
+          "output_id": "f04ec2cc-fd32-42b7-aac8-273bfaa3a283",
+          "output_type": "STRING",
+          "node_input_id": "287431be-000d-498d-9dd0-b8dddbce5a5a"
+        },
+        "inputs": [
+          {
+            "id": "287431be-000d-498d-9dd0-b8dddbce5a5a",
+            "key": "node_input",
+            "value": {
+              "rules": [
+                {
+                  "type": "NODE_OUTPUT",
+                  "data": {
+                    "node_id": "3669684e-500e-4034-be4a-7ee70824b272",
+                    "output_id": "96af83b6-30b3-4ce3-8a8a-2bd245df9a8b"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          }
+        ],
+        "display_data": {
+          "position": {
+            "x": 400.0,
+            "y": -50.0
+          }
+        },
+        "base": {
+          "name": "FinalOutputNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "final_output_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "FinalOutput",
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "simple_manual_trigger_workflow",
+            "code",
+            "nodes",
+            "final_output"
+          ]
+        },
+        "trigger": {
+          "id": "af15d1e2-2ea2-485c-933a-142db6f9b2d4",
+          "merge_behavior": "AWAIT_ANY"
+        },
+        "ports": [],
+        "outputs": [
+          {
+            "id": "f04ec2cc-fd32-42b7-aac8-273bfaa3a283",
+            "name": "value",
+            "type": "STRING",
+            "value": {
+              "type": "NODE_OUTPUT",
+              "node_id": "3669684e-500e-4034-be4a-7ee70824b272",
+              "node_output_id": "96af83b6-30b3-4ce3-8a8a-2bd245df9a8b"
+            }
+          }
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "id": "9eaed9b1-5803-4bc4-bdba-b614f4f465b5",
+        "source_node_id": "63884a7b-c01c-4cbc-b8d4-abe0a8796f6b",
+        "source_handle_id": "eba8fd73-57ab-4d7b-8f75-b54dbe5fc8ba",
+        "target_node_id": "3669684e-500e-4034-be4a-7ee70824b272",
+        "target_handle_id": "7da60409-5790-43fa-80b2-ad88da2812df",
+        "type": "DEFAULT"
+      },
+      {
+        "id": "55ad304f-eddc-40d7-ad19-1e6a2b5fc02a",
+        "source_node_id": "3669684e-500e-4034-be4a-7ee70824b272",
+        "source_handle_id": "ab742d8d-e6d6-4ef0-832c-712d3844a62a",
+        "target_node_id": "2c368766-015e-4d2f-8f57-01937038a4b2",
+        "target_handle_id": "af15d1e2-2ea2-485c-933a-142db6f9b2d4",
+        "type": "DEFAULT"
+      }
+    ],
+    "display_data": {
+      "viewport": {
+        "x": 0.0,
+        "y": 0.0,
+        "zoom": 1.0
+      }
+    },
+    "definition": {
+      "name": "Workflow",
+      "module": [
+        "codegen_integration",
+        "fixtures",
+        "simple_manual_trigger_workflow",
+        "code",
+        "workflow"
+      ]
+    },
+    "output_values": [
+      {
+        "output_variable_id": "16b9fa94-c99b-4290-a57c-2acb5283051f",
+        "value": {
+          "type": "NODE_OUTPUT",
+          "node_id": "2c368766-015e-4d2f-8f57-01937038a4b2",
+          "node_output_id": "f04ec2cc-fd32-42b7-aac8-273bfaa3a283"
+        }
+      }
+    ]
+  },
+  "input_variables": [
+    {
+      "id": "2dc164d7-9512-4b68-8003-9439ea326249",
+      "key": "message",
+      "type": "STRING",
+      "default": null,
+      "required": true,
+      "extensions": {
+        "color": null
+      }
+    }
+  ],
+  "state_variables": [],
+  "output_variables": [
+    {
+      "id": "16b9fa94-c99b-4290-a57c-2acb5283051f",
+      "key": "final_output",
+      "type": "STRING"
+    }
+  ],
+  "triggers": [
+    {
+      "id": "102b7243-666c-479c-bb16-9a43cb65fbad",
+      "type": "MANUAL",
+      "attributes": []
+    }
+  ]
+}

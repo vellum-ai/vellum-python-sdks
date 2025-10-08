@@ -43,6 +43,11 @@ export const VELLUM_WORKFLOWS_DISPLAY_BASE_PATH = [
   "display",
   "base",
 ] as const;
+export const VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH = [
+  "vellum",
+  "workflows",
+  "triggers",
+] as const;
 export const VELLUM_WORKFLOW_EDITOR_TYPES_PATH = [
   "vellum_ee",
   "workflows",

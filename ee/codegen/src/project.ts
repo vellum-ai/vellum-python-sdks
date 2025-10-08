@@ -167,6 +167,7 @@ ${errors.slice(0, 3).map((err) => {
         workflowRawData: this.workflowVersionExecConfig.workflowRawData,
         strict: rest.strict ?? false,
         pythonCodeMergeableNodeFiles: new Set<string>(),
+        triggers: this.workflowVersionExecConfig.triggers,
       });
       this.sandboxInputs = rest.sandboxInputs;
     }

@@ -786,6 +786,12 @@ export interface WorkflowOutputValue {
   value?: WorkflowValueDescriptor;
 }
 
+export interface WorkflowTrigger {
+  id: string;
+  type: string;
+  attributes: NodeAttribute[];
+}
+
 export interface WorkflowRawData {
   nodes: WorkflowNode[];
   edges: WorkflowEdge[];
@@ -810,6 +816,7 @@ export interface WorkflowVersionExecConfig {
   outputVariables: VellumVariable[];
   runnerConfig?: RunnerConfig;
   moduleData?: ModuleData;
+  triggers?: WorkflowTrigger[];
 }
 
 type WorkflowSandboxInput =
