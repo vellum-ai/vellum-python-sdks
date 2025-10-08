@@ -1,4 +1,5 @@
 from abc import ABC
+from uuid import UUID
 from typing import TYPE_CHECKING, Any, Dict, Generic, Optional, Tuple, Type
 
 from vellum.workflows.inputs.base import BaseInputs
@@ -78,6 +79,30 @@ class BaseAdornmentNode(
 
     __wrapped_node__: Optional[Type["BaseNode"]] = None
     subworkflow: Type["BaseWorkflow"]
+
+    class Trigger(BaseNode.Trigger):
+        """
+        Trigger class for adornment nodes that delegates to the wrapped node's Trigger
+        for proper merge behavior handling.
+        """
+
+        @classmethod
+        def _queue_node_execution(
+            cls, state: StateType, dependencies: set[Type[BaseNode]], invoked_by: Optional[UUID] = None
+        ) -> UUID:
+            """
+            Delegates to the wrapped node's Trigger._queue_node_execution method to ensure
+            proper merge behavior (like AWAIT_ALL) is respected for dependency tracking.
+            """
+            # Get the wrapped node's Trigger class
+            wrapped_node = cls.node_class.__wrapped_node__
+            if wrapped_node is not None:
+                wrapped_trigger = wrapped_node.Trigger
+                # Delegate to the wrapped node's trigger logic for queuing
+                return wrapped_trigger._queue_node_execution(state, dependencies, invoked_by)
+
+            # Fallback to the base implementation if no wrapped node
+            return super()._queue_node_execution(state, dependencies, invoked_by)
 
     @classmethod
     def __annotate_outputs_class__(cls, outputs_class: Type[BaseOutputs], reference: OutputReference) -> None:
