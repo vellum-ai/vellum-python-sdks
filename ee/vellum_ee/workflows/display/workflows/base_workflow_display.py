@@ -477,12 +477,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             str(self.workflow_id),
             "trigger",
             trigger_class.__module__,
-            trigger_class.__name__,
+            trigger_class.__qualname__,
         ]
-        trigger_target_identifiers = sorted(
-            f"{edge.to_node.__module__}.{edge.to_node.__name__}" for edge in trigger_edges
-        )
-        trigger_identifier_parts.extend(trigger_target_identifiers)
 
         trigger_id = uuid4_from_hash("|".join(trigger_identifier_parts))
 
