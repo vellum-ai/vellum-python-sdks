@@ -25,6 +25,11 @@ type GraphPortReference = {
   type: "port_reference";
   reference: PortContext;
 };
+type GraphTriggerReference = {
+  type: "trigger_reference";
+  triggerClassName: string;
+  triggerModulePath: string[];
+};
 type GraphRightShift = {
   type: "right_shift";
   lhs: GraphMutableAst;
@@ -35,6 +40,7 @@ type GraphMutableAst =
   | GraphSet
   | GraphNodeReference
   | GraphPortReference
+  | GraphTriggerReference
   | GraphRightShift;
 
 export declare namespace GraphAttribute {
@@ -147,6 +153,20 @@ export class GraphAttribute extends AstNode {
           edgesQueue.push(edge);
         });
       });
+    }
+
+    const trigger = this.workflowContext.workflowRawData.trigger;
+    if (trigger && graphMutableAst.type !== "empty") {
+      const triggerReference: GraphTriggerReference = {
+        type: "trigger_reference",
+        triggerClassName: trigger.definition.name,
+        triggerModulePath: trigger.definition.module,
+      };
+      graphMutableAst = {
+        type: "right_shift",
+        lhs: triggerReference,
+        rhs: graphMutableAst,
+      };
     }
 
     return graphMutableAst;
@@ -1108,7 +1128,11 @@ export class GraphAttribute extends AstNode {
         ? { type: "node_reference", reference: node.reference.nodeContext }
         : node;
     }
-    if (ast.type === "node_reference" || ast.type === "port_reference") {
+    if (
+      ast.type === "node_reference" ||
+      ast.type === "port_reference" ||
+      ast.type === "trigger_reference"
+    ) {
       return {
         type: "right_shift",
         lhs: ast,
@@ -1123,11 +1147,14 @@ export class GraphAttribute extends AstNode {
         values: ast.values.map((value) => this.appendNodeToAst(node, value)),
       };
     }
-    return {
-      type: "right_shift",
-      lhs: ast.lhs,
-      rhs: this.appendNodeToAst(node, ast.rhs),
-    };
+    if (ast.type === "right_shift") {
+      return {
+        type: "right_shift",
+        lhs: ast.lhs,
+        rhs: this.appendNodeToAst(node, ast.rhs),
+      };
+    }
+    return ast;
   }
 
   private startsWithTargetNode = (
@@ -1174,6 +1201,13 @@ export class GraphAttribute extends AstNode {
       return python.reference({
         name: mutableAst.reference.nodeClassName,
         modulePath: mutableAst.reference.nodeModulePath,
+      });
+    }
+
+    if (mutableAst.type === "trigger_reference") {
+      return python.reference({
+        name: mutableAst.triggerClassName,
+        modulePath: mutableAst.triggerModulePath,
       });
     }
 
@@ -1248,6 +1282,10 @@ export class GraphAttribute extends AstNode {
 
     if (mutableAst.type === "node_reference") {
       return mutableAst.reference.nodeClassName;
+    }
+
+    if (mutableAst.type === "trigger_reference") {
+      return mutableAst.triggerClassName;
     }
 
     if (mutableAst.type === "port_reference") {
