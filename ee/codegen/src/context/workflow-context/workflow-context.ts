@@ -282,6 +282,7 @@ export class WorkflowContext {
       classNames,
       nestedWorkflowModuleName,
       workflowClassDescription,
+      triggers: this.triggers,
     });
   }
 
