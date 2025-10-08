@@ -28,7 +28,7 @@ def test_workflow__happy_path(mocker):
     assert terminal_event.outputs.final_value < ExpensiveEmitter.delay  # type: ignore[operator]
 
     # AND the workflow itself completed without blocking on the emitter
-    assert end_time - start_time < ExpensiveEmitter.delay + 0.05  # Allow 50ms overhead for execution
+    assert end_time - start_time < ExpensiveEmitter.delay
 
     # AND the emitter was called at least once
     deadline = time.time() + 2.0
