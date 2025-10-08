@@ -6750,6 +6750,101 @@ client.workflow_deployments.update_workflow_release_tag(
 </dl>
 </details>
 
+<details><summary><code>client.workflow_deployments.<a href="src/vellum/resources/workflow_deployments/client.py">list_workflow_deployment_releases</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+List the Releases of the specified Workflow Deployment for the current Environment.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import Vellum
+
+client = Vellum(
+    api_version="YOUR_API_VERSION",
+    api_key="YOUR_API_KEY",
+)
+client.workflow_deployments.list_workflow_deployment_releases(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Either the Workflow Deployment's ID or its unique name
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**limit:** `typing.Optional[int]` — Number of results to return per page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**offset:** `typing.Optional[int]` — The initial index from which to return the results.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**ordering:** `typing.Optional[str]` — Which field to use when ordering the results.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.workflow_deployments.<a href="src/vellum/resources/workflow_deployments/client.py">retrieve_workflow_deployment_release</a>(...)</code></summary>
 <dl>
 <dd>

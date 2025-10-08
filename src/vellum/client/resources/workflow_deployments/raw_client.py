@@ -10,6 +10,7 @@ from ...core.jsonable_encoder import jsonable_encoder
 from ...core.pydantic_utilities import parse_obj_as
 from ...core.request_options import RequestOptions
 from ...types.paginated_slim_workflow_deployment_list import PaginatedSlimWorkflowDeploymentList
+from ...types.paginated_workflow_deployment_release_list import PaginatedWorkflowDeploymentReleaseList
 from ...types.paginated_workflow_release_tag_read_list import PaginatedWorkflowReleaseTagReadList
 from ...types.workflow_deployment_event_executions_response import WorkflowDeploymentEventExecutionsResponse
 from ...types.workflow_deployment_history_item import WorkflowDeploymentHistoryItem
@@ -428,6 +429,66 @@ class RawWorkflowDeploymentsClient:
                     WorkflowReleaseTagRead,
                     parse_obj_as(
                         type_=WorkflowReleaseTagRead,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
+    def list_workflow_deployment_releases(
+        self,
+        id: str,
+        *,
+        limit: typing.Optional[int] = None,
+        offset: typing.Optional[int] = None,
+        ordering: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> HttpResponse[PaginatedWorkflowDeploymentReleaseList]:
+        """
+        List the Releases of the specified Workflow Deployment for the current Environment.
+
+        Parameters
+        ----------
+        id : str
+            Either the Workflow Deployment's ID or its unique name
+
+        limit : typing.Optional[int]
+            Number of results to return per page.
+
+        offset : typing.Optional[int]
+            The initial index from which to return the results.
+
+        ordering : typing.Optional[str]
+            Which field to use when ordering the results.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[PaginatedWorkflowDeploymentReleaseList]
+
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"v1/workflow-deployments/{jsonable_encoder(id)}/releases",
+            base_url=self._client_wrapper.get_environment().default,
+            method="GET",
+            params={
+                "limit": limit,
+                "offset": offset,
+                "ordering": ordering,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    PaginatedWorkflowDeploymentReleaseList,
+                    parse_obj_as(
+                        type_=PaginatedWorkflowDeploymentReleaseList,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -885,6 +946,66 @@ class AsyncRawWorkflowDeploymentsClient:
                     WorkflowReleaseTagRead,
                     parse_obj_as(
                         type_=WorkflowReleaseTagRead,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
+    async def list_workflow_deployment_releases(
+        self,
+        id: str,
+        *,
+        limit: typing.Optional[int] = None,
+        offset: typing.Optional[int] = None,
+        ordering: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AsyncHttpResponse[PaginatedWorkflowDeploymentReleaseList]:
+        """
+        List the Releases of the specified Workflow Deployment for the current Environment.
+
+        Parameters
+        ----------
+        id : str
+            Either the Workflow Deployment's ID or its unique name
+
+        limit : typing.Optional[int]
+            Number of results to return per page.
+
+        offset : typing.Optional[int]
+            The initial index from which to return the results.
+
+        ordering : typing.Optional[str]
+            Which field to use when ordering the results.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[PaginatedWorkflowDeploymentReleaseList]
+
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"v1/workflow-deployments/{jsonable_encoder(id)}/releases",
+            base_url=self._client_wrapper.get_environment().default,
+            method="GET",
+            params={
+                "limit": limit,
+                "offset": offset,
+                "ordering": ordering,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    PaginatedWorkflowDeploymentReleaseList,
+                    parse_obj_as(
+                        type_=PaginatedWorkflowDeploymentReleaseList,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

@@ -5,6 +5,7 @@ import typing
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.request_options import RequestOptions
 from ...types.paginated_slim_workflow_deployment_list import PaginatedSlimWorkflowDeploymentList
+from ...types.paginated_workflow_deployment_release_list import PaginatedWorkflowDeploymentReleaseList
 from ...types.paginated_workflow_release_tag_read_list import PaginatedWorkflowReleaseTagReadList
 from ...types.workflow_deployment_event_executions_response import WorkflowDeploymentEventExecutionsResponse
 from ...types.workflow_deployment_history_item import WorkflowDeploymentHistoryItem
@@ -384,6 +385,57 @@ class WorkflowDeploymentsClient:
         """
         _response = self._raw_client.update_workflow_release_tag(
             id, name, history_item_id=history_item_id, request_options=request_options
+        )
+        return _response.data
+
+    def list_workflow_deployment_releases(
+        self,
+        id: str,
+        *,
+        limit: typing.Optional[int] = None,
+        offset: typing.Optional[int] = None,
+        ordering: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> PaginatedWorkflowDeploymentReleaseList:
+        """
+        List the Releases of the specified Workflow Deployment for the current Environment.
+
+        Parameters
+        ----------
+        id : str
+            Either the Workflow Deployment's ID or its unique name
+
+        limit : typing.Optional[int]
+            Number of results to return per page.
+
+        offset : typing.Optional[int]
+            The initial index from which to return the results.
+
+        ordering : typing.Optional[str]
+            Which field to use when ordering the results.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        PaginatedWorkflowDeploymentReleaseList
+
+
+        Examples
+        --------
+        from vellum import Vellum
+
+        client = Vellum(
+            api_version="YOUR_API_VERSION",
+            api_key="YOUR_API_KEY",
+        )
+        client.workflow_deployments.list_workflow_deployment_releases(
+            id="id",
+        )
+        """
+        _response = self._raw_client.list_workflow_deployment_releases(
+            id, limit=limit, offset=offset, ordering=ordering, request_options=request_options
         )
         return _response.data
 
@@ -854,6 +906,65 @@ class AsyncWorkflowDeploymentsClient:
         """
         _response = await self._raw_client.update_workflow_release_tag(
             id, name, history_item_id=history_item_id, request_options=request_options
+        )
+        return _response.data
+
+    async def list_workflow_deployment_releases(
+        self,
+        id: str,
+        *,
+        limit: typing.Optional[int] = None,
+        offset: typing.Optional[int] = None,
+        ordering: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> PaginatedWorkflowDeploymentReleaseList:
+        """
+        List the Releases of the specified Workflow Deployment for the current Environment.
+
+        Parameters
+        ----------
+        id : str
+            Either the Workflow Deployment's ID or its unique name
+
+        limit : typing.Optional[int]
+            Number of results to return per page.
+
+        offset : typing.Optional[int]
+            The initial index from which to return the results.
+
+        ordering : typing.Optional[str]
+            Which field to use when ordering the results.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        PaginatedWorkflowDeploymentReleaseList
+
+
+        Examples
+        --------
+        import asyncio
+
+        from vellum import AsyncVellum
+
+        client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.workflow_deployments.list_workflow_deployment_releases(
+                id="id",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.list_workflow_deployment_releases(
+            id, limit=limit, offset=offset, ordering=ordering, request_options=request_options
         )
         return _response.data
 

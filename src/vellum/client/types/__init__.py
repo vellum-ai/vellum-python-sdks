@@ -361,6 +361,7 @@ from .paginated_slim_tool_definition_list import PaginatedSlimToolDefinitionList
 from .paginated_slim_workflow_deployment_list import PaginatedSlimWorkflowDeploymentList
 from .paginated_test_suite_run_execution_list import PaginatedTestSuiteRunExecutionList
 from .paginated_test_suite_test_case_list import PaginatedTestSuiteTestCaseList
+from .paginated_workflow_deployment_release_list import PaginatedWorkflowDeploymentReleaseList
 from .paginated_workflow_release_tag_read_list import PaginatedWorkflowReleaseTagReadList
 from .paginated_workflow_sandbox_example_list import PaginatedWorkflowSandboxExampleList
 from .parent_context import ParentContext
@@ -1068,6 +1069,7 @@ __all__ = [
     "PaginatedSlimWorkflowDeploymentList",
     "PaginatedTestSuiteRunExecutionList",
     "PaginatedTestSuiteTestCaseList",
+    "PaginatedWorkflowDeploymentReleaseList",
     "PaginatedWorkflowReleaseTagReadList",
     "PaginatedWorkflowSandboxExampleList",
     "ParentContext",
