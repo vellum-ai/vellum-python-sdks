@@ -350,6 +350,11 @@ export class GraphAttribute extends AstNode {
           className: "ManualTrigger",
           modulePath: ["vellum", "workflows", "triggers", "manual"],
         };
+      case "SLACK_MESSAGE":
+        return {
+          className: "SlackTrigger",
+          modulePath: ["vellum", "workflows", "triggers", "slack"],
+        };
       default:
         return null;
     }
