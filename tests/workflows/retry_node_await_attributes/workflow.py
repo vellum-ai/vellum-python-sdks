@@ -24,10 +24,6 @@ class RetryWrappedPromptNode(BaseNode):
     class Trigger(BaseNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ALL
 
-    def run(self) -> BaseNode.Outputs:
-        print("returning from retry wrapped prompt node")
-        return self.Outputs()
-
 
 class RetryWrappedAwaitAttributesWorkflow(BaseWorkflow[BaseInputs, BaseState]):
     """Workflow that tests if RetryNode-wrapped node properly respects AWAIT_ALL merge behavior."""
