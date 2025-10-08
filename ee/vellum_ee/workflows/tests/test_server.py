@@ -536,7 +536,7 @@ class BrokenNode(BaseNode)  # Missing colon
 
     # AND the error message should be user-friendly
     error_message = str(exc_info.value)
-    assert "Workflow syntax error:" in error_message
+    assert "Syntax Error raised while loading Workflow:" in error_message
     assert "invalid syntax" in error_message or "expected ':'" in error_message
 
 
@@ -575,7 +575,7 @@ class BrokenNode(BaseNode):
 
     # AND the error message should be user-friendly
     error_message = str(exc_info.value)
-    assert "Workflow name error:" in error_message
+    assert "Invalid variable reference:" in error_message
     assert "UndefinedClass" in error_message or "not defined" in error_message
 
 

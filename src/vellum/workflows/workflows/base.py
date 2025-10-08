@@ -687,7 +687,9 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         try:
             module = importlib.import_module(workflow_path)
         except ValidationError as e:
-            raise WorkflowInitializationException(message=f"Workflow validation error: {e}") from e
+            raise WorkflowInitializationException(
+                message=f"Pydantic Model Validation defined in Workflow Failed: {e}"
+            ) from e
         except TypeError as e:
             if "Unexpected graph type" in str(e) or "unhashable type: 'set'" in str(e):
                 raise WorkflowInitializationException(
@@ -695,15 +697,15 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
                     "Please contact Vellum support for assistance with Workflow configuration."
                 ) from e
             else:
-                raise WorkflowInitializationException(message=f"Workflow type error: {e}") from e
+                raise WorkflowInitializationException(message=f"Type Error raised while loading Workflow: {e}") from e
         except SyntaxError as e:
-            raise WorkflowInitializationException(message=f"Workflow syntax error: {e}") from e
+            raise WorkflowInitializationException(message=f"Syntax Error raised while loading Workflow: {e}") from e
         except ModuleNotFoundError as e:
             raise WorkflowInitializationException(message=f"Workflow module not found: {e}") from e
         except ImportError as e:
-            raise WorkflowInitializationException(message=f"Workflow import error: {e}") from e
+            raise WorkflowInitializationException(message=f"Invalid import found while loading Workflow: {e}") from e
         except NameError as e:
-            raise WorkflowInitializationException(message=f"Workflow name error: {e}") from e
+            raise WorkflowInitializationException(message=f"Invalid variable reference: {e}") from e
         except Exception as e:
             raise WorkflowInitializationException(message=f"Unexpected failure while loading module: {e}") from e
         workflows: List[Type[BaseWorkflow]] = []
