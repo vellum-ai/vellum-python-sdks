@@ -194,19 +194,7 @@
           "node_output_id": "f04ec2cc-fd32-42b7-aac8-273bfaa3a283"
         }
       }
-    ],
-    "trigger": {
-      "type": "MANUAL",
-      "definition": {
-        "name": "ManualTrigger",
-        "module": [
-          "vellum",
-          "workflows",
-          "triggers",
-          "manual"
-        ]
-      }
-    }
+    ]
   },
   "input_variables": [
     {
@@ -226,6 +214,13 @@
       "id": "16b9fa94-c99b-4290-a57c-2acb5283051f",
       "key": "final_output",
       "type": "STRING"
+    }
+  ],
+  "triggers": [
+    {
+      "id": "102b7243-666c-479c-bb16-9a43cb65fbad",
+      "type": "MANUAL",
+      "attributes": []
     }
   ]
 }
