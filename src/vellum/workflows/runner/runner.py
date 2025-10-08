@@ -263,17 +263,18 @@ class WorkflowRunner(Generic[StateType]):
             httpx_logger.removeFilter(span_filter)
 
     def _snapshot_state(self, state: StateType, deltas: List[StateDelta]) -> StateType:
-        self._workflow_event_inner_queue.put(
-            WorkflowExecutionSnapshottedEvent(
-                trace_id=self._execution_context.trace_id,
-                span_id=state.meta.span_id,
-                body=WorkflowExecutionSnapshottedBody(
-                    workflow_definition=self.workflow.__class__,
-                    state=state,
-                ),
-                parent=self._execution_context.parent_context,
+        if not self._execution_context.parent_context or self._execution_context.parent_context.type != "WORKFLOW_NODE":
+            self._workflow_event_inner_queue.put(
+                WorkflowExecutionSnapshottedEvent(
+                    trace_id=self._execution_context.trace_id,
+                    span_id=state.meta.span_id,
+                    body=WorkflowExecutionSnapshottedBody(
+                        workflow_definition=self.workflow.__class__,
+                        state=state,
+                    ),
+                    parent=self._execution_context.parent_context,
+                )
             )
-        )
 
         delta_names = [d.name for d in deltas]
         for descriptor in self._outputs_listening_to_state:
