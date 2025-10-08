@@ -1,4 +1,4 @@
-from tests.workflows.basic_state_management.workflow import BasicStateManagement
+from tests.workflows.basic_state_management.workflow import BasicStateManagement, State
 
 
 def test_run_workflow__happy_path():
@@ -13,3 +13,8 @@ def test_run_workflow__happy_path():
 
     # AND the final value should be read from the written state
     assert terminal_event.outputs == {"final_value": 3}
+
+    # AND the final state should contain the written value
+    assert terminal_event.final_state is not None
+    assert isinstance(terminal_event.final_state, State)
+    assert terminal_event.final_state.writable_value == 3

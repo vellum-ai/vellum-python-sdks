@@ -227,12 +227,12 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
     WorkflowEvent = Union[  # type: ignore
         GenericWorkflowEvent,
         WorkflowExecutionInitiatedEvent[InputsType, StateType],  # type: ignore[valid-type]
-        WorkflowExecutionFulfilledEvent[Outputs],
+        WorkflowExecutionFulfilledEvent[Outputs, StateType],  # type: ignore[valid-type]
         WorkflowExecutionSnapshottedEvent[StateType],  # type: ignore[valid-type]
     ]
 
     TerminalWorkflowEvent = Union[
-        WorkflowExecutionFulfilledEvent[Outputs],
+        WorkflowExecutionFulfilledEvent[Outputs, StateType],  # type: ignore[valid-type]
         WorkflowExecutionRejectedEvent,
         WorkflowExecutionPausedEvent,
     ]
