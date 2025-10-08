@@ -1134,3 +1134,89 @@ def test_push__deploy_stores_deployment_config_in_lock_file(mock_module, vellum_
     deployment_config_str = call_args["deployment_config"]
     deployment_config = json.loads(deployment_config_str)
     assert deployment_config["name"] == "test-push-deploy-stores-deployment-config-in-lock-file"
+
+
+def test_push__custom_workspace_in_lockfile__uses_custom_workspace_without_flag(mock_module, vellum_client_class):
+    """
+    Tests that push respects the custom workspace from the lockfile when no --workspace flag is provided.
+    """
+
+    # GIVEN a workflow already configured in the lockfile with a custom workspace
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+    workflow_sandbox_id = mock_module.workflow_sandbox_id
+    set_pyproject_toml = mock_module.set_pyproject_toml
+
+    # AND the lockfile has the workflow with a custom workspace
+    with open(os.path.join(temp_dir, "vellum.lock.json"), "w") as f:
+        json.dump(
+            {
+                "version": "1.0",
+                "workflows": [
+                    {
+                        "module": module,
+                        "workflow_sandbox_id": workflow_sandbox_id,
+                        "workspace": "my_custom_workspace",
+                        "container_image_name": None,
+                        "container_image_tag": None,
+                        "deployments": [],
+                        "ignore": None,
+                        "target_directory": None,
+                    }
+                ],
+                "workspaces": [],
+            },
+            f,
+            indent=2,
+        )
+
+    # AND the custom workspace is defined in pyproject.toml
+    set_pyproject_toml(
+        {
+            "workflows": [],
+            "workspaces": [
+                {
+                    "name": "my_custom_workspace",
+                    "api_key": "MY_CUSTOM_VELLUM_API_KEY",
+                }
+            ],
+        }
+    )
+
+    # AND the .env file has the custom api key
+    with open(os.path.join(temp_dir, ".env"), "w") as f:
+        f.write(
+            """\
+VELLUM_API_KEY=abcdef123456
+MY_CUSTOM_VELLUM_API_KEY=custom-key-xyz
+"""
+        )
+
+    # AND a workflow exists in the module
+    _ensure_workflow_py(temp_dir, module)
+
+    # AND the push API returns successfully
+    vellum_client_class.return_value.workflows.push.return_value = WorkflowPushResponse(
+        workflow_sandbox_id=workflow_sandbox_id,
+    )
+    vellum_client_class.return_value._client_wrapper._environment.default = "https://api.vellum.ai/v1"
+
+    # WHEN calling `vellum push` WITHOUT the --workspace flag
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["push", module])
+
+    # THEN it should succeed
+    assert result.exit_code == 0, result.output
+
+    # AND the custom workspace API key should have been used
+    vellum_client_class.assert_called_once_with(
+        api_key="custom-key-xyz",
+        environment=mock.ANY,
+        api_version=None,
+    )
+
+    with open(os.path.join(temp_dir, "vellum.lock.json")) as f:
+        lock_file_content = json.load(f)
+        assert len(lock_file_content["workflows"]) == 1
+        assert lock_file_content["workflows"][0]["workspace"] == "my_custom_workspace"
+        assert lock_file_content["workflows"][0]["workflow_sandbox_id"] == workflow_sandbox_id
