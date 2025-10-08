@@ -55,6 +55,28 @@ class FunctionCallNodeMixin:
 
     function_call_output: List[PromptOutput]
 
+    def _handle_tool_exception(self, e: Exception, tool_type: str, tool_name: str) -> None:
+        """
+        Re-raise exceptions with contextual information while preserving NodeException details.
+
+        Args:
+            e: The caught exception
+            tool_type: Type of tool (e.g., "function", "MCP tool", "Vellum Integration tool")
+            tool_name: Name of the tool that failed
+        """
+        if isinstance(e, NodeException):
+            # Preserve original error code and raw_data while adding context
+            raise NodeException(
+                message=f"Error executing {tool_type} '{tool_name}': {e.message}",
+                code=e.code,
+                raw_data=e.raw_data,
+            ) from e
+        else:
+            raise NodeException(
+                message=f"Error executing {tool_type} '{tool_name}': {str(e)}",
+                code=WorkflowErrorCode.NODE_EXECUTION,
+            ) from e
+
     def _extract_function_arguments(self) -> dict:
         """Extract arguments from function call output."""
         current_index = getattr(self, "state").current_prompt_output_index
@@ -200,20 +222,8 @@ class FunctionNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
 
         try:
             result = self.function_definition(**arguments)
-        except NodeException as e:
-            function_name = self.function_definition.__name__
-            # Preserve original error code and raw_data while adding context
-            raise NodeException(
-                message=f"Error executing function '{function_name}': {e.message}",
-                code=e.code,
-                raw_data=e.raw_data,
-            ) from e
         except Exception as e:
-            function_name = self.function_definition.__name__
-            raise NodeException(
-                message=f"Error executing function '{function_name}': {str(e)}",
-                code=WorkflowErrorCode.NODE_EXECUTION,
-            ) from e
+            self._handle_tool_exception(e, "function", self.function_definition.__name__)
 
         # Add the result to the chat history
         self._add_function_result_to_chat_history(result, self.state)
@@ -240,10 +250,7 @@ class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
             else:
                 result = composio_service.execute_tool(tool_name=self.composio_tool.action, arguments=arguments)
         except Exception as e:
-            raise NodeException(
-                message=f"Error executing Composio tool '{self.composio_tool.action}': {str(e)}",
-                code=WorkflowErrorCode.NODE_EXECUTION,
-            ) from e
+            self._handle_tool_exception(e, "Composio tool", self.composio_tool.action)
 
         # Add result to chat history
         self._add_function_result_to_chat_history(result, self.state)
@@ -262,18 +269,8 @@ class MCPNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
         try:
             mcp_service = MCPService()
             result = mcp_service.execute_tool(tool_def=self.mcp_tool, arguments=arguments)
-        except NodeException as e:
-            # Preserve original error code and raw_data while adding context
-            raise NodeException(
-                message=f"Error executing MCP tool '{self.mcp_tool.name}': {e.message}",
-                code=e.code,
-                raw_data=e.raw_data,
-            ) from e
         except Exception as e:
-            raise NodeException(
-                message=f"Error executing MCP tool '{self.mcp_tool.name}': {str(e)}",
-                code=WorkflowErrorCode.NODE_EXECUTION,
-            ) from e
+            self._handle_tool_exception(e, "MCP tool", self.mcp_tool.name)
 
         # Add result to chat history
         self._add_function_result_to_chat_history(result, self.state)
@@ -298,18 +295,8 @@ class VellumIntegrationNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
                 tool_name=self.vellum_integration_tool.name,
                 arguments=arguments,
             )
-        except NodeException as e:
-            # Preserve original error code and raw_data while adding context
-            raise NodeException(
-                message=f"Error executing Vellum Integration tool '{self.vellum_integration_tool.name}': {e.message}",
-                code=e.code,
-                raw_data=e.raw_data,
-            ) from e
         except Exception as e:
-            raise NodeException(
-                message=f"Error executing Vellum Integration tool '{self.vellum_integration_tool.name}': {str(e)}",
-                code=WorkflowErrorCode.NODE_EXECUTION,
-            ) from e
+            self._handle_tool_exception(e, "Vellum Integration tool", self.vellum_integration_tool.name)
 
         # Add result to chat history
         self._add_function_result_to_chat_history(result, self.state)

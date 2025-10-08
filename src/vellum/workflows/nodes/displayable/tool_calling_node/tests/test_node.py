@@ -18,13 +18,11 @@ from vellum.workflows import BaseWorkflow
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
-from vellum.workflows.integrations import mcp_service
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
 from vellum.workflows.nodes.displayable.tool_calling_node.state import ToolCallingState
 from vellum.workflows.nodes.displayable.tool_calling_node.utils import (
     create_function_node,
-    create_mcp_tool_node,
     create_router_node,
     create_tool_prompt_node,
 )
@@ -32,7 +30,7 @@ from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.ports.utils import validate_ports
 from vellum.workflows.state.base import BaseState, StateMeta
 from vellum.workflows.state.context import WorkflowContext
-from vellum.workflows.types.definition import DeploymentDefinition, MCPServer, MCPToolDefinition
+from vellum.workflows.types.definition import DeploymentDefinition
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 
@@ -379,23 +377,16 @@ def test_tool_calling_node_workflow_is_dynamic(vellum_adhoc_prompt_client):
     assert initiated_events[2].body.workflow_definition.is_dynamic is True  # Inline workflow
 
 
-def test_function_node_preserves_node_exception():
-    """
-    Test that FunctionNode preserves NodeException error codes and raw_data.
+def test_tool_node_preserves_node_exception():
+    """Test that tool nodes preserve NodeException error codes and raw_data."""
 
-    When a function raises a NodeException with a specific error code and raw_data,
-    the FunctionNode should preserve those values while adding contextual information.
-    """
-
-    # GIVEN a function that raises a NodeException with specific code and raw_data
     def failing_function() -> str:
         raise NodeException(
-            message="Custom error message",
+            message="Custom error",
             code=WorkflowErrorCode.INVALID_INPUTS,
-            raw_data={"custom_key": "custom_value"},
+            raw_data={"key": "value"},
         )
 
-    # AND a tool prompt node
     tool_prompt_node = create_tool_prompt_node(
         ml_model="test-model",
         blocks=[],
@@ -404,13 +395,11 @@ def test_function_node_preserves_node_exception():
         parameters=DEFAULT_PROMPT_PARAMETERS,
     )
 
-    # AND a function node for the failing function
     function_node_class = create_function_node(
         function=failing_function,
         tool_prompt_node=tool_prompt_node,
     )
 
-    # AND a state with a function call
     state = ToolCallingState(
         meta=StateMeta(
             node_outputs={
@@ -418,7 +407,7 @@ def test_function_node_preserves_node_exception():
                     FunctionCallVellumValue(
                         value=FunctionCall(
                             arguments={},
-                            id="call_test123",
+                            id="call_123",
                             name="failing_function",
                             state="FULFILLED",
                         ),
@@ -428,95 +417,12 @@ def test_function_node_preserves_node_exception():
         )
     )
 
-    # WHEN the function node runs
     function_node = function_node_class(state=state)
 
-    # THEN it should raise a NodeException
     with pytest.raises(NodeException) as exc_info:
         list(function_node.run())
-        e = exc_info.value
-        # AND the error code should be preserved
-        assert e.code == WorkflowErrorCode.INVALID_INPUTS
-        # AND the raw_data should be preserved
-        assert e.raw_data == {"custom_key": "custom_value"}
-        # AND the message should include context about function execution
-        assert "Error executing function" in e.message
-        assert "Custom error message" in e.message
 
-
-def test_mcp_node_preserves_node_exception(monkeypatch):
-    """
-    Test that MCPNode preserves NodeException error codes and raw_data.
-
-    When MCPService raises a NodeException with a specific error code and raw_data,
-    the MCPNode should preserve those values while adding contextual information.
-    """
-    # GIVEN an MCP server
-    mcp_server = MCPServer(
-        name="test_server",
-        url="http://test.example.com",
-    )
-
-    # AND an MCP tool definition
-    mcp_tool = MCPToolDefinition(
-        name="test_mcp_tool",
-        description="Test MCP tool",
-        server=mcp_server,
-    )
-
-    # AND a tool prompt node
-    tool_prompt_node = create_tool_prompt_node(
-        ml_model="test-model",
-        blocks=[],
-        functions=[],
-        prompt_inputs=None,
-        parameters=DEFAULT_PROMPT_PARAMETERS,
-    )
-
-    # AND an MCP node for the tool
-    mcp_node_class = create_mcp_tool_node(
-        tool_def=mcp_tool,
-        tool_prompt_node=tool_prompt_node,
-    )
-
-    # AND a state with a function call
-    state = ToolCallingState(
-        meta=StateMeta(
-            node_outputs={
-                tool_prompt_node.Outputs.results: [
-                    FunctionCallVellumValue(
-                        value=FunctionCall(
-                            arguments={},
-                            id="call_test123",
-                            name="test_mcp_tool",
-                            state="FULFILLED",
-                        ),
-                    )
-                ],
-            },
-        )
-    )
-
-    # AND MCPService.execute_tool raises a NodeException
-    def mock_execute_tool(*args, **kwargs):
-        raise NodeException(
-            message="MCP connection error",
-            code=WorkflowErrorCode.INVALID_INPUTS,
-            raw_data={"mcp_error": "connection_failed"},
-        )
-
-    monkeypatch.setattr(mcp_service.MCPService, "execute_tool", mock_execute_tool)
-
-    # WHEN the MCP node runs
-    mcp_node = mcp_node_class(state=state)
-
-    # THEN it should raise a NodeException
-    with pytest.raises(NodeException) as exc_info:
-        list(mcp_node.run())
-        e = exc_info.value
-        assert e.code == WorkflowErrorCode.INVALID_INPUTS
-        # AND the raw_data should be preserved
-        assert e.raw_data == {"mcp_error": "connection_failed"}
-        # AND the message should include context
-        assert "test_mcp_tool" in e.message
-        assert "MCP connection error" in e.message
+    e = exc_info.value
+    assert e.code == WorkflowErrorCode.INVALID_INPUTS
+    assert e.raw_data == {"key": "value"}
+    assert "Custom error" in e.message
