@@ -118,6 +118,7 @@ import {
   WorkflowOutputValue,
   WorkflowRawData,
   WorkflowSandboxRoutingConfig,
+  WorkflowTrigger,
   WorkflowStateVariableWorkflowReference,
   WorkflowValueDescriptor,
   WorkspaceSecretPointer,
@@ -552,6 +553,21 @@ export declare namespace CodeResourceDefinitionSerializer {
   interface Raw {
     name: string;
     module: string[];
+  }
+}
+
+export const WorkflowTriggerSerializer: ObjectSchema<
+  WorkflowTriggerSerializer.Raw,
+  WorkflowTrigger
+> = objectSchema({
+  type: stringSchema(),
+  definition: CodeResourceDefinitionSerializer,
+});
+
+export declare namespace WorkflowTriggerSerializer {
+  interface Raw {
+    type: string;
+    definition: CodeResourceDefinitionSerializer.Raw;
   }
 }
 
@@ -2255,6 +2271,7 @@ export const WorkflowRawDataSerializer: ObjectSchema<
     "output_values",
     listSchema(WorkflowOutputValueSerializer).optional()
   ),
+  trigger: WorkflowTriggerSerializer.optional(),
 });
 
 export declare namespace WorkflowRawDataSerializer {
@@ -2265,6 +2282,7 @@ export declare namespace WorkflowRawDataSerializer {
     display_data?: any;
     definition?: CodeResourceDefinitionSerializer.Raw | null;
     output_values?: WorkflowOutputValueSerializer.Raw[] | null;
+    trigger?: WorkflowTriggerSerializer.Raw | null;
   }
 }
 

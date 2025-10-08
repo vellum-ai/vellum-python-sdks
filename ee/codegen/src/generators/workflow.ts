@@ -1,5 +1,6 @@
 import { python } from "@fern-api/python-ast";
 import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
+import { OperatorType } from "@fern-api/python-ast/OperatorType";
 import { Reference } from "@fern-api/python-ast/Reference";
 import { Type } from "@fern-api/python-ast/Type";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
@@ -648,9 +649,29 @@ export class Workflow {
       // Only add graph attribute if it's not empty
       const graphMutableAst = graph.generateGraphMutableAst();
       if (graphMutableAst.type !== "empty") {
+        let graphInitializer: python.AstNode = graph;
+
+        // If a trigger is defined, prepend it to the graph using the >> operator
+        const trigger = this.workflowContext.workflowRawData.trigger;
+        if (trigger) {
+          const triggerReference = python.reference({
+            name: trigger.definition.name,
+            modulePath: trigger.definition.module,
+          });
+
+          graphInitializer = python.operator({
+            operator: OperatorType.RightShift,
+            lhs: triggerReference,
+            rhs: graph,
+          });
+
+          // Add the trigger reference to the workflow class so it gets imported
+          workflowClass.inheritReferences(triggerReference);
+        }
+
         const graphField = python.field({
           name: "graph",
-          initializer: graph,
+          initializer: graphInitializer,
         });
 
         workflowClass.add(graphField);

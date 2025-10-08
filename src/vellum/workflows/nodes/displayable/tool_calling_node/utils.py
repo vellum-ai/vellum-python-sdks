@@ -275,26 +275,13 @@ class VellumIntegrationNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
         arguments = self._extract_function_arguments()
         vellum_client = self._context.vellum_client
 
-        try:
-            vellum_service = VellumIntegrationService(vellum_client)
-            result = vellum_service.execute_tool(
-                integration=self.vellum_integration_tool.integration_name,
-                provider=self.vellum_integration_tool.provider.value,
-                tool_name=self.vellum_integration_tool.name,
-                arguments=arguments,
-            )
-        except NodeException as e:
-            # Preserve original error code and raw_data while adding context
-            raise NodeException(
-                message=f"Error executing Vellum Integration tool '{self.vellum_integration_tool.name}': {e.message}",
-                code=e.code,
-                raw_data=e.raw_data,
-            ) from e
-        except Exception as e:
-            raise NodeException(
-                message=f"Error executing Vellum Integration tool '{self.vellum_integration_tool.name}': {str(e)}",
-                code=WorkflowErrorCode.NODE_EXECUTION,
-            ) from e
+        vellum_service = VellumIntegrationService(vellum_client)
+        result = vellum_service.execute_tool(
+            integration=self.vellum_integration_tool.integration_name,
+            provider=self.vellum_integration_tool.provider.value,
+            tool_name=self.vellum_integration_tool.name,
+            arguments=arguments,
+        )
 
         # Add result to chat history
         self._add_function_result_to_chat_history(result, self.state)
