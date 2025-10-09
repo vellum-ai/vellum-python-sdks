@@ -724,22 +724,24 @@ class WorkflowRunner(Generic[StateType]):
             parent_context: The parent context for the cancellation events
         """
         captured_stacktrace = "".join(traceback.format_stack())
-        for span_id, active_node in list(self._active_nodes_by_execution_id.items()):
-            rejection_event = NodeExecutionRejectedEvent(
-                trace_id=self._execution_context.trace_id,
-                span_id=span_id,
-                body=NodeExecutionRejectedBody(
-                    node_definition=active_node.node.__class__,
-                    error=WorkflowError(
-                        code=WorkflowErrorCode.NODE_CANCELLED,
-                        message=error_message,
+        active_span_ids = list(self._active_nodes_by_execution_id.keys())
+        for span_id in active_span_ids:
+            active_node = self._active_nodes_by_execution_id.pop(span_id, None)
+            if active_node is not None:
+                rejection_event = NodeExecutionRejectedEvent(
+                    trace_id=self._execution_context.trace_id,
+                    span_id=span_id,
+                    body=NodeExecutionRejectedBody(
+                        node_definition=active_node.node.__class__,
+                        error=WorkflowError(
+                            code=WorkflowErrorCode.NODE_CANCELLED,
+                            message=error_message,
+                        ),
+                        stacktrace=captured_stacktrace,
                     ),
-                    stacktrace=captured_stacktrace,
-                ),
-                parent=parent_context,
-            )
-            self._workflow_event_outer_queue.put(rejection_event)
-            self._active_nodes_by_execution_id.pop(span_id, None)
+                    parent=parent_context,
+                )
+                self._workflow_event_outer_queue.put(rejection_event)
 
     def _initiate_workflow_event(self) -> WorkflowExecutionInitiatedEvent:
         links: Optional[List[SpanLink]] = None
