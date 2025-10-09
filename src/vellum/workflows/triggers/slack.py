@@ -9,7 +9,7 @@ class SlackTrigger(IntegrationTrigger):
 
     SlackTrigger enables workflows to be initiated from Slack events such as
     messages in channels, direct messages, app mentions, or reactions. The trigger
-    parses Slack webhook payloads and provides structured outputs that downstream
+    parses Slack webhook payloads and provides structured attributes that downstream
     nodes can reference.
 
     Examples:
@@ -17,10 +17,10 @@ class SlackTrigger(IntegrationTrigger):
             >>> class MyWorkflow(BaseWorkflow):
             ...     graph = SlackTrigger >> ProcessMessageNode
 
-        Access trigger outputs in nodes:
+        Access trigger attributes in nodes:
             >>> class ProcessMessageNode(BaseNode):
             ...     class Outputs(BaseNode.Outputs):
-            ...         response = SlackTrigger.Outputs.message
+            ...         response = SlackTrigger.message
 
         Multiple entry points:
             >>> class MyWorkflow(BaseWorkflow):
@@ -29,7 +29,7 @@ class SlackTrigger(IntegrationTrigger):
             ...         ManualTrigger >> ProcessManualNode,
             ...     }
 
-    Outputs:
+    Attributes:
         message: str
             The message text from Slack
         channel: str
@@ -48,18 +48,17 @@ class SlackTrigger(IntegrationTrigger):
         the payload structure, see: https://api.slack.com/apis/connections/events-api
     """
 
-    class Outputs(IntegrationTrigger.Outputs):
-        message: str
-        channel: str
-        user: str
-        timestamp: str
-        thread_ts: Optional[str]
-        event_type: str
+    message: str
+    channel: str
+    user: str
+    timestamp: str
+    thread_ts: Optional[str]
+    event_type: str
 
     @classmethod
-    def process_event(cls, event_data: dict) -> "SlackTrigger.Outputs":
+    def process_event(cls, event_data: dict) -> "SlackTrigger":
         """
-        Parse Slack webhook payload into trigger outputs.
+        Parse Slack webhook payload into trigger instance.
 
         Args:
             event_data: Slack event payload from webhook. Expected structure:
@@ -75,7 +74,7 @@ class SlackTrigger(IntegrationTrigger):
                 }
 
         Returns:
-            SlackTrigger.Outputs with parsed data from the Slack event
+            SlackTrigger instance with parsed data from the Slack event
 
         Examples:
             >>> slack_payload = {
@@ -87,18 +86,20 @@ class SlackTrigger(IntegrationTrigger):
             ...         "ts": "1234567890.123456"
             ...     }
             ... }
-            >>> outputs = SlackTrigger.process_event(slack_payload)
-            >>> outputs.message
+            >>> trigger = SlackTrigger.process_event(slack_payload)
+            >>> trigger.message
             'Hello!'
         """
         # Extract from Slack's event structure
         event = event_data.get("event", {})
 
-        return cls.Outputs(
-            message=event.get("text", ""),
-            channel=event.get("channel", ""),
-            user=event.get("user", ""),
-            timestamp=event.get("ts", ""),
-            thread_ts=event.get("thread_ts"),
-            event_type=event.get("type", "message"),
-        )
+        # Create trigger instance and populate attributes
+        trigger = cls()
+        trigger.message = event.get("text", "")
+        trigger.channel = event.get("channel", "")
+        trigger.user = event.get("user", "")
+        trigger.timestamp = event.get("ts", "")
+        trigger.thread_ts = event.get("thread_ts")
+        trigger.event_type = event.get("type", "message")
+
+        return trigger

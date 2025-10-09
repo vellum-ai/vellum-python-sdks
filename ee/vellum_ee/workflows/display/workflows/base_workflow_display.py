@@ -452,17 +452,17 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         if not issubclass(trigger_class, IntegrationTrigger):
             return None
 
-        # Check if trigger has Outputs class with annotations
-        if not hasattr(trigger_class, "Outputs"):
+        # Check if trigger has class-level annotations (top-level attributes)
+        if not hasattr(trigger_class, "__annotations__"):
             return None
 
-        outputs_class = trigger_class.Outputs
-        if not hasattr(outputs_class, "__annotations__"):
-            return None
-
-        # Serialize each output field
+        # Serialize each output field from top-level attributes
         outputs: JsonArray = []
-        for field_name, field_type in outputs_class.__annotations__.items():
+        for field_name, field_type in trigger_class.__annotations__.items():
+            # Skip private/protected attributes
+            if field_name.startswith("_"):
+                continue
+
             # Map Python types to workflow output types
             type_str = "STRING"  # Default
             if "int" in str(field_type).lower():

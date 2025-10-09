@@ -18,15 +18,15 @@ def test_slack_trigger__process_event__basic():
     }
 
     # WHEN we process the event
-    outputs = SlackTrigger.process_event(slack_payload)
+    trigger = SlackTrigger.process_event(slack_payload)
 
-    # THEN outputs contain the correct data
-    assert outputs.message == "Hello world!"
-    assert outputs.channel == "C123456"
-    assert outputs.user == "U123456"
-    assert outputs.timestamp == "1234567890.123456"
-    assert outputs.thread_ts is None
-    assert outputs.event_type == "message"
+    # THEN trigger attributes contain the correct data
+    assert trigger.message == "Hello world!"
+    assert trigger.channel == "C123456"
+    assert trigger.user == "U123456"
+    assert trigger.timestamp == "1234567890.123456"
+    assert trigger.thread_ts is None
+    assert trigger.event_type == "message"
 
 
 def test_slack_trigger__process_event__with_thread():
@@ -44,10 +44,10 @@ def test_slack_trigger__process_event__with_thread():
     }
 
     # WHEN we process the event
-    outputs = SlackTrigger.process_event(slack_payload)
+    trigger = SlackTrigger.process_event(slack_payload)
 
     # THEN thread_ts is populated
-    assert outputs.thread_ts == "1234567890.123456"
+    assert trigger.thread_ts == "1234567890.123456"
 
 
 def test_slack_trigger__process_event__empty_payload():
@@ -56,15 +56,15 @@ def test_slack_trigger__process_event__empty_payload():
     slack_payload: dict[str, str] = {}
 
     # WHEN we process the event
-    outputs = SlackTrigger.process_event(slack_payload)
+    trigger = SlackTrigger.process_event(slack_payload)
 
     # THEN it returns empty strings for required fields
-    assert outputs.message == ""
-    assert outputs.channel == ""
-    assert outputs.user == ""
-    assert outputs.timestamp == ""
-    assert outputs.thread_ts is None
-    assert outputs.event_type == "message"  # default value
+    assert trigger.message == ""
+    assert trigger.channel == ""
+    assert trigger.user == ""
+    assert trigger.timestamp == ""
+    assert trigger.thread_ts is None
+    assert trigger.event_type == "message"  # default value
 
 
 def test_slack_trigger__process_event__app_mention():
@@ -81,19 +81,19 @@ def test_slack_trigger__process_event__app_mention():
     }
 
     # WHEN we process the event
-    outputs = SlackTrigger.process_event(slack_payload)
+    trigger = SlackTrigger.process_event(slack_payload)
 
     # THEN event_type is app_mention
-    assert outputs.event_type == "app_mention"
-    assert outputs.message == "<@U0LAN0Z89> is it everything a river should be?"
+    assert trigger.event_type == "app_mention"
+    assert trigger.message == "<@U0LAN0Z89> is it everything a river should be?"
 
 
-def test_slack_trigger__outputs_class():
-    """SlackTrigger.Outputs has correct fields."""
-    # GIVEN SlackTrigger.Outputs
-    # THEN it has all expected fields
-    assert hasattr(SlackTrigger.Outputs, "__annotations__")
-    annotations = SlackTrigger.Outputs.__annotations__
+def test_slack_trigger__attributes():
+    """SlackTrigger has correct attributes."""
+    # GIVEN SlackTrigger class
+    # THEN it has all expected fields as top-level attributes
+    assert hasattr(SlackTrigger, "__annotations__")
+    annotations = SlackTrigger.__annotations__
     assert "message" in annotations
     assert "channel" in annotations
     assert "user" in annotations
