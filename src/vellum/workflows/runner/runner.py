@@ -466,11 +466,11 @@ class WorkflowRunner(Generic[StateType]):
                 parent=execution.parent_context,
             )
         except NodeException as e:
-            yield from self._handle_vellum_exception(e, "Node exception: ", execution, span_id, node)
+            yield self._handle_run_node_exception(e, "Node Exception: ", execution, span_id, node)
         except WorkflowInitializationException as e:
-            yield from self._handle_vellum_exception(e, "Workflow initialization exception: ", execution, span_id, node)
+            yield self._handle_run_node_exception(e, "Workflow Initialization Exception: ", execution, span_id, node)
         except InvalidExpressionException as e:
-            yield from self._handle_vellum_exception(e, "Invalid expression exception: ", execution, span_id, node)
+            yield self._handle_run_node_exception(e, "Invalid Expression Exception: ", execution, span_id, node)
         except Exception as e:
             error_message = self._parse_error_message(e)
             if error_message is None:
@@ -495,18 +495,18 @@ class WorkflowRunner(Generic[StateType]):
 
         logger.debug(f"Finished running node: {node.__class__.__name__}")
 
-    def _handle_vellum_exception(
+    def _handle_run_node_exception(
         self,
         exception: Union[NodeException, WorkflowInitializationException, InvalidExpressionException],
         prefix: str,
-        execution: Any,
+        execution: ExecutionContext,
         span_id: UUID,
         node: BaseNode[StateType],
-    ) -> Generator[NodeExecutionRejectedEvent, None, None]:
+    ) -> NodeExecutionRejectedEvent:
         logger.info(f"{prefix}{exception}")
         captured_stacktrace = traceback.format_exc()
 
-        yield NodeExecutionRejectedEvent(
+        return NodeExecutionRejectedEvent(
             trace_id=execution.trace_id,
             span_id=span_id,
             body=NodeExecutionRejectedBody(
