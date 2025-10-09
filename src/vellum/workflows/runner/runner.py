@@ -466,11 +466,11 @@ class WorkflowRunner(Generic[StateType]):
                 parent=execution.parent_context,
             )
         except NodeException as e:
-            yield self._handle_run_node_exception(e, "Node Exception: ", execution, span_id, node)
+            yield self._handle_run_node_exception(e, "Node Exception", execution, span_id, node)
         except WorkflowInitializationException as e:
-            yield self._handle_run_node_exception(e, "Workflow Initialization Exception: ", execution, span_id, node)
+            yield self._handle_run_node_exception(e, "Workflow Initialization Exception", execution, span_id, node)
         except InvalidExpressionException as e:
-            yield self._handle_run_node_exception(e, "Invalid Expression Exception: ", execution, span_id, node)
+            yield self._handle_run_node_exception(e, "Invalid Expression Exception", execution, span_id, node)
         except Exception as e:
             error_message = self._parse_error_message(e)
             if error_message is None:
@@ -503,7 +503,7 @@ class WorkflowRunner(Generic[StateType]):
         span_id: UUID,
         node: BaseNode[StateType],
     ) -> NodeExecutionRejectedEvent:
-        logger.info(f"{prefix}{exception}")
+        logger.info(f"{prefix}: {exception}")
         captured_stacktrace = traceback.format_exc()
 
         return NodeExecutionRejectedEvent(
