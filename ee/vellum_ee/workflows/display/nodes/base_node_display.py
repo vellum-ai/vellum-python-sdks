@@ -188,7 +188,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             type = primitive_type_to_vellum_variable_type(output)
             value = (
                 serialize_value(node_id, display_context, output.instance)
-                if output.instance is not None and output.instance != undefined
+                if output.instance is not None and output.instance is not undefined
                 else None
             )
 

@@ -688,3 +688,19 @@ def test_serialize_node__comment_expanded_preserved_when_explicitly_set(serializ
     assert "comment" in display_data
     assert display_data["comment"]["value"] == "This is a test comment."
     assert display_data["comment"]["expanded"] is False
+
+
+def test_serialize_node__attribute_with_type_annotation_no_default(serialize_node):
+    """
+    Tests that attributes with type annotations but no default values serialize as None.
+    """
+
+    # GIVEN a node with typed attributes but no default values
+    class NodeWithTypedAttributesNoDefault(BaseNode):
+        attr: str
+
+    # WHEN the node is serialized
+    serialized_node = serialize_node(NodeWithTypedAttributesNoDefault)
+
+    # THEN the attribute should serialize as None
+    assert serialized_node["attributes"][0]["value"] is None

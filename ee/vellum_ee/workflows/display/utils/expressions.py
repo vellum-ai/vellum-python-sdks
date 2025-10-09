@@ -3,7 +3,7 @@ import inspect
 from io import StringIO
 import sys
 from uuid import UUID
-from typing import TYPE_CHECKING, Any, Dict, List, cast
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, cast
 
 from pydantic import BaseModel
 
@@ -248,13 +248,11 @@ def serialize_key(key: Any) -> str:
         return str(key)
 
 
-# Sentinel value to indicate a value should be omitted from serialization
-_UNDEFINED_SENTINEL: JsonObject = {"__undefined__": True}
-
-
-def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContext", value: Any) -> JsonObject:
+def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContext", value: Any) -> Optional[JsonObject]:
     """
-    Serialize a value to a JSON object.
+    Serialize a value to a JSON object. Returns `None` if the value resolves to `undefined`.
+    This is safe because all valid values are a JSON object, including the `None` constant:
+    > `{"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}}`
 
     Args:
         executable_id: node id or workflow id
@@ -265,7 +263,7 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
         serialized value
     """
     if value is undefined:
-        return _UNDEFINED_SENTINEL
+        return None
 
     if isinstance(value, ConstantValueReference):
         return serialize_value(executable_id, display_context, value._value)
@@ -353,7 +351,7 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
         serialized_items = []
         for item in value:
             serialized_item = serialize_value(executable_id, display_context, item)
-            if serialized_item != _UNDEFINED_SENTINEL:
+            if serialized_item is not None:
                 serialized_items.append(serialized_item)
 
         if all(isinstance(item, dict) and item["type"] == "CONSTANT_VALUE" for item in serialized_items):
@@ -389,7 +387,7 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
         serialized_entries: List[Dict[str, Any]] = []
         for key, val in value.items():
             serialized_val = serialize_value(executable_id, display_context, val)
-            if serialized_val != _UNDEFINED_SENTINEL:
+            if serialized_val is not None:
                 serialized_entries.append(
                     {
                         "id": str(uuid4_from_hash(f"{executable_id}|{key}")),
@@ -455,7 +453,9 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
         if inputs:
             serialized_inputs = {}
             for param_name, input_ref in inputs.items():
-                serialized_inputs[param_name] = serialize_value(executable_id, display_context, input_ref)
+                serialized_input = serialize_value(executable_id, display_context, input_ref)
+                if serialized_input is not None:
+                    serialized_inputs[param_name] = serialized_input
 
             model_data = function_definition.model_dump()
             model_data["inputs"] = serialized_inputs
