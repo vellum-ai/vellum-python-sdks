@@ -15,7 +15,7 @@ from vellum import (
 from vellum.client.core import RequestOptions
 from vellum.client.core.api_error import ApiError
 from vellum.client.types.chat_message_request import ChatMessageRequest
-from vellum.workflows.constants import LATEST_RELEASE_TAG, OMIT
+from vellum.workflows.constants import LATEST_RELEASE_TAG, OMIT, undefined
 from vellum.workflows.context import execution_context, get_execution_context, get_parent_context
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.errors.types import workflow_event_error_to_workflow_error
@@ -225,6 +225,12 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
             "execution_context": execution_context.model_dump(mode="json"),
             **request_options.get("additional_body_parameters", {}),
         }
+
+        if self.deployment is undefined:
+            raise NodeException(
+                code=WorkflowErrorCode.NODE_EXECUTION,
+                message="Expected subworkflow deployment attribute to be either a UUID or STR, got None instead",
+            )
 
         try:
             deployment_id = str(self.deployment) if isinstance(self.deployment, UUID) else None

@@ -167,12 +167,16 @@ class BaseNodeMeta(ABCMeta):
             attribute = super().__getattribute__(name)
         except AttributeError as e:
             if _is_annotated(cls, name):
+                # Check if it's a ClassVar in any parent class
+                is_class_var = False
                 for klass in cls.__mro__:
                     if hasattr(klass, "__annotations__") and name in klass.__annotations__:
                         annotation = klass.__annotations__[name]
                         if get_origin(annotation) is ClassVar:
-                            return undefined
-                attribute = None
+                            is_class_var = True
+                            break
+
+                attribute = undefined if is_class_var else None
             else:
                 raise e
 
