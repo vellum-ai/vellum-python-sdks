@@ -35,3 +35,29 @@ class BasicInlinePromptWorkflow(BaseWorkflow[WorkflowInputs, BaseState]):
 
     class Outputs(BaseOutputs):
         results = ExampleBaseInlinePromptNode.Outputs.results
+
+
+class ExampleNonStreamingInlinePromptNode(BaseInlinePromptNode):
+    ml_model = "gpt-4o"
+    blocks = [
+        ChatMessagePromptBlock(
+            chat_role="SYSTEM",
+            blocks=[
+                JinjaPromptBlock(
+                    block_type="JINJA",
+                    template="What's your favorite {{noun}}?",
+                ),
+            ],
+        ),
+    ]
+    prompt_inputs = {
+        "noun": WorkflowInputs.noun,
+    }
+    settings = PromptSettings(stream_enabled=False)
+
+
+class BasicNonStreamingInlinePromptWorkflow(BaseWorkflow[WorkflowInputs, BaseState]):
+    graph = ExampleNonStreamingInlinePromptNode
+
+    class Outputs(BaseOutputs):
+        results = ExampleNonStreamingInlinePromptNode.Outputs.results
