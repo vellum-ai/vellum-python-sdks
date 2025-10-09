@@ -703,10 +703,4 @@ def test_serialize_node__attribute_with_type_annotation_no_default(serialize_nod
     serialized_node = serialize_node(NodeWithTypedAttributesNoDefault)
 
     # THEN the attribute should serialize as None
-    assert serialized_node["attributes"][0]["value"] == {
-        "type": "CONSTANT_VALUE",
-        "value": {
-            "type": "JSON",
-            "value": None,
-        },
-    }
+    assert serialized_node["attributes"][0]["value"] is None
