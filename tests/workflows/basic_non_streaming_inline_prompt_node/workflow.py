@@ -11,7 +11,7 @@ class WorkflowInputs(BaseInputs):
     noun: str
 
 
-class ExampleBaseInlinePromptNode(BaseInlinePromptNode):
+class ExampleNonStreamingInlinePromptNode(BaseInlinePromptNode):
     ml_model = "gpt-4o"
     blocks = [
         ChatMessagePromptBlock(
@@ -27,11 +27,11 @@ class ExampleBaseInlinePromptNode(BaseInlinePromptNode):
     prompt_inputs = {
         "noun": WorkflowInputs.noun,
     }
-    settings = PromptSettings(timeout=1, stream_enabled=True)
+    settings = PromptSettings(stream_enabled=False)
 
 
-class BasicInlinePromptWorkflow(BaseWorkflow[WorkflowInputs, BaseState]):
-    graph = ExampleBaseInlinePromptNode
+class BasicNonStreamingInlinePromptWorkflow(BaseWorkflow[WorkflowInputs, BaseState]):
+    graph = ExampleNonStreamingInlinePromptNode
 
     class Outputs(BaseOutputs):
-        results = ExampleBaseInlinePromptNode.Outputs.results
+        results = ExampleNonStreamingInlinePromptNode.Outputs.results
