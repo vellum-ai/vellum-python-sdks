@@ -45,7 +45,7 @@ class SearchNode(BaseSearchNode[StateType]):
             )
 
         if not isinstance(self.query, str):
-            self.query = json.dumps(self.query, cls=DefaultStateEncoder)  # type: ignore[misc]
+            self.query = json.dumps(self.query, cls=DefaultStateEncoder)
 
         results = self._perform_search().results
         text = self.chunk_separator.join([r.text for r in results])

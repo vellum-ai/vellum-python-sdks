@@ -229,7 +229,7 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
         if self.deployment is undefined:
             raise NodeException(
                 code=WorkflowErrorCode.NODE_EXECUTION,
-                message="Expected subworkflow deployment attribute to be either a UUID or STR, got None instead",
+                message="Expected subworkflow deployment attribute to be either a UUID or STR, got `undefined` instead",
             )
 
         try:

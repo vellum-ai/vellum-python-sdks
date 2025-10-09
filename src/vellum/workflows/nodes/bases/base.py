@@ -1,4 +1,5 @@
 from abc import ABC, ABCMeta, abstractmethod
+from collections.abc import Callable as CollectionsCallable
 from dataclasses import field
 from functools import cached_property, reduce
 import inspect
@@ -6,7 +7,7 @@ from types import MappingProxyType
 from uuid import UUID, uuid4
 from typing import (
     Any,
-    ClassVar,
+    Callable as TypingCallable,
     Dict,
     Generic,
     Iterator,
@@ -58,15 +59,15 @@ def _is_nested_class(nested: Any, parent: Type) -> bool:
     ) or any(_is_nested_class(nested, base) for base in parent.__bases__)
 
 
-def _is_annotated(cls: Type, name: str) -> bool:
+def _is_annotated(cls: Type, name: str) -> Any:
     if name in cls.__annotations__:
-        return True
+        return cls.__annotations__[name]
 
     for base in cls.__bases__:
-        if _is_annotated(base, name):
-            return True
+        if annotation := _is_annotated(base, name):
+            return annotation
 
-    return False
+    return None
 
 
 class BaseNodeMeta(ABCMeta):
@@ -166,17 +167,10 @@ class BaseNodeMeta(ABCMeta):
         try:
             attribute = super().__getattribute__(name)
         except AttributeError as e:
-            if _is_annotated(cls, name):
-                # Check if it's a ClassVar in any parent class
-                is_class_var = False
-                for klass in cls.__mro__:
-                    if hasattr(klass, "__annotations__") and name in klass.__annotations__:
-                        annotation = klass.__annotations__[name]
-                        if get_origin(annotation) is ClassVar:
-                            is_class_var = True
-                            break
-
-                attribute = undefined if is_class_var else None
+            annotation = _is_annotated(cls, name)
+            origin_annotation = get_origin(annotation)
+            if origin_annotation is not CollectionsCallable and origin_annotation is not TypingCallable:
+                attribute = undefined
             else:
                 raise e
 
@@ -506,7 +500,8 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
                     setattr(base, leaf, input_value)
 
         for descriptor in self.__class__:
-            if not descriptor.instance:
+            if descriptor.instance is undefined:
+                setattr(self, descriptor.name, undefined)
                 continue
 
             if any(isinstance(t, type) and issubclass(t, BaseDescriptor) for t in descriptor.types):
@@ -525,20 +520,6 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
             all_inputs[inputs_key] = value
 
         self._inputs = MappingProxyType(all_inputs)
-
-    def __getattr__(self, name: str) -> Any:
-        """Handle instance attribute access for unset ClassVar attributes."""
-        if name.startswith("_"):
-            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
-
-        # Check if this attribute is a ClassVar in any parent class
-        for klass in self.__class__.__mro__:
-            if hasattr(klass, "__annotations__") and name in klass.__annotations__:
-                annotation = klass.__annotations__[name]
-                if get_origin(annotation) is ClassVar:
-                    return undefined
-
-        raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
 
     def run(self) -> NodeRunResponse:
         return self.Outputs()

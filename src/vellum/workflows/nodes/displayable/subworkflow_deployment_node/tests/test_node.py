@@ -265,7 +265,7 @@ def test_run_workflow__no_deployment():
 
     # AND the error message should be correct
     assert exc_info.value.code == WorkflowErrorCode.NODE_EXECUTION
-    assert "Expected subworkflow deployment attribute to be either a UUID or STR, got None instead" in str(
+    assert "Expected subworkflow deployment attribute to be either a UUID or STR, got `undefined` instead" in str(
         exc_info.value
     )
 
