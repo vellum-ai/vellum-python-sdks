@@ -53,7 +53,7 @@ def test_slack_trigger__process_event__with_thread():
 def test_slack_trigger__process_event__empty_payload():
     """SlackTrigger.process_event handles empty payload gracefully."""
     # GIVEN an empty payload
-    slack_payload = {}
+    slack_payload: dict[str, str] = {}
 
     # WHEN we process the event
     outputs = SlackTrigger.process_event(slack_payload)
