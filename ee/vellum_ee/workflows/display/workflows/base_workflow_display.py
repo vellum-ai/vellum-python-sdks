@@ -26,6 +26,7 @@ from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, WorkflowInputReference
 from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.triggers.base import BaseTrigger
+from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.types.core import Json, JsonArray, JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.types.utils import get_original_base
@@ -446,8 +447,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         Returns:
             JsonArray with output definitions, or None if trigger has no outputs
         """
-        from vellum.workflows.triggers.integration import IntegrationTrigger
-
         # Only integration triggers have outputs
         if not issubclass(trigger_class, IntegrationTrigger):
             return None
