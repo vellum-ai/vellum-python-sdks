@@ -6,6 +6,7 @@ import inspect
 import logging
 from uuid import UUID, uuid4
 from typing import (
+    TYPE_CHECKING,
     Any,
     Callable,
     ClassVar,
@@ -80,6 +81,11 @@ from vellum.workflows.types.generics import InputsType, StateType
 from vellum.workflows.types.utils import get_original_base
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.workflows.event_filters import workflow_event_filter
+
+if TYPE_CHECKING:
+    from vellum.workflows.references.output import OutputReference
+    from vellum.workflows.triggers.base import BaseTrigger
+    from vellum.workflows.triggers.integration import IntegrationTrigger
 
 logger = logging.getLogger(__name__)
 
@@ -355,6 +361,72 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         return cls._get_edges_from_subgraphs(cls.get_unused_subgraphs())
 
     @classmethod
+    def get_trigger_classes(cls) -> Iterator[Type["BaseTrigger"]]:
+        """
+        Returns an iterator over all trigger classes in the workflow.
+        """
+        from vellum.workflows.triggers.base import BaseTrigger
+
+        seen_triggers: Set[Type[BaseTrigger]] = set()
+        for subgraph in cls.get_subgraphs():
+            for trigger in subgraph.triggers:
+                if trigger not in seen_triggers:
+                    seen_triggers.add(trigger)
+                    yield trigger
+
+    @classmethod
+    def get_integration_trigger(cls) -> Optional[Type["IntegrationTrigger"]]:
+        """
+        Returns the single IntegrationTrigger in the workflow, if present.
+
+        Returns:
+            The IntegrationTrigger class if exactly one is found, None if none found.
+
+        Raises:
+            ValueError: If multiple IntegrationTriggers are found (not currently supported).
+        """
+        from vellum.workflows.triggers.integration import IntegrationTrigger
+
+        integration_triggers: List[Type[IntegrationTrigger]] = []
+        for trigger in cls.get_trigger_classes():
+            if issubclass(trigger, IntegrationTrigger):
+                integration_triggers.append(trigger)
+
+        if len(integration_triggers) == 0:
+            return None
+        elif len(integration_triggers) == 1:
+            return integration_triggers[0]
+        else:
+            trigger_names = [t.__name__ for t in integration_triggers]
+            raise ValueError(
+                f"Multiple IntegrationTriggers found in workflow: {', '.join(trigger_names)}. "
+                f"Only one IntegrationTrigger per workflow is currently supported."
+            )
+
+    @staticmethod
+    def _create_trigger_output_references(
+        trigger_outputs: "IntegrationTrigger.Outputs",
+    ) -> Dict["OutputReference", Any]:
+        """
+        Creates a mapping from OutputReference instances to their values from trigger outputs.
+
+        Args:
+            trigger_outputs: The outputs from trigger.process_event()
+
+        Returns:
+            Dictionary mapping OutputReference instances to their values
+        """
+        from vellum.workflows.references.output import OutputReference
+
+        output_references: Dict[OutputReference, Any] = {}
+
+        # Iterate through all output references in the trigger's Outputs class
+        for output_ref, value in trigger_outputs:
+            output_references[output_ref] = value
+
+        return output_references
+
+    @classmethod
     def get_all_nodes(cls) -> Iterator[Type[BaseNode]]:
         """
         Returns an iterator over all nodes in the Workflow, used or unused.
@@ -377,6 +449,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         cancel_signal: Optional[CancelSignal] = None,
         node_output_mocks: Optional[MockNodeExecutionArg] = None,
         max_concurrency: Optional[int] = None,
+        trigger_event: Optional[dict] = None,
     ) -> TerminalWorkflowEvent:
         """
         Invoke a Workflow, returning the last event emitted, which should be one of:
@@ -413,6 +486,10 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             The max number of concurrent threads to run the Workflow with. If not provided, the Workflow will run
             without limiting concurrency. This configuration only applies to the current Workflow and not to any
             subworkflows or nodes that utilizes threads.
+
+        trigger_event: Optional[dict] = None
+            Event data for workflows with IntegrationTrigger (e.g., SlackTrigger). This data is processed by the
+            trigger's process_event() method and made available to downstream nodes as trigger outputs.
         """
 
         runner = WorkflowRunner(
@@ -426,6 +503,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             node_output_mocks=node_output_mocks,
             max_concurrency=max_concurrency,
             init_execution_context=self._execution_context,
+            trigger_event=trigger_event,
         )
         self._current_runner = runner
         events = runner.stream()
@@ -496,6 +574,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         cancel_signal: Optional[CancelSignal] = None,
         node_output_mocks: Optional[MockNodeExecutionArg] = None,
         max_concurrency: Optional[int] = None,
+        trigger_event: Optional[dict] = None,
     ) -> WorkflowEventStream:
         """
         Invoke a Workflow, yielding events as they are emitted.
@@ -533,6 +612,10 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             The max number of concurrent threads to run the Workflow with. If not provided, the Workflow will run
             without limiting concurrency. This configuration only applies to the current Workflow and not to any
             subworkflows or nodes that utilizes threads.
+
+        trigger_event: Optional[dict] = None
+            Event data for workflows with IntegrationTrigger (e.g., SlackTrigger). This data is processed by the
+            trigger's process_event() method and made available to downstream nodes as trigger outputs.
         """
 
         should_yield = event_filter or workflow_event_filter
@@ -547,6 +630,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             node_output_mocks=node_output_mocks,
             max_concurrency=max_concurrency,
             init_execution_context=self._execution_context,
+            trigger_event=trigger_event,
         )
         self._current_runner = runner
         runner_stream = runner.stream()
