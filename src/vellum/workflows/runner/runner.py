@@ -108,6 +108,7 @@ class WorkflowRunner(Generic[StateType]):
         node_output_mocks: Optional[MockNodeExecutionArg] = None,
         max_concurrency: Optional[int] = None,
         init_execution_context: Optional[ExecutionContext] = None,
+        trigger_event: Optional[dict] = None,
     ):
         if state and external_inputs:
             raise ValueError("Can only run a Workflow providing one of state or external inputs, not both")
@@ -199,6 +200,46 @@ class WorkflowRunner(Generic[StateType]):
                 # there was no initial state provided by the user to invoke the workflow.
                 self._should_emit_initial_state = False
             self._entrypoints = self.workflow.get_entrypoints()
+
+        # Process trigger_event if provided
+        from vellum.workflows.triggers.manual import ManualTrigger
+
+        integration_trigger = self.workflow.get_integration_trigger()
+
+        # Check if workflow has ManualTrigger (either explicit or no triggers means implicit ManualTrigger)
+        trigger_classes = list(self.workflow.get_trigger_classes())
+        has_manual_trigger = (
+            any(trigger is ManualTrigger or issubclass(trigger, ManualTrigger) for trigger in trigger_classes)
+            or len(trigger_classes) == 0
+        )  # No triggers means implicit ManualTrigger
+
+        if trigger_event is not None:
+            if integration_trigger is None:
+                raise WorkflowInitializationException(
+                    message="trigger_event provided but workflow does not have an IntegrationTrigger",
+                    workflow_definition=self.workflow.__class__,
+                    code=WorkflowErrorCode.INVALID_INPUTS,
+                )
+
+            # Process the trigger event to get trigger outputs
+            trigger_outputs = integration_trigger.process_event(trigger_event)
+
+            # Create OutputReference mappings from trigger outputs
+            trigger_output_references = self.workflow._create_trigger_output_references(trigger_outputs)
+
+            # Inject trigger outputs into initial state's node_outputs
+            self._initial_state.meta.node_outputs.update(trigger_output_references)
+        elif integration_trigger is not None and not has_manual_trigger:
+            # Only require trigger_event if workflow ONLY has IntegrationTrigger
+            # (no ManualTrigger)
+            raise WorkflowInitializationException(
+                message=(
+                    f"Workflow has IntegrationTrigger ({integration_trigger.__name__}) "
+                    f"but no trigger_event provided"
+                ),
+                workflow_definition=self.workflow.__class__,
+                code=WorkflowErrorCode.INVALID_INPUTS,
+            )
 
         # This queue is responsible for sending events from WorkflowRunner to the outside world
         self._workflow_event_outer_queue: Queue[WorkflowEvent] = Queue()

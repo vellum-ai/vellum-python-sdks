@@ -1,4 +1,6 @@
 from vellum.workflows.triggers.base import BaseTrigger
+from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.triggers.manual import ManualTrigger
+from vellum.workflows.triggers.slack import SlackTrigger
 
-__all__ = ["BaseTrigger", "ManualTrigger"]
+__all__ = ["BaseTrigger", "IntegrationTrigger", "ManualTrigger", "SlackTrigger"]

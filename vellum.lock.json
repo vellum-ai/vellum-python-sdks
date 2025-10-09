@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "workflows": [
+    {
+      "module": "apollo_bot",
+      "workflow_sandbox_id": "8e17a32e-582d-4873-b010-3656472d4162",
+      "ignore": "sandbox.py",
+      "deployments": [],
+      "container_image_name": null,
+      "container_image_tag": null,
+      "workspace": "default",
+      "target_directory": null
+    }
+  ],
+  "workspaces": []
+}

@@ -25,6 +25,7 @@ from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port,
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, WorkflowInputReference
 from vellum.workflows.state.encoder import DefaultStateEncoder
+from vellum.workflows.triggers.base import BaseTrigger
 from vellum.workflows.types.core import Json, JsonArray, JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.types.utils import get_original_base
@@ -435,13 +436,62 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
         return result
 
+    def _serialize_trigger_outputs(self, trigger_class: Type["BaseTrigger"]) -> Optional[JsonArray]:
+        """
+        Serialize trigger outputs for integration triggers.
+
+        Args:
+            trigger_class: The trigger class to serialize outputs for
+
+        Returns:
+            JsonArray with output definitions, or None if trigger has no outputs
+        """
+        from vellum.workflows.triggers.integration import IntegrationTrigger
+
+        # Only integration triggers have outputs
+        if not issubclass(trigger_class, IntegrationTrigger):
+            return None
+
+        # Check if trigger has Outputs class with annotations
+        if not hasattr(trigger_class, "Outputs"):
+            return None
+
+        outputs_class = trigger_class.Outputs
+        if not hasattr(outputs_class, "__annotations__"):
+            return None
+
+        # Serialize each output field
+        outputs: JsonArray = []
+        for field_name, field_type in outputs_class.__annotations__.items():
+            # Map Python types to workflow output types
+            type_str = "STRING"  # Default
+            if "int" in str(field_type).lower():
+                type_str = "NUMBER"
+            elif "bool" in str(field_type).lower():
+                type_str = "BOOLEAN"
+            elif "dict" in str(field_type).lower() or "json" in str(field_type).lower():
+                type_str = "JSON"
+
+            outputs.append(
+                cast(
+                    JsonObject,
+                    {
+                        "name": field_name,
+                        "type": type_str,
+                    },
+                )
+            )
+
+        return outputs if outputs else None
+
     def _serialize_workflow_trigger(self) -> Optional[JsonArray]:
         """
         Serialize workflow-level trigger information.
 
         Returns:
             JsonArray with trigger data if a trigger is present, None otherwise.
-            Each trigger in the array has: id (UUID), type (str), attributes (list)
+            Each trigger in the array has: id (UUID), type (str), attributes (list),
+            and optionally outputs (for integration triggers)
         """
         # Get all trigger edges from the workflow's subgraphs
         trigger_edges = []
@@ -475,16 +525,20 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         # Return as a list with a single trigger object matching Django schema
         trigger_id = uuid4_from_hash(f"{trigger_class.__module__} | {trigger_class.__qualname__}")
 
-        return cast(
-            JsonArray,
-            [
-                {
-                    "id": str(trigger_id),
-                    "type": trigger_type.value,
-                    "attributes": [],
-                }
-            ],
-        )
+        # Serialize trigger outputs for integration triggers
+        outputs = self._serialize_trigger_outputs(trigger_class)
+
+        trigger_data: JsonObject = {
+            "id": str(trigger_id),
+            "type": trigger_type.value,
+            "attributes": [],
+        }
+
+        # Add outputs if present (for integration triggers)
+        if outputs:
+            trigger_data["outputs"] = outputs
+
+        return cast(JsonArray, [trigger_data])
 
     def _serialize_edge_display_data(self, edge_display: EdgeDisplay) -> Optional[JsonObject]:
         """Serialize edge display data, returning None if no display data is present."""
