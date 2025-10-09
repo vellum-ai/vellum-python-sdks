@@ -55,10 +55,9 @@ class SlackTrigger(IntegrationTrigger):
     thread_ts: Optional[str]
     event_type: str
 
-    @classmethod
-    def process_event(cls, event_data: dict) -> "SlackTrigger":
+    def __init__(self, event_data: dict):
         """
-        Parse Slack webhook payload into trigger instance.
+        Initialize SlackTrigger with Slack webhook payload.
 
         Args:
             event_data: Slack event payload from webhook. Expected structure:
@@ -73,9 +72,6 @@ class SlackTrigger(IntegrationTrigger):
                     }
                 }
 
-        Returns:
-            SlackTrigger instance with parsed data from the Slack event
-
         Examples:
             >>> slack_payload = {
             ...     "event": {
@@ -86,20 +82,20 @@ class SlackTrigger(IntegrationTrigger):
             ...         "ts": "1234567890.123456"
             ...     }
             ... }
-            >>> trigger = SlackTrigger.process_event(slack_payload)
+            >>> trigger = SlackTrigger(slack_payload)
             >>> trigger.message
             'Hello!'
         """
+        # Call parent init
+        super().__init__(event_data)
+
         # Extract from Slack's event structure
         event = event_data.get("event", {})
 
-        # Create trigger instance and populate attributes
-        trigger = cls()
-        trigger.message = event.get("text", "")
-        trigger.channel = event.get("channel", "")
-        trigger.user = event.get("user", "")
-        trigger.timestamp = event.get("ts", "")
-        trigger.thread_ts = event.get("thread_ts")
-        trigger.event_type = event.get("type", "message")
-
-        return trigger
+        # Populate trigger attributes
+        self.message = event.get("text", "")
+        self.channel = event.get("channel", "")
+        self.user = event.get("user", "")
+        self.timestamp = event.get("ts", "")
+        self.thread_ts = event.get("thread_ts")
+        self.event_type = event.get("type", "message")
