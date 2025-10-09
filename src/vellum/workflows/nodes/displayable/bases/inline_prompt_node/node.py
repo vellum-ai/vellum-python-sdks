@@ -7,6 +7,7 @@ from vellum import (
     AdHocExpandMeta,
     ChatMessage,
     FunctionDefinition,
+    InitiatedAdHocExecutePromptEvent,
     PromptBlock,
     PromptOutput,
     PromptParameters,
@@ -185,7 +186,8 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                 expand_meta=self.expand_meta,
                 request_options=request_options,
             )
-            return iter([response])
+            initiated_event = InitiatedAdHocExecutePromptEvent(execution_id=response.execution_id)
+            return iter([initiated_event, response])
         else:
             return self._context.vellum_client.ad_hoc.adhoc_execute_prompt_stream(
                 ml_model=self.ml_model,
