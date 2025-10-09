@@ -739,7 +739,7 @@ class WorkflowRunner(Generic[StateType]):
                 parent=parent_context,
             )
             self._workflow_event_outer_queue.put(rejection_event)
-            self._active_nodes_by_execution_id.pop(span_id)
+            self._active_nodes_by_execution_id.pop(span_id, None)
 
     def _initiate_workflow_event(self) -> WorkflowExecutionInitiatedEvent:
         links: Optional[List[SpanLink]] = None
