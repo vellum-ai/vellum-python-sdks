@@ -18,9 +18,11 @@ class IntegrationTrigger(BaseTrigger, ABC):
         class MyIntegrationTrigger(IntegrationTrigger):
             data: str
 
-            def __init__(self, event_data: dict):
-                super().__init__(event_data)
-                self.data = event_data.get("data", "")
+            @classmethod
+            def process_event(cls, event_data: dict):
+                trigger = cls()
+                trigger.data = event_data.get("data", "")
+                return trigger
 
         # Use in workflow
         class MyWorkflow(BaseWorkflow):
@@ -39,27 +41,22 @@ class IntegrationTrigger(BaseTrigger, ABC):
     # Configuration that can be set at runtime
     config: ClassVar[Optional[dict]] = None
 
-    def __init__(self, event_data: dict):
+    @classmethod
+    def process_event(cls, event_data: dict) -> "IntegrationTrigger":
         """
-        Initialize trigger with event data from external system.
+        Process incoming webhook/event data and return trigger instance.
 
-        Subclasses should override this method to parse external
-        event payloads (e.g., Slack webhooks, email notifications) and
-        populate trigger attributes.
+        This method should be implemented by subclasses to parse external
+        event payloads (e.g., Slack webhooks, email notifications) into
+        a trigger instance with populated attributes.
 
         Args:
             event_data: Raw event data from the external system
 
-        Examples:
-            >>> class MyTrigger(IntegrationTrigger):
-            ...     data: str
-            ...
-            ...     def __init__(self, event_data: dict):
-            ...         super().__init__(event_data)
-            ...         self.data = event_data.get("data", "")
-            >>>
-            >>> trigger = MyTrigger({"data": "hello"})
-            >>> trigger.data
-            'hello'
+        Returns:
+            Trigger instance with attributes populated from parsed event data
+
+        Raises:
+            NotImplementedError: If subclass doesn't implement this method
         """
-        self._event_data = event_data
+        raise NotImplementedError(f"{cls.__name__} must implement process_event() method to handle external events")
