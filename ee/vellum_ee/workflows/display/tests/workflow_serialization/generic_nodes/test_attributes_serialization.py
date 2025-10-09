@@ -692,7 +692,7 @@ def test_serialize_node__comment_expanded_preserved_when_explicitly_set(serializ
 
 def test_serialize_node__attribute_with_type_annotation_no_default(serialize_node):
     """
-    Tests that attributes with type annotations but no default values serialize with undefined sentinel.
+    Tests that attributes with type annotations but no default values serialize as None.
     """
 
     # GIVEN a node with typed attributes but no default values
@@ -702,5 +702,11 @@ def test_serialize_node__attribute_with_type_annotation_no_default(serialize_nod
     # WHEN the node is serialized
     serialized_node = serialize_node(NodeWithTypedAttributesNoDefault)
 
-    # THEN the attribute should serialize with the undefined sentinel value
-    assert serialized_node["attributes"][0]["value"] == {"__undefined__": True}
+    # THEN the attribute should serialize as None
+    assert serialized_node["attributes"][0]["value"] == {
+        "type": "CONSTANT_VALUE",
+        "value": {
+            "type": "JSON",
+            "value": None,
+        },
+    }

@@ -265,7 +265,7 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
         serialized value
     """
     if value is undefined:
-        return _UNDEFINED_SENTINEL
+        return serialize_value(executable_id, display_context, None)
 
     if isinstance(value, ConstantValueReference):
         return serialize_value(executable_id, display_context, value._value)
