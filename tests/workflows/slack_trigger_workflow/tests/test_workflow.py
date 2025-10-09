@@ -4,16 +4,28 @@ from tests.workflows.slack_trigger_workflow.workflow import SlackTriggerWorkflow
 
 
 def test_slack_trigger_workflow__basic_execution():
-    """Test that SlackTrigger workflow can be instantiated and executed."""
+    """Test that SlackTrigger workflow can be instantiated and executed with trigger event."""
     # GIVEN a workflow with SlackTrigger
     workflow = SlackTriggerWorkflow()
 
-    # WHEN we run the workflow
-    result = workflow.run()
+    # AND a Slack event payload
+    slack_event = {
+        "event": {
+            "type": "message",
+            "text": "Hello from Slack!",
+            "channel": "C123456",
+            "user": "U123456",
+            "ts": "1234567890.123456",
+        }
+    }
+
+    # WHEN we run the workflow with the trigger event
+    result = workflow.run(trigger_event=slack_event)
 
     # THEN it should execute successfully
     assert result.name == "workflow.execution.fulfilled"
-    assert result.outputs.result == "Processed Slack message"
+    # AND the node should have processed the message from the trigger
+    assert result.outputs.result == "Processed: Hello from Slack!"
 
 
 def test_slack_trigger_workflow__has_trigger():
