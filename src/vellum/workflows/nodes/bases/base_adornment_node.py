@@ -1,10 +1,12 @@
 from abc import ABC
-from typing import TYPE_CHECKING, Any, Dict, Generic, Optional, Tuple, Type
+from uuid import UUID
+from typing import TYPE_CHECKING, Any, Dict, Generic, Optional, Set, Tuple, Type
 
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode, BaseNodeMeta
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.references.output import OutputReference
+from vellum.workflows.types.core import MergeBehavior
 from vellum.workflows.types.generics import StateType
 
 if TYPE_CHECKING:
@@ -78,6 +80,56 @@ class BaseAdornmentNode(
 
     __wrapped_node__: Optional[Type["BaseNode"]] = None
     subworkflow: Type["BaseWorkflow"]
+
+    class Trigger(BaseNode.Trigger):
+        """
+        Trigger class for adornment nodes that delegates to the wrapped node's Trigger
+        for proper merge behavior handling.
+        """
+
+        @classmethod
+        def should_initiate(
+            cls,
+            state: StateType,
+            dependencies: Set["Type[BaseNode]"],
+            node_span_id: UUID,
+        ) -> bool:
+            """
+            Delegates to the wrapped node's Trigger.should_initiate method to ensure
+            proper merge behavior (like AWAIT_ALL) is respected for initiation logic.
+            """
+            # Get the wrapped node's Trigger class
+            wrapped_node = cls.node_class.__wrapped_node__
+            if wrapped_node is not None:
+                wrapped_trigger = wrapped_node.Trigger
+                # Only delegate if the wrapped node has a specific merge behavior
+                # that differs from the default AWAIT_ATTRIBUTES
+                if (
+                    hasattr(wrapped_trigger, "merge_behavior")
+                    and wrapped_trigger.merge_behavior != MergeBehavior.AWAIT_ATTRIBUTES
+                ):
+                    return wrapped_trigger.should_initiate(state, dependencies, node_span_id)
+
+            # Fallback to the base implementation if no wrapped node
+            return super().should_initiate(state, dependencies, node_span_id)
+
+        @classmethod
+        def _queue_node_execution(
+            cls, state: StateType, dependencies: set[Type[BaseNode]], invoked_by: Optional[UUID] = None
+        ) -> UUID:
+            """
+            Delegates to the wrapped node's Trigger._queue_node_execution method to ensure
+            proper merge behavior (like AWAIT_ALL) is respected for dependency tracking.
+            """
+            # Get the wrapped node's Trigger class
+            wrapped_node = cls.node_class.__wrapped_node__
+            if wrapped_node is not None:
+                wrapped_trigger = wrapped_node.Trigger
+                # Delegate to the wrapped node's trigger logic for queuing
+                return wrapped_trigger._queue_node_execution(state, dependencies, invoked_by)
+
+            # Fallback to the base implementation if no wrapped node
+            return super()._queue_node_execution(state, dependencies, invoked_by)
 
     @classmethod
     def __annotate_outputs_class__(cls, outputs_class: Type[BaseOutputs], reference: OutputReference) -> None:
