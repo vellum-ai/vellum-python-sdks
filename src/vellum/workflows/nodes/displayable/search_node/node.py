@@ -1,6 +1,7 @@
 import json
 from typing import ClassVar
 
+from vellum.workflows.constants import undefined
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.bases import BaseSearchNode as BaseSearchNode
@@ -37,17 +38,14 @@ class SearchNode(BaseSearchNode[StateType]):
         text: str
 
     def run(self) -> Outputs:
-        query = getattr(self, "query", None)
-        if query is None or query == "":
+        if self.query is undefined or self.query is None or self.query == "":
             raise NodeException(
                 message="Search query is required but was not provided",
                 code=WorkflowErrorCode.INVALID_INPUTS,
             )
 
-        if not isinstance(query, str):
-            query = json.dumps(query, cls=DefaultStateEncoder)
-
-        self.query = query  # type: ignore[misc]
+        if not isinstance(self.query, str):
+            self.query = json.dumps(self.query, cls=DefaultStateEncoder)  # type: ignore[misc]
 
         results = self._perform_search().results
         text = self.chunk_separator.join([r.text for r in results])

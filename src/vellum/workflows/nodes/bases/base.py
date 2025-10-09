@@ -4,7 +4,22 @@ from functools import cached_property, reduce
 import inspect
 from types import MappingProxyType
 from uuid import UUID, uuid4
-from typing import Any, Dict, Generic, Iterator, Optional, Set, Tuple, Type, TypeVar, Union, cast, get_args
+from typing import (
+    Any,
+    ClassVar,
+    Dict,
+    Generic,
+    Iterator,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+    cast,
+    get_args,
+    get_origin,
+)
 
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -152,6 +167,11 @@ class BaseNodeMeta(ABCMeta):
             attribute = super().__getattribute__(name)
         except AttributeError as e:
             if _is_annotated(cls, name):
+                for klass in cls.__mro__:
+                    if hasattr(klass, "__annotations__") and name in klass.__annotations__:
+                        annotation = klass.__annotations__[name]
+                        if get_origin(annotation) is ClassVar:
+                            return undefined
                 attribute = None
             else:
                 raise e
@@ -501,6 +521,20 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
             all_inputs[inputs_key] = value
 
         self._inputs = MappingProxyType(all_inputs)
+
+    def __getattr__(self, name: str) -> Any:
+        """Handle instance attribute access for unset ClassVar attributes."""
+        if name.startswith("_"):
+            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
+
+        # Check if this attribute is a ClassVar in any parent class
+        for klass in self.__class__.__mro__:
+            if hasattr(klass, "__annotations__") and name in klass.__annotations__:
+                annotation = klass.__annotations__[name]
+                if get_origin(annotation) is ClassVar:
+                    return undefined
+
+        raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
 
     def run(self) -> NodeRunResponse:
         return self.Outputs()
