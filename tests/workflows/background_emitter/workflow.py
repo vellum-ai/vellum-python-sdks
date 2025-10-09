@@ -8,7 +8,7 @@ from vellum.workflows.state.base import BaseState
 
 
 class ExpensiveEmitter(BaseWorkflowEmitter):
-    delay = 0.2
+    delay = 0.5
     _has_slept: bool
 
     def __init__(self):
