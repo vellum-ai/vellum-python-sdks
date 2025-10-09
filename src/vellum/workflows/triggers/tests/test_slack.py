@@ -5,7 +5,7 @@ from vellum.workflows.triggers.slack import SlackTrigger
 
 
 def test_slack_trigger__process_event__basic():
-    """SlackTrigger.process_event parses Slack payload correctly."""
+    """SlackTrigger parses Slack payload correctly."""
     # GIVEN a Slack event payload
     slack_payload = {
         "event": {
@@ -17,8 +17,8 @@ def test_slack_trigger__process_event__basic():
         }
     }
 
-    # WHEN we process the event
-    trigger = SlackTrigger.process_event(slack_payload)
+    # WHEN we create a trigger instance
+    trigger = SlackTrigger(slack_payload)
 
     # THEN trigger attributes contain the correct data
     assert trigger.message == "Hello world!"
@@ -30,7 +30,7 @@ def test_slack_trigger__process_event__basic():
 
 
 def test_slack_trigger__process_event__with_thread():
-    """SlackTrigger.process_event handles threaded messages."""
+    """SlackTrigger handles threaded messages."""
     # GIVEN a Slack event payload with thread_ts
     slack_payload = {
         "event": {
@@ -43,20 +43,20 @@ def test_slack_trigger__process_event__with_thread():
         }
     }
 
-    # WHEN we process the event
-    trigger = SlackTrigger.process_event(slack_payload)
+    # WHEN we create a trigger instance
+    trigger = SlackTrigger(slack_payload)
 
     # THEN thread_ts is populated
     assert trigger.thread_ts == "1234567890.123456"
 
 
 def test_slack_trigger__process_event__empty_payload():
-    """SlackTrigger.process_event handles empty payload gracefully."""
+    """SlackTrigger handles empty payload gracefully."""
     # GIVEN an empty payload
     slack_payload: dict[str, str] = {}
 
-    # WHEN we process the event
-    trigger = SlackTrigger.process_event(slack_payload)
+    # WHEN we create a trigger instance
+    trigger = SlackTrigger(slack_payload)
 
     # THEN it returns empty strings for required fields
     assert trigger.message == ""
@@ -68,7 +68,7 @@ def test_slack_trigger__process_event__empty_payload():
 
 
 def test_slack_trigger__process_event__app_mention():
-    """SlackTrigger.process_event handles app_mention events."""
+    """SlackTrigger handles app_mention events."""
     # GIVEN an app_mention event
     slack_payload = {
         "event": {
@@ -80,8 +80,8 @@ def test_slack_trigger__process_event__app_mention():
         }
     }
 
-    # WHEN we process the event
-    trigger = SlackTrigger.process_event(slack_payload)
+    # WHEN we create a trigger instance
+    trigger = SlackTrigger(slack_payload)
 
     # THEN event_type is app_mention
     assert trigger.event_type == "app_mention"

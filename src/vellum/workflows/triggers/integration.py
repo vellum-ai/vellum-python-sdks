@@ -18,11 +18,9 @@ class IntegrationTrigger(BaseTrigger, ABC):
         class MyIntegrationTrigger(IntegrationTrigger):
             data: str
 
-            @classmethod
-            def process_event(cls, event_data: dict):
-                trigger = cls()
-                trigger.data = event_data.get("data", "")
-                return trigger
+            def __init__(self, event_data: dict):
+                super().__init__(event_data)
+                self.data = event_data.get("data", "")
 
         # Use in workflow
         class MyWorkflow(BaseWorkflow):
@@ -41,22 +39,27 @@ class IntegrationTrigger(BaseTrigger, ABC):
     # Configuration that can be set at runtime
     config: ClassVar[Optional[dict]] = None
 
-    @classmethod
-    def process_event(cls, event_data: dict) -> "IntegrationTrigger":
+    def __init__(self, event_data: dict):
         """
-        Process incoming webhook/event data and return trigger instance.
+        Initialize trigger with event data from external system.
 
-        This method should be implemented by subclasses to parse external
-        event payloads (e.g., Slack webhooks, email notifications) into
-        a trigger instance with populated attributes.
+        Subclasses should override this method to parse external
+        event payloads (e.g., Slack webhooks, email notifications) and
+        populate trigger attributes.
 
         Args:
             event_data: Raw event data from the external system
 
-        Returns:
-            Trigger instance with attributes populated from parsed event data
-
-        Raises:
-            NotImplementedError: If subclass doesn't implement this method
+        Examples:
+            >>> class MyTrigger(IntegrationTrigger):
+            ...     data: str
+            ...
+            ...     def __init__(self, event_data: dict):
+            ...         super().__init__(event_data)
+            ...         self.data = event_data.get("data", "")
+            >>>
+            >>> trigger = MyTrigger({"data": "hello"})
+            >>> trigger.data
+            'hello'
         """
-        raise NotImplementedError(f"{cls.__name__} must implement process_event() method to handle external events")
+        self._event_data = event_data
