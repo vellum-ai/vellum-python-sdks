@@ -37,14 +37,17 @@ class SearchNode(BaseSearchNode[StateType]):
         text: str
 
     def run(self) -> Outputs:
-        if self.query is None or self.query == "":
+        query = getattr(self, "query", None)
+        if query is None or query == "":
             raise NodeException(
                 message="Search query is required but was not provided",
                 code=WorkflowErrorCode.INVALID_INPUTS,
             )
 
-        if not isinstance(self.query, str):
-            self.query = json.dumps(self.query, cls=DefaultStateEncoder)
+        if not isinstance(query, str):
+            query = json.dumps(query, cls=DefaultStateEncoder)
+
+        self.query = query  # type: ignore[misc]
 
         results = self._perform_search().results
         text = self.chunk_separator.join([r.text for r in results])

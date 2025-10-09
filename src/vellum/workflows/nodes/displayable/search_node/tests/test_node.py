@@ -234,3 +234,17 @@ def test_run_workflow__invalid_query_raises_validation_error(invalid_query):
     assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
     assert "query" in exc_info.value.message.lower()
     assert "required" in exc_info.value.message.lower() or "missing" in exc_info.value.message.lower()
+
+
+def test_run_workflow__missing_query_attribute_raises_validation_error():
+    """Confirm that a SearchNode without a query attribute defined raises INVALID_INPUTS"""
+
+    class MySearchNode(SearchNode):
+        document_index = "document_index"
+
+    with pytest.raises(NodeException) as exc_info:
+        MySearchNode().run()
+
+    assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
+    assert "query" in exc_info.value.message.lower()
+    assert "required" in exc_info.value.message.lower()
