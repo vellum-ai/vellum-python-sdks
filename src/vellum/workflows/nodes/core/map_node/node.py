@@ -218,6 +218,9 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
         #     value: List[str]
         outputs_class.__annotations__ = {**previous_annotations, reference.name: annotation}
 
+        # Set the reference as an attribute so it can be serialized properly
+        setattr(outputs_class, reference.name, reference)
+
         subworkflow_class = cls.subworkflow.instance if isinstance(cls.subworkflow, NodeReference) else None
         if subworkflow_class:
             output_id = subworkflow_class.__output_ids__.get(reference.name) or uuid4_from_hash(
