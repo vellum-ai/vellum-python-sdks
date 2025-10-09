@@ -16,6 +16,7 @@ if TYPE_CHECKING:
 
 class WorkflowTriggerType(Enum):
     MANUAL = "MANUAL"
+    SLACK_MESSAGE = "SLACK_MESSAGE"
 
 
 def get_trigger_type_mapping() -> Dict[Type["BaseTrigger"], WorkflowTriggerType]:
@@ -29,9 +30,11 @@ def get_trigger_type_mapping() -> Dict[Type["BaseTrigger"], WorkflowTriggerType]
         Dictionary mapping trigger classes to their enum types
     """
     from vellum.workflows.triggers.manual import ManualTrigger
+    from vellum.workflows.triggers.slack import SlackTrigger
 
     return {
         ManualTrigger: WorkflowTriggerType.MANUAL,
+        SlackTrigger: WorkflowTriggerType.SLACK_MESSAGE,
     }
 
 
