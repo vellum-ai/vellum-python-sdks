@@ -1,10 +1,26 @@
 from abc import ABC, ABCMeta, abstractmethod
+from collections.abc import Callable as CollectionsCallable
 from dataclasses import field
 from functools import cached_property, reduce
 import inspect
 from types import MappingProxyType
 from uuid import UUID, uuid4
-from typing import Any, Dict, Generic, Iterator, Optional, Set, Tuple, Type, TypeVar, Union, cast, get_args
+from typing import (
+    Any,
+    Callable as TypingCallable,
+    Dict,
+    Generic,
+    Iterator,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+    cast,
+    get_args,
+    get_origin,
+)
 
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -43,15 +59,15 @@ def _is_nested_class(nested: Any, parent: Type) -> bool:
     ) or any(_is_nested_class(nested, base) for base in parent.__bases__)
 
 
-def _is_annotated(cls: Type, name: str) -> bool:
+def _is_annotated(cls: Type, name: str) -> Any:
     if name in cls.__annotations__:
-        return True
+        return cls.__annotations__[name]
 
     for base in cls.__bases__:
-        if _is_annotated(base, name):
-            return True
+        if annotation := _is_annotated(base, name):
+            return annotation
 
-    return False
+    return None
 
 
 class BaseNodeMeta(ABCMeta):
@@ -151,8 +167,10 @@ class BaseNodeMeta(ABCMeta):
         try:
             attribute = super().__getattribute__(name)
         except AttributeError as e:
-            if _is_annotated(cls, name):
-                attribute = None
+            annotation = _is_annotated(cls, name)
+            origin_annotation = get_origin(annotation)
+            if origin_annotation is not CollectionsCallable and origin_annotation is not TypingCallable:
+                attribute = undefined
             else:
                 raise e
 
@@ -482,7 +500,8 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
                     setattr(base, leaf, input_value)
 
         for descriptor in self.__class__:
-            if not descriptor.instance:
+            if descriptor.instance is undefined:
+                setattr(self, descriptor.name, undefined)
                 continue
 
             if any(isinstance(t, type) and issubclass(t, BaseDescriptor) for t in descriptor.types):
