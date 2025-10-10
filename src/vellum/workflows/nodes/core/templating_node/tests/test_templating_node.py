@@ -1,6 +1,6 @@
 import pytest
 import json
-from typing import List, Union
+from typing import Any, Dict, List, Union
 
 from vellum.client.types.chat_message import ChatMessage
 from vellum.client.types.function_call import FunctionCall
@@ -30,6 +30,54 @@ def test_templating_node__dict_output():
     # https://app.shortcut.com/vellum/story/6132
     dump: str = outputs.result  # type: ignore[assignment]
     assert json.loads(dump) == {"key": "value"}
+
+
+def test_templating_node__dict_type_output():
+    """Tests that TemplatingNode correctly parses dict outputs when using dict type annotation."""
+
+    # GIVEN a templating node with dict output type that returns a dict
+    class DictTemplateNode(TemplatingNode[BaseState, dict]):
+        template = "{{ data }}"
+        inputs = {"data": {"key": "value"}}
+
+    # WHEN the node is run
+    node = DictTemplateNode()
+    outputs = node.run()
+
+    # THEN the output is the expected dict
+    assert outputs.result == {"key": "value"}
+
+
+def test_templating_node__any_type_output():
+    """Tests that TemplatingNode correctly parses dict outputs when using Any type annotation."""
+
+    # GIVEN a templating node with Any output type that returns a dict
+    class AnyTemplateNode(TemplatingNode[BaseState, Any]):
+        template = "{{ data }}"
+        inputs = {"data": {"key": "value"}}
+
+    # WHEN the node is run
+    node = AnyTemplateNode()
+    outputs = node.run()
+
+    # THEN the output is the expected dict
+    assert outputs.result == {"key": "value"}
+
+
+def test_templating_node__dict_str_any_type_output():
+    """Tests that TemplatingNode correctly parses dict outputs when using Dict[str, Any] type annotation."""
+
+    # GIVEN a templating node with Dict[str, Any] output type that returns a dict
+    class DictStrAnyTemplateNode(TemplatingNode[BaseState, Dict[str, Any]]):
+        template = "{{ data }}"
+        inputs = {"data": {"key": "value"}}
+
+    # WHEN the node is run
+    node = DictStrAnyTemplateNode()
+    outputs = node.run()
+
+    # THEN the output is the expected dict
+    assert outputs.result == {"key": "value"}
 
 
 def test_templating_node__int_output():
