@@ -1,6 +1,9 @@
 """Tests for serialization of workflows with SlackTrigger."""
 
-from typing import TypeGuard
+try:  # Python 3.9 compatibility
+    from typing import TypeGuard
+except ImportError:  # pragma: no cover - fallback for older runtimes
+    from typing_extensions import TypeGuard  # type: ignore[assignment]
 
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
