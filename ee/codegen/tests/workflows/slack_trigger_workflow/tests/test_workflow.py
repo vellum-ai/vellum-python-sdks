@@ -1,5 +1,7 @@
 """Tests for SlackTrigger workflow."""
 
+from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
+
 from ..workflow import SlackTriggerWorkflow
 
 
@@ -32,8 +34,6 @@ def test_slack_trigger_workflow__has_trigger():
 
 def test_slack_trigger_workflow__serialization():
     """Test that workflow with SlackTrigger can be serialized."""
-    from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
-
     # GIVEN the SlackTrigger workflow
     # WHEN we serialize it
     result = get_workflow_display(workflow_class=SlackTriggerWorkflow).serialize()
@@ -58,8 +58,6 @@ def test_slack_trigger_workflow__serialization():
 
 def test_slack_trigger_workflow__trigger_attribute_reference():
     """Test that nodes can reference trigger attributes."""
-    from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
-
     # GIVEN the SlackTrigger workflow
     # WHEN we serialize it
     result = get_workflow_display(workflow_class=SlackTriggerWorkflow).serialize()
