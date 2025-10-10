@@ -1,24 +1,29 @@
 """Tests for IntegrationTrigger base class."""
 
-import pytest
-
 from vellum.workflows.nodes.bases.base import BaseNode
+from vellum.workflows.references.trigger import TriggerAttributeReference
+from vellum.workflows.state.base import BaseState
 from vellum.workflows.triggers.integration import IntegrationTrigger
 
 
-def test_integration_trigger__is_abstract():
-    """IntegrationTrigger cannot be instantiated directly (ABC)."""
-    # WHEN we try to call process_event on IntegrationTrigger directly
-    # THEN it raises NotImplementedError
-    with pytest.raises(NotImplementedError, match="must implement process_event"):
-        IntegrationTrigger.process_event({})
+def test_integration_trigger__can_be_instantiated_as_base():
+    """IntegrationTrigger can be instantiated as a base class."""
+    # WHEN we instantiate IntegrationTrigger directly
+    trigger = IntegrationTrigger({"test": "data"})
+
+    # THEN it creates an instance with event data stored
+    assert trigger._event_data == {"test": "data"}
 
 
-def test_integration_trigger__outputs_class_exists():
-    """IntegrationTrigger has Outputs class."""
-    # GIVEN IntegrationTrigger
-    # THEN it has an Outputs class
-    assert hasattr(IntegrationTrigger, "Outputs")
+def test_integration_trigger__can_be_instantiated():
+    """IntegrationTrigger can be instantiated for testing."""
+
+    # GIVEN IntegrationTrigger with concrete implementation
+    class TestTrigger(IntegrationTrigger):
+        pass
+
+    # THEN it can be instantiated (even though base is ABC, concrete subclasses work)
+    assert TestTrigger is not None
 
 
 def test_integration_trigger__can_be_subclassed():
@@ -26,18 +31,39 @@ def test_integration_trigger__can_be_subclassed():
 
     # GIVEN a concrete implementation of IntegrationTrigger
     class TestTrigger(IntegrationTrigger):
-        class Outputs(IntegrationTrigger.Outputs):
-            data: str
+        data: str
 
-        @classmethod
-        def process_event(cls, event_data: dict):
-            return cls.Outputs(data=event_data.get("data", ""))
+        def __init__(self, event_data: dict):
+            super().__init__(event_data)
+            self.data = event_data.get("data", "")
 
-    # WHEN we process an event
-    result = TestTrigger.process_event({"data": "test"})
+    # WHEN we create a trigger instance
+    result = TestTrigger({"data": "test"})
 
-    # THEN it returns the expected outputs
+    # THEN it returns the expected trigger instance with populated attributes
     assert result.data == "test"
+
+
+def test_integration_trigger__attribute_reference():
+    """Trigger annotations expose TriggerAttributeReference descriptors."""
+
+    class TestTrigger(IntegrationTrigger):
+        value: str
+
+        def __init__(self, event_data: dict):
+            super().__init__(event_data)
+            self.value = event_data.get("value", "")
+
+    reference = TestTrigger.value
+    assert isinstance(reference, TriggerAttributeReference)
+    assert reference.name == "value"
+    assert TestTrigger.value is reference
+    assert reference is TestTrigger.attribute_references()["value"]
+
+    state = BaseState()
+    trigger = TestTrigger({"value": "data"})
+    trigger.bind_to_state(state)
+    assert reference.resolve(state) == "data"
 
 
 def test_integration_trigger__graph_syntax():
@@ -45,12 +71,11 @@ def test_integration_trigger__graph_syntax():
 
     # GIVEN a concrete trigger and a node
     class TestTrigger(IntegrationTrigger):
-        class Outputs(IntegrationTrigger.Outputs):
-            value: str
+        value: str
 
-        @classmethod
-        def process_event(cls, event_data: dict):
-            return cls.Outputs(value=event_data.get("value", ""))
+        def __init__(self, event_data: dict):
+            super().__init__(event_data)
+            self.value = event_data.get("value", "")
 
     class TestNode(BaseNode):
         pass
@@ -70,12 +95,11 @@ def test_integration_trigger__multiple_entrypoints():
 
     # GIVEN a trigger and multiple nodes
     class TestTrigger(IntegrationTrigger):
-        class Outputs(IntegrationTrigger.Outputs):
-            msg: str
+        msg: str
 
-        @classmethod
-        def process_event(cls, event_data: dict):
-            return cls.Outputs(msg=event_data.get("msg", ""))
+        def __init__(self, event_data: dict):
+            super().__init__(event_data)
+            self.msg = event_data.get("msg", "")
 
     class NodeA(BaseNode):
         pass

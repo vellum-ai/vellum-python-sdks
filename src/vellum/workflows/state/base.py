@@ -31,7 +31,12 @@ from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.utils.uuid import is_valid_uuid
 from vellum.workflows.constants import undefined
 from vellum.workflows.inputs.base import BaseInputs
-from vellum.workflows.references import ExternalInputReference, OutputReference, StateValueReference
+from vellum.workflows.references import (
+    ExternalInputReference,
+    OutputReference,
+    StateValueReference,
+    TriggerAttributeReference,
+)
 from vellum.workflows.state.delta import AppendStateDelta, SetStateDelta, StateDelta
 from vellum.workflows.types.definition import CodeResourceDefinition, serialize_type_encoder_with_id
 from vellum.workflows.types.generics import StateType, import_workflow_class, is_workflow_class
@@ -301,6 +306,7 @@ class StateMeta(UniversalBaseModel):
     workflow_inputs: BaseInputs = field(default_factory=BaseInputs)
     external_inputs: Dict[ExternalInputReference, Any] = field(default_factory=dict)
     node_outputs: Dict[OutputReference, Any] = field(default_factory=dict)
+    trigger_attributes: Dict[TriggerAttributeReference, Any] = field(default_factory=dict)
     node_execution_cache: NodeExecutionCache = field(default_factory=NodeExecutionCache)
     parent: Optional["BaseState"] = None
     __snapshot_callback__: Optional[Callable[[Optional[StateDelta]], None]] = field(init=False, default=None)
@@ -311,6 +317,7 @@ class StateMeta(UniversalBaseModel):
     def add_snapshot_callback(self, callback: Callable[[Optional[StateDelta]], None]) -> None:
         self.node_outputs = _make_snapshottable("meta.node_outputs", self.node_outputs, callback)
         self.external_inputs = _make_snapshottable("meta.external_inputs", self.external_inputs, callback)
+        self.trigger_attributes = _make_snapshottable("meta.trigger_attributes", self.trigger_attributes, callback)
         self.__snapshot_callback__ = callback
 
     def __setattr__(self, name: str, value: Any) -> None:
@@ -345,6 +352,12 @@ class StateMeta(UniversalBaseModel):
     def serialize_node_outputs(self, node_outputs: Dict[OutputReference, Any], _info: Any) -> Dict[str, Any]:
         return {str(descriptor.id): value for descriptor, value in node_outputs.items()}
 
+    @field_serializer("trigger_attributes")
+    def serialize_trigger_attributes(
+        self, trigger_attributes: Dict[TriggerAttributeReference, Any], _info: Any
+    ) -> Dict[str, Any]:
+        return {str(descriptor.id): value for descriptor, value in trigger_attributes.items()}
+
     @field_validator("node_outputs", mode="before")
     @classmethod
     def deserialize_node_outputs(cls, node_outputs: Any, info: ValidationInfo):
@@ -378,6 +391,41 @@ class StateMeta(UniversalBaseModel):
             return deserialized_node_outputs
 
         return node_outputs
+
+    @field_validator("trigger_attributes", mode="before")
+    @classmethod
+    def deserialize_trigger_attributes(cls, trigger_attributes: Any, info: ValidationInfo):
+        if isinstance(trigger_attributes, dict):
+            workflow_definition = cls._get_workflow(info)
+            if not workflow_definition:
+                return trigger_attributes
+
+            trigger_attribute_map: Dict[Union[str, UUID], TriggerAttributeReference] = {}
+            for subgraph in workflow_definition.get_subgraphs():
+                for trigger_class in subgraph.triggers:
+                    for attribute in trigger_class:
+                        trigger_attribute_map[str(attribute)] = attribute
+                        attr_id = getattr(attribute, "id", None)
+                        if isinstance(attr_id, UUID):
+                            trigger_attribute_map[attr_id] = attribute
+                            trigger_attribute_map[str(attr_id)] = attribute
+
+            deserialized_attributes: Dict[TriggerAttributeReference, Any] = {}
+            for key, value in trigger_attributes.items():
+                reference: Optional[TriggerAttributeReference]
+                if is_valid_uuid(key):
+                    reference = trigger_attribute_map.get(UUID(key))
+                else:
+                    reference = trigger_attribute_map.get(key)
+
+                if not reference:
+                    continue
+
+                deserialized_attributes[reference] = value
+
+            return deserialized_attributes
+
+        return trigger_attributes
 
     @field_validator("node_execution_cache", mode="before")
     @classmethod

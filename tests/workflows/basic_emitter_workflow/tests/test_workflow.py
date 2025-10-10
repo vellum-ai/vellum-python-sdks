@@ -79,6 +79,7 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
             "workflow_inputs": {},
             "external_inputs": {},
             "node_outputs": {serialized_start_node_output_id: "Hello, World!"},
+            "trigger_attributes": {},
             "parent": None,
             "node_execution_cache": {
                 "node_executions_fulfilled": {serialized_start_node_id: [str(start_node_span_id)]},
@@ -115,6 +116,7 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
             "node_outputs": {
                 serialized_start_node_output_id: "Hello, World!",
             },
+            "trigger_attributes": {},
             "parent": None,
             "node_execution_cache": {
                 "node_executions_fulfilled": {
@@ -150,6 +152,7 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
                 serialized_start_node_output_id: "Hello, World!",
                 serialized_next_node_output_id: "Score: 13",
             },
+            "trigger_attributes": {},
             "node_execution_cache": {
                 "node_executions_fulfilled": {
                     serialized_start_node_id: [str(start_node_span_id)],
