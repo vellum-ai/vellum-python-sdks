@@ -1,9 +1,11 @@
 """Tests for serialization of workflows with SlackTrigger."""
 
-try:  # Python 3.9 compatibility
+import sys
+
+if sys.version_info >= (3, 10):
     from typing import TypeGuard
-except ImportError:  # pragma: no cover - fallback for older runtimes
-    from typing_extensions import TypeGuard  # type: ignore[assignment]
+else:
+    from typing_extensions import TypeGuard
 
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
