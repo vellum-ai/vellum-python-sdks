@@ -15,9 +15,9 @@ describe("TriggerAttributeWorkflowReference", () => {
           id: "slack-trigger-id",
           type: "SLACK_MESSAGE",
           attributes: [
-            { id: "message-id", name: "message", type: "STRING" },
-            { id: "user-id", name: "user", type: "STRING" },
-            { id: "channel-id", name: "channel", type: "STRING" },
+            { id: "message-id", name: "message" },
+            { id: "user-id", name: "user" },
+            { id: "channel-id", name: "channel" },
           ],
         },
       ],
@@ -96,7 +96,7 @@ describe("TriggerAttributeWorkflowReference", () => {
         {
           id: "manual-trigger-id",
           type: "MANUAL",
-          attributes: [{ id: "input-id", name: "input", type: "STRING" }],
+          attributes: [{ id: "input-id", name: "input" }],
         },
       ],
     });
