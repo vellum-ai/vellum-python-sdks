@@ -1,6 +1,8 @@
 """Tests for SlackTrigger."""
 
 from vellum.workflows.nodes.bases.base import BaseNode
+from vellum.workflows.references.trigger import TriggerAttributeReference
+from vellum.workflows.state.base import BaseState
 from vellum.workflows.triggers.slack import SlackTrigger
 
 
@@ -27,6 +29,13 @@ def test_slack_trigger__basic():
     assert trigger.timestamp == "1234567890.123456"
     assert trigger.thread_ts is None
     assert trigger.event_type == "message"
+
+    # AND the trigger can bind values to workflow state
+    state = BaseState()
+    trigger.bind_to_state(state)
+    stored = state.meta.trigger_attributes
+    assert SlackTrigger.message in stored
+    assert stored[SlackTrigger.message] == "Hello world!"
 
 
 def test_slack_trigger__with_thread():
@@ -91,15 +100,19 @@ def test_slack_trigger__app_mention():
 def test_slack_trigger__attributes():
     """SlackTrigger has correct attributes."""
     # GIVEN SlackTrigger class
-    # THEN it has all expected fields as top-level attributes
-    assert hasattr(SlackTrigger, "__annotations__")
+    # THEN it exposes attribute references for annotated fields
+    reference = SlackTrigger.message
+    assert isinstance(reference, TriggerAttributeReference)
+    assert reference.name == "message"
+    assert SlackTrigger.message is reference  # cache returns same reference
+
     annotations = SlackTrigger.__annotations__
-    assert "message" in annotations
-    assert "channel" in annotations
-    assert "user" in annotations
-    assert "timestamp" in annotations
-    assert "thread_ts" in annotations
-    assert "event_type" in annotations
+    assert set(annotations) >= {"message", "channel", "user", "timestamp", "thread_ts", "event_type"}
+
+    # AND references resolve when present on state
+    state = BaseState()
+    state.meta.trigger_attributes[reference] = "Hello"
+    assert reference.resolve(state) == "Hello"
 
 
 def test_slack_trigger__graph_syntax():

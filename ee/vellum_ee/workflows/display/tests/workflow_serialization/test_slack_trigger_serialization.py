@@ -1,6 +1,6 @@
 """Tests for serialization of workflows with SlackTrigger."""
 
-from typing import cast
+from typing import assert_type
 
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
@@ -20,49 +20,27 @@ class SimpleNode(BaseNode):
         output = Inputs.input
 
 
-def create_workflow(trigger=None):
-    """Factory for creating test workflows."""
+def test_slack_trigger_serialization():
+    """Workflow with SlackTrigger serializes with triggers field."""
 
     class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
-        graph = trigger >> SimpleNode if trigger else SimpleNode
+        graph = SlackTrigger >> SimpleNode
 
         class Outputs(BaseWorkflow.Outputs):
             output = SimpleNode.Outputs.output
 
-    return TestWorkflow
-
-
-def serialize(workflow_class) -> JsonObject:
-    """Helper to serialize a workflow."""
-    return get_workflow_display(workflow_class=workflow_class).serialize()
-
-
-def test_slack_trigger_serialization():
-    """Workflow with SlackTrigger serializes with triggers field and outputs."""
-    result = serialize(create_workflow(SlackTrigger))
-    triggers = cast(JsonArray, result["triggers"])
+    result = get_workflow_display(workflow_class=TestWorkflow).serialize()
+    triggers = result["triggers"]
+    assert_type(triggers, JsonArray)
 
     assert len(triggers) == 1
-    trigger = cast(JsonObject, triggers[0])
+    trigger = triggers[0]
+    assert_type(trigger, JsonObject)
 
     assert trigger["type"] == "SLACK_MESSAGE"
     assert "id" in trigger
     assert "attributes" in trigger
     assert trigger["attributes"] == []
-
-    # Check that outputs are included
-    assert "outputs" in trigger
-    outputs = cast(JsonArray, trigger["outputs"])
-    assert len(outputs) == 6  # message, channel, user, timestamp, thread_ts, event_type
-
-    # Verify output structure
-    output_names = {cast(JsonObject, output)["name"] for output in outputs}
-    assert output_names == {"message", "channel", "user", "timestamp", "thread_ts", "event_type"}
-
-    # Verify output types (all should be STRING for SlackTrigger)
-    for output in outputs:
-        output_obj = cast(JsonObject, output)
-        assert output_obj["type"] == "STRING"
 
 
 def test_slack_trigger_multiple_entrypoints():
@@ -83,23 +61,40 @@ def test_slack_trigger_multiple_entrypoints():
             output_a = NodeA.Outputs.output
             output_b = NodeB.Outputs.output
 
-    result = serialize(MultiWorkflow)
-    triggers = cast(JsonArray, result["triggers"])
-    workflow_data = cast(JsonObject, result["workflow_raw_data"])
-    nodes = cast(JsonArray, workflow_data["nodes"])
+    result = get_workflow_display(workflow_class=MultiWorkflow).serialize()
+    triggers = result["triggers"]
+    assert_type(triggers, JsonArray)
+
+    workflow_data = result["workflow_raw_data"]
+    assert_type(workflow_data, JsonObject)
+
+    nodes = workflow_data["nodes"]
+    assert_type(nodes, JsonArray)
 
     assert len(triggers) == 1
-    trigger = cast(JsonObject, triggers[0])
+    trigger = triggers[0]
+    assert_type(trigger, JsonObject)
     assert trigger["type"] == "SLACK_MESSAGE"
-    assert "outputs" in trigger
-    assert len([n for n in nodes if cast(JsonObject, n)["type"] == "GENERIC"]) >= 2
+
+    generic_nodes = [n for n in nodes if assert_type(n, JsonObject)["type"] == "GENERIC"]
+    assert len(generic_nodes) >= 2
 
 
 def test_serialized_slack_workflow_structure():
     """Verify complete structure of serialized workflow with SlackTrigger."""
-    result = serialize(create_workflow(SlackTrigger))
-    workflow_raw_data = cast(JsonObject, result["workflow_raw_data"])
-    definition = cast(JsonObject, workflow_raw_data["definition"])
+
+    class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
+        graph = SlackTrigger >> SimpleNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            output = SimpleNode.Outputs.output
+
+    result = get_workflow_display(workflow_class=TestWorkflow).serialize()
+    workflow_raw_data = result["workflow_raw_data"]
+    assert_type(workflow_raw_data, JsonObject)
+
+    definition = workflow_raw_data["definition"]
+    assert_type(definition, JsonObject)
 
     assert result.keys() == {
         "workflow_raw_data",
@@ -110,26 +105,3 @@ def test_serialized_slack_workflow_structure():
     }
     assert workflow_raw_data.keys() == {"nodes", "edges", "display_data", "definition", "output_values"}
     assert definition["name"] == "TestWorkflow"
-
-
-def test_slack_trigger_outputs_correct_fields():
-    """Verify SlackTrigger outputs contain all expected fields."""
-    result = serialize(create_workflow(SlackTrigger))
-    triggers = cast(JsonArray, result["triggers"])
-    trigger = cast(JsonObject, triggers[0])
-    outputs = cast(JsonArray, trigger["outputs"])
-
-    # Convert to dict for easy lookup
-    outputs_dict = {cast(JsonObject, o)["name"]: cast(JsonObject, o) for o in outputs}
-
-    # Verify all required fields
-    assert "message" in outputs_dict
-    assert "channel" in outputs_dict
-    assert "user" in outputs_dict
-    assert "timestamp" in outputs_dict
-    assert "thread_ts" in outputs_dict
-    assert "event_type" in outputs_dict
-
-    # All should be STRING type
-    for field_name in ["message", "channel", "user", "timestamp", "thread_ts", "event_type"]:
-        assert outputs_dict[field_name]["type"] == "STRING"

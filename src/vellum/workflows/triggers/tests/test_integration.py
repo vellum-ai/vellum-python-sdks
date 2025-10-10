@@ -1,6 +1,8 @@
 """Tests for IntegrationTrigger base class."""
 
 from vellum.workflows.nodes.bases.base import BaseNode
+from vellum.workflows.references.trigger import TriggerAttributeReference
+from vellum.workflows.state.base import BaseState
 from vellum.workflows.triggers.integration import IntegrationTrigger
 
 
@@ -40,6 +42,28 @@ def test_integration_trigger__can_be_subclassed():
 
     # THEN it returns the expected trigger instance with populated attributes
     assert result.data == "test"
+
+
+def test_integration_trigger__attribute_reference():
+    """Trigger annotations expose TriggerAttributeReference descriptors."""
+
+    class TestTrigger(IntegrationTrigger):
+        value: str
+
+        def __init__(self, event_data: dict):
+            super().__init__(event_data)
+            self.value = event_data.get("value", "")
+
+    reference = TestTrigger.value
+    assert isinstance(reference, TriggerAttributeReference)
+    assert reference.name == "value"
+    assert TestTrigger.value is reference
+    assert reference is TestTrigger.attribute_references()["value"]
+
+    state = BaseState()
+    trigger = TestTrigger({"value": "data"})
+    trigger.bind_to_state(state)
+    assert reference.resolve(state) == "data"
 
 
 def test_integration_trigger__graph_syntax():

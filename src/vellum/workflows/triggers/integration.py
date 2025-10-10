@@ -59,7 +59,9 @@ class IntegrationTrigger(BaseTrigger, ABC):
             ...         self.data = event_data.get("data", "")
             >>>
             >>> trigger = MyTrigger({"data": "hello"})
-            >>> trigger.data
+            >>> state = workflow.get_default_state()
+            >>> trigger.bind_to_state(state)
+            >>> MyTrigger.data.resolve(state)
             'hello'
         """
         self._event_data = event_data
