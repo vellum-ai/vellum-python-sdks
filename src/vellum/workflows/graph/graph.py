@@ -175,7 +175,10 @@ class Graph:
             )
 
         if not self._edges and not self._entrypoints:
-            raise ValueError("Graph instance can only create new edges from nodes within existing edges")
+            raise ValueError(
+                "Cannot create edges from nodes with empty Ports classes (like TERMINAL/FinalOutputNode). "
+                "TERMINAL nodes are designed to be workflow outputs and cannot connect to other nodes."
+            )
 
         if self._terminals and all(isinstance(terminal, NoPortsNode) for terminal in self._terminals):
             terminal_names = [terminal.node_class.__name__ for terminal in self._terminals]
