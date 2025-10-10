@@ -29,6 +29,7 @@ from vellum.workflows.types.core import Json, JsonArray, JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.types.utils import get_original_base
 from vellum.workflows.utils.uuids import uuid4_from_hash
+from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
 from vellum.workflows.vellum_client import create_vellum_client
 from vellum_ee.workflows.display.base import (
     EdgeDisplay,
@@ -475,6 +476,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         # Return as a list with a single trigger object matching Django schema
         trigger_id = uuid4_from_hash(f"{trigger_class.__module__} | {trigger_class.__qualname__}")
 
+        # Serialize trigger attributes like node outputs
         attribute_references = trigger_class.attribute_references().values()
         trigger_attributes: JsonArray = cast(
             JsonArray,
@@ -484,6 +486,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                     {
                         "id": str(reference.id),
                         "name": reference.name,
+                        "type": primitive_type_to_vellum_variable_type(reference),
                         "value": None,
                     },
                 )

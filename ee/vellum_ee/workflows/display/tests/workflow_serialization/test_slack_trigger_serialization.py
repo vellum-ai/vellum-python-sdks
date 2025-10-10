@@ -1,13 +1,10 @@
 """Tests for serialization of workflows with SlackTrigger."""
 
-from typing import cast
-
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.triggers.slack import SlackTrigger
-from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 
@@ -31,17 +28,29 @@ def test_slack_trigger_serialization() -> None:
 
     result = get_workflow_display(workflow_class=TestWorkflow).serialize()
 
-    triggers = cast(JsonArray, result["triggers"])
+    # Validate triggers structure
+    assert "triggers" in result
+    triggers = result["triggers"]
+    assert isinstance(triggers, list)
     assert len(triggers) == 1
 
-    trigger = cast(JsonObject, triggers[0])
+    trigger = triggers[0]
+    assert isinstance(trigger, dict)
     assert trigger["type"] == "SLACK_MESSAGE"
     assert "id" in trigger
 
-    attributes = cast(JsonArray, trigger["attributes"])
+    # Validate attributes
+    assert "attributes" in trigger
+    attributes = trigger["attributes"]
+    assert isinstance(attributes, list)
     assert len(attributes) == 6
 
-    attribute_names = {cast(JsonObject, attr)["name"] for attr in attributes}
+    attribute_names = set()
+    for attribute in attributes:
+        assert isinstance(attribute, dict)
+        assert "name" in attribute
+        assert isinstance(attribute["name"], str)
+        attribute_names.add(attribute["name"])
     assert attribute_names == {
         "message",
         "channel",
@@ -51,8 +60,8 @@ def test_slack_trigger_serialization() -> None:
         "event_type",
     }
 
-    for attr in attributes:
-        attribute = cast(JsonObject, attr)
+    for attribute in attributes:
+        assert isinstance(attribute, dict)
         assert attribute["value"] is None
         assert isinstance(attribute["id"], str)
         assert attribute["id"]
@@ -78,16 +87,28 @@ def test_slack_trigger_multiple_entrypoints() -> None:
 
     result = get_workflow_display(workflow_class=MultiWorkflow).serialize()
 
-    triggers = cast(JsonArray, result["triggers"])
-    workflow_data = cast(JsonObject, result["workflow_raw_data"])
-    nodes = cast(JsonArray, workflow_data["nodes"])
-
+    # Validate triggers
+    assert "triggers" in result
+    triggers = result["triggers"]
+    assert isinstance(triggers, list)
     assert len(triggers) == 1
-    trigger = cast(JsonObject, triggers[0])
+
+    trigger = triggers[0]
+    assert isinstance(trigger, dict)
     assert trigger["type"] == "SLACK_MESSAGE"
 
-    attributes = cast(JsonArray, trigger["attributes"])
-    assert {cast(JsonObject, attr)["name"] for attr in attributes} == {
+    # Validate attributes
+    assert "attributes" in trigger
+    attributes = trigger["attributes"]
+    assert isinstance(attributes, list)
+    attribute_names = set()
+    for attribute in attributes:
+        assert isinstance(attribute, dict)
+        assert "name" in attribute
+        assert isinstance(attribute["name"], str)
+        attribute_names.add(attribute["name"])
+
+    assert attribute_names == {
         "message",
         "channel",
         "user",
@@ -96,11 +117,15 @@ def test_slack_trigger_multiple_entrypoints() -> None:
         "event_type",
     }
 
-    generic_nodes = []
-    for node in nodes:
-        node_obj = cast(JsonObject, node)
-        if node_obj.get("type") == "GENERIC":
-            generic_nodes.append(node_obj)
+    # Validate nodes
+    assert "workflow_raw_data" in result
+    workflow_data = result["workflow_raw_data"]
+    assert isinstance(workflow_data, dict)
+    assert "nodes" in workflow_data
+    nodes = workflow_data["nodes"]
+    assert isinstance(nodes, list)
+
+    generic_nodes = [node for node in nodes if isinstance(node, dict) and node.get("type") == "GENERIC"]
     assert len(generic_nodes) >= 2
 
 
@@ -115,9 +140,8 @@ def test_serialized_slack_workflow_structure() -> None:
 
     result = get_workflow_display(workflow_class=TestWorkflow).serialize()
 
-    workflow_raw_data = cast(JsonObject, result["workflow_raw_data"])
-    definition = cast(JsonObject, workflow_raw_data["definition"])
-
+    # Validate top-level structure
+    assert isinstance(result, dict)
     assert set(result.keys()) == {
         "workflow_raw_data",
         "input_variables",
@@ -126,6 +150,9 @@ def test_serialized_slack_workflow_structure() -> None:
         "triggers",
     }
 
+    # Validate workflow_raw_data structure
+    workflow_raw_data = result["workflow_raw_data"]
+    assert isinstance(workflow_raw_data, dict)
     assert set(workflow_raw_data.keys()) == {
         "nodes",
         "edges",
@@ -134,4 +161,7 @@ def test_serialized_slack_workflow_structure() -> None:
         "output_values",
     }
 
+    # Validate definition
+    definition = workflow_raw_data["definition"]
+    assert isinstance(definition, dict)
     assert definition["name"] == "TestWorkflow"
