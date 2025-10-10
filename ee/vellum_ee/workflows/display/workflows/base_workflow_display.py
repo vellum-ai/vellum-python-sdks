@@ -475,10 +475,26 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         # Return as a list with a single trigger object matching Django schema
         trigger_id = uuid4_from_hash(f"{trigger_class.__module__} | {trigger_class.__qualname__}")
 
+        attribute_references = trigger_class.attribute_references().values()
+        trigger_attributes: JsonArray = cast(
+            JsonArray,
+            [
+                cast(
+                    JsonObject,
+                    {
+                        "id": str(reference.id),
+                        "name": reference.name,
+                        "value": None,
+                    },
+                )
+                for reference in sorted(attribute_references, key=lambda ref: ref.name)
+            ],
+        )
+
         trigger_data: JsonObject = {
             "id": str(trigger_id),
             "type": trigger_type.value,
-            "attributes": [],
+            "attributes": trigger_attributes,
         }
 
         return cast(JsonArray, [trigger_data])

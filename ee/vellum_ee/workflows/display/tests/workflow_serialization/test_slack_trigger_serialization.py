@@ -1,18 +1,13 @@
 """Tests for serialization of workflows with SlackTrigger."""
 
-import sys
-
-if sys.version_info >= (3, 10):
-    from typing import TypeGuard
-else:
-    from typing_extensions import TypeGuard
+from typing import cast
 
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.triggers.slack import SlackTrigger
-from vellum.workflows.types.core import Json, JsonArray, JsonObject
+from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 
@@ -23,18 +18,6 @@ class Inputs(BaseInputs):
 class SimpleNode(BaseNode):
     class Outputs(BaseNode.Outputs):
         output = Inputs.input
-
-
-def is_json_array(value: Json) -> TypeGuard[JsonArray]:
-    return isinstance(value, list)
-
-
-def is_json_object(value: Json) -> TypeGuard[JsonObject]:
-    return isinstance(value, dict)
-
-
-def is_json_str(value: Json) -> TypeGuard[str]:
-    return isinstance(value, str)
 
 
 def test_slack_trigger_serialization() -> None:
@@ -48,23 +31,31 @@ def test_slack_trigger_serialization() -> None:
 
     result = get_workflow_display(workflow_class=TestWorkflow).serialize()
 
-    triggers_value = result["triggers"]
-    assert is_json_array(triggers_value)
-    triggers = triggers_value
-
+    triggers = cast(JsonArray, result["triggers"])
     assert len(triggers) == 1
-    trigger_value = triggers[0]
-    assert is_json_object(trigger_value)
-    trigger = trigger_value
 
-    trigger_type_value = trigger["type"]
-    assert is_json_str(trigger_type_value)
-    assert trigger_type_value == "SLACK_MESSAGE"
-
+    trigger = cast(JsonObject, triggers[0])
+    assert trigger["type"] == "SLACK_MESSAGE"
     assert "id" in trigger
-    attributes_value = trigger["attributes"]
-    assert is_json_array(attributes_value)
-    assert attributes_value == []
+
+    attributes = cast(JsonArray, trigger["attributes"])
+    assert len(attributes) == 6
+
+    attribute_names = {cast(JsonObject, attr)["name"] for attr in attributes}
+    assert attribute_names == {
+        "message",
+        "channel",
+        "user",
+        "timestamp",
+        "thread_ts",
+        "event_type",
+    }
+
+    for attr in attributes:
+        attribute = cast(JsonObject, attr)
+        assert attribute["value"] is None
+        assert isinstance(attribute["id"], str)
+        assert attribute["id"]
 
 
 def test_slack_trigger_multiple_entrypoints() -> None:
@@ -87,36 +78,29 @@ def test_slack_trigger_multiple_entrypoints() -> None:
 
     result = get_workflow_display(workflow_class=MultiWorkflow).serialize()
 
-    triggers_value = result["triggers"]
-    assert is_json_array(triggers_value)
-    triggers = triggers_value
-
-    workflow_data_value = result["workflow_raw_data"]
-    assert is_json_object(workflow_data_value)
-    workflow_data = workflow_data_value
-
-    nodes_value = workflow_data["nodes"]
-    assert is_json_array(nodes_value)
-    nodes = nodes_value
+    triggers = cast(JsonArray, result["triggers"])
+    workflow_data = cast(JsonObject, result["workflow_raw_data"])
+    nodes = cast(JsonArray, workflow_data["nodes"])
 
     assert len(triggers) == 1
-    trigger_value = triggers[0]
-    assert is_json_object(trigger_value)
-    trigger = trigger_value
+    trigger = cast(JsonObject, triggers[0])
+    assert trigger["type"] == "SLACK_MESSAGE"
 
-    trigger_type_value = trigger["type"]
-    assert is_json_str(trigger_type_value)
-    assert trigger_type_value == "SLACK_MESSAGE"
+    attributes = cast(JsonArray, trigger["attributes"])
+    assert {cast(JsonObject, attr)["name"] for attr in attributes} == {
+        "message",
+        "channel",
+        "user",
+        "timestamp",
+        "thread_ts",
+        "event_type",
+    }
 
     generic_nodes = []
     for node in nodes:
-        assert is_json_object(node)
-        node_type_value = node.get("type")
-        assert node_type_value is not None
-        assert is_json_str(node_type_value)
-        if node_type_value == "GENERIC":
-            generic_nodes.append(node)
-
+        node_obj = cast(JsonObject, node)
+        if node_obj.get("type") == "GENERIC":
+            generic_nodes.append(node_obj)
     assert len(generic_nodes) >= 2
 
 
@@ -131,13 +115,8 @@ def test_serialized_slack_workflow_structure() -> None:
 
     result = get_workflow_display(workflow_class=TestWorkflow).serialize()
 
-    workflow_raw_data_value = result["workflow_raw_data"]
-    assert is_json_object(workflow_raw_data_value)
-    workflow_raw_data = workflow_raw_data_value
-
-    definition_value = workflow_raw_data["definition"]
-    assert is_json_object(definition_value)
-    definition = definition_value
+    workflow_raw_data = cast(JsonObject, result["workflow_raw_data"])
+    definition = cast(JsonObject, workflow_raw_data["definition"])
 
     assert set(result.keys()) == {
         "workflow_raw_data",
@@ -155,6 +134,4 @@ def test_serialized_slack_workflow_structure() -> None:
         "output_values",
     }
 
-    definition_name = definition["name"]
-    assert is_json_str(definition_name)
-    assert definition_name == "TestWorkflow"
+    assert definition["name"] == "TestWorkflow"

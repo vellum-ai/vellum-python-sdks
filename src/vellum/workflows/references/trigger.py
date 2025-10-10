@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from uuid import UUID, uuid4
+from uuid import UUID
 from typing import TYPE_CHECKING, Any, Generic, Optional, Tuple, Type, TypeVar, cast
 
 from pydantic import GetCoreSchemaHandler
@@ -43,7 +43,11 @@ class TriggerAttributeReference(BaseDescriptor[_T], Generic[_T]):
         attribute_id = attribute_ids.get(self.name)
         if isinstance(attribute_id, UUID):
             return attribute_id
-        return uuid4()
+
+        raise RuntimeError(
+            "Trigger attribute identifiers must be generated at class creation time. "
+            f"Attribute '{self.name}' is not registered on {self._trigger_class.__qualname__}."
+        )
 
     def resolve(self, state: BaseState) -> _T:
         trigger_attributes = getattr(state.meta, "trigger_attributes", {})

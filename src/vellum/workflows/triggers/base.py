@@ -1,6 +1,6 @@
 from abc import ABC, ABCMeta
 import inspect
-from typing import TYPE_CHECKING, Any, Dict, Iterator, Tuple, Type, cast
+from typing import TYPE_CHECKING, Any, ClassVar, Dict, Iterator, Tuple, Type, cast, get_origin
 
 if TYPE_CHECKING:
     from vellum.workflows.graph.graph import Graph, GraphTarget
@@ -13,7 +13,10 @@ from vellum.workflows.utils.uuids import uuid4_from_hash
 
 def _is_annotated(cls: Type, name: str) -> bool:
     annotations = getattr(cls, "__annotations__", {})
-    if name in annotations:
+    annotation = annotations.get(name)
+    if annotation is not None:
+        if get_origin(annotation) is ClassVar:
+            return False
         return True
 
     for base in cls.__bases__:
@@ -35,10 +38,12 @@ class BaseTriggerMeta(ABCMeta):
                 attribute_ids.update(base_ids)
 
         annotations = getattr(trigger_cls, "__annotations__", {})
-        for attr_name in annotations:
+        for attr_name, annotation in annotations.items():
             if attr_name.startswith("_"):
                 continue
             if attr_name in trigger_cls.__dict__:
+                continue
+            if get_origin(annotation) is ClassVar:
                 continue
             attribute_ids[attr_name] = uuid4_from_hash(
                 f"{trigger_cls.__module__}|{trigger_cls.__qualname__}|{attr_name}"
