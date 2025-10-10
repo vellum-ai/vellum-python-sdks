@@ -355,8 +355,8 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
 
         return {
             "type": "TRIGGER_ATTRIBUTE",
-            "triggerId": str(trigger_id),
-            "attributeId": str(value.id),
+            "trigger_id": str(trigger_id),
+            "attribute_id": str(value.id),
         }
 
     if isinstance(value, list):
