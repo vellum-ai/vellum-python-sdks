@@ -81,6 +81,8 @@ class IntegrationProvidersClient:
         self,
         integration_provider: str,
         *,
+        important: typing.Optional[bool] = None,
+        include_deprecated: typing.Optional[bool] = None,
         integration_name: typing.Optional[str] = None,
         limit: typing.Optional[int] = None,
         offset: typing.Optional[int] = None,
@@ -94,6 +96,12 @@ class IntegrationProvidersClient:
         ----------
         integration_provider : str
             The integration provider name
+
+        important : typing.Optional[bool]
+            Whether to filter the tools by important
+
+        include_deprecated : typing.Optional[bool]
+            Whether to include deprecated tools
 
         integration_name : typing.Optional[str]
             The Vellum Integration name
@@ -129,6 +137,8 @@ class IntegrationProvidersClient:
         """
         _response = self._raw_client.list_integration_tools(
             integration_provider,
+            important=important,
+            include_deprecated=include_deprecated,
             integration_name=integration_name,
             limit=limit,
             offset=offset,
@@ -214,6 +224,8 @@ class AsyncIntegrationProvidersClient:
         self,
         integration_provider: str,
         *,
+        important: typing.Optional[bool] = None,
+        include_deprecated: typing.Optional[bool] = None,
         integration_name: typing.Optional[str] = None,
         limit: typing.Optional[int] = None,
         offset: typing.Optional[int] = None,
@@ -227,6 +239,12 @@ class AsyncIntegrationProvidersClient:
         ----------
         integration_provider : str
             The integration provider name
+
+        important : typing.Optional[bool]
+            Whether to filter the tools by important
+
+        include_deprecated : typing.Optional[bool]
+            Whether to include deprecated tools
 
         integration_name : typing.Optional[str]
             The Vellum Integration name
@@ -270,6 +288,8 @@ class AsyncIntegrationProvidersClient:
         """
         _response = await self._raw_client.list_integration_tools(
             integration_provider,
+            important=important,
+            include_deprecated=include_deprecated,
             integration_name=integration_name,
             limit=limit,
             offset=offset,

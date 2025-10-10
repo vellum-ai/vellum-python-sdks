@@ -4566,6 +4566,22 @@ client.integration_providers.list_integration_tools(
 <dl>
 <dd>
 
+**important:** `typing.Optional[bool]` — Whether to filter the tools by important
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**include_deprecated:** `typing.Optional[bool]` — Whether to include deprecated tools
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **integration_name:** `typing.Optional[str]` — The Vellum Integration name
     
 </dd>

@@ -15,6 +15,7 @@ IntegrationName = typing.Union[
         "GOOGLE_CALENDAR",
         "GOOGLE_DRIVE",
         "GMAIL",
+        "AIRTABLE",
     ],
     typing.Any,
 ]

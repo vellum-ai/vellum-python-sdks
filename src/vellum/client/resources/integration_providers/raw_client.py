@@ -72,6 +72,8 @@ class RawIntegrationProvidersClient:
         self,
         integration_provider: str,
         *,
+        important: typing.Optional[bool] = None,
+        include_deprecated: typing.Optional[bool] = None,
         integration_name: typing.Optional[str] = None,
         limit: typing.Optional[int] = None,
         offset: typing.Optional[int] = None,
@@ -85,6 +87,12 @@ class RawIntegrationProvidersClient:
         ----------
         integration_provider : str
             The integration provider name
+
+        important : typing.Optional[bool]
+            Whether to filter the tools by important
+
+        include_deprecated : typing.Optional[bool]
+            Whether to include deprecated tools
 
         integration_name : typing.Optional[str]
             The Vellum Integration name
@@ -111,6 +119,8 @@ class RawIntegrationProvidersClient:
             base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
+                "important": important,
+                "include_deprecated": include_deprecated,
                 "integration_name": integration_name,
                 "limit": limit,
                 "offset": offset,
@@ -193,6 +203,8 @@ class AsyncRawIntegrationProvidersClient:
         self,
         integration_provider: str,
         *,
+        important: typing.Optional[bool] = None,
+        include_deprecated: typing.Optional[bool] = None,
         integration_name: typing.Optional[str] = None,
         limit: typing.Optional[int] = None,
         offset: typing.Optional[int] = None,
@@ -206,6 +218,12 @@ class AsyncRawIntegrationProvidersClient:
         ----------
         integration_provider : str
             The integration provider name
+
+        important : typing.Optional[bool]
+            Whether to filter the tools by important
+
+        include_deprecated : typing.Optional[bool]
+            Whether to include deprecated tools
 
         integration_name : typing.Optional[str]
             The Vellum Integration name
@@ -232,6 +250,8 @@ class AsyncRawIntegrationProvidersClient:
             base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
+                "important": important,
+                "include_deprecated": include_deprecated,
                 "integration_name": integration_name,
                 "limit": limit,
                 "offset": offset,

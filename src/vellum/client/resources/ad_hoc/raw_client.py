@@ -73,7 +73,7 @@ class RawAdHocClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "v1/ad-hoc/execute-prompt",
-            base_url=self._client_wrapper.get_environment().default,
+            base_url=self._client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "ml_model": ml_model,
@@ -344,7 +344,7 @@ class AsyncRawAdHocClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "v1/ad-hoc/execute-prompt",
-            base_url=self._client_wrapper.get_environment().default,
+            base_url=self._client_wrapper.get_environment().predict,
             method="POST",
             json={
                 "ml_model": ml_model,
