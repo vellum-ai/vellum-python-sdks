@@ -17,6 +17,7 @@ from typing import (
     overload,
 )
 
+from vellum.workflows.constants import undefined
 from vellum.workflows.context import ExecutionContext, execution_context, get_execution_context
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.errors.types import WorkflowErrorCode
@@ -218,8 +219,14 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
         #     value: List[str]
         outputs_class.__annotations__ = {**previous_annotations, reference.name: annotation}
 
-        # Set the reference as an attribute so it can be serialized properly
-        setattr(outputs_class, reference.name, reference)
+        # Create a NEW OutputReference with the List-wrapped type for discoverability during iteration
+        map_output_reference = OutputReference(
+            name=reference.name,
+            types=(annotation,),
+            instance=undefined,
+            outputs_class=outputs_class,
+        )
+        setattr(outputs_class, reference.name, map_output_reference)
 
         subworkflow_class = cls.subworkflow.instance if isinstance(cls.subworkflow, NodeReference) else None
         if subworkflow_class:
