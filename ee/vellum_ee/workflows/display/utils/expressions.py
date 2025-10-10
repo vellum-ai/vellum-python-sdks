@@ -50,6 +50,7 @@ from vellum.workflows.references.execution_count import ExecutionCountReference
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.references.state_value import StateValueReference
+from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.references.workflow_input import WorkflowInputReference
 from vellum.workflows.types.core import JsonArray, JsonObject
@@ -345,6 +346,17 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
         return {
             "type": "EXECUTION_COUNTER",
             "node_id": str(node_class_display.node_id),
+        }
+
+    if isinstance(value, TriggerAttributeReference):
+        # Generate trigger ID using the same hash formula as in base_workflow_display.py
+        trigger_class = value.trigger_class
+        trigger_id = uuid4_from_hash(f"{trigger_class.__module__} | {trigger_class.__qualname__}")
+
+        return {
+            "type": "TRIGGER_ATTRIBUTE",
+            "triggerId": str(trigger_id),
+            "attributeId": str(value.id),
         }
 
     if isinstance(value, list):

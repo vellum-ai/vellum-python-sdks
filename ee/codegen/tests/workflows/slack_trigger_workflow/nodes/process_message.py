@@ -1,13 +1,12 @@
 from vellum.workflows.nodes.bases.base import BaseNode
+from vellum.workflows.triggers.slack import SlackTrigger
 
 
 class ProcessMessageNode(BaseNode):
     """Process a Slack message."""
 
     class Outputs(BaseNode.Outputs):
-        processed_message: str
+        processed_message = SlackTrigger.message
 
     def run(self) -> Outputs:
-        # Access trigger attributes like: SlackTrigger.message, SlackTrigger.channel, etc.
-        # For this test, just return a static message
-        return self.Outputs(processed_message="Processed Slack message")
+        return self.Outputs()

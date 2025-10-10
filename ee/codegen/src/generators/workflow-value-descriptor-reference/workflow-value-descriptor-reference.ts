@@ -12,6 +12,7 @@ import { ConstantValueReference } from "src/generators/workflow-value-descriptor
 import { EnvironmentVariableWorkflowReference } from "src/generators/workflow-value-descriptor-reference/environment-variable-workflow-reference";
 import { ExecutionCounterWorkflowReference } from "src/generators/workflow-value-descriptor-reference/execution-counter-workflow-reference";
 import { NodeOutputWorkflowReference } from "src/generators/workflow-value-descriptor-reference/node-output-workflow-reference";
+import { TriggerAttributeWorkflowReference } from "src/generators/workflow-value-descriptor-reference/trigger-attribute-workflow-reference";
 import { VellumSecretWorkflowReference } from "src/generators/workflow-value-descriptor-reference/vellum-secret-workflow-reference";
 import { WorkflowInputReference } from "src/generators/workflow-value-descriptor-reference/workflow-input-reference";
 import {
@@ -118,6 +119,18 @@ export class WorkflowValueDescriptorReference extends AstNode {
           workflowContext: this.workflowContext,
           nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
         });
+      case "TRIGGER_ATTRIBUTE": {
+        const reference = new TriggerAttributeWorkflowReference({
+          nodeContext: this.nodeContext,
+          workflowContext: this.workflowContext,
+          nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
+        });
+        if (reference.getAstNode()) {
+          return reference;
+        } else {
+          return undefined;
+        }
+      }
       case "DICTIONARY_REFERENCE":
         return new DictionaryWorkflowReference({
           nodeContext: this.nodeContext,
