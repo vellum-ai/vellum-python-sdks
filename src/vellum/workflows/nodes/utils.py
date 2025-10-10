@@ -141,7 +141,7 @@ def parse_type_from_str(result_as_str: str, output_type: Any) -> Any:
         else:
             return data
 
-    if output_type is Json:
+    if output_type is Json or output_type is Any or output_type is dict or get_origin(output_type) is dict:
         try:
             data = json.loads(result_as_str)
             # If we got a FunctionCallVellumValue, return just the value

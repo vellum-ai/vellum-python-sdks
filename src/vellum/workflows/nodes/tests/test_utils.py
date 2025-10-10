@@ -1,5 +1,5 @@
 import pytest
-from typing import Any, List, Union
+from typing import Any, Dict, List, Union
 
 from pydantic import BaseModel
 
@@ -34,6 +34,9 @@ class Person(BaseModel):
             Json,
             {"name": "test", "args": [1, 2]},
         ),
+        ('{"name": "Alice", "age": 30}', dict, {"name": "Alice", "age": 30}),
+        ('{"name": "Alice", "age": 30}', Dict[str, Any], {"name": "Alice", "age": 30}),
+        ('{"name": "Alice", "age": 30}', Any, {"name": "Alice", "age": 30}),
         ("42", Union[int, str], 42),
         ("hello", Union[int, str], "hello"),
     ],
@@ -47,6 +50,9 @@ class Person(BaseModel):
         "list_of_str",
         "simple_json",
         "function_call_json",
+        "dict_type",
+        "dict_str_any_type",
+        "any_type",
         "union_int",
         "union_str",
     ],
