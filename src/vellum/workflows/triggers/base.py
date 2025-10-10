@@ -26,7 +26,7 @@ def _is_annotated(cls: Type, name: str) -> bool:
 class BaseTriggerMeta(ABCMeta):
     def __new__(mcs, name: str, bases: Tuple[Type, ...], dct: Dict[str, Any]) -> Any:
         cls = super().__new__(mcs, name, bases, dct)
-        trigger_cls = cast("Type[BaseTrigger]", cls)
+        trigger_cls = cast(Type["BaseTrigger"], cls)
 
         attribute_ids: Dict[str, Any] = {}
         for base in bases:
@@ -56,6 +56,7 @@ class BaseTriggerMeta(ABCMeta):
     """
 
     def __getattribute__(cls, name: str) -> Any:
+        trigger_cls = cast(Type["BaseTrigger"], cls)
         if name.startswith("_"):
             return super().__getattribute__(name)
 
@@ -90,7 +91,7 @@ class BaseTriggerMeta(ABCMeta):
                 return base_cache[name]
 
         types = infer_types(cls, name)
-        reference = TriggerAttributeReference(name=name, types=types, instance=attribute, trigger_class=cls)
+        reference = TriggerAttributeReference(name=name, types=types, instance=attribute, trigger_class=trigger_cls)
         cache[name] = reference
         cls.__trigger_attribute_cache__ = cache
         return reference
@@ -136,7 +137,7 @@ class BaseTriggerMeta(ABCMeta):
         from vellum.workflows.nodes.bases.base import BaseNode as BaseNodeClass
 
         # Cast cls to the proper type for TriggerEdge
-        trigger_cls = cast("Type[BaseTrigger]", cls)
+        trigger_cls = cast(Type["BaseTrigger"], cls)
 
         if isinstance(other, set):
             # Trigger >> {NodeA, NodeB}

@@ -1,5 +1,7 @@
 """Tests for SlackTrigger."""
 
+from typing import cast
+
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.state.base import BaseState
@@ -34,8 +36,9 @@ def test_slack_trigger__basic():
     state = BaseState()
     trigger.bind_to_state(state)
     stored = state.meta.trigger_attributes
-    assert SlackTrigger.message in stored
-    assert stored[SlackTrigger.message] == "Hello world!"
+    message_ref = cast(TriggerAttributeReference[str], SlackTrigger.message)
+    assert message_ref in stored
+    assert stored[message_ref] == "Hello world!"
 
 
 def test_slack_trigger__with_thread():
