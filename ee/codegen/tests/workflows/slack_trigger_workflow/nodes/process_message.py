@@ -8,6 +8,6 @@ class ProcessMessageNode(BaseNode):
         processed_message: str
 
     def run(self) -> Outputs:
-        # In a real implementation, we would access SlackTrigger.Outputs.message here
+        # In a real implementation, we would access SlackTrigger.Attributes.message here
         # For now, just return a static message for testing
         return self.Outputs(processed_message="Processed Slack message")
