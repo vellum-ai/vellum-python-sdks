@@ -42,12 +42,17 @@ def test_slack_trigger_workflow__serialization():
 
     # THEN it should have triggers
     assert "triggers" in result
-    assert len(result["triggers"]) == 1
+    triggers = result["triggers"]
+    assert isinstance(triggers, list)
+    assert len(triggers) == 1
 
     # AND the trigger should be SLACK_MESSAGE type
-    trigger = result["triggers"][0]
+    trigger = triggers[0]
+    assert isinstance(trigger, dict)
     assert trigger["type"] == "SLACK_MESSAGE"
 
     # AND the trigger should have attributes
     assert "attributes" in trigger
-    assert len(trigger["attributes"]) == 6  # All SlackTrigger attribute fields
+    attributes = trigger["attributes"]
+    assert isinstance(attributes, list)
+    assert len(attributes) == 6  # All SlackTrigger attribute fields
