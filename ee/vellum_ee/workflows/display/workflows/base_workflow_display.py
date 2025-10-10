@@ -25,7 +25,6 @@ from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port,
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, WorkflowInputReference
 from vellum.workflows.state.encoder import DefaultStateEncoder
-from vellum.workflows.triggers.base import BaseTrigger
 from vellum.workflows.types.core import Json, JsonArray, JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.types.utils import get_original_base

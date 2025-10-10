@@ -48,6 +48,6 @@ def test_slack_trigger_workflow__serialization():
     trigger = result["triggers"][0]
     assert trigger["type"] == "SLACK_MESSAGE"
 
-    # AND the trigger should have outputs
-    assert "outputs" in trigger
-    assert len(trigger["outputs"]) == 6  # All SlackTrigger output fields
+    # AND the trigger should have attributes
+    assert "attributes" in trigger
+    assert len(trigger["attributes"]) == 6  # All SlackTrigger attribute fields
