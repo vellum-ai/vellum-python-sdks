@@ -103,5 +103,5 @@ def test_slack_trigger_workflow__trigger_attribute_reference():
     value = processed_message_output["value"]
     assert isinstance(value, dict)
     assert value.get("type") == "TRIGGER_ATTRIBUTE"
-    assert "triggerId" in value
-    assert "attributeId" in value
+    assert "trigger_id" in value
+    assert "attribute_id" in value
