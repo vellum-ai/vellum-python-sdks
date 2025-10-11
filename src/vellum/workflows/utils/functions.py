@@ -283,7 +283,7 @@ def compile_mcp_tool_definition(server_def: MCPServer) -> List[MCPToolDefinition
     We do tool discovery on the MCP server to get the tool definitions.
 
     Args:
-        tool_def: The basic MCPToolDefinition to enhance
+        server_def: The basic MCPToolDefinition to enhance
 
     Returns:
         MCPToolDefinition with detailed parameters and description
