@@ -66,5 +66,5 @@ class BaseTemplatingNodeDisplay(BaseNodeDisplay[_TemplatingNodeType], Generic[_T
                 "template_node_input_id": str(template_node_input.id),
                 "output_type": inferred_output_type,
             },
-            **self.serialize_generic_fields(display_context),
+            **self.serialize_generic_fields(display_context, exclude=["outputs"]),
         }

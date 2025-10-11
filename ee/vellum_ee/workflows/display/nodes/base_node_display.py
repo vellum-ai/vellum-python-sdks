@@ -8,6 +8,7 @@ from typing import (
     Dict,
     ForwardRef,
     Generic,
+    List,
     Optional,
     Set,
     Tuple,
@@ -183,32 +184,13 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             existing_adornments = adornments if adornments is not None else []
             return display_class().serialize(display_context, adornments=existing_adornments + [adornment])
 
-        outputs: JsonArray = []
-        for output in node.Outputs:
-            type = primitive_type_to_vellum_variable_type(output)
-            value = (
-                serialize_value(node_id, display_context, output.instance)
-                if output.instance is not None and output.instance is not undefined
-                else None
-            )
-
-            outputs.append(
-                {
-                    "id": str(uuid4_from_hash(f"{node_id}|{output.name}")),
-                    "name": output.name,
-                    "type": type,
-                    "value": value,
-                }
-            )
-
         return {
             "id": str(node_id),
             "label": self.label,
             "type": "GENERIC",
-            **self.serialize_generic_fields(display_context),
             "adornments": adornments,
             "attributes": attributes,
-            "outputs": outputs,
+            **self.serialize_generic_fields(display_context),
         }
 
     def serialize_ports(self, display_context: "WorkflowDisplayContext") -> JsonArray:
@@ -275,14 +257,49 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
         return attributes
 
-    def serialize_generic_fields(self, display_context: "WorkflowDisplayContext") -> JsonObject:
+    def _serialize_outputs(self, display_context: "WorkflowDisplayContext") -> JsonArray:
+        """Generate outputs array from node output displays or node.Outputs."""
+        outputs: JsonArray = []
+        node = self._node
+
+        for output in node.Outputs:
+            output_type = primitive_type_to_vellum_variable_type(output)
+            value = (
+                serialize_value(self.node_id, display_context, output.instance)
+                if output.instance is not None and output.instance != undefined
+                else None
+            )
+
+            output_id = (
+                str(self.output_display[output].id)
+                if output in self.output_display
+                else str(uuid4_from_hash(f"{self.node_id}|{output.name}"))
+            )
+
+            outputs.append(
+                {
+                    "id": output_id,
+                    "name": output.name,
+                    "type": output_type,
+                    "value": value,
+                }
+            )
+
+        return outputs
+
+    def serialize_generic_fields(
+        self, display_context: "WorkflowDisplayContext", exclude: Optional[List[str]] = None
+    ) -> JsonObject:
         """Serialize generic fields that are common to all nodes."""
+        exclude = exclude or []
+
         result: JsonObject = {
-            "display_data": self.get_display_data().dict(),
-            "base": self.get_base().dict(),
-            "definition": self.get_definition().dict(),
-            "trigger": self.serialize_trigger(),
-            "ports": self.serialize_ports(display_context),
+            "display_data": self.get_display_data().dict() if "display_data" not in exclude else None,
+            "base": self.get_base().dict() if "base" not in exclude else None,
+            "definition": self.get_definition().dict() if "definition" not in exclude else None,
+            "trigger": self.serialize_trigger() if "trigger" not in exclude else None,
+            "ports": self.serialize_ports(display_context) if "ports" not in exclude else None,
+            "outputs": self._serialize_outputs(display_context) if "outputs" not in exclude else None,
         }
 
         # Only include should_file_merge if there are custom methods defined
@@ -298,6 +315,9 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 result["should_file_merge"] = True
         except Exception:
             pass
+
+        for key in exclude:
+            result.pop(key, None)
 
         return result
 

@@ -217,7 +217,7 @@ but the defined conditions have length {len(condition_ids)}"""
                 "conditions": conditions,  # type: ignore
                 "version": "2",
             },
-            **self.serialize_generic_fields(display_context),
+            **self.serialize_generic_fields(display_context, exclude=["outputs"]),
         }
 
     def get_nested_rule_details_by_path(

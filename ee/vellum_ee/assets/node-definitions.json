@@ -46,6 +46,32 @@
           "type": "DEFAULT"
         }
       ],
+      "outputs": [
+        {
+          "id": "99a8d2c4-080f-4605-810e-f5084a52f019",
+          "name": "headers",
+          "type": "JSON",
+          "value": null
+        },
+        {
+          "id": "c5737084-f688-4695-ab81-5f97a6b1a5c2",
+          "name": "json",
+          "type": "JSON",
+          "value": null
+        },
+        {
+          "id": "a2a63a64-75f1-49ba-8743-4db660179ab3",
+          "name": "status_code",
+          "type": "NUMBER",
+          "value": null
+        },
+        {
+          "id": "baa40ce0-35e7-4439-b280-085aaf4f54da",
+          "name": "text",
+          "type": "STRING",
+          "value": null
+        }
+      ],
       "attributes": [
         {
           "id": "aacb36f1-c980-460d-8002-43bb57128e05",
@@ -747,48 +773,6 @@
     {
       "id": "035842e0-34ed-43af-97de-a706e40912ae",
       "label": "Tool Calling Node",
-      "display_data": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0
-        },
-        "comment": {
-          "value": "\n    A Node that dynamically invokes the provided functions to the underlying Prompt\n\n    Attributes:\n        ml_model: str - The model to use for tool calling (e.g., \"gpt-4o-mini\")\n        blocks: List[PromptBlock] - The prompt blocks to use (same format as InlinePromptNode)\n        functions: List[Tool] - The functions that can be called\n        prompt_inputs: Optional[EntityInputsInterface] - Mapping of input variable names to values\n        parameters: PromptParameters - The parameters for the Prompt\n        max_prompt_iterations: Optional[int] - Maximum number of prompt iterations before stopping\n    ",
-          "expanded": true
-        }
-      },
-      "base": {
-        "name": "BaseNode",
-        "module": [
-          "vellum",
-          "workflows",
-          "nodes",
-          "bases",
-          "base"
-        ]
-      },
-      "definition": {
-        "name": "ToolCallingNode",
-        "module": [
-          "vellum",
-          "workflows",
-          "nodes",
-          "displayable",
-          "tool_calling_node",
-          "node"
-        ]
-      },
-      "trigger": {
-        "id": "f9b4a4ce-68ae-45f4-9e29-38b588abdf97",
-        "merge_behavior": "AWAIT_ATTRIBUTES"
-      },
-      "ports": [
-        {
-          "id": "72157fce-fc16-44d8-a00d-506738a20730",
-          "name": "default",
-          "type": "DEFAULT"
-        }
-      ],
       "attributes": [
         {
           "id": "df3761db-067a-4fe9-9fc3-ba270786fcf6",
@@ -878,6 +862,48 @@
           }
         }
       ],
+      "display_data": {
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "comment": {
+          "value": "\n    A Node that dynamically invokes the provided functions to the underlying Prompt\n\n    Attributes:\n        ml_model: str - The model to use for tool calling (e.g., \"gpt-4o-mini\")\n        blocks: List[PromptBlock] - The prompt blocks to use (same format as InlinePromptNode)\n        functions: List[Tool] - The functions that can be called\n        prompt_inputs: Optional[EntityInputsInterface] - Mapping of input variable names to values\n        parameters: PromptParameters - The parameters for the Prompt\n        max_prompt_iterations: Optional[int] - Maximum number of prompt iterations before stopping\n    ",
+          "expanded": true
+        }
+      },
+      "base": {
+        "name": "BaseNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
+      },
+      "definition": {
+        "name": "ToolCallingNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "displayable",
+          "tool_calling_node",
+          "node"
+        ]
+      },
+      "trigger": {
+        "id": "f9b4a4ce-68ae-45f4-9e29-38b588abdf97",
+        "merge_behavior": "AWAIT_ATTRIBUTES"
+      },
+      "ports": [
+        {
+          "id": "72157fce-fc16-44d8-a00d-506738a20730",
+          "name": "default",
+          "type": "DEFAULT"
+        }
+      ],
       "outputs": [
         {
           "id": "c18a8725-21e1-4736-a77c-76d0fc035176",
@@ -896,48 +922,6 @@
     {
       "id": "187ed9ed-ca2b-49e4-943d-ee8da5fad973",
       "label": "Web Search Node",
-      "display_data": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0
-        },
-        "comment": {
-          "value": "\n    Used to perform web search using SerpAPI.\n\n    query: str - The search query to execute\n    api_key: str - SerpAPI authentication key\n    num_results: int - Number of search results to return (default: 10)\n    location: Optional[str] - Geographic location filter for search\n    ",
-          "expanded": true
-        }
-      },
-      "base": {
-        "name": "BaseNode",
-        "module": [
-          "vellum",
-          "workflows",
-          "nodes",
-          "bases",
-          "base"
-        ]
-      },
-      "definition": {
-        "name": "WebSearchNode",
-        "module": [
-          "vellum",
-          "workflows",
-          "nodes",
-          "displayable",
-          "web_search_node",
-          "node"
-        ]
-      },
-      "trigger": {
-        "id": "036c7a0c-fff3-44f7-b49b-429d8f44f212",
-        "merge_behavior": "AWAIT_ATTRIBUTES"
-      },
-      "ports": [
-        {
-          "id": "ef824748-d00d-41e7-b7b4-d0edc536c3af",
-          "name": "default",
-          "type": "DEFAULT"
-        }
-      ],
       "attributes": [
         {
           "id": "b5ba3c60-e02c-46c8-b470-d86c4f8f42af",
@@ -982,6 +966,48 @@
               "value": null
             }
           }
+        }
+      ],
+      "display_data": {
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "comment": {
+          "value": "\n    Used to perform web search using SerpAPI.\n\n    query: str - The search query to execute\n    api_key: str - SerpAPI authentication key\n    num_results: int - Number of search results to return (default: 10)\n    location: Optional[str] - Geographic location filter for search\n    ",
+          "expanded": true
+        }
+      },
+      "base": {
+        "name": "BaseNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
+      },
+      "definition": {
+        "name": "WebSearchNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "displayable",
+          "web_search_node",
+          "node"
+        ]
+      },
+      "trigger": {
+        "id": "036c7a0c-fff3-44f7-b49b-429d8f44f212",
+        "merge_behavior": "AWAIT_ATTRIBUTES"
+      },
+      "ports": [
+        {
+          "id": "ef824748-d00d-41e7-b7b4-d0edc536c3af",
+          "name": "default",
+          "type": "DEFAULT"
         }
       ],
       "outputs": [

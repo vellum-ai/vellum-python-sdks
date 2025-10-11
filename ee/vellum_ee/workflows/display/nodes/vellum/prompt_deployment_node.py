@@ -71,7 +71,7 @@ class BasePromptDeploymentNodeDisplay(BaseNodeDisplay[_PromptDeploymentNodeType]
                 "release_tag": raise_if_descriptor(node.release_tag),
                 "ml_model_fallbacks": list(ml_model_fallbacks) if ml_model_fallbacks else None,
             },
-            **self.serialize_generic_fields(display_context),
+            **self.serialize_generic_fields(display_context, exclude=["outputs"]),
             "outputs": [
                 {"id": str(json_display.id), "name": "json", "type": "JSON", "value": None},
                 {"id": str(output_display.id), "name": "text", "type": "STRING", "value": None},
