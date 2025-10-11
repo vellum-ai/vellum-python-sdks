@@ -127,26 +127,42 @@ export abstract class BaseNode<
   protected getOutputDisplay(): python.Field | undefined {
     const outputIdsByName: Record<string, string> = {};
 
-    const baseClassName = this.nodeData.base?.name;
-    if (baseClassName) {
-      const baseNodeDef = findNodeDefinitionByBaseClassName(baseClassName);
-      if (baseNodeDef?.outputs) {
-        baseNodeDef.outputs.forEach((output) => {
-          outputIdsByName[output.name] = output.id;
-        });
-      }
-    }
-
-    if (this.nodeData.outputs) {
-      this.nodeData.outputs.forEach((output) => {
-        outputIdsByName[output.name] = output.id;
-      });
-    }
-
     const nodeOutputNamesById = this.nodeContext.getNodeOutputNamesById();
+    console.log(`[DEBUG] Node: ${this.nodeContext.nodeClassName}`);
+    console.log(`[DEBUG] P1 Runtime:`, nodeOutputNamesById);
     Object.entries(nodeOutputNamesById).forEach(([id, name]) => {
       outputIdsByName[name] = id;
     });
+
+    console.log(`[DEBUG] P2 Instance outputs:`, this.nodeData.outputs);
+    if (this.nodeData.outputs) {
+      this.nodeData.outputs.forEach((output) => {
+        if (!outputIdsByName[output.name]) {
+          console.log(`[DEBUG] P2 Adding: ${output.name} -> ${output.id}`);
+          outputIdsByName[output.name] = output.id;
+        } else {
+          console.log(`[DEBUG] P2 Skip (exists): ${output.name}`);
+        }
+      });
+    }
+
+    const baseClassName = this.nodeData.base?.name;
+    console.log(`[DEBUG] P3 Base class:`, baseClassName);
+    if (baseClassName) {
+      const baseNodeDef = findNodeDefinitionByBaseClassName(baseClassName);
+      console.log(`[DEBUG] P3 Base outputs:`, baseNodeDef?.outputs);
+      if (baseNodeDef?.outputs) {
+        baseNodeDef.outputs.forEach((output) => {
+          if (!outputIdsByName[output.name]) {
+            console.log(`[DEBUG] P3 Adding: ${output.name} -> ${output.id}`);
+            outputIdsByName[output.name] = output.id;
+          } else {
+            console.log(`[DEBUG] P3 Skip (exists): ${output.name}`);
+          }
+        });
+      }
+    }
+    console.log(`[DEBUG] Final outputIdsByName:`, outputIdsByName);
 
     if (Object.keys(outputIdsByName).length === 0) {
       return undefined;
