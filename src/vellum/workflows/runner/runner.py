@@ -82,7 +82,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-RunFromNodeArg = Sequence[Type[BaseNode]]
+RunFromNodeArg = Union[Sequence[Type[BaseNode]], UUID]
 ExternalInputsArg = Dict[ExternalInputReference, Any]
 BackgroundThreadItem = Union[BaseState, WorkflowEvent, None]
 
@@ -117,6 +117,18 @@ class WorkflowRunner(Generic[StateType]):
         self._should_emit_initial_state = True
         self._span_link_info: Optional[Tuple[str, str, str, str]] = None
         if entrypoint_nodes:
+            if isinstance(entrypoint_nodes, UUID):
+                matching_node = None
+                for node_class in self.workflow.get_all_nodes():
+                    if node_class.__id__ == entrypoint_nodes:
+                        matching_node = node_class
+                        break
+
+                if matching_node is None:
+                    raise ValueError(f"No node found with UUID {entrypoint_nodes}")
+
+                entrypoint_nodes = [matching_node]
+
             if len(list(entrypoint_nodes)) > 1:
                 raise ValueError("Cannot resume from multiple nodes")
 
