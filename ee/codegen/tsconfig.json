@@ -26,5 +26,6 @@
     "noImplicitReturns": true,
     "types": ["node", "vitest/globals"]
   },
-  "include": ["./src/**/*"]
+  "include": ["./src/**/*"],
+  "files": ["./src/assets/node-definitions.json"]
 }
