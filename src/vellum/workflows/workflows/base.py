@@ -723,9 +723,9 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
                 workflows.append(attr)
 
         if len(workflows) == 0:
-            raise ValueError(f"No workflows found in {module_path}")
+            raise WorkflowInitializationException(f"No workflows found in {module_path}")
         elif len(workflows) > 1:
-            raise ValueError(f"Multiple workflows found in {module_path}")
+            raise WorkflowInitializationException(f"Multiple workflows found in {module_path}")
         return workflows[0]
 
     def join(self) -> None:
