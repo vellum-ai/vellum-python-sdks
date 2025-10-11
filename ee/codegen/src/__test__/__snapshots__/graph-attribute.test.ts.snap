@@ -299,6 +299,16 @@ exports[`Workflow > graph > should properly format UUID-like port names in graph
 "
 `;
 
+exports[`Workflow > graph > should generate correct graph when workflow has a manual trigger 1`] = `
+"ManualTrigger >> FirstNode >> SecondNode
+"
+`;
+
+exports[`Workflow > graph > should generate correct graph when workflow has a slack trigger 1`] = `
+"SlackTrigger >> FirstNode >> SecondNode
+"
+`;
+
 exports[`Workflow > graph > should support an edge between two sets 1`] = `
 "{
     TopLeftNode

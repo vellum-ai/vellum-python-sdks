@@ -3,6 +3,7 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { BaseNodeInputWorkflowReference } from "src/generators/workflow-value-descriptor-reference/BaseNodeInputWorkflowReference";
 import { TriggerAttributeWorkflowReference as TriggerAttributeWorkflowReferenceType } from "src/types/vellum";
+import { getTriggerClassInfo } from "src/utils/triggers";
 
 export class TriggerAttributeWorkflowReference extends BaseNodeInputWorkflowReference<TriggerAttributeWorkflowReferenceType> {
   getAstNode(): AstNode | undefined {
@@ -27,7 +28,7 @@ export class TriggerAttributeWorkflowReference extends BaseNodeInputWorkflowRefe
     }
 
     // Get the trigger class information based on trigger type
-    const triggerClassInfo = this.getTriggerClassInfo(trigger.type);
+    const triggerClassInfo = getTriggerClassInfo(trigger.type);
     if (!triggerClassInfo) {
       return undefined;
     }
@@ -38,24 +39,5 @@ export class TriggerAttributeWorkflowReference extends BaseNodeInputWorkflowRefe
       modulePath: triggerClassInfo.modulePath,
       attribute: [attribute.name],
     });
-  }
-
-  private getTriggerClassInfo(
-    triggerType: string
-  ): { className: string; modulePath: string[] } | null {
-    switch (triggerType) {
-      case "MANUAL":
-        return {
-          className: "ManualTrigger",
-          modulePath: ["vellum", "workflows", "triggers", "manual"],
-        };
-      case "SLACK_MESSAGE":
-        return {
-          className: "SlackTrigger",
-          modulePath: ["vellum", "workflows", "triggers", "slack"],
-        };
-      default:
-        return null;
-    }
   }
 }
