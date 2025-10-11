@@ -103,6 +103,7 @@ import {
   SubworkflowNode,
   TemplatingNode,
   TernaryWorkflowExpression,
+  TriggerAttributeWorkflowReference,
   UnaryWorkflowExpression,
   VariablePromptTemplateBlock,
   VellumLogicalCondition,
@@ -831,6 +832,21 @@ export declare namespace ExecutionCounterWorkflowReferenceSerializer {
   }
 }
 
+export const TriggerAttributeWorkflowReferenceSerializer: ObjectSchema<
+  TriggerAttributeWorkflowReferenceSerializer.Raw,
+  Omit<TriggerAttributeWorkflowReference, "type">
+> = objectSchema({
+  triggerId: propertySchema("trigger_id", stringSchema()),
+  attributeId: propertySchema("attribute_id", stringSchema()),
+});
+
+export declare namespace TriggerAttributeWorkflowReferenceSerializer {
+  interface Raw {
+    trigger_id: string;
+    attribute_id: string;
+  }
+}
+
 export const DictionaryWorkflowReferenceEntrySerializer: ObjectSchema<
   DictionaryWorkflowReferenceEntrySerializer.Raw,
   Omit<DictionaryWorkflowReferenceEntry, "type">
@@ -888,6 +904,7 @@ export const WorkflowValueDescriptorSerializer: Schema<
   VELLUM_SECRET: VellumSecretWorkflowReferenceSerializer,
   ENVIRONMENT_VARIABLE: EnvironmentVariableWorkflowReferenceSerializer,
   EXECUTION_COUNTER: ExecutionCounterWorkflowReferenceSerializer,
+  TRIGGER_ATTRIBUTE: TriggerAttributeWorkflowReferenceSerializer,
   DICTIONARY_REFERENCE: DictionaryWorkflowReferenceSerializer,
   ARRAY_REFERENCE: ArrayWorkflowReferenceSerializer,
 });
@@ -904,6 +921,7 @@ export declare namespace WorkflowValueDescriptorSerializer {
     | VellumSecretWorkflowReferenceSerializer.Raw
     | EnvironmentVariableWorkflowReferenceSerializer.Raw
     | ExecutionCounterWorkflowReferenceSerializer.Raw
+    | TriggerAttributeWorkflowReferenceSerializer.Raw
     | DictionaryWorkflowReferenceSerializer.Raw
     | ArrayWorkflowReferenceSerializer.Raw;
 }
