@@ -128,16 +128,26 @@ export abstract class BaseNode<
     const outputIdsByName: Record<string, string> = {};
 
     const nodeOutputNamesById = this.nodeContext.getNodeOutputNamesById();
+    console.log(`[DEBUG] Node: ${this.nodeContext.nodeClassName}`);
+    console.log(`[DEBUG] this.nodeData type:`, this.nodeData.type);
+    console.log(`[DEBUG] this.nodeData.outputs:`, this.nodeData.outputs);
+    console.log(`[DEBUG] P1 Runtime outputs:`, nodeOutputNamesById);
     Object.entries(nodeOutputNamesById).forEach(([id, name]) => {
       outputIdsByName[name] = id;
     });
 
     if (this.nodeData.outputs) {
+      console.log(`[DEBUG] P2 Processing instance outputs:`, this.nodeData.outputs);
       this.nodeData.outputs.forEach((output) => {
         if (!outputIdsByName[output.name]) {
+          console.log(`[DEBUG] P2 Adding: ${output.name} -> ${output.id}`);
           outputIdsByName[output.name] = output.id;
+        } else {
+          console.log(`[DEBUG] P2 Skip (exists): ${output.name}`);
         }
       });
+    } else {
+      console.log(`[DEBUG] P2 this.nodeData.outputs is undefined/null`);
     }
 
     const baseClassName = this.nodeData.base?.name;
