@@ -109,35 +109,90 @@ export abstract class BaseNode<
 
   // Override to specify a custom output display
   protected getOutputDisplay(): python.Field | undefined {
-    if (!this.nodeData.outputs || this.nodeData.outputs.length === 0) {
+    const outputIdsByName: Record<string, string> = {};
+    const nodeOutputNamesById = this.nodeContext.getNodeOutputNamesById();
+    Object.entries(nodeOutputNamesById).forEach(([id, name]) => {
+      outputIdsByName[name] = id;
+    });
+
+    const hasOutputsInDefinition =
+      this.nodeData.outputs && this.nodeData.outputs.length > 0;
+    const hasRuntimeOutputs = Object.keys(outputIdsByName).length > 0;
+
+    if (!hasOutputsInDefinition && !hasRuntimeOutputs) {
       return undefined;
     }
 
-    const outputDisplayEntries = this.nodeData.outputs.map((output) => ({
-      key: python.reference({
-        name: this.nodeContext.nodeClassName,
-        modulePath: this.nodeContext.nodeModulePath,
-        attribute: [OUTPUTS_CLASS_NAME, output.name],
-      }),
-      value: python.instantiateClass({
-        classReference: python.reference({
-          name: "NodeOutputDisplay",
-          modulePath:
-            this.workflowContext.sdkModulePathNames
-              .NODE_DISPLAY_TYPES_MODULE_PATH,
+    const outputDisplayEntries: Array<{
+      key: python.AstNode;
+      value: python.AstNode;
+    }> = [];
+
+    Object.entries(outputIdsByName).forEach(([name, id]) => {
+      outputDisplayEntries.push({
+        key: python.reference({
+          name: this.nodeContext.nodeClassName,
+          modulePath: this.nodeContext.nodeModulePath,
+          attribute: [OUTPUTS_CLASS_NAME, name],
         }),
-        arguments_: [
-          python.methodArgument({
-            name: "id",
-            value: python.TypeInstantiation.uuid(output.id),
+        value: python.instantiateClass({
+          classReference: python.reference({
+            name: "NodeOutputDisplay",
+            modulePath:
+              this.workflowContext.sdkModulePathNames
+                .NODE_DISPLAY_TYPES_MODULE_PATH,
           }),
-          python.methodArgument({
-            name: "name",
-            value: python.TypeInstantiation.str(output.name),
+          arguments_: [
+            python.methodArgument({
+              name: "id",
+              value: python.TypeInstantiation.uuid(id),
+            }),
+            python.methodArgument({
+              name: "name",
+              value: python.TypeInstantiation.str(name),
+            }),
+          ],
+        }),
+      });
+    });
+
+    if (this.nodeData.outputs) {
+      this.nodeData.outputs.forEach((output) => {
+        if (outputIdsByName[output.name]) {
+          return;
+        }
+
+        outputDisplayEntries.push({
+          key: python.reference({
+            name: this.nodeContext.nodeClassName,
+            modulePath: this.nodeContext.nodeModulePath,
+            attribute: [OUTPUTS_CLASS_NAME, output.name],
           }),
-        ],
-      }),
-    }));
+          value: python.instantiateClass({
+            classReference: python.reference({
+              name: "NodeOutputDisplay",
+              modulePath:
+                this.workflowContext.sdkModulePathNames
+                  .NODE_DISPLAY_TYPES_MODULE_PATH,
+            }),
+            arguments_: [
+              python.methodArgument({
+                name: "id",
+                value: python.TypeInstantiation.uuid(output.id),
+              }),
+              python.methodArgument({
+                name: "name",
+                value: python.TypeInstantiation.str(output.name),
+              }),
+            ],
+          }),
+        });
+      });
+    }
+
+    if (outputDisplayEntries.length === 0) {
+      return undefined;
+    }
 
     return python.field({
       name: "output_display",

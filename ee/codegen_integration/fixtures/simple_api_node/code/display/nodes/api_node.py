@@ -2,7 +2,7 @@ from uuid import UUID
 
 from vellum_ee.workflows.display.editor import NodeDisplayComment, NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseAPINodeDisplay
-from vellum_ee.workflows.display.nodes.types import PortDisplayOverrides
+from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 
 from ...nodes.api_node import ApiNode
 
@@ -31,6 +31,13 @@ class ApiNodeDisplay(BaseAPINodeDisplay[ApiNode]):
         "additional_header_value": UUID("58099189-1676-4d89-a01d-9c1d79ba833a"),
     }
     attribute_ids_by_name = {"timeout": UUID("63c3fb19-534a-4a75-b868-35e42a9e866b")}
+    output_display = {
+        ApiNode.Outputs.json: NodeOutputDisplay(id=UUID("f6f469ae-3f50-4276-a294-43d8d0fcf477"), name="json"),
+        ApiNode.Outputs.status_code: NodeOutputDisplay(
+            id=UUID("6ab9d555-7007-43e1-9f90-d2ca21ea99cf"), name="status_code"
+        ),
+        ApiNode.Outputs.text: NodeOutputDisplay(id=UUID("6a3c1704-7020-411d-a440-84b2a481691e"), name="text"),
+    }
     port_displays = {ApiNode.Ports.default: PortDisplayOverrides(id=UUID("b8ad3fd2-c96c-4ae8-8eae-d234fb13a139"))}
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=1889.865705614568, y=236.61265174506826),
