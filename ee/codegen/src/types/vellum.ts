@@ -891,6 +891,12 @@ export interface ExecutionCounterWorkflowReference {
   nodeId: string;
 }
 
+export interface TriggerAttributeWorkflowReference {
+  type: "TRIGGER_ATTRIBUTE";
+  triggerId: string;
+  attributeId: string;
+}
+
 export interface DictionaryWorkflowReferenceEntry {
   id?: string; // TODO: Temporary supporting id key translation for input variable in blocks
   key: string;
@@ -920,6 +926,7 @@ export type WorkflowValueDescriptorReference =
   | VellumSecretWorkflowReference
   | EnvironmentVariableWorkflowReference
   | ExecutionCounterWorkflowReference
+  | TriggerAttributeWorkflowReference
   | DictionaryWorkflowReference
   | ArrayWorkflowReference;
 
