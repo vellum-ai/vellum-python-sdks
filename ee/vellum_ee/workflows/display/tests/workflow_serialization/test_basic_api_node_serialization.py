@@ -8,6 +8,8 @@ from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class imp
 
 from tests.workflows.basic_api_node.workflow import SimpleAPIWorkflow
 
+# 0d76e1e1-3a4b-4eb4-a606-f73d62c -> 12e4a99d-883d-4da5-aa51-35817d94013e
+
 
 def test_serialize_workflow(vellum_client):
     # GIVEN a Workflow that uses a vellum API node
@@ -209,8 +211,8 @@ def test_serialize_workflow(vellum_client):
             },
             "ports": [{"id": "7c33b4d3-9204-4bd5-9371-80ee34f83073", "name": "default", "type": "DEFAULT"}],
             "outputs": [
-                {"id": "0d76e1e1-3a4b-4eb4-a606-f73d62cf1a7e", "name": "headers", "type": "JSON", "value": None},
                 {"id": "12e4a99d-883d-4da5-aa51-35817d94013e", "name": "json", "type": "JSON", "value": None},
+                {"id": "0d76e1e1-3a4b-4eb4-a606-f73d62cf1a7e", "name": "headers", "type": "JSON", "value": None},
                 {"id": "fecc16c3-400e-4fd3-8223-08366070e3b1", "name": "status_code", "type": "NUMBER", "value": None},
                 {"id": "17342c21-12bb-49ab-88ce-f144e0376b32", "name": "text", "type": "STRING", "value": None},
             ],
