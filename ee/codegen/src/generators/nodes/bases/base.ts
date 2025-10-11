@@ -4,6 +4,7 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import * as codegen from "src/codegen";
 import {
+  OUTPUTS_CLASS_NAME,
   PORTS_CLASS_NAME,
   VELLUM_CLIENT_MODULE_PATH,
   VELLUM_WORKFLOW_NODES_MODULE_PATH,
@@ -107,7 +108,97 @@ export abstract class BaseNode<
   protected abstract getNodeDisplayClassBodyStatements(): AstNode[];
 
   // Override to specify a custom output display
-  protected abstract getOutputDisplay(): python.Field | undefined;
+  protected getOutputDisplay(): python.Field | undefined {
+    const outputIdsByName: Record<string, string> = {};
+    const nodeOutputNamesById = this.nodeContext.getNodeOutputNamesById();
+    Object.entries(nodeOutputNamesById).forEach(([id, name]) => {
+      outputIdsByName[name] = id;
+    });
+
+    const hasOutputsInDefinition =
+      this.nodeData.outputs && this.nodeData.outputs.length > 0;
+    const hasRuntimeOutputs = Object.keys(outputIdsByName).length > 0;
+
+    if (!hasOutputsInDefinition && !hasRuntimeOutputs) {
+      return undefined;
+    }
+
+    const outputDisplayEntries: Array<{
+      key: python.AstNode;
+      value: python.AstNode;
+    }> = [];
+
+    Object.entries(outputIdsByName).forEach(([name, id]) => {
+      outputDisplayEntries.push({
+        key: python.reference({
+          name: this.nodeContext.nodeClassName,
+          modulePath: this.nodeContext.nodeModulePath,
+          attribute: [OUTPUTS_CLASS_NAME, name],
+        }),
+        value: python.instantiateClass({
+          classReference: python.reference({
+            name: "NodeOutputDisplay",
+            modulePath:
+              this.workflowContext.sdkModulePathNames
+                .NODE_DISPLAY_TYPES_MODULE_PATH,
+          }),
+          arguments_: [
+            python.methodArgument({
+              name: "id",
+              value: python.TypeInstantiation.uuid(id),
+            }),
+            python.methodArgument({
+              name: "name",
+              value: python.TypeInstantiation.str(name),
+            }),
+          ],
+        }),
+      });
+    });
+
+    if (this.nodeData.outputs) {
+      this.nodeData.outputs.forEach((output) => {
+        if (outputIdsByName[output.name]) {
+          return;
+        }
+
+        outputDisplayEntries.push({
+          key: python.reference({
+            name: this.nodeContext.nodeClassName,
+            modulePath: this.nodeContext.nodeModulePath,
+            attribute: [OUTPUTS_CLASS_NAME, output.name],
+          }),
+          value: python.instantiateClass({
+            classReference: python.reference({
+              name: "NodeOutputDisplay",
+              modulePath:
+                this.workflowContext.sdkModulePathNames
+                  .NODE_DISPLAY_TYPES_MODULE_PATH,
+            }),
+            arguments_: [
+              python.methodArgument({
+                name: "id",
+                value: python.TypeInstantiation.uuid(output.id),
+              }),
+              python.methodArgument({
+                name: "name",
+                value: python.TypeInstantiation.str(output.name),
+              }),
+            ],
+          }),
+        });
+      });
+    }
+
+    if (outputDisplayEntries.length === 0) {
+      return undefined;
+    }
+
+    return python.field({
+      name: "output_display",
+      initializer: python.TypeInstantiation.dict(outputDisplayEntries),
+    });
+  }
 
   // If the node supports the Reject on Error toggle, then implement this to return
   // the error_output_id from this.nodeData. If returned, a @TryNode decorator will be

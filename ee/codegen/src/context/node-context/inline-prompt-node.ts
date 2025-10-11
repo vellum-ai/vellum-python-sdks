@@ -16,7 +16,7 @@ export class InlinePromptNodeContext extends BaseNodeContext<InlinePromptNodeTyp
   baseNodeClassName = "InlinePromptNode";
   baseNodeDisplayClassName = "BaseInlinePromptNodeDisplay";
 
-  protected getNodeOutputNamesById(): Record<string, string> {
+  public getNodeOutputNamesById(): Record<string, string> {
     const jsonOutput = this.nodeData.outputs?.find(
       (output) => output.type === "JSON"
     );

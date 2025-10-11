@@ -2,7 +2,6 @@ import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { isNil } from "lodash";
 
-import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { ApiNodeContext } from "src/context/node-context/api-node";
 import { NodeInput } from "src/generators";
 import { NodeAttributeGenerationError } from "src/generators/errors";
@@ -270,95 +269,6 @@ export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
     }
 
     return statements;
-  }
-
-  protected getOutputDisplay(): python.Field {
-    return python.field({
-      name: "output_display",
-      initializer: python.TypeInstantiation.dict([
-        {
-          key: python.reference({
-            name: this.nodeContext.nodeClassName,
-            modulePath: this.nodeContext.nodeModulePath,
-            attribute: [OUTPUTS_CLASS_NAME, "json"],
-          }),
-          value: python.instantiateClass({
-            classReference: python.reference({
-              name: "NodeOutputDisplay",
-              modulePath:
-                this.workflowContext.sdkModulePathNames
-                  .NODE_DISPLAY_TYPES_MODULE_PATH,
-            }),
-            arguments_: [
-              python.methodArgument({
-                name: "id",
-                value: python.TypeInstantiation.uuid(
-                  this.nodeData.data.jsonOutputId
-                ),
-              }),
-              python.methodArgument({
-                name: "name",
-                value: python.TypeInstantiation.str("json"),
-              }),
-            ],
-          }),
-        },
-        {
-          key: python.reference({
-            name: this.nodeContext.nodeClassName,
-            modulePath: this.nodeContext.nodeModulePath,
-            attribute: [OUTPUTS_CLASS_NAME, "status_code"],
-          }),
-          value: python.instantiateClass({
-            classReference: python.reference({
-              name: "NodeOutputDisplay",
-              modulePath:
-                this.workflowContext.sdkModulePathNames
-                  .NODE_DISPLAY_TYPES_MODULE_PATH,
-            }),
-            arguments_: [
-              python.methodArgument({
-                name: "id",
-                value: python.TypeInstantiation.uuid(
-                  this.nodeData.data.statusCodeOutputId
-                ),
-              }),
-              python.methodArgument({
-                name: "name",
-                value: python.TypeInstantiation.str("status_code"),
-              }),
-            ],
-          }),
-        },
-        {
-          key: python.reference({
-            name: this.nodeContext.nodeClassName,
-            modulePath: this.nodeContext.nodeModulePath,
-            attribute: [OUTPUTS_CLASS_NAME, "text"],
-          }),
-          value: python.instantiateClass({
-            classReference: python.reference({
-              name: "NodeOutputDisplay",
-              modulePath:
-                this.workflowContext.sdkModulePathNames
-                  .NODE_DISPLAY_TYPES_MODULE_PATH,
-            }),
-            arguments_: [
-              python.methodArgument({
-                name: "id",
-                value: python.TypeInstantiation.uuid(
-                  this.nodeData.data.textOutputId
-                ),
-              }),
-              python.methodArgument({
-                name: "name",
-                value: python.TypeInstantiation.str("text"),
-              }),
-            ],
-          }),
-        },
-      ]),
-    });
   }
 
   getErrorOutputId(): string | undefined {
