@@ -4,6 +4,7 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import * as codegen from "src/codegen";
 import {
+  OUTPUTS_CLASS_NAME,
   PORTS_CLASS_NAME,
   VELLUM_CLIENT_MODULE_PATH,
   VELLUM_WORKFLOW_NODES_MODULE_PATH,
@@ -107,7 +108,42 @@ export abstract class BaseNode<
   protected abstract getNodeDisplayClassBodyStatements(): AstNode[];
 
   // Override to specify a custom output display
-  protected abstract getOutputDisplay(): python.Field | undefined;
+  protected getOutputDisplay(): python.Field | undefined {
+    if (!this.nodeData.outputs || this.nodeData.outputs.length === 0) {
+      return undefined;
+    }
+
+    const outputDisplayEntries = this.nodeData.outputs.map((output) => ({
+      key: python.reference({
+        name: this.nodeContext.nodeClassName,
+        modulePath: this.nodeContext.nodeModulePath,
+        attribute: [OUTPUTS_CLASS_NAME, output.name],
+      }),
+      value: python.instantiateClass({
+        classReference: python.reference({
+          name: "NodeOutputDisplay",
+          modulePath:
+            this.workflowContext.sdkModulePathNames
+              .NODE_DISPLAY_TYPES_MODULE_PATH,
+        }),
+        arguments_: [
+          python.methodArgument({
+            name: "id",
+            value: python.TypeInstantiation.uuid(output.id),
+          }),
+          python.methodArgument({
+            name: "name",
+            value: python.TypeInstantiation.str(output.name),
+          }),
+        ],
+      }),
+    }));
+
+    return python.field({
+      name: "output_display",
+      initializer: python.TypeInstantiation.dict(outputDisplayEntries),
+    });
+  }
 
   // If the node supports the Reject on Error toggle, then implement this to return
   // the error_output_id from this.nodeData. If returned, a @TryNode decorator will be
