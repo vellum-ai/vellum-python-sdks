@@ -2012,6 +2012,7 @@ export const ApiNodeSerializer: ObjectSchema<
   ports: listSchema(NodePortSerializer).optional(),
   trigger: NodeTriggerSerializer.optional(),
   attributes: listSchema(NodeAttributeSerializer).optional(),
+  outputs: listSchema(NodeOutputSerializer).optional(),
 });
 
 export declare namespace ApiNodeSerializer {
