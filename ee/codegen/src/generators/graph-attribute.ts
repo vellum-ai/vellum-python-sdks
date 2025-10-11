@@ -8,6 +8,7 @@ import {
   VELLUM_WORKFLOW_GRAPH_MODULE_PATH,
 } from "src/constants";
 import { WorkflowDataNode, WorkflowEdge } from "src/types/vellum";
+import { getTriggerClassInfo } from "src/utils/triggers";
 
 import type { WorkflowContext } from "src/context";
 import type { BaseNodeContext } from "src/context/node-context/base";
@@ -161,7 +162,7 @@ export class GraphAttribute extends AstNode {
     if (triggers && triggers.length > 0 && graphMutableAst.type !== "empty") {
       const trigger = triggers[0];
       if (trigger) {
-        const triggerInfo = this.getTriggerClassInfo(trigger.type);
+        const triggerInfo = getTriggerClassInfo(trigger.type);
         if (triggerInfo) {
           const triggerReference: GraphTriggerReference = {
             type: "trigger_reference",
@@ -341,24 +342,6 @@ export class GraphAttribute extends AstNode {
     return this.workflowContext.findLocalNodeContext(nodeId) ?? null;
   }
 
-  private getTriggerClassInfo(
-    triggerType: string
-  ): { className: string; modulePath: string[] } | null {
-    switch (triggerType) {
-      case "MANUAL":
-        return {
-          className: "ManualTrigger",
-          modulePath: ["vellum", "workflows", "triggers", "manual"],
-        };
-      case "SLACK_MESSAGE":
-        return {
-          className: "SlackTrigger",
-          modulePath: ["vellum", "workflows", "triggers", "slack"],
-        };
-      default:
-        return null;
-    }
-  }
 
   /**
    * Adds an edge to the graph.

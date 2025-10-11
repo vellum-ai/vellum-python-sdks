@@ -1097,9 +1097,7 @@ describe("Workflow", () => {
 
       graphAttribute.write(writer);
 
-      expect(writer.toString()).toMatchInlineSnapshot(
-        `"ManualTrigger >> FirstNode >> SecondNode"`
-      );
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
     it("should generate correct graph when workflow has a slack trigger", async () => {
@@ -1151,9 +1149,7 @@ describe("Workflow", () => {
 
       graphAttribute.write(writer);
 
-      expect(writer.toString()).toMatchInlineSnapshot(
-        `"SlackTrigger >> FirstNode >> SecondNode"`
-      );
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
 });

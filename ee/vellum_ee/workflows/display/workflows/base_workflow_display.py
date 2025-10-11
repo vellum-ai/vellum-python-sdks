@@ -474,7 +474,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             )
 
         # Return as a list with a single trigger object matching Django schema
-        trigger_id = uuid4_from_hash(f"{trigger_class.__module__} | {trigger_class.__qualname__}")
+        trigger_id = uuid4_from_hash(f"{trigger_class.__module__}|{trigger_class.__qualname__}")
 
         # Serialize trigger attributes like node outputs
         attribute_references = trigger_class.attribute_references().values()
