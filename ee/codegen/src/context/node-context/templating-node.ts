@@ -9,7 +9,7 @@ export class TemplatingNodeContext extends BaseNodeContext<TemplatingNode> {
   baseNodeDisplayClassName = "BaseTemplatingNodeDisplay";
   isCore = true;
 
-  protected getNodeOutputNamesById(): Record<string, string> {
+  public getNodeOutputNamesById(): Record<string, string> {
     const errorOutputId = this.getErrorOutputId();
     return {
       [this.nodeData.data.outputId]: "result",

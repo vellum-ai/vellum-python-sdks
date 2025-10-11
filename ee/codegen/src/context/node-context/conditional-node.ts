@@ -8,7 +8,7 @@ export class ConditionalNodeContext extends BaseNodeContext<ConditionalNode> {
   baseNodeClassName = "ConditionalNode";
   baseNodeDisplayClassName = "BaseConditionalNodeDisplay";
 
-  protected getNodeOutputNamesById(): Record<string, string> {
+  public getNodeOutputNamesById(): Record<string, string> {
     return {};
   }
 

@@ -13,7 +13,7 @@ export class PromptDeploymentNodeContext extends BaseNodeContext<PromptNode> {
 
   public promptDeploymentRelease: PromptDeploymentRelease | null = null;
 
-  protected getNodeOutputNamesById(): Record<string, string> {
+  public getNodeOutputNamesById(): Record<string, string> {
     const jsonOutput = this.nodeData.outputs?.find(
       (output) => output.type === "JSON"
     );

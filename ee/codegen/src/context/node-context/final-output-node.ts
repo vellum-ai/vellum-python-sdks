@@ -8,7 +8,7 @@ export class FinalOutputNodeContext extends BaseNodeContext<FinalOutputNode> {
   baseNodeClassName = "FinalOutputNode";
   baseNodeDisplayClassName = "BaseFinalOutputNodeDisplay";
 
-  protected getNodeOutputNamesById(): Record<string, string> {
+  public getNodeOutputNamesById(): Record<string, string> {
     return {
       [this.nodeData.data.outputId]: "value",
     };
