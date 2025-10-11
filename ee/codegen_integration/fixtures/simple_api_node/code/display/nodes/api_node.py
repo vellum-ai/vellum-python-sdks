@@ -32,6 +32,7 @@ class ApiNodeDisplay(BaseAPINodeDisplay[ApiNode]):
     }
     attribute_ids_by_name = {"timeout": UUID("63c3fb19-534a-4a75-b868-35e42a9e866b")}
     output_display = {
+        ApiNode.Outputs.headers: NodeOutputDisplay(id=UUID("99a8d2c4-080f-4605-810e-f5084a52f019"), name="headers"),
         ApiNode.Outputs.json: NodeOutputDisplay(id=UUID("f6f469ae-3f50-4276-a294-43d8d0fcf477"), name="json"),
         ApiNode.Outputs.status_code: NodeOutputDisplay(
             id=UUID("6ab9d555-7007-43e1-9f90-d2ca21ea99cf"), name="status_code"

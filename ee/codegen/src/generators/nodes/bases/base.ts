@@ -2,6 +2,7 @@ import { python } from "@fern-api/python-ast";
 import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
+import nodeDefinitions from "src/assets/node-definitions.json";
 import * as codegen from "src/codegen";
 import {
   OUTPUTS_CLASS_NAME,
@@ -37,6 +38,21 @@ import {
 } from "src/types/vellum";
 import { doesModulePathStartWith } from "src/utils/paths";
 import { isNilOrEmpty } from "src/utils/typing";
+
+interface NodeDefinition {
+  id: string;
+  base?: { name: string; module: string[] };
+  definition?: { name: string; module: string[] };
+  outputs?: Array<{ id: string; name: string; type: string }>;
+}
+
+function findNodeDefinitionByBaseClassName(
+  baseClassName: string
+): NodeDefinition | undefined {
+  return (nodeDefinitions as { nodes: NodeDefinition[] }).nodes.find(
+    (node) => node.definition?.name === baseClassName
+  );
+}
 
 export declare namespace BaseNode {
   interface Args<T extends WorkflowDataNode, V extends BaseNodeContext<T>> {
@@ -110,16 +126,29 @@ export abstract class BaseNode<
   // Override to specify a custom output display
   protected getOutputDisplay(): python.Field | undefined {
     const outputIdsByName: Record<string, string> = {};
+
+    const baseClassName = this.nodeData.base?.name;
+    if (baseClassName) {
+      const baseNodeDef = findNodeDefinitionByBaseClassName(baseClassName);
+      if (baseNodeDef?.outputs) {
+        baseNodeDef.outputs.forEach((output) => {
+          outputIdsByName[output.name] = output.id;
+        });
+      }
+    }
+
+    if (this.nodeData.outputs) {
+      this.nodeData.outputs.forEach((output) => {
+        outputIdsByName[output.name] = output.id;
+      });
+    }
+
     const nodeOutputNamesById = this.nodeContext.getNodeOutputNamesById();
     Object.entries(nodeOutputNamesById).forEach(([id, name]) => {
       outputIdsByName[name] = id;
     });
 
-    const hasOutputsInDefinition =
-      this.nodeData.outputs && this.nodeData.outputs.length > 0;
-    const hasRuntimeOutputs = Object.keys(outputIdsByName).length > 0;
-
-    if (!hasOutputsInDefinition && !hasRuntimeOutputs) {
+    if (Object.keys(outputIdsByName).length === 0) {
       return undefined;
     }
 
@@ -155,44 +184,6 @@ export abstract class BaseNode<
         }),
       });
     });
-
-    if (this.nodeData.outputs) {
-      this.nodeData.outputs.forEach((output) => {
-        if (outputIdsByName[output.name]) {
-          return;
-        }
-
-        outputDisplayEntries.push({
-          key: python.reference({
-            name: this.nodeContext.nodeClassName,
-            modulePath: this.nodeContext.nodeModulePath,
-            attribute: [OUTPUTS_CLASS_NAME, output.name],
-          }),
-          value: python.instantiateClass({
-            classReference: python.reference({
-              name: "NodeOutputDisplay",
-              modulePath:
-                this.workflowContext.sdkModulePathNames
-                  .NODE_DISPLAY_TYPES_MODULE_PATH,
-            }),
-            arguments_: [
-              python.methodArgument({
-                name: "id",
-                value: python.TypeInstantiation.uuid(output.id),
-              }),
-              python.methodArgument({
-                name: "name",
-                value: python.TypeInstantiation.str(output.name),
-              }),
-            ],
-          }),
-        });
-      });
-    }
-
-    if (outputDisplayEntries.length === 0) {
-      return undefined;
-    }
 
     return python.field({
       name: "output_display",
