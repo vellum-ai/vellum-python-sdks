@@ -342,7 +342,6 @@ export class GraphAttribute extends AstNode {
     return this.workflowContext.findLocalNodeContext(nodeId) ?? null;
   }
 
-
   /**
    * Adds an edge to the graph.
    *
