@@ -33,7 +33,7 @@ export function isVellumErrorWithDetail(
 
 export function getCallableFunctions(
   nodeData: WorkflowDataNode
-): FunctionsType | undefined {
+): FunctionsType[] | undefined {
   const functionsAttribute = nodeData.attributes?.find(
     (attr) => attr.name === "functions"
   );
@@ -44,7 +44,7 @@ export function getCallableFunctions(
     Array.isArray(functionsAttribute.value.value.value) &&
     functionsAttribute.value.value.value.length > 0
   ) {
-    return functionsAttribute.value.value.value as FunctionsType;
+    return functionsAttribute.value.value.value as FunctionsType[];
   }
 
   return undefined;

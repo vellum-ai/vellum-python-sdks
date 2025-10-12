@@ -1026,11 +1026,10 @@ export type VellumIntegrationToolFunctionArgs = {
   name: string;
 } & NameDescription;
 
-export type ToolArgs = (
+export type ToolArgs =
   | FunctionArgs
   | InlineWorkflowFunctionArgs
   | WorkflowDeploymentFunctionArgs
   | ComposioToolFunctionArgs
   | MCPServerFunctionArgs
-  | VellumIntegrationToolFunctionArgs
-)[];
+  | VellumIntegrationToolFunctionArgs;
