@@ -1,6 +1,21 @@
 from vellum.workflows import BaseWorkflow
+from vellum.workflows.nodes.bases import BaseNode
 
-from .nodes import Node1, Node2
+
+class Node1(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        result: str
+
+    def run(self) -> Outputs:
+        return self.Outputs(result="node1_executed")
+
+
+class Node2(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        result: str
+
+    def run(self) -> Outputs:
+        return self.Outputs(result="node2_executed")
 
 
 class RunFromNodeUuidWorkflow(BaseWorkflow):

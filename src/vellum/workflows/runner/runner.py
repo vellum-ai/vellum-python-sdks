@@ -82,7 +82,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-RunFromNodeArg = Union[Sequence[Type[BaseNode]], UUID]
+RunFromNodeArg = Sequence[Union[Type[BaseNode], UUID]]
 ExternalInputsArg = Dict[ExternalInputReference, Any]
 BackgroundThreadItem = Union[BaseState, WorkflowEvent, None]
 
@@ -117,17 +117,23 @@ class WorkflowRunner(Generic[StateType]):
         self._should_emit_initial_state = True
         self._span_link_info: Optional[Tuple[str, str, str, str]] = None
         if entrypoint_nodes:
-            if isinstance(entrypoint_nodes, UUID):
-                matching_node = None
-                for node_class in self.workflow.get_all_nodes():
-                    if node_class.__id__ == entrypoint_nodes:
-                        matching_node = node_class
-                        break
+            resolved_nodes = []
+            for item in entrypoint_nodes:
+                if isinstance(item, UUID):
+                    matching_node = None
+                    for node_class in self.workflow.get_all_nodes():
+                        if node_class.__id__ == item:
+                            matching_node = node_class
+                            break
 
-                if matching_node is None:
-                    raise ValueError(f"No node found with UUID {entrypoint_nodes}")
+                    if matching_node is None:
+                        raise ValueError(f"No node found with UUID {item}")
 
-                entrypoint_nodes = [matching_node]
+                    resolved_nodes.append(matching_node)
+                else:
+                    resolved_nodes.append(item)
+
+            entrypoint_nodes = resolved_nodes
 
             if len(list(entrypoint_nodes)) > 1:
                 raise ValueError("Cannot resume from multiple nodes")
