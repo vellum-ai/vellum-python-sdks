@@ -209,7 +209,7 @@ export abstract class BasePersistedFile extends AstNode {
       contents = await writer.toStringFormatted({ line_width: 120 });
       contents = this.postprocessDocstrings(contents);
     } catch (error) {
-      console.error("Error formatting", fileName, "with error", error);
+      console.error(`Error formatting ${fileName}:`, error);
       contents = writer.toString();
     }
 
