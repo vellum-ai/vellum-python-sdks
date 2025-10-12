@@ -117,37 +117,31 @@ class WorkflowRunner(Generic[StateType]):
         self._should_emit_initial_state = True
         self._span_link_info: Optional[Tuple[str, str, str, str]] = None
         if entrypoint_nodes:
+            nodes_by_id = {node.__id__: node for node in self.workflow.get_all_nodes()}
+
             resolved_nodes = []
             for item in entrypoint_nodes:
                 if isinstance(item, UUID):
-                    matching_node = None
-                    for node_class in self.workflow.get_all_nodes():
-                        if node_class.__id__ == item:
-                            matching_node = node_class
-                            break
-
+                    matching_node = nodes_by_id.get(item)
                     if matching_node is None:
                         raise ValueError(f"No node found with UUID {item}")
-
                     resolved_nodes.append(matching_node)
                 else:
                     resolved_nodes.append(item)
 
-            entrypoint_nodes = resolved_nodes
-
-            if len(list(entrypoint_nodes)) > 1:
-                raise ValueError("Cannot resume from multiple nodes")
+            if len(list(resolved_nodes)) > 1:
+                raise WorkflowInitializationException("Cannot resume from multiple nodes")
 
             # TODO: Support resuming from multiple nodes
             # https://app.shortcut.com/vellum/story/4408
-            node = next(iter(entrypoint_nodes))
+            node = next(iter(resolved_nodes))
             if state:
                 self._initial_state = deepcopy(state)
                 self._initial_state.meta.span_id = uuid4()
                 self._initial_state.meta.workflow_definition = self.workflow.__class__
             else:
                 self._initial_state = self.workflow.get_state_at_node(node)
-            self._entrypoints = entrypoint_nodes
+            self._entrypoints = resolved_nodes
         elif external_inputs:
             self._initial_state = self.workflow.get_most_recent_state()
             for descriptor, value in external_inputs.items():
