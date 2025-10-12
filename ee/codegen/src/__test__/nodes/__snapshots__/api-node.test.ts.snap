@@ -302,9 +302,6 @@ class APINodeDisplay(BaseAPINodeDisplay[APINode]):
         APINode.Outputs.text: NodeOutputDisplay(
             id=UUID("81b270c0-4deb-4db3-aae5-138f79531b2b"), name="text"
         ),
-        APINode.Outputs.error: NodeOutputDisplay(
-            id=UUID("af589f73-effe-4a80-b48f-fb912ac6ce67"), name="error"
-        ),
     }
     port_displays = {
         APINode.Ports.default: PortDisplayOverrides(

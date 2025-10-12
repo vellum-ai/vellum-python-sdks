@@ -39,17 +39,12 @@ import {
 import { doesModulePathStartWith } from "src/utils/paths";
 import { isNilOrEmpty } from "src/utils/typing";
 
-interface NodeDefinition {
-  id: string;
-  base?: { name: string; module: string[] };
-  definition?: { name: string; module: string[] };
-  outputs?: Array<{ id: string; name: string; type: string }>;
-}
+type NodeDefinition = (typeof nodeDefinitions.nodes)[number];
 
 function findNodeDefinitionByBaseClassName(
   baseClassName: string
 ): NodeDefinition | undefined {
-  return (nodeDefinitions as { nodes: NodeDefinition[] }).nodes.find(
+  return nodeDefinitions.nodes.find(
     (node) => node.definition?.name === baseClassName
   );
 }
@@ -127,8 +122,14 @@ export abstract class BaseNode<
   protected getOutputDisplay(): python.Field | undefined {
     const outputIdsByName: Record<string, string> = {};
 
-    const nodeOutputNamesById = this.nodeContext.getNodeOutputNamesById();
-    Object.entries(nodeOutputNamesById).forEach(([id, name]) => {
+    // We use this mapping for backwards compatibility support with legacy `node.data`
+    // output id mappings.
+    const legacyNodeOutputNamesById = this.nodeContext.getNodeOutputNamesById();
+    Object.entries(legacyNodeOutputNamesById).forEach(([id, name]) => {
+      if (name === "error") {
+        // This now gets handled as part of TryNodeDisplay adornments
+        return;
+      }
       outputIdsByName[name] = id;
     });
 

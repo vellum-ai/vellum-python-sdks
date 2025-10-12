@@ -8,10 +8,6 @@ export class ConditionalNodeContext extends BaseNodeContext<ConditionalNode> {
   baseNodeClassName = "ConditionalNode";
   baseNodeDisplayClassName = "BaseConditionalNodeDisplay";
 
-  public getNodeOutputNamesById(): Record<string, string> {
-    return {};
-  }
-
   protected getNodeOutputTypesById(): Record<string, VellumVariableType> {
     return {};
   }

@@ -120,7 +120,9 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
     );
   }
 
-  public abstract getNodeOutputNamesById(): Record<string, string>;
+  public getNodeOutputNamesById(): Record<string, string> {
+    return {};
+  }
   protected abstract getNodeOutputTypesById(): Record<
     string,
     VellumVariableType
