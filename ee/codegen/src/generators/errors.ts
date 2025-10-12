@@ -145,4 +145,11 @@ export class ValueGenerationError extends BaseCodegenError {
  */
 export class FileFormattingError extends BaseCodegenError {
   code = "FILE_FORMATTING_ERROR" as const;
+
+  constructor(message: string, cause?: unknown) {
+    super(message);
+    if (cause !== undefined) {
+      this.cause = cause;
+    }
+  }
 }
