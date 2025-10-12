@@ -13,7 +13,8 @@ export type CodegenErrorCode =
   | "UNSUPPORTED_SANDBOX_INPUT_ERROR"
   | "ENTITY_NOT_FOUND_ERROR"
   | "POST_PROCESSING_ERROR"
-  | "VALUE_GENERATION_ERROR";
+  | "VALUE_GENERATION_ERROR"
+  | "FILE_FORMATTING_ERROR";
 
 export type CodegenErrorSeverity = "ERROR" | "WARNING";
 
@@ -138,4 +139,10 @@ export class NodeInputNotFoundError extends BaseCodegenError {
  */
 export class ValueGenerationError extends BaseCodegenError {
   code = "VALUE_GENERATION_ERROR" as const;
+}
+/**
+ * An error that raises when file formatting fails.
+ */
+export class FileFormattingError extends BaseCodegenError {
+  code = "FILE_FORMATTING_ERROR" as const;
 }
