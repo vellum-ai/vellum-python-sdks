@@ -37,6 +37,7 @@ class ApiNodeDisplay(BaseAPINodeDisplay[ApiNode]):
             id=UUID("6ab9d555-7007-43e1-9f90-d2ca21ea99cf"), name="status_code"
         ),
         ApiNode.Outputs.text: NodeOutputDisplay(id=UUID("6a3c1704-7020-411d-a440-84b2a481691e"), name="text"),
+        ApiNode.Outputs.headers: NodeOutputDisplay(id=UUID("3c738ba5-4278-46d3-a452-327905b7e68f"), name="headers"),
     }
     port_displays = {ApiNode.Ports.default: PortDisplayOverrides(id=UUID("b8ad3fd2-c96c-4ae8-8eae-d234fb13a139"))}
     display_data = NodeDisplayData(
