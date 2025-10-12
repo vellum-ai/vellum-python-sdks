@@ -1,5 +1,6 @@
 import {
   createPythonClassName,
+  escapePythonKeyword,
   toKebabCase,
   toPythonSafeSnakeCase,
   toValidPythonIdentifier,
@@ -108,6 +109,31 @@ describe("Casing utility functions", () => {
     );
   });
 
+  describe("escapePythonKeyword", () => {
+    const testCases = [
+      { input: "class", expected: "class_" },
+      { input: "import", expected: "import_" },
+      { input: "from", expected: "from_" },
+      { input: "def", expected: "def_" },
+      { input: "if", expected: "if_" },
+      { input: "for", expected: "for_" },
+      { input: "while", expected: "while_" },
+      { input: "return", expected: "return_" },
+      { input: "True", expected: "True_" },
+      { input: "False", expected: "False_" },
+      { input: "None", expected: "None_" },
+      { input: "normal_name", expected: "normal_name" },
+      { input: "myVariable", expected: "myVariable" },
+    ];
+
+    it.each(testCases)(
+      "should escape '$input' to '$expected'",
+      ({ input, expected }) => {
+        expect(escapePythonKeyword(input)).toBe(expected);
+      }
+    );
+  });
+
   describe("toValidPythonIdentifier", () => {
     const testCases = [
       {
@@ -124,6 +150,26 @@ describe("Casing utility functions", () => {
         input: "123invalid",
         safetyPrefix: "output",
         expected: "output_123invalid",
+      },
+      {
+        input: "class",
+        safetyPrefix: undefined,
+        expected: "class_",
+      },
+      {
+        input: "import",
+        safetyPrefix: undefined,
+        expected: "import_",
+      },
+      {
+        input: "for",
+        safetyPrefix: "input",
+        expected: "for_",
+      },
+      {
+        input: "normal-name",
+        safetyPrefix: undefined,
+        expected: "normal_name",
       },
     ];
 

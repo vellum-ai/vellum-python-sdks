@@ -7,6 +7,7 @@ import { WorkflowContext } from "src/context";
 import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { NodeOutput as NodeOutputType } from "src/types/vellum";
+import { toValidPythonIdentifier } from "src/utils/casing";
 import { getVellumVariablePrimitiveType } from "src/utils/vellum-variables";
 
 export declare namespace NodeOutputs {
@@ -54,9 +55,10 @@ export class NodeOutputs extends AstNode {
 
     nodeOutputs.forEach((output) => {
       const type = getVellumVariablePrimitiveType(output.type);
+      const sanitizedName = toValidPythonIdentifier(output.name, "output");
       const field = output.value
         ? python.field({
-            name: output.name,
+            name: sanitizedName,
             initializer: new WorkflowValueDescriptor({
               workflowValueDescriptor: output.value,
               workflowContext,
@@ -64,7 +66,7 @@ export class NodeOutputs extends AstNode {
             }),
           })
         : python.field({
-            name: output.name,
+            name: sanitizedName,
             type: type,
           });
       clazz.addField(field);

@@ -436,7 +436,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
 
             nodeAttributesStatements.push(
               python.field({
-                name: attribute.name,
+                name: toValidPythonIdentifier(attribute.name, "attr"),
                 initializer: python.TypeInstantiation.list(functionReferences),
               })
             );

@@ -36,6 +36,7 @@ import {
   WorkflowDataNode,
   WorkflowValueDescriptor as WorkflowValueDescriptorType,
 } from "src/types/vellum";
+import { toValidPythonIdentifier } from "src/utils/casing";
 import { doesModulePathStartWith } from "src/utils/paths";
 import { isNilOrEmpty } from "src/utils/typing";
 
@@ -801,7 +802,9 @@ export abstract class BaseNode<
           initializer: python.TypeInstantiation.dict(
             this.nodeData.attributes.map((attribute) => {
               return {
-                key: python.TypeInstantiation.str(attribute.name),
+                key: python.TypeInstantiation.str(
+                  toValidPythonIdentifier(attribute.name, "attr")
+                ),
                 value: python.TypeInstantiation.uuid(attribute.id),
               };
             })

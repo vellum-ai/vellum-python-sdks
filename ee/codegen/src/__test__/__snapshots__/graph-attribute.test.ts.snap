@@ -286,6 +286,16 @@ exports[`Workflow > graph > should generate correct graph for expression referen
 "
 `;
 
+exports[`Workflow > graph > should generate correct graph when workflow has a manual trigger 1`] = `
+"ManualTrigger >> FirstNode >> SecondNode
+"
+`;
+
+exports[`Workflow > graph > should generate correct graph when workflow has a slack trigger 1`] = `
+"SlackTrigger >> FirstNode >> SecondNode
+"
+`;
+
 exports[`Workflow > graph > should handle a simple edge of generic nodes 1`] = `
 "StartNode >> EndNode
 "
@@ -296,16 +306,6 @@ exports[`Workflow > graph > should properly format UUID-like port names in graph
     GenericNode.Ports.port_7d813792_04c2_4d26_a126_16de4c4cebaf >> FirstNode,
     GenericNode.Ports.port_6f909cc6_887c_46d8_966b_46547900fc9c >> SecondNode,
 }
-"
-`;
-
-exports[`Workflow > graph > should generate correct graph when workflow has a manual trigger 1`] = `
-"ManualTrigger >> FirstNode >> SecondNode
-"
-`;
-
-exports[`Workflow > graph > should generate correct graph when workflow has a slack trigger 1`] = `
-"SlackTrigger >> FirstNode >> SecondNode
 "
 `;
 
