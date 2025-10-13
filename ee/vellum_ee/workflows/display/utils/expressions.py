@@ -351,7 +351,7 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
     if isinstance(value, TriggerAttributeReference):
         # Generate trigger ID using the same hash formula as in base_workflow_display.py
         trigger_class = value.trigger_class
-        trigger_id = uuid4_from_hash(f"{trigger_class.__module__}|{trigger_class.__qualname__}")
+        trigger_id = uuid4_from_hash(trigger_class.__qualname__)
 
         return {
             "type": "TRIGGER_ATTRIBUTE",
