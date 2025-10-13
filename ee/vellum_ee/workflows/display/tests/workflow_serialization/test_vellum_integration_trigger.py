@@ -111,9 +111,9 @@ class TestVellumIntegrationTriggerBehavior:
 
         trigger = SlackNewMessage(event_data=event_data)
 
-        assert trigger.message == "Hello world"
-        assert trigger.channel == "C123456"
-        assert trigger.user == "U789012"
+        assert trigger.message == "Hello world"  # type: ignore[attr-defined]
+        assert trigger.channel == "C123456"  # type: ignore[attr-defined]
+        assert trigger.user == "U789012"  # type: ignore[attr-defined]
 
     def test_trigger_populates_dynamic_attributes(self) -> None:
         """Trigger dynamically populates attributes from event_data keys."""
@@ -131,10 +131,10 @@ class TestVellumIntegrationTriggerBehavior:
 
         trigger = GithubPush(event_data=event_data)
 
-        assert trigger.repository == "vellum-ai/workflows"
-        assert trigger.branch == "main"
-        assert trigger.commits == ["abc123", "def456"]
-        assert trigger.pusher == "alex"
+        assert trigger.repository == "vellum-ai/workflows"  # type: ignore[attr-defined]
+        assert trigger.branch == "main"  # type: ignore[attr-defined]
+        assert trigger.commits == ["abc123", "def456"]  # type: ignore[attr-defined]
+        assert trigger.pusher == "alex"  # type: ignore[attr-defined]
 
     def test_trigger_works_with_graph_operator(self) -> None:
         """Trigger class works with the >> operator in workflow graphs."""
@@ -237,8 +237,8 @@ class TestVellumIntegrationTriggerEdgeCases:
 
         trigger = GithubPush(event_data=event_data)
 
-        assert trigger.repository == {"name": "workflows", "owner": "vellum-ai"}
-        assert trigger.commits == [{"sha": "abc123", "message": "Initial commit"}]
+        assert trigger.repository == {"name": "workflows", "owner": "vellum-ai"}  # type: ignore[attr-defined]
+        assert trigger.commits == [{"sha": "abc123", "message": "Initial commit"}]  # type: ignore[attr-defined]
 
     def test_different_triggers_different_cache_keys(self) -> None:
         """Different integration/trigger combinations use different cache keys."""
