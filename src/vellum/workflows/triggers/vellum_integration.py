@@ -67,7 +67,7 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
 
                 # Create a new dynamic reference for this attribute
                 # For dynamic attributes, we use Any as the type since we don't know the type ahead of time
-                types = (Any,)
+                types = (object,)
                 reference = TriggerAttributeReference(name=name, types=types, instance=None, trigger_class=trigger_cls)
                 cache[name] = reference
                 return reference
