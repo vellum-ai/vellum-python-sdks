@@ -354,7 +354,7 @@ export class InlinePromptNode extends BaseNode<
       functionsAttribute.value.value?.type === "JSON" &&
       Array.isArray(functionsAttribute.value.value.value)
     ) {
-      const functions: FunctionsType = functionsAttribute.value.value.value;
+      const functions: FunctionsType[] = functionsAttribute.value.value.value;
 
       const codeExecutionFunctions = functions.filter(
         (f) => f.type === "CODE_EXECUTION" && !isNil((f as FunctionArgs).src)

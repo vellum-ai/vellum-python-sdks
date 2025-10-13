@@ -38,6 +38,7 @@ import {
   GenericNode as GenericNodeType,
   InlineWorkflowFunctionArgs,
   MCPServerFunctionArgs,
+  ToolArgs,
   VellumIntegrationToolFunctionArgs,
   WorkflowDeploymentFunctionArgs,
   WorkflowRawData,
@@ -96,14 +97,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
             value.value?.type === "JSON" &&
             Array.isArray(value.value.value)
           ) {
-            const functions: Array<
-              | FunctionArgs
-              | InlineWorkflowFunctionArgs
-              | WorkflowDeploymentFunctionArgs
-              | ComposioToolFunctionArgs
-              | MCPServerFunctionArgs
-              | VellumIntegrationToolFunctionArgs
-            > = value.value.value;
+            const functions: ToolArgs[] = value.value.value;
 
             const codeExecutionFunctions: FunctionArgs[] = [];
             const inlineWorkflowFunctions: InlineWorkflowFunctionArgs[] = [];
