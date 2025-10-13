@@ -23,8 +23,25 @@ export abstract class BaseCodegenError extends Error {
 
   public readonly severity: CodegenErrorSeverity;
 
-  constructor(message: string, severity?: CodegenErrorSeverity) {
-    super(message);
+  constructor(message: string, severity?: CodegenErrorSeverity);
+  constructor(
+    message: string,
+    options?: ErrorOptions & { severity?: CodegenErrorSeverity }
+  );
+  constructor(
+    message: string,
+    optionsOrSeverity?:
+      | CodegenErrorSeverity
+      | (ErrorOptions & { severity?: CodegenErrorSeverity })
+  ) {
+    const options =
+      typeof optionsOrSeverity === "string" ? undefined : optionsOrSeverity;
+    const severity =
+      typeof optionsOrSeverity === "string"
+        ? optionsOrSeverity
+        : optionsOrSeverity?.severity;
+
+    super(message, options);
 
     this.severity = severity ?? "ERROR";
     this.name = this.constructor.name;
@@ -145,11 +162,4 @@ export class ValueGenerationError extends BaseCodegenError {
  */
 export class FileFormattingError extends BaseCodegenError {
   code = "FILE_FORMATTING_ERROR" as const;
-
-  constructor(message: string, cause?: unknown) {
-    super(message);
-    if (cause !== undefined) {
-      this.cause = cause;
-    }
-  }
 }

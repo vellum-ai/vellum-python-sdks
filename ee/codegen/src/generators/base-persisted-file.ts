@@ -216,7 +216,7 @@ export abstract class BasePersistedFile extends AstNode {
         console.error(
           new FileFormattingError(
             `Error formatting ${fileName}: ${String(error)}`,
-            error
+            { cause: error }
           )
         );
       }
