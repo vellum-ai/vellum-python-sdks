@@ -191,6 +191,36 @@ class VellumIntegrationToolDetails(VellumIntegrationToolDefinition):
     parameters: Optional[Dict[str, Any]] = None
 
 
+class VellumIntegrationTriggerDefinition(UniversalBaseModel):
+    """Definition of a Vellum Integration trigger.
+
+    This class defines the structure of integration trigger definitions that are
+    retrieved from the Vellum integrations API. It follows the same pattern as
+    VellumIntegrationToolDefinition but for triggers.
+
+    Examples:
+        >>> trigger_def = VellumIntegrationTriggerDefinition(
+        ...     provider="COMPOSIO",
+        ...     integration_name="SLACK",
+        ...     name="SLACK_NEW_MESSAGE",
+        ...     description="Triggered when a new message is posted in Slack"
+        ... )
+
+    Attributes:
+        provider: The integration provider (e.g., COMPOSIO)
+        integration_name: The integration identifier (e.g., "SLACK", "GITHUB")
+        name: The specific trigger identifier (e.g., "SLACK_NEW_MESSAGE")
+        description: Human-readable description of what the trigger does
+        attributes: Optional dictionary of trigger attribute definitions from the API
+    """
+
+    provider: VellumIntegrationProviderType
+    integration_name: str  # "GITHUB", "SLACK", etc.
+    name: str  # Specific trigger like "SLACK_NEW_MESSAGE"
+    description: str
+    attributes: Optional[Dict[str, Any]] = None  # Trigger attribute definitions from API
+
+
 class MCPServer(UniversalBaseModel):
     type: Literal["MCP_SERVER"] = "MCP_SERVER"
     name: str
