@@ -1,3 +1,46 @@
+const PYTHON_KEYWORDS = new Set([
+  "False",
+  "None",
+  "True",
+  "__peg_parser__",
+  "and",
+  "as",
+  "assert",
+  "async",
+  "await",
+  "break",
+  "class",
+  "continue",
+  "def",
+  "del",
+  "elif",
+  "else",
+  "except",
+  "finally",
+  "for",
+  "from",
+  "global",
+  "if",
+  "import",
+  "in",
+  "is",
+  "lambda",
+  "nonlocal",
+  "not",
+  "or",
+  "pass",
+  "raise",
+  "return",
+  "try",
+  "while",
+  "with",
+  "yield",
+]);
+
+export function escapePythonKeyword(name: string): string {
+  return PYTHON_KEYWORDS.has(name) ? `${name}_` : name;
+}
+
 export function toKebabCase(str: string): string {
   return str
     .replace(/([a-z])([A-Z])/g, "$1-$2") // Insert hyphen between lower and upper case
@@ -102,10 +145,10 @@ export function toValidPythonIdentifier(
   const isValidPythonIdentifier = /^[a-zA-Z][a-zA-Z0-9]*$/.test(cleanedStr);
 
   if (isValidPythonIdentifier && !startsWithUnsafe) {
-    return cleanedStr;
+    return escapePythonKeyword(cleanedStr);
   }
 
-  return toPythonSafeSnakeCase(str, safetyPrefix);
+  return escapePythonKeyword(toPythonSafeSnakeCase(str, safetyPrefix));
 }
 
 export function removeEscapeCharacters(str: string): string {

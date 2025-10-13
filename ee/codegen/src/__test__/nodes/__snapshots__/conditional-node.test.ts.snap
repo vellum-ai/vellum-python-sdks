@@ -66,6 +66,20 @@ class ConditionalNode(BaseConditionalNode):
 "
 `;
 
+exports[`Conditional Node with Python keyword input variable > should escape Python keyword input variable names when referenced in port 1`] = `
+"from vellum.workflows.nodes.displayable import ConditionalNode as BaseConditionalNode
+from vellum.workflows.ports import Port
+
+from ..inputs import Inputs
+
+
+class ConditionalNode(BaseConditionalNode):
+    class Ports(BaseConditionalNode.Ports):
+        if_1 = Port.on_if(Inputs.class_.equals("test_value"))
+        else_1 = Port.on_else()
+"
+`;
+
 exports[`Conditional Node with constant value string base > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import ConditionalNode as BaseConditionalNode
 from vellum.workflows.ports import Port

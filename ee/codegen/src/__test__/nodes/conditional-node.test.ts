@@ -1609,3 +1609,81 @@ describe("Conditional Node with NodePorts defined", () => {
     expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
 });
+describe("Conditional Node with Python keyword input variable", () => {
+  let workflowContext: WorkflowContext;
+  let writer: Writer;
+  let node: ConditionalNode;
+
+  beforeEach(async () => {
+    workflowContext = workflowContextFactory();
+    writer = new Writer();
+
+    const classInputVariableId = uuid4();
+    workflowContext.addInputVariableContext(
+      inputVariableContextFactory({
+        inputVariableData: {
+          id: classInputVariableId,
+          key: "class",
+          type: "STRING",
+          required: true,
+        },
+        workflowContext,
+      })
+    );
+
+    const nodeData = conditionalNodeFactory({
+      inputs: [
+        {
+          id: "2cb6582e-c329-4952-8598-097830b766c7",
+          key: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.field",
+          value: {
+            rules: [
+              {
+                type: "INPUT_VARIABLE",
+                data: {
+                  inputVariableId: classInputVariableId,
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        {
+          id: "cf63d0ad-5e52-4031-a29f-922e7004cdd8",
+          key: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.value",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "test_value",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+      ],
+    }).build();
+
+    const nodeContext = (await createNodeContext({
+      nodeData,
+      workflowContext,
+    })) as ConditionalNodeContext;
+
+    node = new ConditionalNode({
+      workflowContext,
+      nodeContext,
+    });
+  });
+
+  it("should escape Python keyword input variable names when referenced in port", async () => {
+    node.getNodeFile().write(writer);
+    const generated = await writer.toStringFormatted();
+
+    expect(generated).toContain("Inputs.class_");
+    expect(generated).not.toContain("Inputs.class.");
+    expect(generated).toMatchSnapshot();
+  });
+});
