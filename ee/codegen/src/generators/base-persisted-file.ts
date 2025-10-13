@@ -10,6 +10,7 @@ import { ModulePath } from "@fern-api/python-ast/core/types";
 
 import { INIT_FILE_NAME } from "src/constants";
 import { WorkflowContext } from "src/context";
+import { FileFormattingError } from "src/generators/errors";
 import { PythonFile } from "src/generators/extensions";
 
 export declare namespace BasePersistedFile {
@@ -209,7 +210,16 @@ export abstract class BasePersistedFile extends AstNode {
       contents = await writer.toStringFormatted({ line_width: 120 });
       contents = this.postprocessDocstrings(contents);
     } catch (error) {
-      console.error("Error formatting", fileName, "with error", error);
+      if (error instanceof Error) {
+        console.error(`Error formatting ${fileName}:`, error);
+      } else {
+        console.error(
+          new FileFormattingError(
+            `Error formatting ${fileName}: ${String(error)}`,
+            { cause: error }
+          )
+        );
+      }
       contents = writer.toString();
     }
 
