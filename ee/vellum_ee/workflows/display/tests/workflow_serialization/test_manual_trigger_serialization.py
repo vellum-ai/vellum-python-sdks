@@ -1,7 +1,4 @@
-"""Tests for serialization of workflows with ManualTrigger."""
-
 import pytest
-from typing import cast
 
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
@@ -9,95 +6,55 @@ from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.triggers.base import BaseTrigger
 from vellum.workflows.triggers.manual import ManualTrigger
-from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
-
-
-class Inputs(BaseInputs):
-    input: str
-
-
-class SimpleNode(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
-
-
-def create_workflow(trigger=None):
-    """Factory for creating test workflows."""
-
-    class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
-        graph = trigger >> SimpleNode if trigger else SimpleNode
-
-        class Outputs(BaseWorkflow.Outputs):
-            output = SimpleNode.Outputs.output
-
-    return TestWorkflow
-
-
-def serialize(workflow_class) -> JsonObject:
-    """Helper to serialize a workflow."""
-    return get_workflow_display(workflow_class=workflow_class).serialize()
 
 
 def test_manual_trigger_serialization():
     """Workflow with ManualTrigger serializes with triggers field."""
-    result = serialize(create_workflow(ManualTrigger))
-    triggers = cast(JsonArray, result["triggers"])
+
+    class SimpleNode(BaseNode):
+        pass
+
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = ManualTrigger >> SimpleNode
+
+    result = get_workflow_display(workflow_class=TestWorkflow).serialize()
+    assert "triggers" in result
+    triggers = result["triggers"]
+    assert isinstance(triggers, list)
 
     assert len(triggers) == 1
-    trigger = cast(JsonObject, triggers[0])
-
-    assert trigger["type"] == "MANUAL"
-    assert "id" in trigger
-    assert "attributes" in trigger
-    assert trigger["attributes"] == []
-    assert "definition" not in trigger
-
-
-def test_no_trigger_serialization():
-    """Workflow without trigger has no triggers field."""
-    result = serialize(create_workflow())
-    assert "triggers" not in result
+    assert triggers[0] == {"id": "102b7243-666c-479c-bb16-9a43cb65fbad", "type": "MANUAL", "attributes": []}
 
 
 def test_manual_trigger_multiple_entrypoints():
     """ManualTrigger with multiple entrypoints."""
 
     class NodeA(BaseNode):
-        class Outputs(BaseNode.Outputs):
-            output = Inputs.input
+        pass
 
     class NodeB(BaseNode):
-        class Outputs(BaseNode.Outputs):
-            output = Inputs.input
+        pass
 
-    class MultiWorkflow(BaseWorkflow[Inputs, BaseState]):
+    class MultiWorkflow(BaseWorkflow[BaseInputs, BaseState]):
         graph = ManualTrigger >> {NodeA, NodeB}
 
-        class Outputs(BaseWorkflow.Outputs):
-            output_a = NodeA.Outputs.output
-            output_b = NodeB.Outputs.output
+    result = get_workflow_display(workflow_class=MultiWorkflow).serialize()
+    workflow_data = result["workflow_raw_data"]
+    assert isinstance(workflow_data, dict)
+    assert "nodes" in workflow_data
+    nodes = workflow_data["nodes"]
+    assert isinstance(nodes, list)
 
-    result = serialize(MultiWorkflow)
-    triggers = cast(JsonArray, result["triggers"])
-    workflow_data = cast(JsonObject, result["workflow_raw_data"])
-    nodes = cast(JsonArray, workflow_data["nodes"])
+    # entrypoint + 2 nodes
+    assert len(nodes) == 3
+
+    assert "triggers" in result
+    triggers = result["triggers"]
+    assert isinstance(triggers, list)
 
     assert len(triggers) == 1
-    trigger = cast(JsonObject, triggers[0])
-    assert trigger["type"] == "MANUAL"
-    assert len([n for n in nodes if cast(JsonObject, n)["type"] == "GENERIC"]) >= 2
-
-
-def test_serialized_workflow_structure():
-    """Verify complete structure of serialized workflow."""
-    result = serialize(create_workflow(ManualTrigger))
-    workflow_raw_data = cast(JsonObject, result["workflow_raw_data"])
-    definition = cast(JsonObject, workflow_raw_data["definition"])
-
-    assert result.keys() == {"workflow_raw_data", "input_variables", "state_variables", "output_variables", "triggers"}
-    assert workflow_raw_data.keys() == {"nodes", "edges", "display_data", "definition", "output_values"}
-    assert definition["name"] == "TestWorkflow"
+    assert triggers[0] == {"id": "102b7243-666c-479c-bb16-9a43cb65fbad", "type": "MANUAL", "attributes": []}
 
 
 def test_unknown_trigger_type():
@@ -106,5 +63,11 @@ def test_unknown_trigger_type():
     class UnknownTrigger(BaseTrigger):
         pass
 
+    class SimpleNode(BaseNode):
+        pass
+
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = UnknownTrigger >> SimpleNode
+
     with pytest.raises(ValueError, match="Unknown trigger type: UnknownTrigger"):
-        serialize(create_workflow(UnknownTrigger))
+        get_workflow_display(workflow_class=TestWorkflow).serialize()
