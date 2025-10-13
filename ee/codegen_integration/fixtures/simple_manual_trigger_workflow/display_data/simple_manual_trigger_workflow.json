@@ -30,13 +30,7 @@
         },
         "base": {
           "name": "BaseNode",
-          "module": [
-            "vellum",
-            "workflows",
-            "nodes",
-            "bases",
-            "base"
-          ]
+          "module": ["vellum", "workflows", "nodes", "bases", "base"]
         },
         "definition": {
           "name": "SimpleNode",
@@ -218,7 +212,7 @@
   ],
   "triggers": [
     {
-      "id": "ed4cdbb9-5c59-4d7b-8884-daa761da23ec",
+      "id": "b09c1902-3cca-4c79-b775-4c32e3e88466",
       "type": "MANUAL",
       "attributes": []
     }

@@ -24,7 +24,7 @@ def test_manual_trigger_serialization():
     assert isinstance(triggers, list)
 
     assert len(triggers) == 1
-    assert triggers[0] == {"id": "102b7243-666c-479c-bb16-9a43cb65fbad", "type": "MANUAL", "attributes": []}
+    assert triggers[0] == {"id": "b09c1902-3cca-4c79-b775-4c32e3e88466", "type": "MANUAL", "attributes": []}
 
 
 def test_manual_trigger_multiple_entrypoints():
@@ -54,7 +54,7 @@ def test_manual_trigger_multiple_entrypoints():
     assert isinstance(triggers, list)
 
     assert len(triggers) == 1
-    assert triggers[0] == {"id": "102b7243-666c-479c-bb16-9a43cb65fbad", "type": "MANUAL", "attributes": []}
+    assert triggers[0] == {"id": "b09c1902-3cca-4c79-b775-4c32e3e88466", "type": "MANUAL", "attributes": []}
 
 
 def test_unknown_trigger_type():
