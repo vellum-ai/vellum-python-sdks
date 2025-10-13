@@ -6,6 +6,7 @@ if TYPE_CHECKING:
 from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.triggers.base import BaseTriggerMeta
 from vellum.workflows.triggers.integration import IntegrationTrigger
+from vellum.workflows.utils.uuids import uuid4_from_hash
 
 
 class VellumIntegrationTriggerMeta(BaseTriggerMeta):
@@ -59,6 +60,12 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
                 cache = super().__getattribute__("__trigger_attribute_cache__")
                 if name in cache:
                     return cache[name]
+
+                attribute_ids = super().__getattribute__("__trigger_attribute_ids__")
+                if name not in attribute_ids:
+                    attribute_ids[name] = uuid4_from_hash(
+                        f"{trigger_cls.__module__}|{trigger_cls.__qualname__}|{name}"
+                    )
 
                 # Create a new dynamic reference for this attribute
                 # For dynamic attributes, we use Any as the type since we don't know the type ahead of time
