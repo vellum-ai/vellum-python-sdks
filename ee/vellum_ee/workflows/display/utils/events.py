@@ -29,7 +29,7 @@ def _should_mark_workflow_dynamic(event: WorkflowExecutionInitiatedEvent) -> boo
 
 
 def event_enricher(
-    event: WorkflowExecutionInitiatedEvent, client: Optional[Vellum] = None
+    event: WorkflowExecutionInitiatedEvent, client: Optional[Vellum] = None, metadata: Optional[dict] = None
 ) -> WorkflowExecutionInitiatedEvent:
     if event.name != "workflow.execution.initiated":
         return event
@@ -48,5 +48,8 @@ def event_enricher(
         register_workflow_display_class(workflow_definition, workflow_display.__class__)
         workflow_version_exec_config = workflow_display.serialize()
         setattr(event.body, "workflow_version_exec_config", workflow_version_exec_config)
+
+    if metadata is not None:
+        event.body.server_metadata = metadata
 
     return event

@@ -83,6 +83,9 @@ class WorkflowExecutionInitiatedBody(_BaseWorkflowExecutionBody, Generic[InputsT
     # This field will be populated during serialization by the serialize_body method
     workflow_version_exec_config: Optional[Any] = None
 
+    # This field can be populated with arbitrary server metadata during event enrichment
+    server_metadata: Optional[Dict[str, Any]] = None
+
     @field_serializer("inputs")
     def serialize_inputs(self, inputs: InputsType, _info: Any) -> Dict[str, Any]:
         return default_serializer(inputs)
