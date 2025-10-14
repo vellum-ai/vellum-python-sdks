@@ -476,9 +476,13 @@ export class WorkflowContext {
     const nodeId = nodeContext.nodeData.id;
 
     if (this.globalNodeContextsByNodeId.get(nodeId)) {
-      throw new NodeDefinitionGenerationError(
-        `Node context already exists for node ID: ${nodeId}`
+      this.addError(
+        new NodeDefinitionGenerationError(
+          `Node context already exists for node ID: ${nodeId}`,
+          "WARNING"
+        )
       );
+      return;
     }
 
     this.nodeContextsByNodeId.set(nodeId, nodeContext);

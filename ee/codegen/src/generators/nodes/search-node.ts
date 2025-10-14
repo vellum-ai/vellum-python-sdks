@@ -511,9 +511,19 @@ export class SearchNodeMetadataFilters extends AstNode {
     const lhsId = data.lhsVariableId;
     const lhs = this.nodeInputsById.get(lhsId);
     if (!lhs) {
-      throw new NodeAttributeGenerationError(
-        `Could not find search node input for id ${lhsId}`
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          `Could not find search node input for id ${lhsId}`,
+          "WARNING"
+        )
       );
+      return python.instantiateClass({
+        classReference: python.reference({
+          name: "MetadataLogicalCondition",
+          modulePath: VELLUM_WORKFLOW_NODE_BASE_TYPES_PATH,
+        }),
+        arguments_: [],
+      });
     }
 
     args.push(
@@ -530,9 +540,19 @@ export class SearchNodeMetadataFilters extends AstNode {
     const rhsId = data.rhsVariableId;
     const rhs = this.nodeInputsById.get(rhsId);
     if (!isUnaryOperator(data.operator) && !rhs) {
-      throw new NodeAttributeGenerationError(
-        `Could not find search node input for id ${rhsId}`
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          `Could not find search node input for id ${rhsId}`,
+          "WARNING"
+        )
       );
+      return python.instantiateClass({
+        classReference: python.reference({
+          name: "MetadataLogicalCondition",
+          modulePath: VELLUM_WORKFLOW_NODE_BASE_TYPES_PATH,
+        }),
+        arguments_: [],
+      });
     }
 
     if (rhs) {
