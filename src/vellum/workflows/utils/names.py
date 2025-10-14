@@ -25,14 +25,14 @@ def snake_to_title_case(snake_str: str) -> str:
 
 
 def create_module_name(*, deployment_name: Optional[str] = None, label: Optional[str] = None) -> Optional[str]:
-    """Create a module name from deployment_name or label.
+    """Create a module name from potential workflow metadata.
 
     Args:
         deployment_name: Optional deployment name to convert to snake_case
         label: Optional label to convert to snake_case (fallback if deployment_name not provided)
 
     Returns:
-        Module name in snake_case format, or None if neither parameter is provided
+        Module name in valid python syntax, or None if unable to resolve one based on the arguments
     """
     if deployment_name:
         return snake_case(deployment_name)

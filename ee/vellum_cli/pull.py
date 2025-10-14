@@ -259,11 +259,9 @@ def pull_command(
                     workflow_config.workflow_sandbox_id = str(pull_contents_metadata.workflow_sandbox_id)
                 if not workflow_config.module:
                     deployment_name = pull_contents_metadata.deployment_name if workflow_deployment else None
-                    module_name = create_module_name(
+                    workflow_config.module = create_module_name(
                         deployment_name=deployment_name, label=pull_contents_metadata.label
                     )
-                    if module_name:
-                        workflow_config.module = module_name
 
                 # Save or update the deployment info when pulling with --workflow-deployment
                 if workflow_deployment:
