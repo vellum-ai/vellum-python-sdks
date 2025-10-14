@@ -1,3 +1,4 @@
+import builtins
 from copy import deepcopy
 from datetime import datetime
 import importlib
@@ -67,6 +68,27 @@ def infer_types(object_: Type, attr_name: str, localns: Optional[Dict[str, Any]]
                 class_ = origin
                 args = get_args(object_)
                 type_var_mapping = {t: a for t, a in zip(origin.__parameters__, args)}
+
+        if hasattr(object_, "__annotations__") and attr_name in object_.__annotations__:
+            annotation_str = object_.__annotations__[attr_name]
+            if isinstance(annotation_str, str) and "|" in annotation_str:
+                parts = [part.strip() for part in annotation_str.split("|")]
+                types_list: List[Type] = []
+                for part in parts:
+                    if part == "None":
+                        types_list.append(type(None))
+                    else:
+                        try:
+                            module = importlib.import_module(object_.__module__)
+                            resolved_type = getattr(module, part, None)
+                            if resolved_type is None:
+                                resolved_type = getattr(builtins, part, None)
+                            if resolved_type is not None and isinstance(resolved_type, type):
+                                types_list.append(resolved_type)
+                        except (ImportError, AttributeError):
+                            pass
+                if len(types_list) == len(parts):
+                    return tuple(types_list)
 
         type_hints = get_type_hints(class_, localns=LOCAL_NS if localns is None else {**LOCAL_NS, **localns})
         if attr_name in type_hints:
