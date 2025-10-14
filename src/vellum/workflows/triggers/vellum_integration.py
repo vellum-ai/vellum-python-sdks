@@ -1,4 +1,4 @@
-from typing import Any, ClassVar, Dict, Type, cast
+from typing import Any, ClassVar, Dict, Optional, Type, cast
 
 from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.references.trigger import TriggerAttributeReference
@@ -251,7 +251,7 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
         slug: str,
         trigger_nano_id: str,
         provider: str = "COMPOSIO",
-        attributes: Dict[str, Any] | None = None,
+        attributes: Optional[Dict[str, Any]] = None,
     ) -> Type["VellumIntegrationTrigger"]:
         """
         Factory method to create a new trigger class for a specific integration trigger.
