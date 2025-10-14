@@ -100,6 +100,29 @@ def infer_types(object_: Type, attr_name: str, localns: Optional[Dict[str, Any]]
 
         raise AttributeError(f"Failed to infer type from attribute {attr_name} on {object_.__name__}")
     except TypeError:
+        if attr_name in object_.__annotations__:
+            annotation_str = object_.__annotations__[attr_name]
+            if isinstance(annotation_str, str) and "|" in annotation_str:
+                parts = [part.strip() for part in annotation_str.split("|")]
+                types_list: List[Type] = []
+                for part in parts:
+                    if part == "None":
+                        types_list.append(type(None))
+                    else:
+                        try:
+                            module = importlib.import_module(object_.__module__)
+                            resolved_type = getattr(module, part, None)
+                            if resolved_type is None:
+                                import builtins
+
+                                resolved_type = getattr(builtins, part, None)
+                            if resolved_type is not None and isinstance(resolved_type, type):
+                                types_list.append(resolved_type)
+                        except (ImportError, AttributeError):
+                            pass
+                if types_list:
+                    return tuple(types_list)
+
         raise AttributeError(
             f"Found 3.9+ typing syntax for field '{attr_name}' on class '{object_.__name__}' – {object_.__annotations__[attr_name]}. Type annotations must be compatible with python version 3.8. "  # noqa: E501
         )
