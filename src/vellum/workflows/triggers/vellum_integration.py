@@ -208,7 +208,7 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
             ...     trigger_name="SLACK_NEW_MESSAGE"
             ... )
             >>> type(SlackNewMessage).__name__
-            'VellumIntegrationTrigger_SLACK_SLACK_NEW_MESSAGE'
+            'VellumIntegrationTrigger_COMPOSIO_SLACK_SLACK_NEW_MESSAGE'
             >>>
             >>> # Use in workflow
             >>> class MyWorkflow(BaseWorkflow):
@@ -228,8 +228,10 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
         if cache_key in cls._trigger_class_cache:
             return cls._trigger_class_cache[cache_key]
 
-        # Generate unique class name
-        class_name = f"VellumIntegrationTrigger_{integration_name}_{trigger_name}"
+        # Generate unique class name including provider to avoid collisions across providers
+        class_name = (
+            f"VellumIntegrationTrigger_{provider_enum.value}_{integration_name}_{trigger_name}"
+        )
 
         # Create the new trigger class
         trigger_class = type(
