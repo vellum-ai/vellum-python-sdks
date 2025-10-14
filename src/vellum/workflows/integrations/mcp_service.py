@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import traceback
 from typing import Any, Dict, List, Optional
 
 import httpx
@@ -226,6 +227,8 @@ class MCPService:
             raise NodeException(
                 message=f"Error executing MCP operation '{operation}': {str(e)}",
                 code=WorkflowErrorCode.NODE_EXECUTION,
+                stacktrace=traceback.format_exc(),
+                raw_data={"operation": operation, "error_type": type(e).__name__, "error_message": str(e)},
             )
 
     def list_tools(self, server: MCPServer) -> List[Dict[str, Any]]:
@@ -249,11 +252,15 @@ class MCPService:
                 )
             )
             return result
+        except NodeException:
+            raise
         except Exception as e:
             logger.error(f"Error executing MCP tool '{tool_def.name}': {e}")
             raise NodeException(
                 message=f"Error executing MCP tool '{tool_def.name}': {str(e)}",
                 code=WorkflowErrorCode.NODE_EXECUTION,
+                stacktrace=traceback.format_exc(),
+                raw_data={"tool_name": tool_def.name, "error_type": type(e).__name__, "error_message": str(e)},
             )
 
     def hydrate_tool_definitions(self, server_def: MCPServer) -> List[MCPToolDefinition]:

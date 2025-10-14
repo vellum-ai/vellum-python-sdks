@@ -4,6 +4,8 @@ import json
 from unittest import mock
 
 from vellum.workflows.constants import AuthorizationType
+from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.exceptions import NodeException
 from vellum.workflows.integrations.mcp_service import MCPHttpClient, MCPService
 from vellum.workflows.types.definition import MCPServer, MCPToolDefinition
 
@@ -223,3 +225,49 @@ def test_mcp_service_list_tools_handles_errors():
 
         # THEN we should get an empty list instead of crashing
         assert tools == []
+
+
+def test_mcp_service_call_tool_includes_stacktrace_and_raw_data_on_error():
+    """
+    Tests that NodeException contains stacktrace and raw_data when call_tool errors.
+    """
+    # GIVEN an MCP server configuration
+    sample_mcp_server = MCPServer(
+        name="test-server",
+        url="https://test.mcp.server.com/mcp",
+        authorization_type=AuthorizationType.BEARER_TOKEN,
+        bearer_token_value="test-token",
+    )
+
+    tool_def = MCPToolDefinition(
+        name="test-tool",
+        server=sample_mcp_server,
+        description="A test tool",
+        parameters={},
+    )
+
+    # AND a mock httpx client that raises an exception during tool execution
+    with mock.patch("vellum.workflows.integrations.mcp_service.httpx.AsyncClient") as mock_client_class:
+        mock_client = mock.AsyncMock()
+        mock_client_class.return_value = mock_client
+        mock_client.post.side_effect = RuntimeError("Tool execution failed")
+
+        # WHEN we try to execute the tool
+        service = MCPService()
+
+        with pytest.raises(NodeException) as exc_info:
+            service.execute_tool(tool_def, {"arg": "value"})
+
+        # THEN the exception should have the correct error code
+        assert exc_info.value.code == WorkflowErrorCode.NODE_EXECUTION
+
+        # AND the exception should have a stacktrace
+        assert exc_info.value.stacktrace is not None
+        assert len(exc_info.value.stacktrace) > 0
+        assert "RuntimeError: Tool execution failed" in exc_info.value.stacktrace
+
+        # AND the exception should have raw_data with operation details
+        assert exc_info.value.raw_data is not None
+        assert exc_info.value.raw_data["operation"] == "call_tool"
+        assert exc_info.value.raw_data["error_type"] == "RuntimeError"
+        assert exc_info.value.raw_data["error_message"] == "Tool execution failed"
