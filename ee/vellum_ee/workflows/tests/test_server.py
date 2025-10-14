@@ -603,17 +603,16 @@ class Workflow(BaseWorkflow):
     namespace = str(uuid4())
 
     # AND the virtual file loader is registered
-    sys.meta_path.append(VirtualFileFinder(files, namespace))
+    sys.meta_path.append(VirtualFileFinder(files, namespace, source_module="test"))
 
     # WHEN we attempt to load the workflow
     # THEN it should raise WorkflowInitializationException
     with pytest.raises(WorkflowInitializationException) as exc_info:
         BaseWorkflow.load_from_module(namespace)
 
-    # AND the error message should be user-friendly
+    # AND the error message should be user-friendly and show source_module instead of namespace
     error_message = str(exc_info.value)
-    assert "Workflow module not found:" in error_message
-    assert "non_existent_module" in error_message
+    assert error_message == "Workflow module not found: No module named 'test.non_existent_module'"
 
 
 def test_serialize_module__tool_calling_node_with_single_tool():

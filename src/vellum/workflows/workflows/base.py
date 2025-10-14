@@ -4,6 +4,7 @@ from functools import lru_cache
 import importlib
 import inspect
 import logging
+import sys
 from uuid import UUID, uuid4
 from typing import (
     Any,
@@ -701,7 +702,20 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         except SyntaxError as e:
             raise WorkflowInitializationException(message=f"Syntax Error raised while loading Workflow: {e}") from e
         except ModuleNotFoundError as e:
-            raise WorkflowInitializationException(message=f"Workflow module not found: {e}") from e
+            error_message = f"Workflow module not found: {e}"
+            for finder in sys.meta_path:
+                if hasattr(finder, "source_module") and hasattr(finder, "namespace"):
+                    if finder.source_module:
+                        import re
+
+                        match = re.search(r"No module named '([^']+)'", str(e))
+                        if match:
+                            original_module = match.group(1)
+                            if not original_module.startswith(finder.source_module + "."):
+                                new_module = f"{finder.source_module}.{original_module}"
+                                error_message = error_message.replace(f"'{original_module}'", f"'{new_module}'")
+                            break
+            raise WorkflowInitializationException(message=error_message) from e
         except ImportError as e:
             raise WorkflowInitializationException(message=f"Invalid import found while loading Workflow: {e}") from e
         except NameError as e:

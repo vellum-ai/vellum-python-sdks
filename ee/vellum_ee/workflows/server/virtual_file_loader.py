@@ -6,9 +6,10 @@ from typing import Optional
 
 
 class VirtualFileLoader(importlib.abc.Loader):
-    def __init__(self, files: dict[str, str], namespace: str):
+    def __init__(self, files: dict[str, str], namespace: str, source_module: Optional[str] = None):
         self.files = files
         self.namespace = namespace
+        self.source_module = source_module
 
     def create_module(self, spec: ModuleSpec):
         """
@@ -66,8 +67,10 @@ class VirtualFileLoader(importlib.abc.Loader):
 
 
 class VirtualFileFinder(importlib.abc.MetaPathFinder, importlib.abc.Loader):
-    def __init__(self, files: dict[str, str], namespace: str):
-        self.loader = VirtualFileLoader(files, namespace)
+    def __init__(self, files: dict[str, str], namespace: str, source_module: Optional[str] = None):
+        self.loader = VirtualFileLoader(files, namespace, source_module)
+        self.source_module = source_module
+        self.namespace = namespace
 
     def find_spec(self, fullname: str, path, target=None):
         module_info = self.loader._resolve_module(fullname)
