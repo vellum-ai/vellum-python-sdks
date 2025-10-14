@@ -405,9 +405,13 @@ export class WorkflowContext {
     const outputVariableId = outputVariableContext.getOutputVariableId();
 
     if (this.globalOutputVariableContextsById.get(outputVariableId)) {
-      throw new WorkflowOutputGenerationError(
-        `Output variable context already exists for output variable ID: ${outputVariableId}`
+      this.addError(
+        new WorkflowOutputGenerationError(
+          `Output variable context already exists for output variable ID: ${outputVariableId}`,
+          "WARNING"
+        )
       );
+      return;
     }
 
     this.outputVariableContextsById.set(
