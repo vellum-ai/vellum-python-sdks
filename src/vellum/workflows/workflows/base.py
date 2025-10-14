@@ -704,10 +704,16 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             raise WorkflowInitializationException(message=f"Syntax Error raised while loading Workflow: {e}") from e
         except ModuleNotFoundError as e:
             error_message = f"Workflow module not found: {e}"
+            raw_data = None
+            has_namespace_match = False
             for finder in sys.meta_path:
                 if isinstance(finder, BaseWorkflowFinder):
                     error_message = finder.format_error_message(error_message)
-            raise WorkflowInitializationException(message=error_message) from e
+                    if hasattr(finder, "namespace") and e.name and finder.namespace in e.name:
+                        has_namespace_match = True
+            if not has_namespace_match:
+                raw_data = {"vellum_on_error_action": "CREATE_CUSTOM_IMAGE"}
+            raise WorkflowInitializationException(message=error_message, raw_data=raw_data) from e
         except ImportError as e:
             raise WorkflowInitializationException(message=f"Invalid import found while loading Workflow: {e}") from e
         except NameError as e:
