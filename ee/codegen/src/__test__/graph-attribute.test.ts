@@ -1151,5 +1151,51 @@ describe("Workflow", () => {
 
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
+
+    it("should handle a conditional node with default port pointing back to itself", async () => {
+      /**
+       * Reproduces the issue from APO-1882 where a self-referencing default port
+       * generates an invalid graph structure.
+       *
+       * The expected graph should be:
+       * {
+       *     ValidateAPIResponse.Ports.success >> APISuccessOutput,
+       *     {
+       *         ValidateAPIResponse.Ports.network_error,
+       *         ValidateAPIResponse.Ports.api_error,
+       *     } >> APIErrorHandler,
+       *     ValidateAPIResponse.Ports.default >> ValidateAPIResponse,
+       * }
+       */
+      const validateAPIResponseNode = genericNodeFactory({
+        id: uuidv4(),
+        label: "ValidateAPIResponse",
+        nodePorts: [
+          nodePortFactory({ name: "success" }),
+          nodePortFactory({ name: "network_error" }),
+          nodePortFactory({ name: "api_error" }),
+          nodePortFactory({ name: "default", type: "ELSE" }),
+        ],
+      });
+
+      const apiSuccessOutputNode = finalOutputNodeFactory({
+        id: uuidv4(),
+        label: "APISuccessOutput",
+        name: "api_success_output",
+      }).build();
+
+      const apiErrorHandlerNode = genericNodeFactory({
+        id: uuidv4(),
+        label: "APIErrorHandler",
+      });
+
+      await runGraphTest([
+        [entrypointNode, validateAPIResponseNode],
+        [[validateAPIResponseNode, "success"], apiSuccessOutputNode],
+        [[validateAPIResponseNode, "network_error"], apiErrorHandlerNode],
+        [[validateAPIResponseNode, "api_error"], apiErrorHandlerNode],
+        [[validateAPIResponseNode, "default"], validateAPIResponseNode],
+      ]);
+    });
   });
 });
