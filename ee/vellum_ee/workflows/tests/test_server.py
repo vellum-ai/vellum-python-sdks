@@ -584,6 +584,37 @@ class BrokenNode(BaseNode):
     assert "UndefinedClass" in error_message or "not defined" in error_message
 
 
+def test_load_from_module__module_not_found_error():
+    """
+    Tests that a ModuleNotFoundError raises WorkflowInitializationException with user-facing message.
+    """
+    # GIVEN a workflow module that imports a non-existent module
+    files = {
+        "__init__.py": "",
+        "workflow.py": """\
+from vellum.workflows import BaseWorkflow
+from .non_existent_module import SomeClass
+
+class Workflow(BaseWorkflow):
+    graph = None
+""",
+    }
+
+    namespace = str(uuid4())
+
+    # AND the virtual file loader is registered
+    sys.meta_path.append(VirtualFileFinder(files, namespace, source_module="test"))
+
+    # WHEN we attempt to load the workflow
+    # THEN it should raise WorkflowInitializationException
+    with pytest.raises(WorkflowInitializationException) as exc_info:
+        BaseWorkflow.load_from_module(namespace)
+
+    # AND the error message should be user-friendly and show source_module instead of namespace
+    error_message = str(exc_info.value)
+    assert error_message == "Workflow module not found: No module named 'test.non_existent_module'"
+
+
 def test_serialize_module__tool_calling_node_with_single_tool():
     """Test that serialize_module works with a tool calling node that has a single tool."""
 

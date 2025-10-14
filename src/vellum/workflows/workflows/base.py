@@ -4,6 +4,7 @@ from functools import lru_cache
 import importlib
 import inspect
 import logging
+import sys
 from uuid import UUID, uuid4
 from typing import (
     Any,
@@ -68,6 +69,7 @@ from vellum.workflows.exceptions import WorkflowInitializationException
 from vellum.workflows.executable import BaseExecutable
 from vellum.workflows.graph import Graph
 from vellum.workflows.inputs.base import BaseInputs
+from vellum.workflows.loaders.base import BaseWorkflowFinder
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.mocks import MockNodeExecutionArg
 from vellum.workflows.outputs import BaseOutputs
@@ -701,7 +703,11 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         except SyntaxError as e:
             raise WorkflowInitializationException(message=f"Syntax Error raised while loading Workflow: {e}") from e
         except ModuleNotFoundError as e:
-            raise WorkflowInitializationException(message=f"Workflow module not found: {e}") from e
+            error_message = f"Workflow module not found: {e}"
+            for finder in sys.meta_path:
+                if isinstance(finder, BaseWorkflowFinder):
+                    error_message = finder.format_error_message(error_message)
+            raise WorkflowInitializationException(message=error_message) from e
         except ImportError as e:
             raise WorkflowInitializationException(message=f"Invalid import found while loading Workflow: {e}") from e
         except NameError as e:
