@@ -40,7 +40,9 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
             return super().__getattribute__(name)
         except AttributeError:
             # For VellumIntegrationTrigger factory-generated classes, create dynamic references
-            # Check if this is a VellumIntegrationTrigger subclass (not VellumIntegrationTrigger itself)
+            # Only enable dynamic attribute creation for factory-generated classes, not the base
+            # VellumIntegrationTrigger class itself. Factory classes have names like:
+            # "VellumIntegrationTrigger_COMPOSIO_SLACK_NEW_MESSAGE"
             try:
                 is_factory_class = super().__getattribute__("__name__").startswith(
                     "VellumIntegrationTrigger_"
@@ -59,6 +61,9 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
                 if name in cache:
                     return cache[name]
 
+                # Generate and store deterministic UUID for this attribute if not already present.
+                # This ensures consistent IDs across multiple accesses to the same attribute,
+                # which is critical for serialization and state resolution.
                 attribute_ids = super().__getattribute__("__trigger_attribute_ids__")
                 if name not in attribute_ids:
                     attribute_ids[name] = uuid4_from_hash(f"{trigger_cls.__qualname__}|{name}")
@@ -154,7 +159,9 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
         """
         super().__init__(event_data)
 
-        # Dynamically populate attributes from event_data
+        # Dynamically populate instance attributes from event_data.
+        # This allows any key in event_data to become an accessible attribute:
+        # event_data={"message": "Hi"} → trigger.message == "Hi"
         for key, value in event_data.items():
             setattr(self, key, value)
 
@@ -168,7 +175,10 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
 
         attribute_values: Dict["TriggerAttributeReference[Any]", Any] = {}
 
-        # Iterate only over attributes from event_data (more efficient than dir())
+        # Unlike the base class which iterates over type(self) (predefined annotations),
+        # we iterate over event_data keys since our attributes are discovered dynamically at runtime.
+        # The base class approach: for reference in type(self)
+        # Our approach: for attr_name in self._event_data.keys()
         for attr_name in self._event_data.keys():
             # Get the class-level reference for this attribute
             # This will create it via our custom metaclass if it doesn't exist
@@ -238,6 +248,9 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
                 "integration_name": integration_name,
                 "trigger_name": trigger_name,
                 "__module__": cls.__module__,
+                # Explicitly set __qualname__ to match __name__ for deterministic UUID generation.
+                # UUIDs are generated from __qualname__, so this must be consistent and unique
+                # across different trigger configurations to prevent ID collisions.
                 "__qualname__": class_name,
             },
         )
