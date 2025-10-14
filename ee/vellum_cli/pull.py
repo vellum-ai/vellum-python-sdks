@@ -7,11 +7,11 @@ import zipfile
 from typing import Optional
 
 from dotenv import load_dotenv
-from pydash import snake_case
 
 from vellum.client.core.api_error import ApiError
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.utils.uuid import is_valid_uuid
+from vellum.workflows.utils.names import create_module_name
 from vellum.workflows.vellum_client import create_vellum_client
 from vellum_cli.config import (
     DEFAULT_WORKSPACE_CONFIG,
@@ -257,10 +257,13 @@ def pull_command(
                         workflow_config.container_image_tag = "latest"
                 if not workflow_config.workflow_sandbox_id and pull_contents_metadata.workflow_sandbox_id:
                     workflow_config.workflow_sandbox_id = str(pull_contents_metadata.workflow_sandbox_id)
-                if not workflow_config.module and workflow_deployment and pull_contents_metadata.deployment_name:
-                    workflow_config.module = snake_case(pull_contents_metadata.deployment_name)
-                if not workflow_config.module and pull_contents_metadata.label:
-                    workflow_config.module = snake_case(pull_contents_metadata.label)
+                if not workflow_config.module:
+                    deployment_name = pull_contents_metadata.deployment_name if workflow_deployment else None
+                    module_name = create_module_name(
+                        deployment_name=deployment_name, label=pull_contents_metadata.label
+                    )
+                    if module_name:
+                        workflow_config.module = module_name
 
                 # Save or update the deployment info when pulling with --workflow-deployment
                 if workflow_deployment:
