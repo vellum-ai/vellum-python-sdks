@@ -1220,3 +1220,101 @@ MY_CUSTOM_VELLUM_API_KEY=custom-key-xyz
         assert len(lock_file_content["workflows"]) == 1
         assert lock_file_content["workflows"][0]["workspace"] == "my_custom_workspace"
         assert lock_file_content["workflows"][0]["workflow_sandbox_id"] == workflow_sandbox_id
+
+
+def test_push__new_workspace_with_existing_sandbox_id__should_not_send_sandbox_id(mock_module, vellum_client_class):
+    """
+    Tests that when pushing to a new workspace with --workflow-sandbox-id flag,
+    we don't send the sandbox_id from the default workspace.
+    """
+
+    # GIVEN a workflow configured in the default workspace with a sandbox_id
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+    default_workspace_sandbox_id = mock_module.workflow_sandbox_id
+    set_pyproject_toml = mock_module.set_pyproject_toml
+
+    # AND a different workspace is configured
+    set_pyproject_toml(
+        {
+            "workflows": [
+                {
+                    "module": module,
+                    "workflow_sandbox_id": default_workspace_sandbox_id,
+                }
+            ],
+            "workspaces": [
+                {
+                    "name": "my_other_workspace",
+                    "api_key": "MY_OTHER_VELLUM_API_KEY",
+                }
+            ],
+        }
+    )
+
+    # AND the .env file has both api keys stored
+    with open(os.path.join(temp_dir, ".env"), "w") as f:
+        f.write(
+            """\
+VELLUM_API_KEY=abcdef123456
+MY_OTHER_VELLUM_API_KEY=aaabbbcccddd
+"""
+        )
+
+    # AND a workflow exists in the module
+    _ensure_workflow_py(temp_dir, module)
+
+    # AND the push API call returns a new workflow sandbox id
+    new_workflow_sandbox_id = str(uuid4())
+    vellum_client_class.return_value.workflows.push.return_value = WorkflowPushResponse(
+        workflow_sandbox_id=new_workflow_sandbox_id,
+    )
+
+    # WHEN calling `vellum push` with the --workspace flag AND --workflow-sandbox-id flag
+    runner = CliRunner()
+    result = runner.invoke(
+        cli_main,
+        [
+            "push",
+            module,
+            "--workspace",
+            "my_other_workspace",
+            "--workflow-sandbox-id",
+            default_workspace_sandbox_id,
+        ],
+    )
+
+    # THEN it should succeed
+    assert result.exit_code == 0, result.output
+
+    # AND we should have called the push API once
+    vellum_client_class.return_value.workflows.push.assert_called_once()
+
+    # AND the workflow sandbox id arg passed in should be None (not the default workspace's id)
+    call_args = vellum_client_class.return_value.workflows.push.call_args.kwargs
+    assert call_args["workflow_sandbox_id"] is None, (
+        f"Expected workflow_sandbox_id to be None when pushing to a new workspace, "
+        f"but got {call_args['workflow_sandbox_id']}"
+    )
+
+    # AND it should use the correct api key for the new workspace
+    vellum_client_class.assert_called_once_with(
+        api_key="aaabbbcccddd",
+        environment=mock.ANY,
+        api_version=None,
+    )
+
+    # AND the vellum lock file should now have two workflows
+    with open(os.path.join(temp_dir, "vellum.lock.json")) as f:
+        lock_file_content = json.load(f)
+        assert len(lock_file_content["workflows"]) == 2
+
+        # AND the first workflow should be the default workspace config
+        assert lock_file_content["workflows"][0]["module"] == module
+        assert lock_file_content["workflows"][0]["workflow_sandbox_id"] == default_workspace_sandbox_id
+        assert lock_file_content["workflows"][0]["workspace"] == "default"
+
+        # AND the second workflow should be the new workspace config with the new sandbox_id
+        assert lock_file_content["workflows"][1]["module"] == module
+        assert lock_file_content["workflows"][1]["workflow_sandbox_id"] == new_workflow_sandbox_id
+        assert lock_file_content["workflows"][1]["workspace"] == "my_other_workspace"

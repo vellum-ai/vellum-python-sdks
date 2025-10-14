@@ -82,7 +82,8 @@ def push_command(
     if not api_key:
         raise ValueError(f"No API key value found in environment for workspace '{workspace_config.name}'.")
 
-    if workspace_config.name != workflow_config.workspace:
+    pushing_to_new_workspace = workspace_config.name != workflow_config.workspace
+    if pushing_to_new_workspace:
         # We are pushing to a new workspace, so we need a new workflow config
         workflow_config = WorkflowConfig(
             module=workflow_config.module,
@@ -182,11 +183,14 @@ def push_command(
     artifact.name = f"{workflow_config.module.replace('.', '__')}.tar.gz"
 
     try:
+        sandbox_id_to_send = workflow_config.workflow_sandbox_id or (
+            None if pushing_to_new_workspace else workflow_sandbox_id
+        )
         response = client.workflows.push(
             # Remove this once we could serialize using the artifact in Vembda
             # https://app.shortcut.com/vellum/story/5585
             exec_config=json.dumps(exec_config),
-            workflow_sandbox_id=workflow_config.workflow_sandbox_id or workflow_sandbox_id,
+            workflow_sandbox_id=sandbox_id_to_send,
             artifact=artifact,
             # We should check with fern if we could auto-serialize typed object fields for us
             # https://app.shortcut.com/vellum/story/5568
