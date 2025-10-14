@@ -16,7 +16,7 @@ class SwitchNode(BaseNode):
         bottom = Port.on_else()
 
     class Outputs(BaseNode.Outputs):
-        condition: int
+        condition: float
 
     def run(self):
         condition = random.random()

@@ -124,4 +124,7 @@ class BasePromptNode(BaseNode[StateType], Generic[StateType]):
         if not target_node_output:
             return False
 
+        if not isinstance(target_node_output.instance, BaseDescriptor):
+            return False
+
         return _contains_reference_to_output(target_node_output.instance, event.node_definition.Outputs.text)
