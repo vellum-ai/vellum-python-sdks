@@ -10,15 +10,15 @@ from vellum import (
     StringVellumValue,
 )
 
-from tests.workflows.basic_streaming_inline_prompt.workflow import BasicStreamingInlinePromptWorkflow
+from tests.workflows.text_node_streaming_prompt.workflow import TextNodeStreamingPromptWorkflow
 
 
-def test_streaming_workflow__three_text_deltas(vellum_adhoc_prompt_client):
+def test_streaming_workflow__one_streaming_event(vellum_adhoc_prompt_client):
     """
-    Test that the workflow correctly handles streaming with three text deltas from the prompt API.
+    Test that the workflow correctly does not stream when the final output points to a text node.
     """
 
-    workflow = BasicStreamingInlinePromptWorkflow()
+    workflow = TextNodeStreamingPromptWorkflow()
 
     # AND we know what the Prompt will respond with (3 text deltas)
     expected_outputs: List[PromptOutput] = [
@@ -61,18 +61,9 @@ def test_streaming_workflow__three_text_deltas(vellum_adhoc_prompt_client):
 
     final_output_events = [e for e in streaming_events if e.output.name == "final_output"]
 
-    assert len(final_output_events) == 5
+    # THEN there should be one final output event
+    assert len(final_output_events) == 1
 
-    assert final_output_events[0].output.is_initiated
-
-    assert final_output_events[1].output.is_streaming
-    assert final_output_events[1].output.delta == "Hello, "
-
-    assert final_output_events[2].output.is_streaming
-    assert final_output_events[2].output.delta == "this is "
-
-    assert final_output_events[3].output.is_streaming
-    assert final_output_events[3].output.delta == "a test!"
-
-    assert final_output_events[4].output.is_fulfilled
-    assert final_output_events[4].output.value == "Hello, this is a test!"
+    assert final_output_events[0].output.is_fulfilled
+    assert final_output_events[0].output.name == "final_output"
+    assert final_output_events[0].output.value == "Hello from base node"

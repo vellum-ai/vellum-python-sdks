@@ -9,7 +9,7 @@ from vellum.workflows.outputs import BaseOutput
 from vellum.workflows.workflows.base import BaseWorkflow
 
 
-class BaseTextNode(BaseNode):
+class MyTextNode(BaseNode):
     """
     A simple base node that outputs text.
     """
@@ -39,7 +39,7 @@ class MyInlinePromptNode(InlinePromptNode):
         )
     ]
     prompt_inputs = {
-        "base_text": BaseTextNode.Outputs.text,
+        "base_text": MyTextNode.Outputs.text,
     }
 
 
@@ -49,16 +49,15 @@ class MyFinalOutputNode(FinalOutputNode):
     """
 
     class Outputs(FinalOutputNode.Outputs):
-        value = MyInlinePromptNode.Outputs.text
+        value = MyTextNode.Outputs.text
 
 
-class BasicStreamingInlinePromptWorkflow(BaseWorkflow):
+class TextNodeStreamingPromptWorkflow(BaseWorkflow):
     """
-    A workflow that streams text deltas from an inline prompt node.
+    A workflow that returns the text from a text node.
     """
 
-    graph = BaseTextNode >> MyInlinePromptNode >> MyFinalOutputNode
+    graph = MyTextNode >> MyInlinePromptNode >> MyFinalOutputNode
 
     class Outputs(BaseWorkflow.Outputs):
         final_output = MyFinalOutputNode.Outputs.value
-        prompt_text = MyInlinePromptNode.Outputs.text
