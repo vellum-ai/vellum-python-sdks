@@ -1,9 +1,7 @@
-from typing import TYPE_CHECKING, Any, ClassVar, Dict, Type, cast
-
-if TYPE_CHECKING:
-    from vellum.workflows.references.trigger import TriggerAttributeReference
+from typing import Any, ClassVar, Dict, Type, cast
 
 from vellum.workflows.constants import VellumIntegrationProviderType
+from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.triggers.base import BaseTriggerMeta
 from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.utils.uuids import uuid4_from_hash
