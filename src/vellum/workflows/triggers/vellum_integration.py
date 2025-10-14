@@ -296,8 +296,10 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
         # Normalize attributes
         attrs = attributes or {}
 
-        # Create cache key - include trigger_nano_id for uniqueness
-        cache_key = (provider_enum.value, integration_name, slug, trigger_nano_id)
+        # Create cache key - include all identifying parameters including attributes
+        # Convert attributes dict to hashable tuple for caching
+        attrs_tuple = tuple(sorted(attrs.items())) if attrs else ()
+        cache_key = (provider_enum.value, integration_name, slug, trigger_nano_id, attrs_tuple)
 
         # Return cached class if it exists
         if cache_key in cls._trigger_class_cache:
