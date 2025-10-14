@@ -1,148 +1,13 @@
-"""Tests for serialization of workflows with SlackTrigger."""
-
-from vellum.workflows import BaseWorkflow
-from vellum.workflows.inputs.base import BaseInputs
-from vellum.workflows.nodes.bases.base import BaseNode
-from vellum.workflows.state.base import BaseState
-from vellum.workflows.triggers.slack import SlackTrigger
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
-
-class Inputs(BaseInputs):
-    input: str
+from tests.workflows.basic_trigger_slack.workflow import SlackTriggerWorkflow
 
 
-class SimpleNode(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
+def test_serialize_slack_trigger_workflow():
+    workflow_display = get_workflow_display(workflow_class=SlackTriggerWorkflow)
+    serialized_workflow: dict = workflow_display.serialize()
 
-
-def test_slack_trigger_serialization() -> None:
-    """Workflow with SlackTrigger serializes with triggers field."""
-
-    class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
-        graph = SlackTrigger >> SimpleNode
-
-        class Outputs(BaseWorkflow.Outputs):
-            output = SimpleNode.Outputs.output
-
-    result = get_workflow_display(workflow_class=TestWorkflow).serialize()
-
-    # Validate triggers structure
-    assert "triggers" in result
-    triggers = result["triggers"]
-    assert isinstance(triggers, list)
-    assert len(triggers) == 1
-
-    trigger = triggers[0]
-    assert isinstance(trigger, dict)
-    assert trigger["type"] == "SLACK_MESSAGE"
-    assert "id" in trigger
-
-    # Validate attributes
-    assert "attributes" in trigger
-    attributes = trigger["attributes"]
-    assert isinstance(attributes, list)
-    assert len(attributes) == 6
-
-    attribute_names = set()
-    for attribute in attributes:
-        assert isinstance(attribute, dict)
-        assert "name" in attribute
-        assert isinstance(attribute["name"], str)
-        attribute_names.add(attribute["name"])
-    assert attribute_names == {
-        "message",
-        "channel",
-        "user",
-        "timestamp",
-        "thread_ts",
-        "event_type",
-    }
-
-    for attribute in attributes:
-        assert isinstance(attribute, dict)
-        assert attribute["value"] is None
-        assert isinstance(attribute["id"], str)
-        assert attribute["id"]
-
-
-def test_slack_trigger_multiple_entrypoints() -> None:
-    """SlackTrigger with multiple entrypoints."""
-
-    class NodeA(BaseNode):
-        class Outputs(BaseNode.Outputs):
-            output = Inputs.input
-
-    class NodeB(BaseNode):
-        class Outputs(BaseNode.Outputs):
-            output = Inputs.input
-
-    class MultiWorkflow(BaseWorkflow[Inputs, BaseState]):
-        graph = SlackTrigger >> {NodeA, NodeB}
-
-        class Outputs(BaseWorkflow.Outputs):
-            output_a = NodeA.Outputs.output
-            output_b = NodeB.Outputs.output
-
-    result = get_workflow_display(workflow_class=MultiWorkflow).serialize()
-
-    # Validate triggers
-    assert "triggers" in result
-    triggers = result["triggers"]
-    assert isinstance(triggers, list)
-    assert len(triggers) == 1
-
-    trigger = triggers[0]
-    assert isinstance(trigger, dict)
-    assert trigger["type"] == "SLACK_MESSAGE"
-
-    # Validate attributes
-    assert "attributes" in trigger
-    attributes = trigger["attributes"]
-    assert isinstance(attributes, list)
-    attribute_names = set()
-    for attribute in attributes:
-        assert isinstance(attribute, dict)
-        assert "name" in attribute
-        assert isinstance(attribute["name"], str)
-        attribute_names.add(attribute["name"])
-
-    assert attribute_names == {
-        "message",
-        "channel",
-        "user",
-        "timestamp",
-        "thread_ts",
-        "event_type",
-    }
-
-    # Validate nodes
-    assert "workflow_raw_data" in result
-    workflow_data = result["workflow_raw_data"]
-    assert isinstance(workflow_data, dict)
-    assert "nodes" in workflow_data
-    nodes = workflow_data["nodes"]
-    assert isinstance(nodes, list)
-
-    generic_nodes = [node for node in nodes if isinstance(node, dict) and node.get("type") == "GENERIC"]
-    assert len(generic_nodes) >= 2
-
-
-def test_serialized_slack_workflow_structure() -> None:
-    """Verify complete structure of serialized workflow with SlackTrigger."""
-
-    class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
-        graph = SlackTrigger >> SimpleNode
-
-        class Outputs(BaseWorkflow.Outputs):
-            output = SimpleNode.Outputs.output
-
-    result = get_workflow_display(workflow_class=TestWorkflow).serialize()
-
-    # Validate top-level structure
-    assert isinstance(result, dict)
-    assert set(result.keys()) == {
+    assert serialized_workflow.keys() == {
         "workflow_raw_data",
         "input_variables",
         "state_variables",
@@ -150,18 +15,36 @@ def test_serialized_slack_workflow_structure() -> None:
         "triggers",
     }
 
-    # Validate workflow_raw_data structure
-    workflow_raw_data = result["workflow_raw_data"]
-    assert isinstance(workflow_raw_data, dict)
-    assert set(workflow_raw_data.keys()) == {
-        "nodes",
-        "edges",
-        "display_data",
-        "definition",
-        "output_values",
-    }
+    triggers = serialized_workflow["triggers"]
+    assert triggers == [
+        {
+            "id": "45855aa4-27a0-426b-b399-a8ff2932a684",
+            "type": "SLACK_MESSAGE",
+            "attributes": [
+                {"id": "9d4bd7d7-314d-48b8-a483-f964ac3ca28a", "name": "channel", "type": "STRING", "value": None},
+                {"id": "af4aac3c-74f2-4250-801b-f2dbd7745277", "name": "event_type", "type": "STRING", "value": None},
+                {"id": "bdf8965f-b2f1-4f83-9a5a-e1532d73c795", "name": "message", "type": "STRING", "value": None},
+                {"id": "5a910518-f875-497c-ab5f-680eecce2d1d", "name": "thread_ts", "type": "STRING", "value": None},
+                {"id": "4aadb9ec-aabf-4a58-a9bb-41e89e8a20cb", "name": "timestamp", "type": "STRING", "value": None},
+                {"id": "c16971a0-73a3-4b81-93dc-2bcaafa3585a", "name": "user", "type": "STRING", "value": None},
+            ],
+        }
+    ]
 
-    # Validate definition
-    definition = workflow_raw_data["definition"]
-    assert isinstance(definition, dict)
-    assert definition["name"] == "TestWorkflow"
+    workflow_raw_data = serialized_workflow["workflow_raw_data"]
+    nodes = workflow_raw_data["nodes"]
+
+    process_node = next(node for node in nodes if node["type"] == "GENERIC" and node["label"] == "Process Message Node")
+    assert "outputs" in process_node
+    assert process_node["outputs"] == [
+        {
+            "id": "a1208db6-2daf-48a4-acee-71c8b1f42656",
+            "name": "processed_message",
+            "type": "STRING",
+            "value": {
+                "type": "TRIGGER_ATTRIBUTE",
+                "trigger_id": "45855aa4-27a0-426b-b399-a8ff2932a684",
+                "attribute_id": "bdf8965f-b2f1-4f83-9a5a-e1532d73c795",
+            },
+        }
+    ]
