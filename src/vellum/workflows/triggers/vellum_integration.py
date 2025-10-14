@@ -51,8 +51,9 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
         except AttributeError:
             # For VellumIntegrationTrigger factory-generated classes, create dynamic references
             # Only enable dynamic attribute creation for factory-generated classes, not the base
-            # VellumIntegrationTrigger class itself. Factory classes have names like:
-            # "VellumIntegrationTrigger_COMPOSIO_SLACK_NEW_MESSAGE"
+            # VellumIntegrationTrigger class itself. We check the internal __name__ attribute
+            # (e.g., "VellumIntegrationTrigger_COMPOSIO_SLACK_NEW_MESSAGE"), not the user-facing
+            # variable name (e.g., "SlackNewMessage").
             try:
                 is_factory_class = super().__getattribute__("__name__").startswith(
                     "VellumIntegrationTrigger_"
