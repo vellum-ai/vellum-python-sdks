@@ -4,6 +4,7 @@ from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.triggers.base import BaseTriggerMeta
 from vellum.workflows.triggers.integration import IntegrationTrigger
+from vellum.workflows.types import ComposioIntegrationTriggerExecConfig
 from vellum.workflows.utils.uuids import uuid4_from_hash
 
 
@@ -72,9 +73,15 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
                 # Generate and store deterministic UUID for this attribute if not already present.
                 # This ensures consistent IDs across multiple accesses to the same attribute,
                 # which is critical for serialization and state resolution.
+                # Use semantic identity (provider|integration|slug) instead of __qualname__ for stability.
                 attribute_ids = super().__getattribute__("__trigger_attribute_ids__")
                 if name not in attribute_ids:
-                    attribute_ids[name] = uuid4_from_hash(f"{trigger_cls.__qualname__}|{name}")
+                    # Generate stable ID from trigger semantics, not class naming
+                    provider = super().__getattribute__("provider")
+                    integration_name = super().__getattribute__("integration_name")
+                    slug = super().__getattribute__("slug")
+                    trigger_identity = f"{provider.value}|{integration_name}|{slug}"
+                    attribute_ids[name] = uuid4_from_hash(f"{trigger_identity}|{name}")
 
                 # Create a new dynamic reference for this attribute
                 types = (object,)
@@ -137,7 +144,9 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
     # Class variables that identify this trigger
     provider: ClassVar[VellumIntegrationProviderType]
     integration_name: ClassVar[str]
-    trigger_name: ClassVar[str]
+    slug: ClassVar[str]
+    trigger_nano_id: ClassVar[str]
+    attributes: ClassVar[Dict[str, Any]]
 
     # Cache for generated trigger classes to ensure consistency
     _trigger_class_cache: ClassVar[Dict[tuple, Type["VellumIntegrationTrigger"]]] = {}
@@ -195,23 +204,70 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
         return attribute_values
 
     @classmethod
+    def to_exec_config(cls) -> ComposioIntegrationTriggerExecConfig:
+        """
+        Generate execution configuration for serialization.
+
+        This method creates a ComposioIntegrationTriggerExecConfig from the trigger
+        class's configuration, which is used during serialization to the backend.
+
+        Returns:
+            ComposioIntegrationTriggerExecConfig with all required fields
+
+        Raises:
+            AttributeError: If called on base VellumIntegrationTrigger (not factory class)
+
+        Examples:
+            >>> SlackMessage = VellumIntegrationTrigger.for_trigger(
+            ...     integration_name="SLACK",
+            ...     slug="slack_new_message",
+            ...     trigger_nano_id="abc123",
+            ...     attributes={"channel": "C123456"}
+            ... )
+            >>> exec_config = SlackMessage.to_exec_config()
+            >>> exec_config.slug
+            'slack_new_message'
+            >>> exec_config.attributes
+            {'channel': 'C123456'}
+        """
+        if not hasattr(cls, "slug"):
+            raise AttributeError(
+                "to_exec_config() can only be called on factory-generated trigger classes. "
+                "Use VellumIntegrationTrigger.for_trigger() to create a trigger class first."
+            )
+
+        return ComposioIntegrationTriggerExecConfig(
+            provider=cls.provider,
+            integration_name=cls.integration_name,
+            slug=cls.slug,
+            trigger_nano_id=cls.trigger_nano_id,
+            attributes=cls.attributes,
+        )
+
+    @classmethod
     def for_trigger(
         cls,
         integration_name: str,
-        trigger_name: str,
+        slug: str,
+        trigger_nano_id: str,
         provider: str = "COMPOSIO",
+        attributes: Dict[str, Any] | None = None,
     ) -> Type["VellumIntegrationTrigger"]:
         """
         Factory method to create a new trigger class for a specific integration trigger.
 
         This method generates a unique trigger class that can be used in workflow graphs
-        and node definitions. Each unique combination of provider, integration_name, and
-        trigger_name produces the same class instance (cached).
+        and node definitions. Each unique combination of provider, integration_name,
+        slug, and trigger_nano_id produces the same class instance (cached).
 
         Args:
             integration_name: The integration identifier (e.g., "SLACK", "GITHUB")
-            trigger_name: The specific trigger identifier (e.g., "SLACK_NEW_MESSAGE")
+            slug: The slug of the integration trigger in Composio (e.g., "slack_new_message")
+            trigger_nano_id: Composio's unique trigger identifier used for event matching
             provider: The integration provider (default: "COMPOSIO")
+            attributes: Optional dict of trigger-specific configuration attributes
+                used for filtering events. For example, {"channel": "C123456"} to only
+                match events from a specific Slack channel.
 
         Returns:
             A new trigger class configured for the specified integration trigger
@@ -219,10 +275,12 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
         Examples:
             >>> SlackNewMessage = VellumIntegrationTrigger.for_trigger(
             ...     integration_name="SLACK",
-            ...     trigger_name="SLACK_NEW_MESSAGE"
+            ...     slug="slack_new_message",
+            ...     trigger_nano_id="abc123def456",
+            ...     attributes={"channel": "C123456"}
             ... )
             >>> type(SlackNewMessage).__name__
-            'VellumIntegrationTrigger_COMPOSIO_SLACK_SLACK_NEW_MESSAGE'
+            'VellumIntegrationTrigger_COMPOSIO_SLACK_slack_new_message'
             >>>
             >>> # Use in workflow
             >>> class MyWorkflow(BaseWorkflow):
@@ -235,15 +293,18 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
         # Validate and normalize provider
         provider_enum = VellumIntegrationProviderType(provider)
 
-        # Create cache key
-        cache_key = (provider_enum.value, integration_name, trigger_name)
+        # Normalize attributes
+        attrs = attributes or {}
+
+        # Create cache key - include trigger_nano_id for uniqueness
+        cache_key = (provider_enum.value, integration_name, slug, trigger_nano_id)
 
         # Return cached class if it exists
         if cache_key in cls._trigger_class_cache:
             return cls._trigger_class_cache[cache_key]
 
         # Generate unique class name including provider to avoid collisions across providers
-        class_name = f"VellumIntegrationTrigger_{provider_enum.value}_{integration_name}_{trigger_name}"
+        class_name = f"VellumIntegrationTrigger_{provider_enum.value}_{integration_name}_{slug}"
 
         # Create the new trigger class
         trigger_class = type(
@@ -252,7 +313,9 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
             {
                 "provider": provider_enum,
                 "integration_name": integration_name,
-                "trigger_name": trigger_name,
+                "slug": slug,
+                "trigger_nano_id": trigger_nano_id,
+                "attributes": attrs,
                 "__module__": cls.__module__,
                 # Explicitly set __qualname__ to match __name__ for deterministic UUID generation.
                 # UUIDs are generated from __qualname__, so this must be consistent and unique
