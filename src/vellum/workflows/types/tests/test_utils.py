@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 from typing import Any, ClassVar, Generic, List, TypeVar, Union
 
@@ -22,6 +24,11 @@ class ExampleClass:
     eta: List[str]
     kappa: Any
     mu: list[str]
+
+
+class ExamplePEP604Class:
+    pep604_union: str | int
+    pep604_optional: str | None
 
 
 T = TypeVar("T")
@@ -58,6 +65,8 @@ class ExampleNode(BaseNode):
         (ExampleNode.Outputs, "iota", (str,)),
         (ExampleClass, "kappa", (Any,)),
         (ExampleClass, "mu", (list[str],)),
+        (ExamplePEP604Class, "pep604_union", (str, int)),
+        (ExamplePEP604Class, "pep604_optional", (str, type(None))),
     ],
     ids=[
         "str",
@@ -74,6 +83,8 @@ class ExampleNode(BaseNode):
         "try_node_output",
         "any",
         "list_str_generic",
+        "pep604_union",
+        "pep604_optional",
     ],
 )
 def test_infer_types(cls, attr_name, expected_type):
