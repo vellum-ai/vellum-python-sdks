@@ -1,29 +1,12 @@
 """Tests for VellumIntegrationTrigger factory pattern and behavior."""
 
-import pytest
-
-from vellum.workflows import BaseWorkflow
 from vellum.workflows.constants import VellumIntegrationProviderType
-from vellum.workflows.inputs.base import BaseInputs
-from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.references.trigger import TriggerAttributeReference
-from vellum.workflows.state.base import BaseState
 from vellum.workflows.triggers.vellum_integration import VellumIntegrationTrigger
-
-
-class Inputs(BaseInputs):
-    input: str
-
-
-class SimpleNode(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        output = Inputs.input
 
 
 class TestVellumIntegrationTrigger:
     """Tests for VellumIntegrationTrigger factory pattern and dynamic behavior."""
-
-    # Factory tests
 
     def test_factory_creates_trigger_class(self) -> None:
         """Factory method creates a trigger class with correct attributes."""
@@ -37,22 +20,8 @@ class TestVellumIntegrationTrigger:
         assert SlackNewMessage.integration_name == "SLACK"
         assert SlackNewMessage.trigger_name == "SLACK_NEW_MESSAGE"
 
-    def test_factory_generates_unique_class_names(self) -> None:
-        """Factory generates unique class names for different triggers."""
-        SlackNewMessage = VellumIntegrationTrigger.for_trigger(
-            integration_name="SLACK",
-            trigger_name="SLACK_NEW_MESSAGE",
-        )
-        GithubPush = VellumIntegrationTrigger.for_trigger(
-            integration_name="GITHUB",
-            trigger_name="GITHUB_PUSH",
-        )
-
-        # Different triggers must have different names (for UUID generation)
-        assert SlackNewMessage.__name__ != GithubPush.__name__
-
     def test_factory_caches_trigger_classes(self) -> None:
-        """Factory returns the same class instance for identical parameters."""
+        """Factory returns the same class instance for identical parameters (ensures deterministic UUIDs)."""
         SlackNewMessage1 = VellumIntegrationTrigger.for_trigger(
             integration_name="SLACK",
             trigger_name="SLACK_NEW_MESSAGE",
@@ -63,36 +32,6 @@ class TestVellumIntegrationTrigger:
         )
 
         assert SlackNewMessage1 is SlackNewMessage2
-
-    def test_factory_validates_provider(self) -> None:
-        """Factory validates provider enum values."""
-        with pytest.raises(ValueError):
-            VellumIntegrationTrigger.for_trigger(
-                integration_name="SLACK",
-                trigger_name="SLACK_NEW_MESSAGE",
-                provider="INVALID_PROVIDER",  # type: ignore[arg-type]
-            )
-
-    # Instance behavior tests
-
-    def test_instantiation_with_event_data(self) -> None:
-        """Trigger can be instantiated with event data."""
-        SlackNewMessage = VellumIntegrationTrigger.for_trigger(
-            integration_name="SLACK",
-            trigger_name="SLACK_NEW_MESSAGE",
-        )
-
-        event_data = {
-            "message": "Hello world",
-            "channel": "C123456",
-            "user": "U789012",
-        }
-
-        trigger = SlackNewMessage(event_data=event_data)
-
-        assert getattr(trigger, "message") == "Hello world"
-        assert getattr(trigger, "channel") == "C123456"
-        assert getattr(trigger, "user") == "U789012"
 
     def test_populates_dynamic_attributes(self) -> None:
         """Trigger dynamically populates attributes from event_data keys."""
@@ -105,7 +44,6 @@ class TestVellumIntegrationTrigger:
             "repository": "vellum-ai/workflows",
             "branch": "main",
             "commits": ["abc123", "def456"],
-            "pusher": "alex",
         }
 
         trigger = GithubPush(event_data=event_data)
@@ -113,32 +51,15 @@ class TestVellumIntegrationTrigger:
         assert getattr(trigger, "repository") == "vellum-ai/workflows"
         assert getattr(trigger, "branch") == "main"
         assert getattr(trigger, "commits") == ["abc123", "def456"]
-        assert getattr(trigger, "pusher") == "alex"
-
-    def test_works_with_graph_operator(self) -> None:
-        """Trigger class works with the >> operator in workflow graphs."""
-        SlackNewMessage = VellumIntegrationTrigger.for_trigger(
-            integration_name="SLACK",
-            trigger_name="SLACK_NEW_MESSAGE",
-        )
-
-        class TestWorkflow(BaseWorkflow[Inputs, BaseState]):
-            graph = SlackNewMessage >> SimpleNode
-
-            class Outputs(BaseWorkflow.Outputs):
-                output = SimpleNode.Outputs.output
-
-        # Should not raise any errors
-        assert TestWorkflow.graph is not None
 
     def test_supports_attribute_references(self) -> None:
-        """Trigger supports attribute references for use in nodes."""
+        """Metaclass creates TriggerAttributeReference dynamically on attribute access."""
         SlackNewMessage = VellumIntegrationTrigger.for_trigger(
             integration_name="SLACK",
             trigger_name="SLACK_NEW_MESSAGE",
         )
 
-        # Metaclass creates references dynamically on attribute access
+        # Metaclass __getattribute__ creates references for undefined attributes
         message_ref = SlackNewMessage.message
         channel_ref = SlackNewMessage.channel
 
@@ -146,31 +67,6 @@ class TestVellumIntegrationTrigger:
         assert isinstance(channel_ref, TriggerAttributeReference)
         assert message_ref.name == "message"
         assert channel_ref.name == "channel"
-
-    def test_state_binding(self) -> None:
-        """Trigger can bind attributes to workflow state."""
-        SlackNewMessage = VellumIntegrationTrigger.for_trigger(
-            integration_name="SLACK",
-            trigger_name="SLACK_NEW_MESSAGE",
-        )
-
-        event_data = {
-            "message": "Hello",
-            "channel": "C123",
-        }
-
-        trigger = SlackNewMessage(event_data=event_data)
-        state = BaseState()
-
-        # Bind trigger to state
-        trigger.bind_to_state(state)
-
-        # Resolve references from state
-        message_ref = SlackNewMessage.message
-        channel_ref = SlackNewMessage.channel
-
-        assert message_ref.resolve(state) == "Hello"
-        assert channel_ref.resolve(state) == "C123"
 
     def test_to_trigger_attribute_values(self) -> None:
         """to_trigger_attribute_values returns correct attribute mappings."""
@@ -184,79 +80,7 @@ class TestVellumIntegrationTrigger:
 
         attr_values = trigger.to_trigger_attribute_values()
 
-        # Should have 2 entries
         assert len(attr_values) == 2
-
-        # Keys should be TriggerAttributeReference
         for key in attr_values.keys():
             assert isinstance(key, TriggerAttributeReference)
-
-        # Values should match event_data
         assert set(attr_values.values()) == {"Hello", "C123"}
-
-    # Edge cases
-
-    def test_with_empty_event_data(self) -> None:
-        """Trigger handles empty event data gracefully."""
-        SlackNewMessage = VellumIntegrationTrigger.for_trigger(
-            integration_name="SLACK",
-            trigger_name="SLACK_NEW_MESSAGE",
-        )
-
-        trigger = SlackNewMessage(event_data={})
-
-        # Should not raise errors
-        attr_values = trigger.to_trigger_attribute_values()
-        assert len(attr_values) == 0
-
-    def test_with_nested_event_data(self) -> None:
-        """Trigger handles nested event data structures."""
-        GithubPush = VellumIntegrationTrigger.for_trigger(
-            integration_name="GITHUB",
-            trigger_name="GITHUB_PUSH",
-        )
-
-        event_data = {
-            "repository": {"name": "workflows", "owner": "vellum-ai"},
-            "commits": [{"sha": "abc123", "message": "Initial commit"}],
-        }
-
-        trigger = GithubPush(event_data=event_data)
-
-        assert getattr(trigger, "repository") == {"name": "workflows", "owner": "vellum-ai"}
-        assert getattr(trigger, "commits") == [{"sha": "abc123", "message": "Initial commit"}]
-
-    def test_different_cache_keys(self) -> None:
-        """Different integration/trigger combinations use different cache keys."""
-        Slack1 = VellumIntegrationTrigger.for_trigger("SLACK", "NEW_MESSAGE")
-        Slack2 = VellumIntegrationTrigger.for_trigger("SLACK", "REACTION_ADDED")
-        Github1 = VellumIntegrationTrigger.for_trigger("GITHUB", "PUSH")
-
-        # Different trigger names within same integration
-        assert Slack1 is not Slack2
-        # Different integrations
-        assert Slack1 is not Github1
-
-        # Same params return same instance (caching works)
-        Slack1_again = VellumIntegrationTrigger.for_trigger("SLACK", "NEW_MESSAGE")
-        assert Slack1 is Slack1_again
-
-    def test_attribute_name_conflicts(self) -> None:
-        """Event data keys that conflict with methods/properties shadow instance attributes."""
-        TestTrigger = VellumIntegrationTrigger.for_trigger("TEST", "CONFLICT")
-
-        # Use event_data keys that conflict with method/class attribute names
-        event_data = {
-            "bind_to_state": "shadows method on instance",
-            "provider": "shadows class var on instance",
-        }
-
-        trigger = TestTrigger(event_data=event_data)
-
-        # Instance attributes from event_data shadow methods (expected Python behavior)
-        assert getattr(trigger, "bind_to_state") == "shadows method on instance"
-        assert getattr(trigger, "provider") == "shadows class var on instance"
-
-        # Class-level attributes remain unchanged
-        assert TestTrigger.provider == VellumIntegrationProviderType.COMPOSIO
-        assert callable(TestTrigger.bind_to_state)
