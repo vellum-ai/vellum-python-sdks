@@ -48,3 +48,5 @@ def test_serialize_slack_trigger_workflow():
             },
         }
     ]
+
+    assert triggers[0]["id"] == process_node["outputs"][0]["value"]["trigger_id"]
