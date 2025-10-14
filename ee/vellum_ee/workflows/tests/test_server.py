@@ -615,6 +615,80 @@ class Workflow(BaseWorkflow):
     assert error_message == "Workflow module not found: No module named 'test.non_existent_module'"
 
 
+def test_load_from_module__module_not_found_error_with_external_package():
+    """
+    Tests that when ModuleNotFoundError occurs for an external package (not containing the namespace),
+    the exception includes vellum_on_error_action set to CREATE_CUSTOM_IMAGE in raw_data.
+    """
+
+    # GIVEN a workflow module that imports a non-existent external package
+    files = {
+        "__init__.py": "",
+        "workflow.py": """\
+from vellum.workflows import BaseWorkflow
+import some_external_package
+
+class Workflow(BaseWorkflow):
+    graph = None
+""",
+    }
+
+    namespace = str(uuid4())
+
+    # AND the virtual file loader is registered
+    finder = VirtualFileFinder(files, namespace, source_module="test")
+    sys.meta_path.append(finder)
+
+    # WHEN we attempt to load the workflow
+    # THEN it should raise WorkflowInitializationException
+    with pytest.raises(WorkflowInitializationException) as exc_info:
+        BaseWorkflow.load_from_module(namespace)
+
+    # AND the error message should be user-friendly
+    error_message = str(exc_info.value)
+    assert "Workflow module not found:" in error_message
+    assert "some_external_package" in error_message
+
+    assert exc_info.value.raw_data is not None
+    assert exc_info.value.raw_data["vellum_on_error_action"] == "CREATE_CUSTOM_IMAGE"
+
+
+def test_load_from_module__module_not_found_error_with_internal_package():
+    """
+    Tests that when ModuleNotFoundError occurs for an internal module (containing the namespace),
+    the exception does NOT include vellum_on_error_action in raw_data.
+    """
+
+    # GIVEN a workflow module that imports a non-existent internal module
+    files = {
+        "__init__.py": "",
+        "workflow.py": """\
+from vellum.workflows import BaseWorkflow
+from .non_existent_module import SomeClass
+
+class Workflow(BaseWorkflow):
+    graph = None
+""",
+    }
+
+    namespace = str(uuid4())
+
+    # AND the virtual file loader is registered
+    finder = VirtualFileFinder(files, namespace, source_module="test")
+    sys.meta_path.append(finder)
+
+    # WHEN we attempt to load the workflow
+    # THEN it should raise WorkflowInitializationException
+    with pytest.raises(WorkflowInitializationException) as exc_info:
+        BaseWorkflow.load_from_module(namespace)
+
+    # AND the error message should be user-friendly
+    error_message = str(exc_info.value)
+    assert "Workflow module not found:" in error_message
+
+    assert exc_info.value.raw_data is None
+
+
 def test_serialize_module__tool_calling_node_with_single_tool():
     """Test that serialize_module works with a tool calling node that has a single tool."""
 
