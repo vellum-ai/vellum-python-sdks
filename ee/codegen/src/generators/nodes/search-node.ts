@@ -228,6 +228,7 @@ export class SearchNode extends BaseNode<
             ? new SearchNodeMetadataFilters({
                 metadata: rawMetadata,
                 nodeInputsById: this.nodeInputsById,
+                onError: (error) => this.workflowContext.addError(error),
               })
             : python.TypeInstantiation.none(),
         }),
@@ -438,12 +439,14 @@ export declare namespace SearchNodeMetadataFilters {
   export interface Args {
     metadata: VellumLogicalExpressionType;
     nodeInputsById: Map<string, NodeInput>;
+    onError?: (error: NodeAttributeGenerationError) => void;
   }
 }
 
 export class SearchNodeMetadataFilters extends AstNode {
   private metadata: VellumLogicalExpressionType;
   private nodeInputsById: Map<string, NodeInput>;
+  private onError?: (error: NodeAttributeGenerationError) => void;
   private astNode: AstNode;
 
   public constructor(args: SearchNodeMetadataFilters.Args) {
@@ -451,6 +454,7 @@ export class SearchNodeMetadataFilters extends AstNode {
 
     this.metadata = args.metadata;
     this.nodeInputsById = args.nodeInputsById;
+    this.onError = args.onError;
     this.astNode = this.generateAstNode();
     this.inheritReferences(this.astNode);
   }
@@ -511,12 +515,15 @@ export class SearchNodeMetadataFilters extends AstNode {
     const lhsId = data.lhsVariableId;
     const lhs = this.nodeInputsById.get(lhsId);
     if (!lhs) {
-      this.workflowContext.addError(
-        new NodeAttributeGenerationError(
-          `Could not find search node input for id ${lhsId}`,
-          "WARNING"
-        )
+      const error = new NodeAttributeGenerationError(
+        `Could not find search node input for id ${lhsId}`,
+        "WARNING"
       );
+      if (this.onError) {
+        this.onError(error);
+      } else {
+        throw error;
+      }
       return python.instantiateClass({
         classReference: python.reference({
           name: "MetadataLogicalCondition",
@@ -540,12 +547,15 @@ export class SearchNodeMetadataFilters extends AstNode {
     const rhsId = data.rhsVariableId;
     const rhs = this.nodeInputsById.get(rhsId);
     if (!isUnaryOperator(data.operator) && !rhs) {
-      this.workflowContext.addError(
-        new NodeAttributeGenerationError(
-          `Could not find search node input for id ${rhsId}`,
-          "WARNING"
-        )
+      const error = new NodeAttributeGenerationError(
+        `Could not find search node input for id ${rhsId}`,
+        "WARNING"
       );
+      if (this.onError) {
+        this.onError(error);
+      } else {
+        throw error;
+      }
       return python.instantiateClass({
         classReference: python.reference({
           name: "MetadataLogicalCondition",
