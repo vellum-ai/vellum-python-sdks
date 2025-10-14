@@ -4,7 +4,7 @@ from vellum.client.core.api_error import ApiError
 from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
-from vellum.workflows.types.definition import VellumIntegrationToolDetails, VellumIntegrationTriggerDefinition
+from vellum.workflows.types.definition import VellumIntegrationToolDetails
 from vellum.workflows.vellum_client import Vellum
 
 
@@ -128,42 +128,3 @@ class VellumIntegrationService:
                 message=error_message,
                 code=WorkflowErrorCode.INVALID_OUTPUTS,
             ) from e
-
-    def get_trigger_definition(
-        self,
-        integration: str,
-        provider: str,
-        trigger_name: str,
-    ) -> VellumIntegrationTriggerDefinition:
-        """Retrieve a trigger definition from Vellum integrations.
-
-        TODO(APO-1877): Implement when backend API endpoint is available.
-        This is a stub method for future backend API support. Currently raises
-        NotImplementedError as the backend endpoint is not yet available.
-
-        Args:
-            integration: The integration name (e.g., "GITHUB", "SLACK")
-            provider: The integration provider name (e.g., "COMPOSIO")
-            trigger_name: The trigger's unique name as specified by the provider
-
-        Returns:
-            VellumIntegrationTriggerDefinition containing the trigger definition with attributes
-
-        Raises:
-            NotImplementedError: Always, as this is a stub for future implementation
-            NodeException: Will be used in future implementation if trigger definition cannot be retrieved
-
-        Example:
-            >>> service = VellumIntegrationService(client)
-            >>> # Future usage once backend API is available:
-            >>> # trigger_def = service.get_trigger_definition(
-            >>> #     integration="SLACK",
-            >>> #     provider="COMPOSIO",
-            >>> #     trigger_name="SLACK_NEW_MESSAGE"
-            >>> # )
-        """
-        raise NotImplementedError(
-            "Trigger definition retrieval from backend API is not yet implemented. "
-            "This stub is a placeholder for future functionality when the backend "
-            "endpoint becomes available."
-        )
