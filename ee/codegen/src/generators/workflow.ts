@@ -216,46 +216,50 @@ export class Workflow {
                   }),
                 ]
               : []),
-            python.methodArgument({
-              name: "display_data",
-              value: python.instantiateClass({
-                classReference: python.reference({
-                  name: "WorkflowDisplayData",
-                  modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
-                }),
-                arguments_: [
+            ...(this.displayData
+              ? [
                   python.methodArgument({
-                    name: "viewport",
+                    name: "display_data",
                     value: python.instantiateClass({
                       classReference: python.reference({
-                        name: "WorkflowDisplayDataViewport",
+                        name: "WorkflowDisplayData",
                         modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
                       }),
                       arguments_: [
                         python.methodArgument({
-                          name: "x",
-                          value: python.TypeInstantiation.float(
-                            this.displayData?.viewport.x ?? 0
-                          ),
-                        }),
-                        python.methodArgument({
-                          name: "y",
-                          value: python.TypeInstantiation.float(
-                            this.displayData?.viewport.y ?? 0
-                          ),
-                        }),
-                        python.methodArgument({
-                          name: "zoom",
-                          value: python.TypeInstantiation.float(
-                            this.displayData?.viewport.zoom ?? 0
-                          ),
+                          name: "viewport",
+                          value: python.instantiateClass({
+                            classReference: python.reference({
+                              name: "WorkflowDisplayDataViewport",
+                              modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
+                            }),
+                            arguments_: [
+                              python.methodArgument({
+                                name: "x",
+                                value: python.TypeInstantiation.float(
+                                  this.displayData.viewport.x ?? 0
+                                ),
+                              }),
+                              python.methodArgument({
+                                name: "y",
+                                value: python.TypeInstantiation.float(
+                                  this.displayData.viewport.y ?? 0
+                                ),
+                              }),
+                              python.methodArgument({
+                                name: "zoom",
+                                value: python.TypeInstantiation.float(
+                                  this.displayData.viewport.zoom ?? 0
+                                ),
+                              }),
+                            ],
+                          }),
                         }),
                       ],
                     }),
                   }),
-                ],
-              }),
-            }),
+                ]
+              : []),
           ],
         }),
       })
@@ -483,6 +487,7 @@ export class Workflow {
           }
 
           if (sourcePortContext && targetNode) {
+            const zIndex = edge.display_data?.z_index;
             const edgeDisplayEntry = {
               key: python.TypeInstantiation.tuple([
                 python.reference({
@@ -507,8 +512,8 @@ export class Workflow {
                   }),
                   python.methodArgument({
                     name: "z_index",
-                    value: !isNil(edge.display_data?.z_index)
-                      ? python.TypeInstantiation.int(edge.display_data.z_index)
+                    value: !isNil(zIndex)
+                      ? python.TypeInstantiation.int(zIndex)
                       : python.TypeInstantiation.none(),
                   }),
                 ],

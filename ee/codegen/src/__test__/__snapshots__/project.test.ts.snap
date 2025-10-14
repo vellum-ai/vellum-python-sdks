@@ -1428,14 +1428,7 @@ from ....display import *
 exports[`WorkflowProjectGenerator > state > should generate a state.py file > code/display/workflow.py 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.base import (
-    EdgeDisplay,
-    EntrypointDisplay,
-    StateValueDisplay,
-    WorkflowDisplayData,
-    WorkflowDisplayDataViewport,
-    WorkflowMetaDisplay,
-)
+from vellum_ee.workflows.display.base import EdgeDisplay, EntrypointDisplay, StateValueDisplay, WorkflowMetaDisplay
 from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
 
@@ -1449,7 +1442,6 @@ class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
         entrypoint_node_id=UUID("entry"),
         entrypoint_node_source_handle_id=UUID("entry_source"),
         entrypoint_node_display=NodeDisplayData(position=NodeDisplayPosition(x=0, y=0)),
-        display_data=WorkflowDisplayData(viewport=WorkflowDisplayDataViewport(x=0, y=0, zoom=0)),
     )
     state_value_displays = {
         State.foo: StateValueDisplay(id=UUID("5bc5356a-154f-4bba-a8ee-eb283bfd2a25"), name="foo"),

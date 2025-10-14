@@ -54,3 +54,19 @@ class CodeExecutionWithAwaitAll(CodeExecutionNode[BaseState, str]):
         merge_behavior = MergeBehavior.AWAIT_ALL
 "
 `;
+
+exports[`generateCode > should generate code for %1 map-node-output-disappear.ts > nodes/outer_map_workflow/nodes/inner_map_workflow/__init__.py 1`] = `
+"from vellum.workflows.nodes.displayable import MapNode
+
+from .workflow import InnerMapWorkflow
+
+
+class InnerMapNode(MapNode):
+    items = [
+        "a",
+        "b",
+    ]
+    subworkflow = InnerMapWorkflow
+    max_concurrency = 1
+"
+`;
