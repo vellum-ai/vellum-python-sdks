@@ -227,9 +227,7 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
             return cls._trigger_class_cache[cache_key]
 
         # Generate unique class name including provider to avoid collisions across providers
-        class_name = (
-            f"VellumIntegrationTrigger_{provider_enum.value}_{integration_name}_{trigger_name}"
-        )
+        class_name = f"VellumIntegrationTrigger_{provider_enum.value}_{integration_name}_{trigger_name}"
 
         # Create the new trigger class
         trigger_class = type(
