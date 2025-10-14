@@ -69,6 +69,7 @@ from vellum.workflows.exceptions import WorkflowInitializationException
 from vellum.workflows.executable import BaseExecutable
 from vellum.workflows.graph import Graph
 from vellum.workflows.inputs.base import BaseInputs
+from vellum.workflows.loaders.base import BaseWorkflowLoader
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.mocks import MockNodeExecutionArg
 from vellum.workflows.outputs import BaseOutputs
@@ -704,17 +705,11 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         except ModuleNotFoundError as e:
             error_message = f"Workflow module not found: {e}"
             for finder in sys.meta_path:
-                if hasattr(finder, "source_module") and hasattr(finder, "namespace"):
-                    if finder.source_module:
-                        import re
-
-                        match = re.search(r"No module named '([^']+)'", str(e))
-                        if match:
-                            original_module = match.group(1)
-                            if not original_module.startswith(finder.source_module + "."):
-                                new_module = f"{finder.source_module}.{original_module}"
-                                error_message = error_message.replace(f"'{original_module}'", f"'{new_module}'")
-                            break
+                if isinstance(finder, BaseWorkflowLoader):
+                    formatted_message = finder.format_error_message(error_message)
+                    if formatted_message != error_message:
+                        error_message = formatted_message
+                        break
             raise WorkflowInitializationException(message=error_message) from e
         except ImportError as e:
             raise WorkflowInitializationException(message=f"Invalid import found while loading Workflow: {e}") from e

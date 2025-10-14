@@ -593,7 +593,7 @@ def test_load_from_module__module_not_found_error():
         "__init__.py": "",
         "workflow.py": """\
 from vellum.workflows import BaseWorkflow
-from non_existent_module import SomeClass
+from .non_existent_module import SomeClass
 
 class Workflow(BaseWorkflow):
     graph = None

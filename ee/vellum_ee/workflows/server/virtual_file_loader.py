@@ -4,6 +4,8 @@ import re
 import sys
 from typing import Optional
 
+from vellum.workflows.loaders.base import BaseWorkflowLoader
+
 
 class VirtualFileLoader(importlib.abc.Loader):
     def __init__(self, files: dict[str, str], namespace: str, source_module: Optional[str] = None):
@@ -66,11 +68,17 @@ class VirtualFileLoader(importlib.abc.Loader):
         return self.files.get(file_key_name)
 
 
-class VirtualFileFinder(importlib.abc.MetaPathFinder, importlib.abc.Loader):
+class VirtualFileFinder(importlib.abc.MetaPathFinder, BaseWorkflowLoader):
     def __init__(self, files: dict[str, str], namespace: str, source_module: Optional[str] = None):
         self.loader = VirtualFileLoader(files, namespace, source_module)
         self.source_module = source_module
         self.namespace = namespace
+
+    def format_error_message(self, error_message: str) -> str:
+        """Format error message by replacing namespace with source_module."""
+        if self.source_module and self.namespace in error_message:
+            return error_message.replace(self.namespace, self.source_module)
+        return error_message
 
     def find_spec(self, fullname: str, path, target=None):
         module_info = self.loader._resolve_module(fullname)
