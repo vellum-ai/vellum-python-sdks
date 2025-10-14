@@ -442,6 +442,33 @@ export class GraphAttribute extends AstNode {
       if (
         isCycle &&
         isSourceInGraph &&
+        sourceNode &&
+        sourceNode === targetNode
+      ) {
+        const sourceNodePortContext = sourceNode.portContextsById.get(
+          edge.sourceHandleId
+        );
+        if (sourceNodePortContext && !sourceNodePortContext.isDefault) {
+          return {
+            type: "set",
+            values: [
+              ...setAst.values,
+              {
+                type: "right_shift",
+                lhs: {
+                  type: "port_reference",
+                  reference: sourceNodePortContext,
+                },
+                rhs: { type: "node_reference", reference: targetNode },
+              },
+            ],
+          };
+        }
+      }
+
+      if (
+        isCycle &&
+        isSourceInGraph &&
         sourceNodeId &&
         Array.from(this.workflowContext.getEdgesByPortId().values())
           .flat()
@@ -451,18 +478,14 @@ export class GraphAttribute extends AstNode {
               e.targetNodeId === sourceNodeId
           )
       ) {
-        // Create a new set with the same values, but modify the branch that contains the source node
         const newValues = setAst.values.map((value) => {
-          // Check if this branch contains the source node
           if (this.isNodeInBranch(sourceNode, value)) {
-            // If it does, append the target node to create the cycle
             return {
               type: "right_shift" as const,
               lhs: value,
               rhs: { type: "node_reference" as const, reference: targetNode },
             };
           }
-          // Otherwise, leave the branch unchanged
           return value;
         });
 
@@ -657,9 +680,19 @@ export class GraphAttribute extends AstNode {
         const uniqueAstSourceIds = new Set(
           newAstSources.map((source) => source.reference.portId)
         );
+
+        const uniqueNodeIds = new Set(
+          newAstSources.map(
+            (source) => source.reference.nodeContext.nodeData.id
+          )
+        );
+        const hasMultipleNonDefaultPortsFromSameNode =
+          uniqueNodeIds.size === 1 &&
+          uniqueAstSourceIds.size > 1 &&
+          newAstSources.filter((source) => !source.reference.isDefault).length >
+            1;
+
         if (uniqueAstSourceIds.size === 1 && newAstSources[0]) {
-          // If all the sources are the same, we can simplify the graph into a
-          // right shift between the source node and the set.
           const portReference = newAstSources[0];
           return {
             type: "right_shift",
@@ -671,6 +704,8 @@ export class GraphAttribute extends AstNode {
               : portReference,
             rhs: this.popSources(newSetAst),
           };
+        } else if (hasMultipleNonDefaultPortsFromSameNode) {
+          return this.flattenSet(newSetAst);
         }
       }
       return this.flattenSet(newSetAst);

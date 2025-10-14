@@ -1153,27 +1153,13 @@ describe("Workflow", () => {
     });
 
     it("should handle a conditional node with default port pointing back to itself", async () => {
-      /**
-       * Reproduces the issue from APO-1882 where a self-referencing default port
-       * generates an invalid graph structure.
-       *
-       * The expected graph should be:
-       * {
-       *     ValidateAPIResponse.Ports.success >> APISuccessOutput,
-       *     {
-       *         ValidateAPIResponse.Ports.network_error,
-       *         ValidateAPIResponse.Ports.api_error,
-       *     } >> APIErrorHandler,
-       *     ValidateAPIResponse.Ports.default >> ValidateAPIResponse,
-       * }
-       */
       const validateAPIResponseNode = genericNodeFactory({
         id: uuidv4(),
         label: "ValidateAPIResponse",
         nodePorts: [
-          nodePortFactory({ name: "success" }),
-          nodePortFactory({ name: "network_error" }),
-          nodePortFactory({ name: "api_error" }),
+          nodePortFactory({ name: "success", type: "IF" }),
+          nodePortFactory({ name: "network_error", type: "IF" }),
+          nodePortFactory({ name: "api_error", type: "IF" }),
           nodePortFactory({ name: "default", type: "ELSE" }),
         ],
       });
