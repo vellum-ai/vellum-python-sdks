@@ -14,8 +14,18 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
     This metaclass extends BaseTriggerMeta to enable class-level access to attributes
     that aren't statically defined. When accessing an undefined attribute on a
     VellumIntegrationTrigger class, this metaclass will create a TriggerAttributeReference
-    dynamically, allowing triggers to work with attributes discovered at runtime from
-    integration APIs or event payloads.
+    dynamically, allowing triggers to work with attributes discovered from integration
+    APIs or event payloads.
+
+    Note: This metaclass intentionally deviates from the standard metaclass pattern used
+    in BaseNodeMeta and BaseWorkflowMeta, which generate nested classes (Outputs, Inputs)
+    in __new__. Since VellumIntegrationTrigger uses a factory pattern with dynamic
+    attributes rather than predefined nested classes, this metaclass focuses on
+    attribute discovery via __getattribute__ during workflow definition (when the
+    developer references trigger attributes in their workflow code) instead of class
+    generation in __new__. This architectural difference is necessary to support the
+    dynamic nature of integration triggers where attributes are not known until the
+    integration is queried or event data is received.
     """
 
     def __getattribute__(cls, name: str) -> Any:
@@ -51,9 +61,6 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
                 is_factory_class = False
 
             if is_factory_class:
-                # Import here to avoid circular dependency
-                from vellum.workflows.references.trigger import TriggerAttributeReference
-
                 trigger_cls = cast(Type["VellumIntegrationTrigger"], cls)
 
                 # Check cache first
@@ -69,7 +76,6 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
                     attribute_ids[name] = uuid4_from_hash(f"{trigger_cls.__qualname__}|{name}")
 
                 # Create a new dynamic reference for this attribute
-                # For dynamic attributes, we use Any as the type since we don't know the type ahead of time
                 types = (object,)
                 reference = TriggerAttributeReference(name=name, types=types, instance=None, trigger_class=trigger_cls)
                 cache[name] = reference
@@ -171,12 +177,11 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
 
         For VellumIntegrationTrigger, this includes all dynamic attributes from event_data.
         """
-        from vellum.workflows.references.trigger import TriggerAttributeReference
-
         attribute_values: Dict["TriggerAttributeReference[Any]", Any] = {}
 
         # Unlike the base class which iterates over type(self) (predefined annotations),
-        # we iterate over event_data keys since our attributes are discovered dynamically at runtime.
+        # we iterate over event_data keys since our attributes are discovered dynamically
+        # from the actual event data received during workflow execution.
         # The base class approach: for reference in type(self)
         # Our approach: for attr_name in self._event_data.keys()
         for attr_name in self._event_data.keys():
@@ -252,6 +257,10 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
                 # UUIDs are generated from __qualname__, so this must be consistent and unique
                 # across different trigger configurations to prevent ID collisions.
                 "__qualname__": class_name,
+                # Initialize cache attributes that would normally be set by BaseTriggerMeta.__new__
+                # Since we're using type() directly, we need to set these ourselves
+                "__trigger_attribute_ids__": {},
+                "__trigger_attribute_cache__": {},
             },
         )
 
