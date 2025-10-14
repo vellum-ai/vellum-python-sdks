@@ -26,6 +26,8 @@ from vellum.workflows.utils.vellum_variables import (
         (Optional[Json], "JSON"),
         (VellumDocument, "DOCUMENT"),
         (Optional[VellumDocument], "DOCUMENT"),
+        (List[VellumDocument], "JSON"),
+        (Optional[List[VellumDocument]], "JSON"),
         (VellumAudio, "AUDIO"),
         (Optional[VellumAudio], "AUDIO"),
         (VellumImage, "IMAGE"),
@@ -36,6 +38,8 @@ from vellum.workflows.utils.vellum_variables import (
         (Optional[list[SearchResult]], "SEARCH_RESULTS"),
         (list[VellumValue], "ARRAY"),
         (Optional[list[VellumValue]], "ARRAY"),
+        (list[VellumDocument], "JSON"),
+        (Optional[list[VellumDocument]], "JSON"),
     ],
 )
 def test_primitive_type_to_vellum_variable_type(type_, expected):
