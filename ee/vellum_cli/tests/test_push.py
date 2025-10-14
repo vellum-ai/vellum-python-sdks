@@ -1220,3 +1220,46 @@ MY_CUSTOM_VELLUM_API_KEY=custom-key-xyz
         assert len(lock_file_content["workflows"]) == 1
         assert lock_file_content["workflows"][0]["workspace"] == "my_custom_workspace"
         assert lock_file_content["workflows"][0]["workflow_sandbox_id"] == workflow_sandbox_id
+
+
+def test_push__workspace_option__nonexistent_workspace_should_fail(mock_module):
+    """
+    Tests that pushing with a nonexistent workspace that isn't default should fail.
+    """
+
+    # GIVEN a single workflow configured
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+    set_pyproject_toml = mock_module.set_pyproject_toml
+
+    # AND a custom workspace is configured
+    set_pyproject_toml(
+        {
+            "workflows": [
+                {
+                    "module": module,
+                }
+            ],
+            "workspaces": [
+                {
+                    "name": "my_custom_workspace",
+                    "api_key": "MY_CUSTOM_VELLUM_API_KEY",
+                }
+            ],
+        }
+    )
+
+    # AND a workflow exists in the module successfully
+    _ensure_workflow_py(temp_dir, module)
+
+    # WHEN calling `vellum push` with a nonexistent workspace
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["push", module, "--workspace", "nonexistent_workspace"])
+
+    # THEN it should fail
+    assert result.exit_code == 1
+    assert result.exception
+
+    # AND the error message should indicate the workspace doesn't exist
+    assert "Workspace 'nonexistent_workspace' not found in config" in str(result.exception)
+    assert "Available workspaces:" in str(result.exception)
