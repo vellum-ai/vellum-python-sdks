@@ -195,6 +195,23 @@ def push_command(
             strict=strict,
         )
     except ApiError as e:
+        if e.status_code == 404:
+            provided_id = workflow_config.workflow_sandbox_id or workflow_sandbox_id
+            if provided_id:
+                handle_cli_error(
+                    logger,
+                    title="Workflow Sandbox not found",
+                    message=f"Could not find Workflow Sandbox with ID '{provided_id}'. "
+                    "Please verify the workflow_sandbox_id is correct or remove it to create a new Workflow Sandbox.",
+                )
+            else:
+                handle_cli_error(
+                    logger,
+                    title="Workflow Sandbox not found",
+                    message="The workflow push endpoint returned a 404 error. Please verify your configuration.",
+                )
+            return
+
         if e.status_code == 400 and isinstance(e.body, dict) and "diffs" in e.body:
             diffs: dict = e.body["diffs"]
             generated_only = diffs.get("generated_only", [])
