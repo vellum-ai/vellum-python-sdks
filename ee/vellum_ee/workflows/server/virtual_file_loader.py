@@ -4,7 +4,7 @@ import re
 import sys
 from typing import Optional
 
-from vellum.workflows.loaders.base import BaseWorkflowLoader
+from vellum.workflows.loaders.base import BaseWorkflowFinder
 
 
 class VirtualFileLoader(importlib.abc.Loader):
@@ -68,7 +68,7 @@ class VirtualFileLoader(importlib.abc.Loader):
         return self.files.get(file_key_name)
 
 
-class VirtualFileFinder(importlib.abc.MetaPathFinder, BaseWorkflowLoader):
+class VirtualFileFinder(BaseWorkflowFinder):
     def __init__(self, files: dict[str, str], namespace: str, source_module: Optional[str] = None):
         self.loader = VirtualFileLoader(files, namespace, source_module)
         self.source_module = source_module

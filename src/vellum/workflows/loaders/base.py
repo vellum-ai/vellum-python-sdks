@@ -2,9 +2,9 @@ from abc import ABC, abstractmethod
 import importlib.abc
 
 
-class BaseWorkflowLoader(importlib.abc.Loader, ABC):
+class BaseWorkflowFinder(importlib.abc.MetaPathFinder, ABC):
     """
-    Abstract base class for workflow loaders that support custom error message formatting.
+    Abstract base class for workflow finders that support custom error message formatting.
     """
 
     @abstractmethod

@@ -1,3 +1,3 @@
-from vellum.workflows.loaders.base import BaseWorkflowLoader
+from vellum.workflows.loaders.base import BaseWorkflowFinder
 
-__all__ = ["BaseWorkflowLoader"]
+__all__ = ["BaseWorkflowFinder"]
