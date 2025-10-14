@@ -137,6 +137,7 @@ class VellumIntegrationService:
     ) -> VellumIntegrationTriggerDefinition:
         """Retrieve a trigger definition from Vellum integrations.
 
+        TODO(APO-1877): Implement when backend API endpoint is available.
         This is a stub method for future backend API support. Currently raises
         NotImplementedError as the backend endpoint is not yet available.
 

@@ -170,22 +170,13 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
 
         attribute_values: Dict["TriggerAttributeReference[Any]", Any] = {}
 
-        # Get all instance attributes (set during __init__ from event_data)
-        for attr_name in dir(self):
-            if attr_name.startswith("_"):
-                continue
-            if not hasattr(self, attr_name):
-                continue
-
+        # Iterate only over attributes from event_data (more efficient than dir())
+        for attr_name in self._event_data.keys():
             # Get the class-level reference for this attribute
             # This will create it via our custom metaclass if it doesn't exist
-            try:
-                reference = getattr(type(self), attr_name)
-                if isinstance(reference, TriggerAttributeReference):
-                    attribute_values[reference] = getattr(self, attr_name)
-            except AttributeError:
-                # Skip attributes that can't be turned into references
-                continue
+            reference = getattr(type(self), attr_name)
+            if isinstance(reference, TriggerAttributeReference):
+                attribute_values[reference] = getattr(self, attr_name)
 
         return attribute_values
 
