@@ -7,6 +7,7 @@ from vellum import ChatMessage
 from vellum.client.types.execute_prompt_event import ExecutePromptEvent
 from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
 from vellum.client.types.function_call import FunctionCall
+from vellum.client.types.function_call_chat_message_content import FunctionCallChatMessageContent
 from vellum.client.types.function_call_vellum_value import FunctionCallVellumValue
 from vellum.client.types.initiated_execute_prompt_event import InitiatedExecutePromptEvent
 from vellum.client.types.prompt_output import PromptOutput
@@ -426,3 +427,86 @@ def test_tool_node_preserves_node_exception():
     assert e.code == WorkflowErrorCode.INVALID_INPUTS
     assert e.raw_data == {"key": "value"}
     assert "Custom error" in e.message
+
+
+def test_gemini_function_call_with_string_response(vellum_adhoc_prompt_client):
+    """
+    Test that function call responses that are string values are properly formatted as FUNCTION messages.
+
+    This simulates the scenario where a tool returns a string value and verifies that it gets
+    properly formatted as a FUNCTION message with StringChatMessageContent, which is particularly
+    relevant for models like Gemini and GPT-4o that have specific requirements for function call responses.
+    """
+
+    # GIVEN a tool function that returns weather data as a string
+    def get_current_weather(location: str, unit: str = "celsius") -> str:
+        return f"The current weather in {location} is sunny with a temperature of 25 degrees {unit}."
+
+    def generate_prompt_events(*_args, **_kwargs) -> Iterator[ExecutePromptEvent]:
+        execution_id = str(uuid4())
+
+        call_count = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count
+        expected_outputs: List[PromptOutput]
+        if call_count == 1:
+            expected_outputs = [
+                FunctionCallVellumValue(
+                    value=FunctionCall(
+                        arguments={"location": "San Francisco", "unit": "celsius"},
+                        id="call_test_123",
+                        name="get_current_weather",
+                        state="FULFILLED",
+                    ),
+                ),
+            ]
+        else:
+            expected_outputs = [StringVellumValue(value="The weather in San Francisco is sunny and 25°C.")]
+
+        events: List[ExecutePromptEvent] = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            FulfilledExecutePromptEvent(
+                execution_id=execution_id,
+                outputs=expected_outputs,
+            ),
+        ]
+        yield from events
+
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
+
+    # AND a ToolCallingNode configured for Gemini
+    class GeminiToolCallingNode(ToolCallingNode):
+        ml_model = "gemini-1.5-flash-latest"
+        blocks = []
+        functions = [get_current_weather]
+
+    # AND a state
+    state = BaseState()
+
+    # WHEN the ToolCallingNode runs
+    node = GeminiToolCallingNode(state=state)
+    outputs = list(node.run())
+
+    # THEN the node should complete successfully
+    assert len(outputs) > 0
+
+    # AND we should have made two API calls (one for the function call request, one for the final response)
+    assert vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count == 2
+
+    # AND the second API call should include the FUNCTION message in chat history
+    second_call = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_args_list[1]
+    input_values = second_call.kwargs["input_values"]
+    chat_history_input = next((inp for inp in input_values if hasattr(inp, "key") and inp.key == "chat_history"), None)
+    assert chat_history_input is not None
+
+    # AND the chat history should contain both the assistant's function call and the FUNCTION response
+    assert len(chat_history_input.value) == 2
+
+    # AND the first message should be the assistant's function call
+    assert chat_history_input.value[0].role == "ASSISTANT"
+    assert isinstance(chat_history_input.value[0].content, FunctionCallChatMessageContent)
+
+    # AND the second message should be the FUNCTION response with string content
+    function_message = chat_history_input.value[1]
+    assert function_message.role == "FUNCTION"
+    assert isinstance(function_message.content, StringChatMessageContent)
+    assert function_message.source == "call_test_123"
+    assert "The current weather in San Francisco is sunny" in function_message.content.value
