@@ -145,6 +145,11 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, int]):
     # AND we get the code execution result
     assert event.body.outputs == {"final_output": 5.0}
 
+    # AND the workflow definition module is correctly serialized as a list
+    serialized_event = event.model_dump(mode="json")
+    workflow_definition = serialized_event["body"]["workflow_definition"]
+    assert workflow_definition["module"] == [namespace, "workflow"]
+
 
 def test_load_from_module__simple_code_execution_node_with_try(
     vellum_client,
