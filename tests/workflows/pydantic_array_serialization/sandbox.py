@@ -1,40 +1,33 @@
-from pydantic import BaseModel
+from typing import List, Union
 
-from vellum.workflows import BaseWorkflow
-from vellum.workflows.nodes.displayable.code_execution_node import CodeExecutionNode
-from vellum.workflows.state.base import BaseState
+from vellum.workflows.inputs.base import BaseInputs
+from vellum.workflows.inputs.dataset_row import DatasetRow
+from vellum.workflows.sandbox import WorkflowSandboxRunner
 
+from .workflow import CustomItem, Inputs, PydanticArrayWorkflow
 
-class CustomItem(BaseModel):
-    """A custom Pydantic model for testing serialization."""
+if __name__ == "__main__":
+    raise Exception("This file is not meant to be imported")
 
-    name: str
-    value: int
-    is_active: bool = True
-
-
-class ProcessItemsNode(CodeExecutionNode[BaseState, str]):
-    """A code execution node that processes an array of Pydantic models."""
-
-    code = """
-def main(items: list) -> str:
-    total = sum(item['value'] for item in items)
-    active_count = sum(1 for item in items if item.get('is_active', True))
-    return f"Processed {len(items)} items: total={total}, active={active_count}"
-"""
-    code_inputs = {
-        "items": [
+dataset: List[Union[BaseInputs, DatasetRow]] = [
+    Inputs(
+        items=[
             CustomItem(name="item1", value=10, is_active=True),
             CustomItem(name="item2", value=20, is_active=False),
             CustomItem(name="item3", value=30),
         ]
-    }
+    ),
+    DatasetRow(
+        label="Custom Test",
+        inputs=Inputs(
+            items=[
+                CustomItem(name="test1", value=100),
+                CustomItem(name="test2", value=200, is_active=False),
+            ]
+        ),
+    ),
+]
 
+runner = WorkflowSandboxRunner(workflow=PydanticArrayWorkflow(), dataset=dataset)
 
-class PydanticArrayWorkflow(BaseWorkflow):
-    """A workflow demonstrating serialization of an array of Pydantic models."""
-
-    graph = ProcessItemsNode
-
-    class Outputs(BaseWorkflow.Outputs):
-        result = ProcessItemsNode.Outputs.result
+runner.run()
