@@ -4,14 +4,26 @@ from typing import ClassVar, Generator, Generic, Iterator, List, Optional, Union
 from vellum import AdHocExecutePromptEvent, ExecutePromptEvent, PromptOutput
 from vellum.client.core import RequestOptions
 from vellum.client.core.api_error import ApiError
+from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.errors.types import WorkflowErrorCode, vellum_error_to_workflow_error
 from vellum.workflows.events.node import NodeExecutionStreamingEvent
 from vellum.workflows.exceptions import NodeException
+from vellum.workflows.expressions.coalesce_expression import CoalesceExpression
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior
 from vellum.workflows.types.generics import StateType
+
+
+def _contains_reference_to_output(reference: BaseDescriptor, target_reference: OutputReference) -> bool:
+    if reference == target_reference:
+        return True
+    if isinstance(reference, CoalesceExpression):
+        return _contains_reference_to_output(reference.lhs, target_reference) or _contains_reference_to_output(
+            reference.rhs, target_reference
+        )
+    return False
 
 
 class BasePromptNode(BaseNode[StateType], Generic[StateType]):
@@ -112,10 +124,4 @@ class BasePromptNode(BaseNode[StateType], Generic[StateType]):
         if not target_node_output:
             return False
 
-        if not isinstance(target_node_output.instance, OutputReference):
-            return False
-
-        if target_node_output.instance.name != "text":
-            return False
-
-        return True
+        return _contains_reference_to_output(target_node_output.instance, event.node_definition.Outputs.text)
