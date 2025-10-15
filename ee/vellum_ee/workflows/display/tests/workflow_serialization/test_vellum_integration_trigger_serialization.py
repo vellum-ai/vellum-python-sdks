@@ -90,14 +90,19 @@ def test_vellum_integration_trigger_multiple_attributes():
     )
 
     outputs = process_node["outputs"]
+    assert isinstance(outputs, list), "outputs should be a list"
     assert len(outputs) == 2
 
     # Verify both outputs reference trigger attributes
-    processed_message_output = next(o for o in outputs if o["name"] == "processed_message")
+    processed_message_output = next(o for o in outputs if isinstance(o, dict) and o.get("name") == "processed_message")
+    assert isinstance(processed_message_output, dict), "output should be a dict"
+    assert isinstance(processed_message_output.get("value"), dict), "value should be a dict"
     assert processed_message_output["value"]["type"] == "TRIGGER_ATTRIBUTE"
     assert "attribute_id" in processed_message_output["value"]
 
-    channel_output = next(o for o in outputs if o["name"] == "channel")
+    channel_output = next(o for o in outputs if isinstance(o, dict) and o.get("name") == "channel")
+    assert isinstance(channel_output, dict), "output should be a dict"
+    assert isinstance(channel_output.get("value"), dict), "value should be a dict"
     assert channel_output["value"]["type"] == "TRIGGER_ATTRIBUTE"
     assert "attribute_id" in channel_output["value"]
 
@@ -128,13 +133,16 @@ def test_vellum_integration_trigger_without_attributes():
     result = workflow_display.serialize()
 
     triggers = result["triggers"]
+    assert isinstance(triggers, list), "triggers should be a list"
     assert len(triggers) == 1
 
     trigger = triggers[0]
+    assert isinstance(trigger, dict), "trigger should be a dict"
     assert trigger["type"] == "VELLUM_INTEGRATION_TRIGGER"
 
     # Attributes should be empty dict when not provided
     exec_config = trigger["exec_config"]
+    assert isinstance(exec_config, dict), "exec_config should be a dict"
     assert exec_config["attributes"] == {}
     assert exec_config["provider"] == "COMPOSIO"
     assert exec_config["integration_name"] == "GITHUB"
