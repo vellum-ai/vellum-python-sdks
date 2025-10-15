@@ -76,11 +76,11 @@ exports[`generateCode > should generate code for %1 two-generic-nodes-with-same-
 from vellum.workflows.state import BaseState
 
 from .first_generic_node import FirstGenericNode
-from .second_generic_node import SecondGenericNode
+from .first_generic_node_1 import FirstGenericNode as FirstGenericNode1FirstGenericNode
 
 
 class FinalOutputNode(BaseFinalOutputNode[BaseState, str]):
     class Outputs(BaseFinalOutputNode.Outputs):
-        value = FirstGenericNode.Outputs.value.coalesce(SecondGenericNode.Outputs.value)
+        value = FirstGenericNode.Outputs.value.coalesce(FirstGenericNode.Outputs.value)
 "
 `;

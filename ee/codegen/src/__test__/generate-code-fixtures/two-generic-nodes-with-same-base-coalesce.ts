@@ -87,8 +87,8 @@ export default {
           module: ["testing", "nodes", "shared_base_node"],
         },
         definition: {
-          name: "SecondGenericNode",
-          module: ["testing", "nodes", "second_generic_node"],
+          name: "FirstGenericNode",
+          module: ["testing", "nodes", "first_generic_node"],
         },
         trigger: {
           id: "second-generic-target",
