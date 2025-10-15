@@ -181,6 +181,10 @@ def push_command(
     artifact.seek(0)
     artifact.name = f"{workflow_config.module.replace('.', '__')}.tar.gz"
 
+    dataset_serialized = None
+    if serialization_result.dataset:
+        dataset_serialized = json.dumps(serialization_result.dataset)
+
     try:
         response = client.workflows.push(
             # Remove this once we could serialize using the artifact in Vembda
@@ -191,6 +195,7 @@ def push_command(
             # We should check with fern if we could auto-serialize typed object fields for us
             # https://app.shortcut.com/vellum/story/5568
             deployment_config=deployment_config_serialized,  # type: ignore[arg-type]
+            dataset=dataset_serialized,  # type: ignore[arg-type]
             dry_run=dry_run,
             strict=strict,
         )
