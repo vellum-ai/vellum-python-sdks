@@ -112,6 +112,7 @@ def test_event_enricher_marks_subworkflow_deployment_as_dynamic(vellum_client):
 
     enriched_event = event_enricher(event, vellum_client)
 
+    assert enriched_event.name == "workflow.execution.initiated"
     assert hasattr(enriched_event.body, "workflow_version_exec_config")
     assert enriched_event.body.workflow_version_exec_config is not None
 
@@ -145,4 +146,5 @@ def test_event_enricher_with_metadata(vellum_client):
     enriched_event = event_enricher(event, vellum_client, metadata=metadata)
 
     # THEN the metadata should be attached to server_metadata
+    assert enriched_event.name == "workflow.execution.initiated"
     assert enriched_event.body.server_metadata == metadata

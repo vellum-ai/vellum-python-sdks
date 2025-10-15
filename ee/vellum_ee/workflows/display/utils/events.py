@@ -1,4 +1,4 @@
-from typing import Optional, TypeVar
+from typing import Optional
 
 from vellum import Vellum
 from vellum.workflows.events.workflow import WorkflowEvent, WorkflowExecutionInitiatedEvent
@@ -8,8 +8,6 @@ from vellum_ee.workflows.display.utils.registry import (
     register_workflow_display_context,
 )
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
-
-WorkflowEventType = TypeVar("WorkflowEventType", bound=WorkflowEvent)
 
 
 def _should_mark_workflow_dynamic(event: WorkflowExecutionInitiatedEvent) -> bool:
@@ -31,8 +29,8 @@ def _should_mark_workflow_dynamic(event: WorkflowExecutionInitiatedEvent) -> boo
 
 
 def event_enricher(
-    event: WorkflowEventType, client: Optional[Vellum] = None, metadata: Optional[dict] = None
-) -> WorkflowEventType:
+    event: WorkflowEvent, client: Optional[Vellum] = None, metadata: Optional[dict] = None
+) -> WorkflowEvent:
     if event.name != "workflow.execution.initiated":
         return event
 
