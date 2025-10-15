@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Dict, Iterator, List, Optional, Tuple, Type
+from typing import TYPE_CHECKING, Dict, Iterator, List, Optional, Set, Tuple, Type
 
 from vellum.client import Vellum as VellumClient
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -22,6 +22,8 @@ from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDispl
 from vellum_ee.workflows.display.utils.registry import get_default_workflow_display_class
 
 if TYPE_CHECKING:
+    from vellum.workflows.triggers.base import BaseTrigger
+    from vellum.workflows.references.trigger import TriggerAttributeReference
     from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
 
 
@@ -51,6 +53,9 @@ class WorkflowDisplayContext:
     workflow_output_displays: WorkflowOutputDisplays = field(default_factory=dict)
     edge_displays: EdgeDisplays = field(default_factory=dict)
     port_displays: PortDisplays = field(default_factory=dict)
+    trigger_attribute_usage: Dict[
+        Type["BaseTrigger"], Set["TriggerAttributeReference"]
+    ] = field(default_factory=dict)
     dry_run: bool = False
     _errors: List[Exception] = field(default_factory=list)
     _invalid_nodes: List[Type[BaseNode]] = field(default_factory=list)

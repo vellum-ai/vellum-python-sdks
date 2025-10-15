@@ -352,6 +352,11 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
         # Generate trigger ID using the appropriate method for each trigger type
         trigger_class = value.trigger_class
 
+        # Track trigger attribute usage for the current workflow serialization so that
+        # trigger definitions only include attributes referenced within the workflow.
+        trigger_usage = display_context.trigger_attribute_usage.setdefault(trigger_class, set())
+        trigger_usage.add(value)
+
         # Check if this is a VellumIntegrationTrigger (factory-generated)
         from vellum.workflows.triggers.vellum_integration import VellumIntegrationTrigger
 

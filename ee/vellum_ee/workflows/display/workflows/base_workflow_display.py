@@ -547,10 +547,10 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         # Get exec config from the trigger class
         exec_config = trigger_class.to_exec_config()
 
-        # Serialize trigger attributes from the cached dynamic attributes
-        # VellumIntegrationTrigger uses __trigger_attribute_cache__ for dynamically
-        # discovered attributes (accessed via trigger_class.attribute_name)
-        attribute_cache = getattr(trigger_class, "__trigger_attribute_cache__", {})
+        # Serialize trigger attributes based on the references actually used within
+        # the current workflow. This avoids leaking references cached from other
+        # workflows that reuse the same trigger class instance.
+        attribute_references = self.display_context.trigger_attribute_usage.get(trigger_class, set())
         trigger_attributes: JsonArray = cast(
             JsonArray,
             [
@@ -563,7 +563,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                         "value": None,
                     },
                 )
-                for reference in sorted(attribute_cache.values(), key=lambda ref: ref.name)
+                for reference in sorted(attribute_references, key=lambda ref: ref.name)
             ],
         )
 
