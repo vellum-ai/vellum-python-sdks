@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 class WorkflowTriggerType(Enum):
     MANUAL = "MANUAL"
     SLACK_MESSAGE = "SLACK_MESSAGE"
+    VELLUM_INTEGRATION_TRIGGER = "VELLUM_INTEGRATION_TRIGGER"
 
 
 def get_trigger_type_mapping() -> Dict[Type["BaseTrigger"], WorkflowTriggerType]:
@@ -25,6 +26,10 @@ def get_trigger_type_mapping() -> Dict[Type["BaseTrigger"], WorkflowTriggerType]
 
     This is a function to avoid circular imports - it imports trigger classes
     only when called, not at module load time.
+
+    Note: VellumIntegrationTrigger classes are not included in this mapping
+    because they are factory-generated. They are handled specially in the
+    serialization logic by checking if they are subclasses of VellumIntegrationTrigger.
 
     Returns:
         Dictionary mapping trigger classes to their enum types

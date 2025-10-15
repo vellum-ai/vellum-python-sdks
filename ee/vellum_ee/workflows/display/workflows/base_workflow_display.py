@@ -25,6 +25,7 @@ from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port,
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, WorkflowInputReference
 from vellum.workflows.state.encoder import DefaultStateEncoder
+from vellum.workflows.triggers.base import BaseTrigger
 from vellum.workflows.types.core import Json, JsonArray, JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.types.utils import get_original_base
@@ -38,6 +39,7 @@ from vellum_ee.workflows.display.base import (
     WorkflowInputsDisplay,
     WorkflowMetaDisplay,
     WorkflowOutputDisplay,
+    WorkflowTriggerType,
     get_trigger_type_mapping,
 )
 from vellum_ee.workflows.display.editor.types import NodeDisplayData, NodeDisplayPosition
@@ -442,7 +444,9 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
         Returns:
             JsonArray with trigger data if a trigger is present, None otherwise.
-            Each trigger in the array has: id (UUID), type (str), attributes (list)
+            Each trigger in the array has: id (UUID), type (str), and either
+            attributes (list) for regular triggers or exec_config (dict) for
+            VellumIntegrationTrigger.
         """
         # Get all trigger edges from the workflow's subgraphs
         trigger_edges = []
@@ -457,7 +461,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         trigger_class = trigger_edges[0].trigger_class
 
         # Validate that all trigger edges use the same trigger type
-        trigger_type_mapping = get_trigger_type_mapping()
         for edge in trigger_edges:
             if edge.trigger_class != trigger_class:
                 raise ValueError(
@@ -465,7 +468,15 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                     f"{edge.trigger_class.__name__} in the same workflow."
                 )
 
-        # Get the trigger type from the mapping
+        # Check if this is a VellumIntegrationTrigger (factory-generated)
+        from vellum.workflows.triggers.vellum_integration import VellumIntegrationTrigger
+
+        if issubclass(trigger_class, VellumIntegrationTrigger):
+            # Special serialization for VellumIntegrationTrigger
+            return self._serialize_vellum_integration_trigger(trigger_class)
+
+        # Regular trigger serialization
+        trigger_type_mapping = get_trigger_type_mapping()
         trigger_type = trigger_type_mapping.get(trigger_class)
         if trigger_type is None:
             raise ValueError(
@@ -498,6 +509,50 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             "id": str(trigger_id),
             "type": trigger_type.value,
             "attributes": trigger_attributes,
+        }
+
+        return cast(JsonArray, [trigger_data])
+
+    def _serialize_vellum_integration_trigger(self, trigger_class: Type["BaseTrigger"]) -> JsonArray:
+        """
+        Serialize a VellumIntegrationTrigger to exec_config format.
+
+        Args:
+            trigger_class: The factory-generated VellumIntegrationTrigger class
+
+        Returns:
+            JsonArray with a single trigger object containing exec_config
+
+        Example output:
+            [{
+                "id": "uuid",
+                "type": "VELLUM_INTEGRATION_TRIGGER",
+                "exec_config": {
+                    "provider": "COMPOSIO",
+                    "integration_name": "SLACK",
+                    "slug": "slack_new_message",
+                    "trigger_nano_id": "abc123",
+                    "attributes": {"channel": "C123"}
+                }
+            }]
+        """
+        # Use the trigger class's method to get the deterministic trigger ID
+        # This ensures consistency with attribute ID generation
+        trigger_id = trigger_class.get_trigger_id()
+
+        # Get exec config from the trigger class
+        exec_config = trigger_class.to_exec_config()
+
+        trigger_data: JsonObject = {
+            "id": str(trigger_id),
+            "type": WorkflowTriggerType.VELLUM_INTEGRATION_TRIGGER.value,
+            "exec_config": {
+                "provider": exec_config.provider.value,
+                "integration_name": exec_config.integration_name,
+                "slug": exec_config.slug,
+                "trigger_nano_id": exec_config.trigger_nano_id,
+                "attributes": exec_config.attributes or {},
+            },
         }
 
         return cast(JsonArray, [trigger_data])

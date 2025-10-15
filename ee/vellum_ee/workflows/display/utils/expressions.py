@@ -349,9 +349,18 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
         }
 
     if isinstance(value, TriggerAttributeReference):
-        # Generate trigger ID using the same hash formula as in base_workflow_display.py
+        # Generate trigger ID using the appropriate method for each trigger type
         trigger_class = value.trigger_class
-        trigger_id = uuid4_from_hash(trigger_class.__qualname__)
+
+        # Check if this is a VellumIntegrationTrigger (factory-generated)
+        from vellum.workflows.triggers.vellum_integration import VellumIntegrationTrigger
+
+        if issubclass(trigger_class, VellumIntegrationTrigger):
+            # Use semantic identity for VellumIntegrationTrigger to ensure stability
+            trigger_id = trigger_class.get_trigger_id()
+        else:
+            # Use __qualname__ for regular triggers (ManualTrigger, SlackTrigger, etc.)
+            trigger_id = uuid4_from_hash(trigger_class.__qualname__)
 
         return {
             "type": "TRIGGER_ATTRIBUTE",

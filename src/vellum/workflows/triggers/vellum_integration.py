@@ -1,4 +1,5 @@
 import json
+from uuid import UUID
 from typing import Any, ClassVar, Dict, Optional, Type, cast
 
 from vellum.workflows.constants import VellumIntegrationProviderType
@@ -243,6 +244,37 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
                 attribute_values[reference] = getattr(self, attr_name)
 
         return attribute_values
+
+    @classmethod
+    def get_trigger_id(cls) -> "UUID":
+        """
+        Get the deterministic UUID for this trigger.
+
+        The trigger ID is generated from the semantic identity (provider|integration|slug)
+        rather than __qualname__ to ensure stability across different import contexts.
+
+        Returns:
+            UUID: The deterministic trigger ID
+
+        Raises:
+            AttributeError: If called on base VellumIntegrationTrigger (not factory class)
+
+        Examples:
+            >>> SlackMessage = VellumIntegrationTrigger.for_trigger(
+            ...     integration_name="SLACK",
+            ...     slug="slack_new_message",
+            ...     trigger_nano_id="abc123"
+            ... )
+            >>> trigger_id = SlackMessage.get_trigger_id()
+        """
+        if not hasattr(cls, "slug"):
+            raise AttributeError(
+                "get_trigger_id() can only be called on factory-generated trigger classes. "
+                "Use VellumIntegrationTrigger.for_trigger() to create a trigger class first."
+            )
+
+        trigger_identity = f"{cls.provider.value}|{cls.integration_name}|{cls.slug}"
+        return uuid4_from_hash(trigger_identity)
 
     @classmethod
     def to_exec_config(cls) -> ComposioIntegrationTriggerExecConfig:
