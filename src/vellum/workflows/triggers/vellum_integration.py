@@ -38,7 +38,11 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
         allows access to any attribute name, creating TriggerAttributeReference objects
         on demand. This enables usage like:
 
-            SlackMessage = VellumIntegrationTrigger.for_trigger("SLACK", "NEW_MESSAGE")
+            SlackMessage = VellumIntegrationTrigger.for_trigger(
+                integration_name="SLACK",
+                slug="slack_new_message",
+                trigger_nano_id="abc123"
+            )
             text = SlackMessage.message  # Creates reference even though 'message' isn't pre-defined
 
         Args:
@@ -54,7 +58,7 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
             # For VellumIntegrationTrigger factory-generated classes, create dynamic references
             # Only enable dynamic attribute creation for factory-generated classes, not the base
             # VellumIntegrationTrigger class itself. We check the internal __name__ attribute
-            # (e.g., "VellumIntegrationTrigger_COMPOSIO_SLACK_NEW_MESSAGE"), not the user-facing
+            # (e.g., "VellumIntegrationTrigger_COMPOSIO_SLACK_slack_new_message"), not the user-facing
             # variable name (e.g., "SlackNewMessage").
             try:
                 is_factory_class = super().__getattribute__("__name__").startswith(
@@ -99,9 +103,9 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
     Factory-based trigger for Vellum-managed integration events.
 
     VellumIntegrationTrigger provides a pure factory pattern for creating trigger
-    classes dynamically based on integration provider, integration name, and trigger name.
-    Unlike predefined trigger classes, these triggers are created on-demand and support
-    dynamic attribute discovery from the integration API.
+    classes dynamically based on integration provider, integration name, slug, and
+    trigger nano ID. Unlike predefined trigger classes, these triggers are created
+    on-demand and support dynamic attribute discovery from the integration API.
 
     This design ensures parity with VellumIntegrationToolDefinition and allows users to
     work with any integration trigger without requiring SDK updates for new integrations.
@@ -110,12 +114,14 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
         Create triggers dynamically for different integrations:
             >>> SlackNewMessage = VellumIntegrationTrigger.for_trigger(
             ...     integration_name="SLACK",
-            ...     trigger_name="SLACK_NEW_MESSAGE"
+            ...     slug="slack_new_message",
+            ...     trigger_nano_id="abc123def456"
             ... )
             >>>
             >>> GithubPush = VellumIntegrationTrigger.for_trigger(
             ...     integration_name="GITHUB",
-            ...     trigger_name="GITHUB_PUSH"
+            ...     slug="github_push_event",
+            ...     trigger_nano_id="xyz789ghi012"
             ... )
 
         Use in workflow graph:
@@ -193,7 +199,11 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
             event_data: Raw event data from the integration. Keys become trigger attributes.
 
         Examples:
-            >>> SlackMessage = VellumIntegrationTrigger.for_trigger("SLACK", "SLACK_NEW_MESSAGE")
+            >>> SlackMessage = VellumIntegrationTrigger.for_trigger(
+            ...     integration_name="SLACK",
+            ...     slug="slack_new_message",
+            ...     trigger_nano_id="abc123"
+            ... )
             >>> trigger = SlackMessage(event_data={
             ...     "message": "Hello",
             ...     "channel": "C123",
