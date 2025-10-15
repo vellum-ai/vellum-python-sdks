@@ -83,11 +83,13 @@ def push_command(
         if resolved_workspace == DEFAULT_WORKSPACE_CONFIG.name:
             workspace_config = DEFAULT_WORKSPACE_CONFIG
         else:
-            available_workspaces = [w.name for w in config.workspaces] + [DEFAULT_WORKSPACE_CONFIG.name]
-            raise ValueError(
-                f"Workspace '{resolved_workspace}' not found in config. "
-                f"Available workspaces: {', '.join(available_workspaces)}"
+            available_workspaces = sorted(set([w.name for w in config.workspaces] + [DEFAULT_WORKSPACE_CONFIG.name]))
+            handle_cli_error(
+                logger,
+                title=f"Workspace '{resolved_workspace}' not found in config",
+                message=f"Available workspaces: {', '.join(available_workspaces)}",
             )
+            return
 
     api_key = os.getenv(workspace_config.api_key)
     if not api_key:

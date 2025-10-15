@@ -1256,10 +1256,11 @@ def test_push__workspace_option__nonexistent_workspace_should_fail(mock_module):
     runner = CliRunner()
     result = runner.invoke(cli_main, ["push", module, "--workspace", "nonexistent_workspace"])
 
-    # THEN it should fail
+    # THEN it should exit with an error
     assert result.exit_code == 1
-    assert result.exception
 
     # AND the error message should indicate the workspace doesn't exist
-    assert "Workspace 'nonexistent_workspace' not found in config" in str(result.exception)
-    assert "Available workspaces:" in str(result.exception)
+    assert "Workspace 'nonexistent_workspace' not found in config" in result.output
+    assert "Available workspaces:" in result.output
+    assert "default" in result.output
+    assert "my_custom_workspace" in result.output
