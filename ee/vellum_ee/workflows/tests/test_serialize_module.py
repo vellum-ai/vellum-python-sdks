@@ -119,6 +119,7 @@ def test_serialize_module_with_pydantic_array():
     items_input = input_variables[0]
     assert items_input["key"] == "items"
     assert items_input["type"] == "JSON"
+    # TODO: In the future, this should be a custom type based on an OpenAPI schema (important-comment)
 
     assert result.dataset is not None
     assert isinstance(result.dataset, list)

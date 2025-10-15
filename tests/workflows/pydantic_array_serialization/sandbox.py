@@ -6,9 +6,6 @@ from vellum.workflows.sandbox import WorkflowSandboxRunner
 
 from .workflow import CustomItem, Inputs, PydanticArrayWorkflow
 
-if __name__ == "__main__":
-    raise Exception("This file is not meant to be imported")
-
 dataset: List[Union[BaseInputs, DatasetRow]] = [
     Inputs(
         items=[
@@ -30,4 +27,5 @@ dataset: List[Union[BaseInputs, DatasetRow]] = [
 
 runner = WorkflowSandboxRunner(workflow=PydanticArrayWorkflow(), dataset=dataset)
 
-runner.run()
+if __name__ == "__main__":
+    runner.run()
