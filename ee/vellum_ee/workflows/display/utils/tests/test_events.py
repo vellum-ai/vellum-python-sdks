@@ -112,6 +112,7 @@ def test_event_enricher_marks_subworkflow_deployment_as_dynamic(vellum_client):
 
     enriched_event = event_enricher(event, vellum_client)
 
+    assert enriched_event.name == "workflow.execution.initiated"
     assert hasattr(enriched_event.body, "workflow_version_exec_config")
     assert enriched_event.body.workflow_version_exec_config is not None
 
@@ -119,3 +120,31 @@ def test_event_enricher_marks_subworkflow_deployment_as_dynamic(vellum_client):
     assert hasattr(enriched_event.body.display_context, "node_displays")
     assert hasattr(enriched_event.body.display_context, "workflow_inputs")
     assert hasattr(enriched_event.body.display_context, "workflow_outputs")
+
+
+def test_event_enricher_with_metadata(vellum_client):
+    """Test that event_enricher attaches metadata to server_metadata field."""
+
+    # GIVEN a workflow class
+    class TestWorkflow(BaseWorkflow):
+        is_dynamic = False
+
+    # AND an event
+    event: WorkflowExecutionInitiatedEvent = WorkflowExecutionInitiatedEvent(
+        trace_id=uuid4(),
+        span_id=uuid4(),
+        body=WorkflowExecutionInitiatedBody(
+            workflow_definition=TestWorkflow,
+            inputs=BaseInputs(),
+        ),
+    )
+
+    # AND some metadata
+    metadata = {"custom_key": "custom_value", "another_key": 123}
+
+    # WHEN the event_enricher is called with metadata
+    enriched_event = event_enricher(event, vellum_client, metadata=metadata)
+
+    # THEN the metadata should be attached to server_metadata
+    assert enriched_event.name == "workflow.execution.initiated"
+    assert enriched_event.body.server_metadata == metadata

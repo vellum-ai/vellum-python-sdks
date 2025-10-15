@@ -93,6 +93,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
                     "display_context": None,
                     "initial_state": None,
                     "workflow_version_exec_config": None,
+                    "server_metadata": None,
                 },
                 "parent": None,
                 "links": None,
