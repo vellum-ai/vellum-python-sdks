@@ -1,3 +1,4 @@
+import json
 from typing import Any, ClassVar, Dict, Optional, Type, cast
 
 from vellum.workflows.constants import VellumIntegrationProviderType
@@ -152,30 +153,34 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
     _trigger_class_cache: ClassVar[Dict[tuple, Type["VellumIntegrationTrigger"]]] = {}
 
     @classmethod
-    def _freeze_attribute_value(cls, value: Any) -> Any:
-        """Convert attribute values into hashable, immutable equivalents."""
-        if isinstance(value, dict):
-            return tuple((key, cls._freeze_attribute_value(val)) for key, val in sorted(value.items()))
-        if isinstance(value, (list, tuple)):
-            return tuple(cls._freeze_attribute_value(item) for item in value)
-        if isinstance(value, set):
-            return tuple(sorted((cls._freeze_attribute_value(item) for item in value), key=repr))
+    def _freeze_attributes(cls, attributes: Dict[str, Any]) -> str:
+        """
+        Convert attributes dict to hashable string for caching.
+
+        Attributes must be JSON-serializable since they're sent to the backend
+        via ComposioIntegrationTriggerExecConfig. This method fails fast if
+        attributes contain non-JSON-serializable types.
+
+        Args:
+            attributes: Dictionary of trigger attributes
+
+        Returns:
+            JSON string representation with sorted keys for deterministic hashing
+
+        Raises:
+            ValueError: If attributes are not JSON-serializable
+        """
+        if not attributes:
+            return ""
 
         try:
-            hash(value)
-        except TypeError:
-            # Fall back to repr for objects that cannot be hashed to ensure deterministic
-            # cache keys without imposing additional serialization requirements.
-            return repr(value)
-
-        return value
-
-    @classmethod
-    def _freeze_attributes(cls, attributes: Dict[str, Any]) -> tuple:
-        if not attributes:
-            return ()
-
-        return tuple((key, cls._freeze_attribute_value(attributes[key])) for key in sorted(attributes.keys()))
+            # Use json.dumps with sort_keys for deterministic output
+            return json.dumps(attributes, sort_keys=True)
+        except (TypeError, ValueError) as e:
+            raise ValueError(
+                f"Trigger attributes must be JSON-serializable (str, int, float, bool, None, list, dict). "
+                f"Got non-serializable value: {e}"
+            ) from e
 
     def __init__(self, event_data: dict):
         """
