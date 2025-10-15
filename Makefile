@@ -1,4 +1,4 @@
-tSHELL := /bin/bash
+SHELL := /bin/bash
 
 ################################
 # Setup

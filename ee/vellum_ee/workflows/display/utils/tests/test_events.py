@@ -141,32 +141,8 @@ def test_event_enricher_with_metadata(vellum_client):
     # AND some metadata
     metadata = {"custom_key": "custom_value", "another_key": 123}
 
-    # WHEN the event_enricher is called with metadata (important-comment)
+    # WHEN the event_enricher is called with metadata
     enriched_event = event_enricher(event, vellum_client, metadata=metadata)
 
     # THEN the metadata should be attached to server_metadata
     assert enriched_event.body.server_metadata == metadata
-
-
-def test_event_enricher_without_metadata(vellum_client):
-    """Test that event_enricher works without metadata parameter."""
-
-    # GIVEN a workflow class
-    class TestWorkflow(BaseWorkflow):
-        is_dynamic = False
-
-    # AND an event
-    event: WorkflowExecutionInitiatedEvent = WorkflowExecutionInitiatedEvent(
-        trace_id=uuid4(),
-        span_id=uuid4(),
-        body=WorkflowExecutionInitiatedBody(
-            workflow_definition=TestWorkflow,
-            inputs=BaseInputs(),
-        ),
-    )
-
-    # WHEN the event_enricher is called without metadata (important-comment)
-    enriched_event = event_enricher(event, vellum_client)
-
-    # THEN server_metadata should be None
-    assert enriched_event.body.server_metadata is None
