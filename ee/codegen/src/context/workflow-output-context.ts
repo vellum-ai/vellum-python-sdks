@@ -61,6 +61,10 @@ export class WorkflowOutputContext {
 
   public getOutputVariable(): OutputVariableContext {
     const outputVariableId = this.getOutputVariableId();
-    return this.workflowContext.getOutputVariableContextById(outputVariableId);
+    const outputVariableKey = this.terminalNodeData?.data.name;
+    return this.workflowContext.getOutputVariableContextById(
+      outputVariableId,
+      outputVariableKey
+    );
   }
 }

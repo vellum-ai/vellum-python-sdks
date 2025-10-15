@@ -394,9 +394,22 @@ export class WorkflowContext {
   }
 
   public findOutputVariableContextById(
-    outputVariableId: string
+    outputVariableId: string,
+    outputVariableKey?: string
   ): OutputVariableContext | undefined {
-    return this.globalOutputVariableContextsById.get(outputVariableId);
+    const outputVariableById =
+      this.globalOutputVariableContextsById.get(outputVariableId);
+    if (outputVariableById) {
+      return outputVariableById;
+    }
+
+    if (outputVariableKey) {
+      return Array.from(this.globalOutputVariableContextsById.values()).find(
+        (outputContext) => outputContext.getRawName() === outputVariableKey
+      );
+    }
+
+    return undefined;
   }
 
   public addOutputVariableContext(
@@ -428,10 +441,13 @@ export class WorkflowContext {
   }
 
   public getOutputVariableContextById(
-    outputVariableId: string
+    outputVariableId: string,
+    outputVariableKey?: string
   ): OutputVariableContext {
-    const outputVariableContext =
-      this.findOutputVariableContextById(outputVariableId);
+    const outputVariableContext = this.findOutputVariableContextById(
+      outputVariableId,
+      outputVariableKey
+    );
 
     if (!outputVariableContext) {
       throw new WorkflowInputGenerationError(
