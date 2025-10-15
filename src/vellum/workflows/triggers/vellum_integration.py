@@ -155,18 +155,11 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
     def _freeze_attribute_value(cls, value: Any) -> Any:
         """Convert attribute values into hashable, immutable equivalents."""
         if isinstance(value, dict):
-            return tuple(
-                (key, cls._freeze_attribute_value(val))
-                for key, val in sorted(value.items())
-            )
+            return tuple((key, cls._freeze_attribute_value(val)) for key, val in sorted(value.items()))
         if isinstance(value, (list, tuple)):
-            return tuple(
-                cls._freeze_attribute_value(item) for item in value
-            )
+            return tuple(cls._freeze_attribute_value(item) for item in value)
         if isinstance(value, set):
-            return tuple(
-                sorted((cls._freeze_attribute_value(item) for item in value), key=repr)
-            )
+            return tuple(sorted((cls._freeze_attribute_value(item) for item in value), key=repr))
 
         try:
             hash(value)
@@ -182,10 +175,7 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
         if not attributes:
             return ()
 
-        return tuple(
-            (key, cls._freeze_attribute_value(attributes[key]))
-            for key in sorted(attributes.keys())
-        )
+        return tuple((key, cls._freeze_attribute_value(attributes[key])) for key in sorted(attributes.keys()))
 
     def __init__(self, event_data: dict):
         """
