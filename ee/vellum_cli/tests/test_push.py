@@ -620,7 +620,7 @@ def test_push__push_fails_due_to_404_error_with_id(mock_module, vellum_client):
     # AND the error message should be in the error message
     assert "Workflow Sandbox not found" in result.output
     assert mock_module.workflow_sandbox_id in result.output
-    assert "Please verify the workflow_sandbox_id is correct" in result.output
+    assert "workspace" in result.output
 
     # AND the stack trace should not be present
     assert "Traceback" not in result.output
@@ -663,7 +663,8 @@ def test_push__push_fails_due_to_404_error_without_id(tmp_path, vellum_client, m
 
     # AND the error message should be in the output
     assert "Workflow Sandbox not found" in result.output
-    assert "returned a 404 error" in result.output
+    assert "/workflows/push" in result.output
+    assert "404 response" in result.output
 
     # AND the stack trace should not be present
     assert "Traceback" not in result.output

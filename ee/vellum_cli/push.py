@@ -181,12 +181,14 @@ def push_command(
     artifact.seek(0)
     artifact.name = f"{workflow_config.module.replace('.', '__')}.tar.gz"
 
+    provided_id = workflow_config.workflow_sandbox_id or workflow_sandbox_id
+
     try:
         response = client.workflows.push(
             # Remove this once we could serialize using the artifact in Vembda
             # https://app.shortcut.com/vellum/story/5585
             exec_config=json.dumps(exec_config),
-            workflow_sandbox_id=workflow_config.workflow_sandbox_id or workflow_sandbox_id,
+            workflow_sandbox_id=provided_id,
             artifact=artifact,
             # We should check with fern if we could auto-serialize typed object fields for us
             # https://app.shortcut.com/vellum/story/5568
@@ -196,19 +198,20 @@ def push_command(
         )
     except ApiError as e:
         if e.status_code == 404:
-            provided_id = workflow_config.workflow_sandbox_id or workflow_sandbox_id
             if provided_id:
                 handle_cli_error(
                     logger,
                     title="Workflow Sandbox not found",
-                    message=f"Could not find Workflow Sandbox with ID '{provided_id}'. "
-                    "Please verify the workflow_sandbox_id is correct or remove it to create a new Workflow Sandbox.",
+                    message=f"Could not find Workflow Sandbox with ID '{provided_id}' "
+                    f"in workspace '{resolved_workspace}'.",
                 )
             else:
+                error_detail = e.body.get("detail") if isinstance(e.body, dict) else None
+                default_message = "The `/workflows/push` endpoint failed with a 404 response."
                 handle_cli_error(
                     logger,
                     title="Workflow Sandbox not found",
-                    message="The workflow push endpoint returned a 404 error. Please verify your configuration.",
+                    message=error_detail or default_message,
                 )
             return
 
