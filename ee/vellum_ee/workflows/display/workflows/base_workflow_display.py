@@ -515,13 +515,13 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
     def _serialize_vellum_integration_trigger(self, trigger_class: Type["BaseTrigger"]) -> JsonArray:
         """
-        Serialize a VellumIntegrationTrigger to exec_config format.
+        Serialize a VellumIntegrationTrigger with both exec_config and attributes array.
 
         Args:
             trigger_class: The factory-generated VellumIntegrationTrigger class
 
         Returns:
-            JsonArray with a single trigger object containing exec_config
+            JsonArray with a single trigger object containing exec_config and attributes
 
         Example output:
             [{
@@ -533,7 +533,11 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                     "slug": "slack_new_message",
                     "trigger_nano_id": "abc123",
                     "attributes": {"channel": "C123"}
-                }
+                },
+                "attributes": [
+                    {"id": "uuid", "name": "message", "type": "STRING", "value": None},
+                    {"id": "uuid", "name": "channel", "type": "STRING", "value": None}
+                ]
             }]
         """
         # Use the trigger class's method to get the deterministic trigger ID
@@ -542,6 +546,26 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
         # Get exec config from the trigger class
         exec_config = trigger_class.to_exec_config()
+
+        # Serialize trigger attributes from the cached dynamic attributes
+        # VellumIntegrationTrigger uses __trigger_attribute_cache__ for dynamically
+        # discovered attributes (accessed via trigger_class.attribute_name)
+        attribute_cache = getattr(trigger_class, "__trigger_attribute_cache__", {})
+        trigger_attributes: JsonArray = cast(
+            JsonArray,
+            [
+                cast(
+                    JsonObject,
+                    {
+                        "id": str(reference.id),
+                        "name": reference.name,
+                        "type": primitive_type_to_vellum_variable_type(reference),
+                        "value": None,
+                    },
+                )
+                for reference in sorted(attribute_cache.values(), key=lambda ref: ref.name)
+            ],
+        )
 
         trigger_data: JsonObject = {
             "id": str(trigger_id),
@@ -553,6 +577,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 "trigger_nano_id": exec_config.trigger_nano_id,
                 "attributes": exec_config.attributes or {},
             },
+            "attributes": trigger_attributes,
         }
 
         return cast(JsonArray, [trigger_data])

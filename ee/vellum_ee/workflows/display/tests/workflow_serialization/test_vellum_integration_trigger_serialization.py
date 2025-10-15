@@ -6,7 +6,7 @@ from tests.workflows.basic_trigger_vellum_integration.workflow import VellumInte
 
 
 def test_serialize_vellum_integration_trigger_workflow():
-    """VellumIntegrationTrigger workflow serializes with exec_config format."""
+    """VellumIntegrationTrigger workflow serializes with both exec_config and attributes array."""
     workflow_display = get_workflow_display(workflow_class=VellumIntegrationTriggerWorkflow)
     serialized_workflow: dict = workflow_display.serialize()
 
@@ -25,10 +25,11 @@ def test_serialize_vellum_integration_trigger_workflow():
     assert trigger["type"] == "VELLUM_INTEGRATION_TRIGGER"
     assert trigger["id"] == "472448ae-3bb0-4ca5-86f3-0a19c023b2f7"
 
-    # VellumIntegrationTrigger should have exec_config, not attributes
+    # VellumIntegrationTrigger should have BOTH exec_config AND attributes (like SlackTrigger)
     assert "exec_config" in trigger
-    assert "attributes" not in trigger
+    assert "attributes" in trigger
 
+    # Validate exec_config structure
     exec_config = trigger["exec_config"]
     assert exec_config == {
         "provider": "COMPOSIO",
@@ -37,6 +38,24 @@ def test_serialize_vellum_integration_trigger_workflow():
         "trigger_nano_id": "abc123def456",
         "attributes": {"channel": "C123456"},
     }
+
+    # Validate attributes array structure (matches SlackTrigger pattern)
+    attributes = trigger["attributes"]
+    assert isinstance(attributes, list)
+    assert len(attributes) == 2  # message and channel
+
+    # Verify attributes have correct structure
+    attribute_names = {attr["name"] for attr in attributes}
+    assert attribute_names == {"message", "channel"}
+
+    for attr in attributes:
+        assert "id" in attr
+        assert "name" in attr
+        assert "type" in attr
+        assert "value" in attr
+        assert attr["value"] is None
+        # Dynamic attributes use types=(object,) which maps to JSON type
+        assert attr["type"] == "JSON"
 
 
 def test_vellum_integration_trigger_id_consistency():
@@ -108,7 +127,7 @@ def test_vellum_integration_trigger_multiple_attributes():
 
 
 def test_vellum_integration_trigger_without_attributes():
-    """VellumIntegrationTrigger without configuration attributes serializes correctly."""
+    """VellumIntegrationTrigger without accessed attributes serializes with empty attributes array."""
     from vellum.workflows import BaseWorkflow
     from vellum.workflows.inputs.base import BaseInputs
     from vellum.workflows.nodes.bases.base import BaseNode
@@ -140,11 +159,15 @@ def test_vellum_integration_trigger_without_attributes():
     assert isinstance(trigger, dict), "trigger should be a dict"
     assert trigger["type"] == "VELLUM_INTEGRATION_TRIGGER"
 
-    # Attributes should be empty dict when not provided
+    # Validate exec_config
     exec_config = trigger["exec_config"]
     assert isinstance(exec_config, dict), "exec_config should be a dict"
-    assert exec_config["attributes"] == {}
+    assert exec_config["attributes"] == {}  # No filter attributes
     assert exec_config["provider"] == "COMPOSIO"
     assert exec_config["integration_name"] == "GITHUB"
     assert exec_config["slug"] == "github_push_event"
     assert exec_config["trigger_nano_id"] == "xyz789ghi012"
+
+    # Validate attributes array is empty (no attributes accessed in workflow)
+    assert "attributes" in trigger
+    assert trigger["attributes"] == []
