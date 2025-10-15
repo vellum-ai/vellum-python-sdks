@@ -592,6 +592,84 @@ def test_push__push_fails_due_to_400_error(mock_module, vellum_client):
     assert "Traceback" not in result.output
 
 
+def test_push__push_fails_due_to_404_error_with_id(mock_module, vellum_client):
+    """
+    Tests that a 404 error with a workflow sandbox ID shows a helpful error message.
+    """
+
+    # GIVEN a single workflow configured with a workflow_sandbox_id
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+
+    # AND a workflow exists in the module successfully
+    _ensure_workflow_py(temp_dir, module)
+
+    # AND the push API call returns a 404 response
+    vellum_client.workflows.push.side_effect = ApiError(
+        status_code=404,
+        body={},
+    )
+
+    # WHEN calling `vellum push`
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["push", module])
+
+    # THEN it should fail with a user error code
+    assert result.exit_code == 1
+
+    # AND the error message should be in the error message
+    assert "Workflow Sandbox not found" in result.output
+    assert mock_module.workflow_sandbox_id in result.output
+    assert "workspace" in result.output
+
+    # AND the stack trace should not be present
+    assert "Traceback" not in result.output
+
+
+def test_push__push_fails_due_to_404_error_without_id(tmp_path, vellum_client, monkeypatch):
+    """
+    Tests that a 404 error without a workflow sandbox ID shows a helpful error message.
+    """
+
+    # GIVEN a workflow module exists but has no workflow_sandbox_id configured
+    module = "examples.mock.test_push__404_without_id"
+    module_dir = tmp_path / "examples" / "mock" / "test_push__404_without_id"
+    module_dir.mkdir(parents=True)
+
+    # AND a workflow.py file exists
+    workflow_file = module_dir / "workflow.py"
+    workflow_file.write_text(
+        "from vellum.workflows import BaseWorkflow\n\nclass ExampleWorkflow(BaseWorkflow):\n    pass\n"
+    )
+
+    # AND the pyproject.toml file exists without workflow_sandbox_id
+    pyproject_file = tmp_path / "pyproject.toml"
+    pyproject_file.write_text(f'[tool.vellum]\n[[tool.vellum.workflows]]\nmodule = "{module}"\n')
+
+    monkeypatch.chdir(tmp_path)
+
+    # AND the push API call returns a 404 response
+    vellum_client.workflows.push.side_effect = ApiError(
+        status_code=404,
+        body={},
+    )
+
+    # WHEN calling `vellum push`
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["push", module])
+
+    # THEN it should fail with a user error code
+    assert result.exit_code == 1
+
+    # AND the error message should be in the output
+    assert "Workflow Sandbox not found" in result.output
+    assert "/workflows/push" in result.output
+    assert "404 response" in result.output
+
+    # AND the stack trace should not be present
+    assert "Traceback" not in result.output
+
+
 @pytest.mark.parametrize(
     "file_data",
     [
