@@ -96,6 +96,54 @@ def test_serialize_module_includes_additional_files():
     assert "CONSTANT_VALUE" in additional_files["utils/constants.py"]
 
 
+def test_serialize_module_with_pydantic_array():
+    """
+    Test that serialize_module correctly serializes arrays of Pydantic models in workflow inputs.
+
+    This test verifies that when a workflow has inputs containing a List[PydanticModel],
+    the serialization properly converts the Pydantic models to JSON format.
+    """
+    module_path = "tests.workflows.pydantic_array_serialization"
+
+    # WHEN we serialize it
+    result = BaseWorkflowDisplay.serialize_module(module_path)
+
+    assert hasattr(result, "exec_config")
+    assert hasattr(result, "errors")
+    assert isinstance(result.exec_config, dict)
+    assert isinstance(result.errors, list)
+
+    input_variables = result.exec_config["input_variables"]
+    assert len(input_variables) == 1
+
+    items_input = input_variables[0]
+    assert items_input["key"] == "items"
+    assert items_input["type"] == "JSON"
+    # TODO: In the future, this should be a custom type based on an OpenAPI schema (important-comment)
+
+    assert result.dataset is not None
+    assert isinstance(result.dataset, list)
+    assert len(result.dataset) == 2
+
+    first_scenario = result.dataset[0]
+    assert first_scenario["label"] == "Scenario 1"
+    assert "items" in first_scenario["inputs"]
+    items = first_scenario["inputs"]["items"]
+    assert isinstance(items, list)
+    assert len(items) == 3
+    assert items[0]["name"] == "item1"
+    assert items[0]["value"] == 10
+    assert items[0]["is_active"] is True
+
+    second_scenario = result.dataset[1]
+    assert second_scenario["label"] == "Custom Test"
+    assert "items" in second_scenario["inputs"]
+    test_items = second_scenario["inputs"]["items"]
+    assert len(test_items) == 2
+    assert test_items[0]["name"] == "test1"
+    assert test_items[0]["value"] == 100
+
+
 def test_serialize_module__with_invalid_nested_set_graph(temp_module_path):
     """
     Tests that serialize_module raises a clear user-facing exception for workflows with nested sets in graph attribute.
