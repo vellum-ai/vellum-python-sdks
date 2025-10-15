@@ -228,6 +228,7 @@ export class SearchNode extends BaseNode<
             ? new SearchNodeMetadataFilters({
                 metadata: rawMetadata,
                 nodeInputsById: this.nodeInputsById,
+                nodeContext: this.nodeContext,
               })
             : python.TypeInstantiation.none(),
         }),
@@ -438,12 +439,14 @@ export declare namespace SearchNodeMetadataFilters {
   export interface Args {
     metadata: VellumLogicalExpressionType;
     nodeInputsById: Map<string, NodeInput>;
+    nodeContext: TextSearchNodeContext;
   }
 }
 
 export class SearchNodeMetadataFilters extends AstNode {
   private metadata: VellumLogicalExpressionType;
   private nodeInputsById: Map<string, NodeInput>;
+  private nodeContext: TextSearchNodeContext;
   private astNode: AstNode;
 
   public constructor(args: SearchNodeMetadataFilters.Args) {
@@ -451,6 +454,7 @@ export class SearchNodeMetadataFilters extends AstNode {
 
     this.metadata = args.metadata;
     this.nodeInputsById = args.nodeInputsById;
+    this.nodeContext = args.nodeContext;
     this.astNode = this.generateAstNode();
     this.inheritReferences(this.astNode);
   }
@@ -511,9 +515,19 @@ export class SearchNodeMetadataFilters extends AstNode {
     const lhsId = data.lhsVariableId;
     const lhs = this.nodeInputsById.get(lhsId);
     if (!lhs) {
-      throw new NodeAttributeGenerationError(
-        `Could not find search node input for id ${lhsId}`
+      this.nodeContext.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          `Could not find search node input for id ${lhsId}`,
+          "WARNING"
+        )
       );
+      return python.instantiateClass({
+        classReference: python.reference({
+          name: "MetadataLogicalCondition",
+          modulePath: VELLUM_WORKFLOW_NODE_BASE_TYPES_PATH,
+        }),
+        arguments_: args,
+      });
     }
 
     args.push(
@@ -530,9 +544,19 @@ export class SearchNodeMetadataFilters extends AstNode {
     const rhsId = data.rhsVariableId;
     const rhs = this.nodeInputsById.get(rhsId);
     if (!isUnaryOperator(data.operator) && !rhs) {
-      throw new NodeAttributeGenerationError(
-        `Could not find search node input for id ${rhsId}`
+      this.nodeContext.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          `Could not find search node input for id ${rhsId}`,
+          "WARNING"
+        )
       );
+      return python.instantiateClass({
+        classReference: python.reference({
+          name: "MetadataLogicalCondition",
+          modulePath: VELLUM_WORKFLOW_NODE_BASE_TYPES_PATH,
+        }),
+        arguments_: args,
+      });
     }
 
     if (rhs) {
