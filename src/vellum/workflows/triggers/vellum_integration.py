@@ -151,6 +151,42 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
     # Cache for generated trigger classes to ensure consistency
     _trigger_class_cache: ClassVar[Dict[tuple, Type["VellumIntegrationTrigger"]]] = {}
 
+    @classmethod
+    def _freeze_attribute_value(cls, value: Any) -> Any:
+        """Convert attribute values into hashable, immutable equivalents."""
+        if isinstance(value, dict):
+            return tuple(
+                (key, cls._freeze_attribute_value(val))
+                for key, val in sorted(value.items())
+            )
+        if isinstance(value, (list, tuple)):
+            return tuple(
+                cls._freeze_attribute_value(item) for item in value
+            )
+        if isinstance(value, set):
+            return tuple(
+                sorted((cls._freeze_attribute_value(item) for item in value), key=repr)
+            )
+
+        try:
+            hash(value)
+        except TypeError:
+            # Fall back to repr for objects that cannot be hashed to ensure deterministic
+            # cache keys without imposing additional serialization requirements.
+            return repr(value)
+
+        return value
+
+    @classmethod
+    def _freeze_attributes(cls, attributes: Dict[str, Any]) -> tuple:
+        if not attributes:
+            return ()
+
+        return tuple(
+            (key, cls._freeze_attribute_value(attributes[key]))
+            for key in sorted(attributes.keys())
+        )
+
     def __init__(self, event_data: dict):
         """
         Initialize trigger with event data from the integration.
@@ -297,9 +333,15 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
         attrs = attributes or {}
 
         # Create cache key - include all identifying parameters including attributes
-        # Convert attributes dict to hashable tuple for caching
-        attrs_tuple = tuple(sorted(attrs.items())) if attrs else ()
-        cache_key = (provider_enum.value, integration_name, slug, trigger_nano_id, attrs_tuple)
+        # Convert attributes dict to a hashable representation for caching
+        frozen_attrs = cls._freeze_attributes(attrs)
+        cache_key = (
+            provider_enum.value,
+            integration_name,
+            slug,
+            trigger_nano_id,
+            frozen_attrs,
+        )
 
         # Return cached class if it exists
         if cache_key in cls._trigger_class_cache:
