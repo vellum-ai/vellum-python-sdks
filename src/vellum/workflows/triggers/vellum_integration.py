@@ -55,19 +55,29 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
         try:
             return super().__getattribute__(name)
         except AttributeError:
-            # For VellumIntegrationTrigger factory-generated classes, create dynamic references
-            # Only enable dynamic attribute creation for factory-generated classes, not the base
-            # VellumIntegrationTrigger class itself. We check the internal __name__ attribute
-            # (e.g., "VellumIntegrationTrigger_COMPOSIO_SLACK_slack_new_message"), not the user-facing
-            # variable name (e.g., "SlackNewMessage").
+            # For VellumIntegrationTrigger subclasses (both factory-generated and inheritance-based),
+            # create dynamic references. Only enable dynamic attribute creation for properly configured
+            # trigger classes, not the base VellumIntegrationTrigger class itself.
             try:
-                is_factory_class = super().__getattribute__("__name__").startswith(
-                    "VellumIntegrationTrigger_"
-                ) and not name.startswith("_")
-            except AttributeError:
-                is_factory_class = False
+                # Check if this is a configured trigger class by verifying it has the required attributes
+                # This works for both factory pattern (class name starts with "VellumIntegrationTrigger_")
+                # and inheritance pattern (class defines provider, integration_name, slug, trigger_nano_id)
+                class_name = super().__getattribute__("__name__")
+                is_base_class = class_name == "VellumIntegrationTrigger"
 
-            if is_factory_class:
+                if is_base_class or name.startswith("_"):
+                    is_configured_trigger = False
+                else:
+                    # Check if class has required configuration attributes
+                    has_provider = hasattr(cls, "provider")
+                    has_integration_name = hasattr(cls, "integration_name")
+                    has_slug = hasattr(cls, "slug")
+                    has_trigger_nano_id = hasattr(cls, "trigger_nano_id")
+                    is_configured_trigger = has_provider and has_integration_name and has_slug and has_trigger_nano_id
+            except AttributeError:
+                is_configured_trigger = False
+
+            if is_configured_trigger:
                 trigger_cls = cast(Type["VellumIntegrationTrigger"], cls)
 
                 # Check cache first
@@ -100,52 +110,44 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
 
 class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTriggerMeta):
     """
-    Factory-based trigger for Vellum-managed integration events.
+    Base class for Vellum-managed integration triggers using inheritance pattern.
 
-    VellumIntegrationTrigger provides a pure factory pattern for creating trigger
-    classes dynamically based on integration provider, integration name, slug, and
-    trigger nano ID. Unlike predefined trigger classes, these triggers are created
-    on-demand and support dynamic attribute discovery from the integration API.
-
-    This design ensures parity with VellumIntegrationToolDefinition and allows users to
-    work with any integration trigger without requiring SDK updates for new integrations.
+    Subclasses must define configuration and event attributes to create a trigger.
 
     Examples:
-        Create triggers dynamically for different integrations:
-            >>> SlackNewMessage = VellumIntegrationTrigger.for_trigger(
-            ...     integration_name="SLACK",
-            ...     slug="slack_new_message",
-            ...     trigger_nano_id="abc123def456"
-            ... )
-            >>>
-            >>> GithubPush = VellumIntegrationTrigger.for_trigger(
-            ...     integration_name="GITHUB",
-            ...     slug="github_push_event",
-            ...     trigger_nano_id="xyz789ghi012"
-            ... )
+        Create a Slack trigger:
+            >>> class SlackNewMessageTrigger(VellumIntegrationTrigger):
+            ...     provider = VellumIntegrationProviderType.COMPOSIO
+            ...     integration_name = "SLACK"
+            ...     slug = "slack_new_message"
+            ...     trigger_nano_id = "abc123def456"
+            ...     event_attributes = {
+            ...         "message": str,
+            ...         "user": str,
+            ...         "channel": str,
+            ...         "timestamp": float,
+            ...     }
+            ...     filter_attributes = {"channel": "C123456"}  # Optional
 
         Use in workflow graph:
             >>> class MyWorkflow(BaseWorkflow):
-            ...     graph = SlackNewMessage >> ProcessMessageNode
+            ...     graph = SlackNewMessageTrigger >> ProcessMessageNode
 
         Reference trigger attributes in nodes:
             >>> class ProcessNode(BaseNode):
             ...     class Outputs(BaseNode.Outputs):
-            ...         text = SlackNewMessage.message
-            ...         channel = SlackNewMessage.channel
+            ...         text = SlackNewMessageTrigger.message
+            ...         channel = SlackNewMessageTrigger.channel
 
         Instantiate for testing:
-            >>> trigger = SlackNewMessage(event_data={
+            >>> trigger = SlackNewMessageTrigger(event_data={
             ...     "message": "Hello world",
-            ...     "channel": "C123456"
+            ...     "channel": "C123456",
+            ...     "user": "U123",
+            ...     "timestamp": 1234567890.0,
             ... })
             >>> trigger.message
             'Hello world'
-
-    Note:
-        The factory method generates unique classes with proper __name__ and __module__
-        for correct attribute ID generation and serialization. Each factory call with
-        the same parameters returns the same class instance (cached).
     """
 
     # Class variables that identify this trigger
@@ -153,10 +155,41 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
     integration_name: ClassVar[str]
     slug: ClassVar[str]
     trigger_nano_id: ClassVar[str]
-    attributes: ClassVar[Dict[str, Any]]
+    event_attributes: ClassVar[Dict[str, type]]
+    filter_attributes: ClassVar[Dict[str, Any]]
 
     # Cache for generated trigger classes to ensure consistency
     _trigger_class_cache: ClassVar[Dict[tuple, Type["VellumIntegrationTrigger"]]] = {}
+
+    def __init_subclass__(cls, **kwargs: Any) -> None:
+        """Validate that subclasses properly define required attributes."""
+        super().__init_subclass__(**kwargs)
+
+        # Skip validation for the base class itself
+        if cls.__name__ == "VellumIntegrationTrigger":
+            return
+
+        # Require event_attributes to be defined
+        if not hasattr(cls, "event_attributes"):
+            raise TypeError(
+                f"{cls.__name__} must define 'event_attributes' as a Dict[str, type] "
+                f"declaring the attributes that will be present in trigger events. "
+                f"Example: event_attributes = {{'message': str, 'user': str}}"
+            )
+
+        # Validate event_attributes is a dict
+        if not isinstance(cls.event_attributes, dict):
+            raise TypeError(
+                f"{cls.__name__}.event_attributes must be a dict, got {type(cls.event_attributes).__name__}"
+            )
+
+        # Validate all values in event_attributes are types
+        for attr_name, attr_type in cls.event_attributes.items():
+            if not isinstance(attr_type, type):
+                raise TypeError(
+                    f"{cls.__name__}.event_attributes['{attr_name}'] must be a type, "
+                    f"got {type(attr_type).__name__}: {attr_type}"
+                )
 
     @classmethod
     def _freeze_attributes(cls, attributes: Dict[str, Any]) -> str:
