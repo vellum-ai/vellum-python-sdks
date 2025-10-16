@@ -31,7 +31,7 @@ class ComposioIntegrationTriggerExecConfig(BaseIntegrationTriggerExecConfig):
 
     This configuration is used to identify and execute triggers through the Composio
     integration provider. It includes the provider type, integration name, slug,
-    trigger nano ID, and optional attributes for filtering.
+    trigger nano ID, event schema, and optional attributes for filtering.
 
     Examples:
         >>> config = ComposioIntegrationTriggerExecConfig(
@@ -39,6 +39,7 @@ class ComposioIntegrationTriggerExecConfig(BaseIntegrationTriggerExecConfig):
         ...     integration_name="SLACK",
         ...     slug="slack_new_message",
         ...     trigger_nano_id="abc123def456",
+        ...     event_attributes={"message": str, "user": str},
         ...     filter_attributes={"channel": "C123456"}
         ... )
         >>> config.provider
@@ -50,6 +51,7 @@ class ComposioIntegrationTriggerExecConfig(BaseIntegrationTriggerExecConfig):
         integration_name: The integration identifier (e.g., "SLACK", "GITHUB")
         slug: The slug of the integration trigger in Composio
         trigger_nano_id: Composio's unique trigger identifier used for event matching
+        event_attributes: Dictionary mapping attribute names to their types (schema for event data)
         filter_attributes: Optional dictionary of trigger-specific configuration attributes for filtering
     """
 
@@ -58,6 +60,9 @@ class ComposioIntegrationTriggerExecConfig(BaseIntegrationTriggerExecConfig):
     integration_name: str = Field(..., description="The integration name (e.g., 'SLACK', 'GITHUB')")
     slug: str = Field(..., description="The slug of the integration trigger in Composio")
     trigger_nano_id: str = Field(..., description="Composio's unique trigger identifier used for event matching")
+    event_attributes: Dict[str, Any] = Field(
+        default_factory=dict, description="Schema of event attributes with their types"
+    )
     filter_attributes: Dict[str, Any] = Field(
         default_factory=dict, description="Optional trigger-specific configuration attributes for filtering"
     )

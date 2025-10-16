@@ -121,6 +121,32 @@ def test_attribute_ids_include_class_name():
     assert Trigger1.message.id != Trigger2.message.id
 
 
+def test_exec_config_includes_event_attributes():
+    """to_exec_config() should include event_attributes for codegen."""
+
+    class SlackTrigger(VellumIntegrationTrigger):
+        provider = VellumIntegrationProviderType.COMPOSIO
+        integration_name = "SLACK"
+        slug = "slack_new_message"
+        trigger_nano_id = "test_123"
+        event_attributes = {
+            "message": str,
+            "user": str,
+            "channel": str,
+        }
+        filter_attributes = {"channel": "C123"}
+
+    exec_config = SlackTrigger.to_exec_config()
+
+    # Should include event_attributes for backend/codegen
+    assert hasattr(exec_config, "event_attributes")
+    assert exec_config.event_attributes == {
+        "message": str,
+        "user": str,
+        "channel": str,
+    }
+
+
 def test_serialize_workflow_with_inheritance_trigger():
     """Workflow with inheritance trigger serializes correctly."""
     from vellum.workflows.nodes.bases import BaseNode

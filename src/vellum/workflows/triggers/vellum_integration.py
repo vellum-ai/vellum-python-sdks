@@ -351,11 +351,15 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
         # Get filter_attributes, defaulting to empty dict if not set
         filter_attributes = getattr(cls, "filter_attributes", {})
 
+        # Get event_attributes, defaulting to empty dict if not set
+        event_attributes = getattr(cls, "event_attributes", {})
+
         return ComposioIntegrationTriggerExecConfig(
             provider=cls.provider,
             integration_name=cls.integration_name,
             slug=cls.slug,
             trigger_nano_id=cls.trigger_nano_id,
+            event_attributes=event_attributes,
             filter_attributes=filter_attributes,
         )
 
