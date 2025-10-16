@@ -90,11 +90,15 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
                     is_configured_trigger = False
                 else:
                     # Check if class has required configuration attributes
-                    has_provider = hasattr(cls, "provider")
-                    has_integration_name = hasattr(cls, "integration_name")
-                    has_slug = hasattr(cls, "slug")
-                    has_trigger_nano_id = hasattr(cls, "trigger_nano_id")
-                    is_configured_trigger = has_provider and has_integration_name and has_slug and has_trigger_nano_id
+                    # Use super().__getattribute__() instead of hasattr() to avoid recursion
+                    try:
+                        super().__getattribute__("provider")
+                        super().__getattribute__("integration_name")
+                        super().__getattribute__("slug")
+                        super().__getattribute__("trigger_nano_id")
+                        is_configured_trigger = True
+                    except AttributeError:
+                        is_configured_trigger = False
             except AttributeError:
                 is_configured_trigger = False
 
@@ -184,7 +188,16 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
             'Hello world'
     """
 
-    # Class variables that identify this trigger
+    # Base Config class for inheritance pattern
+    class Config:
+        """Base configuration class for VellumIntegrationTrigger subclasses."""
+
+        provider: ClassVar[VellumIntegrationProviderType]
+        integration_name: ClassVar[str]
+        slug: ClassVar[str]
+        trigger_nano_id: ClassVar[str]
+
+    # Class variables that identify this trigger (for backward compatibility with old pattern)
     provider: ClassVar[VellumIntegrationProviderType]
     integration_name: ClassVar[str]
     slug: ClassVar[str]
@@ -207,27 +220,60 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
         if cls.__name__.startswith("VellumIntegrationTrigger_"):
             return
 
-        # Require event_attributes to be defined for inheritance-based classes
-        if not hasattr(cls, "event_attributes"):
-            raise TypeError(
-                f"{cls.__name__} must define 'event_attributes' as a Dict[str, type] "
-                f"declaring the attributes that will be present in trigger events. "
-                f"Example: event_attributes = {{'message': str, 'user': str}}"
-            )
+        # For new Config pattern: Check if Config class exists with required fields
+        # For backward compatibility: also support old event_attributes pattern
+        has_config = hasattr(cls, "Config") and cls.Config is not VellumIntegrationTrigger.Config
+        has_event_attributes = hasattr(cls, "event_attributes")
 
-        # Validate event_attributes is a dict
-        if not isinstance(cls.event_attributes, dict):
-            raise TypeError(
-                f"{cls.__name__}.event_attributes must be a dict, got {type(cls.event_attributes).__name__}"
-            )
+        if has_config:
+            # New Config pattern - validate Config class has required fields
+            config_cls = cls.Config
 
-        # Validate all values in event_attributes are types
-        for attr_name, attr_type in cls.event_attributes.items():
-            if not isinstance(attr_type, type):
+            # Check for required fields in Config
+            required_fields = ["provider", "integration_name", "slug", "trigger_nano_id"]
+            for field in required_fields:
+                if not hasattr(config_cls, field):
+                    raise TypeError(
+                        f"{cls.__name__}.Config must define '{field}'. "
+                        f"Required fields: {', '.join(required_fields)}"
+                    )
+
+            # Copy Config attributes to class level for backward compatibility
+            cls.provider = config_cls.provider
+            cls.integration_name = config_cls.integration_name
+            cls.slug = config_cls.slug
+            cls.trigger_nano_id = config_cls.trigger_nano_id
+
+        elif has_event_attributes:
+            # Old event_attributes pattern - validate event_attributes
+            if not isinstance(cls.event_attributes, dict):
                 raise TypeError(
-                    f"{cls.__name__}.event_attributes['{attr_name}'] must be a type, "
-                    f"got {type(attr_type).__name__}: {attr_type}"
+                    f"{cls.__name__}.event_attributes must be a dict, got {type(cls.event_attributes).__name__}"
                 )
+
+            # Validate all values in event_attributes are types
+            for attr_name, attr_type in cls.event_attributes.items():
+                if not isinstance(attr_type, type):
+                    raise TypeError(
+                        f"{cls.__name__}.event_attributes['{attr_name}'] must be a type, "
+                        f"got {type(attr_type).__name__}: {attr_type}"
+                    )
+        else:
+            # Neither Config nor event_attributes defined
+            raise TypeError(
+                f"{cls.__name__} must define either:\n"
+                f"1. A nested Config class with required fields "
+                f"(provider, integration_name, slug, trigger_nano_id), OR\n"
+                f"2. event_attributes as a Dict[str, type] (legacy pattern)\n"
+                f"Example with Config:\n"
+                f"  class {cls.__name__}(VellumIntegrationTrigger):\n"
+                f"      message: str\n"
+                f"      class Config(VellumIntegrationTrigger.Config):\n"
+                f"          provider = VellumIntegrationProviderType.COMPOSIO\n"
+                f"          integration_name = 'SLACK'\n"
+                f"          slug = 'slack_new_message'\n"
+                f"          trigger_nano_id = 'abc123'"
+            )
 
     @classmethod
     def _freeze_attributes(cls, attributes: Dict[str, Any]) -> str:
