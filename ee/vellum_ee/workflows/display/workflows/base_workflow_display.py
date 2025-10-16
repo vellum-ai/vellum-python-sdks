@@ -25,6 +25,7 @@ from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port,
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, WorkflowInputReference
 from vellum.workflows.state.encoder import DefaultStateEncoder
+from vellum.workflows.triggers.vellum_integration import VellumIntegrationTrigger
 from vellum.workflows.types.core import Json, JsonArray, JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.types.utils import get_original_base
@@ -470,7 +471,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         trigger_type = trigger_type_mapping.get(trigger_class)
         if trigger_type is None:
             # Check if it's a VellumIntegrationTrigger subclass
-            from vellum.workflows.triggers.vellum_integration import VellumIntegrationTrigger
 
             if issubclass(trigger_class, VellumIntegrationTrigger):
                 trigger_type = WorkflowTriggerType.COMPOSIO_INTEGRATION_TRIGGER
