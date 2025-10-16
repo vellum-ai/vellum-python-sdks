@@ -87,17 +87,20 @@ class BasePromptNode(BaseNode[StateType], Generic[StateType]):
             raise NodeException(
                 message=e.body.get("detail", "Provider credentials is missing or unavailable"),
                 code=WorkflowErrorCode.PROVIDER_CREDENTIALS_UNAVAILABLE,
+                raw_data=e.body,
             )
 
         elif e.status_code and e.status_code >= 400 and e.status_code < 500 and isinstance(e.body, dict):
             raise NodeException(
                 message=e.body.get("detail", "Failed to execute Prompt"),
                 code=WorkflowErrorCode.INVALID_INPUTS,
+                raw_data=e.body,
             ) from e
 
         raise NodeException(
             message="Failed to execute Prompt",
             code=WorkflowErrorCode.INTERNAL_ERROR,
+            raw_data=e.body,
         ) from e
 
     def __directly_emit_workflow_output__(

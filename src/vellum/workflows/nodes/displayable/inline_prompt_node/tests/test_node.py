@@ -197,6 +197,9 @@ def test_inline_prompt_node__api_error__invalid_inputs_node_exception(
     assert e.value.code == expected_code
     assert e.value.message == expected_message
 
+    # AND the node exception includes the response body in raw_data
+    assert e.value.raw_data == exception.body
+
 
 def test_inline_prompt_node__chat_history_inputs(vellum_adhoc_prompt_client):
     # GIVEN a prompt node with a chat history input
