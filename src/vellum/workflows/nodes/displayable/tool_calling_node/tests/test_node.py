@@ -426,3 +426,55 @@ def test_tool_node_preserves_node_exception():
     assert e.code == WorkflowErrorCode.INVALID_INPUTS
     assert e.raw_data == {"key": "value"}
     assert "Custom error" in e.message
+
+
+def test_tool_node_error_message_includes_function_name():
+    """Test that error messages include the actual function name, not 'wrapper'."""
+
+    # GIVEN a function that raises a regular exception
+    def my_tool_function() -> str:
+        raise ValueError("Something went wrong")
+
+    # AND a tool prompt node with that function
+    tool_prompt_node = create_tool_prompt_node(
+        ml_model="test-model",
+        blocks=[],
+        functions=[my_tool_function],
+        prompt_inputs=None,
+        parameters=DEFAULT_PROMPT_PARAMETERS,
+    )
+
+    function_node_class = create_function_node(
+        function=my_tool_function,
+        tool_prompt_node=tool_prompt_node,
+    )
+
+    # AND a state with a function call
+    state = ToolCallingState(
+        meta=StateMeta(
+            node_outputs={
+                tool_prompt_node.Outputs.results: [
+                    FunctionCallVellumValue(
+                        value=FunctionCall(
+                            arguments={},
+                            id="call_456",
+                            name="my_tool_function",
+                            state="FULFILLED",
+                        ),
+                    )
+                ],
+            },
+        )
+    )
+
+    function_node = function_node_class(state=state)
+
+    # WHEN the function node runs and raises an exception
+    with pytest.raises(NodeException) as exc_info:
+        list(function_node.run())
+
+    # THEN the error message should include the actual function name
+    e = exc_info.value
+    assert "my_tool_function" in e.message
+    assert "wrapper" not in e.message.lower()
+    assert "Something went wrong" in e.message

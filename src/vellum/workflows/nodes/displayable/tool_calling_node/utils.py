@@ -550,6 +550,8 @@ def create_function_node(
 
                 return func(**merged_kwargs)
 
+            # Preserve the original function name for better error messages
+            wrapper.__name__ = func.__name__
             return wrapper
 
         node = type(
