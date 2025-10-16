@@ -38,6 +38,7 @@ from vellum_ee.workflows.display.base import (
     WorkflowInputsDisplay,
     WorkflowMetaDisplay,
     WorkflowOutputDisplay,
+    WorkflowTriggerType,
     get_trigger_type_mapping,
 )
 from vellum_ee.workflows.display.editor.types import NodeDisplayData, NodeDisplayPosition
@@ -465,13 +466,19 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                     f"{edge.trigger_class.__name__} in the same workflow."
                 )
 
-        # Get the trigger type from the mapping
+        # Get the trigger type from the mapping, or check if it's a VellumIntegrationTrigger subclass
         trigger_type = trigger_type_mapping.get(trigger_class)
         if trigger_type is None:
-            raise ValueError(
-                f"Unknown trigger type: {trigger_class.__name__}. "
-                f"Please add it to the trigger type mapping in get_trigger_type_mapping()."
-            )
+            # Check if it's a VellumIntegrationTrigger subclass
+            from vellum.workflows.triggers.vellum_integration import VellumIntegrationTrigger
+
+            if issubclass(trigger_class, VellumIntegrationTrigger):
+                trigger_type = WorkflowTriggerType.COMPOSIO_INTEGRATION_TRIGGER
+            else:
+                raise ValueError(
+                    f"Unknown trigger type: {trigger_class.__name__}. "
+                    f"Please add it to the trigger type mapping in get_trigger_type_mapping()."
+                )
 
         # Return as a list with a single trigger object matching Django schema
         trigger_id = uuid4_from_hash(trigger_class.__qualname__)

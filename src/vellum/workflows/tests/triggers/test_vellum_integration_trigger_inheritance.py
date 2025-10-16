@@ -119,3 +119,42 @@ def test_attribute_ids_include_class_name():
 
     # Different class names = different IDs (like nodes)
     assert Trigger1.message.id != Trigger2.message.id
+
+
+def test_serialize_workflow_with_inheritance_trigger():
+    """Workflow with inheritance trigger serializes correctly."""
+    from vellum.workflows.nodes.bases import BaseNode
+    from vellum.workflows.workflows.base import BaseWorkflow
+
+    try:
+        from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
+    except ImportError:
+        pytest.skip("vellum_ee not available")
+
+    class SlackTrigger(VellumIntegrationTrigger):
+        provider = VellumIntegrationProviderType.COMPOSIO
+        integration_name = "SLACK"
+        slug = "slack_new_message"
+        trigger_nano_id = "test_123"
+        event_attributes = {"message": str}
+        filter_attributes = {"channel": "C123"}
+
+    class SimpleNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result = SlackTrigger.message
+
+        def run(self) -> BaseNode.Outputs:
+            return self.Outputs()
+
+    class TestWorkflow(BaseWorkflow):
+        graph = SlackTrigger >> SimpleNode
+
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    serialized = workflow_display.serialize()
+
+    assert "triggers" in serialized
+    triggers = serialized.get("triggers")
+    assert isinstance(triggers, list)
+    assert len(triggers) == 1
+    assert isinstance(triggers[0], dict)
+    assert triggers[0].get("type") == "COMPOSIO_INTEGRATION_TRIGGER"
