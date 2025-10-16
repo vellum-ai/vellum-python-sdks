@@ -160,7 +160,7 @@ def test_to_exec_config():
 
     exec_config = SlackTrigger.to_exec_config()
 
-    assert exec_config.type == "VELLUM_INTEGRATION_TRIGGER"
+    assert exec_config.type == "INTEGRATION"
     assert exec_config.provider == VellumIntegrationProviderType.COMPOSIO
     assert exec_config.integration_name == "SLACK"
     assert exec_config.slug == "slack_new_message"

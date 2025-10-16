@@ -45,7 +45,7 @@ class ComposioIntegrationTriggerExecConfig(BaseIntegrationTriggerExecConfig):
         <VellumIntegrationProviderType.COMPOSIO: 'COMPOSIO'>
 
     Attributes:
-        type: Always "VELLUM_INTEGRATION_TRIGGER" for this config type
+        type: Always "INTEGRATION" for this config type
         provider: The integration provider (e.g., COMPOSIO)
         integration_name: The integration identifier (e.g., "SLACK", "GITHUB")
         slug: The slug of the integration trigger in Composio
@@ -53,7 +53,7 @@ class ComposioIntegrationTriggerExecConfig(BaseIntegrationTriggerExecConfig):
         event_attributes: Dictionary mapping attribute names to their types (schema for event data)
     """
 
-    type: Literal["VELLUM_INTEGRATION_TRIGGER"] = "VELLUM_INTEGRATION_TRIGGER"
+    type: Literal["INTEGRATION"] = "INTEGRATION"
     provider: VellumIntegrationProviderType = Field(..., description="The integration provider (e.g., COMPOSIO)")
     integration_name: str = Field(..., description="The integration name (e.g., 'SLACK', 'GITHUB')")
     slug: str = Field(..., description="The slug of the integration trigger in Composio")
