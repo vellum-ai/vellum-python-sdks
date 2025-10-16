@@ -19,16 +19,39 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
     dynamically, allowing triggers to work with attributes discovered from integration
     APIs or event payloads.
 
-    Note: This metaclass intentionally deviates from the standard metaclass pattern used
-    in BaseNodeMeta and BaseWorkflowMeta, which generate nested classes (Outputs, Inputs)
-    in __new__. Since VellumIntegrationTrigger uses a factory pattern with dynamic
-    attributes rather than predefined nested classes, this metaclass focuses on
-    attribute discovery via __getattribute__ during workflow definition (when the
-    developer references trigger attributes in their workflow code) instead of class
-    generation in __new__. This architectural difference is necessary to support the
-    dynamic nature of integration triggers where attributes are not known until the
-    integration is queried or event data is received.
+    For inheritance-based triggers, event_attributes are automatically converted to
+    TriggerAttributeReference objects during class creation in __new__.
     """
+
+    def __new__(mcs, name: str, bases: tuple, namespace: dict, **kwargs: Any) -> "VellumIntegrationTriggerMeta":
+        """Create a new trigger class and set up attribute references."""
+        cls = super().__new__(mcs, name, bases, namespace, **kwargs)
+
+        # For inheritance-based triggers with event_attributes, create references automatically
+        if hasattr(cls, "event_attributes") and isinstance(cls.event_attributes, dict):
+            # Initialize caches if not already present
+            if not hasattr(cls, "__trigger_attribute_ids__"):
+                cls.__trigger_attribute_ids__ = {}
+            if not hasattr(cls, "__trigger_attribute_cache__"):
+                cls.__trigger_attribute_cache__ = {}
+
+            # Create TriggerAttributeReference for each event_attribute
+            for attr_name, attr_type in cls.event_attributes.items():
+                # Generate stable ID from trigger semantics
+                if hasattr(cls, "provider") and hasattr(cls, "integration_name") and hasattr(cls, "slug"):
+                    trigger_identity = f"{cls.provider.value}|{cls.integration_name}|{cls.slug}"
+                    attr_id = uuid4_from_hash(f"{trigger_identity}|{attr_name}")
+                    cls.__trigger_attribute_ids__[attr_name] = attr_id
+
+                # Create reference with proper type
+                reference = TriggerAttributeReference(
+                    name=attr_name, types=(attr_type,), instance=None, trigger_class=cls
+                )
+                cls.__trigger_attribute_cache__[attr_name] = reference
+                # Set as class attribute so it's directly accessible
+                setattr(cls, attr_name, reference)
+
+        return cls
 
     def __getattribute__(cls, name: str) -> Any:
         """
@@ -84,6 +107,22 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
                 cache = super().__getattribute__("__trigger_attribute_cache__")
                 if name in cache:
                     return cache[name]
+
+                # For inheritance-based triggers with event_attributes, only allow declared attributes
+                # For factory-generated triggers (no event_attributes), allow any attribute
+                try:
+                    event_attributes = super().__getattribute__("event_attributes")
+                except AttributeError:
+                    # No event_attributes defined (factory pattern), allow any attribute
+                    event_attributes = None
+
+                if event_attributes is not None and isinstance(event_attributes, dict):
+                    if name not in event_attributes:
+                        # Attribute not declared in event_attributes, raise AttributeError
+                        raise AttributeError(
+                            f"{cls.__name__} has no attribute '{name}'. "
+                            f"Available event attributes: {list(event_attributes.keys())}"
+                        )
 
                 # Generate and store deterministic UUID for this attribute if not already present.
                 # This ensures consistent IDs across multiple accesses to the same attribute,

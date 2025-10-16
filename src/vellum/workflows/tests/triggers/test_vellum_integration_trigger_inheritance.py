@@ -49,3 +49,26 @@ def test_inheritance_requires_event_attributes():
         }
 
     assert GoodTrigger.event_attributes == {"message": str, "user": str}
+
+
+def test_event_attributes_create_references():
+    """Declared event_attributes automatically create TriggerAttributeReference."""
+
+    class SlackTrigger(VellumIntegrationTrigger):
+        provider = VellumIntegrationProviderType.COMPOSIO
+        integration_name = "SLACK"
+        slug = "slack_new_message"
+        trigger_nano_id = "test_123"
+        event_attributes = {
+            "message": str,
+            "user": str,
+        }
+
+    # Should auto-create references from event_attributes
+    assert isinstance(SlackTrigger.message, TriggerAttributeReference)
+    assert isinstance(SlackTrigger.user, TriggerAttributeReference)
+    assert SlackTrigger.message.types == (str,)
+
+    # Undeclared attributes should raise AttributeError
+    with pytest.raises(AttributeError):
+        _ = SlackTrigger.undefined_attribute
