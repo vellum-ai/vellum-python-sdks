@@ -114,7 +114,7 @@ def test_event_attributes_create_references():
 
 ## Test 4: Filter attributes work correctly
 
-**Status:** 🔴 Not Started
+**Status:** ✅ COMPLETE
 
 **Test:**
 ```python
@@ -153,14 +153,14 @@ def test_filter_attributes():
 
 ---
 
-## Test 5: Stable attribute IDs based on semantic identity
+## Test 5: Attribute IDs include class name (like nodes)
 
-**Status:** 🔴 Not Started
+**Status:** ✅ COMPLETE
 
 **Test:**
 ```python
-def test_attribute_ids_use_semantic_identity():
-    """Attribute IDs based on trigger config, not class name."""
+def test_attribute_ids_include_class_name():
+    """Attribute IDs should include class name (like nodes)."""
 
     class Trigger1(VellumIntegrationTrigger):
         provider = VellumIntegrationProviderType.COMPOSIO
@@ -176,13 +176,13 @@ def test_attribute_ids_use_semantic_identity():
         trigger_nano_id = "test_123"
         event_attributes = {"message": str}
 
-    # Same config = same IDs, regardless of class name
-    assert Trigger1.message.id == Trigger2.message.id
+    # Different class names = different IDs (like nodes)
+    assert Trigger1.message.id != Trigger2.message.id
 ```
 
-**Why it fails:** Currently may use class name in ID generation.
+**Why it failed:** Implementation was using semantic identity `(provider, integration_name, slug)` instead of class name.
 
-**Fix:** Ensure attribute IDs are generated from semantic identity `(provider, integration_name, slug, attribute_name)` not class name.
+**Fix:** Updated ID generation to use `__qualname__` (like nodes) in both `__new__` and `__getattribute__` methods.
 
 ---
 
@@ -265,10 +265,10 @@ def test_serialize_workflow_with_inheritance_trigger():
 ## Progress Tracking
 
 - [x] Test 1: Metaclass recognizes inheritance classes
-- [ ] Test 2: Event attributes declaration required
-- [ ] Test 3: Event attributes create references automatically
-- [ ] Test 4: Filter attributes work correctly
-- [ ] Test 5: Stable attribute IDs
+- [x] Test 2: Event attributes declaration required
+- [x] Test 3: Event attributes create references automatically
+- [x] Test 4: Filter attributes work correctly
+- [x] Test 5: Attribute IDs include class name
 - [ ] Test 6: Serialization
 - [ ] Step 7: Delete factory pattern code
 - [ ] Step 8: Delete factory pattern tests

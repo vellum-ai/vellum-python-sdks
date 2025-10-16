@@ -37,11 +37,9 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
 
             # Create TriggerAttributeReference for each event_attribute
             for attr_name, attr_type in cls.event_attributes.items():
-                # Generate stable ID from trigger semantics
-                if hasattr(cls, "provider") and hasattr(cls, "integration_name") and hasattr(cls, "slug"):
-                    trigger_identity = f"{cls.provider.value}|{cls.integration_name}|{cls.slug}"
-                    attr_id = uuid4_from_hash(f"{trigger_identity}|{attr_name}")
-                    cls.__trigger_attribute_ids__[attr_name] = attr_id
+                # Generate stable ID from class name (like nodes)
+                attr_id = uuid4_from_hash(f"{cls.__qualname__}|{attr_name}")
+                cls.__trigger_attribute_ids__[attr_name] = attr_id
 
                 # Create reference with proper type
                 reference = TriggerAttributeReference(
@@ -127,15 +125,12 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
                 # Generate and store deterministic UUID for this attribute if not already present.
                 # This ensures consistent IDs across multiple accesses to the same attribute,
                 # which is critical for serialization and state resolution.
-                # Use semantic identity (provider|integration|slug) instead of __qualname__ for stability.
+                # Use __qualname__ for ID generation (like nodes).
                 attribute_ids = super().__getattribute__("__trigger_attribute_ids__")
                 if name not in attribute_ids:
-                    # Generate stable ID from trigger semantics, not class naming
-                    provider = super().__getattribute__("provider")
-                    integration_name = super().__getattribute__("integration_name")
-                    slug = super().__getattribute__("slug")
-                    trigger_identity = f"{provider.value}|{integration_name}|{slug}"
-                    attribute_ids[name] = uuid4_from_hash(f"{trigger_identity}|{name}")
+                    # Generate stable ID from class name (like nodes)
+                    qualname = super().__getattribute__("__qualname__")
+                    attribute_ids[name] = uuid4_from_hash(f"{qualname}|{name}")
 
                 # Create a new dynamic reference for this attribute
                 types = (object,)

@@ -98,3 +98,24 @@ def test_filter_attributes():
 
     exec_config2 = SlackTriggerNoFilter.to_exec_config()
     assert exec_config2.filter_attributes == {}
+
+
+def test_attribute_ids_include_class_name():
+    """Attribute IDs should include class name (like nodes)."""
+
+    class Trigger1(VellumIntegrationTrigger):
+        provider = VellumIntegrationProviderType.COMPOSIO
+        integration_name = "SLACK"
+        slug = "slack_new_message"
+        trigger_nano_id = "test_123"
+        event_attributes = {"message": str}
+
+    class Trigger2(VellumIntegrationTrigger):
+        provider = VellumIntegrationProviderType.COMPOSIO
+        integration_name = "SLACK"
+        slug = "slack_new_message"
+        trigger_nano_id = "test_123"
+        event_attributes = {"message": str}
+
+    # Different class names = different IDs (like nodes)
+    assert Trigger1.message.id != Trigger2.message.id
