@@ -14,6 +14,7 @@ VellumErrorCodeEnum = typing.Union[
         "USER_DEFINED_ERROR",
         "WORKFLOW_CANCELLED",
         "NODE_CANCELLED",
+        "PROVIDER_QUOTA_EXCEEDED",
     ],
     typing.Any,
 ]

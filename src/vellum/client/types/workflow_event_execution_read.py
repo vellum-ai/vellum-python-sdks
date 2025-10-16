@@ -17,15 +17,15 @@ from .workflow_execution_view_online_eval_metric_result import WorkflowExecution
 
 class WorkflowEventExecutionRead(UniversalBaseModel):
     span_id: str
-    parent_context: typing.Optional["WorkflowDeploymentParentContext"] = None
     start: dt.datetime
     end: typing.Optional[dt.datetime] = None
     inputs: typing.List[ExecutionVellumValue]
     outputs: typing.List[ExecutionVellumValue]
     error: typing.Optional[WorkflowError] = None
+    usage_results: typing.Optional[typing.List[WorkflowExecutionUsageResult]] = None
+    parent_context: typing.Optional["WorkflowDeploymentParentContext"] = None
     latest_actual: typing.Optional[WorkflowExecutionActual] = None
     metric_results: typing.List[WorkflowExecutionViewOnlineEvalMetricResult]
-    usage_results: typing.Optional[typing.List[WorkflowExecutionUsageResult]] = None
     spans: typing.List[VellumSpan]
     state: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = None
 
@@ -39,6 +39,7 @@ class WorkflowEventExecutionRead(UniversalBaseModel):
             extra = pydantic.Extra.allow
 
 
+from .array_vellum_value import ArrayVellumValue  # noqa: E402, F401, I001
 from .api_request_parent_context import ApiRequestParentContext  # noqa: E402, F401, I001
 from .external_parent_context import ExternalParentContext  # noqa: E402, F401, I001
 from .node_parent_context import NodeParentContext  # noqa: E402, F401, I001
@@ -47,6 +48,5 @@ from .span_link import SpanLink  # noqa: E402, F401, I001
 from .workflow_deployment_parent_context import WorkflowDeploymentParentContext  # noqa: E402, F401, I001
 from .workflow_parent_context import WorkflowParentContext  # noqa: E402, F401, I001
 from .workflow_sandbox_parent_context import WorkflowSandboxParentContext  # noqa: E402, F401, I001
-from .array_vellum_value import ArrayVellumValue  # noqa: E402, F401, I001
 
 update_forward_refs(WorkflowEventExecutionRead)

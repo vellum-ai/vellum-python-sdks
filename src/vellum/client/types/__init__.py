@@ -27,6 +27,7 @@ from .audio_input_request import AudioInputRequest
 from .audio_prompt_block import AudioPromptBlock
 from .audio_vellum_value import AudioVellumValue
 from .audio_vellum_value_request import AudioVellumValueRequest
+from .auth_type_enum import AuthTypeEnum
 from .base_output import BaseOutput
 from .basic_vectorizer_intfloat_multilingual_e_5_large import BasicVectorizerIntfloatMultilingualE5Large
 from .basic_vectorizer_intfloat_multilingual_e_5_large_request import BasicVectorizerIntfloatMultilingualE5LargeRequest
@@ -747,6 +748,7 @@ __all__ = [
     "AudioPromptBlock",
     "AudioVellumValue",
     "AudioVellumValueRequest",
+    "AuthTypeEnum",
     "BaseOutput",
     "BasicVectorizerIntfloatMultilingualE5Large",
     "BasicVectorizerIntfloatMultilingualE5LargeRequest",

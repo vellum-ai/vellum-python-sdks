@@ -9,6 +9,7 @@ from .vellum_code_resource_definition import VellumCodeResourceDefinition
 
 class WorkflowExecutionSnapshottedBody(UniversalBaseModel):
     workflow_definition: VellumCodeResourceDefinition
+    edited_by: typing.Optional[VellumCodeResourceDefinition] = None
     state: typing.Dict[str, typing.Optional[typing.Any]]
 
     if IS_PYDANTIC_V2:

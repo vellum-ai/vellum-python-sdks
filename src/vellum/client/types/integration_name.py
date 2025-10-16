@@ -16,6 +16,10 @@ IntegrationName = typing.Union[
         "GOOGLE_DRIVE",
         "GMAIL",
         "AIRTABLE",
+        "GAMMA",
+        "FIRECRAWL",
+        "PERPLEXITY",
+        "SERPAPI",
     ],
     typing.Any,
 ]

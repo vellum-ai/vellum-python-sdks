@@ -15,6 +15,7 @@ WorkflowExecutionEventErrorCode = typing.Union[
         "LLM_PROVIDER",
         "INVALID_TEMPLATE",
         "INVALID_INPUTS",
+        "PROVIDER_QUOTA_EXCEEDED",
         "USER_DEFINED_ERROR",
     ],
     typing.Any,
