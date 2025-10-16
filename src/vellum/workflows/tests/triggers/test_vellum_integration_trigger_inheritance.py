@@ -43,6 +43,32 @@ def test_inheritance_requires_config():
     assert hasattr(GoodTrigger, "Config")
 
 
+def test_top_level_annotations_create_references():
+    """Top-level type annotations automatically create TriggerAttributeReference."""
+
+    class SlackTrigger(VellumIntegrationTrigger):
+        message: str
+        user: str
+        timestamp: float
+
+        class Config(VellumIntegrationTrigger.Config):
+            provider = VellumIntegrationProviderType.COMPOSIO
+            integration_name = "SLACK"
+            slug = "slack_new_message"
+            trigger_nano_id = "test_123"
+
+    # Should auto-create references from annotations
+    assert isinstance(SlackTrigger.message, TriggerAttributeReference)
+    assert isinstance(SlackTrigger.user, TriggerAttributeReference)
+    assert isinstance(SlackTrigger.timestamp, TriggerAttributeReference)
+    assert SlackTrigger.message.types == (str,)
+    assert SlackTrigger.timestamp.types == (float,)
+
+    # Undeclared attributes should raise AttributeError
+    with pytest.raises(AttributeError):
+        _ = SlackTrigger.undefined_attribute
+
+
 def test_inheritance_dynamic_attribute_references():
     """Metaclass should create TriggerAttributeReference for inheritance classes."""
 
