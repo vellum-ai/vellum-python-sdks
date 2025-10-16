@@ -462,14 +462,14 @@ class WorkflowRunner(Generic[StateType]):
 
             node.state.meta.node_execution_cache.fulfill_node_execution(node.__class__, span_id)
 
-            with node.state.__atomic__():
-                for descriptor, output_value in outputs:
-                    if output_value is undefined:
-                        if descriptor in node.state.meta.node_outputs:
-                            del node.state.meta.node_outputs[descriptor]
-                        continue
-
-                    node.state.meta.node_outputs[descriptor] = output_value
+            with execution_context(parent_context=updated_parent_context, trace_id=execution.trace_id):
+                with node.state.__atomic__():
+                    for descriptor, output_value in outputs:
+                        if output_value is undefined:
+                            if descriptor in node.state.meta.node_outputs:
+                                del node.state.meta.node_outputs[descriptor]
+                            continue
+                        node.state.meta.node_outputs[descriptor] = output_value
 
             invoked_ports = ports(outputs, node.state)
             yield NodeExecutionFulfilledEvent(
