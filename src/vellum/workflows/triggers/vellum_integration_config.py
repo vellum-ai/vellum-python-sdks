@@ -27,18 +27,18 @@ class VellumIntegrationTriggerConfig:
     integration_name: str
     slug: str
     trigger_nano_id: str
-    attributes: Mapping[str, Any] = field(default_factory=dict)
-    exposed_attributes: Tuple[str, ...] = field(default_factory=tuple)
+    filter_attributes: Mapping[str, Any] = field(default_factory=dict)
+    attribute_names: Tuple[str, ...] = field(default_factory=tuple)
 
     def __post_init__(self) -> None:
-        attribute_map = self._validate_attributes(self.attributes)
-        object.__setattr__(self, "attributes", attribute_map)
-        object.__setattr__(self, "exposed_attributes", tuple(self.exposed_attributes))
+        filter_map = self._validate_filter_attributes(self.filter_attributes)
+        object.__setattr__(self, "filter_attributes", filter_map)
+        object.__setattr__(self, "attribute_names", tuple(self.attribute_names))
 
     def identity(self) -> TriggerIdentity:
         """Stable identity tuple used for caching and UUID generation."""
 
-        frozen_attrs = json.dumps(self.attributes or {}, sort_keys=True, separators=(",", ":"))
+        frozen_attrs = json.dumps(self.filter_attributes or {}, sort_keys=True, separators=(",", ":"))
         return (
             self.provider.value,
             self.integration_name,
@@ -61,27 +61,27 @@ class VellumIntegrationTriggerConfig:
             sanitized = f"Trigger_{sanitized}"
         return sanitized or "VellumIntegrationTrigger"
 
-    def attribute_names(self) -> Tuple[str, ...]:
+    def resolved_attribute_names(self) -> Tuple[str, ...]:
         """Attribute names surfaced on the trigger class."""
 
-        if self.exposed_attributes:
-            return self.exposed_attributes
-        return tuple(self.attributes.keys())
+        if self.attribute_names:
+            return self.attribute_names
+        return tuple(self.filter_attributes.keys())
 
     @staticmethod
-    def _validate_attributes(attributes: Mapping[str, Any]) -> Dict[str, Any]:
-        attribute_map = dict(attributes or {})
-        if not attribute_map:
-            return attribute_map
+    def _validate_filter_attributes(filter_attributes: Mapping[str, Any]) -> Dict[str, Any]:
+        filter_map = dict(filter_attributes or {})
+        if not filter_map:
+            return filter_map
 
         try:
-            json.dumps(attribute_map, sort_keys=True, separators=(",", ":"))
+            json.dumps(filter_map, sort_keys=True, separators=(",", ":"))
         except (TypeError, ValueError) as exc:
             raise ValueError(
                 "Trigger attributes must be JSON-serializable (str, int, float, bool, None, list, dict)."
             ) from exc
 
-        return attribute_map
+        return filter_map
 
     @classmethod
     def from_raw(
@@ -91,21 +91,21 @@ class VellumIntegrationTriggerConfig:
         integration_name: str,
         slug: str,
         trigger_nano_id: str,
-        attributes: Mapping[str, Any] | None = None,
-        exposed_attributes: Iterable[str] | None = None,
+        filter_attributes: Mapping[str, Any] | None = None,
+        attribute_names: Iterable[str] | None = None,
     ) -> VellumIntegrationTriggerConfig:
         """Coerce raw workflow metadata into a normalized config instance."""
 
         provider_enum = (
             provider if isinstance(provider, VellumIntegrationProviderType) else VellumIntegrationProviderType(provider)
         )
-        attribute_map = dict(attributes or {})
-        attribute_list = tuple(exposed_attributes or ())
+        filter_map = dict(filter_attributes or {})
+        attribute_list = tuple(attribute_names or ())
         return cls(
             provider=provider_enum,
             integration_name=integration_name,
             slug=slug,
             trigger_nano_id=trigger_nano_id,
-            attributes=attribute_map,
-            exposed_attributes=attribute_list,
+            filter_attributes=filter_map,
+            attribute_names=attribute_list,
         )

@@ -1,5 +1,7 @@
 """Tests for the inheritance-based VellumIntegrationTrigger helpers."""
 
+import pytest
+
 from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.triggers.vellum_integration import VellumIntegrationTrigger
@@ -13,7 +15,7 @@ def _slack_config() -> VellumIntegrationTriggerConfig:
         integration_name="SLACK",
         slug="slack_new_message",
         trigger_nano_id="nano-123",
-        exposed_attributes=("channel", "user", "timestamp"),
+        attribute_names=("channel", "user", "timestamp"),
     )
 
 
@@ -26,7 +28,7 @@ def test_from_config_creates_subclass() -> None:
     assert SlackTrigger.integration_name == "SLACK"
     assert SlackTrigger.slug == "slack_new_message"
     assert SlackTrigger.trigger_nano_id == "nano-123"
-    assert SlackTrigger.attributes == {}
+    assert SlackTrigger.filter_attributes == {}
     assert SlackTrigger.__name__ == "SlackNewMessageTrigger"
 
 
@@ -86,16 +88,47 @@ def test_to_exec_config_round_trip() -> None:
     assert exec_config.attributes is None
 
 
+def test_filter_attributes_round_trip() -> None:
+    config = VellumIntegrationTriggerConfig.from_raw(
+        provider="COMPOSIO",
+        integration_name="SLACK",
+        slug="slack_new_message",
+        trigger_nano_id="nano-123",
+        filter_attributes={"channel_filter": "FILTER_CHANNEL"},
+    )
+
+    SlackTrigger = VellumIntegrationTrigger.from_config(config)
+
+    assert SlackTrigger.filter_attributes == {"channel_filter": "FILTER_CHANNEL"}
+
+    exec_config = SlackTrigger.to_exec_config()
+    assert exec_config.attributes == {"channel_filter": "FILTER_CHANNEL"}
+
+
 def test_from_raw_helper_populates_annotations() -> None:
     config = VellumIntegrationTriggerConfig.from_raw(
         provider="COMPOSIO",
         integration_name="SLACK",
         slug="slack_new_message",
         trigger_nano_id="nano-123",
-        exposed_attributes=["channel"],
+        attribute_names=["channel"],
     )
 
     SlackTrigger = VellumIntegrationTrigger.from_config(config)
 
     assert SlackTrigger.__name__ == "SlackNewMessageTrigger"
     assert SlackTrigger.channel.name == "channel"
+
+
+def test_non_serializable_filter_attributes_raise_value_error() -> None:
+    class CustomObject:
+        pass
+
+    with pytest.raises(ValueError, match="Trigger attributes must be JSON-serializable"):
+        VellumIntegrationTriggerConfig.from_raw(
+            provider="COMPOSIO",
+            integration_name="SLACK",
+            slug="slack_new_message",
+            trigger_nano_id="nano-123",
+            filter_attributes={"custom": CustomObject()},
+        )

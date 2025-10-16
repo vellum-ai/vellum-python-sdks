@@ -29,12 +29,12 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
             namespace["integration_name"] = config.integration_name
             namespace["slug"] = config.slug
             namespace["trigger_nano_id"] = config.trigger_nano_id
-            namespace["attributes"] = types.MappingProxyType(dict(config.attributes))
+            namespace["filter_attributes"] = types.MappingProxyType(dict(config.filter_attributes))
             namespace["__trigger_identity__"] = config.identity()
             namespace["__config__"] = config
 
             annotations = dict(namespace.get("__annotations__", {}))
-            for attr_name in config.attribute_names():
+            for attr_name in config.resolved_attribute_names():
                 annotations.setdefault(attr_name, Any)
             namespace["__annotations__"] = annotations
 
@@ -91,7 +91,7 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
         ...     integration_name="SLACK",
         ...     slug="slack_new_message",
         ...     trigger_nano_id="nano-123",
-        ...     exposed_attributes=("channel", "user"),
+        ...     attribute_names=("channel", "user"),
         ... )
         >>> SlackNewMessageTrigger = VellumIntegrationTrigger.from_config(config)
         >>> SlackNewMessageTrigger.channel  # TriggerAttributeReference
@@ -105,7 +105,7 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
     integration_name: ClassVar[str]
     slug: ClassVar[str]
     trigger_nano_id: ClassVar[str]
-    attributes: ClassVar[Dict[str, Any]]
+    filter_attributes: ClassVar[Dict[str, Any]]
     __config__: ClassVar[Optional[VellumIntegrationTriggerConfig]]
     __trigger_identity__: ClassVar[TriggerIdentity]
 
@@ -140,7 +140,7 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
             integration_name=cls.integration_name,
             slug=cls.slug,
             trigger_nano_id=cls.trigger_nano_id,
-            attributes=dict(cls.attributes) if cls.attributes else None,
+            attributes=dict(cls.filter_attributes) if cls.filter_attributes else None,
         )
 
     @classmethod
