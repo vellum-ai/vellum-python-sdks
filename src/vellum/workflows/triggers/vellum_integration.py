@@ -45,6 +45,9 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
 
         if config is not None:
             cls.__config__ = config
+            cls.__id__ = uuid4_from_hash("|".join(config.identity()))
+        else:
+            cls.__id__ = uuid4_from_hash(cls.__qualname__)
 
         return cls
 

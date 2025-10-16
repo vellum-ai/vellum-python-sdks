@@ -1,11 +1,10 @@
 """Tests for the inheritance-based VellumIntegrationTrigger helpers."""
 
-import pytest
-
 from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.triggers.vellum_integration import VellumIntegrationTrigger
 from vellum.workflows.triggers.vellum_integration_config import VellumIntegrationTriggerConfig
+from vellum.workflows.utils.uuids import uuid4_from_hash
 
 
 def _slack_config() -> VellumIntegrationTriggerConfig:
@@ -14,7 +13,6 @@ def _slack_config() -> VellumIntegrationTriggerConfig:
         integration_name="SLACK",
         slug="slack_new_message",
         trigger_nano_id="nano-123",
-        attributes={"channel": "C123"},
         exposed_attributes=("channel", "user", "timestamp"),
     )
 
@@ -28,7 +26,7 @@ def test_from_config_creates_subclass() -> None:
     assert SlackTrigger.integration_name == "SLACK"
     assert SlackTrigger.slug == "slack_new_message"
     assert SlackTrigger.trigger_nano_id == "nano-123"
-    assert SlackTrigger.attributes == {"channel": "C123"}
+    assert SlackTrigger.attributes == {}
     assert SlackTrigger.__name__ == "SlackNewMessageTrigger"
 
 
@@ -44,12 +42,8 @@ def test_attribute_references_available_on_class() -> None:
     SlackTrigger = VellumIntegrationTrigger.from_config(_slack_config())
 
     channel_ref = SlackTrigger.channel
-    user_ref = SlackTrigger.user
-
     assert isinstance(channel_ref, TriggerAttributeReference)
-    assert isinstance(user_ref, TriggerAttributeReference)
     assert channel_ref.name == "channel"
-    assert user_ref.name == "user"
 
 
 def test_attribute_reference_uuid_stability() -> None:
@@ -71,21 +65,12 @@ def test_dynamic_attribute_reference_creation() -> None:
     assert message_ref.name == "message"
 
 
-def test_instance_populates_event_data() -> None:
-    SlackTrigger = VellumIntegrationTrigger.from_config(_slack_config())
+def test_trigger_class_id_is_derived_from_config_identity() -> None:
+    config = _slack_config()
+    SlackTrigger = VellumIntegrationTrigger.from_config(config)
 
-    event_data = {"channel": "C123", "user": "U456", "message": "Hello"}
-    trigger = SlackTrigger(event_data=event_data)
-
-    assert trigger.channel == "C123"
-    assert trigger.user == "U456"
-    assert trigger.message == "Hello"
-
-    attr_values = trigger.to_trigger_attribute_values()
-    assert len(attr_values) == 3
-    for reference, value in attr_values.items():
-        assert isinstance(reference, TriggerAttributeReference)
-        assert value == event_data[reference.name]
+    expected_id = uuid4_from_hash("|".join(config.identity()))
+    assert SlackTrigger.__id__ == expected_id
 
 
 def test_to_exec_config_round_trip() -> None:
@@ -98,7 +83,7 @@ def test_to_exec_config_round_trip() -> None:
     assert exec_config.integration_name == "SLACK"
     assert exec_config.slug == "slack_new_message"
     assert exec_config.trigger_nano_id == "nano-123"
-    assert exec_config.attributes == {"channel": "C123"}
+    assert exec_config.attributes is None
 
 
 def test_from_raw_helper_populates_annotations() -> None:
@@ -107,7 +92,6 @@ def test_from_raw_helper_populates_annotations() -> None:
         integration_name="SLACK",
         slug="slack_new_message",
         trigger_nano_id="nano-123",
-        attributes={"channel": "C123"},
         exposed_attributes=["channel"],
     )
 
@@ -115,17 +99,3 @@ def test_from_raw_helper_populates_annotations() -> None:
 
     assert SlackTrigger.__name__ == "SlackNewMessageTrigger"
     assert SlackTrigger.channel.name == "channel"
-
-
-def test_non_serializable_attributes_raise_value_error() -> None:
-    class CustomObject:
-        pass
-
-    with pytest.raises(ValueError, match="Trigger attributes must be JSON-serializable"):
-        VellumIntegrationTriggerConfig.from_raw(
-            provider="COMPOSIO",
-            integration_name="SLACK",
-            slug="slack_new_message",
-            trigger_nano_id="nano-123",
-            attributes={"custom": CustomObject()},
-        )
