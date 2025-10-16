@@ -33,9 +33,9 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
         if not hasattr(cls, "__trigger_attribute_cache__"):
             cls.__trigger_attribute_cache__ = {}
 
-        # For new Config pattern: process __annotations__ to create references
-        # Check if class has a Config that's not just inherited from base
-        has_config = hasattr(cls, "Config") and "Config" in namespace  # Config was defined in this class, not inherited
+        # Process __annotations__ to create TriggerAttributeReference for each attribute
+        # Only process if class has Config (inheritance pattern) and annotations
+        has_config = hasattr(cls, "Config") and "Config" in namespace
         if has_config and hasattr(cls, "__annotations__"):
             # Create TriggerAttributeReference for each annotated attribute
             for attr_name, attr_type in cls.__annotations__.items():
@@ -43,22 +43,6 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
                 if attr_name.startswith("_") or attr_name == "Config":
                     continue
 
-                # Generate stable ID from class name (like nodes)
-                attr_id = uuid4_from_hash(f"{cls.__qualname__}|{attr_name}")
-                cls.__trigger_attribute_ids__[attr_name] = attr_id
-
-                # Create reference with proper type
-                reference = TriggerAttributeReference(
-                    name=attr_name, types=(attr_type,), instance=None, trigger_class=cls
-                )
-                cls.__trigger_attribute_cache__[attr_name] = reference
-                # Set as class attribute so it's directly accessible
-                setattr(cls, attr_name, reference)
-
-        # For old event_attributes pattern: create references from dict
-        elif hasattr(cls, "event_attributes") and isinstance(cls.event_attributes, dict):
-            # Create TriggerAttributeReference for each event_attribute
-            for attr_name, attr_type in cls.event_attributes.items():
                 # Generate stable ID from class name (like nodes)
                 attr_id = uuid4_from_hash(f"{cls.__qualname__}|{attr_name}")
                 cls.__trigger_attribute_ids__[attr_name] = attr_id
@@ -132,43 +116,18 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
                 if name in cache:
                     return cache[name]
 
-                # For Config pattern with annotations: only allow declared annotations
-                # For old event_attributes pattern: only allow declared event_attributes
-                # For factory-generated triggers (no event_attributes): allow any attribute
-
-                # Check if using Config pattern with annotations
+                # For Config pattern: only allow declared annotations
+                # Check annotations to see if attribute is declared
                 try:
-                    has_config = super().__getattribute__("Config") is not VellumIntegrationTrigger.Config
+                    annotations = super().__getattribute__("__annotations__")
+                    if name not in annotations:
+                        raise AttributeError(
+                            f"{cls.__name__} has no attribute '{name}'. "
+                            f"Declared attributes: {list(annotations.keys())}"
+                        )
                 except AttributeError:
-                    has_config = False
-
-                if has_config:
-                    # Config pattern - check annotations
-                    try:
-                        annotations = super().__getattribute__("__annotations__")
-                        if name not in annotations:
-                            raise AttributeError(
-                                f"{cls.__name__} has no attribute '{name}'. "
-                                f"Declared attributes: {list(annotations.keys())}"
-                            )
-                    except AttributeError:
-                        # No annotations, raise error
-                        raise AttributeError(f"{cls.__name__} has no attribute '{name}'. " f"No attributes declared.")
-                else:
-                    # Check for old event_attributes pattern
-                    try:
-                        event_attributes = super().__getattribute__("event_attributes")
-                    except AttributeError:
-                        # No event_attributes defined (factory pattern), allow any attribute
-                        event_attributes = None
-
-                    if event_attributes is not None and isinstance(event_attributes, dict):
-                        if name not in event_attributes:
-                            # Attribute not declared in event_attributes, raise AttributeError
-                            raise AttributeError(
-                                f"{cls.__name__} has no attribute '{name}'. "
-                                f"Available event attributes: {list(event_attributes.keys())}"
-                            )
+                    # No annotations, raise error
+                    raise AttributeError(f"{cls.__name__} has no attribute '{name}'. No attributes declared.")
 
                 # Generate and store deterministic UUID for this attribute if not already present.
                 # This ensures consistent IDs across multiple accesses to the same attribute,
@@ -241,18 +200,11 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
         slug: ClassVar[str]
         trigger_nano_id: ClassVar[str]
 
-    # Class variables that identify this trigger (for backward compatibility with old pattern)
-    provider: ClassVar[VellumIntegrationProviderType]
-    integration_name: ClassVar[str]
-    slug: ClassVar[str]
-    trigger_nano_id: ClassVar[str]
-    event_attributes: ClassVar[Dict[str, type]]
-
     # Cache for generated trigger classes to ensure consistency
     _trigger_class_cache: ClassVar[Dict[tuple, Type["VellumIntegrationTrigger"]]] = {}
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
-        """Validate that subclasses properly define required attributes."""
+        """Validate that subclasses properly define required Config class with annotations."""
         super().__init_subclass__(**kwargs)
 
         # Skip validation for the base class itself
@@ -263,53 +215,11 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
         if cls.__name__.startswith("VellumIntegrationTrigger_"):
             return
 
-        # For new Config pattern: Check if Config class exists with required fields
-        # For backward compatibility: also support old event_attributes pattern
-        has_config = hasattr(cls, "Config") and cls.Config is not VellumIntegrationTrigger.Config
-        # Check if event_attributes was actually defined in this class (not a TriggerAttributeReference from metaclass)
-        has_event_attributes = hasattr(cls, "event_attributes") and isinstance(cls.event_attributes, dict)
-
-        if has_config:
-            # New Config pattern - validate Config class has required fields
-            config_cls = cls.Config
-
-            # Check for required fields in Config
-            required_fields = ["provider", "integration_name", "slug", "trigger_nano_id"]
-            for field in required_fields:
-                if not hasattr(config_cls, field):
-                    raise TypeError(
-                        f"{cls.__name__}.Config must define '{field}'. "
-                        f"Required fields: {', '.join(required_fields)}"
-                    )
-
-            # Copy Config attributes to class level for backward compatibility
-            cls.provider = config_cls.provider
-            cls.integration_name = config_cls.integration_name
-            cls.slug = config_cls.slug
-            cls.trigger_nano_id = config_cls.trigger_nano_id
-
-        elif has_event_attributes:
-            # Old event_attributes pattern - validate event_attributes
-            if not isinstance(cls.event_attributes, dict):
-                raise TypeError(
-                    f"{cls.__name__}.event_attributes must be a dict, got {type(cls.event_attributes).__name__}"
-                )
-
-            # Validate all values in event_attributes are types
-            for attr_name, attr_type in cls.event_attributes.items():
-                if not isinstance(attr_type, type):
-                    raise TypeError(
-                        f"{cls.__name__}.event_attributes['{attr_name}'] must be a type, "
-                        f"got {type(attr_type).__name__}: {attr_type}"
-                    )
-        else:
-            # Neither Config nor event_attributes defined
+        # Require Config class with required fields
+        if not hasattr(cls, "Config") or cls.Config is VellumIntegrationTrigger.Config:
             raise TypeError(
-                f"{cls.__name__} must define either:\n"
-                f"1. A nested Config class with required fields "
-                f"(provider, integration_name, slug, trigger_nano_id), OR\n"
-                f"2. event_attributes as a Dict[str, type] (legacy pattern)\n"
-                f"Example with Config:\n"
+                f"{cls.__name__} must define a nested Config class. "
+                f"Example:\n"
                 f"  class {cls.__name__}(VellumIntegrationTrigger):\n"
                 f"      message: str\n"
                 f"      class Config(VellumIntegrationTrigger.Config):\n"
@@ -318,6 +228,21 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
                 f"          slug = 'slack_new_message'\n"
                 f"          trigger_nano_id = 'abc123'"
             )
+
+        # Validate Config class has required fields
+        config_cls = cls.Config
+        required_fields = ["provider", "integration_name", "slug", "trigger_nano_id"]
+        for field in required_fields:
+            if not hasattr(config_cls, field):
+                raise TypeError(
+                    f"{cls.__name__}.Config must define '{field}'. " f"Required fields: {', '.join(required_fields)}"
+                )
+
+        # Copy Config attributes to class level for easy access
+        cls.provider = config_cls.provider
+        cls.integration_name = config_cls.integration_name
+        cls.slug = config_cls.slug
+        cls.trigger_nano_id = config_cls.trigger_nano_id
 
     @classmethod
     def _freeze_attributes(cls, attributes: Dict[str, Any]) -> str:
@@ -417,29 +342,37 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
             ComposioIntegrationTriggerExecConfig with all required fields
 
         Raises:
-            AttributeError: If called on base VellumIntegrationTrigger (not factory class)
+            AttributeError: If called on base VellumIntegrationTrigger
 
         Examples:
-            >>> SlackMessage = VellumIntegrationTrigger.for_trigger(
-            ...     integration_name="SLACK",
-            ...     slug="slack_new_message",
-            ...     trigger_nano_id="abc123",
-            ...     filter_attributes={"channel": "C123456"}
-            ... )
-            >>> exec_config = SlackMessage.to_exec_config()
+            >>> class SlackTrigger(VellumIntegrationTrigger):
+            ...     message: str
+            ...     user: str
+            ...     class Config(VellumIntegrationTrigger.Config):
+            ...         provider = VellumIntegrationProviderType.COMPOSIO
+            ...         integration_name = "SLACK"
+            ...         slug = "slack_new_message"
+            ...         trigger_nano_id = "abc123"
+            >>> exec_config = SlackTrigger.to_exec_config()
             >>> exec_config.slug
             'slack_new_message'
-            >>> exec_config.filter_attributes
-            {'channel': 'C123456'}
+            >>> exec_config.event_attributes
+            {'message': <class 'str'>, 'user': <class 'str'>}
         """
         if not hasattr(cls, "slug"):
             raise AttributeError(
-                "to_exec_config() can only be called on factory-generated trigger classes. "
-                "Use VellumIntegrationTrigger.for_trigger() to create a trigger class first."
+                "to_exec_config() can only be called on configured VellumIntegrationTrigger subclasses, "
+                "not on the base class."
             )
 
-        # Get event_attributes, defaulting to empty dict if not set
-        event_attributes = getattr(cls, "event_attributes", {})
+        # Build event_attributes from annotations
+        event_attributes: Dict[str, Any] = {}
+        if hasattr(cls, "__annotations__"):
+            event_attributes = {
+                name: type_
+                for name, type_ in cls.__annotations__.items()
+                if not name.startswith("_") and name != "Config"
+            }
 
         return ComposioIntegrationTriggerExecConfig(
             provider=cls.provider,
