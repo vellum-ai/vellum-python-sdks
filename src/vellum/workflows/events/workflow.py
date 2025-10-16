@@ -207,6 +207,15 @@ class WorkflowExecutionResumedEvent(_BaseWorkflowEvent):
 
 class WorkflowExecutionSnapshottedBody(_BaseWorkflowExecutionBody, Generic[StateType]):
     state: StateType
+    edited_by: Optional[Type["BaseNode"]] = None
+
+    @field_validator("edited_by", mode="before")
+    @classmethod
+    def validate_edited_by(cls, value: Any) -> Any:
+        if value is None:
+            return None
+        value = CodeResourceDefinition.model_validate(value)
+        return value.decode()
 
     @field_serializer("state")
     def serialize_state(self, state: StateType, _info: Any) -> Dict[str, Any]:

@@ -275,6 +275,11 @@ class WorkflowRunner(Generic[StateType]):
             httpx_logger.removeFilter(span_filter)
 
     def _snapshot_state(self, state: StateType, deltas: List[StateDelta]) -> StateType:
+        execution = get_execution_context()
+        edited_by = None
+        if execution.parent_context and hasattr(execution.parent_context, "node_definition"):
+            edited_by = execution.parent_context.node_definition
+
         self._workflow_event_inner_queue.put(
             WorkflowExecutionSnapshottedEvent(
                 trace_id=self._execution_context.trace_id,
@@ -282,6 +287,7 @@ class WorkflowRunner(Generic[StateType]):
                 body=WorkflowExecutionSnapshottedBody(
                     workflow_definition=self.workflow.__class__,
                     state=state,
+                    edited_by=edited_by,
                 ),
                 parent=self._execution_context.parent_context,
             )
