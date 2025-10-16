@@ -663,7 +663,13 @@ def test_tool_calling_node__tool_error_includes_stacktrace(vellum_adhoc_prompt_c
     """
     Test that when a tool errors, the rejected event includes a stacktrace.
     """
-    from tests.workflows.basic_tool_calling_node.get_current_weather import error_tool
+    from typing import Annotated
+
+    def error_tool(location: Annotated[str, "The location to get the weather for"]) -> str:
+        """
+        A tool that always throws an error.
+        """
+        raise ValueError("This tool always fails")
 
     def generate_prompt_events(*_args, **_kwargs) -> Iterator[ExecutePromptEvent]:
         execution_id = str(uuid4())

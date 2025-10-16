@@ -16,10 +16,3 @@ def get_temperature(temperature: float) -> int:
     Get the temperature in a given location.
     """
     return math.floor(temperature)
-
-
-def error_tool(location: Annotated[str, "The location to get the weather for"]) -> str:
-    """
-    A tool that always throws an error.
-    """
-    raise ValueError("This tool always fails")
