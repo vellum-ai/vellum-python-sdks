@@ -127,7 +127,7 @@ def test_to_exec_config() -> None:
     SlackMessage = VellumIntegrationTrigger.for_trigger(
         integration_name="SLACK",
         slug="slack_new_message",
-        trigger_nano_id="abc123def456",
+        trigger_nano_id="test_nano_123",
         attributes={"channel": "C123456"},
     )
 
@@ -137,7 +137,7 @@ def test_to_exec_config() -> None:
     assert exec_config.provider == VellumIntegrationProviderType.COMPOSIO
     assert exec_config.integration_name == "SLACK"
     assert exec_config.slug == "slack_new_message"
-    assert exec_config.trigger_nano_id == "abc123def456"
+    assert exec_config.trigger_nano_id == "test_nano_123"
     assert exec_config.attributes == {"channel": "C123456"}
 
 

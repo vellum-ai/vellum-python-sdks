@@ -51,51 +51,44 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
         Returns:
             The attribute value or a dynamically created TriggerAttributeReference
         """
-        # Let BaseTriggerMeta handle internal attributes and known attributes
+        # Skip private/dunder attributes early - they should use standard behavior
+        if name.startswith("_"):
+            return super().__getattribute__(name)
+
+        # Try standard attribute access first (covers known attributes, methods, etc.)
         try:
             return super().__getattribute__(name)
         except AttributeError:
-            # For VellumIntegrationTrigger factory-generated classes, create dynamic references
-            # Only enable dynamic attribute creation for factory-generated classes, not the base
-            # VellumIntegrationTrigger class itself. We check the internal __name__ attribute
-            # (e.g., "VellumIntegrationTrigger_COMPOSIO_SLACK_slack_new_message"), not the user-facing
-            # variable name (e.g., "SlackNewMessage").
-            try:
-                is_factory_class = super().__getattribute__("__name__").startswith(
-                    "VellumIntegrationTrigger_"
-                ) and not name.startswith("_")
-            except AttributeError:
-                is_factory_class = False
+            pass
 
-            if is_factory_class:
-                trigger_cls = cast(Type["VellumIntegrationTrigger"], cls)
+        # For VellumIntegrationTrigger factory-generated classes, create dynamic references
+        # Only enable dynamic attribute creation for factory-generated classes, not the base
+        # VellumIntegrationTrigger class itself.
+        if not issubclass(cls, VellumIntegrationTrigger) or cls is VellumIntegrationTrigger:
+            raise AttributeError(f"type object '{cls.__name__}' has no attribute '{name}'")
 
-                # Check cache first
-                cache = super().__getattribute__("__trigger_attribute_cache__")
-                if name in cache:
-                    return cache[name]
+        trigger_cls = cast(Type["VellumIntegrationTrigger"], cls)
 
-                # Generate and store deterministic UUID for this attribute if not already present.
-                # This ensures consistent IDs across multiple accesses to the same attribute,
-                # which is critical for serialization and state resolution.
-                # Use semantic identity (provider|integration|slug) instead of __qualname__ for stability.
-                attribute_ids = super().__getattribute__("__trigger_attribute_ids__")
-                if name not in attribute_ids:
-                    # Generate stable ID from trigger semantics, not class naming
-                    provider = super().__getattribute__("provider")
-                    integration_name = super().__getattribute__("integration_name")
-                    slug = super().__getattribute__("slug")
-                    trigger_identity = f"{provider.value}|{integration_name}|{slug}"
-                    attribute_ids[name] = uuid4_from_hash(f"{trigger_identity}|{name}")
+        # Generate and store deterministic UUID for this attribute if not already present.
+        # This ensures consistent IDs across multiple accesses to the same attribute,
+        # which is critical for serialization and state resolution.
+        # Use semantic identity (provider|integration|slug) for class identity.
+        # trigger_nano_id is intentionally excluded - it's instance configuration, not class identity.
+        attribute_ids = super().__getattribute__("__trigger_attribute_ids__")
+        if name not in attribute_ids:
+            # Generate stable ID from trigger semantics, not class naming
+            provider = super().__getattribute__("provider")
+            integration_name = super().__getattribute__("integration_name")
+            slug = super().__getattribute__("slug")
+            trigger_identity = f"{provider.value}|{integration_name}|{slug}"
+            attribute_ids[name] = uuid4_from_hash(f"{trigger_identity}|{name}")
 
-                # Create a new dynamic reference for this attribute
-                types = (object,)
-                reference = TriggerAttributeReference(name=name, types=types, instance=None, trigger_class=trigger_cls)
-                cache[name] = reference
-                return reference
-
-            # Not a factory class or starts with _, re-raise the AttributeError
-            raise
+        # Create a new dynamic reference for this attribute
+        # Note: No caching needed - TriggerAttributeReference implements proper __eq__/__hash__
+        # based on trigger_class and name, so multiple instances behave identically.
+        types = (object,)
+        reference = TriggerAttributeReference(name=name, types=types, instance=None, trigger_class=trigger_cls)
+        return reference
 
 
 class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTriggerMeta):
@@ -337,22 +330,30 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
         # Normalize attributes
         attrs = attributes or {}
 
-        # Create cache key - include all identifying parameters including attributes
+        # Create cache key based on trigger type identity (provider, integration, slug)
+        # trigger_nano_id is intentionally excluded - it's instance configuration, not class identity
         # Convert attributes dict to a hashable representation for caching
         frozen_attrs = cls._freeze_attributes(attrs)
         cache_key = (
             provider_enum.value,
             integration_name,
             slug,
-            trigger_nano_id,
             frozen_attrs,
         )
 
         # Return cached class if it exists
+        # Validate that nano_id matches if one was stored (prevents inconsistent reuse)
         if cache_key in cls._trigger_class_cache:
-            return cls._trigger_class_cache[cache_key]
+            cached_class = cls._trigger_class_cache[cache_key]
+            if cached_class.trigger_nano_id != trigger_nano_id:
+                raise ValueError(
+                    f"Conflicting trigger_nano_ids for {integration_name}/{slug}: "
+                    f"cached={cached_class.trigger_nano_id}, requested={trigger_nano_id}. "
+                    f"trigger_nano_id is configuration, not class identity - use the same value consistently."
+                )
+            return cached_class
 
-        # Generate unique class name including provider to avoid collisions across providers
+        # Generate unique class name based on trigger type (not including nano_id or attributes)
         class_name = f"VellumIntegrationTrigger_{provider_enum.value}_{integration_name}_{slug}"
 
         # Create the new trigger class
@@ -370,10 +371,9 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
                 # UUIDs are generated from __qualname__, so this must be consistent and unique
                 # across different trigger configurations to prevent ID collisions.
                 "__qualname__": class_name,
-                # Initialize cache attributes that would normally be set by BaseTriggerMeta.__new__
-                # Since we're using type() directly, we need to set these ourselves
+                # Initialize attribute ID storage (normally set by BaseTriggerMeta.__new__)
+                # Since we're using type() directly, we need to set this ourselves
                 "__trigger_attribute_ids__": {},
-                "__trigger_attribute_cache__": {},
             },
         )
 
