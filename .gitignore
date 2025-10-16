@@ -15,3 +15,4 @@ tsconfig.tsbuildinfo
 .DS_Store
 htmlcov/
 CLAUDE.md
+TDD_PLAN.md
