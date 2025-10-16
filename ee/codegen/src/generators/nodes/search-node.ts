@@ -236,6 +236,30 @@ export class SearchNode extends BaseNode<
     });
   }
 
+  private formatMetadataFilterParsingError(errors: unknown[]): string {
+    const errorStr = JSON.stringify(errors);
+
+    if (
+      errorStr.includes("operator") &&
+      errorStr.includes("Expected enum") &&
+      errorStr.includes("Received")
+    ) {
+      const operatorMatch = errorStr.match(/Received\s+"([^"]+)"/);
+      if (operatorMatch && operatorMatch[1]) {
+        const receivedValue = operatorMatch[1];
+        const lowercaseValue = receivedValue.toLowerCase();
+        return (
+          `Failed to parse metadata filter JSON: Invalid operator value "${receivedValue}". ` +
+          `Operator values must be lowercase. Did you mean "${lowercaseValue}"? ` +
+          `Valid operators include: "=", "!=", "<", ">", "<=", ">=", "contains", "beginsWith", "endsWith", etc. ` +
+          `Full error: ${errorStr}`
+        );
+      }
+    }
+
+    return `Failed to parse metadata filter JSON: ${errorStr}`;
+  }
+
   private convertNodeInputToMetadata(
     nodeInput: NodeInput
   ): VellumLogicalExpression | undefined {
@@ -259,11 +283,10 @@ export class SearchNode extends BaseNode<
       VellumValueLogicalExpressionSerializer.parse(metadataFilters);
 
     if (!parsedData.ok) {
-      throw new NodeAttributeGenerationError(
-        `Failed to parse metadata filter JSON: ${JSON.stringify(
-          parsedData.errors
-        )}`
+      const errorMessage = this.formatMetadataFilterParsingError(
+        parsedData.errors
       );
+      throw new NodeAttributeGenerationError(errorMessage);
     }
 
     return parsedData.value;
