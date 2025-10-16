@@ -247,7 +247,6 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
     slug: ClassVar[str]
     trigger_nano_id: ClassVar[str]
     event_attributes: ClassVar[Dict[str, type]]
-    filter_attributes: ClassVar[Dict[str, Any]]
 
     # Cache for generated trigger classes to ensure consistency
     _trigger_class_cache: ClassVar[Dict[tuple, Type["VellumIntegrationTrigger"]]] = {}
@@ -439,9 +438,6 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
                 "Use VellumIntegrationTrigger.for_trigger() to create a trigger class first."
             )
 
-        # Get filter_attributes, defaulting to empty dict if not set
-        filter_attributes = getattr(cls, "filter_attributes", {})
-
         # Get event_attributes, defaulting to empty dict if not set
         event_attributes = getattr(cls, "event_attributes", {})
 
@@ -451,7 +447,6 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
             slug=cls.slug,
             trigger_nano_id=cls.trigger_nano_id,
             event_attributes=event_attributes,
-            filter_attributes=filter_attributes,
         )
 
     @classmethod
