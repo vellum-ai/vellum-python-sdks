@@ -14,7 +14,6 @@ def _slack_config() -> VellumIntegrationTriggerConfig:
         provider="COMPOSIO",
         integration_name="SLACK",
         slug="slack_new_message",
-        trigger_nano_id="nano-123",
         attribute_names=("channel", "user", "timestamp"),
     )
 
@@ -27,7 +26,7 @@ def test_from_config_creates_subclass() -> None:
     assert SlackTrigger.provider == VellumIntegrationProviderType.COMPOSIO
     assert SlackTrigger.integration_name == "SLACK"
     assert SlackTrigger.slug == "slack_new_message"
-    assert SlackTrigger.trigger_nano_id == "nano-123"
+    assert SlackTrigger.trigger_nano_id is None
     assert SlackTrigger.filter_attributes == {}
     assert SlackTrigger.__name__ == "SlackNewMessageTrigger"
 
@@ -75,8 +74,16 @@ def test_trigger_class_id_is_derived_from_config_identity() -> None:
     assert SlackTrigger.__id__ == expected_id
 
 
+def test_to_exec_config_requires_trigger_id() -> None:
+    SlackTrigger = VellumIntegrationTrigger.from_config(_slack_config())
+
+    with pytest.raises(RuntimeError, match="trigger_nano_id has not been resolved"):
+        SlackTrigger.to_exec_config()
+
+
 def test_to_exec_config_round_trip() -> None:
     SlackTrigger = VellumIntegrationTrigger.from_config(_slack_config())
+    SlackTrigger.bind_backend_metadata("nano-123")
 
     exec_config = SlackTrigger.to_exec_config()
 
@@ -100,9 +107,28 @@ def test_filter_attributes_round_trip() -> None:
     SlackTrigger = VellumIntegrationTrigger.from_config(config)
 
     assert SlackTrigger.filter_attributes == {"channel_filter": "FILTER_CHANNEL"}
+    assert SlackTrigger.trigger_nano_id == "nano-123"
 
     exec_config = SlackTrigger.to_exec_config()
     assert exec_config.attributes == {"channel_filter": "FILTER_CHANNEL"}
+
+
+def test_bind_backend_metadata_updates_config() -> None:
+    config = VellumIntegrationTriggerConfig.from_raw(
+        provider="COMPOSIO",
+        integration_name="SLACK",
+        slug="slack_binding_demo",
+        attribute_names=("channel",),
+    )
+
+    SlackTrigger = VellumIntegrationTrigger.from_config(config)
+    assert SlackTrigger.trigger_nano_id is None
+
+    SlackTrigger.bind_backend_metadata("nano-456")
+
+    assert SlackTrigger.trigger_nano_id == "nano-456"
+    assert SlackTrigger.__config__ is not None
+    assert SlackTrigger.__config__.trigger_nano_id == "nano-456"
 
 
 def test_from_raw_helper_populates_annotations() -> None:

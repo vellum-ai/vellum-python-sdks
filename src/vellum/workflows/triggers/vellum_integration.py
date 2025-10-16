@@ -10,7 +10,7 @@ from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.triggers.base import BaseTriggerMeta
 from vellum.workflows.triggers.integration import IntegrationTrigger
-from vellum.workflows.triggers.vellum_integration_config import TriggerIdentity, VellumIntegrationTriggerConfig
+from vellum.workflows.triggers.vellum_integration_config import TriggerCacheKey, VellumIntegrationTriggerConfig
 from vellum.workflows.types import ComposioIntegrationTriggerExecConfig
 from vellum.workflows.utils.uuids import uuid4_from_hash
 
@@ -45,6 +45,7 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
 
         if config is not None:
             cls.__config__ = config
+            cls.trigger_nano_id = config.trigger_nano_id
             cls.__id__ = uuid4_from_hash("|".join(config.identity()))
         else:
             cls.__id__ = uuid4_from_hash(cls.__qualname__)
@@ -90,7 +91,6 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
         ...     provider="COMPOSIO",
         ...     integration_name="SLACK",
         ...     slug="slack_new_message",
-        ...     trigger_nano_id="nano-123",
         ...     attribute_names=("channel", "user"),
         ... )
         >>> SlackNewMessageTrigger = VellumIntegrationTrigger.from_config(config)
@@ -104,12 +104,12 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
     provider: ClassVar[VellumIntegrationProviderType]
     integration_name: ClassVar[str]
     slug: ClassVar[str]
-    trigger_nano_id: ClassVar[str]
-    filter_attributes: ClassVar[Dict[str, Any]]
-    __config__: ClassVar[Optional[VellumIntegrationTriggerConfig]]
-    __trigger_identity__: ClassVar[TriggerIdentity]
+    trigger_nano_id: ClassVar[Optional[str]] = None
+    filter_attributes: ClassVar[Dict[str, Any]] = {}
+    __config__: ClassVar[Optional[VellumIntegrationTriggerConfig]] = None
+    __trigger_identity__: ClassVar[TriggerCacheKey]
 
-    _registry: ClassVar[WeakValueDictionary[TriggerIdentity, Type[VellumIntegrationTrigger]]] = WeakValueDictionary()
+    _registry: ClassVar[WeakValueDictionary[TriggerCacheKey, Type[VellumIntegrationTrigger]]] = WeakValueDictionary()
 
     def __init__(self, event_data: dict):
         """Populate instance attributes from inbound event data."""
@@ -135,6 +135,12 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
         if cls is VellumIntegrationTrigger:
             raise AttributeError("to_exec_config() can only be called on configured integration trigger subclasses.")
 
+        if cls.trigger_nano_id is None:
+            raise RuntimeError(
+                "trigger_nano_id has not been resolved for this trigger. "
+                "Ensure backend metadata is attached before serialization."
+            )
+
         return ComposioIntegrationTriggerExecConfig(
             provider=cls.provider,
             integration_name=cls.integration_name,
@@ -150,6 +156,8 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
         identity = config.identity()
         existing = cls._registry.get(identity)
         if existing is not None:
+            if config.trigger_nano_id and existing.trigger_nano_id != config.trigger_nano_id:
+                existing.bind_backend_metadata(config.trigger_nano_id)
             return existing
 
         def exec_body(namespace: Dict[str, Any]) -> None:
@@ -167,5 +175,28 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
         # by explicitly invoking the metaclass. types.new_class already handles this,
         # so trigger_class is ready to use at this point.
 
-        cls._registry[identity] = cast(Type["VellumIntegrationTrigger"], trigger_class)
-        return cast(Type["VellumIntegrationTrigger"], trigger_class)
+        typed_class = cast(Type["VellumIntegrationTrigger"], trigger_class)
+        if config.trigger_nano_id:
+            typed_class.bind_backend_metadata(config.trigger_nano_id)
+
+        cls._registry[identity] = typed_class
+        return typed_class
+
+    @classmethod
+    def bind_backend_metadata(cls, trigger_nano_id: str) -> Type[VellumIntegrationTrigger]:
+        """Attach backend trigger metadata to a synthesized trigger class."""
+
+        if cls is VellumIntegrationTrigger:
+            raise TypeError("bind_backend_metadata() cannot be called on the base class")
+        if not trigger_nano_id:
+            raise ValueError("trigger_nano_id must be a non-empty string")
+
+        if cls.trigger_nano_id == trigger_nano_id:
+            return cls
+
+        cls.trigger_nano_id = trigger_nano_id
+        config = cls.__config__
+        if config is not None:
+            cls.__config__ = config.with_trigger_nano_id(trigger_nano_id)
+
+        return cls

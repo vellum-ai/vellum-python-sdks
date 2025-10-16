@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 import json
 import re
-from typing import Any, Dict, Iterable, Mapping, Tuple
+from typing import Any, Dict, Iterable, Mapping, Optional, Tuple
 
 from vellum.workflows.constants import VellumIntegrationProviderType
 
-TriggerIdentity = Tuple[str, str, str, str, str]
+TriggerCacheKey = Tuple[str, str, str, str]
 
 
 def _to_pascal_case(value: str) -> str:
@@ -26,7 +26,7 @@ class VellumIntegrationTriggerConfig:
     provider: VellumIntegrationProviderType
     integration_name: str
     slug: str
-    trigger_nano_id: str
+    trigger_nano_id: Optional[str] = None
     filter_attributes: Mapping[str, Any] = field(default_factory=dict)
     attribute_names: Tuple[str, ...] = field(default_factory=tuple)
 
@@ -35,7 +35,7 @@ class VellumIntegrationTriggerConfig:
         object.__setattr__(self, "filter_attributes", filter_map)
         object.__setattr__(self, "attribute_names", tuple(self.attribute_names))
 
-    def identity(self) -> TriggerIdentity:
+    def identity(self) -> TriggerCacheKey:
         """Stable identity tuple used for caching and UUID generation."""
 
         frozen_attrs = json.dumps(self.filter_attributes or {}, sort_keys=True, separators=(",", ":"))
@@ -43,7 +43,6 @@ class VellumIntegrationTriggerConfig:
             self.provider.value,
             self.integration_name,
             self.slug,
-            self.trigger_nano_id,
             frozen_attrs,
         )
 
@@ -90,11 +89,18 @@ class VellumIntegrationTriggerConfig:
         provider: str | VellumIntegrationProviderType,
         integration_name: str,
         slug: str,
-        trigger_nano_id: str,
+        trigger_nano_id: Optional[str] = None,
         filter_attributes: Mapping[str, Any] | None = None,
         attribute_names: Iterable[str] | None = None,
     ) -> VellumIntegrationTriggerConfig:
-        """Coerce raw workflow metadata into a normalized config instance."""
+        """Coerce raw workflow metadata into a normalized config instance.
+
+        `trigger_nano_id` is provided by backend services (e.g., Composio) and is
+        not required when authoring workflows locally. Use
+        :meth:`with_trigger_nano_id` or
+        :meth:`vellum.workflows.triggers.vellum_integration.VellumIntegrationTrigger.bind_backend_metadata`
+        to attach it once it becomes available.
+        """
 
         provider_enum = (
             provider if isinstance(provider, VellumIntegrationProviderType) else VellumIntegrationProviderType(provider)
@@ -109,3 +115,8 @@ class VellumIntegrationTriggerConfig:
             filter_attributes=filter_map,
             attribute_names=attribute_list,
         )
+
+    def with_trigger_nano_id(self, trigger_nano_id: str) -> VellumIntegrationTriggerConfig:
+        """Return a copy of this config with the trigger nano id populated."""
+
+        return replace(self, trigger_nano_id=trigger_nano_id)
