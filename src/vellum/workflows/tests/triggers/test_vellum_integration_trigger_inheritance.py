@@ -72,3 +72,29 @@ def test_event_attributes_create_references():
     # Undeclared attributes should raise AttributeError
     with pytest.raises(AttributeError):
         _ = SlackTrigger.undefined_attribute
+
+
+def test_filter_attributes():
+    """Filter attributes are optional and used for event filtering."""
+
+    class SlackTrigger(VellumIntegrationTrigger):
+        provider = VellumIntegrationProviderType.COMPOSIO
+        integration_name = "SLACK"
+        slug = "slack_new_message"
+        trigger_nano_id = "test_123"
+        event_attributes = {"message": str}
+        filter_attributes = {"channel": "C123456"}
+
+    exec_config = SlackTrigger.to_exec_config()
+    assert exec_config.filter_attributes == {"channel": "C123456"}
+
+    # filter_attributes is optional
+    class SlackTriggerNoFilter(VellumIntegrationTrigger):
+        provider = VellumIntegrationProviderType.COMPOSIO
+        integration_name = "SLACK"
+        slug = "slack_new_message"
+        trigger_nano_id = "test_456"
+        event_attributes = {"message": str}
+
+    exec_config2 = SlackTriggerNoFilter.to_exec_config()
+    assert exec_config2.filter_attributes == {}

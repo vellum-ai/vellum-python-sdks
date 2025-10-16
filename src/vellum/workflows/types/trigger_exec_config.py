@@ -6,7 +6,7 @@ sent to/from the backend for integration triggers. They are used during
 serialization and deserialization of trigger configurations.
 """
 
-from typing import Any, Dict, Literal, Optional
+from typing import Any, Dict, Literal
 
 from pydantic import Field
 
@@ -39,7 +39,7 @@ class ComposioIntegrationTriggerExecConfig(BaseIntegrationTriggerExecConfig):
         ...     integration_name="SLACK",
         ...     slug="slack_new_message",
         ...     trigger_nano_id="abc123def456",
-        ...     attributes={"channel": "C123456"}
+        ...     filter_attributes={"channel": "C123456"}
         ... )
         >>> config.provider
         <VellumIntegrationProviderType.COMPOSIO: 'COMPOSIO'>
@@ -50,7 +50,7 @@ class ComposioIntegrationTriggerExecConfig(BaseIntegrationTriggerExecConfig):
         integration_name: The integration identifier (e.g., "SLACK", "GITHUB")
         slug: The slug of the integration trigger in Composio
         trigger_nano_id: Composio's unique trigger identifier used for event matching
-        attributes: Optional dictionary of trigger-specific configuration attributes for filtering
+        filter_attributes: Optional dictionary of trigger-specific configuration attributes for filtering
     """
 
     type: Literal["COMPOSIO_INTEGRATION_TRIGGER"] = "COMPOSIO_INTEGRATION_TRIGGER"
@@ -58,6 +58,6 @@ class ComposioIntegrationTriggerExecConfig(BaseIntegrationTriggerExecConfig):
     integration_name: str = Field(..., description="The integration name (e.g., 'SLACK', 'GITHUB')")
     slug: str = Field(..., description="The slug of the integration trigger in Composio")
     trigger_nano_id: str = Field(..., description="Composio's unique trigger identifier used for event matching")
-    attributes: Optional[Dict[str, Any]] = Field(
-        default=None, description="Optional trigger-specific configuration attributes for filtering"
+    filter_attributes: Dict[str, Any] = Field(
+        default_factory=dict, description="Optional trigger-specific configuration attributes for filtering"
     )

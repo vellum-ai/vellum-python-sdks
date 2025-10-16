@@ -13,7 +13,7 @@ def test_factory_creates_trigger_class() -> None:
         integration_name="SLACK",
         slug="slack_new_message",
         trigger_nano_id="test_nano_123",
-        attributes={"channel": "C123456"},
+        filter_attributes={"channel": "C123456"},
     )
 
     assert issubclass(SlackNewMessage, VellumIntegrationTrigger)
@@ -21,7 +21,7 @@ def test_factory_creates_trigger_class() -> None:
     assert SlackNewMessage.integration_name == "SLACK"
     assert SlackNewMessage.slug == "slack_new_message"
     assert SlackNewMessage.trigger_nano_id == "test_nano_123"
-    assert SlackNewMessage.attributes == {"channel": "C123456"}
+    assert SlackNewMessage.filter_attributes == {"channel": "C123456"}
 
 
 def test_factory_caches_trigger_classes() -> None:
@@ -128,7 +128,7 @@ def test_to_exec_config() -> None:
         integration_name="SLACK",
         slug="slack_new_message",
         trigger_nano_id="abc123def456",
-        attributes={"channel": "C123456"},
+        filter_attributes={"channel": "C123456"},
     )
 
     exec_config = SlackMessage.to_exec_config()
@@ -138,7 +138,7 @@ def test_to_exec_config() -> None:
     assert exec_config.integration_name == "SLACK"
     assert exec_config.slug == "slack_new_message"
     assert exec_config.trigger_nano_id == "abc123def456"
-    assert exec_config.attributes == {"channel": "C123456"}
+    assert exec_config.filter_attributes == {"channel": "C123456"}
 
 
 def test_to_exec_config_base_class_fails() -> None:
@@ -190,7 +190,7 @@ def test_non_json_serializable_attributes_fail_fast() -> None:
             integration_name="SLACK",
             slug="slack_new_message",
             trigger_nano_id="test_nano_123",
-            attributes={"custom": CustomObject()},
+            filter_attributes={"custom": CustomObject()},
         )
 
     # Sets are not JSON-serializable
@@ -199,7 +199,7 @@ def test_non_json_serializable_attributes_fail_fast() -> None:
             integration_name="SLACK",
             slug="slack_new_message",
             trigger_nano_id="test_nano_123",
-            attributes={"tags": {"a", "b", "c"}},
+            filter_attributes={"tags": {"a", "b", "c"}},
         )
 
 
@@ -209,7 +209,7 @@ def test_nested_json_serializable_attributes_work() -> None:
         integration_name="SLACK",
         slug="slack_new_message",
         trigger_nano_id="test_nano_123",
-        attributes={
+        filter_attributes={
             "channel": "C123456",
             "filters": {"status": "active", "priority": ["high", "medium"]},
             "count": 42,
@@ -217,7 +217,7 @@ def test_nested_json_serializable_attributes_work() -> None:
         },
     )
 
-    assert SlackMessage.attributes == {
+    assert SlackMessage.filter_attributes == {
         "channel": "C123456",
         "filters": {"status": "active", "priority": ["high", "medium"]},
         "count": 42,
