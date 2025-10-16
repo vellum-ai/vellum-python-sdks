@@ -473,7 +473,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             # Check if it's a VellumIntegrationTrigger subclass
 
             if issubclass(trigger_class, VellumIntegrationTrigger):
-                trigger_type = WorkflowTriggerType.COMPOSIO_INTEGRATION_TRIGGER
+                trigger_type = WorkflowTriggerType.VELLUM_INTEGRATION_TRIGGER
             else:
                 raise ValueError(
                     f"Unknown trigger type: {trigger_class.__name__}. "
