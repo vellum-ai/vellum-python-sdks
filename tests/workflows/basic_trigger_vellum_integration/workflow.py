@@ -4,14 +4,21 @@ from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.triggers.vellum_integration import VellumIntegrationTrigger
 
-# Create a Slack trigger using the factory
-SlackNewMessage = VellumIntegrationTrigger.for_trigger(
-    provider="COMPOSIO",
-    integration_name="SLACK",
-    slug="slack_new_message",
-    trigger_nano_id="abc123def456",
-    attributes={"channel": "C123456"},
-)
+
+# Use inheritance pattern with Schema for type safety
+class SlackNewMessage(VellumIntegrationTrigger):
+    """Slack trigger using inheritance pattern with typed Schema."""
+
+    provider = "COMPOSIO"
+    integration_name = "SLACK"
+    slug = "slack_new_message"
+    trigger_nano_id = "abc123def456"
+
+    class Schema:
+        """Define trigger attributes with type hints for IDE support."""
+
+        message: str
+        channel: str
 
 
 class ProcessMessageNode(BaseNode):

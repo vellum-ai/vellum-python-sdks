@@ -53,6 +53,7 @@ from vellum.workflows.references.state_value import StateValueReference
 from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.references.workflow_input import WorkflowInputReference
+from vellum.workflows.triggers.vellum_integration import VellumIntegrationTrigger
 from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.types.generics import is_workflow_class
 from vellum.workflows.utils.functions import compile_function_definition
@@ -357,14 +358,14 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
         trigger_usage = display_context.trigger_attribute_usage.setdefault(trigger_class, set())
         trigger_usage.add(value)
 
-        # Check if this is a VellumIntegrationTrigger (factory-generated)
-        from vellum.workflows.triggers.vellum_integration import VellumIntegrationTrigger
-
-        if issubclass(trigger_class, VellumIntegrationTrigger):
-            # Use semantic identity for VellumIntegrationTrigger to ensure stability
+        # Use __id__ field if available (consistent with BaseNode/BaseWorkflow pattern)
+        if hasattr(trigger_class, "__id__"):
+            trigger_id = trigger_class.__id__
+        elif issubclass(trigger_class, VellumIntegrationTrigger):
+            # Fallback for VellumIntegrationTrigger without __id__ (shouldn't happen normally)
             trigger_id = trigger_class.get_trigger_id()
         else:
-            # Use __qualname__ for regular triggers (ManualTrigger, SlackTrigger, etc.)
+            # Use __qualname__ for other triggers (ManualTrigger, SlackTrigger, etc.)
             trigger_id = uuid4_from_hash(trigger_class.__qualname__)
 
         return {

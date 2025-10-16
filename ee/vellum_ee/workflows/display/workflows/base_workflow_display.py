@@ -518,7 +518,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         Serialize a VellumIntegrationTrigger with both exec_config and attributes array.
 
         Args:
-            trigger_class: The factory-generated VellumIntegrationTrigger class
+            trigger_class: The VellumIntegrationTrigger class (inheritance or factory pattern)
 
         Returns:
             JsonArray with a single trigger object containing exec_config and attributes
@@ -532,7 +532,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                     "integration_name": "SLACK",
                     "slug": "slack_new_message",
                     "trigger_nano_id": "abc123",
-                    "attributes": {"channel": "C123"}
+                    "attributes": {}
                 },
                 "attributes": [
                     {"id": "uuid", "name": "message", "type": "STRING", "value": None},
@@ -540,9 +540,12 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 ]
             }]
         """
-        # Use the trigger class's method to get the deterministic trigger ID
-        # This ensures consistency with attribute ID generation
-        trigger_id = trigger_class.get_trigger_id()
+        # Use __id__ field if available (consistent with BaseNode/BaseWorkflow pattern)
+        if hasattr(trigger_class, "__id__"):
+            trigger_id = trigger_class.__id__
+        else:
+            # Fallback to method for compatibility
+            trigger_id = trigger_class.get_trigger_id()
 
         # Get exec config from the trigger class
         exec_config = trigger_class.to_exec_config()

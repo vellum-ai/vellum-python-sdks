@@ -36,7 +36,7 @@ def test_serialize_vellum_integration_trigger_workflow():
         "integration_name": "SLACK",
         "slug": "slack_new_message",
         "trigger_nano_id": "abc123def456",
-        "attributes": {"channel": "C123456"},
+        "attributes": {},  # No filter attributes at definition time
     }
 
     # Validate attributes array structure (matches SlackTrigger pattern)
@@ -54,8 +54,8 @@ def test_serialize_vellum_integration_trigger_workflow():
         assert "type" in attr
         assert "value" in attr
         assert attr["value"] is None
-        # Dynamic attributes use types=(object,) which maps to JSON type
-        assert attr["type"] == "JSON"
+        # Schema-based attributes use their declared types (str -> STRING)
+        assert attr["type"] == "STRING"
 
 
 def test_vellum_integration_trigger_id_consistency():
@@ -126,21 +126,25 @@ def test_vellum_integration_trigger_multiple_attributes():
     assert "attribute_id" in channel_output["value"]
 
 
-def test_vellum_integration_trigger_without_attributes():
-    """VellumIntegrationTrigger without accessed attributes serializes with empty attributes array."""
+def test_vellum_integration_trigger_without_accessed_attributes():
+    """VellumIntegrationTrigger with Schema but no accessed attributes serializes with empty attributes array."""
     from vellum.workflows import BaseWorkflow
     from vellum.workflows.inputs.base import BaseInputs
     from vellum.workflows.nodes.bases.base import BaseNode
     from vellum.workflows.state.base import BaseState
     from vellum.workflows.triggers.vellum_integration import VellumIntegrationTrigger
 
-    # Create trigger without attributes parameter
-    GitHubPush = VellumIntegrationTrigger.for_trigger(
-        provider="COMPOSIO",
-        integration_name="GITHUB",
-        slug="github_push_event",
-        trigger_nano_id="xyz789ghi012",
-    )
+    # Define trigger with Schema but don't access any attributes in workflow
+    class GitHubPush(VellumIntegrationTrigger):
+        provider = "COMPOSIO"
+        integration_name = "GITHUB"
+        slug = "github_push_event"
+        trigger_nano_id = "xyz789ghi012"
+
+        class Schema:
+            repository: str
+            branch: str
+            commit_sha: str
 
     class SimpleNode(BaseNode):
         pass
@@ -171,3 +175,96 @@ def test_vellum_integration_trigger_without_attributes():
     # Validate attributes array is empty (no attributes accessed in workflow)
     assert "attributes" in trigger
     assert trigger["attributes"] == []
+
+
+def test_vellum_integration_trigger_inheritance_pattern():
+    """Test that inheritance pattern with Schema works and produces same results."""
+    from vellum.workflows import BaseWorkflow
+    from vellum.workflows.inputs.base import BaseInputs
+    from vellum.workflows.nodes.bases.base import BaseNode
+    from vellum.workflows.state.base import BaseState
+    from vellum.workflows.triggers.vellum_integration import VellumIntegrationTrigger
+
+    # Define trigger using inheritance pattern with Schema
+    class GitHubPushInherit(VellumIntegrationTrigger):
+        provider = "COMPOSIO"
+        integration_name = "GITHUB"
+        slug = "github_push_inherit"
+        trigger_nano_id = "xyz789inherit"
+
+        class Schema:
+            repository: str
+            branch: str
+            commit_sha: str
+
+    # Verify __id__ field was generated
+    assert hasattr(GitHubPushInherit, "__id__")
+
+    class ProcessPushNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            repo = GitHubPushInherit.repository
+            branch = GitHubPushInherit.branch
+
+    class GitHubWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = GitHubPushInherit >> ProcessPushNode
+
+    # Test serialization
+    workflow_display = get_workflow_display(workflow_class=GitHubWorkflow)
+    result = workflow_display.serialize()
+
+    triggers = result["triggers"]
+    assert len(triggers) == 1
+
+    trigger = triggers[0]
+    assert trigger["type"] == "VELLUM_INTEGRATION_TRIGGER"
+    assert trigger["id"] == str(GitHubPushInherit.__id__)
+
+    # Verify exec_config
+    exec_config = trigger["exec_config"]
+    assert exec_config["provider"] == "COMPOSIO"
+    assert exec_config["integration_name"] == "GITHUB"
+    assert exec_config["slug"] == "github_push_inherit"
+    assert exec_config["trigger_nano_id"] == "xyz789inherit"
+
+    # Verify attributes from Schema (only accessed ones)
+    attributes = trigger["attributes"]
+    attr_names = {attr["name"] for attr in attributes}
+    # Only repository and branch are referenced in the workflow
+    assert attr_names == {"repository", "branch"}
+
+
+def test_same_config_produces_same_id():
+    """Verify that triggers with same semantic identity produce the same trigger ID."""
+    from vellum.workflows.triggers.vellum_integration import VellumIntegrationTrigger
+
+    # Two different trigger classes with the same semantic identity
+    class Trigger1(VellumIntegrationTrigger):
+        provider = "COMPOSIO"
+        integration_name = "TEST"
+        slug = "test_trigger"
+        trigger_nano_id = "test123"
+
+        class Schema:
+            field1: str
+
+    class Trigger2(VellumIntegrationTrigger):
+        provider = "COMPOSIO"
+        integration_name = "TEST"
+        slug = "test_trigger"
+        trigger_nano_id = "different_nano"  # Different nano_id doesn't affect trigger ID
+
+        class Schema:
+            field1: str
+            field2: str  # Different schema doesn't affect trigger ID
+
+    # Both should generate the same ID from semantic identity (provider|integration|slug)
+    assert Trigger1.__id__ == Trigger2.__id__
+    assert Trigger1.get_trigger_id() == Trigger2.get_trigger_id()
+
+    # Both should produce similar exec config (except nano_id and attributes)
+    config1 = Trigger1.to_exec_config()
+    config2 = Trigger2.to_exec_config()
+
+    assert config1.provider == config2.provider
+    assert config1.integration_name == config2.integration_name
+    assert config1.slug == config2.slug
