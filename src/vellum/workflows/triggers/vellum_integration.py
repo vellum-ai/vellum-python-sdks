@@ -282,7 +282,7 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
         slug: str,
         trigger_nano_id: str,
         provider: str = "COMPOSIO",
-        filter_attributes: Optional[Dict[str, Any]] = None,
+        attributes: Optional[Dict[str, Any]] = None,
     ) -> Type["VellumIntegrationTrigger"]:
         """
         Factory method to create a new trigger class for a specific integration trigger.
@@ -296,7 +296,7 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
             slug: The slug of the integration trigger in Composio (e.g., "slack_new_message")
             trigger_nano_id: Composio's unique trigger identifier used for event matching
             provider: The integration provider (default: "COMPOSIO")
-            filter_attributes: Optional dict of trigger-specific configuration attributes
+            attributes: Optional dict of trigger-specific configuration attributes
                 used for filtering events. For example, {"channel": "C123456"} to only
                 match events from a specific Slack channel.
 
@@ -308,7 +308,7 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
             ...     integration_name="SLACK",
             ...     slug="slack_new_message",
             ...     trigger_nano_id="abc123def456",
-            ...     filter_attributes={"channel": "C123456"}
+            ...     attributes={"channel": "C123456"}
             ... )
             >>> type(SlackNewMessage).__name__
             'VellumIntegrationTrigger_COMPOSIO_SLACK_slack_new_message'
@@ -324,11 +324,11 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
         # Validate and normalize provider
         provider_enum = VellumIntegrationProviderType(provider)
 
-        # Normalize filter_attributes
-        attrs = filter_attributes or {}
+        # Normalize attributes
+        attrs = attributes or {}
 
-        # Create cache key - include all identifying parameters including filter_attributes
-        # Convert filter_attributes dict to a hashable representation for caching
+        # Create cache key - include all identifying parameters including attributes
+        # Convert attributes dict to a hashable representation for caching
         frozen_attrs = cls._freeze_attributes(attrs)
         cache_key = (
             provider_enum.value,
@@ -354,12 +354,16 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
                 "integration_name": integration_name,
                 "slug": slug,
                 "trigger_nano_id": trigger_nano_id,
-                "filter_attributes": attrs,
+                "attributes": attrs,
                 "__module__": cls.__module__,
                 # Explicitly set __qualname__ to match __name__ for deterministic UUID generation.
                 # UUIDs are generated from __qualname__, so this must be consistent and unique
                 # across different trigger configurations to prevent ID collisions.
                 "__qualname__": class_name,
+                # Initialize cache attributes that would normally be set by BaseTriggerMeta.__new__
+                # Since we're using type() directly, we need to set these ourselves
+                "__trigger_attribute_ids__": {},
+                "__trigger_attribute_cache__": {},
             },
         )
 
