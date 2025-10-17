@@ -69,32 +69,35 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
         try:
             return super().__getattribute__(name)
         except AttributeError:
-            # Only enable dynamic attribute creation for properly configured trigger classes
-            # Check if this class has been marked as configured (set in __init_subclass__ or for_trigger)
-            try:
-                is_configured_trigger = super().__getattribute__("_is_configured") and not name.startswith("_")
-            except AttributeError:
-                is_configured_trigger = False
-
-            if is_configured_trigger:
-                trigger_cls = cast(Type["VellumIntegrationTrigger"], cls)
-
-                # Only allow declared annotations (event attributes)
+            # Only enable dynamic attribute creation for configured trigger classes
+            # Check if class has Config defined (not the base class Config) and is not requesting private attribute
+            if not name.startswith("_") and hasattr(cls, "Config"):
                 try:
-                    annotations = super().__getattribute__("__annotations__")
-                    if name not in annotations:
-                        raise AttributeError(
-                            f"{cls.__name__} has no attribute '{name}'. "
-                            f"Declared attributes: {list(annotations.keys())}"
-                        )
-                except AttributeError:
-                    # No annotations, raise error
-                    raise AttributeError(f"{cls.__name__} has no attribute '{name}'. No attributes declared.")
+                    config = super().__getattribute__("Config")
+                    # Skip if this is the base VellumIntegrationTrigger.Config
+                    if config is not VellumIntegrationTrigger.Config:
+                        trigger_cls = cast(Type["VellumIntegrationTrigger"], cls)
 
-                # Create a new dynamic reference for this attribute
-                types = (object,)
-                reference = TriggerAttributeReference(name=name, types=types, instance=None, trigger_class=trigger_cls)
-                return reference
+                        # Only allow declared annotations (event attributes)
+                        try:
+                            annotations = super().__getattribute__("__annotations__")
+                            if name not in annotations:
+                                raise AttributeError(
+                                    f"{cls.__name__} has no attribute '{name}'. "
+                                    f"Declared attributes: {list(annotations.keys())}"
+                                )
+                        except AttributeError:
+                            # No annotations, raise error
+                            raise AttributeError(f"{cls.__name__} has no attribute '{name}'. No attributes declared.")
+
+                        # Create a new dynamic reference for this attribute
+                        types = (object,)
+                        reference = TriggerAttributeReference(
+                            name=name, types=types, instance=None, trigger_class=trigger_cls
+                        )
+                        return reference
+                except AttributeError:
+                    pass
 
             # Not a configured trigger or starts with _, re-raise the AttributeError
             raise
@@ -199,9 +202,6 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
         cls.provider = config_cls.provider
         cls.integration_name = config_cls.integration_name
         cls.slug = config_cls.slug
-
-        # Mark as configured for simplified detection in __getattribute__
-        cls._is_configured = True
 
     @classmethod
     def _freeze_attributes(cls, attributes: Dict[str, Any]) -> str:
@@ -428,8 +428,6 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
                 # UUIDs are generated from __qualname__, so this must be consistent and unique
                 # across different trigger configurations to prevent ID collisions.
                 "__qualname__": class_name,
-                # Mark as configured for simplified detection in __getattribute__
-                "_is_configured": True,
             },
         )
 

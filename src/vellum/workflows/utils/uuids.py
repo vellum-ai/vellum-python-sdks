@@ -1,5 +1,9 @@
 import hashlib
 from uuid import UUID
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from vellum.workflows.triggers.base import BaseTrigger
 
 
 def generate_workflow_deployment_prefix(deployment_name: str, release_tag: str) -> str:
@@ -37,3 +41,38 @@ def uuid4_from_hash(input_str: str) -> UUID:
 
     # Create a UUID from the modified bytes
     return UUID(bytes=bytes(hash_list))
+
+
+def get_trigger_id(trigger_class: "type[BaseTrigger]") -> UUID:
+    """
+    Generate a deterministic trigger ID from a trigger class.
+
+    Uses the class's __qualname__ to ensure stability across different import paths.
+
+    IMPORTANT: Once a trigger class is deployed, its __qualname__ should NOT be changed
+    as it's used for deterministic ID generation.
+
+    Args:
+        trigger_class: The trigger class to generate an ID for
+
+    Returns:
+        A deterministic UUID based on the trigger class qualname
+    """
+    return uuid4_from_hash(trigger_class.__qualname__)
+
+
+def get_trigger_attribute_id(trigger_class: "type[BaseTrigger]", attribute_name: str) -> UUID:
+    """
+    Generate a deterministic trigger attribute ID from a trigger class and attribute name.
+
+    Uses the class's __qualname__ and attribute name to ensure stability across different
+    import paths and runtime contexts.
+
+    Args:
+        trigger_class: The trigger class containing the attribute
+        attribute_name: The name of the attribute
+
+    Returns:
+        A deterministic UUID based on the trigger class qualname and attribute name
+    """
+    return uuid4_from_hash(f"{trigger_class.__qualname__}|{attribute_name}")

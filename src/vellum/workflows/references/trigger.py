@@ -11,7 +11,7 @@ from pydantic_core import core_schema
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
-from vellum.workflows.utils.uuids import uuid4_from_hash
+from vellum.workflows.utils.uuids import get_trigger_attribute_id
 
 if TYPE_CHECKING:
     from vellum.workflows.state.base import BaseState
@@ -41,7 +41,7 @@ class TriggerAttributeReference(BaseDescriptor[_T], Generic[_T]):
     @property
     def id(self) -> UUID:
         """Generate deterministic UUID from trigger class qualname and attribute name."""
-        return uuid4_from_hash(f"{self._trigger_class.__qualname__}|{self.name}")
+        return get_trigger_attribute_id(self._trigger_class, self.name)
 
     def resolve(self, state: BaseState) -> _T:
         trigger_attributes = getattr(state.meta, "trigger_attributes", {})
