@@ -259,11 +259,15 @@ export class SearchNode extends BaseNode<
       VellumValueLogicalExpressionSerializer.parse(metadataFilters);
 
     if (!parsedData.ok) {
-      throw new NodeAttributeGenerationError(
-        `Failed to parse metadata filter JSON: ${JSON.stringify(
-          parsedData.errors
-        )}`
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          `Failed to parse metadata filter JSON: ${JSON.stringify(
+            parsedData.errors
+          )}`,
+          "WARNING"
+        )
       );
+      return undefined;
     }
 
     return parsedData.value;
