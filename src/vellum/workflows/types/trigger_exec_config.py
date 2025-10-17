@@ -6,7 +6,7 @@ sent to/from the backend for integration triggers. They are used during
 serialization and deserialization of trigger configurations.
 """
 
-from typing import Any, Dict, Literal, Optional
+from typing import Any, Dict, Literal
 
 from pydantic import Field
 
@@ -31,33 +31,30 @@ class ComposioIntegrationTriggerExecConfig(BaseIntegrationTriggerExecConfig):
 
     This configuration is used to identify and execute triggers through the Composio
     integration provider. It includes the provider type, integration name, slug,
-    trigger nano ID, and optional attributes for filtering.
+    trigger nano ID, and event schema.
 
     Examples:
         >>> config = ComposioIntegrationTriggerExecConfig(
         ...     provider="COMPOSIO",
         ...     integration_name="SLACK",
         ...     slug="slack_new_message",
-        ...     trigger_nano_id="abc123def456",
-        ...     attributes={"channel": "C123456"}
+        ...     event_attributes={"message": str, "user": str}
         ... )
         >>> config.provider
         <VellumIntegrationProviderType.COMPOSIO: 'COMPOSIO'>
 
     Attributes:
-        type: Always "COMPOSIO_INTEGRATION_TRIGGER" for this config type
+        type: Always "INTEGRATION" for this config type
         provider: The integration provider (e.g., COMPOSIO)
         integration_name: The integration identifier (e.g., "SLACK", "GITHUB")
         slug: The slug of the integration trigger in Composio
-        trigger_nano_id: Composio's unique trigger identifier used for event matching
-        attributes: Optional dictionary of trigger-specific configuration attributes for filtering
+        event_attributes: Dictionary mapping attribute names to their types (schema for event data)
     """
 
-    type: Literal["COMPOSIO_INTEGRATION_TRIGGER"] = "COMPOSIO_INTEGRATION_TRIGGER"
+    type: Literal["INTEGRATION"] = "INTEGRATION"
     provider: VellumIntegrationProviderType = Field(..., description="The integration provider (e.g., COMPOSIO)")
     integration_name: str = Field(..., description="The integration name (e.g., 'SLACK', 'GITHUB')")
     slug: str = Field(..., description="The slug of the integration trigger in Composio")
-    trigger_nano_id: str = Field(..., description="Composio's unique trigger identifier used for event matching")
-    attributes: Optional[Dict[str, Any]] = Field(
-        default=None, description="Optional trigger-specific configuration attributes for filtering"
+    event_attributes: Dict[str, Any] = Field(
+        default_factory=dict, description="Schema of event attributes with their types"
     )

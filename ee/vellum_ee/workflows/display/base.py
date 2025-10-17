@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 class WorkflowTriggerType(Enum):
     MANUAL = "MANUAL"
     SLACK_MESSAGE = "SLACK_MESSAGE"
+    INTEGRATION = "INTEGRATION"
 
 
 def get_trigger_type_mapping() -> Dict[Type["BaseTrigger"], WorkflowTriggerType]:

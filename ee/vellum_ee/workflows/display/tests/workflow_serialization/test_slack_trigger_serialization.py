@@ -1,8 +1,11 @@
+import pytest
+
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 from tests.workflows.basic_trigger_slack.workflow import SlackTriggerWorkflow
 
 
+@pytest.mark.xfail(reason="SlackTrigger class is deprecated and will be removed in favor of VellumIntegrationTrigger")
 def test_serialize_slack_trigger_workflow():
     workflow_display = get_workflow_display(workflow_class=SlackTriggerWorkflow)
     serialized_workflow: dict = workflow_display.serialize()

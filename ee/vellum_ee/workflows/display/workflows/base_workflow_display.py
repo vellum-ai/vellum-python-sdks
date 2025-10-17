@@ -25,10 +25,11 @@ from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port,
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, WorkflowInputReference
 from vellum.workflows.state.encoder import DefaultStateEncoder
+from vellum.workflows.triggers.vellum_integration import VellumIntegrationTrigger
 from vellum.workflows.types.core import Json, JsonArray, JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.types.utils import get_original_base
-from vellum.workflows.utils.uuids import uuid4_from_hash
+from vellum.workflows.utils.uuids import get_trigger_id, uuid4_from_hash
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
 from vellum.workflows.vellum_client import create_vellum_client
 from vellum_ee.workflows.display.base import (
@@ -38,6 +39,7 @@ from vellum_ee.workflows.display.base import (
     WorkflowInputsDisplay,
     WorkflowMetaDisplay,
     WorkflowOutputDisplay,
+    WorkflowTriggerType,
     get_trigger_type_mapping,
 )
 from vellum_ee.workflows.display.editor.types import NodeDisplayData, NodeDisplayPosition
@@ -465,16 +467,21 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                     f"{edge.trigger_class.__name__} in the same workflow."
                 )
 
-        # Get the trigger type from the mapping
+        # Get the trigger type from the mapping, or check if it's a VellumIntegrationTrigger subclass
         trigger_type = trigger_type_mapping.get(trigger_class)
         if trigger_type is None:
-            raise ValueError(
-                f"Unknown trigger type: {trigger_class.__name__}. "
-                f"Please add it to the trigger type mapping in get_trigger_type_mapping()."
-            )
+            # Check if it's a VellumIntegrationTrigger subclass
+
+            if issubclass(trigger_class, VellumIntegrationTrigger):
+                trigger_type = WorkflowTriggerType.INTEGRATION
+            else:
+                raise ValueError(
+                    f"Unknown trigger type: {trigger_class.__name__}. "
+                    f"Please add it to the trigger type mapping in get_trigger_type_mapping()."
+                )
 
         # Return as a list with a single trigger object matching Django schema
-        trigger_id = uuid4_from_hash(trigger_class.__qualname__)
+        trigger_id = get_trigger_id(trigger_class)
 
         # Serialize trigger attributes like node outputs
         attribute_references = trigger_class.attribute_references().values()
