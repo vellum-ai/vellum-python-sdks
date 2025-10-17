@@ -26,10 +26,6 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
         """Create a new trigger class and set up attribute references."""
         cls = super().__new__(mcs, name, bases, namespace, **kwargs)
 
-        # Initialize cache if not already present
-        if not hasattr(cls, "__trigger_attribute_cache__"):
-            cls.__trigger_attribute_cache__ = {}
-
         # Process __annotations__ to create TriggerAttributeReference for each attribute
         # Only process if class has Config and annotations
         has_config = hasattr(cls, "Config") and "Config" in namespace
@@ -44,7 +40,6 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
                 reference = TriggerAttributeReference(
                     name=attr_name, types=(attr_type,), instance=None, trigger_class=cls
                 )
-                cls.__trigger_attribute_cache__[attr_name] = reference
                 # Set as class attribute so it's directly accessible
                 setattr(cls, attr_name, reference)
 
@@ -84,11 +79,6 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
             if is_configured_trigger:
                 trigger_cls = cast(Type["VellumIntegrationTrigger"], cls)
 
-                # Check cache first
-                cache = super().__getattribute__("__trigger_attribute_cache__")
-                if name in cache:
-                    return cache[name]
-
                 # Only allow declared annotations (event attributes)
                 try:
                     annotations = super().__getattribute__("__annotations__")
@@ -104,7 +94,6 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
                 # Create a new dynamic reference for this attribute
                 types = (object,)
                 reference = TriggerAttributeReference(name=name, types=types, instance=None, trigger_class=trigger_cls)
-                cache[name] = reference
                 return reference
 
             # Not a configured trigger or starts with _, re-raise the AttributeError
@@ -439,9 +428,6 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
                 # UUIDs are generated from __qualname__, so this must be consistent and unique
                 # across different trigger configurations to prevent ID collisions.
                 "__qualname__": class_name,
-                # Initialize cache attributes that would normally be set by BaseTriggerMeta.__new__
-                # Since we're using type() directly, we need to set these ourselves
-                "__trigger_attribute_cache__": {},
                 # Mark as configured for simplified detection in __getattribute__
                 "_is_configured": True,
             },

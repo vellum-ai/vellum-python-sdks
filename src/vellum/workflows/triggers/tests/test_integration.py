@@ -57,8 +57,8 @@ def test_integration_trigger__attribute_reference():
     reference = TestTrigger.value
     assert isinstance(reference, TriggerAttributeReference)
     assert reference.name == "value"
-    assert TestTrigger.value is reference
-    assert reference is TestTrigger.attribute_references()["value"]
+    assert TestTrigger.value == reference
+    assert reference == TestTrigger.attribute_references()["value"]
 
     state = BaseState()
     trigger = TestTrigger({"value": "data"})
