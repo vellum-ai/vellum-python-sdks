@@ -70,37 +70,37 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
             return super().__getattribute__(name)
         except AttributeError:
             # Only enable dynamic attribute creation for configured trigger classes
-            # Check if class has Config defined (not the base class Config) and is not requesting private attribute
-            if not name.startswith("_") and hasattr(cls, "Config"):
-                try:
-                    config = super().__getattribute__("Config")
-                    # Skip if this is the base VellumIntegrationTrigger.Config
-                    if config is not VellumIntegrationTrigger.Config:
-                        trigger_cls = cast(Type["VellumIntegrationTrigger"], cls)
+            # Skip private attributes
+            if name.startswith("_"):
+                raise
 
-                        # Only allow declared annotations (event attributes)
-                        try:
-                            annotations = super().__getattribute__("__annotations__")
-                            if name not in annotations:
-                                raise AttributeError(
-                                    f"{cls.__name__} has no attribute '{name}'. "
-                                    f"Declared attributes: {list(annotations.keys())}"
-                                )
-                        except AttributeError:
-                            # No annotations, raise error
-                            raise AttributeError(f"{cls.__name__} has no attribute '{name}'. No attributes declared.")
+            # Check if this class has a custom Config (not the base class Config)
+            try:
+                config = super().__getattribute__("Config")
+                if config is VellumIntegrationTrigger.Config:
+                    # This is the base class, not a configured trigger
+                    raise
+            except AttributeError:
+                # No Config defined, not a configured trigger
+                raise
 
-                        # Create a new dynamic reference for this attribute
-                        types = (object,)
-                        reference = TriggerAttributeReference(
-                            name=name, types=types, instance=None, trigger_class=trigger_cls
-                        )
-                        return reference
-                except AttributeError:
-                    pass
+            # This is a configured trigger class - create dynamic reference
+            trigger_cls = cast(Type["VellumIntegrationTrigger"], cls)
 
-            # Not a configured trigger or starts with _, re-raise the AttributeError
-            raise
+            # Only allow declared annotations (event attributes)
+            try:
+                annotations = super().__getattribute__("__annotations__")
+                if name not in annotations:
+                    raise AttributeError(
+                        f"{cls.__name__} has no attribute '{name}'. " f"Declared attributes: {list(annotations.keys())}"
+                    )
+            except AttributeError:
+                # No annotations, raise error
+                raise AttributeError(f"{cls.__name__} has no attribute '{name}'. No attributes declared.")
+
+            # Create a new dynamic reference for this attribute
+            types = (object,)
+            return TriggerAttributeReference(name=name, types=types, instance=None, trigger_class=trigger_cls)
 
 
 class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTriggerMeta):
