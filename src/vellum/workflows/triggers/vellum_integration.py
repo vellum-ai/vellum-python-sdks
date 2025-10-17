@@ -215,7 +215,9 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
         # Our approach: for attr_name in self._event_data.keys()
         for attr_name in self._event_data.keys():
             # Get the class-level reference for this attribute (created by __new__ from annotations)
-            reference = getattr(type(self), attr_name)
+            # Unknown keys can appear in webhook payloads, so gracefully skip them if the
+            # trigger class doesn't expose a corresponding reference.
+            reference = getattr(type(self), attr_name, None)
             if isinstance(reference, TriggerAttributeReference):
                 attribute_values[reference] = getattr(self, attr_name)
 
