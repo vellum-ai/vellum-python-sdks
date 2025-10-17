@@ -439,60 +439,61 @@ export class GraphAttribute extends AstNode {
       // We already know sourceNode -> targetNode exists (it's the edge we're adding)
       // So we only need to check if targetNode -> sourceNode exists
       const sourceNodeId = sourceNode?.nodeData.id;
-      if (
-        isCycle &&
-        isSourceInGraph &&
-        sourceNode &&
-        sourceNode === targetNode
-      ) {
-        const sourceNodePortContext = sourceNode.portContextsById.get(
-          edge.sourceHandleId
-        );
-        if (sourceNodePortContext && !sourceNodePortContext.isDefault) {
-          return {
-            type: "set",
-            values: [
-              ...setAst.values,
-              {
-                type: "right_shift",
-                lhs: {
-                  type: "port_reference",
-                  reference: sourceNodePortContext,
+      if (isCycle && isSourceInGraph && sourceNodeId) {
+        // Self cycle edge
+        if (sourceNode === targetNode) {
+          const sourceNodePortContext = sourceNode.portContextsById.get(
+            edge.sourceHandleId
+          );
+          if (sourceNodePortContext && !sourceNodePortContext.isDefault) {
+            return {
+              type: "set",
+              values: [
+                ...setAst.values,
+                {
+                  type: "right_shift",
+                  lhs: {
+                    type: "port_reference",
+                    reference: sourceNodePortContext,
+                  },
+                  rhs: { type: "node_reference", reference: targetNode },
                 },
-                rhs: { type: "node_reference", reference: targetNode },
-              },
-            ],
-          };
+              ],
+            };
+          }
         }
-      }
 
-      if (
-        isCycle &&
-        isSourceInGraph &&
-        sourceNodeId &&
-        Array.from(this.workflowContext.getEdgesByPortId().values())
+        // Anything else
+        const doesReverseEdgeExist = Array.from(
+          this.workflowContext.getEdgesByPortId().values()
+        )
           .flat()
           .some(
             (e) =>
               e.sourceNodeId === targetNode.nodeData.id &&
               e.targetNodeId === sourceNodeId
-          )
-      ) {
-        const newValues = setAst.values.map((value) => {
-          if (this.isNodeInBranch(sourceNode, value)) {
-            return {
-              type: "right_shift" as const,
-              lhs: value,
-              rhs: { type: "node_reference" as const, reference: targetNode },
-            };
-          }
-          return value;
-        });
+          );
+        if (doesReverseEdgeExist) {
+          // Create a new set with the same values, but modify the branch that contains the source node
+          const newValues = setAst.values.map((value) => {
+            // Check if this branch contains the source node
+            if (this.isNodeInBranch(sourceNode, value)) {
+              // If it does, append the target node to create the cycle
+              return {
+                type: "right_shift" as const,
+                lhs: value,
+                rhs: { type: "node_reference" as const, reference: targetNode },
+              };
+            }
+            // Otherwise, leave the branch unchanged
+            return value;
+          });
 
-        return {
-          type: "set" as const,
-          values: newValues,
-        };
+          return {
+            type: "set" as const,
+            values: newValues,
+          };
+        }
       }
 
       const newSet = setAst.values.map((subAst) => {
@@ -500,7 +501,6 @@ export class GraphAttribute extends AstNode {
         if (!canBeAdded) {
           return { edgeAddedPriority: 0, original: subAst, value: subAst };
         }
-
         const newSubAst = this.addEdgeToGraph({
           edge,
           mutableAst: subAst,
@@ -680,18 +680,6 @@ export class GraphAttribute extends AstNode {
         const uniqueAstSourceIds = new Set(
           newAstSources.map((source) => source.reference.portId)
         );
-
-        const uniqueNodeIds = new Set(
-          newAstSources.map(
-            (source) => source.reference.nodeContext.nodeData.id
-          )
-        );
-        const hasMultipleNonDefaultPortsFromSameNode =
-          uniqueNodeIds.size === 1 &&
-          uniqueAstSourceIds.size > 1 &&
-          newAstSources.filter((source) => !source.reference.isDefault).length >
-            1;
-
         if (uniqueAstSourceIds.size === 1 && newAstSources[0]) {
           const portReference = newAstSources[0];
           return {
@@ -704,11 +692,17 @@ export class GraphAttribute extends AstNode {
               : portReference,
             rhs: this.popSources(newSetAst),
           };
-        } else if (hasMultipleNonDefaultPortsFromSameNode) {
-          return this.flattenSet(newSetAst);
         }
       }
-      return this.flattenSet(newSetAst);
+
+      const flattenedNewSetAst = this.flattenSet(newSetAst);
+      if (mutableAst.rhs.type === "node_reference") {
+        return this.optimizeSetThroughCommonTarget(
+          flattenedNewSetAst,
+          mutableAst.rhs.reference
+        );
+      }
+      return flattenedNewSetAst;
     }
 
     const lhsTerminals = this.getAstTerminals(mutableAst.lhs);

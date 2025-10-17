@@ -299,10 +299,11 @@ exports[`Workflow > graph > should generate correct graph when workflow has a sl
 exports[`Workflow > graph > should handle a conditional node with default port pointing back to itself 1`] = `
 "{
     ValidateAPIResponse.Ports.success >> APISuccessOutput,
-    { 
-        ValidateAPIResponse.Ports.api_error,
+    {
         ValidateAPIResponse.Ports.network_error,
-    } >> APIErrorHandler,
+        ValidateAPIResponse.Ports.api_error,
+    }
+    >> APIErrorHandler,
     ValidateAPIResponse.Ports.default >> ValidateAPIResponse,
 }
 "
