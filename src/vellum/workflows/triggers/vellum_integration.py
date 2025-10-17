@@ -6,7 +6,6 @@ from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.triggers.base import BaseTriggerMeta
 from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.types import ComposioIntegrationTriggerExecConfig
-from vellum.workflows.utils.uuids import uuid4_from_hash
 
 
 class VellumIntegrationTriggerMeta(BaseTriggerMeta):
@@ -27,9 +26,7 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
         """Create a new trigger class and set up attribute references."""
         cls = super().__new__(mcs, name, bases, namespace, **kwargs)
 
-        # Initialize caches if not already present
-        if not hasattr(cls, "__trigger_attribute_ids__"):
-            cls.__trigger_attribute_ids__ = {}
+        # Initialize cache if not already present
         if not hasattr(cls, "__trigger_attribute_cache__"):
             cls.__trigger_attribute_cache__ = {}
 
@@ -42,10 +39,6 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
                 # Skip special attributes and Config
                 if attr_name.startswith("_") or attr_name == "Config":
                     continue
-
-                # Generate stable ID from class name (like nodes)
-                attr_id = uuid4_from_hash(f"{cls.__qualname__}|{attr_name}")
-                cls.__trigger_attribute_ids__[attr_name] = attr_id
 
                 # Create reference with proper type
                 reference = TriggerAttributeReference(
@@ -107,16 +100,6 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
                 except AttributeError:
                     # No annotations, raise error
                     raise AttributeError(f"{cls.__name__} has no attribute '{name}'. No attributes declared.")
-
-                # Generate and store deterministic UUID for this attribute if not already present.
-                # This ensures consistent IDs across multiple accesses to the same attribute,
-                # which is critical for serialization and state resolution.
-                # Use __qualname__ for ID generation (like nodes).
-                attribute_ids = super().__getattribute__("__trigger_attribute_ids__")
-                if name not in attribute_ids:
-                    # Generate stable ID from class name (like nodes)
-                    qualname = super().__getattribute__("__qualname__")
-                    attribute_ids[name] = uuid4_from_hash(f"{qualname}|{name}")
 
                 # Create a new dynamic reference for this attribute
                 types = (object,)
@@ -458,7 +441,6 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
                 "__qualname__": class_name,
                 # Initialize cache attributes that would normally be set by BaseTriggerMeta.__new__
                 # Since we're using type() directly, we need to set these ourselves
-                "__trigger_attribute_ids__": {},
                 "__trigger_attribute_cache__": {},
                 # Mark as configured for simplified detection in __getattribute__
                 "_is_configured": True,
