@@ -3,13 +3,13 @@ from uuid import UUID
 from typing import TYPE_CHECKING, Any, Dict, Generic, Iterable, Literal, Optional, Type, Union
 from typing_extensions import TypeGuard
 
-from pydantic import SerializationInfo, field_serializer
+from pydantic import SerializationInfo, field_serializer, field_validator
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.errors import WorkflowError
 from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.references import ExternalInputReference
-from vellum.workflows.types.definition import serialize_type_encoder_with_id
+from vellum.workflows.types.definition import CodeResourceDefinition, serialize_type_encoder_with_id
 from vellum.workflows.types.generics import InputsType, OutputsType, StateType
 
 from .node import (
@@ -24,6 +24,7 @@ from .stream import WorkflowEventGenerator
 from .types import BaseEvent, default_serializer
 
 if TYPE_CHECKING:
+    from vellum.workflows.nodes.bases.base import BaseNode
     from vellum.workflows.workflows.base import BaseWorkflow
 
 logger = logging.getLogger(__name__)
@@ -207,6 +208,15 @@ class WorkflowExecutionResumedEvent(_BaseWorkflowEvent):
 
 class WorkflowExecutionSnapshottedBody(_BaseWorkflowExecutionBody, Generic[StateType]):
     state: StateType
+    edited_by: Optional[Type["BaseNode"]] = None
+
+    @field_validator("edited_by", mode="before")
+    @classmethod
+    def validate_edited_by(cls, value: Any) -> Any:
+        if value is None:
+            return None
+        value = CodeResourceDefinition.model_validate(value)
+        return value.decode()
 
     @field_serializer("state")
     def serialize_state(self, state: StateType, _info: Any) -> Dict[str, Any]:

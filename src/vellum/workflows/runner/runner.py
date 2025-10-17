@@ -275,6 +275,11 @@ class WorkflowRunner(Generic[StateType]):
             httpx_logger.removeFilter(span_filter)
 
     def _snapshot_state(self, state: StateType, deltas: List[StateDelta]) -> StateType:
+        execution = get_execution_context()
+        edited_by = None
+        if execution.parent_context and hasattr(execution.parent_context, "node_definition"):
+            edited_by = execution.parent_context.node_definition
+
         self._workflow_event_inner_queue.put(
             WorkflowExecutionSnapshottedEvent(
                 trace_id=self._execution_context.trace_id,
@@ -282,6 +287,7 @@ class WorkflowRunner(Generic[StateType]):
                 body=WorkflowExecutionSnapshottedBody(
                     workflow_definition=self.workflow.__class__,
                     state=state,
+                    edited_by=edited_by,
                 ),
                 parent=self._execution_context.parent_context,
             )
@@ -456,14 +462,14 @@ class WorkflowRunner(Generic[StateType]):
 
             node.state.meta.node_execution_cache.fulfill_node_execution(node.__class__, span_id)
 
-            with node.state.__atomic__():
-                for descriptor, output_value in outputs:
-                    if output_value is undefined:
-                        if descriptor in node.state.meta.node_outputs:
-                            del node.state.meta.node_outputs[descriptor]
-                        continue
-
-                    node.state.meta.node_outputs[descriptor] = output_value
+            with execution_context(parent_context=updated_parent_context, trace_id=execution.trace_id):
+                with node.state.__atomic__():
+                    for descriptor, output_value in outputs:
+                        if output_value is undefined:
+                            if descriptor in node.state.meta.node_outputs:
+                                del node.state.meta.node_outputs[descriptor]
+                            continue
+                        node.state.meta.node_outputs[descriptor] = output_value
 
             invoked_ports = ports(outputs, node.state)
             yield NodeExecutionFulfilledEvent(
