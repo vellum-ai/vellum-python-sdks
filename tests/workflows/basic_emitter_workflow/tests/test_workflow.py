@@ -71,6 +71,15 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
     assert events[1].span_id == start_node_span_id
 
     assert events[2].name == "workflow.execution.snapshotted"
+    assert events[2].body.edited_by == StartNode
+
+    serialized_event_2 = default_serializer(events[2])
+    assert serialized_event_2["body"]["edited_by"] == {
+        "name": "StartNode",
+        "id": str(StartNode.__id__),
+        "module": ["tests", "workflows", "basic_emitter_workflow", "workflow"],
+    }
+
     assert default_serializer(events[2].state) == {
         "meta": {
             "id": str(state_id),
