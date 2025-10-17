@@ -146,24 +146,19 @@ class TestWorkflow(BaseWorkflow):
 
 
 def test_gather_event_display_context__final_output_node_workflow_output_id():
-    # GIVEN a workflow with a FinalOutputNode
+    # GIVEN a workflow with only a FinalOutputNode
     files = {
         "__init__.py": "",
         "workflow.py": """\
 from vellum.workflows import BaseWorkflow
-from vellum.workflows.nodes import BaseNode
 from vellum.workflows.nodes.displayable import FinalOutputNode
-
-class DataNode(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        value: str
 
 class MyFinalOutput(FinalOutputNode):
     class Outputs(FinalOutputNode.Outputs):
         pass
 
 class TestWorkflow(BaseWorkflow):
-    graph = DataNode >> MyFinalOutput
+    graph = MyFinalOutput
     
     class Outputs(BaseWorkflow.Outputs):
         result = MyFinalOutput.Outputs.value
@@ -180,15 +175,15 @@ class TestWorkflow(BaseWorkflow):
     assert display_meta is not None
     assert isinstance(display_meta, WorkflowEventDisplayContext)
 
+    assert len(display_meta.node_displays) == 1
+    node_display = list(display_meta.node_displays.values())[0]
+    node_output_id = node_display.output_display["value"]
+
     # AND the workflow_outputs should map to a workflow output variable ID
     assert "result" in display_meta.workflow_outputs
     workflow_output_id = display_meta.workflow_outputs["result"]
 
     # AND the workflow output ID should NOT be the same as the node's output ID
-    node_displays = list(display_meta.node_displays.values())
-    final_output_node_display = [nd for nd in node_displays if "value" in nd.output_display][0]
-    node_output_id = final_output_node_display.output_display["value"]
-
     assert workflow_output_id != node_output_id, (
         f"Workflow output ID ({workflow_output_id}) should not be the same as "
         f"node output ID ({node_output_id}). Workflow outputs need their own unique IDs."

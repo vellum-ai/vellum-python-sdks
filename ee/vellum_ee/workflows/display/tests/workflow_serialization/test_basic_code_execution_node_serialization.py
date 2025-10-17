@@ -31,8 +31,8 @@ def test_serialize_workflow_with_filepath():
     assert len(output_variables) == 2
     assert not DeepDiff(
         [
-            {"id": "7770093f-e596-48f7-b836-312c6dd9b8bf", "key": "log", "type": "STRING"},
-            {"id": "1f7ddc5d-52ab-4f9b-9e71-edfd64f31a78", "key": "result", "type": "NUMBER"},
+            {"id": "1cee930f-342f-421c-89fc-ff212b3764bb", "key": "log", "type": "STRING"},
+            {"id": "f6a3e3e0-f83f-4491-8b7a-b20fddd7160c", "key": "result", "type": "NUMBER"},
         ],
         output_variables,
         ignore_order=True,
@@ -125,7 +125,7 @@ def test_serialize_workflow_with_filepath():
                     "label": "Final Output",
                     "name": "result",
                     "target_handle_id": "30fb0f4a-61c3-49de-a0aa-7dfdcee6ea07",
-                    "output_id": "1f7ddc5d-52ab-4f9b-9e71-edfd64f31a78",
+                    "output_id": "f6a3e3e0-f83f-4491-8b7a-b20fddd7160c",
                     "output_type": "NUMBER",
                     "node_input_id": "529bdd20-0985-4c99-87dc-590907937c1d",
                 },
@@ -161,7 +161,7 @@ def test_serialize_workflow_with_filepath():
                     "label": "Final Output",
                     "name": "log",
                     "target_handle_id": "1e126004-9de7-42c0-b1e1-87f9eb0642e2",
-                    "output_id": "7770093f-e596-48f7-b836-312c6dd9b8bf",
+                    "output_id": "1cee930f-342f-421c-89fc-ff212b3764bb",
                     "output_type": "STRING",
                     "node_input_id": "09501b65-d9b3-4920-81d4-96f93c840667",
                 },

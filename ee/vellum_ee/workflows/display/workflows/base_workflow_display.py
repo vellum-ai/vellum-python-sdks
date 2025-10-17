@@ -782,8 +782,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         return EntrypointDisplay(id=entrypoint_id, edge_display=edge_display)
 
     def _generate_workflow_output_display(self, output: OutputReference) -> WorkflowOutputDisplay:
-        workflow_output_id = uuid4_from_hash(f"{self.workflow_id}|output_variable_id|{output.name}")
-        return WorkflowOutputDisplay(id=workflow_output_id, name=output.name)
+        return WorkflowOutputDisplay(id=output.id, name=output.name)
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
         super().__init_subclass__(**kwargs)

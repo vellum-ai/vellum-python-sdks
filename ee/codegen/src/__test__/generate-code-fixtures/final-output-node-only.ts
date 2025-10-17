@@ -17,7 +17,7 @@ export default {
           label: "Final Output",
           name: "result",
           target_handle_id: "terminal-target",
-          output_id: "workflow-output-variable-id",
+          output_id: "terminal-node-output-id",
           output_type: "STRING",
           node_input_id: "terminal-node-input-id",
         },
