@@ -86,7 +86,8 @@ def test_attribute_ids_include_class_name():
             slug = "slack_new_message"
 
     # Different class names = different IDs (like nodes)
-    assert Trigger1.message.id != Trigger2.message.id
+    # Type ignore: mypy sees message as str, but it's actually TriggerAttributeReference at class level
+    assert Trigger1.message.id != Trigger2.message.id  # type: ignore[attr-defined]
 
 
 def test_populates_dynamic_attributes():

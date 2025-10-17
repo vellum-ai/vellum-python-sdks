@@ -136,11 +136,6 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
                     f"{cls.__name__}.Config must define '{field}'. " f"Required fields: {', '.join(required_fields)}"
                 )
 
-        # Copy Config attributes to class level for easy access
-        cls.provider = config_cls.provider
-        cls.integration_name = config_cls.integration_name
-        cls.slug = config_cls.slug
-
     @classmethod
     def _freeze_attributes(cls, attributes: Dict[str, Any]) -> str:
         """
@@ -258,7 +253,7 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
             >>> exec_config.event_attributes
             {'message': <class 'str'>, 'user': <class 'str'>}
         """
-        if not hasattr(cls, "slug"):
+        if not hasattr(cls, "Config") or cls.Config is VellumIntegrationTrigger.Config:
             raise AttributeError(
                 "to_exec_config() can only be called on configured VellumIntegrationTrigger subclasses, "
                 "not on the base class."
@@ -274,9 +269,9 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
             }
 
         return ComposioIntegrationTriggerExecConfig(
-            provider=cls.provider,
-            integration_name=cls.integration_name,
-            slug=cls.slug,
+            provider=cls.Config.provider,
+            integration_name=cls.Config.integration_name,
+            slug=cls.Config.slug,
             event_attributes=event_attributes,
         )
 
