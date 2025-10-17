@@ -1,5 +1,5 @@
 import json
-from typing import Any, ClassVar, Dict, Optional, Type, cast
+from typing import Any, ClassVar, Dict, Optional, Type
 
 from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.references.trigger import TriggerAttributeReference
@@ -10,16 +10,11 @@ from vellum.workflows.types import ComposioIntegrationTriggerExecConfig
 
 class VellumIntegrationTriggerMeta(BaseTriggerMeta):
     """
-    Custom metaclass for VellumIntegrationTrigger that supports dynamic attribute discovery.
+    Custom metaclass for VellumIntegrationTrigger.
 
-    This metaclass extends BaseTriggerMeta to enable class-level access to attributes
-    that aren't statically defined. When accessing an undefined attribute on a
-    VellumIntegrationTrigger class, this metaclass will create a TriggerAttributeReference
-    dynamically, allowing triggers to work with attributes discovered from integration
-    APIs or event payloads.
-
-    Event attributes (defined as top-level type annotations) are automatically converted to
-    TriggerAttributeReference objects during class creation in __new__.
+    This metaclass extends BaseTriggerMeta to automatically convert type annotations
+    into TriggerAttributeReference objects during class creation. This enables trigger
+    attributes to be referenced in workflow graphs while maintaining type safety.
     """
 
     def __new__(mcs, name: str, bases: tuple, namespace: dict, **kwargs: Any) -> "VellumIntegrationTriggerMeta":
@@ -44,63 +39,6 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
                 setattr(cls, attr_name, reference)
 
         return cls
-
-    def __getattribute__(cls, name: str) -> Any:
-        """
-        Override attribute access to support dynamic attribute discovery.
-
-        For configured VellumIntegrationTrigger classes, this method allows access
-        to any attribute name, creating TriggerAttributeReference objects on demand.
-        This enables usage like:
-
-            SlackMessage = VellumIntegrationTrigger.for_trigger(
-                integration_name="SLACK",
-                slug="slack_new_message",
-            )
-            text = SlackMessage.message  # Creates reference even though 'message' isn't pre-defined
-
-        Args:
-            name: The attribute name being accessed
-
-        Returns:
-            The attribute value or a dynamically created TriggerAttributeReference
-        """
-        # Let BaseTriggerMeta handle internal attributes and known attributes
-        try:
-            return super().__getattribute__(name)
-        except AttributeError:
-            # Only enable dynamic attribute creation for configured trigger classes
-            # Skip private attributes
-            if name.startswith("_"):
-                raise
-
-            # Check if this class has a custom Config (not the base class Config)
-            try:
-                config = super().__getattribute__("Config")
-                if config is VellumIntegrationTrigger.Config:
-                    # This is the base class, not a configured trigger
-                    raise
-            except AttributeError:
-                # No Config defined, not a configured trigger
-                raise
-
-            # This is a configured trigger class - create dynamic reference
-            trigger_cls = cast(Type["VellumIntegrationTrigger"], cls)
-
-            # Only allow declared annotations (event attributes)
-            try:
-                annotations = super().__getattribute__("__annotations__")
-                if name not in annotations:
-                    raise AttributeError(
-                        f"{cls.__name__} has no attribute '{name}'. " f"Declared attributes: {list(annotations.keys())}"
-                    )
-            except AttributeError:
-                # No annotations, raise error
-                raise AttributeError(f"{cls.__name__} has no attribute '{name}'. No attributes declared.")
-
-            # Create a new dynamic reference for this attribute
-            types = (object,)
-            return TriggerAttributeReference(name=name, types=types, instance=None, trigger_class=trigger_cls)
 
 
 class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTriggerMeta):
@@ -281,8 +219,7 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
         # The base class approach: for reference in type(self)
         # Our approach: for attr_name in self._event_data.keys()
         for attr_name in self._event_data.keys():
-            # Get the class-level reference for this attribute
-            # This will create it via our custom metaclass if it doesn't exist
+            # Get the class-level reference for this attribute (created by __new__ from annotations)
             reference = getattr(type(self), attr_name)
             if isinstance(reference, TriggerAttributeReference):
                 attribute_values[reference] = getattr(self, attr_name)
