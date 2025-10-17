@@ -38,7 +38,6 @@ class ComposioIntegrationTriggerExecConfig(BaseIntegrationTriggerExecConfig):
         ...     provider="COMPOSIO",
         ...     integration_name="SLACK",
         ...     slug="slack_new_message",
-        ...     trigger_nano_id="abc123def456",
         ...     event_attributes={"message": str, "user": str}
         ... )
         >>> config.provider
@@ -49,7 +48,6 @@ class ComposioIntegrationTriggerExecConfig(BaseIntegrationTriggerExecConfig):
         provider: The integration provider (e.g., COMPOSIO)
         integration_name: The integration identifier (e.g., "SLACK", "GITHUB")
         slug: The slug of the integration trigger in Composio
-        trigger_nano_id: Composio's unique trigger identifier used for event matching
         event_attributes: Dictionary mapping attribute names to their types (schema for event data)
     """
 
@@ -57,7 +55,6 @@ class ComposioIntegrationTriggerExecConfig(BaseIntegrationTriggerExecConfig):
     provider: VellumIntegrationProviderType = Field(..., description="The integration provider (e.g., COMPOSIO)")
     integration_name: str = Field(..., description="The integration name (e.g., 'SLACK', 'GITHUB')")
     slug: str = Field(..., description="The slug of the integration trigger in Composio")
-    trigger_nano_id: str = Field(..., description="Composio's unique trigger identifier used for event matching")
     event_attributes: Dict[str, Any] = Field(
         default_factory=dict, description="Schema of event attributes with their types"
     )

@@ -68,7 +68,6 @@ class VellumIntegrationTriggerMeta(BaseTriggerMeta):
             SlackMessage = VellumIntegrationTrigger.for_trigger(
                 integration_name="SLACK",
                 slug="slack_new_message",
-                trigger_nano_id="abc123"
             )
             text = SlackMessage.message  # Creates reference even though 'message' isn't pre-defined
 
@@ -134,7 +133,7 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
     Base class for Vellum-managed integration triggers.
 
     Subclasses define two types of attributes:
-    1. **Config class**: Specifies how the trigger is configured (provider, integration_name, slug, trigger_nano_id)
+    1. **Config class**: Specifies how the trigger is configured (provider, integration_name, slug)
        - These are configuration details users shouldn't need to interact with directly
     2. **Top-level type annotations**: Define the webhook event payload structure (message, user, channel, etc.)
        - These become TriggerAttributeReference that can be referenced in workflow nodes
@@ -153,7 +152,6 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
             ...         provider = VellumIntegrationProviderType.COMPOSIO
             ...         integration_name = "SLACK"
             ...         slug = "slack_new_message"
-            ...         trigger_nano_id = "abc123def456"
 
         Use in workflow graph:
             >>> class MyWorkflow(BaseWorkflow):
@@ -181,14 +179,12 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
         Configuration for VellumIntegrationTrigger subclasses.
 
         Defines how the trigger connects to the integration provider. These settings
-        specify which integration, which specific trigger type, and how to identify
-        incoming events.
+        specify which integration and which specific trigger type to use.
         """
 
         provider: ClassVar[VellumIntegrationProviderType]
         integration_name: ClassVar[str]
         slug: ClassVar[str]
-        trigger_nano_id: ClassVar[str]
 
     # Cache for generated trigger classes to ensure consistency
     _trigger_class_cache: ClassVar[Dict[tuple, Type["VellumIntegrationTrigger"]]] = {}
@@ -215,13 +211,12 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
                 f"      class Config(VellumIntegrationTrigger.Config):\n"
                 f"          provider = VellumIntegrationProviderType.COMPOSIO\n"
                 f"          integration_name = 'SLACK'\n"
-                f"          slug = 'slack_new_message'\n"
-                f"          trigger_nano_id = 'abc123'"
+                f"          slug = 'slack_new_message'"
             )
 
         # Validate Config class has required fields
         config_cls = cls.Config
-        required_fields = ["provider", "integration_name", "slug", "trigger_nano_id"]
+        required_fields = ["provider", "integration_name", "slug"]
         for field in required_fields:
             if not hasattr(config_cls, field):
                 raise TypeError(
@@ -232,7 +227,6 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
         cls.provider = config_cls.provider
         cls.integration_name = config_cls.integration_name
         cls.slug = config_cls.slug
-        cls.trigger_nano_id = config_cls.trigger_nano_id
 
         # Mark as configured for simplified detection in __getattribute__
         cls._is_configured = True
@@ -349,7 +343,6 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
             ...         provider = VellumIntegrationProviderType.COMPOSIO
             ...         integration_name = "SLACK"
             ...         slug = "slack_new_message"
-            ...         trigger_nano_id = "abc123"
             >>> exec_config = SlackTrigger.to_exec_config()
             >>> exec_config.slug
             'slack_new_message'
@@ -375,7 +368,6 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
             provider=cls.provider,
             integration_name=cls.integration_name,
             slug=cls.slug,
-            trigger_nano_id=cls.trigger_nano_id,
             event_attributes=event_attributes,
         )
 

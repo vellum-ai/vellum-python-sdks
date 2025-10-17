@@ -26,7 +26,6 @@ def test_requires_config():
             class Config(VellumIntegrationTrigger.Config):
                 integration_name = "SLACK"
                 slug = "slack_new_message"
-                trigger_nano_id = "test_123"
                 # Missing provider!
 
     # This should work
@@ -38,7 +37,6 @@ def test_requires_config():
             provider = VellumIntegrationProviderType.COMPOSIO
             integration_name = "SLACK"
             slug = "slack_new_message"
-            trigger_nano_id = "test_123"
 
     assert hasattr(GoodTrigger, "Config")
 
@@ -55,7 +53,6 @@ def test_top_level_annotations_create_references():
             provider = VellumIntegrationProviderType.COMPOSIO
             integration_name = "SLACK"
             slug = "slack_new_message"
-            trigger_nano_id = "test_123"
 
     # Should auto-create references from annotations
     assert isinstance(SlackTrigger.message, TriggerAttributeReference)
@@ -79,7 +76,6 @@ def test_attribute_ids_include_class_name():
             provider = VellumIntegrationProviderType.COMPOSIO
             integration_name = "SLACK"
             slug = "slack_new_message"
-            trigger_nano_id = "test_123"
 
     class Trigger2(VellumIntegrationTrigger):
         message: str
@@ -88,7 +84,6 @@ def test_attribute_ids_include_class_name():
             provider = VellumIntegrationProviderType.COMPOSIO
             integration_name = "SLACK"
             slug = "slack_new_message"
-            trigger_nano_id = "test_123"
 
     # Different class names = different IDs (like nodes)
     assert Trigger1.message.id != Trigger2.message.id
@@ -106,7 +101,6 @@ def test_populates_dynamic_attributes():
             provider = VellumIntegrationProviderType.COMPOSIO
             integration_name = "GITHUB"
             slug = "github_push_event"
-            trigger_nano_id = "test_456"
 
     event_data = {
         "repository": "vellum-ai/workflows",
@@ -132,7 +126,6 @@ def test_to_trigger_attribute_values():
             provider = VellumIntegrationProviderType.COMPOSIO
             integration_name = "SLACK"
             slug = "slack_new_message"
-            trigger_nano_id = "test_123"
 
     event_data = {"message": "Hello", "channel": "C123"}
     trigger = SlackTrigger(event_data=event_data)
@@ -156,7 +149,6 @@ def test_to_exec_config():
             provider = VellumIntegrationProviderType.COMPOSIO
             integration_name = "SLACK"
             slug = "slack_new_message"
-            trigger_nano_id = "abc123def456"
 
     exec_config = SlackTrigger.to_exec_config()
 
@@ -164,7 +156,6 @@ def test_to_exec_config():
     assert exec_config.provider == VellumIntegrationProviderType.COMPOSIO
     assert exec_config.integration_name == "SLACK"
     assert exec_config.slug == "slack_new_message"
-    assert exec_config.trigger_nano_id == "abc123def456"
     assert exec_config.event_attributes == {"message": str, "user": str}
 
 
@@ -184,7 +175,6 @@ def test_empty_event_data():
             provider = VellumIntegrationProviderType.COMPOSIO
             integration_name = "SLACK"
             slug = "slack_new_message"
-            trigger_nano_id = "test_123"
 
     trigger = SlackTrigger(event_data={})
 
