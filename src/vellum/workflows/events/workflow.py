@@ -222,6 +222,12 @@ class WorkflowExecutionSnapshottedBody(_BaseWorkflowExecutionBody, Generic[State
     def serialize_state(self, state: StateType, _info: Any) -> Dict[str, Any]:
         return default_serializer(state)
 
+    @field_serializer("edited_by")
+    def serialize_edited_by(self, edited_by: Optional[Type["BaseNode"]], _info: Any) -> Optional[Dict[str, Any]]:
+        if edited_by is None:
+            return None
+        return serialize_type_encoder_with_id(edited_by)
+
 
 class WorkflowExecutionSnapshottedEvent(_BaseWorkflowEvent, Generic[StateType]):
     name: Literal["workflow.execution.snapshotted"] = "workflow.execution.snapshotted"
