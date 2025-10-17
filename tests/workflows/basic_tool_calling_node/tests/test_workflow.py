@@ -25,7 +25,9 @@ from vellum.client.types.string_chat_message_content import StringChatMessageCon
 from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.client.types.vellum_variable import VellumVariable
+from vellum.workflows.nodes.displayable.tool_calling_node import ToolCallingNode
 from vellum.workflows.nodes.displayable.tool_calling_node.utils import ToolPromptNode
+from vellum.workflows.workflows.base import BaseWorkflow
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 from tests.workflows.basic_tool_calling_node.workflow import BasicToolCallingNodeWorkflow, Inputs
@@ -655,3 +657,75 @@ def test_run_workflow__emits_subworkflow_events_with_tool_call(vellum_adhoc_prom
         assert event.parent.parent is not None
         assert event.parent.parent.type == "WORKFLOW"
         assert event.parent.parent.workflow_definition.name == "BasicToolCallingNodeWorkflow"
+
+
+def test_tool_calling_node__tool_error_includes_stacktrace(vellum_adhoc_prompt_client, vellum_client):
+    """
+    Test that when a tool errors, the rejected event includes a stacktrace.
+    """
+    from typing import Annotated
+
+    def error_tool(location: Annotated[str, "The location to get the weather for"]) -> str:
+        """
+        A tool that always throws an error.
+        """
+        raise ValueError("This tool always fails")
+
+    def generate_prompt_events(*_args, **_kwargs) -> Iterator[ExecutePromptEvent]:
+        execution_id = str(uuid4())
+
+        expected_outputs = [
+            FunctionCallVellumValue(
+                value=FunctionCall(
+                    arguments={"location": "San Francisco"},
+                    id="call_error_tool",
+                    name="error_tool",
+                    state="FULFILLED",
+                ),
+            ),
+        ]
+
+        events: List[ExecutePromptEvent] = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            FulfilledExecutePromptEvent(
+                execution_id=execution_id,
+                outputs=expected_outputs,
+            ),
+        ]
+        yield from events
+
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
+
+    class ErrorToolCallingNode(ToolCallingNode):
+        ml_model = "gpt-4o-mini"
+        blocks = [
+            ChatMessagePromptBlock(
+                chat_role="USER",
+                blocks=[
+                    RichTextPromptBlock(
+                        blocks=[
+                            PlainTextPromptBlock(text="Call the error tool"),
+                        ],
+                    ),
+                ],
+            ),
+        ]
+        functions = [error_tool]
+
+    class ErrorToolWorkflow(BaseWorkflow):
+        graph = ErrorToolCallingNode
+
+    workflow = ErrorToolWorkflow()
+
+    # WHEN the workflow is run
+    events = list(workflow.stream(event_filter=all_workflow_event_filter))
+
+    # THEN we should find a node rejection event
+    node_rejected_events = [e for e in events if e.name == "node.execution.rejected"]
+    assert len(node_rejected_events) > 0
+
+    # AND the rejected event should have a stacktrace
+    rejected_event = node_rejected_events[-1]
+    assert rejected_event.body.stacktrace is not None
+    assert "NodeException" in rejected_event.body.stacktrace
+    assert "Error executing function 'error_tool': This tool always fails" in rejected_event.body.stacktrace
