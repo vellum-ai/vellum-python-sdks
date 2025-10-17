@@ -1,4 +1,4 @@
-"""Tests for VellumIntegrationTrigger inheritance pattern."""
+"""Tests for VellumIntegrationTrigger."""
 
 import pytest
 
@@ -7,8 +7,8 @@ from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.triggers.vellum_integration import VellumIntegrationTrigger
 
 
-def test_inheritance_requires_config():
-    """Inheritance classes must declare Config with required fields."""
+def test_requires_config():
+    """Trigger classes must declare Config with required fields."""
 
     # This should fail - no Config class
     with pytest.raises(TypeError, match="Config"):
@@ -44,7 +44,7 @@ def test_inheritance_requires_config():
 
 
 def test_top_level_annotations_create_references():
-    """Top-level type annotations automatically create TriggerAttributeReference."""
+    """Top-level type annotations (webhook event attributes) automatically create TriggerAttributeReference."""
 
     class SlackTrigger(VellumIntegrationTrigger):
         message: str
