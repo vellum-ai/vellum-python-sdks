@@ -70,3 +70,36 @@ class InnerMapNode(MapNode):
     max_concurrency = 1
 "
 `;
+
+exports[`generateCode > should generate code for %1 two-generic-nodes-with-same-base-coalesce.ts > nodes/final_output_node.py 1`] = `
+"from vellum.workflows.nodes.displayable import FinalOutputNode as BaseFinalOutputNode
+from vellum.workflows.state import BaseState
+
+from .first_generic_node import FirstGenericNode
+from .first_generic_node_1 import FirstGenericNode as FirstGenericNode1FirstGenericNode
+
+
+class FinalOutputNode(BaseFinalOutputNode[BaseState, str]):
+    class Outputs(BaseFinalOutputNode.Outputs):
+        value = FirstGenericNode.Outputs.value.coalesce(FirstGenericNode1FirstGenericNode.Outputs.value)
+"
+`;
+
+exports[`generateCode > should generate code for %1 two-generic-nodes-with-same-base-coalesce.ts > workflow.py 1`] = `
+"from vellum.workflows import BaseWorkflow
+
+from .nodes.final_output_node import FinalOutputNode
+from .nodes.first_generic_node import FirstGenericNode
+from .nodes.first_generic_node_1 import FirstGenericNode as FirstGenericNode1FirstGenericNode
+
+
+class Workflow(BaseWorkflow):
+    graph = {
+        FirstGenericNode,
+        FirstGenericNode1FirstGenericNode,
+    } >> FinalOutputNode
+
+    class Outputs(BaseWorkflow.Outputs):
+        result = FinalOutputNode.Outputs.value
+"
+`;

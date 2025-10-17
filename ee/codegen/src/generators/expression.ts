@@ -3,9 +3,12 @@ import { TypeInstantiation } from "@fern-api/python-ast/TypeInstantiation";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
+import { NodeAttributeGenerationError } from "./errors";
+import { BinaryExpression } from "./expressions/binary";
+import { TernaryExpression } from "./expressions/ternary";
+
 import { VELLUM_WORKFLOW_CONSTANTS_PATH } from "src/constants";
 import { WorkflowContext } from "src/context";
-import { NodeAttributeGenerationError } from "src/generators/errors";
 import { WorkflowValueDescriptorReference } from "src/generators/workflow-value-descriptor-reference/workflow-value-descriptor-reference";
 
 export declare namespace Expression {
@@ -52,88 +55,62 @@ export class Expression extends AstNode {
     rhs,
     base,
   }: Omit<Expression.Args, "workflowContext">): AstNode {
-    this.inheritReferences(lhs);
-    if (rhs) {
-      this.inheritReferences(rhs);
+    if (base) {
+      let rawBase = base;
+      if (
+        this.isConstantValueReference(base) ||
+        this.isConstantValuePointer(base) ||
+        this.isTypeInstantiation(base)
+      ) {
+        rawBase = this.generateConstantReference(base);
+      }
+      this.inheritReferences(rawBase);
+
+      let rawRhs = rhs;
+      if (!rawRhs) {
+        this.workflowContext.addError(
+          new NodeAttributeGenerationError(
+            "rhs must be defined for ternary expressions"
+          )
+        );
+        rawRhs = python.TypeInstantiation.none();
+      }
+
+      this.inheritReferences(rawRhs);
+      this.inheritReferences(lhs);
+      this.inheritReferences(rawBase);
+
+      return new TernaryExpression({
+        base: rawBase,
+        lhs,
+        rhs: rawRhs,
+        operator,
+        workflowContext: this.workflowContext,
+      });
     }
 
-    // TODO: We should ideally perform this using native fern functionality, but it requires being able to create
-    //  a Reference object from an existing AstNode, which in turn requires all AstNode's to internally track their
-    //  name and modulePath.
-
-    const rawExpression = base
-      ? this.generateExpressionWithBase(base, operator, lhs, rhs)
-      : this.generateStandardExpression(lhs, operator, rhs);
-
-    return python.codeBlock(rawExpression);
-  }
-
-  private generateExpressionWithBase(
-    base: AstNode,
-    operator: string,
-    lhs: AstNode,
-    rhs: AstNode | undefined
-  ): string {
-    let rawLhs = base;
-    if (!rhs) {
-      throw new NodeAttributeGenerationError(
-        "rhs must be defined if base is defined"
-      );
-    }
-    if (
-      this.isConstantValueReference(base) ||
-      this.isConstantValuePointer(base)
-    ) {
-      rawLhs = this.generateLhsAsConstantReference(base);
-    }
-    this.inheritReferences(rawLhs);
-    return `${rawLhs.toString()}.${operator}(${lhs.toString()}, ${rhs.toString()})`;
-  }
-
-  private generateStandardExpression(
-    lhs: AstNode,
-    operator: string,
-    rhs: AstNode | undefined
-  ): string {
     let rawLhs = lhs;
     if (
       this.isConstantValueReference(lhs) ||
       this.isConstantValuePointer(lhs) ||
       this.isTypeInstantiation(lhs)
     ) {
-      rawLhs = this.generateLhsAsConstantReference(lhs);
+      rawLhs = this.generateConstantReference(lhs);
     }
     this.inheritReferences(rawLhs);
+    this.inheritReferences(rhs);
 
-    if (operator === "access_field") {
-      if (!rhs) {
-        this.workflowContext.addError(
-          new NodeAttributeGenerationError(
-            "rhs must be defined if operator is access_field"
-          )
-        );
-        return `${rawLhs.toString()}[""]`;
-      }
-      return `${rawLhs.toString()}[${rhs.toString()}]`;
-    }
-
-    const rhsExpression = rhs ? `(${rhs.toString()})` : "()";
-
-    if (operator === "or") {
-      return `${rawLhs.toString()} | ${rhsExpression}`;
-    } else if (operator === "and") {
-      return `${rawLhs.toString()} & ${rhsExpression}`;
-    } else if (operator === "+") {
-      return `${rawLhs.toString()}.add${rhsExpression}`;
-    } else if (operator === "-") {
-      return `${rawLhs.toString()}.minus${rhsExpression}`;
-    }
-    return `${rawLhs.toString()}.${operator}${rhsExpression}`;
+    return new BinaryExpression({
+      lhs: rawLhs,
+      rhs,
+      operator,
+      workflowContext: this.workflowContext,
+    });
   }
 
   // We are assuming that the expression contains "good data". If the expression contains data
   // where the generated expression is not correct, update the logic here with guardrails similar to the UI
-  private generateLhsAsConstantReference(lhs: AstNode): AstNode {
+  private generateConstantReference(ref: AstNode): AstNode {
     const constantValueReference = python.reference({
       name: "ConstantValueReference",
       modulePath: VELLUM_WORKFLOW_CONSTANTS_PATH,
@@ -142,7 +119,7 @@ export class Expression extends AstNode {
       classReference: constantValueReference,
       arguments_: [
         python.methodArgument({
-          value: lhs,
+          value: ref,
         }),
       ],
     });

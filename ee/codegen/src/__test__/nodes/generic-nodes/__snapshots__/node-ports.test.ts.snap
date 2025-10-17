@@ -36,7 +36,7 @@ exports[`NodePorts > empty expression for if port > generates correct ports clas
 
 exports[`NodePorts > nested binary expression with AND operator > generates correct ports class with nested AND operator 1`] = `
 "class Ports(BaseNode.Ports):
-    if_port = Port.on_if(Inputs.count.greater_than(10) & (Inputs.count.less_than(100)))
+    if_port = Port.on_if(Inputs.count.greater_than(10) & Inputs.count.less_than(100))
     else_port = Port.on_else()
 "
 `;
@@ -44,7 +44,7 @@ exports[`NodePorts > nested binary expression with AND operator > generates corr
 exports[`NodePorts > nested binary expression with OR operator > generates correct ports class with nested OR operator 1`] = `
 "class Ports(BaseNode.Ports):
     if_port = Port.on_if(
-        TestNode.Outputs.my_output.equals("first-value") | (Inputs.count.equals(42))
+        TestNode.Outputs.my_output.equals("first-value") | Inputs.count.equals(42)
     )
     else_port = Port.on_else()
 "

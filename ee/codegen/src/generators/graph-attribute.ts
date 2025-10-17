@@ -438,16 +438,17 @@ export class GraphAttribute extends AstNode {
       // Handle for direct cycles in a set
       // We already know sourceNode -> targetNode exists (it's the edge we're adding)
       // So we only need to check if targetNode -> sourceNode exists
+      const sourceNodeId = sourceNode?.nodeData.id;
       if (
         isCycle &&
         isSourceInGraph &&
-        sourceNode &&
+        sourceNodeId &&
         Array.from(this.workflowContext.getEdgesByPortId().values())
           .flat()
           .some(
             (e) =>
               e.sourceNodeId === targetNode.nodeData.id &&
-              e.targetNodeId === sourceNode.nodeData.id
+              e.targetNodeId === sourceNodeId
           )
       ) {
         // Create a new set with the same values, but modify the branch that contains the source node

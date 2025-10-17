@@ -9,7 +9,9 @@ export function isDefined<TValue>(value: TValue | undefined): value is TValue {
 }
 
 export function assertUnreachable(_: never): never {
-  throw new ValueGenerationError("Didn't expect to get here");
+  throw new ValueGenerationError(
+    `Didn't expect to get here: ${JSON.stringify(_)}.`
+  );
 }
 
 export function isNilOrEmpty<T>(

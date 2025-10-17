@@ -228,7 +228,6 @@ describe("GuardrailNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
 
       const errors = workflowContext.getErrors();
-      // console.log(errors);
       expect(errors).toHaveLength(1);
       expect(errors[0]?.message).toContain(
         'Metric Definition "589df5bd-8c0d-4797-9a84-9598ecd043de LATEST" not found.'
