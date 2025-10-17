@@ -439,37 +439,61 @@ export class GraphAttribute extends AstNode {
       // We already know sourceNode -> targetNode exists (it's the edge we're adding)
       // So we only need to check if targetNode -> sourceNode exists
       const sourceNodeId = sourceNode?.nodeData.id;
-      if (
-        isCycle &&
-        isSourceInGraph &&
-        sourceNodeId &&
-        Array.from(this.workflowContext.getEdgesByPortId().values())
+      if (isCycle && isSourceInGraph && sourceNodeId) {
+        // Self cycle edge
+        if (sourceNode === targetNode) {
+          const sourceNodePortContext = sourceNode.portContextsById.get(
+            edge.sourceHandleId
+          );
+          if (sourceNodePortContext && !sourceNodePortContext.isDefault) {
+            return {
+              type: "set",
+              values: [
+                ...setAst.values,
+                {
+                  type: "right_shift",
+                  lhs: {
+                    type: "port_reference",
+                    reference: sourceNodePortContext,
+                  },
+                  rhs: { type: "node_reference", reference: targetNode },
+                },
+              ],
+            };
+          }
+        }
+
+        // Anything else
+        const doesReverseEdgeExist = Array.from(
+          this.workflowContext.getEdgesByPortId().values()
+        )
           .flat()
           .some(
             (e) =>
               e.sourceNodeId === targetNode.nodeData.id &&
               e.targetNodeId === sourceNodeId
-          )
-      ) {
-        // Create a new set with the same values, but modify the branch that contains the source node
-        const newValues = setAst.values.map((value) => {
-          // Check if this branch contains the source node
-          if (this.isNodeInBranch(sourceNode, value)) {
-            // If it does, append the target node to create the cycle
-            return {
-              type: "right_shift" as const,
-              lhs: value,
-              rhs: { type: "node_reference" as const, reference: targetNode },
-            };
-          }
-          // Otherwise, leave the branch unchanged
-          return value;
-        });
+          );
+        if (doesReverseEdgeExist) {
+          // Create a new set with the same values, but modify the branch that contains the source node
+          const newValues = setAst.values.map((value) => {
+            // Check if this branch contains the source node
+            if (this.isNodeInBranch(sourceNode, value)) {
+              // If it does, append the target node to create the cycle
+              return {
+                type: "right_shift" as const,
+                lhs: value,
+                rhs: { type: "node_reference" as const, reference: targetNode },
+              };
+            }
+            // Otherwise, leave the branch unchanged
+            return value;
+          });
 
-        return {
-          type: "set" as const,
-          values: newValues,
-        };
+          return {
+            type: "set" as const,
+            values: newValues,
+          };
+        }
       }
 
       const newSet = setAst.values.map((subAst) => {
@@ -477,7 +501,6 @@ export class GraphAttribute extends AstNode {
         if (!canBeAdded) {
           return { edgeAddedPriority: 0, original: subAst, value: subAst };
         }
-
         const newSubAst = this.addEdgeToGraph({
           edge,
           mutableAst: subAst,
@@ -658,8 +681,6 @@ export class GraphAttribute extends AstNode {
           newAstSources.map((source) => source.reference.portId)
         );
         if (uniqueAstSourceIds.size === 1 && newAstSources[0]) {
-          // If all the sources are the same, we can simplify the graph into a
-          // right shift between the source node and the set.
           const portReference = newAstSources[0];
           return {
             type: "right_shift",
@@ -673,7 +694,15 @@ export class GraphAttribute extends AstNode {
           };
         }
       }
-      return this.flattenSet(newSetAst);
+
+      const flattenedNewSetAst = this.flattenSet(newSetAst);
+      if (mutableAst.rhs.type === "node_reference") {
+        return this.optimizeSetThroughCommonTarget(
+          flattenedNewSetAst,
+          mutableAst.rhs.reference
+        );
+      }
+      return flattenedNewSetAst;
     }
 
     const lhsTerminals = this.getAstTerminals(mutableAst.lhs);

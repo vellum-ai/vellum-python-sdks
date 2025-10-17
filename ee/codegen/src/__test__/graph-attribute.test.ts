@@ -1151,5 +1151,37 @@ describe("Workflow", () => {
 
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
+
+    it("should handle a conditional node with default port pointing back to itself", async () => {
+      const validateAPIResponseNode = genericNodeFactory({
+        id: uuidv4(),
+        label: "ValidateAPIResponse",
+        nodePorts: [
+          nodePortFactory({ name: "success", type: "IF" }),
+          nodePortFactory({ name: "network_error", type: "IF" }),
+          nodePortFactory({ name: "api_error", type: "IF" }),
+          nodePortFactory({ name: "default", type: "ELSE" }),
+        ],
+      });
+
+      const apiSuccessOutputNode = finalOutputNodeFactory({
+        id: uuidv4(),
+        label: "APISuccessOutput",
+        name: "api_success_output",
+      }).build();
+
+      const apiErrorHandlerNode = genericNodeFactory({
+        id: uuidv4(),
+        label: "APIErrorHandler",
+      });
+
+      await runGraphTest([
+        [entrypointNode, validateAPIResponseNode],
+        [[validateAPIResponseNode, "success"], apiSuccessOutputNode],
+        [[validateAPIResponseNode, "network_error"], apiErrorHandlerNode],
+        [[validateAPIResponseNode, "api_error"], apiErrorHandlerNode],
+        [[validateAPIResponseNode, "default"], validateAPIResponseNode],
+      ]);
+    });
   });
 });
