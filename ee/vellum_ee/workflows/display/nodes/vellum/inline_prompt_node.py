@@ -153,7 +153,9 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
 
     def _generate_function_tools(
         self,
-        function: Union[FunctionDefinition, Callable, DeploymentDefinition, Type["BaseWorkflow"]],
+        function: Union[
+            FunctionDefinition, Callable, DeploymentDefinition, Type["BaseWorkflow"], VellumIntegrationToolDefinition
+        ],
         index: int,
         display_context: WorkflowDisplayContext,
     ) -> JsonObject:
