@@ -238,5 +238,5 @@ export default {
       type: "STRING",
     },
   ],
-  assertions: ["nodes/final_output_node.py"],
+  assertions: ["workflow.py", "nodes/final_output_node.py"],
 };

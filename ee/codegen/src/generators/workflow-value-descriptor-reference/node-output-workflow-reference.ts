@@ -21,61 +21,65 @@ export class NodeOutputWorkflowReference extends BaseNodeInputWorkflowReference<
       nodeOutputPointer.nodeOutputId
     );
 
-    if (nodeOutputName) {
-      if (this.nodeContext && this.nodeContext.isImportedBefore(nodeContext)) {
-        return python.instantiateClass({
-          classReference: python.reference({
-            name: "LazyReference",
-            modulePath: [
-              ...this.nodeContext.workflowContext.sdkModulePathNames
-                .WORKFLOWS_MODULE_PATH,
-              "references",
-            ],
-          }),
-          arguments_: [
-            python.methodArgument({
-              value: python.TypeInstantiation.str(
-                `${nodeContext.nodeClassName}.${OUTPUTS_CLASS_NAME}.${nodeOutputName}`
-              ),
-            }),
+    if (!nodeOutputName) {
+      return undefined;
+    }
+
+    if (this.nodeContext && this.nodeContext.isImportedBefore(nodeContext)) {
+      return python.instantiateClass({
+        classReference: python.reference({
+          name: "LazyReference",
+          modulePath: [
+            ...this.nodeContext.workflowContext.sdkModulePathNames
+              .WORKFLOWS_MODULE_PATH,
+            "references",
           ],
-        });
-      }
-      if (this.nodeContext?.nodeClassName === nodeContext.nodeClassName) {
-        return python.instantiateClass({
-          classReference: python.reference({
-            name: "LazyReference",
-            modulePath: [
-              ...this.nodeContext.workflowContext.sdkModulePathNames
-                .WORKFLOWS_MODULE_PATH,
-              "references",
-            ],
+        }),
+        arguments_: [
+          python.methodArgument({
+            value: python.TypeInstantiation.str(
+              `${nodeContext.nodeClassName}.${OUTPUTS_CLASS_NAME}.${nodeOutputName}`
+            ),
           }),
-          arguments_: [
-            python.methodArgument({
-              value: python.lambda({
-                body: python.accessAttribute({
-                  lhs: python.reference({
-                    name: nodeContext.nodeClassName,
-                    modulePath: [],
-                  }),
-                  rhs: python.reference({
-                    name: `${OUTPUTS_CLASS_NAME}.${nodeOutputName}`,
-                    modulePath: [],
-                  }),
+        ],
+      });
+    }
+
+    if (this.nodeContext?.nodeClassName === nodeContext.nodeClassName) {
+      return python.instantiateClass({
+        classReference: python.reference({
+          name: "LazyReference",
+          modulePath: [
+            ...this.nodeContext.workflowContext.sdkModulePathNames
+              .WORKFLOWS_MODULE_PATH,
+            "references",
+          ],
+        }),
+        arguments_: [
+          python.methodArgument({
+            value: python.lambda({
+              body: python.accessAttribute({
+                lhs: python.reference({
+                  name: nodeContext.nodeClassName,
+                  modulePath: [],
+                }),
+                rhs: python.reference({
+                  name: `${OUTPUTS_CLASS_NAME}.${nodeOutputName}`,
+                  modulePath: [],
                 }),
               }),
             }),
-          ],
-        });
-      } else {
-        return python.reference({
-          name: nodeContext.nodeClassName,
-          modulePath: nodeContext.nodeModulePath,
-          attribute: [OUTPUTS_CLASS_NAME, nodeOutputName],
-        });
-      }
+          }),
+        ],
+      });
     }
-    return undefined;
+
+    const reference = python.reference({
+      name: nodeContext.nodeClassName,
+      modulePath: nodeContext.nodeModulePath,
+      attribute: [OUTPUTS_CLASS_NAME, nodeOutputName],
+    });
+    this.inheritReferences(reference);
+    return reference;
   }
 }
