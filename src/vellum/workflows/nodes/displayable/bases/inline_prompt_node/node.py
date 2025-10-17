@@ -87,7 +87,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
     functions: Optional[List[Union[FunctionDefinition, Callable]]] = None
 
     parameters: PromptParameters = DEFAULT_PROMPT_PARAMETERS
-    expand_meta: Optional[AdHocExpandMeta] = None
+    expand_meta: Optional[AdHocExpandMeta] = AdHocExpandMeta(finish_reason=True)
 
     settings: Optional[PromptSettings] = None
 

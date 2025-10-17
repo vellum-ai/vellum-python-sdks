@@ -62,7 +62,7 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
     release_tag: str = LATEST_RELEASE_TAG
     external_id: Optional[str] = None
 
-    expand_meta: Optional[PromptDeploymentExpandMetaRequest] = None
+    expand_meta: Optional[PromptDeploymentExpandMetaRequest] = PromptDeploymentExpandMetaRequest(finish_reason=True)
     raw_overrides: Optional[RawPromptExecutionOverridesRequest] = None
     expand_raw: Optional[Sequence[str]] = None
     metadata: Optional[Dict[str, Optional[Any]]] = None

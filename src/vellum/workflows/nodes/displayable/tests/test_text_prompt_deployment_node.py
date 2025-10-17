@@ -68,3 +68,8 @@ def test_text_prompt_deployment_node__basic(vellum_client):
     exec_ctx = call_kwargs["request_options"]["additional_body_parameters"]["execution_context"]
     assert exec_ctx["parent_context"] is not None
     assert exec_ctx["parent_context"]["type"] == "EXTERNAL"
+
+    # AND expand_meta should include finish_reason=True by default
+    expand_meta = call_kwargs.get("expand_meta")
+    assert expand_meta is not None
+    assert expand_meta.finish_reason is True
