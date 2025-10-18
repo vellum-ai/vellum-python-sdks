@@ -12,6 +12,7 @@ from vellum import (
     StringVellumValue,
     VellumError,
 )
+from vellum.client.types.ad_hoc_expand_meta import AdHocExpandMeta
 from vellum.workflows.errors import WorkflowError as SdkVellumError
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.inputs import BaseInputs
@@ -74,7 +75,12 @@ def test_inline_text_prompt_node__basic(vellum_adhoc_prompt_client):
     # AND we should have made the expected call to Vellum search
     vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.assert_called_once_with(
         blocks=[],
-        expand_meta=None,
+        expand_meta=AdHocExpandMeta(
+            cost=None, 
+            model_name=None, 
+            usage=None, 
+            finish_reason=True
+        ),
         functions=None,
         input_values=[],
         input_variables=[],

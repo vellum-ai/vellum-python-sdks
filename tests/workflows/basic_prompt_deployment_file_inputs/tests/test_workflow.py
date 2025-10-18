@@ -14,6 +14,7 @@ from vellum.client.types import VellumAudio, VellumDocument, VellumImage, Vellum
 from vellum.client.types.audio_input_request import AudioInputRequest
 from vellum.client.types.document_input_request import DocumentInputRequest
 from vellum.client.types.image_input_request import ImageInputRequest
+from vellum.client.types.prompt_deployment_expand_meta_request import PromptDeploymentExpandMetaRequest
 from vellum.client.types.vellum_audio_request import VellumAudioRequest
 from vellum.client.types.vellum_document_request import VellumDocumentRequest
 from vellum.client.types.vellum_image_request import VellumImageRequest
@@ -103,7 +104,15 @@ def test_run_workflow__happy_path(vellum_client):
     assert call_kwargs["prompt_deployment_name"] == "example_prompt_deployment"
     assert call_kwargs["release_tag"] == LATEST_RELEASE_TAG
     assert call_kwargs["external_id"] is None
-    assert call_kwargs["expand_meta"] is None
+    assert call_kwargs["expand_meta"] == PromptDeploymentExpandMetaRequest(
+        model_name=None, 
+        usage=None, 
+        cost=None, 
+        finish_reason=True, 
+        latency=None, 
+        deployment_release_tag=None, 
+        prompt_version_id=None
+    )
     assert call_kwargs["raw_overrides"] is None
     assert call_kwargs["expand_raw"] is None
     assert call_kwargs["metadata"] is None
