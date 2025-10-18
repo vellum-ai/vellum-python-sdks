@@ -1100,58 +1100,6 @@ describe("Workflow", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
-    it("should generate correct graph when workflow has a slack trigger", async () => {
-      const writer = new Writer();
-
-      const firstNode = genericNodeFactory({
-        id: "first-node",
-        label: "FirstNode",
-      });
-
-      const secondNode = genericNodeFactory({
-        id: "second-node",
-        label: "SecondNode",
-      });
-
-      const edges = edgesFactory([
-        [entrypointNode, firstNode],
-        [firstNode, secondNode],
-      ]);
-
-      const workflowContext = workflowContextFactory({
-        workflowRawData: {
-          nodes: [entrypointNode, firstNode, secondNode],
-          edges,
-        },
-        triggers: [
-          {
-            id: "trigger-1",
-            type: "SLACK_MESSAGE",
-            attributes: [],
-          },
-        ],
-      });
-
-      await Promise.all([
-        createNodeContext({
-          nodeData: firstNode,
-          workflowContext,
-        }),
-        createNodeContext({
-          nodeData: secondNode,
-          workflowContext,
-        }),
-      ]);
-
-      const graphAttribute = new GraphAttribute({
-        workflowContext,
-      });
-
-      graphAttribute.write(writer);
-
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
-    });
-
     it("should handle a conditional node with default port pointing back to itself", async () => {
       const validateAPIResponseNode = genericNodeFactory({
         id: uuidv4(),

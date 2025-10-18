@@ -12,23 +12,22 @@ describe("TriggerAttributeWorkflowReference", () => {
     workflowContext = workflowContextFactory({
       triggers: [
         {
-          id: "slack-trigger-id",
-          type: "SLACK_MESSAGE",
+          id: "manual-trigger-id",
+          type: "MANUAL",
           attributes: [
-            { id: "message-id", name: "message" },
-            { id: "user-id", name: "user" },
-            { id: "channel-id", name: "channel" },
+            { id: "input-id", name: "input" },
+            { id: "config-id", name: "config" },
           ],
         },
       ],
     });
   });
 
-  it("should generate correct AST for SlackTrigger.message reference", async () => {
+  it("should generate correct AST for ManualTrigger.input reference", async () => {
     const triggerAttributeReference: WorkflowValueDescriptorReference = {
       type: "TRIGGER_ATTRIBUTE",
-      triggerId: "slack-trigger-id",
-      attributeId: "message-id",
+      triggerId: "manual-trigger-id",
+      attributeId: "input-id",
     };
 
     const pointer = new TriggerAttributeWorkflowReference({
@@ -42,11 +41,11 @@ describe("TriggerAttributeWorkflowReference", () => {
     expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
 
-  it("should generate correct AST for SlackTrigger.user reference", async () => {
+  it("should generate correct AST for ManualTrigger.config reference", async () => {
     const triggerAttributeReference: WorkflowValueDescriptorReference = {
       type: "TRIGGER_ATTRIBUTE",
-      triggerId: "slack-trigger-id",
-      attributeId: "user-id",
+      triggerId: "manual-trigger-id",
+      attributeId: "config-id",
     };
 
     const pointer = new TriggerAttributeWorkflowReference({
@@ -64,7 +63,7 @@ describe("TriggerAttributeWorkflowReference", () => {
     const triggerAttributeReference: WorkflowValueDescriptorReference = {
       type: "TRIGGER_ATTRIBUTE",
       triggerId: "non-existent-trigger",
-      attributeId: "message-id",
+      attributeId: "input-id",
     };
 
     const pointer = new TriggerAttributeWorkflowReference({
@@ -78,7 +77,7 @@ describe("TriggerAttributeWorkflowReference", () => {
   it("should return undefined for non-existent attribute", async () => {
     const triggerAttributeReference: WorkflowValueDescriptorReference = {
       type: "TRIGGER_ATTRIBUTE",
-      triggerId: "slack-trigger-id",
+      triggerId: "manual-trigger-id",
       attributeId: "non-existent-attribute",
     };
 
@@ -88,33 +87,5 @@ describe("TriggerAttributeWorkflowReference", () => {
     });
 
     expect(pointer.getAstNode()).toBeUndefined();
-  });
-
-  it("should handle ManualTrigger reference", async () => {
-    const manualWorkflowContext = workflowContextFactory({
-      triggers: [
-        {
-          id: "manual-trigger-id",
-          type: "MANUAL",
-          attributes: [{ id: "input-id", name: "input" }],
-        },
-      ],
-    });
-
-    const triggerAttributeReference: WorkflowValueDescriptorReference = {
-      type: "TRIGGER_ATTRIBUTE",
-      triggerId: "manual-trigger-id",
-      attributeId: "input-id",
-    };
-
-    const pointer = new TriggerAttributeWorkflowReference({
-      workflowContext: manualWorkflowContext,
-      nodeInputWorkflowReferencePointer: triggerAttributeReference,
-    });
-
-    const writer = new Writer();
-    pointer.write(writer);
-
-    expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
 });
