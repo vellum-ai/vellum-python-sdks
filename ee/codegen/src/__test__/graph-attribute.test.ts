@@ -1100,7 +1100,6 @@ describe("Workflow", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
-
     it("should handle a conditional node with default port pointing back to itself", async () => {
       const validateAPIResponseNode = genericNodeFactory({
         id: uuidv4(),
