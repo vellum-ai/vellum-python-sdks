@@ -105,13 +105,13 @@ def test_run_workflow__happy_path(vellum_client):
     assert call_kwargs["release_tag"] == LATEST_RELEASE_TAG
     assert call_kwargs["external_id"] is None
     assert call_kwargs["expand_meta"] == PromptDeploymentExpandMetaRequest(
-        model_name=None, 
-        usage=None, 
-        cost=None, 
-        finish_reason=True, 
-        latency=None, 
-        deployment_release_tag=None, 
-        prompt_version_id=None
+        model_name=None,
+        usage=None,
+        cost=None,
+        finish_reason=True,
+        latency=None,
+        deployment_release_tag=None,
+        prompt_version_id=None,
     )
     assert call_kwargs["raw_overrides"] is None
     assert call_kwargs["expand_raw"] is None
