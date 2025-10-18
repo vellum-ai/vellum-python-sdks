@@ -2,6 +2,7 @@ from unittest import mock
 from uuid import uuid4
 from typing import Iterator, List
 
+from vellum.client.types.ad_hoc_expand_meta import AdHocExpandMeta
 from vellum.client.types.chat_message import ChatMessage
 from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
 from vellum.client.types.execute_prompt_event import ExecutePromptEvent
@@ -145,6 +146,6 @@ def test_get_current_weather_workflow(vellum_adhoc_prompt_client, mock_uuid4_gen
         ],
         "settings": None,
         "functions": None,
-        "expand_meta": None,
+        "expand_meta": AdHocExpandMeta(finish_reason=True),
         "request_options": mock.ANY,
     }

@@ -4,6 +4,7 @@ from typing import Any, Iterator, List
 
 from vellum import (
     AdHocExecutePromptEvent,
+    AdHocExpandMeta,
     ChatMessagePromptBlock,
     FulfilledAdHocExecutePromptEvent,
     InitiatedAdHocExecutePromptEvent,
@@ -78,7 +79,7 @@ def test_autocasting_blocks_compile_to_correct_api_schema(vellum_adhoc_prompt_cl
                 ],
             ),
         ],
-        expand_meta=None,
+        expand_meta=AdHocExpandMeta(finish_reason=True),
         functions=None,
         request_options=mock.ANY,
         settings=None,
