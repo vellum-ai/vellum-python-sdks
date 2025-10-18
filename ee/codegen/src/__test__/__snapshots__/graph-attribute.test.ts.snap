@@ -291,11 +291,6 @@ exports[`Workflow > graph > should generate correct graph when workflow has a ma
 "
 `;
 
-exports[`Workflow > graph > should generate correct graph when workflow has a slack trigger 1`] = `
-"SlackTrigger >> FirstNode >> SecondNode
-"
-`;
-
 exports[`Workflow > graph > should handle a conditional node with default port pointing back to itself 1`] = `
 "{
     ValidateAPIResponse.Ports.success >> APISuccessOutput,
