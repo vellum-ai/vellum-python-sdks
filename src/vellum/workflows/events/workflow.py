@@ -145,6 +145,9 @@ class WorkflowExecutionFulfilledBody(_BaseWorkflowExecutionBody, Generic[Outputs
     outputs: OutputsType
     final_state: Optional[StateType] = None
 
+    # This field can be populated with arbitrary server metadata during event enrichment
+    server_metadata: Optional[Dict[str, Any]] = None
+
     @field_serializer("outputs")
     def serialize_outputs(self, outputs: OutputsType, _info: Any) -> Dict[str, Any]:
         return default_serializer(outputs)
@@ -168,6 +171,21 @@ class WorkflowExecutionFulfilledEvent(_BaseWorkflowEvent, Generic[OutputsType, S
     @property
     def final_state(self) -> Optional[StateType]:
         return self.body.final_state
+
+    @field_serializer("body")
+    def serialize_body(
+        self, body: WorkflowExecutionFulfilledBody[OutputsType, StateType], info: SerializationInfo
+    ) -> WorkflowExecutionFulfilledBody[OutputsType, StateType]:
+        context = info.context if info and hasattr(info, "context") else {}
+        if context and "event_enricher" in context and callable(context["event_enricher"]):
+            try:
+                event = context["event_enricher"](self)
+                return event.body
+            except Exception as e:
+                logger.exception(f"Error in event_enricher: {e}")
+                return body
+        else:
+            return body
 
 
 class WorkflowExecutionRejectedBody(_BaseWorkflowExecutionBody):
