@@ -14,6 +14,6 @@ class FinalOutputDisplay(BaseFinalOutputNodeDisplay[FinalOutput]):
     output_name = "final-output"
     node_input_ids_by_name = {"node_input": UUID("e4585fda-2016-40fb-8ceb-6553a73f0311")}
     output_display = {
-        FinalOutput.Outputs.value: NodeOutputDisplay(id=UUID("b38e08c7-904d-4f49-b8fb-56e1eff254d6"), name="value")
+        FinalOutput.Outputs.value: NodeOutputDisplay(id=UUID("b38e08c7-904d-4f49-b8fb-56e1eff254d6"), name="value"),
     }
     display_data = NodeDisplayData(position=NodeDisplayPosition(x=2750, y=210), width=480, height=233)

@@ -86,6 +86,16 @@ export default {
         type: "DEFAULT",
       },
     ],
+    output_values: [
+      {
+        output_variable_id: "workflow-output-variable-id",
+        value: {
+          type: "NODE_OUTPUT",
+          node_id: "terminal-node",
+          node_output_id: "terminal-node-output-id",
+        },
+      },
+    ],
   },
   input_variables: [],
   output_variables: [

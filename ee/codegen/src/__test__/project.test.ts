@@ -4927,9 +4927,10 @@ baz = foo + bar
                                 {
                                   value: {
                                     type: "NODE_OUTPUT",
-                                    node_id: "start-node-id",
+                                    node_id:
+                                      "938ac916-6b4d-4097-a16e-cf7feb663b17",
                                     node_output_id:
-                                      "3f4c753e-f057-47bb-9748-7968283cc8aa",
+                                      "1f300ab1-7a63-4c0f-81d5-5e6df2a5181c",
                                   },
                                   output_variable_id:
                                     "1f300ab1-7a63-4c0f-81d5-5e6df2a5181c",
@@ -4937,9 +4938,10 @@ baz = foo + bar
                                 {
                                   value: {
                                     type: "NODE_OUTPUT",
-                                    node_id: "start-node-id",
+                                    node_id:
+                                      "d4abe0fd-0ba5-438c-8d20-4155ca89429e",
                                     node_output_id:
-                                      "2a4a62b3-cd26-4d2c-b3f1-eaa5f9dd22dd",
+                                      "64c803c9-02a0-4133-8858-14a3bddc0600",
                                   },
                                   output_variable_id:
                                     "64c803c9-02a0-4133-8858-14a3bddc0600",
@@ -5212,7 +5214,7 @@ baz = foo + bar
                 node_id: "88e59503-f7fb-48cc-b535-3cd1db07627a",
                 node_output_id: "9a233225-16ef-48b4-8cf6-d8a6c1ae72ce",
               },
-              output_variable_id: "9a233225-16ef-48b4-8cf6-d8a6c1ae72ce",
+              output_variable_id: "dbedc4ee-be3b-4135-8c26-3643c0b6a530",
             },
             {
               value: {
@@ -5220,7 +5222,7 @@ baz = foo + bar
                 node_id: "8834dd6c-d3cc-49fa-aec8-6a6d23ca2d6a",
                 node_output_id: "5ebf2c00-cb24-421b-9a23-5e0e2673f1ef",
               },
-              output_variable_id: "5ebf2c00-cb24-421b-9a23-5e0e2673f1ef",
+              output_variable_id: "c5733df5-03bb-498e-a770-8ef9bff85df3",
             },
           ],
         },
@@ -5250,6 +5252,11 @@ baz = foo + bar
         ],
         state_variables: [],
         output_variables: [
+          {
+            id: "f04ec2cc-fd32-42b7-aac8-273bfaa3a283",
+            key: "final_output",
+            type: "STRING",
+          },
           {
             id: "dbedc4ee-be3b-4135-8c26-3643c0b6a530",
             key: "text",

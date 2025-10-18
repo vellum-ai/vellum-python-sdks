@@ -72,7 +72,7 @@ class MyFinalOutputDisplay(BaseFinalOutputNodeDisplay[MyFinalOutput]):
     output_name = "result"
     node_input_ids_by_name = {"node_input": "terminal-node-input-id"}
     output_display = {
-        MyFinalOutput.Outputs.value: NodeOutputDisplay(id=UUID("workflow-output-variable-id"), name="value")
+        MyFinalOutput.Outputs.value: NodeOutputDisplay(id=UUID("terminal-node-output-id"), name="value"),
     }
     display_data = NodeDisplayData(position=NodeDisplayPosition(x=500, y=200), z_index=1, width=330, height=96)
 "

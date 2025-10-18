@@ -96,35 +96,38 @@ export class FinalOutputNode extends BaseNode<
   protected getOutputDisplay(): python.Field {
     return python.field({
       name: "output_display",
-      initializer: python.TypeInstantiation.dict([
-        {
-          key: python.reference({
-            name: this.nodeContext.nodeClassName,
-            modulePath: this.nodeContext.nodeModulePath,
-            attribute: [OUTPUTS_CLASS_NAME, "value"],
-          }),
-          value: python.instantiateClass({
-            classReference: python.reference({
-              name: "NodeOutputDisplay",
-              modulePath:
-                this.workflowContext.sdkModulePathNames
-                  .NODE_DISPLAY_TYPES_MODULE_PATH,
+      initializer: python.TypeInstantiation.dict(
+        [
+          {
+            key: python.reference({
+              name: this.nodeContext.nodeClassName,
+              modulePath: this.nodeContext.nodeModulePath,
+              attribute: [OUTPUTS_CLASS_NAME, "value"],
             }),
-            arguments_: [
-              python.methodArgument({
-                name: "id",
-                value: python.TypeInstantiation.uuid(
-                  this.nodeData.data.outputId
-                ),
+            value: python.instantiateClass({
+              classReference: python.reference({
+                name: "NodeOutputDisplay",
+                modulePath:
+                  this.workflowContext.sdkModulePathNames
+                    .NODE_DISPLAY_TYPES_MODULE_PATH,
               }),
-              python.methodArgument({
-                name: "name",
-                value: python.TypeInstantiation.str("value"),
-              }),
-            ],
-          }),
-        },
-      ]),
+              arguments_: [
+                python.methodArgument({
+                  name: "id",
+                  value: python.TypeInstantiation.uuid(
+                    this.nodeData.data.outputId
+                  ),
+                }),
+                python.methodArgument({
+                  name: "name",
+                  value: python.TypeInstantiation.str("value"),
+                }),
+              ],
+            }),
+          },
+        ],
+        { endWithComma: true }
+      ),
     });
   }
 
