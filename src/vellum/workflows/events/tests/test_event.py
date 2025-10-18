@@ -229,6 +229,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
                         "example": "foo",
                     },
                     "final_state": None,
+                    "server_metadata": None,
                 },
                 "parent": None,
                 "links": None,
@@ -267,6 +268,7 @@ mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
                     "final_state": {
                         "writable_value": 42,
                     },
+                    "server_metadata": None,
                 },
                 "parent": None,
                 "links": None,
