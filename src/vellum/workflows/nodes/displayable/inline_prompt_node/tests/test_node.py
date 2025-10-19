@@ -14,6 +14,7 @@ from vellum.client.types.chat_message_request import ChatMessageRequest
 from vellum.client.types.execute_prompt_event import ExecutePromptEvent
 from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
 from vellum.client.types.function_call import FunctionCall
+from vellum.client.types.function_call_prompt_block import FunctionCallPromptBlock
 from vellum.client.types.function_call_vellum_value import FunctionCallVellumValue
 from vellum.client.types.function_definition import FunctionDefinition
 from vellum.client.types.initiated_execute_prompt_event import InitiatedExecutePromptEvent
@@ -300,3 +301,65 @@ def test_inline_prompt_node__parent_context(mock_httpx_transport, mock_complex_p
             "blocks": [],
         }
     ]
+
+
+@pytest.mark.timeout(5)
+def test_inline_prompt_node__anthropic_function_block_empty_properties(mock_httpx_transport):
+    """
+    Tests that function blocks with empty properties are correctly sent to Anthropic models.
+    """
+
+    # GIVEN a prompt node with an Anthropic model
+    class MyNode(InlinePromptNode):
+        ml_model = "claude-3-5-sonnet-20241022"
+        blocks = [
+            ChatMessagePromptBlock(chat_role="USER", blocks=[]),
+            FunctionCallPromptBlock(name="my_tool", arguments={}),
+        ]
+        prompt_inputs = {}
+
+    # AND a known response from the httpx client
+    expected_outputs: List[PromptOutput] = [
+        StringVellumValue(value="Test"),
+    ]
+    execution_id = str(uuid4())
+    events: List[ExecutePromptEvent] = [
+        InitiatedExecutePromptEvent(execution_id=execution_id),
+        FulfilledExecutePromptEvent(
+            execution_id=execution_id,
+            outputs=expected_outputs,
+        ),
+    ]
+    text = "\n".join(e.model_dump_json() for e in events)
+
+    mock_httpx_transport.handle_request.return_value = Response(
+        status_code=200,
+        text=text,
+    )
+
+    # WHEN the node is run
+    outputs = list(MyNode().run())
+
+    # THEN the last output is as expected
+    assert outputs[-1].value == "Test"
+
+    # AND the prompt is executed with the correct blocks
+    call_request_args = mock_httpx_transport.handle_request.call_args_list[0][0][0]
+    call_request = json.loads(call_request_args.read().decode("utf-8"))
+
+    # THEN the blocks are serialized correctly
+    assert call_request["blocks"] == [
+        {
+            "block_type": "CHAT_MESSAGE",
+            "chat_role": "USER",
+            "blocks": [],
+        },
+        {
+            "block_type": "FUNCTION_CALL",
+            "name": "my_tool",
+            "arguments": {},
+        },
+    ]
+
+    # AND the ml_model is set correctly
+    assert call_request["ml_model"] == "claude-3-5-sonnet-20241022"
