@@ -1128,8 +1128,8 @@ describe("Workflow", () => {
             id: "trigger-1",
             type: "INTEGRATION",
             attributes: [
-              { id: "attr-1", name: "message", type: "STRING", value: null },
-              { id: "attr-2", name: "channel", type: "STRING", value: null },
+              { id: "attr-1", name: "message", value: null },
+              { id: "attr-2", name: "channel", value: null },
             ],
             class_name: "SlackMessageTrigger",
             module_path: ["tests", "fixtures", "triggers", "slack_message"],
