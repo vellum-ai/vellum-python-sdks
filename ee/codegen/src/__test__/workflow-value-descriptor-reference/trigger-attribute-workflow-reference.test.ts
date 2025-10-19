@@ -96,8 +96,8 @@ describe("TriggerAttributeWorkflowReference", () => {
           id: "integration-trigger-id",
           type: "INTEGRATION",
           attributes: [
-            { id: "message-id", name: "message", type: "STRING", value: null },
-            { id: "channel-id", name: "channel", type: "STRING", value: null },
+            { id: "message-id", name: "message", value: null },
+            { id: "channel-id", name: "channel", value: null },
           ],
           class_name: "SlackMessageTrigger",
           module_path: ["tests", "fixtures", "triggers", "slack_message"],
@@ -129,8 +129,8 @@ describe("TriggerAttributeWorkflowReference", () => {
           id: "integration-trigger-id",
           type: "INTEGRATION",
           attributes: [
-            { id: "message-id", name: "message", type: "STRING", value: null },
-            { id: "channel-id", name: "channel", type: "STRING", value: null },
+            { id: "message-id", name: "message", value: null },
+            { id: "channel-id", name: "channel", value: null },
           ],
           class_name: "SlackMessageTrigger",
           module_path: ["tests", "fixtures", "triggers", "slack_message"],
