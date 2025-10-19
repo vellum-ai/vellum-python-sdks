@@ -55,6 +55,55 @@ class CodeExecutionWithAwaitAll(CodeExecutionNode[BaseState, str]):
 "
 `;
 
+exports[`generateCode > should generate code for %1 final-output-node-only.ts > display/nodes/my_final_output.py 1`] = `
+"from uuid import UUID
+
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.nodes import BaseFinalOutputNodeDisplay
+from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
+
+from ...nodes.my_final_output import MyFinalOutput
+
+
+class MyFinalOutputDisplay(BaseFinalOutputNodeDisplay[MyFinalOutput]):
+    label = "Final Output"
+    node_id = UUID("terminal-node")
+    target_handle_id = UUID("terminal-target")
+    output_name = "result"
+    node_input_ids_by_name = {"node_input": "terminal-node-input-id"}
+    output_display = {
+        MyFinalOutput.Outputs.value: NodeOutputDisplay(id=UUID("terminal-node-output-id"), name="value"),
+    }
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=500, y=200), z_index=1, width=330, height=96)
+"
+`;
+
+exports[`generateCode > should generate code for %1 final-output-node-only.ts > display/workflow.py 1`] = `
+"from uuid import UUID
+
+from vellum_ee.workflows.display.base import EdgeDisplay, EntrypointDisplay, WorkflowMetaDisplay, WorkflowOutputDisplay
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
+
+from ..nodes.my_final_output import MyFinalOutput
+from ..workflow import Workflow
+
+
+class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
+    workflow_display = WorkflowMetaDisplay(
+        entrypoint_node_id=UUID("entrypoint-node"),
+        entrypoint_node_source_handle_id=UUID("entrypoint-source"),
+        entrypoint_node_display=NodeDisplayData(position=NodeDisplayPosition(x=0, y=0)),
+    )
+    entrypoint_displays = {
+        MyFinalOutput: EntrypointDisplay(id=UUID("entrypoint-node"), edge_display=EdgeDisplay(id=UUID("edge-1")))
+    }
+    output_displays = {
+        Workflow.Outputs.result: WorkflowOutputDisplay(id=UUID("workflow-output-variable-id"), name="result")
+    }
+"
+`;
+
 exports[`generateCode > should generate code for %1 map-node-output-disappear.ts > nodes/outer_map_workflow/nodes/inner_map_workflow/__init__.py 1`] = `
 "from vellum.workflows.nodes.displayable import MapNode
 
