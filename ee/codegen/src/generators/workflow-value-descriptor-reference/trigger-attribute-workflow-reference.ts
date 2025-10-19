@@ -27,8 +27,8 @@ export class TriggerAttributeWorkflowReference extends BaseNodeInputWorkflowRefe
       return undefined;
     }
 
-    // Get the trigger class information based on trigger type
-    const triggerClassInfo = getTriggerClassInfo(trigger.type);
+    // Get the trigger class information based on trigger
+    const triggerClassInfo = getTriggerClassInfo(trigger);
     if (!triggerClassInfo) {
       return undefined;
     }

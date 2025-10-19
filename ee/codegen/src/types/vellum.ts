@@ -790,6 +790,8 @@ export interface WorkflowTrigger {
   id: string;
   type: string;
   attributes: NodeAttribute[];
+  class_name?: string; // Only present for INTEGRATION triggers
+  module_path?: string[]; // Only present for INTEGRATION triggers
 }
 
 export interface WorkflowRawData {
