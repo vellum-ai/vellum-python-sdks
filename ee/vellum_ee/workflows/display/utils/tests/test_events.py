@@ -3,7 +3,12 @@ from uuid import uuid4
 from typing import Optional
 
 from vellum.workflows.events.types import NodeParentContext, WorkflowDeploymentParentContext
-from vellum.workflows.events.workflow import WorkflowExecutionInitiatedBody, WorkflowExecutionInitiatedEvent
+from vellum.workflows.events.workflow import (
+    WorkflowExecutionFulfilledBody,
+    WorkflowExecutionFulfilledEvent,
+    WorkflowExecutionInitiatedBody,
+    WorkflowExecutionInitiatedEvent,
+)
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.workflows.base import BaseWorkflow
@@ -147,4 +152,34 @@ def test_event_enricher_with_metadata(vellum_client):
 
     # THEN the metadata should be attached to server_metadata
     assert enriched_event.name == "workflow.execution.initiated"
+    assert enriched_event.body.server_metadata == metadata
+
+
+def test_event_enricher_with_metadata_for_fulfilled_event(vellum_client):
+    """Test that event_enricher attaches metadata to server_metadata field for fulfilled events."""
+
+    # GIVEN a workflow class
+    class TestWorkflow(BaseWorkflow):
+        is_dynamic = False
+
+        class Outputs(BaseOutputs):
+            pass
+
+    event: WorkflowExecutionFulfilledEvent = WorkflowExecutionFulfilledEvent(
+        trace_id=uuid4(),
+        span_id=uuid4(),
+        body=WorkflowExecutionFulfilledBody(
+            workflow_definition=TestWorkflow,
+            outputs=TestWorkflow.Outputs(),
+        ),
+    )
+
+    # AND some metadata
+    metadata = {"execution_time_ms": 1234, "server_id": "server-abc"}
+
+    # WHEN the event_enricher is called with metadata
+    enriched_event = event_enricher(event, vellum_client, metadata=metadata)
+
+    # THEN the metadata should be attached to server_metadata
+    assert enriched_event.name == "workflow.execution.fulfilled"
     assert enriched_event.body.server_metadata == metadata
