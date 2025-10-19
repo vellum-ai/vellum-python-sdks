@@ -1,16 +1,11 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`TriggerAttributeWorkflowReference > should generate correct AST for SlackTrigger.message reference 1`] = `
-"SlackTrigger.message
-"
-`;
-
-exports[`TriggerAttributeWorkflowReference > should generate correct AST for SlackTrigger.user reference 1`] = `
-"SlackTrigger.user
-"
-`;
-
-exports[`TriggerAttributeWorkflowReference > should handle ManualTrigger reference 1`] = `
+exports[`TriggerAttributeWorkflowReference > should generate correct AST for ManualTrigger.input reference 1`] = `
 "ManualTrigger.input
+"
+`;
+
+exports[`TriggerAttributeWorkflowReference > should generate correct AST for ManualTrigger.config reference 1`] = `
+"ManualTrigger.config
 "
 `;
