@@ -1,5 +1,7 @@
 """Tests for VellumIntegrationTrigger serialization."""
 
+from typing import cast
+
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
@@ -40,19 +42,19 @@ def test_vellum_integration_trigger_serialization():
 
     # Verify triggers field exists
     assert "triggers" in result
-    triggers = result["triggers"]
+    triggers = cast(list, result["triggers"])
     assert isinstance(triggers, list)
     assert len(triggers) == 1
 
-    trigger = triggers[0]
+    trigger = cast(dict, triggers[0])
     assert trigger["type"] == "INTEGRATION"
 
     # Check that attributes are serialized
     assert "attributes" in trigger
-    attributes = trigger["attributes"]
+    attributes = cast(list, trigger["attributes"])
     assert len(attributes) == 3
 
-    attribute_names = {attr["name"] for attr in attributes}
+    attribute_names = {cast(dict, attr)["name"] for attr in attributes}
     assert attribute_names == {"message", "channel", "user"}
 
     # RED: These assertions should fail because we haven't implemented class_name and module_path yet
@@ -61,5 +63,6 @@ def test_vellum_integration_trigger_serialization():
 
     assert "module_path" in trigger, "Trigger should include module_path for codegen"
     # The module path should be a list of strings representing the module hierarchy
-    assert isinstance(trigger["module_path"], list)
-    assert all(isinstance(part, str) for part in trigger["module_path"])
+    module_path = trigger["module_path"]
+    assert isinstance(module_path, list)
+    assert all(isinstance(part, str) for part in module_path)
