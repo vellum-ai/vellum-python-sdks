@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 
-import { getTriggerClassInfo } from "src/utils/triggers";
 import { WorkflowTrigger } from "src/types/vellum";
+import { getTriggerClassInfo } from "src/utils/triggers";
 
 describe("getTriggerClassInfo", () => {
   it("should return correct info for MANUAL trigger", () => {
