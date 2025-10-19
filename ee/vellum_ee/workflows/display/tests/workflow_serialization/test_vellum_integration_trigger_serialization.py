@@ -1,7 +1,5 @@
 """Tests for VellumIntegrationTrigger serialization."""
 
-from typing import cast
-
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
@@ -38,23 +36,23 @@ def test_vellum_integration_trigger_serialization():
     class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
         graph = SlackMessageTrigger >> ProcessNode
 
-    result = get_workflow_display(workflow_class=TestWorkflow).serialize()
+    result: dict = get_workflow_display(workflow_class=TestWorkflow).serialize()
 
     # Verify triggers field exists
     assert "triggers" in result
-    triggers = cast(list, result["triggers"])
+    triggers = result["triggers"]
     assert isinstance(triggers, list)
     assert len(triggers) == 1
 
-    trigger = cast(dict, triggers[0])
+    trigger = triggers[0]
     assert trigger["type"] == "INTEGRATION"
 
     # Check that attributes are serialized
     assert "attributes" in trigger
-    attributes = cast(list, trigger["attributes"])
+    attributes = trigger["attributes"]
     assert len(attributes) == 3
 
-    attribute_names = {cast(dict, attr)["name"] for attr in attributes}
+    attribute_names = {attr["name"] for attr in attributes}
     assert attribute_names == {"message", "channel", "user"}
 
     # RED: These assertions should fail because we haven't implemented class_name and module_path yet
