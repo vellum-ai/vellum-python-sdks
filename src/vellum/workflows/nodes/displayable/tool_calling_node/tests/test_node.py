@@ -4,6 +4,7 @@ from uuid import uuid4
 from typing import Any, Iterator, List
 
 from vellum import ChatMessage
+from vellum.client.core.api_error import ApiError
 from vellum.client.types.execute_prompt_event import ExecutePromptEvent
 from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
 from vellum.client.types.function_call import FunctionCall
@@ -484,7 +485,6 @@ def test_tool_calling_node_400_error_returns_internal_error(vellum_adhoc_prompt_
     """
     Test that ToolCallingNode returns INTERNAL_ERROR when the underlying prompt node returns a 400 error.
     """
-    from vellum.client.core.api_error import ApiError
 
     # GIVEN a ToolCallingNode with minimal configuration
     class TestToolCallingNode(ToolCallingNode):

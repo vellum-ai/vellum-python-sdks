@@ -121,6 +121,13 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
                 exception = NodeException.of(event.error)
 
         if exception:
+            if exception.code == WorkflowErrorCode.INVALID_INPUTS:
+                raise NodeException(
+                    message=exception.message,
+                    code=WorkflowErrorCode.INTERNAL_ERROR,
+                    raw_data=exception.raw_data,
+                    stacktrace=exception.stacktrace,
+                ) from exception
             raise exception
 
         if outputs is None:
