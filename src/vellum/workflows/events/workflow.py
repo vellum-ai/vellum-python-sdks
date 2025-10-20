@@ -1,6 +1,6 @@
 import logging
 from uuid import UUID
-from typing import TYPE_CHECKING, Any, Dict, Generic, Iterable, Literal, Optional, Type, Union
+from typing import TYPE_CHECKING, Any, Dict, Generic, Iterable, Literal, Optional, Type, Union, cast
 from typing_extensions import TypeGuard
 
 from pydantic import SerializationInfo, field_serializer, field_validator
@@ -28,6 +28,27 @@ if TYPE_CHECKING:
     from vellum.workflows.workflows.base import BaseWorkflow
 
 logger = logging.getLogger(__name__)
+
+
+def _serialize_body_with_enricher(
+    event: "_BaseWorkflowEvent", body: "_BaseWorkflowExecutionBody", info: SerializationInfo
+) -> "_BaseWorkflowExecutionBody":
+    """
+    Helper function to serialize event body with optional event enrichment.
+
+    This function is used by both WorkflowExecutionInitiatedEvent and WorkflowExecutionFulfilledEvent
+    to apply event enrichment if an event_enricher is provided in the serialization context.
+    """
+    context = info.context if info and hasattr(info, "context") else {}
+    if context and "event_enricher" in context and callable(context["event_enricher"]):
+        try:
+            enriched_event = context["event_enricher"](event)
+            return enriched_event.body
+        except Exception as e:
+            logger.exception(f"Error in event_enricher: {e}")
+            return body
+    else:
+        return body
 
 
 class _BaseWorkflowExecutionBody(UniversalBaseModel):
@@ -112,16 +133,9 @@ class WorkflowExecutionInitiatedEvent(_BaseWorkflowEvent, Generic[InputsType, St
     def serialize_body(
         self, body: WorkflowExecutionInitiatedBody[InputsType, StateType], info: SerializationInfo
     ) -> WorkflowExecutionInitiatedBody[InputsType, StateType]:
-        context = info.context if info and hasattr(info, "context") else {}
-        if context and "event_enricher" in context and callable(context["event_enricher"]):
-            try:
-                event = context["event_enricher"](self)
-                return event.body
-            except Exception as e:
-                logger.exception(f"Error in event_enricher: {e}")
-                return body
-        else:
-            return body
+        return cast(
+            WorkflowExecutionInitiatedBody[InputsType, StateType], _serialize_body_with_enricher(self, body, info)
+        )
 
 
 class WorkflowExecutionStreamingBody(_BaseWorkflowExecutionBody):
@@ -144,6 +158,9 @@ class WorkflowExecutionStreamingEvent(_BaseWorkflowEvent):
 class WorkflowExecutionFulfilledBody(_BaseWorkflowExecutionBody, Generic[OutputsType, StateType]):
     outputs: OutputsType
     final_state: Optional[StateType] = None
+
+    # This field can be populated with arbitrary server metadata during event enrichment
+    server_metadata: Optional[Dict[str, Any]] = None
 
     @field_serializer("outputs")
     def serialize_outputs(self, outputs: OutputsType, _info: Any) -> Dict[str, Any]:
@@ -168,6 +185,14 @@ class WorkflowExecutionFulfilledEvent(_BaseWorkflowEvent, Generic[OutputsType, S
     @property
     def final_state(self) -> Optional[StateType]:
         return self.body.final_state
+
+    @field_serializer("body")
+    def serialize_body(
+        self, body: WorkflowExecutionFulfilledBody[OutputsType, StateType], info: SerializationInfo
+    ) -> WorkflowExecutionFulfilledBody[OutputsType, StateType]:
+        return cast(
+            WorkflowExecutionFulfilledBody[OutputsType, StateType], _serialize_body_with_enricher(self, body, info)
+        )
 
 
 class WorkflowExecutionRejectedBody(_BaseWorkflowExecutionBody):

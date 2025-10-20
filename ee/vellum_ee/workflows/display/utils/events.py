@@ -31,25 +31,27 @@ def _should_mark_workflow_dynamic(event: WorkflowExecutionInitiatedEvent) -> boo
 def event_enricher(
     event: WorkflowEvent, client: Optional[Vellum] = None, metadata: Optional[dict] = None
 ) -> WorkflowEvent:
-    if event.name != "workflow.execution.initiated":
-        return event
+    if event.name == "workflow.execution.initiated":
+        workflow_definition = event.body.workflow_definition
+        workflow_display = get_workflow_display(
+            workflow_class=workflow_definition,
+            parent_display_context=get_parent_display_context_from_event(event),
+            client=client,
+            dry_run=True,
+        )
+        register_workflow_display_context(event.span_id, workflow_display.display_context)
+        event.body.display_context = workflow_display.get_event_display_context()
 
-    workflow_definition = event.body.workflow_definition
-    workflow_display = get_workflow_display(
-        workflow_class=workflow_definition,
-        parent_display_context=get_parent_display_context_from_event(event),
-        client=client,
-        dry_run=True,
-    )
-    register_workflow_display_context(event.span_id, workflow_display.display_context)
-    event.body.display_context = workflow_display.get_event_display_context()
+        if event.body.workflow_definition.is_dynamic or _should_mark_workflow_dynamic(event):
+            register_workflow_display_class(workflow_definition, workflow_display.__class__)
+            workflow_version_exec_config = workflow_display.serialize()
+            setattr(event.body, "workflow_version_exec_config", workflow_version_exec_config)
 
-    if event.body.workflow_definition.is_dynamic or _should_mark_workflow_dynamic(event):
-        register_workflow_display_class(workflow_definition, workflow_display.__class__)
-        workflow_version_exec_config = workflow_display.serialize()
-        setattr(event.body, "workflow_version_exec_config", workflow_version_exec_config)
+        if metadata is not None:
+            event.body.server_metadata = metadata
 
-    if metadata is not None:
-        event.body.server_metadata = metadata
+    elif event.name == "workflow.execution.fulfilled":
+        if metadata is not None:
+            event.body.server_metadata = metadata
 
     return event
