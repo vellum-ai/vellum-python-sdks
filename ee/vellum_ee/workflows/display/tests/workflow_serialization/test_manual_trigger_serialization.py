@@ -46,8 +46,8 @@ def test_manual_trigger_multiple_entrypoints():
     nodes = workflow_data["nodes"]
     assert isinstance(nodes, list)
 
-    # entrypoint + 2 nodes
-    assert len(nodes) == 3
+    # With triggers, only the 2 actual nodes exist (no entrypoint node)
+    assert len(nodes) == 2
 
     assert "triggers" in result
     triggers = result["triggers"]
@@ -55,6 +55,48 @@ def test_manual_trigger_multiple_entrypoints():
 
     assert len(triggers) == 1
     assert triggers[0] == {"id": "b09c1902-3cca-4c79-b775-4c32e3e88466", "type": "MANUAL", "attributes": []}
+
+
+def test_manual_trigger_replaces_entrypoint_node():
+    """
+    TDD: Triggers should REPLACE entrypoint nodes, not coexist with them.
+
+    When a workflow has a trigger, the serialized workflow_raw_data should NOT
+    contain an ENTRYPOINT node. The trigger IS the entry point.
+    """
+
+    class FirstNode(BaseNode):
+        pass
+
+    class SecondNode(BaseNode):
+        pass
+
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = ManualTrigger >> FirstNode >> SecondNode
+
+    result = get_workflow_display(workflow_class=TestWorkflow).serialize()
+
+    # Verify trigger exists
+    assert "triggers" in result
+    assert len(result["triggers"]) == 1
+    assert result["triggers"][0]["type"] == "MANUAL"
+
+    # TDD: The key assertion - NO ENTRYPOINT node should exist
+    workflow_data = result["workflow_raw_data"]
+    nodes = workflow_data["nodes"]
+
+    # Check that NO node has type "ENTRYPOINT"
+    entrypoint_nodes = [node for node in nodes if node.get("type") == "ENTRYPOINT"]
+    assert len(entrypoint_nodes) == 0, (
+        "Workflows with triggers should NOT have ENTRYPOINT nodes. "
+        f"Found {len(entrypoint_nodes)} ENTRYPOINT node(s). "
+        "Triggers should REPLACE entrypoint nodes, not coexist with them."
+    )
+
+    # Should only have the two actual nodes
+    assert len(nodes) == 2
+    node_labels = {node.get("label") for node in nodes}
+    assert node_labels == {"First Node", "Second Node"}
 
 
 def test_unknown_trigger_type():
