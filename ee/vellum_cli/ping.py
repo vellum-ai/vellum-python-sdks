@@ -1,7 +1,4 @@
-import os
-
 from dotenv import load_dotenv
-import requests
 
 from vellum.client.core.api_error import ApiError
 from vellum.workflows.vellum_client import create_vellum_client
@@ -17,13 +14,7 @@ def ping_command():
     try:
         workspace = client.workspaces.workspace_identity()
         organization = client.organizations.organization_identity()
-
-        api_url = os.getenv("VELLUM_API_URL", "https://api.vellum.ai")
-        api_key = os.getenv("VELLUM_API_KEY")
-
-        environment_response = requests.get(f"{api_url}/v1/environments/identity", headers={"X-API-KEY": api_key})
-        environment_response.raise_for_status()
-        environment = environment_response.json()
+        environment = client.environments.environment_identity()
     except ApiError as e:
         # If user did not provide an API key, we will get a 403 error
         if e.status_code == 401 or e.status_code == 403:
@@ -33,8 +24,6 @@ def ping_command():
         raise Exception(
             "The API we tried to ping returned an invalid response. Please make sure your `VELLUM_API_URL` environment variable is set correctly."  # noqa: E501
         )
-    except requests.RequestException as e:
-        raise Exception(f"Failed to retrieve environment information: {str(e)}") from e  # noqa: E501
 
     logger.info(
         f"""\
@@ -49,8 +38,8 @@ Workspace:
     Name: {workspace.name}
 
 Environment:
-    ID: {environment['id']}
-    Name: {environment['name']}
-    Label: {environment['label']}
+    ID: {environment.id}
+    Name: {environment.name}
+    Label: {environment.label}
 """
     )
