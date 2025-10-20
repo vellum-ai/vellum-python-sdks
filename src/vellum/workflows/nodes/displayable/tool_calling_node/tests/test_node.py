@@ -4,6 +4,7 @@ from uuid import uuid4
 from typing import Any, Iterator, List
 
 from vellum import ChatMessage
+from vellum.client.core.api_error import ApiError
 from vellum.client.types.execute_prompt_event import ExecutePromptEvent
 from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
 from vellum.client.types.function_call import FunctionCall
@@ -478,3 +479,37 @@ def test_tool_node_error_message_includes_function_name():
     assert "my_tool_function" in e.message
     assert "wrapper" not in e.message.lower()
     assert "Something went wrong" in e.message
+
+
+def test_tool_calling_node_400_error_returns_internal_error(vellum_adhoc_prompt_client):
+    """
+    Test that ToolCallingNode returns INTERNAL_ERROR when the underlying prompt node returns a 400 error.
+    """
+
+    # GIVEN a ToolCallingNode with minimal configuration
+    class TestToolCallingNode(ToolCallingNode):
+        ml_model = "gpt-4o-mini"
+        blocks = []
+        functions = []
+        max_prompt_iterations = 1
+
+    # AND the API client raises a 400 error
+    api_error = ApiError(
+        status_code=400,
+        body={"detail": "Invalid request parameters"},
+    )
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = api_error
+
+    # AND a state
+    state = BaseState()
+
+    # WHEN the ToolCallingNode runs
+    node = TestToolCallingNode(state=state)
+
+    with pytest.raises(NodeException) as exc_info:
+        list(node.run())
+
+    # AND the error code should be INTERNAL_ERROR (not INVALID_INPUTS)
+    e = exc_info.value
+    assert e.code == WorkflowErrorCode.INTERNAL_ERROR
+    assert e.message == "Internal server error"
