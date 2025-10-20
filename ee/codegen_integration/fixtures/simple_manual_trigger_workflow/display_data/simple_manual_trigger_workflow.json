@@ -2,29 +2,12 @@
   "workflow_raw_data": {
     "nodes": [
       {
-        "id": "63884a7b-c01c-4cbc-b8d4-abe0a8796f6b",
-        "type": "ENTRYPOINT",
-        "inputs": [],
-        "data": {
-          "label": "Entrypoint Node",
-          "source_handle_id": "eba8fd73-57ab-4d7b-8f75-b54dbe5fc8ba"
-        },
-        "display_data": {
-          "position": {
-            "x": 0.0,
-            "y": -50.0
-          }
-        },
-        "base": null,
-        "definition": null
-      },
-      {
         "id": "3669684e-500e-4034-be4a-7ee70824b272",
         "label": "Simple Node",
         "type": "GENERIC",
         "display_data": {
           "position": {
-            "x": 200.0,
+            "x": 0.0,
             "y": -50.0
           }
         },
@@ -99,7 +82,7 @@
         ],
         "display_data": {
           "position": {
-            "x": 400.0,
+            "x": 200.0,
             "y": -50.0
           }
         },
@@ -145,14 +128,6 @@
       }
     ],
     "edges": [
-      {
-        "id": "9eaed9b1-5803-4bc4-bdba-b614f4f465b5",
-        "source_node_id": "63884a7b-c01c-4cbc-b8d4-abe0a8796f6b",
-        "source_handle_id": "eba8fd73-57ab-4d7b-8f75-b54dbe5fc8ba",
-        "target_node_id": "3669684e-500e-4034-be4a-7ee70824b272",
-        "target_handle_id": "7da60409-5790-43fa-80b2-ad88da2812df",
-        "type": "DEFAULT"
-      },
       {
         "id": "55ad304f-eddc-40d7-ad19-1e6a2b5fc02a",
         "source_node_id": "3669684e-500e-4034-be4a-7ee70824b272",

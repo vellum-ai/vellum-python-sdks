@@ -75,18 +75,27 @@ def test_manual_trigger_replaces_entrypoint_node():
         graph = ManualTrigger >> FirstNode >> SecondNode
 
     result = get_workflow_display(workflow_class=TestWorkflow).serialize()
+    assert isinstance(result, dict)
 
     # Verify trigger exists
     assert "triggers" in result
-    assert len(result["triggers"]) == 1
-    assert result["triggers"][0]["type"] == "MANUAL"
+    triggers = result["triggers"]
+    assert isinstance(triggers, list)
+    assert len(triggers) == 1
+
+    trigger = triggers[0]
+    assert isinstance(trigger, dict)
+    assert trigger["type"] == "MANUAL"
 
     # TDD: The key assertion - NO ENTRYPOINT node should exist
     workflow_data = result["workflow_raw_data"]
+    assert isinstance(workflow_data, dict)
+
     nodes = workflow_data["nodes"]
+    assert isinstance(nodes, list)
 
     # Check that NO node has type "ENTRYPOINT"
-    entrypoint_nodes = [node for node in nodes if node.get("type") == "ENTRYPOINT"]
+    entrypoint_nodes = [node for node in nodes if isinstance(node, dict) and node.get("type") == "ENTRYPOINT"]
     assert len(entrypoint_nodes) == 0, (
         "Workflows with triggers should NOT have ENTRYPOINT nodes. "
         f"Found {len(entrypoint_nodes)} ENTRYPOINT node(s). "
@@ -95,7 +104,7 @@ def test_manual_trigger_replaces_entrypoint_node():
 
     # Should only have the two actual nodes
     assert len(nodes) == 2
-    node_labels = {node.get("label") for node in nodes}
+    node_labels = {node.get("label") for node in nodes if isinstance(node, dict)}
     assert node_labels == {"First Node", "Second Node"}
 
 
