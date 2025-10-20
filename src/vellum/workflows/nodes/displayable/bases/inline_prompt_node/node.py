@@ -386,6 +386,25 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                         ),
                     )
                 )
+            elif (
+                isinstance(input_value, dict)
+                and "src" in input_value
+                and isinstance(input_value.get("src"), str)
+                and input_value["src"].endswith(".pdf")
+            ):
+                input_variables.append(
+                    VellumVariable(
+                        id=str(uuid4()),
+                        key=input_name,
+                        type="DOCUMENT",
+                    )
+                )
+                input_values.append(
+                    PromptRequestDocumentInput(
+                        key=input_name,
+                        value=VellumDocument.model_validate(input_value),
+                    )
+                )
             else:
                 try:
                     input_value = default_serializer(input_value)
