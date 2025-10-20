@@ -524,6 +524,10 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         # For INTEGRATION triggers, include class name and module path for codegen
         if trigger_type == WorkflowTriggerType.INTEGRATION:
             trigger_data["class_name"] = trigger_class.__name__
+            # Use __module__ for module path, needed for TypeScript codegen to know import location.
+            # Note: __module__ can vary based on import path (e.g., absolute vs relative imports).
+            # Triggers should be imported from their canonical location for consistency.
+            # Consider defining a __canonical_module__ class attribute if stable paths are required.
             trigger_data["module_path"] = cast(Json, trigger_class.__module__.split("."))
 
         return cast(JsonArray, [trigger_data])
