@@ -512,4 +512,4 @@ def test_tool_calling_node_400_error_returns_internal_error(vellum_adhoc_prompt_
     # AND the error code should be INTERNAL_ERROR (not INVALID_INPUTS)
     e = exc_info.value
     assert e.code == WorkflowErrorCode.INTERNAL_ERROR
-    assert "Invalid request parameters" in e.message
+    assert e.message == "Internal server error"
