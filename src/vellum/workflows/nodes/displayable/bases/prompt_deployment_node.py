@@ -1,39 +1,21 @@
-import json
 from uuid import UUID
 from typing import Any, ClassVar, Dict, Generator, Generic, Iterator, List, Optional, Sequence, Set, Union
 
 from vellum import (
-    AudioInputRequest,
-    ChatHistoryInputRequest,
-    ChatMessage,
-    DocumentInputRequest,
     ExecutePromptEvent,
-    ImageInputRequest,
-    JsonInputRequest,
     PromptDeploymentExpandMetaRequest,
     PromptDeploymentInputRequest,
     PromptOutput,
     RawPromptExecutionOverridesRequest,
-    StringInputRequest,
-    VellumAudio,
-    VellumAudioRequest,
-    VellumDocument,
-    VellumDocumentRequest,
-    VellumImage,
-    VellumImageRequest,
-    VellumVideo,
-    VellumVideoRequest,
-    VideoInputRequest,
 )
 from vellum.client import ApiError, RequestOptions
-from vellum.client.types.chat_message_request import ChatMessageRequest
 from vellum.workflows.constants import LATEST_RELEASE_TAG
 from vellum.workflows.context import get_execution_context
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.errors.types import vellum_error_to_workflow_error
-from vellum.workflows.events.types import default_serializer
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.bases.base_prompt_node import BasePromptNode
+from vellum.workflows.nodes.displayable.bases.utils import compile_prompt_deployment_inputs
 from vellum.workflows.outputs import BaseOutput
 from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.generics import StateType
@@ -174,108 +156,4 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
         return None
 
     def _compile_prompt_inputs(self) -> List[PromptDeploymentInputRequest]:
-        # TODO: We may want to consolidate with subworkflow deployment input compilation
-        # https://app.shortcut.com/vellum/story/4117
-
-        compiled_inputs: List[PromptDeploymentInputRequest] = []
-
-        if not self.prompt_inputs:
-            return compiled_inputs
-
-        for input_name, input_value in self.prompt_inputs.items():
-            # Exclude inputs that resolved to be null. This ensure that we don't pass input values
-            # to optional prompt inputs whose values were unresolved.
-            if input_value is None:
-                continue
-            if isinstance(input_value, str):
-                compiled_inputs.append(
-                    StringInputRequest(
-                        name=input_name,
-                        value=input_value,
-                    )
-                )
-            elif (
-                input_value
-                and isinstance(input_value, list)
-                and all(isinstance(message, (ChatMessage, ChatMessageRequest)) for message in input_value)
-            ):
-                chat_history = [
-                    (
-                        message
-                        if isinstance(message, ChatMessageRequest)
-                        else ChatMessageRequest.model_validate(message.model_dump())
-                    )
-                    for message in input_value
-                    if isinstance(message, (ChatMessage, ChatMessageRequest))
-                ]
-                compiled_inputs.append(
-                    ChatHistoryInputRequest(
-                        name=input_name,
-                        value=chat_history,
-                    )
-                )
-            elif isinstance(input_value, (VellumAudio, VellumAudioRequest)):
-                audio_value = (
-                    input_value
-                    if isinstance(input_value, VellumAudioRequest)
-                    else VellumAudioRequest.model_validate(input_value.model_dump())
-                )
-                compiled_inputs.append(
-                    AudioInputRequest(
-                        name=input_name,
-                        value=audio_value,
-                    )
-                )
-            elif isinstance(input_value, (VellumImage, VellumImageRequest)):
-                image_value = (
-                    input_value
-                    if isinstance(input_value, VellumImageRequest)
-                    else VellumImageRequest.model_validate(input_value.model_dump())
-                )
-                compiled_inputs.append(
-                    ImageInputRequest(
-                        name=input_name,
-                        value=image_value,
-                    )
-                )
-            elif isinstance(input_value, (VellumDocument, VellumDocumentRequest)):
-                document_value = (
-                    input_value
-                    if isinstance(input_value, VellumDocumentRequest)
-                    else VellumDocumentRequest.model_validate(input_value.model_dump())
-                )
-                compiled_inputs.append(
-                    DocumentInputRequest(
-                        name=input_name,
-                        value=document_value,
-                    )
-                )
-            elif isinstance(input_value, (VellumVideo, VellumVideoRequest)):
-                video_value = (
-                    input_value
-                    if isinstance(input_value, VellumVideoRequest)
-                    else VellumVideoRequest.model_validate(input_value.model_dump())
-                )
-                compiled_inputs.append(
-                    VideoInputRequest(
-                        name=input_name,
-                        value=video_value,
-                    )
-                )
-            else:
-                try:
-                    input_value = default_serializer(input_value)
-                except json.JSONDecodeError as e:
-                    raise NodeException(
-                        message=f"Failed to serialize input '{input_name}' of type '{input_value.__class__}': {e}",
-                        code=WorkflowErrorCode.INVALID_INPUTS,
-                    )
-
-                compiled_inputs.append(
-                    JsonInputRequest(
-                        name=input_name,
-                        value=input_value,
-                    )
-                )
-
-        return compiled_inputs
+        return compile_prompt_deployment_inputs(self.prompt_inputs)
