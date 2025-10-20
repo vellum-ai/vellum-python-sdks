@@ -116,6 +116,12 @@ class VellumIntegrationService:
                         message=e.body.get("detail", "You do not have permission to execute this tool."),
                         code=WorkflowErrorCode.PROVIDER_CREDENTIALS_UNAVAILABLE,
                     ) from e
+            elif e.status_code == 500 and isinstance(e.body, dict):
+                error_message = e.body.get("detail", f"Internal server error occurred while executing tool {tool_name}")
+                raise NodeException(
+                    message=error_message,
+                    code=WorkflowErrorCode.PROVIDER_ERROR,
+                ) from e
             # Generic server error
             raise NodeException(
                 message=f"Failed to execute tool {tool_name}: {str(e)}",
