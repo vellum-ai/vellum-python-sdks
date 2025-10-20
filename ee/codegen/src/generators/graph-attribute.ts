@@ -108,11 +108,45 @@ export class GraphAttribute extends AstNode {
 
     // Check if entrypoint exists and get its edges
     const entrypointNode = this.workflowContext.tryGetEntrypointNode();
-    const edges = entrypointNode
-      ? this.workflowContext.getEntrypointNodeEdges()
-      : [];
+    let edges: WorkflowEdge[];
 
-    // If no edges from entrypoint, return empty
+    if (entrypointNode) {
+      edges = this.workflowContext.getEntrypointNodeEdges();
+    } else {
+      // No entrypoint node - check if we have triggers
+      // When triggers exist, they replace the entrypoint, so we need to find root nodes
+      const triggers = this.workflowContext.triggers;
+      if (triggers && triggers.length > 0) {
+        // Find root nodes (nodes with no incoming edges from other nodes)
+        const allEdges = this.workflowContext.workflowRawData.edges;
+        const incomingEdges = new Map<string, number>();
+
+        allEdges.forEach((edge) => {
+          incomingEdges.set(
+            edge.targetNodeId,
+            (incomingEdges.get(edge.targetNodeId) || 0) + 1
+          );
+          if (!incomingEdges.has(edge.sourceNodeId)) {
+            incomingEdges.set(edge.sourceNodeId, 0);
+          }
+        });
+
+        // Find nodes with zero incoming edges (root nodes)
+        const rootNodeIds = new Set<string>();
+        incomingEdges.forEach((count, nodeId) => {
+          if (count === 0) {
+            rootNodeIds.add(nodeId);
+          }
+        });
+
+        // Get edges starting from root nodes
+        edges = allEdges.filter((edge) => rootNodeIds.has(edge.sourceNodeId));
+      } else {
+        edges = [];
+      }
+    }
+
+    // If no edges from entrypoint or root nodes, return empty
     // Single disconnected nodes should be handled as unused_graphs, not main graph
     if (edges.length === 0) {
       return { type: "empty" };
@@ -383,10 +417,21 @@ export class GraphAttribute extends AstNode {
     }
 
     if (mutableAst.type === "empty") {
-      return {
-        type: "node_reference",
-        reference: targetNode,
-      };
+      // When adding the first edge to an empty graph, create the full chain
+      if (sourceNode) {
+        // Include both source and target nodes
+        return {
+          type: "right_shift",
+          lhs: { type: "node_reference", reference: sourceNode },
+          rhs: { type: "node_reference", reference: targetNode },
+        };
+      } else {
+        // No source node (e.g., entrypoint edge) - just add target
+        return {
+          type: "node_reference",
+          reference: targetNode,
+        };
+      }
     } else if (mutableAst.type === "node_reference") {
       if (sourceNode && mutableAst.reference === sourceNode) {
         const sourceNodePortContext = sourceNode.portContextsById.get(
