@@ -1,11 +1,21 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`TriggerAttributeWorkflowReference > should generate correct AST for ManualTrigger.config reference 1`] = `
+"ManualTrigger.config
+"
+`;
+
 exports[`TriggerAttributeWorkflowReference > should generate correct AST for ManualTrigger.input reference 1`] = `
 "ManualTrigger.input
 "
 `;
 
-exports[`TriggerAttributeWorkflowReference > should generate correct AST for ManualTrigger.config reference 1`] = `
-"ManualTrigger.config
+exports[`TriggerAttributeWorkflowReference > should generate correct AST for VellumIntegrationTrigger.channel reference 1`] = `
+"SlackMessageTrigger.channel
+"
+`;
+
+exports[`TriggerAttributeWorkflowReference > should generate correct AST for VellumIntegrationTrigger.message reference 1`] = `
+"SlackMessageTrigger.message
 "
 `;

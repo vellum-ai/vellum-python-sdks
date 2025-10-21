@@ -88,4 +88,70 @@ describe("TriggerAttributeWorkflowReference", () => {
 
     expect(pointer.getAstNode()).toBeUndefined();
   });
+
+  it("should generate correct AST for VellumIntegrationTrigger.message reference", async () => {
+    const integrationWorkflowContext = workflowContextFactory({
+      triggers: [
+        {
+          id: "integration-trigger-id",
+          type: "INTEGRATION",
+          attributes: [
+            { id: "message-id", name: "message", value: null },
+            { id: "channel-id", name: "channel", value: null },
+          ],
+          class_name: "SlackMessageTrigger",
+          module_path: ["tests", "fixtures", "triggers", "slack_message"],
+        },
+      ],
+    });
+
+    const triggerAttributeReference: WorkflowValueDescriptorReference = {
+      type: "TRIGGER_ATTRIBUTE",
+      triggerId: "integration-trigger-id",
+      attributeId: "message-id",
+    };
+
+    const pointer = new TriggerAttributeWorkflowReference({
+      workflowContext: integrationWorkflowContext,
+      nodeInputWorkflowReferencePointer: triggerAttributeReference,
+    });
+
+    const writer = new Writer();
+    pointer.write(writer);
+
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
+
+  it("should generate correct AST for VellumIntegrationTrigger.channel reference", async () => {
+    const integrationWorkflowContext = workflowContextFactory({
+      triggers: [
+        {
+          id: "integration-trigger-id",
+          type: "INTEGRATION",
+          attributes: [
+            { id: "message-id", name: "message", value: null },
+            { id: "channel-id", name: "channel", value: null },
+          ],
+          class_name: "SlackMessageTrigger",
+          module_path: ["tests", "fixtures", "triggers", "slack_message"],
+        },
+      ],
+    });
+
+    const triggerAttributeReference: WorkflowValueDescriptorReference = {
+      type: "TRIGGER_ATTRIBUTE",
+      triggerId: "integration-trigger-id",
+      attributeId: "channel-id",
+    };
+
+    const pointer = new TriggerAttributeWorkflowReference({
+      workflowContext: integrationWorkflowContext,
+      nodeInputWorkflowReferencePointer: triggerAttributeReference,
+    });
+
+    const writer = new Writer();
+    pointer.write(writer);
+
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
 });

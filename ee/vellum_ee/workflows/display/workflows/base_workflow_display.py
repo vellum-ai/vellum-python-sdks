@@ -521,6 +521,11 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             "attributes": trigger_attributes,
         }
 
+        # For INTEGRATION triggers, include class name and module path for codegen
+        if trigger_type == WorkflowTriggerType.INTEGRATION:
+            trigger_data["class_name"] = trigger_class.__name__
+            trigger_data["module_path"] = cast(Json, trigger_class.__module__.split("."))
+
         return cast(JsonArray, [trigger_data])
 
     def _serialize_edge_display_data(self, edge_display: EdgeDisplay) -> Optional[JsonObject]:
