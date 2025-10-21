@@ -1,5 +1,7 @@
 """Tests for VellumIntegrationTrigger serialization."""
 
+from typing import Any, cast
+
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
@@ -221,10 +223,11 @@ def test_trigger_module_paths_are_canonical():
     result = get_workflow_display(workflow_class=TestWorkflow).serialize()
 
     # Get the trigger and its module path
-    trigger = result["triggers"][0]
+    triggers = cast(list[Any], result["triggers"])
+    trigger = cast(dict[str, Any], triggers[0])
     assert trigger["type"] == "INTEGRATION"
 
-    module_path = trigger["module_path"]
+    module_path = cast(list[Any], trigger["module_path"])
     assert isinstance(module_path, list), "module_path should be a list of strings"
     assert all(isinstance(part, str) for part in module_path), "All module_path parts should be strings"
 
@@ -239,7 +242,8 @@ def test_trigger_module_paths_are_canonical():
     )
 
     # Verify the class_name is correct
-    assert trigger["class_name"] == "TestSlackTrigger"
+    class_name = cast(str, trigger["class_name"])
+    assert class_name == "TestSlackTrigger"
 
     # Additional validation: If we had triggers imported from fixtures,
     # we'd want to ensure they always use the canonical fixture path
