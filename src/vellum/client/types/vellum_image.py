@@ -7,7 +7,11 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 
 
 class VellumImage(UniversalBaseModel):
-    src: str
+    src: str = pydantic.Field()
+    """
+    A valid data URL containing the image data.
+    """
+
     metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = None
 
     if IS_PYDANTIC_V2:

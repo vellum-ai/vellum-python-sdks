@@ -4089,6 +4089,68 @@ The current status of the document
 </dl>
 </details>
 
+## Environments
+<details><summary><code>client.environments.<a href="src/vellum/resources/environments/client.py">environment_identity</a>()</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieves information about the active Environment
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import Vellum
+
+client = Vellum(
+    api_version="YOUR_API_VERSION",
+    api_key="YOUR_API_KEY",
+)
+client.environments.environment_identity()
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## FolderEntities
 <details><summary><code>client.folder_entities.<a href="src/vellum/resources/folder_entities/client.py">list</a>(...)</code></summary>
 <dl>

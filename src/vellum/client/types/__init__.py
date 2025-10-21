@@ -93,6 +93,7 @@ from .container_image_container_image_tag import ContainerImageContainerImageTag
 from .container_image_read import ContainerImageRead
 from .create_test_suite_test_case_request import CreateTestSuiteTestCaseRequest
 from .create_workflow_event_request import CreateWorkflowEventRequest
+from .dataset_row_push_request import DatasetRowPushRequest
 from .delimiter_chunker_config import DelimiterChunkerConfig
 from .delimiter_chunker_config_request import DelimiterChunkerConfigRequest
 from .delimiter_chunking import DelimiterChunking
@@ -124,7 +125,9 @@ from .document_vellum_value_request import DocumentVellumValueRequest
 from .enriched_normalized_completion import EnrichedNormalizedCompletion
 from .entity_status import EntityStatus
 from .entity_visibility import EntityVisibility
+from .environment_display_config import EnvironmentDisplayConfig
 from .environment_enum import EnvironmentEnum
+from .environment_read import EnvironmentRead
 from .ephemeral_prompt_cache_config import EphemeralPromptCacheConfig
 from .ephemeral_prompt_cache_config_type_enum import EphemeralPromptCacheConfigTypeEnum
 from .error_detail_response import ErrorDetailResponse
@@ -806,6 +809,7 @@ __all__ = [
     "ContainerImageRead",
     "CreateTestSuiteTestCaseRequest",
     "CreateWorkflowEventRequest",
+    "DatasetRowPushRequest",
     "DelimiterChunkerConfig",
     "DelimiterChunkerConfigRequest",
     "DelimiterChunking",
@@ -837,7 +841,9 @@ __all__ = [
     "EnrichedNormalizedCompletion",
     "EntityStatus",
     "EntityVisibility",
+    "EnvironmentDisplayConfig",
     "EnvironmentEnum",
+    "EnvironmentRead",
     "EphemeralPromptCacheConfig",
     "EphemeralPromptCacheConfigTypeEnum",
     "ErrorDetailResponse",
