@@ -121,7 +121,6 @@ import {
   WorkflowSandboxRoutingConfig,
   WorkflowStateVariableWorkflowReference,
   WorkflowTrigger,
-  WorkflowTriggerType,
   WorkflowValueDescriptor,
   WorkspaceSecretPointer,
 } from "src/types/vellum";
