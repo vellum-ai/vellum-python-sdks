@@ -180,3 +180,70 @@ def test_vellum_integration_trigger_id_consistency():
                         f"but trigger attribute '{expected_attr_name}' has {expected_attr_id}. "
                         "This indicates an attribute ID generation inconsistency."
                     )
+
+
+def test_trigger_module_paths_are_canonical():
+    """
+    Ensure triggers use canonical import paths for consistent codegen.
+
+    Module paths are used to generate import statements in TypeScript.
+    They should be consistent regardless of how the trigger is imported in Python.
+
+    This test validates that the module_path field in serialized triggers
+    matches the expected canonical path for known triggers.
+    """
+
+    # Create a custom VellumIntegrationTrigger subclass defined inline
+    class TestSlackTrigger(VellumIntegrationTrigger):
+        """Test Slack trigger for module path validation."""
+
+        message: str
+        channel: str
+
+        class Config:
+            provider = "COMPOSIO"
+            integration_name = "SLACK"
+            slug = "test_slack_trigger"
+
+    class SimpleNode(BaseNode):
+        """Simple node to complete the workflow."""
+
+        class Outputs(BaseNode.Outputs):
+            result = TestSlackTrigger.message
+
+        def run(self) -> Outputs:
+            return self.Outputs()
+
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = TestSlackTrigger >> SimpleNode
+
+    # Serialize the workflow
+    result = get_workflow_display(workflow_class=TestWorkflow).serialize()
+
+    # Get the trigger and its module path
+    trigger = result["triggers"][0]
+    assert trigger["type"] == "INTEGRATION"
+
+    module_path = trigger["module_path"]
+    assert isinstance(module_path, list), "module_path should be a list of strings"
+    assert all(isinstance(part, str) for part in module_path), "All module_path parts should be strings"
+
+    # The module path should reflect where the class is defined
+    # Since TestSlackTrigger is defined inline in this test function,
+    # its module should be this test module
+    expected_module_parts = __name__.split(".")
+
+    assert module_path == expected_module_parts, (
+        f"Module path {module_path} doesn't match expected {expected_module_parts}. "
+        "This could cause inconsistent imports in generated TypeScript code."
+    )
+
+    # Verify the class_name is correct
+    assert trigger["class_name"] == "TestSlackTrigger"
+
+    # Additional validation: If we had triggers imported from fixtures,
+    # we'd want to ensure they always use the canonical fixture path
+    # For example:
+    # from tests.fixtures.triggers.slack import SlackTrigger
+    # should always produce ["tests", "fixtures", "triggers", "slack"]
+    # regardless of relative vs absolute imports
