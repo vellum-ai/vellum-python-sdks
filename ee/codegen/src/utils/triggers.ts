@@ -1,5 +1,5 @@
 import { VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH } from "src/constants";
-import { WorkflowTrigger } from "src/types/vellum";
+import { WorkflowTrigger, WorkflowTriggerType } from "src/types/vellum";
 
 export interface TriggerClassInfo {
   className: string;
@@ -8,23 +8,18 @@ export interface TriggerClassInfo {
 
 export function getTriggerClassInfo(
   trigger: WorkflowTrigger
-): TriggerClassInfo | null {
+): TriggerClassInfo {
   switch (trigger.type) {
-    case "MANUAL":
+    case WorkflowTriggerType.MANUAL:
       return {
         className: "ManualTrigger",
         modulePath: [...VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH, "manual"],
       };
-    case "INTEGRATION":
-      // For INTEGRATION triggers, class_name and module_path are required from serialization
-      if (!trigger.class_name || !trigger.module_path) {
-        return null;
-      }
+    case WorkflowTriggerType.INTEGRATION:
+      // TypeScript guarantees className and modulePath exist for INTEGRATION triggers
       return {
-        className: trigger.class_name,
-        modulePath: trigger.module_path,
+        className: trigger.className,
+        modulePath: trigger.modulePath,
       };
-    default:
-      return null;
   }
 }
