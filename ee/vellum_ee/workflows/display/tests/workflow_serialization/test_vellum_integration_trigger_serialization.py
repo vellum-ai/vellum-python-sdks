@@ -141,7 +141,8 @@ def test_trigger_module_paths_are_canonical():
 
     result = get_workflow_display(workflow_class=TestWorkflow).serialize()
 
-    trigger = cast(dict[str, Any], result["triggers"][0])
+    triggers = cast(list[Any], result["triggers"])
+    trigger = cast(dict[str, Any], triggers[0])
     assert trigger["type"] == "INTEGRATION"
 
     module_path = cast(list[Any], trigger["module_path"])
