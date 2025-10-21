@@ -2,7 +2,7 @@
   "workflow_raw_data": {
     "nodes": [
       {
-        "id": "63884a7b-c01c-4cbc-b8d4-abe0a8796f6b",
+        "id": "b09c1902-3cca-4c79-b775-4c32e3e88466",
         "type": "ENTRYPOINT",
         "inputs": [],
         "data": {
@@ -147,7 +147,7 @@
     "edges": [
       {
         "id": "9eaed9b1-5803-4bc4-bdba-b614f4f465b5",
-        "source_node_id": "63884a7b-c01c-4cbc-b8d4-abe0a8796f6b",
+        "source_node_id": "b09c1902-3cca-4c79-b775-4c32e3e88466",
         "source_handle_id": "eba8fd73-57ab-4d7b-8f75-b54dbe5fc8ba",
         "target_node_id": "3669684e-500e-4034-be4a-7ee70824b272",
         "target_handle_id": "7da60409-5790-43fa-80b2-ad88da2812df",

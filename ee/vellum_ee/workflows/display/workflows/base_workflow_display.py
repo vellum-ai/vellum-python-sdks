@@ -179,9 +179,22 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         serialized_nodes: Dict[UUID, JsonObject] = {}
         edges: JsonArray = []
 
-        # Add a single synthetic node for the workflow entrypoint
-        entrypoint_node_id = self.display_context.workflow_display.entrypoint_node_id
+        # Get all trigger edges from the workflow's subgraphs to check if trigger exists
+        trigger_edges = []
+        for subgraph in self._workflow.get_subgraphs():
+            trigger_edges.extend(list(subgraph.trigger_edges))
+
+        # Determine entrypoint node ID: use trigger ID if trigger exists, otherwise use default
+        # This maintains backwards compatibility while linking trigger and entrypoint
+        if len(trigger_edges) > 0:
+            trigger_class = trigger_edges[0].trigger_class
+            entrypoint_node_id = get_trigger_id(trigger_class)
+        else:
+            entrypoint_node_id = self.display_context.workflow_display.entrypoint_node_id
+
         entrypoint_node_source_handle_id = self.display_context.workflow_display.entrypoint_node_source_handle_id
+
+        # Always add entrypoint node for backwards compatibility
         serialized_nodes[entrypoint_node_id] = {
             "id": str(entrypoint_node_id),
             "type": "ENTRYPOINT",
@@ -340,7 +353,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 ValueError("Unable to serialize terminal nodes that are not referenced by workflow outputs.")
             )
 
-        # Add an edge for each edge in the workflow
+        # Add edges from entrypoint node to first nodes
+        # These edges always exist for backwards compatibility
         for target_node, entrypoint_display in self.display_context.entrypoint_displays.items():
             unadorned_target_node = get_unadorned_node(target_node)
             # Skip edges to invalid nodes
