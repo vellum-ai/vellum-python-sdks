@@ -4,6 +4,7 @@ if TYPE_CHECKING:
     from vellum.workflows.expressions.accessor import AccessorExpression
     from vellum.workflows.expressions.add import AddExpression
     from vellum.workflows.expressions.and_ import AndExpression
+    from vellum.workflows.expressions.append import AppendExpression
     from vellum.workflows.expressions.begins_with import BeginsWithExpression
     from vellum.workflows.expressions.between import BetweenExpression
     from vellum.workflows.expressions.coalesce_expression import CoalesceExpression
@@ -409,3 +410,14 @@ class BaseDescriptor(Generic[_T]):
         from vellum.workflows.expressions.minus import MinusExpression
 
         return MinusExpression(lhs=self, rhs=other)
+
+    @overload
+    def append(self, other: "BaseDescriptor[_O]") -> "AppendExpression[_T, _O]": ...
+
+    @overload
+    def append(self, other: _O) -> "AppendExpression[_T, _O]": ...
+
+    def append(self, other: "Union[BaseDescriptor[_O], _O]") -> "AppendExpression[_T, _O]":
+        from vellum.workflows.expressions.append import AppendExpression
+
+        return AppendExpression(lhs=self, rhs=other)
