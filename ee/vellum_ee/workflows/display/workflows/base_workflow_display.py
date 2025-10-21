@@ -185,11 +185,18 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         for subgraph in self._workflow.get_subgraphs():
             trigger_edges.extend(list(subgraph.trigger_edges))
 
-        # Determine entrypoint node ID: use trigger ID if ManualTrigger exists, otherwise use default
+        # Determine entrypoint node ID: use trigger ID if invocation-style trigger exists, otherwise use default
         # This maintains backwards compatibility while linking trigger and entrypoint
-        manual_trigger_edges = [edge for edge in trigger_edges if edge.trigger_class == ManualTrigger]
-        if len(manual_trigger_edges) > 0:
-            trigger_class = manual_trigger_edges[0].trigger_class
+        # We only link entrypoint to triggers that represent workflow invocation:
+        # - ManualTrigger: Explicit workflow.run() or workflow.stream() calls
+        # - VellumIntegrationTrigger subclasses: External integration events (e.g., Slack messages)
+        entrypoint_trigger_edges = [
+            edge
+            for edge in trigger_edges
+            if edge.trigger_class == ManualTrigger or issubclass(edge.trigger_class, VellumIntegrationTrigger)
+        ]
+        if len(entrypoint_trigger_edges) > 0:
+            trigger_class = entrypoint_trigger_edges[0].trigger_class
             entrypoint_node_id = get_trigger_id(trigger_class)
         else:
             entrypoint_node_id = self.display_context.workflow_display.entrypoint_node_id
