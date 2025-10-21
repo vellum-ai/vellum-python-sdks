@@ -130,18 +130,20 @@ def test_stream_workflow__happy_path(vellum_client):
     )
     events = list(result)
 
-    # THEN the workflow should have completed successfully with 3 events
-    assert len(events) == 3
+    # THEN the workflow should have completed successfully with 11 events (3 workflow + 8 node events)
+    assert len(events) == 11
+
+    workflow_events = [e for e in events if e.name.startswith("workflow.")]
 
     # AND the outputs should be as expected
-    assert events[0].name == "workflow.execution.initiated"
+    assert workflow_events[0].name == "workflow.execution.initiated"
 
-    assert events[1].name == "workflow.execution.streaming"
-    assert events[1].output.is_fulfilled
-    assert events[1].output.name == "text"
-    assert events[1].output.value == "It was hot"
+    assert workflow_events[1].name == "workflow.execution.streaming"
+    assert workflow_events[1].output.is_fulfilled
+    assert workflow_events[1].output.name == "text"
+    assert workflow_events[1].output.value == "It was hot"
 
-    assert events[2].name == "workflow.execution.fulfilled"
-    assert events[2].outputs == {
+    assert workflow_events[2].name == "workflow.execution.fulfilled"
+    assert workflow_events[2].outputs == {
         "text": "It was hot",
     }

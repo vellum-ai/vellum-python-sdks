@@ -133,38 +133,40 @@ def test_stream_workflow__happy_path(vellum_adhoc_prompt_client):
     result = workflow.stream(inputs=WorkflowInputs(noun="color"))
     events = list(result)
 
-    # THEN the workflow should have completed successfully with 7 events
-    assert len(events) == 7
+    # THEN the workflow should have completed successfully with 14 events (7 workflow + 7 node events)
+    assert len(events) == 14
+
+    workflow_events = [e for e in events if e.name.startswith("workflow.")]
 
     # AND the outputs should be as expected
-    assert events[0].name == "workflow.execution.initiated"
+    assert workflow_events[0].name == "workflow.execution.initiated"
 
-    assert events[1].name == "workflow.execution.streaming"
-    assert events[1].output.is_initiated
-    assert events[1].output.name == "results"
+    assert workflow_events[1].name == "workflow.execution.streaming"
+    assert workflow_events[1].output.is_initiated
+    assert workflow_events[1].output.name == "results"
 
-    assert events[2].name == "workflow.execution.streaming"
-    assert events[2].output.is_streaming
-    assert events[2].output.name == "results"
-    assert events[2].output.delta == "It"
+    assert workflow_events[2].name == "workflow.execution.streaming"
+    assert workflow_events[2].output.is_streaming
+    assert workflow_events[2].output.name == "results"
+    assert workflow_events[2].output.delta == "It"
 
-    assert events[3].name == "workflow.execution.streaming"
-    assert events[3].output.is_streaming
-    assert events[3].output.name == "results"
-    assert events[3].output.delta == " was"
+    assert workflow_events[3].name == "workflow.execution.streaming"
+    assert workflow_events[3].output.is_streaming
+    assert workflow_events[3].output.name == "results"
+    assert workflow_events[3].output.delta == " was"
 
-    assert events[4].name == "workflow.execution.streaming"
-    assert events[4].output.is_streaming
-    assert events[4].output.name == "results"
-    assert events[4].output.delta == " hot"
+    assert workflow_events[4].name == "workflow.execution.streaming"
+    assert workflow_events[4].output.is_streaming
+    assert workflow_events[4].output.name == "results"
+    assert workflow_events[4].output.delta == " hot"
 
-    assert events[5].name == "workflow.execution.streaming"
-    assert events[5].output.is_fulfilled
-    assert events[5].output.name == "results"
-    assert events[5].output.value == expected_outputs
+    assert workflow_events[5].name == "workflow.execution.streaming"
+    assert workflow_events[5].output.is_fulfilled
+    assert workflow_events[5].output.name == "results"
+    assert workflow_events[5].output.value == expected_outputs
 
-    assert events[6].name == "workflow.execution.fulfilled"
-    assert events[6].outputs == {
+    assert workflow_events[6].name == "workflow.execution.fulfilled"
+    assert workflow_events[6].outputs == {
         "results": expected_outputs,
     }
 

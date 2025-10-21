@@ -83,7 +83,7 @@ from vellum.workflows.types import CancelSignal
 from vellum.workflows.types.generics import InputsType, StateType
 from vellum.workflows.types.utils import get_original_base
 from vellum.workflows.utils.uuids import uuid4_from_hash
-from vellum.workflows.workflows.event_filters import workflow_event_filter
+from vellum.workflows.workflows.event_filters import root_workflow_event_filter
 
 logger = logging.getLogger(__name__)
 
@@ -539,7 +539,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             subworkflows or nodes that utilizes threads.
         """
 
-        should_yield = event_filter or workflow_event_filter
+        should_yield = event_filter or root_workflow_event_filter
         runner = WorkflowRunner(
             self,
             inputs=inputs,
