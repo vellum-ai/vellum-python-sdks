@@ -788,9 +788,32 @@ def test_inline_prompt_node__empty_string_output_with_length_finish_reason(vellu
             "DOCUMENT",
             [PromptRequestDocumentInput(key="file_input", value=VellumDocument(src="mockdocument"))],
         ),
+        (
+            {"src": "https://example.com/document.pdf"},
+            "DOCUMENT",
+            [
+                PromptRequestDocumentInput(
+                    key="file_input", value=VellumDocument(src="https://example.com/document.pdf")
+                )
+            ],
+        ),
+        (
+            {"src": "https://example.com/document.pdf", "metadata": {"author": "test"}},
+            "DOCUMENT",
+            [
+                PromptRequestDocumentInput(
+                    key="file_input",
+                    value=VellumDocument(src="https://example.com/document.pdf", metadata={"author": "test"}),
+                )
+            ],
+        ),
     ],
 )
 def test_file_input_compilation(raw_input, expected_vellum_variable_type, expected_compiled_inputs):
+    """
+    Tests that file inputs are correctly compiled to the appropriate input type.
+    """
+
     # GIVEN a prompt node with file input
     class MyPromptDeploymentNode(InlinePromptNode):
         ml_model = "test-model"

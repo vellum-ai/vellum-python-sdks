@@ -250,6 +250,18 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
                         value=document_value,
                     )
                 )
+            elif (
+                isinstance(input_value, dict)
+                and "src" in input_value
+                and isinstance(input_value.get("src"), str)
+                and input_value["src"].endswith(".pdf")
+            ):
+                compiled_inputs.append(
+                    DocumentInputRequest(
+                        name=input_name,
+                        value=VellumDocumentRequest.model_validate(input_value),
+                    )
+                )
             elif isinstance(input_value, (VellumVideo, VellumVideoRequest)):
                 video_value = (
                     input_value
