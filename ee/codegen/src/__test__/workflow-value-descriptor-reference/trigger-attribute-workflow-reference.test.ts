@@ -3,7 +3,10 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
 import { workflowContextFactory } from "src/__test__/helpers";
 import { WorkflowContext } from "src/context";
 import { TriggerAttributeWorkflowReference } from "src/generators/workflow-value-descriptor-reference/trigger-attribute-workflow-reference";
-import { WorkflowValueDescriptorReference, WorkflowTriggerType } from "src/types/vellum";
+import {
+  WorkflowValueDescriptorReference,
+  WorkflowTriggerType,
+} from "src/types/vellum";
 
 describe("TriggerAttributeWorkflowReference", () => {
   let workflowContext: WorkflowContext;
