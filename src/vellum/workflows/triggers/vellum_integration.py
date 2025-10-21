@@ -362,10 +362,6 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
                 # UUIDs are generated from __qualname__, so this must be consistent and unique
                 # across different trigger configurations to prevent ID collisions.
                 "__qualname__": class_name,
-                # Initialize cache attributes that would normally be set by BaseTriggerMeta.__new__
-                # Since we're using type() directly, we need to set these ourselves
-                "__trigger_attribute_ids__": {},
-                "__trigger_attribute_cache__": {},
             },
         )
 

@@ -8,7 +8,6 @@ if TYPE_CHECKING:
 
 from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.types.utils import get_class_attr_names, infer_types
-from vellum.workflows.utils.uuids import uuid4_from_hash
 
 
 def _is_annotated(cls: Type, name: str) -> bool:
@@ -31,25 +30,6 @@ class BaseTriggerMeta(ABCMeta):
         cls = super().__new__(mcs, name, bases, dct)
         trigger_cls = cast(Type["BaseTrigger"], cls)
 
-        attribute_ids: Dict[str, Any] = {}
-        for base in bases:
-            base_ids = getattr(base, "__trigger_attribute_ids__", None)
-            if isinstance(base_ids, dict):
-                attribute_ids.update(base_ids)
-
-        annotations = getattr(trigger_cls, "__annotations__", {})
-        for attr_name, annotation in annotations.items():
-            if attr_name.startswith("_"):
-                continue
-            if attr_name in trigger_cls.__dict__:
-                continue
-            if get_origin(annotation) is ClassVar:
-                continue
-            attribute_ids[attr_name] = uuid4_from_hash(
-                f"{trigger_cls.__module__}|{trigger_cls.__qualname__}|{attr_name}"
-            )
-
-        trigger_cls.__trigger_attribute_ids__ = attribute_ids
         trigger_cls.__trigger_attribute_cache__ = {}
         return trigger_cls
 
@@ -231,7 +211,6 @@ class BaseTrigger(ABC, metaclass=BaseTriggerMeta):
         Like nodes, triggers work at the class level only. Do not instantiate triggers.
     """
 
-    __trigger_attribute_ids__: Dict[str, Any]
     __trigger_attribute_cache__: Dict[str, "TriggerAttributeReference[Any]"]
 
     @classmethod
