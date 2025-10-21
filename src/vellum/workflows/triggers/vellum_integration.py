@@ -1,5 +1,4 @@
-import json
-from typing import Any, ClassVar, Dict, Optional, Type
+from typing import Any, ClassVar, Dict
 
 from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.references.trigger import TriggerAttributeReference
@@ -99,19 +98,12 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
         integration_name: ClassVar[str]
         slug: ClassVar[str]
 
-    # Cache for generated trigger classes to ensure consistency
-    _trigger_class_cache: ClassVar[Dict[tuple, Type["VellumIntegrationTrigger"]]] = {}
-
     def __init_subclass__(cls, **kwargs: Any) -> None:
         """Validate that subclasses define required Config class with all required fields."""
         super().__init_subclass__(**kwargs)
 
         # Skip validation for the base class itself
         if cls.__name__ == "VellumIntegrationTrigger":
-            return
-
-        # Skip validation for dynamically created classes (they use dynamic attributes)
-        if cls.__name__.startswith("VellumIntegrationTrigger_"):
             return
 
         # Require Config class with required fields
@@ -136,36 +128,6 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
                     f"{cls.__name__}.Config must define '{field}'. " f"Required fields: {', '.join(required_fields)}"
                 )
 
-    @classmethod
-    def _freeze_attributes(cls, attributes: Dict[str, Any]) -> str:
-        """
-        Convert attributes dict to hashable string for caching.
-
-        Attributes must be JSON-serializable since they're sent to the backend
-        via ComposioIntegrationTriggerExecConfig. This method fails fast if
-        attributes contain non-JSON-serializable types.
-
-        Args:
-            attributes: Dictionary of trigger attributes
-
-        Returns:
-            JSON string representation with sorted keys for deterministic hashing
-
-        Raises:
-            ValueError: If attributes are not JSON-serializable
-        """
-        if not attributes:
-            return ""
-
-        try:
-            # Use json.dumps with sort_keys for deterministic output
-            return json.dumps(attributes, sort_keys=True)
-        except (TypeError, ValueError) as e:
-            raise ValueError(
-                f"Trigger attributes must be JSON-serializable (str, int, float, bool, None, list, dict). "
-                f"Got non-serializable value: {e}"
-            ) from e
-
     def __init__(self, event_data: dict):
         """
         Initialize trigger with event data from the integration.
@@ -177,12 +139,16 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
             event_data: Raw event data from the integration. Keys become trigger attributes.
 
         Examples:
-            >>> SlackMessage = VellumIntegrationTrigger.for_trigger(
-            ...     integration_name="SLACK",
-            ...     slug="slack_new_message",
-            ...     trigger_nano_id="abc123"
-            ... )
-            >>> trigger = SlackMessage(event_data={
+            >>> class SlackTrigger(VellumIntegrationTrigger):
+            ...     message: str
+            ...     channel: str
+            ...     user: str
+            ...
+            ...     class Config(VellumIntegrationTrigger.Config):
+            ...         provider = VellumIntegrationProviderType.COMPOSIO
+            ...         integration_name = "SLACK"
+            ...         slug = "slack_new_message"
+            >>> trigger = SlackTrigger(event_data={
             ...     "message": "Hello",
             ...     "channel": "C123",
             ...     "user": "U456"
@@ -276,96 +242,3 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
             slug=cls.Config.slug,
             event_attributes=event_attributes,
         )
-
-    @classmethod
-    def for_trigger(
-        cls,
-        integration_name: str,
-        slug: str,
-        trigger_nano_id: str,
-        provider: str = "COMPOSIO",
-        attributes: Optional[Dict[str, Any]] = None,
-    ) -> Type["VellumIntegrationTrigger"]:
-        """
-        Factory method to create a new trigger class for a specific integration trigger.
-
-        This method generates a unique trigger class that can be used in workflow graphs
-        and node definitions. Each unique combination of provider, integration_name,
-        slug, and trigger_nano_id produces the same class instance (cached).
-
-        Args:
-            integration_name: The integration identifier (e.g., "SLACK", "GITHUB")
-            slug: The slug of the integration trigger in Composio (e.g., "slack_new_message")
-            trigger_nano_id: Composio's unique trigger identifier used for event matching
-            provider: The integration provider (default: "COMPOSIO")
-            attributes: Optional dict of trigger-specific configuration attributes
-                used for filtering events. For example, {"channel": "C123456"} to only
-                match events from a specific Slack channel.
-
-        Returns:
-            A new trigger class configured for the specified integration trigger
-
-        Examples:
-            >>> SlackNewMessage = VellumIntegrationTrigger.for_trigger(
-            ...     integration_name="SLACK",
-            ...     slug="slack_new_message",
-            ...     trigger_nano_id="abc123def456",
-            ...     attributes={"channel": "C123456"}
-            ... )
-            >>> type(SlackNewMessage).__name__
-            'VellumIntegrationTrigger_COMPOSIO_SLACK_slack_new_message'
-            >>>
-            >>> # Use in workflow
-            >>> class MyWorkflow(BaseWorkflow):
-            ...     graph = SlackNewMessage >> ProcessNode
-
-        Note:
-            The generated class has proper __name__, __module__, and __qualname__
-            for correct serialization and attribute ID generation.
-        """
-        # Validate and normalize provider
-        provider_enum = VellumIntegrationProviderType(provider)
-
-        # Normalize attributes
-        attrs = attributes or {}
-
-        # Create cache key - include all identifying parameters including attributes
-        # Convert attributes dict to a hashable representation for caching
-        frozen_attrs = cls._freeze_attributes(attrs)
-        cache_key = (
-            provider_enum.value,
-            integration_name,
-            slug,
-            trigger_nano_id,
-            frozen_attrs,
-        )
-
-        # Return cached class if it exists
-        if cache_key in cls._trigger_class_cache:
-            return cls._trigger_class_cache[cache_key]
-
-        # Generate unique class name including provider to avoid collisions across providers
-        class_name = f"VellumIntegrationTrigger_{provider_enum.value}_{integration_name}_{slug}"
-
-        # Create the new trigger class
-        trigger_class = type(
-            class_name,
-            (cls,),
-            {
-                "provider": provider_enum,
-                "integration_name": integration_name,
-                "slug": slug,
-                "trigger_nano_id": trigger_nano_id,
-                "attributes": attrs,
-                "__module__": cls.__module__,
-                # Explicitly set __qualname__ to match __name__ for deterministic UUID generation.
-                # UUIDs are generated from __qualname__, so this must be consistent and unique
-                # across different trigger configurations to prevent ID collisions.
-                "__qualname__": class_name,
-            },
-        )
-
-        # Cache the generated class
-        cls._trigger_class_cache[cache_key] = trigger_class
-
-        return trigger_class
