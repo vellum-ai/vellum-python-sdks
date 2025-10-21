@@ -3,7 +3,7 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
 import { workflowContextFactory } from "src/__test__/helpers";
 import { WorkflowContext } from "src/context";
 import { TriggerAttributeWorkflowReference } from "src/generators/workflow-value-descriptor-reference/trigger-attribute-workflow-reference";
-import { WorkflowValueDescriptorReference } from "src/types/vellum";
+import { WorkflowValueDescriptorReference, WorkflowTriggerType } from "src/types/vellum";
 
 describe("TriggerAttributeWorkflowReference", () => {
   let workflowContext: WorkflowContext;
@@ -13,7 +13,7 @@ describe("TriggerAttributeWorkflowReference", () => {
       triggers: [
         {
           id: "manual-trigger-id",
-          type: "MANUAL",
+          type: WorkflowTriggerType.MANUAL,
           attributes: [
             { id: "input-id", name: "input" },
             { id: "config-id", name: "config" },
@@ -94,7 +94,7 @@ describe("TriggerAttributeWorkflowReference", () => {
       triggers: [
         {
           id: "integration-trigger-id",
-          type: "INTEGRATION",
+          type: WorkflowTriggerType.INTEGRATION,
           attributes: [
             { id: "message-id", name: "message", value: null },
             { id: "channel-id", name: "channel", value: null },
@@ -127,7 +127,7 @@ describe("TriggerAttributeWorkflowReference", () => {
       triggers: [
         {
           id: "integration-trigger-id",
-          type: "INTEGRATION",
+          type: WorkflowTriggerType.INTEGRATION,
           attributes: [
             { id: "message-id", name: "message", value: null },
             { id: "channel-id", name: "channel", value: null },
