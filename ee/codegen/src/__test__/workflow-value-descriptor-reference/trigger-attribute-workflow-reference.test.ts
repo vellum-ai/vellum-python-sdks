@@ -102,8 +102,8 @@ describe("TriggerAttributeWorkflowReference", () => {
             { id: "message-id", name: "message", value: null },
             { id: "channel-id", name: "channel", value: null },
           ],
-          class_name: "SlackMessageTrigger",
-          module_path: ["tests", "fixtures", "triggers", "slack_message"],
+          className: "SlackMessageTrigger",
+          modulePath: ["tests", "fixtures", "triggers", "slack_message"],
         },
       ],
     });
@@ -135,8 +135,8 @@ describe("TriggerAttributeWorkflowReference", () => {
             { id: "message-id", name: "message", value: null },
             { id: "channel-id", name: "channel", value: null },
           ],
-          class_name: "SlackMessageTrigger",
-          module_path: ["tests", "fixtures", "triggers", "slack_message"],
+          className: "SlackMessageTrigger",
+          modulePath: ["tests", "fixtures", "triggers", "slack_message"],
         },
       ],
     });

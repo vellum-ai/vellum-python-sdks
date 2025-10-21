@@ -801,8 +801,8 @@ export type WorkflowTrigger =
       id: string;
       type: WorkflowTriggerType.INTEGRATION;
       attributes: NodeAttribute[];
-      class_name: string;
-      module_path: string[];
+      className: string;
+      modulePath: string[];
     };
 
 export interface WorkflowRawData {
