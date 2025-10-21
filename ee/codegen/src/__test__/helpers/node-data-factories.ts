@@ -44,9 +44,9 @@ import {
   WorkflowNodeType,
 } from "src/types/vellum";
 
-export function entrypointNodeDataFactory(): EntrypointNode {
+export function entrypointNodeDataFactory(id?: string): EntrypointNode {
   return {
-    id: "entrypoint",
+    id: id ?? "entrypoint",
     type: WorkflowNodeType.ENTRYPOINT,
     inputs: [],
     data: { label: "Entrypoint", sourceHandleId: "<source_handle_id>" },
