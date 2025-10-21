@@ -16,10 +16,10 @@ export function getTriggerClassInfo(
         modulePath: [...VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH, "manual"],
       };
     case WorkflowTriggerType.INTEGRATION:
-      // TypeScript guarantees class_name and module_path exist for INTEGRATION triggers
+      // TypeScript guarantees className and modulePath exist for INTEGRATION triggers
       return {
-        className: trigger.class_name,
-        modulePath: trigger.module_path,
+        className: trigger.className,
+        modulePath: trigger.modulePath,
       };
   }
 }

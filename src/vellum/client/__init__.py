@@ -14,6 +14,7 @@ from .resources.container_images.client import AsyncContainerImagesClient, Conta
 from .resources.deployments.client import AsyncDeploymentsClient, DeploymentsClient
 from .resources.document_indexes.client import AsyncDocumentIndexesClient, DocumentIndexesClient
 from .resources.documents.client import AsyncDocumentsClient, DocumentsClient
+from .resources.environments.client import AsyncEnvironmentsClient, EnvironmentsClient
 from .resources.events.client import AsyncEventsClient, EventsClient
 from .resources.folder_entities.client import AsyncFolderEntitiesClient, FolderEntitiesClient
 from .resources.integration_auth_configs.client import AsyncIntegrationAuthConfigsClient, IntegrationAuthConfigsClient
@@ -139,6 +140,7 @@ class Vellum:
         self.deployments = DeploymentsClient(client_wrapper=self._client_wrapper)
         self.document_indexes = DocumentIndexesClient(client_wrapper=self._client_wrapper)
         self.documents = DocumentsClient(client_wrapper=self._client_wrapper)
+        self.environments = EnvironmentsClient(client_wrapper=self._client_wrapper)
         self.folder_entities = FolderEntitiesClient(client_wrapper=self._client_wrapper)
         self.integration_auth_configs = IntegrationAuthConfigsClient(client_wrapper=self._client_wrapper)
         self.integration_providers = IntegrationProvidersClient(client_wrapper=self._client_wrapper)
@@ -1016,6 +1018,7 @@ class AsyncVellum:
         self.deployments = AsyncDeploymentsClient(client_wrapper=self._client_wrapper)
         self.document_indexes = AsyncDocumentIndexesClient(client_wrapper=self._client_wrapper)
         self.documents = AsyncDocumentsClient(client_wrapper=self._client_wrapper)
+        self.environments = AsyncEnvironmentsClient(client_wrapper=self._client_wrapper)
         self.folder_entities = AsyncFolderEntitiesClient(client_wrapper=self._client_wrapper)
         self.integration_auth_configs = AsyncIntegrationAuthConfigsClient(client_wrapper=self._client_wrapper)
         self.integration_providers = AsyncIntegrationProvidersClient(client_wrapper=self._client_wrapper)

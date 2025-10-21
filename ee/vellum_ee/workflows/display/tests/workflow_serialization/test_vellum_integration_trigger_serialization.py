@@ -1,5 +1,7 @@
 """Tests for VellumIntegrationTrigger serialization."""
 
+from typing import Any, cast
+
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
@@ -67,25 +69,11 @@ def test_vellum_integration_trigger_serialization():
 
 
 def test_vellum_integration_trigger_id_consistency():
-    """
-    Regression test: Ensure trigger IDs remain consistent across references.
+    """Validates trigger and attribute IDs match between definitions and references."""
 
-    This test validates that trigger IDs generated in the trigger definition
-    match the trigger IDs referenced in node outputs. This prevents bugs where
-    IDs become inconsistent due to changes in hash formulas or import paths.
-
-    Context: PR #2747 fixed a bug where trigger IDs were inconsistent because
-    __module__ was included in the hash formula, causing IDs to vary based on
-    import paths.
-    """
-
-    # Create a custom VellumIntegrationTrigger subclass
     class SlackMessageTrigger(VellumIntegrationTrigger):
-        """Custom Slack message trigger for testing ID consistency."""
-
         message: str
         channel: str
-        user: str
 
         class Config:
             provider = "COMPOSIO"
@@ -93,13 +81,9 @@ def test_vellum_integration_trigger_id_consistency():
             slug = "slack_new_message"
 
     class ProcessNode(BaseNode):
-        """Node that references trigger attributes."""
-
         class Outputs(BaseNode.Outputs):
-            # Reference trigger attributes - these should generate consistent IDs
             msg_output = SlackMessageTrigger.message
             channel_output = SlackMessageTrigger.channel
-            user_output = SlackMessageTrigger.user
 
         def run(self) -> Outputs:
             return self.Outputs()
@@ -107,76 +91,63 @@ def test_vellum_integration_trigger_id_consistency():
     class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
         graph = SlackMessageTrigger >> ProcessNode
 
-    # Serialize the workflow
     result: dict = get_workflow_display(workflow_class=TestWorkflow).serialize()
 
-    # Extract trigger definition
-    triggers = result["triggers"]
-    assert len(triggers) == 1
-    trigger = triggers[0]
+    # Get trigger definition IDs
+    trigger = result["triggers"][0]
     trigger_id = trigger["id"]
+    trigger_attrs = {attr["name"]: attr["id"] for attr in trigger["attributes"]}
 
-    # Extract trigger attributes and their IDs
-    trigger_attributes = {attr["name"]: attr["id"] for attr in trigger["attributes"]}
-
-    # Find the ProcessNode in the workflow
+    # Find node with trigger attribute references
     nodes = result["workflow_raw_data"]["nodes"]
+    process_node = next(
+        (n for n in nodes if any(o.get("value", {}).get("type") == "TRIGGER_ATTRIBUTE" for o in n.get("outputs", []))),
+        None,
+    )
+    assert process_node, "No node found with trigger attribute references"
 
-    # Find ProcessNode - it might have different type or label in the serialized form
-    process_node = None
-    for node in nodes:
-        if node.get("label") == "ProcessNode" or (node.get("data", {}).get("label") == "ProcessNode"):
-            process_node = node
-            break
+    # Validate all trigger attribute references have matching IDs
+    attr_mapping = {"msg_output": "message", "channel_output": "channel"}
+    for output in process_node["outputs"]:
+        value = output.get("value", {})
+        if value.get("type") == "TRIGGER_ATTRIBUTE":
+            assert value["trigger_id"] == trigger_id, "Trigger ID mismatch"
 
-    # If we can't find by label, look for a node with outputs that reference triggers
-    if not process_node:
-        for node in nodes:
-            if node.get("outputs"):
-                # Check if any output references a trigger
-                for output in node.get("outputs", []):
-                    if output.get("value", {}).get("type") == "TRIGGER_ATTRIBUTE":
-                        process_node = node
-                        break
-                if process_node:
-                    break
+            expected_attr = attr_mapping[output["name"]]
+            expected_id = trigger_attrs[expected_attr]
+            assert value["attribute_id"] == expected_id, f"Attribute ID mismatch for {expected_attr}"
 
-    assert process_node is not None, f"Could not find ProcessNode in nodes: {nodes}"
 
-    # Check that node outputs reference the correct trigger and attribute IDs
-    outputs = process_node["outputs"]
+def test_trigger_module_paths_are_canonical():
+    """Validates trigger module_path and class_name for consistent codegen."""
 
-    # Each output should reference a trigger attribute
-    for output in outputs:
-        if "value" in output and isinstance(output["value"], dict):
-            value = output["value"]
+    class TestSlackTrigger(VellumIntegrationTrigger):
+        message: str
 
-            # If this is a trigger attribute reference, validate IDs match
-            if value.get("type") == "TRIGGER_ATTRIBUTE":
-                # The trigger ID in the reference should match the trigger definition
-                assert value["trigger_id"] == trigger_id, (
-                    f"Trigger ID mismatch: reference has {value['trigger_id']}, "
-                    f"but trigger definition has {trigger_id}. "
-                    "This indicates an ID generation inconsistency."
-                )
+        class Config:
+            provider = "COMPOSIO"
+            integration_name = "SLACK"
+            slug = "test_slack_trigger"
 
-                # The attribute ID should match the corresponding attribute in the trigger
-                attribute_id = value["attribute_id"]
-                output_name = output["name"]
+    class SimpleNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result = TestSlackTrigger.message
 
-                # Map output names to expected attribute names
-                attribute_mapping = {
-                    "msg_output": "message",
-                    "channel_output": "channel",
-                    "user_output": "user",
-                }
+        def run(self) -> Outputs:
+            return self.Outputs()
 
-                if output_name in attribute_mapping:
-                    expected_attr_name = attribute_mapping[output_name]
-                    expected_attr_id = trigger_attributes[expected_attr_name]
-                    assert attribute_id == expected_attr_id, (
-                        f"Attribute ID mismatch for {output_name}: "
-                        f"reference has {attribute_id}, "
-                        f"but trigger attribute '{expected_attr_name}' has {expected_attr_id}. "
-                        "This indicates an attribute ID generation inconsistency."
-                    )
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = TestSlackTrigger >> SimpleNode
+
+    result = get_workflow_display(workflow_class=TestWorkflow).serialize()
+
+    triggers = cast(list[Any], result["triggers"])
+    trigger = cast(dict[str, Any], triggers[0])
+    assert trigger["type"] == "INTEGRATION"
+
+    module_path = cast(list[Any], trigger["module_path"])
+    assert isinstance(module_path, list)
+    assert all(isinstance(part, str) for part in module_path)
+    assert module_path == __name__.split(".")
+
+    assert trigger["class_name"] == "TestSlackTrigger"

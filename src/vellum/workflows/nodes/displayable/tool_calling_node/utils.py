@@ -295,6 +295,19 @@ class VellumIntegrationNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
                 tool_name=self.vellum_integration_tool.name,
                 arguments=arguments,
             )
+        except NodeException as e:
+            error_payload = {
+                "error": {
+                    "code": e.code.value,
+                    "message": e.message,
+                }
+            }
+            if e.raw_data is not None:
+                error_payload["error"]["raw_data"] = e.raw_data
+
+            self._add_function_result_to_chat_history(error_payload, self.state)
+            yield from []
+            return
         except Exception as e:
             self._handle_tool_exception(e, "Vellum Integration tool", self.vellum_integration_tool.name)
 

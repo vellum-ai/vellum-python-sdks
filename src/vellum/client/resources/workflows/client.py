@@ -5,6 +5,7 @@ import typing
 from ... import core
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.request_options import RequestOptions
+from ...types.dataset_row_push_request import DatasetRowPushRequest
 from ...types.workflow_push_deployment_config_request import WorkflowPushDeploymentConfigRequest
 from ...types.workflow_push_exec_config import WorkflowPushExecConfig
 from ...types.workflow_push_response import WorkflowPushResponse
@@ -133,6 +134,7 @@ class WorkflowsClient:
         workflow_sandbox_id: typing.Optional[str] = OMIT,
         deployment_config: typing.Optional[WorkflowPushDeploymentConfigRequest] = OMIT,
         artifact: typing.Optional[core.File] = OMIT,
+        dataset: typing.Optional[typing.List[DatasetRowPushRequest]] = OMIT,
         dry_run: typing.Optional[bool] = OMIT,
         strict: typing.Optional[bool] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -149,6 +151,9 @@ class WorkflowsClient:
 
         artifact : typing.Optional[core.File]
             See core.File for more documentation
+
+        dataset : typing.Optional[typing.List[DatasetRowPushRequest]]
+            List of dataset rows with inputs for scenarios.
 
         dry_run : typing.Optional[bool]
 
@@ -167,6 +172,7 @@ class WorkflowsClient:
             workflow_sandbox_id=workflow_sandbox_id,
             deployment_config=deployment_config,
             artifact=artifact,
+            dataset=dataset,
             dry_run=dry_run,
             strict=strict,
             request_options=request_options,
@@ -333,6 +339,7 @@ class AsyncWorkflowsClient:
         workflow_sandbox_id: typing.Optional[str] = OMIT,
         deployment_config: typing.Optional[WorkflowPushDeploymentConfigRequest] = OMIT,
         artifact: typing.Optional[core.File] = OMIT,
+        dataset: typing.Optional[typing.List[DatasetRowPushRequest]] = OMIT,
         dry_run: typing.Optional[bool] = OMIT,
         strict: typing.Optional[bool] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -349,6 +356,9 @@ class AsyncWorkflowsClient:
 
         artifact : typing.Optional[core.File]
             See core.File for more documentation
+
+        dataset : typing.Optional[typing.List[DatasetRowPushRequest]]
+            List of dataset rows with inputs for scenarios.
 
         dry_run : typing.Optional[bool]
 
@@ -367,6 +377,7 @@ class AsyncWorkflowsClient:
             workflow_sandbox_id=workflow_sandbox_id,
             deployment_config=deployment_config,
             artifact=artifact,
+            dataset=dataset,
             dry_run=dry_run,
             strict=strict,
             request_options=request_options,
