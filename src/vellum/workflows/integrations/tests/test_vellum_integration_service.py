@@ -297,35 +297,3 @@ def test_vellum_integration_service_execute_tool_legacy_403_error(vellum_client)
 
     # AND raw_data should be None (no integration details available)
     assert exc_info.value.raw_data is None
-
-
-def test_vellum_integration_service_execute_tool_500_error(vellum_client):
-    """Test that 500 responses from integration tools raise PROVIDER_ERROR"""
-    from vellum.client.core.api_error import ApiError
-    from vellum.workflows.errors.types import WorkflowErrorCode
-
-    # GIVEN a mock client configured to raise a 500 error
-    mock_client = vellum_client
-    mock_client.integrations = mock.MagicMock()
-
-    error_body = {"detail": "Internal server error occurred while executing the tool."}
-    mock_client.integrations.execute_integration_tool.side_effect = ApiError(
-        status_code=500,
-        body=error_body,
-    )
-
-    # WHEN we attempt to execute a tool that returns a 500 error
-    service = VellumIntegrationService(client=mock_client)
-    with pytest.raises(NodeException) as exc_info:
-        service.execute_tool(
-            integration="GITHUB",
-            provider="COMPOSIO",
-            tool_name="GITHUB_CREATE_AN_ISSUE",
-            arguments={"repo": "user/repo"},
-        )
-
-    # THEN it should raise NodeException with PROVIDER_ERROR code
-    assert exc_info.value.code == WorkflowErrorCode.PROVIDER_ERROR
-
-    # AND the error message should indicate the provider error
-    assert "Internal server error occurred while executing the tool" in exc_info.value.message

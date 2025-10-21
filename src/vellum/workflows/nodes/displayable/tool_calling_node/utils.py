@@ -296,21 +296,18 @@ class VellumIntegrationNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
                 arguments=arguments,
             )
         except NodeException as e:
-            if e.code == WorkflowErrorCode.PROVIDER_ERROR:
-                error_payload = {
-                    "error": {
-                        "code": e.code.value,
-                        "message": e.message,
-                    }
+            error_payload = {
+                "error": {
+                    "code": e.code.value,
+                    "message": e.message,
                 }
-                if e.raw_data is not None:
-                    error_payload["error"]["raw_data"] = e.raw_data
+            }
+            if e.raw_data is not None:
+                error_payload["error"]["raw_data"] = e.raw_data
 
-                self._add_function_result_to_chat_history(error_payload, self.state)
-                yield from []
-                return
-            else:
-                self._handle_tool_exception(e, "Vellum Integration tool", self.vellum_integration_tool.name)
+            self._add_function_result_to_chat_history(error_payload, self.state)
+            yield from []
+            return
         except Exception as e:
             self._handle_tool_exception(e, "Vellum Integration tool", self.vellum_integration_tool.name)
 

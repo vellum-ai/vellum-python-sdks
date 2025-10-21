@@ -16,6 +16,7 @@ from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
 from vellum.workflows import BaseWorkflow
+from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
@@ -31,7 +32,7 @@ from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.ports.utils import validate_ports
 from vellum.workflows.state.base import BaseState, StateMeta
 from vellum.workflows.state.context import WorkflowContext
-from vellum.workflows.types.definition import DeploymentDefinition
+from vellum.workflows.types.definition import DeploymentDefinition, VellumIntegrationToolDefinition
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 
@@ -515,15 +516,10 @@ def test_tool_calling_node_400_error_returns_internal_error(vellum_adhoc_prompt_
     assert e.message == "Internal server error"
 
 
-def test_vellum_integration_node_500_error_feeds_back_to_model(vellum_adhoc_prompt_client):
+def test_vellum_integration_node_500_error_feeds_back_to_model(vellum_adhoc_prompt_client, vellum_client):
     """
-    Test that 500 errors from integration tools feed back an error response to the model.
+    Test that NodeException errors from integration tools feed back an error response to the model.
     """
-    from unittest import mock
-
-    from vellum.workflows.constants import VellumIntegrationProviderType
-    from vellum.workflows.types.definition import VellumIntegrationToolDefinition
-
     # GIVEN a VellumIntegrationToolDefinition
     github_create_issue_tool = VellumIntegrationToolDefinition(
         provider=VellumIntegrationProviderType.COMPOSIO,
@@ -539,78 +535,73 @@ def test_vellum_integration_node_500_error_feeds_back_to_model(vellum_adhoc_prom
         functions = [github_create_issue_tool]
         max_prompt_iterations = 2
 
-    # AND the VellumIntegrationService raises a NodeException with PROVIDER_ERROR
-    with mock.patch(
-        "vellum.workflows.nodes.displayable.tool_calling_node.utils.VellumIntegrationService"
-    ) as mock_service_class:
-        mock_service_instance = mock.Mock()
-        mock_service_instance.execute_tool.side_effect = NodeException(
-            message="Internal server error occurred while executing the tool.",
-            code=WorkflowErrorCode.PROVIDER_ERROR,
-        )
-        mock_service_class.return_value = mock_service_instance
+    # AND the integration API raises a 500 error
+    vellum_client.integrations.execute_integration_tool.side_effect = ApiError(
+        status_code=500,
+        body={"detail": "Internal server error occurred while executing the tool."},
+    )
 
-        def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[Any]:
-            execution_id = str(uuid4())
-            call_count = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count
+    def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[Any]:
+        execution_id = str(uuid4())
+        call_count = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count
 
-            outputs: List[PromptOutput]
-            if call_count == 1:
-                outputs = [
-                    FunctionCallVellumValue(
-                        value=FunctionCall(
-                            arguments={"owner": "test-owner", "repo": "test-repo", "title": "Test Issue"},
-                            id="call_500_error_test",
-                            name="create_issue",
-                            state="FULFILLED",
-                        ),
-                    )
-                ]
-            else:
-                outputs = [
-                    StringVellumValue(
-                        value="I apologize, but I encountered an error while trying to create the issue. "
-                        "The integration service is currently unavailable."
-                    )
-                ]
-
-            events = [
-                InitiatedExecutePromptEvent(execution_id=execution_id),
-                FulfilledExecutePromptEvent(
-                    execution_id=execution_id,
-                    outputs=outputs,
-                ),
+        outputs: List[PromptOutput]
+        if call_count == 1:
+            outputs = [
+                FunctionCallVellumValue(
+                    value=FunctionCall(
+                        arguments={"owner": "test-owner", "repo": "test-repo", "title": "Test Issue"},
+                        id="call_500_error_test",
+                        name="create_issue",
+                        state="FULFILLED",
+                    ),
+                )
             ]
-            yield from events
+        else:
+            outputs = [
+                StringVellumValue(
+                    value="I apologize, but I encountered an error while trying to create the issue. "
+                    "The integration service is currently unavailable."
+                )
+            ]
 
-        vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
+        events = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            FulfilledExecutePromptEvent(
+                execution_id=execution_id,
+                outputs=outputs,
+            ),
+        ]
+        yield from events
 
-        # WHEN the ToolCallingNode runs
-        state = ToolCallingState()
-        node = TestToolCallingNode(state=state)
-        outputs = {}
-        for output in node.run():
-            if output.is_fulfilled:
-                outputs[output.name] = output.value
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
 
-        # THEN the node should fulfill successfully
-        # AND the chat history should contain a FUNCTION message with the error
-        chat_history = cast(List[ChatMessage], outputs["chat_history"])
-        assert len(chat_history) == 3
+    # WHEN the ToolCallingNode runs
+    state = ToolCallingState()
+    node = TestToolCallingNode(state=state)
+    node_outputs = {}
+    for output in node.run():
+        if output.is_fulfilled:
+            node_outputs[output.name] = output.value
 
-        # AND the first message should be the assistant's function call
-        assert chat_history[0].role == "ASSISTANT"
+    # THEN the node should fulfill successfully
+    # AND the chat history should contain a FUNCTION message with the error
+    chat_history = cast(List[ChatMessage], node_outputs["chat_history"])
+    assert len(chat_history) == 3
 
-        # AND the second message should be the FUNCTION error result
-        function_message = chat_history[1]
-        assert function_message.role == "FUNCTION"
-        assert isinstance(function_message.content, StringChatMessageContent)
+    # AND the first message should be the assistant's function call
+    assert chat_history[0].role == "ASSISTANT"
 
-        # AND the error payload should contain the error details
-        error_data = json.loads(function_message.content.value)
-        assert "error" in error_data
-        assert error_data["error"]["code"] == "PROVIDER_ERROR"
-        assert "Internal server error occurred while executing the tool" in error_data["error"]["message"]
+    # AND the second message should be the FUNCTION error result
+    function_message = chat_history[1]
+    assert function_message.role == "FUNCTION"
+    assert isinstance(function_message.content, StringChatMessageContent)
 
-        # AND the third message should be the assistant's response to the error
-        assert chat_history[2].role == "ASSISTANT"
+    # AND the error payload should contain the error details
+    error_data = json.loads(function_message.content.value)
+    assert "error" in error_data
+    assert error_data["error"]["code"] == "PROVIDER_ERROR"
+    assert "Internal server error occurred while executing the tool" in error_data["error"]["message"]
+
+    # AND the third message should be the assistant's response to the error
+    assert chat_history[2].role == "ASSISTANT"
