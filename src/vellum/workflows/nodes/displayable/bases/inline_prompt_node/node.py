@@ -1,13 +1,17 @@
-import json
 from uuid import uuid4
 from typing import Callable, ClassVar, Generator, Generic, Iterator, List, Optional, Set, Tuple, Union
 
 from vellum import (
     AdHocExecutePromptEvent,
     AdHocExpandMeta,
+    AudioInputRequest,
+    ChatHistoryInputRequest,
     ChatMessage,
+    DocumentInputRequest,
     FunctionDefinition,
+    ImageInputRequest,
     InitiatedAdHocExecutePromptEvent,
+    JsonInputRequest,
     PromptBlock,
     PromptOutput,
     PromptParameters,
@@ -15,7 +19,9 @@ from vellum import (
     PromptRequestInput,
     PromptRequestJsonInput,
     PromptRequestStringInput,
+    StringInputRequest,
     VellumVariable,
+    VideoInputRequest,
 )
 from vellum.client import ApiError, RequestOptions
 from vellum.client.types import (
@@ -23,16 +29,7 @@ from vellum.client.types import (
     PromptRequestDocumentInput,
     PromptRequestImageInput,
     PromptRequestVideoInput,
-    VellumAudio,
-    VellumAudioRequest,
-    VellumDocument,
-    VellumDocumentRequest,
-    VellumImage,
-    VellumImageRequest,
-    VellumVideo,
-    VellumVideoRequest,
 )
-from vellum.client.types.chat_message_request import ChatMessageRequest
 from vellum.client.types.prompt_exec_config import PromptExecConfig
 from vellum.client.types.prompt_settings import PromptSettings
 from vellum.client.types.rich_text_child_block import RichTextChildBlock
@@ -40,10 +37,12 @@ from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
 from vellum.workflows.context import get_execution_context
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.errors.types import vellum_error_to_workflow_error
-from vellum.workflows.events.types import default_serializer
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.bases.base_prompt_node import BasePromptNode
-from vellum.workflows.nodes.displayable.bases.utils import process_additional_prompt_outputs
+from vellum.workflows.nodes.displayable.bases.utils import (
+    compile_prompt_deployment_inputs,
+    process_additional_prompt_outputs,
+)
 from vellum.workflows.outputs import BaseOutput
 from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.definition import (
@@ -260,155 +259,128 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
         return outputs
 
     def _compile_prompt_inputs(self) -> Tuple[List[VellumVariable], List[PromptRequestInput]]:
+        """
+        Compile prompt inputs using the shared compilation logic and convert to the format
+        expected by the ad_hoc API (PromptRequestInput with 'key' field).
+        """
+        compiled_inputs = compile_prompt_deployment_inputs(self.prompt_inputs)
+
         input_variables: List[VellumVariable] = []
         input_values: List[PromptRequestInput] = []
 
-        if not self.prompt_inputs:
-            return input_variables, input_values
-
-        for input_name, input_value in self.prompt_inputs.items():
-            # Exclude inputs that resolved to be null. This ensure that we don't pass input values
-            # to optional prompt inputs whose values were unresolved.
-            if input_value is None:
-                continue
-            if isinstance(input_value, str):
+        for compiled_input in compiled_inputs:
+            if isinstance(compiled_input, StringInputRequest):
                 input_variables.append(
                     VellumVariable(
                         # TODO: Determine whether or not we actually need an id here and if we do,
                         #   figure out how to maintain stable id references.
                         #   https://app.shortcut.com/vellum/story/4080
                         id=str(uuid4()),
-                        key=input_name,
+                        key=compiled_input.name,
                         type="STRING",
                     )
                 )
                 input_values.append(
                     PromptRequestStringInput(
-                        key=input_name,
-                        value=input_value,
+                        key=compiled_input.name,
+                        value=compiled_input.value,
                     )
                 )
-            elif (
-                input_value
-                and isinstance(input_value, list)
-                and all(isinstance(message, (ChatMessage, ChatMessageRequest)) for message in input_value)
-            ):
-                chat_history = [
-                    message if isinstance(message, ChatMessage) else ChatMessage.model_validate(message.model_dump())
-                    for message in input_value
-                    if isinstance(message, (ChatMessage, ChatMessageRequest))
-                ]
+            elif isinstance(compiled_input, ChatHistoryInputRequest):
+                chat_history = [ChatMessage.model_validate(message.model_dump()) for message in compiled_input.value]
                 input_variables.append(
                     VellumVariable(
-                        # TODO: Determine whether or not we actually need an id here and if we do,
-                        #   figure out how to maintain stable id references.
-                        #   https://app.shortcut.com/vellum/story/4080
                         id=str(uuid4()),
-                        key=input_name,
+                        key=compiled_input.name,
                         type="CHAT_HISTORY",
                     )
                 )
                 input_values.append(
                     PromptRequestChatHistoryInput(
-                        key=input_name,
+                        key=compiled_input.name,
                         value=chat_history,
                     )
                 )
-            elif isinstance(input_value, (VellumAudio, VellumAudioRequest)):
+            elif isinstance(compiled_input, AudioInputRequest):
+                from vellum.client.types import VellumAudio
+
+                audio_value = VellumAudio.model_validate(compiled_input.value.model_dump())
                 input_variables.append(
                     VellumVariable(
                         id=str(uuid4()),
-                        key=input_name,
+                        key=compiled_input.name,
                         type="AUDIO",
                     )
                 )
                 input_values.append(
                     PromptRequestAudioInput(
-                        key=input_name,
-                        value=(
-                            input_value
-                            if isinstance(input_value, VellumAudio)
-                            else VellumAudio.model_validate(input_value.model_dump())
-                        ),
+                        key=compiled_input.name,
+                        value=audio_value,
                     )
                 )
-            elif isinstance(input_value, (VellumVideo, VellumVideoRequest)):
+            elif isinstance(compiled_input, VideoInputRequest):
+                from vellum.client.types import VellumVideo
+
+                video_value = VellumVideo.model_validate(compiled_input.value.model_dump())
                 input_variables.append(
                     VellumVariable(
                         id=str(uuid4()),
-                        key=input_name,
+                        key=compiled_input.name,
                         type="VIDEO",
                     )
                 )
                 input_values.append(
                     PromptRequestVideoInput(
-                        key=input_name,
-                        value=(
-                            input_value
-                            if isinstance(input_value, VellumVideo)
-                            else VellumVideo.model_validate(input_value.model_dump())
-                        ),
+                        key=compiled_input.name,
+                        value=video_value,
                     )
                 )
-            elif isinstance(input_value, (VellumImage, VellumImageRequest)):
+            elif isinstance(compiled_input, ImageInputRequest):
+                from vellum.client.types import VellumImage
+
+                image_value = VellumImage.model_validate(compiled_input.value.model_dump())
                 input_variables.append(
                     VellumVariable(
                         id=str(uuid4()),
-                        key=input_name,
+                        key=compiled_input.name,
                         type="IMAGE",
                     )
                 )
                 input_values.append(
                     PromptRequestImageInput(
-                        key=input_name,
-                        value=(
-                            input_value
-                            if isinstance(input_value, VellumImage)
-                            else VellumImage.model_validate(input_value.model_dump())
-                        ),
+                        key=compiled_input.name,
+                        value=image_value,
                     )
                 )
-            elif isinstance(input_value, (VellumDocument, VellumDocumentRequest)):
+            elif isinstance(compiled_input, DocumentInputRequest):
+                from vellum.client.types import VellumDocument
+
+                document_value = VellumDocument.model_validate(compiled_input.value.model_dump())
                 input_variables.append(
                     VellumVariable(
                         id=str(uuid4()),
-                        key=input_name,
+                        key=compiled_input.name,
                         type="DOCUMENT",
                     )
                 )
                 input_values.append(
                     PromptRequestDocumentInput(
-                        key=input_name,
-                        value=(
-                            input_value
-                            if isinstance(input_value, VellumDocument)
-                            else VellumDocument.model_validate(input_value.model_dump())
-                        ),
+                        key=compiled_input.name,
+                        value=document_value,
                     )
                 )
-            else:
-                try:
-                    input_value = default_serializer(input_value)
-                except json.JSONDecodeError as e:
-                    raise NodeException(
-                        message=f"Failed to serialize input '{input_name}' of type '{input_value.__class__}': {e}",
-                        code=WorkflowErrorCode.INVALID_INPUTS,
-                    )
-
+            elif isinstance(compiled_input, JsonInputRequest):
                 input_variables.append(
                     VellumVariable(
-                        # TODO: Determine whether or not we actually need an id here and if we do,
-                        #   figure out how to maintain stable id references.
-                        #   https://app.shortcut.com/vellum/story/4080
                         id=str(uuid4()),
-                        key=input_name,
+                        key=compiled_input.name,
                         type="JSON",
                     )
                 )
                 input_values.append(
                     PromptRequestJsonInput(
-                        key=input_name,
-                        value=input_value,
+                        key=compiled_input.name,
+                        value=compiled_input.value,
                     )
                 )
 

@@ -1,15 +1,34 @@
 import enum
 import json
-from typing import Any, List, Optional, Tuple, Union, cast
+from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
-from vellum import PromptOutput
+from vellum import (
+    AudioInputRequest,
+    ChatHistoryInputRequest,
+    ChatMessage,
+    DocumentInputRequest,
+    ImageInputRequest,
+    JsonInputRequest,
+    PromptDeploymentInputRequest,
+    PromptOutput,
+    StringInputRequest,
+    VellumAudio,
+    VellumAudioRequest,
+    VellumDocument,
+    VellumDocumentRequest,
+    VellumImage,
+    VellumImageRequest,
+    VellumVideo,
+    VellumVideoRequest,
+    VideoInputRequest,
+)
 from vellum.client.types.array_vellum_value import ArrayVellumValue
 from vellum.client.types.array_vellum_value_request import ArrayVellumValueRequest
 from vellum.client.types.audio_vellum_value import AudioVellumValue
 from vellum.client.types.audio_vellum_value_request import AudioVellumValueRequest
 from vellum.client.types.chat_history_vellum_value import ChatHistoryVellumValue
 from vellum.client.types.chat_history_vellum_value_request import ChatHistoryVellumValueRequest
-from vellum.client.types.chat_message import ChatMessage
+from vellum.client.types.chat_message_request import ChatMessageRequest
 from vellum.client.types.error_vellum_value import ErrorVellumValue
 from vellum.client.types.error_vellum_value_request import ErrorVellumValueRequest
 from vellum.client.types.function_call_vellum_value import FunctionCallVellumValue
@@ -31,7 +50,10 @@ from vellum.client.types.vellum_value import VellumValue
 from vellum.client.types.vellum_value_request import VellumValueRequest
 from vellum.client.types.video_vellum_value import VideoVellumValue
 from vellum.client.types.video_vellum_value_request import VideoVellumValueRequest
+from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.errors.types import WorkflowError, workflow_error_to_vellum_error
+from vellum.workflows.events.types import default_serializer
+from vellum.workflows.exceptions import NodeException
 from vellum.workflows.state.encoder import DefaultStateEncoder
 
 VELLUM_VALUE_REQUEST_TUPLE = (
@@ -160,3 +182,125 @@ def process_additional_prompt_outputs(outputs: List[PromptOutput]) -> Tuple[str,
             string_outputs.append(output.value.message)
 
     return "\n".join(string_outputs), json_output
+
+
+def compile_prompt_deployment_inputs(
+    prompt_inputs: Optional[Dict[str, Any]],
+) -> List[PromptDeploymentInputRequest]:
+    """
+    Compile prompt inputs into PromptDeploymentInputRequest objects.
+
+    This function is shared between PromptDeploymentNode and InlinePromptNode to ensure
+    consistent input compilation using the XInputRequest classes.
+
+    Args:
+        prompt_inputs: Dictionary of input names to input values
+
+    Returns:
+        List of PromptDeploymentInputRequest objects
+
+    Raises:
+        NodeException: If input serialization fails
+    """
+    compiled_inputs: List[PromptDeploymentInputRequest] = []
+
+    if not prompt_inputs:
+        return compiled_inputs
+
+    for input_name, input_value in prompt_inputs.items():
+        # Exclude inputs that resolved to be null. This ensure that we don't pass input values
+        # to optional prompt inputs whose values were unresolved.
+        if input_value is None:
+            continue
+        if isinstance(input_value, str):
+            compiled_inputs.append(
+                StringInputRequest(
+                    name=input_name,
+                    value=input_value,
+                )
+            )
+        elif (
+            input_value
+            and isinstance(input_value, list)
+            and all(isinstance(message, (ChatMessage, ChatMessageRequest)) for message in input_value)
+        ):
+            chat_history = [
+                (
+                    message
+                    if isinstance(message, ChatMessageRequest)
+                    else ChatMessageRequest.model_validate(message.model_dump())
+                )
+                for message in input_value
+                if isinstance(message, (ChatMessage, ChatMessageRequest))
+            ]
+            compiled_inputs.append(
+                ChatHistoryInputRequest(
+                    name=input_name,
+                    value=chat_history,
+                )
+            )
+        elif isinstance(input_value, (VellumAudio, VellumAudioRequest)):
+            audio_value = (
+                input_value
+                if isinstance(input_value, VellumAudioRequest)
+                else VellumAudioRequest.model_validate(input_value.model_dump())
+            )
+            compiled_inputs.append(
+                AudioInputRequest(
+                    name=input_name,
+                    value=audio_value,
+                )
+            )
+        elif isinstance(input_value, (VellumImage, VellumImageRequest)):
+            image_value = (
+                input_value
+                if isinstance(input_value, VellumImageRequest)
+                else VellumImageRequest.model_validate(input_value.model_dump())
+            )
+            compiled_inputs.append(
+                ImageInputRequest(
+                    name=input_name,
+                    value=image_value,
+                )
+            )
+        elif isinstance(input_value, (VellumDocument, VellumDocumentRequest)):
+            document_value = (
+                input_value
+                if isinstance(input_value, VellumDocumentRequest)
+                else VellumDocumentRequest.model_validate(input_value.model_dump())
+            )
+            compiled_inputs.append(
+                DocumentInputRequest(
+                    name=input_name,
+                    value=document_value,
+                )
+            )
+        elif isinstance(input_value, (VellumVideo, VellumVideoRequest)):
+            video_value = (
+                input_value
+                if isinstance(input_value, VellumVideoRequest)
+                else VellumVideoRequest.model_validate(input_value.model_dump())
+            )
+            compiled_inputs.append(
+                VideoInputRequest(
+                    name=input_name,
+                    value=video_value,
+                )
+            )
+        else:
+            try:
+                input_value = default_serializer(input_value)
+            except json.JSONDecodeError as e:
+                raise NodeException(
+                    message=f"Failed to serialize input '{input_name}' of type '{input_value.__class__}': {e}",
+                    code=WorkflowErrorCode.INVALID_INPUTS,
+                )
+
+            compiled_inputs.append(
+                JsonInputRequest(
+                    name=input_name,
+                    value=input_value,
+                )
+            )
+
+    return compiled_inputs
