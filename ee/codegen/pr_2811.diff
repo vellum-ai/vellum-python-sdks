@@ -1,0 +1,61 @@
+diff --git a/ee/codegen_integration/fixtures/simple_manual_trigger_workflow/display_data/simple_manual_trigger_workflow.json b/ee/codegen_integration/fixtures/simple_manual_trigger_workflow/display_data/simple_manual_trigger_workflow.json
+index 297c5caac..ae2ba9b41 100644
+--- a/ee/codegen_integration/fixtures/simple_manual_trigger_workflow/display_data/simple_manual_trigger_workflow.json
++++ b/ee/codegen_integration/fixtures/simple_manual_trigger_workflow/display_data/simple_manual_trigger_workflow.json
+@@ -2,7 +2,7 @@
+   "workflow_raw_data": {
+     "nodes": [
+       {
+-        "id": "63884a7b-c01c-4cbc-b8d4-abe0a8796f6b",
++        "id": "b09c1902-3cca-4c79-b775-4c32e3e88466",
+         "type": "ENTRYPOINT",
+         "inputs": [],
+         "data": {
+@@ -147,7 +147,7 @@
+     "edges": [
+       {
+         "id": "9eaed9b1-5803-4bc4-bdba-b614f4f465b5",
+-        "source_node_id": "63884a7b-c01c-4cbc-b8d4-abe0a8796f6b",
++        "source_node_id": "b09c1902-3cca-4c79-b775-4c32e3e88466",
+         "source_handle_id": "eba8fd73-57ab-4d7b-8f75-b54dbe5fc8ba",
+         "target_node_id": "3669684e-500e-4034-be4a-7ee70824b272",
+         "target_handle_id": "7da60409-5790-43fa-80b2-ad88da2812df",
+diff --git a/ee/vellum_ee/workflows/display/workflows/base_workflow_display.py b/ee/vellum_ee/workflows/display/workflows/base_workflow_display.py
+index 74d033afe..c63d7c2e0 100644
+--- a/ee/vellum_ee/workflows/display/workflows/base_workflow_display.py
++++ b/ee/vellum_ee/workflows/display/workflows/base_workflow_display.py
+@@ -179,9 +179,22 @@ def serialize(self) -> JsonObject:
+         serialized_nodes: Dict[UUID, JsonObject] = {}
+         edges: JsonArray = []
+
+-        # Add a single synthetic node for the workflow entrypoint
+-        entrypoint_node_id = self.display_context.workflow_display.entrypoint_node_id
++        # Get all trigger edges from the workflow's subgraphs to check if trigger exists
++        trigger_edges = []
++        for subgraph in self._workflow.get_subgraphs():
++            trigger_edges.extend(list(subgraph.trigger_edges))
++
++        # Determine entrypoint node ID: use trigger ID if trigger exists, otherwise use default
++        # This maintains backwards compatibility while linking trigger and entrypoint
++        if len(trigger_edges) > 0:
++            trigger_class = trigger_edges[0].trigger_class
++            entrypoint_node_id = get_trigger_id(trigger_class)
++        else:
++            entrypoint_node_id = self.display_context.workflow_display.entrypoint_node_id
++
+         entrypoint_node_source_handle_id = self.display_context.workflow_display.entrypoint_node_source_handle_id
++
++        # Always add entrypoint node for backwards compatibility
+         serialized_nodes[entrypoint_node_id] = {
+             "id": str(entrypoint_node_id),
+             "type": "ENTRYPOINT",
+@@ -340,7 +353,8 @@ def serialize(self) -> JsonObject:
+                 ValueError("Unable to serialize terminal nodes that are not referenced by workflow outputs.")
+             )
+
+-        # Add an edge for each edge in the workflow
++        # Add edges from entrypoint node to first nodes
++        # These edges always exist for backwards compatibility
+         for target_node, entrypoint_display in self.display_context.entrypoint_displays.items():
+             unadorned_target_node = get_unadorned_node(target_node)
+             # Skip edges to invalid nodes
