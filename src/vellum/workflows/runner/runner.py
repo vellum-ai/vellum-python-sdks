@@ -1113,7 +1113,6 @@ class WorkflowRunner(Generic[StateType]):
         cancel_thread_kill_switch.set()
         timeout_thread_kill_switch.set()
 
-
     def stream(self) -> WorkflowEventStream:
         return WorkflowEventGenerator(self._generate_events(), self._initial_state.meta.span_id)
 
@@ -1133,12 +1132,3 @@ class WorkflowRunner(Generic[StateType]):
 
         if self._timeout_thread and self._timeout_thread.is_alive():
             self._timeout_thread.join()
-
-
-class WorkflowEventGenerator:
-    def __init__(self, events: Iterator[WorkflowEvent], span_id: UUID):
-        self.events = events
-        self.span_id = span_id
-
-    def __iter__(self) -> Iterator[WorkflowEvent]:
-        return self.events
