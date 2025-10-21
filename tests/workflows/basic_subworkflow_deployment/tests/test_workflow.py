@@ -16,8 +16,13 @@ from vellum import (
     WorkflowStreamEvent,
 )
 from vellum.workflows.constants import LATEST_RELEASE_TAG, OMIT
-from vellum.workflows.events.types import VellumCodeResourceDefinition, WorkflowParentContext
-from vellum.workflows.workflows.event_filters import root_workflow_event_filter
+from vellum.workflows.events.types import NodeParentContext, VellumCodeResourceDefinition, WorkflowParentContext
+from vellum.workflows.inputs import BaseInputs
+from vellum.workflows.nodes import BaseNode
+from vellum.workflows.state import BaseState
+from vellum.workflows.state.context import WorkflowContext
+from vellum.workflows.workflows.base import BaseWorkflow
+from vellum.workflows.workflows.event_filters import all_workflow_event_filter, root_workflow_event_filter
 
 from tests.workflows.basic_subworkflow_deployment.workflow import (
     BasicSubworkflowDeploymentWorkflow,
@@ -402,3 +407,76 @@ def test_run_workflow__optional_inputs_excluded(vellum_client):
     input_names = [input_req.name for input_req in call_kwargs["inputs"]]
     assert "optional_field" not in input_names
     assert len(call_kwargs["inputs"]) == 2
+
+
+def test_stream_workflow__emits_workflow_initiated_and_fulfilled_events(mocker):
+    """Confirm that workflow initiated and fulfilled events are emitted when using _run_resolved_workflow"""
+
+    # GIVEN a simple workflow that will be resolved locally
+    class SimpleWorkflowInputs(BaseInputs):
+        city: str
+        date: str
+
+    class SimpleNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            temperature = 70
+            reasoning = "Checked the weather"
+
+    class SimpleWorkflow(BaseWorkflow[SimpleWorkflowInputs, BaseState]):
+        graph = SimpleNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            temperature = SimpleNode.Outputs.temperature
+            reasoning = SimpleNode.Outputs.reasoning
+
+    # AND a workflow with a Subworkflow Deployment Node
+    workflow = BasicSubworkflowDeploymentWorkflow()
+
+    # AND we mock resolve_workflow_deployment to return a workflow instance with proper context
+    def mock_resolve(deployment_name: str, release_tag: str, state: Any):
+        return SimpleWorkflow(context=WorkflowContext.create_from(workflow._context), parent_state=state)
+
+    mocker.patch.object(workflow._context, "resolve_workflow_deployment", side_effect=mock_resolve)
+
+    # WHEN we stream the workflow with all_workflow_event_filter to capture subworkflow events
+    result = list(
+        workflow.stream(
+            inputs=Inputs(
+                city="San Francisco",
+                date="2024-01-01",
+            ),
+            event_filter=all_workflow_event_filter,
+        )
+    )
+
+    all_workflow_events = list(event for event in result if event.name.startswith("workflow."))
+
+    # THEN we should have workflow initiated and fulfilled events
+    initiated_events = [e for e in all_workflow_events if e.name == "workflow.execution.initiated"]
+    fulfilled_events = [e for e in all_workflow_events if e.name == "workflow.execution.fulfilled"]
+
+    # THEN we should have two initiated events (parent workflow and subworkflow)
+    assert len(initiated_events) == 2
+    assert len(fulfilled_events) == 2
+
+    # AND the first initiated event should be from the parent workflow with External parent
+    assert initiated_events[0].name == "workflow.execution.initiated"
+    assert initiated_events[0].workflow_definition == BasicSubworkflowDeploymentWorkflow
+    assert initiated_events[0].parent is not None
+    assert initiated_events[0].parent.type == "EXTERNAL"
+
+    # AND the second initiated event should be from the subworkflow with Node Parent Context
+    assert initiated_events[1].name == "workflow.execution.initiated"
+    assert initiated_events[1].workflow_definition == SimpleWorkflow
+    assert initiated_events[1].parent is not None
+    assert initiated_events[1].parent.type == "WORKFLOW_NODE"
+    assert isinstance(initiated_events[1].parent, NodeParentContext)
+
+    # AND the Node Parent should have a Workflow Parent (the parent workflow)
+    assert isinstance(initiated_events[1].parent.parent, WorkflowParentContext)
+    assert (
+        initiated_events[1].parent.parent.workflow_definition.model_dump()
+        == WorkflowParentContext(
+            workflow_definition=workflow.__class__, span_id=uuid4()
+        ).workflow_definition.model_dump()
+    )
