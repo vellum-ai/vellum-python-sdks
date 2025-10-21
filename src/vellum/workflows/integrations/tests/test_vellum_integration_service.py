@@ -300,7 +300,7 @@ def test_vellum_integration_service_execute_tool_legacy_403_error(vellum_client)
 
 
 def test_vellum_integration_service_execute_tool_500_error(vellum_client):
-    """Test that 500 responses from integration tools feed back an error to the model"""
+    """Test that 500 responses from integration tools raise PROVIDER_ERROR"""
     from vellum.client.core.api_error import ApiError
     from vellum.workflows.errors.types import WorkflowErrorCode
 
