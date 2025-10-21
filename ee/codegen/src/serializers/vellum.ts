@@ -121,6 +121,7 @@ import {
   WorkflowSandboxRoutingConfig,
   WorkflowStateVariableWorkflowReference,
   WorkflowTrigger,
+  WorkflowTriggerType,
   WorkflowValueDescriptor,
   WorkspaceSecretPointer,
 } from "src/types/vellum";
@@ -2301,7 +2302,9 @@ export const WorkflowTriggerSerializer = unionSchema("type", {
 }) as unknown as Schema<WorkflowTriggerSerializer.Raw, WorkflowTrigger>;
 
 export declare namespace WorkflowTriggerSerializer {
-  type Raw = ManualTriggerSerializer.Raw | IntegrationTriggerSerializer.Raw;
+  type Raw =
+    | ManualTriggerSerializer.Raw
+    | IntegrationTriggerSerializer.Raw;
 }
 
 export const WorkflowRawDataSerializer: ObjectSchema<
