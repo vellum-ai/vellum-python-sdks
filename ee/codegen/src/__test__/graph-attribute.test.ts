@@ -19,6 +19,7 @@ import {
 
 import { createNodeContext } from "src/context";
 import { GraphAttribute } from "src/generators/graph-attribute";
+import { WorkflowTriggerType } from "src/types/vellum";
 
 describe("Workflow", () => {
   const entrypointNode = entrypointNodeDataFactory();
@@ -1051,6 +1052,11 @@ describe("Workflow", () => {
     it("should generate correct graph when workflow has a manual trigger", async () => {
       const writer = new Writer();
 
+      const triggerId = "trigger-1";
+
+      // With triggers, entrypoint node exists with ID matching the trigger ID
+      const entrypointNode = entrypointNodeDataFactory(triggerId);
+
       const firstNode = genericNodeFactory({
         id: "first-node",
         label: "FirstNode",
@@ -1061,18 +1067,20 @@ describe("Workflow", () => {
         label: "SecondNode",
       });
 
-      // With triggers, no entrypoint node exists - trigger IS the entry point
-      const edges = edgesFactory([[firstNode, secondNode]]);
+      const edges = edgesFactory([
+        [entrypointNode, firstNode],
+        [firstNode, secondNode],
+      ]);
 
       const workflowContext = workflowContextFactory({
         workflowRawData: {
-          nodes: [firstNode, secondNode],
+          nodes: [entrypointNode, firstNode, secondNode],
           edges,
         },
         triggers: [
           {
-            id: "trigger-1",
-            type: "MANUAL",
+            id: triggerId,
+            type: WorkflowTriggerType.MANUAL,
             attributes: [],
           },
         ],
@@ -1101,6 +1109,11 @@ describe("Workflow", () => {
     it("should generate correct graph when workflow has a VellumIntegrationTrigger", async () => {
       const writer = new Writer();
 
+      const triggerId = "trigger-1";
+
+      // With triggers, entrypoint node exists with ID matching the trigger ID
+      const entrypointNode = entrypointNodeDataFactory(triggerId);
+
       const firstNode = genericNodeFactory({
         id: "first-node",
         label: "FirstNode",
@@ -1111,18 +1124,20 @@ describe("Workflow", () => {
         label: "SecondNode",
       });
 
-      // With triggers, no entrypoint node exists - trigger IS the entry point
-      const edges = edgesFactory([[firstNode, secondNode]]);
+      const edges = edgesFactory([
+        [entrypointNode, firstNode],
+        [firstNode, secondNode],
+      ]);
 
       const workflowContext = workflowContextFactory({
         workflowRawData: {
-          nodes: [firstNode, secondNode],
+          nodes: [entrypointNode, firstNode, secondNode],
           edges,
         },
         triggers: [
           {
-            id: "trigger-1",
-            type: "INTEGRATION",
+            id: triggerId,
+            type: WorkflowTriggerType.INTEGRATION,
             attributes: [
               { id: "attr-1", name: "message", value: null },
               { id: "attr-2", name: "channel", value: null },

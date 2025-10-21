@@ -197,18 +197,16 @@ export class GraphAttribute extends AstNode {
       const trigger = triggers[0];
       if (trigger) {
         const triggerInfo = getTriggerClassInfo(trigger);
-        if (triggerInfo) {
-          const triggerReference: GraphTriggerReference = {
-            type: "trigger_reference",
-            triggerClassName: triggerInfo.className,
-            triggerModulePath: triggerInfo.modulePath,
-          };
-          graphMutableAst = {
-            type: "right_shift",
-            lhs: triggerReference,
-            rhs: graphMutableAst,
-          };
-        }
+        const triggerReference: GraphTriggerReference = {
+          type: "trigger_reference",
+          triggerClassName: triggerInfo.className,
+          triggerModulePath: triggerInfo.modulePath,
+        };
+        graphMutableAst = {
+          type: "right_shift",
+          lhs: triggerReference,
+          rhs: graphMutableAst,
+        };
       }
     }
 

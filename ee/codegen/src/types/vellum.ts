@@ -786,13 +786,24 @@ export interface WorkflowOutputValue {
   value?: WorkflowValueDescriptor;
 }
 
-export interface WorkflowTrigger {
-  id: string;
-  type: string;
-  attributes: NodeAttribute[];
-  class_name?: string; // Only present for INTEGRATION triggers
-  module_path?: string[]; // Only present for INTEGRATION triggers
+export enum WorkflowTriggerType {
+  MANUAL = "MANUAL",
+  INTEGRATION = "INTEGRATION",
 }
+
+export type WorkflowTrigger =
+  | {
+      id: string;
+      type: WorkflowTriggerType.MANUAL;
+      attributes: NodeAttribute[];
+    }
+  | {
+      id: string;
+      type: WorkflowTriggerType.INTEGRATION;
+      attributes: NodeAttribute[];
+      class_name: string;
+      module_path: string[];
+    };
 
 export interface WorkflowRawData {
   nodes: WorkflowNode[];
