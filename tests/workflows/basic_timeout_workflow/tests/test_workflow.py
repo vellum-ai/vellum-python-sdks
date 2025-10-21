@@ -1,4 +1,5 @@
 from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.workflows.event_filters import root_workflow_event_filter
 
 from tests.workflows.basic_timeout_workflow.workflow import BasicTimeoutWorkflow
 
@@ -27,11 +28,12 @@ def test_workflow__timeout_stream():
     # GIVEN a workflow that is long running
     workflow = BasicTimeoutWorkflow()
 
-    result = workflow.stream(timeout=0.1)
+    result = workflow.stream(timeout=0.1, event_filter=root_workflow_event_filter)
 
     # THEN we should get the expected initiated and rejected events
     events = list(result)
     assert events[0].name == "workflow.execution.initiated"
+    assert events[-2].name == "node.execution.rejected"
     assert events[-1].name == "workflow.execution.rejected"
     assert "timeout" in events[-1].error.message.lower()
     assert events[-1].error.code == WorkflowErrorCode.WORKFLOW_TIMEOUT

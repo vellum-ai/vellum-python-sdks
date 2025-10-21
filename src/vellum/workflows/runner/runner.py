@@ -1026,6 +1026,17 @@ class WorkflowRunner(Generic[StateType]):
         if kill_switch.wait(timeout=self._timeout):
             return
 
+        parent_context = WorkflowParentContext(
+            span_id=self._initial_state.meta.span_id,
+            workflow_definition=self.workflow.__class__,
+            parent=self._execution_context.parent_context,
+        )
+
+        self._emit_node_cancellation_events(
+            error_message=f"Workflow execution exceeded timeout of {self._timeout} seconds",
+            parent_context=parent_context,
+        )
+
         self._workflow_event_outer_queue.put(
             self._reject_workflow_event(
                 WorkflowError(
