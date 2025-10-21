@@ -2263,21 +2263,47 @@ export const WorkflowOutputValueSerializer: ObjectSchema<
   value: WorkflowValueDescriptorSerializer.optional(),
 });
 
-export const WorkflowTriggerSerializer: ObjectSchema<
-  WorkflowTriggerSerializer.Raw,
-  WorkflowTrigger
-> = objectSchema({
+const ManualTriggerSerializer = objectSchema({
   id: stringSchema(),
-  type: stringSchema(),
+  type: stringLiteralSchema("MANUAL"),
   attributes: listSchema(NodeAttributeSerializer),
 });
 
-export declare namespace WorkflowTriggerSerializer {
+export declare namespace ManualTriggerSerializer {
   interface Raw {
     id: string;
-    type: string;
+    type: "MANUAL";
     attributes: NodeAttributeSerializer.Raw[];
   }
+}
+
+const IntegrationTriggerSerializer = objectSchema({
+  id: stringSchema(),
+  type: stringLiteralSchema("INTEGRATION"),
+  attributes: listSchema(NodeAttributeSerializer),
+  className: propertySchema("class_name", stringSchema()),
+  modulePath: propertySchema("module_path", listSchema(stringSchema())),
+});
+
+export declare namespace IntegrationTriggerSerializer {
+  interface Raw {
+    id: string;
+    type: "INTEGRATION";
+    attributes: NodeAttributeSerializer.Raw[];
+    class_name: string;
+    module_path: string[];
+  }
+}
+
+export const WorkflowTriggerSerializer = unionSchema("type", {
+  MANUAL: ManualTriggerSerializer,
+  INTEGRATION: IntegrationTriggerSerializer,
+}) as unknown as Schema<WorkflowTriggerSerializer.Raw, WorkflowTrigger>;
+
+export declare namespace WorkflowTriggerSerializer {
+  type Raw =
+    | ManualTriggerSerializer.Raw
+    | IntegrationTriggerSerializer.Raw;
 }
 
 export const WorkflowRawDataSerializer: ObjectSchema<
