@@ -4,7 +4,6 @@ if TYPE_CHECKING:
     from vellum.workflows.expressions.accessor import AccessorExpression
     from vellum.workflows.expressions.add import AddExpression
     from vellum.workflows.expressions.and_ import AndExpression
-    from vellum.workflows.expressions.append import AppendExpression
     from vellum.workflows.expressions.begins_with import BeginsWithExpression
     from vellum.workflows.expressions.between import BetweenExpression
     from vellum.workflows.expressions.coalesce_expression import CoalesceExpression
@@ -16,6 +15,7 @@ if TYPE_CHECKING:
     from vellum.workflows.expressions.does_not_equal import DoesNotEqualExpression
     from vellum.workflows.expressions.ends_with import EndsWithExpression
     from vellum.workflows.expressions.equals import EqualsExpression
+    from vellum.workflows.expressions.extend import ExtendExpression
     from vellum.workflows.expressions.greater_than import GreaterThanExpression
     from vellum.workflows.expressions.greater_than_or_equal_to import GreaterThanOrEqualToExpression
     from vellum.workflows.expressions.in_ import InExpression
@@ -412,12 +412,12 @@ class BaseDescriptor(Generic[_T]):
         return MinusExpression(lhs=self, rhs=other)
 
     @overload
-    def append(self, other: "BaseDescriptor[_O]") -> "AppendExpression[_T, _O]": ...
+    def extend(self, other: "BaseDescriptor[_O]") -> "ExtendExpression[_T, _O]": ...
 
     @overload
-    def append(self, other: _O) -> "AppendExpression[_T, _O]": ...
+    def extend(self, other: _O) -> "ExtendExpression[_T, _O]": ...
 
-    def append(self, other: "Union[BaseDescriptor[_O], _O]") -> "AppendExpression[_T, _O]":
-        from vellum.workflows.expressions.append import AppendExpression
+    def extend(self, other: "Union[BaseDescriptor[_O], _O]") -> "ExtendExpression[_T, _O]":
+        from vellum.workflows.expressions.extend import ExtendExpression
 
-        return AppendExpression(lhs=self, rhs=other)
+        return ExtendExpression(lhs=self, rhs=other)
