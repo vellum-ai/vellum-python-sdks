@@ -1054,9 +1054,6 @@ describe("Workflow", () => {
 
       const triggerId = "trigger-1";
 
-      // Manual triggers have an associated entrypoint node with ID matching the trigger
-      const entrypointNodeWithTriggerId = entrypointNodeDataFactory(triggerId);
-
       const firstNode = genericNodeFactory({
         id: "first-node",
         label: "FirstNode",
