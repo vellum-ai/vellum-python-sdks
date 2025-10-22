@@ -1,4 +1,5 @@
 import pytest
+from typing import List
 
 from vellum.workflows.descriptors.exceptions import InvalidExpressionException
 from vellum.workflows.references.constant import ConstantValueReference
@@ -83,7 +84,7 @@ def test_extend_expression_lhs_fail():
 def test_extend_expression_empty_list():
     # GIVEN an empty list and an item
     state = TestState()
-    lhs_ref = ConstantValueReference([])
+    lhs_ref: ConstantValueReference[List[str]] = ConstantValueReference([])
     rhs_ref = ConstantValueReference("first")
     extend_expr = lhs_ref.extend(rhs_ref)
 
