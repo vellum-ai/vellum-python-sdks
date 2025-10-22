@@ -4,6 +4,7 @@ from datetime import datetime
 from click.testing import CliRunner
 
 from vellum.client.core.api_error import ApiError
+from vellum.client.types.environment_read import EnvironmentRead
 from vellum.client.types.organization_read import OrganizationRead
 from vellum.client.types.workspace_read import WorkspaceRead
 from vellum_cli import main as cli_main
@@ -28,6 +29,12 @@ def test_ping__happy_path(vellum_client):
         allow_staff_access=True,
         limit_config={},
     )
+    vellum_client.environments.environment_identity.return_value = EnvironmentRead(
+        id="1234567890",
+        name="development",
+        label="Development",
+        display_config={},
+    )
 
     # WHEN calling `vellum ping`
     result = runner.invoke(cli_main, ["ping"])
@@ -46,6 +53,11 @@ Organization:
 Workspace:
     ID: 1234567890
     Name: Test Workspace
+
+Environment:
+    ID: 1234567890
+    Name: development
+    Label: Development
 \x1b[0m
 """
     )
