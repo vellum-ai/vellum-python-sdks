@@ -185,10 +185,9 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         for subgraph in self._workflow.get_subgraphs():
             trigger_edges.extend(list(subgraph.trigger_edges))
 
-        # Determine entrypoint node ID: use trigger ID if ManualTrigger exists, otherwise use default
-        # This maintains backwards compatibility while linking ManualTrigger and entrypoint
-        # ManualTrigger represents explicit workflow.run() or workflow.stream() calls
-        entrypoint_trigger_edges = [edge for edge in trigger_edges if edge.trigger_class == ManualTrigger]
+        # Determine entrypoint node ID
+        # Use trigger ID if ManualTrigger exists, otherwise use default from workflow display
+        entrypoint_trigger_edges = [edge for edge in trigger_edges if issubclass(edge.trigger_class, ManualTrigger)]
         if len(entrypoint_trigger_edges) > 0:
             trigger_class = entrypoint_trigger_edges[0].trigger_class
             entrypoint_node_id = get_trigger_id(trigger_class)
