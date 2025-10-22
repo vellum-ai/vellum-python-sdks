@@ -74,12 +74,13 @@ from vellum.workflows.references import ExternalInputReference, OutputReference
 from vellum.workflows.references.state_value import StateValueReference
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.delta import StateDelta
+from vellum.workflows.triggers.integration import IntegrationTrigger
+from vellum.workflows.triggers.manual import ManualTrigger
 from vellum.workflows.types.core import CancelSignal
 from vellum.workflows.types.generics import InputsType, OutputsType, StateType
 
 if TYPE_CHECKING:
     from vellum.workflows import BaseWorkflow
-    from vellum.workflows.triggers.integration import IntegrationTrigger
 
 logger = logging.getLogger(__name__)
 
@@ -110,7 +111,7 @@ class WorkflowRunner(Generic[StateType]):
         max_concurrency: Optional[int] = None,
         timeout: Optional[float] = None,
         init_execution_context: Optional[ExecutionContext] = None,
-        trigger: Optional["IntegrationTrigger"] = None,
+        trigger: Optional[IntegrationTrigger] = None,
     ):
         if state and external_inputs:
             raise ValueError("Can only run a Workflow providing one of state or external inputs, not both")
@@ -257,10 +258,8 @@ class WorkflowRunner(Generic[StateType]):
         self._cancel_thread: Optional[Thread] = None
         self._timeout_thread: Optional[Thread] = None
 
-    def _get_integration_trigger(self) -> Optional[Type["IntegrationTrigger"]]:
+    def _get_integration_trigger(self) -> Optional[Type[IntegrationTrigger]]:
         """Get the IntegrationTrigger from the workflow, if present."""
-        from vellum.workflows.triggers.integration import IntegrationTrigger
-
         for subgraph in self.workflow.get_subgraphs():
             for trigger in subgraph.triggers:
                 if issubclass(trigger, IntegrationTrigger):
@@ -269,8 +268,6 @@ class WorkflowRunner(Generic[StateType]):
 
     def _has_manual_trigger(self) -> bool:
         """Check if workflow has ManualTrigger."""
-        from vellum.workflows.triggers.manual import ManualTrigger
-
         for subgraph in self.workflow.get_subgraphs():
             for trigger in subgraph.triggers:
                 if issubclass(trigger, ManualTrigger):
@@ -286,7 +283,7 @@ class WorkflowRunner(Generic[StateType]):
                     entrypoints.extend(subgraph.entrypoints)
         return entrypoints
 
-    def _process_trigger(self, trigger: Optional["IntegrationTrigger"]) -> None:
+    def _process_trigger(self, trigger: Optional[IntegrationTrigger]) -> None:
         """
         Process trigger and bind trigger attributes to state.
 
@@ -296,9 +293,6 @@ class WorkflowRunner(Generic[StateType]):
         - When trigger is missing: validates workflow can run without it (has ManualTrigger)
           and filters entrypoints to ManualTrigger path (ONLY if caller didn't explicitly provide entrypoints)
         """
-        from vellum.workflows.triggers.integration import IntegrationTrigger
-        from vellum.workflows.triggers.manual import ManualTrigger
-
         integration_trigger = self._get_integration_trigger()
 
         # Case 1: trigger provided
