@@ -86,12 +86,18 @@ def test_manual_trigger_entrypoint_id_consistency():
 
     # Get trigger ID
     triggers = result["triggers"]
+    assert isinstance(triggers, list)
     assert len(triggers) == 1
-    trigger_id = triggers[0]["id"]
+    trigger = triggers[0]
+    assert isinstance(trigger, dict)
+    trigger_id = trigger["id"]
 
     # Get entrypoint node ID
-    nodes = result["workflow_raw_data"]["nodes"]
-    entrypoint_nodes = [n for n in nodes if n["type"] == "ENTRYPOINT"]
+    workflow_raw_data = result["workflow_raw_data"]
+    assert isinstance(workflow_raw_data, dict)
+    nodes = workflow_raw_data["nodes"]
+    assert isinstance(nodes, list)
+    entrypoint_nodes = [n for n in nodes if isinstance(n, dict) and n["type"] == "ENTRYPOINT"]
     assert len(entrypoint_nodes) == 1
     entrypoint_id = entrypoint_nodes[0]["id"]
 
