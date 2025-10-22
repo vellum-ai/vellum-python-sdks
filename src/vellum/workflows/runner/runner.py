@@ -735,15 +735,18 @@ class WorkflowRunner(Generic[StateType]):
     def _emit_node_cancellation_events(
         self,
         error_message: str,
-        parent_context: Optional[ParentContext],
     ) -> None:
         """
         Emit node cancellation events for all active nodes.
 
         Args:
             error_message: The error message to include in the cancellation events
-            parent_context: The parent context for the cancellation events
         """
+        parent_context = WorkflowParentContext(
+            span_id=self._initial_state.meta.span_id,
+            workflow_definition=self.workflow.__class__,
+            parent=self._execution_context.parent_context,
+        )
         captured_stacktrace = "".join(traceback.format_stack())
         active_span_ids = list(self._active_nodes_by_execution_id.keys())
         for span_id in active_span_ids:
@@ -996,15 +999,8 @@ class WorkflowRunner(Generic[StateType]):
 
         while not kill_switch.wait(timeout=0.1):
             if self._cancel_signal.is_set():
-                parent_context = WorkflowParentContext(
-                    span_id=self._initial_state.meta.span_id,
-                    workflow_definition=self.workflow.__class__,
-                    parent=self._execution_context.parent_context,
-                )
-
                 self._emit_node_cancellation_events(
                     error_message="Workflow run cancelled",
-                    parent_context=parent_context,
                 )
 
                 captured_stacktrace = "".join(traceback.format_stack())
@@ -1026,15 +1022,8 @@ class WorkflowRunner(Generic[StateType]):
         if kill_switch.wait(timeout=self._timeout):
             return
 
-        parent_context = WorkflowParentContext(
-            span_id=self._initial_state.meta.span_id,
-            workflow_definition=self.workflow.__class__,
-            parent=self._execution_context.parent_context,
-        )
-
         self._emit_node_cancellation_events(
             error_message=f"Workflow execution exceeded timeout of {self._timeout} seconds",
-            parent_context=parent_context,
         )
 
         self._workflow_event_outer_queue.put(
