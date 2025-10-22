@@ -928,7 +928,6 @@ class WorkflowRunner(Generic[StateType]):
                 failed_node_name = rejection_event.body.node_definition.__name__
                 self._emit_node_cancellation_events(
                     error_message=f"Node execution cancelled due to {failed_node_name} failure",
-                    parent_context=self._execution_context.parent_context,
                 )
                 break
 
