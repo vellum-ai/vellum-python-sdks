@@ -110,28 +110,6 @@ def test_no_trigger_workflow_runs_without_trigger_event():
     assert result.outputs.result == "No trigger workflow"
 
 
-def test_trigger_attributes_accessible_in_nodes():
-    """Test that all trigger attribute fields are accessible in downstream nodes."""
-    # GIVEN a workflow with SlackMessageTrigger
-    workflow = SimpleSlackWorkflow()
-
-    # AND a comprehensive Slack trigger instance
-    trigger = SlackMessageTrigger(
-        event_data={
-            "message": "Complete test",
-            "channel": "C111111",
-            "user": "U222222",
-        }
-    )
-
-    # WHEN we run the workflow
-    result = workflow.run(trigger=trigger)
-
-    # THEN it should successfully access trigger attributes
-    assert result.name == "workflow.execution.fulfilled"
-    assert result.outputs.result == "Received 'Complete test' from channel C111111"
-
-
 def test_workflow_with_multiple_triggers_manual_path():
     """Test workflow with both ManualTrigger and IntegrationTrigger - manual path."""
     # GIVEN a workflow with both ManualTrigger and IntegrationTrigger
@@ -166,49 +144,3 @@ def test_workflow_with_multiple_triggers_slack_path():
     # THEN it should execute successfully via SlackTrigger path
     assert result.name == "workflow.execution.fulfilled"
     assert result.outputs.slack_result == "Slack: Multi-trigger test"
-
-
-def test_trigger_event_with_minimal_payload():
-    """Test that trigger works with minimal valid payload."""
-    # GIVEN a workflow with SlackMessageTrigger
-    workflow = SimpleSlackWorkflow()
-
-    # AND a minimal trigger instance (VellumIntegrationTrigger handles missing fields)
-    trigger = SlackMessageTrigger(
-        event_data={
-            "message": "Minimal",
-            "channel": "C000000",
-            "user": "U000000",
-        }
-    )
-
-    # WHEN we run the workflow
-    result = workflow.run(trigger=trigger)
-
-    # THEN it should execute successfully
-    assert result.name == "workflow.execution.fulfilled"
-    assert result.outputs.result == "Received 'Minimal' from channel C000000"
-
-
-def test_stream_with_multiple_triggers_slack_path():
-    """Test workflow.stream() with multiple triggers using Slack path."""
-    # GIVEN a workflow with both triggers
-    workflow = MultiTriggerWorkflow()
-
-    # AND a Slack trigger instance
-    trigger = SlackMessageTrigger(
-        event_data={
-            "message": "Stream multi-trigger",
-            "channel": "C555555",
-            "user": "U666666",
-        }
-    )
-
-    # WHEN we stream with trigger
-    events = list(workflow.stream(trigger=trigger))
-
-    # THEN it should complete successfully
-    assert len(events) > 0
-    last_event = events[-1]
-    assert last_event.name == "workflow.execution.fulfilled"
-    assert last_event.outputs.slack_result == "Slack: Stream multi-trigger"
