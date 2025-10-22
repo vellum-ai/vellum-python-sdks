@@ -118,51 +118,6 @@ def test_vellum_integration_trigger_id_consistency():
             assert value["attribute_id"] == expected_id, f"Attribute ID mismatch for {expected_attr}"
 
 
-def test_vellum_integration_trigger_entrypoint_id_consistency():
-    """VellumIntegrationTrigger ID matches entrypoint node ID for proper linkage."""
-
-    class SlackMessageTrigger(VellumIntegrationTrigger):
-        """Custom Slack message trigger."""
-
-        message: str
-
-        class Config:
-            provider = "COMPOSIO"
-            integration_name = "SLACK"
-            slug = "slack_new_message"
-
-    class ProcessNode(BaseNode):
-        """Node that processes the trigger."""
-
-        class Outputs(BaseNode.Outputs):
-            result = SlackMessageTrigger.message
-
-        def run(self) -> Outputs:
-            return self.Outputs()
-
-    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
-        graph = SlackMessageTrigger >> ProcessNode
-
-    result: dict = get_workflow_display(workflow_class=TestWorkflow).serialize()
-
-    # Get trigger ID
-    triggers = result["triggers"]
-    assert len(triggers) == 1
-    trigger_id = triggers[0]["id"]
-
-    # Get entrypoint node ID
-    nodes = result["workflow_raw_data"]["nodes"]
-    entrypoint_nodes = [n for n in nodes if n["type"] == "ENTRYPOINT"]
-    assert len(entrypoint_nodes) == 1
-    entrypoint_id = entrypoint_nodes[0]["id"]
-
-    # Verify IDs match - this is critical for frontend to understand trigger-entrypoint relationship
-    assert trigger_id == entrypoint_id, (
-        f"VellumIntegrationTrigger ID ({trigger_id}) must match entrypoint node ID ({entrypoint_id}) "
-        "to maintain trigger-entrypoint linkage"
-    )
-
-
 def test_trigger_module_paths_are_canonical():
     """Validates trigger module_path and class_name for consistent codegen."""
 

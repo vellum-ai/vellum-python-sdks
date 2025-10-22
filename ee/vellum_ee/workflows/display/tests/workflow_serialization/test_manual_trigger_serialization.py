@@ -71,3 +71,34 @@ def test_unknown_trigger_type():
 
     with pytest.raises(ValueError, match="Unknown trigger type: UnknownTrigger"):
         get_workflow_display(workflow_class=TestWorkflow).serialize()
+
+
+def test_manual_trigger_entrypoint_id_consistency():
+    """ManualTrigger ID matches entrypoint node ID for proper linkage."""
+
+    class SimpleNode(BaseNode):
+        pass
+
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = ManualTrigger >> SimpleNode
+
+    result = get_workflow_display(workflow_class=TestWorkflow).serialize()
+
+    # Get trigger ID
+    triggers = result["triggers"]
+    assert len(triggers) == 1
+    trigger_id = triggers[0]["id"]
+
+    # Get entrypoint node ID
+    nodes = result["workflow_raw_data"]["nodes"]
+    entrypoint_nodes = [n for n in nodes if n["type"] == "ENTRYPOINT"]
+    assert len(entrypoint_nodes) == 1
+    entrypoint_id = entrypoint_nodes[0]["id"]
+
+    # Verify IDs match
+    assert trigger_id == entrypoint_id, (
+        f"ManualTrigger ID ({trigger_id}) must match entrypoint node ID ({entrypoint_id}) "
+        "to maintain trigger-entrypoint linkage"
+    )
+    # Also verify the expected UUID
+    assert trigger_id == "b09c1902-3cca-4c79-b775-4c32e3e88466"
