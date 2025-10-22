@@ -79,6 +79,7 @@ from vellum.workflows.runner.runner import ExternalInputsArg, RunFromNodeArg
 from vellum.workflows.state.base import BaseState, StateMeta
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.state.store import Store
+from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.types import CancelSignal
 from vellum.workflows.types.generics import InputsType, StateType
 from vellum.workflows.types.utils import get_original_base
@@ -381,6 +382,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         cancel_signal: Optional[CancelSignal] = None,
         node_output_mocks: Optional[MockNodeExecutionArg] = None,
         max_concurrency: Optional[int] = None,
+        trigger: Optional[IntegrationTrigger] = None,
     ) -> TerminalWorkflowEvent:
         """
         Invoke a Workflow, returning the last event emitted, which should be one of:
@@ -417,6 +419,12 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             The max number of concurrent threads to run the Workflow with. If not provided, the Workflow will run
             without limiting concurrency. This configuration only applies to the current Workflow and not to any
             subworkflows or nodes that utilizes threads.
+
+        trigger: Optional[IntegrationTrigger] = None
+            An IntegrationTrigger instance for workflows with IntegrationTrigger (e.g., VellumIntegrationTrigger
+            subclasses). The trigger instance is bound to the workflow state, making its attributes accessible
+            to downstream nodes. Required for workflows that only have IntegrationTrigger; optional for workflows
+            with both ManualTrigger and IntegrationTrigger.
         """
 
         runner = WorkflowRunner(
@@ -430,6 +438,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             node_output_mocks=node_output_mocks,
             max_concurrency=max_concurrency,
             init_execution_context=self._execution_context,
+            trigger=trigger,
         )
         self._current_runner = runner
         events = runner.stream()
@@ -500,6 +509,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         cancel_signal: Optional[CancelSignal] = None,
         node_output_mocks: Optional[MockNodeExecutionArg] = None,
         max_concurrency: Optional[int] = None,
+        trigger: Optional[IntegrationTrigger] = None,
     ) -> WorkflowEventStream:
         """
         Invoke a Workflow, yielding events as they are emitted.
@@ -537,6 +547,12 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             The max number of concurrent threads to run the Workflow with. If not provided, the Workflow will run
             without limiting concurrency. This configuration only applies to the current Workflow and not to any
             subworkflows or nodes that utilizes threads.
+
+        trigger: Optional[IntegrationTrigger] = None
+            An IntegrationTrigger instance for workflows with IntegrationTrigger (e.g., VellumIntegrationTrigger
+            subclasses). The trigger instance is bound to the workflow state, making its attributes accessible
+            to downstream nodes. Required for workflows that only have IntegrationTrigger; optional for workflows
+            with both ManualTrigger and IntegrationTrigger.
         """
 
         should_yield = event_filter or workflow_event_filter
@@ -551,6 +567,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             node_output_mocks=node_output_mocks,
             max_concurrency=max_concurrency,
             init_execution_context=self._execution_context,
+            trigger=trigger,
         )
         self._current_runner = runner
         runner_stream = runner.stream()
