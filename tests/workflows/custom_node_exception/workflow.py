@@ -10,7 +10,7 @@ class CustomNode(BaseNode):
         try:
             raise Exception("foo")
         except Exception as e:
-            return self.Outputs(err=str(e))
+            return self.Outputs(err=e)
 
 
 class CustomNodeExceptionWorkflow(BaseWorkflow):
