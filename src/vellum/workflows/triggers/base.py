@@ -8,7 +8,6 @@ if TYPE_CHECKING:
 
 from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.types.utils import get_class_attr_names, infer_types
-from vellum.workflows.utils.uuids import uuid4_from_hash
 
 
 def _is_annotated(cls: Type, name: str) -> bool:
@@ -29,29 +28,7 @@ def _is_annotated(cls: Type, name: str) -> bool:
 class BaseTriggerMeta(ABCMeta):
     def __new__(mcs, name: str, bases: Tuple[Type, ...], dct: Dict[str, Any]) -> Any:
         cls = super().__new__(mcs, name, bases, dct)
-        trigger_cls = cast(Type["BaseTrigger"], cls)
-
-        attribute_ids: Dict[str, Any] = {}
-        for base in bases:
-            base_ids = getattr(base, "__trigger_attribute_ids__", None)
-            if isinstance(base_ids, dict):
-                attribute_ids.update(base_ids)
-
-        annotations = getattr(trigger_cls, "__annotations__", {})
-        for attr_name, annotation in annotations.items():
-            if attr_name.startswith("_"):
-                continue
-            if attr_name in trigger_cls.__dict__:
-                continue
-            if get_origin(annotation) is ClassVar:
-                continue
-            attribute_ids[attr_name] = uuid4_from_hash(
-                f"{trigger_cls.__module__}|{trigger_cls.__qualname__}|{attr_name}"
-            )
-
-        trigger_cls.__trigger_attribute_ids__ = attribute_ids
-        trigger_cls.__trigger_attribute_cache__ = {}
-        return trigger_cls
+        return cls
 
     """
     Metaclass for BaseTrigger that enables class-level >> operator.
@@ -85,36 +62,20 @@ class BaseTriggerMeta(ABCMeta):
         if not _is_annotated(cls, name):
             return attribute
 
-        cache = getattr(cls, "__trigger_attribute_cache__", {})
-        if name in cache:
-            return cache[name]
-
-        for base in cls.__mro__[1:]:
-            base_cache = getattr(base, "__trigger_attribute_cache__", None)
-            if base_cache and name in base_cache:
-                cache[name] = base_cache[name]
-                return base_cache[name]
-
         types = infer_types(cls, name)
         reference = TriggerAttributeReference(name=name, types=types, instance=attribute, trigger_class=trigger_cls)
-        cache[name] = reference
-        cls.__trigger_attribute_cache__ = cache
         return reference
 
     def __iter__(cls) -> Iterator[TriggerAttributeReference]:
-        cache = getattr(cls, "__trigger_attribute_cache__", {})
-        seen: Dict[str, TriggerAttributeReference] = dict(cache)
-
-        for base in cls.__mro__[1:]:
-            base_cache = getattr(base, "__trigger_attribute_cache__", None)
-            if not base_cache:
-                continue
-            for key, value in base_cache.items():
-                seen.setdefault(key, value)
+        seen: Dict[str, TriggerAttributeReference] = {}
 
         for attr_name in get_class_attr_names(cls):
             if attr_name in seen:
                 yield seen[attr_name]
+                continue
+
+            # Skip ClassVar annotations - they're not trigger attributes
+            if not _is_annotated(cls, attr_name):
                 continue
 
             attr_value = getattr(cls, attr_name)
@@ -230,9 +191,6 @@ class BaseTrigger(ABC, metaclass=BaseTriggerMeta):
     Note:
         Like nodes, triggers work at the class level only. Do not instantiate triggers.
     """
-
-    __trigger_attribute_ids__: Dict[str, Any]
-    __trigger_attribute_cache__: Dict[str, "TriggerAttributeReference[Any]"]
 
     @classmethod
     def attribute_references(cls) -> Dict[str, "TriggerAttributeReference[Any]"]:
