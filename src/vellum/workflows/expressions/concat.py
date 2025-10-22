@@ -26,7 +26,10 @@ class ConcatExpression(BaseDescriptor[list], Generic[LHS, RHS]):
 
         if not isinstance(lval, list):
             raise InvalidExpressionException(f"Expected LHS to be a list, got {type(lval)}")
-        if not isinstance(rval, list):
-            raise InvalidExpressionException(f"Expected RHS to be a list, got {type(rval)}")
 
-        return lval + rval
+        # If RHS is a list, concatenate normally
+        if isinstance(rval, list):
+            return lval + rval
+        # If RHS is not a list, append it as a single item
+        else:
+            return lval + [rval]
