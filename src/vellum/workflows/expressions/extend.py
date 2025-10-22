@@ -28,4 +28,3 @@ class ExtendExpression(BaseDescriptor[list], Generic[LHS, RHS]):
             raise InvalidExpressionException(f"Expected LHS to be a list, got {type(lval)}")
 
         return lval + [rval]
-
