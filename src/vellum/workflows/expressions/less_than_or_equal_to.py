@@ -34,7 +34,14 @@ class LessThanOrEqualToExpression(BaseDescriptor[bool], Generic[LHS, RHS]):
         lhs = resolve_value(self._lhs, state)
         rhs = resolve_value(self._rhs, state)
 
-        if not has_le(lhs):
-            raise InvalidExpressionException(f"'{lhs.__class__.__name__}' must support the '<=' operator")
+        if not isinstance(lhs, (int, float)):
+            raise InvalidExpressionException(
+                f"Cannot perform '<=' comparison: left operand must be numeric, got {lhs.__class__.__name__}"
+            )
+
+        if not isinstance(rhs, (int, float)):
+            raise InvalidExpressionException(
+                f"Cannot perform '<=' comparison: right operand must be numeric, got {rhs.__class__.__name__}"
+            )
 
         return lhs <= rhs

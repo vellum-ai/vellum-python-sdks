@@ -1,5 +1,6 @@
 import pytest
 
+from vellum.workflows.descriptors.exceptions import InvalidExpressionException
 from vellum.workflows.expressions.greater_than import GreaterThanExpression
 from vellum.workflows.expressions.greater_than_or_equal_to import GreaterThanOrEqualToExpression
 from vellum.workflows.expressions.less_than import LessThanExpression
@@ -59,252 +60,122 @@ class TestState(BaseState):
 
 
 def test_greater_than_or_equal_to():
-    # GIVEN objects with two values
-    obj1 = Comparable(4, 5)  # Computed: 4 × 5 = 20
-    obj2 = Comparable(2, 10)  # Computed: 2 × 10 = 20
-    obj3 = Comparable(3, 6)  # Computed: 3 × 6 = 18
-    obj4 = Comparable(5, 5)  # Computed: 5 × 5 = 25
-
     state = TestState()
 
-    # WHEN comparing objects
-    assert GreaterThanOrEqualToExpression(lhs=obj1, rhs=obj2).resolve(state) is True  # 20 >= 20
-    assert GreaterThanOrEqualToExpression(lhs=obj1, rhs=obj3).resolve(state) is True  # 20 >= 18
-    assert GreaterThanOrEqualToExpression(lhs=obj3, rhs=obj4).resolve(state) is False  # 18 < 25
+    # WHEN comparing numbers
+    assert GreaterThanOrEqualToExpression(lhs=20, rhs=20).resolve(state) is True  # 20 >= 20
+    assert GreaterThanOrEqualToExpression(lhs=20, rhs=18).resolve(state) is True  # 20 >= 18
+    assert GreaterThanOrEqualToExpression(lhs=18, rhs=25).resolve(state) is False  # 18 < 25
+    assert GreaterThanOrEqualToExpression(lhs=20, rhs=19).resolve(state) is True  # 20 >= 19
+    assert GreaterThanOrEqualToExpression(lhs=18, rhs=20).resolve(state) is False  # 18 < 20
 
-    # WHEN comparing to raw numbers
-    assert GreaterThanOrEqualToExpression(lhs=obj1, rhs=19).resolve(state) is True  # 20 >= 19
-    assert GreaterThanOrEqualToExpression(lhs=obj3, rhs=20).resolve(state) is False  # 18 < 20
+    # WHEN comparing floats
+    assert GreaterThanOrEqualToExpression(lhs=20.5, rhs=20.5).resolve(state) is True
+    assert GreaterThanOrEqualToExpression(lhs=20.5, rhs=20.0).resolve(state) is True
+    assert GreaterThanOrEqualToExpression(lhs=20.0, rhs=20.5).resolve(state) is False
 
 
 def test_greater_than_or_equal_to_invalid():
-    # GIVEN objects with two values
-    obj1 = Comparable(4, 5)
-    obj2 = "invalid"
-
+    """Test that string comparisons raise InvalidExpressionException"""
     state = TestState()
 
-    # WHEN comparing objects with incompatible types
-    with pytest.raises(TypeError) as exc_info:
-        GreaterThanOrEqualToExpression(lhs=obj1, rhs=obj2).resolve(state)
+    # WHEN comparing strings with >=
+    with pytest.raises(InvalidExpressionException) as exc_info:
+        GreaterThanOrEqualToExpression(lhs="hello", rhs="world").resolve(state)
 
     # THEN the expected error is raised
-    assert str(exc_info.value) == "'>=' not supported between instances of 'Comparable' and 'str'"
+    assert "Cannot perform '>=' comparison" in str(exc_info.value)
+    assert "left operand must be numeric" in str(exc_info.value)
+    assert "str" in str(exc_info.value)
 
-    # WHEN comparing objects with incompatible types
-    with pytest.raises(TypeError) as exc_info:
-        GreaterThanOrEqualToExpression(lhs=obj2, rhs=obj1).resolve(state)
-
-    # THEN the expected error is raised
-    assert str(exc_info.value) == "'>=' not supported between instances of 'str' and 'Comparable'"
-
-
-def test_greater_than_or_equal_to_non_comparable():
-    # GIVEN objects with two values
-    obj1 = Comparable(4, 5)
-    obj2 = NonComparable(2, 10)
-
-    state = TestState()
-
-    # WHEN comparing objects with incompatible types
-    with pytest.raises(TypeError) as exc_info:
-        GreaterThanOrEqualToExpression(lhs=obj1, rhs=obj2).resolve(state)
+    # WHEN comparing number with string
+    with pytest.raises(InvalidExpressionException) as exc_info:
+        GreaterThanOrEqualToExpression(lhs=10, rhs="world").resolve(state)
 
     # THEN the expected error is raised
-    assert str(exc_info.value) == "'>=' not supported between instances of 'Comparable' and 'NonComparable'"
-
-    # WHEN comparing objects with incompatible types
-    with pytest.raises(TypeError) as exc_info:
-        GreaterThanOrEqualToExpression(lhs=obj2, rhs=obj1).resolve(state)
-
-    # THEN the expected error is raised
-    assert str(exc_info.value) == "'>=' not supported between instances of 'NonComparable' and 'Comparable'"
+    assert "Cannot perform '>=' comparison" in str(exc_info.value)
+    assert "right operand must be numeric" in str(exc_info.value)
 
 
 def test_greater_than():
-    # GIVEN objects with two values
-    obj1 = Comparable(4, 5)  # Computed: 4 × 5 = 20
-    obj2 = Comparable(2, 10)  # Computed: 2 × 10 = 20
-    obj3 = Comparable(3, 6)  # Computed: 3 × 6 = 18
-    obj4 = Comparable(5, 5)  # Computed: 5 × 5 = 25
-
     state = TestState()
 
-    # WHEN comparing objects
-    assert GreaterThanExpression(lhs=obj1, rhs=obj2).resolve(state) is False  # 20 > 20
-    assert GreaterThanExpression(lhs=obj1, rhs=obj3).resolve(state) is True  # 20 > 18
-    assert GreaterThanExpression(lhs=obj3, rhs=obj4).resolve(state) is False  # 18 < 25
+    # WHEN comparing numbers
+    assert GreaterThanExpression(lhs=20, rhs=20).resolve(state) is False
+    assert GreaterThanExpression(lhs=20, rhs=18).resolve(state) is True
+    assert GreaterThanExpression(lhs=18, rhs=25).resolve(state) is False
+    assert GreaterThanExpression(lhs=20, rhs=19).resolve(state) is True
+    assert GreaterThanExpression(lhs=18, rhs=20).resolve(state) is False
 
-    # WHEN comparing to raw numbers
-    assert GreaterThanExpression(lhs=obj1, rhs=19).resolve(state) is True  # 20 > 19
-    assert GreaterThanExpression(lhs=obj3, rhs=20).resolve(state) is False  # 18 < 20
+    # WHEN comparing floats
+    assert GreaterThanExpression(lhs=20.5, rhs=20.0).resolve(state) is True
+    assert GreaterThanExpression(lhs=20.0, rhs=20.5).resolve(state) is False
 
 
 def test_greater_than_invalid():
-    # GIVEN objects with two values
-    obj1 = Comparable(4, 5)
-    obj2 = "invalid"
-
+    """Test that string comparisons raise InvalidExpressionException"""
     state = TestState()
 
-    # WHEN comparing objects with incompatible types
-    with pytest.raises(TypeError) as exc_info:
-        GreaterThanExpression(lhs=obj1, rhs=obj2).resolve(state)
+    # WHEN comparing strings with >
+    with pytest.raises(InvalidExpressionException) as exc_info:
+        GreaterThanExpression(lhs="hello", rhs="world").resolve(state)
 
     # THEN the expected error is raised
-    assert str(exc_info.value) == "'>' not supported between instances of 'Comparable' and 'str'"
-
-    # WHEN comparing objects with incompatible types
-    with pytest.raises(TypeError) as exc_info:
-        GreaterThanExpression(lhs=obj2, rhs=obj1).resolve(state)
-
-    # THEN the expected error is raised
-    assert str(exc_info.value) == "'>' not supported between instances of 'str' and 'Comparable'"
-
-
-def test_greater_than_non_comparable():
-    # GIVEN objects with two values
-    obj1 = Comparable(4, 5)
-    obj2 = NonComparable(2, 10)
-
-    state = TestState()
-
-    # WHEN comparing objects with incompatible types
-    with pytest.raises(TypeError) as exc_info:
-        GreaterThanExpression(lhs=obj1, rhs=obj2).resolve(state)
-
-    # THEN the expected error is raised
-    assert str(exc_info.value) == "'>' not supported between instances of 'Comparable' and 'NonComparable'"
-
-    # WHEN comparing objects with incompatible types
-    with pytest.raises(TypeError) as exc_info:
-        GreaterThanExpression(lhs=obj2, rhs=obj1).resolve(state)
-
-    # THEN the expected error is raised
-    assert str(exc_info.value) == "'>' not supported between instances of 'NonComparable' and 'Comparable'"
+    assert "Cannot perform '>' comparison" in str(exc_info.value)
+    assert "left operand must be numeric" in str(exc_info.value)
 
 
 def test_less_than_or_equal_to():
-    # GIVEN objects with two values
-    obj1 = Comparable(4, 5)  # Computed: 4 × 5 = 20
-    obj2 = Comparable(2, 10)  # Computed: 2 × 10 = 20
-    obj3 = Comparable(3, 6)  # Computed: 3 × 6 = 18
-    obj4 = Comparable(5, 5)  # Computed: 5 × 5 = 25
-
     state = TestState()
 
-    # WHEN comparing objects
-    assert LessThanOrEqualToExpression(lhs=obj1, rhs=obj2).resolve(state) is True  # 20 <= 20
-    assert LessThanOrEqualToExpression(lhs=obj1, rhs=obj3).resolve(state) is False  # 20 > 18
-    assert LessThanOrEqualToExpression(lhs=obj3, rhs=obj4).resolve(state) is True  # 18 <= 25
+    # WHEN comparing numbers
+    assert LessThanOrEqualToExpression(lhs=20, rhs=20).resolve(state) is True
+    assert LessThanOrEqualToExpression(lhs=20, rhs=18).resolve(state) is False
+    assert LessThanOrEqualToExpression(lhs=18, rhs=25).resolve(state) is True
+    assert LessThanOrEqualToExpression(lhs=20, rhs=21).resolve(state) is True
+    assert LessThanOrEqualToExpression(lhs=18, rhs=17).resolve(state) is False
 
-    # WHEN comparing to raw numbers
-    assert LessThanOrEqualToExpression(lhs=obj1, rhs=21).resolve(state) is True  # 20 <= 21
-    assert LessThanOrEqualToExpression(lhs=obj3, rhs=17).resolve(state) is False  # 18 > 17
+    # WHEN comparing floats
+    assert LessThanOrEqualToExpression(lhs=20.0, rhs=20.5).resolve(state) is True
+    assert LessThanOrEqualToExpression(lhs=20.5, rhs=20.0).resolve(state) is False
 
 
 def test_less_than_or_equal_to_invalid():
-    # GIVEN objects with two values
-    obj1 = Comparable(4, 5)
-    obj2 = "invalid"
-
+    """Test that string comparisons raise InvalidExpressionException"""
     state = TestState()
 
-    # WHEN comparing objects with incompatible types
-    with pytest.raises(TypeError) as exc_info:
-        LessThanOrEqualToExpression(lhs=obj1, rhs=obj2).resolve(state)
+    # WHEN comparing strings with <=
+    with pytest.raises(InvalidExpressionException) as exc_info:
+        LessThanOrEqualToExpression(lhs="hello", rhs="world").resolve(state)
 
     # THEN the expected error is raised
-    assert str(exc_info.value) == "'<=' not supported between instances of 'Comparable' and 'str'"
-
-    # WHEN comparing objects with incompatible types
-    with pytest.raises(TypeError) as exc_info:
-        LessThanOrEqualToExpression(lhs=obj2, rhs=obj1).resolve(state)
-
-    # THEN the expected error is raised
-    assert str(exc_info.value) == "'<=' not supported between instances of 'str' and 'Comparable'"
-
-
-def test_less_than_or_equal_to_non_comparable():
-    # GIVEN objects with two values
-    obj1 = Comparable(4, 5)
-    obj2 = NonComparable(2, 10)
-
-    state = TestState()
-
-    # WHEN comparing objects with incompatible types
-    with pytest.raises(TypeError) as exc_info:
-        LessThanOrEqualToExpression(lhs=obj1, rhs=obj2).resolve(state)
-
-    # THEN the expected error is raised
-    assert str(exc_info.value) == "'<=' not supported between instances of 'Comparable' and 'NonComparable'"
-
-    # WHEN comparing objects with incompatible types
-    with pytest.raises(TypeError) as exc_info:
-        LessThanOrEqualToExpression(lhs=obj2, rhs=obj1).resolve(state)
-
-    # THEN the expected error is raised
-    assert str(exc_info.value) == "'<=' not supported between instances of 'NonComparable' and 'Comparable'"
+    assert "Cannot perform '<=' comparison" in str(exc_info.value)
+    assert "left operand must be numeric" in str(exc_info.value)
 
 
 def test_less_than():
-    # GIVEN objects with two values
-    obj1 = Comparable(4, 5)  # Computed: 4 × 5 = 20
-    obj2 = Comparable(2, 10)  # Computed: 2 × 10 = 20
-    obj3 = Comparable(3, 6)  # Computed: 3 × 6 = 18
-    obj4 = Comparable(5, 5)  # Computed: 5 × 5 = 25
-
     state = TestState()
 
-    # WHEN comparing objects
-    assert LessThanExpression(lhs=obj1, rhs=obj2).resolve(state) is False  # 20 < 20
-    assert LessThanExpression(lhs=obj1, rhs=obj3).resolve(state) is False  # 20 < 18
-    assert LessThanExpression(lhs=obj3, rhs=obj4).resolve(state) is True  # 18 < 25
+    # WHEN comparing numbers
+    assert LessThanExpression(lhs=20, rhs=20).resolve(state) is False
+    assert LessThanExpression(lhs=20, rhs=18).resolve(state) is False
+    assert LessThanExpression(lhs=18, rhs=25).resolve(state) is True
+    assert LessThanExpression(lhs=20, rhs=21).resolve(state) is True
+    assert LessThanExpression(lhs=18, rhs=17).resolve(state) is False
 
-    # WHEN comparing to raw numbers
-    assert LessThanExpression(lhs=obj1, rhs=21).resolve(state) is True  # 20 < 21
-    assert LessThanExpression(lhs=obj3, rhs=17).resolve(state) is False  # 18 > 17
+    # WHEN comparing floats
+    assert LessThanExpression(lhs=20.0, rhs=20.5).resolve(state) is True
+    assert LessThanExpression(lhs=20.5, rhs=20.0).resolve(state) is False
 
 
 def test_less_than_invalid():
-    # GIVEN objects with two values
-    obj1 = Comparable(4, 5)
-    obj2 = "invalid"
-
+    """Test that string comparisons raise InvalidExpressionException"""
     state = TestState()
 
-    # WHEN comparing objects with incompatible types
-    with pytest.raises(TypeError) as exc_info:
-        LessThanExpression(lhs=obj1, rhs=obj2).resolve(state)
+    # WHEN comparing strings with <
+    with pytest.raises(InvalidExpressionException) as exc_info:
+        LessThanExpression(lhs="hello", rhs="world").resolve(state)
 
     # THEN the expected error is raised
-    assert str(exc_info.value) == "'<' not supported between instances of 'Comparable' and 'str'"
-
-    # WHEN comparing objects with incompatible types
-    with pytest.raises(TypeError) as exc_info:
-        LessThanExpression(lhs=obj2, rhs=obj1).resolve(state)
-
-    # THEN the expected error is raised
-    assert str(exc_info.value) == "'<' not supported between instances of 'str' and 'Comparable'"
-
-
-def test_less_than_non_comparable():
-    # GIVEN objects with two values
-    obj1 = Comparable(4, 5)
-    obj2 = NonComparable(2, 10)
-
-    state = TestState()
-
-    # WHEN comparing objects with incompatible types
-    with pytest.raises(TypeError) as exc_info:
-        LessThanExpression(lhs=obj1, rhs=obj2).resolve(state)
-
-    # THEN the expected error is raised
-    assert str(exc_info.value) == "'<' not supported between instances of 'Comparable' and 'NonComparable'"
-
-    # WHEN comparing objects with incompatible types
-    with pytest.raises(TypeError) as exc_info:
-        LessThanExpression(lhs=obj2, rhs=obj1).resolve(state)
-
-    # THEN the expected error is raised
-    assert str(exc_info.value) == "'<' not supported between instances of 'NonComparable' and 'Comparable'"
+    assert "Cannot perform '<' comparison" in str(exc_info.value)
+    assert "left operand must be numeric" in str(exc_info.value)
