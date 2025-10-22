@@ -74,6 +74,10 @@ class BaseTriggerMeta(ABCMeta):
                 yield seen[attr_name]
                 continue
 
+            # Skip ClassVar annotations - they're not trigger attributes
+            if not _is_annotated(cls, attr_name):
+                continue
+
             attr_value = getattr(cls, attr_name)
             if isinstance(attr_value, TriggerAttributeReference):
                 seen[attr_name] = attr_value
