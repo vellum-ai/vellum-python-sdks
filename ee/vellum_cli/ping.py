@@ -14,6 +14,7 @@ def ping_command():
     try:
         workspace = client.workspaces.workspace_identity()
         organization = client.organizations.organization_identity()
+        environment = client.environments.environment_identity()
     except ApiError as e:
         # If user did not provide an API key, we will get a 403 error
         if e.status_code == 401 or e.status_code == 403:
@@ -35,5 +36,10 @@ Organization:
 Workspace:
     ID: {workspace.id}
     Name: {workspace.name}
+
+Environment:
+    ID: {environment.id}
+    Name: {environment.name}
+    Label: {environment.label}
 """
     )
