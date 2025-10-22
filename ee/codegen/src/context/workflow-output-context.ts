@@ -59,7 +59,7 @@ export class WorkflowOutputContext {
     }
   }
 
-  public getOutputVariable(): OutputVariableContext {
+  public getOutputVariable(): OutputVariableContext | undefined {
     const outputVariableId = this.getOutputVariableId();
     return this.workflowContext.getOutputVariableContextById(outputVariableId);
   }

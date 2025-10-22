@@ -18,7 +18,7 @@ export declare namespace WorkflowOutput {
 export class WorkflowOutput extends AstNode {
   private workflowContext: WorkflowContext;
   private workflowOutputContext: WorkflowOutputContext;
-  private workflowOutput: Field;
+  private workflowOutput: Field | undefined;
 
   public constructor(args: WorkflowOutput.Args) {
     super();
@@ -29,9 +29,14 @@ export class WorkflowOutput extends AstNode {
     this.workflowOutput = this.generateWorkflowOutput();
   }
 
-  private generateWorkflowOutput(): Field {
+  private generateWorkflowOutput(): Field | undefined {
+    const outputVariable = this.workflowOutputContext.getOutputVariable();
+    if (!outputVariable) {
+      return undefined;
+    }
+
     const workflowOutput = python.field({
-      name: this.workflowOutputContext.getOutputVariable().name,
+      name: outputVariable.name,
       initializer: new WorkflowValueDescriptor({
         workflowContext: this.workflowContext,
         workflowValueDescriptor:
@@ -45,6 +50,8 @@ export class WorkflowOutput extends AstNode {
   }
 
   write(writer: Writer): void {
-    this.workflowOutput.write(writer);
+    if (this.workflowOutput) {
+      this.workflowOutput.write(writer);
+    }
   }
 }

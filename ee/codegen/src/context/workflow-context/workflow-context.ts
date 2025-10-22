@@ -429,14 +429,18 @@ export class WorkflowContext {
 
   public getOutputVariableContextById(
     outputVariableId: string
-  ): OutputVariableContext {
+  ): OutputVariableContext | undefined {
     const outputVariableContext =
       this.findOutputVariableContextById(outputVariableId);
 
     if (!outputVariableContext) {
-      throw new WorkflowInputGenerationError(
-        `Output variable context not found for ID: ${outputVariableId}`
+      this.addError(
+        new WorkflowOutputGenerationError(
+          `Output variable context not found for ID: ${outputVariableId}`,
+          "WARNING"
+        )
       );
+      return undefined;
     }
 
     return outputVariableContext;
