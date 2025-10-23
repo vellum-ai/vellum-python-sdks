@@ -63,7 +63,18 @@ def push_command(
             config.workflows.append(new_config)
             workflow_configs = [new_config]
         elif not module:
-            raise ValueError("No Workflows found in project to push.")
+            handle_cli_error(
+                logger,
+                title="No workflows found in project to push",
+                message="No workflow configurations were found in vellum.lock.json.",
+                suggestion="If you pulled a workflow with a specific sandbox ID"
+                "(e.g., vellum workflows pull --workflow-sandbox-id=<id>), "
+                "you should push without specifying a different sandbox ID:\n\n"
+                "  vellum workflows push\n\n"
+                "Or, if you want to push to a specific module:\n\n"
+                "  vellum workflows push --module=<module-name>",
+            )
+            return
         else:
             raise ValueError(f"No workflow config for '{module}' found in project to push.")
 

@@ -62,8 +62,41 @@ def test_push__no_config(mock_module):
 
     # THEN it should fail
     assert result.exit_code == 1
-    assert result.exception
-    assert str(result.exception) == "No Workflows found in project to push."
+    assert "No workflows found in project to push" in result.output
+    assert "No workflow configurations were found in vellum.lock.json" in result.output
+
+
+def test_push__no_matching_config_with_workflow_sandbox_id(mock_module):
+    # GIVEN a workflow was pulled with a specific sandbox ID
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+    original_workflow_sandbox_id = mock_module.workflow_sandbox_id
+
+    # AND we have a valid project config from a pulled workflow
+    mock_module.set_pyproject_toml(
+        {
+            "workflows": [
+                {
+                    "module": module,
+                    "workflow_sandbox_id": original_workflow_sandbox_id,
+                }
+            ]
+        }
+    )
+
+    # AND a workflow exists in the module successfully
+    _ensure_workflow_py(temp_dir, module)
+
+    # WHEN the user tries to push with a different workflow sandbox ID via --workflow-sandbox-id
+    different_workflow_sandbox_id = str(uuid4())
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["workflows", "push", "--workflow-sandbox-id", different_workflow_sandbox_id])
+
+    # THEN it should fail with a helpful error message
+    assert result.exit_code == 1
+    assert "No workflows found in project to push" in result.output
+    assert "No workflow configurations were found in vellum.lock.json" in result.output
+    assert "vellum workflows push" in result.output
 
 
 def test_push__multiple_workflows_configured__no_module_specified(mock_module):
