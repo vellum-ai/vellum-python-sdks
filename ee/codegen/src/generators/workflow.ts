@@ -547,9 +547,12 @@ export class Workflow {
       python.field({
         name: "output_displays",
         initializer: python.TypeInstantiation.dict(
-          this.workflowContext.workflowOutputContexts.map(
-            (workflowOutputContext) => {
+          this.workflowContext.workflowOutputContexts
+            .map((workflowOutputContext) => {
               const outputVariable = workflowOutputContext.getOutputVariable();
+              if (!outputVariable) {
+                return undefined;
+              }
 
               return {
                 key: python.reference({
@@ -580,8 +583,8 @@ export class Workflow {
                   ],
                 }),
               };
-            }
-          )
+            })
+            .filter((entry) => entry !== undefined)
         ),
       })
     );

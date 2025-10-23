@@ -109,6 +109,7 @@ class WorkflowRunner(Generic[StateType]):
         cancel_signal: Optional[CancelSignal] = None,
         node_output_mocks: Optional[MockNodeExecutionArg] = None,
         max_concurrency: Optional[int] = None,
+        timeout: Optional[float] = None,
         init_execution_context: Optional[ExecutionContext] = None,
         trigger: Optional[IntegrationTrigger] = None,
     ):
@@ -238,6 +239,7 @@ class WorkflowRunner(Generic[StateType]):
 
         self._active_nodes_by_execution_id: Dict[UUID, ActiveNode[StateType]] = {}
         self._cancel_signal = cancel_signal
+        self._timeout = timeout
         self._execution_context = init_execution_context or get_execution_context()
 
         setattr(
@@ -254,6 +256,7 @@ class WorkflowRunner(Generic[StateType]):
 
         self._background_thread: Optional[Thread] = None
         self._cancel_thread: Optional[Thread] = None
+        self._timeout_thread: Optional[Thread] = None
 
     def _get_integration_trigger(self) -> Optional[Type[IntegrationTrigger]]:
         """Get the IntegrationTrigger from the workflow, if present."""
@@ -833,15 +836,18 @@ class WorkflowRunner(Generic[StateType]):
     def _emit_node_cancellation_events(
         self,
         error_message: str,
-        parent_context: Optional[ParentContext],
     ) -> None:
         """
         Emit node cancellation events for all active nodes.
 
         Args:
             error_message: The error message to include in the cancellation events
-            parent_context: The parent context for the cancellation events
         """
+        parent_context = WorkflowParentContext(
+            span_id=self._initial_state.meta.span_id,
+            workflow_definition=self.workflow.__class__,
+            parent=self._execution_context.parent_context,
+        )
         captured_stacktrace = "".join(traceback.format_stack())
         active_span_ids = list(self._active_nodes_by_execution_id.keys())
         for span_id in active_span_ids:
@@ -1023,7 +1029,6 @@ class WorkflowRunner(Generic[StateType]):
                 failed_node_name = rejection_event.body.node_definition.__name__
                 self._emit_node_cancellation_events(
                     error_message=f"Node execution cancelled due to {failed_node_name} failure",
-                    parent_context=self._execution_context.parent_context,
                 )
                 break
 
@@ -1094,15 +1099,8 @@ class WorkflowRunner(Generic[StateType]):
 
         while not kill_switch.wait(timeout=0.1):
             if self._cancel_signal.is_set():
-                parent_context = WorkflowParentContext(
-                    span_id=self._initial_state.meta.span_id,
-                    workflow_definition=self.workflow.__class__,
-                    parent=self._execution_context.parent_context,
-                )
-
                 self._emit_node_cancellation_events(
                     error_message="Workflow run cancelled",
-                    parent_context=parent_context,
                 )
 
                 captured_stacktrace = "".join(traceback.format_stack())
@@ -1116,6 +1114,26 @@ class WorkflowRunner(Generic[StateType]):
                     )
                 )
                 return
+
+    def _run_timeout_thread(self, kill_switch: ThreadingEvent) -> None:
+        if not self._timeout:
+            return
+
+        if kill_switch.wait(timeout=self._timeout):
+            return
+
+        self._emit_node_cancellation_events(
+            error_message=f"Workflow execution exceeded timeout of {self._timeout} seconds",
+        )
+
+        self._workflow_event_outer_queue.put(
+            self._reject_workflow_event(
+                WorkflowError(
+                    code=WorkflowErrorCode.WORKFLOW_TIMEOUT,
+                    message=f"Workflow execution exceeded timeout of {self._timeout} seconds",
+                )
+            )
+        )
 
     def _is_terminal_event(self, event: WorkflowEvent) -> bool:
         if (
@@ -1141,6 +1159,15 @@ class WorkflowRunner(Generic[StateType]):
                 kwargs={"kill_switch": cancel_thread_kill_switch},
             )
             self._cancel_thread.start()
+
+        timeout_thread_kill_switch = ThreadingEvent()
+        if self._timeout:
+            self._timeout_thread = Thread(
+                target=self._run_timeout_thread,
+                name=f"{self.workflow.__class__.__name__}.timeout_thread",
+                kwargs={"kill_switch": timeout_thread_kill_switch},
+            )
+            self._timeout_thread.start()
 
         event: WorkflowEvent
         if self._is_resuming:
@@ -1184,6 +1211,7 @@ class WorkflowRunner(Generic[StateType]):
 
         self._background_thread_queue.put(None)
         cancel_thread_kill_switch.set()
+        timeout_thread_kill_switch.set()
 
     def stream(self) -> WorkflowEventStream:
         return WorkflowEventGenerator(self._generate_events(), self._initial_state.meta.span_id)
@@ -1201,3 +1229,6 @@ class WorkflowRunner(Generic[StateType]):
 
         if self._cancel_thread and self._cancel_thread.is_alive():
             self._cancel_thread.join()
+
+        if self._timeout_thread and self._timeout_thread.is_alive():
+            self._timeout_thread.join()

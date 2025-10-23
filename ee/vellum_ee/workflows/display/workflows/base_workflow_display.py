@@ -25,6 +25,7 @@ from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port,
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, WorkflowInputReference
 from vellum.workflows.state.encoder import DefaultStateEncoder
+from vellum.workflows.triggers.manual import ManualTrigger
 from vellum.workflows.triggers.vellum_integration import VellumIntegrationTrigger
 from vellum.workflows.types.core import Json, JsonArray, JsonObject
 from vellum.workflows.types.generics import WorkflowType
@@ -184,10 +185,11 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         for subgraph in self._workflow.get_subgraphs():
             trigger_edges.extend(list(subgraph.trigger_edges))
 
-        # Determine entrypoint node ID: use trigger ID if trigger exists, otherwise use default
-        # This maintains backwards compatibility while linking trigger and entrypoint
-        if len(trigger_edges) > 0:
-            trigger_class = trigger_edges[0].trigger_class
+        # Determine entrypoint node ID
+        # Use trigger ID if ManualTrigger exists, otherwise use default from workflow display
+        entrypoint_trigger_edges = [edge for edge in trigger_edges if issubclass(edge.trigger_class, ManualTrigger)]
+        if len(entrypoint_trigger_edges) > 0:
+            trigger_class = entrypoint_trigger_edges[0].trigger_class
             entrypoint_node_id = get_trigger_id(trigger_class)
         else:
             entrypoint_node_id = self.display_context.workflow_display.entrypoint_node_id

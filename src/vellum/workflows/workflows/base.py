@@ -383,6 +383,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         node_output_mocks: Optional[MockNodeExecutionArg] = None,
         max_concurrency: Optional[int] = None,
         trigger: Optional[IntegrationTrigger] = None,
+        timeout: Optional[float] = None,
     ) -> TerminalWorkflowEvent:
         """
         Invoke a Workflow, returning the last event emitted, which should be one of:
@@ -425,6 +426,9 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             subclasses). The trigger instance is bound to the workflow state, making its attributes accessible
             to downstream nodes. Required for workflows that only have IntegrationTrigger; optional for workflows
             with both ManualTrigger and IntegrationTrigger.
+        timeout: Optional[float] = None
+            The maximum time in seconds to allow the Workflow to run. If the timeout is exceeded, the Workflow
+            will be rejected with a WORKFLOW_TIMEOUT error code and any nodes in flight will be rejected.
         """
 
         runner = WorkflowRunner(
@@ -437,6 +441,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             cancel_signal=cancel_signal,
             node_output_mocks=node_output_mocks,
             max_concurrency=max_concurrency,
+            timeout=timeout,
             init_execution_context=self._execution_context,
             trigger=trigger,
         )
@@ -510,6 +515,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         node_output_mocks: Optional[MockNodeExecutionArg] = None,
         max_concurrency: Optional[int] = None,
         trigger: Optional[IntegrationTrigger] = None,
+        timeout: Optional[float] = None,
     ) -> WorkflowEventStream:
         """
         Invoke a Workflow, yielding events as they are emitted.
@@ -553,6 +559,9 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             subclasses). The trigger instance is bound to the workflow state, making its attributes accessible
             to downstream nodes. Required for workflows that only have IntegrationTrigger; optional for workflows
             with both ManualTrigger and IntegrationTrigger.
+        timeout: Optional[float] = None
+            The maximum time in seconds to allow the Workflow to run. If the timeout is exceeded, the Workflow
+            will be rejected with a WORKFLOW_TIMEOUT error code and any nodes in flight will be rejected.
         """
 
         should_yield = event_filter or workflow_event_filter
@@ -566,6 +575,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             cancel_signal=cancel_signal,
             node_output_mocks=node_output_mocks,
             max_concurrency=max_concurrency,
+            timeout=timeout,
             init_execution_context=self._execution_context,
             trigger=trigger,
         )
