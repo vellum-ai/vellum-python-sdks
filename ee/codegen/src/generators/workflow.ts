@@ -444,10 +444,17 @@ export class Workflow {
     const edgeDisplayEntries: { key: AstNode; value: AstNode }[] =
       this.getEdges().reduce<{ key: AstNode; value: AstNode }[]>(
         (acc, edge) => {
-          // Stable id references of edges connected to entrypoint nodes are handles separately as part of
+          // Stable id references of edges connected to entrypoint nodes or triggers are handled separately as part of
           // `entrypoint_displays` and don't need to be taken care of here.
           const entrypointNode = this.workflowContext.tryGetEntrypointNode();
-          if (entrypointNode && edge.sourceNodeId === entrypointNode.id) {
+          const triggers = this.workflowContext.triggers;
+          const isTriggerSource = triggers?.some(
+            (t) => t.id === edge.sourceNodeId
+          );
+          if (
+            (entrypointNode && edge.sourceNodeId === entrypointNode.id) ||
+            isTriggerSource
+          ) {
             return acc;
           }
 

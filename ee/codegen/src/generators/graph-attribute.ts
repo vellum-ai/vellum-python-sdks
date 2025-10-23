@@ -106,11 +106,8 @@ export class GraphAttribute extends AstNode {
       }
     }
 
-    // Check if entrypoint exists and get its edges
-    const entrypointNode = this.workflowContext.tryGetEntrypointNode();
-    const edges = entrypointNode
-      ? this.workflowContext.getEntrypointNodeEdges()
-      : [];
+    // Get edges from entrypoint (either from trigger entrypoints or ENTRYPOINT node)
+    const edges = this.workflowContext.getEntrypointNodeEdges();
 
     // If no edges from entrypoint, return empty
     // Single disconnected nodes should be handled as unused_graphs, not main graph
@@ -365,8 +362,15 @@ export class GraphAttribute extends AstNode {
     const entrypointNode = this.workflowContext.tryGetEntrypointNode();
     const entrypointNodeId = entrypointNode?.id;
 
+    // Check if this edge comes from a trigger
+    const triggers = this.workflowContext.triggers;
+    const isTriggerSource = triggers?.some((t) => t.id === edge.sourceNodeId);
+
     let sourceNode: BaseNodeContext<WorkflowDataNode> | null;
-    if (entrypointNodeId && edge.sourceNodeId === entrypointNodeId) {
+    if (
+      (entrypointNodeId && edge.sourceNodeId === entrypointNodeId) ||
+      isTriggerSource
+    ) {
       sourceNode = null;
     } else {
       sourceNode = this.resolveNodeId(edge.sourceNodeId);
