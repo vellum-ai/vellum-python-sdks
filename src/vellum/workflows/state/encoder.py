@@ -60,6 +60,9 @@ class DefaultStateEncoder(JSONEncoder):
         if isinstance(obj, type):
             return str(obj)
 
+        if isinstance(obj, Exception):
+            return str(obj)
+
         if obj.__class__ in self.encoders:
             return self.encoders[obj.__class__](obj)
 
