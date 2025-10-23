@@ -165,7 +165,8 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
             )
 
         try:
-            next(subworkflow_stream)
+            first_event = next(subworkflow_stream)
+            self._context._emit_subworkflow_event(first_event)
         except WorkflowInitializationException as e:
             hashed_module = e.definition.__module__
             raise NodeException(
