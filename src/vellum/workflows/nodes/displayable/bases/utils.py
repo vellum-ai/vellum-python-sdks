@@ -126,6 +126,39 @@ def primitive_to_vellum_value_request(value: Any) -> VellumValueRequest:
     return vellum_value_request_class.model_validate(vellum_value.model_dump())
 
 
+def _strip_markdown_json(text: str) -> str:
+    """
+    Strip markdown code block formatting from JSON text.
+
+    Handles cases like:
+    ```json
+    {"key": "value"}
+    ```
+
+    Or with surrounding text:
+    Here is the json you asked for!
+
+    ```json
+    {"key": "value"}
+    ```
+
+    Args:
+        text: The text potentially containing markdown-formatted JSON
+
+    Returns:
+        The stripped JSON text, or the original text if no markdown formatting found
+    """
+    import re
+
+    pattern = r"```(?:json)?\s*\n(.*?)\n```"
+
+    match = re.search(pattern, text, re.DOTALL)
+    if match:
+        return match.group(1).strip()
+
+    return text
+
+
 def process_additional_prompt_outputs(outputs: List[PromptOutput]) -> Tuple[str, Optional[Any]]:
     """
     Process prompt outputs using the same logic as prompt nodes to determine text output.
@@ -148,7 +181,12 @@ def process_additional_prompt_outputs(outputs: List[PromptOutput]) -> Tuple[str,
             try:
                 json_output = json.loads(output.value)
             except (json.JSONDecodeError, TypeError):
-                pass
+                stripped_value = _strip_markdown_json(output.value)
+                if stripped_value != output.value:
+                    try:
+                        json_output = json.loads(stripped_value)
+                    except (json.JSONDecodeError, TypeError):
+                        pass
         elif output.type == "JSON":
             string_outputs.append(json.dumps(output.value, indent=4))
             json_output = output.value

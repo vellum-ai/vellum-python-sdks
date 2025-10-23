@@ -828,3 +828,71 @@ def test_file_input_compilation(raw_input, expected_vellum_variable_type, expect
     assert len(vellum_variables) == 1
     assert vellum_variables[0].type == expected_vellum_variable_type
     assert compiled_inputs == expected_compiled_inputs
+
+
+def test_inline_prompt_node__json_output_with_markdown_code_blocks(vellum_adhoc_prompt_client):
+    """
+    Tests that InlinePromptNodes correctly parse JSON from markdown code blocks.
+    """
+
+    # GIVEN a node that subclasses InlinePromptNode
+    class Inputs(BaseInputs):
+        input: str
+
+    class State(BaseState):
+        pass
+
+    class MyInlinePromptNode(InlinePromptNode):
+        ml_model = "gpt-4o"
+        blocks = []
+        parameters = PromptParameters(
+            stop=[],
+            temperature=0.0,
+            max_tokens=4096,
+            top_p=1.0,
+            top_k=0,
+            frequency_penalty=0.0,
+            presence_penalty=0.0,
+            logit_bias=None,
+            custom_parameters={},
+        )
+
+    expected_json = {"result": "Hello, world!"}
+    markdown_wrapped_json = f"```json\n{json.dumps(expected_json)}\n```"
+    expected_outputs: List[PromptOutput] = [
+        StringVellumValue(value=markdown_wrapped_json),
+    ]
+
+    def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[ExecutePromptEvent]:
+        execution_id = str(uuid4())
+        events: List[ExecutePromptEvent] = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            FulfilledExecutePromptEvent(
+                execution_id=execution_id,
+                outputs=expected_outputs,
+            ),
+        ]
+        yield from events
+
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
+
+    # WHEN the node is run
+    node = MyInlinePromptNode(
+        state=State(
+            meta=StateMeta(workflow_inputs=Inputs(input="Generate JSON.")),
+        )
+    )
+    outputs = [o for o in node.run()]
+
+    # THEN the node should have produced the outputs we expect
+    results_output = outputs[0]
+    assert results_output.name == "results"
+    assert results_output.value == expected_outputs
+
+    text_output = outputs[1]
+    assert text_output.name == "text"
+    assert text_output.value == markdown_wrapped_json
+
+    json_output = outputs[2]
+    assert json_output.name == "json"
+    assert json_output.value == expected_json
