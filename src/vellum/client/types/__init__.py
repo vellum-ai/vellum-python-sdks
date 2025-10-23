@@ -234,6 +234,7 @@ from .initiated_prompt_execution_meta import InitiatedPromptExecutionMeta
 from .initiated_workflow_node_result_event import InitiatedWorkflowNodeResultEvent
 from .instructor_vectorizer_config import InstructorVectorizerConfig
 from .instructor_vectorizer_config_request import InstructorVectorizerConfigRequest
+from .integration import Integration
 from .integration_auth_config_integration import IntegrationAuthConfigIntegration
 from .integration_auth_config_integration_credential import IntegrationAuthConfigIntegrationCredential
 from .integration_credential_access_type import IntegrationCredentialAccessType
@@ -598,7 +599,6 @@ from .token_overlapping_window_chunker_config import TokenOverlappingWindowChunk
 from .token_overlapping_window_chunker_config_request import TokenOverlappingWindowChunkerConfigRequest
 from .token_overlapping_window_chunking import TokenOverlappingWindowChunking
 from .token_overlapping_window_chunking_request import TokenOverlappingWindowChunkingRequest
-from .tool_definition_integration import ToolDefinitionIntegration
 from .unit_enum import UnitEnum
 from .upload_document_response import UploadDocumentResponse
 from .upsert_test_suite_test_case_request import UpsertTestSuiteTestCaseRequest
@@ -946,6 +946,7 @@ __all__ = [
     "InitiatedWorkflowNodeResultEvent",
     "InstructorVectorizerConfig",
     "InstructorVectorizerConfigRequest",
+    "Integration",
     "IntegrationAuthConfigIntegration",
     "IntegrationAuthConfigIntegrationCredential",
     "IntegrationCredentialAccessType",
@@ -1294,7 +1295,6 @@ __all__ = [
     "TokenOverlappingWindowChunkerConfigRequest",
     "TokenOverlappingWindowChunking",
     "TokenOverlappingWindowChunkingRequest",
-    "ToolDefinitionIntegration",
     "UnitEnum",
     "UploadDocumentResponse",
     "UpsertTestSuiteTestCaseRequest",

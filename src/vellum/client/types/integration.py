@@ -8,7 +8,11 @@ from .integration_name import IntegrationName
 from .integration_provider import IntegrationProvider
 
 
-class ToolDefinitionIntegration(UniversalBaseModel):
+class Integration(UniversalBaseModel):
+    """
+    Serializer for Integration model - used in both tool and trigger definitions.
+    """
+
     id: str
     provider: IntegrationProvider = "COMPOSIO"
     name: IntegrationName

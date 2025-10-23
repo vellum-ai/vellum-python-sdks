@@ -4,12 +4,12 @@ import typing
 
 import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
-from .tool_definition_integration import ToolDefinitionIntegration
+from .integration import Integration
 
 
 class SlimComposioToolDefinition(UniversalBaseModel):
     provider: typing.Literal["COMPOSIO"] = "COMPOSIO"
-    integration: ToolDefinitionIntegration
+    integration: Integration
     name: str
     label: str
     description: str
