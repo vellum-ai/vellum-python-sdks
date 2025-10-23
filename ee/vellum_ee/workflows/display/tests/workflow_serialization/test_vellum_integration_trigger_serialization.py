@@ -177,6 +177,10 @@ def test_integration_trigger_no_entrypoint_node():
     assert len(triggers) == 1
     trigger_id = triggers[0]["id"]
 
+    # Verify trigger has source_handle_id matching trigger_id
+    assert "source_handle_id" in triggers[0], "Trigger should have source_handle_id"
+    assert triggers[0]["source_handle_id"] == trigger_id, "source_handle_id should match trigger_id"
+
     # Verify no ENTRYPOINT node exists
     workflow_raw_data = result["workflow_raw_data"]
     nodes = workflow_raw_data["nodes"]

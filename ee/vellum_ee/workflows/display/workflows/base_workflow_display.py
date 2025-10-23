@@ -387,7 +387,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             # Option 3: Use trigger ID directly as sourceNodeId (no ENTRYPOINT node)
             trigger_class = integration_trigger_edges[0].trigger_class
             trigger_id = get_trigger_id(trigger_class)
-            trigger_source_handle_id = self.display_context.workflow_display.entrypoint_node_source_handle_id
+            trigger_source_handle_id = trigger_id  # Use trigger ID as handle ID
 
             for target_node, entrypoint_display in self.display_context.entrypoint_displays.items():
                 unadorned_target_node = get_unadorned_node(target_node)
@@ -574,6 +574,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             "id": str(trigger_id),
             "type": trigger_type.value,
             "attributes": trigger_attributes,
+            "source_handle_id": str(trigger_id),  # Use trigger ID as handle ID
         }
 
         # For INTEGRATION triggers, include class name and module path for codegen
