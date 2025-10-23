@@ -574,13 +574,14 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             "id": str(trigger_id),
             "type": trigger_type.value,
             "attributes": trigger_attributes,
-            "source_handle_id": str(trigger_id),  # Use trigger ID as handle ID
         }
 
-        # For INTEGRATION triggers, include class name and module path for codegen
+        # For INTEGRATION triggers, include class name, module path, and source_handle_id
+        # ManualTrigger doesn't need source_handle_id because edges come from ENTRYPOINT node
         if trigger_type == WorkflowTriggerType.INTEGRATION:
             trigger_data["class_name"] = trigger_class.__name__
             trigger_data["module_path"] = cast(Json, trigger_class.__module__.split("."))
+            trigger_data["source_handle_id"] = str(trigger_id)  # IntegrationTrigger acts as edge source
 
         return cast(JsonArray, [trigger_data])
 
