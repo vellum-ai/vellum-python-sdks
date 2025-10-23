@@ -67,3 +67,22 @@ def test_workflow__no_timeout__run():
     # THEN the workflow should run to completion
     assert terminal_event.name == "workflow.execution.fulfilled"
     assert terminal_event.outputs.final_value == "hello world"
+
+
+def test_workflow__timeout_includes_stacktrace():
+    """
+    Tests that a workflow timeout includes a stacktrace in the rejected event.
+    """
+
+    # GIVEN a workflow that is long running
+    workflow = BasicTimeoutWorkflow()
+
+    terminal_event = workflow.run(timeout=0.1)
+
+    # THEN we should get a rejection with a stacktrace
+    assert terminal_event.name == "workflow.execution.rejected"
+    assert terminal_event.error.code == WorkflowErrorCode.WORKFLOW_TIMEOUT
+
+    assert terminal_event.stacktrace is not None
+    assert len(terminal_event.stacktrace) > 0
+    assert "_run_timeout_thread" in terminal_event.stacktrace
