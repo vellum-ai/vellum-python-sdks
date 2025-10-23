@@ -4,7 +4,7 @@ from vellum.workflows.workflows.base import BaseWorkflow
 
 class CustomNode(BaseNode):
     class Outputs(BaseNode.Outputs):
-        err: str
+        err: Exception
 
     def run(self) -> Outputs:
         try:

@@ -46,9 +46,7 @@ def test_workflow__stream_events_end_with_fulfilled():
     assert len(node_initiated_events) == 1, f"Expected exactly 1 node.execution.initiated event. Events: {event_names}"
     assert len(node_fulfilled_events) == 1, f"Expected exactly 1 node.execution.fulfilled event. Events: {event_names}"
 
-    last_two_events = events[-2:]
-    for event in last_two_events:
-        serialized = json.dumps(event, cls=DefaultStateEncoder)
-        assert serialized is not None
-        parsed = json.loads(serialized)
-        assert parsed is not None
+    serialized_workflow_fulfilled_event = json.loads(json.dumps(events[-1], cls=DefaultStateEncoder))
+    assert serialized_workflow_fulfilled_event["body"]["outputs"]["error_message"] == "foo"
+    serialized_node_fulfilled_event = json.loads(json.dumps(node_fulfilled_events[0], cls=DefaultStateEncoder))
+    assert serialized_node_fulfilled_event["body"]["outputs"]["err"] == "foo"
