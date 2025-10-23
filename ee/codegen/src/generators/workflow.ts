@@ -414,7 +414,8 @@ export class Workflow {
                     python.methodArgument({
                       name: "id",
                       value: python.TypeInstantiation.uuid(
-                        entrypointNode?.id ?? ""
+                        // Use trigger ID when no entrypoint node exists (IntegrationTrigger workflows)
+                        entrypointNode?.id ?? edge.sourceNodeId
                       ),
                     }),
                     python.methodArgument({
