@@ -182,7 +182,7 @@ def test_trigger_module_paths_are_canonical():
 
 
 def test_integration_trigger_no_entrypoint_node():
-    """IntegrationTrigger-only workflows use trigger ID in edges (Option 3)."""
+    """IntegrationTrigger-only workflows use trigger ID in edges."""
 
     class SlackMessageTrigger(VellumIntegrationTrigger):
         message: str

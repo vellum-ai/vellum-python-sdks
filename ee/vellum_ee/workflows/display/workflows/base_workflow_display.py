@@ -384,7 +384,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
         # Add edges from trigger/entrypoint to first nodes
         if has_only_integration_trigger:
-            # Option 3: Use trigger ID directly as sourceNodeId (no ENTRYPOINT node)
+            # Use trigger ID directly as sourceNodeId (no ENTRYPOINT node)
             trigger_class = integration_trigger_edges[0].trigger_class
             trigger_id = get_trigger_id(trigger_class)
             trigger_source_handle_id = trigger_id  # Use trigger ID as handle ID
