@@ -1128,7 +1128,7 @@ describe("Workflow", () => {
           id: "trigger-edge",
           type: "DEFAULT" as const,
           sourceNodeId: triggerId,
-          sourceHandleId: "default",
+          sourceHandleId: triggerId,  // Use trigger ID as handle ID
           targetNodeId: firstNode.id,
           targetHandleId: "default",
         },
@@ -1150,6 +1150,7 @@ describe("Workflow", () => {
             ],
             className: "SlackMessageTrigger",
             modulePath: ["tests", "fixtures", "triggers", "slack_message"],
+            sourceHandleId: triggerId,  // Use trigger ID as handle ID
           },
         ],
       });
