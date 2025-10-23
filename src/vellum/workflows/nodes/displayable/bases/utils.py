@@ -1,5 +1,6 @@
 import enum
 import json
+import re
 from typing import Any, List, Optional, Tuple, Union, cast
 
 from vellum import PromptOutput
@@ -148,8 +149,6 @@ def _strip_markdown_json(text: str) -> str:
     Returns:
         The stripped JSON text, or the original text if no markdown formatting found
     """
-    import re
-
     pattern = r"```(?:json)?\s*\n(.*?)\n```"
 
     match = re.search(pattern, text, re.DOTALL)
@@ -178,15 +177,12 @@ def process_additional_prompt_outputs(outputs: List[PromptOutput]) -> Tuple[str,
 
         if output.type == "STRING":
             string_outputs.append(output.value)
-            try:
-                json_output = json.loads(output.value)
-            except (json.JSONDecodeError, TypeError):
-                stripped_value = _strip_markdown_json(output.value)
-                if stripped_value != output.value:
-                    try:
-                        json_output = json.loads(stripped_value)
-                    except (json.JSONDecodeError, TypeError):
-                        pass
+            for value_to_parse in [output.value, _strip_markdown_json(output.value)]:
+                try:
+                    json_output = json.loads(value_to_parse)
+                    break
+                except (json.JSONDecodeError, TypeError):
+                    continue
         elif output.type == "JSON":
             string_outputs.append(json.dumps(output.value, indent=4))
             json_output = output.value
