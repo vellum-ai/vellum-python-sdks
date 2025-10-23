@@ -2,7 +2,7 @@ import pytest
 from unittest import mock
 from uuid import uuid4
 
-from vellum import ToolDefinitionIntegration
+from vellum import Integration
 from vellum.client.types.components_schemas_composio_tool_definition import ComponentsSchemasComposioToolDefinition
 from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.exceptions import NodeException
@@ -15,7 +15,7 @@ def test_vellum_integration_service_get_tool_definition_success(vellum_client):
     # GIVEN a mock client configured to return a tool definition
     mock_client = vellum_client
     tool_definition_response = ComponentsSchemasComposioToolDefinition(
-        integration=ToolDefinitionIntegration(
+        integration=Integration(
             id=str(uuid4()),
             provider="COMPOSIO",
             name="GITHUB",
