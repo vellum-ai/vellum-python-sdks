@@ -23,15 +23,15 @@ def test_conditional_node__string_greater_than_or_equal_comparison_error():
     Reproduces: https://linear.app/vellum/issue/APO-1936
     """
 
-    # GIVEN workflow inputs with string values
+    # GIVEN workflow inputs with a string field and a float value
     class Inputs(BaseInputs):
         field: str
-        value: str
+        value: float
 
     class State(BaseState):
         pass
 
-    # AND a conditional node that compares strings with >=
+    # AND a conditional node that compares a string to a float with >=
     class ConditionalNode(BaseNode[State]):
         class Ports(BaseNode.Ports):
             if_port = Port.on_if(Inputs.field.greater_than_or_equal_to(Inputs.value))
@@ -43,16 +43,18 @@ def test_conditional_node__string_greater_than_or_equal_comparison_error():
         def run(self) -> Outputs:
             return self.Outputs(result="executed")
 
-    # WHEN we initialize the node with string inputs
+    # WHEN we initialize the node with a string field and float value
     state = State(
         meta=StateMeta(
-            workflow_inputs=Inputs(field="hello", value="world"),
+            workflow_inputs=Inputs(field="hello", value=42.0),
         )
     )
 
+    node = ConditionalNode(state=state)
+
     # THEN it should raise InvalidExpressionException when evaluating the port condition
     with pytest.raises(InvalidExpressionException) as exc_info:
-        ConditionalNode(state=state)
+        node.Ports.if_port.resolve_condition(state)
 
     # AND the error message should be informative
     assert "numeric" in str(exc_info.value).lower() or "comparison" in str(exc_info.value).lower()
