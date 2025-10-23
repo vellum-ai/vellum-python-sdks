@@ -1,7 +1,5 @@
 """Tests for VellumIntegrationTrigger serialization."""
 
-from typing import Any, cast
-
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
@@ -47,14 +45,16 @@ def test_vellum_integration_trigger_serialization():
     assert len(triggers) == 1
 
     trigger = triggers[0]
+    assert isinstance(trigger, dict)
     assert trigger["type"] == "INTEGRATION"
 
     # Check that attributes are serialized
     assert "attributes" in trigger
     attributes = trigger["attributes"]
+    assert isinstance(attributes, list)
     assert len(attributes) == 3
 
-    attribute_names = {attr["name"] for attr in attributes}
+    attribute_names = {attr["name"] for attr in attributes if isinstance(attr, dict)}
     assert attribute_names == {"message", "channel", "user"}
 
     # RED: These assertions should fail because we haven't implemented class_name and module_path yet
@@ -94,26 +94,52 @@ def test_vellum_integration_trigger_id_consistency():
     result: dict = get_workflow_display(workflow_class=TestWorkflow).serialize()
 
     # Get trigger definition IDs
-    trigger = result["triggers"][0]
+    triggers = result["triggers"]
+    assert isinstance(triggers, list)
+    trigger = triggers[0]
+    assert isinstance(trigger, dict)
     trigger_id = trigger["id"]
-    trigger_attrs = {attr["name"]: attr["id"] for attr in trigger["attributes"]}
+    trigger_attributes = trigger["attributes"]
+    assert isinstance(trigger_attributes, list)
+    trigger_attrs = {attr["name"]: attr["id"] for attr in trigger_attributes if isinstance(attr, dict)}
 
     # Find node with trigger attribute references
-    nodes = result["workflow_raw_data"]["nodes"]
+    workflow_raw_data = result["workflow_raw_data"]
+    assert isinstance(workflow_raw_data, dict)
+    nodes = workflow_raw_data["nodes"]
+    assert isinstance(nodes, list)
     process_node = next(
-        (n for n in nodes if any(o.get("value", {}).get("type") == "TRIGGER_ATTRIBUTE" for o in n.get("outputs", []))),
+        (
+            n
+            for n in nodes
+            if isinstance(n, dict)
+            and isinstance(n.get("outputs"), list)
+            and any(
+                isinstance(o, dict)
+                and isinstance(o.get("value"), dict)
+                and o.get("value", {}).get("type") == "TRIGGER_ATTRIBUTE"
+                for o in n.get("outputs", [])
+            )
+        ),
         None,
     )
     assert process_node, "No node found with trigger attribute references"
 
     # Validate all trigger attribute references have matching IDs
     attr_mapping = {"msg_output": "message", "channel_output": "channel"}
-    for output in process_node["outputs"]:
+    outputs = process_node["outputs"]
+    assert isinstance(outputs, list)
+    for output in outputs:
+        if not isinstance(output, dict):
+            continue
         value = output.get("value", {})
+        if not isinstance(value, dict):
+            continue
         if value.get("type") == "TRIGGER_ATTRIBUTE":
             assert value["trigger_id"] == trigger_id, "Trigger ID mismatch"
 
-            expected_attr = attr_mapping[output["name"]]
+            output_name = output["name"]
+            expected_attr = attr_mapping[output_name]
             expected_id = trigger_attrs[expected_attr]
             assert value["attribute_id"] == expected_id, f"Attribute ID mismatch for {expected_attr}"
 
@@ -141,11 +167,13 @@ def test_trigger_module_paths_are_canonical():
 
     result = get_workflow_display(workflow_class=TestWorkflow).serialize()
 
-    triggers = cast(list[Any], result["triggers"])
-    trigger = cast(dict[str, Any], triggers[0])
+    triggers = result["triggers"]
+    assert isinstance(triggers, list)
+    trigger = triggers[0]
+    assert isinstance(trigger, dict)
     assert trigger["type"] == "INTEGRATION"
 
-    module_path = cast(list[Any], trigger["module_path"])
+    module_path = trigger["module_path"]
     assert isinstance(module_path, list)
     assert all(isinstance(part, str) for part in module_path)
     assert module_path == __name__.split(".")
@@ -174,34 +202,43 @@ def test_integration_trigger_no_entrypoint_node():
 
     # Get trigger ID
     triggers = result["triggers"]
+    assert isinstance(triggers, list)
     assert len(triggers) == 1
-    trigger_id = triggers[0]["id"]
+    trigger = triggers[0]
+    assert isinstance(trigger, dict)
+    trigger_id = trigger["id"]
 
     # Verify trigger has source_handle_id matching trigger_id
-    assert "source_handle_id" in triggers[0], "Trigger should have source_handle_id"
-    assert triggers[0]["source_handle_id"] == trigger_id, "source_handle_id should match trigger_id"
+    assert "source_handle_id" in trigger, "Trigger should have source_handle_id"
+    assert trigger["source_handle_id"] == trigger_id, "source_handle_id should match trigger_id"
 
     # Verify no ENTRYPOINT node exists
     workflow_raw_data = result["workflow_raw_data"]
+    assert isinstance(workflow_raw_data, dict)
     nodes = workflow_raw_data["nodes"]
-    entrypoint_nodes = [n for n in nodes if n.get("type") == "ENTRYPOINT"]
+    assert isinstance(nodes, list)
+    entrypoint_nodes = [n for n in nodes if isinstance(n, dict) and n.get("type") == "ENTRYPOINT"]
     assert len(entrypoint_nodes) == 0, "IntegrationTrigger-only workflows should not have ENTRYPOINT nodes"
 
     # Verify edges use trigger ID as sourceNodeId
     edges = workflow_raw_data["edges"]
-    trigger_edges = [e for e in edges if e["source_node_id"] == trigger_id]
+    assert isinstance(edges, list)
+    trigger_edges = [e for e in edges if isinstance(e, dict) and e.get("source_node_id") == trigger_id]
     assert len(trigger_edges) > 0, "Should have edges from trigger ID"
 
     # Verify the edge connects trigger to first node
     # ProcessNode should be the only non-terminal node
-    process_nodes = [n for n in nodes if n.get("type") != "TERMINAL"]
+    process_nodes = [n for n in nodes if isinstance(n, dict) and n.get("type") != "TERMINAL"]
     assert len(process_nodes) > 0, "Should have at least one process node"
-    process_node_id = process_nodes[0]["id"]
+    process_node = process_nodes[0]
+    assert isinstance(process_node, dict)
+    process_node_id = process_node["id"]
 
     trigger_to_process_edge = next(
-        (e for e in trigger_edges if e["target_node_id"] == process_node_id),
+        (e for e in trigger_edges if isinstance(e, dict) and e.get("target_node_id") == process_node_id),
         None,
     )
     assert trigger_to_process_edge is not None, "Should have edge from trigger to ProcessNode"
+    assert isinstance(trigger_to_process_edge, dict)
     assert trigger_to_process_edge["source_node_id"] == trigger_id
     assert trigger_to_process_edge["target_node_id"] == process_node_id
