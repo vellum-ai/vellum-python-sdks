@@ -1025,12 +1025,14 @@ class WorkflowRunner(Generic[StateType]):
             error_message=f"Workflow execution exceeded timeout of {self._timeout} seconds",
         )
 
+        captured_stacktrace = "".join(traceback.format_stack())
         self._workflow_event_outer_queue.put(
             self._reject_workflow_event(
                 WorkflowError(
                     code=WorkflowErrorCode.WORKFLOW_TIMEOUT,
                     message=f"Workflow execution exceeded timeout of {self._timeout} seconds",
-                )
+                ),
+                captured_stacktrace,
             )
         )
 

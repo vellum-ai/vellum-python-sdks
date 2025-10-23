@@ -208,6 +208,10 @@ class WorkflowExecutionRejectedEvent(_BaseWorkflowEvent):
     def error(self) -> WorkflowError:
         return self.body.error
 
+    @property
+    def stacktrace(self) -> Optional[str]:
+        return self.body.stacktrace
+
 
 class WorkflowExecutionPausedBody(_BaseWorkflowExecutionBody):
     external_inputs: Iterable[ExternalInputReference]
