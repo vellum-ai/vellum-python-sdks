@@ -1054,9 +1054,6 @@ describe("Workflow", () => {
 
       const triggerId = "trigger-1";
 
-      // With triggers, entrypoint node exists with ID matching the trigger ID
-      const entrypointNode = entrypointNodeDataFactory(triggerId);
-
       const firstNode = genericNodeFactory({
         id: "first-node",
         label: "FirstNode",
@@ -1119,9 +1116,6 @@ describe("Workflow", () => {
       const writer = new Writer();
 
       const triggerId = "trigger-1";
-
-      // With triggers, entrypoint node exists with ID matching the trigger ID
-      const entrypointNode = entrypointNodeDataFactory(triggerId);
 
       const firstNode = genericNodeFactory({
         id: "first-node",
