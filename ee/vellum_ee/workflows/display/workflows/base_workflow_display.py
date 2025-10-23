@@ -185,30 +185,57 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         for subgraph in self._workflow.get_subgraphs():
             trigger_edges.extend(list(subgraph.trigger_edges))
 
-        # Determine entrypoint node ID
-        # Use trigger ID if ManualTrigger exists, otherwise use default from workflow display
-        entrypoint_trigger_edges = [edge for edge in trigger_edges if issubclass(edge.trigger_class, ManualTrigger)]
-        if len(entrypoint_trigger_edges) > 0:
-            trigger_class = entrypoint_trigger_edges[0].trigger_class
+        # Determine if we need an ENTRYPOINT node and what ID to use
+        # For ManualTrigger: create ENTRYPOINT node for backward compatibility
+        # For IntegrationTrigger only: no ENTRYPOINT node (use trigger ID directly in edges)
+        manual_trigger_edges = [edge for edge in trigger_edges if issubclass(edge.trigger_class, ManualTrigger)]
+        integration_trigger_edges = [
+            edge for edge in trigger_edges if issubclass(edge.trigger_class, VellumIntegrationTrigger)
+        ]
+
+        has_manual_trigger = len(manual_trigger_edges) > 0
+        has_only_integration_trigger = len(integration_trigger_edges) > 0 and not has_manual_trigger
+
+        entrypoint_node_id: Optional[UUID] = None
+        entrypoint_node_source_handle_id: Optional[UUID] = None
+
+        if has_manual_trigger:
+            # ManualTrigger: use trigger ID for ENTRYPOINT node (backward compatibility)
+            trigger_class = manual_trigger_edges[0].trigger_class
             entrypoint_node_id = get_trigger_id(trigger_class)
-        else:
+            entrypoint_node_source_handle_id = self.display_context.workflow_display.entrypoint_node_source_handle_id
+
+            # Add ENTRYPOINT node for ManualTrigger workflows
+            serialized_nodes[entrypoint_node_id] = {
+                "id": str(entrypoint_node_id),
+                "type": "ENTRYPOINT",
+                "inputs": [],
+                "data": {
+                    "label": "Entrypoint Node",
+                    "source_handle_id": str(entrypoint_node_source_handle_id),
+                },
+                "display_data": self.display_context.workflow_display.entrypoint_node_display.dict(),
+                "base": None,
+                "definition": None,
+            }
+        elif not trigger_edges:
+            # No trigger: use default ENTRYPOINT node (backward compatibility)
             entrypoint_node_id = self.display_context.workflow_display.entrypoint_node_id
+            entrypoint_node_source_handle_id = self.display_context.workflow_display.entrypoint_node_source_handle_id
 
-        entrypoint_node_source_handle_id = self.display_context.workflow_display.entrypoint_node_source_handle_id
-
-        # Always add entrypoint node for backwards compatibility
-        serialized_nodes[entrypoint_node_id] = {
-            "id": str(entrypoint_node_id),
-            "type": "ENTRYPOINT",
-            "inputs": [],
-            "data": {
-                "label": "Entrypoint Node",
-                "source_handle_id": str(entrypoint_node_source_handle_id),
-            },
-            "display_data": self.display_context.workflow_display.entrypoint_node_display.dict(),
-            "base": None,
-            "definition": None,
-        }
+            serialized_nodes[entrypoint_node_id] = {
+                "id": str(entrypoint_node_id),
+                "type": "ENTRYPOINT",
+                "inputs": [],
+                "data": {
+                    "label": "Entrypoint Node",
+                    "source_handle_id": str(entrypoint_node_source_handle_id),
+                },
+                "display_data": self.display_context.workflow_display.entrypoint_node_display.dict(),
+                "base": None,
+                "definition": None,
+            }
+        # else: has_only_integration_trigger - no ENTRYPOINT node needed
 
         # Add all the nodes in the workflows
         for node in self._workflow.get_all_nodes():
@@ -355,27 +382,53 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 ValueError("Unable to serialize terminal nodes that are not referenced by workflow outputs.")
             )
 
-        # Add edges from entrypoint node to first nodes
-        # These edges always exist for backwards compatibility
-        for target_node, entrypoint_display in self.display_context.entrypoint_displays.items():
-            unadorned_target_node = get_unadorned_node(target_node)
-            # Skip edges to invalid nodes
-            if self._is_node_invalid(unadorned_target_node):
-                continue
+        # Add edges from trigger/entrypoint to first nodes
+        if has_only_integration_trigger:
+            # Option 3: Use trigger ID directly as sourceNodeId (no ENTRYPOINT node)
+            trigger_class = integration_trigger_edges[0].trigger_class
+            trigger_id = get_trigger_id(trigger_class)
+            trigger_source_handle_id = self.display_context.workflow_display.entrypoint_node_source_handle_id
 
-            target_node_display = self.display_context.node_displays[unadorned_target_node]
-            entrypoint_edge_dict: Dict[str, Json] = {
-                "id": str(entrypoint_display.edge_display.id),
-                "source_node_id": str(entrypoint_node_id),
-                "source_handle_id": str(entrypoint_node_source_handle_id),
-                "target_node_id": str(target_node_display.node_id),
-                "target_handle_id": str(target_node_display.get_trigger_id()),
-                "type": "DEFAULT",
-            }
-            display_data = self._serialize_edge_display_data(entrypoint_display.edge_display)
-            if display_data is not None:
-                entrypoint_edge_dict["display_data"] = display_data
-            edges.append(entrypoint_edge_dict)
+            for target_node, entrypoint_display in self.display_context.entrypoint_displays.items():
+                unadorned_target_node = get_unadorned_node(target_node)
+                # Skip edges to invalid nodes
+                if self._is_node_invalid(unadorned_target_node):
+                    continue
+
+                target_node_display = self.display_context.node_displays[unadorned_target_node]
+                trigger_edge_dict: Dict[str, Json] = {
+                    "id": str(entrypoint_display.edge_display.id),
+                    "source_node_id": str(trigger_id),
+                    "source_handle_id": str(trigger_source_handle_id),
+                    "target_node_id": str(target_node_display.node_id),
+                    "target_handle_id": str(target_node_display.get_trigger_id()),
+                    "type": "DEFAULT",
+                }
+                display_data = self._serialize_edge_display_data(entrypoint_display.edge_display)
+                if display_data is not None:
+                    trigger_edge_dict["display_data"] = display_data
+                edges.append(trigger_edge_dict)
+        elif entrypoint_node_id is not None:
+            # Traditional approach: edges from ENTRYPOINT node (backward compatibility)
+            for target_node, entrypoint_display in self.display_context.entrypoint_displays.items():
+                unadorned_target_node = get_unadorned_node(target_node)
+                # Skip edges to invalid nodes
+                if self._is_node_invalid(unadorned_target_node):
+                    continue
+
+                target_node_display = self.display_context.node_displays[unadorned_target_node]
+                entrypoint_edge_dict: Dict[str, Json] = {
+                    "id": str(entrypoint_display.edge_display.id),
+                    "source_node_id": str(entrypoint_node_id),
+                    "source_handle_id": str(entrypoint_node_source_handle_id),
+                    "target_node_id": str(target_node_display.node_id),
+                    "target_handle_id": str(target_node_display.get_trigger_id()),
+                    "type": "DEFAULT",
+                }
+                display_data = self._serialize_edge_display_data(entrypoint_display.edge_display)
+                if display_data is not None:
+                    entrypoint_edge_dict["display_data"] = display_data
+                edges.append(entrypoint_edge_dict)
 
         for (source_node_port, target_node), edge_display in self.display_context.edge_displays.items():
             unadorned_source_node_port = get_unadorned_port(source_node_port)

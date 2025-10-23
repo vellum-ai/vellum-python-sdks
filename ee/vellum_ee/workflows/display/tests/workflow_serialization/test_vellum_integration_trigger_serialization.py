@@ -151,3 +151,53 @@ def test_trigger_module_paths_are_canonical():
     assert module_path == __name__.split(".")
 
     assert trigger["class_name"] == "TestSlackTrigger"
+
+
+def test_integration_trigger_no_entrypoint_node():
+    """IntegrationTrigger-only workflows use trigger ID in edges (Option 3)."""
+
+    class SlackMessageTrigger(VellumIntegrationTrigger):
+        message: str
+
+        class Config:
+            provider = "COMPOSIO"
+            integration_name = "SLACK"
+            slug = "slack_message"
+
+    class ProcessNode(BaseNode):
+        pass
+
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = SlackMessageTrigger >> ProcessNode
+
+    result = get_workflow_display(workflow_class=TestWorkflow).serialize()
+
+    # Get trigger ID
+    triggers = result["triggers"]
+    assert len(triggers) == 1
+    trigger_id = triggers[0]["id"]
+
+    # Verify no ENTRYPOINT node exists
+    workflow_raw_data = result["workflow_raw_data"]
+    nodes = workflow_raw_data["nodes"]
+    entrypoint_nodes = [n for n in nodes if n.get("type") == "ENTRYPOINT"]
+    assert len(entrypoint_nodes) == 0, "IntegrationTrigger-only workflows should not have ENTRYPOINT nodes"
+
+    # Verify edges use trigger ID as sourceNodeId
+    edges = workflow_raw_data["edges"]
+    trigger_edges = [e for e in edges if e["source_node_id"] == trigger_id]
+    assert len(trigger_edges) > 0, "Should have edges from trigger ID"
+
+    # Verify the edge connects trigger to first node
+    # ProcessNode should be the only non-terminal node
+    process_nodes = [n for n in nodes if n.get("type") != "TERMINAL"]
+    assert len(process_nodes) > 0, "Should have at least one process node"
+    process_node_id = process_nodes[0]["id"]
+
+    trigger_to_process_edge = next(
+        (e for e in trigger_edges if e["target_node_id"] == process_node_id),
+        None,
+    )
+    assert trigger_to_process_edge is not None, "Should have edge from trigger to ProcessNode"
+    assert trigger_to_process_edge["source_node_id"] == trigger_id
+    assert trigger_to_process_edge["target_node_id"] == process_node_id

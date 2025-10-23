@@ -74,7 +74,7 @@ def test_unknown_trigger_type():
 
 
 def test_manual_trigger_entrypoint_id_consistency():
-    """ManualTrigger ID matches entrypoint node ID for proper linkage."""
+    """ManualTrigger ID matches entrypoint node ID for backward compatibility."""
 
     class SimpleNode(BaseNode):
         pass
@@ -92,13 +92,13 @@ def test_manual_trigger_entrypoint_id_consistency():
     assert isinstance(trigger, dict)
     trigger_id = trigger["id"]
 
-    # Get entrypoint node ID
+    # Get entrypoint node ID - ManualTrigger workflows still use ENTRYPOINT nodes
     workflow_raw_data = result["workflow_raw_data"]
     assert isinstance(workflow_raw_data, dict)
     nodes = workflow_raw_data["nodes"]
     assert isinstance(nodes, list)
     entrypoint_nodes = [n for n in nodes if isinstance(n, dict) and n["type"] == "ENTRYPOINT"]
-    assert len(entrypoint_nodes) == 1
+    assert len(entrypoint_nodes) == 1, "ManualTrigger workflows should have ENTRYPOINT node for backward compatibility"
     entrypoint_id = entrypoint_nodes[0]["id"]
 
     # Verify IDs match
