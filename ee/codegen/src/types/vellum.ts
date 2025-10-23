@@ -796,7 +796,6 @@ export type WorkflowTrigger =
       id: string;
       type: WorkflowTriggerType.MANUAL;
       attributes: NodeAttribute[];
-      entrypoints?: string[];
     }
   | {
       id: string;
@@ -804,7 +803,6 @@ export type WorkflowTrigger =
       attributes: NodeAttribute[];
       className: string;
       modulePath: string[];
-      entrypoints?: string[];
     };
 
 export interface WorkflowRawData {

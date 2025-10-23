@@ -1068,7 +1068,18 @@ describe("Workflow", () => {
       });
 
       // When a trigger is present, it IS the entry point - no entrypoint node needed
-      const edges = edgesFactory([[firstNode, secondNode]]);
+      // Create edge from trigger to firstNode, then firstNode to secondNode
+      const edges = [
+        {
+          id: "trigger-edge",
+          type: "DEFAULT" as const,
+          sourceNodeId: triggerId,
+          sourceHandleId: "default",
+          targetNodeId: firstNode.id,
+          targetHandleId: "default",
+        },
+        ...edgesFactory([[firstNode, secondNode]]),
+      ];
 
       const workflowContext = workflowContextFactory({
         workflowRawData: {
@@ -1080,7 +1091,6 @@ describe("Workflow", () => {
             id: triggerId,
             type: WorkflowTriggerType.MANUAL,
             attributes: [],
-            entrypoints: [firstNode.id],
           },
         ],
       });
@@ -1124,7 +1134,18 @@ describe("Workflow", () => {
       });
 
       // When a trigger is present, it IS the entry point - no entrypoint node needed
-      const edges = edgesFactory([[firstNode, secondNode]]);
+      // Create edge from trigger to firstNode, then firstNode to secondNode
+      const edges = [
+        {
+          id: "trigger-edge",
+          type: "DEFAULT" as const,
+          sourceNodeId: triggerId,
+          sourceHandleId: "default",
+          targetNodeId: firstNode.id,
+          targetHandleId: "default",
+        },
+        ...edgesFactory([[firstNode, secondNode]]),
+      ];
 
       const workflowContext = workflowContextFactory({
         workflowRawData: {
@@ -1141,7 +1162,6 @@ describe("Workflow", () => {
             ],
             className: "SlackMessageTrigger",
             modulePath: ["tests", "fixtures", "triggers", "slack_message"],
-            entrypoints: [firstNode.id],
           },
         ],
       });

@@ -308,19 +308,14 @@ export class WorkflowContext {
   }
 
   public getEntrypointNodeEdges(): WorkflowEdge[] {
-    // First, check if we have triggers with explicit entrypoints
+    // First, check if we have triggers and edges from those triggers
     if (this.triggers && this.triggers.length > 0) {
-      const trigger = this.triggers[0];
-      if (trigger?.entrypoints && trigger.entrypoints.length > 0) {
-        // Create synthetic edges from trigger to its entrypoint nodes
-        return trigger.entrypoints.map((nodeId, index) => ({
-          id: `trigger-${trigger.id}-entrypoint-${index}`,
-          type: "DEFAULT" as const,
-          sourceNodeId: trigger.id,
-          sourceHandleId: "default",
-          targetNodeId: nodeId,
-          targetHandleId: "default",
-        }));
+      const triggerIds = new Set(this.triggers.map((t) => t.id));
+      const triggerEdges = this.workflowRawData.edges.filter((edge) =>
+        triggerIds.has(edge.sourceNodeId)
+      );
+      if (triggerEdges.length > 0) {
+        return triggerEdges;
       }
     }
 
