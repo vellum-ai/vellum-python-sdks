@@ -1080,6 +1080,7 @@ describe("Workflow", () => {
             id: triggerId,
             type: WorkflowTriggerType.MANUAL,
             attributes: [],
+            entrypoints: [firstNode.id],
           },
         ],
       });
@@ -1140,6 +1141,7 @@ describe("Workflow", () => {
             ],
             className: "SlackMessageTrigger",
             modulePath: ["tests", "fixtures", "triggers", "slack_message"],
+            entrypoints: [firstNode.id],
           },
         ],
       });
