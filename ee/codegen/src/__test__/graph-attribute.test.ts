@@ -1054,8 +1054,8 @@ describe("Workflow", () => {
 
       const triggerId = "trigger-1";
 
-      // With triggers, entrypoint node exists with ID matching the trigger ID
-      const entrypointNode = entrypointNodeDataFactory(triggerId);
+      // Manual triggers have an associated entrypoint node with ID matching the trigger
+      const entrypointNodeWithTriggerId = entrypointNodeDataFactory(triggerId);
 
       const firstNode = genericNodeFactory({
         id: "first-node",
@@ -1068,13 +1068,13 @@ describe("Workflow", () => {
       });
 
       const edges = edgesFactory([
-        [entrypointNode, firstNode],
+        [entrypointNodeWithTriggerId, firstNode],
         [firstNode, secondNode],
       ]);
 
       const workflowContext = workflowContextFactory({
         workflowRawData: {
-          nodes: [entrypointNode, firstNode, secondNode],
+          nodes: [entrypointNodeWithTriggerId, firstNode, secondNode],
           edges,
         },
         triggers: [
@@ -1111,9 +1111,6 @@ describe("Workflow", () => {
 
       const triggerId = "trigger-1";
 
-      // With triggers, entrypoint node exists with ID matching the trigger ID
-      const entrypointNode = entrypointNodeDataFactory(triggerId);
-
       const firstNode = genericNodeFactory({
         id: "first-node",
         label: "FirstNode",
@@ -1124,14 +1121,23 @@ describe("Workflow", () => {
         label: "SecondNode",
       });
 
-      const edges = edgesFactory([
-        [entrypointNode, firstNode],
-        [firstNode, secondNode],
-      ]);
+      // When a trigger is present, it IS the entry point - no entrypoint node needed
+      // Create edge from trigger to firstNode, then firstNode to secondNode
+      const edges = [
+        {
+          id: "trigger-edge",
+          type: "DEFAULT" as const,
+          sourceNodeId: triggerId,
+          sourceHandleId: triggerId, // Use trigger ID as handle ID
+          targetNodeId: firstNode.id,
+          targetHandleId: "default",
+        },
+        ...edgesFactory([[firstNode, secondNode]]),
+      ];
 
       const workflowContext = workflowContextFactory({
         workflowRawData: {
-          nodes: [entrypointNode, firstNode, secondNode],
+          nodes: [firstNode, secondNode],
           edges,
         },
         triggers: [
@@ -1144,6 +1150,7 @@ describe("Workflow", () => {
             ],
             className: "SlackMessageTrigger",
             modulePath: ["tests", "fixtures", "triggers", "slack_message"],
+            sourceHandleId: triggerId, // Use trigger ID as handle ID
           },
         ],
       });

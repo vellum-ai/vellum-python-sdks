@@ -803,6 +803,7 @@ export type WorkflowTrigger =
       attributes: NodeAttribute[];
       className: string;
       modulePath: string[];
+      sourceHandleId: string;
     };
 
 export interface WorkflowRawData {

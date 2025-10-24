@@ -308,6 +308,18 @@ export class WorkflowContext {
   }
 
   public getEntrypointNodeEdges(): WorkflowEdge[] {
+    // First, check if we have triggers and edges from those triggers
+    if (this.triggers && this.triggers.length > 0) {
+      const triggerIds = new Set(this.triggers.map((t) => t.id));
+      const triggerEdges = this.workflowRawData.edges.filter((edge) =>
+        triggerIds.has(edge.sourceNodeId)
+      );
+      if (triggerEdges.length > 0) {
+        return triggerEdges;
+      }
+    }
+
+    // Fall back to ENTRYPOINT node for backward compatibility
     const entrypointNode = this.tryGetEntrypointNode();
     if (!entrypointNode) {
       return [];
