@@ -1064,8 +1064,18 @@ describe("Workflow", () => {
         label: "SecondNode",
       });
 
-      // When a trigger is present, it IS the entry point - no entrypoint node needed
-      const edges = edgesFactory([[firstNode, secondNode]]);
+      // Trigger acts as edge source directly (no ENTRYPOINT node)
+      const edges = [
+        {
+          id: "trigger-edge",
+          type: "DEFAULT" as const,
+          sourceNodeId: triggerId,
+          sourceHandleId: triggerId,
+          targetNodeId: firstNode.id,
+          targetHandleId: "default",
+        },
+        ...edgesFactory([[firstNode, secondNode]]),
+      ];
 
       const workflowContext = workflowContextFactory({
         workflowRawData: {
@@ -1116,8 +1126,18 @@ describe("Workflow", () => {
         label: "SecondNode",
       });
 
-      // When a trigger is present, it IS the entry point - no entrypoint node needed
-      const edges = edgesFactory([[firstNode, secondNode]]);
+      // Trigger acts as edge source directly (no ENTRYPOINT node)
+      const edges = [
+        {
+          id: "trigger-edge",
+          type: "DEFAULT" as const,
+          sourceNodeId: triggerId,
+          sourceHandleId: triggerId,
+          targetNodeId: firstNode.id,
+          targetHandleId: "default",
+        },
+        ...edgesFactory([[firstNode, secondNode]]),
+      ];
 
       const workflowContext = workflowContextFactory({
         workflowRawData: {
