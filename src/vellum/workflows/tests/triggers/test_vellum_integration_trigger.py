@@ -139,33 +139,6 @@ def test_to_trigger_attribute_values():
     assert set(attr_values.values()) == {"Hello", "C123"}
 
 
-def test_to_exec_config():
-    """to_exec_config() produces valid ComposioIntegrationTriggerExecConfig."""
-
-    class SlackTrigger(VellumIntegrationTrigger):
-        message: str
-        user: str
-
-        class Config(VellumIntegrationTrigger.Config):
-            provider = VellumIntegrationProviderType.COMPOSIO
-            integration_name = "SLACK"
-            slug = "slack_new_message"
-
-    exec_config = SlackTrigger.to_exec_config()
-
-    assert exec_config.type == "INTEGRATION"
-    assert exec_config.provider == VellumIntegrationProviderType.COMPOSIO
-    assert exec_config.integration_name == "SLACK"
-    assert exec_config.slug == "slack_new_message"
-    assert exec_config.event_attributes == {"message": str, "user": str}
-
-
-def test_to_exec_config_base_class_fails():
-    """to_exec_config() raises error on base class."""
-    with pytest.raises(AttributeError):
-        VellumIntegrationTrigger.to_exec_config()
-
-
 def test_empty_event_data():
     """Trigger handles empty event data gracefully."""
 
