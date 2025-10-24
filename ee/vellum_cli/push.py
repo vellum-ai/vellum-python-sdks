@@ -144,7 +144,8 @@ def push_command(
         container_tag = "latest"
 
     exec_config["runner_config"] = {
-        "sdk_version": metadata.version("vellum-ai"),
+        "sdk_version": metadata.version("vellum-ai"),  # Deprecated in favor of codegen_version
+        "codegen_version": metadata.version("vellum-ai"),
         "container_image_tag": container_tag,
         "container_image_name": workflow_config.container_image_name,
     }
