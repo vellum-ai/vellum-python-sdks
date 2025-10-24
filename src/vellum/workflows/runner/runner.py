@@ -275,11 +275,17 @@ class WorkflowRunner(Generic[StateType]):
         return False
 
     def _get_entrypoints_for_trigger_type(self, trigger_class: Type) -> List[Type[BaseNode]]:
-        """Get all entrypoints connected to a specific trigger type."""
+        """Get all entrypoints connected to a specific trigger type.
+
+        Allows subclasses: if trigger_class is a subclass of any declared trigger,
+        returns those entrypoints.
+        """
         entrypoints: List[Type[BaseNode]] = []
         for subgraph in self.workflow.get_subgraphs():
             for trigger in subgraph.triggers:
-                if issubclass(trigger, trigger_class):
+                # Check if the provided trigger_class is a subclass of the declared trigger
+                # This allows runtime instances to be subclasses of what's declared in the workflow
+                if issubclass(trigger_class, trigger):
                     entrypoints.extend(subgraph.entrypoints)
         return entrypoints
 
@@ -304,7 +310,8 @@ class WorkflowRunner(Generic[StateType]):
                     code=WorkflowErrorCode.INVALID_INPUTS,
                 )
 
-            # Validate that the trigger instance matches one of the workflow's trigger types
+            # Validate that the trigger instance is compatible with one of the workflow's trigger types
+            # Allow subclasses: if workflow declares BaseSlackTrigger, accept SpecificSlackTrigger instances
             trigger_class = type(trigger)
             workflow_trigger_types = [
                 t
@@ -313,9 +320,10 @@ class WorkflowRunner(Generic[StateType]):
                 if issubclass(t, IntegrationTrigger)
             ]
 
-            if trigger_class not in workflow_trigger_types:
+            # Check if the provided trigger_class is a subclass of any declared trigger type
+            if not any(issubclass(trigger_class, declared_trigger) for declared_trigger in workflow_trigger_types):
                 raise WorkflowInitializationException(
-                    message=f"Provided trigger type {trigger_class.__name__} is not declared in workflow. "
+                    message=f"Provided trigger type {trigger_class.__name__} is not compatible with workflow triggers. "
                     f"Workflow has: {[t.__name__ for t in workflow_trigger_types]}",
                     workflow_definition=self.workflow.__class__,
                     code=WorkflowErrorCode.INVALID_INPUTS,
