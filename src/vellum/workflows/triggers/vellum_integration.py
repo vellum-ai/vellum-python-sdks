@@ -4,7 +4,6 @@ from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.triggers.base import BaseTriggerMeta
 from vellum.workflows.triggers.integration import IntegrationTrigger
-from vellum.workflows.types import ComposioIntegrationTriggerExecConfig
 
 
 class VellumIntegrationTriggerMeta(BaseTriggerMeta):
@@ -188,57 +187,3 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
                 attribute_values[reference] = getattr(self, attr_name)
 
         return attribute_values
-
-    @classmethod
-    def to_exec_config(cls) -> ComposioIntegrationTriggerExecConfig:
-        """
-        Generate execution configuration for serialization.
-
-        This method creates a ComposioIntegrationTriggerExecConfig from the trigger
-        class's configuration (from Config class) and event attributes (from top-level
-        type annotations), which is used during serialization to the backend.
-
-        Returns:
-            ComposioIntegrationTriggerExecConfig with configuration and event attribute schema
-
-        Raises:
-            AttributeError: If called on base VellumIntegrationTrigger
-
-        Examples:
-            >>> class SlackTrigger(VellumIntegrationTrigger):
-            ...     # Event attributes
-            ...     message: str
-            ...     user: str
-            ...
-            ...     # Configuration
-            ...     class Config(VellumIntegrationTrigger.Config):
-            ...         provider = VellumIntegrationProviderType.COMPOSIO
-            ...         integration_name = "SLACK"
-            ...         slug = "slack_new_message"
-            >>> exec_config = SlackTrigger.to_exec_config()
-            >>> exec_config.slug
-            'slack_new_message'
-            >>> exec_config.event_attributes
-            {'message': <class 'str'>, 'user': <class 'str'>}
-        """
-        if not hasattr(cls, "Config") or cls.Config is VellumIntegrationTrigger.Config:
-            raise AttributeError(
-                "to_exec_config() can only be called on configured VellumIntegrationTrigger subclasses, "
-                "not on the base class."
-            )
-
-        # Build event_attributes from annotations
-        event_attributes: Dict[str, Any] = {}
-        if hasattr(cls, "__annotations__"):
-            event_attributes = {
-                name: type_
-                for name, type_ in cls.__annotations__.items()
-                if not name.startswith("_") and name != "Config"
-            }
-
-        return ComposioIntegrationTriggerExecConfig(
-            provider=cls.Config.provider,
-            integration_name=cls.Config.integration_name,
-            slug=cls.Config.slug,
-            event_attributes=event_attributes,
-        )
