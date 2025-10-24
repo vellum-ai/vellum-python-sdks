@@ -42,6 +42,7 @@ class IterationSubworkflow(BaseWorkflow[MapNode.SubworkflowInputs, State]):
 
 class MapIterationsNode(MapNode):
     items = Inputs.items
+    max_concurrency = 4
     subworkflow = IterationSubworkflow
 
 
