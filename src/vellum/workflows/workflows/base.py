@@ -201,7 +201,7 @@ class _BaseWorkflowMeta(type):
 
         cls = super().__new__(mcs, name, bases, dct)
         workflow_class = cast(Type["BaseWorkflow"], cls)
-        workflow_class.__id__ = uuid4_from_hash(workflow_class.__qualname__)
+        workflow_class.__id__ = uuid4_from_hash(f"{workflow_class.__module__}.{workflow_class.__qualname__}")
 
         inputs_class = workflow_class.get_inputs_class()
         if inputs_class is not BaseInputs and inputs_class.__parent_class__ is type(None):
