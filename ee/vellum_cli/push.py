@@ -1,7 +1,7 @@
-from importlib import metadata
 import io
 import json
 import os
+from pathlib import Path
 import sys
 import tarfile
 from uuid import UUID
@@ -18,6 +18,18 @@ from vellum_cli.config import DEFAULT_WORKSPACE_CONFIG, WorkflowConfig, Workflow
 from vellum_cli.logger import handle_cli_error, load_cli_logger
 from vellum_ee.workflows.display.nodes.utils import to_kebab_case
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
+
+
+def _get_codegen_version() -> str:
+    """Read the codegen version from the package.json file."""
+    codegen_package_json_path = Path(__file__).parent.parent / "codegen" / "package.json"
+
+    try:
+        with open(codegen_package_json_path) as f:
+            package_data = json.load(f)
+            return package_data.get("version", "unknown")
+    except (FileNotFoundError, json.JSONDecodeError, KeyError):
+        return "unknown"
 
 
 def push_command(
@@ -144,7 +156,7 @@ def push_command(
         container_tag = "latest"
 
     exec_config["runner_config"] = {
-        "sdk_version": metadata.version("vellum-ai"),
+        "codegen_version": _get_codegen_version(),
         "container_image_tag": container_tag,
         "container_image_name": workflow_config.container_image_name,
     }
