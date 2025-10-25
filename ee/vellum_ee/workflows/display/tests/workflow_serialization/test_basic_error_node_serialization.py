@@ -83,7 +83,7 @@ def test_serialize_workflow():
     )
     assert not DeepDiff(
         {
-            "id": "5cf9c5e3-0eae-4daf-8d73-8b9536258eb9",
+            "id": "98597c0e-8951-4320-98ed-efd7f79c00cf",
             "type": "ERROR",
             "inputs": [
                 {
@@ -102,7 +102,7 @@ def test_serialize_workflow():
             ],
             "data": {
                 "label": "Fail Node",
-                "target_handle_id": "70c19f1c-309c-4a5d-ba65-664c0bb2fedf",
+                "target_handle_id": "865dcf9c-8fe8-44c0-bf36-2c92eb47927e",
                 "error_source_input_id": "f7fc097f-db5b-48c1-8c33-391834678521",
             },
             "display_data": {"position": {"x": 400.0, "y": 75.0}},
@@ -115,7 +115,7 @@ def test_serialize_workflow():
                 "module": ["tests", "workflows", "basic_error_node", "workflow"],
             },
             "trigger": {
-                "id": "70c19f1c-309c-4a5d-ba65-664c0bb2fedf",
+                "id": "865dcf9c-8fe8-44c0-bf36-2c92eb47927e",
                 "merge_behavior": "AWAIT_ATTRIBUTES",
             },
             "ports": [],

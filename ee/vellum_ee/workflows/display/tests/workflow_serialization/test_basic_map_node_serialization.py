@@ -77,7 +77,7 @@ def test_serialize_workflow():
     map_node = workflow_raw_data["nodes"][1]
     assert not DeepDiff(
         {
-            "id": "bf83099a-40df-4445-b90d-1f6f1067ebe3",
+            "id": "f2f94af1-fcbe-497c-80ce-80952c8903c8",
             "type": "MAP",
             "inputs": [
                 {
@@ -97,8 +97,8 @@ def test_serialize_workflow():
             "data": {
                 "label": "Map Fruits Node",
                 "error_output_id": None,
-                "source_handle_id": "a2171a61-0657-43ad-b6d9-cf93ce3270d0",
-                "target_handle_id": "b5e8182e-20c5-482b-b4c5-4dde48c01472",
+                "source_handle_id": "aff8a80e-7ce7-43d2-9c9e-9d137efd3b33",
+                "target_handle_id": "e16e9d55-5f26-4d89-8c7a-939f1f463d80",
                 "variant": "INLINE",
                 "workflow_raw_data": {
                     "nodes": [
@@ -115,7 +115,7 @@ def test_serialize_workflow():
                             "definition": None,
                         },
                         {
-                            "id": "baf6d316-dc75-41e8-96c0-015aede96309",
+                            "id": "9dffa9e5-00e3-4d20-8ab8-ad0412f35bf2",
                             "label": "Iteration",
                             "type": "GENERIC",
                             "should_file_merge": True,
@@ -129,16 +129,16 @@ def test_serialize_workflow():
                                 "module": ["tests", "workflows", "basic_map_node", "workflow"],
                             },
                             "trigger": {
-                                "id": "551d5528-f4e1-42ea-bde0-9de4b4968253",
+                                "id": "40631b74-8a35-4cb1-897d-3c93f8d5b625",
                                 "merge_behavior": "AWAIT_ATTRIBUTES",
                             },
                             "ports": [
-                                {"id": "71ada606-d791-4a59-a252-0795c5faeeaf", "type": "DEFAULT", "name": "default"}
+                                {"id": "8d5d36aa-f7c2-49bf-b4d5-cda6f6cd18f9", "type": "DEFAULT", "name": "default"}
                             ],
                             "adornments": None,
                             "attributes": [
                                 {
-                                    "id": "4306b0ce-f31c-4c8f-8122-659d40e60ffe",
+                                    "id": "52a43441-9162-40b1-96c6-445250af1c34",
                                     "name": "item",
                                     "value": {
                                         "type": "WORKFLOW_INPUT",
@@ -146,7 +146,7 @@ def test_serialize_workflow():
                                     },
                                 },
                                 {
-                                    "id": "bca02056-0fd9-44c6-8aa9-743dd1180d48",
+                                    "id": "dadea752-95db-4e5f-a0d4-f3920376ee8f",
                                     "name": "index",
                                     "value": {
                                         "type": "WORKFLOW_INPUT",
@@ -183,7 +183,7 @@ def test_serialize_workflow():
                                             {
                                                 "type": "NODE_OUTPUT",
                                                 "data": {
-                                                    "node_id": "baf6d316-dc75-41e8-96c0-015aede96309",
+                                                    "node_id": "9dffa9e5-00e3-4d20-8ab8-ad0412f35bf2",
                                                     "output_id": "3d97725d-a423-4072-9a73-7b6517edc76e",
                                                 },
                                             }
@@ -209,17 +209,17 @@ def test_serialize_workflow():
                     ],
                     "edges": [
                         {
-                            "id": "b59c050b-0f6a-4153-ab58-fa051222fa05",
+                            "id": "8b52ffcb-1ccf-41eb-ad89-705c6abc2369",
                             "source_node_id": "ff9bfe6e-839d-4d40-b8fc-313b3bbd0ab0",
                             "source_handle_id": "520d3616-8369-4e79-9da5-3febae299c2a",
-                            "target_node_id": "baf6d316-dc75-41e8-96c0-015aede96309",
-                            "target_handle_id": "551d5528-f4e1-42ea-bde0-9de4b4968253",
+                            "target_node_id": "9dffa9e5-00e3-4d20-8ab8-ad0412f35bf2",
+                            "target_handle_id": "40631b74-8a35-4cb1-897d-3c93f8d5b625",
                             "type": "DEFAULT",
                         },
                         {
                             "id": "14152688-6996-4d64-9231-a6e66a4827eb",
-                            "source_node_id": "baf6d316-dc75-41e8-96c0-015aede96309",
-                            "source_handle_id": "71ada606-d791-4a59-a252-0795c5faeeaf",
+                            "source_node_id": "9dffa9e5-00e3-4d20-8ab8-ad0412f35bf2",
+                            "source_handle_id": "8d5d36aa-f7c2-49bf-b4d5-cda6f6cd18f9",
                             "target_node_id": "6f4883b2-70b1-4e1c-ae15-7d0f5aec810b",
                             "target_handle_id": "9d74571f-b7f5-4c1d-8b7c-b9c648738a4d",
                             "type": "DEFAULT",
@@ -240,7 +240,7 @@ def test_serialize_workflow():
                             "output_variable_id": "2a957315-fae0-4366-8a35-f0b315c5eade",
                             "value": {
                                 "type": "NODE_OUTPUT",
-                                "node_id": "baf6d316-dc75-41e8-96c0-015aede96309",
+                                "node_id": "9dffa9e5-00e3-4d20-8ab8-ad0412f35bf2",
                                 "node_output_id": "3d97725d-a423-4072-9a73-7b6517edc76e",
                             },
                         }
@@ -288,10 +288,10 @@ def test_serialize_workflow():
                 "module": ["tests", "workflows", "basic_map_node", "workflow"],
             },
             "trigger": {
-                "id": "b5e8182e-20c5-482b-b4c5-4dde48c01472",
+                "id": "e16e9d55-5f26-4d89-8c7a-939f1f463d80",
                 "merge_behavior": "AWAIT_ATTRIBUTES",
             },
-            "ports": [{"id": "a2171a61-0657-43ad-b6d9-cf93ce3270d0", "name": "default", "type": "DEFAULT"}],
+            "ports": [{"id": "aff8a80e-7ce7-43d2-9c9e-9d137efd3b33", "name": "default", "type": "DEFAULT"}],
         },
         map_node,
         ignore_order=True,
@@ -318,7 +318,7 @@ def test_serialize_workflow():
                             {
                                 "type": "NODE_OUTPUT",
                                 "data": {
-                                    "node_id": "bf83099a-40df-4445-b90d-1f6f1067ebe3",
+                                    "node_id": "f2f94af1-fcbe-497c-80ce-80952c8903c8",
                                     "output_id": "2a957315-fae0-4366-8a35-f0b315c5eade",
                                 },
                             }
@@ -352,17 +352,17 @@ def test_serialize_workflow():
     assert not DeepDiff(
         [
             {
-                "id": "f39477f3-445a-412e-a8ab-371baa8ae990",
+                "id": "528eb20a-9db4-4c01-87c0-39b9f5f09753",
                 "source_node_id": "c0aa464d-1685-4f15-a051-31b426fec92e",
                 "source_handle_id": "844d992e-60ab-4af2-a8ff-52cd858386f7",
-                "target_node_id": "bf83099a-40df-4445-b90d-1f6f1067ebe3",
-                "target_handle_id": "b5e8182e-20c5-482b-b4c5-4dde48c01472",
+                "target_node_id": "f2f94af1-fcbe-497c-80ce-80952c8903c8",
+                "target_handle_id": "e16e9d55-5f26-4d89-8c7a-939f1f463d80",
                 "type": "DEFAULT",
             },
             {
                 "id": "47a34f6e-d139-4702-aa46-6212bb8a150f",
-                "source_node_id": "bf83099a-40df-4445-b90d-1f6f1067ebe3",
-                "source_handle_id": "a2171a61-0657-43ad-b6d9-cf93ce3270d0",
+                "source_node_id": "f2f94af1-fcbe-497c-80ce-80952c8903c8",
+                "source_handle_id": "aff8a80e-7ce7-43d2-9c9e-9d137efd3b33",
                 "target_node_id": "bacc5d55-07d4-4a0a-a69e-831524480de5",
                 "target_handle_id": "720dd872-2f3d-47b9-8245-89387f04f300",
                 "type": "DEFAULT",

@@ -36,19 +36,19 @@ def test_serialize_workflow__missing_final_output_node():
     assert not DeepDiff(
         [
             {
-                "id": "acc91103-f761-47a5-bdd4-0e5e7650bb30",
+                "id": "8683c087-4372-4357-bdd4-e13a50447d5e",
                 "type": "TERMINAL",
                 "data": {
                     "label": "First Final Output Node",
                     "name": "alpha",
-                    "target_handle_id": "a0c2eb7a-398e-4f28-b63d-f3bae9b563ee",
+                    "target_handle_id": "438edefd-131d-4d00-8645-d0a7ea07029e",
                     "output_id": "1d261e4b-4d77-4ace-9349-972129583519",
                     "output_type": "STRING",
-                    "node_input_id": "16363762-c14a-4162-8fab-525079d3cffe",
+                    "node_input_id": "ec1a9df2-a809-49fa-971b-8718df47e456",
                 },
                 "inputs": [
                     {
-                        "id": "16363762-c14a-4162-8fab-525079d3cffe",
+                        "id": "ec1a9df2-a809-49fa-971b-8718df47e456",
                         "key": "node_input",
                         "value": {
                             "rules": [
@@ -82,7 +82,7 @@ def test_serialize_workflow__missing_final_output_node():
                     }
                 ],
                 "trigger": {
-                    "id": "a0c2eb7a-398e-4f28-b63d-f3bae9b563ee",
+                    "id": "438edefd-131d-4d00-8645-d0a7ea07029e",
                     "merge_behavior": "AWAIT_ANY",
                 },
                 "ports": [],
@@ -107,8 +107,8 @@ def test_serialize_workflow__missing_final_output_node():
                                 {
                                     "type": "NODE_OUTPUT",
                                     "data": {
-                                        "node_id": "32d88cab-e9fa-4a56-9bc2-fb6e1fd0897f",
-                                        "output_id": "04df0e76-690a-4ae1-ab52-fe825a334dcc",
+                                        "node_id": "74b891e0-5573-4c7a-a0ef-c3c210187738",
+                                        "output_id": "ae21fc3f-dd81-4174-b08a-97bc96422a8f",
                                     },
                                 }
                             ],

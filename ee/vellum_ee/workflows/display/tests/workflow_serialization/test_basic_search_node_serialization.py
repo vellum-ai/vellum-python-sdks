@@ -57,7 +57,7 @@ def test_serialize_workflow():
 
     search_node = workflow_raw_data["nodes"][1]
     assert search_node == {
-        "id": "ab3a1413-c7b5-4cb0-a2d4-f5ab7d1d65b4",
+        "id": "89c8bee0-8015-4d73-9112-e436ab086567",
         "type": "SEARCH",
         "inputs": [
             {
@@ -218,8 +218,8 @@ def test_serialize_workflow():
             "results_output_id": "e27fa934-589a-48f7-92a9-dcc90710ec7b",
             "text_output_id": "3f3bd066-ce73-46ee-84f1-d8ece69ecd8c",
             "error_output_id": None,
-            "source_handle_id": "00ae06b3-f8d9-4ae6-9fbf-e4ff4d520e9b",
-            "target_handle_id": "6d50305f-588b-469f-a042-b0767d3f99b1",
+            "source_handle_id": "928c79f2-bc07-43ee-9420-380a3bd36fb8",
+            "target_handle_id": "85db938d-9a85-4f08-8bbf-b795db2c40d5",
             "query_node_input_id": "1dbfd1d9-8e8e-47b6-bb65-c578385ef978",
             "document_index_node_input_id": "8cb28a69-088d-410d-bd0d-886d57ce7b64",
             "weights_node_input_id": "983f2b7f-ad86-45cf-b04b-08724af27236",
@@ -239,10 +239,10 @@ def test_serialize_workflow():
             "module": ["tests", "workflows", "basic_search_node", "workflow"],
         },
         "trigger": {
-            "id": "6d50305f-588b-469f-a042-b0767d3f99b1",
+            "id": "85db938d-9a85-4f08-8bbf-b795db2c40d5",
             "merge_behavior": "AWAIT_ANY",
         },
-        "ports": [{"id": "00ae06b3-f8d9-4ae6-9fbf-e4ff4d520e9b", "name": "default", "type": "DEFAULT"}],
+        "ports": [{"id": "928c79f2-bc07-43ee-9420-380a3bd36fb8", "name": "default", "type": "DEFAULT"}],
     }
 
     final_output_node = workflow_raw_data["nodes"][2]
@@ -266,7 +266,7 @@ def test_serialize_workflow():
                         {
                             "type": "NODE_OUTPUT",
                             "data": {
-                                "node_id": "ab3a1413-c7b5-4cb0-a2d4-f5ab7d1d65b4",
+                                "node_id": "89c8bee0-8015-4d73-9112-e436ab086567",
                                 "output_id": "3f3bd066-ce73-46ee-84f1-d8ece69ecd8c",
                             },
                         }
@@ -290,14 +290,14 @@ def test_serialize_workflow():
             "id": "06533904-4897-4a7a-aa8d-50419b3d33ae",
             "source_node_id": "06671b25-5c6b-4675-8c74-6c396a608728",
             "source_handle_id": "df80b4aa-2ba1-49a2-8375-fb1f78eee31f",
-            "target_node_id": "ab3a1413-c7b5-4cb0-a2d4-f5ab7d1d65b4",
-            "target_handle_id": "6d50305f-588b-469f-a042-b0767d3f99b1",
+            "target_node_id": "89c8bee0-8015-4d73-9112-e436ab086567",
+            "target_handle_id": "85db938d-9a85-4f08-8bbf-b795db2c40d5",
             "type": "DEFAULT",
         },
         {
             "id": "cb918deb-f546-47b5-8b6b-db0d22a29fd1",
-            "source_node_id": "ab3a1413-c7b5-4cb0-a2d4-f5ab7d1d65b4",
-            "source_handle_id": "00ae06b3-f8d9-4ae6-9fbf-e4ff4d520e9b",
+            "source_node_id": "89c8bee0-8015-4d73-9112-e436ab086567",
+            "source_handle_id": "928c79f2-bc07-43ee-9420-380a3bd36fb8",
             "target_node_id": "4e466510-6756-403f-a182-56e5a2b85d94",
             "target_handle_id": "cd8c736f-1b77-493d-b857-d8feb5c03b15",
             "type": "DEFAULT",

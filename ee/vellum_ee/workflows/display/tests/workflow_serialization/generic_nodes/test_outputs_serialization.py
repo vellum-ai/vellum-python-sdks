@@ -22,7 +22,7 @@ def test_serialize_node__annotated_output(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "e33ddf79-f48c-4057-ba17-d41a3a60ac98",
+            "id": "6337349e-5718-4732-b717-b6be650c6664",
             "label": "Annotated Output Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -39,8 +39,8 @@ def test_serialize_node__annotated_output(serialize_node):
                     "test_outputs_serialization",
                 ],
             },
-            "trigger": {"id": "e66c7dde-02c9-4f6d-84a6-16117b54cd88", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "d83b7a5d-bbac-47ee-9277-1fbed71e83e8", "type": "DEFAULT", "name": "default"}],
+            "trigger": {"id": "e23d58ad-012b-48a2-80bc-81fe740b5785", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "2d86f771-e1b6-4e58-8af1-9b12604e9bb6", "type": "DEFAULT", "name": "default"}],
             "adornments": None,
             "attributes": [],
             "outputs": [
@@ -70,7 +70,7 @@ def test_serialize_node__workflow_input(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "30116483-6f38-40e0-baf2-32de0e14e9a3",
+            "id": "b8b45ce8-b897-4347-a8ad-45e0576fcf59",
             "label": "Workflow Input Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -87,8 +87,8 @@ def test_serialize_node__workflow_input(serialize_node):
                     "test_outputs_serialization",
                 ],
             },
-            "trigger": {"id": "debf37b9-720d-48dd-9699-69283966f927", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "20d91130-ca86-4420-b2e7-a962c0f1a509", "type": "DEFAULT", "name": "default"}],
+            "trigger": {"id": "6fb30c9c-b9f0-452f-99f5-58d484b89882", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "8997d239-eefb-4006-8961-a8241829b433", "type": "DEFAULT", "name": "default"}],
             "adornments": None,
             "attributes": [],
             "outputs": [
@@ -133,7 +133,7 @@ def test_serialize_node__node_output_reference(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "ac067acc-6a6f-44b1-ae84-428e965ce691",
+            "id": "a3a63eb0-ed79-41c1-9bd2-c4b3d69c3017",
             "label": "Generic Node Referencing Output",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -150,8 +150,8 @@ def test_serialize_node__node_output_reference(serialize_node):
                     "test_outputs_serialization",
                 ],
             },
-            "trigger": {"id": "c8804b97-9f84-41b6-ade8-aa74544d6846", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "383dc10a-d8f3-4bac-b995-8b95bc6deb21", "type": "DEFAULT", "name": "default"}],
+            "trigger": {"id": "b12c8ed6-42e2-4dad-9a39-adb1650a6f85", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "3953fe95-7ea9-49ce-a45f-cc55c0f0b9a4", "type": "DEFAULT", "name": "default"}],
             "adornments": None,
             "attributes": [],
             "outputs": [
@@ -161,7 +161,7 @@ def test_serialize_node__node_output_reference(serialize_node):
                     "type": "STRING",
                     "value": {
                         "type": "NODE_OUTPUT",
-                        "node_id": "21213d1e-991c-405a-b4fa-a1e01c4dd088",
+                        "node_id": "40fcba1f-9b25-4fed-8f15-a2fd80ff85a1",
                         "node_output_id": str(node_output_id),
                     },
                 }

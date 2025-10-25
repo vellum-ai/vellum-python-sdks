@@ -62,17 +62,17 @@ def test_serialize_workflow__await_all():
     merge_node = next(node for node in workflow_raw_data["nodes"] if node["type"] == "MERGE")
     assert not DeepDiff(
         {
-            "id": "37c10e8a-771b-432b-a767-31f5007851f0",
+            "id": "f07c263c-65a3-4b58-83c1-f4a29123f167",
             "type": "MERGE",
             "inputs": [],
             "data": {
                 "label": "Await All Merge Node",
                 "merge_strategy": "AWAIT_ALL",
                 "target_handles": [
-                    {"id": "f40ff7fb-de1b-4aa4-ba3c-7630f7357cbf"},
-                    {"id": "42eeb66c-9792-4609-8c71-3a56f668f4dc"},
+                    {"id": "6da3e50a-8c6d-4de1-8ee9-da26f7c9552f"},
+                    {"id": "4441c835-7d16-4c43-8599-e948b57eaab1"},
                 ],
-                "source_handle_id": "3bbc469f-0fb0-4b3d-a28b-746fefec2818",
+                "source_handle_id": "da1bdfe9-8e99-4d06-842f-a76af95a713a",
             },
             "display_data": {"position": {"x": 400.0, "y": -50.0}},
             "base": {
@@ -84,10 +84,10 @@ def test_serialize_workflow__await_all():
                 "name": "AwaitAllMergeNode",
             },
             "trigger": {
-                "id": "0efd256f-f5f6-45fe-9adb-651780f5e63d",
+                "id": "1c68b622-cc93-4678-a0c4-89f06b6cad1f",
                 "merge_behavior": "AWAIT_ALL",
             },
-            "ports": [{"id": "3bbc469f-0fb0-4b3d-a28b-746fefec2818", "name": "default", "type": "DEFAULT"}],
+            "ports": [{"id": "da1bdfe9-8e99-4d06-842f-a76af95a713a", "name": "default", "type": "DEFAULT"}],
         },
         merge_node,
         ignore_order_func=lambda x: x.path() == "root['data']['target_handles']",
@@ -162,22 +162,22 @@ def test_serialize_workflow__await_all():
                 "id": "8ff20817-974e-4a3a-bb65-f0ad73557649",
                 "source_node_id": "59243c65-053f-4ea6-9157-3f3edb1477bf",
                 "source_handle_id": "b9c5f52b-b714-46e8-a09c-38b4e770dd36",
-                "target_node_id": "37c10e8a-771b-432b-a767-31f5007851f0",
-                "target_handle_id": "42eeb66c-9792-4609-8c71-3a56f668f4dc",
+                "target_node_id": "f07c263c-65a3-4b58-83c1-f4a29123f167",
+                "target_handle_id": "4441c835-7d16-4c43-8599-e948b57eaab1",
                 "type": "DEFAULT",
             },
             {
                 "id": "0d8c801c-d76a-437a-831a-530885b75f96",
                 "source_node_id": "127ef456-91bc-43c6-bd8b-1772db5e3cb5",
                 "source_handle_id": "b0bd17f3-4ce6-4232-9666-ec8afa161bf2",
-                "target_node_id": "37c10e8a-771b-432b-a767-31f5007851f0",
-                "target_handle_id": "f40ff7fb-de1b-4aa4-ba3c-7630f7357cbf",
+                "target_node_id": "f07c263c-65a3-4b58-83c1-f4a29123f167",
+                "target_handle_id": "6da3e50a-8c6d-4de1-8ee9-da26f7c9552f",
                 "type": "DEFAULT",
             },
             {
                 "id": "70c1005d-339a-41bc-b6c2-10bc30a0281c",
-                "source_node_id": "37c10e8a-771b-432b-a767-31f5007851f0",
-                "source_handle_id": "3bbc469f-0fb0-4b3d-a28b-746fefec2818",
+                "source_node_id": "f07c263c-65a3-4b58-83c1-f4a29123f167",
+                "source_handle_id": "da1bdfe9-8e99-4d06-842f-a76af95a713a",
                 "target_node_id": "634f0202-9ea9-4c62-b152-1a58c595cffb",
                 "target_handle_id": "acd48f48-54fb-4b2b-ab37-96d336f6dfb3",
                 "type": "DEFAULT",
