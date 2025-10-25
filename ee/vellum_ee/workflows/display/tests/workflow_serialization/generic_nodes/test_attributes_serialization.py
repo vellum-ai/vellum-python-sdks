@@ -33,7 +33,7 @@ def test_serialize_node__constant_value(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "67e07859-7f67-4287-9854-06ab4199e576",
+            "id": "115acb09-8bb4-4088-a76a-99a145802c00",
             "label": "Constant Value Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -50,12 +50,12 @@ def test_serialize_node__constant_value(serialize_node):
                     "test_attributes_serialization",
                 ],
             },
-            "trigger": {"id": "e2cde904-de60-4755-87cf-55052ea23a51", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "96ac6512-0128-4cf7-ba51-2725b4807c8f", "type": "DEFAULT", "name": "default"}],
+            "trigger": {"id": "3522f3b2-5e4e-4296-a7b9-09849c57ec57", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "72cf5f4b-9c3e-4e0c-989e-f44c04652280", "type": "DEFAULT", "name": "default"}],
             "adornments": None,
             "attributes": [
                 {
-                    "id": "84e4f91c-af1a-4f9d-a578-e3f234dea23b",
+                    "id": "889e90b4-a139-4f75-85a3-21d3974dccef",
                     "name": "attr",
                     "value": {
                         "type": "CONSTANT_VALUE",
@@ -103,7 +103,7 @@ def test_serialize_node__constant_value_reference(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "73643f17-e49e-47d2-bd01-bb9c3eab6ae9",
+            "id": "e99eebee-2a3d-488f-9365-7210de6daef9",
             "label": "Constant Value Reference Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -120,12 +120,12 @@ def test_serialize_node__constant_value_reference(serialize_node):
                     "test_attributes_serialization",
                 ],
             },
-            "trigger": {"id": "dc2f90b9-14a1-457a-a9f9-dec7a04f74eb", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "61adfacf-c3a9-4aea-a3da-bcdbc03273c6", "name": "default", "type": "DEFAULT"}],
+            "trigger": {"id": "e1a16f8a-5ab4-463f-a888-b9d2699af96d", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "6a1632c7-232f-4546-b2fe-94381f7a670e", "name": "default", "type": "DEFAULT"}],
             "adornments": None,
             "attributes": [
                 {
-                    "id": "f8e5efc6-8117-4a1c-bcea-5ba23555409a",
+                    "id": "35885b7e-bca5-4053-96c1-a2bcf5530348",
                     "name": "attr",
                     "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "hello"}},
                 }
@@ -146,7 +146,7 @@ def test_serialize_node__lazy_reference(serialize_node):
 
     assert attributes == [
         {
-            "id": "7ae37eb4-18c8-49e1-b5ac-6369ce7ed5dd",
+            "id": "7d98966d-8ef0-4fc4-ac90-2f1d46da0ba4",
             "name": "attr",
             "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "hello"}},
         }
@@ -179,12 +179,12 @@ def test_serialize_node__lazy_reference_with_string():
 
     assert lazy_reference_node["attributes"] == [
         {
-            "id": "98833d71-42a8-47e9-81c4-6a35646e3d3c",
+            "id": "c8da84b7-fd1b-4629-a80b-a31eabada2a9",
             "name": "attr",
             "value": {
                 "type": "NODE_OUTPUT",
                 "node_id": str(OtherNode.__id__),
-                "node_output_id": "7a3406a1-6f11-4568-8aa0-e5dba6534dc2",
+                "node_output_id": "3c28ab49-1c7c-42cc-8175-be17bf05b5e7",
             },
         }
     ]
@@ -202,7 +202,7 @@ def test_serialize_node__workflow_input(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "30116483-6f38-40e0-baf2-32de0e14e9a3",
+            "id": "8ad5d3b2-4d4d-494f-ab5c-caa650a397e9",
             "label": "Workflow Input Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -219,12 +219,12 @@ def test_serialize_node__workflow_input(serialize_node):
                     "test_attributes_serialization",
                 ],
             },
-            "trigger": {"id": "debf37b9-720d-48dd-9699-69283966f927", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "20d91130-ca86-4420-b2e7-a962c0f1a509", "type": "DEFAULT", "name": "default"}],
+            "trigger": {"id": "f8a79f35-b083-47d1-80ee-5efc2baa54e5", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "78878dd7-87fc-4f93-b340-0e1155260f23", "type": "DEFAULT", "name": "default"}],
             "adornments": None,
             "attributes": [
                 {
-                    "id": "6b2f781b-1a70-4abc-965a-a4edb8563f0e",
+                    "id": "23fddc82-c5a9-4aee-b736-2484518d6779",
                     "name": "attr",
                     "value": {
                         "type": "WORKFLOW_INPUT",
@@ -265,7 +265,7 @@ def test_serialize_node__workflow_input_as_nested_chat_history():
 
     assert not DeepDiff(
         {
-            "id": "11be9d37-0069-4695-a317-14a3b6519d4e",
+            "id": "6cf118f2-f550-493b-b49e-c24d4001baea",
             "label": "Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 200.0, "y": -50.0}},
@@ -282,18 +282,18 @@ def test_serialize_node__workflow_input_as_nested_chat_history():
                     "test_attributes_serialization",
                 ],
             },
-            "trigger": {"id": "d4548468-85a4-449e-92e0-e2d8b8fd097c", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "c4a9a57d-1380-4689-8500-e8a0b6477291", "name": "default", "type": "DEFAULT"}],
+            "trigger": {"id": "33ad6542-c6bc-4030-a110-167e37cceb7b", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "1f963bfe-d826-452c-8f1f-9f23e350b299", "name": "default", "type": "DEFAULT"}],
             "adornments": None,
             "attributes": [
                 {
-                    "id": "e878bbc9-1231-461e-9e9d-947604da116e",
+                    "id": "07ca2e5d-0215-45c7-bcf5-88b2f5fe2dd3",
                     "name": "attr",
                     "value": {
                         "type": "DICTIONARY_REFERENCE",
                         "entries": [
                             {
-                                "id": "07513ab1-cf47-490e-8b43-5da226332a00",
+                                "id": "03260b95-1648-4a60-9c4a-51402b3d9a3a",
                                 "key": "hello",
                                 "value": {
                                     "type": "WORKFLOW_INPUT",
@@ -335,7 +335,7 @@ def test_serialize_node__node_output(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "7210742f-8c3e-4379-9800-8b4b7f5dd7ed",
+            "id": "b79e1e71-a81d-4cb6-a4cb-efa8fc350e9f",
             "label": "Generic Node Referencing Output",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -352,16 +352,16 @@ def test_serialize_node__node_output(serialize_node):
                     "test_attributes_serialization",
                 ],
             },
-            "trigger": {"id": "d4b08664-bb78-4fdd-83a2-877c4ca4175a", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "a345665a-decd-4f6b-af38-387bd41c2643", "type": "DEFAULT", "name": "default"}],
+            "trigger": {"id": "4dc05332-fc5d-420e-ae39-5186329bc6a7", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "9fd4e17b-e270-40e9-8e34-6b4203839648", "type": "DEFAULT", "name": "default"}],
             "adornments": None,
             "attributes": [
                 {
-                    "id": "1318ab14-deb1-4254-9636-4bd783bdd9eb",
+                    "id": "4455b900-fae8-45d6-8791-af2b4c324519",
                     "name": "attr",
                     "value": {
                         "type": "NODE_OUTPUT",
-                        "node_id": "48cf26cc-7b6d-49a7-a1a3-298f6d66772b",
+                        "node_id": "e253523d-da42-405f-b44f-24999a1ea2b0",
                         "node_output_id": str(node_output_id),
                     },
                 }
@@ -385,7 +385,7 @@ def test_serialize_node__vellum_secret(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "0e75bd8f-882e-4ab7-8348-061319b574f7",
+            "id": "7400819d-68dc-4469-a390-2ca908e827f4",
             "label": "Vellum Secret Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -402,12 +402,12 @@ def test_serialize_node__vellum_secret(serialize_node):
                     "test_attributes_serialization",
                 ],
             },
-            "trigger": {"id": "70a3d4c0-83e3-428d-ac84-bf9e5644a84d", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "6d1c2139-64bd-4433-84d7-3fe08850134b", "type": "DEFAULT", "name": "default"}],
+            "trigger": {"id": "299e9fca-dab9-42df-ac49-ef4e69fe8abd", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "65a83e3e-e8b4-4744-a200-109ff0148ae8", "type": "DEFAULT", "name": "default"}],
             "adornments": None,
             "attributes": [
                 {
-                    "id": "c2eb79e2-4cd3-4176-8da9-0d76327cbf0f",
+                    "id": "2cc1113c-69db-42f1-a378-d09414a3cb2c",
                     "name": "attr",
                     "value": {"type": "VELLUM_SECRET", "vellum_secret_name": "hello"},
                 }
@@ -438,7 +438,7 @@ def test_serialize_node__node_execution(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "f42dda6b-e856-49bd-b203-46c9dd66c08b",
+            "id": "8f96a3df-ea29-48a5-a5f3-5ef95296d25f",
             "label": "Generic Node Referencing Executions",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -455,16 +455,16 @@ def test_serialize_node__node_execution(serialize_node):
                     "test_attributes_serialization",
                 ],
             },
-            "trigger": {"id": "0c06baa5-55b6-494a-a89d-9535dfa5f24b", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "59844b72-ac5e-43c5-b3a7-9c57ba73ec8c", "type": "DEFAULT", "name": "default"}],
+            "trigger": {"id": "ecd645fb-8079-4217-ac35-720993845899", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "faed7c7b-3aed-4662-8b36-5c6ce92c6754", "type": "DEFAULT", "name": "default"}],
             "adornments": None,
             "attributes": [
                 {
-                    "id": "8be1be85-ac70-4e61-b52a-cd416f5320b9",
+                    "id": "235d400b-e46e-46fd-9a75-8d1220bee29d",
                     "name": "attr",
                     "value": {
                         "type": "EXECUTION_COUNTER",
-                        "node_id": "d68cc3c3-d5dc-4a51-bbfc-1fd4b41abad0",
+                        "node_id": "d1edee11-6fa1-4ccf-a62c-9f7ca3d446da",
                     },
                 }
             ],
@@ -528,7 +528,7 @@ def test_serialize_node__coalesce(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "bb99f326-7d2a-4b5e-95f3-6039114798da",
+            "id": "fc3216ee-4ab4-4856-b660-d9158e72ed5f",
             "label": "Coalesce Node Final",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -545,24 +545,24 @@ def test_serialize_node__coalesce(serialize_node):
                     "test_attributes_serialization",
                 ],
             },
-            "trigger": {"id": "b9894d9a-1887-416d-895d-a4129aac37b8", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "9d97a0c9-6a79-433a-bcdf-e07aa10c0f3c", "name": "default", "type": "DEFAULT"}],
+            "trigger": {"id": "80b9055b-e1da-454c-babc-b1605c5cfab3", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "4ceb95a9-c257-4492-828f-ebcdc685d8b0", "name": "default", "type": "DEFAULT"}],
             "adornments": None,
             "attributes": [
                 {
-                    "id": "2e25b25b-4aac-425f-91f4-f0fa55453b8c",
+                    "id": "f5fba9a8-0d90-4a99-a5b0-9f95a61e61d1",
                     "name": "attr",
                     "value": {
                         "type": "BINARY_EXPRESSION",
                         "lhs": {
                             "type": "NODE_OUTPUT",
-                            "node_id": "f6d1aa4d-c3fd-421d-9dc8-4209bddf7fd3",
+                            "node_id": "bacedc11-f833-4bce-80e6-4becbf002fd0",
                             "node_output_id": str(coalesce_node_a_output_id),
                         },
                         "operator": "coalesce",
                         "rhs": {
                             "type": "NODE_OUTPUT",
-                            "node_id": "d1f673fb-80e1-4f9e-9d7d-afe64599ce39",
+                            "node_id": "1637e989-eb51-4edd-a4d9-831cb5e58368",
                             "node_output_id": str(coalesce_node_b_output_id),
                         },
                     },

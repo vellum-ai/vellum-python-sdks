@@ -64,12 +64,12 @@ def test_serialize_workflow():
     assert not DeepDiff(
         [
             {
-                "id": "c05f7d96-59a0-4d58-93d7-d451afd3f630",
+                "id": "cdbe2adf-9951-409a-b9a8-b8b349037f4f",
                 "key": "question",
                 "type": "STRING",
             },
             {
-                "id": "93f2cb75-6fa2-4e46-9488-c0bcd29153c0",
+                "id": "f936ae31-ba15-4864-8961-86231022a4d7",
                 "key": "compliment",
                 "type": "STRING",
             },
@@ -84,7 +84,7 @@ def test_serialize_workflow():
                 "type": "STRING",
             },
             {
-                "id": "62ad462f-f819-4940-99ab-b3f145507f57",
+                "id": "cdbe2adf-9951-409a-b9a8-b8b349037f4f",
                 "key": "fallthrough",
                 "type": "STRING",
             },
@@ -520,19 +520,19 @@ def test_serialize_workflow():
     assert not DeepDiff(
         [
             {
-                "id": "9c22ee47-01da-4e4e-863d-b4a6874bed66",
+                "id": "fa11b84b-1d76-4adc-ab28-cbbaa933c267",
                 "type": "TERMINAL",
                 "data": {
                     "label": "Final Output",
                     "name": "statement",
-                    "target_handle_id": "f02a8971-e9a4-4716-bfb4-d08f5614b5d8",
+                    "target_handle_id": "e1a6da28-02c5-40d7-8ac5-9fb07e2e3e1d",
                     "output_id": "cdbe2adf-9951-409a-b9a8-b8b349037f4f",
                     "output_type": "STRING",
-                    "node_input_id": "2e742a40-cbee-4e19-9269-c62dc4a9204e",
+                    "node_input_id": "a13377c4-ae1c-4be4-b695-f9da590486ef",
                 },
                 "inputs": [
                     {
-                        "id": "2e742a40-cbee-4e19-9269-c62dc4a9204e",
+                        "id": "a13377c4-ae1c-4be4-b695-f9da590486ef",
                         "key": "node_input",
                         "value": {
                             "rules": [
@@ -556,19 +556,19 @@ def test_serialize_workflow():
                 "definition": None,
             },
             {
-                "id": "47f0931c-41f6-4b84-bf39-0c486941f599",
+                "id": "e3d29229-f746-4125-819e-f847acbed307",
                 "type": "TERMINAL",
                 "data": {
                     "label": "Final Output",
                     "name": "compliment",
-                    "target_handle_id": "a4d57adc-58c1-40c6-810b-ee5fd923bfc5",
-                    "output_id": "93f2cb75-6fa2-4e46-9488-c0bcd29153c0",
+                    "target_handle_id": "c5dd9bf5-9e18-4dbc-8c20-2c0baf969ebe",
+                    "output_id": "f936ae31-ba15-4864-8961-86231022a4d7",
                     "output_type": "STRING",
-                    "node_input_id": "9ba792e6-55e3-4a14-8768-e8ef6955c934",
+                    "node_input_id": "47f426a4-8770-4f30-a285-5d21849063a5",
                 },
                 "inputs": [
                     {
-                        "id": "9ba792e6-55e3-4a14-8768-e8ef6955c934",
+                        "id": "47f426a4-8770-4f30-a285-5d21849063a5",
                         "key": "node_input",
                         "value": {
                             "rules": [
@@ -628,19 +628,19 @@ def test_serialize_workflow():
                 "definition": None,
             },
             {
-                "id": "6efa7b45-0580-406d-85aa-439117ba8021",
+                "id": "fa11b84b-1d76-4adc-ab28-cbbaa933c267",
                 "type": "TERMINAL",
                 "data": {
                     "label": "Final Output",
                     "name": "fallthrough",
-                    "target_handle_id": "2283cd2c-b077-4b5d-a96f-aa2cd6023eda",
-                    "output_id": "62ad462f-f819-4940-99ab-b3f145507f57",
+                    "target_handle_id": "e1a6da28-02c5-40d7-8ac5-9fb07e2e3e1d",
+                    "output_id": "cdbe2adf-9951-409a-b9a8-b8b349037f4f",
                     "output_type": "STRING",
-                    "node_input_id": "d2d3e7cc-f6d6-4ac1-ad19-e6f52a75b38f",
+                    "node_input_id": "a13377c4-ae1c-4be4-b695-f9da590486ef",
                 },
                 "inputs": [
                     {
-                        "id": "d2d3e7cc-f6d6-4ac1-ad19-e6f52a75b38f",
+                        "id": "a13377c4-ae1c-4be4-b695-f9da590486ef",
                         "key": "node_input",
                         "value": {
                             "rules": [
@@ -664,19 +664,19 @@ def test_serialize_workflow():
                 "definition": None,
             },
             {
-                "id": "fa11b84b-1d76-4adc-ab28-cbbaa933c267",
+                "id": "6efa7b45-0580-406d-85aa-439117ba8021",
                 "type": "TERMINAL",
                 "data": {
                     "label": "Final Output",
                     "name": "question",
-                    "target_handle_id": "e1a6da28-02c5-40d7-8ac5-9fb07e2e3e1d",
-                    "output_id": "c05f7d96-59a0-4d58-93d7-d451afd3f630",
+                    "target_handle_id": "2283cd2c-b077-4b5d-a96f-aa2cd6023eda",
+                    "output_id": "cdbe2adf-9951-409a-b9a8-b8b349037f4f",
                     "output_type": "STRING",
-                    "node_input_id": "a13377c4-ae1c-4be4-b695-f9da590486ef",
+                    "node_input_id": "d2d3e7cc-f6d6-4ac1-ad19-e6f52a75b38f",
                 },
                 "inputs": [
                     {
-                        "id": "a13377c4-ae1c-4be4-b695-f9da590486ef",
+                        "id": "d2d3e7cc-f6d6-4ac1-ad19-e6f52a75b38f",
                         "key": "node_input",
                         "value": {
                             "rules": [
@@ -760,8 +760,8 @@ def test_serialize_workflow():
                 "id": "8a554637-e382-4a66-9b77-4eadce45a25a",
                 "source_node_id": "ed7caf01-9ae7-47a3-b15a-16697abaf486",
                 "source_handle_id": "cde43aef-f607-4b5d-87f6-9238dd4a3a2b",
-                "target_node_id": "9c22ee47-01da-4e4e-863d-b4a6874bed66",
-                "target_handle_id": "f02a8971-e9a4-4716-bfb4-d08f5614b5d8",
+                "target_node_id": "fa11b84b-1d76-4adc-ab28-cbbaa933c267",
+                "target_handle_id": "e1a6da28-02c5-40d7-8ac5-9fb07e2e3e1d",
                 "type": "DEFAULT",
             },
             {
@@ -776,24 +776,24 @@ def test_serialize_workflow():
                 "id": "47758209-70cb-4f12-b71f-dc28df0f6d0b",
                 "source_node_id": "0d959311-c836-4641-a867-58f63df9dfea",
                 "source_handle_id": "69a2121d-fc21-47a1-af49-6200aad836de",
-                "target_node_id": "fa11b84b-1d76-4adc-ab28-cbbaa933c267",
-                "target_handle_id": "e1a6da28-02c5-40d7-8ac5-9fb07e2e3e1d",
+                "target_node_id": "6efa7b45-0580-406d-85aa-439117ba8021",
+                "target_handle_id": "2283cd2c-b077-4b5d-a96f-aa2cd6023eda",
                 "type": "DEFAULT",
             },
             {
                 "id": "f08a49f8-8bfd-4c05-8f28-dfa536654af8",
                 "source_node_id": "8df781b1-ff28-48a5-98a2-d7d796b932b0",
                 "source_handle_id": "aeb6805d-2c9f-4d52-a690-341ea0e869b3",
-                "target_node_id": "47f0931c-41f6-4b84-bf39-0c486941f599",
-                "target_handle_id": "a4d57adc-58c1-40c6-810b-ee5fd923bfc5",
+                "target_node_id": "e3d29229-f746-4125-819e-f847acbed307",
+                "target_handle_id": "c5dd9bf5-9e18-4dbc-8c20-2c0baf969ebe",
                 "type": "DEFAULT",
             },
             {
                 "id": "c45e03b4-dba6-4620-bc02-3847ad90086b",
                 "source_node_id": "148c61bd-e8b0-4d4b-8734-b043a72b90ed",
                 "source_handle_id": "26f50353-85ae-462f-b82d-9fd736900bd6",
-                "target_node_id": "6efa7b45-0580-406d-85aa-439117ba8021",
-                "target_handle_id": "2283cd2c-b077-4b5d-a96f-aa2cd6023eda",
+                "target_node_id": "fa11b84b-1d76-4adc-ab28-cbbaa933c267",
+                "target_handle_id": "e1a6da28-02c5-40d7-8ac5-9fb07e2e3e1d",
                 "type": "DEFAULT",
             },
         ],
@@ -880,12 +880,12 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
     conditional_node = workflow_raw_data["nodes"][1]
     assert not DeepDiff(
         {
-            "id": "a9143814-6bb0-4cb3-a817-4fc076417121",
+            "id": "9d1b29dc-b795-415f-8a56-bea2c77bbf1a",
             "type": "CONDITIONAL",
             "inputs": [
                 {
-                    "id": "738a274f-962d-466e-9aee-7774d3e05ab9",
-                    "key": "f497b2bf-7d35-43af-b162-ced2d8abd46f.field",
+                    "id": "3afbc787-fe7d-4411-934e-32c6ad101676",
+                    "key": "12944986-8e31-4501-bc74-4eb00f2d7d2a.field",
                     "value": {
                         "rules": [
                             {
@@ -897,8 +897,8 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
                     },
                 },
                 {
-                    "id": "f30bceb4-39bf-433a-9229-b6871dbdbe00",
-                    "key": "f497b2bf-7d35-43af-b162-ced2d8abd46f.value",
+                    "id": "c9d3791a-da39-42b4-83cd-2205cd2beece",
+                    "key": "12944986-8e31-4501-bc74-4eb00f2d7d2a.value",
                     "value": {
                         "rules": [
                             {
@@ -912,23 +912,23 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
             ],
             "data": {
                 "label": "Simple Conditional Node",
-                "target_handle_id": "c6e99e94-bc8e-47a4-b75c-cc96c6bedbb0",
+                "target_handle_id": "82348aaa-655f-47ef-8a7c-96a618b0aab0",
                 "conditions": [
                     {
-                        "id": "a4c32611-fd58-4b98-9d08-313cfd1c214e",
+                        "id": "4d325440-5c08-4669-9ac2-df56dc97205c",
                         "type": "IF",
-                        "source_handle_id": "2ff87aa6-37cf-43dd-af9d-13b9198ab70a",
+                        "source_handle_id": "90f7bb16-87b5-48dd-a14a-5dc12e8347d6",
                         "data": {
-                            "id": "650e7105-3e76-43ca-858f-b290970b438b",
+                            "id": "08c6312c-bfe3-4254-affd-8650e48c7f47",
                             "rules": [
                                 {
-                                    "id": "f497b2bf-7d35-43af-b162-ced2d8abd46f",
+                                    "id": "12944986-8e31-4501-bc74-4eb00f2d7d2a",
                                     "rules": None,
                                     "combinator": None,
                                     "negated": False,
-                                    "field_node_input_id": "738a274f-962d-466e-9aee-7774d3e05ab9",
+                                    "field_node_input_id": "3afbc787-fe7d-4411-934e-32c6ad101676",
                                     "operator": f"{operator}",
-                                    "value_node_input_id": "f30bceb4-39bf-433a-9229-b6871dbdbe00",
+                                    "value_node_input_id": "c9d3791a-da39-42b4-83cd-2205cd2beece",
                                 }
                             ],
                             "combinator": "AND",
@@ -939,9 +939,9 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
                         },
                     },
                     {
-                        "id": "342e5497-ea2b-4e5c-99cf-e6492f133a3c",
+                        "id": "5d164388-d76d-4bf1-9a88-a9fb8e797cbe",
                         "type": "ELSE",
-                        "source_handle_id": "9a7e8c2e-0228-4321-8f74-61cb5778f3df",
+                        "source_handle_id": "a66da8a4-7148-4554-a63c-38d20643cbb7",
                         "data": None,
                     },
                 ],
@@ -957,12 +957,12 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
                 "module": ["tests", "workflows", "basic_conditional_node", "workflow_with_only_one_conditional_node"],
             },
             "trigger": {
-                "id": "c6e99e94-bc8e-47a4-b75c-cc96c6bedbb0",
+                "id": "82348aaa-655f-47ef-8a7c-96a618b0aab0",
                 "merge_behavior": "AWAIT_ANY",
             },
             "ports": [
                 {
-                    "id": "2ff87aa6-37cf-43dd-af9d-13b9198ab70a",
+                    "id": "90f7bb16-87b5-48dd-a14a-5dc12e8347d6",
                     "name": "text_str",
                     "type": "IF",
                     "expression": {
@@ -973,7 +973,7 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
                     },
                 },
                 {
-                    "id": "9a7e8c2e-0228-4321-8f74-61cb5778f3df",
+                    "id": "a66da8a4-7148-4554-a63c-38d20643cbb7",
                     "name": "text_fallthrough",
                     "type": "ELSE",
                     "expression": None,
@@ -1008,12 +1008,12 @@ def test_conditional_node_serialize_all_operators_with_expression(descriptor, op
     conditional_node = workflow_raw_data["nodes"][1]
     assert not DeepDiff(
         {
-            "id": "a9143814-6bb0-4cb3-a817-4fc076417121",
+            "id": "9d1b29dc-b795-415f-8a56-bea2c77bbf1a",
             "type": "CONDITIONAL",
             "inputs": [
                 {
-                    "id": "738a274f-962d-466e-9aee-7774d3e05ab9",
-                    "key": "f497b2bf-7d35-43af-b162-ced2d8abd46f.field",
+                    "id": "3afbc787-fe7d-4411-934e-32c6ad101676",
+                    "key": "12944986-8e31-4501-bc74-4eb00f2d7d2a.field",
                     "value": {
                         "rules": [
                             {
@@ -1027,23 +1027,23 @@ def test_conditional_node_serialize_all_operators_with_expression(descriptor, op
             ],
             "data": {
                 "label": "Simple Conditional Node",
-                "target_handle_id": "c6e99e94-bc8e-47a4-b75c-cc96c6bedbb0",
+                "target_handle_id": "82348aaa-655f-47ef-8a7c-96a618b0aab0",
                 "conditions": [
                     {
-                        "id": "a4c32611-fd58-4b98-9d08-313cfd1c214e",
+                        "id": "4d325440-5c08-4669-9ac2-df56dc97205c",
                         "type": "IF",
-                        "source_handle_id": "2ff87aa6-37cf-43dd-af9d-13b9198ab70a",
+                        "source_handle_id": "90f7bb16-87b5-48dd-a14a-5dc12e8347d6",
                         "data": {
-                            "id": "650e7105-3e76-43ca-858f-b290970b438b",
+                            "id": "08c6312c-bfe3-4254-affd-8650e48c7f47",
                             "rules": [
                                 {
-                                    "id": "f497b2bf-7d35-43af-b162-ced2d8abd46f",
+                                    "id": "12944986-8e31-4501-bc74-4eb00f2d7d2a",
                                     "rules": None,
                                     "combinator": None,
                                     "negated": False,
-                                    "field_node_input_id": "738a274f-962d-466e-9aee-7774d3e05ab9",
+                                    "field_node_input_id": "3afbc787-fe7d-4411-934e-32c6ad101676",
                                     "operator": f"{operator}",
-                                    "value_node_input_id": "f30bceb4-39bf-433a-9229-b6871dbdbe00",
+                                    "value_node_input_id": "c9d3791a-da39-42b4-83cd-2205cd2beece",
                                 }
                             ],
                             "combinator": "AND",
@@ -1054,9 +1054,9 @@ def test_conditional_node_serialize_all_operators_with_expression(descriptor, op
                         },
                     },
                     {
-                        "id": "342e5497-ea2b-4e5c-99cf-e6492f133a3c",
+                        "id": "5d164388-d76d-4bf1-9a88-a9fb8e797cbe",
                         "type": "ELSE",
-                        "source_handle_id": "9a7e8c2e-0228-4321-8f74-61cb5778f3df",
+                        "source_handle_id": "a66da8a4-7148-4554-a63c-38d20643cbb7",
                         "data": None,
                     },
                 ],
@@ -1072,12 +1072,12 @@ def test_conditional_node_serialize_all_operators_with_expression(descriptor, op
                 "module": ["tests", "workflows", "basic_conditional_node", "workflow_with_only_one_conditional_node"],
             },
             "trigger": {
-                "id": "c6e99e94-bc8e-47a4-b75c-cc96c6bedbb0",
+                "id": "82348aaa-655f-47ef-8a7c-96a618b0aab0",
                 "merge_behavior": "AWAIT_ANY",
             },
             "ports": [
                 {
-                    "id": "2ff87aa6-37cf-43dd-af9d-13b9198ab70a",
+                    "id": "90f7bb16-87b5-48dd-a14a-5dc12e8347d6",
                     "name": "text_str",
                     "type": "IF",
                     "expression": {
@@ -1087,7 +1087,7 @@ def test_conditional_node_serialize_all_operators_with_expression(descriptor, op
                     },
                 },
                 {
-                    "id": "9a7e8c2e-0228-4321-8f74-61cb5778f3df",
+                    "id": "a66da8a4-7148-4554-a63c-38d20643cbb7",
                     "name": "text_fallthrough",
                     "type": "ELSE",
                     "expression": None,
@@ -1122,12 +1122,12 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
     conditional_node = workflow_raw_data["nodes"][1]
     assert not DeepDiff(
         {
-            "id": "a9143814-6bb0-4cb3-a817-4fc076417121",
+            "id": "9d1b29dc-b795-415f-8a56-bea2c77bbf1a",
             "type": "CONDITIONAL",
             "inputs": [
                 {
-                    "id": "738a274f-962d-466e-9aee-7774d3e05ab9",
-                    "key": "f497b2bf-7d35-43af-b162-ced2d8abd46f.field",
+                    "id": "3afbc787-fe7d-4411-934e-32c6ad101676",
+                    "key": "12944986-8e31-4501-bc74-4eb00f2d7d2a.field",
                     "value": {
                         "rules": [
                             {
@@ -1139,8 +1139,8 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
                     },
                 },
                 {
-                    "id": "f30bceb4-39bf-433a-9229-b6871dbdbe00",
-                    "key": "f497b2bf-7d35-43af-b162-ced2d8abd46f.value",
+                    "id": "c9d3791a-da39-42b4-83cd-2205cd2beece",
+                    "key": "12944986-8e31-4501-bc74-4eb00f2d7d2a.value",
                     "value": {
                         "rules": [
                             {
@@ -1154,23 +1154,23 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
             ],
             "data": {
                 "label": "Simple Conditional Node",
-                "target_handle_id": "c6e99e94-bc8e-47a4-b75c-cc96c6bedbb0",
+                "target_handle_id": "82348aaa-655f-47ef-8a7c-96a618b0aab0",
                 "conditions": [
                     {
-                        "id": "a4c32611-fd58-4b98-9d08-313cfd1c214e",
+                        "id": "4d325440-5c08-4669-9ac2-df56dc97205c",
                         "type": "IF",
-                        "source_handle_id": "2ff87aa6-37cf-43dd-af9d-13b9198ab70a",
+                        "source_handle_id": "90f7bb16-87b5-48dd-a14a-5dc12e8347d6",
                         "data": {
-                            "id": "650e7105-3e76-43ca-858f-b290970b438b",
+                            "id": "08c6312c-bfe3-4254-affd-8650e48c7f47",
                             "rules": [
                                 {
-                                    "id": "f497b2bf-7d35-43af-b162-ced2d8abd46f",
+                                    "id": "12944986-8e31-4501-bc74-4eb00f2d7d2a",
                                     "rules": None,
                                     "combinator": None,
                                     "negated": False,
-                                    "field_node_input_id": "738a274f-962d-466e-9aee-7774d3e05ab9",
+                                    "field_node_input_id": "3afbc787-fe7d-4411-934e-32c6ad101676",
                                     "operator": f"{operator}",
-                                    "value_node_input_id": "f30bceb4-39bf-433a-9229-b6871dbdbe00",
+                                    "value_node_input_id": "c9d3791a-da39-42b4-83cd-2205cd2beece",
                                 }
                             ],
                             "combinator": "AND",
@@ -1181,9 +1181,9 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
                         },
                     },
                     {
-                        "id": "342e5497-ea2b-4e5c-99cf-e6492f133a3c",
+                        "id": "5d164388-d76d-4bf1-9a88-a9fb8e797cbe",
                         "type": "ELSE",
-                        "source_handle_id": "9a7e8c2e-0228-4321-8f74-61cb5778f3df",
+                        "source_handle_id": "a66da8a4-7148-4554-a63c-38d20643cbb7",
                         "data": None,
                     },
                 ],
@@ -1199,12 +1199,12 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
                 "module": ["tests", "workflows", "basic_conditional_node", "workflow_with_only_one_conditional_node"],
             },
             "trigger": {
-                "id": "c6e99e94-bc8e-47a4-b75c-cc96c6bedbb0",
+                "id": "82348aaa-655f-47ef-8a7c-96a618b0aab0",
                 "merge_behavior": "AWAIT_ANY",
             },
             "ports": [
                 {
-                    "id": "2ff87aa6-37cf-43dd-af9d-13b9198ab70a",
+                    "id": "90f7bb16-87b5-48dd-a14a-5dc12e8347d6",
                     "name": "text_str",
                     "type": "IF",
                     "expression": {
@@ -1216,7 +1216,7 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
                     },
                 },
                 {
-                    "id": "9a7e8c2e-0228-4321-8f74-61cb5778f3df",
+                    "id": "a66da8a4-7148-4554-a63c-38d20643cbb7",
                     "name": "text_fallthrough",
                     "type": "ELSE",
                     "expression": None,

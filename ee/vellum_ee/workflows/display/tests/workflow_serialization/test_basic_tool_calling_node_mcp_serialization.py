@@ -42,7 +42,7 @@ def test_serialize_workflow():
         (attribute for attribute in tool_calling_node["attributes"] if attribute["name"] == "functions"),
     )
     assert function_attributes == {
-        "id": "20adf593-c4f0-4c67-8e36-37eb66f28f66",
+        "id": "80ed138a-1127-4c77-ba27-a66a37c92717",
         "name": "functions",
         "value": {
             "type": "CONSTANT_VALUE",

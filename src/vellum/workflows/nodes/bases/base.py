@@ -146,7 +146,7 @@ class BaseNodeMeta(ABCMeta):
         node_class.Execution.node_class = node_class
         node_class.Trigger.node_class = node_class
         node_class.ExternalInputs.__parent_class__ = node_class
-        node_class.__id__ = uuid4_from_hash(node_class.__qualname__)
+        node_class.__id__ = uuid4_from_hash(f"{node_class.__module__}.{node_class.__qualname__}")
         node_class.__output_ids__ = {
             ref.name: uuid4_from_hash(f"{node_class.__id__}|{ref.name}")
             for ref in node_class.Outputs

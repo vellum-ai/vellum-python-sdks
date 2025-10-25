@@ -20,7 +20,7 @@ def test_serialize_node__basic(serialize_node):
     serialized_node = serialize_node(BasicGenericNode)
     assert not DeepDiff(
         {
-            "id": "8d7cbfe4-72ca-4367-a401-8d28723d2f00",
+            "id": "9f275cfd-3446-4bb8-a6c2-1632724adc30",
             "label": "Basic Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -37,10 +37,10 @@ def test_serialize_node__basic(serialize_node):
                     "test_trigger_serialization",
                 ],
             },
-            "trigger": {"id": "b95cca96-b570-42ac-ace8-51ca0f627881", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "15a7923e-fed8-4301-a25f-440a30f10a0d", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "8bec8d0c-113f-4110-afcb-4a6e566e7236",
+                    "id": "ccd60c7f-be3a-4616-8aa2-9bcc02f6232a",
                     "name": "default",
                     "type": "DEFAULT",
                 }
@@ -62,7 +62,7 @@ def test_serialize_node__await_any(serialize_node):
     serialized_node = serialize_node(AwaitAnyGenericNode)
     assert not DeepDiff(
         {
-            "id": "42e17f0e-8496-415f-9c72-f85250ba6f0b",
+            "id": "0c58b55b-9ccf-46eb-ab64-bf8904c54a3f",
             "label": "Await Any Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -79,10 +79,10 @@ def test_serialize_node__await_any(serialize_node):
                     "test_trigger_serialization",
                 ],
             },
-            "trigger": {"id": "c0db17e7-6766-4062-aaee-7404580d76e4", "merge_behavior": "AWAIT_ANY"},
+            "trigger": {"id": "a342830b-fe12-4460-9291-c8b31eeb3079", "merge_behavior": "AWAIT_ANY"},
             "ports": [
                 {
-                    "id": "d9a84db7-8bd6-4a15-9e3c-c2e898c26d16",
+                    "id": "940e2f08-ccf6-436f-9cb4-aa288de80420",
                     "name": "default",
                     "type": "DEFAULT",
                 }
@@ -104,7 +104,7 @@ def test_serialize_node__await_all(serialize_node):
     serialized_node = serialize_node(AwaitAllGenericNode)
     assert not DeepDiff(
         {
-            "id": "b3e1145a-5f41-456b-9382-6d0a1e828c2f",
+            "id": "97ac6add-c1fc-4e8b-ba5d-2a76c2cf0f55",
             "label": "Await All Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -121,10 +121,10 @@ def test_serialize_node__await_all(serialize_node):
                     "test_trigger_serialization",
                 ],
             },
-            "trigger": {"id": "1b22935e-0e79-485a-b274-a2f316c0983c", "merge_behavior": "AWAIT_ALL"},
+            "trigger": {"id": "531de423-8c70-4c13-9ed4-dbecf0e85e2e", "merge_behavior": "AWAIT_ALL"},
             "ports": [
                 {
-                    "id": "fa73da35-0bf9-4f02-bf5b-0b0d1a6f1494",
+                    "id": "b33884e3-b8fb-463b-b6f4-6a7156c75ba3",
                     "name": "default",
                     "type": "DEFAULT",
                 }

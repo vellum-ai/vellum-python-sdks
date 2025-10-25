@@ -64,11 +64,11 @@ def test_serialize_workflow():
     templating_node = workflow_raw_data["nodes"][1]
     assert not DeepDiff(
         {
-            "id": "51cbe21d-0232-4362-bc54-5bc283297aa6",
+            "id": "28ac8611-a755-4d8a-a5c3-520ddd119cf8",
             "type": "TEMPLATING",
             "inputs": [
                 {
-                    "id": "7c775379-d589-4d79-b876-dcd224d72966",
+                    "id": "7ceb3528-49c6-4f90-b3ef-92b1921a1b7d",
                     "key": "template",
                     "value": {
                         "rules": [
@@ -81,7 +81,7 @@ def test_serialize_workflow():
                     },
                 },
                 {
-                    "id": "e6c9d062-1a4f-4d4d-a258-59b75c6062fc",
+                    "id": "f46b5986-74f1-4ad4-b4d1-b8d2df6bc86f",
                     "key": "info",
                     "value": {
                         "rules": [
@@ -96,11 +96,11 @@ def test_serialize_workflow():
             ],
             "data": {
                 "label": "Example Templating Node",
-                "output_id": "6834cae4-8173-4fa6-88f7-bc09d335bdd1",
+                "output_id": "076becd5-f282-40c5-9917-61099e114298",
                 "error_output_id": None,
-                "source_handle_id": "39317827-df43-4f5a-bfbc-20bffc839748",
-                "target_handle_id": "58427684-3848-498a-8299-c6b0fc70265d",
-                "template_node_input_id": "7c775379-d589-4d79-b876-dcd224d72966",
+                "source_handle_id": "90a2ea33-b08d-46ec-8d9e-612592764268",
+                "target_handle_id": "a215a440-cbd9-48ae-a831-be8fa78530a6",
+                "template_node_input_id": "7ceb3528-49c6-4f90-b3ef-92b1921a1b7d",
                 "output_type": "JSON",
             },
             "display_data": {"position": {"x": 200.0, "y": -50.0}},
@@ -113,10 +113,10 @@ def test_serialize_workflow():
                 "module": ["tests", "workflows", "basic_templating_node", "workflow_with_json_input"],
             },
             "trigger": {
-                "id": "58427684-3848-498a-8299-c6b0fc70265d",
+                "id": "a215a440-cbd9-48ae-a831-be8fa78530a6",
                 "merge_behavior": "AWAIT_ATTRIBUTES",
             },
-            "ports": [{"id": "39317827-df43-4f5a-bfbc-20bffc839748", "name": "default", "type": "DEFAULT"}],
+            "ports": [{"id": "90a2ea33-b08d-46ec-8d9e-612592764268", "name": "default", "type": "DEFAULT"}],
         },
         templating_node,
     )
@@ -143,8 +143,8 @@ def test_serialize_workflow():
                             {
                                 "type": "NODE_OUTPUT",
                                 "data": {
-                                    "node_id": "51cbe21d-0232-4362-bc54-5bc283297aa6",
-                                    "output_id": "6834cae4-8173-4fa6-88f7-bc09d335bdd1",
+                                    "node_id": "28ac8611-a755-4d8a-a5c3-520ddd119cf8",
+                                    "output_id": "076becd5-f282-40c5-9917-61099e114298",
                                 },
                             }
                         ],
@@ -168,17 +168,17 @@ def test_serialize_workflow():
     assert not DeepDiff(
         [
             {
-                "id": "9f753b40-68de-4186-838e-806a14853935",
+                "id": "7f26b32f-defb-4a2a-8656-c719fc9996a8",
                 "source_node_id": "09579c0a-acbf-4e04-8724-2230a8aa6534",
                 "source_handle_id": "34069190-0942-4e0c-8700-b33b9dea4ea0",
-                "target_node_id": "51cbe21d-0232-4362-bc54-5bc283297aa6",
-                "target_handle_id": "58427684-3848-498a-8299-c6b0fc70265d",
+                "target_node_id": "28ac8611-a755-4d8a-a5c3-520ddd119cf8",
+                "target_handle_id": "a215a440-cbd9-48ae-a831-be8fa78530a6",
                 "type": "DEFAULT",
             },
             {
                 "id": "00cbff5c-5cce-4ef4-81b2-1a11d9b42597",
-                "source_node_id": "51cbe21d-0232-4362-bc54-5bc283297aa6",
-                "source_handle_id": "39317827-df43-4f5a-bfbc-20bffc839748",
+                "source_node_id": "28ac8611-a755-4d8a-a5c3-520ddd119cf8",
+                "source_handle_id": "90a2ea33-b08d-46ec-8d9e-612592764268",
                 "target_node_id": "9f75228b-1d5b-4c30-a581-6087e6a1b738",
                 "target_handle_id": "16ba108e-61a8-4338-8a5b-4f1278d7fd7b",
                 "type": "DEFAULT",
