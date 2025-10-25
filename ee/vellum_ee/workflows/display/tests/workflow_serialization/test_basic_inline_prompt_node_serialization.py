@@ -325,7 +325,7 @@ def test_serialize_workflow():
     assert not DeepDiff(
         [
             {
-                "id": "924f693f-3f4c-466a-8cde-648ba3baf9fd",
+                "id": "bd2af66e-7724-45e1-8ab6-d37d5b2769f5",
                 "source_node_id": "382842a3-0490-4dee-b87b-eef86766f07c",
                 "source_handle_id": "8294baa6-8bf4-4b54-a56b-407b64851b77",
                 "target_node_id": "f800ecab-fe14-498f-88cf-8f67b3f04338",
