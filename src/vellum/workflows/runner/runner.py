@@ -494,6 +494,7 @@ class WorkflowRunner(Generic[StateType]):
             yield self._handle_run_node_exception(e, "Invalid Expression Exception", execution, span_id, node)
         except Exception as e:
             error_message = self._parse_error_message(e)
+            captured_stacktrace = traceback.format_exc()
             if error_message is None:
                 logger.exception(f"An unexpected error occurred while running node {node.__class__.__name__}")
                 error_code = WorkflowErrorCode.INTERNAL_ERROR
@@ -510,6 +511,7 @@ class WorkflowRunner(Generic[StateType]):
                         message=error_message,
                         code=error_code,
                     ),
+                    stacktrace=captured_stacktrace,
                 ),
                 parent=execution.parent_context,
             )
