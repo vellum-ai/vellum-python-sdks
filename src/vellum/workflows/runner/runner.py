@@ -109,6 +109,7 @@ class WorkflowRunner(Generic[StateType]):
         max_concurrency: Optional[int] = None,
         timeout: Optional[float] = None,
         init_execution_context: Optional[ExecutionContext] = None,
+        is_new_server: Optional[bool] = None,
     ):
         if state and external_inputs:
             raise ValueError("Can only run a Workflow providing one of state or external inputs, not both")
@@ -233,6 +234,7 @@ class WorkflowRunner(Generic[StateType]):
         self._cancel_signal = cancel_signal
         self._timeout = timeout
         self._execution_context = init_execution_context or get_execution_context()
+        self._is_new_server = is_new_server
 
         setattr(
             self._initial_state,
@@ -793,6 +795,10 @@ class WorkflowRunner(Generic[StateType]):
                 ),
             ]
 
+        server_metadata = None
+        if self._is_new_server is not None:
+            server_metadata = {"is_new_server": self._is_new_server}
+
         return WorkflowExecutionInitiatedEvent(
             trace_id=self._execution_context.trace_id,
             span_id=self._initial_state.meta.span_id,
@@ -800,6 +806,7 @@ class WorkflowRunner(Generic[StateType]):
                 workflow_definition=self.workflow.__class__,
                 inputs=self._initial_state.meta.workflow_inputs,
                 initial_state=deepcopy(self._initial_state) if self._should_emit_initial_state else None,
+                server_metadata=server_metadata,
             ),
             parent=self._execution_context.parent_context,
             links=links,
