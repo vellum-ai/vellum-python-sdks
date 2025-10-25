@@ -103,7 +103,7 @@ def test_serialize_workflow(vellum_client):
         "type": "PROMPT",
         "inputs": [
             {
-                "id": "947d7ead-0fad-4e5f-aa3a-d06029ac94bc",
+                "id": "b99dec61-8c38-4b6b-96fa-cb83d5c9a9ef",
                 "key": "city",
                 "value": {
                     "rules": [
@@ -336,7 +336,7 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
         "type": "PROMPT",
         "inputs": [
             {
-                "id": "947d7ead-0fad-4e5f-aa3a-d06029ac94bc",
+                "id": "b99dec61-8c38-4b6b-96fa-cb83d5c9a9ef",
                 "key": "city",
                 "value": {
                     "rules": [

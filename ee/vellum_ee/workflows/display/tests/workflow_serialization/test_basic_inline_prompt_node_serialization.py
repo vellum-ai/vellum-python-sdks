@@ -81,7 +81,7 @@ def test_serialize_workflow():
             "type": "PROMPT",
             "inputs": [
                 {
-                    "id": "f7fca55e-93e9-4009-9227-acf839c7990d",
+                    "id": "15381676-75eb-4688-8ae1-7f9f937d6bb0",
                     "key": "noun",
                     "value": {
                         "rules": [
@@ -96,9 +96,9 @@ def test_serialize_workflow():
             ],
             "data": {
                 "label": "Example Base Inline Prompt Node With Functions",
-                "output_id": "ead0ccb5-092f-4d9b-a9ec-5eb83d498188",
+                "output_id": "71f6717e-31b5-478c-b204-9da91dfa6a29",
                 "error_output_id": None,
-                "array_output_id": "628df199-a049-40b9-a29b-a378edd759bb",
+                "array_output_id": "f5180d8d-89e4-479d-8baf-f6db8f9defa6",
                 "source_handle_id": "d4a097ab-e22d-42f1-b6bc-2ed96856377a",
                 "target_handle_id": "c2dccecb-8a41-40a8-95af-325d3ab8bfe5",
                 "variant": "INLINE",
@@ -115,7 +115,7 @@ def test_serialize_workflow():
                         "custom_parameters": None,
                     },
                     "input_variables": [
-                        {"id": "f7fca55e-93e9-4009-9227-acf839c7990d", "key": "noun", "type": "STRING"}
+                        {"id": "15381676-75eb-4688-8ae1-7f9f937d6bb0", "key": "noun", "type": "STRING"}
                     ],
                     "prompt_template_block_data": {
                         "version": 1,
@@ -173,9 +173,9 @@ def test_serialize_workflow():
                 "merge_behavior": "AWAIT_ANY",
             },
             "outputs": [
-                {"id": "9557bd86-702d-4b45-b8c1-c3980bffe28f", "name": "json", "type": "JSON", "value": None},
-                {"id": "ead0ccb5-092f-4d9b-a9ec-5eb83d498188", "name": "text", "type": "STRING", "value": None},
-                {"id": "628df199-a049-40b9-a29b-a378edd759bb", "name": "results", "type": "ARRAY", "value": None},
+                {"id": "3170eef8-02ec-458d-b2f0-a916241227e4", "name": "json", "type": "JSON", "value": None},
+                {"id": "71f6717e-31b5-478c-b204-9da91dfa6a29", "name": "text", "type": "STRING", "value": None},
+                {"id": "f5180d8d-89e4-479d-8baf-f6db8f9defa6", "name": "results", "type": "ARRAY", "value": None},
             ],
             "ports": [{"id": "d4a097ab-e22d-42f1-b6bc-2ed96856377a", "name": "default", "type": "DEFAULT"}],
             "attributes": [
@@ -301,7 +301,7 @@ def test_serialize_workflow():
                                 "type": "NODE_OUTPUT",
                                 "data": {
                                     "node_id": "8450dd06-975a-41a4-a564-808ee8808fe6",
-                                    "output_id": "628df199-a049-40b9-a29b-a378edd759bb",
+                                    "output_id": "f5180d8d-89e4-479d-8baf-f6db8f9defa6",
                                 },
                             }
                         ],
@@ -420,7 +420,7 @@ def test_serialize_workflow_with_descriptor_functions():
 
     assert functions_attr["value"] == {
         "node_id": "cb1186e0-8ff1-4145-823e-96b3fc05a39a",
-        "node_output_id": "470fadb9-b8b5-477e-a502-5209d398bcf9",
+        "node_output_id": "c7ab8632-0cad-40e2-a49e-bf2731bb7f60",
         "type": "NODE_OUTPUT",
     }
 
@@ -558,7 +558,7 @@ def test_serialize_workflow_with_nested_descriptor_blocks():
                             {
                                 "lhs": {
                                     "node_id": "9fe5d3a3-7d26-4692-aa2d-e67c673b0c2b",
-                                    "node_output_id": "92f9a1b7-d33b-4f00-b4c2-e6f58150e166",
+                                    "node_output_id": "ff10b7e3-1f60-43d8-bd6e-6843b2eb870e",
                                     "type": "NODE_OUTPUT",
                                 },
                                 "operator": "accessField",

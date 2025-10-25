@@ -156,7 +156,7 @@ def test_serialize_workflow():
                             ],
                             "outputs": [
                                 {
-                                    "id": "a7bcb362-a2b8-4476-b0de-a361efeec204",
+                                    "id": "3d97725d-a423-4072-9a73-7b6517edc76e",
                                     "name": "count",
                                     "type": "NUMBER",
                                     "value": None,
@@ -184,7 +184,7 @@ def test_serialize_workflow():
                                                 "type": "NODE_OUTPUT",
                                                 "data": {
                                                     "node_id": "baf6d316-dc75-41e8-96c0-015aede96309",
-                                                    "output_id": "a7bcb362-a2b8-4476-b0de-a361efeec204",
+                                                    "output_id": "3d97725d-a423-4072-9a73-7b6517edc76e",
                                                 },
                                             }
                                         ],
@@ -241,7 +241,7 @@ def test_serialize_workflow():
                             "value": {
                                 "type": "NODE_OUTPUT",
                                 "node_id": "baf6d316-dc75-41e8-96c0-015aede96309",
-                                "node_output_id": "a7bcb362-a2b8-4476-b0de-a361efeec204",
+                                "node_output_id": "3d97725d-a423-4072-9a73-7b6517edc76e",
                             },
                         }
                     ],

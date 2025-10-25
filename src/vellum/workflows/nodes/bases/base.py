@@ -146,18 +146,7 @@ class BaseNodeMeta(ABCMeta):
         node_class.Execution.node_class = node_class
         node_class.Trigger.node_class = node_class
         node_class.ExternalInputs.__parent_class__ = node_class
-
-        id_namespace = None
-        for base_class in node_class.__mro__:
-            if "__id_namespace__" in base_class.__dict__:
-                id_namespace = base_class.__dict__["__id_namespace__"]
-                break
-
-        if id_namespace == "module":
-            node_class.__id__ = uuid4_from_hash(f"{node_class.__module__}.{node_class.__qualname__}")
-        else:
-            node_class.__id__ = uuid4_from_hash(node_class.__qualname__)
-
+        node_class.__id__ = uuid4_from_hash(f"{node_class.__module__}.{node_class.__qualname__}")
         node_class.__output_ids__ = {
             ref.name: uuid4_from_hash(f"{node_class.__id__}|{ref.name}")
             for ref in node_class.Outputs

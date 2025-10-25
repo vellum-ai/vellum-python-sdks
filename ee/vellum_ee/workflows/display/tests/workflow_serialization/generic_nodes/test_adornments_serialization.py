@@ -105,7 +105,7 @@ def test_serialize_node__retry(serialize_node):
                 }
             ],
             "outputs": [
-                {"id": "dc89dc0d-c0bd-47fd-88aa-ec7b262aa2f1", "name": "output", "type": "STRING", "value": None}
+                {"id": "78eece53-8a20-40a1-8a86-ffebe256282b", "name": "output", "type": "STRING", "value": None}
             ],
         },
         serialized_node,
@@ -197,7 +197,7 @@ def test_serialize_node__try(serialize_node):
                 }
             ],
             "outputs": [
-                {"id": "ce9f8b86-6d26-4c03-8bfa-a31aa2cd97f1", "name": "output", "type": "STRING", "value": None}
+                {"id": "d8d0c9a8-0804-4b43-a874-28a7e7d6aec8", "name": "output", "type": "STRING", "value": None}
             ],
         },
         serialized_node,

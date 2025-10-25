@@ -8,7 +8,7 @@ from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class imp
 
 from tests.workflows.basic_api_node.workflow import SimpleAPIWorkflow
 
-# 0d76e1e1-3a4b-4eb4-a606-f73d62c -> 12e4a99d-883d-4da5-aa51-35817d94013e
+# 0d76e1e1-3a4b-4eb4-a606-f73d62c -> a0542dcc-443c-4b3b-aac8-c41d2277a5c7
 
 
 def test_serialize_workflow(vellum_client):
@@ -78,7 +78,7 @@ def test_serialize_workflow(vellum_client):
             "type": "API",
             "inputs": [
                 {
-                    "id": "cd8a19f4-4eb7-4359-a8a6-918569c466a5",
+                    "id": "df921419-5ccb-4e1e-987f-b2349701b3db",
                     "key": "url",
                     "value": {
                         "rules": [
@@ -88,7 +88,7 @@ def test_serialize_workflow(vellum_client):
                     },
                 },
                 {
-                    "id": "fd61b5ac-39f9-4cfe-a839-f8ce78c202df",
+                    "id": "327b4d34-2803-4782-8449-fda65b12a064",
                     "key": "method",
                     "value": {
                         "rules": [{"type": "CONSTANT_VALUE", "data": {"type": "STRING", "value": "POST"}}],
@@ -104,7 +104,7 @@ def test_serialize_workflow(vellum_client):
                     },
                 },
                 {
-                    "id": "3092bf23-3202-4f3e-874c-9a33ccc73459",
+                    "id": "76fcf4b3-7e7f-4fc5-8065-18cb1c4c0225",
                     "key": "authorization_type",
                     "value": {
                         "rules": [{"type": "CONSTANT_VALUE", "data": {"type": "STRING", "value": "API_KEY"}}],
@@ -112,7 +112,7 @@ def test_serialize_workflow(vellum_client):
                     },
                 },
                 {
-                    "id": "fee5e3c9-442a-4922-ba80-5ee07361cea7",
+                    "id": "94e73208-63db-4511-b86e-9fa285cdd1ad",
                     "key": "bearer_token_value",
                     "value": {
                         "rules": [
@@ -122,7 +122,7 @@ def test_serialize_workflow(vellum_client):
                     },
                 },
                 {
-                    "id": "2fcdfbc3-8095-4277-bb4a-a201fd326b54",
+                    "id": "1b3f6dfc-2053-4536-898a-747e64cc1313",
                     "key": "api_key_header_key",
                     "value": {
                         "rules": [{"type": "CONSTANT_VALUE", "data": {"type": "STRING", "value": "CUSTOM_API_KEY"}}],
@@ -130,7 +130,7 @@ def test_serialize_workflow(vellum_client):
                     },
                 },
                 {
-                    "id": "d794bb51-a419-4fd8-be63-dfaf4166e831",
+                    "id": "7d728938-fd08-4224-81b4-5d5bc3d3bd57",
                     "key": "api_key_header_value",
                     "value": {
                         "rules": [
@@ -179,22 +179,22 @@ def test_serialize_workflow(vellum_client):
                 "error_output_id": None,
                 "source_handle_id": "7c33b4d3-9204-4bd5-9371-80ee34f83073",
                 "target_handle_id": "14b538a5-aedb-41f3-b579-039956b7c7ed",
-                "url_input_id": "cd8a19f4-4eb7-4359-a8a6-918569c466a5",
-                "method_input_id": "fd61b5ac-39f9-4cfe-a839-f8ce78c202df",
+                "url_input_id": "df921419-5ccb-4e1e-987f-b2349701b3db",
+                "method_input_id": "327b4d34-2803-4782-8449-fda65b12a064",
                 "body_input_id": "c3a17ceb-e201-4025-b18a-9162aac7705e",
-                "authorization_type_input_id": "3092bf23-3202-4f3e-874c-9a33ccc73459",
-                "bearer_token_value_input_id": "fee5e3c9-442a-4922-ba80-5ee07361cea7",
-                "api_key_header_key_input_id": "2fcdfbc3-8095-4277-bb4a-a201fd326b54",
-                "api_key_header_value_input_id": "d794bb51-a419-4fd8-be63-dfaf4166e831",
+                "authorization_type_input_id": "76fcf4b3-7e7f-4fc5-8065-18cb1c4c0225",
+                "bearer_token_value_input_id": "94e73208-63db-4511-b86e-9fa285cdd1ad",
+                "api_key_header_key_input_id": "1b3f6dfc-2053-4536-898a-747e64cc1313",
+                "api_key_header_value_input_id": "7d728938-fd08-4224-81b4-5d5bc3d3bd57",
                 "additional_headers": [
                     {
                         "header_key_input_id": "57c31247-998a-430d-bb62-bf50eca7df35",
                         "header_value_input_id": "47b32274-f19b-4c15-b788-55c069c311c5",
                     }
                 ],
-                "text_output_id": "17342c21-12bb-49ab-88ce-f144e0376b32",
-                "json_output_id": "12e4a99d-883d-4da5-aa51-35817d94013e",
-                "status_code_output_id": "fecc16c3-400e-4fd3-8223-08366070e3b1",
+                "text_output_id": "f7190a6b-0c13-4a5a-9087-d8e6feb84eca",
+                "json_output_id": "a0542dcc-443c-4b3b-aac8-c41d2277a5c7",
+                "status_code_output_id": "f687c0a1-b63a-4c5c-b6ef-472c6108ae4b",
             },
             "display_data": {"position": {"x": 200.0, "y": -50.0}},
             "base": {
@@ -211,10 +211,10 @@ def test_serialize_workflow(vellum_client):
             },
             "ports": [{"id": "7c33b4d3-9204-4bd5-9371-80ee34f83073", "name": "default", "type": "DEFAULT"}],
             "outputs": [
-                {"id": "12e4a99d-883d-4da5-aa51-35817d94013e", "name": "json", "type": "JSON", "value": None},
-                {"id": "0d76e1e1-3a4b-4eb4-a606-f73d62cf1a7e", "name": "headers", "type": "JSON", "value": None},
-                {"id": "fecc16c3-400e-4fd3-8223-08366070e3b1", "name": "status_code", "type": "NUMBER", "value": None},
-                {"id": "17342c21-12bb-49ab-88ce-f144e0376b32", "name": "text", "type": "STRING", "value": None},
+                {"id": "a0542dcc-443c-4b3b-aac8-c41d2277a5c7", "name": "json", "type": "JSON", "value": None},
+                {"id": "88082704-42bc-453f-a02a-40754453546b", "name": "headers", "type": "JSON", "value": None},
+                {"id": "f687c0a1-b63a-4c5c-b6ef-472c6108ae4b", "name": "status_code", "type": "NUMBER", "value": None},
+                {"id": "f7190a6b-0c13-4a5a-9087-d8e6feb84eca", "name": "text", "type": "STRING", "value": None},
             ],
         },
         api_node,
@@ -244,7 +244,7 @@ def test_serialize_workflow(vellum_client):
                                     "type": "NODE_OUTPUT",
                                     "data": {
                                         "node_id": "facb80d7-ee08-42a0-82a9-ee26a9218185",
-                                        "output_id": "12e4a99d-883d-4da5-aa51-35817d94013e",
+                                        "output_id": "a0542dcc-443c-4b3b-aac8-c41d2277a5c7",
                                     },
                                 }
                             ],
@@ -280,7 +280,7 @@ def test_serialize_workflow(vellum_client):
                                     "type": "NODE_OUTPUT",
                                     "data": {
                                         "node_id": "facb80d7-ee08-42a0-82a9-ee26a9218185",
-                                        "output_id": "0d76e1e1-3a4b-4eb4-a606-f73d62cf1a7e",
+                                        "output_id": "88082704-42bc-453f-a02a-40754453546b",
                                     },
                                 }
                             ],
@@ -316,7 +316,7 @@ def test_serialize_workflow(vellum_client):
                                     "type": "NODE_OUTPUT",
                                     "data": {
                                         "node_id": "facb80d7-ee08-42a0-82a9-ee26a9218185",
-                                        "output_id": "fecc16c3-400e-4fd3-8223-08366070e3b1",
+                                        "output_id": "f687c0a1-b63a-4c5c-b6ef-472c6108ae4b",
                                     },
                                 }
                             ],

@@ -42,7 +42,7 @@ def test_serialize_workflow__missing_final_output_node():
                     "label": "First Final Output Node",
                     "name": "alpha",
                     "target_handle_id": "a0c2eb7a-398e-4f28-b63d-f3bae9b563ee",
-                    "output_id": "0cd02933-c5b9-47c9-aede-e97c5870e8aa",
+                    "output_id": "1d261e4b-4d77-4ace-9349-972129583519",
                     "output_type": "STRING",
                     "node_input_id": "16363762-c14a-4162-8fab-525079d3cffe",
                 },
@@ -72,7 +72,7 @@ def test_serialize_workflow__missing_final_output_node():
                 },
                 "outputs": [
                     {
-                        "id": "0cd02933-c5b9-47c9-aede-e97c5870e8aa",
+                        "id": "1d261e4b-4d77-4ace-9349-972129583519",
                         "name": "value",
                         "type": "STRING",
                         "value": {

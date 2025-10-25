@@ -64,7 +64,7 @@ def test_serialize_workflow():
     assert not DeepDiff(
         [
             {
-                "id": "c05f7d96-59a0-4d58-93d7-d451afd3f630",
+                "id": "62ad462f-f819-4940-99ab-b3f145507f57",
                 "key": "question",
                 "type": "STRING",
             },
@@ -74,12 +74,12 @@ def test_serialize_workflow():
                 "type": "STRING",
             },
             {
-                "id": "f936ae31-ba15-4864-8961-86231022a4d7",
+                "id": "93f2cb75-6fa2-4e46-9488-c0bcd29153c0",
                 "key": "complaint",
                 "type": "STRING",
             },
             {
-                "id": "cdbe2adf-9951-409a-b9a8-b8b349037f4f",
+                "id": "62ad462f-f819-4940-99ab-b3f145507f57",
                 "key": "statement",
                 "type": "STRING",
             },
@@ -520,19 +520,19 @@ def test_serialize_workflow():
     assert not DeepDiff(
         [
             {
-                "id": "9c22ee47-01da-4e4e-863d-b4a6874bed66",
+                "id": "fa11b84b-1d76-4adc-ab28-cbbaa933c267",
                 "type": "TERMINAL",
                 "data": {
                     "label": "Final Output",
                     "name": "statement",
-                    "target_handle_id": "f02a8971-e9a4-4716-bfb4-d08f5614b5d8",
-                    "output_id": "cdbe2adf-9951-409a-b9a8-b8b349037f4f",
+                    "target_handle_id": "e1a6da28-02c5-40d7-8ac5-9fb07e2e3e1d",
+                    "output_id": "62ad462f-f819-4940-99ab-b3f145507f57",
                     "output_type": "STRING",
-                    "node_input_id": "2e742a40-cbee-4e19-9269-c62dc4a9204e",
+                    "node_input_id": "a13377c4-ae1c-4be4-b695-f9da590486ef",
                 },
                 "inputs": [
                     {
-                        "id": "2e742a40-cbee-4e19-9269-c62dc4a9204e",
+                        "id": "a13377c4-ae1c-4be4-b695-f9da590486ef",
                         "key": "node_input",
                         "value": {
                             "rules": [
@@ -556,19 +556,19 @@ def test_serialize_workflow():
                 "definition": None,
             },
             {
-                "id": "47f0931c-41f6-4b84-bf39-0c486941f599",
+                "id": "e3d29229-f746-4125-819e-f847acbed307",
                 "type": "TERMINAL",
                 "data": {
                     "label": "Final Output",
                     "name": "compliment",
-                    "target_handle_id": "a4d57adc-58c1-40c6-810b-ee5fd923bfc5",
+                    "target_handle_id": "c5dd9bf5-9e18-4dbc-8c20-2c0baf969ebe",
                     "output_id": "93f2cb75-6fa2-4e46-9488-c0bcd29153c0",
                     "output_type": "STRING",
-                    "node_input_id": "9ba792e6-55e3-4a14-8768-e8ef6955c934",
+                    "node_input_id": "47f426a4-8770-4f30-a285-5d21849063a5",
                 },
                 "inputs": [
                     {
-                        "id": "9ba792e6-55e3-4a14-8768-e8ef6955c934",
+                        "id": "47f426a4-8770-4f30-a285-5d21849063a5",
                         "key": "node_input",
                         "value": {
                             "rules": [
@@ -598,7 +598,7 @@ def test_serialize_workflow():
                     "label": "Final Output",
                     "name": "complaint",
                     "target_handle_id": "c5dd9bf5-9e18-4dbc-8c20-2c0baf969ebe",
-                    "output_id": "f936ae31-ba15-4864-8961-86231022a4d7",
+                    "output_id": "93f2cb75-6fa2-4e46-9488-c0bcd29153c0",
                     "output_type": "STRING",
                     "node_input_id": "47f426a4-8770-4f30-a285-5d21849063a5",
                 },
@@ -628,19 +628,19 @@ def test_serialize_workflow():
                 "definition": None,
             },
             {
-                "id": "6efa7b45-0580-406d-85aa-439117ba8021",
+                "id": "fa11b84b-1d76-4adc-ab28-cbbaa933c267",
                 "type": "TERMINAL",
                 "data": {
                     "label": "Final Output",
                     "name": "fallthrough",
-                    "target_handle_id": "2283cd2c-b077-4b5d-a96f-aa2cd6023eda",
+                    "target_handle_id": "e1a6da28-02c5-40d7-8ac5-9fb07e2e3e1d",
                     "output_id": "62ad462f-f819-4940-99ab-b3f145507f57",
                     "output_type": "STRING",
-                    "node_input_id": "d2d3e7cc-f6d6-4ac1-ad19-e6f52a75b38f",
+                    "node_input_id": "a13377c4-ae1c-4be4-b695-f9da590486ef",
                 },
                 "inputs": [
                     {
-                        "id": "d2d3e7cc-f6d6-4ac1-ad19-e6f52a75b38f",
+                        "id": "a13377c4-ae1c-4be4-b695-f9da590486ef",
                         "key": "node_input",
                         "value": {
                             "rules": [
@@ -664,19 +664,19 @@ def test_serialize_workflow():
                 "definition": None,
             },
             {
-                "id": "fa11b84b-1d76-4adc-ab28-cbbaa933c267",
+                "id": "6efa7b45-0580-406d-85aa-439117ba8021",
                 "type": "TERMINAL",
                 "data": {
                     "label": "Final Output",
                     "name": "question",
-                    "target_handle_id": "e1a6da28-02c5-40d7-8ac5-9fb07e2e3e1d",
-                    "output_id": "c05f7d96-59a0-4d58-93d7-d451afd3f630",
+                    "target_handle_id": "2283cd2c-b077-4b5d-a96f-aa2cd6023eda",
+                    "output_id": "62ad462f-f819-4940-99ab-b3f145507f57",
                     "output_type": "STRING",
-                    "node_input_id": "a13377c4-ae1c-4be4-b695-f9da590486ef",
+                    "node_input_id": "d2d3e7cc-f6d6-4ac1-ad19-e6f52a75b38f",
                 },
                 "inputs": [
                     {
-                        "id": "a13377c4-ae1c-4be4-b695-f9da590486ef",
+                        "id": "d2d3e7cc-f6d6-4ac1-ad19-e6f52a75b38f",
                         "key": "node_input",
                         "value": {
                             "rules": [
@@ -760,8 +760,8 @@ def test_serialize_workflow():
                 "id": "8a554637-e382-4a66-9b77-4eadce45a25a",
                 "source_node_id": "ed7caf01-9ae7-47a3-b15a-16697abaf486",
                 "source_handle_id": "cde43aef-f607-4b5d-87f6-9238dd4a3a2b",
-                "target_node_id": "9c22ee47-01da-4e4e-863d-b4a6874bed66",
-                "target_handle_id": "f02a8971-e9a4-4716-bfb4-d08f5614b5d8",
+                "target_node_id": "fa11b84b-1d76-4adc-ab28-cbbaa933c267",
+                "target_handle_id": "e1a6da28-02c5-40d7-8ac5-9fb07e2e3e1d",
                 "type": "DEFAULT",
             },
             {
@@ -776,24 +776,24 @@ def test_serialize_workflow():
                 "id": "47758209-70cb-4f12-b71f-dc28df0f6d0b",
                 "source_node_id": "0d959311-c836-4641-a867-58f63df9dfea",
                 "source_handle_id": "69a2121d-fc21-47a1-af49-6200aad836de",
-                "target_node_id": "fa11b84b-1d76-4adc-ab28-cbbaa933c267",
-                "target_handle_id": "e1a6da28-02c5-40d7-8ac5-9fb07e2e3e1d",
+                "target_node_id": "6efa7b45-0580-406d-85aa-439117ba8021",
+                "target_handle_id": "2283cd2c-b077-4b5d-a96f-aa2cd6023eda",
                 "type": "DEFAULT",
             },
             {
                 "id": "f08a49f8-8bfd-4c05-8f28-dfa536654af8",
                 "source_node_id": "8df781b1-ff28-48a5-98a2-d7d796b932b0",
                 "source_handle_id": "aeb6805d-2c9f-4d52-a690-341ea0e869b3",
-                "target_node_id": "47f0931c-41f6-4b84-bf39-0c486941f599",
-                "target_handle_id": "a4d57adc-58c1-40c6-810b-ee5fd923bfc5",
+                "target_node_id": "e3d29229-f746-4125-819e-f847acbed307",
+                "target_handle_id": "c5dd9bf5-9e18-4dbc-8c20-2c0baf969ebe",
                 "type": "DEFAULT",
             },
             {
                 "id": "c45e03b4-dba6-4620-bc02-3847ad90086b",
                 "source_node_id": "148c61bd-e8b0-4d4b-8734-b043a72b90ed",
                 "source_handle_id": "26f50353-85ae-462f-b82d-9fd736900bd6",
-                "target_node_id": "6efa7b45-0580-406d-85aa-439117ba8021",
-                "target_handle_id": "2283cd2c-b077-4b5d-a96f-aa2cd6023eda",
+                "target_node_id": "fa11b84b-1d76-4adc-ab28-cbbaa933c267",
+                "target_handle_id": "e1a6da28-02c5-40d7-8ac5-9fb07e2e3e1d",
                 "type": "DEFAULT",
             },
         ],

@@ -74,7 +74,7 @@ def test_serialize_workflow():
         "type": "METRIC",
         "inputs": [
             {
-                "id": "e5e9757e-27db-4200-a650-2f7bb2cd61f5",
+                "id": "dad627f3-d46d-4f12-b3d0-4aa25a5f24b5",
                 "key": "expected",
                 "value": {
                     "rules": [

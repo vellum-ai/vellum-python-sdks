@@ -109,7 +109,7 @@ def test_serialize_workflow(vellum_client):
         "type": "SUBWORKFLOW",
         "inputs": [
             {
-                "id": "be426336-0844-4ebd-8cfe-efef60305b92",
+                "id": "8107cec2-8215-4730-b52c-859e87a1c116",
                 "key": "city",
                 "value": {
                     "rules": [

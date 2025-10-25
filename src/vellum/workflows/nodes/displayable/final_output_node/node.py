@@ -104,8 +104,6 @@ class FinalOutputNode(BaseNode[StateType], Generic[StateType, _OutputType], meta
     This provides backward compatibility with Vellum's Final Output Node.
     """
 
-    __id_namespace__ = "module"
-
     class Trigger(BaseNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY
 

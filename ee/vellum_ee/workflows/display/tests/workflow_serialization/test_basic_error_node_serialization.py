@@ -87,7 +87,7 @@ def test_serialize_workflow():
             "type": "ERROR",
             "inputs": [
                 {
-                    "id": "8e4c8d76-2e02-4d7e-a7bf-d71af392dc49",
+                    "id": "f7fc097f-db5b-48c1-8c33-391834678521",
                     "key": "error_source_input_id",
                     "value": {
                         "rules": [
@@ -103,7 +103,7 @@ def test_serialize_workflow():
             "data": {
                 "label": "Fail Node",
                 "target_handle_id": "70c19f1c-309c-4a5d-ba65-664c0bb2fedf",
-                "error_source_input_id": "8e4c8d76-2e02-4d7e-a7bf-d71af392dc49",
+                "error_source_input_id": "f7fc097f-db5b-48c1-8c33-391834678521",
             },
             "display_data": {"position": {"x": 400.0, "y": 75.0}},
             "base": {
@@ -150,7 +150,7 @@ def test_serialize_workflow():
                                 "type": "NODE_OUTPUT",
                                 "data": {
                                     "node_id": "1eee9b4e-531f-45f2-a4b9-42207fac2c33",
-                                    "output_id": "c6b017a4-25e9-4296-8d81-6aa4b3dad171",
+                                    "output_id": "29fbd4af-bb7f-40c3-a5c7-2bb47e12c534",
                                 },
                             }
                         ],

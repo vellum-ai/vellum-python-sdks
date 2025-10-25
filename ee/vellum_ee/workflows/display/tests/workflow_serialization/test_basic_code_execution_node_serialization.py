@@ -61,7 +61,7 @@ def test_serialize_workflow_with_filepath():
         "type": "CODE_EXECUTION",
         "inputs": [
             {
-                "id": "f2e8a4fa-b54e-41e9-b314-0e5443519ac7",
+                "id": "5049de20-77c9-4bcf-a572-260ec18c0528",
                 "key": "code",
                 "value": {
                     "rules": [
@@ -87,7 +87,7 @@ def test_serialize_workflow_with_filepath():
             "error_output_id": None,
             "source_handle_id": "832f81ec-427b-42a8-825c-e62c43c1f961",
             "target_handle_id": "e02a2701-22c0-4533-8b00-175998e7350a",
-            "code_input_id": "f2e8a4fa-b54e-41e9-b314-0e5443519ac7",
+            "code_input_id": "5049de20-77c9-4bcf-a572-260ec18c0528",
             "runtime_input_id": "19d64948-f22b-4103-a7f5-3add184b31cc",
             "output_type": "NUMBER",
             "packages": [{"name": "openai", "version": "1.0.0"}],
@@ -304,7 +304,7 @@ def test_serialize_workflow_with_code():
         "type": "CODE_EXECUTION",
         "inputs": [
             {
-                "id": "f2e8a4fa-b54e-41e9-b314-0e5443519ac7",
+                "id": "5049de20-77c9-4bcf-a572-260ec18c0528",
                 "key": "code",
                 "value": {
                     "rules": [
@@ -330,7 +330,7 @@ def test_serialize_workflow_with_code():
             "error_output_id": None,
             "source_handle_id": "832f81ec-427b-42a8-825c-e62c43c1f961",
             "target_handle_id": "e02a2701-22c0-4533-8b00-175998e7350a",
-            "code_input_id": "f2e8a4fa-b54e-41e9-b314-0e5443519ac7",
+            "code_input_id": "5049de20-77c9-4bcf-a572-260ec18c0528",
             "runtime_input_id": "19d64948-f22b-4103-a7f5-3add184b31cc",
             "output_type": "NUMBER",
             "packages": [],
@@ -540,7 +540,7 @@ def test_serialize_workflow__try_wrapped():
         "type": "CODE_EXECUTION",
         "inputs": [
             {
-                "id": "f2e8a4fa-b54e-41e9-b314-0e5443519ac7",
+                "id": "5049de20-77c9-4bcf-a572-260ec18c0528",
                 "key": "code",
                 "value": {
                     "rules": [
@@ -566,7 +566,7 @@ def test_serialize_workflow__try_wrapped():
             "error_output_id": "7236b0f4-b6bb-4103-a993-a8908d597dc3",
             "source_handle_id": "832f81ec-427b-42a8-825c-e62c43c1f961",
             "target_handle_id": "e02a2701-22c0-4533-8b00-175998e7350a",
-            "code_input_id": "f2e8a4fa-b54e-41e9-b314-0e5443519ac7",
+            "code_input_id": "5049de20-77c9-4bcf-a572-260ec18c0528",
             "runtime_input_id": "19d64948-f22b-4103-a7f5-3add184b31cc",
             "output_type": "NUMBER",
             "packages": [{"name": "openai", "version": "1.0.0", "repository": "test-repo"}],

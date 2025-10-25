@@ -61,7 +61,7 @@ def test_serialize_workflow():
         "type": "SEARCH",
         "inputs": [
             {
-                "id": "49d21956-6e62-472b-b62a-7ec65faea1fd",
+                "id": "1dbfd1d9-8e8e-47b6-bb65-c578385ef978",
                 "key": "query",
                 "value": {
                     "rules": [
@@ -220,7 +220,7 @@ def test_serialize_workflow():
             "error_output_id": None,
             "source_handle_id": "00ae06b3-f8d9-4ae6-9fbf-e4ff4d520e9b",
             "target_handle_id": "6d50305f-588b-469f-a042-b0767d3f99b1",
-            "query_node_input_id": "49d21956-6e62-472b-b62a-7ec65faea1fd",
+            "query_node_input_id": "1dbfd1d9-8e8e-47b6-bb65-c578385ef978",
             "document_index_node_input_id": "8cb28a69-088d-410d-bd0d-886d57ce7b64",
             "weights_node_input_id": "983f2b7f-ad86-45cf-b04b-08724af27236",
             "limit_node_input_id": "8072ec05-5fe4-47db-bc48-4c20ce49e123",

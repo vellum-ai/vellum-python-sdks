@@ -81,7 +81,7 @@ def test_serialize_workflow():
                     },
                 },
                 {
-                    "id": "e6c9d062-1a4f-4d4d-a258-59b75c6062fc",
+                    "id": "f46b5986-74f1-4ad4-b4d1-b8d2df6bc86f",
                     "key": "info",
                     "value": {
                         "rules": [
@@ -96,7 +96,7 @@ def test_serialize_workflow():
             ],
             "data": {
                 "label": "Example Templating Node",
-                "output_id": "6834cae4-8173-4fa6-88f7-bc09d335bdd1",
+                "output_id": "076becd5-f282-40c5-9917-61099e114298",
                 "error_output_id": None,
                 "source_handle_id": "39317827-df43-4f5a-bfbc-20bffc839748",
                 "target_handle_id": "58427684-3848-498a-8299-c6b0fc70265d",
@@ -144,7 +144,7 @@ def test_serialize_workflow():
                                 "type": "NODE_OUTPUT",
                                 "data": {
                                     "node_id": "51cbe21d-0232-4362-bc54-5bc283297aa6",
-                                    "output_id": "6834cae4-8173-4fa6-88f7-bc09d335bdd1",
+                                    "output_id": "076becd5-f282-40c5-9917-61099e114298",
                                 },
                             }
                         ],
