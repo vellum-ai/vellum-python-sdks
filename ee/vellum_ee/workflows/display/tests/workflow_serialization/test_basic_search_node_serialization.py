@@ -215,8 +215,8 @@ def test_serialize_workflow():
         ],
         "data": {
             "label": "Simple Search Node",
-            "results_output_id": "e27fa934-589a-48f7-92a9-dcc90710ec7b",
-            "text_output_id": "3f3bd066-ce73-46ee-84f1-d8ece69ecd8c",
+            "results_output_id": "184c5214-29be-4029-8ece-2991972e0822",
+            "text_output_id": "9bab7f1b-3a4b-46bf-8b30-e3016ac38f51",
             "error_output_id": None,
             "source_handle_id": "928c79f2-bc07-43ee-9420-380a3bd36fb8",
             "target_handle_id": "85db938d-9a85-4f08-8bbf-b795db2c40d5",
@@ -267,7 +267,7 @@ def test_serialize_workflow():
                             "type": "NODE_OUTPUT",
                             "data": {
                                 "node_id": "89c8bee0-8015-4d73-9112-e436ab086567",
-                                "output_id": "3f3bd066-ce73-46ee-84f1-d8ece69ecd8c",
+                                "output_id": "9bab7f1b-3a4b-46bf-8b30-e3016ac38f51",
                             },
                         }
                     ],

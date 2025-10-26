@@ -64,7 +64,7 @@ def test_serialize_workflow():
     assert not DeepDiff(
         [
             {
-                "id": "62ad462f-f819-4940-99ab-b3f145507f57",
+                "id": "c05f7d96-59a0-4d58-93d7-d451afd3f630",
                 "key": "question",
                 "type": "STRING",
             },
@@ -74,12 +74,12 @@ def test_serialize_workflow():
                 "type": "STRING",
             },
             {
-                "id": "93f2cb75-6fa2-4e46-9488-c0bcd29153c0",
+                "id": "f936ae31-ba15-4864-8961-86231022a4d7",
                 "key": "complaint",
                 "type": "STRING",
             },
             {
-                "id": "62ad462f-f819-4940-99ab-b3f145507f57",
+                "id": "cdbe2adf-9951-409a-b9a8-b8b349037f4f",
                 "key": "statement",
                 "type": "STRING",
             },
