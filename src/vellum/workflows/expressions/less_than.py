@@ -37,4 +37,10 @@ class LessThanExpression(BaseDescriptor[bool], Generic[LHS, RHS]):
         if not has_lt(lhs):
             raise InvalidExpressionException(f"'{lhs.__class__.__name__}' must support the '<' operator")
 
+        if not isinstance(lhs, (int, float)) or not isinstance(rhs, (int, float)):
+            raise InvalidExpressionException(
+                f"Comparison operators require numeric types. "
+                f"Cannot compare '{type(lhs).__name__}' with '{type(rhs).__name__}'"
+            )
+
         return lhs < rhs

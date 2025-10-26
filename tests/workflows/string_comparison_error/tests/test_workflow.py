@@ -24,6 +24,10 @@ def test_string_comparison_error__string_to_float_comparison():
     # WHEN we run the workflow with a string field and float value
     terminal_event = workflow.run(inputs=Inputs(field="hello", value=42.0))
 
-    # THEN the workflow should reject with an internal error
+    # THEN the workflow should reject with a user-facing error
     assert terminal_event.name == "workflow.execution.rejected"
-    assert terminal_event.error.code == WorkflowErrorCode.INTERNAL_ERROR
+    assert terminal_event.error.code == WorkflowErrorCode.INVALID_INPUTS
+
+    assert "numeric types" in terminal_event.error.message
+    assert "str" in terminal_event.error.message
+    assert "float" in terminal_event.error.message
