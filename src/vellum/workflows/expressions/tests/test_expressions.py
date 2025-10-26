@@ -309,3 +309,115 @@ def test_less_than_non_comparable():
 
     # THEN the expected error is raised
     assert "not supported between instances of 'NonComparable' and 'Comparable'" in str(exc_info.value)
+
+
+def test_greater_than_or_equal_to_with_numeric_string():
+    """
+    Test that numeric strings are parsed and compared correctly with numbers.
+    """
+
+    state = TestState()
+
+    # WHEN comparing a numeric string to an int
+    assert GreaterThanOrEqualToExpression(lhs="50", rhs=42).resolve(state) is True
+    assert GreaterThanOrEqualToExpression(lhs="42", rhs=42).resolve(state) is True
+    assert GreaterThanOrEqualToExpression(lhs="30", rhs=42).resolve(state) is False
+
+    # WHEN comparing a numeric string to a float
+    assert GreaterThanOrEqualToExpression(lhs="50.5", rhs=42.0).resolve(state) is True
+    assert GreaterThanOrEqualToExpression(lhs="42.0", rhs=42.0).resolve(state) is True
+    assert GreaterThanOrEqualToExpression(lhs="30.5", rhs=42.0).resolve(state) is False
+
+    # WHEN comparing an int to a numeric string
+    assert GreaterThanOrEqualToExpression(lhs=50, rhs="42").resolve(state) is True
+    assert GreaterThanOrEqualToExpression(lhs=42, rhs="42").resolve(state) is True
+    assert GreaterThanOrEqualToExpression(lhs=30, rhs="42").resolve(state) is False
+
+    # WHEN comparing a float to a numeric string
+    assert GreaterThanOrEqualToExpression(lhs=50.5, rhs="42.0").resolve(state) is True
+    assert GreaterThanOrEqualToExpression(lhs=42.0, rhs="42.0").resolve(state) is True
+    assert GreaterThanOrEqualToExpression(lhs=30.5, rhs="42.0").resolve(state) is False
+
+
+def test_greater_than_with_numeric_string():
+    """
+    Test that numeric strings are parsed and compared correctly with numbers.
+    """
+
+    state = TestState()
+
+    # WHEN comparing a numeric string to an int
+    assert GreaterThanExpression(lhs="50", rhs=42).resolve(state) is True
+    assert GreaterThanExpression(lhs="42", rhs=42).resolve(state) is False
+    assert GreaterThanExpression(lhs="30", rhs=42).resolve(state) is False
+
+    # WHEN comparing a numeric string to a float
+    assert GreaterThanExpression(lhs="50.5", rhs=42.0).resolve(state) is True
+    assert GreaterThanExpression(lhs="42.0", rhs=42.0).resolve(state) is False
+    assert GreaterThanExpression(lhs="30.5", rhs=42.0).resolve(state) is False
+
+    # WHEN comparing an int to a numeric string
+    assert GreaterThanExpression(lhs=50, rhs="42").resolve(state) is True
+    assert GreaterThanExpression(lhs=42, rhs="42").resolve(state) is False
+    assert GreaterThanExpression(lhs=30, rhs="42").resolve(state) is False
+
+    # WHEN comparing a float to a numeric string
+    assert GreaterThanExpression(lhs=50.5, rhs="42.0").resolve(state) is True
+    assert GreaterThanExpression(lhs=42.0, rhs="42.0").resolve(state) is False
+    assert GreaterThanExpression(lhs=30.5, rhs="42.0").resolve(state) is False
+
+
+def test_less_than_or_equal_to_with_numeric_string():
+    """
+    Test that numeric strings are parsed and compared correctly with numbers.
+    """
+
+    state = TestState()
+
+    # WHEN comparing a numeric string to an int
+    assert LessThanOrEqualToExpression(lhs="30", rhs=42).resolve(state) is True
+    assert LessThanOrEqualToExpression(lhs="42", rhs=42).resolve(state) is True
+    assert LessThanOrEqualToExpression(lhs="50", rhs=42).resolve(state) is False
+
+    # WHEN comparing a numeric string to a float
+    assert LessThanOrEqualToExpression(lhs="30.5", rhs=42.0).resolve(state) is True
+    assert LessThanOrEqualToExpression(lhs="42.0", rhs=42.0).resolve(state) is True
+    assert LessThanOrEqualToExpression(lhs="50.5", rhs=42.0).resolve(state) is False
+
+    # WHEN comparing an int to a numeric string
+    assert LessThanOrEqualToExpression(lhs=30, rhs="42").resolve(state) is True
+    assert LessThanOrEqualToExpression(lhs=42, rhs="42").resolve(state) is True
+    assert LessThanOrEqualToExpression(lhs=50, rhs="42").resolve(state) is False
+
+    # WHEN comparing a float to a numeric string
+    assert LessThanOrEqualToExpression(lhs=30.5, rhs="42.0").resolve(state) is True
+    assert LessThanOrEqualToExpression(lhs=42.0, rhs="42.0").resolve(state) is True
+    assert LessThanOrEqualToExpression(lhs=50.5, rhs="42.0").resolve(state) is False
+
+
+def test_less_than_with_numeric_string():
+    """
+    Test that numeric strings are parsed and compared correctly with numbers.
+    """
+
+    state = TestState()
+
+    # WHEN comparing a numeric string to an int
+    assert LessThanExpression(lhs="30", rhs=42).resolve(state) is True
+    assert LessThanExpression(lhs="42", rhs=42).resolve(state) is False
+    assert LessThanExpression(lhs="50", rhs=42).resolve(state) is False
+
+    # WHEN comparing a numeric string to a float
+    assert LessThanExpression(lhs="30.5", rhs=42.0).resolve(state) is True
+    assert LessThanExpression(lhs="42.0", rhs=42.0).resolve(state) is False
+    assert LessThanExpression(lhs="50.5", rhs=42.0).resolve(state) is False
+
+    # WHEN comparing an int to a numeric string
+    assert LessThanExpression(lhs=30, rhs="42").resolve(state) is True
+    assert LessThanExpression(lhs=42, rhs="42").resolve(state) is False
+    assert LessThanExpression(lhs=50, rhs="42").resolve(state) is False
+
+    # WHEN comparing a float to a numeric string
+    assert LessThanExpression(lhs=30.5, rhs="42.0").resolve(state) is True
+    assert LessThanExpression(lhs=42.0, rhs="42.0").resolve(state) is False
+    assert LessThanExpression(lhs=50.5, rhs="42.0").resolve(state) is False

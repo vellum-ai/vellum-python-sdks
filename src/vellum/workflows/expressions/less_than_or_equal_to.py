@@ -19,6 +19,26 @@ def has_le(obj: Any) -> TypeGuard[SupportsLessThanOrEqualTo]:
     return hasattr(obj, "__le__")
 
 
+def _try_parse_numeric_string(value: Any) -> Any:
+    """
+    Attempt to parse a string value as a number (int or float).
+
+    This is to support the legacy workflow runner logic where string operands (important-comment)
+    should be automatically parsed as numbers when compared with numeric types. (important-comment)
+
+    Returns the parsed number if successful, otherwise returns the original value.
+    """
+    if not isinstance(value, str):
+        return value
+
+    try:
+        if "." not in value:
+            return int(value)
+        return float(value)
+    except (ValueError, TypeError):
+        return value
+
+
 class LessThanOrEqualToExpression(BaseDescriptor[bool], Generic[LHS, RHS]):
     def __init__(
         self,
@@ -33,6 +53,12 @@ class LessThanOrEqualToExpression(BaseDescriptor[bool], Generic[LHS, RHS]):
     def resolve(self, state: "BaseState") -> bool:
         lhs = resolve_value(self._lhs, state)
         rhs = resolve_value(self._rhs, state)
+
+        # Parse string operands as numbers when comparing with numeric types (important-comment)
+        if isinstance(lhs, str) and isinstance(rhs, (int, float)):
+            lhs = _try_parse_numeric_string(lhs)
+        elif isinstance(rhs, str) and isinstance(lhs, (int, float)):
+            rhs = _try_parse_numeric_string(rhs)
 
         if not has_le(lhs):
             raise InvalidExpressionException(f"'{lhs.__class__.__name__}' must support the '<=' operator")
