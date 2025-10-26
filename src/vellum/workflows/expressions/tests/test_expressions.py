@@ -90,14 +90,14 @@ def test_greater_than_or_equal_to_invalid():
         GreaterThanOrEqualToExpression(lhs=obj1, rhs=obj2).resolve(state)
 
     # THEN the expected error is raised
-    assert "Cannot compare 'Comparable' with 'str'" in str(exc_info.value)
+    assert "not supported between instances of 'Comparable' and 'str'" in str(exc_info.value)
 
     # WHEN comparing objects with incompatible types
     with pytest.raises(InvalidExpressionException) as exc_info:
         GreaterThanOrEqualToExpression(lhs=obj2, rhs=obj1).resolve(state)
 
     # THEN the expected error is raised
-    assert "Cannot compare 'str' with 'Comparable'" in str(exc_info.value)
+    assert "not supported between instances of 'str' and 'Comparable'" in str(exc_info.value)
 
 
 def test_greater_than_or_equal_to_non_comparable():
@@ -112,14 +112,14 @@ def test_greater_than_or_equal_to_non_comparable():
         GreaterThanOrEqualToExpression(lhs=obj1, rhs=obj2).resolve(state)
 
     # THEN the expected error is raised
-    assert "Cannot compare 'Comparable' with 'NonComparable'" in str(exc_info.value)
+    assert "not supported between instances of 'Comparable' and 'NonComparable'" in str(exc_info.value)
 
     # WHEN comparing objects with incompatible types
     with pytest.raises(InvalidExpressionException) as exc_info:
         GreaterThanOrEqualToExpression(lhs=obj2, rhs=obj1).resolve(state)
 
     # THEN the expected error is raised
-    assert "Cannot compare 'NonComparable' with 'Comparable'" in str(exc_info.value)
+    assert "not supported between instances of 'NonComparable' and 'Comparable'" in str(exc_info.value)
 
 
 def test_greater_than():
@@ -153,14 +153,14 @@ def test_greater_than_invalid():
         GreaterThanExpression(lhs=obj1, rhs=obj2).resolve(state)
 
     # THEN the expected error is raised
-    assert "Cannot compare 'Comparable' with 'str'" in str(exc_info.value)
+    assert "not supported between instances of 'Comparable' and 'str'" in str(exc_info.value)
 
     # WHEN comparing objects with incompatible types
     with pytest.raises(InvalidExpressionException) as exc_info:
         GreaterThanExpression(lhs=obj2, rhs=obj1).resolve(state)
 
     # THEN the expected error is raised
-    assert "Cannot compare 'str' with 'Comparable'" in str(exc_info.value)
+    assert "not supported between instances of 'str' and 'Comparable'" in str(exc_info.value)
 
 
 def test_greater_than_non_comparable():
@@ -175,14 +175,14 @@ def test_greater_than_non_comparable():
         GreaterThanExpression(lhs=obj1, rhs=obj2).resolve(state)
 
     # THEN the expected error is raised
-    assert "Cannot compare 'Comparable' with 'NonComparable'" in str(exc_info.value)
+    assert "not supported between instances of 'Comparable' and 'NonComparable'" in str(exc_info.value)
 
     # WHEN comparing objects with incompatible types
     with pytest.raises(InvalidExpressionException) as exc_info:
         GreaterThanExpression(lhs=obj2, rhs=obj1).resolve(state)
 
     # THEN the expected error is raised
-    assert "Cannot compare 'NonComparable' with 'Comparable'" in str(exc_info.value)
+    assert "not supported between instances of 'NonComparable' and 'Comparable'" in str(exc_info.value)
 
 
 def test_less_than_or_equal_to():
@@ -216,14 +216,14 @@ def test_less_than_or_equal_to_invalid():
         LessThanOrEqualToExpression(lhs=obj1, rhs=obj2).resolve(state)
 
     # THEN the expected error is raised
-    assert "Cannot compare 'Comparable' with 'str'" in str(exc_info.value)
+    assert "not supported between instances of 'Comparable' and 'str'" in str(exc_info.value)
 
     # WHEN comparing objects with incompatible types
     with pytest.raises(InvalidExpressionException) as exc_info:
         LessThanOrEqualToExpression(lhs=obj2, rhs=obj1).resolve(state)
 
     # THEN the expected error is raised
-    assert "Cannot compare 'str' with 'Comparable'" in str(exc_info.value)
+    assert "not supported between instances of 'str' and 'Comparable'" in str(exc_info.value)
 
 
 def test_less_than_or_equal_to_non_comparable():
@@ -238,14 +238,14 @@ def test_less_than_or_equal_to_non_comparable():
         LessThanOrEqualToExpression(lhs=obj1, rhs=obj2).resolve(state)
 
     # THEN the expected error is raised
-    assert "Cannot compare 'Comparable' with 'NonComparable'" in str(exc_info.value)
+    assert "not supported between instances of 'Comparable' and 'NonComparable'" in str(exc_info.value)
 
     # WHEN comparing objects with incompatible types
     with pytest.raises(InvalidExpressionException) as exc_info:
         LessThanOrEqualToExpression(lhs=obj2, rhs=obj1).resolve(state)
 
     # THEN the expected error is raised
-    assert "Cannot compare 'NonComparable' with 'Comparable'" in str(exc_info.value)
+    assert "not supported between instances of 'NonComparable' and 'Comparable'" in str(exc_info.value)
 
 
 def test_less_than():
@@ -279,14 +279,14 @@ def test_less_than_invalid():
         LessThanExpression(lhs=obj1, rhs=obj2).resolve(state)
 
     # THEN the expected error is raised
-    assert "Cannot compare 'Comparable' with 'str'" in str(exc_info.value)
+    assert "not supported between instances of 'Comparable' and 'str'" in str(exc_info.value)
 
     # WHEN comparing objects with incompatible types
     with pytest.raises(InvalidExpressionException) as exc_info:
         LessThanExpression(lhs=obj2, rhs=obj1).resolve(state)
 
     # THEN the expected error is raised
-    assert "Cannot compare 'str' with 'Comparable'" in str(exc_info.value)
+    assert "not supported between instances of 'str' and 'Comparable'" in str(exc_info.value)
 
 
 def test_less_than_non_comparable():
@@ -301,11 +301,11 @@ def test_less_than_non_comparable():
         LessThanExpression(lhs=obj1, rhs=obj2).resolve(state)
 
     # THEN the expected error is raised
-    assert "Cannot compare 'Comparable' with 'NonComparable'" in str(exc_info.value)
+    assert "not supported between instances of 'Comparable' and 'NonComparable'" in str(exc_info.value)
 
     # WHEN comparing objects with incompatible types
     with pytest.raises(InvalidExpressionException) as exc_info:
         LessThanExpression(lhs=obj2, rhs=obj1).resolve(state)
 
     # THEN the expected error is raised
-    assert "Cannot compare 'NonComparable' with 'Comparable'" in str(exc_info.value)
+    assert "not supported between instances of 'NonComparable' and 'Comparable'" in str(exc_info.value)

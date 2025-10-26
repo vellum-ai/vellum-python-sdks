@@ -40,6 +40,4 @@ class LessThanOrEqualToExpression(BaseDescriptor[bool], Generic[LHS, RHS]):
         try:
             return lhs <= rhs
         except TypeError as e:
-            raise InvalidExpressionException(
-                f"Cannot compare '{type(lhs).__name__}' with '{type(rhs).__name__}': {str(e)}"
-            )
+            raise InvalidExpressionException(str(e))
