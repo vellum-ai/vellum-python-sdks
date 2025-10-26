@@ -28,6 +28,4 @@ def test_string_comparison_error__string_to_float_comparison():
     assert terminal_event.name == "workflow.execution.rejected"
     assert terminal_event.error.code == WorkflowErrorCode.INVALID_INPUTS
 
-    assert "numeric types" in terminal_event.error.message
-    assert "str" in terminal_event.error.message
-    assert "float" in terminal_event.error.message
+    assert "Cannot compare 'str' with 'float'" in terminal_event.error.message

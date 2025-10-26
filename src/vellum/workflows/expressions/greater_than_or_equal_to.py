@@ -37,10 +37,9 @@ class GreaterThanOrEqualToExpression(BaseDescriptor[bool], Generic[LHS, RHS]):
         if not has_ge(lhs):
             raise InvalidExpressionException(f"'{lhs.__class__.__name__}' must support the '>=' operator")
 
-        if not isinstance(lhs, (int, float)) or not isinstance(rhs, (int, float)):
+        try:
+            return lhs >= rhs
+        except TypeError as e:
             raise InvalidExpressionException(
-                f"Comparison operators require numeric types. "
-                f"Cannot compare '{type(lhs).__name__}' with '{type(rhs).__name__}'"
+                f"Cannot compare '{type(lhs).__name__}' with '{type(rhs).__name__}': {str(e)}"
             )
-
-        return lhs >= rhs
