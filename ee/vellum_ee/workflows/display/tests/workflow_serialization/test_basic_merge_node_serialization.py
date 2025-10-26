@@ -127,7 +127,7 @@ def test_serialize_workflow__await_all():
                             "type": "NODE_OUTPUT",
                             "data": {
                                 "node_id": "634f0202-9ea9-4c62-b152-1a58c595cffb",
-                                "output_id": "d4266640-9718-4a74-b24b-500448d87871",
+                                "output_id": "f6148c39-9ec1-4b10-9d24-d19bec9eeea8",
                             },
                         }
                     ],

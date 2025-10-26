@@ -74,7 +74,7 @@ def test_serialize_workflow_with_filepath():
                 },
             },
             {
-                "id": "19d64948-f22b-4103-a7f5-3add184b31cc",
+                "id": "167a0eb0-3bb7-4f9c-9517-15eda41b7b58",
                 "key": "runtime",
                 "value": {
                     "rules": [{"type": "CONSTANT_VALUE", "data": {"type": "STRING", "value": "PYTHON_3_11_6"}}],
@@ -88,10 +88,10 @@ def test_serialize_workflow_with_filepath():
             "source_handle_id": "dede45ee-e17a-447c-b1d3-ed0d29ff1057",
             "target_handle_id": "f4a58613-628e-4a6d-aeae-4f81cf96bbf4",
             "code_input_id": "5049de20-77c9-4bcf-a572-260ec18c0528",
-            "runtime_input_id": "19d64948-f22b-4103-a7f5-3add184b31cc",
+            "runtime_input_id": "167a0eb0-3bb7-4f9c-9517-15eda41b7b58",
             "output_type": "NUMBER",
             "packages": [{"name": "openai", "version": "1.0.0"}],
-            "output_id": "0fde9607-353f-42c2-85c4-20f720ebc1ec",
+            "output_id": "0022691d-4707-476f-a9f5-4947b5e36f07",
             "log_output_id": "7cac05e3-b7c3-475e-8df8-422b496c3398",
         },
         "display_data": {"position": {"x": 200.0, "y": -50.0}},
@@ -139,7 +139,7 @@ def test_serialize_workflow_with_filepath():
                                     "type": "NODE_OUTPUT",
                                     "data": {
                                         "node_id": "1c910367-dff1-4466-85bc-6a8ec4ca039d",
-                                        "output_id": "0fde9607-353f-42c2-85c4-20f720ebc1ec",
+                                        "output_id": "0022691d-4707-476f-a9f5-4947b5e36f07",
                                     },
                                 }
                             ],
@@ -317,7 +317,7 @@ def test_serialize_workflow_with_code():
                 },
             },
             {
-                "id": "19d64948-f22b-4103-a7f5-3add184b31cc",
+                "id": "167a0eb0-3bb7-4f9c-9517-15eda41b7b58",
                 "key": "runtime",
                 "value": {
                     "rules": [{"type": "CONSTANT_VALUE", "data": {"type": "STRING", "value": "PYTHON_3_11_6"}}],
@@ -331,10 +331,10 @@ def test_serialize_workflow_with_code():
             "source_handle_id": "dede45ee-e17a-447c-b1d3-ed0d29ff1057",
             "target_handle_id": "f4a58613-628e-4a6d-aeae-4f81cf96bbf4",
             "code_input_id": "5049de20-77c9-4bcf-a572-260ec18c0528",
-            "runtime_input_id": "19d64948-f22b-4103-a7f5-3add184b31cc",
+            "runtime_input_id": "167a0eb0-3bb7-4f9c-9517-15eda41b7b58",
             "output_type": "NUMBER",
             "packages": [],
-            "output_id": "0fde9607-353f-42c2-85c4-20f720ebc1ec",
+            "output_id": "0022691d-4707-476f-a9f5-4947b5e36f07",
             "log_output_id": "7cac05e3-b7c3-475e-8df8-422b496c3398",
         },
         "display_data": {"position": {"x": 200.0, "y": -50.0}},
@@ -375,7 +375,7 @@ def test_serialize_workflow_with_code():
                                     "type": "NODE_OUTPUT",
                                     "data": {
                                         "node_id": "1c910367-dff1-4466-85bc-6a8ec4ca039d",
-                                        "output_id": "0fde9607-353f-42c2-85c4-20f720ebc1ec",
+                                        "output_id": "0022691d-4707-476f-a9f5-4947b5e36f07",
                                     },
                                 }
                             ],
@@ -553,7 +553,7 @@ def test_serialize_workflow__try_wrapped():
                 },
             },
             {
-                "id": "19d64948-f22b-4103-a7f5-3add184b31cc",
+                "id": "167a0eb0-3bb7-4f9c-9517-15eda41b7b58",
                 "key": "runtime",
                 "value": {
                     "rules": [{"type": "CONSTANT_VALUE", "data": {"type": "STRING", "value": "PYTHON_3_11_6"}}],
@@ -563,14 +563,14 @@ def test_serialize_workflow__try_wrapped():
         ],
         "data": {
             "label": "Simple Code Execution Node",
-            "error_output_id": "7236b0f4-b6bb-4103-a993-a8908d597dc3",
+            "error_output_id": "5049de20-77c9-4bcf-a572-260ec18c0528",
             "source_handle_id": "dede45ee-e17a-447c-b1d3-ed0d29ff1057",
             "target_handle_id": "f4a58613-628e-4a6d-aeae-4f81cf96bbf4",
             "code_input_id": "5049de20-77c9-4bcf-a572-260ec18c0528",
-            "runtime_input_id": "19d64948-f22b-4103-a7f5-3add184b31cc",
+            "runtime_input_id": "167a0eb0-3bb7-4f9c-9517-15eda41b7b58",
             "output_type": "NUMBER",
             "packages": [{"name": "openai", "version": "1.0.0", "repository": "test-repo"}],
-            "output_id": "0fde9607-353f-42c2-85c4-20f720ebc1ec",
+            "output_id": "0022691d-4707-476f-a9f5-4947b5e36f07",
             "log_output_id": "7cac05e3-b7c3-475e-8df8-422b496c3398",
         },
         "display_data": {"position": {"x": 200.0, "y": -50.0}},
@@ -598,12 +598,12 @@ def test_serialize_workflow__try_wrapped():
         },
         "adornments": [
             {
-                "id": "3344083c-a32c-4a32-920b-0fb5093448fa",
+                "id": "d602b4ed-fb9d-45ef-8d07-1b6c2d8cd893",
                 "label": "Try Node",
                 "base": {"name": "TryNode", "module": ["vellum", "workflows", "nodes", "core", "try_node", "node"]},
                 "attributes": [
                     {
-                        "id": "ab2fbab0-e2a0-419b-b1ef-ce11ecf11e90",
+                        "id": "2a313b7c-accd-4af2-a05b-c73b73c222b7",
                         "name": "on_error_code",
                         "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
                     }
@@ -677,7 +677,7 @@ def test_serialize_workflow__try_wrapped():
                                     "type": "NODE_OUTPUT",
                                     "data": {
                                         "node_id": "1c910367-dff1-4466-85bc-6a8ec4ca039d",
-                                        "output_id": "0fde9607-353f-42c2-85c4-20f720ebc1ec",
+                                        "output_id": "0022691d-4707-476f-a9f5-4947b5e36f07",
                                     },
                                 }
                             ],

@@ -521,37 +521,37 @@ def test_serialize_workflow_with_nested_descriptor_blocks():
         {
             "entries": [
                 {
-                    "id": "4e61fbcf-13b3-4d5f-b5fb-2bf919a92045",
+                    "id": "d84963ba-9f9f-446a-8341-5e16fb81efea",
                     "key": "block_type",
                     "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "CHAT_MESSAGE"}},
                 },
                 {
-                    "id": "79dd757e-46db-4c36-9ffc-ddb763d14f27",
+                    "id": "cbe1cbe1-c40c-4479-9521-fdde77f38740",
                     "key": "state",
                     "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
                 },
                 {
-                    "id": "2f8164e8-5495-4b9c-8268-d75618cd0842",
+                    "id": "2aece7e1-a392-4744-9a8b-39e4c46583ea",
                     "key": "cache_config",
                     "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
                 },
                 {
-                    "id": "0e8dc132-de9a-40dc-9845-336bc957df5a",
+                    "id": "d4e3b6c5-fcb5-4348-b3f4-a9758d26ee84",
                     "key": "chat_role",
                     "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "SYSTEM"}},
                 },
                 {
-                    "id": "755a45d2-2420-4414-b318-5790880f84ec",
+                    "id": "4efd1012-d201-4946-b087-c8cde47dbdee",
                     "key": "chat_source",
                     "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
                 },
                 {
-                    "id": "3a563cdb-d130-497f-bac6-c324a4349a3c",
+                    "id": "fbe0f3a4-fedc-448d-92fa-b34485ef839c",
                     "key": "chat_message_unterminated",
                     "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
                 },
                 {
-                    "id": "2d0c084e-c54f-48f5-9444-a17f8aeb8f76",
+                    "id": "f68bde51-e730-44d7-97a6-421d5d7b8e4d",
                     "key": "blocks",
                     "value": {
                         "items": [

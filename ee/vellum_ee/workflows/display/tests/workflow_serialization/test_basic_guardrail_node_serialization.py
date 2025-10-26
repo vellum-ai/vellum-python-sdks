@@ -87,7 +87,7 @@ def test_serialize_workflow():
                 },
             },
             {
-                "id": "f5cd9336-e8e9-429e-b7bc-785402e31bfb",
+                "id": "42aef2a5-5dcf-41ea-8da4-1eee1f8baf84",
                 "key": "actual",
                 "value": {
                     "rules": [
