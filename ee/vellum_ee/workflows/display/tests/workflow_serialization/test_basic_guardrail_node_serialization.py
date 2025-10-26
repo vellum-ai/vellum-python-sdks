@@ -173,7 +173,7 @@ def test_serialize_workflow():
     serialized_edges = workflow_raw_data["edges"]
     assert serialized_edges == [
         {
-            "id": "7bab1cc9-eedd-4e76-8bc1-0437b842c3bd",
+            "id": "4737867f-1967-45a1-966b-a0bda81a583d",
             "source_node_id": "54c5c7d0-ab86-4ae9-b0b8-ea9ca7b87c14",
             "source_handle_id": "41840690-8d85-486e-a864-b0661ccf0f2e",
             "target_node_id": "7fef2bbc-cdfc-4f66-80eb-2a52ee52da5f",
