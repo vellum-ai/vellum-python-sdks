@@ -4,6 +4,7 @@ from typing_extensions import TypeGuard
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.exceptions import InvalidExpressionException
 from vellum.workflows.descriptors.utils import resolve_value
+from vellum.workflows.expressions.comparison_utils import prepare_comparison_operands
 from vellum.workflows.state.base import BaseState
 
 LHS = TypeVar("LHS")
@@ -33,6 +34,9 @@ class LessThanOrEqualToExpression(BaseDescriptor[bool], Generic[LHS, RHS]):
     def resolve(self, state: "BaseState") -> bool:
         lhs = resolve_value(self._lhs, state)
         rhs = resolve_value(self._rhs, state)
+
+        # Parse string operands as numbers when comparing with numeric types
+        lhs, rhs = prepare_comparison_operands(lhs, rhs)
 
         if not has_le(lhs):
             raise InvalidExpressionException(f"'{lhs.__class__.__name__}' must support the '<=' operator")
