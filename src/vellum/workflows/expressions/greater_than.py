@@ -4,6 +4,7 @@ from typing_extensions import TypeGuard
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.exceptions import InvalidExpressionException
 from vellum.workflows.descriptors.utils import resolve_value
+from vellum.workflows.expressions.comparison_utils import prepare_comparison_operands
 from vellum.workflows.state.base import BaseState
 
 
@@ -14,26 +15,6 @@ class SupportsGreaterThan(Protocol):
 
 def has_gt(obj: Any) -> TypeGuard[SupportsGreaterThan]:
     return hasattr(obj, "__gt__")
-
-
-def _try_parse_numeric_string(value: Any) -> Any:
-    """
-    Attempt to parse a string value as a number (int or float).
-
-    This is to support the legacy workflow runner logic where string operands
-    should be automatically parsed as numbers when compared with numeric types.
-
-    Returns the parsed number if successful, otherwise returns the original value.
-    """
-    if not isinstance(value, str):
-        return value
-
-    try:
-        if "." not in value:
-            return int(value)
-        return float(value)
-    except (ValueError, TypeError):
-        return value
 
 
 LHS = TypeVar("LHS")
@@ -56,10 +37,7 @@ class GreaterThanExpression(BaseDescriptor[bool], Generic[LHS, RHS]):
         rhs = resolve_value(self._rhs, state)
 
         # Parse string operands as numbers when comparing with numeric types
-        if isinstance(lhs, str) and isinstance(rhs, (int, float)):
-            lhs = _try_parse_numeric_string(lhs)
-        elif isinstance(rhs, str) and isinstance(lhs, (int, float)):
-            rhs = _try_parse_numeric_string(rhs)
+        lhs, rhs = prepare_comparison_operands(lhs, rhs)
 
         if not has_gt(lhs):
             raise InvalidExpressionException(f"'{lhs.__class__.__name__}' must support the '>' operator")
