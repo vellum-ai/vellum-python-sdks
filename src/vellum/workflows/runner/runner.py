@@ -546,17 +546,17 @@ class WorkflowRunner(Generic[StateType]):
             if tb:
                 tb_list = traceback.extract_tb(tb)
                 if tb_list:
-                    last_frame = tb_list[-1]
-                    exception_module = next(
-                        (
-                            mod.__name__
-                            for mod in sys.modules.values()
-                            if hasattr(mod, "__file__") and mod.__file__ == last_frame.filename
-                        ),
-                        None,
-                    )
-                    if exception_module and not exception_module.startswith("vellum."):
-                        return str(exception)
+                    for frame in reversed(tb_list):
+                        exception_module = next(
+                            (
+                                mod.__name__
+                                for mod in sys.modules.values()
+                                if hasattr(mod, "__file__") and mod.__file__ == frame.filename
+                            ),
+                            None,
+                        )
+                        if exception_module and not exception_module.startswith("vellum."):
+                            return str(exception)
         except Exception:
             pass
 
