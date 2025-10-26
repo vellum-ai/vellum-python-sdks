@@ -67,7 +67,7 @@ def test_serialize_workflow():
     assert entrypoint_node["definition"] is None
 
     api_node = workflow_raw_data["nodes"][1]
-    assert api_node["id"] == "c2ed23f7-f6cb-4a56-a91c-2e5f9d8fda7f"
+    assert api_node["id"] == "bf98371c-65d3-43c1-99a2-0f5369397847"
 
     final_output_node = workflow_raw_data["nodes"][2]
     assert not DeepDiff(
@@ -91,7 +91,7 @@ def test_serialize_workflow():
                             {
                                 "type": "NODE_OUTPUT",
                                 "data": {
-                                    "node_id": "c2ed23f7-f6cb-4a56-a91c-2e5f9d8fda7f",
+                                    "node_id": "bf98371c-65d3-43c1-99a2-0f5369397847",
                                     "output_id": "83a720ef-d397-429b-8124-1db8286b3b00",
                                 },
                             }
@@ -116,17 +116,17 @@ def test_serialize_workflow():
     assert not DeepDiff(
         [
             {
-                "id": "445dd2de-82b2-482b-89f6-5f49d8eb21a9",
+                "id": "cd4d1a87-1fa2-46df-89fe-7fed9bb4600c",
                 "source_node_id": "f1e4678f-c470-400b-a40e-c8922cc99a86",
                 "source_handle_id": "40201804-8beb-43ad-8873-a027759512f1",
-                "target_node_id": "c2ed23f7-f6cb-4a56-a91c-2e5f9d8fda7f",
-                "target_handle_id": "b7bfb298-959a-4d2b-8b85-bbd0d2522703",
+                "target_node_id": "bf98371c-65d3-43c1-99a2-0f5369397847",
+                "target_handle_id": "43d9db30-98f6-4d75-a487-f74f3c660d8a",
                 "type": "DEFAULT",
             },
             {
                 "id": "b741c861-cf67-4649-b9ef-b43a4add72b1",
-                "source_node_id": "c2ed23f7-f6cb-4a56-a91c-2e5f9d8fda7f",
-                "source_handle_id": "89dccfa5-cc1a-4612-bd87-86cb444f6dd4",
+                "source_node_id": "bf98371c-65d3-43c1-99a2-0f5369397847",
+                "source_handle_id": "f710ef29-a056-420d-9342-8f0ac79ce4ca",
                 "target_node_id": "50e3b446-afcd-4a5d-8c6f-5f05eaf2200e",
                 "target_handle_id": "8bd9f4f3-9f66-4d95-8e84-529b0002c531",
                 "type": "DEFAULT",
