@@ -91,6 +91,14 @@ class BasePromptNode(BaseNode[StateType], Generic[StateType]):
             )
 
         elif e.status_code and e.status_code >= 400 and e.status_code < 500 and isinstance(e.body, dict):
+            error_code = e.body.get("code")
+            if error_code == "PROVIDER_ERROR":
+                raise NodeException(
+                    message=e.body.get("detail", "Provider error occurred"),
+                    code=WorkflowErrorCode.PROVIDER_ERROR,
+                    raw_data=e.body,
+                ) from e
+
             raise NodeException(
                 message=e.body.get("detail", "Failed to execute Prompt"),
                 code=WorkflowErrorCode.INVALID_INPUTS,

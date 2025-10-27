@@ -37,6 +37,7 @@ from vellum import (
     VellumVideo,
     VellumVideoRequest,
 )
+from vellum.client import ApiError
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs import BaseInputs
@@ -896,3 +897,33 @@ def test_inline_prompt_node__json_output_with_markdown_code_blocks(vellum_adhoc_
     json_output = outputs[2]
     assert json_output.name == "json"
     assert json_output.value == expected_json
+
+
+def test_inline_prompt_node__provider_error_from_api(vellum_adhoc_prompt_client):
+    """
+    Tests that InlinePromptNode raises NodeException with PROVIDER_ERROR code when API returns provider error.
+    """
+
+    # GIVEN an InlinePromptNode with basic configuration
+    class TestNode(InlinePromptNode):
+        ml_model = "test-model"
+        blocks = []
+        prompt_inputs = {}
+
+    # AND the API client raises an ApiError with a provider error in the body
+    provider_error_body = {
+        "detail": "Provider rate limit exceeded",
+        "code": "PROVIDER_ERROR",
+    }
+    api_error = ApiError(status_code=400, body=provider_error_body)
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = api_error
+
+    # WHEN the node is run
+    node = TestNode()
+
+    # THEN it should raise a NodeException with PROVIDER_ERROR error code
+    with pytest.raises(NodeException) as excinfo:
+        list(node.run())
+
+    # AND the exception should have the correct error code
+    assert excinfo.value.code == WorkflowErrorCode.PROVIDER_ERROR
