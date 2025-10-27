@@ -45,7 +45,14 @@ class VirtualFileLoader(importlib.abc.Loader):
         return None
 
     def _resolve_module(self, fullname: str) -> Optional[tuple[str, str]]:
-        file_path = self._get_file_path(fullname)
+        if fullname.startswith(self.namespace + "."):
+            relative_name = fullname[len(self.namespace) + 1 :]
+        elif fullname == self.namespace:
+            relative_name = ""
+        else:
+            return None
+
+        file_path = self._get_file_path(relative_name) if relative_name else "__init__.py"
         code = self._get_code(file_path)
 
         if code is not None:
@@ -58,6 +65,9 @@ class VirtualFileLoader(importlib.abc.Loader):
             if code is not None:
                 return file_path, code
 
+            if self._is_package_directory(relative_name):
+                return self._generate_init_content(relative_name)
+
         return None
 
     def _get_file_path(self, fullname):
@@ -66,6 +76,29 @@ class VirtualFileLoader(importlib.abc.Loader):
     def _get_code(self, file_path):
         file_key_name = re.sub(r"^" + re.escape(self.namespace) + r"/", "", file_path)
         return self.files.get(file_key_name)
+
+    def _is_package_directory(self, fullname: str) -> bool:
+        """Check if directory contains .py files that should be treated as a package."""
+        directory_prefix = fullname.replace(".", "/") + "/"
+
+        for file_path in self.files.keys():
+            if file_path.startswith(directory_prefix):
+                if file_path.endswith(".py") and not file_path.endswith("__init__.py"):
+                    return True
+                remaining_path = file_path[len(directory_prefix) :]
+                if "/" in remaining_path:
+                    return True
+
+        return False
+
+    def _generate_init_content(self, fullname: str) -> tuple[str, str]:
+        """Auto-generate empty __init__.py content to mark directory as a package."""
+        directory_prefix = fullname.replace(".", "/") + "/"
+        file_path = directory_prefix + "__init__.py"
+
+        code = ""
+
+        return file_path, code
 
 
 class VirtualFileFinder(BaseWorkflowFinder):
@@ -85,10 +118,11 @@ class VirtualFileFinder(BaseWorkflowFinder):
         if module_info:
             file_path, _ = module_info
             is_package = file_path.endswith("__init__.py")
+            origin = f"{self.namespace}/{file_path}"
             return importlib.machinery.ModuleSpec(
                 fullname,
                 self.loader,
-                origin=file_path,
+                origin=origin,
                 is_package=is_package,
             )
 

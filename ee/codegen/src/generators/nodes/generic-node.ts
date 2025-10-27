@@ -769,38 +769,42 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     }
 
     if (this.isNestedNode) {
-      // Create __init__.py for node implementation
-      const nodeInitFile = new InitFile({
-        workflowContext: this.workflowContext,
-        modulePath: this.nodeContext.nodeModulePath,
-        statements: [this.generateNodeClass()],
-      });
-
-      // Create __init__.py for node display
-      // We need to import nodes from those nested workflows to register the display classes
-      const nestedImports: python.StarImport[] = [];
-      this.inlineWorkflowsToGenerate.forEach((workflowFile) => {
-        const workflowName = workflowFile.functionName;
-        nestedImports.push(
-          python.starImport({
-            modulePath: [`.${workflowName}`, "nodes"],
-          })
-        );
-      });
-
-      const displayInitFile = new InitFile({
-        workflowContext: this.workflowContext,
-        modulePath: this.nodeContext.nodeDisplayModulePath,
-        statements: this.generateNodeDisplayClasses(),
-        imports: nestedImports.length > 0 ? nestedImports : undefined,
-      });
-
-      await Promise.all([
-        nodeInitFile.persist(),
-        displayInitFile.persist(),
+      const promises: Promise<unknown>[] = [
         this.generateFunctionFiles(),
         this.generateInlineWorkflowProjects(),
-      ]);
+      ];
+
+      if (!this.workflowContext.skipInitFiles) {
+        // Create __init__.py for node implementation
+        const nodeInitFile = new InitFile({
+          workflowContext: this.workflowContext,
+          modulePath: this.nodeContext.nodeModulePath,
+          statements: [this.generateNodeClass()],
+        });
+
+        // Create __init__.py for node display
+        // We need to import nodes from those nested workflows to register the display classes
+        const nestedImports: python.StarImport[] = [];
+        this.inlineWorkflowsToGenerate.forEach((workflowFile) => {
+          const workflowName = workflowFile.functionName;
+          nestedImports.push(
+            python.starImport({
+              modulePath: [`.${workflowName}`, "nodes"],
+            })
+          );
+        });
+
+        const displayInitFile = new InitFile({
+          workflowContext: this.workflowContext,
+          modulePath: this.nodeContext.nodeDisplayModulePath,
+          statements: this.generateNodeDisplayClasses(),
+          imports: nestedImports.length > 0 ? nestedImports : undefined,
+        });
+
+        promises.push(nodeInitFile.persist(), displayInitFile.persist());
+      }
+
+      await Promise.all(promises);
     } else {
       await super.persist();
     }

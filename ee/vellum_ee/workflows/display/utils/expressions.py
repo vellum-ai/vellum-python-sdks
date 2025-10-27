@@ -77,6 +77,10 @@ def virtual_open(file_path: str, mode: str = "r"):
                 content = finder.loader._get_code(relative_path)
                 if content is not None:
                     return StringIO(content)
+            else:
+                content = finder.loader._get_code(file_path)
+                if content is not None:
+                    return StringIO(content)
 
     return open(file_path, mode)
 

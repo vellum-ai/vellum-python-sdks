@@ -974,6 +974,10 @@ ${errors.slice(0, 3).map((err) => {
       return await node.persist();
     });
 
+    if (this.workflowContext.skipInitFiles) {
+      return [...nodePromises];
+    }
+
     return [
       // nodes/__init__.py
       rootNodesInitFile.persist(),

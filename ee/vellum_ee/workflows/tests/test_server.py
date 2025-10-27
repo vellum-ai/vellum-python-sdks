@@ -35,13 +35,6 @@ from .nodes.start_node import StartNode
 class Workflow(BaseWorkflow):
     graph = StartNode
 """,
-        "nodes/__init__.py": """\
-from .start_node import StartNode
-
-__all__ = [
-    "StartNode",
-]
-""",
         "nodes/start_node.py": """\
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.references import LazyReference
@@ -98,11 +91,6 @@ class Workflow(BaseWorkflow):
 
     class Outputs(BaseWorkflow.Outputs):
        final_output = CodeExecutionNode.Outputs.result
-""",
-        "nodes/__init__.py": """
-from .code_execution_node import CodeExecutionNode
-
-__all__ = ["CodeExecutionNode"]
 """,
         "nodes/code_execution_node/__init__.py": """
 from typing import Any
@@ -175,11 +163,6 @@ class Workflow(BaseWorkflow):
     class Outputs(BaseWorkflow.Outputs):
        final_output = CodeExecutionNode.Outputs.result
 """,
-        "nodes/__init__.py": """
-from .code_execution_node import CodeExecutionNode
-
-__all__ = ["CodeExecutionNode"]
-""",
         "nodes/code_execution_node/__init__.py": """
 from typing import Union
 
@@ -250,11 +233,6 @@ class Workflow(BaseWorkflow):
 
     class Outputs(BaseWorkflow.Outputs):
        final_output = CodeExecutionNode.Outputs.result
-""",
-        "nodes/__init__.py": """
-from .code_execution_node import CodeExecutionNode
-
-__all__ = ["CodeExecutionNode"]
 """,
         "nodes/code_execution_node/__init__.py": """
 from typing import Union
@@ -327,11 +305,6 @@ class Workflow(BaseWorkflow):
     class Outputs(BaseWorkflow.Outputs):
        final_output = Subworkflow.Outputs.result
 """,
-        "nodes/__init__.py": """
-from .subworkflow import Subworkflow
-
-__all__ = ["Subworkflow"]
-""",
         "nodes/subworkflow/__init__.py": """
 from vellum.workflows.nodes.displayable import InlineSubworkflowNode
 
@@ -339,11 +312,6 @@ from .workflow import SubworkflowWorkflow
 
 class Subworkflow(InlineSubworkflowNode):
     subworkflow = SubworkflowWorkflow
-""",
-        "nodes/subworkflow/nodes/__init__.py": """
-from .code_execution_node import CodeExecutionNode
-
-__all__ = ["CodeExecutionNode"]
 """,
         "nodes/subworkflow/nodes/code_execution_node/__init__.py": """
 from typing import Union
@@ -425,11 +393,6 @@ class Workflow(BaseWorkflow):
     class Outputs(BaseWorkflow.Outputs):  # noqa: W293
        results = MapNode.Outputs.final_output
 """,
-        "nodes/__init__.py": """
-from .map_node import MapNode
-
-__all__ = ["MapNode"]
-""",
         "nodes/map_node/__init__.py": """
 from vellum.workflows.nodes.core.map_node import MapNode as BaseMapNode
 
@@ -439,11 +402,6 @@ class MapNode(BaseMapNode):
     items = ["foo", "bar", "baz"]
     subworkflow = MapNodeWorkflow
     max_concurrency = 4
-""",
-        "nodes/map_node/nodes/__init__.py": """
-from .code_execution_node import CodeExecutionNode
-
-__all__ = ["CodeExecutionNode"]
 """,
         "nodes/map_node/nodes/code_execution_node/__init__.py": """
 from typing import Union
@@ -520,7 +478,6 @@ from .nodes.broken_node import BrokenNode
 class Workflow(BaseWorkflow):
     graph = BrokenNode
 """,
-        "nodes/__init__.py": "",
         "nodes/broken_node.py": """\
 from vellum.workflows.nodes import BaseNode
 
@@ -559,7 +516,6 @@ from .nodes.broken_node import BrokenNode
 class Workflow(BaseWorkflow):
     graph = BrokenNode
 """,
-        "nodes/__init__.py": "",
         "nodes/broken_node.py": """\
 from vellum.workflows.nodes import BaseNode
 
@@ -819,19 +775,9 @@ class TestSubworkflowDeploymentNode(SubworkflowDeploymentNode):
     files = {
         "__init__.py": "",
         "workflow.py": parent_workflow_code,
-        "nodes/__init__.py": """
-from .subworkflow_deployment_node import TestSubworkflowDeploymentNode
-
-__all__ = ["TestSubworkflowDeploymentNode"]
-""",
         "nodes/subworkflow_deployment_node.py": parent_node_code,
         f"{expected_prefix}/__init__.py": "",
         f"{expected_prefix}/workflow.py": mock_workflow_code,
-        f"{expected_prefix}/nodes/__init__.py": """
-from .test_node import TestNode
-
-__all__ = ["TestNode"]
-""",
         f"{expected_prefix}/nodes/test_node.py": test_node_code,
     }
 
@@ -919,11 +865,6 @@ class TestSubworkflowDeploymentNode(SubworkflowDeploymentNode):
     subworkflow_files = {
         "__init__.py": "",
         "workflow.py": mock_workflow_code,
-        "nodes/__init__.py": """
-from .test_node import TestNode
-
-__all__ = ["TestNode"]
-""",
         "nodes/test_node.py": test_node_code,
     }
 
@@ -931,11 +872,6 @@ __all__ = ["TestNode"]
         "__init__.py": "",
         "inputs.py": inputs_code,
         "workflow.py": parent_workflow_code,
-        "nodes/__init__.py": """
-from .subworkflow_deployment_node import TestSubworkflowDeploymentNode
-
-__all__ = ["TestSubworkflowDeploymentNode"]
-""",
         "nodes/subworkflow_deployment_node.py": parent_node_code,
     }
 
