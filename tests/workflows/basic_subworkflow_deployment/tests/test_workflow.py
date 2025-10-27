@@ -442,8 +442,8 @@ def test_stream_workflow__emits_workflow_initiated_and_fulfilled_events(mocker):
             release_tag_name=release_tag,
             workflow_version_id=uuid4(),
         )
-        # Return the class, state, and metadata tuple
-        return (SimpleWorkflow, state, metadata)
+        # Return the class and metadata tuple
+        return (SimpleWorkflow, metadata)
 
     mocker.patch.object(workflow._context, "resolve_workflow_deployment", side_effect=mock_resolve)
 

@@ -161,7 +161,7 @@ class WorkflowContext:
 
     def resolve_workflow_deployment(
         self, deployment_name: str, release_tag: str, state: "BaseState"
-    ) -> Optional[Tuple[Type["BaseWorkflow"], "BaseState", Optional[WorkflowDeploymentMetadata]]]:
+    ) -> Optional[Tuple[Type["BaseWorkflow"], Optional[WorkflowDeploymentMetadata]]]:
         """
         Resolve a workflow deployment by name and release tag.
 
@@ -171,7 +171,7 @@ class WorkflowContext:
             state: The base state to pass to the workflow
 
         Returns:
-            Tuple of (BaseWorkflow class, state, deployment metadata) if found
+            Tuple of (BaseWorkflow class, deployment metadata) if found
         """
         if not self._generated_files or not self._namespace:
             return None
@@ -186,7 +186,7 @@ class WorkflowContext:
             WorkflowClass = BaseWorkflow.load_from_module(f"{self.namespace}.{expected_prefix}")
             WorkflowClass.is_dynamic = True
             # Return the class, not an instance, so caller can instantiate within proper execution context
-            return (WorkflowClass, state, deployment_metadata)
+            return (WorkflowClass, deployment_metadata)
         except Exception:
             pass
 
@@ -211,16 +211,12 @@ class WorkflowContext:
                 prefixed_file_name = f"{expected_prefix}/{file_name}"
                 self._generated_files[prefixed_file_name] = content
 
-            # Re-fetch deployment metadata if it wasn't available before
-            if deployment_metadata is None:
-                deployment_metadata = self._fetch_deployment_metadata(deployment_name, release_tag)
-
             from vellum.workflows.workflows.base import BaseWorkflow
 
             WorkflowClass = BaseWorkflow.load_from_module(f"{self.namespace}.{expected_prefix}")
             WorkflowClass.is_dynamic = True
             # Return the class, not an instance, so caller can instantiate within proper execution context
-            return (WorkflowClass, state, deployment_metadata)
+            return (WorkflowClass, deployment_metadata)
 
         except Exception:
             pass

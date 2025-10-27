@@ -25,7 +25,6 @@ from vellum.workflows.exceptions import NodeException, WorkflowInitializationExc
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.outputs.base import BaseOutput
-from vellum.workflows.state import BaseState
 from vellum.workflows.state.context import WorkflowContext, WorkflowDeploymentMetadata
 from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior
 from vellum.workflows.types.generics import StateType
@@ -160,7 +159,6 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
     def _run_resolved_workflow(
         self,
         workflow_class: Type["BaseWorkflow"],
-        state: "BaseState",
         deployment_metadata: Optional[WorkflowDeploymentMetadata],
     ) -> Iterator[BaseOutput]:
         """Execute resolved workflow directly (similar to InlineSubworkflowNode)."""
@@ -184,7 +182,9 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
 
         with execution_context(parent_context=parent_context):
             # Instantiate the workflow inside the execution context so it captures the correct parent context
-            resolved_workflow = workflow_class(context=WorkflowContext.create_from(self._context), parent_state=state)
+            resolved_workflow = workflow_class(
+                context=WorkflowContext.create_from(self._context), parent_state=self.state
+            )
             subworkflow_stream = resolved_workflow.stream(
                 inputs=self._compile_subworkflow_inputs_for_direct_invocation(resolved_workflow),
                 event_filter=all_workflow_event_filter,
@@ -279,8 +279,8 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
             deployment_name=deployment_name, release_tag=self.release_tag, state=self.state
         )
         if resolved_result:
-            workflow_class, state, deployment_metadata = resolved_result
-            yield from self._run_resolved_workflow(workflow_class, state, deployment_metadata)
+            workflow_class, deployment_metadata = resolved_result
+            yield from self._run_resolved_workflow(workflow_class, deployment_metadata)
             return
 
         try:
