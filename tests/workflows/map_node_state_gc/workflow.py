@@ -13,23 +13,18 @@ class Inputs(BaseInputs):
 
 
 class State(BaseState):
-    accumulated_data: List[str] = []
+    data: str = ""
 
 
 class IterationNode(BaseNode):
     item = MapNode.SubworkflowInputs.item
-    index = MapNode.SubworkflowInputs.index
 
     class Outputs(BaseOutputs):
         result: str
-        state_size: int
 
     def run(self) -> Outputs:
-        large_string = f"iteration_{self.index}_" + ("x" * 1000)
-
-        self.state.accumulated_data.append(large_string)
-
-        return self.Outputs(result=large_string, state_size=len(self.state.accumulated_data))
+        self.state.data += "x" * 1000  # 1KB per iteration
+        return self.Outputs(result=self.state.data)
 
 
 class IterationSubworkflow(BaseWorkflow[MapNode.SubworkflowInputs, State]):
@@ -37,7 +32,6 @@ class IterationSubworkflow(BaseWorkflow[MapNode.SubworkflowInputs, State]):
 
     class Outputs(BaseOutputs):
         result = IterationNode.Outputs.result
-        state_size = IterationNode.Outputs.state_size
 
 
 class MapIterationsNode(MapNode):
@@ -51,4 +45,3 @@ class MapNodeStateGCWorkflow(BaseWorkflow[Inputs, State]):
 
     class Outputs(BaseOutputs):
         results = MapIterationsNode.Outputs.result
-        state_sizes = MapIterationsNode.Outputs.state_size
