@@ -24,7 +24,7 @@ from typing import (
 )
 from typing_extensions import dataclass_transform
 
-from pydantic import GetCoreSchemaHandler, ValidationInfo, field_serializer, field_validator
+from pydantic import GetCoreSchemaHandler, ValidationInfo, field_serializer, field_validator, model_serializer
 from pydantic_core import core_schema
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
@@ -230,7 +230,6 @@ class NodeExecutionCache:
         node: Type["BaseNode"],
         invoked_by: UUID,
         dependencies: Set["Type[BaseNode]"],
-        state: Optional["BaseState"] = None,
     ) -> None:
         self._dependencies_invoked[execution_id].add(invoked_by)
         invoked_node_classes = {
@@ -238,46 +237,6 @@ class NodeExecutionCache:
             for dep in self._dependencies_invoked[execution_id]
             if dep in self.__node_execution_lookup__
         }
-
-        if hasattr(node, "Trigger") and hasattr(node.Trigger, "merge_behavior"):
-            from vellum.workflows.types.core import MergeBehavior
-
-            merge_behavior = node.Trigger.merge_behavior
-            if merge_behavior == MergeBehavior.AWAIT_ALL and state and state.meta.workflow_dependencies:
-                expanded_invoked = set(invoked_node_classes)
-                for invoked_class in invoked_node_classes:
-                    for exec_id in self._dependencies_invoked[execution_id]:
-                        exec_lookup = self.__node_execution_lookup__
-                        if exec_id in exec_lookup and exec_lookup[exec_id] == invoked_class:
-                            upstream_deps = self._dependencies_invoked.get(exec_id, set())
-                            for upstream_dep in upstream_deps:
-                                if upstream_dep in exec_lookup:
-                                    expanded_invoked.add(exec_lookup[upstream_dep])
-
-                workflow_deps = state.meta.workflow_dependencies
-                common_upstream = None
-                all_deps_have_single_upstream = True
-
-                for dep in dependencies:
-                    if dep in invoked_node_classes:
-                        continue
-
-                    dep_upstreams = workflow_deps.get(dep, set())
-
-                    if len(dep_upstreams) != 1:
-                        all_deps_have_single_upstream = False
-                        break
-
-                    dep_upstream = next(iter(dep_upstreams))
-                    if common_upstream is None:
-                        common_upstream = dep_upstream
-                    elif common_upstream != dep_upstream:
-                        all_deps_have_single_upstream = False
-                        break
-
-                if all_deps_have_single_upstream and common_upstream and common_upstream in expanded_invoked:
-                    self._node_executions_queued[node].remove(execution_id)
-                    return
 
         if len(invoked_node_classes) != len(dependencies):
             return
@@ -352,7 +311,9 @@ class StateMeta(UniversalBaseModel):
     node_execution_cache: NodeExecutionCache = field(default_factory=NodeExecutionCache)
     parent: Optional["BaseState"] = None
     __snapshot_callback__: Optional[Callable[[Optional[StateDelta]], None]] = field(init=False, default=None)
-    workflow_dependencies: Optional[Dict[Type["BaseNode"], Set[Type["BaseNode"]]]] = field(init=False, default=None)
+    workflow_dependencies: Optional[Dict[Type["BaseNode"], Set[Type["BaseNode"]]]] = field(
+        init=False, default=None, repr=False
+    )
 
     def model_post_init(self, context: Any) -> None:
         self.__snapshot_callback__ = None
@@ -364,7 +325,7 @@ class StateMeta(UniversalBaseModel):
         self.__snapshot_callback__ = callback
 
     def __setattr__(self, name: str, value: Any) -> None:
-        if name.startswith("__") or name == "updated_ts":
+        if name.startswith("__") or name == "updated_ts" or name == "workflow_dependencies":
             super().__setattr__(name, value)
             return
 
@@ -506,6 +467,12 @@ class StateMeta(UniversalBaseModel):
         self, external_inputs: Dict[ExternalInputReference, Any], _info: Any
     ) -> Dict[str, Any]:
         return {str(descriptor): value for descriptor, value in external_inputs.items()}
+
+    @model_serializer(mode="wrap")
+    def _serialize_model(self, serializer: Any) -> Dict[str, Any]:
+        data = serializer(self)
+        data.pop("workflow_dependencies", None)
+        return data
 
     @field_validator("parent", mode="before")
     @classmethod

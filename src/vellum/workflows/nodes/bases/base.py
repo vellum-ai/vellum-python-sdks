@@ -395,7 +395,17 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
                             break
 
                     if all_deps_have_single_upstream and common_upstream and common_upstream in expanded_invoked:
-                        return True
+                        if hasattr(common_upstream, "Ports"):
+                            ports_class = common_upstream.Ports
+                            port_count = sum(
+                                1
+                                for attr_name in dir(ports_class)
+                                if not attr_name.startswith("_")
+                                and hasattr(ports_class, attr_name)
+                                and attr_name not in ["default"]
+                            )
+                            if port_count > 1:
+                                return True
 
                 return False
 
@@ -478,14 +488,12 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
                     and not in_loop
                 ):
                     state.meta.node_execution_cache._invoke_dependency(
-                        queued_node_execution_id, cls.node_class, invoked_by, dependencies, state
+                        queued_node_execution_id, cls.node_class, invoked_by, dependencies
                     )
                     return queued_node_execution_id
 
             state.meta.node_execution_cache._node_executions_queued[cls.node_class].append(execution_id)
-            state.meta.node_execution_cache._invoke_dependency(
-                execution_id, cls.node_class, invoked_by, dependencies, state
-            )
+            state.meta.node_execution_cache._invoke_dependency(execution_id, cls.node_class, invoked_by, dependencies)
             return execution_id
 
     class Execution(metaclass=_BaseNodeExecutionMeta):
