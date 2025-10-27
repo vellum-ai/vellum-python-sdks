@@ -20,7 +20,7 @@ from vellum.workflows.events.types import NodeParentContext, VellumCodeResourceD
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.state import BaseState
-from vellum.workflows.state.context import WorkflowContext
+from vellum.workflows.state.context import WorkflowDeploymentMetadata
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter, root_workflow_event_filter
 
@@ -432,9 +432,18 @@ def test_stream_workflow__emits_workflow_initiated_and_fulfilled_events(mocker):
     # AND a workflow with a Subworkflow Deployment Node
     workflow = BasicSubworkflowDeploymentWorkflow()
 
-    # AND we mock resolve_workflow_deployment to return a workflow instance with proper context
+    # AND we mock resolve_workflow_deployment to return a workflow class with proper context and metadata
     def mock_resolve(deployment_name: str, release_tag: str, state: Any):
-        return SimpleWorkflow(context=WorkflowContext.create_from(workflow._context), parent_state=state)
+        metadata = WorkflowDeploymentMetadata(
+            deployment_id=uuid4(),
+            deployment_name=deployment_name,
+            deployment_history_item_id=uuid4(),
+            release_tag_id=uuid4(),
+            release_tag_name=release_tag,
+            workflow_version_id=uuid4(),
+        )
+        # Return the class and metadata tuple
+        return (SimpleWorkflow, metadata)
 
     mocker.patch.object(workflow._context, "resolve_workflow_deployment", side_effect=mock_resolve)
 
@@ -465,17 +474,23 @@ def test_stream_workflow__emits_workflow_initiated_and_fulfilled_events(mocker):
     assert initiated_events[0].parent is not None
     assert initiated_events[0].parent.type == "EXTERNAL"
 
-    # AND the second initiated event should be from the subworkflow with Node Parent Context
+    # AND the second initiated event should be from the subworkflow with proper parent context hierarchy
     assert initiated_events[1].name == "workflow.execution.initiated"
     assert initiated_events[1].workflow_definition == SimpleWorkflow
     assert initiated_events[1].parent is not None
-    assert initiated_events[1].parent.type == "WORKFLOW_NODE"
-    assert isinstance(initiated_events[1].parent, NodeParentContext)
 
-    # AND the Node Parent should have a Workflow Parent (the parent workflow)
-    assert isinstance(initiated_events[1].parent.parent, WorkflowParentContext)
+    assert initiated_events[1].parent.type == "WORKFLOW_RELEASE_TAG"
+
+    # AND the parent of that should be WORKFLOW_NODE
+    assert initiated_events[1].parent.parent is not None
+    assert initiated_events[1].parent.parent.type == "WORKFLOW_NODE"
+    assert isinstance(initiated_events[1].parent.parent, NodeParentContext)
+
+    # AND the parent of that should be WORKFLOW
+    assert isinstance(initiated_events[1].parent.parent.parent, WorkflowParentContext)
+    assert initiated_events[1].parent.parent.parent.type == "WORKFLOW"
     assert (
-        initiated_events[1].parent.parent.workflow_definition.model_dump()
+        initiated_events[1].parent.parent.parent.workflow_definition.model_dump()
         == WorkflowParentContext(
             workflow_definition=workflow.__class__, span_id=uuid4()
         ).workflow_definition.model_dump()
