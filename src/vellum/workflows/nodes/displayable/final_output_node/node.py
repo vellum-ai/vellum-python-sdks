@@ -1,4 +1,4 @@
-from typing import Any, Dict, Generic, Tuple, Type, TypeVar, get_args
+from typing import Any, Dict, Generic, Tuple, Type, TypeVar, get_args, get_origin
 
 from vellum.workflows.constants import undefined
 from vellum.workflows.nodes.bases import BaseNode
@@ -72,6 +72,12 @@ class _FinalOutputNodeMeta(BaseNodeMeta):
             type_mismatch = True
             for descriptor_type in descriptor_types:
                 if descriptor_type == declared_output_type:
+                    type_mismatch = False
+                    break
+                if (
+                    get_origin(descriptor_type) == declared_output_type
+                    or get_origin(declared_output_type) == descriptor_type
+                ):
                     type_mismatch = False
                     break
                 try:
