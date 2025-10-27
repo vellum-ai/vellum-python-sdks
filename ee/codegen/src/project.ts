@@ -82,6 +82,15 @@ export interface WorkflowProjectGeneratorOptions {
    *  be inlined as a node attribute.
    */
   codeExecutionNodeCodeRepresentationOverride?: "STANDALONE" | "INLINE";
+  /**
+   * When true, skips generation of aggregator-level __init__.py files
+   * (e.g., nodes/__init__.py, display/nodes/__init__.py). Node implementation
+   * __init__.py files (e.g., nodes/workflow/__init__.py) are always generated.
+   *
+   * Useful for Agent Builder where these aggregator files add unnecessary tokens.
+   * @default false
+   */
+  skipInitFiles?: boolean;
 }
 
 export declare namespace WorkflowProjectGenerator {
@@ -169,7 +178,7 @@ ${errors.slice(0, 3).map((err) => {
         strict: rest.strict ?? false,
         pythonCodeMergeableNodeFiles: new Set<string>(),
         triggers: this.workflowVersionExecConfig.triggers,
-        skipInitFiles: rest.skipInitFiles,
+        skipInitFiles: rest.options?.skipInitFiles ?? false,
       });
       this.sandboxInputs = rest.sandboxInputs;
     }
