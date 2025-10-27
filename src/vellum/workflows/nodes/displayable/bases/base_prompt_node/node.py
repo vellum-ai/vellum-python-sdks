@@ -60,13 +60,6 @@ class BasePromptNode(BaseNode[StateType], Generic[StateType]):
         except ApiError as e:
             self._handle_api_error(e)
 
-        # We don't use the INITIATED event anyway, so we can just skip it
-        # and use the exception handling to catch other api level errors
-        try:
-            next(prompt_event_stream)
-        except ApiError as e:
-            self._handle_api_error(e)
-
         outputs: Optional[List[PromptOutput]] = None
         for event in prompt_event_stream:
             if event.state == "INITIATED":
@@ -91,14 +84,6 @@ class BasePromptNode(BaseNode[StateType], Generic[StateType]):
             )
 
         elif e.status_code and e.status_code >= 400 and e.status_code < 500 and isinstance(e.body, dict):
-            error_code = e.body.get("code")
-            if error_code == "PROVIDER_ERROR":
-                raise NodeException(
-                    message=e.body.get("detail", "Provider error occurred"),
-                    code=WorkflowErrorCode.PROVIDER_ERROR,
-                    raw_data=e.body,
-                ) from e
-
             raise NodeException(
                 message=e.body.get("detail", "Failed to execute Prompt"),
                 code=WorkflowErrorCode.INVALID_INPUTS,

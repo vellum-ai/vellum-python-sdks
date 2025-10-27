@@ -25,6 +25,7 @@ from vellum import (
     PromptRequestStringInput,
     PromptRequestVideoInput,
     PromptSettings,
+    RejectedExecutePromptEvent,
     RichTextPromptBlock,
     StringVellumValue,
     VariablePromptBlock,
@@ -32,12 +33,12 @@ from vellum import (
     VellumAudioRequest,
     VellumDocument,
     VellumDocumentRequest,
+    VellumError,
     VellumImage,
     VellumImageRequest,
     VellumVideo,
     VellumVideoRequest,
 )
-from vellum.client import ApiError
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs import BaseInputs
@@ -901,7 +902,7 @@ def test_inline_prompt_node__json_output_with_markdown_code_blocks(vellum_adhoc_
 
 def test_inline_prompt_node__provider_error_from_api(vellum_adhoc_prompt_client):
     """
-    Tests that InlinePromptNode raises NodeException with PROVIDER_ERROR code when API returns provider error.
+    Tests that InlinePromptNode raises NodeException with PROVIDER_ERROR code when first event is REJECTED.
     """
 
     # GIVEN an InlinePromptNode with basic configuration
@@ -910,13 +911,23 @@ def test_inline_prompt_node__provider_error_from_api(vellum_adhoc_prompt_client)
         blocks = []
         prompt_inputs = {}
 
-    # AND the API client raises an ApiError with a provider error in the body
-    provider_error_body = {
-        "detail": "Provider rate limit exceeded",
-        "code": "PROVIDER_ERROR",
-    }
-    api_error = ApiError(status_code=400, body=provider_error_body)
-    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = api_error
+    # AND the API returns a REJECTED event as the first event with a provider error
+    provider_error = VellumError(
+        code="PROVIDER_ERROR",
+        message="Provider rate limit exceeded",
+    )
+
+    def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[ExecutePromptEvent]:
+        execution_id = str(uuid4())
+        events: List[ExecutePromptEvent] = [
+            RejectedExecutePromptEvent(
+                execution_id=execution_id,
+                error=provider_error,
+            ),
+        ]
+        yield from events
+
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
 
     # WHEN the node is run
     node = TestNode()
