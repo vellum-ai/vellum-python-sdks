@@ -880,6 +880,8 @@ class WorkflowRunner(Generic[StateType]):
         for edge in self.workflow.get_edges():
             self._dependencies[edge.to_node].add(edge.from_port.node_class)
 
+        self._initial_state.meta.workflow_dependencies = self._dependencies
+
         current_parent = WorkflowParentContext(
             span_id=self._initial_state.meta.span_id,
             workflow_definition=self.workflow.__class__,
