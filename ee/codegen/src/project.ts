@@ -97,6 +97,7 @@ export declare namespace WorkflowProjectGenerator {
     vellumApiKey?: string;
     vellumApiEnvironment?: VellumEnvironmentUrls;
     sandboxInputs?: WorkflowSandboxDatasetRow[];
+    skipInitFiles?: boolean;
     options?: WorkflowProjectGeneratorOptions;
   }
 
@@ -168,6 +169,7 @@ ${errors.slice(0, 3).map((err) => {
         strict: rest.strict ?? false,
         pythonCodeMergeableNodeFiles: new Set<string>(),
         triggers: this.workflowVersionExecConfig.triggers,
+        skipInitFiles: rest.skipInitFiles,
       });
       this.sandboxInputs = rest.sandboxInputs;
     }
