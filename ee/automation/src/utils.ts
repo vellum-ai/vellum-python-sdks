@@ -6,12 +6,12 @@ export function getVersion() {
   // Read and parse manifest file from environment variable
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
-  
+
   const manifestFile = "pyproject.toml";
   if (!manifestFile) {
     throw new Error('FERN_MANIFEST_FILE environment variable is required');
   }
-  
+
   const manifestPath = path.join(__dirname, '..', '..', '..', manifestFile);
   const manifestContent = fs.readFileSync(manifestPath, 'utf8');
 
@@ -20,13 +20,15 @@ export function getVersion() {
   if (!versionRegexPattern) {
     throw new Error('FERN_VERSION_REGEX environment variable is required');
   }
-  
+
   const versionRegex = new RegExp(versionRegexPattern);
   const version = manifestContent.match(versionRegex)?.[1];
-  
+
   if (!version) {
     throw new Error(`Could not find version in ${manifestFile} using pattern ${versionRegexPattern}`);
   }
-  console.log('Found Version:', version);
-  return version;
+
+  // Sanitize version by removing 'v' prefix if present
+  const sanitizedVersion = version.replace(/^v\.?/, '');
+  return sanitizedVersion;
 }
