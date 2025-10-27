@@ -1,3 +1,1 @@
-from .openai_chat_completion_node import OpenAIChatCompletionNode
-
-__all__ = ["OpenAIChatCompletionNode"]
+__all__: list[str] = []
