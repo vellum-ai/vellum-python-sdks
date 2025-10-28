@@ -31,6 +31,7 @@ from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.references.node import NodeReference
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.state.context import WorkflowContext
+from vellum.workflows.state.store import EmptyStore
 from vellum.workflows.types.generics import StateType
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
@@ -99,7 +100,6 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
                     map_node_event = self._event_queue.get(block=False)
                     index = map_node_event[0]
                     subworkflow_event = map_node_event[1]
-                    self._context._emit_subworkflow_event(subworkflow_event)
 
                     if not is_workflow_event(subworkflow_event):
                         continue
@@ -173,6 +173,7 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
         subworkflow = self.subworkflow(
             parent_state=self.state,
             context=context,
+            store=EmptyStore(),
         )
         SubworkflowInputsClass = self.subworkflow.get_inputs_class()
         events = subworkflow.stream(

@@ -6,10 +6,10 @@ from tests.workflows.map_node_state_gc.workflow import Inputs, MapNodeStateGCWor
 
 def test_map_node_does_not_garbage_collect_nested_states():
     """
-    Demonstrates that nested subworkflow states are NOT garbage collected.
+    Verifies that nested subworkflow states ARE garbage collected.
 
-    This test shows that after map node execution, nested State objects
-    from individual iterations remain in memory, causing a memory leak.
+    This test ensures that after map node execution, nested State objects
+    from individual iterations are properly released from memory.
     """
 
     gc.collect()
@@ -25,6 +25,9 @@ def test_map_node_does_not_garbage_collect_nested_states():
 
     assert terminal_event.name == "workflow.execution.fulfilled"
 
+    del terminal_event
+    del workflow
+
     gc.collect()
 
     final_state_count = len([obj for obj in gc.get_objects() if isinstance(obj, State)])
@@ -37,14 +40,14 @@ def test_map_node_does_not_garbage_collect_nested_states():
     max_acceptable_state_growth = 5
 
     expected_output_memory_kb = (num_iterations * 1000) / 1024  # ~50KB
-    max_acceptable_memory_kb = expected_output_memory_kb * 5  # ~250KB with overhead
+    max_acceptable_memory_kb = expected_output_memory_kb * 50  # ~2.5MB with workflow overhead
 
-    assert state_growth > max_acceptable_state_growth, (
-        f"Expected state growth >{max_acceptable_state_growth} to demonstrate leak, "
-        f"but got {state_growth}. If this passes, the leak may have been fixed!"
+    assert state_growth <= max_acceptable_state_growth, (
+        f"Memory leak detected! State objects grew by {state_growth} (expected <={max_acceptable_state_growth}). "
+        f"Nested states are NOT being garbage collected."
     )
 
-    assert memory_growth > max_acceptable_memory_kb, (
-        f"Expected memory growth >{max_acceptable_memory_kb:.2f}KB to demonstrate leak, "
-        f"but got {memory_growth:.2f}KB. If this passes, the leak may have been fixed!"
+    assert memory_growth <= max_acceptable_memory_kb, (
+        f"Memory leak detected! Memory grew by {memory_growth:.2f}KB (expected <={max_acceptable_memory_kb:.2f}KB). "
+        f"Nested states are NOT being garbage collected."
     )

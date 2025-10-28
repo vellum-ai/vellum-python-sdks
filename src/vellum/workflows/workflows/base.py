@@ -447,6 +447,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             last_event = event
 
         if not last_event:
+            self._current_runner = None
             rejected_event = WorkflowExecutionRejectedEvent(
                 trace_id=self._execution_context.trace_id,
                 span_id=uuid4(),
@@ -461,6 +462,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             return rejected_event
 
         if not first_event:
+            self._current_runner = None
             rejected_event = WorkflowExecutionRejectedEvent(
                 trace_id=self._execution_context.trace_id,
                 span_id=uuid4(),
@@ -479,6 +481,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             or last_event.name == "workflow.execution.fulfilled"
             or last_event.name == "workflow.execution.paused"
         ):
+            self._current_runner = None
             return last_event
 
         rejected_event = WorkflowExecutionRejectedEvent(
@@ -492,6 +495,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
                 ),
             ),
         )
+        self._current_runner = None
         return rejected_event
 
     def stream(
