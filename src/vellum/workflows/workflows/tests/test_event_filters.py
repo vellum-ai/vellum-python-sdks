@@ -100,3 +100,27 @@ def test_workflow_sandbox_event_filter__includes_root_workflow_snapshotted_event
 
     for event in snapshotted_events:
         assert event.workflow_definition == SimpleWorkflow
+
+
+def test_workflow_sandbox_event_filter__includes_nested_workflow_non_snapshotted_events():
+    """
+    Tests that workflow_sandbox_event_filter includes non-snapshotted events from nested workflows.
+    """
+
+    workflow = ParentWorkflow()
+
+    # WHEN we stream the workflow with workflow_sandbox_event_filter
+    events = list(
+        workflow.stream(
+            inputs=ParentInputs(value="test"),
+            event_filter=workflow_sandbox_event_filter,
+        )
+    )
+
+    nested_workflow_events = [
+        e for e in events if hasattr(e, "workflow_definition") and e.workflow_definition == NestedWorkflow
+    ]
+    assert len(nested_workflow_events) > 0
+
+    for event in nested_workflow_events:
+        assert event.name != "workflow.execution.snapshotted"
