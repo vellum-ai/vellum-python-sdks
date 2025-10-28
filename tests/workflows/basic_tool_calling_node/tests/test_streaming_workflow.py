@@ -7,6 +7,7 @@ from vellum.client.types.function_call import FunctionCall
 from vellum.client.types.function_call_vellum_value import FunctionCallVellumValue
 from vellum.client.types.initiated_execute_prompt_event import InitiatedExecutePromptEvent
 from vellum.client.types.prompt_output import PromptOutput
+from vellum.client.types.streaming_execute_prompt_event import StreamingExecutePromptEvent
 from vellum.client.types.string_vellum_value import StringVellumValue
 
 from tests.workflows.basic_tool_calling_node.workflow import BasicToolCallingNodeWorkflow, Inputs
@@ -33,20 +34,40 @@ def test_stream_workflow__happy_path(vellum_adhoc_prompt_client):
                     ),
                 ),
             ]
-        else:
-            expected_outputs = [
-                StringVellumValue(
-                    value="Based on the function call, the current temperature in San Francisco is 70 degrees celsius."
-                )
+            events: List[ExecutePromptEvent] = [
+                InitiatedExecutePromptEvent(execution_id=execution_id),
+                FulfilledExecutePromptEvent(
+                    execution_id=execution_id,
+                    outputs=expected_outputs,
+                ),
             ]
-
-        events: List[ExecutePromptEvent] = [
-            InitiatedExecutePromptEvent(execution_id=execution_id),
-            FulfilledExecutePromptEvent(
-                execution_id=execution_id,
-                outputs=expected_outputs,
-            ),
-        ]
+        else:
+            events: List[ExecutePromptEvent] = [
+                InitiatedExecutePromptEvent(execution_id=execution_id),
+                StreamingExecutePromptEvent(
+                    execution_id=execution_id,
+                    output=StringVellumValue(value="Based on the function call, "),
+                    output_index=0,
+                ),
+                StreamingExecutePromptEvent(
+                    execution_id=execution_id,
+                    output=StringVellumValue(value="the current temperature in San Francisco "),
+                    output_index=0,
+                ),
+                StreamingExecutePromptEvent(
+                    execution_id=execution_id,
+                    output=StringVellumValue(value="is 70 degrees celsius."),
+                    output_index=0,
+                ),
+                FulfilledExecutePromptEvent(
+                    execution_id=execution_id,
+                    outputs=[
+                        StringVellumValue(
+                            value="Based on the function call, the current temperature in San Francisco is 70 degrees celsius."
+                        )
+                    ],
+                ),
+            ]
         yield from events
 
     vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
@@ -62,21 +83,29 @@ def test_stream_workflow__happy_path(vellum_adhoc_prompt_client):
     first_event = chat_history_events[0]
     assert first_event.output.is_initiated
 
-    streaming_event_1 = chat_history_events[1]
-    assert streaming_event_1.output.is_streaming
-    assert len(streaming_event_1.output.delta) == 1
+    text_streaming_events = [
+        event
+        for event in chat_history_events[1:-1]  # Skip initiated and fulfilled
+        if (
+            event.output.is_streaming
+            and len(event.output.delta) == 1
+            and event.output.delta[0].text is not None
+            and event.output.delta[0].role == "ASSISTANT"
+        )
+    ]
 
-    streaming_event_2 = chat_history_events[2]
-    assert streaming_event_2.output.is_streaming
-    assert len(streaming_event_2.output.delta) == 2
+    assert len(text_streaming_events) == 3
 
-    streaming_event_3 = chat_history_events[3]
-    assert streaming_event_3.output.is_streaming
-    assert len(streaming_event_3.output.delta) == 3
+    assert text_streaming_events[0].output.delta[0].text == "Based on the function call, "
+    assert text_streaming_events[0].output.delta[0].role == "ASSISTANT"
+
+    assert text_streaming_events[1].output.delta[0].text == "the current temperature in San Francisco "
+    assert text_streaming_events[1].output.delta[0].role == "ASSISTANT"
+
+    assert text_streaming_events[2].output.delta[0].text == "is 70 degrees celsius."
+    assert text_streaming_events[2].output.delta[0].role == "ASSISTANT"
 
     final_event = chat_history_events[-1]
     assert final_event.output.is_fulfilled
     final_chat_history = final_event.output.value
     assert len(final_chat_history) == 3
-
-    assert len(chat_history_events) == 5
