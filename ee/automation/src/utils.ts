@@ -30,5 +30,7 @@ export function getVersion() {
 
   // Sanitize version by removing 'v' prefix if present
   const sanitizedVersion = version.replace(/^v\.?/, '');
+
+  console.log('Found Version:', sanitizedVersion);
   return sanitizedVersion;
 }
