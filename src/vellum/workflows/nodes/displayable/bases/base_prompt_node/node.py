@@ -68,7 +68,11 @@ class BasePromptNode(BaseNode[StateType], Generic[StateType]):
             self._handle_api_error(e)
 
         outputs: Optional[List[PromptOutput]] = None
+        exception: Optional[NodeException] = None
         for event in prompt_event_stream:
+            if exception:
+                continue
+
             if event.state == "INITIATED":
                 continue
             elif event.state == "STREAMING":
@@ -78,7 +82,10 @@ class BasePromptNode(BaseNode[StateType], Generic[StateType]):
                 yield BaseOutput(name="results", value=event.outputs)
             elif event.state == "REJECTED":
                 workflow_error = vellum_error_to_workflow_error(event.error)
-                raise NodeException.of(workflow_error)
+                exception = NodeException.of(workflow_error)
+
+        if exception:
+            raise exception
 
         return outputs
 
