@@ -30,9 +30,9 @@ class VirtualFileLoader(importlib.abc.Loader):
 
         if module_info:
             file_path, code = module_info
-            spec = module.__spec__
-            filename_for_compile = spec.origin if spec and spec.origin else file_path
-            compiled = compile(code, filename_for_compile, "exec")
+            namespaced_path = f"{self.namespace}/{file_path}"
+            module.__file__ = namespaced_path
+            compiled = compile(code, namespaced_path, "exec")
             exec(compiled, module.__dict__)
 
     def get_source(self, fullname):
@@ -120,11 +120,10 @@ class VirtualFileFinder(BaseWorkflowFinder):
         if module_info:
             file_path, _ = module_info
             is_package = file_path.endswith("__init__.py")
-            origin = f"{self.namespace}/{file_path}"
             return importlib.machinery.ModuleSpec(
                 fullname,
                 self.loader,
-                origin=origin,
+                origin=file_path,
                 is_package=is_package,
             )
 

@@ -82,15 +82,6 @@ export interface WorkflowProjectGeneratorOptions {
    *  be inlined as a node attribute.
    */
   codeExecutionNodeCodeRepresentationOverride?: "STANDALONE" | "INLINE";
-  /**
-   * When true, skips generation of aggregator-level __init__.py files
-   * (e.g., nodes/__init__.py, display/nodes/__init__.py). Node implementation
-   * __init__.py files (e.g., nodes/workflow/__init__.py) are always generated.
-   *
-   * Useful for Agent Builder where these aggregator files add unnecessary tokens.
-   * @default false
-   */
-  skipInitFiles?: boolean;
 }
 
 export declare namespace WorkflowProjectGenerator {
@@ -106,7 +97,6 @@ export declare namespace WorkflowProjectGenerator {
     vellumApiKey?: string;
     vellumApiEnvironment?: VellumEnvironmentUrls;
     sandboxInputs?: WorkflowSandboxDatasetRow[];
-    skipInitFiles?: boolean;
     options?: WorkflowProjectGeneratorOptions;
   }
 
@@ -178,7 +168,6 @@ ${errors.slice(0, 3).map((err) => {
         strict: rest.strict ?? false,
         pythonCodeMergeableNodeFiles: new Set<string>(),
         triggers: this.workflowVersionExecConfig.triggers,
-        skipInitFiles: rest.options?.skipInitFiles ?? false,
       });
       this.sandboxInputs = rest.sandboxInputs;
     }
@@ -984,10 +973,6 @@ ${errors.slice(0, 3).map((err) => {
     const nodePromises = nodes.map(async (node) => {
       return await node.persist();
     });
-
-    if (this.workflowContext.skipInitFiles) {
-      return [...nodePromises];
-    }
 
     return [
       // nodes/__init__.py

@@ -68,7 +68,6 @@ export declare namespace WorkflowContext {
     nestedWorkflowModuleName?: string;
     workflowClassDescription?: string;
     triggers?: WorkflowTrigger[];
-    skipInitFiles?: boolean;
   };
 }
 
@@ -158,7 +157,6 @@ export class WorkflowContext {
   > = {};
 
   public readonly triggers?: WorkflowTrigger[];
-  public readonly skipInitFiles: boolean;
 
   constructor({
     absolutePathToOutputDirectory,
@@ -180,7 +178,6 @@ export class WorkflowContext {
     nestedWorkflowModuleName,
     pythonCodeMergeableNodeFiles,
     triggers,
-    skipInitFiles = false,
   }: WorkflowContext.Args) {
     this.absolutePathToOutputDirectory = absolutePathToOutputDirectory;
     this.moduleName = moduleName;
@@ -241,8 +238,6 @@ export class WorkflowContext {
 
     this.pythonCodeMergeableNodeFiles =
       pythonCodeMergeableNodeFiles ?? new Set<string>();
-
-    this.skipInitFiles = skipInitFiles ?? false;
   }
 
   public getAbsolutePath(filePath: string): string {
@@ -288,7 +283,6 @@ export class WorkflowContext {
       nestedWorkflowModuleName,
       workflowClassDescription,
       triggers: this.triggers,
-      skipInitFiles: this.skipInitFiles,
     });
   }
 
