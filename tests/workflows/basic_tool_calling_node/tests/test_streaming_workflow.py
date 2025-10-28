@@ -63,7 +63,7 @@ def test_stream_workflow__happy_path(vellum_adhoc_prompt_client):
                     execution_id=execution_id,
                     outputs=[
                         StringVellumValue(
-                            value="Based on the function call, the current temperature in San Francisco is 70 degrees celsius."
+                            value="Based on the function call, the current temperature in San Francisco is 70 degrees celsius."  # noqa: E501
                         )
                     ],
                 ),
