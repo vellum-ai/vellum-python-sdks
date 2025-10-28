@@ -40,6 +40,10 @@ def root_workflow_event_filter(workflow_definition: Type["BaseWorkflow"], event:
     ):
         return event.workflow_definition == workflow_definition
 
+    if event.name == "workflow.execution.snapshotted":
+        # Only include snapshotted events from the root workflow definition
+        return event.workflow_definition == workflow_definition
+
     if not event.parent:
         return False
 
