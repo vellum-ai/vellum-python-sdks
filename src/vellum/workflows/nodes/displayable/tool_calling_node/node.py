@@ -128,7 +128,7 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
                 elif event.output.name == "text":
                     if event.output.is_fulfilled:
                         fulfilled_output_names.add(event.output.name)
-                        yield event.output
+                    yield event.output
             elif event.name == "workflow.execution.fulfilled":
                 outputs = event.outputs
             elif event.name == "workflow.execution.rejected":
