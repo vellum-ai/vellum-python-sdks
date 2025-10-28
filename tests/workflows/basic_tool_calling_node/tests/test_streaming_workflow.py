@@ -1,5 +1,5 @@
 from uuid import uuid4
-from typing import Iterator, List
+from typing import Iterator, List, Any
 
 from vellum.client.types.execute_prompt_event import ExecutePromptEvent
 from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
@@ -34,7 +34,7 @@ def test_stream_workflow__happy_path(vellum_adhoc_prompt_client):
                     ),
                 ),
             ]
-            events: List[ExecutePromptEvent] = [
+            first_events: List[ExecutePromptEvent] = [
                 InitiatedExecutePromptEvent(execution_id=execution_id),
                 StreamingExecutePromptEvent(
                     execution_id=execution_id, output=StringVellumValue(value="Let"), output_index=0
@@ -56,14 +56,18 @@ def test_stream_workflow__happy_path(vellum_adhoc_prompt_client):
                     value="Based on the function call, the current temperature in San Francisco is 70 degrees celsius."
                 )
             ]
-            events: List[ExecutePromptEvent] = [
+            second_events: List[ExecutePromptEvent] = [
                 InitiatedExecutePromptEvent(execution_id=execution_id),
                 FulfilledExecutePromptEvent(
                     execution_id=execution_id,
                     outputs=expected_outputs,
                 ),
             ]
-        yield from events
+        
+        if call_count == 1:
+            yield from first_events
+        else:
+            yield from second_events
 
     vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
 
@@ -82,22 +86,26 @@ def test_stream_workflow__happy_path(vellum_adhoc_prompt_client):
     event_1 = chat_history_events[1]
     assert event_1.output.is_streaming
     assert len(event_1.output.delta) == 1
+    assert isinstance(event_1.output.delta, list)
     assert event_1.output.delta[0].role == "ASSISTANT"
     assert event_1.output.delta[0].text == "Let"
 
     event_2 = chat_history_events[2]
     assert event_2.output.is_streaming
     assert len(event_2.output.delta) == 1
+    assert isinstance(event_2.output.delta, list)
     assert event_2.output.delta[0].text == " me"
 
     event_3 = chat_history_events[3]
     assert event_3.output.is_streaming
     assert len(event_3.output.delta) == 1
+    assert isinstance(event_3.output.delta, list)
     assert event_3.output.delta[0].text == " check"
 
     event_4 = chat_history_events[4]
     assert event_4.output.is_streaming
     assert len(event_4.output.delta) == 1
+    assert isinstance(event_4.output.delta, list)
     assert event_4.output.delta[0].role == "ASSISTANT"
     assert event_4.output.delta[0].content.type == "FUNCTION_CALL"
     assert event_4.output.delta[0].content.value.name == "get_current_weather"
@@ -105,6 +113,7 @@ def test_stream_workflow__happy_path(vellum_adhoc_prompt_client):
     event_5 = chat_history_events[5]
     assert event_5.output.is_streaming
     assert len(event_5.output.delta) == 2  # Function call + function result
+    assert isinstance(event_5.output.delta, list)
     assert event_5.output.delta[0].role == "ASSISTANT"
     assert event_5.output.delta[0].content.type == "FUNCTION_CALL"
     assert event_5.output.delta[1].role == "FUNCTION"
@@ -113,6 +122,7 @@ def test_stream_workflow__happy_path(vellum_adhoc_prompt_client):
     event_6 = chat_history_events[6]
     assert event_6.output.is_streaming
     assert len(event_6.output.delta) == 3  # All messages: function call + function result + final response
+    assert isinstance(event_6.output.delta, list)
     assert event_6.output.delta[2].role == "ASSISTANT"
     assert (
         event_6.output.delta[2].text
