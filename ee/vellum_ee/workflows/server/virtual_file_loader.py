@@ -30,7 +30,9 @@ class VirtualFileLoader(importlib.abc.Loader):
 
         if module_info:
             file_path, code = module_info
-            namespaced_path = f"{self.namespace}/{file_path}"
+            namespaced_path = (
+                file_path if file_path.startswith(f"{self.namespace}/") else f"{self.namespace}/{file_path}"
+            )
             module.__file__ = namespaced_path
             compiled = compile(code, namespaced_path, "exec")
             exec(compiled, module.__dict__)
@@ -47,14 +49,7 @@ class VirtualFileLoader(importlib.abc.Loader):
         return None
 
     def _resolve_module(self, fullname: str) -> Optional[tuple[str, str]]:
-        if fullname.startswith(self.namespace + "."):
-            relative_name = fullname[len(self.namespace) + 1 :]
-        elif fullname == self.namespace:
-            relative_name = ""
-        else:
-            return None
-
-        file_path = self._get_file_path(relative_name) if relative_name else "__init__.py"
+        file_path = self._get_file_path(fullname)
         code = self._get_code(file_path)
 
         if code is not None:
@@ -67,9 +62,18 @@ class VirtualFileLoader(importlib.abc.Loader):
             if code is not None:
                 return file_path, code
 
-            if self._is_package_directory(relative_name):
+            relative_name = self._to_relative(fullname)
+            if relative_name is not None and self._is_package_directory(relative_name):
                 return self._generate_init_content(relative_name)
 
+        return None
+
+    def _to_relative(self, fullname: str) -> Optional[str]:
+        """Convert a fully qualified module name to a relative name without the namespace prefix."""
+        if fullname.startswith(self.namespace + "."):
+            return fullname[len(self.namespace) + 1 :]
+        elif fullname == self.namespace:
+            return ""
         return None
 
     def _get_file_path(self, fullname):
