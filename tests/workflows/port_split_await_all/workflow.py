@@ -35,14 +35,6 @@ class TruePathNode(BaseNode):
         return self.Outputs()
 
 
-class FalsePathNode(BaseNode):
-    class Outputs(BaseNode.Outputs):
-        pass
-
-    def run(self) -> Outputs:
-        return self.Outputs()
-
-
 class MergeNode(BaseNode):
     class Outputs(BaseNode.Outputs):
         merged: str
@@ -68,7 +60,7 @@ class PortSplitAwaitAllWorkflow(BaseWorkflow[Inputs, State]):
     graph = (
         {
             BranchingNode.Ports.true_port >> TruePathNode,
-            BranchingNode.Ports.false_port >> FalsePathNode,
+            BranchingNode.Ports.false_port,
         }
         >> MergeNode
         >> FinalNode
