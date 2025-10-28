@@ -40,10 +40,6 @@ def root_workflow_event_filter(workflow_definition: Type["BaseWorkflow"], event:
     ):
         return event.workflow_definition == workflow_definition
 
-    if event.name == "workflow.execution.snapshotted":
-        # Only include snapshotted events from the root workflow definition
-        return event.workflow_definition == workflow_definition
-
     if not event.parent:
         return False
 
@@ -54,6 +50,20 @@ def root_workflow_event_filter(workflow_definition: Type["BaseWorkflow"], event:
     current_workflow_definition = VellumCodeResourceDefinition.encode(workflow_definition)
 
     return event_parent_definition.model_dump() == current_workflow_definition.model_dump()
+
+
+def workflow_sandbox_event_filter(workflow_definition: Type["BaseWorkflow"], event: "WorkflowEvent") -> bool:
+    """
+    This filter is specifically designed to produce a reasonable stream for Workflow Sandbox interfaces.
+
+    It behaves like root_workflow_event_filter, but includes workflow.execution.snapshotted events
+    only when they belong to the root workflow, filtering out snapshots from nested/subworkflows.
+    """
+
+    if event.name == "workflow.execution.snapshotted":
+        return event.workflow_definition == workflow_definition
+
+    return root_workflow_event_filter(workflow_definition, event)
 
 
 def all_workflow_event_filter(workflow_definition: Type["BaseWorkflow"], event: "WorkflowEvent") -> bool:
