@@ -30,7 +30,9 @@ class VirtualFileLoader(importlib.abc.Loader):
 
         if module_info:
             file_path, code = module_info
-            compiled = compile(code, file_path, "exec")
+            spec = module.__spec__
+            filename_for_compile = spec.origin if spec and spec.origin else file_path
+            compiled = compile(code, filename_for_compile, "exec")
             exec(compiled, module.__dict__)
 
     def get_source(self, fullname):
