@@ -1,3 +1,5 @@
+from vellum.workflows.constants import undefined
+
 from tests.workflows.basic_merge_node.await_all_workflow import AwaitAllFailingWorkflow, AwaitAllPassingWorkflow
 from tests.workflows.basic_merge_node.await_any_workflow import AwaitAnyPassingWorkflow
 
@@ -17,7 +19,7 @@ def test_run_workflow__await_all__passing():
 
 
 def test_run_workflow__await_all__failing():
-    # GIVEN a workflow with an await all merge node after a port split
+    # GIVEN a workflow that fails an await all merge node
     workflow = AwaitAllFailingWorkflow()
 
     # WHEN the workflow is run
@@ -26,7 +28,8 @@ def test_run_workflow__await_all__failing():
     # THEN the workflow should complete successfully
     assert terminal_event.name == "workflow.execution.fulfilled", terminal_event
 
-    assert terminal_event.outputs.value == "output"
+    # AND there should not be a final output
+    assert terminal_event.outputs.value is undefined
 
 
 def test_run_workflow__await_any__passing():

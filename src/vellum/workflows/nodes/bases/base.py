@@ -348,66 +348,18 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
                 A node utilizing an AWAIT_ALL merge strategy will only be considered ready
                 when all of its dependencies have invoked this node.
                 """
+                # Check if all dependencies have invoked this node
                 dependencies_invoked = state.meta.node_execution_cache._dependencies_invoked.get(node_span_id, set())
                 node_classes_invoked = {
                     state.meta.node_execution_cache.__node_execution_lookup__[dep]
                     for dep in dependencies_invoked
                     if dep in state.meta.node_execution_cache.__node_execution_lookup__
                 }
+                if len(node_classes_invoked) != len(dependencies):
+                    return False
 
-                if len(node_classes_invoked) == len(dependencies):
-                    all_deps_invoked = all(dep in node_classes_invoked for dep in dependencies)
-                    if all_deps_invoked:
-                        return True
-
-                if state.meta.workflow_dependencies:
-                    expanded_invoked = set(node_classes_invoked)
-                    for invoked_class in node_classes_invoked:
-                        for exec_id in dependencies_invoked:
-                            exec_lookup = state.meta.node_execution_cache.__node_execution_lookup__
-                            if exec_id in exec_lookup and exec_lookup[exec_id] == invoked_class:
-                                upstream_deps = state.meta.node_execution_cache._dependencies_invoked.get(
-                                    exec_id, set()
-                                )
-                                for upstream_dep in upstream_deps:
-                                    if upstream_dep in exec_lookup:
-                                        expanded_invoked.add(exec_lookup[upstream_dep])
-
-                    workflow_deps = state.meta.workflow_dependencies
-                    common_upstream = None
-                    all_deps_have_single_upstream = True
-
-                    for dep in dependencies:
-                        if dep in node_classes_invoked:
-                            continue
-
-                        dep_upstreams = workflow_deps.get(dep, set())
-
-                        if len(dep_upstreams) != 1:
-                            all_deps_have_single_upstream = False
-                            break
-
-                        dep_upstream = next(iter(dep_upstreams))
-                        if common_upstream is None:
-                            common_upstream = dep_upstream
-                        elif common_upstream != dep_upstream:
-                            all_deps_have_single_upstream = False
-                            break
-
-                    if all_deps_have_single_upstream and common_upstream and common_upstream in expanded_invoked:
-                        if hasattr(common_upstream, "Ports"):
-                            ports_class = common_upstream.Ports
-                            port_count = sum(
-                                1
-                                for attr_name in dir(ports_class)
-                                if not attr_name.startswith("_")
-                                and hasattr(ports_class, attr_name)
-                                and attr_name not in ["default"]
-                            )
-                            if port_count > 1:
-                                return True
-
-                return False
+                all_deps_invoked = all(dep in node_classes_invoked for dep in dependencies)
+                return all_deps_invoked
 
             raise NodeException(
                 message="Invalid Trigger Node Specification",

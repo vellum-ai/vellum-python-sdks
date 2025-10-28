@@ -24,7 +24,7 @@ from typing import (
 )
 from typing_extensions import dataclass_transform
 
-from pydantic import GetCoreSchemaHandler, ValidationInfo, field_serializer, field_validator, model_serializer
+from pydantic import GetCoreSchemaHandler, ValidationInfo, field_serializer, field_validator
 from pydantic_core import core_schema
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
@@ -237,7 +237,6 @@ class NodeExecutionCache:
             for dep in self._dependencies_invoked[execution_id]
             if dep in self.__node_execution_lookup__
         }
-
         if len(invoked_node_classes) != len(dependencies):
             return
 
@@ -311,9 +310,6 @@ class StateMeta(UniversalBaseModel):
     node_execution_cache: NodeExecutionCache = field(default_factory=NodeExecutionCache)
     parent: Optional["BaseState"] = None
     __snapshot_callback__: Optional[Callable[[Optional[StateDelta]], None]] = field(init=False, default=None)
-    workflow_dependencies: Optional[Dict[Type["BaseNode"], Set[Type["BaseNode"]]]] = field(
-        init=False, default=None, repr=False
-    )
 
     def model_post_init(self, context: Any) -> None:
         self.__snapshot_callback__ = None
@@ -325,7 +321,7 @@ class StateMeta(UniversalBaseModel):
         self.__snapshot_callback__ = callback
 
     def __setattr__(self, name: str, value: Any) -> None:
-        if name.startswith("__") or name == "updated_ts" or name == "workflow_dependencies":
+        if name.startswith("__") or name == "updated_ts":
             super().__setattr__(name, value)
             return
 
@@ -467,12 +463,6 @@ class StateMeta(UniversalBaseModel):
         self, external_inputs: Dict[ExternalInputReference, Any], _info: Any
     ) -> Dict[str, Any]:
         return {str(descriptor): value for descriptor, value in external_inputs.items()}
-
-    @model_serializer(mode="wrap")
-    def _serialize_model(self, serializer: Any) -> Dict[str, Any]:
-        data = serializer(self)
-        data.pop("workflow_dependencies", None)
-        return data
 
     @field_validator("parent", mode="before")
     @classmethod
