@@ -225,6 +225,7 @@ class FunctionNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
         except Exception as e:
             self._handle_tool_exception(e, "function", self.function_definition.__name__)
 
+        # Add the result to the chat history
         self._add_function_result_to_chat_history(result, self.state)
 
         yield from []
@@ -254,6 +255,8 @@ class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
         # Add result to chat history
         self._add_function_result_to_chat_history(result, self.state)
 
+        yield from []
+
 
 class MCPNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
     """Node that executes an MCP tool with function call output."""
@@ -269,6 +272,7 @@ class MCPNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
         except Exception as e:
             self._handle_tool_exception(e, "MCP tool", self.mcp_tool.name)
 
+        # Add result to chat history
         self._add_function_result_to_chat_history(result, self.state)
 
         yield from []
