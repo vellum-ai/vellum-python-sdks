@@ -3,6 +3,7 @@
 import pytest
 
 from vellum.workflows.exceptions import WorkflowInitializationException
+from vellum.workflows.triggers.manual import ManualTrigger
 
 from tests.workflows.integration_trigger_execution.nodes.slack_message_trigger import SlackMessageTrigger
 from tests.workflows.integration_trigger_execution.workflows.multi_trigger_workflow import MultiTriggerWorkflow
@@ -75,7 +76,7 @@ def test_error_when_trigger_event_missing():
 
 
 def test_error_when_trigger_event_provided_but_no_integration_trigger():
-    """Test that workflow raises error when trigger provided but no IntegrationTrigger in workflow."""
+    """Test that workflow raises error when trigger provided but no matching trigger in workflow."""
     # GIVEN a workflow without IntegrationTrigger
     workflow = NoTriggerWorkflow()
 
@@ -93,8 +94,9 @@ def test_error_when_trigger_event_provided_but_no_integration_trigger():
     with pytest.raises(WorkflowInitializationException) as exc_info:
         workflow.run(trigger=trigger)
 
-    assert "trigger provided" in str(exc_info.value)
-    assert "does not have an IntegrationTrigger" in str(exc_info.value)
+    assert "not compatible with workflow" in str(exc_info.value)
+    assert "SlackMessageTrigger" in str(exc_info.value)
+    assert "ManualTrigger" in str(exc_info.value)
 
 
 def test_no_trigger_workflow_runs_without_trigger_event():
@@ -144,3 +146,36 @@ def test_workflow_with_multiple_triggers_slack_path():
     # THEN it should execute successfully via SlackTrigger path
     assert result.name == "workflow.execution.fulfilled"
     assert result.outputs.slack_result == "Slack: Multi-trigger test"
+
+
+def test_manual_trigger_instance_can_be_passed():
+    """Test that ManualTrigger instance can be passed explicitly (supports BaseTrigger)."""
+    # GIVEN a workflow with both ManualTrigger and IntegrationTrigger
+    workflow = MultiTriggerWorkflow()
+
+    # AND an explicit ManualTrigger instance
+    trigger = ManualTrigger()
+
+    # WHEN we run the workflow with ManualTrigger instance
+    result = workflow.run(trigger=trigger)
+
+    # THEN it should execute successfully via ManualTrigger path
+    assert result.name == "workflow.execution.fulfilled"
+    # The manual path node should execute
+    assert result.outputs.manual_result == "Manual execution"
+
+
+def test_workflow_with_only_manual_trigger_accepts_manual_trigger_instance():
+    """Test that workflow with only ManualTrigger accepts ManualTrigger instance."""
+    # GIVEN a workflow without IntegrationTrigger (implicit ManualTrigger)
+    workflow = NoTriggerWorkflow()
+
+    # AND an explicit ManualTrigger instance
+    trigger = ManualTrigger()
+
+    # WHEN we run the workflow with ManualTrigger instance
+    result = workflow.run(trigger=trigger)
+
+    # THEN it should execute successfully
+    assert result.name == "workflow.execution.fulfilled"
+    assert result.outputs.result == "No trigger workflow"

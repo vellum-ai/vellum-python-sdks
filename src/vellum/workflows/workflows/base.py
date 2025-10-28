@@ -79,7 +79,7 @@ from vellum.workflows.runner.runner import ExternalInputsArg, RunFromNodeArg
 from vellum.workflows.state.base import BaseState, StateMeta
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.state.store import Store
-from vellum.workflows.triggers.integration import IntegrationTrigger
+from vellum.workflows.triggers.base import BaseTrigger
 from vellum.workflows.types import CancelSignal
 from vellum.workflows.types.generics import InputsType, StateType
 from vellum.workflows.types.utils import get_original_base
@@ -383,7 +383,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         node_output_mocks: Optional[MockNodeExecutionArg] = None,
         max_concurrency: Optional[int] = None,
         timeout: Optional[float] = None,
-        trigger: Optional[IntegrationTrigger] = None,
+        trigger: Optional[BaseTrigger] = None,
     ) -> TerminalWorkflowEvent:
         """
         Invoke a Workflow, returning the last event emitted, which should be one of:
@@ -425,11 +425,11 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             The maximum time in seconds to allow the Workflow to run. If the timeout is exceeded, the Workflow
             will be rejected with a WORKFLOW_TIMEOUT error code and any nodes in flight will be rejected.
 
-        trigger: Optional[IntegrationTrigger] = None
-            An IntegrationTrigger instance for workflows with IntegrationTrigger (e.g., VellumIntegrationTrigger
-            subclasses). The trigger instance is bound to the workflow state, making its attributes accessible
-            to downstream nodes. Required for workflows that only have IntegrationTrigger; optional for workflows
-            with both ManualTrigger and IntegrationTrigger.
+        trigger: Optional[BaseTrigger] = None
+            A trigger instance for workflows with triggers (e.g., IntegrationTrigger, ManualTrigger, ScheduledTrigger).
+            The trigger instance is bound to the workflow state, making its attributes accessible to downstream nodes.
+            Required for workflows that only have IntegrationTrigger; optional for workflows with both ManualTrigger
+            and IntegrationTrigger.
         """
 
         runner = WorkflowRunner(
@@ -516,7 +516,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         node_output_mocks: Optional[MockNodeExecutionArg] = None,
         max_concurrency: Optional[int] = None,
         timeout: Optional[float] = None,
-        trigger: Optional[IntegrationTrigger] = None,
+        trigger: Optional[BaseTrigger] = None,
     ) -> WorkflowEventStream:
         """
         Invoke a Workflow, yielding events as they are emitted.
@@ -559,11 +559,11 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             The maximum time in seconds to allow the Workflow to run. If the timeout is exceeded, the Workflow
             will be rejected with a WORKFLOW_TIMEOUT error code and any nodes in flight will be rejected.
 
-        trigger: Optional[IntegrationTrigger] = None
-            An IntegrationTrigger instance for workflows with IntegrationTrigger (e.g., VellumIntegrationTrigger
-            subclasses). The trigger instance is bound to the workflow state, making its attributes accessible
-            to downstream nodes. Required for workflows that only have IntegrationTrigger; optional for workflows
-            with both ManualTrigger and IntegrationTrigger.
+        trigger: Optional[BaseTrigger] = None
+            A trigger instance for workflows with triggers (e.g., IntegrationTrigger, ManualTrigger, ScheduledTrigger).
+            The trigger instance is bound to the workflow state, making its attributes accessible to downstream nodes.
+            Required for workflows that only have IntegrationTrigger; optional for workflows with both ManualTrigger
+            and IntegrationTrigger.
         """
 
         should_yield = event_filter or workflow_event_filter
