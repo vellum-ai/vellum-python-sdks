@@ -25,6 +25,7 @@ from vellum import (
     PromptRequestStringInput,
     PromptRequestVideoInput,
     PromptSettings,
+    RejectedExecutePromptEvent,
     RichTextPromptBlock,
     StringVellumValue,
     VariablePromptBlock,
@@ -32,6 +33,7 @@ from vellum import (
     VellumAudioRequest,
     VellumDocument,
     VellumDocumentRequest,
+    VellumError,
     VellumImage,
     VellumImageRequest,
     VellumVideo,
@@ -896,3 +898,43 @@ def test_inline_prompt_node__json_output_with_markdown_code_blocks(vellum_adhoc_
     json_output = outputs[2]
     assert json_output.name == "json"
     assert json_output.value == expected_json
+
+
+def test_inline_prompt_node__provider_error_from_api(vellum_adhoc_prompt_client):
+    """
+    Tests that InlinePromptNode raises NodeException with PROVIDER_ERROR code when first event is REJECTED.
+    """
+
+    # GIVEN an InlinePromptNode with basic configuration
+    class TestNode(InlinePromptNode):
+        ml_model = "test-model"
+        blocks = []
+        prompt_inputs = {}
+
+    # AND the API returns a REJECTED event as the first event with a provider error
+    provider_error = VellumError(
+        code="PROVIDER_ERROR",
+        message="Provider rate limit exceeded",
+    )
+
+    def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[ExecutePromptEvent]:
+        execution_id = str(uuid4())
+        events: List[ExecutePromptEvent] = [
+            RejectedExecutePromptEvent(
+                execution_id=execution_id,
+                error=provider_error,
+            ),
+        ]
+        yield from events
+
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
+
+    # WHEN the node is run
+    node = TestNode()
+
+    # THEN it should raise a NodeException with PROVIDER_ERROR error code
+    with pytest.raises(NodeException) as excinfo:
+        list(node.run())
+
+    # AND the exception should have the correct error code
+    assert excinfo.value.code == WorkflowErrorCode.PROVIDER_ERROR
