@@ -1,5 +1,6 @@
 from abc import abstractmethod
-from typing import ClassVar, Generator, Generic, Iterator, List, Optional, Union
+from itertools import chain
+from typing import ClassVar, Generator, Generic, Iterator, List, Optional, Union, cast
 
 from vellum import AdHocExecutePromptEvent, ExecutePromptEvent, PromptOutput
 from vellum.client.core import RequestOptions
@@ -59,6 +60,20 @@ class BasePromptNode(BaseNode[StateType], Generic[StateType]):
             prompt_event_stream = self._get_prompt_event_stream()
         except ApiError as e:
             self._handle_api_error(e)
+
+        try:
+            first_event = next(prompt_event_stream)
+        except ApiError as e:
+            self._handle_api_error(e)
+        else:
+            if first_event.state == "REJECTED":
+                workflow_error = vellum_error_to_workflow_error(first_event.error)
+                raise NodeException.of(workflow_error)
+            if first_event.state != "INITIATED":
+                prompt_event_stream = cast(
+                    Union[Iterator[AdHocExecutePromptEvent], Iterator[ExecutePromptEvent]],
+                    chain([first_event], prompt_event_stream),
+                )
 
         outputs: Optional[List[PromptOutput]] = None
         for event in prompt_event_stream:

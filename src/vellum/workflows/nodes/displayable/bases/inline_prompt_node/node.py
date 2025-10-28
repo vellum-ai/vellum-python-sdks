@@ -1,3 +1,4 @@
+from itertools import chain
 import json
 from uuid import uuid4
 from typing import Callable, ClassVar, Generator, Generic, Iterator, List, Optional, Set, Tuple, Union
@@ -224,6 +225,17 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
             prompt_event_stream = self._get_prompt_event_stream()
         except ApiError as e:
             self._handle_api_error(e)
+
+        try:
+            first_event = next(prompt_event_stream)
+        except ApiError as e:
+            self._handle_api_error(e)
+        else:
+            if first_event.state == "REJECTED":
+                workflow_error = vellum_error_to_workflow_error(first_event.error)
+                raise NodeException.of(workflow_error)
+            if first_event.state != "INITIATED":
+                prompt_event_stream = chain([first_event], prompt_event_stream)
 
         outputs: Optional[List[PromptOutput]] = None
         for event in prompt_event_stream:
