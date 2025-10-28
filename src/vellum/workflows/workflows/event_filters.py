@@ -52,5 +52,18 @@ def root_workflow_event_filter(workflow_definition: Type["BaseWorkflow"], event:
     return event_parent_definition.model_dump() == current_workflow_definition.model_dump()
 
 
+def workflow_sandbox_event_filter(workflow_definition: Type["BaseWorkflow"], event: "WorkflowEvent") -> bool:
+    """
+    Filter designed for Workflow Sandbox interfaces: include all events except
+    workflow.execution.snapshotted events from nested/subworkflows. Only allow
+    snapshotted events when they belong to the root workflow definition.
+    """
+
+    if event.name == "workflow.execution.snapshotted":
+        return event.workflow_definition == workflow_definition
+
+    return True
+
+
 def all_workflow_event_filter(workflow_definition: Type["BaseWorkflow"], event: "WorkflowEvent") -> bool:
     return True
