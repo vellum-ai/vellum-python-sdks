@@ -1054,9 +1054,6 @@ describe("Workflow", () => {
 
       const triggerId = "trigger-1";
 
-      // Manual triggers have an associated entrypoint node with ID matching the trigger
-      const entrypointNodeWithTriggerId = entrypointNodeDataFactory(triggerId);
-
       const firstNode = genericNodeFactory({
         id: "first-node",
         label: "FirstNode",
@@ -1067,14 +1064,22 @@ describe("Workflow", () => {
         label: "SecondNode",
       });
 
-      const edges = edgesFactory([
-        [entrypointNodeWithTriggerId, firstNode],
-        [firstNode, secondNode],
-      ]);
+      // Trigger acts as edge source directly (no ENTRYPOINT node)
+      const edges = [
+        {
+          id: "trigger-edge",
+          type: "DEFAULT" as const,
+          sourceNodeId: triggerId,
+          sourceHandleId: triggerId,
+          targetNodeId: firstNode.id,
+          targetHandleId: "default",
+        },
+        ...edgesFactory([[firstNode, secondNode]]),
+      ];
 
       const workflowContext = workflowContextFactory({
         workflowRawData: {
-          nodes: [entrypointNodeWithTriggerId, firstNode, secondNode],
+          nodes: [firstNode, secondNode],
           edges,
         },
         triggers: [
@@ -1121,14 +1126,13 @@ describe("Workflow", () => {
         label: "SecondNode",
       });
 
-      // When a trigger is present, it IS the entry point - no entrypoint node needed
-      // Create edge from trigger to firstNode, then firstNode to secondNode
+      // Trigger acts as edge source directly (no ENTRYPOINT node)
       const edges = [
         {
           id: "trigger-edge",
           type: "DEFAULT" as const,
           sourceNodeId: triggerId,
-          sourceHandleId: triggerId, // Use trigger ID as handle ID
+          sourceHandleId: triggerId,
           targetNodeId: firstNode.id,
           targetHandleId: "default",
         },

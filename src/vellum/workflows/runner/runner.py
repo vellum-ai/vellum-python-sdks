@@ -74,6 +74,9 @@ from vellum.workflows.references import ExternalInputReference, OutputReference
 from vellum.workflows.references.state_value import StateValueReference
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.delta import StateDelta
+from vellum.workflows.triggers.base import BaseTrigger
+from vellum.workflows.triggers.integration import IntegrationTrigger
+from vellum.workflows.triggers.manual import ManualTrigger
 from vellum.workflows.types.core import CancelSignal
 from vellum.workflows.types.generics import InputsType, OutputsType, StateType
 
@@ -109,6 +112,7 @@ class WorkflowRunner(Generic[StateType]):
         max_concurrency: Optional[int] = None,
         timeout: Optional[float] = None,
         init_execution_context: Optional[ExecutionContext] = None,
+        trigger: Optional[BaseTrigger] = None,
     ):
         if state and external_inputs:
             raise ValueError("Can only run a Workflow providing one of state or external inputs, not both")
@@ -198,7 +202,24 @@ class WorkflowRunner(Generic[StateType]):
                 )
 
             self._entrypoints = self.workflow.get_entrypoints()
+        elif trigger:
+            # When trigger is provided, set up default state and filter entrypoints by trigger type
+            normalized_inputs = deepcopy(inputs) if inputs else self.workflow.get_default_inputs()
+            if state:
+                self._initial_state = deepcopy(state)
+                self._initial_state.meta.workflow_inputs = normalized_inputs
+                self._initial_state.meta.span_id = uuid4()
+                self._initial_state.meta.workflow_definition = self.workflow.__class__
+            else:
+                self._initial_state = self.workflow.get_default_state(normalized_inputs)
+                self._should_emit_initial_state = False
+
+            # Validate and bind trigger, then filter entrypoints
+            self._validate_and_bind_trigger(trigger)
+            self._entrypoints = self.workflow.get_entrypoints()
+            self._filter_entrypoints_for_trigger(trigger)
         else:
+            # Default case: no entrypoint overrides and no trigger
             normalized_inputs = deepcopy(inputs) if inputs else self.workflow.get_default_inputs()
             if state:
                 self._initial_state = deepcopy(state)
@@ -212,6 +233,9 @@ class WorkflowRunner(Generic[StateType]):
                 # there was no initial state provided by the user to invoke the workflow.
                 self._should_emit_initial_state = False
             self._entrypoints = self.workflow.get_entrypoints()
+
+            # Check if workflow requires a trigger but none was provided
+            self._validate_no_trigger_provided()
 
         # This queue is responsible for sending events from WorkflowRunner to the outside world
         self._workflow_event_outer_queue: Queue[WorkflowEvent] = Queue()
@@ -249,6 +273,126 @@ class WorkflowRunner(Generic[StateType]):
         self._background_thread: Optional[Thread] = None
         self._cancel_thread: Optional[Thread] = None
         self._timeout_thread: Optional[Thread] = None
+
+    def _has_manual_trigger(self) -> bool:
+        """Check if workflow has ManualTrigger."""
+        for subgraph in self.workflow.get_subgraphs():
+            for trigger in subgraph.triggers:
+                if issubclass(trigger, ManualTrigger):
+                    return True
+        return False
+
+    def _get_entrypoints_for_trigger_type(self, trigger_class: Type) -> List[Type[BaseNode]]:
+        """Get all entrypoints connected to a specific trigger type.
+
+        Allows subclasses: if trigger_class is a subclass of any declared trigger,
+        returns those entrypoints.
+        """
+        entrypoints: List[Type[BaseNode]] = []
+        for subgraph in self.workflow.get_subgraphs():
+            for trigger in subgraph.triggers:
+                # Check if the provided trigger_class is a subclass of the declared trigger
+                # This allows runtime instances to be subclasses of what's declared in the workflow
+                if issubclass(trigger_class, trigger):
+                    entrypoints.extend(subgraph.entrypoints)
+        return entrypoints
+
+    def _validate_and_bind_trigger(self, trigger: BaseTrigger) -> None:
+        """
+        Validate that trigger is compatible with workflow and bind it to state.
+
+        Supports all trigger types derived from BaseTrigger:
+        - IntegrationTrigger instances (Slack, Gmail, etc.)
+        - ManualTrigger instances (explicit manual execution)
+        - ScheduledTrigger instances (time-based triggers)
+        - Any future trigger types
+
+        Raises:
+            WorkflowInitializationException: If trigger type is not compatible with workflow
+        """
+        trigger_class = type(trigger)
+
+        # Search for a compatible trigger type in the workflow
+        found_compatible_trigger = False
+        has_any_triggers = False
+        incompatible_trigger_names: List[str] = []
+
+        for subgraph in self.workflow.get_subgraphs():
+            for declared_trigger in subgraph.triggers:
+                has_any_triggers = True
+                # Allow subclasses: if workflow declares BaseSlackTrigger, accept SpecificSlackTrigger instances
+                if issubclass(trigger_class, declared_trigger):
+                    found_compatible_trigger = True
+                    break
+                else:
+                    incompatible_trigger_names.append(declared_trigger.__name__)
+
+            if found_compatible_trigger:
+                break
+
+        # Special case: workflows with no explicit triggers implicitly support ManualTrigger
+        if not has_any_triggers and not isinstance(trigger, ManualTrigger):
+            raise WorkflowInitializationException(
+                message=f"Provided trigger type {trigger_class.__name__} is not compatible with workflow. "
+                f"Workflow has no explicit triggers and only supports ManualTrigger.",
+                workflow_definition=self.workflow.__class__,
+                code=WorkflowErrorCode.INVALID_INPUTS,
+            )
+
+        # Validate that we found a compatible trigger type
+        if has_any_triggers and not found_compatible_trigger:
+            raise WorkflowInitializationException(
+                message=f"Provided trigger type {trigger_class.__name__} is not compatible with workflow triggers. "
+                f"Workflow has: {sorted(set(incompatible_trigger_names))}",
+                workflow_definition=self.workflow.__class__,
+                code=WorkflowErrorCode.INVALID_INPUTS,
+            )
+
+        # Bind trigger to state (works for all trigger types via BaseTrigger.bind_to_state)
+        trigger.bind_to_state(self._initial_state)
+
+    def _filter_entrypoints_for_trigger(self, trigger: BaseTrigger) -> None:
+        """
+        Filter entrypoints to those connected to the specific trigger type.
+
+        Uses the specific trigger subclass, not the parent class, allowing workflows
+        with multiple triggers to route to the correct path.
+        """
+        trigger_class = type(trigger)
+        specific_entrypoints = self._get_entrypoints_for_trigger_type(trigger_class)
+        if specific_entrypoints:
+            self._entrypoints = specific_entrypoints
+
+    def _validate_no_trigger_provided(self) -> None:
+        """
+        Validate that workflow can run without a trigger.
+
+        If workflow has IntegrationTrigger(s) but no ManualTrigger, it requires a trigger instance.
+        If workflow has both, filter entrypoints to ManualTrigger path only.
+
+        Raises:
+            WorkflowInitializationException: If workflow requires trigger but none was provided
+        """
+        # Collect all IntegrationTrigger types in the workflow
+        workflow_integration_triggers = []
+        for subgraph in self.workflow.get_subgraphs():
+            for trigger_type in subgraph.triggers:
+                if issubclass(trigger_type, IntegrationTrigger):
+                    workflow_integration_triggers.append(trigger_type)
+
+        if workflow_integration_triggers:
+            if not self._has_manual_trigger():
+                # Workflow has ONLY IntegrationTrigger - this is an error
+                raise WorkflowInitializationException(
+                    message="Workflow has IntegrationTrigger which requires trigger parameter",
+                    workflow_definition=self.workflow.__class__,
+                    code=WorkflowErrorCode.INVALID_INPUTS,
+                )
+
+            # Workflow has both IntegrationTrigger and ManualTrigger - filter to ManualTrigger path
+            manual_entrypoints = self._get_entrypoints_for_trigger_type(ManualTrigger)
+            if manual_entrypoints:
+                self._entrypoints = manual_entrypoints
 
     @contextmanager
     def _httpx_logger_with_span_id(self) -> Iterator[None]:
