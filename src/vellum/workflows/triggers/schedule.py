@@ -12,7 +12,6 @@ class ScheduleTrigger(BaseTrigger):
 
     current_run_at: datetime
     next_run_at: datetime
-    last_run_at: datetime
 
     class Config:
         cron: str
