@@ -1,0 +1,11 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`WorkflowStatePointer > should generate correct Python code 1`] = `
+"State.state_1
+"
+`;
+
+exports[`WorkflowStatePointer > should handle when it's referencing a state variable that no longer exists 1`] = `
+"None
+"
+`;

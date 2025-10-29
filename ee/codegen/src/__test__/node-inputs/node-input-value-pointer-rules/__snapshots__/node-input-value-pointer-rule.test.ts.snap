@@ -14,3 +14,8 @@ exports[`NodeInputValuePointerRule > should generate correct AST for NODE_OUTPUT
 "TestNode.Outputs.my_output
 "
 `;
+
+exports[`NodeInputValuePointerRule > should generate correct AST for WORKFLOW_STATE pointer 1`] = `
+"State.state_1
+"
+`;
