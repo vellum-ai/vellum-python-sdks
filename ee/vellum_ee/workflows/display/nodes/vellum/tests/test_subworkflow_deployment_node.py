@@ -56,7 +56,7 @@ def mock_fetch_deployment(mocker):
 @pytest.mark.parametrize(
     ["GetDisplayClass", "expected_input_id"],
     [
-        (_no_display_class, "394132c2-1817-455e-9f3f-b7073eb63a2b"),
+        (_no_display_class, "b35e4da6-7810-4d93-ab84-3ad1cbd71251"),
         (_display_class_with_node_input_ids_by_name, "aff4f838-577e-44b9-ac5c-6d8213abbb9c"),
         (_display_class_with_node_input_ids_by_name_with_inputs_prefix, "aff4f838-577e-44b9-ac5c-6d8213abbb9c"),
     ],

@@ -43,7 +43,7 @@ def test_serialize_node__lazy_reference_in_prompt_inputs():
 
     assert lazy_reference_node["inputs"] == [
         {
-            "id": "aa81c1bc-d5d8-4ae8-8946-e9f4d0c1ab5f",
+            "id": "e80bda60-b6b7-4c53-ad99-41d0bd47d3bd",
             "key": "attr",
             "value": {
                 "combinator": "OR",
@@ -82,7 +82,7 @@ def _display_class_with_node_input_ids_by_name_with_inputs_prefix(Node: Type[Inl
 @pytest.mark.parametrize(
     ["GetDisplayClass", "expected_input_id"],
     [
-        (_no_display_class, "9b036991-67ff-4cd0-a4d7-b4ed581e8b6d"),
+        (_no_display_class, "f435df49-a8bf-4de0-bb49-ff5bb92de30e"),
         (_display_class_with_node_input_ids_by_name, "fba6a4d5-835a-4e99-afb7-f6a4aed15110"),
         (_display_class_with_node_input_ids_by_name_with_inputs_prefix, "fba6a4d5-835a-4e99-afb7-f6a4aed15110"),
     ],
@@ -161,7 +161,7 @@ def test_serialize_node__prompt_inputs__state_reference():
 
     assert my_prompt_node["inputs"] == [
         {
-            "id": "e47e0a80-afbb-4888-b06b-8dc78edd8572",
+            "id": "7c5d23b3-c5ed-4ed6-a685-43fbe9a9baf8",
             "key": "foo",
             "value": {
                 "rules": [],
@@ -169,7 +169,7 @@ def test_serialize_node__prompt_inputs__state_reference():
             },
         },
         {
-            "id": "b83c40f7-0159-442f-af03-e80870363c52",
+            "id": "e138f06e-d705-46bc-8ac4-c844b0e9131a",
             "key": "bar",
             "value": {
                 "rules": [
@@ -205,7 +205,7 @@ def test_serialize_node__prompt_inputs__state_reference():
                     },
                 },
                 {
-                    "id": "3750feb9-5d5c-4150-b62d-a9924f466888",
+                    "id": "341f8329-5d5f-417b-a20d-e88234a17c49",
                     "key": "bar",
                     "value": {
                         "type": "CONSTANT_VALUE",
@@ -325,47 +325,47 @@ def test_serialize_node__prompt_parameters__dynamic_references():
     assert parameters_attribute["value"]["type"] == "DICTIONARY_REFERENCE"
     assert parameters_attribute["value"]["entries"] == [
         {
-            "id": "24703d3a-ee6c-4b1b-80f8-6c19ef16723a",
+            "id": "652844a5-1f66-4211-ab0d-77c0c7d29a8a",
             "key": "stop",
             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
         },
         {
-            "id": "88a3bf5d-f42b-4895-850e-ad843945a003",
+            "id": "52def0d8-9d2b-4ff3-b9b7-e0212de3987d",
             "key": "temperature",
             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
         },
         {
-            "id": "ede3e0c2-3033-4d0a-bd72-e52595bdc916",
+            "id": "3444b1bc-5cd3-413a-8023-6dfe08e1a7c6",
             "key": "max_tokens",
             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
         },
         {
-            "id": "0013cd8f-7658-4908-80fc-b8995d8ca4cc",
+            "id": "36956dde-3a3d-47f3-982d-ee38e8b9d900",
             "key": "top_p",
             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
         },
         {
-            "id": "98eb2e57-d4ec-4c27-b39b-0b8086918a0f",
+            "id": "6755f4a6-ab90-4004-b3f7-495d06cdbdfa",
             "key": "top_k",
             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
         },
         {
-            "id": "04accc66-888c-4145-8b4f-d8ff99e38172",
+            "id": "ba427da5-55c8-4daf-a84e-4ac62784aa5e",
             "key": "frequency_penalty",
             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
         },
         {
-            "id": "9236d564-0637-48de-8423-cdf3617dd6b4",
+            "id": "736ccb67-efec-4958-a4c0-12f8c068856f",
             "key": "presence_penalty",
             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
         },
         {
-            "id": "74f3e80a-3935-45af-a9b3-d49e310a4c03",
+            "id": "1162f136-b72e-4848-8424-d1357053eb16",
             "key": "logit_bias",
             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
         },
         {
-            "id": "69a7ebf7-d21a-44e9-a0fa-43eb9b2815df",
+            "id": "56958af3-ed56-409d-bf1d-a357f01b917d",
             "key": "custom_parameters",
             "value": {
                 "entries": [

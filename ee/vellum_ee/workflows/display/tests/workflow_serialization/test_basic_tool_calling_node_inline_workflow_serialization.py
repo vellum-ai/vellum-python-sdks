@@ -192,7 +192,7 @@ def test_serialize_workflow():
                                                         },
                                                     },
                                                     {
-                                                        "id": "c5f2d66c-5bb6-4d2a-8e4d-5356318cd3ba",
+                                                        "id": "5b3ed6d0-8cd6-41b6-ad55-d380b41f943b",
                                                         "name": "date",
                                                         "value": {
                                                             "type": "WORKFLOW_INPUT",
@@ -208,7 +208,7 @@ def test_serialize_workflow():
                                                         "value": None,
                                                     },
                                                     {
-                                                        "id": "2a4a62b3-cd26-4d2c-b3f1-eaa5f9dd22dd",
+                                                        "id": "8616509d-fecb-4bbf-afdc-bd4c5de35ce7",
                                                         "name": "reasoning",
                                                         "type": "STRING",
                                                         "value": None,
@@ -279,7 +279,7 @@ def test_serialize_workflow():
                                                                     "type": "NODE_OUTPUT",
                                                                     "data": {
                                                                         "node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",  # noqa: E501
-                                                                        "output_id": "2a4a62b3-cd26-4d2c-b3f1-eaa5f9dd22dd",  # noqa: E501
+                                                                        "output_id": "8616509d-fecb-4bbf-afdc-bd4c5de35ce7",  # noqa: E501
                                                                     },
                                                                 }
                                                             ],
@@ -352,7 +352,7 @@ def test_serialize_workflow():
                                                 "value": {
                                                     "type": "NODE_OUTPUT",
                                                     "node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
-                                                    "node_output_id": "2a4a62b3-cd26-4d2c-b3f1-eaa5f9dd22dd",
+                                                    "node_output_id": "8616509d-fecb-4bbf-afdc-bd4c5de35ce7",
                                                 },
                                             },
                                         ],

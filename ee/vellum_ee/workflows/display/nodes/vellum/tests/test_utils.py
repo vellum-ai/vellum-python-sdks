@@ -73,7 +73,7 @@ class MyNodeB(BaseNode):
                     ),
                 ),
                 InputVariablePointer(
-                    data=InputVariableData(input_variable_id="a154c29d-fac0-4cd0-ba88-bc52034f5470"),
+                    data=InputVariableData(input_variable_id="4b16a629-11a1-4b3f-a965-a57b872d13b8"),
                 ),
                 ConstantValuePointer(data=StringVellumValue(value="fallback")),
             ],
@@ -82,7 +82,7 @@ class MyNodeB(BaseNode):
             MyNodeB.constant_coalesce,
             [
                 InputVariablePointer(
-                    data=InputVariableData(input_variable_id="a154c29d-fac0-4cd0-ba88-bc52034f5470"),
+                    data=InputVariableData(input_variable_id="4b16a629-11a1-4b3f-a965-a57b872d13b8"),
                 ),
                 ConstantValuePointer(data=StringVellumValue(value="default_value")),
             ],
@@ -97,7 +97,7 @@ class MyNodeB(BaseNode):
                     ),
                 ),
                 InputVariablePointer(
-                    data=InputVariableData(input_variable_id="a154c29d-fac0-4cd0-ba88-bc52034f5470"),
+                    data=InputVariableData(input_variable_id="4b16a629-11a1-4b3f-a965-a57b872d13b8"),
                 ),
             ],
         ),
@@ -117,7 +117,7 @@ def test_create_node_input_value_pointer_rules(
             ),
             global_workflow_input_displays={
                 Inputs.example_workflow_input: WorkflowInputsDisplay(
-                    id=UUID("a154c29d-fac0-4cd0-ba88-bc52034f5470"),
+                    id=UUID("4b16a629-11a1-4b3f-a965-a57b872d13b8"),
                 ),
             },
             global_node_output_displays={

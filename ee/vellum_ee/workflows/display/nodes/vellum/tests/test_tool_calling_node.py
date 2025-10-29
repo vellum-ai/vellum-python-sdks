@@ -139,7 +139,7 @@ def test_serialize_node__prompt_inputs__mixed_values():
                     "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "bar"}},
                 },
                 {
-                    "id": "828928b1-24e3-4457-9d6f-4f0692dfa355",
+                    "id": "b0de6603-fcdd-44a3-b33a-56f05bd03bb4",
                     "key": "baz",
                     "value": {"type": "WORKFLOW_INPUT", "input_variable_id": "8d57cf1d-147c-427b-9a5e-e5f6ab76e2eb"},
                 },

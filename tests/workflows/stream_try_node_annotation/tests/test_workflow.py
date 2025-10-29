@@ -43,7 +43,7 @@ def test_workflow_stream__happy_path():
     assert node_initiated_events[0].node_definition == InnerNode
     assert node_initiated_events[0].model_dump(mode="json")["body"]["node_definition"] == {
         "name": "TryNode",
-        "id": str(uuid4_from_hash(InnerNode.__qualname__)),
+        "id": str(uuid4_from_hash(f"{InnerNode.__module__}.{InnerNode.__qualname__}")),
         "module": [
             "tests",
             "workflows",

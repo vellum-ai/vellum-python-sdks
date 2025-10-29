@@ -32,7 +32,7 @@ def _display_class_with_node_input_ids_by_name_with_inputs_prefix(Node: Type[Cod
 @pytest.mark.parametrize(
     ["GetDisplayClass", "expected_input_id"],
     [
-        (_no_display_class, "a5dbe403-0b00-4df6-b8f7-ed5f7794b003"),
+        (_no_display_class, "20ff166f-af59-4515-8ff5-205226c01aa4"),
         (_display_class_with_node_input_ids_by_name, "fba6a4d5-835a-4e99-afb7-f6a4aed15110"),
         (_display_class_with_node_input_ids_by_name_with_inputs_prefix, "fba6a4d5-835a-4e99-afb7-f6a4aed15110"),
     ],
@@ -81,7 +81,7 @@ def test_serialize_node__code_node_inputs(GetDisplayClass, expected_input_id):
             },
         },
         {
-            "id": "9774d864-c76d-4a1a-8181-b632ed3ab87c",
+            "id": "50678b9f-bdea-41c0-bc3d-425ea38466ee",
             "key": "code",
             "value": {
                 "combinator": "OR",
@@ -97,7 +97,7 @@ def test_serialize_node__code_node_inputs(GetDisplayClass, expected_input_id):
             },
         },
         {
-            "id": "34742235-5699-45cd-9d34-bce3745e743d",
+            "id": "6d2840f3-a5c1-4376-8616-ced4fffc6cf2",
             "key": "runtime",
             "value": {
                 "combinator": "OR",
@@ -211,7 +211,7 @@ def test_serialize_node__with_non_exist_code_input_path_with_dry_run():
                             },
                         },
                         {
-                            "id": "58598cc8-aa8a-4b4f-99fb-09f6815b6c01",
+                            "id": "dcd1e1a4-49e2-4d6b-95f9-8ec5fd2f8f5d",
                             "key": "runtime",
                             "value": {
                                 "rules": [
@@ -227,7 +227,7 @@ def test_serialize_node__with_non_exist_code_input_path_with_dry_run():
                         "source_handle_id": "7afa3858-f50c-4116-936a-a401e3b2c60f",
                         "target_handle_id": "3a39ea63-9f86-4891-a902-0216a7190720",
                         "code_input_id": "a0b9d6f6-ce59-4075-8db6-866781bc73ef",
-                        "runtime_input_id": "58598cc8-aa8a-4b4f-99fb-09f6815b6c01",
+                        "runtime_input_id": "dcd1e1a4-49e2-4d6b-95f9-8ec5fd2f8f5d",
                         "output_type": "STRING",
                         "packages": [],
                         "output_id": "00b2120e-b642-46e4-8276-5f3c69d8a6cb",

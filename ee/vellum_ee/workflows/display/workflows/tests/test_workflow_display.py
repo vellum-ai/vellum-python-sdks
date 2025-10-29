@@ -711,7 +711,7 @@ def test_serialize_workflow__dict_reference():
                 "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "constant1"}},
             },
             {
-                "id": "89e01555-b0b5-42d5-a0a7-bce72716cf65",
+                "id": "ca19400f-9cce-4b4f-860f-63c98f43ad88",
                 "key": "key2",
                 "value": {
                     "type": "NODE_OUTPUT",
@@ -720,12 +720,12 @@ def test_serialize_workflow__dict_reference():
                 },
             },
             {
-                "id": "2dc84109-b85c-4732-aa60-8c10a1a377d2",
+                "id": "10df74b1-56f8-4414-8042-3d4f5a51314d",
                 "key": "key3",
                 "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "constant2"}},
             },
             {
-                "id": "d1b3ce75-1b1e-45e3-b798-beafe6c4826f",
+                "id": "4803c0f8-e582-4693-b9c3-1d6d54f999b1",
                 "key": "key4",
                 "value": {
                     "type": "NODE_OUTPUT",
@@ -756,7 +756,7 @@ def test_serialize_workflow__dict_reference():
                             "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "constant1"}},
                         },
                         {
-                            "id": "89e01555-b0b5-42d5-a0a7-bce72716cf65",
+                            "id": "ca19400f-9cce-4b4f-860f-63c98f43ad88",
                             "key": "key2",
                             "value": {
                                 "type": "NODE_OUTPUT",
@@ -768,7 +768,7 @@ def test_serialize_workflow__dict_reference():
                 },
             },
             {
-                "id": "89e01555-b0b5-42d5-a0a7-bce72716cf65",
+                "id": "ca19400f-9cce-4b4f-860f-63c98f43ad88",
                 "key": "key2",
                 "value": {
                     "type": "DICTIONARY_REFERENCE",
@@ -779,7 +779,7 @@ def test_serialize_workflow__dict_reference():
                             "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "constant2"}},
                         },
                         {
-                            "id": "89e01555-b0b5-42d5-a0a7-bce72716cf65",
+                            "id": "ca19400f-9cce-4b4f-860f-63c98f43ad88",
                             "key": "key2",
                             "value": {
                                 "type": "NODE_OUTPUT",
