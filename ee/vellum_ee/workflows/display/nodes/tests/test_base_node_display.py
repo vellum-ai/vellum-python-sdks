@@ -194,8 +194,10 @@ def test_serialize_basenode_with_display_class():
     node_display_class = get_node_display_class(MyNode)
     data = node_display_class().serialize(WorkflowDisplayContext())
 
-    assert data["display_data"]["icon"] == "vellum:icon:gear"
-    assert data["display_data"]["color"] == "purple"
+    display_data = data["display_data"]
+    assert isinstance(display_data, dict)
+    assert display_data["icon"] == "vellum:icon:gear"
+    assert display_data["color"] == "purple"
 
 
 def test_serialize_display_class_overrides_explicit_display_data():
@@ -215,6 +217,8 @@ def test_serialize_display_class_overrides_explicit_display_data():
 
     data = MyNodeDisplay().serialize(WorkflowDisplayContext())
 
-    assert data["display_data"]["icon"] == "vellum:icon:check"
-    assert data["display_data"]["color"] == "gold"
-    assert data["display_data"]["position"] == {"x": 100, "y": 200}
+    display_data = data["display_data"]
+    assert isinstance(display_data, dict)
+    assert display_data["icon"] == "vellum:icon:check"
+    assert display_data["color"] == "gold"
+    assert display_data["position"] == {"x": 100, "y": 200}
