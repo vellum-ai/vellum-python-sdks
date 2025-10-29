@@ -535,14 +535,14 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
         # No explicit_value - build from Display class and/or docstring
         if display_class_icon is not None or display_class_color is not None or docstring:
-            kwargs: Dict[str, Any] = {}
+            fallback_kwargs: Dict[str, Any] = {}
             if docstring:
-                kwargs["comment"] = NodeDisplayComment(value=docstring, expanded=True)
+                fallback_kwargs["comment"] = NodeDisplayComment(value=docstring, expanded=True)
             if display_class_icon is not None:
-                kwargs["icon"] = display_class_icon
+                fallback_kwargs["icon"] = display_class_icon
             if display_class_color is not None:
-                kwargs["color"] = display_class_color
-            return NodeDisplayData(**kwargs)
+                fallback_kwargs["color"] = display_class_color
+            return NodeDisplayData(**fallback_kwargs)
 
         return NodeDisplayData()
 
