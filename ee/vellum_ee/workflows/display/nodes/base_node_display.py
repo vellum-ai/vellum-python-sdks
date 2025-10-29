@@ -467,6 +467,14 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
         explicit_value = self._get_explicit_node_display_attr("display_data", NodeDisplayData)
         docstring = self._node.__doc__
 
+        # Check if the node class has a nested Display class with icon/color
+        display_class_icon = None
+        display_class_color = None
+        if hasattr(self._node, "Display"):
+            display_cls = getattr(self._node, "Display")
+            display_class_icon = getattr(display_cls, "icon", None)
+            display_class_color = getattr(display_cls, "color", None)
+
         if explicit_value and explicit_value.comment and docstring:
             comment = (
                 NodeDisplayComment(value=docstring, expanded=explicit_value.comment.expanded)
@@ -482,19 +490,55 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 "height": explicit_value.height,
                 "comment": comment,
             }
-            if explicit_value.icon is not None:
+            # Display class attributes take precedence over explicit_value
+            if display_class_icon is not None:
+                kwargs["icon"] = display_class_icon
+            elif explicit_value.icon is not None:
                 kwargs["icon"] = explicit_value.icon
-            if explicit_value.color is not None:
+            if display_class_color is not None:
+                kwargs["color"] = display_class_color
+            elif explicit_value.color is not None:
                 kwargs["color"] = explicit_value.color
             return NodeDisplayData(**kwargs)
 
         if explicit_value:
+            # If we have explicit_value but no docstring merging, still check for Display class
+            if display_class_icon is not None or display_class_color is not None:
+                # Create a new NodeDisplayData merging explicit_value with Display class attributes
+                from typing import Any, Dict
+
+                kwargs: Dict[str, Any] = {
+                    "position": explicit_value.position,
+                    "z_index": explicit_value.z_index,
+                    "width": explicit_value.width,
+                    "height": explicit_value.height,
+                }
+                if explicit_value.comment is not None:
+                    kwargs["comment"] = explicit_value.comment
+                # Display class attributes take precedence
+                if display_class_icon is not None:
+                    kwargs["icon"] = display_class_icon
+                elif explicit_value.icon is not None:
+                    kwargs["icon"] = explicit_value.icon
+                if display_class_color is not None:
+                    kwargs["color"] = display_class_color
+                elif explicit_value.color is not None:
+                    kwargs["color"] = explicit_value.color
+                return NodeDisplayData(**kwargs)
             return explicit_value
 
-        if docstring:
-            return NodeDisplayData(
-                comment=NodeDisplayComment(value=docstring, expanded=True),
-            )
+        # No explicit_value, but check for Display class or docstring
+        if display_class_icon is not None or display_class_color is not None or docstring:
+            from typing import Any, Dict
+
+            kwargs: Dict[str, Any] = {}
+            if docstring:
+                kwargs["comment"] = NodeDisplayComment(value=docstring, expanded=True)
+            if display_class_icon is not None:
+                kwargs["icon"] = display_class_icon
+            if display_class_color is not None:
+                kwargs["color"] = display_class_color
+            return NodeDisplayData(**kwargs)
 
         return NodeDisplayData()
 
