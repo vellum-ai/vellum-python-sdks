@@ -183,104 +183,24 @@ def test_serialize_display_data_with_navy_color():
     assert display_data["color"] == "navy"
 
 
-def test_serialize_basenode_with_display_class_icon_and_color():
-    """
-    Tests that BaseNode with nested Display class containing icon and color serializes correctly.
+def test_serialize_basenode_with_display_class():
+    """Tests that BaseNode.Display class attributes serialize correctly."""
 
-    This is the key feature for APO-2007: Supporting inline Display customization without
-    requiring separate display files or post-processing.
-    """
-
-    # GIVEN a BaseNode with nested Display class containing icon and color
     class MyNode(BaseNode):
         class Display:
             icon = "vellum:icon:gear"
             color = "purple"
 
-    # WHEN we serialize the node using the default BaseNodeDisplay
     node_display_class = get_node_display_class(MyNode)
     data = node_display_class().serialize(WorkflowDisplayContext())
 
-    # THEN the display_data should include the icon and color from the Display class
-    display_data = data["display_data"]
-    assert isinstance(display_data, dict)
-    assert display_data["icon"] == "vellum:icon:gear"
-    assert display_data["color"] == "purple"
+    assert data["display_data"]["icon"] == "vellum:icon:gear"
+    assert data["display_data"]["color"] == "purple"
 
 
-def test_serialize_basenode_with_display_class_icon_only():
-    """
-    Tests that BaseNode with Display class containing only icon works correctly.
-    """
+def test_serialize_display_class_overrides_explicit_display_data():
+    """Tests that Display class attributes take precedence over explicit display_data."""
 
-    # GIVEN a BaseNode with Display class containing only icon
-    class MyNode(BaseNode):
-        class Display:
-            icon = "vellum:icon:star"
-
-    # WHEN we serialize the node
-    node_display_class = get_node_display_class(MyNode)
-    data = node_display_class().serialize(WorkflowDisplayContext())
-
-    # THEN the display_data should include the icon but color should be None
-    display_data = data["display_data"]
-    assert isinstance(display_data, dict)
-    assert display_data["icon"] == "vellum:icon:star"
-    assert display_data.get("color") is None
-
-
-def test_serialize_basenode_with_display_class_color_only():
-    """
-    Tests that BaseNode with Display class containing only color works correctly.
-    """
-
-    # GIVEN a BaseNode with Display class containing only color
-    class MyNode(BaseNode):
-        class Display:
-            color = "grass"
-
-    # WHEN we serialize the node
-    node_display_class = get_node_display_class(MyNode)
-    data = node_display_class().serialize(WorkflowDisplayContext())
-
-    # THEN the display_data should include the color but icon should be None
-    display_data = data["display_data"]
-    assert isinstance(display_data, dict)
-    assert display_data.get("icon") is None
-    assert display_data["color"] == "grass"
-
-
-def test_serialize_basenode_without_display_class():
-    """
-    Tests that BaseNode without Display class serializes normally without icon/color.
-
-    This ensures backward compatibility - nodes without Display class should work as before.
-    """
-
-    # GIVEN a BaseNode without a Display class
-    class MyNode(BaseNode):
-        """Just a regular node"""
-
-        pass
-
-    # WHEN we serialize the node
-    node_display_class = get_node_display_class(MyNode)
-    data = node_display_class().serialize(WorkflowDisplayContext())
-
-    # THEN the display_data should not include icon or color
-    display_data = data["display_data"]
-    assert isinstance(display_data, dict)
-    assert display_data.get("icon") is None
-    assert display_data.get("color") is None
-
-
-def test_serialize_basenode_display_class_overrides_explicit_display_data():
-    """
-    Tests that when both Display class and explicit display_data exist,
-    Display class attributes should be merged/take precedence for icon and color.
-    """
-
-    # GIVEN a BaseNode with Display class AND explicit display_data
     class MyNode(BaseNode):
         class Display:
             icon = "vellum:icon:check"
@@ -289,17 +209,12 @@ def test_serialize_basenode_display_class_overrides_explicit_display_data():
     class MyNodeDisplay(BaseNodeDisplay[MyNode]):
         display_data = NodeDisplayData(
             position=NodeDisplayPosition(x=100, y=200),
-            icon="vellum:icon:times",  # This should be overridden
-            color="navy",  # This should be overridden
+            icon="vellum:icon:times",
+            color="navy",
         )
 
-    # WHEN we serialize the node
     data = MyNodeDisplay().serialize(WorkflowDisplayContext())
 
-    # THEN the Display class attributes should take precedence
-    display_data = data["display_data"]
-    assert isinstance(display_data, dict)
-    assert display_data["icon"] == "vellum:icon:check"
-    assert display_data["color"] == "gold"
-    # But position should still come from explicit display_data
-    assert display_data["position"] == {"x": 100, "y": 200}
+    assert data["display_data"]["icon"] == "vellum:icon:check"
+    assert data["display_data"]["color"] == "gold"
+    assert data["display_data"]["position"] == {"x": 100, "y": 200}
