@@ -51,7 +51,7 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
     max_prompt_iterations: ClassVar[Optional[int]] = 25
     settings: ClassVar[Optional[Union[PromptSettings, Dict[str, Any]]]] = None
 
-    class Outputs(BaseOutputs):
+    class Outputs:
         """
         The outputs of the ToolCallingNode.
 
