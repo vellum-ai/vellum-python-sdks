@@ -259,9 +259,24 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
     def _serialize_outputs(self, display_context: "WorkflowDisplayContext") -> JsonArray:
         """Generate outputs array from node output displays or node.Outputs."""
-        outputs: JsonArray = []
         node = self._node
 
+        # Check if outputs are identical to base class - if so, don't serialize them
+        base_node_classes = [base for base in node.__bases__ if issubclass(base, BaseNode)]
+        if len(base_node_classes) == 1 and hasattr(base_node_classes[0], "Outputs"):
+            base_node_class = base_node_classes[0]
+
+            # Get output names and types for both node and base
+            node_outputs = {(output.name, primitive_type_to_vellum_variable_type(output)) for output in node.Outputs}
+            base_outputs = {
+                (output.name, primitive_type_to_vellum_variable_type(output)) for output in base_node_class.Outputs
+            }
+
+            # If outputs are identical to base class, return empty (inherit from base)
+            if node_outputs == base_outputs and len(node_outputs) > 0:
+                return []
+
+        outputs: JsonArray = []
         for output in node.Outputs:
             output_type = primitive_type_to_vellum_variable_type(output)
             value = (
