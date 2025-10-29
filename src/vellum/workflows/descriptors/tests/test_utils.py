@@ -125,6 +125,10 @@ class DummyNode(BaseNode[FixtureState]):
         (ConstantValueReference(b'{"foo": "bar"}').parse_json(), {"foo": "bar"}),
         (ConstantValueReference(bytearray(b'{"foo": "bar"}')).parse_json(), {"foo": "bar"}),
         (ConstantValueReference(b'{"key": "\xf0\x9f\x8c\x9f"}').parse_json(), {"key": "🌟"}),
+        # Test + operator
+        (FixtureState.alpha + FixtureState.beta, 3),
+        (FixtureState.gamma + FixtureState.delta, "helloel"),
+        (FixtureState.theta + FixtureState.theta, ["baz", "baz"]),
     ],
     ids=[
         "or",
@@ -184,6 +188,9 @@ class DummyNode(BaseNode[FixtureState]):
         "parse_json_bytes",
         "parse_json_bytearray",
         "parse_json_bytes_with_utf8_chars",
+        "add_integers",
+        "add_strings",
+        "add_lists",
     ],
 )
 def test_resolve_value__happy_path(descriptor, expected_value):
