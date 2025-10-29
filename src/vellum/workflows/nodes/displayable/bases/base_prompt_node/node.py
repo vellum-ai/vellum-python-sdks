@@ -28,6 +28,8 @@ def _contains_reference_to_output(reference: BaseDescriptor, target_reference: O
 
 
 class BasePromptNode(BaseNode[StateType], Generic[StateType]):
+    __legacy_id__ = True
+
     # Inputs that are passed to the Prompt
     prompt_inputs: ClassVar[Optional[EntityInputsInterface]] = None
 

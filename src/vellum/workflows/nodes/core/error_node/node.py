@@ -15,6 +15,7 @@ class ErrorNode(BaseNode[StateType], Generic[StateType]):
     error: Union[str, VellumError] - The error to raise.
     """
 
+    __legacy_id__ = True
     error: ClassVar[Union[str, WorkflowError, VellumError]]
 
     class Ports(NodePorts):
