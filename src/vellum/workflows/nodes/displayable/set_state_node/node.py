@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Any, ClassVar, Dict, Generic
 
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -61,9 +62,19 @@ class SetStateNode(BaseNode[StateType], Generic[StateType]):
 
             resolved_updates[path] = resolved_value
 
-        # Second pass: apply all updates atomically
+        # Second pass: apply on a deepcopy first to ensure all setters succeed,
+        # then swap onto the real state atomically to avoid partial mutations.
+        new_state = deepcopy(self.state)
+        try:
+            with new_state.__quiet__():
+                for path, resolved_value in resolved_updates.items():
+                    setattr(new_state, path, resolved_value)
+        except Exception as e:
+            raise NodeException(str(e)) from e
+
+        # If the copy application succeeded, atomically assign the finalized values
         with self.state.__atomic__():
-            for path, resolved_value in resolved_updates.items():
-                setattr(self.state, path, resolved_value)
+            for path in resolved_updates.keys():
+                setattr(self.state, path, getattr(new_state, path))
 
         return self.Outputs(result=resolved_updates)
