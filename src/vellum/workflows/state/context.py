@@ -9,6 +9,7 @@ from vellum.workflows.events.types import ExternalParentContext
 from vellum.workflows.nodes.mocks import MockNodeExecution, MockNodeExecutionArg
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.references.constant import ConstantValueReference
+from vellum.workflows.state.store import Store
 from vellum.workflows.utils.uuids import generate_workflow_deployment_prefix
 from vellum.workflows.utils.zip import extract_zip_files
 from vellum.workflows.vellum_client import create_vellum_client
@@ -27,12 +28,14 @@ class WorkflowContext:
         execution_context: Optional[ExecutionContext] = None,
         generated_files: Optional[dict[str, str]] = None,
         namespace: Optional[str] = None,
+        store_class: Optional[Type[Store]] = None,
     ):
         self._vellum_client = vellum_client
         self._event_queue: Optional[Queue["WorkflowEvent"]] = None
         self._node_output_mocks_map: Dict[Type[BaseOutputs], List[MockNodeExecution]] = {}
         self._execution_context = get_execution_context()
         self._namespace = namespace
+        self._store_class = store_class if store_class is not None else Store
 
         if execution_context is not None:
             self._execution_context.trace_id = execution_context.trace_id
@@ -71,6 +74,10 @@ class WorkflowContext:
     @cached_property
     def node_output_mocks_map(self) -> Dict[Type[BaseOutputs], List[MockNodeExecution]]:
         return self._node_output_mocks_map
+
+    @property
+    def store_class(self) -> Type[Store]:
+        return self._store_class
 
     @property
     def monitoring_url(self) -> Optional[str]:
@@ -211,5 +218,8 @@ class WorkflowContext:
     @classmethod
     def create_from(cls, context):
         return cls(
-            vellum_client=context.vellum_client, generated_files=context.generated_files, namespace=context.namespace
+            vellum_client=context.vellum_client,
+            generated_files=context.generated_files,
+            namespace=context.namespace,
+            store_class=context.store_class,
         )

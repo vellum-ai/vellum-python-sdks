@@ -256,7 +256,9 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         self._context = context or WorkflowContext()
         self.emitters = emitters or (self.emitters if hasattr(self, "emitters") else [])
         self.resolvers = resolvers or (self.resolvers if hasattr(self, "resolvers") else [])
-        self._store = store or Store()
+        # Prioritize store type from WorkflowContext to allow subworkflows to inherit EmptyStore
+        # TODO(v2.0.0): Remove the concept of an internal store altogether (important-comment)
+        self._store = store or self._context.store_class()
         self._execution_context = self._context.execution_context
         self._current_runner: Optional[WorkflowRunner] = None
 
@@ -447,7 +449,6 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             last_event = event
 
         if not last_event:
-            self._current_runner = None
             rejected_event = WorkflowExecutionRejectedEvent(
                 trace_id=self._execution_context.trace_id,
                 span_id=uuid4(),
@@ -462,7 +463,6 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             return rejected_event
 
         if not first_event:
-            self._current_runner = None
             rejected_event = WorkflowExecutionRejectedEvent(
                 trace_id=self._execution_context.trace_id,
                 span_id=uuid4(),
@@ -481,7 +481,6 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             or last_event.name == "workflow.execution.fulfilled"
             or last_event.name == "workflow.execution.paused"
         ):
-            self._current_runner = None
             return last_event
 
         rejected_event = WorkflowExecutionRejectedEvent(
@@ -495,7 +494,6 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
                 ),
             ),
         )
-        self._current_runner = None
         return rejected_event
 
     def stream(

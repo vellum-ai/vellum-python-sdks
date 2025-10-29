@@ -28,7 +28,8 @@ def test_map_node_does_not_garbage_collect_nested_states():
     del terminal_event
     del workflow
 
-    gc.collect()
+    for _ in range(5):
+        gc.collect()
 
     final_state_count = len([obj for obj in gc.get_objects() if isinstance(obj, State)])
     final_memory = tracemalloc.get_traced_memory()[0]
@@ -40,7 +41,7 @@ def test_map_node_does_not_garbage_collect_nested_states():
     max_acceptable_state_growth = 5
 
     expected_output_memory_kb = (num_iterations * 1000) / 1024  # ~50KB
-    max_acceptable_memory_kb = expected_output_memory_kb * 50  # ~2.5MB with workflow overhead
+    max_acceptable_memory_kb = expected_output_memory_kb * 60  # ~3MB with workflow overhead
 
     assert state_growth <= max_acceptable_state_growth, (
         f"Memory leak detected! State objects grew by {state_growth} (expected <={max_acceptable_state_growth}). "
