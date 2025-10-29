@@ -400,6 +400,17 @@ class BaseDescriptor(Generic[_T]):
         return AddExpression(lhs=self, rhs=other)
 
     @overload
+    def __add__(self, other: "BaseDescriptor[_O]") -> "AddExpression[_T, _O]": ...
+
+    @overload
+    def __add__(self, other: _O) -> "AddExpression[_T, _O]": ...
+
+    def __add__(self, other: "Union[BaseDescriptor[_O], _O]") -> "AddExpression[_T, _O]":
+        from vellum.workflows.expressions.add import AddExpression
+
+        return AddExpression(lhs=self, rhs=other)
+
+    @overload
     def minus(self, other: "BaseDescriptor[_O]") -> "MinusExpression[_T, _O]": ...
 
     @overload
