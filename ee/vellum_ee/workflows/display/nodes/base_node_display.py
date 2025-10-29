@@ -263,7 +263,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
         # Special case for ToolCallingNode: skip serializing if outputs are only text and chat_history
         # This matches the TypeScript codegen behavior in hasRedundantOutputs()
-        from src.vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
+        from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
 
         if issubclass(node, ToolCallingNode) and len(list(node.Outputs)) == 2:
             output_data = [(output.name, primitive_type_to_vellum_variable_type(output)) for output in node.Outputs]
