@@ -2,7 +2,7 @@
   "workflow_raw_data": {
     "nodes": [
       {
-        "id": "b09c1902-3cca-4c79-b775-4c32e3e88466",
+        "id": "b3c8ab56-001f-4157-bbc2-4a7fe5ebf8c6",
         "type": "ENTRYPOINT",
         "inputs": [],
         "data": {
@@ -22,6 +22,8 @@
         "id": "3669684e-500e-4034-be4a-7ee70824b272",
         "label": "Simple Node",
         "type": "GENERIC",
+        "adornments": null,
+        "attributes": [],
         "display_data": {
           "position": {
             "x": 200.0,
@@ -30,7 +32,13 @@
         },
         "base": {
           "name": "BaseNode",
-          "module": ["vellum", "workflows", "nodes", "bases", "base"]
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "bases",
+            "base"
+          ]
         },
         "definition": {
           "name": "SimpleNode",
@@ -54,8 +62,6 @@
             "type": "DEFAULT"
           }
         ],
-        "adornments": null,
-        "attributes": [],
         "outputs": [
           {
             "id": "96af83b6-30b3-4ce3-8a8a-2bd245df9a8b",
@@ -147,7 +153,7 @@
     "edges": [
       {
         "id": "9eaed9b1-5803-4bc4-bdba-b614f4f465b5",
-        "source_node_id": "b09c1902-3cca-4c79-b775-4c32e3e88466",
+        "source_node_id": "b3c8ab56-001f-4157-bbc2-4a7fe5ebf8c6",
         "source_handle_id": "eba8fd73-57ab-4d7b-8f75-b54dbe5fc8ba",
         "target_node_id": "3669684e-500e-4034-be4a-7ee70824b272",
         "target_handle_id": "7da60409-5790-43fa-80b2-ad88da2812df",
@@ -212,7 +218,7 @@
   ],
   "triggers": [
     {
-      "id": "b09c1902-3cca-4c79-b775-4c32e3e88466",
+      "id": "b3c8ab56-001f-4157-bbc2-4a7fe5ebf8c6",
       "type": "MANUAL",
       "attributes": []
     }

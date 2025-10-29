@@ -46,27 +46,27 @@ def uuid4_from_hash(input_str: str) -> UUID:
 def get_trigger_id(trigger_class: "type[BaseTrigger]") -> UUID:
     """
     Generate a deterministic trigger ID from a trigger class using
-    the class's __qualname__ to ensure stability across different import paths.
+    the class's module name and __qualname__ to ensure stability and uniqueness.
 
     Args:
         trigger_class: The trigger class to generate an ID for
 
     Returns:
-        A deterministic UUID based on the trigger class qualname
+        A deterministic UUID based on the trigger class module and qualname
     """
-    return uuid4_from_hash(trigger_class.__qualname__)
+    return uuid4_from_hash(f"{trigger_class.__module__}.{trigger_class.__qualname__}")
 
 
 def get_trigger_attribute_id(trigger_class: "type[BaseTrigger]", attribute_name: str) -> UUID:
     """
     Generate a deterministic trigger attribute ID from a trigger class and attribute name
-    using the class's __qualname__ and attribute name to ensure stability.
+    using the class's module name, __qualname__, and attribute name to ensure stability and uniqueness.
 
     Args:
         trigger_class: The trigger class containing the attribute
         attribute_name: The name of the attribute
 
     Returns:
-        A deterministic UUID based on the trigger class qualname and attribute name
+        A deterministic UUID based on the trigger class module, qualname, and attribute name
     """
-    return uuid4_from_hash(f"{trigger_class.__qualname__}|{attribute_name}")
+    return uuid4_from_hash(f"{trigger_class.__module__}.{trigger_class.__qualname__}|{attribute_name}")
