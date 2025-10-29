@@ -261,19 +261,20 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
         """Generate outputs array from node output displays or node.Outputs."""
         node = self._node
 
-        # Check if outputs are identical to base class - if so, don't serialize them
-        base_node_classes = [base for base in node.__bases__ if issubclass(base, BaseNode)]
-        if len(base_node_classes) == 1 and hasattr(base_node_classes[0], "Outputs"):
-            base_node_class = base_node_classes[0]
+        # Special case for ToolCallingNode: skip serializing if outputs are only text and chat_history
+        # This matches the TypeScript codegen behavior in hasRedundantOutputs()
+        from src.vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
 
-            # Get output names and types for both node and base
-            node_outputs = {(output.name, primitive_type_to_vellum_variable_type(output)) for output in node.Outputs}
-            base_outputs = {
-                (output.name, primitive_type_to_vellum_variable_type(output)) for output in base_node_class.Outputs
-            }
+        if issubclass(node, ToolCallingNode) and len(list(node.Outputs)) == 2:
+            output_data = [(output.name, primitive_type_to_vellum_variable_type(output)) for output in node.Outputs]
+            output_names = {name for name, _ in output_data}
+            output_dict = {name: type_ for name, type_ in output_data}
 
-            # If outputs are identical to base class, return empty (inherit from base)
-            if node_outputs == base_outputs and len(node_outputs) > 0:
+            has_text = "text" in output_names and output_dict.get("text") == "STRING"
+            has_chat_history = "chat_history" in output_names and output_dict.get("chat_history") == "CHAT_HISTORY"
+
+            # If outputs are exactly text and chat_history, return empty (inherit from base)
+            if has_text and has_chat_history:
                 return []
 
         outputs: JsonArray = []
