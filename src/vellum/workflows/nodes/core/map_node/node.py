@@ -99,6 +99,7 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
                     map_node_event = self._event_queue.get(block=False)
                     index = map_node_event[0]
                     subworkflow_event = map_node_event[1]
+
                     self._context._emit_subworkflow_event(subworkflow_event)
 
                     if not is_workflow_event(subworkflow_event):
