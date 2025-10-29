@@ -56,8 +56,8 @@ class MockWorkflow(BaseWorkflow[MockInputs, BaseState]):
 
 name_parts = __name__.split(".")
 module_root = name_parts[: name_parts.index("events")]
-mock_workflow_uuid = str(uuid4_from_hash(MockWorkflow.__qualname__))
-mock_node_uuid = str(uuid4_from_hash(MockNode.__qualname__))
+mock_workflow_uuid = str(uuid4_from_hash(f"{MockWorkflow.__module__}.{MockWorkflow.__qualname__}"))
+mock_node_uuid = str(uuid4_from_hash(f"{MockNode.__module__}.{MockNode.__qualname__}"))
 
 
 @pytest.mark.parametrize(
