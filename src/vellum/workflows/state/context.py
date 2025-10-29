@@ -1,8 +1,7 @@
-from dataclasses import dataclass
 from functools import cached_property
 from queue import Queue
 from uuid import UUID, uuid4
-from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Type
+from typing import TYPE_CHECKING, Dict, List, Optional, Type
 
 from vellum import Vellum, __version__
 from vellum.workflows.context import ExecutionContext, get_execution_context, set_execution_context
@@ -18,18 +17,6 @@ if TYPE_CHECKING:
     from vellum.workflows.events.workflow import WorkflowEvent
     from vellum.workflows.state.base import BaseState
     from vellum.workflows.workflows.base import BaseWorkflow
-
-
-@dataclass
-class WorkflowDeploymentMetadata:
-    """Metadata about a workflow deployment needed for parent context construction."""
-
-    deployment_id: UUID
-    deployment_name: str
-    deployment_history_item_id: UUID
-    release_tag_id: UUID
-    release_tag_name: str
-    workflow_version_id: UUID
 
 
 class WorkflowContext:
@@ -161,7 +148,7 @@ class WorkflowContext:
 
     def resolve_workflow_deployment(
         self, deployment_name: str, release_tag: str, state: "BaseState"
-    ) -> Optional[Tuple[Type["BaseWorkflow"], Optional[WorkflowDeploymentMetadata]]]:
+    ) -> Optional["BaseWorkflow"]:
         """
         Resolve a workflow deployment by name and release tag.
 
@@ -171,22 +158,20 @@ class WorkflowContext:
             state: The base state to pass to the workflow
 
         Returns:
-            Tuple of (BaseWorkflow class, deployment metadata) if found
+            BaseWorkflow instance if found, None otherwise
         """
         if not self._generated_files or not self._namespace:
             return None
 
         expected_prefix = generate_workflow_deployment_prefix(deployment_name, release_tag)
 
-        deployment_metadata = self._fetch_deployment_metadata(deployment_name, release_tag)
-
         try:
             from vellum.workflows.workflows.base import BaseWorkflow
 
             WorkflowClass = BaseWorkflow.load_from_module(f"{self.namespace}.{expected_prefix}")
             WorkflowClass.is_dynamic = True
-            # Return the class, not an instance, so caller can instantiate within proper execution context
-            return (WorkflowClass, deployment_metadata)
+            workflow_instance = WorkflowClass(context=WorkflowContext.create_from(self), parent_state=state)
+            return workflow_instance
         except Exception:
             pass
 
@@ -215,50 +200,13 @@ class WorkflowContext:
 
             WorkflowClass = BaseWorkflow.load_from_module(f"{self.namespace}.{expected_prefix}")
             WorkflowClass.is_dynamic = True
-            # Return the class, not an instance, so caller can instantiate within proper execution context
-            return (WorkflowClass, deployment_metadata)
+            workflow_instance = WorkflowClass(context=WorkflowContext.create_from(self), parent_state=state)
+            return workflow_instance
 
         except Exception:
             pass
 
         return None
-
-    def _fetch_deployment_metadata(
-        self, deployment_name: str, release_tag: str
-    ) -> Optional[WorkflowDeploymentMetadata]:
-        """
-        Fetch deployment metadata from the Vellum API.
-
-        Args:
-            deployment_name: The name of the workflow deployment
-            release_tag: The release tag name
-
-        Returns:
-            WorkflowDeploymentMetadata if successful, None otherwise
-        """
-        try:
-            # Fetch deployment details
-            deployment = self.vellum_client.workflow_deployments.retrieve(deployment_name)
-
-            deployment_id = UUID(deployment.id)
-
-            # Fetch release tag details
-            release_tag_info = self.vellum_client.workflow_deployments.retrieve_workflow_release_tag(
-                deployment.id, release_tag
-            )
-
-            return WorkflowDeploymentMetadata(
-                deployment_id=deployment_id,
-                deployment_name=deployment.name,
-                deployment_history_item_id=UUID(deployment.last_deployed_history_item_id),
-                release_tag_id=UUID(release_tag_info.release.id),
-                release_tag_name=release_tag_info.name,
-                workflow_version_id=uuid4(),
-            )
-        except Exception:
-            # If we fail to fetch metadata, return None - the workflow can still run
-            # but won't have the full parent context hierarchy
-            return None
 
     @classmethod
     def create_from(cls, context):
