@@ -540,7 +540,7 @@ def test_serialize_workflow():
                                     "type": "NODE_OUTPUT",
                                     "data": {
                                         "node_id": "ed7caf01-9ae7-47a3-b15a-16697abaf486",
-                                        "output_id": "74ea6af1-8934-4e3c-b68d-b93092b4be73",
+                                        "output_id": "fef1242f-f91e-4b07-96df-d37e052a76b3",
                                     },
                                 }
                             ],
@@ -576,7 +576,7 @@ def test_serialize_workflow():
                                     "type": "NODE_OUTPUT",
                                     "data": {
                                         "node_id": "8df781b1-ff28-48a5-98a2-d7d796b932b0",
-                                        "output_id": "61c357a1-41d8-4adf-bfe1-ce615c4d7d23",
+                                        "output_id": "68e90c31-23f0-4fc9-8d3b-529c58ba9621",
                                     },
                                 }
                             ],
@@ -612,7 +612,7 @@ def test_serialize_workflow():
                                     "type": "NODE_OUTPUT",
                                     "data": {
                                         "node_id": "68c02b7c-5077-4087-803d-841474a8081f",
-                                        "output_id": "0ec68ffe-cbb7-4dbb-aaff-f6025bd62efa",
+                                        "output_id": "82949306-1719-4538-8f4d-5f253ab5d93b",
                                     },
                                 }
                             ],
@@ -648,7 +648,7 @@ def test_serialize_workflow():
                                     "type": "NODE_OUTPUT",
                                     "data": {
                                         "node_id": "148c61bd-e8b0-4d4b-8734-b043a72b90ed",
-                                        "output_id": "fafa0bde-8508-43d5-a9c8-db5d49f307f6",
+                                        "output_id": "571351c8-4caf-4071-995b-93e1fa66a653",
                                     },
                                 }
                             ],
@@ -684,7 +684,7 @@ def test_serialize_workflow():
                                     "type": "NODE_OUTPUT",
                                     "data": {
                                         "node_id": "0d959311-c836-4641-a867-58f63df9dfea",
-                                        "output_id": "db9f7ff3-77e2-4b0a-9c39-bb4bb50e3ad5",
+                                        "output_id": "d011aa88-36ca-48e5-94ee-cb053f8b21fd",
                                     },
                                 }
                             ],
