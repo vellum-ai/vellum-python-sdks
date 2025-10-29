@@ -3,7 +3,7 @@ name = "vellum-ai"
 
 [tool.poetry]
 name = "vellum-ai"
-version = "v1.8.2"
+version = "1.8.3"
 description = ""
 readme = "README.md"
 authors = []
@@ -40,6 +40,7 @@ Jinja2 = ">=3.1.0,<4.0.0"
 click = ">=8.1.7,<9.0.0"
 docker = ">=7.1.0,<8.0.0"
 httpx = ">=0.21.2"
+openai = ">=1.0.0,<2.0.0"
 orderly-set = "^5.2.2"
 publication = "0.0.3"
 pydantic = ">= 1.9.2"

@@ -41,6 +41,7 @@ IntegrationName = typing.Union[
         "JIRA",
         "KLAVIYO",
         "PAGERDUTY",
+        "PARSERA",
         "PEOPLEDATALABS",
         "PERPLEXITY",
         "POSTHOG",
