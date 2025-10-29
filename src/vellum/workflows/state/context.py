@@ -247,13 +247,18 @@ class WorkflowContext:
                 deployment.id, release_tag
             )
 
+            # Fetch workflow version
+            release = self.vellum_client.workflow_deployments.retrieve_workflow_deployment_release(
+                deployment_id, release_tag
+            )
+
             return WorkflowDeploymentMetadata(
                 deployment_id=deployment_id,
                 deployment_name=deployment.name,
                 deployment_history_item_id=UUID(deployment.last_deployed_history_item_id),
                 release_tag_id=UUID(release_tag_info.release.id),
                 release_tag_name=release_tag_info.name,
-                workflow_version_id=uuid4(),
+                workflow_version_id=UUID(release.workflow_version.id),
             )
         except Exception:
             # If we fail to fetch metadata, return None - the workflow can still run
