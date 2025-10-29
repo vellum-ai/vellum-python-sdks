@@ -69,4 +69,5 @@ def get_trigger_attribute_id(trigger_class: "type[BaseTrigger]", attribute_name:
     Returns:
         A deterministic UUID based on the trigger class module, qualname, and attribute name
     """
-    return uuid4_from_hash(f"{trigger_class.__module__}.{trigger_class.__qualname__}|{attribute_name}")
+    trigger_id = get_trigger_id(trigger_class)
+    return uuid4_from_hash(f"{trigger_id}|{attribute_name}")
