@@ -85,6 +85,14 @@ class ExternalParentContext(BaseParentContext):
     type: Literal["EXTERNAL"] = "EXTERNAL"
 
 
+class WorkflowDeploymentScheduledTriggerContext(BaseParentContext):
+    type: Literal["SCHEDULED"] = "SCHEDULED"
+
+
+class WorkflowDeploymentIntegrationTriggerContext(BaseParentContext):
+    type: Literal["INTEGRATION"] = "INTEGRATION"
+
+
 class SpanLink(UniversalBaseModel):
     trace_id: str
     type: Literal["TRIGGERED_BY", "PREVIOUS_SPAN", "ROOT_SPAN"]
