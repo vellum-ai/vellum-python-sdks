@@ -1,6 +1,9 @@
 import gc
 import tracemalloc
 
+from vellum.workflows.state.context import WorkflowContext
+from vellum.workflows.state.store import EmptyStore
+
 from tests.workflows.map_node_state_gc.workflow import Inputs, MapNodeStateGCWorkflow, State
 
 
@@ -18,7 +21,8 @@ def test_map_node_does_not_garbage_collect_nested_states():
     initial_state_count = len([obj for obj in gc.get_objects() if isinstance(obj, State)])
     baseline_memory = tracemalloc.get_traced_memory()[0]
 
-    workflow = MapNodeStateGCWorkflow()
+    context = WorkflowContext(store_class=EmptyStore)
+    workflow = MapNodeStateGCWorkflow(context=context)
     num_iterations = 50
 
     terminal_event = workflow.run(inputs=Inputs(items=list(range(num_iterations))))

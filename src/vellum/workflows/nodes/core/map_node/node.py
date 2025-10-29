@@ -31,7 +31,6 @@ from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.references.node import NodeReference
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.state.context import WorkflowContext
-from vellum.workflows.state.store import EmptyStore
 from vellum.workflows.types.generics import StateType
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
@@ -101,15 +100,6 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
                     index = map_node_event[0]
                     subworkflow_event = map_node_event[1]
 
-                    if hasattr(subworkflow_event, "body") and hasattr(subworkflow_event.body, "final_state"):
-                        subworkflow_event.body.final_state = None
-
-                    if hasattr(subworkflow_event, "workflow"):
-                        subworkflow_event.workflow = None
-
-                    if hasattr(subworkflow_event, "server_metadata"):
-                        subworkflow_event.server_metadata = None
-
                     self._context._emit_subworkflow_event(subworkflow_event)
 
                     if not is_workflow_event(subworkflow_event):
@@ -168,8 +158,6 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
                         else:
                             break
 
-            futures.clear()
-
         for output_name, output_list in mapped_items.items():
             yield BaseOutput(name=output_name, value=output_list)
 
@@ -182,12 +170,7 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
             self._run_subworkflow(item=item, index=index)
 
     def _run_subworkflow(self, *, item: MapNodeItemType, index: int) -> None:
-        context = WorkflowContext(
-            vellum_client=self._context.vellum_client,
-            generated_files=self._context.generated_files,
-            namespace=self._context.namespace,
-            store_class=EmptyStore,
-        )
+        context = WorkflowContext.create_from(self._context)
         subworkflow = self.subworkflow(
             parent_state=self.state,
             context=context,
@@ -201,9 +184,6 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
 
         for event in events:
             self._event_queue.put((index, event))
-
-        del subworkflow
-        del context
 
     @overload
     @classmethod
