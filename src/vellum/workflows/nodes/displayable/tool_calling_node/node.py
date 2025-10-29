@@ -3,6 +3,7 @@ from typing import Any, ClassVar, Dict, Generic, Iterator, List, Optional, Set, 
 from vellum import ChatMessage, PromptBlock, PromptOutput
 from vellum.client.types.prompt_parameters import PromptParameters
 from vellum.client.types.prompt_settings import PromptSettings
+from vellum.client.types.string_chat_message_content import StringChatMessageContent
 from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
 from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.errors.types import WorkflowErrorCode
@@ -107,7 +108,20 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
                 continue
 
             if event.name == "workflow.execution.streaming":
-                if event.output.name == "chat_history":
+                if event.output.name == "results":
+                    if event.output.is_streaming:
+                        if isinstance(event.output.delta, str):
+                            text_message = ChatMessage(
+                                text=event.output.delta,
+                                role="ASSISTANT",
+                                content=StringChatMessageContent(type="STRING", value=event.output.delta),
+                                source=None,
+                            )
+                            yield BaseOutput(
+                                name="chat_history",
+                                delta=[text_message],
+                            )
+                elif event.output.name == "chat_history":
                     if event.output.is_fulfilled:
                         fulfilled_output_names.add(event.output.name)
                     yield event.output
