@@ -249,7 +249,7 @@ class WorkflowContext:
 
             # Fetch workflow version
             release = self.vellum_client.workflow_deployments.retrieve_workflow_deployment_release(
-                deployment_id, release_tag
+                str(deployment_id), release_tag
             )
 
             return WorkflowDeploymentMetadata(
