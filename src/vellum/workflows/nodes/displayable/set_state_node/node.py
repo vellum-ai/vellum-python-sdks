@@ -43,23 +43,27 @@ class SetStateNode(BaseNode[StateType], Generic[StateType]):
         Run the node and set all the state values.
         Resolves descriptors to their actual values before setting state.
         """
-        result = {}
+        # First pass: validate and resolve all operations without mutating state
+        resolved_updates: Dict[str, Any] = {}
         for path, value in self.operations.items():
-            # Check if the state attribute exists
+            # Validate the state attribute exists prior to any mutation
             if not hasattr(self.state, path):
                 raise NodeException(
                     f"State does not have attribute '{path}'. "
                     f"Only existing state attributes can be set via SetStateNode."
                 )
 
-            # Resolve the value if it's a descriptor
+            # Resolve the value if it's a descriptor against the current (unmodified) state
             if isinstance(value, BaseDescriptor):
                 resolved_value = resolve_value(value, self.state)
             else:
                 resolved_value = value
 
-            # Set the state value
-            setattr(self.state, path, resolved_value)
-            result[path] = resolved_value
+            resolved_updates[path] = resolved_value
 
-        return self.Outputs(result=result)
+        # Second pass: apply all updates atomically
+        with self.state.__atomic__():
+            for path, resolved_value in resolved_updates.items():
+                setattr(self.state, path, resolved_value)
+
+        return self.Outputs(result=resolved_updates)

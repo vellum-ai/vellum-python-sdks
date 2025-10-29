@@ -164,3 +164,48 @@ def test_set_state_not_existing_value():
         "State does not have attribute 'unknown_value'. Only existing state attributes can be set via SetStateNode."
         == str(exc_info.value)
     )
+
+
+def test_set_state_node_atomic_order_independent_resolution():
+    """Both operations resolve against the original state before any mutation."""
+
+    class TestState(BaseState):
+        a: int = 1
+        b: int = 0
+
+    class UpdateAB(SetStateNode[TestState]):
+        # Both should see original a=1, so both resolve to 2
+        operations = {
+            "a": TestState.a + 1,
+            "b": TestState.a + 1,
+        }
+
+    state = TestState()
+    node = UpdateAB(state=state)
+    outputs = node.run()
+
+    assert state.a == 2
+    assert state.b == 2
+    assert outputs.result == {"a": 2, "b": 2}
+
+
+def test_set_state_node_no_partial_update_on_error():
+    """If a later operation is invalid, no earlier changes should be applied."""
+
+    class TestState(BaseState):
+        a: int = 5
+
+    class PartialFail(SetStateNode[TestState]):
+        operations = {
+            "a": 42,  # would change a
+            "missing": 1,  # invalid attribute triggers NodeException
+        }
+
+    state = TestState()
+    node = PartialFail(state=state)
+
+    with pytest.raises(NodeException):
+        node.run()
+
+    # Ensure no partial mutation occurred
+    assert state.a == 5
