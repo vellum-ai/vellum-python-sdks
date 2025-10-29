@@ -646,12 +646,33 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     );
   }
 
+  private hasRedundantOutputs(): boolean {
+    if (
+      this.nodeContext.baseNodeClassName !== "ToolCallingNode" ||
+      this.nodeData.outputs.length !== 2
+    ) {
+      return false;
+    }
+
+    const outputNames = this.nodeData.outputs.map((output) => output.name);
+    const outputTypes = this.nodeData.outputs.map((output) => output.type);
+
+    const hasText =
+      outputNames.includes("text") &&
+      outputTypes[outputNames.indexOf("text")] === "STRING";
+    const hasChatHistory =
+      outputNames.includes("chat_history") &&
+      outputTypes[outputNames.indexOf("chat_history")] === "CHAT_HISTORY";
+
+    return hasText && hasChatHistory;
+  }
+
   getNodeClassBodyStatements(): AstNode[] {
     const statements: AstNode[] = [];
 
     statements.push(...this.nodeAttributes);
 
-    if (this.nodeData.outputs.length > 0) {
+    if (this.nodeData.outputs.length > 0 && !this.hasRedundantOutputs()) {
       statements.push(
         new NodeOutputs({
           nodeOutputs: this.nodeData.outputs,
