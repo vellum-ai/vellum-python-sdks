@@ -158,6 +158,8 @@ ParentContext = Annotated[
         WorkflowSandboxParentContext,
         APIRequestParentContext,
         ExternalParentContext,
+        WorkflowDeploymentScheduledTriggerContext,
+        WorkflowDeploymentIntegrationTriggerContext,
         UnknownParentContext,
     ],
     ParentContextDiscriminator(),
