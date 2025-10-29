@@ -636,6 +636,7 @@ from .video_input_request import VideoInputRequest
 from .video_prompt_block import VideoPromptBlock
 from .video_vellum_value import VideoVellumValue
 from .video_vellum_value_request import VideoVellumValueRequest
+from .workflow_deployment_display_data import WorkflowDeploymentDisplayData
 from .workflow_deployment_event_executions_response import WorkflowDeploymentEventExecutionsResponse
 from .workflow_deployment_history_item import WorkflowDeploymentHistoryItem
 from .workflow_deployment_parent_context import WorkflowDeploymentParentContext
@@ -643,6 +644,7 @@ from .workflow_deployment_read import WorkflowDeploymentRead
 from .workflow_deployment_release import WorkflowDeploymentRelease
 from .workflow_deployment_release_workflow_deployment import WorkflowDeploymentReleaseWorkflowDeployment
 from .workflow_deployment_release_workflow_version import WorkflowDeploymentReleaseWorkflowVersion
+from .workflow_display_icon import WorkflowDisplayIcon
 from .workflow_error import WorkflowError
 from .workflow_event import WorkflowEvent
 from .workflow_event_error import WorkflowEventError
@@ -1332,6 +1334,7 @@ __all__ = [
     "VideoPromptBlock",
     "VideoVellumValue",
     "VideoVellumValueRequest",
+    "WorkflowDeploymentDisplayData",
     "WorkflowDeploymentEventExecutionsResponse",
     "WorkflowDeploymentHistoryItem",
     "WorkflowDeploymentParentContext",
@@ -1339,6 +1342,7 @@ __all__ = [
     "WorkflowDeploymentRelease",
     "WorkflowDeploymentReleaseWorkflowDeployment",
     "WorkflowDeploymentReleaseWorkflowVersion",
+    "WorkflowDisplayIcon",
     "WorkflowError",
     "WorkflowEvent",
     "WorkflowEventError",

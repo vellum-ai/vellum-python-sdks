@@ -10,6 +10,7 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel, update
 from .entity_status import EntityStatus
 from .environment_enum import EnvironmentEnum
 from .vellum_variable import VellumVariable
+from .workflow_deployment_display_data import WorkflowDeploymentDisplayData
 
 
 class WorkflowDeploymentRead(UniversalBaseModel):
@@ -61,6 +62,11 @@ class WorkflowDeploymentRead(UniversalBaseModel):
     description: typing.Optional[str] = pydantic.Field(default=None)
     """
     A human-readable description of the workflow deployment
+    """
+
+    display_data: typing.Optional[WorkflowDeploymentDisplayData] = pydantic.Field(default=None)
+    """
+    Information used to display this Workflow Deployment.
     """
 
     if IS_PYDANTIC_V2:
