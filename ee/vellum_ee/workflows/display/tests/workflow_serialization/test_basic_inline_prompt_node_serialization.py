@@ -420,7 +420,7 @@ def test_serialize_workflow_with_descriptor_functions():
 
     assert functions_attr["value"] == {
         "node_id": "cb1186e0-8ff1-4145-823e-96b3fc05a39a",
-        "node_output_id": "470fadb9-b8b5-477e-a502-5209d398bcf9",
+        "node_output_id": "c7ab8632-0cad-40e2-a49e-bf2731bb7f60",
         "type": "NODE_OUTPUT",
     }
 
