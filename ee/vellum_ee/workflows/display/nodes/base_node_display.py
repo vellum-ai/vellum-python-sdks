@@ -280,11 +280,15 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
         outputs: JsonArray = []
         for output in node.Outputs:
             output_type = primitive_type_to_vellum_variable_type(output)
-            value = (
-                serialize_value(self.node_id, display_context, output.instance)
-                if output.instance is not None and output.instance != undefined
-                else None
-            )
+
+            try:
+                value = (
+                    serialize_value(self.node_id, display_context, output.instance)
+                    if output.instance is not None and output.instance != undefined
+                    else None
+                )
+            except ValueError as e:
+                raise ValueError(f"Failed to serialize output '{output.name}': {e}")
 
             output_id = (
                 str(self.output_display[output].id)
@@ -300,6 +304,57 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                     "value": value,
                 }
             )
+
+        if self._outputs_match_base(node, outputs, display_context):
+            return []
+
+        return outputs
+
+    def _outputs_match_base(
+        self,
+        node: Type[BaseNode],
+        serialized_outputs: JsonArray,
+        display_context: "WorkflowDisplayContext",
+    ) -> bool:
+        base_node_classes = [base for base in node.__bases__ if issubclass(base, BaseNode)]
+        if len(base_node_classes) != 1:
+            return False
+
+        base_node_class = base_node_classes[0]
+
+        try:
+            base_serialized_outputs = self._serialize_outputs_for_node(base_node_class, display_context)
+        except ValueError:
+            return False
+
+        simplified_outputs = [
+            {"name": output["name"], "type": output["type"], "value": output.get("value")}
+            for output in serialized_outputs
+        ]
+        simplified_base_outputs = [
+            {"name": output["name"], "type": output["type"], "value": output.get("value")}
+            for output in base_serialized_outputs
+        ]
+
+        return simplified_outputs == simplified_base_outputs
+
+    def _serialize_outputs_for_node(self, node: Type[BaseNode], display_context: "WorkflowDisplayContext") -> JsonArray:
+        node_id = uuid4_from_hash(node.__qualname__)
+        outputs: JsonArray = []
+
+        for output in node.Outputs:
+            output_type = primitive_type_to_vellum_variable_type(output)
+
+            try:
+                value = (
+                    serialize_value(node_id, display_context, output.instance)
+                    if output.instance is not None and output.instance != undefined
+                    else None
+                )
+            except ValueError as e:
+                raise ValueError(f"Failed to serialize output '{output.name}': {e}")
+
+            outputs.append({"name": output.name, "type": output_type, "value": value})
 
         return outputs
 
