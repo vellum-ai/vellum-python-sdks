@@ -4365,6 +4365,154 @@ baz = foo + bar
       ]);
     });
 
+    it("should not generate redundant Outputs class for ToolCallingNode with default outputs", async () => {
+      const displayData = {
+        workflow_raw_data: {
+          edges: [],
+          nodes: [
+            {
+              id: "entrypoint",
+              base: null,
+              data: {
+                label: "Entrypoint Node",
+                source_handle_id: "d8144c82-8b1a-4181-b068-6aaf69d21b73",
+              },
+              type: "ENTRYPOINT",
+              inputs: [],
+            },
+            {
+              id: "tool-calling-node",
+              base: {
+                name: "ToolCallingNode",
+                module: [
+                  "vellum",
+                  "workflows",
+                  "nodes",
+                  "displayable",
+                  "tool_calling_node",
+                  "node",
+                ],
+              },
+              type: "GENERIC",
+              label: "SimpleToolCallingNode",
+              ports: [
+                {
+                  id: "7b97f998-4be5-478d-94c4-9423db5f6392",
+                  name: "default",
+                  type: "DEFAULT",
+                },
+              ],
+              outputs: [
+                {
+                  id: "73a3c1e6-b632-45c5-a837-50922ccf0d47",
+                  name: "text",
+                  type: "STRING",
+                  value: null,
+                },
+                {
+                  id: "7dfce73d-3d56-4bb6-8a7e-cc1b3e38746e",
+                  name: "chat_history",
+                  type: "CHAT_HISTORY",
+                  value: null,
+                },
+              ],
+              trigger: {
+                id: "d8d60185-e88a-467b-84f4-e5fddd8b3209",
+                merge_behavior: "AWAIT_ATTRIBUTES",
+              },
+              adornments: null,
+              attributes: [
+                {
+                  id: "75bd1347-dca2-4cba-b0b0-a20a2923ebcc",
+                  name: "ml_model",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: { type: "STRING", value: "gpt-4o-mini" },
+                  },
+                },
+                {
+                  id: "beec5344-2eff-47d2-b920-b90367370d79",
+                  name: "blocks",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: {
+                      type: "JSON",
+                      value: [
+                        {
+                          state: null,
+                          blocks: [
+                            {
+                              state: null,
+                              blocks: [
+                                {
+                                  text: "You are a helpful assistant",
+                                  state: null,
+                                  block_type: "PLAIN_TEXT",
+                                  cache_config: null,
+                                },
+                              ],
+                              block_type: "RICH_TEXT",
+                              cache_config: null,
+                            },
+                          ],
+                          chat_role: "SYSTEM",
+                          block_type: "CHAT_MESSAGE",
+                          chat_source: null,
+                          cache_config: null,
+                          chat_message_unterminated: null,
+                        },
+                      ],
+                    },
+                  },
+                },
+                {
+                  id: "7b1ab802-3228-43b3-a493-734c94794710",
+                  name: "functions",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: {
+                      type: "JSON",
+                      value: [],
+                    },
+                  },
+                },
+              ],
+              definition: {
+                name: "SimpleToolCallingNode",
+                module: ["testing", "nodes", "simple_tool_call"],
+              },
+            },
+          ],
+
+          output_values: [],
+        },
+        input_variables: [],
+        state_variables: [],
+        output_variables: [],
+      };
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+      });
+
+      await project.generateCode();
+
+      const generatedFilePath = join(
+        tempDir,
+        "code",
+        "nodes",
+        "simple_tool_call",
+        "__init__.py"
+      );
+      const generatedContent = fs.readFileSync(generatedFilePath, "utf-8");
+
+      expect(generatedContent).not.toContain(
+        "class Outputs(ToolCallingNode.Outputs):"
+      );
+    });
+
     it.each([
       { name: "no packages", packages: [] },
       {

@@ -416,9 +416,8 @@ __all__ = [
 exports[`WorkflowProjectGenerator > function > should generate <function_name>.py file > code/nodes/tool_call/__init__.py 1`] = `
 "from .format_answer import format_answer
 from .get_current_weather import get_current_weather
-from typing import List
 
-from vellum import ChatMessage, ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
+from vellum import ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
 from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
 
 
@@ -438,10 +437,6 @@ class GetCurrentWeatherNode(ToolCallingNode):
     prompt_inputs = {
         "question": "What's the weather like in San Francisco?",
     }
-
-    class Outputs(ToolCallingNode.Outputs):
-        text: str
-        chat_history: List[ChatMessage]
 "
 `;
 
@@ -474,9 +469,7 @@ def get_current_weather(location: str, unit: str) -> str:
 `;
 
 exports[`WorkflowProjectGenerator > function > should generate empty function array if no functions are defined > code/nodes/tool_call/__init__.py 1`] = `
-"from typing import List
-
-from vellum import ChatMessage, ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
+"from vellum import ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
 from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
 
 
@@ -496,10 +489,6 @@ class GetCurrentWeatherNode(ToolCallingNode):
     prompt_inputs = {
         "question": "What's the weather like in San Francisco?",
     }
-
-    class Outputs(ToolCallingNode.Outputs):
-        text: str
-        chat_history: List[ChatMessage]
 "
 `;
 
@@ -703,9 +692,8 @@ class FinalOutput2(FinalOutputNode[BaseState, List[ChatMessage]]):
 
 exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 'no packages' > code/nodes/tool_call_get_current_weather_node/__init__.py 1`] = `
 "from .weather_function.workflow import WeatherFunction
-from typing import List
 
-from vellum import ChatMessage, ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
+from vellum import ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
 from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
 
 from ...inputs import Inputs
@@ -743,10 +731,6 @@ class GetCurrentWeatherNode(ToolCallingNode):
         "city": Inputs.city,
         "date": Inputs.date,
     }
-
-    class Outputs(ToolCallingNode.Outputs):
-        text: str
-        chat_history: List[ChatMessage]
 "
 `;
 
@@ -1082,9 +1066,8 @@ class FinalOutput2(FinalOutputNode[BaseState, List[ChatMessage]]):
 
 exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 'with packages' > code/nodes/tool_call_get_current_weather_node/__init__.py 1`] = `
 "from .weather_function.workflow import WeatherFunction
-from typing import List
 
-from vellum import ChatMessage, ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
+from vellum import ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
 from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
 
 from ...inputs import Inputs
@@ -1122,10 +1105,6 @@ class GetCurrentWeatherNode(ToolCallingNode):
         "city": Inputs.city,
         "date": Inputs.date,
     }
-
-    class Outputs(ToolCallingNode.Outputs):
-        text: str
-        chat_history: List[ChatMessage]
 "
 `;
 
@@ -1262,10 +1241,7 @@ class Workflow(BaseWorkflow[Inputs, BaseState]):
 `;
 
 exports[`WorkflowProjectGenerator > function > should generate workflow deployment tool > code/nodes/workflow/__init__.py 1`] = `
-"from typing import List
-
-from vellum import ChatMessage
-from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
+"from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
 from vellum.workflows.types.definition import DeploymentDefinition
 
 
@@ -1274,10 +1250,6 @@ class MyToolCallingNode(ToolCallingNode):
     blocks = []
     functions = [DeploymentDefinition(deployment="add-code-exec", release_tag="LATEST")]
     prompt_inputs = {}
-
-    class Outputs(ToolCallingNode.Outputs):
-        text: str
-        chat_history: List[ChatMessage]
 "
 `;
 
