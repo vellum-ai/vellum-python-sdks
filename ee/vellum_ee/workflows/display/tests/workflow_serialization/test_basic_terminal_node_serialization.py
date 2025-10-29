@@ -65,9 +65,9 @@ def test_serialize_workflow():
         "type": "TERMINAL",
         "data": {
             "label": "Basic Final Output Node",
-            "name": "value",
+            "name": "basic-final-output-node",
             "target_handle_id": "0173d3c6-11d1-44b7-b070-ca9ff5119046",
-            "output_id": "aa63e3f6-fde3-4d19-84ef-29982d44d709",
+            "output_id": "f331936d-2cce-4dd7-ab02-b650bc5260df",
             "output_type": "STRING",
             "node_input_id": "5322567a-f40c-400a-96b3-c3b054db543e",
         },
@@ -97,7 +97,7 @@ def test_serialize_workflow():
         },
         "outputs": [
             {
-                "id": "aa63e3f6-fde3-4d19-84ef-29982d44d709",
+                "id": "f331936d-2cce-4dd7-ab02-b650bc5260df",
                 "name": "value",
                 "type": "STRING",
                 "value": {"type": "WORKFLOW_INPUT", "input_variable_id": "e39a7b63-de15-490a-ae9b-8112c767aea0"},
