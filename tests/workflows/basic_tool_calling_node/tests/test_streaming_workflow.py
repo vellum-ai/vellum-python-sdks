@@ -23,6 +23,7 @@ def test_stream_workflow__happy_path(vellum_adhoc_prompt_client):
 
         call_count = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count
         expected_outputs: List[PromptOutput]
+        events: List[ExecutePromptEvent]
         if call_count == 1:
             expected_outputs = [
                 FunctionCallVellumValue(
@@ -34,7 +35,7 @@ def test_stream_workflow__happy_path(vellum_adhoc_prompt_client):
                     ),
                 ),
             ]
-            events: List[ExecutePromptEvent] = [
+            events = [
                 InitiatedExecutePromptEvent(execution_id=execution_id),
                 FulfilledExecutePromptEvent(
                     execution_id=execution_id,
@@ -42,7 +43,7 @@ def test_stream_workflow__happy_path(vellum_adhoc_prompt_client):
                 ),
             ]
         else:
-            events: List[ExecutePromptEvent] = [
+            events = [
                 InitiatedExecutePromptEvent(execution_id=execution_id),
                 StreamingExecutePromptEvent(
                     execution_id=execution_id,
@@ -88,6 +89,7 @@ def test_stream_workflow__happy_path(vellum_adhoc_prompt_client):
         for event in chat_history_events[1:-1]  # Skip initiated and fulfilled
         if (
             event.output.is_streaming
+            and isinstance(event.output.delta, list)
             and len(event.output.delta) == 1
             and event.output.delta[0].text is not None
             and event.output.delta[0].role == "ASSISTANT"
@@ -96,12 +98,16 @@ def test_stream_workflow__happy_path(vellum_adhoc_prompt_client):
 
     assert len(text_streaming_events) == 3
 
+    # Verify the exact text content matches our mocked deltas
+    assert isinstance(text_streaming_events[0].output.delta, list)
     assert text_streaming_events[0].output.delta[0].text == "Based on the function call, "
     assert text_streaming_events[0].output.delta[0].role == "ASSISTANT"
 
+    assert isinstance(text_streaming_events[1].output.delta, list)
     assert text_streaming_events[1].output.delta[0].text == "the current temperature in San Francisco "
     assert text_streaming_events[1].output.delta[0].role == "ASSISTANT"
 
+    assert isinstance(text_streaming_events[2].output.delta, list)
     assert text_streaming_events[2].output.delta[0].text == "is 70 degrees celsius."
     assert text_streaming_events[2].output.delta[0].role == "ASSISTANT"
 
