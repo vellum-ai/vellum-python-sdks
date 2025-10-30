@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Optional
 
 from vellum.client.types.chat_message import ChatMessage
 from vellum.workflows.inputs.base import BaseInputs
@@ -126,3 +126,92 @@ def test_dataset_row_with_empty_inputs():
 
     assert serialized_dict["label"] == "test_label"
     assert serialized_dict["inputs"] == {}
+
+
+def test_dataset_row_with_dict_inputs():
+    """
+    Test that DatasetRow can accept a dict for the inputs parameter.
+    """
+
+    # GIVEN a dict with input data
+    inputs_dict = {"message": "Hello World", "count": 42}
+
+    dataset_row = DatasetRow(label="test_label", inputs=inputs_dict)
+
+    # THEN the inputs should remain as a dict
+    assert isinstance(dataset_row.inputs, dict)
+
+    serialized_dict = dataset_row.model_dump()
+    assert serialized_dict["label"] == "test_label"
+    assert serialized_dict["inputs"]["message"] == "Hello World"
+    assert serialized_dict["inputs"]["count"] == 42
+
+
+def test_dataset_row_with_empty_dict_inputs():
+    """
+    Test that DatasetRow can accept an empty dict for the inputs parameter.
+    """
+
+    inputs_dict: dict[str, Any] = {}
+
+    dataset_row = DatasetRow(label="test_label", inputs=inputs_dict)
+
+    # THEN the inputs should remain as a dict
+    assert isinstance(dataset_row.inputs, dict)
+
+    serialized_dict = dataset_row.model_dump()
+    assert serialized_dict["label"] == "test_label"
+    assert serialized_dict["inputs"] == {}
+
+
+def test_dataset_row_with_complex_dict_inputs():
+    """
+    Test that DatasetRow can accept a dict with complex nested data structures.
+    """
+
+    # GIVEN a dict with complex nested data
+    inputs_dict = {
+        "text_field": "test_text",
+        "number_field": 456,
+        "chat_history": [
+            {"text": "Hello", "role": "USER"},
+            {"text": "Hi there!", "role": "ASSISTANT"},
+        ],
+    }
+
+    dataset_row = DatasetRow(label="complex_test", inputs=inputs_dict)
+
+    # THEN the inputs should remain as a dict
+    assert isinstance(dataset_row.inputs, dict)
+
+    # AND the serialized dict should contain all the nested data
+    serialized_dict = dataset_row.model_dump()
+    assert serialized_dict["label"] == "complex_test"
+    assert serialized_dict["inputs"]["text_field"] == "test_text"
+    assert serialized_dict["inputs"]["number_field"] == 456
+    assert len(serialized_dict["inputs"]["chat_history"]) == 2
+    assert serialized_dict["inputs"]["chat_history"][0]["text"] == "Hello"
+    assert serialized_dict["inputs"]["chat_history"][1]["role"] == "ASSISTANT"
+
+
+def test_dataset_row_backward_compatibility_with_base_inputs():
+    """
+    Test that DatasetRow still works with BaseInputs instances (backward compatibility).
+    """
+
+    # GIVEN a custom BaseInputs subclass
+    class CustomInputs(BaseInputs):
+        message: str
+        count: int
+
+    custom_inputs = CustomInputs(message="Test Message", count=100)
+
+    dataset_row = DatasetRow(label="backward_compat_test", inputs=custom_inputs)
+
+    assert isinstance(dataset_row.inputs, BaseInputs)
+    assert isinstance(dataset_row.inputs, CustomInputs)
+
+    serialized_dict = dataset_row.model_dump()
+    assert serialized_dict["label"] == "backward_compat_test"
+    assert serialized_dict["inputs"]["message"] == "Test Message"
+    assert serialized_dict["inputs"]["count"] == 100
