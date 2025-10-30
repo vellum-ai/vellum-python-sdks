@@ -46,7 +46,7 @@ class TestTriggerSubclassCompatibility:
             class Outputs(BaseWorkflow.Outputs):
                 result = TestNode.Outputs.result
 
-        trigger = SpecificSlackMessageTrigger(event_data={"message": "test", "channel": "#general", "user": "@alice"})
+        trigger = SpecificSlackMessageTrigger(message="test", channel="#general", user="@alice")
 
         result = TestWorkflow().run(trigger=trigger)
         assert result.name == "workflow.execution.fulfilled"
@@ -72,7 +72,7 @@ class TestTriggerSubclassCompatibility:
         class TestWorkflow(BaseWorkflow):
             graph = BaseSlackTrigger >> TestNode
 
-        trigger = UnrelatedTrigger(event_data={"data": "test"})
+        trigger = UnrelatedTrigger(data="test")
 
         with pytest.raises(WorkflowInitializationException) as exc_info:
             TestWorkflow().run(trigger=trigger)
@@ -98,7 +98,7 @@ class TestTriggerSubclassCompatibility:
             class Outputs(BaseWorkflow.Outputs):
                 result = TestNode.Outputs.result
 
-        trigger = SpecificSlackMessageTrigger(event_data={"message": "test", "channel": "#test", "user": "@bot"})
+        trigger = SpecificSlackMessageTrigger(message="test", channel="#test", user="@bot")
 
         result = TestWorkflow().run(trigger=trigger)
         assert result.name == "workflow.execution.fulfilled"

@@ -109,7 +109,7 @@ def test_populates_dynamic_attributes():
         "commits": ["abc123", "def456"],
     }
 
-    trigger = GithubPushTrigger(event_data=event_data)
+    trigger = GithubPushTrigger(**event_data)
 
     assert trigger.repository == "vellum-ai/workflows"
     assert trigger.branch == "main"
@@ -129,7 +129,7 @@ def test_to_trigger_attribute_values():
             slug = "slack_new_message"
 
     event_data = {"message": "Hello", "channel": "C123"}
-    trigger = SlackTrigger(event_data=event_data)
+    trigger = SlackTrigger(**event_data)
 
     attr_values = trigger.to_trigger_attribute_values()
 
@@ -150,7 +150,7 @@ def test_empty_event_data():
             integration_name = "SLACK"
             slug = "slack_new_message"
 
-    trigger = SlackTrigger(event_data={})
+    trigger = SlackTrigger()
 
     attr_values = trigger.to_trigger_attribute_values()
     assert attr_values == {}

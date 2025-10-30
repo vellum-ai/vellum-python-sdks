@@ -75,12 +75,12 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
             ...         channel = SlackNewMessageTrigger.channel
 
         Instantiate for testing:
-            >>> trigger = SlackNewMessageTrigger(event_data={
-            ...     "message": "Hello world",
-            ...     "channel": "C123456",
-            ...     "user": "U123",
-            ...     "timestamp": 1234567890.0,
-            ... })
+            >>> trigger = SlackNewMessageTrigger(
+            ...     message="Hello world",
+            ...     channel="C123456",
+            ...     user="U123",
+            ...     timestamp=1234567890.0,
+            ... )
             >>> trigger.message
             'Hello world'
     """
@@ -127,15 +127,12 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
                     f"{cls.__name__}.Config must define '{field}'. " f"Required fields: {', '.join(required_fields)}"
                 )
 
-    def __init__(self, event_data: dict):
+    def __init__(self, **kwargs: Any):
         """
         Initialize trigger with event data from the integration.
 
-        The trigger dynamically populates its attributes based on the event_data
-        dictionary keys. Any key in event_data becomes an accessible attribute.
-
-        Args:
-            event_data: Raw event data from the integration. Keys become trigger attributes.
+        The trigger dynamically populates its attributes based on the kwargs
+        dictionary keys. Any key in kwargs becomes an accessible attribute.
 
         Examples:
             >>> class SlackTrigger(VellumIntegrationTrigger):
@@ -147,22 +144,22 @@ class VellumIntegrationTrigger(IntegrationTrigger, metaclass=VellumIntegrationTr
             ...         provider = VellumIntegrationProviderType.COMPOSIO
             ...         integration_name = "SLACK"
             ...         slug = "slack_new_message"
-            >>> trigger = SlackTrigger(event_data={
-            ...     "message": "Hello",
-            ...     "channel": "C123",
-            ...     "user": "U456"
-            ... })
+            >>> trigger = SlackTrigger(
+            ...     message="Hello",
+            ...     channel="C123",
+            ...     user="U456"
+            ... )
             >>> trigger.message
             'Hello'
             >>> trigger.channel
             'C123'
         """
-        super().__init__(event_data)
+        super().__init__(**kwargs)
 
-        # Dynamically populate instance attributes from event_data.
-        # This allows any key in event_data to become an accessible attribute:
-        # event_data={"message": "Hi"} → trigger.message == "Hi"
-        for key, value in event_data.items():
+        # Dynamically populate instance attributes from kwargs.
+        # This allows any key in kwargs to become an accessible attribute:
+        # kwargs={"message": "Hi"} → trigger.message == "Hi"
+        for key, value in kwargs.items():
             setattr(self, key, value)
 
     def to_trigger_attribute_values(self) -> Dict["TriggerAttributeReference[Any]", Any]:

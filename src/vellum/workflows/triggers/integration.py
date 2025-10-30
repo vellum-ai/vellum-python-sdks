@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import ClassVar, Optional
+from typing import Any, ClassVar, Optional
 
 from vellum.workflows.triggers.base import BaseTrigger
 
@@ -18,9 +18,9 @@ class IntegrationTrigger(BaseTrigger, ABC):
         class MyIntegrationTrigger(IntegrationTrigger):
             data: str
 
-            def __init__(self, event_data: dict):
-                super().__init__(event_data)
-                self.data = event_data.get("data", "")
+            def __init__(self, **kwargs: Any):
+                super().__init__(**kwargs)
+                self.data = kwargs.get("data", "")
 
         # Use in workflow
         class MyWorkflow(BaseWorkflow):
@@ -39,7 +39,7 @@ class IntegrationTrigger(BaseTrigger, ABC):
     # Configuration that can be set at runtime
     config: ClassVar[Optional[dict]] = None
 
-    def __init__(self, event_data: dict):
+    def __init__(self, **kwargs: Any):
         """
         Initialize trigger with event data from external system.
 
@@ -47,21 +47,18 @@ class IntegrationTrigger(BaseTrigger, ABC):
         event payloads (e.g., Slack webhooks, email notifications) and
         populate trigger attributes.
 
-        Args:
-            event_data: Raw event data from the external system
-
         Examples:
             >>> class MyTrigger(IntegrationTrigger):
             ...     data: str
             ...
-            ...     def __init__(self, event_data: dict):
-            ...         super().__init__(event_data)
-            ...         self.data = event_data.get("data", "")
+            ...     def __init__(self, **kwargs: Any):
+            ...         super().__init__(**kwargs)
+            ...         self.data = kwargs.get("data", "")
             >>>
-            >>> trigger = MyTrigger({"data": "hello"})
+            >>> trigger = MyTrigger(data="hello")
             >>> state = workflow.get_default_state()
             >>> trigger.bind_to_state(state)
             >>> MyTrigger.data.resolve(state)
             'hello'
         """
-        self._event_data = event_data
+        self._event_data = kwargs
