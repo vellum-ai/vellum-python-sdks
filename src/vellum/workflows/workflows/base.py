@@ -738,30 +738,29 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
 
         Raises
         ------
-        ValueError
+        WorkflowInitializationException
             If trigger_id is provided but no matching trigger class is found in the workflow.
         """
-        from vellum.workflows.triggers.integration import IntegrationTrigger
-
         if trigger_id is None:
             inputs_class = cls.get_inputs_class()
             return inputs_class(**inputs)
 
-        trigger_edges = []
+        trigger_classes = []
         for subgraph in cls.get_subgraphs():
-            trigger_edges.extend(list(subgraph.trigger_edges))
+            for trigger_class in subgraph.triggers:
+                if trigger_class.__id__ == trigger_id:
+                    init_signature = inspect.signature(trigger_class.__init__)
+                    init_params = list(init_signature.parameters.keys())
 
-        for edge in trigger_edges:
-            trigger_class = edge.trigger_class
-            if trigger_class.__id__ == trigger_id:
-                if issubclass(trigger_class, IntegrationTrigger):
-                    return trigger_class(event_data=inputs)
-                else:
-                    return trigger_class()
+                    if "event_data" in init_params:
+                        return trigger_class(event_data=inputs)  # type: ignore[call-arg]
+                    else:
+                        return trigger_class(**inputs)  # type: ignore[call-arg]
+                trigger_classes.append(trigger_class)
 
-        raise ValueError(
-            f"No trigger class found with id {trigger_id} in workflow {cls.__name__}. "
-            f"Available trigger classes: {[edge.trigger_class.__name__ for edge in trigger_edges]}"
+        raise WorkflowInitializationException(
+            message=f"No trigger class found with id {trigger_id} in workflow {cls.__name__}. "
+            f"Available trigger classes: {[trigger_class.__name__ for trigger_class in trigger_classes]}"
         )
 
     @staticmethod

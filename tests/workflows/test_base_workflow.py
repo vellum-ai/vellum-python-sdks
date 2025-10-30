@@ -268,12 +268,12 @@ def test_deserialize_trigger__returns_trigger_instance_from_multi_trigger_workfl
 
 def test_deserialize_trigger__raises_error_when_trigger_id_not_found():
     """
-    Tests that deserialize_trigger raises ValueError when trigger_id doesn't match any workflow trigger.
+    Tests that deserialize_trigger raises WorkflowInitializationException when trigger_id doesn't match.
     """
 
     non_existent_trigger_id = uuid4()
 
-    with pytest.raises(ValueError) as exc_info:
+    with pytest.raises(WorkflowInitializationException) as exc_info:
         WorkflowWithSlackTrigger.deserialize_trigger(trigger_id=non_existent_trigger_id, inputs={"message": "test"})
 
     assert "No trigger class found" in str(exc_info.value)
