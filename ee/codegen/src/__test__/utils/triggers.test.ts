@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 
-import { WorkflowTrigger, WorkflowTriggerType } from "src/types/vellum";
+import { IntegrationProvider, WorkflowTrigger, WorkflowTriggerType } from "src/types/vellum";
 import { getTriggerClassInfo } from "src/utils/triggers";
 
 describe("getTriggerClassInfo", () => {
@@ -46,7 +46,7 @@ describe("getTriggerClassInfo", () => {
         { id: "attr-2", name: "channel", value: null },
       ],
       execConfig: {
-        type: "COMPOSIO" as const,
+        type: IntegrationProvider.COMPOSIO,
         slug: "SLACK_NEW_MESSAGE",
         setupAttributes: [],
         integrationName: "slack",

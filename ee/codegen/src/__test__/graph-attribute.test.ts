@@ -19,7 +19,7 @@ import {
 
 import { createNodeContext } from "src/context";
 import { GraphAttribute } from "src/generators/graph-attribute";
-import { WorkflowTriggerType } from "src/types/vellum";
+import { IntegrationProvider, WorkflowTriggerType } from "src/types/vellum";
 
 describe("Workflow", () => {
   const entrypointNode = entrypointNodeDataFactory();
@@ -1152,6 +1152,12 @@ describe("Workflow", () => {
               { id: "attr-1", name: "message", value: null },
               { id: "attr-2", name: "channel", value: null },
             ],
+            execConfig: {
+              type: IntegrationProvider.COMPOSIO,
+              slug: "SLACK_NEW_MESSAGE",
+              setupAttributes: [],
+              integrationName: "slack",
+            },
             className: "SlackMessageTrigger",
             modulePath: ["tests", "fixtures", "triggers", "slack_message"],
             sourceHandleId: triggerId, // Use trigger ID as handle ID
