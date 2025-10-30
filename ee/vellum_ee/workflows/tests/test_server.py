@@ -931,7 +931,10 @@ class StartNode(BaseNode):
     class Outputs(BaseNode.Outputs):
         result: str = "test output"
 """,
-        "display/__init__.py": "",
+        "display/__init__.py": """\
+from .nodes import *
+from .workflow import *
+""",
         "display/nodes/__init__.py": """\
 from .start_node import StartNodeDisplay
 """,
@@ -949,6 +952,8 @@ class StartNodeDisplay(BaseNodeDisplay[StartNode]):
             name="Pretty Result"
         )
     }
+""",
+        "display/workflow.py": """\
 """,
     }
 
