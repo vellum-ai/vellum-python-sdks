@@ -1,6 +1,10 @@
 import { describe, it, expect } from "vitest";
 
-import { IntegrationProvider, WorkflowTrigger, WorkflowTriggerType } from "src/types/vellum";
+import {
+  IntegrationProvider,
+  WorkflowTrigger,
+  WorkflowTriggerType,
+} from "src/types/vellum";
 import { getTriggerClassInfo } from "src/utils/triggers";
 
 describe("getTriggerClassInfo", () => {
