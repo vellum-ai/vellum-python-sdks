@@ -30,7 +30,11 @@ class VirtualFileLoader(importlib.abc.Loader):
 
         if module_info:
             file_path, code = module_info
-            compiled = compile(code, file_path, "exec")
+            namespaced_path = (
+                file_path if file_path.startswith(f"{self.namespace}/") else f"{self.namespace}/{file_path}"
+            )
+            module.__file__ = namespaced_path
+            compiled = compile(code, namespaced_path, "exec")
             exec(compiled, module.__dict__)
 
     def get_source(self, fullname):
@@ -58,6 +62,18 @@ class VirtualFileLoader(importlib.abc.Loader):
             if code is not None:
                 return file_path, code
 
+            relative_name = self._to_relative(fullname)
+            if relative_name is not None and self._is_package_directory(relative_name):
+                return self._generate_init_content(relative_name)
+
+        return None
+
+    def _to_relative(self, fullname: str) -> Optional[str]:
+        """Convert a fully qualified module name to a relative name without the namespace prefix."""
+        if fullname.startswith(self.namespace + "."):
+            return fullname[len(self.namespace) + 1 :]
+        elif fullname == self.namespace:
+            return ""
         return None
 
     def _get_file_path(self, fullname):
@@ -66,6 +82,29 @@ class VirtualFileLoader(importlib.abc.Loader):
     def _get_code(self, file_path):
         file_key_name = re.sub(r"^" + re.escape(self.namespace) + r"/", "", file_path)
         return self.files.get(file_key_name)
+
+    def _is_package_directory(self, fullname: str) -> bool:
+        """Check if directory contains .py files that should be treated as a package."""
+        directory_prefix = fullname.replace(".", "/") + "/"
+
+        for file_path in self.files.keys():
+            if file_path.startswith(directory_prefix):
+                if file_path.endswith(".py") and not file_path.endswith("__init__.py"):
+                    return True
+                remaining_path = file_path[len(directory_prefix) :]
+                if "/" in remaining_path:
+                    return True
+
+        return False
+
+    def _generate_init_content(self, fullname: str) -> tuple[str, str]:
+        """Auto-generate empty __init__.py content to mark directory as a package."""
+        directory_prefix = fullname.replace(".", "/") + "/"
+        file_path = directory_prefix + "__init__.py"
+
+        code = ""
+
+        return file_path, code
 
 
 class VirtualFileFinder(BaseWorkflowFinder):

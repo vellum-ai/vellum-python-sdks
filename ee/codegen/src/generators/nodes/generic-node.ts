@@ -790,15 +790,12 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     }
 
     if (this.isNestedNode) {
-      // Create __init__.py for node implementation
       const nodeInitFile = new InitFile({
         workflowContext: this.workflowContext,
         modulePath: this.nodeContext.nodeModulePath,
         statements: [this.generateNodeClass()],
       });
 
-      // Create __init__.py for node display
-      // We need to import nodes from those nested workflows to register the display classes
       const nestedImports: python.StarImport[] = [];
       this.inlineWorkflowsToGenerate.forEach((workflowFile) => {
         const workflowName = workflowFile.functionName;
