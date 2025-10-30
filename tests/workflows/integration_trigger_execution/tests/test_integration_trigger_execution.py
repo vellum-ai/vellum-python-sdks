@@ -18,11 +18,9 @@ def test_successful_execution_with_trigger_event():
 
     # AND a valid Slack trigger instance
     trigger = SlackMessageTrigger(
-        event_data={
-            "message": "Test message",
-            "channel": "C123456",
-            "user": "U789012",
-        }
+        message="Test message",
+        channel="C123456",
+        user="U789012",
     )
 
     # WHEN we run the workflow with the trigger
@@ -42,11 +40,9 @@ def test_stream_execution_with_trigger_event():
 
     # AND a valid Slack trigger instance
     trigger = SlackMessageTrigger(
-        event_data={
-            "message": "Streaming test",
-            "channel": "C999999",
-            "user": "U111111",
-        }
+        message="Streaming test",
+        channel="C999999",
+        user="U111111",
     )
 
     # WHEN we stream the workflow with the trigger
@@ -82,11 +78,9 @@ def test_error_when_trigger_event_provided_but_no_integration_trigger():
 
     # AND a trigger instance
     trigger = SlackMessageTrigger(
-        event_data={
-            "message": "This should fail",
-            "channel": "C123456",
-            "user": "U789012",
-        }
+        message="This should fail",
+        channel="C123456",
+        user="U789012",
     )
 
     # WHEN we run the workflow with trigger
@@ -133,11 +127,9 @@ def test_workflow_with_multiple_triggers_slack_path():
 
     # AND a Slack trigger instance
     trigger = SlackMessageTrigger(
-        event_data={
-            "message": "Multi-trigger test",
-            "channel": "C333333",
-            "user": "U444444",
-        }
+        message="Multi-trigger test",
+        channel="C333333",
+        user="U444444",
     )
 
     # WHEN we run the workflow with trigger (Slack trigger path)

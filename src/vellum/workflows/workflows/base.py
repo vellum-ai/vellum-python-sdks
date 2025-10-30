@@ -728,7 +728,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             The UUID of the trigger class to instantiate. If None, returns workflow Inputs.
 
         inputs: dict
-            The inputs/event_data to pass to the trigger or Inputs constructor.
+            The inputs to pass to the trigger or Inputs constructor.
 
         Returns
         -------
@@ -749,13 +749,8 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         for subgraph in cls.get_subgraphs():
             for trigger_class in subgraph.triggers:
                 if trigger_class.__id__ == trigger_id:
-                    init_signature = inspect.signature(trigger_class.__init__)
-                    init_params = list(init_signature.parameters.keys())
+                    return trigger_class(**inputs)  # type: ignore[call-arg]
 
-                    if "event_data" in init_params:
-                        return trigger_class(event_data=inputs)  # type: ignore[call-arg]
-                    else:
-                        return trigger_class(**inputs)  # type: ignore[call-arg]
                 trigger_classes.append(trigger_class)
 
         raise WorkflowInitializationException(

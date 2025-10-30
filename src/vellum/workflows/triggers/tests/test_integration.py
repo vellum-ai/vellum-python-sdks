@@ -1,5 +1,7 @@
 """Tests for IntegrationTrigger base class."""
 
+from typing import Any
+
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.state.base import BaseState
@@ -9,7 +11,7 @@ from vellum.workflows.triggers.integration import IntegrationTrigger
 def test_integration_trigger__can_be_instantiated_as_base():
     """IntegrationTrigger can be instantiated as a base class."""
     # WHEN we instantiate IntegrationTrigger directly
-    trigger = IntegrationTrigger({"test": "data"})
+    trigger = IntegrationTrigger(test="data")
 
     # THEN it creates an instance with event data stored
     assert trigger._event_data == {"test": "data"}
@@ -33,12 +35,12 @@ def test_integration_trigger__can_be_subclassed():
     class TestTrigger(IntegrationTrigger):
         data: str
 
-        def __init__(self, event_data: dict):
-            super().__init__(event_data)
-            self.data = event_data.get("data", "")
+        def __init__(self, **kwargs: Any):
+            super().__init__(**kwargs)
+            self.data = kwargs.get("data", "")
 
     # WHEN we create a trigger instance
-    result = TestTrigger({"data": "test"})
+    result = TestTrigger(data="test")
 
     # THEN it returns the expected trigger instance with populated attributes
     assert result.data == "test"
@@ -50,9 +52,9 @@ def test_integration_trigger__attribute_reference():
     class TestTrigger(IntegrationTrigger):
         value: str
 
-        def __init__(self, event_data: dict):
-            super().__init__(event_data)
-            self.value = event_data.get("value", "")
+        def __init__(self, **kwargs: Any):
+            super().__init__(**kwargs)
+            self.value = kwargs.get("value", "")
 
     reference = TestTrigger.value
     assert isinstance(reference, TriggerAttributeReference)
@@ -61,7 +63,7 @@ def test_integration_trigger__attribute_reference():
     assert reference == TestTrigger.attribute_references()["value"]
 
     state = BaseState()
-    trigger = TestTrigger({"value": "data"})
+    trigger = TestTrigger(value="data")
     trigger.bind_to_state(state)
     assert reference.resolve(state) == "data"
 
@@ -73,9 +75,9 @@ def test_integration_trigger__graph_syntax():
     class TestTrigger(IntegrationTrigger):
         value: str
 
-        def __init__(self, event_data: dict):
-            super().__init__(event_data)
-            self.value = event_data.get("value", "")
+        def __init__(self, **kwargs: Any):
+            super().__init__(**kwargs)
+            self.value = kwargs.get("value", "")
 
     class TestNode(BaseNode):
         pass
@@ -97,9 +99,9 @@ def test_integration_trigger__multiple_entrypoints():
     class TestTrigger(IntegrationTrigger):
         msg: str
 
-        def __init__(self, event_data: dict):
-            super().__init__(event_data)
-            self.msg = event_data.get("msg", "")
+        def __init__(self, **kwargs: Any):
+            super().__init__(**kwargs)
+            self.msg = kwargs.get("msg", "")
 
     class NodeA(BaseNode):
         pass

@@ -7,7 +7,7 @@ from vellum.workflows.triggers.vellum_integration import VellumIntegrationTrigge
 class GmailTrigger(VellumIntegrationTrigger):
     """Example Gmail trigger for testing runtime execution with multiple triggers."""
 
-    # Event attributes - populated from event_data at instantiation
+    # Event attributes - populated from kwargs at instantiation
     subject: str
     from_email: str
     body: str
