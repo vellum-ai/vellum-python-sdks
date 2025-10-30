@@ -82,28 +82,11 @@ def test_base_class_dynamic_import(files):
         pytest.fail(f"Failed to create an instance of BaseClass: {e}")
 
 
-@pytest.mark.parametrize(
-    "display_module_path,display_file_path,description",
-    [
-        (
-            "display",
-            "display/workflow.py",
-            "top-level display directory (display/)",
-        ),
-        (
-            "nodes.subworkflow.display",
-            "nodes/subworkflow/display/workflow.py",
-            "nested display directory (nodes/subworkflow/display/)",
-        ),
-    ],
-)
-def test_display_directory_not_auto_generated(display_module_path, display_file_path, description):
+def test_display_directory_not_auto_generated():
     """
-    Test that display directories are NOT auto-generated with empty __init__.py files.
+    Test that the top-level display directory is NOT auto-generated with empty __init__.py.
     Display directories typically have specific __init__.py content (e.g., "from .workflow import *")
     that should not be replaced with empty auto-generated files.
-
-    This test covers both top-level (display/) and nested (nodes/.../display/) directories.
     """
     # GIVEN a workflow with display/workflow.py but NO display/__init__.py
     files = {
@@ -118,13 +101,13 @@ class StartNode(BaseNode):
 class Workflow(BaseWorkflow):
     graph = StartNode
 """,
-        display_file_path: """\
+        "display/workflow.py": """\
 from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
 
 class WorkflowDisplay(BaseWorkflowDisplay):
     pass
 """,
-        # Note: NO display __init__.py in files dict
+        # Note: NO "display/__init__.py" in files dict
     }
 
     namespace = str(uuid4())
@@ -133,15 +116,15 @@ class WorkflowDisplay(BaseWorkflowDisplay):
     sys.meta_path.append(VirtualFileFinder(files, namespace))
 
     try:
-        # WHEN we try to resolve the display module
+        # WHEN we try to resolve display/__init__.py
         import importlib.util
 
-        spec = importlib.util.find_spec(f"{namespace}.{display_module_path}")
+        spec = importlib.util.find_spec(f"{namespace}.display")
 
         # THEN the spec should be None because we don't want to auto-generate display/__init__.py
         # If the spec exists, it means an empty __init__.py was auto-generated (BAD)
         assert spec is None, (
-            f"{description} should NOT have auto-generated __init__.py. "
+            "display directory should NOT have auto-generated __init__.py. "
             "Display directories require specific __init__.py content that shouldn't be empty."
         )
 

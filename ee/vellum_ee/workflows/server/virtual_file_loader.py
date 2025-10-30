@@ -87,10 +87,9 @@ class VirtualFileLoader(importlib.abc.Loader):
         """Check if directory contains .py files that should be treated as a package."""
         directory_prefix = fullname.replace(".", "/") + "/"
 
-        # Exclude display directories from auto-generation as they typically have
+        # Exclude top-level display directory from auto-generation as it typically has
         # specific __init__.py content that shouldn't be replaced with empty files.
-        # Check for both top-level (display/) and nested (.../display/) directories.
-        if directory_prefix == "display/" or "/display/" in directory_prefix:
+        if directory_prefix == "display/":
             return False
 
         for file_path in self.files.keys():
