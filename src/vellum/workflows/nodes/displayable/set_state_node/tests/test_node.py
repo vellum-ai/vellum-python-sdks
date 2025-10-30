@@ -209,33 +209,4 @@ def test_set_state_node_no_partial_update_on_error():
     with pytest.raises(NodeException):
         node.run()
 
-    # Ensure no partial mutation occurred
     assert state.a == 5
-
-
-def test_set_state_node_rollback_when_second_assignment_fails():
-    """If the second assignment raises during application, no changes are committed."""
-
-    class TestState(BaseState):
-        a: int = 1
-        b: int = 2
-
-        def __setattr__(self, name, value):
-            if name == "b" and value == 999:
-                raise ValueError("invalid b value")
-            return super().__setattr__(name, value)
-
-    class UpdateAB(SetStateNode[TestState]):
-        operations = {
-            "a": 111,  # should have been applied first
-            "b": 999,  # will raise during assignment
-        }
-
-    state = TestState()
-    node = UpdateAB(state=state)
-
-    with pytest.raises(NodeException):
-        node.run()
-
-    assert state.a == 1
-    assert state.b == 2
