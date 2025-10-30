@@ -67,13 +67,14 @@ export class GenericNodeDisplayData extends AstNode {
       );
     }
 
-    if (!isNil(this.sourceNodeDisplayData?.z_index)) {
+    // Include z_index if the field exists in source data (even if null)
+    if (this.sourceNodeDisplayData && "z_index" in this.sourceNodeDisplayData) {
       args.push(
         python.methodArgument({
           name: "z_index",
-          value: python.TypeInstantiation.int(
-            this.sourceNodeDisplayData.z_index
-          ),
+          value: !isNil(this.sourceNodeDisplayData.z_index)
+            ? python.TypeInstantiation.int(this.sourceNodeDisplayData.z_index)
+            : python.TypeInstantiation.none(),
         })
       );
     }
