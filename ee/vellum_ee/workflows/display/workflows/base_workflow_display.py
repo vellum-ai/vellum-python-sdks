@@ -30,7 +30,7 @@ from vellum.workflows.triggers.vellum_integration import VellumIntegrationTrigge
 from vellum.workflows.types.core import Json, JsonArray, JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.types.utils import get_original_base
-from vellum.workflows.utils.uuids import get_trigger_id, uuid4_from_hash
+from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
 from vellum.workflows.vellum_client import create_vellum_client
 from vellum_ee.workflows.display.base import (
@@ -202,7 +202,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         if has_manual_trigger:
             # ManualTrigger: use trigger ID for ENTRYPOINT node (backward compatibility)
             trigger_class = manual_trigger_edges[0].trigger_class
-            entrypoint_node_id = get_trigger_id(trigger_class)
+            entrypoint_node_id = trigger_class.__id__
             entrypoint_node_source_handle_id = self.display_context.workflow_display.entrypoint_node_source_handle_id
 
             # Add ENTRYPOINT node for ManualTrigger workflows
@@ -386,7 +386,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         if has_only_integration_trigger:
             # Use trigger ID directly as sourceNodeId (no ENTRYPOINT node)
             trigger_class = integration_trigger_edges[0].trigger_class
-            trigger_id = get_trigger_id(trigger_class)
+            trigger_id = trigger_class.__id__
             trigger_source_handle_id = trigger_id  # Use trigger ID as handle ID
 
             for target_node, entrypoint_display in self.display_context.entrypoint_displays.items():
@@ -550,7 +550,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 )
 
         # Return as a list with a single trigger object matching Django schema
-        trigger_id = get_trigger_id(trigger_class)
+        trigger_id = trigger_class.__id__
 
         # Serialize trigger attributes like node outputs
         attribute_references = trigger_class.attribute_references().values()
