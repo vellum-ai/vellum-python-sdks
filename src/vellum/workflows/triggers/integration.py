@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Any, ClassVar, Optional
+from typing import ClassVar, Optional
 
 from vellum.workflows.triggers.base import BaseTrigger
 
@@ -38,27 +38,3 @@ class IntegrationTrigger(BaseTrigger, ABC):
 
     # Configuration that can be set at runtime
     config: ClassVar[Optional[dict]] = None
-
-    def __init__(self, **kwargs: Any):
-        """
-        Initialize trigger with event data from external system.
-
-        Subclasses should override this method to parse external
-        event payloads (e.g., Slack webhooks, email notifications) and
-        populate trigger attributes.
-
-        Examples:
-            >>> class MyTrigger(IntegrationTrigger):
-            ...     data: str
-            ...
-            ...     def __init__(self, **kwargs: Any):
-            ...         super().__init__(**kwargs)
-            ...         self.data = kwargs.get("data", "")
-            >>>
-            >>> trigger = MyTrigger(data="hello")
-            >>> state = workflow.get_default_state()
-            >>> trigger.bind_to_state(state)
-            >>> MyTrigger.data.resolve(state)
-            'hello'
-        """
-        self._event_data = kwargs
