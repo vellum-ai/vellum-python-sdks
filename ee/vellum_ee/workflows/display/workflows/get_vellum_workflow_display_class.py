@@ -1,3 +1,4 @@
+import importlib
 import types
 from typing import TYPE_CHECKING, Generic, Optional, Type, TypeVar
 
@@ -11,6 +12,19 @@ if TYPE_CHECKING:
 
 
 def _get_workflow_display_class(*, workflow_class: Type[WorkflowType]) -> Type["BaseWorkflowDisplay"]:
+    # Try to import the display module to ensure display classes are registered
+    try:
+        # Extract package root from workflow module (e.g., "foo.workflow" -> "foo")
+        workflow_module = workflow_class.__module__
+        if workflow_module.endswith(".workflow"):
+            package_root = workflow_module[: -len(".workflow")]
+        else:
+            package_root = workflow_module
+        display_module_path = f"{package_root}.display"
+        importlib.import_module(display_module_path)
+    except (ModuleNotFoundError, ImportError):
+        pass  # Display module doesn't exist, will use dynamically generated display class
+
     workflow_display_class = get_from_workflow_display_registry(workflow_class)
     if workflow_display_class:
         return workflow_display_class

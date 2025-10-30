@@ -933,14 +933,15 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             for input in display_context.workflow_input_displays
         }
         node_displays = {
-            node.__id__: (node, display_context.node_displays[node]) for node in display_context.node_displays
+            display_context.node_displays[node].node_id: (node, display_context.node_displays[node])
+            for node in display_context.node_displays
         }
         node_event_displays = {}
         for node_id in node_displays:
             node, current_node_display = node_displays[node_id]
             input_display = current_node_display.node_input_ids_by_name
             output_display = {
-                output.name: current_node_display.output_display[output].id
+                current_node_display.output_display[output].name: current_node_display.output_display[output].id
                 for output in current_node_display.output_display
             }
             port_display_meta = {
