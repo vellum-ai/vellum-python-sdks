@@ -4365,7 +4365,7 @@ baz = foo + bar
       ]);
     });
 
-    it("should not generate redundant Outputs class for ToolCallingNode with default outputs", async () => {
+    it("should not generate Outputs class when outputs array is empty", async () => {
       const displayData = {
         workflow_raw_data: {
           edges: [],
@@ -4402,20 +4402,7 @@ baz = foo + bar
                   type: "DEFAULT",
                 },
               ],
-              outputs: [
-                {
-                  id: "73a3c1e6-b632-45c5-a837-50922ccf0d47",
-                  name: "text",
-                  type: "STRING",
-                  value: null,
-                },
-                {
-                  id: "7dfce73d-3d56-4bb6-8a7e-cc1b3e38746e",
-                  name: "chat_history",
-                  type: "CHAT_HISTORY",
-                  value: null,
-                },
-              ],
+              outputs: [],
               trigger: {
                 id: "d8d60185-e88a-467b-84f4-e5fddd8b3209",
                 merge_behavior: "AWAIT_ATTRIBUTES",

@@ -22,48 +22,6 @@
         "id": "d23a040c-cc1c-46a0-8368-7a9dcb79aa44",
         "label": "Composio Tool Calling Node",
         "type": "GENERIC",
-        "display_data": {
-          "position": {
-            "x": 200.0,
-            "y": -50.0
-          },
-          "comment": {
-            "expanded": true,
-            "value": "\n    A tool calling node that uses a ComposioTool for GitHub issue creation.\n    "
-          }
-        },
-        "base": {
-          "name": "ToolCallingNode",
-          "module": [
-            "vellum",
-            "workflows",
-            "nodes",
-            "displayable",
-            "tool_calling_node",
-            "node"
-          ]
-        },
-        "definition": {
-          "name": "ComposioToolCallingNode",
-          "module": [
-            "codegen_integration",
-            "fixtures",
-            "simple_composio_tool_calling_node",
-            "code",
-            "workflow"
-          ]
-        },
-        "trigger": {
-          "id": "8f664dfb-0542-434c-ab85-ff59151bf488",
-          "merge_behavior": "AWAIT_ATTRIBUTES"
-        },
-        "ports": [
-          {
-            "id": "527188f1-6724-4fb5-be79-cc0be61ee888",
-            "name": "default",
-            "type": "DEFAULT"
-          }
-        ],
         "adornments": null,
         "attributes": [
           {
@@ -163,20 +121,49 @@
             }
           }
         ],
-        "outputs": [
-          {
-            "id": "e05cc145-34ca-4007-bba9-2eed26cadda6",
-            "name": "text",
-            "type": "STRING",
-            "value": null
+        "display_data": {
+          "position": {
+            "x": 200.0,
+            "y": -50.0
           },
-          {
-            "id": "5625e421-ca8f-4477-8312-e7c99172be32",
-            "name": "chat_history",
-            "type": "CHAT_HISTORY",
-            "value": null
+          "comment": {
+            "value": "\n    A tool calling node that uses a ComposioTool for GitHub issue creation.\n    ",
+            "expanded": true
           }
-        ]
+        },
+        "base": {
+          "name": "ToolCallingNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "tool_calling_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "ComposioToolCallingNode",
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "simple_composio_tool_calling_node",
+            "code",
+            "workflow"
+          ]
+        },
+        "trigger": {
+          "id": "8f664dfb-0542-434c-ab85-ff59151bf488",
+          "merge_behavior": "AWAIT_ATTRIBUTES"
+        },
+        "ports": [
+          {
+            "id": "527188f1-6724-4fb5-be79-cc0be61ee888",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ],
+        "outputs": []
       },
       {
         "id": "88e59503-f7fb-48cc-b535-3cd1db07627a",

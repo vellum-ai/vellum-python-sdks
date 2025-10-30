@@ -4,6 +4,7 @@ from deepdiff import DeepDiff
 
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
+from vellum.workflows.references.constant import ConstantValueReference
 from vellum_ee.workflows.display.base import WorkflowInputsDisplay
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
@@ -170,3 +171,26 @@ def test_serialize_node__node_output_reference(serialize_node):
         serialized_node,
         ignore_order=True,
     )
+
+
+def test_serialize_node__inherits_output_and_overrides_default(serialize_node):
+    class ParentNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            message: str
+
+    class ChildNode(ParentNode):
+        class Outputs(ParentNode.Outputs):
+            message = ConstantValueReference("hello world")
+
+    serialized_node = serialize_node(ChildNode)
+
+    outputs = serialized_node["outputs"]
+    assert len(outputs) == 1
+
+    output = outputs[0]
+    assert output["name"] == "message"
+    assert output["type"] == "STRING"
+    assert output["value"] == {
+        "type": "CONSTANT_VALUE",
+        "value": {"type": "STRING", "value": "hello world"},
+    }
