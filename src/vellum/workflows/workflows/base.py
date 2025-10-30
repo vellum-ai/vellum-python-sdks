@@ -714,6 +714,56 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
 
         return state_class(**state)
 
+    @classmethod
+    def deserialize_trigger(cls, trigger_id: Optional[UUID], inputs: dict) -> Union[InputsType, BaseTrigger]:
+        """
+        Deserialize a trigger from a trigger_id and inputs dict.
+
+        If trigger_id is None, returns an instance of the workflow's Inputs class.
+        Otherwise, finds a trigger class that matches the trigger_id and creates an instance of that.
+
+        Parameters
+        ----------
+        trigger_id: Optional[UUID]
+            The UUID of the trigger class to instantiate. If None, returns workflow Inputs.
+
+        inputs: dict
+            The inputs/event_data to pass to the trigger or Inputs constructor.
+
+        Returns
+        -------
+        Union[InputsType, BaseTrigger]
+            Either an instance of the workflow's Inputs class (if trigger_id is None)
+            or an instance of the matching trigger class.
+
+        Raises
+        ------
+        ValueError
+            If trigger_id is provided but no matching trigger class is found in the workflow.
+        """
+        from vellum.workflows.triggers.integration import IntegrationTrigger
+
+        if trigger_id is None:
+            inputs_class = cls.get_inputs_class()
+            return inputs_class(**inputs)
+
+        trigger_edges = []
+        for subgraph in cls.get_subgraphs():
+            trigger_edges.extend(list(subgraph.trigger_edges))
+
+        for edge in trigger_edges:
+            trigger_class = edge.trigger_class
+            if trigger_class.__id__ == trigger_id:
+                if issubclass(trigger_class, IntegrationTrigger):
+                    return trigger_class(event_data=inputs)
+                else:
+                    return trigger_class()
+
+        raise ValueError(
+            f"No trigger class found with id {trigger_id} in workflow {cls.__name__}. "
+            f"Available trigger classes: {[edge.trigger_class.__name__ for edge in trigger_edges]}"
+        )
+
     @staticmethod
     def load_from_module(module_path: str) -> Type["BaseWorkflow"]:
         workflow_path = f"{module_path}.workflow"

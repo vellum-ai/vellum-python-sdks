@@ -1,12 +1,17 @@
 import pytest
 from uuid import uuid4
 
+from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import WorkflowInitializationException
+from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.resolvers.base import BaseWorkflowResolver
 from vellum.workflows.runner.runner import WorkflowRunner
+from vellum.workflows.state.base import BaseState
+from vellum.workflows.triggers.manual import ManualTrigger
+from vellum.workflows.triggers.vellum_integration import VellumIntegrationTrigger
 from vellum.workflows.workflows.base import BaseWorkflow
 
 
@@ -161,3 +166,115 @@ def test_no_exception_when_no_previous_execution_id():
     assert runner is not None
 
     assert runner._initial_state is not None
+
+
+class TestSlackTrigger(VellumIntegrationTrigger):
+    """Test Slack trigger for deserialize_trigger tests."""
+
+    message: str
+    channel: str
+
+    class Config(VellumIntegrationTrigger.Config):
+        provider = VellumIntegrationProviderType.COMPOSIO
+        integration_name = "SLACK"
+        slug = "slack_test"
+
+
+class WorkflowWithInputsInputs(BaseInputs):
+    user_query: str
+    count: int = 0
+
+
+class WorkflowWithInputs(BaseWorkflow[WorkflowWithInputsInputs, BaseState]):
+    """Test workflow with custom inputs."""
+
+    graph = TestNode
+
+
+class WorkflowWithSlackTrigger(BaseWorkflow):
+    """Test workflow with Slack trigger."""
+
+    graph = TestSlackTrigger >> TestNode
+
+
+class WorkflowWithMultipleTriggers(BaseWorkflow):
+    """Test workflow with multiple triggers."""
+
+    graph = {
+        ManualTrigger >> TestNode,
+        TestSlackTrigger >> TestNode,
+    }
+
+
+def test_deserialize_trigger__returns_inputs_when_trigger_id_is_none():
+    """
+    Tests that deserialize_trigger returns workflow Inputs instance when trigger_id is None.
+    """
+
+    result = WorkflowWithInputs.deserialize_trigger(trigger_id=None, inputs={"user_query": "test query", "count": 5})
+
+    assert isinstance(result, WorkflowWithInputsInputs)
+
+    assert result.user_query == "test query"
+    assert result.count == 5
+
+
+def test_deserialize_trigger__returns_inputs_with_defaults_when_trigger_id_is_none():
+    """
+    Tests that deserialize_trigger returns workflow Inputs with default values when trigger_id is None.
+    """
+
+    result = WorkflowWithInputs.deserialize_trigger(trigger_id=None, inputs={"user_query": "test query"})
+
+    assert isinstance(result, WorkflowWithInputsInputs)
+
+    assert result.user_query == "test query"
+    assert result.count == 0
+
+
+def test_deserialize_trigger__returns_trigger_instance_when_trigger_id_matches():
+    """
+    Tests that deserialize_trigger returns trigger instance when trigger_id matches a workflow trigger.
+    """
+
+    trigger_id = TestSlackTrigger.__id__
+
+    result = WorkflowWithSlackTrigger.deserialize_trigger(
+        trigger_id=trigger_id, inputs={"message": "Hello", "channel": "#general"}
+    )
+
+    assert isinstance(result, TestSlackTrigger)
+
+    assert result.message == "Hello"
+    assert result.channel == "#general"
+
+
+def test_deserialize_trigger__returns_trigger_instance_from_multi_trigger_workflow():
+    """
+    Tests that deserialize_trigger returns correct trigger instance from workflow with multiple triggers.
+    """
+
+    trigger_id = TestSlackTrigger.__id__
+
+    result = WorkflowWithMultipleTriggers.deserialize_trigger(
+        trigger_id=trigger_id, inputs={"message": "Multi-trigger test", "channel": "#test"}
+    )
+
+    assert isinstance(result, TestSlackTrigger)
+
+    assert result.message == "Multi-trigger test"
+    assert result.channel == "#test"
+
+
+def test_deserialize_trigger__raises_error_when_trigger_id_not_found():
+    """
+    Tests that deserialize_trigger raises ValueError when trigger_id doesn't match any workflow trigger.
+    """
+
+    non_existent_trigger_id = uuid4()
+
+    with pytest.raises(ValueError) as exc_info:
+        WorkflowWithSlackTrigger.deserialize_trigger(trigger_id=non_existent_trigger_id, inputs={"message": "test"})
+
+    assert "No trigger class found" in str(exc_info.value)
+    assert str(non_existent_trigger_id) in str(exc_info.value)
