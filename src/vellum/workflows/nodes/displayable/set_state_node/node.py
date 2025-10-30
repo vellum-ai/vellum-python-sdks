@@ -1,4 +1,3 @@
-from copy import deepcopy
 from typing import Any, ClassVar, Dict, Generic
 
 from vellum.workflows.descriptors.base import BaseDescriptor
