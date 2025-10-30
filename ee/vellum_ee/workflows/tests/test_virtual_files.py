@@ -80,3 +80,112 @@ def test_base_class_dynamic_import(files):
         assert instance.id
     except Exception as e:
         pytest.fail(f"Failed to create an instance of BaseClass: {e}")
+
+
+def test_display_directory_not_auto_generated():
+    """
+    Test that display directories are NOT auto-generated with empty __init__.py files.
+    Display directories typically have specific __init__.py content (e.g., "from .workflow import *")
+    that should not be replaced with empty auto-generated files.
+    """
+    # GIVEN a workflow with display/workflow.py but NO display/__init__.py
+    files = {
+        "__init__.py": "",
+        "workflow.py": """\
+from vellum.workflows import BaseWorkflow
+from vellum.workflows.nodes.bases import BaseNode
+
+class StartNode(BaseNode):
+    pass
+
+class Workflow(BaseWorkflow):
+    graph = StartNode
+""",
+        "display/workflow.py": """\
+from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
+
+class WorkflowDisplay(BaseWorkflowDisplay):
+    pass
+""",
+        # Note: NO "display/__init__.py" in files dict
+    }
+
+    namespace = str(uuid4())
+
+    # AND the virtual file loader is registered
+    sys.meta_path.append(VirtualFileFinder(files, namespace))
+
+    try:
+        # WHEN we try to resolve display/__init__.py
+        # (This is what happens internally when trying to import the display module)
+        import importlib.util
+
+        spec = importlib.util.find_spec(f"{namespace}.display")
+
+        # THEN the spec should be None because we don't want to auto-generate display/__init__.py
+        # If the spec exists, it means an empty __init__.py was auto-generated (BAD)
+        assert spec is None, (
+            "display directory should NOT have auto-generated __init__.py. "
+            "Display directories require specific __init__.py content that shouldn't be empty."
+        )
+
+    finally:
+        # Clean up
+        sys.meta_path = [finder for finder in sys.meta_path if not isinstance(finder, VirtualFileFinder)]
+
+
+def test_nested_display_directory_not_auto_generated():
+    """
+    Test that nested display directories (e.g., nodes/subworkflow/display/) are also excluded
+    from auto-generation. This catches cases where display directories appear inside
+    subworkflows or map nodes.
+    """
+    # GIVEN a workflow with nested display directory but NO display/__init__.py
+    files = {
+        "__init__.py": "",
+        "workflow.py": """\
+from vellum.workflows import BaseWorkflow
+from vellum.workflows.nodes.bases import BaseNode
+
+class StartNode(BaseNode):
+    pass
+
+class Workflow(BaseWorkflow):
+    graph = StartNode
+""",
+        "nodes/subworkflow/workflow.py": """\
+from vellum.workflows import BaseWorkflow
+
+class SubworkflowWorkflow(BaseWorkflow):
+    pass
+""",
+        "nodes/subworkflow/display/workflow.py": """\
+from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
+
+class SubworkflowWorkflowDisplay(BaseWorkflowDisplay):
+    pass
+""",
+        # Note: NO "nodes/subworkflow/display/__init__.py" in files dict
+    }
+
+    namespace = str(uuid4())
+
+    # AND the virtual file loader is registered
+    sys.meta_path.append(VirtualFileFinder(files, namespace))
+
+    try:
+        # WHEN we try to resolve nodes.subworkflow.display.__init__.py
+        import importlib.util
+
+        spec = importlib.util.find_spec(f"{namespace}.nodes.subworkflow.display")
+
+        # THEN the spec should be None because nested display directories should also be excluded
+        assert spec is None, (
+            "Nested display directory (nodes/subworkflow/display/) should NOT have "
+            "auto-generated __init__.py. Display directories at any nesting level require "
+            "specific __init__.py content that shouldn't be empty."
+        )
+
+    finally:
+        # Clean up
+        sys.meta_path = [finder for finder in sys.meta_path if not isinstance(finder, VirtualFileFinder)]

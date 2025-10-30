@@ -88,8 +88,9 @@ class VirtualFileLoader(importlib.abc.Loader):
         directory_prefix = fullname.replace(".", "/") + "/"
 
         # Exclude display directories from auto-generation as they typically have
-        # specific __init__.py content that shouldn't be replaced with empty files
-        if directory_prefix.startswith("display/"):
+        # specific __init__.py content that shouldn't be replaced with empty files.
+        # Check for both top-level (display/) and nested (.../display/) directories.
+        if directory_prefix == "display/" or "/display/" in directory_prefix:
             return False
 
         for file_path in self.files.keys():
