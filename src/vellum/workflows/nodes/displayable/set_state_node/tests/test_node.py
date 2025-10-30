@@ -2,6 +2,7 @@ import pytest
 from typing import List
 
 from vellum import ChatMessage
+from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.set_state_node import SetStateNode
 from vellum.workflows.state.base import BaseState
