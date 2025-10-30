@@ -59,6 +59,10 @@ class _FinalOutputNodeMeta(BaseNodeMeta):
             return
 
         declared_output_type = cls.get_output_type()
+
+        if declared_output_type is Any:
+            return
+
         value_descriptor = None
 
         if "value" in outputs_class.__dict__:
