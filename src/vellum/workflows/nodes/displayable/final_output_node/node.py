@@ -59,6 +59,10 @@ class _FinalOutputNodeMeta(BaseNodeMeta):
             return
 
         declared_output_type = cls.get_output_type()
+
+        if declared_output_type is Any:
+            return
+
         value_descriptor = None
 
         if "value" in outputs_class.__dict__:
@@ -68,9 +72,6 @@ class _FinalOutputNodeMeta(BaseNodeMeta):
 
         if isinstance(value_descriptor, OutputReference):
             descriptor_types = value_descriptor.types
-
-            if declared_output_type is Any:
-                return
 
             type_mismatch = True
             for descriptor_type in descriptor_types:
