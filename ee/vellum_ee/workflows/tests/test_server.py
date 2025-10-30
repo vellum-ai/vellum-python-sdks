@@ -7,6 +7,7 @@ from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.code_executor_response import CodeExecutorResponse
 from vellum.client.types.number_vellum_value import NumberVellumValue
 from vellum.workflows import BaseWorkflow
+from vellum.workflows.events.workflow import WorkflowExecutionInitiatedBody
 from vellum.workflows.exceptions import WorkflowInitializationException
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.state.context import WorkflowContext
@@ -963,10 +964,12 @@ class StartNodeDisplay(BaseNodeDisplay[StartNode]):
         enriched_event = event_enricher(initiated_event)
 
         # THEN the initiated event should have display context
-        assert enriched_event.body.display_context is not None
+        assert isinstance(enriched_event.body, WorkflowExecutionInitiatedBody)
+        body = enriched_event.body
+        assert body.display_context is not None
 
         # AND the display context should contain the annotated node
-        node_displays = enriched_event.body.display_context.node_displays
+        node_displays = body.display_context.node_displays
         annotated_node_id = UUID("11111111-1111-1111-1111-111111111111")
         assert annotated_node_id in node_displays
 
