@@ -463,86 +463,61 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
         register_node_display_class(node_class=node_class, node_display_class=cls)
 
-    def _get_display_class_overrides(self) -> tuple[Optional[str], Optional[str]]:
-        """Extract icon and color from nested Display class if present."""
-        if not hasattr(self._node, "Display"):
-            return None, None
-
-        display_cls = getattr(self._node, "Display")
-        return getattr(display_cls, "icon", None), getattr(display_cls, "color", None)
-
-    def _merge_display_attributes(
-        self,
-        base_kwargs: Dict[str, Any],
-        explicit_icon: Optional[str],
-        explicit_color: Optional[str],
-        display_class_icon: Optional[str],
-        display_class_color: Optional[str],
-    ) -> Dict[str, Any]:
-        """Merge icon/color with Display class taking precedence."""
-        if display_class_icon is not None:
-            base_kwargs["icon"] = display_class_icon
-        elif explicit_icon is not None:
-            base_kwargs["icon"] = explicit_icon
-
-        if display_class_color is not None:
-            base_kwargs["color"] = display_class_color
-        elif explicit_color is not None:
-            base_kwargs["color"] = explicit_color
-
-        return base_kwargs
-
     def get_display_data(self) -> NodeDisplayData:
-        explicit_value = self._get_explicit_node_display_attr("display_data", NodeDisplayData)
+        """
+        Get display data by first building from BaseNode.Display, then overriding with BaseNodeDisplay.
+        This approach is more scalable as we add more attributes to Display class.
+        """
         docstring = self._node.__doc__
-        display_class_icon, display_class_color = self._get_display_class_overrides()
 
-        # Build base kwargs from explicit_value if present
+        # Step 1: Start with BaseNode.Display attributes as base
+        base_kwargs: Dict[str, Any] = {}
+
+        # Add Display class attributes if they exist
+        if self._node.Display.icon is not None:
+            base_kwargs["icon"] = self._node.Display.icon
+        if self._node.Display.color is not None:
+            base_kwargs["color"] = self._node.Display.color
+
+        # Add docstring as comment if present
+        if docstring:
+            base_kwargs["comment"] = NodeDisplayComment(value=docstring, expanded=True)
+
+        # Step 2: Get explicit BaseNodeDisplay values
+        explicit_value = self._get_explicit_node_display_attr("display_data", NodeDisplayData)
+
+        # Step 3: Override with explicit BaseNodeDisplay values if present
         if explicit_value:
-            kwargs: Dict[str, Any] = {
-                "position": explicit_value.position,
-                "z_index": explicit_value.z_index,
-                "width": explicit_value.width,
-                "height": explicit_value.height,
-            }
+            # Override all explicit values
+            if explicit_value.position is not None:
+                base_kwargs["position"] = explicit_value.position
+            if explicit_value.z_index is not None:
+                base_kwargs["z_index"] = explicit_value.z_index
+            if explicit_value.width is not None:
+                base_kwargs["width"] = explicit_value.width
+            if explicit_value.height is not None:
+                base_kwargs["height"] = explicit_value.height
+            if explicit_value.icon is not None:
+                base_kwargs["icon"] = explicit_value.icon
+            if explicit_value.color is not None:
+                base_kwargs["color"] = explicit_value.color
 
-            # Handle docstring comment merging
-            if explicit_value.comment and docstring:
-                kwargs["comment"] = NodeDisplayComment(
-                    value=docstring,
-                    expanded=explicit_value.comment.expanded if explicit_value.comment.expanded is not None else True,
-                )
-            elif explicit_value.comment:
-                kwargs["comment"] = explicit_value.comment
+            # Special handling for comment: merge docstring with explicit comment's expanded state
+            if explicit_value.comment:
+                if docstring:
+                    # Use docstring value but preserve explicit comment's expanded state
+                    base_kwargs["comment"] = NodeDisplayComment(
+                        value=docstring,
+                        expanded=(
+                            explicit_value.comment.expanded if explicit_value.comment.expanded is not None else True
+                        ),
+                    )
+                else:
+                    base_kwargs["comment"] = explicit_value.comment
 
-            # Merge icon/color with Display class precedence
-            kwargs = self._merge_display_attributes(
-                kwargs,
-                explicit_value.icon,
-                explicit_value.color,
-                display_class_icon,
-                display_class_color,
-            )
-
-            # Only rebuild if we have overrides, otherwise return explicit_value as-is
-            if (
-                display_class_icon is not None
-                or display_class_color is not None
-                or (explicit_value.comment and docstring)
-            ):
-                return NodeDisplayData(**kwargs)
-            return explicit_value
-
-        # No explicit_value - build from Display class and/or docstring
-        if display_class_icon is not None or display_class_color is not None or docstring:
-            fallback_kwargs: Dict[str, Any] = {}
-            if docstring:
-                fallback_kwargs["comment"] = NodeDisplayComment(value=docstring, expanded=True)
-            if display_class_icon is not None:
-                fallback_kwargs["icon"] = display_class_icon
-            if display_class_color is not None:
-                fallback_kwargs["color"] = display_class_color
-            return NodeDisplayData(**fallback_kwargs)
+        # Step 4: Return the merged result
+        if base_kwargs:
+            return NodeDisplayData(**base_kwargs)
 
         return NodeDisplayData()
 

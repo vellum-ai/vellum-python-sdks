@@ -200,8 +200,8 @@ def test_serialize_basenode_with_display_class():
     assert display_data["color"] == "purple"
 
 
-def test_serialize_display_class_overrides_explicit_display_data():
-    """Tests that Display class attributes take precedence over explicit display_data."""
+def test_serialize_explicit_display_data_overrides_display_class():
+    """Tests that BaseNodeDisplay's explicit display_data takes precedence over Display class."""
 
     class MyNode(BaseNode):
         class Display:
@@ -219,6 +219,29 @@ def test_serialize_display_class_overrides_explicit_display_data():
 
     display_data = data["display_data"]
     assert isinstance(display_data, dict)
-    assert display_data["icon"] == "vellum:icon:check"
-    assert display_data["color"] == "gold"
+    assert display_data["icon"] == "vellum:icon:times"  # BaseNodeDisplay overrides
+    assert display_data["color"] == "navy"  # BaseNodeDisplay overrides
     assert display_data["position"] == {"x": 100, "y": 200}
+
+
+def test_serialize_display_class_used_as_fallback():
+    """Tests that Display class attributes are used when BaseNodeDisplay doesn't specify them."""
+
+    class MyNode(BaseNode):
+        class Display:
+            icon = "vellum:icon:star"
+            color = "green"
+
+    class MyNodeDisplay(BaseNodeDisplay[MyNode]):
+        display_data = NodeDisplayData(
+            position=NodeDisplayPosition(x=50, y=75),
+            # Not specifying icon or color - should fall back to Display class
+        )
+
+    data = MyNodeDisplay().serialize(WorkflowDisplayContext())
+
+    display_data = data["display_data"]
+    assert isinstance(display_data, dict)
+    assert display_data["icon"] == "vellum:icon:star"  # Falls back to Display class
+    assert display_data["color"] == "green"  # Falls back to Display class
+    assert display_data["position"] == {"x": 50, "y": 75}  # From BaseNodeDisplay
