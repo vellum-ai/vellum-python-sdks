@@ -1,10 +1,10 @@
 """Example SlackMessageTrigger for testing."""
 
 from vellum.workflows.constants import VellumIntegrationProviderType
-from vellum.workflows.triggers.vellum_integration import VellumIntegrationTrigger
+from vellum.workflows.triggers.integration import IntegrationTrigger
 
 
-class SlackMessageTrigger(VellumIntegrationTrigger):
+class SlackMessageTrigger(IntegrationTrigger):
     """Example Slack message trigger for testing runtime execution."""
 
     # Event attributes - populated from kwargs at instantiation
@@ -12,7 +12,7 @@ class SlackMessageTrigger(VellumIntegrationTrigger):
     channel: str
     user: str
 
-    class Config(VellumIntegrationTrigger.Config):
+    class Config(IntegrationTrigger.Config):
         provider = VellumIntegrationProviderType.COMPOSIO
         integration_name = "SLACK"
         slug = "slack_new_message"

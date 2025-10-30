@@ -92,7 +92,7 @@ describe("TriggerAttributeWorkflowReference", () => {
     expect(pointer.getAstNode()).toBeUndefined();
   });
 
-  it("should generate correct AST for VellumIntegrationTrigger.message reference", async () => {
+  it("should generate correct AST for IntegrationTrigger.message reference", async () => {
     const integrationWorkflowContext = workflowContextFactory({
       triggers: [
         {
@@ -126,7 +126,7 @@ describe("TriggerAttributeWorkflowReference", () => {
     expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
 
-  it("should generate correct AST for VellumIntegrationTrigger.channel reference", async () => {
+  it("should generate correct AST for IntegrationTrigger.channel reference", async () => {
     const integrationWorkflowContext = workflowContextFactory({
       triggers: [
         {

@@ -1,18 +1,18 @@
-"""Tests for VellumIntegrationTrigger serialization."""
+"""Tests for IntegrationTrigger serialization."""
 
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.state.base import BaseState
-from vellum.workflows.triggers.vellum_integration import VellumIntegrationTrigger
+from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 
 def test_vellum_integration_trigger_serialization():
-    """VellumIntegrationTrigger subclass serializes with class name and module path."""
+    """IntegrationTrigger subclass serializes with class name and module path."""
 
-    # Create a custom VellumIntegrationTrigger subclass
-    class SlackMessageTrigger(VellumIntegrationTrigger):
+    # Create a custom IntegrationTrigger subclass
+    class SlackMessageTrigger(IntegrationTrigger):
         """Custom Slack message trigger."""
 
         message: str
@@ -71,7 +71,7 @@ def test_vellum_integration_trigger_serialization():
 def test_vellum_integration_trigger_id_consistency():
     """Validates trigger and attribute IDs match between definitions and references."""
 
-    class SlackMessageTrigger(VellumIntegrationTrigger):
+    class SlackMessageTrigger(IntegrationTrigger):
         message: str
         channel: str
 
@@ -147,7 +147,7 @@ def test_vellum_integration_trigger_id_consistency():
 def test_trigger_module_paths_are_canonical():
     """Validates trigger module_path and class_name for consistent codegen."""
 
-    class TestSlackTrigger(VellumIntegrationTrigger):
+    class TestSlackTrigger(IntegrationTrigger):
         message: str
 
         class Config:
@@ -184,7 +184,7 @@ def test_trigger_module_paths_are_canonical():
 def test_integration_trigger_no_entrypoint_node():
     """IntegrationTrigger-only workflows use trigger ID in edges."""
 
-    class SlackMessageTrigger(VellumIntegrationTrigger):
+    class SlackMessageTrigger(IntegrationTrigger):
         message: str
 
         class Config:

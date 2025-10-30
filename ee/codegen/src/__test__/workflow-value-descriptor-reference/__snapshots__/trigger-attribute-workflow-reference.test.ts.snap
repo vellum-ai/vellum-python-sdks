@@ -10,12 +10,12 @@ exports[`TriggerAttributeWorkflowReference > should generate correct AST for Man
 "
 `;
 
-exports[`TriggerAttributeWorkflowReference > should generate correct AST for VellumIntegrationTrigger.channel reference 1`] = `
+exports[`TriggerAttributeWorkflowReference > should generate correct AST for IntegrationTrigger.channel reference 1`] = `
 "SlackMessageTrigger.channel
 "
 `;
 
-exports[`TriggerAttributeWorkflowReference > should generate correct AST for VellumIntegrationTrigger.message reference 1`] = `
+exports[`TriggerAttributeWorkflowReference > should generate correct AST for IntegrationTrigger.message reference 1`] = `
 "SlackMessageTrigger.message
 "
 `;

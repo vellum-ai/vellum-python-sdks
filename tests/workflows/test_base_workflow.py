@@ -10,8 +10,8 @@ from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.resolvers.base import BaseWorkflowResolver
 from vellum.workflows.runner.runner import WorkflowRunner
 from vellum.workflows.state.base import BaseState
+from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.triggers.manual import ManualTrigger
-from vellum.workflows.triggers.vellum_integration import VellumIntegrationTrigger
 from vellum.workflows.workflows.base import BaseWorkflow
 
 
@@ -168,13 +168,13 @@ def test_no_exception_when_no_previous_execution_id():
     assert runner._initial_state is not None
 
 
-class TestSlackTrigger(VellumIntegrationTrigger):
+class TestSlackTrigger(IntegrationTrigger):
     """Test Slack trigger for deserialize_trigger tests."""
 
     message: str
     channel: str
 
-    class Config(VellumIntegrationTrigger.Config):
+    class Config(IntegrationTrigger.Config):
         provider = VellumIntegrationProviderType.COMPOSIO
         integration_name = "SLACK"
         slug = "slack_test"
