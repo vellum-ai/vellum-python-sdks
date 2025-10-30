@@ -2,10 +2,12 @@ import pytest
 from typing import Any, Dict
 
 from vellum.workflows.exceptions import NodeException
+from vellum.workflows.nodes.core.templating_node import TemplatingNode
 from vellum.workflows.nodes.displayable.final_output_node import FinalOutputNode
 from vellum.workflows.nodes.displayable.inline_prompt_node import InlinePromptNode
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.state.base import BaseState
+from vellum.workflows.types.core import Json
 
 
 def test_final_output_node__mismatched_output_type_should_raise_exception_when_ran():
@@ -85,3 +87,29 @@ def test_final_output_node__dict_and_Dict_should_be_compatible():
         DictOutputNode.__validate__()
     except ValueError as e:
         pytest.fail(f"Validation should not raise an exception for dict/Dict compatibility: {e}")
+
+
+def test_final_output_node__any_output_type_should_accept_json():
+    """
+    Tests that FinalOutputNode with Any output type accepts a TemplatingNode with Json output type.
+    """
+
+    # GIVEN a TemplatingNode with Json output type
+    class JsonTemplatingNode(TemplatingNode[BaseState, Json]):
+        """Templating node that outputs Json."""
+
+        template = '{"key": "value"}'
+
+    # AND a FinalOutputNode with Any output type referencing the TemplatingNode
+    class AnyOutputNode(FinalOutputNode[BaseState, Any]):
+        """Output with Any type."""
+
+        class Outputs(FinalOutputNode.Outputs):
+            value = JsonTemplatingNode.Outputs.result
+
+    # WHEN attempting to validate the node class
+    # THEN validation should pass without raising an exception
+    try:
+        AnyOutputNode.__validate__()
+    except ValueError as e:
+        pytest.fail(f"Validation should not raise an exception when Any accepts Json: {e}")

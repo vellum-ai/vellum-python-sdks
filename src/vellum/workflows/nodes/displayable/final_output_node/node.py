@@ -69,6 +69,9 @@ class _FinalOutputNodeMeta(BaseNodeMeta):
         if isinstance(value_descriptor, OutputReference):
             descriptor_types = value_descriptor.types
 
+            if declared_output_type is Any:
+                return
+
             type_mismatch = True
             for descriptor_type in descriptor_types:
                 if descriptor_type == declared_output_type:
