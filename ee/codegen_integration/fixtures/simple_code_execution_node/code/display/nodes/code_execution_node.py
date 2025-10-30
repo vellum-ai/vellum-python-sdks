@@ -32,4 +32,5 @@ class CodeExecutionNodeDisplay(BaseCodeExecutionNodeDisplay[CodeExecutionNode]):
         width=480,
         height=224,
         comment=NodeDisplayComment(expanded=True, value="This is my code execution node"),
+        z_index=None,
     )

@@ -491,7 +491,12 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             # Override all explicit values
             if explicit_value.position is not None:
                 base_kwargs["position"] = explicit_value.position
-            if explicit_value.z_index is not None:
+            # Include z_index if explicitly set (even if None)
+            if hasattr(explicit_value, "model_fields_set"):
+                fields_set = explicit_value.model_fields_set
+            else:
+                fields_set = explicit_value.__fields_set__
+            if "z_index" in fields_set:
                 base_kwargs["z_index"] = explicit_value.z_index
             if explicit_value.width is not None:
                 base_kwargs["width"] = explicit_value.width
