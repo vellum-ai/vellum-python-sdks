@@ -1,13 +1,15 @@
 from abc import ABC, ABCMeta
 import inspect
+from uuid import UUID
 from typing import TYPE_CHECKING, Any, ClassVar, Dict, Iterator, Tuple, Type, cast, get_origin
+
+from vellum.workflows.references.trigger import TriggerAttributeReference
+from vellum.workflows.types.utils import get_class_attr_names, infer_types
+from vellum.workflows.utils.uuids import uuid4_from_hash
 
 if TYPE_CHECKING:
     from vellum.workflows.graph.graph import Graph, GraphTarget
     from vellum.workflows.state.base import BaseState
-
-from vellum.workflows.references.trigger import TriggerAttributeReference
-from vellum.workflows.types.utils import get_class_attr_names, infer_types
 
 
 def _is_annotated(cls: Type, name: str) -> bool:
@@ -28,7 +30,11 @@ def _is_annotated(cls: Type, name: str) -> bool:
 class BaseTriggerMeta(ABCMeta):
     def __new__(mcs, name: str, bases: Tuple[Type, ...], dct: Dict[str, Any]) -> Any:
         cls = super().__new__(mcs, name, bases, dct)
-        return cls
+        trigger_class = cast(Type["BaseTrigger"], cls)
+
+        trigger_class.__id__ = uuid4_from_hash(f"{trigger_class.__module__}.{trigger_class.__qualname__}")
+
+        return trigger_class
 
     """
     Metaclass for BaseTrigger that enables class-level >> operator.
@@ -191,6 +197,8 @@ class BaseTrigger(ABC, metaclass=BaseTriggerMeta):
     Note:
         Like nodes, triggers work at the class level only. Do not instantiate triggers.
     """
+
+    __id__: UUID
 
     @classmethod
     def attribute_references(cls) -> Dict[str, "TriggerAttributeReference[Any]"]:
