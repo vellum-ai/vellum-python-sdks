@@ -126,3 +126,23 @@ def test_dataset_row_with_empty_inputs():
 
     assert serialized_dict["label"] == "test_label"
     assert serialized_dict["inputs"] == {}
+
+
+def test_dataset_row_with_dict_inputs():
+    """
+    Test that DatasetRow can accept a dict for the inputs parameter.
+    """
+
+    # GIVEN a dict with input data
+    inputs_dict = {"message": "Hello World", "count": 42}
+
+    dataset_row = DatasetRow(label="test_label", inputs=inputs_dict)
+
+    # THEN the inputs should remain as a dict
+    assert isinstance(dataset_row.inputs, dict)
+
+    # AND the serialized dict should contain the correct data
+    serialized_dict = dataset_row.model_dump()
+    assert serialized_dict["label"] == "test_label"
+    assert serialized_dict["inputs"]["message"] == "Hello World"
+    assert serialized_dict["inputs"]["count"] == 42

@@ -1,4 +1,4 @@
-from typing import Generic, Optional, Sequence, Union
+from typing import Any, Dict, Generic, Optional, Sequence, Union
 
 import dotenv
 
@@ -51,11 +51,21 @@ class WorkflowSandboxRunner(Generic[WorkflowType]):
 
         selected_inputs = self._inputs[index]
 
+        raw_inputs: Union[BaseInputs, Dict[str, Any]]
         if isinstance(selected_inputs, DatasetRow):
-            selected_inputs = selected_inputs.inputs
+            raw_inputs = selected_inputs.inputs
+        else:
+            raw_inputs = selected_inputs
+
+        inputs_for_stream: BaseInputs
+        if isinstance(raw_inputs, dict):
+            inputs_class = type(self._workflow).get_inputs_class()
+            inputs_for_stream = inputs_class(**raw_inputs)
+        else:
+            inputs_for_stream = raw_inputs
 
         events = self._workflow.stream(
-            inputs=selected_inputs,
+            inputs=inputs_for_stream,
             event_filter=root_workflow_event_filter,
         )
 
