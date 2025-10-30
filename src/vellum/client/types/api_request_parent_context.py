@@ -6,6 +6,7 @@ import typing
 
 import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel, update_forward_refs
+from .api_actor_type_enum import ApiActorTypeEnum
 
 
 class ApiRequestParentContext(UniversalBaseModel):
@@ -13,6 +14,9 @@ class ApiRequestParentContext(UniversalBaseModel):
     links: typing.Optional[typing.List["SpanLink"]] = None
     type: typing.Literal["API_REQUEST"] = "API_REQUEST"
     span_id: str
+    api_actor_id: typing.Optional[str] = None
+    api_actor_type: typing.Optional[ApiActorTypeEnum] = None
+    api_actor_label: typing.Optional[str] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
@@ -25,8 +29,10 @@ class ApiRequestParentContext(UniversalBaseModel):
 
 
 from .external_parent_context import ExternalParentContext  # noqa: E402, F401, I001
+from .integration_trigger_context import IntegrationTriggerContext  # noqa: E402, F401, I001
 from .node_parent_context import NodeParentContext  # noqa: E402, F401, I001
 from .prompt_deployment_parent_context import PromptDeploymentParentContext  # noqa: E402, F401, I001
+from .scheduled_trigger_context import ScheduledTriggerContext  # noqa: E402, F401, I001
 from .span_link import SpanLink  # noqa: E402, F401, I001
 from .workflow_deployment_parent_context import WorkflowDeploymentParentContext  # noqa: E402, F401, I001
 from .workflow_parent_context import WorkflowParentContext  # noqa: E402, F401, I001

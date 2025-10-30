@@ -9,6 +9,7 @@ from .ad_hoc_initiated_prompt_execution_meta import AdHocInitiatedPromptExecutio
 from .ad_hoc_rejected_prompt_execution_meta import AdHocRejectedPromptExecutionMeta
 from .ad_hoc_streaming_prompt_execution_meta import AdHocStreamingPromptExecutionMeta
 from .add_openai_api_key_enum import AddOpenaiApiKeyEnum
+from .api_actor_type_enum import ApiActorTypeEnum
 from .api_node_result import ApiNodeResult
 from .api_node_result_data import ApiNodeResultData
 from .api_request_parent_context import ApiRequestParentContext
@@ -241,6 +242,7 @@ from .integration_credential_access_type import IntegrationCredentialAccessType
 from .integration_name import IntegrationName
 from .integration_provider import IntegrationProvider
 from .integration_read import IntegrationRead
+from .integration_trigger_context import IntegrationTriggerContext
 from .invoked_port import InvokedPort
 from .iteration_state_enum import IterationStateEnum
 from .jinja_prompt_block import JinjaPromptBlock
@@ -433,6 +435,7 @@ from .scenario_input_image_variable_value import ScenarioInputImageVariableValue
 from .scenario_input_json_variable_value import ScenarioInputJsonVariableValue
 from .scenario_input_string_variable_value import ScenarioInputStringVariableValue
 from .scenario_input_video_variable_value import ScenarioInputVideoVariableValue
+from .scheduled_trigger_context import ScheduledTriggerContext
 from .search_filters_request import SearchFiltersRequest
 from .search_node_result import SearchNodeResult
 from .search_node_result_data import SearchNodeResultData
@@ -735,6 +738,7 @@ __all__ = [
     "AdHocRejectedPromptExecutionMeta",
     "AdHocStreamingPromptExecutionMeta",
     "AddOpenaiApiKeyEnum",
+    "ApiActorTypeEnum",
     "ApiNodeResult",
     "ApiNodeResultData",
     "ApiRequestParentContext",
@@ -955,6 +959,7 @@ __all__ = [
     "IntegrationName",
     "IntegrationProvider",
     "IntegrationRead",
+    "IntegrationTriggerContext",
     "InvokedPort",
     "IterationStateEnum",
     "JinjaPromptBlock",
@@ -1147,6 +1152,7 @@ __all__ = [
     "ScenarioInputJsonVariableValue",
     "ScenarioInputStringVariableValue",
     "ScenarioInputVideoVariableValue",
+    "ScheduledTriggerContext",
     "SearchFiltersRequest",
     "SearchNodeResult",
     "SearchNodeResultData",

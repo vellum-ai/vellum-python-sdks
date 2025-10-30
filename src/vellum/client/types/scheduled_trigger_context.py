@@ -2,24 +2,16 @@
 
 from __future__ import annotations
 
-import datetime as dt
 import typing
 
 import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel, update_forward_refs
-from .api_version_enum import ApiVersionEnum
-from .workflow_execution_snapshotted_body import WorkflowExecutionSnapshottedBody
 
 
-class WorkflowExecutionSnapshottedEvent(UniversalBaseModel):
+class ScheduledTriggerContext(UniversalBaseModel):
     parent: typing.Optional["ParentContext"] = None
     links: typing.Optional[typing.List["SpanLink"]] = None
-    name: typing.Literal["workflow.execution.snapshotted"] = "workflow.execution.snapshotted"
-    body: WorkflowExecutionSnapshottedBody
-    id: str
-    timestamp: dt.datetime
-    api_version: typing.Optional[ApiVersionEnum] = None
-    trace_id: str
+    type: typing.Literal["SCHEDULED"] = "SCHEDULED"
     span_id: str
 
     if IS_PYDANTIC_V2:
@@ -37,11 +29,10 @@ from .external_parent_context import ExternalParentContext  # noqa: E402, F401, 
 from .integration_trigger_context import IntegrationTriggerContext  # noqa: E402, F401, I001
 from .node_parent_context import NodeParentContext  # noqa: E402, F401, I001
 from .prompt_deployment_parent_context import PromptDeploymentParentContext  # noqa: E402, F401, I001
-from .scheduled_trigger_context import ScheduledTriggerContext  # noqa: E402, F401, I001
 from .span_link import SpanLink  # noqa: E402, F401, I001
 from .workflow_deployment_parent_context import WorkflowDeploymentParentContext  # noqa: E402, F401, I001
 from .workflow_parent_context import WorkflowParentContext  # noqa: E402, F401, I001
 from .workflow_sandbox_parent_context import WorkflowSandboxParentContext  # noqa: E402, F401, I001
 from .parent_context import ParentContext  # noqa: E402, F401, I001
 
-update_forward_refs(WorkflowExecutionSnapshottedEvent)
+update_forward_refs(ScheduledTriggerContext)

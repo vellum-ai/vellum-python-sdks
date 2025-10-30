@@ -7,8 +7,10 @@ import typing
 if typing.TYPE_CHECKING:
     from .api_request_parent_context import ApiRequestParentContext
     from .external_parent_context import ExternalParentContext
+    from .integration_trigger_context import IntegrationTriggerContext
     from .node_parent_context import NodeParentContext
     from .prompt_deployment_parent_context import PromptDeploymentParentContext
+    from .scheduled_trigger_context import ScheduledTriggerContext
     from .workflow_deployment_parent_context import WorkflowDeploymentParentContext
     from .workflow_parent_context import WorkflowParentContext
     from .workflow_sandbox_parent_context import WorkflowSandboxParentContext
@@ -20,4 +22,6 @@ ParentContext = typing.Union[
     "PromptDeploymentParentContext",
     "ApiRequestParentContext",
     "ExternalParentContext",
+    "ScheduledTriggerContext",
+    "IntegrationTriggerContext",
 ]

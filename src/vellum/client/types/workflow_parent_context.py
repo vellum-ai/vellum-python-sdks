@@ -28,8 +28,10 @@ class WorkflowParentContext(UniversalBaseModel):
 
 from .api_request_parent_context import ApiRequestParentContext  # noqa: E402, F401, I001
 from .external_parent_context import ExternalParentContext  # noqa: E402, F401, I001
+from .integration_trigger_context import IntegrationTriggerContext  # noqa: E402, F401, I001
 from .node_parent_context import NodeParentContext  # noqa: E402, F401, I001
 from .prompt_deployment_parent_context import PromptDeploymentParentContext  # noqa: E402, F401, I001
+from .scheduled_trigger_context import ScheduledTriggerContext  # noqa: E402, F401, I001
 from .span_link import SpanLink  # noqa: E402, F401, I001
 from .workflow_deployment_parent_context import WorkflowDeploymentParentContext  # noqa: E402, F401, I001
 from .workflow_sandbox_parent_context import WorkflowSandboxParentContext  # noqa: E402, F401, I001
