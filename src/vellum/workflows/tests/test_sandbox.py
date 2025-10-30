@@ -2,6 +2,7 @@ import pytest
 from typing import List
 
 from vellum.workflows.inputs.base import BaseInputs
+from vellum.workflows.inputs.dataset_row import DatasetRow
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.sandbox import WorkflowSandboxRunner
 from vellum.workflows.state.base import BaseState
@@ -59,4 +60,43 @@ def test_sandbox_runner__happy_path(mock_logger, run_kwargs, expected_last_log):
         "Workflow fulfilled!",
         "----------------------------------",
         expected_last_log,
+    ]
+
+
+def test_sandbox_runner_with_dict_inputs(mock_logger):
+    """
+    Test that WorkflowSandboxRunner can run with dict inputs in DatasetRow.
+    """
+
+    # GIVEN we capture the logs to stdout
+    logs = []
+    mock_logger.return_value.info.side_effect = lambda msg: logs.append(msg)
+
+    class Inputs(BaseInputs):
+        message: str
+
+    class StartNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result = Inputs.message
+
+    class Workflow(BaseWorkflow[Inputs, BaseState]):
+        graph = StartNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_output = StartNode.Outputs.result
+
+    dataset = [
+        DatasetRow(label="test_row", inputs={"message": "Hello from dict"}),
+    ]
+
+    # WHEN we run the sandbox with the DatasetRow containing dict inputs
+    runner = WorkflowSandboxRunner(workflow=Workflow(), dataset=dataset)
+    runner.run()
+
+    assert logs == [
+        "Just started Node: StartNode",
+        "Just finished Node: StartNode",
+        "Workflow fulfilled!",
+        "----------------------------------",
+        "final_output: Hello from dict",
     ]

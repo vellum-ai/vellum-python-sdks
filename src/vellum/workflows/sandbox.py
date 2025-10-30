@@ -51,11 +51,18 @@ class WorkflowSandboxRunner(Generic[WorkflowType]):
 
         selected_inputs = self._inputs[index]
 
-        inputs_for_stream: Union[BaseInputs, Dict[str, Any]]
+        raw_inputs: Union[BaseInputs, Dict[str, Any]]
         if isinstance(selected_inputs, DatasetRow):
-            inputs_for_stream = selected_inputs.inputs
+            raw_inputs = selected_inputs.inputs
         else:
-            inputs_for_stream = selected_inputs
+            raw_inputs = selected_inputs
+
+        inputs_for_stream: BaseInputs
+        if isinstance(raw_inputs, dict):
+            inputs_class = self._resolve_inputs_class()
+            inputs_for_stream = inputs_class(**raw_inputs)
+        else:
+            inputs_for_stream = raw_inputs
 
         events = self._workflow.stream(
             inputs=inputs_for_stream,
@@ -63,6 +70,20 @@ class WorkflowSandboxRunner(Generic[WorkflowType]):
         )
 
         self._process_events(events)
+
+    def _resolve_inputs_class(self):
+        inputs_class = getattr(type(self._workflow), "Inputs", None)
+        if inputs_class is not None and isinstance(inputs_class, type) and issubclass(inputs_class, BaseInputs):
+            return inputs_class
+
+        for base in getattr(type(self._workflow), "__orig_bases__", []):
+            args = getattr(base, "__args__", None)
+            if args and len(args) >= 1:
+                candidate = args[0]
+                if isinstance(candidate, type) and issubclass(candidate, BaseInputs):
+                    return candidate
+
+        return BaseInputs
 
     def _process_events(self, events: WorkflowEventStream):
         for event in events:
