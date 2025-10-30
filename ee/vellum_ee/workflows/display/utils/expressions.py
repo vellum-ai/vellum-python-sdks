@@ -57,7 +57,7 @@ from vellum.workflows.references.workflow_input import WorkflowInputReference
 from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.types.generics import is_workflow_class
 from vellum.workflows.utils.functions import compile_function_definition
-from vellum.workflows.utils.uuids import get_trigger_id, uuid4_from_hash
+from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.utils.exceptions import InvalidInputReferenceError, UnsupportedSerializationException
 from vellum_ee.workflows.server.virtual_file_loader import VirtualFileLoader
 
@@ -353,9 +353,8 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
         }
 
     if isinstance(value, TriggerAttributeReference):
-        # Generate trigger ID using get_trigger_id to ensure consistency with trigger definitions
         trigger_class = value.trigger_class
-        trigger_id = get_trigger_id(trigger_class)
+        trigger_id = trigger_class.__id__
 
         return {
             "type": "TRIGGER_ATTRIBUTE",
