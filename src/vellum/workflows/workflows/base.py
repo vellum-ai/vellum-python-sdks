@@ -749,7 +749,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         for subgraph in cls.get_subgraphs():
             for trigger_class in subgraph.triggers:
                 if trigger_class.__id__ == trigger_id:
-                    return trigger_class(**inputs)  # type: ignore[call-arg]
+                    return trigger_class(**inputs)
 
                 trigger_classes.append(trigger_class)
 

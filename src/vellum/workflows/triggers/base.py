@@ -200,6 +200,16 @@ class BaseTrigger(ABC, metaclass=BaseTriggerMeta):
 
     __id__: UUID
 
+    def __init__(self, **kwargs: Any):
+        """
+        Initialize trigger with event data.
+
+        Args:
+            **kwargs: Arbitrary keyword arguments passed during trigger instantiation.
+                     Subclasses may use these to populate trigger attributes.
+        """
+        self._event_data = kwargs
+
     @classmethod
     def attribute_references(cls) -> Dict[str, "TriggerAttributeReference[Any]"]:
         """Return class-level trigger attribute descriptors keyed by attribute name."""
