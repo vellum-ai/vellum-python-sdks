@@ -3,6 +3,7 @@ from typing import Any, ClassVar, Dict, Generic
 
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.utils import resolve_value
+from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.outputs import BaseOutputs
@@ -51,7 +52,8 @@ class SetStateNode(BaseNode[StateType], Generic[StateType]):
             if not hasattr(self.state, path):
                 raise NodeException(
                     f"State does not have attribute '{path}'. "
-                    f"Only existing state attributes can be set via SetStateNode."
+                    f"Only existing state attributes can be set via SetStateNode.",
+                    code=WorkflowErrorCode.INVALID_STATE,
                 )
 
             # Resolve the value if it's a descriptor against the current (unmodified) state

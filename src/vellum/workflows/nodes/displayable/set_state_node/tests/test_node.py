@@ -159,7 +159,8 @@ def test_set_state_not_existing_value():
     with pytest.raises(NodeException) as exc_info:
         node.run()
 
-    # AND the error message should mention the non-existent attribute
+    # AND the error should be INVALID_STATE and the message should mention the non-existent attribute
+    assert exc_info.value.code == WorkflowErrorCode.INVALID_STATE
     assert (
         "State does not have attribute 'unknown_value'. Only existing state attributes can be set via SetStateNode."
         == str(exc_info.value)
