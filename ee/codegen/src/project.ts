@@ -62,6 +62,7 @@ import { PromptDeploymentNode } from "src/generators/nodes/prompt-deployment-nod
 import { SearchNode } from "src/generators/nodes/search-node";
 import { SubworkflowDeploymentNode } from "src/generators/nodes/subworkflow-deployment-node";
 import { TemplatingNode } from "src/generators/nodes/templating-node";
+import { BaseTrigger } from "src/generators/triggers";
 import { WorkflowSandboxFile } from "src/generators/workflow-sandbox-file";
 import { WorkflowVersionExecConfigSerializer } from "src/serializers/vellum";
 import {
@@ -73,6 +74,7 @@ import {
   WorkflowVersionExecConfig,
 } from "src/types/vellum";
 import { getNodeLabel } from "src/utils/nodes";
+import { getTriggerClassInfo } from "src/utils/triggers";
 import { isDefined, isNilOrEmpty } from "src/utils/typing";
 
 export interface WorkflowProjectGeneratorOptions {
@@ -231,6 +233,7 @@ ${errors.slice(0, 3).map((err) => {
       state.persist(),
       // workflow.py
       workflow.getWorkflowFile().persist(),
+      ...this.generateTriggerFiles(),
       // nodes/*
       ...this.generateNodeFiles(nodes),
       // sandbox.py
@@ -877,6 +880,82 @@ ${errors.slice(0, 3).map((err) => {
 
   private sortAlphabetically(items: string[]): string[] {
     return items.sort((a, b) => a.localeCompare(b));
+  }
+
+  private generateTriggers(): BaseTrigger[] {
+    const triggers = this.workflowContext.triggers;
+    if (!triggers || triggers.length === 0) {
+      return [];
+    }
+
+    const integrationTriggers = triggers.filter(
+      (trigger) => trigger.type === "INTEGRATION"
+    );
+
+    if (integrationTriggers.length === 0) {
+      return [];
+    }
+
+    return integrationTriggers.map((trigger) => {
+      return new BaseTrigger({
+        trigger,
+        workflowContext: this.workflowContext,
+      });
+    });
+  }
+
+  private generateTriggerFiles(): Promise<unknown>[] {
+    const triggers = this.generateTriggers();
+    if (triggers.length === 0) {
+      return [];
+    }
+
+    const rootTriggersInitFileStatements: AstNode[] = [];
+    const triggerInitFileAllField = python.field({
+      name: "__all__",
+      initializer: python.TypeInstantiation.list(
+        [
+          ...this.sortAlphabetically(
+            triggers.map((trigger) => {
+              const triggerInfo = getTriggerClassInfo(
+                trigger.trigger,
+                this.workflowContext
+              );
+              return triggerInfo.className;
+            })
+          ).map((name) => python.TypeInstantiation.str(name)),
+        ],
+        {
+          endWithComma: true,
+        }
+      ),
+    });
+    rootTriggersInitFileStatements.push(triggerInitFileAllField);
+
+    const rootTriggersInitFile = codegen.initFile({
+      workflowContext: this.workflowContext,
+      modulePath: [...this.getModulePath(), "triggers"],
+      statements: rootTriggersInitFileStatements,
+    });
+
+    triggers.forEach((trigger) => {
+      const triggerInfo = getTriggerClassInfo(
+        trigger.trigger,
+        this.workflowContext
+      );
+      rootTriggersInitFile.addReference(
+        python.reference({
+          name: triggerInfo.className,
+          modulePath: triggerInfo.modulePath,
+        })
+      );
+    });
+
+    const triggerPromises = triggers.map(async (trigger) => {
+      return await trigger.getTriggerFile().persist();
+    });
+
+    return [rootTriggersInitFile.persist(), ...triggerPromises];
   }
 
   private generateNodeFiles(

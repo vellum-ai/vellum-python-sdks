@@ -159,7 +159,7 @@ export class GraphAttribute extends AstNode {
     if (triggers && triggers.length > 0 && graphMutableAst.type !== "empty") {
       const trigger = triggers[0];
       if (trigger) {
-        const triggerInfo = getTriggerClassInfo(trigger);
+        const triggerInfo = getTriggerClassInfo(trigger, this.workflowContext);
         const triggerReference: GraphTriggerReference = {
           type: "trigger_reference",
           triggerClassName: triggerInfo.className,
