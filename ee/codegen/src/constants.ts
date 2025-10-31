@@ -76,6 +76,8 @@ export const GENERATED_STATE_MODULE_NAME = "state";
 
 export const GENERATED_NODES_MODULE_NAME = "nodes";
 
+export const GENERATED_TRIGGERS_MODULE_NAME = "triggers";
+
 export const GENERATED_DISPLAY_MODULE_NAME = "display";
 export const GENERATED_NODES_PATH = [GENERATED_NODES_MODULE_NAME] as const;
 

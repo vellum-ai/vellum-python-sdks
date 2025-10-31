@@ -16,6 +16,7 @@ import { getAllFilesInDir } from "./utils/files";
 import {
   GENERATED_DISPLAY_MODULE_NAME,
   GENERATED_NODES_MODULE_NAME,
+  GENERATED_TRIGGERS_MODULE_NAME,
 } from "src/constants";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { InputVariableContext } from "src/context/input-variable-context";
@@ -233,6 +234,7 @@ ${errors.slice(0, 3).map((err) => {
       workflow.getWorkflowFile().persist(),
       // nodes/*
       ...this.generateNodeFiles(nodes),
+      ...this.generateTriggerFiles(),
       // sandbox.py
       ...(this.sandboxInputs ? [this.generateSandboxFile().persist()] : []),
       this.writeAdditionalFiles(),
@@ -982,6 +984,56 @@ ${errors.slice(0, 3).map((err) => {
       // nodes/* and display/nodes/*
       ...nodePromises,
     ];
+  }
+
+  private generateTriggerFiles(): Promise<unknown>[] {
+    const triggers = this.workflowContext.triggers;
+    if (!triggers || triggers.length === 0) {
+      return [];
+    }
+
+    const integrationTriggers = triggers.filter(
+      (trigger) => trigger.type === "INTEGRATION"
+    );
+
+    if (integrationTriggers.length === 0) {
+      return [];
+    }
+
+    const triggerPromises: Promise<unknown>[] = [];
+
+    integrationTriggers.forEach((trigger) => {
+      if (trigger.type === "INTEGRATION") {
+        const { IntegrationTriggerGenerator } = require("./generators/triggers/integration-trigger");
+        const triggerGenerator = new IntegrationTriggerGenerator({
+          workflowContext: this.workflowContext,
+          trigger,
+        });
+        triggerPromises.push(triggerGenerator.persist());
+      }
+    });
+
+    // Generate triggers/__init__.py
+    const rootTriggersInitFile = codegen.initFile({
+      workflowContext: this.workflowContext,
+      modulePath: [...this.getModulePath(), GENERATED_TRIGGERS_MODULE_NAME],
+      statements: [],
+    });
+
+    integrationTriggers.forEach((trigger) => {
+      if (trigger.type === "INTEGRATION") {
+        rootTriggersInitFile.addReference(
+          python.reference({
+            name: trigger.className,
+            modulePath: trigger.modulePath,
+          })
+        );
+      }
+    });
+
+    triggerPromises.push(rootTriggersInitFile.persist());
+
+    return triggerPromises;
   }
 
   private generateErrorLogFile(): ErrorLogFile {
