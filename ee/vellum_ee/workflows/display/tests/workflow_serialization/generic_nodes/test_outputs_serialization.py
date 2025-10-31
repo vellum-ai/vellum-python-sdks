@@ -45,7 +45,7 @@ def test_serialize_node__annotated_output(serialize_node):
             "attributes": [],
             "outputs": [
                 {
-                    "id": "0fd1356f-ca4e-4e85-b923-8a0164bfc451",
+                    "id": "6d08f5f4-cb29-4240-899a-d811e547a30b",
                     "name": "output",
                     "type": "NUMBER",
                     "value": None,
@@ -93,7 +93,7 @@ def test_serialize_node__workflow_input(serialize_node):
             "attributes": [],
             "outputs": [
                 {
-                    "id": "b62c0cbe-48d5-465d-8d9e-4ff82847f8c7",
+                    "id": "70c7e4c8-2ad3-4093-b69f-a83b4e2a8167",
                     "name": "output",
                     "type": "STRING",
                     "value": {
@@ -156,7 +156,7 @@ def test_serialize_node__node_output_reference(serialize_node):
             "attributes": [],
             "outputs": [
                 {
-                    "id": "46e6e98e-9ecf-4880-86f9-6390f0851c31",
+                    "id": "72f37d68-c927-4f4e-8b25-72e8cb2c7f5c",
                     "name": "output",
                     "type": "STRING",
                     "value": {
