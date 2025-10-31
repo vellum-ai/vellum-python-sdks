@@ -2277,10 +2277,55 @@ export declare namespace ManualTriggerSerializer {
   }
 }
 
+const ScheduleTriggerSerializer = objectSchema({
+  id: stringSchema(),
+  type: stringLiteralSchema("SCHEDULED"),
+  attributes: listSchema(NodeAttributeSerializer),
+});
+
+export declare namespace ScheduleTriggerSerializer {
+  interface Raw {
+    id: string;
+    type: "SCHEDULED";
+    attributes: NodeAttributeSerializer.Raw[];
+  }
+}
+
+const ComposioIntegrationTriggerExecConfigSerializer = objectSchema({
+  type: stringLiteralSchema("COMPOSIO"),
+  slug: stringSchema(),
+  setupAttributes: propertySchema(
+    "setup_attributes",
+    listSchema(VellumVariableSerializer)
+  ),
+  integrationName: propertySchema("integration_name", stringSchema()),
+});
+
+export declare namespace ComposioIntegrationTriggerExecConfigSerializer {
+  interface Raw {
+    type: "COMPOSIO";
+    slug: string;
+    setup_attributes: VellumVariableSerializer.Raw[];
+    integration_name: string;
+  }
+}
+
+const IntegrationTriggerExecConfigSerializer = unionSchema("type", {
+  COMPOSIO: ComposioIntegrationTriggerExecConfigSerializer,
+});
+
+export declare namespace IntegrationTriggerExecConfigSerializer {
+  type Raw = ComposioIntegrationTriggerExecConfigSerializer.Raw;
+}
+
 const IntegrationTriggerSerializer = objectSchema({
   id: stringSchema(),
   type: stringLiteralSchema("INTEGRATION"),
   attributes: listSchema(NodeAttributeSerializer),
+  execConfig: propertySchema(
+    "exec_config",
+    IntegrationTriggerExecConfigSerializer
+  ),
   className: propertySchema("class_name", stringSchema()),
   modulePath: propertySchema("module_path", listSchema(stringSchema())),
 });
@@ -2290,6 +2335,7 @@ export declare namespace IntegrationTriggerSerializer {
     id: string;
     type: "INTEGRATION";
     attributes: NodeAttributeSerializer.Raw[];
+    exec_config: IntegrationTriggerExecConfigSerializer.Raw;
     class_name: string;
     module_path: string[];
   }
@@ -2297,11 +2343,15 @@ export declare namespace IntegrationTriggerSerializer {
 
 export const WorkflowTriggerSerializer = unionSchema("type", {
   MANUAL: ManualTriggerSerializer,
+  SCHEDULED: ScheduleTriggerSerializer,
   INTEGRATION: IntegrationTriggerSerializer,
 }) as unknown as Schema<WorkflowTriggerSerializer.Raw, WorkflowTrigger>;
 
 export declare namespace WorkflowTriggerSerializer {
-  type Raw = ManualTriggerSerializer.Raw | IntegrationTriggerSerializer.Raw;
+  type Raw =
+    | ManualTriggerSerializer.Raw
+    | ScheduleTriggerSerializer.Raw
+    | IntegrationTriggerSerializer.Raw;
 }
 
 export const WorkflowRawDataSerializer: ObjectSchema<

@@ -4,6 +4,7 @@ import { workflowContextFactory } from "src/__test__/helpers";
 import { WorkflowContext } from "src/context";
 import { TriggerAttributeWorkflowReference } from "src/generators/workflow-value-descriptor-reference/trigger-attribute-workflow-reference";
 import {
+  IntegrationProvider,
   WorkflowValueDescriptorReference,
   WorkflowTriggerType,
 } from "src/types/vellum";
@@ -102,6 +103,12 @@ describe("TriggerAttributeWorkflowReference", () => {
             { id: "message-id", name: "message", value: null },
             { id: "channel-id", name: "channel", value: null },
           ],
+          execConfig: {
+            type: IntegrationProvider.COMPOSIO,
+            slug: "SLACK_NEW_MESSAGE",
+            setupAttributes: [],
+            integrationName: "slack",
+          },
           className: "SlackMessageTrigger",
           modulePath: ["tests", "fixtures", "triggers", "slack_message"],
           sourceHandleId: "integration-trigger-id",
@@ -136,6 +143,12 @@ describe("TriggerAttributeWorkflowReference", () => {
             { id: "message-id", name: "message", value: null },
             { id: "channel-id", name: "channel", value: null },
           ],
+          execConfig: {
+            type: IntegrationProvider.COMPOSIO,
+            slug: "SLACK_NEW_MESSAGE",
+            setupAttributes: [],
+            integrationName: "slack",
+          },
           className: "SlackMessageTrigger",
           modulePath: ["tests", "fixtures", "triggers", "slack_message"],
           sourceHandleId: "integration-trigger-id",

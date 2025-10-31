@@ -788,8 +788,22 @@ export interface WorkflowOutputValue {
 
 export enum WorkflowTriggerType {
   MANUAL = "MANUAL",
+  SCHEDULED = "SCHEDULED",
   INTEGRATION = "INTEGRATION",
 }
+
+export enum IntegrationProvider {
+  COMPOSIO = "COMPOSIO",
+}
+
+export interface ComposioIntegrationTriggerExecConfig {
+  type: IntegrationProvider.COMPOSIO;
+  slug: string;
+  setupAttributes: VellumVariable[];
+  integrationName: string;
+}
+
+export type IntegrationTriggerExecConfig = ComposioIntegrationTriggerExecConfig;
 
 export type WorkflowTrigger =
   | {
@@ -799,8 +813,14 @@ export type WorkflowTrigger =
     }
   | {
       id: string;
+      type: WorkflowTriggerType.SCHEDULED;
+      attributes: NodeAttribute[];
+    }
+  | {
+      id: string;
       type: WorkflowTriggerType.INTEGRATION;
       attributes: NodeAttribute[];
+      execConfig: IntegrationTriggerExecConfig;
       className: string;
       modulePath: string[];
       sourceHandleId: string;
