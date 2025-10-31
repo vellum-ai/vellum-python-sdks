@@ -286,13 +286,13 @@ exports[`Workflow > graph > should generate correct graph for expression referen
 "
 `;
 
-exports[`Workflow > graph > should generate correct graph when workflow has a manual trigger 1`] = `
-"ManualTrigger >> FirstNode >> SecondNode
+exports[`Workflow > graph > should generate correct graph when workflow has an IntegrationTrigger 1`] = `
+"SlackMessageTrigger >> FirstNode >> SecondNode
 "
 `;
 
-exports[`Workflow > graph > should generate correct graph when workflow has an IntegrationTrigger 1`] = `
-"SlackMessageTrigger >> FirstNode >> SecondNode
+exports[`Workflow > graph > should generate correct graph when workflow has a manual trigger 1`] = `
+"ManualTrigger >> FirstNode >> SecondNode
 "
 `;
 
