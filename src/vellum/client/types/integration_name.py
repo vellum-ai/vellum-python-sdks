@@ -26,6 +26,7 @@ IntegrationName = typing.Union[
         "APOLLO",
         "ASANA",
         "ATLASSIAN",
+        "BITBUCKET",
         "BOX",
         "BREVO",
         "BROWSERBASE_TOOL",
