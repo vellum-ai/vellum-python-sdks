@@ -815,9 +815,6 @@ export type WorkflowTrigger =
       id: string;
       type: WorkflowTriggerType.SCHEDULED;
       attributes: NodeAttribute[];
-      cron: string;
-      timezone?: string | null;
-      nextRunAt?: string | null;
     }
   | {
       id: string;

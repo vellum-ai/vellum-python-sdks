@@ -2281,9 +2281,6 @@ const ScheduleTriggerSerializer = objectSchema({
   id: stringSchema(),
   type: stringLiteralSchema("SCHEDULED"),
   attributes: listSchema(NodeAttributeSerializer),
-  cron: stringSchema(),
-  timezone: stringSchema().optional(),
-  nextRunAt: propertySchema("next_run_at", stringSchema().optional()),
 });
 
 export declare namespace ScheduleTriggerSerializer {
@@ -2291,9 +2288,6 @@ export declare namespace ScheduleTriggerSerializer {
     id: string;
     type: "SCHEDULED";
     attributes: NodeAttributeSerializer.Raw[];
-    cron: string;
-    timezone?: string | null;
-    next_run_at?: string | null;
   }
 }
 
