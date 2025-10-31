@@ -168,6 +168,50 @@ def test_no_exception_when_no_previous_execution_id():
     assert runner._initial_state is not None
 
 
+def test_workflow_constructor_accepts_execution_id():
+    """
+    Tests that execution_id can be passed to the workflow constructor.
+    """
+
+    execution_id = str(uuid4())
+
+    workflow = TestWorkflowWithNoResolvers(execution_id=execution_id)
+
+    assert workflow._execution_id == execution_id
+
+
+def test_workflow_uses_constructor_execution_id_when_running():
+    """
+    Tests that execution_id from constructor is used when calling run() without previous_execution_id.
+    """
+
+    execution_id = str(uuid4())
+    workflow = TestWorkflowWithFailingResolver(execution_id=execution_id)
+
+    with pytest.raises(WorkflowInitializationException) as exc_info:
+        workflow.run()
+
+    assert "All resolvers failed to load initial state" in str(exc_info.value)
+
+
+def test_workflow_run_previous_execution_id_overrides_constructor_execution_id():
+    """
+    Tests that previous_execution_id parameter in run() overrides constructor execution_id.
+    """
+
+    constructor_execution_id = str(uuid4())
+    workflow = TestWorkflowWithNoResolvers(execution_id=constructor_execution_id)
+
+    run_execution_id = str(uuid4())
+
+    # THEN it should raise an exception because no resolvers are configured
+    with pytest.raises(WorkflowInitializationException) as exc_info:
+        workflow.run(previous_execution_id=run_execution_id)
+
+    # AND the error message should mention no resolvers configured
+    assert "No resolvers configured to load initial state" in str(exc_info.value)
+
+
 class TestSlackTrigger(IntegrationTrigger):
     """Test Slack trigger for deserialize_trigger tests."""
 

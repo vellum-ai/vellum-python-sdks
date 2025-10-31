@@ -252,6 +252,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         emitters: Optional[List[BaseWorkflowEmitter]] = None,
         resolvers: Optional[List[BaseWorkflowResolver]] = None,
         store: Optional[Store] = None,
+        execution_id: Optional[Union[str, UUID]] = None,
     ):
         self._parent_state = parent_state
         self._context = context or WorkflowContext()
@@ -262,6 +263,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         self._store = store or self._context.store_class()
         self._execution_context = self._context.execution_context
         self._current_runner: Optional[WorkflowRunner] = None
+        self._execution_id = execution_id
 
         # Register context with all emitters
         for emitter in self.emitters:
@@ -440,7 +442,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             state=state,
             entrypoint_nodes=entrypoint_nodes,
             external_inputs=external_inputs,
-            previous_execution_id=previous_execution_id,
+            previous_execution_id=previous_execution_id if previous_execution_id is not None else self._execution_id,
             cancel_signal=cancel_signal,
             node_output_mocks=node_output_mocks,
             max_concurrency=max_concurrency,
@@ -575,7 +577,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             state=state,
             entrypoint_nodes=entrypoint_nodes,
             external_inputs=external_inputs,
-            previous_execution_id=previous_execution_id,
+            previous_execution_id=previous_execution_id if previous_execution_id is not None else self._execution_id,
             cancel_signal=cancel_signal,
             node_output_mocks=node_output_mocks,
             max_concurrency=max_concurrency,
