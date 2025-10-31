@@ -8,6 +8,7 @@ from pydantic import BaseModel
 
 from vellum import (
     AdHocExecutePromptEvent,
+    AdHocExpandMeta,
     ChatMessagePromptBlock,
     ExecutePromptEvent,
     FulfilledAdHocExecutePromptEvent,
@@ -338,7 +339,7 @@ def test_inline_prompt_node__json_output(
 
     vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.assert_called_once_with(
         blocks=[],
-        expand_meta=None,
+        expand_meta=AdHocExpandMeta(finish_reason=True),
         functions=None,
         input_values=[],
         input_variables=[],
@@ -408,7 +409,7 @@ def test_inline_prompt_node__streaming_disabled(vellum_adhoc_prompt_client):
     # AND we should have made the expected call to Vellum search
     vellum_adhoc_prompt_client.adhoc_execute_prompt.assert_called_once_with(
         blocks=[],
-        expand_meta=None,
+        expand_meta=AdHocExpandMeta(finish_reason=True),
         functions=None,
         input_values=[],
         input_variables=[],
@@ -502,7 +503,7 @@ def test_inline_prompt_node__json_output_with_streaming_disabled(vellum_adhoc_pr
     # AND we should have made the expected call to Vellum search
     vellum_adhoc_prompt_client.adhoc_execute_prompt.assert_called_once_with(
         blocks=[],
-        expand_meta=None,
+        expand_meta=AdHocExpandMeta(finish_reason=True),
         functions=None,
         input_values=[],
         input_variables=[],
