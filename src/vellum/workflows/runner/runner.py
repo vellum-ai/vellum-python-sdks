@@ -214,8 +214,6 @@ class WorkflowRunner(Generic[StateType]):
             else:
                 self._initial_state = self.workflow.get_default_state(normalized_inputs)
                 self._should_emit_initial_state = False
-                if execution_id is not None and previous_execution_id is None:
-                    self._initial_state.meta.span_id = execution_id
 
             # Validate and bind trigger, then filter entrypoints
             self._validate_and_bind_trigger(trigger)
@@ -235,12 +233,19 @@ class WorkflowRunner(Generic[StateType]):
                 # all of that data is redundant and is derivable. It also clearly communicates that
                 # there was no initial state provided by the user to invoke the workflow.
                 self._should_emit_initial_state = False
-                if execution_id is not None and previous_execution_id is None:
-                    self._initial_state.meta.span_id = execution_id
             self._entrypoints = self.workflow.get_entrypoints()
 
             # Check if workflow requires a trigger but none was provided
             self._validate_no_trigger_provided()
+
+        if (
+            execution_id is not None
+            and previous_execution_id is None
+            and state is None
+            and external_inputs is None
+            and entrypoint_nodes is None
+        ):
+            self._initial_state.meta.span_id = execution_id
 
         # This queue is responsible for sending events from WorkflowRunner to the outside world
         self._workflow_event_outer_queue: Queue[WorkflowEvent] = Queue()
