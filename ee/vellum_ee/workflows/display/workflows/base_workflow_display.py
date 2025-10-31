@@ -25,8 +25,8 @@ from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port,
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, WorkflowInputReference
 from vellum.workflows.state.encoder import DefaultStateEncoder
+from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.triggers.manual import ManualTrigger
-from vellum.workflows.triggers.vellum_integration import VellumIntegrationTrigger
 from vellum.workflows.types.core import Json, JsonArray, JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.types.utils import get_original_base
@@ -190,7 +190,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         # For IntegrationTrigger only: no ENTRYPOINT node (use trigger ID directly in edges)
         manual_trigger_edges = [edge for edge in trigger_edges if issubclass(edge.trigger_class, ManualTrigger)]
         integration_trigger_edges = [
-            edge for edge in trigger_edges if issubclass(edge.trigger_class, VellumIntegrationTrigger)
+            edge for edge in trigger_edges if issubclass(edge.trigger_class, IntegrationTrigger)
         ]
 
         has_manual_trigger = len(manual_trigger_edges) > 0
@@ -536,12 +536,12 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                     f"{edge.trigger_class.__name__} in the same workflow."
                 )
 
-        # Get the trigger type from the mapping, or check if it's a VellumIntegrationTrigger subclass
+        # Get the trigger type from the mapping, or check if it's an IntegrationTrigger subclass
         trigger_type = trigger_type_mapping.get(trigger_class)
         if trigger_type is None:
-            # Check if it's a VellumIntegrationTrigger subclass
+            # Check if it's an IntegrationTrigger subclass
 
-            if issubclass(trigger_class, VellumIntegrationTrigger):
+            if issubclass(trigger_class, IntegrationTrigger):
                 trigger_type = WorkflowTriggerType.INTEGRATION
             else:
                 raise ValueError(

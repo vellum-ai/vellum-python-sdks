@@ -2,6 +2,5 @@ from vellum.workflows.triggers.base import BaseTrigger
 from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.triggers.manual import ManualTrigger
 from vellum.workflows.triggers.schedule import ScheduleTrigger
-from vellum.workflows.triggers.vellum_integration import VellumIntegrationTrigger
 
-__all__ = ["BaseTrigger", "IntegrationTrigger", "ManualTrigger", "ScheduleTrigger", "VellumIntegrationTrigger"]
+__all__ = ["BaseTrigger", "IntegrationTrigger", "ManualTrigger", "ScheduleTrigger"]

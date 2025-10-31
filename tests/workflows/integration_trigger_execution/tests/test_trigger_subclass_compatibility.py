@@ -6,14 +6,14 @@ from vellum.workflows import BaseWorkflow
 from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.exceptions import WorkflowInitializationException
 from vellum.workflows.nodes.bases import BaseNode
+from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.triggers.manual import ManualTrigger
-from vellum.workflows.triggers.vellum_integration import VellumIntegrationTrigger
 
 
-class BaseSlackTrigger(VellumIntegrationTrigger):
+class BaseSlackTrigger(IntegrationTrigger):
     message: str
 
-    class Config(VellumIntegrationTrigger.Config):
+    class Config(IntegrationTrigger.Config):
         provider = VellumIntegrationProviderType.COMPOSIO
         integration_name = "SLACK"
         slug = "slack_base"
@@ -54,10 +54,10 @@ class TestTriggerSubclassCompatibility:
     def test_workflow_rejects_incompatible_trigger(self):
         """Workflow should still reject triggers that aren't subclasses."""
 
-        class UnrelatedTrigger(VellumIntegrationTrigger):
+        class UnrelatedTrigger(IntegrationTrigger):
             data: str
 
-            class Config(VellumIntegrationTrigger.Config):
+            class Config(IntegrationTrigger.Config):
                 provider = VellumIntegrationProviderType.COMPOSIO
                 integration_name = "OTHER"
                 slug = "unrelated"

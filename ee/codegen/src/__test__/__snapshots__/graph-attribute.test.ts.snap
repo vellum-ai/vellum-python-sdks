@@ -286,7 +286,7 @@ exports[`Workflow > graph > should generate correct graph for expression referen
 "
 `;
 
-exports[`Workflow > graph > should generate correct graph when workflow has a VellumIntegrationTrigger 1`] = `
+exports[`Workflow > graph > should generate correct graph when workflow has an IntegrationTrigger 1`] = `
 "SlackMessageTrigger >> FirstNode >> SecondNode
 "
 `;

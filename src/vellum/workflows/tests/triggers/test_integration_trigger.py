@@ -1,10 +1,10 @@
-"""Tests for VellumIntegrationTrigger."""
+"""Tests for IntegrationTrigger."""
 
 import pytest
 
 from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.references.trigger import TriggerAttributeReference
-from vellum.workflows.triggers.vellum_integration import VellumIntegrationTrigger
+from vellum.workflows.triggers.integration import IntegrationTrigger
 
 
 def test_requires_config():
@@ -13,27 +13,27 @@ def test_requires_config():
     # This should fail - no Config class
     with pytest.raises(TypeError, match="Config"):
 
-        class BadTrigger1(VellumIntegrationTrigger):
+        class BadTrigger1(IntegrationTrigger):
             message: str
             # Missing Config!
 
     # This should fail - incomplete Config
     with pytest.raises(TypeError, match="provider"):
 
-        class BadTrigger2(VellumIntegrationTrigger):
+        class BadTrigger2(IntegrationTrigger):
             message: str
 
-            class Config(VellumIntegrationTrigger.Config):
+            class Config(IntegrationTrigger.Config):
                 integration_name = "SLACK"
                 slug = "slack_new_message"
                 # Missing provider!
 
     # This should work
-    class GoodTrigger(VellumIntegrationTrigger):
+    class GoodTrigger(IntegrationTrigger):
         message: str
         user: str
 
-        class Config(VellumIntegrationTrigger.Config):
+        class Config(IntegrationTrigger.Config):
             provider = VellumIntegrationProviderType.COMPOSIO
             integration_name = "SLACK"
             slug = "slack_new_message"
@@ -44,12 +44,12 @@ def test_requires_config():
 def test_top_level_annotations_create_references():
     """Top-level type annotations (webhook event attributes) automatically create TriggerAttributeReference."""
 
-    class SlackTrigger(VellumIntegrationTrigger):
+    class SlackTrigger(IntegrationTrigger):
         message: str
         user: str
         timestamp: float
 
-        class Config(VellumIntegrationTrigger.Config):
+        class Config(IntegrationTrigger.Config):
             provider = VellumIntegrationProviderType.COMPOSIO
             integration_name = "SLACK"
             slug = "slack_new_message"
@@ -69,18 +69,18 @@ def test_top_level_annotations_create_references():
 def test_attribute_ids_include_class_name():
     """Attribute IDs should include class name (like nodes)."""
 
-    class Trigger1(VellumIntegrationTrigger):
+    class Trigger1(IntegrationTrigger):
         message: str
 
-        class Config(VellumIntegrationTrigger.Config):
+        class Config(IntegrationTrigger.Config):
             provider = VellumIntegrationProviderType.COMPOSIO
             integration_name = "SLACK"
             slug = "slack_new_message"
 
-    class Trigger2(VellumIntegrationTrigger):
+    class Trigger2(IntegrationTrigger):
         message: str
 
-        class Config(VellumIntegrationTrigger.Config):
+        class Config(IntegrationTrigger.Config):
             provider = VellumIntegrationProviderType.COMPOSIO
             integration_name = "SLACK"
             slug = "slack_new_message"
@@ -93,12 +93,12 @@ def test_attribute_ids_include_class_name():
 def test_populates_dynamic_attributes():
     """Trigger dynamically populates attributes from event_data keys."""
 
-    class GithubPushTrigger(VellumIntegrationTrigger):
+    class GithubPushTrigger(IntegrationTrigger):
         repository: str
         branch: str
         commits: list
 
-        class Config(VellumIntegrationTrigger.Config):
+        class Config(IntegrationTrigger.Config):
             provider = VellumIntegrationProviderType.COMPOSIO
             integration_name = "GITHUB"
             slug = "github_push_event"
@@ -119,11 +119,11 @@ def test_populates_dynamic_attributes():
 def test_to_trigger_attribute_values():
     """to_trigger_attribute_values returns correct attribute mappings."""
 
-    class SlackTrigger(VellumIntegrationTrigger):
+    class SlackTrigger(IntegrationTrigger):
         message: str
         channel: str
 
-        class Config(VellumIntegrationTrigger.Config):
+        class Config(IntegrationTrigger.Config):
             provider = VellumIntegrationProviderType.COMPOSIO
             integration_name = "SLACK"
             slug = "slack_new_message"
@@ -142,10 +142,10 @@ def test_to_trigger_attribute_values():
 def test_empty_event_data():
     """Trigger handles empty event data gracefully."""
 
-    class SlackTrigger(VellumIntegrationTrigger):
+    class SlackTrigger(IntegrationTrigger):
         message: str
 
-        class Config(VellumIntegrationTrigger.Config):
+        class Config(IntegrationTrigger.Config):
             provider = VellumIntegrationProviderType.COMPOSIO
             integration_name = "SLACK"
             slug = "slack_new_message"

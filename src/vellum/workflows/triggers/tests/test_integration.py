@@ -2,6 +2,7 @@
 
 from typing import Any
 
+from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.state.base import BaseState
@@ -22,7 +23,10 @@ def test_integration_trigger__can_be_instantiated():
 
     # GIVEN IntegrationTrigger with concrete implementation
     class TestTrigger(IntegrationTrigger):
-        pass
+        class Config(IntegrationTrigger.Config):
+            provider = VellumIntegrationProviderType.COMPOSIO
+            integration_name = "test"
+            slug = "test"
 
     # THEN it can be instantiated (even though base is ABC, concrete subclasses work)
     assert TestTrigger is not None
@@ -34,6 +38,11 @@ def test_integration_trigger__can_be_subclassed():
     # GIVEN a concrete implementation of IntegrationTrigger
     class TestTrigger(IntegrationTrigger):
         data: str
+
+        class Config(IntegrationTrigger.Config):
+            provider = VellumIntegrationProviderType.COMPOSIO
+            integration_name = "test"
+            slug = "test"
 
         def __init__(self, **kwargs: Any):
             super().__init__(**kwargs)
@@ -51,6 +60,11 @@ def test_integration_trigger__attribute_reference():
 
     class TestTrigger(IntegrationTrigger):
         value: str
+
+        class Config(IntegrationTrigger.Config):
+            provider = VellumIntegrationProviderType.COMPOSIO
+            integration_name = "test"
+            slug = "test"
 
         def __init__(self, **kwargs: Any):
             super().__init__(**kwargs)
@@ -74,6 +88,11 @@ def test_integration_trigger__graph_syntax():
     # GIVEN a concrete trigger and a node
     class TestTrigger(IntegrationTrigger):
         value: str
+
+        class Config(IntegrationTrigger.Config):
+            provider = VellumIntegrationProviderType.COMPOSIO
+            integration_name = "test"
+            slug = "test"
 
         def __init__(self, **kwargs: Any):
             super().__init__(**kwargs)
@@ -99,6 +118,11 @@ def test_integration_trigger__multiple_entrypoints():
     class TestTrigger(IntegrationTrigger):
         msg: str
 
+        class Config(IntegrationTrigger.Config):
+            provider = VellumIntegrationProviderType.COMPOSIO
+            integration_name = "test"
+            slug = "test"
+
         def __init__(self, **kwargs: Any):
             super().__init__(**kwargs)
             self.msg = kwargs.get("msg", "")
@@ -120,9 +144,12 @@ def test_integration_trigger__multiple_entrypoints():
 
 
 def test_integration_trigger__config_attribute():
-    """IntegrationTrigger has optional config attribute."""
+    """IntegrationTrigger requires Config class with provider, integration_name, and slug."""
 
     # GIVEN IntegrationTrigger
-    # THEN it has a config class variable
-    assert hasattr(IntegrationTrigger, "config")
-    assert IntegrationTrigger.config is None
+    # THEN it has a Config class with type annotations for required fields
+    assert hasattr(IntegrationTrigger, "Config")
+    assert hasattr(IntegrationTrigger.Config, "__annotations__")
+    assert "provider" in IntegrationTrigger.Config.__annotations__
+    assert "integration_name" in IntegrationTrigger.Config.__annotations__
+    assert "slug" in IntegrationTrigger.Config.__annotations__

@@ -1111,7 +1111,7 @@ describe("Workflow", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
-    it("should generate correct graph when workflow has a VellumIntegrationTrigger", async () => {
+    it("should generate correct graph when workflow has an IntegrationTrigger", async () => {
       const writer = new Writer();
 
       const triggerId = "trigger-1";
