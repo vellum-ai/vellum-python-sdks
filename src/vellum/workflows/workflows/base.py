@@ -252,7 +252,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         emitters: Optional[List[BaseWorkflowEmitter]] = None,
         resolvers: Optional[List[BaseWorkflowResolver]] = None,
         store: Optional[Store] = None,
-        execution_id: Optional[Union[str, UUID]] = None,
+        execution_id: Optional[UUID] = None,
     ):
         self._parent_state = parent_state
         self._context = context or WorkflowContext()

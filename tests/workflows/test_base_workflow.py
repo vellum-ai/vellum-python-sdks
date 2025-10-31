@@ -173,7 +173,7 @@ def test_workflow_constructor_accepts_execution_id():
     Tests that execution_id can be passed to the workflow constructor.
     """
 
-    execution_id = str(uuid4())
+    execution_id = uuid4()
 
     workflow = TestWorkflowWithNoResolvers(execution_id=execution_id)
 
@@ -198,7 +198,7 @@ def test_workflow_run_previous_execution_id_overrides_constructor_execution_id()
     Tests that previous_execution_id parameter in run() overrides constructor execution_id.
     """
 
-    constructor_execution_id = str(uuid4())
+    constructor_execution_id = uuid4()
     workflow = TestWorkflowWithNoResolvers(execution_id=constructor_execution_id)
 
     run_execution_id = str(uuid4())
