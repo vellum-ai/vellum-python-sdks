@@ -107,10 +107,12 @@ class BaseSearchNode(BaseNode[StateType], Generic[StateType]):
                 code=WorkflowErrorCode.INVALID_INPUTS,
             )
         except ApiError as e:
+            raw_data = e.body if isinstance(e.body, dict) else None
             if e.status_code and e.status_code == 403 and isinstance(e.body, dict):
                 raise NodeException(
                     message=e.body.get("detail", "Provider credentials is missing or unavailable"),
                     code=WorkflowErrorCode.PROVIDER_CREDENTIALS_UNAVAILABLE,
+                    raw_data=raw_data,
                 )
             elif e.status_code and e.status_code >= 400 and e.status_code < 500 and isinstance(e.body, dict):
                 raise NodeException(
@@ -118,10 +120,12 @@ class BaseSearchNode(BaseNode[StateType], Generic[StateType]):
                         "detail", f"An error occurred while searching against Document Index '{self.document_index}'"
                     ),
                     code=WorkflowErrorCode.INVALID_INPUTS,
+                    raw_data=raw_data,
                 ) from e
             raise NodeException(
                 message=f"An error occurred while searching against Document Index '{self.document_index}'",
                 code=WorkflowErrorCode.INTERNAL_ERROR,
+                raw_data=raw_data,
             ) from e
 
     def _get_options_request(self) -> SearchRequestOptionsRequest:

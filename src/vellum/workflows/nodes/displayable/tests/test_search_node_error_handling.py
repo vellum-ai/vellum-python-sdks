@@ -213,3 +213,117 @@ def test_search_node_handles_api_error_without_status_code(vellum_client):
 
     assert exc_info.value.code == WorkflowErrorCode.INTERNAL_ERROR
     assert "An error occurred while searching against Document Index 'test-index'" in exc_info.value.message
+
+
+def test_search_node_includes_raw_data_in_403_error(vellum_client):
+    """Test that SearchNode includes raw_data in 403 error responses."""
+
+    # GIVEN a SearchNode configured with query and document_index
+    class Inputs(BaseInputs):
+        query: str
+        document_index: str
+
+    class State(BaseState):
+        pass
+
+    class SearchNode(BaseSearchNode):
+        query = Inputs.query
+        document_index = Inputs.document_index
+
+    error_body = {
+        "detail": "Provider credentials is missing or unavailable",
+        "error_code": "CREDENTIALS_MISSING",
+        "provider": "openai",
+        "additional_info": "Please configure your API key",
+    }
+    vellum_client.search.side_effect = ApiError(status_code=403, body=error_body)
+
+    node = SearchNode(
+        state=State(
+            meta=StateMeta(
+                workflow_inputs=Inputs(
+                    query="test query",
+                    document_index="test-index",
+                )
+            ),
+        )
+    )
+
+    with pytest.raises(NodeException) as exc_info:
+        node.run()
+
+    assert exc_info.value.raw_data == error_body
+
+
+def test_search_node_includes_raw_data_in_4xx_error(vellum_client):
+    """Test that SearchNode includes raw_data in 4xx error responses."""
+
+    # GIVEN a SearchNode configured with query and document_index
+    class Inputs(BaseInputs):
+        query: str
+        document_index: str
+
+    class State(BaseState):
+        pass
+
+    class SearchNode(BaseSearchNode):
+        query = Inputs.query
+        document_index = Inputs.document_index
+
+    error_body = {
+        "detail": "Invalid request parameters",
+        "error_code": "INVALID_PARAMS",
+        "field_errors": {"query": "Query cannot be empty"},
+    }
+    vellum_client.search.side_effect = ApiError(status_code=400, body=error_body)
+
+    node = SearchNode(
+        state=State(
+            meta=StateMeta(
+                workflow_inputs=Inputs(
+                    query="test query",
+                    document_index="test-index",
+                )
+            ),
+        )
+    )
+
+    with pytest.raises(NodeException) as exc_info:
+        node.run()
+
+    assert exc_info.value.raw_data == error_body
+
+
+def test_search_node_includes_raw_data_in_5xx_error(vellum_client):
+    """Test that SearchNode includes raw_data in 5xx error responses."""
+
+    # GIVEN a SearchNode configured with query and document_index
+    class Inputs(BaseInputs):
+        query: str
+        document_index: str
+
+    class State(BaseState):
+        pass
+
+    class SearchNode(BaseSearchNode):
+        query = Inputs.query
+        document_index = Inputs.document_index
+
+    error_body = {"detail": "Internal server error", "error_code": "INTERNAL_ERROR", "request_id": "req_123456"}
+    vellum_client.search.side_effect = ApiError(status_code=500, body=error_body)
+
+    node = SearchNode(
+        state=State(
+            meta=StateMeta(
+                workflow_inputs=Inputs(
+                    query="test query",
+                    document_index="test-index",
+                )
+            ),
+        )
+    )
+
+    with pytest.raises(NodeException) as exc_info:
+        node.run()
+
+    assert exc_info.value.raw_data == error_body
