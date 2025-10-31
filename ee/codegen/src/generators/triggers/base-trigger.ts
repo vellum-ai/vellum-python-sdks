@@ -48,6 +48,17 @@ export class BaseTrigger {
         });
         return triggerClass;
       }
+      case WorkflowTriggerType.SCHEDULED: {
+        const triggerClass = python.class_({
+          name: triggerInfo.className,
+          extends_: [
+            python.reference({
+              name: "_ScheduleTrigger",
+            }),
+          ],
+        });
+        return triggerClass;
+      }
     }
   }
 
@@ -103,6 +114,16 @@ class TriggerFile extends BasePersistedFile {
             name: triggerInfo.className,
             alias: `_${triggerInfo.className}`,
             modulePath: remoteTriggerInfo.modulePath,
+          })
+        );
+        break;
+      }
+      case WorkflowTriggerType.SCHEDULED: {
+        this.addReference(
+          python.reference({
+            name: "ScheduleTrigger",
+            alias: "_ScheduleTrigger",
+            modulePath: ["vellum", "workflows", "triggers", "schedule"],
           })
         );
         break;

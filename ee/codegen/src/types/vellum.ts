@@ -789,6 +789,7 @@ export interface WorkflowOutputValue {
 export enum WorkflowTriggerType {
   MANUAL = "MANUAL",
   INTEGRATION = "INTEGRATION",
+  SCHEDULED = "SCHEDULED",
 }
 
 export type WorkflowTrigger =
@@ -803,6 +804,12 @@ export type WorkflowTrigger =
       attributes: NodeAttribute[];
       className: string;
       modulePath: string[];
+      sourceHandleId: string;
+    }
+  | {
+      id: string;
+      type: WorkflowTriggerType.SCHEDULED;
+      attributes: NodeAttribute[];
       sourceHandleId: string;
     };
 
