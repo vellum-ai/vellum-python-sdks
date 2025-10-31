@@ -113,6 +113,7 @@ class WorkflowRunner(Generic[StateType]):
         timeout: Optional[float] = None,
         init_execution_context: Optional[ExecutionContext] = None,
         trigger: Optional[BaseTrigger] = None,
+        execution_id: Optional[UUID] = None,
     ):
         if state and external_inputs:
             raise ValueError("Can only run a Workflow providing one of state or external inputs, not both")
@@ -236,6 +237,9 @@ class WorkflowRunner(Generic[StateType]):
 
             # Check if workflow requires a trigger but none was provided
             self._validate_no_trigger_provided()
+
+        if execution_id is not None and previous_execution_id is None:
+            self._initial_state.meta.span_id = execution_id
 
         # This queue is responsible for sending events from WorkflowRunner to the outside world
         self._workflow_event_outer_queue: Queue[WorkflowEvent] = Queue()
