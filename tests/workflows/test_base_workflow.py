@@ -168,18 +168,6 @@ def test_no_exception_when_no_previous_execution_id():
     assert runner._initial_state is not None
 
 
-def test_workflow_constructor_accepts_execution_id():
-    """
-    Tests that execution_id can be passed to the workflow constructor.
-    """
-
-    execution_id = uuid4()
-
-    workflow = TestWorkflowWithNoResolvers(execution_id=execution_id)
-
-    assert workflow._execution_id == execution_id
-
-
 def test_workflow_uses_constructor_execution_id_as_span_id():
     """
     Tests that execution_id from constructor sets the span_id in workflow events.
