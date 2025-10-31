@@ -44,50 +44,10 @@ export class BaseTrigger {
         triggerClass.add(
           python.field({
             name: attribute.name,
-            typeHint: python.Type.str(), // Default to str, could be enhanced
+            type: python.Type.str(),
           })
         );
       });
-
-      const configClass = python.class_({
-        name: "Config",
-        extends_: [
-          python.reference({
-            name: "IntegrationTrigger",
-            modulePath: ["vellum", "workflows", "triggers", "integration"],
-            attribute: ["Config"],
-          }),
-        ],
-      });
-
-      configClass.add(
-        python.field({
-          name: "provider",
-          initializer: python.reference({
-            name: "VellumIntegrationProviderType",
-            modulePath: ["vellum", "workflows", "constants"],
-            attribute: [this.trigger.provider || "COMPOSIO"],
-          }),
-        })
-      );
-
-      configClass.add(
-        python.field({
-          name: "integration_name",
-          initializer: python.TypeInstantiation.str(
-            this.trigger.integrationName || ""
-          ),
-        })
-      );
-
-      configClass.add(
-        python.field({
-          name: "slug",
-          initializer: python.TypeInstantiation.str(this.trigger.slug || ""),
-        })
-      );
-
-      triggerClass.add(configClass);
     }
 
     return triggerClass;
