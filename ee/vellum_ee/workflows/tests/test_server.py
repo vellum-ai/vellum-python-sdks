@@ -1,17 +1,19 @@
 import pytest
 import sys
-from uuid import uuid4
+from uuid import UUID, uuid4
 from typing import Type, cast
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.code_executor_response import CodeExecutorResponse
 from vellum.client.types.number_vellum_value import NumberVellumValue
 from vellum.workflows import BaseWorkflow
+from vellum.workflows.events.workflow import WorkflowExecutionInitiatedBody
 from vellum.workflows.exceptions import WorkflowInitializationException
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.utils.uuids import generate_workflow_deployment_prefix
 from vellum.workflows.utils.zip import zip_file_map
+from vellum_ee.workflows.display.utils.events import event_enricher
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 from vellum_ee.workflows.server.virtual_file_loader import VirtualFileFinder
 
@@ -27,7 +29,6 @@ def test_load_workflow_event_display_context():
 def test_load_from_module__lazy_reference_in_file_loader():
     # GIVEN a workflow module with a node containing a lazy reference
     files = {
-        "__init__.py": "",
         "workflow.py": """\
 from vellum.workflows import BaseWorkflow
 from .nodes.start_node import StartNode
@@ -902,3 +903,81 @@ class TestSubworkflowDeploymentNode(SubworkflowDeploymentNode):
 
     # AND the X-Vellum-Always-Success header should be included for graceful error handling
     assert kwargs["request_options"]["additional_headers"]["X-Vellum-Always-Success"] == "true"
+
+
+def test_workflow_initiated_event_includes_display_context_with_output_display_name():
+    """
+    Tests that workflow initiated events include display context with annotated node and output information.
+    """
+    # GIVEN a workflow with a single node that has a single output
+    files = {
+        "workflow.py": """\
+from vellum.workflows import BaseWorkflow
+from .nodes.start_node import StartNode
+
+class Workflow(BaseWorkflow):
+    graph = StartNode
+
+    class Outputs(BaseWorkflow.Outputs):
+        final_result = StartNode.Outputs.result
+""",
+        "nodes/start_node.py": """\
+from vellum.workflows.nodes import BaseNode
+
+class StartNode(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        result: str = "test output"
+""",
+        "display/nodes/__init__.py": """\
+from .start_node import StartNodeDisplay
+""",
+        "display/nodes/start_node.py": """\
+from uuid import UUID
+from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
+from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
+from ...nodes.start_node import StartNode
+
+class StartNodeDisplay(BaseNodeDisplay[StartNode]):
+    node_id = UUID("11111111-1111-1111-1111-111111111111")
+    output_display = {
+        StartNode.Outputs.result: NodeOutputDisplay(
+            id=UUID("22222222-2222-2222-2222-222222222222"),
+            name="Pretty Result"
+        )
+    }
+""",
+        "display/workflow.py": """\
+""",
+    }
+
+    namespace = str(uuid4())
+    finder = VirtualFileFinder(files, namespace)
+    sys.meta_path.append(finder)
+
+    try:
+        # WHEN we stream the workflow and enrich the initiated event with display context
+        Workflow = BaseWorkflow.load_from_module(namespace)
+        workflow = Workflow()
+        initiated_event = list(workflow.stream())[0]
+        enriched_event = event_enricher(initiated_event)
+
+        # THEN the initiated event should have display context
+        assert isinstance(enriched_event.body, WorkflowExecutionInitiatedBody)
+        body = enriched_event.body
+        assert body.display_context is not None
+
+        # AND the display context should contain the annotated node
+        node_displays = body.display_context.node_displays
+        annotated_node_id = UUID("11111111-1111-1111-1111-111111111111")
+        assert annotated_node_id in node_displays
+
+        # AND the node's output display should contain the output with the display name "Pretty Result"
+        node_display = node_displays[annotated_node_id]
+        assert "result" in node_display.output_display
+
+        # AND the output should map to the annotated output id
+        annotated_output_id = UUID("22222222-2222-2222-2222-222222222222")
+        assert node_display.output_display["result"] == annotated_output_id
+    finally:
+        if finder in sys.meta_path:
+            sys.meta_path.remove(finder)

@@ -121,12 +121,9 @@ class WorkflowDisplay(BaseWorkflowDisplay):
 
         spec = importlib.util.find_spec(f"{namespace}.display")
 
-        # THEN the spec should be None because we don't want to auto-generate display/__init__.py
-        # If the spec exists, it means an empty __init__.py was auto-generated (BAD)
-        assert spec is None, (
-            "display directory should NOT have auto-generated __init__.py. "
-            "Display directories require specific __init__.py content that shouldn't be empty."
-        )
+        # THEN the spec should be found because we now support dynamic display module imports
+        assert spec
+        assert spec.origin == "display/__init__.py"
 
     finally:
         # Clean up
