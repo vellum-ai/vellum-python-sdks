@@ -148,7 +148,6 @@ export class SubworkflowDeploymentNode extends BaseNode<
       name: SUBWORKFLOW_INPUTS_CLASS_NAME,
       extends_: [baseInputsClassReference],
     });
-    this.addReference(baseInputsClassReference);
 
     const sanitizedNames = new Set<string>();
     let hasCollision = false;
