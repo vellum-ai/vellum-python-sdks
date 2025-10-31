@@ -23,34 +23,32 @@ export class BaseTrigger {
   }
 
   public generateTriggerClass(): python.Class {
-    const triggerInfo = getTriggerClassInfo(this.trigger);
+    const triggerInfo = getTriggerClassInfo(this.trigger, this.workflowContext);
 
-    if (this.trigger.type === WorkflowTriggerType.MANUAL) {
-      throw new Error("Manual triggers should not be generated");
+    switch (this.trigger.type) {
+      case WorkflowTriggerType.MANUAL: {
+        const triggerClass = python.class_({
+          name: triggerInfo.className,
+          extends_: [
+            python.reference({
+              name: "_ManualTrigger",
+            }),
+          ],
+        });
+        return triggerClass;
+      }
+      case WorkflowTriggerType.INTEGRATION: {
+        const triggerClass = python.class_({
+          name: triggerInfo.className,
+          extends_: [
+            python.reference({
+              name: `_${triggerInfo.className}`,
+            }),
+          ],
+        });
+        return triggerClass;
+      }
     }
-
-    const triggerClass = python.class_({
-      name: triggerInfo.className,
-      extends_: [
-        python.reference({
-          name: "IntegrationTrigger",
-          modulePath: ["vellum", "workflows", "triggers", "integration"],
-        }),
-      ],
-    });
-
-    if (this.trigger.type === WorkflowTriggerType.INTEGRATION) {
-      this.trigger.attributes.forEach((attribute) => {
-        triggerClass.add(
-          python.field({
-            name: attribute.name,
-            type: python.Type.str(),
-          })
-        );
-      });
-    }
-
-    return triggerClass;
   }
 
   public getTriggerFile(): TriggerFile {
@@ -73,15 +71,44 @@ class TriggerFile extends BasePersistedFile {
   }
 
   public getModulePath(): string[] {
-    const triggerInfo = getTriggerClassInfo(this.trigger.trigger);
-    return [
-      ...this.workflowContext.modulePath.slice(0, -1),
-      "triggers",
-      triggerInfo.className.toLowerCase().replace(/trigger$/, ""),
-    ];
+    const triggerInfo = getTriggerClassInfo(
+      this.trigger.trigger,
+      this.workflowContext
+    );
+    return triggerInfo.modulePath;
   }
 
   protected getFileStatements(): AstNode[] {
-    return [this.trigger.generateTriggerClass()];
+    const triggerClass = this.trigger.generateTriggerClass();
+
+    switch (this.trigger.trigger.type) {
+      case WorkflowTriggerType.MANUAL: {
+        this.addReference(
+          python.reference({
+            name: "ManualTrigger",
+            alias: "_ManualTrigger",
+            modulePath: ["vellum", "workflows", "triggers", "manual"],
+          })
+        );
+        break;
+      }
+      case WorkflowTriggerType.INTEGRATION: {
+        const remoteTriggerInfo = getTriggerClassInfo(this.trigger.trigger);
+        const triggerInfo = getTriggerClassInfo(
+          this.trigger.trigger,
+          this.workflowContext
+        );
+        this.addReference(
+          python.reference({
+            name: triggerInfo.className,
+            alias: `_${triggerInfo.className}`,
+            modulePath: remoteTriggerInfo.modulePath,
+          })
+        );
+        break;
+      }
+    }
+
+    return [triggerClass];
   }
 }

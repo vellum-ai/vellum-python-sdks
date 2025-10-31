@@ -13,18 +13,35 @@ export function getTriggerClassInfo(
 ): TriggerClassInfo {
   switch (trigger.type) {
     case WorkflowTriggerType.MANUAL:
+      if (workflowContext) {
+        return {
+          className: "ManualTrigger",
+          modulePath: [
+            ...workflowContext.modulePath.slice(0, -1),
+            "triggers",
+            "manual",
+          ],
+        };
+      }
       return {
         className: "ManualTrigger",
         modulePath: [...VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH, "manual"],
       };
     case WorkflowTriggerType.INTEGRATION:
       if (workflowContext) {
+        const remoteModuleName =
+          trigger.modulePath[trigger.modulePath.length - 1];
+        if (!remoteModuleName) {
+          throw new Error(
+            `Integration trigger ${trigger.className} has invalid modulePath`
+          );
+        }
         return {
           className: trigger.className,
           modulePath: [
             ...workflowContext.modulePath.slice(0, -1),
             "triggers",
-            trigger.className.toLowerCase().replace(/trigger$/, ""),
+            remoteModuleName,
           ],
         };
       }

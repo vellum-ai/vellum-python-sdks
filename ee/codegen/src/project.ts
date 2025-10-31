@@ -888,15 +888,7 @@ ${errors.slice(0, 3).map((err) => {
       return [];
     }
 
-    const integrationTriggers = triggers.filter(
-      (trigger) => trigger.type === "INTEGRATION"
-    );
-
-    if (integrationTriggers.length === 0) {
-      return [];
-    }
-
-    return integrationTriggers.map((trigger) => {
+    return triggers.map((trigger) => {
       return new BaseTrigger({
         trigger,
         workflowContext: this.workflowContext,
