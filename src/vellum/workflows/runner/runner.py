@@ -238,13 +238,7 @@ class WorkflowRunner(Generic[StateType]):
             # Check if workflow requires a trigger but none was provided
             self._validate_no_trigger_provided()
 
-        if (
-            execution_id is not None
-            and previous_execution_id is None
-            and state is None
-            and external_inputs is None
-            and entrypoint_nodes is None
-        ):
+        if execution_id is not None and previous_execution_id is None:
             self._initial_state.meta.span_id = execution_id
 
         # This queue is responsible for sending events from WorkflowRunner to the outside world
