@@ -85,13 +85,11 @@ class VirtualFileLoader(importlib.abc.Loader):
 
     def _is_package_directory(self, fullname: str) -> bool:
         """Check if directory contains .py files that should be treated as a package."""
+        if fullname == "":
+            # This is the root namespace, so it's a package directory
+            return True
+
         directory_prefix = fullname.replace(".", "/") + "/"
-
-        # Exclude top-level display directory from auto-generation as it typically has
-        # specific __init__.py content that shouldn't be replaced with empty files.
-        if directory_prefix == "display/":
-            return False
-
         for file_path in self.files.keys():
             if file_path.startswith(directory_prefix):
                 if file_path.endswith(".py") and not file_path.endswith("__init__.py"):
@@ -104,10 +102,40 @@ class VirtualFileLoader(importlib.abc.Loader):
 
     def _generate_init_content(self, fullname: str) -> tuple[str, str]:
         """Auto-generate empty __init__.py content to mark directory as a package."""
+        if fullname == "":
+            if any(file_path.startswith("display/") for file_path in self.files.keys()):
+                return (
+                    "__init__.py",
+                    """\
+from .display import *
+""",
+                )
+            else:
+                return "__init__.py", ""
+
         directory_prefix = fullname.replace(".", "/") + "/"
         file_path = directory_prefix + "__init__.py"
 
-        code = ""
+        if not fullname.startswith("display"):
+            return "__init__.py", ""
+
+        # We have to go through the effort of exhaustively importing all display modules, because that's how
+        # dynamically annotate our Workflow graph.
+        all_nested_files = [
+            file_path[len(directory_prefix) :]
+            for file_path in self.files.keys()
+            if file_path.startswith(directory_prefix)
+        ]
+
+        top_level_items = {file_path.split("/")[0] for file_path in all_nested_files}
+
+        top_level_modules = [
+            re.sub(r"\.py$", "", file_path)
+            for file_path in top_level_items
+            if file_path.endswith(".py") or "." not in file_path
+        ]
+
+        code = "\n".join([f"from .{file_path} import *" for file_path in top_level_modules])
 
         return file_path, code
 
@@ -126,7 +154,7 @@ class VirtualFileFinder(BaseWorkflowFinder):
 
     def find_spec(self, fullname: str, path, target=None):
         module_info = self.loader._resolve_module(fullname)
-        if module_info:
+        if isinstance(module_info, tuple) and len(module_info) == 2:
             file_path, _ = module_info
             is_package = file_path.endswith("__init__.py")
             return importlib.machinery.ModuleSpec(

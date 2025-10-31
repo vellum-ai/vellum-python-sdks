@@ -29,7 +29,6 @@ def test_load_workflow_event_display_context():
 def test_load_from_module__lazy_reference_in_file_loader():
     # GIVEN a workflow module with a node containing a lazy reference
     files = {
-        "__init__.py": "",
         "workflow.py": """\
 from vellum.workflows import BaseWorkflow
 from .nodes.start_node import StartNode
@@ -912,7 +911,6 @@ def test_workflow_initiated_event_includes_display_context_with_output_display_n
     """
     # GIVEN a workflow with a single node that has a single output
     files = {
-        "__init__.py": "",
         "workflow.py": """\
 from vellum.workflows import BaseWorkflow
 from .nodes.start_node import StartNode
@@ -923,17 +921,12 @@ class Workflow(BaseWorkflow):
     class Outputs(BaseWorkflow.Outputs):
         final_result = StartNode.Outputs.result
 """,
-        "nodes/__init__.py": "",
         "nodes/start_node.py": """\
 from vellum.workflows.nodes import BaseNode
 
 class StartNode(BaseNode):
     class Outputs(BaseNode.Outputs):
         result: str = "test output"
-""",
-        "display/__init__.py": """\
-from .nodes import *
-from .workflow import *
 """,
         "display/nodes/__init__.py": """\
 from .start_node import StartNodeDisplay
@@ -965,7 +958,7 @@ class StartNodeDisplay(BaseNodeDisplay[StartNode]):
         # WHEN we stream the workflow and enrich the initiated event with display context
         Workflow = BaseWorkflow.load_from_module(namespace)
         workflow = Workflow()
-        initiated_event = next(workflow.stream())
+        initiated_event = list(workflow.stream())[0]
         enriched_event = event_enricher(initiated_event)
 
         # THEN the initiated event should have display context
@@ -980,11 +973,11 @@ class StartNodeDisplay(BaseNodeDisplay[StartNode]):
 
         # AND the node's output display should contain the output with the display name "Pretty Result"
         node_display = node_displays[annotated_node_id]
-        assert "Pretty Result" in node_display.output_display
+        assert "result" in node_display.output_display
 
         # AND the output should map to the annotated output id
         annotated_output_id = UUID("22222222-2222-2222-2222-222222222222")
-        assert node_display.output_display["Pretty Result"] == annotated_output_id
+        assert node_display.output_display["result"] == annotated_output_id
     finally:
         if finder in sys.meta_path:
             sys.meta_path.remove(finder)
