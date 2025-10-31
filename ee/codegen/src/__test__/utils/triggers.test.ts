@@ -28,9 +28,6 @@ describe("getTriggerClassInfo", () => {
       id: "scheduled-trigger-id",
       type: WorkflowTriggerType.SCHEDULED,
       attributes: [],
-      cron: "0 0 * * *",
-      timezone: "America/New_York",
-      nextRunAt: "2024-01-01T00:00:00Z",
     };
 
     const result = getTriggerClassInfo(trigger);

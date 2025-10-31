@@ -1,15 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`TriggerAttributeWorkflowReference > should generate correct AST for ManualTrigger.config reference 1`] = `
-"ManualTrigger.config
-"
-`;
-
-exports[`TriggerAttributeWorkflowReference > should generate correct AST for ManualTrigger.input reference 1`] = `
-"ManualTrigger.input
-"
-`;
-
 exports[`TriggerAttributeWorkflowReference > should generate correct AST for IntegrationTrigger.channel reference 1`] = `
 "SlackMessageTrigger.channel
 "
@@ -17,5 +7,15 @@ exports[`TriggerAttributeWorkflowReference > should generate correct AST for Int
 
 exports[`TriggerAttributeWorkflowReference > should generate correct AST for IntegrationTrigger.message reference 1`] = `
 "SlackMessageTrigger.message
+"
+`;
+
+exports[`TriggerAttributeWorkflowReference > should generate correct AST for ManualTrigger.config reference 1`] = `
+"ManualTrigger.config
+"
+`;
+
+exports[`TriggerAttributeWorkflowReference > should generate correct AST for ManualTrigger.input reference 1`] = `
+"ManualTrigger.input
 "
 `;
