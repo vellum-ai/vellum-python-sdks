@@ -248,4 +248,77 @@ describe("SubworkflowDeploymentNode", () => {
       expect(outputName).toBe("fooBAR");
     });
   });
+
+  describe("with input variables", () => {
+    beforeEach(async () => {
+      vi.spyOn(
+        WorkflowReleaseClient.prototype,
+        "retrieveWorkflowDeploymentRelease"
+      ).mockResolvedValue({
+        id: "mocked-workflow-deployment-history-item-id",
+        created: new Date(),
+        environment: {
+          id: "mocked-environment-id",
+          name: "mocked-environment-name",
+          label: "mocked-environment-label",
+        },
+        createdBy: {
+          id: "mocked-created-by-id",
+          email: "mocked-created-by-email",
+        },
+        workflowVersion: {
+          id: "mocked-workflow-release-id",
+          inputVariables: [
+            { id: "1", key: "city", type: "STRING", required: true },
+            { id: "2", key: "date", type: "STRING", required: true },
+          ],
+          outputVariables: [
+            { id: "3", key: "temperature", type: "NUMBER" },
+            { id: "4", key: "reasoning", type: "STRING" },
+          ],
+        },
+        deployment: {
+          name: "test-deployment",
+        },
+        releaseTags: [
+          {
+            name: "mocked-release-tag-name",
+            source: "USER",
+          },
+        ],
+        reviews: [
+          {
+            id: "mocked-release-review-id",
+            created: new Date(),
+            reviewer: {
+              id: "mocked-reviewer-id",
+            },
+            state: "APPROVED",
+          },
+        ],
+      } as unknown as WorkflowDeploymentRelease);
+
+      const nodeData = subworkflowDeploymentNodeDataFactory().build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as SubworkflowDeploymentNodeContext;
+
+      node = new SubworkflowDeploymentNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it(`getNodeFile with BaseInputs class`, async () => {
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it(`getNodeDisplayFile with input variables`, async () => {
+      node.getNodeDisplayFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });

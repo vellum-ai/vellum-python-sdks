@@ -10,8 +10,10 @@ import {
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { codegen } from "src/index";
 import { SubworkflowNode as SubworkflowNodeType } from "src/types/vellum";
+import { toValidPythonIdentifier } from "src/utils/casing";
 
 const INPUTS_PREFIX = "subworkflow_inputs";
+const SUBWORKFLOW_INPUTS_CLASS_NAME = "SubworkflowInputs";
 
 export class SubworkflowDeploymentNode extends BaseNode<
   SubworkflowNodeType,
@@ -58,19 +60,13 @@ export class SubworkflowDeploymentNode extends BaseNode<
       })
     );
 
+    const subworkflowInputsClass = this.generateSubworkflowInputsClass();
+    if (subworkflowInputsClass) {
+      statements.push(subworkflowInputsClass);
+    }
+
     statements.push(
-      python.field({
-        name: INPUTS_PREFIX,
-        initializer: python.TypeInstantiation.dict(
-          Array.from(this.nodeInputsByKey.entries()).map(([key, value]) => ({
-            key: python.TypeInstantiation.str(key),
-            value: value,
-          })),
-          {
-            endWithComma: true,
-          }
-        ),
-      })
+      this.generateSubworkflowInputsInitializer(subworkflowInputsClass)
     );
 
     const outputsClass = this.generateOutputsClass();
@@ -125,6 +121,129 @@ export class SubworkflowDeploymentNode extends BaseNode<
     );
 
     return outputsClass;
+  }
+
+  private generateSubworkflowInputsClass(): python.Class | null {
+    if (!this.nodeContext.workflowDeploymentRelease) {
+      return null;
+    }
+
+    const inputVariables =
+      this.nodeContext.workflowDeploymentRelease.workflowVersion.inputVariables;
+
+    if (inputVariables.length === 0) {
+      return null;
+    }
+
+    if (this.nodeInputsByKey.size === 0) {
+      return null;
+    }
+
+    const baseInputsClassReference = python.reference({
+      name: "BaseInputs",
+      modulePath: this.workflowContext.sdkModulePathNames.INPUTS_MODULE_PATH,
+    });
+
+    const inputsClass = python.class_({
+      name: SUBWORKFLOW_INPUTS_CLASS_NAME,
+      extends_: [baseInputsClassReference],
+    });
+    this.addReference(baseInputsClassReference);
+
+    const sanitizedNames = new Set<string>();
+    let hasCollision = false;
+
+    inputVariables.forEach((inputVariable) => {
+      const sanitizedName = toValidPythonIdentifier(inputVariable.key, "input");
+
+      if (sanitizedNames.has(sanitizedName)) {
+        this.workflowContext.addError(
+          new NodeAttributeGenerationError(
+            `Failed to generate ${this.nodeData.data.label}.${SUBWORKFLOW_INPUTS_CLASS_NAME}: duplicate input name "${sanitizedName}" after sanitization`,
+            "WARNING"
+          )
+        );
+        hasCollision = true;
+        return;
+      }
+
+      sanitizedNames.add(sanitizedName);
+
+      const vellumVariableField = codegen.vellumVariable({
+        variable: {
+          id: inputVariable.id,
+          name: sanitizedName,
+          type: inputVariable.type,
+          required: inputVariable.required,
+          default: inputVariable.default,
+        },
+        defaultRequired: false,
+      });
+
+      inputsClass.add(vellumVariableField);
+    });
+
+    if (hasCollision) {
+      return null;
+    }
+
+    return inputsClass;
+  }
+
+  private generateSubworkflowInputsInitializer(
+    subworkflowInputsClass: python.Class | null
+  ): python.Field {
+    if (
+      subworkflowInputsClass &&
+      this.nodeContext.workflowDeploymentRelease &&
+      this.nodeInputsByKey.size > 0
+    ) {
+      const inputVariables =
+        this.nodeContext.workflowDeploymentRelease.workflowVersion
+          .inputVariables;
+
+      const arguments_: python.MethodArgument[] = [];
+
+      inputVariables.forEach((inputVariable) => {
+        const sanitizedName = toValidPythonIdentifier(
+          inputVariable.key,
+          "input"
+        );
+
+        const nodeInput = this.nodeInputsByKey.get(inputVariable.key);
+        if (nodeInput) {
+          arguments_.push(
+            python.methodArgument({
+              name: sanitizedName,
+              value: nodeInput,
+            })
+          );
+        }
+      });
+
+      return python.field({
+        name: INPUTS_PREFIX,
+        initializer: python.instantiateClass({
+          classReference: python.reference({
+            name: SUBWORKFLOW_INPUTS_CLASS_NAME,
+          }),
+          arguments_,
+        }),
+      });
+    }
+
+    return python.field({
+      name: INPUTS_PREFIX,
+      initializer: python.TypeInstantiation.dict(
+        Array.from(this.nodeInputsByKey.entries()).map(([key, value]) => ({
+          key: python.TypeInstantiation.str(key),
+          value: value,
+        })),
+        {
+          endWithComma: true,
+        }
+      ),
+    });
   }
 
   getNodeDisplayClassBodyStatements(): AstNode[] {
