@@ -113,6 +113,7 @@ class WorkflowRunner(Generic[StateType]):
         timeout: Optional[float] = None,
         init_execution_context: Optional[ExecutionContext] = None,
         trigger: Optional[BaseTrigger] = None,
+        execution_id: Optional[Union[str, UUID]] = None,
     ):
         if state and external_inputs:
             raise ValueError("Can only run a Workflow providing one of state or external inputs, not both")
@@ -213,6 +214,14 @@ class WorkflowRunner(Generic[StateType]):
             else:
                 self._initial_state = self.workflow.get_default_state(normalized_inputs)
                 self._should_emit_initial_state = False
+                if execution_id is not None and previous_execution_id is None:
+                    if isinstance(execution_id, str):
+                        try:
+                            self._initial_state.meta.span_id = UUID(execution_id)
+                        except ValueError as e:
+                            raise ValueError(f"Invalid execution_id format: {execution_id}") from e
+                    else:
+                        self._initial_state.meta.span_id = execution_id
 
             # Validate and bind trigger, then filter entrypoints
             self._validate_and_bind_trigger(trigger)
@@ -232,6 +241,14 @@ class WorkflowRunner(Generic[StateType]):
                 # all of that data is redundant and is derivable. It also clearly communicates that
                 # there was no initial state provided by the user to invoke the workflow.
                 self._should_emit_initial_state = False
+                if execution_id is not None and previous_execution_id is None:
+                    if isinstance(execution_id, str):
+                        try:
+                            self._initial_state.meta.span_id = UUID(execution_id)
+                        except ValueError as e:
+                            raise ValueError(f"Invalid execution_id format: {execution_id}") from e
+                    else:
+                        self._initial_state.meta.span_id = execution_id
             self._entrypoints = self.workflow.get_entrypoints()
 
             # Check if workflow requires a trigger but none was provided
