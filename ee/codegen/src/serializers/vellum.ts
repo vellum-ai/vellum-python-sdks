@@ -119,6 +119,7 @@ import {
   WorkflowOutputValue,
   WorkflowRawData,
   WorkflowSandboxRoutingConfig,
+  WorkflowStatePointer,
   WorkflowStateVariableWorkflowReference,
   WorkflowTrigger,
   WorkflowValueDescriptor,
@@ -491,6 +492,23 @@ export declare namespace EnvironmentVariablePointerSerializer {
   }
 }
 
+export const WorkflowStatePointerSerializer: ObjectSchema<
+  WorkflowStatePointerSerializer.Raw,
+  Omit<WorkflowStatePointer, "type">
+> = objectSchema({
+  data: objectSchema({
+    stateVariableId: propertySchema("state_variable_id", stringSchema()),
+  }),
+});
+
+export declare namespace WorkflowStatePointerSerializer {
+  interface Raw {
+    data: {
+      state_variable_id: string;
+    };
+  }
+}
+
 export const NodeInputValuePointerRuleSerializer: Schema<
   NodeInputValuePointerRuleSerializer.Raw,
   NodeInputValuePointerRule
@@ -501,6 +519,7 @@ export const NodeInputValuePointerRuleSerializer: Schema<
   WORKSPACE_SECRET: WorkspaceSecretPointerSerializer,
   EXECUTION_COUNTER: ExecutionCounterPointerSerializer,
   ENVIRONMENT_VARIABLE: EnvironmentVariablePointerSerializer,
+  WORKFLOW_STATE: WorkflowStatePointerSerializer,
 });
 
 export declare namespace NodeInputValuePointerRuleSerializer {
@@ -510,7 +529,8 @@ export declare namespace NodeInputValuePointerRuleSerializer {
     | ConstantValuePointerSerializer.Raw
     | WorkspaceSecretPointerSerializer.Raw
     | ExecutionCounterPointerSerializer.Raw
-    | EnvironmentVariablePointerSerializer.Raw;
+    | EnvironmentVariablePointerSerializer.Raw
+    | WorkflowStatePointerSerializer.Raw;
 }
 
 export const NodeInputSerializer: ObjectSchema<

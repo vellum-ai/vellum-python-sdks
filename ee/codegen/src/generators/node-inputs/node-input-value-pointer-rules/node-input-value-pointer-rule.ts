@@ -6,6 +6,7 @@ import { ConstantValuePointerRule } from "./constant-value-pointer";
 import { EnvironmentVariablePointerRule } from "./environment-variable-pointer";
 import { InputVariablePointerRule } from "./input-variable-pointer";
 import { NodeOutputPointerRule } from "./node-output-pointer";
+import { WorkflowStatePointerRule } from "./workflow-state-pointer";
 
 import { BaseNodeContext } from "src/context/node-context/base";
 import { ExecutionCounterPointerRule } from "src/generators/node-inputs/node-input-value-pointer-rules/execution-counter-pointer";
@@ -85,6 +86,11 @@ export class NodeInputValuePointerRule extends AstNode {
         });
       case "ENVIRONMENT_VARIABLE":
         return new EnvironmentVariablePointerRule({
+          nodeContext: this.nodeContext,
+          nodeInputValuePointerRule: nodeInputValuePointerRuleData,
+        });
+      case "WORKFLOW_STATE":
+        return new WorkflowStatePointerRule({
           nodeContext: this.nodeContext,
           nodeInputValuePointerRule: nodeInputValuePointerRuleData,
         });

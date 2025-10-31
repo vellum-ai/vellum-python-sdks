@@ -148,13 +148,21 @@ export interface EnvironmentVariablePointer {
   };
 }
 
+export interface WorkflowStatePointer {
+  type: "WORKFLOW_STATE";
+  data: {
+    stateVariableId: string;
+  };
+}
+
 export type NodeInputValuePointerRule =
   | NodeOutputPointer
   | InputVariablePointer
   | ConstantValuePointer
   | WorkspaceSecretPointer
   | ExecutionCounterPointer
-  | EnvironmentVariablePointer;
+  | EnvironmentVariablePointer
+  | WorkflowStatePointer;
 
 export interface NodeInputValuePointer {
   rules: NodeInputValuePointerRule[];
