@@ -838,6 +838,7 @@ def test_serialize_workflow__empty_rules_indexerror():
 def test_serialize_workflow__input_variables():
     # GIVEN a workflow with inputs
     class Inputs(BaseInputs):
+        empty_string: str = ""
         input_1: str
         input_2: Optional[str]
         input_3: int = 1
@@ -854,7 +855,17 @@ def test_serialize_workflow__input_variables():
     assert "input_variables" in data
     input_variables = data["input_variables"]
     assert isinstance(input_variables, list)
-    assert len(input_variables) == 4
+    assert len(input_variables) == 5
+
+    empty_string = next(var for var in input_variables if isinstance(var, dict) and var["key"] == "empty_string")
+    assert empty_string == {
+        "id": "09c3e825-8932-4d37-990a-b8a7c2a3bdec",
+        "key": "empty_string",
+        "type": "STRING",
+        "default": None,
+        "required": False,
+        "extensions": {"color": None},
+    }
 
     input_1 = next(var for var in input_variables if isinstance(var, dict) and var["key"] == "input_1")
     assert input_1 == {
@@ -900,6 +911,7 @@ def test_serialize_workflow__input_variables():
 def test_serialize_workflow__state_variables():
     # GIVEN a workflow with state variables
     class State(BaseState):
+        empty_string: str = ""
         state_1: str = "hello"
         state_2: Optional[str] = None
         state_3: int = 1
@@ -916,7 +928,17 @@ def test_serialize_workflow__state_variables():
     assert "state_variables" in data
     state_variables = data["state_variables"]
     assert isinstance(state_variables, list)
-    assert len(state_variables) == 4
+    assert len(state_variables) == 5
+
+    empty_string = next(var for var in state_variables if isinstance(var, dict) and var["key"] == "empty_string")
+    assert empty_string == {
+        "id": "0ed1f179-1734-487f-b3ed-9e6026390d90",
+        "key": "empty_string",
+        "type": "STRING",
+        "default": None,
+        "required": False,
+        "extensions": {"color": None},
+    }
 
     state_1 = next(var for var in state_variables if isinstance(var, dict) and var["key"] == "state_1")
     assert state_1 == {
