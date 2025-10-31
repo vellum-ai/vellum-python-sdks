@@ -15,6 +15,26 @@ import { toValidPythonIdentifier } from "src/utils/casing";
 const INPUTS_PREFIX = "subworkflow_inputs";
 const SUBWORKFLOW_INPUTS_CLASS_NAME = "SubworkflowInputs";
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function getProp<T extends string>(obj: unknown, key: T): unknown {
+  return isRecord(obj) ? obj[key] : undefined;
+}
+
+function hasInputsClassEnabled(wv: unknown, nodeId: string): boolean {
+  if (!isRecord(wv)) return false;
+  const moduleData = getProp(wv, "moduleData");
+  if (!isRecord(moduleData)) return false;
+  const workflowNodeModules = getProp(moduleData, "workflowNodeModules");
+  if (!isRecord(workflowNodeModules)) return false;
+  const nodeModule = getProp(workflowNodeModules, nodeId);
+  if (!isRecord(nodeModule)) return false;
+  const hasInputsClass = getProp(nodeModule, "hasInputsClass");
+  return hasInputsClass === true;
+}
+
 export class SubworkflowDeploymentNode extends BaseNode<
   SubworkflowNodeType,
   SubworkflowDeploymentNodeContext
@@ -125,6 +145,12 @@ export class SubworkflowDeploymentNode extends BaseNode<
 
   private generateSubworkflowInputsClass(): python.Class | null {
     if (!this.nodeContext.workflowDeploymentRelease) {
+      return null;
+    }
+
+    const workflowVersion =
+      this.nodeContext.workflowDeploymentRelease.workflowVersion;
+    if (!hasInputsClassEnabled(workflowVersion, this.nodeData.id)) {
       return null;
     }
 

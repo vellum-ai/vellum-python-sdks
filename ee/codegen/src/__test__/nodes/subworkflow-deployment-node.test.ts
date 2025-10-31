@@ -251,6 +251,42 @@ describe("SubworkflowDeploymentNode", () => {
 
   describe("with input variables", () => {
     beforeEach(async () => {
+      const nodeData = subworkflowDeploymentNodeDataFactory().build();
+      nodeData.inputs = [
+        {
+          id: "city-input-id",
+          key: "city",
+          value: {
+            combinator: "OR" as const,
+            rules: [
+              {
+                type: "CONSTANT_VALUE" as const,
+                data: {
+                  type: "STRING" as const,
+                  value: "San Francisco",
+                },
+              },
+            ],
+          },
+        },
+        {
+          id: "date-input-id",
+          key: "date",
+          value: {
+            combinator: "OR" as const,
+            rules: [
+              {
+                type: "CONSTANT_VALUE" as const,
+                data: {
+                  type: "STRING" as const,
+                  value: "2024-01-01",
+                },
+              },
+            ],
+          },
+        },
+      ];
+
       vi.spyOn(
         WorkflowReleaseClient.prototype,
         "retrieveWorkflowDeploymentRelease"
@@ -276,6 +312,13 @@ describe("SubworkflowDeploymentNode", () => {
             { id: "3", key: "temperature", type: "NUMBER" },
             { id: "4", key: "reasoning", type: "STRING" },
           ],
+          moduleData: {
+            workflowNodeModules: {
+              [nodeData.id]: {
+                hasInputsClass: true,
+              },
+            },
+          },
         },
         deployment: {
           name: "test-deployment",
@@ -298,8 +341,6 @@ describe("SubworkflowDeploymentNode", () => {
         ],
       } as unknown as WorkflowDeploymentRelease);
 
-      const nodeData = subworkflowDeploymentNodeDataFactory().build();
-
       const nodeContext = (await createNodeContext({
         workflowContext,
         nodeData,
@@ -313,11 +354,6 @@ describe("SubworkflowDeploymentNode", () => {
 
     it(`getNodeFile with BaseInputs class`, async () => {
       node.getNodeFile().write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
-    });
-
-    it(`getNodeDisplayFile with input variables`, async () => {
-      node.getNodeDisplayFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });

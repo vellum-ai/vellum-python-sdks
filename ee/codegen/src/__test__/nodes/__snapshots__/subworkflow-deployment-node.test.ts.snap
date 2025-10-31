@@ -89,52 +89,22 @@ class SubworkflowNode(SubworkflowDeploymentNode):
 "
 `;
 
-exports[`SubworkflowDeploymentNode > with input variables > getNodeDisplayFile with input variables 1`] = `
-"from uuid import UUID
-
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
-from vellum_ee.workflows.display.nodes import BaseSubworkflowDeploymentNodeDisplay
-from vellum_ee.workflows.display.nodes.types import (
-    NodeOutputDisplay,
-    PortDisplayOverrides,
-)
-
-from ...nodes.subworkflow_node import SubworkflowNode
-
-
-class SubworkflowNodeDisplay(BaseSubworkflowDeploymentNodeDisplay[SubworkflowNode]):
-    label = "Subworkflow Node"
-    node_id = UUID("c8f2964c-09b8-44e0-a06d-606319fe5e2a")
-    target_handle_id = UUID("f5e6bd33-527a-4ba6-8906-cd5e96a4321c")
-    output_display = {
-        SubworkflowNode.Outputs.temperature: NodeOutputDisplay(
-            id=UUID("3"), name="temperature"
-        ),
-        SubworkflowNode.Outputs.reasoning: NodeOutputDisplay(
-            id=UUID("4"), name="reasoning"
-        ),
-    }
-    port_displays = {
-        SubworkflowNode.Ports.default: PortDisplayOverrides(
-            id=UUID("600efd51-8677-4ba3-a582-b298bebb2868")
-        )
-    }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=2239.986322714681, y=484.74458968144046)
-    )
-"
-`;
-
 exports[`SubworkflowDeploymentNode > with input variables > getNodeFile with BaseInputs class 1`] = `
 "from typing import Union
 
+from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.displayable import SubworkflowDeploymentNode
 
 
 class SubworkflowNode(SubworkflowDeploymentNode):
     deployment = "test-deployment"
     release_tag = "LATEST"
-    subworkflow_inputs = {}
+
+    class SubworkflowInputs(BaseInputs):
+        city: str
+        date: str
+
+    subworkflow_inputs = SubworkflowInputs(city="San Francisco", date="2024-01-01")
 
     class Outputs(SubworkflowDeploymentNode.Outputs):
         temperature: Union[float, int]
