@@ -464,37 +464,59 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
         register_node_display_class(node_class=node_class, node_display_class=cls)
 
     def get_display_data(self) -> NodeDisplayData:
-        explicit_value = self._get_explicit_node_display_attr("display_data", NodeDisplayData)
+        """
+        Get display data by first building from BaseNode.Display, then overriding with BaseNodeDisplay.
+        This approach is more scalable as we add more attributes to Display class.
+        """
         docstring = self._node.__doc__
 
-        if explicit_value and explicit_value.comment and docstring:
-            comment = (
-                NodeDisplayComment(value=docstring, expanded=explicit_value.comment.expanded)
-                if explicit_value.comment.expanded is not None
-                else NodeDisplayComment(value=docstring, expanded=True)
-            )
-            from typing import Any, Dict
+        # Step 1: Start with BaseNode.Display attributes as base
+        base_kwargs: Dict[str, Any] = {}
 
-            kwargs: Dict[str, Any] = {
-                "position": explicit_value.position,
-                "z_index": explicit_value.z_index,
-                "width": explicit_value.width,
-                "height": explicit_value.height,
-                "comment": comment,
-            }
-            if explicit_value.icon is not None:
-                kwargs["icon"] = explicit_value.icon
-            if explicit_value.color is not None:
-                kwargs["color"] = explicit_value.color
-            return NodeDisplayData(**kwargs)
+        # Add Display class attributes if they exist
+        if self._node.Display.icon is not None:
+            base_kwargs["icon"] = self._node.Display.icon
+        if self._node.Display.color is not None:
+            base_kwargs["color"] = self._node.Display.color
 
-        if explicit_value:
-            return explicit_value
-
+        # Add docstring as comment if present
         if docstring:
-            return NodeDisplayData(
-                comment=NodeDisplayComment(value=docstring, expanded=True),
-            )
+            base_kwargs["comment"] = NodeDisplayComment(value=docstring, expanded=True)
+
+        # Step 2: Get explicit BaseNodeDisplay values
+        explicit_value = self._get_explicit_node_display_attr("display_data", NodeDisplayData)
+
+        # Step 3: Override with explicit BaseNodeDisplay values if present
+        if explicit_value:
+            # Get fields that were explicitly set for z_index handling
+            fields_set = explicit_value.model_fields_set
+
+            # Override simple attributes (only if not None)
+            for attr in ("position", "width", "height", "icon", "color"):
+                value = getattr(explicit_value, attr, None)
+                if value is not None:
+                    base_kwargs[attr] = value
+
+            # Include z_index if explicitly set (even if None)
+            if "z_index" in fields_set:
+                base_kwargs["z_index"] = explicit_value.z_index
+
+            # Special handling for comment: merge docstring with explicit comment's expanded state
+            if explicit_value.comment:
+                base_kwargs["comment"] = (
+                    NodeDisplayComment(
+                        value=docstring,
+                        expanded=(
+                            explicit_value.comment.expanded if explicit_value.comment.expanded is not None else True
+                        ),
+                    )
+                    if docstring
+                    else explicit_value.comment
+                )
+
+        # Step 4: Return the merged result
+        if base_kwargs:
+            return NodeDisplayData(**base_kwargs)
 
         return NodeDisplayData()
 

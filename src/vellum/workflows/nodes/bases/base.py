@@ -304,6 +304,12 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
     class Ports(NodePorts):
         default = Port(default=True)
 
+    class Display:
+        """Optional display metadata for visual representation."""
+
+        icon: Optional[str] = None
+        color: Optional[str] = None
+
     class Trigger(metaclass=_BaseNodeTriggerMeta):
         node_class: Type["BaseNode"]
         merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES

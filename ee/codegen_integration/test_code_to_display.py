@@ -57,6 +57,19 @@ def _process_negated_hook(key, value, current_json_obj) -> None:
         current_json_obj[key] = False
 
 
+def _process_display_data_none_fields_hook(key, value, current_json_obj) -> None:
+    """
+    Private hook to remove display_data fields with None values.
+    Fields like z_index, width, height can be null in raw JSON, but we don't include them
+    in generated Python code when they're None (to keep generated code clean).
+    """
+    if key == "display_data" and isinstance(value, dict):
+        # Remove None values for optional display fields
+        for field in ["z_index", "width", "height"]:
+            if field in value and value[field] is None:
+                del value[field]
+
+
 def _custom_obj_hook(json_dict) -> Dict[str, Any]:
     """
     Private hook to convert some raw json items to values we expect.
@@ -64,4 +77,5 @@ def _custom_obj_hook(json_dict) -> Dict[str, Any]:
     for key, value in list(json_dict.items()):
         _process_position_hook(key, value)
         _process_negated_hook(key, value, json_dict)
+        _process_display_data_none_fields_hook(key, value, json_dict)
     return json_dict
