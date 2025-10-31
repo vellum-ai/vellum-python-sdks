@@ -2,6 +2,7 @@
 
 from typing import Any
 
+from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.state.base import BaseState
@@ -23,7 +24,7 @@ def test_integration_trigger__can_be_instantiated():
     # GIVEN IntegrationTrigger with concrete implementation
     class TestTrigger(IntegrationTrigger):
         class Config(IntegrationTrigger.Config):
-            provider = "test"
+            provider = VellumIntegrationProviderType.COMPOSIO
             integration_name = "test"
             slug = "test"
 
@@ -39,7 +40,7 @@ def test_integration_trigger__can_be_subclassed():
         data: str
 
         class Config(IntegrationTrigger.Config):
-            provider = "test"
+            provider = VellumIntegrationProviderType.COMPOSIO
             integration_name = "test"
             slug = "test"
 
@@ -61,7 +62,7 @@ def test_integration_trigger__attribute_reference():
         value: str
 
         class Config(IntegrationTrigger.Config):
-            provider = "test"
+            provider = VellumIntegrationProviderType.COMPOSIO
             integration_name = "test"
             slug = "test"
 
@@ -89,7 +90,7 @@ def test_integration_trigger__graph_syntax():
         value: str
 
         class Config(IntegrationTrigger.Config):
-            provider = "test"
+            provider = VellumIntegrationProviderType.COMPOSIO
             integration_name = "test"
             slug = "test"
 
@@ -118,7 +119,7 @@ def test_integration_trigger__multiple_entrypoints():
         msg: str
 
         class Config(IntegrationTrigger.Config):
-            provider = "test"
+            provider = VellumIntegrationProviderType.COMPOSIO
             integration_name = "test"
             slug = "test"
 
