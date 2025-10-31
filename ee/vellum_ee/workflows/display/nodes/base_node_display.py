@@ -488,37 +488,31 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
         # Step 3: Override with explicit BaseNodeDisplay values if present
         if explicit_value:
-            # Override all explicit values
-            if explicit_value.position is not None:
-                base_kwargs["position"] = explicit_value.position
+            # Get fields that were explicitly set for z_index handling
+            fields_set = explicit_value.model_fields_set
+
+            # Override simple attributes (only if not None)
+            for attr in ("position", "width", "height", "icon", "color"):
+                value = getattr(explicit_value, attr, None)
+                if value is not None:
+                    base_kwargs[attr] = value
+
             # Include z_index if explicitly set (even if None)
-            if hasattr(explicit_value, "model_fields_set"):
-                fields_set = explicit_value.model_fields_set
-            else:
-                fields_set = explicit_value.__fields_set__
             if "z_index" in fields_set:
                 base_kwargs["z_index"] = explicit_value.z_index
-            if explicit_value.width is not None:
-                base_kwargs["width"] = explicit_value.width
-            if explicit_value.height is not None:
-                base_kwargs["height"] = explicit_value.height
-            if explicit_value.icon is not None:
-                base_kwargs["icon"] = explicit_value.icon
-            if explicit_value.color is not None:
-                base_kwargs["color"] = explicit_value.color
 
             # Special handling for comment: merge docstring with explicit comment's expanded state
             if explicit_value.comment:
-                if docstring:
-                    # Use docstring value but preserve explicit comment's expanded state
-                    base_kwargs["comment"] = NodeDisplayComment(
+                base_kwargs["comment"] = (
+                    NodeDisplayComment(
                         value=docstring,
                         expanded=(
                             explicit_value.comment.expanded if explicit_value.comment.expanded is not None else True
                         ),
                     )
-                else:
-                    base_kwargs["comment"] = explicit_value.comment
+                    if docstring
+                    else explicit_value.comment
+                )
 
         # Step 4: Return the merged result
         if base_kwargs:
