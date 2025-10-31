@@ -248,4 +248,113 @@ describe("SubworkflowDeploymentNode", () => {
       expect(outputName).toBe("fooBAR");
     });
   });
+
+  describe("with input variables", () => {
+    beforeEach(async () => {
+      const nodeData = subworkflowDeploymentNodeDataFactory().build();
+      nodeData.inputs = [
+        {
+          id: "city-input-id",
+          key: "city",
+          value: {
+            combinator: "OR" as const,
+            rules: [
+              {
+                type: "CONSTANT_VALUE" as const,
+                data: {
+                  type: "STRING" as const,
+                  value: "San Francisco",
+                },
+              },
+            ],
+          },
+        },
+        {
+          id: "date-input-id",
+          key: "date",
+          value: {
+            combinator: "OR" as const,
+            rules: [
+              {
+                type: "CONSTANT_VALUE" as const,
+                data: {
+                  type: "STRING" as const,
+                  value: "2024-01-01",
+                },
+              },
+            ],
+          },
+        },
+      ];
+
+      vi.spyOn(
+        WorkflowReleaseClient.prototype,
+        "retrieveWorkflowDeploymentRelease"
+      ).mockResolvedValue({
+        id: "mocked-workflow-deployment-history-item-id",
+        created: new Date(),
+        environment: {
+          id: "mocked-environment-id",
+          name: "mocked-environment-name",
+          label: "mocked-environment-label",
+        },
+        createdBy: {
+          id: "mocked-created-by-id",
+          email: "mocked-created-by-email",
+        },
+        workflowVersion: {
+          id: "mocked-workflow-release-id",
+          inputVariables: [
+            { id: "1", key: "city", type: "STRING", required: true },
+            { id: "2", key: "date", type: "STRING", required: true },
+          ],
+          outputVariables: [
+            { id: "3", key: "temperature", type: "NUMBER" },
+            { id: "4", key: "reasoning", type: "STRING" },
+          ],
+          moduleData: {
+            workflowNodeModules: {
+              [nodeData.id]: {
+                hasInputsClass: true,
+              },
+            },
+          },
+        },
+        deployment: {
+          name: "test-deployment",
+        },
+        releaseTags: [
+          {
+            name: "mocked-release-tag-name",
+            source: "USER",
+          },
+        ],
+        reviews: [
+          {
+            id: "mocked-release-review-id",
+            created: new Date(),
+            reviewer: {
+              id: "mocked-reviewer-id",
+            },
+            state: "APPROVED",
+          },
+        ],
+      } as unknown as WorkflowDeploymentRelease);
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as SubworkflowDeploymentNodeContext;
+
+      node = new SubworkflowDeploymentNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it(`getNodeFile with BaseInputs class`, async () => {
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });

@@ -88,3 +88,26 @@ class SubworkflowNode(SubworkflowDeploymentNode):
     subworkflow_inputs = {}
 "
 `;
+
+exports[`SubworkflowDeploymentNode > with input variables > getNodeFile with BaseInputs class 1`] = `
+"from typing import Union
+
+from vellum.workflows.inputs import BaseInputs
+from vellum.workflows.nodes.displayable import SubworkflowDeploymentNode
+
+
+class SubworkflowNode(SubworkflowDeploymentNode):
+    deployment = "test-deployment"
+    release_tag = "LATEST"
+
+    class SubworkflowInputs(BaseInputs):
+        city: str
+        date: str
+
+    subworkflow_inputs = SubworkflowInputs(city="San Francisco", date="2024-01-01")
+
+    class Outputs(SubworkflowDeploymentNode.Outputs):
+        temperature: Union[float, int]
+        reasoning: str
+"
+`;
