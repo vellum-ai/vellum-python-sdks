@@ -7,7 +7,12 @@ import {
   PORTS_CLASS_NAME,
   VELLUM_WORKFLOW_GRAPH_MODULE_PATH,
 } from "src/constants";
-import { WorkflowDataNode, WorkflowEdge } from "src/types/vellum";
+import {
+  EntrypointNode,
+  WorkflowDataNode,
+  WorkflowEdge,
+  WorkflowTrigger,
+} from "src/types/vellum";
 import { getTriggerClassInfo } from "src/utils/triggers";
 
 import type { WorkflowContext } from "src/context";
@@ -28,8 +33,7 @@ type GraphPortReference = {
 };
 type GraphTriggerReference = {
   type: "trigger_reference";
-  triggerClassName: string;
-  triggerModulePath: string[];
+  reference: WorkflowTrigger;
 };
 type GraphRightShift = {
   type: "right_shift";
@@ -53,6 +57,7 @@ export declare namespace GraphAttribute {
 
 export class GraphAttribute extends AstNode {
   private readonly workflowContext: WorkflowContext;
+  private readonly entrypointNode: EntrypointNode | null;
   private readonly astNode: python.AstNode;
   private readonly unusedEdges: Set<WorkflowEdge>;
   private readonly usedEdges = new Set<WorkflowEdge>();
@@ -67,6 +72,7 @@ export class GraphAttribute extends AstNode {
     this.workflowContext = workflowContext;
     this.unusedEdges = unusedEdges; // This will only have value after used graph is generated
 
+    this.entrypointNode = this.workflowContext.tryGetEntrypointNode();
     this.mutableAst = this.generateGraphMutableAst();
     this.astNode = this.generateGraphAttribute();
   }
@@ -106,8 +112,7 @@ export class GraphAttribute extends AstNode {
       }
     }
 
-    // Get edges from entrypoint (either from trigger entrypoints or ENTRYPOINT node)
-    const edges = this.workflowContext.getEntrypointNodeEdges();
+    const edges = this.workflowContext.getTriggerEdges();
 
     // If no edges from entrypoint, return empty
     // Single disconnected nodes should be handled as unused_graphs, not main graph
@@ -139,12 +144,12 @@ export class GraphAttribute extends AstNode {
       }
 
       graphMutableAst = newMutableAst;
-      const targetNode = this.resolveNodeId(edge.targetNodeId);
+      const targetNode = this.resolveTargetNodeId(edge.targetNodeId);
       if (!targetNode) {
         continue;
       }
 
-      targetNode.portContextsById.forEach((portContext) => {
+      targetNode.reference.portContextsById.forEach((portContext) => {
         const edges = edgesByPortId.get(portContext.portId);
         edges?.forEach((edge) => {
           if (processedEdges.has(edge) || edgesQueue.includes(edge)) {
@@ -153,24 +158,6 @@ export class GraphAttribute extends AstNode {
           edgesQueue.push(edge);
         });
       });
-    }
-
-    const triggers = this.workflowContext.triggers;
-    if (triggers && triggers.length > 0 && graphMutableAst.type !== "empty") {
-      const trigger = triggers[0];
-      if (trigger) {
-        const triggerInfo = getTriggerClassInfo(trigger);
-        const triggerReference: GraphTriggerReference = {
-          type: "trigger_reference",
-          triggerClassName: triggerInfo.className,
-          triggerModulePath: triggerInfo.modulePath,
-        };
-        graphMutableAst = {
-          type: "right_shift",
-          lhs: triggerReference,
-          rhs: graphMutableAst,
-        };
-      }
     }
 
     return graphMutableAst;
@@ -331,10 +318,33 @@ export class GraphAttribute extends AstNode {
     }
   }
 
-  private resolveNodeId(
+  private resolveSourceNodeId(
     nodeId: string
-  ): BaseNodeContext<WorkflowDataNode> | null {
-    return this.workflowContext.findLocalNodeContext(nodeId) ?? null;
+  ): GraphNodeReference | GraphTriggerReference | null {
+    if (this.entrypointNode?.id && nodeId === this.entrypointNode.id) {
+      return null;
+    }
+
+    const trigger = this.workflowContext.triggers?.find((t) => t.id === nodeId);
+    if (trigger) {
+      return {
+        type: "trigger_reference",
+        reference: trigger,
+      };
+    }
+
+    return this.resolveTargetNodeId(nodeId);
+  }
+
+  private resolveTargetNodeId(nodeId: string): GraphNodeReference | null {
+    const node = this.workflowContext.findLocalNodeContext(nodeId);
+    if (node) {
+      return {
+        type: "node_reference",
+        reference: node,
+      };
+    }
+    return null;
   }
 
   /**
@@ -356,42 +366,45 @@ export class GraphAttribute extends AstNode {
   }: {
     edge: WorkflowEdge;
     mutableAst: GraphMutableAst;
-    graphSourceNode: BaseNodeContext<WorkflowDataNode> | null;
+    graphSourceNode: GraphNodeReference | GraphTriggerReference | null;
   }): GraphMutableAst | undefined {
     this.usedEdges.add(edge);
-    const entrypointNode = this.workflowContext.tryGetEntrypointNode();
-    const entrypointNodeId = entrypointNode?.id;
-
-    // Check if this edge comes from a trigger
-    const triggers = this.workflowContext.triggers;
-    const isTriggerSource = triggers?.some((t) => t.id === edge.sourceNodeId);
-
-    let sourceNode: BaseNodeContext<WorkflowDataNode> | null;
-    if (
-      (entrypointNodeId && edge.sourceNodeId === entrypointNodeId) ||
-      isTriggerSource
-    ) {
-      sourceNode = null;
-    } else {
-      sourceNode = this.resolveNodeId(edge.sourceNodeId);
-      if (!sourceNode) {
-        return;
-      }
-    }
-
-    const targetNode = this.resolveNodeId(edge.targetNodeId);
+    const sourceNodeOrTrigger = this.resolveSourceNodeId(edge.sourceNodeId);
+    const targetNode = this.resolveTargetNodeId(edge.targetNodeId);
     if (!targetNode) {
       return;
     }
 
+    if (sourceNodeOrTrigger?.type === "trigger_reference") {
+      // TODO: Lots of other cases to handle here
+      const sourceTrigger = sourceNodeOrTrigger;
+      if (mutableAst.type === "empty") {
+        return {
+          type: "right_shift",
+          lhs: sourceTrigger,
+          rhs: targetNode,
+        };
+      } else {
+        return {
+          type: "set",
+          values: [
+            mutableAst,
+            {
+              type: "right_shift",
+              lhs: sourceTrigger,
+              rhs: targetNode,
+            },
+          ],
+        };
+      }
+    }
+
+    const sourceNode = sourceNodeOrTrigger;
     if (mutableAst.type === "empty") {
-      return {
-        type: "node_reference",
-        reference: targetNode,
-      };
+      return targetNode;
     } else if (mutableAst.type === "node_reference") {
-      if (sourceNode && mutableAst.reference === sourceNode) {
-        const sourceNodePortContext = sourceNode.portContextsById.get(
+      if (sourceNode && mutableAst.reference === sourceNode.reference) {
+        const sourceNodePortContext = sourceNode.reference.portContextsById.get(
           edge.sourceHandleId
         );
         if (sourceNodePortContext) {
@@ -399,7 +412,7 @@ export class GraphAttribute extends AstNode {
             return {
               type: "right_shift",
               lhs: mutableAst,
-              rhs: { type: "node_reference", reference: targetNode },
+              rhs: targetNode,
             };
           } else {
             return {
@@ -408,17 +421,14 @@ export class GraphAttribute extends AstNode {
                 type: "port_reference",
                 reference: sourceNodePortContext,
               },
-              rhs: { type: "node_reference", reference: targetNode },
+              rhs: targetNode,
             };
           }
         }
       } else if (sourceNode == graphSourceNode) {
         return {
           type: "set",
-          values: [
-            mutableAst,
-            { type: "node_reference", reference: targetNode },
-          ],
+          values: [mutableAst, targetNode],
         };
       }
     } else if (mutableAst.type === "port_reference") {
@@ -440,13 +450,12 @@ export class GraphAttribute extends AstNode {
       // Handle for direct cycles in a set
       // We already know sourceNode -> targetNode exists (it's the edge we're adding)
       // So we only need to check if targetNode -> sourceNode exists
-      const sourceNodeId = sourceNode?.nodeData.id;
+      const sourceNodeId = sourceNode?.reference.nodeData.id;
       if (isCycle && isSourceInGraph && sourceNodeId) {
         // Self cycle edge
-        if (sourceNode === targetNode) {
-          const sourceNodePortContext = sourceNode.portContextsById.get(
-            edge.sourceHandleId
-          );
+        if (sourceNode.reference === targetNode.reference) {
+          const sourceNodePortContext =
+            sourceNode.reference.portContextsById.get(edge.sourceHandleId);
           if (sourceNodePortContext && !sourceNodePortContext.isDefault) {
             return {
               type: "set",
@@ -458,7 +467,7 @@ export class GraphAttribute extends AstNode {
                     type: "port_reference",
                     reference: sourceNodePortContext,
                   },
-                  rhs: { type: "node_reference", reference: targetNode },
+                  rhs: targetNode,
                 },
               ],
             };
@@ -472,7 +481,7 @@ export class GraphAttribute extends AstNode {
           .flat()
           .some(
             (e) =>
-              e.sourceNodeId === targetNode.nodeData.id &&
+              e.sourceNodeId === targetNode.reference.nodeData.id &&
               e.targetNodeId === sourceNodeId
           );
         if (doesReverseEdgeExist) {
@@ -484,7 +493,7 @@ export class GraphAttribute extends AstNode {
               return {
                 type: "right_shift" as const,
                 lhs: value,
-                rhs: { type: "node_reference" as const, reference: targetNode },
+                rhs: targetNode,
               };
             }
             // Otherwise, leave the branch unchanged
@@ -538,10 +547,7 @@ export class GraphAttribute extends AstNode {
         if (sourceNode == graphSourceNode) {
           return {
             type: "set",
-            values: [
-              ...setAst.values,
-              { type: "node_reference", reference: targetNode },
-            ],
+            values: [...setAst.values, targetNode],
           };
         } else {
           return;
@@ -606,19 +612,19 @@ export class GraphAttribute extends AstNode {
   }: {
     edge: WorkflowEdge;
     mutableAst: GraphPortReference;
-    sourceNode: BaseNodeContext<WorkflowDataNode> | null;
-    targetNode: BaseNodeContext<WorkflowDataNode>;
-    graphSourceNode: BaseNodeContext<WorkflowDataNode> | null;
+    sourceNode: GraphNodeReference | null;
+    targetNode: GraphNodeReference;
+    graphSourceNode: GraphNodeReference | GraphTriggerReference | null;
   }): GraphMutableAst | undefined {
     if (sourceNode) {
-      const sourceNodePortContext = sourceNode.portContextsById.get(
+      const sourceNodePortContext = sourceNode.reference.portContextsById.get(
         edge.sourceHandleId
       );
       if (sourceNodePortContext === mutableAst.reference) {
         return {
           type: "right_shift",
           lhs: mutableAst,
-          rhs: { type: "node_reference", reference: targetNode },
+          rhs: targetNode,
         };
       }
       if (
@@ -634,7 +640,7 @@ export class GraphAttribute extends AstNode {
                 type: "port_reference",
                 reference: sourceNodePortContext,
               },
-              rhs: { type: "node_reference", reference: targetNode },
+              rhs: targetNode,
             },
           ],
         };
@@ -642,7 +648,7 @@ export class GraphAttribute extends AstNode {
     } else if (sourceNode == graphSourceNode) {
       return {
         type: "set",
-        values: [mutableAst, { type: "node_reference", reference: targetNode }],
+        values: [mutableAst, targetNode],
       };
     }
     return;
@@ -661,7 +667,7 @@ export class GraphAttribute extends AstNode {
   }: {
     edge: WorkflowEdge;
     mutableAst: GraphRightShift;
-    graphSourceNode: BaseNodeContext<WorkflowDataNode> | null;
+    graphSourceNode: GraphNodeReference | GraphTriggerReference | null;
   }): GraphMutableAst | undefined {
     const newLhs = this.addEdgeToGraph({
       edge,
@@ -701,7 +707,7 @@ export class GraphAttribute extends AstNode {
       if (mutableAst.rhs.type === "node_reference") {
         return this.optimizeSetThroughCommonTarget(
           flattenedNewSetAst,
-          mutableAst.rhs.reference
+          mutableAst.rhs
         );
       }
       return flattenedNewSetAst;
@@ -716,7 +722,7 @@ export class GraphAttribute extends AstNode {
     const newRhs = this.addEdgeToGraph({
       edge,
       mutableAst: mutableAst.rhs,
-      graphSourceNode: lhsTerminal.reference,
+      graphSourceNode: lhsTerminal,
     });
     if (newRhs) {
       return {
@@ -777,10 +783,15 @@ export class GraphAttribute extends AstNode {
    * serve as the exit points of the Graph. In the case of a set, it's the set of
    * terminals of each of the set's members.
    */
-  private getAstTerminals(mutableAst: GraphMutableAst): GraphNodeReference[] {
+  private getAstTerminals(
+    mutableAst: GraphMutableAst
+  ): (GraphNodeReference | GraphTriggerReference)[] {
     if (mutableAst.type === "empty") {
       return [];
-    } else if (mutableAst.type === "node_reference") {
+    } else if (
+      mutableAst.type === "node_reference" ||
+      mutableAst.type === "trigger_reference"
+    ) {
       return [mutableAst];
     } else if (mutableAst.type === "set") {
       return mutableAst.values.flatMap((val) => this.getAstTerminals(val));
@@ -817,7 +828,7 @@ export class GraphAttribute extends AstNode {
    */
   private optimizeSetThroughCommonTarget(
     mutableSetAst: GraphSet,
-    targetNode: BaseNodeContext<WorkflowDataNode>
+    targetNode: GraphNodeReference
   ): GraphMutableAst | undefined {
     if (
       this.canBranchBeSplitByTargetNode({
@@ -928,7 +939,7 @@ export class GraphAttribute extends AstNode {
    * Checks if targetNode is in the branch
    */
   private isNodeInBranch(
-    targetNode: BaseNodeContext<WorkflowDataNode> | null,
+    targetNode: GraphNodeReference | null,
     mutableAst: GraphMutableAst
   ): boolean {
     if (targetNode == null) {
@@ -936,7 +947,7 @@ export class GraphAttribute extends AstNode {
     }
     if (
       mutableAst.type === "node_reference" &&
-      mutableAst.reference === targetNode
+      mutableAst.reference === targetNode.reference
     ) {
       return true;
     } else if (mutableAst.type === "set") {
@@ -949,7 +960,7 @@ export class GraphAttribute extends AstNode {
         this.isNodeInBranch(targetNode, mutableAst.rhs)
       );
     } else if (mutableAst.type === "port_reference") {
-      return mutableAst.reference.nodeContext === targetNode;
+      return mutableAst.reference.nodeContext === targetNode.reference;
     }
     return false;
   }
@@ -964,7 +975,7 @@ export class GraphAttribute extends AstNode {
     mutableAst,
     isRoot,
   }: {
-    targetNode: BaseNodeContext<WorkflowDataNode> | null;
+    targetNode: GraphNodeReference | null;
     mutableAst: GraphMutableAst;
     isRoot: boolean;
   }): boolean {
@@ -982,7 +993,7 @@ export class GraphAttribute extends AstNode {
     }
     if (
       mutableAst.type === "node_reference" &&
-      mutableAst.reference === targetNode
+      mutableAst.reference === targetNode.reference
     ) {
       return !isRoot;
     }
@@ -1055,29 +1066,29 @@ export class GraphAttribute extends AstNode {
    * Splits the branch by the target node into two ASTs.
    */
   private splitBranchByTargetNode(
-    targetNode: BaseNodeContext<WorkflowDataNode>,
+    targetNode: GraphNodeReference,
     mutableAst: GraphMutableAst
   ): { lhs: GraphMutableAst; rhs: GraphMutableAst } {
     if (mutableAst.type === "empty") {
       return { lhs: { type: "empty" }, rhs: { type: "empty" } };
     } else if (
       mutableAst.type === "node_reference" &&
-      mutableAst.reference === targetNode
+      mutableAst.reference === targetNode.reference
     ) {
       return { lhs: { type: "empty" }, rhs: mutableAst };
     } else if (
       mutableAst.type === "node_reference" &&
-      mutableAst.reference != targetNode
+      mutableAst.reference != targetNode.reference
     ) {
       return { lhs: mutableAst, rhs: { type: "empty" } };
     } else if (
       mutableAst.type === "port_reference" &&
-      mutableAst.reference.nodeContext === targetNode
+      mutableAst.reference.nodeContext === targetNode.reference
     ) {
       return { lhs: { type: "empty" }, rhs: mutableAst };
     } else if (
       mutableAst.type === "port_reference" &&
-      mutableAst.reference.nodeContext != targetNode
+      mutableAst.reference.nodeContext != targetNode.reference
     ) {
       return { lhs: mutableAst, rhs: { type: "empty" } };
     } else if (mutableAst.type === "set") {
@@ -1216,13 +1227,13 @@ export class GraphAttribute extends AstNode {
   }
 
   private startsWithTargetNode = (
-    targetNode: BaseNodeContext<WorkflowDataNode>,
+    targetNode: GraphNodeReference,
     mutableAst: GraphMutableAst
   ): boolean => {
     if (mutableAst.type === "node_reference") {
-      return mutableAst.reference === targetNode;
+      return mutableAst.reference === targetNode.reference;
     } else if (mutableAst.type === "port_reference") {
-      return mutableAst.reference.nodeContext === targetNode;
+      return mutableAst.reference.nodeContext === targetNode.reference;
     } else if (mutableAst.type === "set") {
       return mutableAst.values.every((value) =>
         this.startsWithTargetNode(targetNode, value)
@@ -1263,9 +1274,13 @@ export class GraphAttribute extends AstNode {
     }
 
     if (mutableAst.type === "trigger_reference") {
+      const { className, modulePath } = getTriggerClassInfo(
+        mutableAst.reference,
+        this.workflowContext
+      );
       return python.reference({
-        name: mutableAst.triggerClassName,
-        modulePath: mutableAst.triggerModulePath,
+        name: className,
+        modulePath: modulePath,
       });
     }
 
@@ -1332,7 +1347,11 @@ export class GraphAttribute extends AstNode {
     this.astNode.write(writer);
   }
 
-  private debug(mutableAst: GraphMutableAst): string {
+  private debug(mutableAst: GraphMutableAst | undefined): string {
+    if (!mutableAst) {
+      return "NULL";
+    }
+
     if (mutableAst.type === "right_shift") {
       return `${this.debug(mutableAst.lhs)} >> ${this.debug(mutableAst.rhs)}`;
     }
@@ -1342,7 +1361,11 @@ export class GraphAttribute extends AstNode {
     }
 
     if (mutableAst.type === "trigger_reference") {
-      return mutableAst.triggerClassName;
+      const { className } = getTriggerClassInfo(
+        mutableAst.reference,
+        this.workflowContext
+      );
+      return className;
     }
 
     if (mutableAst.type === "port_reference") {

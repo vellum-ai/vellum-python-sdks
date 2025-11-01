@@ -50,7 +50,17 @@ export function toKebabCase(str: string): string {
     .toLowerCase(); // Convert to lowercase
 }
 
-export function createPythonClassName(input: string): string {
+/**
+ * Converts a string to a valid Python class name.
+ * @param input the input string to convert to a Python class name
+ * @param options the options for the conversion
+ * @param options.force whether to force the PascalCase conversion no matter what the input is
+ * @returns the converted Python class name
+ */
+export function createPythonClassName(
+  input: string,
+  options: { force?: boolean } = {}
+): string {
   // Handle empty input
   if (!input) {
     return "Class";
@@ -73,8 +83,11 @@ export function createPythonClassName(input: string): string {
   }
 
   // Split into words and handle special cases
+  const splitRegex = options?.force
+    ? /(?<=[a-z])(?=[A-Z])|[-_\s]+/
+    : /(?=[A-Z])|[-_\s]+/;
   const words = cleanedInput
-    .split(/(?=[A-Z])|[-_\s]+/)
+    .split(splitRegex)
     .filter((word) => word.length > 0)
     .map((word) => {
       // Fix any garbled text by splitting on number boundaries
@@ -97,7 +110,8 @@ export function createPythonClassName(input: string): string {
       if (
         word.length > 1 &&
         word === word.toUpperCase() &&
-        !/^\d+$/.test(word)
+        !/^\d+$/.test(word) &&
+        !options?.force
       ) {
         return word;
       }

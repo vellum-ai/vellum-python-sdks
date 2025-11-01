@@ -282,7 +282,6 @@ export class WorkflowContext {
       classNames,
       nestedWorkflowModuleName,
       workflowClassDescription,
-      triggers: this.triggers,
     });
   }
 
@@ -307,25 +306,18 @@ export class WorkflowContext {
     return this.entrypointNode;
   }
 
-  public getEntrypointNodeEdges(): WorkflowEdge[] {
+  public getTriggerEdges(): WorkflowEdge[] {
     // First, check if we have triggers and edges from those triggers
-    if (this.triggers && this.triggers.length > 0) {
-      const triggerIds = new Set(this.triggers.map((t) => t.id));
-      const triggerEdges = this.workflowRawData.edges.filter((edge) =>
-        triggerIds.has(edge.sourceNodeId)
-      );
-      if (triggerEdges.length > 0) {
-        return triggerEdges;
-      }
-    }
+    const triggerIds = new Set((this.triggers ?? []).map((t) => t.id));
 
     // Fall back to ENTRYPOINT node for backward compatibility
     const entrypointNode = this.tryGetEntrypointNode();
-    if (!entrypointNode) {
-      return [];
+    if (entrypointNode) {
+      triggerIds.add(entrypointNode.id);
     }
-    return this.workflowRawData.edges.filter(
-      (edge) => edge.sourceNodeId === entrypointNode.id
+
+    return this.workflowRawData.edges.filter((edge) =>
+      triggerIds.has(edge.sourceNodeId)
     );
   }
 

@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 
+import { workflowContextFactory } from "src/__test__/helpers/workflow-context-factory";
 import {
   IntegrationProvider,
   WorkflowTrigger,
@@ -15,7 +16,7 @@ describe("getTriggerClassInfo", () => {
       attributes: [],
     };
 
-    const result = getTriggerClassInfo(trigger);
+    const result = getTriggerClassInfo(trigger, workflowContextFactory());
 
     expect(result).toEqual({
       className: "ManualTrigger",
@@ -30,7 +31,7 @@ describe("getTriggerClassInfo", () => {
       attributes: [],
     };
 
-    const result = getTriggerClassInfo(trigger);
+    const result = getTriggerClassInfo(trigger, workflowContextFactory());
 
     expect(result).toEqual({
       className: "ScheduleTrigger",
@@ -52,16 +53,18 @@ describe("getTriggerClassInfo", () => {
         setupAttributes: [],
         integrationName: "slack",
       },
-      className: "SlackMessageTrigger",
-      modulePath: ["tests", "fixtures", "triggers", "slack_message"],
-      sourceHandleId: "integration-trigger-id",
     };
 
-    const result = getTriggerClassInfo(trigger);
+    const result = getTriggerClassInfo(
+      trigger,
+      workflowContextFactory({
+        moduleName: "tests.fixtures",
+      })
+    );
 
     expect(result).toEqual({
-      className: "SlackMessageTrigger",
-      modulePath: ["tests", "fixtures", "triggers", "slack_message"],
+      className: "SlackNewMessage",
+      modulePath: ["tests", "fixtures", "triggers", "slack_new_message"],
     });
   });
 });

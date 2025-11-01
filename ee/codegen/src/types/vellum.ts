@@ -821,9 +821,6 @@ export interface ScheduledTrigger extends BaseTrigger {
 export interface IntegrationTrigger extends BaseTrigger {
   type: WorkflowTriggerType.INTEGRATION;
   execConfig: IntegrationTriggerExecConfig;
-  className: string;
-  modulePath: string[];
-  sourceHandleId: string;
 }
 
 export type WorkflowTrigger =

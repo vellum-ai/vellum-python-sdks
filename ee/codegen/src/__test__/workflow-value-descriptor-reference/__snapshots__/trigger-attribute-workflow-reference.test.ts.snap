@@ -1,12 +1,12 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`TriggerAttributeWorkflowReference > should generate correct AST for IntegrationTrigger.channel reference 1`] = `
-"SlackMessageTrigger.channel
+"SlackNewMessage.channel
 "
 `;
 
 exports[`TriggerAttributeWorkflowReference > should generate correct AST for IntegrationTrigger.message reference 1`] = `
-"SlackMessageTrigger.message
+"SlackNewMessage.message
 "
 `;
 

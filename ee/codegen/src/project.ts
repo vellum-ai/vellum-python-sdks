@@ -992,17 +992,9 @@ ${errors.slice(0, 3).map((err) => {
       return [];
     }
 
-    const integrationTriggers = triggers.filter(
-      (trigger) => trigger.type === "INTEGRATION"
-    );
-
-    if (integrationTriggers.length === 0) {
-      return [];
-    }
-
     const triggerPromises: Promise<unknown>[] = [];
 
-    integrationTriggers.forEach((trigger) => {
+    triggers.forEach((trigger) => {
       if (trigger.type === "INTEGRATION") {
         const triggerGenerator = new IntegrationTriggerGenerator({
           workflowContext: this.workflowContext,

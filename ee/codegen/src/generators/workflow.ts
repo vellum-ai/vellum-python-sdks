@@ -391,7 +391,7 @@ export class Workflow {
         name: "entrypoint_displays",
         initializer: python.TypeInstantiation.dict(
           this.workflowContext
-            .getEntrypointNodeEdges()
+            .getTriggerEdges()
             .map((edge): DictEntry | null => {
               const defaultEntrypointNodeContext =
                 this.workflowContext.findNodeContext(edge.targetNodeId);
