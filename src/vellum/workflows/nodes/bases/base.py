@@ -148,13 +148,7 @@ class BaseNodeMeta(ABCMeta):
         node_class.ExternalInputs.__parent_class__ = node_class
 
         # Check if this node uses legacy ID generation (qualname only) or new ID generation (module + qualname)
-        use_legacy_id = False
-        for base_class in node_class.__mro__:
-            if "__legacy_id__" in base_class.__dict__:
-                use_legacy_id = base_class.__dict__["__legacy_id__"]
-                break
-
-        if use_legacy_id:
+        if getattr(node_class, "__legacy_id__", False):
             node_class.__id__ = uuid4_from_hash(node_class.__qualname__)
         else:
             node_class.__id__ = uuid4_from_hash(f"{node_class.__module__}.{node_class.__qualname__}")
