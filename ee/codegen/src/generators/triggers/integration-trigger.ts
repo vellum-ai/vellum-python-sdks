@@ -1,11 +1,11 @@
 import { python } from "@fern-api/python-ast";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
-import { VellumVariable } from "vellum-ai/api/types";
+import type { AstNode } from "@fern-api/python-ast/core/AstNode";
+import type { VellumVariable } from "vellum-ai/api/types";
 
 import { VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
-import { IntegrationTrigger } from "src/types/vellum";
+import type { IntegrationTrigger } from "src/types/vellum";
 import { getVellumVariablePrimitiveType } from "src/utils/vellum-variables";
 
 export declare namespace IntegrationTriggerGenerator {
@@ -61,9 +61,7 @@ export class IntegrationTriggerGenerator extends BasePersistedFile {
       ],
     });
 
-    configClass.add(
-      python.codeBlock("pass")
-    );
+    configClass.add(python.codeBlock("pass"));
 
     triggerClass.add(configClass);
 

@@ -16,7 +16,6 @@ import { getAllFilesInDir } from "./utils/files";
 import {
   GENERATED_DISPLAY_MODULE_NAME,
   GENERATED_NODES_MODULE_NAME,
-  GENERATED_TRIGGERS_MODULE_NAME,
 } from "src/constants";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { InputVariableContext } from "src/context/input-variable-context";
