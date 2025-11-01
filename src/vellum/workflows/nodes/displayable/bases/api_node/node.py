@@ -29,6 +29,8 @@ class BaseAPINode(BaseNode, Generic[StateType]):
     timeout: Optional[int] - The timeout in seconds for the API request.
     """
 
+    __legacy_id__ = True
+
     class Trigger(BaseNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY
 

@@ -15,6 +15,8 @@ class ConditionalNode(BaseNode[StateType], Generic[StateType]):
     Vellum's Conditional Node, and for most cases, you should extend `BaseNode.Ports` directly.
     """
 
+    __legacy_id__ = True
+
     class Trigger(BaseNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY
 

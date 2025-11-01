@@ -68,6 +68,8 @@ class InlineSubworkflowNode(
     subworkflow_inputs: ClassVar[EntityInputsInterface] = {}
     """
 
+    __legacy_id__ = True
+
     subworkflow: Type["BaseWorkflow[InputsType, InnerStateType]"]
     subworkflow_inputs: ClassVar[Union[EntityInputsInterface, BaseInputs, Type[undefined]]] = undefined
 

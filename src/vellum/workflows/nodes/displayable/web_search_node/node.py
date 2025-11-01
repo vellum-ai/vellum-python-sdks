@@ -23,6 +23,7 @@ class WebSearchNode(BaseNode[StateType]):
     location: Optional[str] - Geographic location filter for search
     """
 
+    __legacy_id__ = True
     query: ClassVar[str] = ""
     api_key: ClassVar[Optional[str]] = None
     num_results: ClassVar[int] = 10

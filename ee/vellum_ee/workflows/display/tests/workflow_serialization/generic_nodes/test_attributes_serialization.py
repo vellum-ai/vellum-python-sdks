@@ -174,7 +174,7 @@ def test_serialize_node__lazy_reference_with_string():
     lazy_reference_node = next(
         node
         for node in serialized_workflow["workflow_raw_data"]["nodes"]
-        if node["id"] == str(LazyReferenceGenericNode.__id__)
+        if node["id"] == "12defbad-a1ef-49a6-9fbc-cc4eb21c19ef"
     )
 
     assert lazy_reference_node["attributes"] == [
@@ -183,8 +183,8 @@ def test_serialize_node__lazy_reference_with_string():
             "name": "attr",
             "value": {
                 "type": "NODE_OUTPUT",
-                "node_id": str(OtherNode.__id__),
-                "node_output_id": "7a3406a1-6f11-4568-8aa0-e5dba6534dc2",
+                "node_id": "d6e86ef8-54e5-463a-ae6d-2fa56f4bc2ad",
+                "node_output_id": "3c28ab49-1c7c-42cc-8175-be17bf05b5e7",
             },
         }
     ]
@@ -260,7 +260,9 @@ def test_serialize_node__workflow_input_as_nested_chat_history():
 
     # THEN the node should properly serialize the attribute reference
     generic_node = next(
-        node for node in serialized_workflow["workflow_raw_data"]["nodes"] if node["id"] == str(GenericNode.__id__)
+        node
+        for node in serialized_workflow["workflow_raw_data"]["nodes"]
+        if node["id"] == "11be9d37-0069-4695-a317-14a3b6519d4e"
     )
 
     assert not DeepDiff(

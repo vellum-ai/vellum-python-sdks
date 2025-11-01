@@ -40,9 +40,9 @@ def test_serialize_workflow__missing_final_output_node():
                 "type": "TERMINAL",
                 "data": {
                     "label": "First Final Output Node",
-                    "name": "alpha",
+                    "name": "first-final-output-node",
                     "target_handle_id": "a0c2eb7a-398e-4f28-b63d-f3bae9b563ee",
-                    "output_id": "0cd02933-c5b9-47c9-aede-e97c5870e8aa",
+                    "output_id": "1d261e4b-4d77-4ace-9349-972129583519",
                     "output_type": "STRING",
                     "node_input_id": "16363762-c14a-4162-8fab-525079d3cffe",
                 },
@@ -72,7 +72,7 @@ def test_serialize_workflow__missing_final_output_node():
                 },
                 "outputs": [
                     {
-                        "id": "0cd02933-c5b9-47c9-aede-e97c5870e8aa",
+                        "id": "1d261e4b-4d77-4ace-9349-972129583519",
                         "name": "value",
                         "type": "STRING",
                         "value": {
@@ -108,7 +108,7 @@ def test_serialize_workflow__missing_final_output_node():
                                     "type": "NODE_OUTPUT",
                                     "data": {
                                         "node_id": "32d88cab-e9fa-4a56-9bc2-fb6e1fd0897f",
-                                        "output_id": "04df0e76-690a-4ae1-ab52-fe825a334dcc",
+                                        "output_id": "ae21fc3f-dd81-4174-b08a-97bc96422a8f",
                                     },
                                 }
                             ],

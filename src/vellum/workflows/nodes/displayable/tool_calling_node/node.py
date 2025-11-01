@@ -43,6 +43,7 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
         max_prompt_iterations: Optional[int] - Maximum number of prompt iterations before stopping
     """
 
+    __legacy_id__ = True
     ml_model: ClassVar[str] = "gpt-4o-mini"
     blocks: ClassVar[List[Union[PromptBlock, Dict[str, Any]]]] = []
     functions: ClassVar[List[Tool]] = []
