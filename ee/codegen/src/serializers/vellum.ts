@@ -2267,6 +2267,7 @@ const ManualTriggerSerializer = objectSchema({
   id: stringSchema(),
   type: stringLiteralSchema("MANUAL"),
   attributes: listSchema(NodeAttributeSerializer),
+  definition: CodeResourceDefinitionSerializer.optional(),
 });
 
 export declare namespace ManualTriggerSerializer {
@@ -2274,6 +2275,7 @@ export declare namespace ManualTriggerSerializer {
     id: string;
     type: "MANUAL";
     attributes: NodeAttributeSerializer.Raw[];
+    definition?: CodeResourceDefinitionSerializer.Raw | null;
   }
 }
 
@@ -2281,6 +2283,7 @@ const ScheduleTriggerSerializer = objectSchema({
   id: stringSchema(),
   type: stringLiteralSchema("SCHEDULED"),
   attributes: listSchema(NodeAttributeSerializer),
+  definition: CodeResourceDefinitionSerializer.optional(),
 });
 
 export declare namespace ScheduleTriggerSerializer {
@@ -2288,6 +2291,7 @@ export declare namespace ScheduleTriggerSerializer {
     id: string;
     type: "SCHEDULED";
     attributes: NodeAttributeSerializer.Raw[];
+    definition?: CodeResourceDefinitionSerializer.Raw | null;
   }
 }
 
@@ -2324,6 +2328,7 @@ const IntegrationTriggerSerializer = objectSchema({
     "exec_config",
     IntegrationTriggerExecConfigSerializer
   ),
+  definition: CodeResourceDefinitionSerializer.optional(),
 });
 
 export declare namespace IntegrationTriggerSerializer {
@@ -2332,6 +2337,7 @@ export declare namespace IntegrationTriggerSerializer {
     type: "INTEGRATION";
     attributes: NodeAttributeSerializer.Raw[];
     exec_config: IntegrationTriggerExecConfigSerializer.Raw;
+    definition?: CodeResourceDefinitionSerializer.Raw | null;
   }
 }
 
