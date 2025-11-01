@@ -80,6 +80,10 @@ class BaseOutput(Generic[_Delta, _Accumulated]):
 
         return data
 
+    def __vellum_encode__(self) -> dict:
+        """Return a JSON-serializable representation of this output."""
+        return self.serialize()
+
     def __repr__(self) -> str:
         if self.value is not undefined:
             return f"{self.__class__.__name__}({self.name}={self.value})"
@@ -255,6 +259,10 @@ class BaseOutputs(metaclass=_BaseOutputsMeta):
 
     def __getitem__(self, key: str) -> Any:
         return getattr(self, key)
+
+    def __vellum_encode__(self) -> Dict[str, Any]:
+        """Return a JSON-serializable representation of this outputs object."""
+        return {descriptor.name: value for descriptor, value in self if value is not undefined}
 
     @classmethod
     def __get_pydantic_core_schema__(
