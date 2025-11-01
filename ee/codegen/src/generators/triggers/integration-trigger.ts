@@ -1,12 +1,10 @@
 import { python } from "@fern-api/python-ast";
 import type { AstNode } from "@fern-api/python-ast/core/AstNode";
-import type { VellumVariable } from "vellum-ai/api/types";
 
 import { VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
 import type { IntegrationTrigger } from "src/types/vellum";
-import { getVellumVariablePrimitiveType } from "src/utils/vellum-variables";
 
 export declare namespace IntegrationTriggerGenerator {
   interface Args {
@@ -39,13 +37,10 @@ export class IntegrationTriggerGenerator extends BasePersistedFile {
     });
 
     this.trigger.attributes.forEach((attr) => {
-      const attrType = (attr as unknown as VellumVariable).type;
-      const pythonType = getVellumVariablePrimitiveType(attrType);
-
       triggerClass.add(
         python.field({
           name: attr.name,
-          type: pythonType,
+          type: python.Type.str(),
         })
       );
     });
