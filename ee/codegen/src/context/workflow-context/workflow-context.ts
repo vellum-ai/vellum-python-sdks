@@ -44,7 +44,10 @@ type OutputVariableContextsById = Map<string, OutputVariableContext>;
 
 type NodeContextsByNodeId = Map<string, BaseNodeContext<WorkflowDataNode>>;
 
-type TriggerContextsByTriggerId = Map<string, BaseTriggerContext<WorkflowTrigger>>;
+type TriggerContextsByTriggerId = Map<
+  string,
+  BaseTriggerContext<WorkflowTrigger>
+>;
 
 // A mapping between source handle ids and port contexts
 type PortContextById = Map<string, PortContext>;

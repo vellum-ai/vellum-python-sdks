@@ -1,7 +1,11 @@
 import { WorkflowContext } from "src/context";
 import { IntegrationTriggerContext } from "src/context/trigger-context/integration-trigger";
 import { ScheduledTriggerContext } from "src/context/trigger-context/scheduled-trigger";
-import { IntegrationTrigger, ScheduledTrigger, WorkflowTrigger } from "src/types/vellum";
+import {
+  IntegrationTrigger,
+  ScheduledTrigger,
+  WorkflowTrigger,
+} from "src/types/vellum";
 
 export declare namespace createTriggerContext {
   interface Args {
