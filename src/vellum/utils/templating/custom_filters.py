@@ -4,7 +4,7 @@ from typing import Any, Union
 from jinja2 import Undefined
 from jinja2.utils import htmlsafe_json_dumps
 
-from vellum.workflows.state.encoder import DefaultStateEncoder
+from vellum.utils.json_encoder import VellumJsonEncoder
 
 
 def is_valid_json_string(value: Union[str, bytes]) -> bool:
@@ -19,11 +19,11 @@ def is_valid_json_string(value: Union[str, bytes]) -> bool:
 
 def replace(s: Any, old: Any, new: Any) -> str:
     def encode_to_str(obj: Any) -> str:
-        """Encode an object for template rendering using DefaultStateEncoder."""
+        """Encode an object for template rendering using VellumJsonEncoder."""
         try:
             if isinstance(obj, str):
                 return obj
-            return json.dumps(obj, cls=DefaultStateEncoder)
+            return json.dumps(obj, cls=VellumJsonEncoder)
         except TypeError:
             return str(obj)
 
@@ -39,4 +39,4 @@ def replace(s: Any, old: Any, new: Any) -> str:
 def safe_tojson(value: Any) -> str:
     if isinstance(value, Undefined):
         return ""
-    return htmlsafe_json_dumps(value, cls=DefaultStateEncoder)
+    return htmlsafe_json_dumps(value, cls=VellumJsonEncoder)

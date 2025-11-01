@@ -123,6 +123,10 @@ class Port:
             "name": self.name,
         }
 
+    def __vellum_encode__(self) -> dict:
+        """Return a JSON-serializable representation of this port."""
+        return self.serialize()
+
     @classmethod
     def __get_pydantic_core_schema__(
         cls, source_type: Type[Any], handler: GetCoreSchemaHandler

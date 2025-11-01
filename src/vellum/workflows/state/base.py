@@ -276,6 +276,10 @@ class NodeExecutionCache:
             },
         }
 
+    def __vellum_encode__(self) -> Dict[str, Any]:
+        """Return a JSON-serializable representation of this cache."""
+        return self.dump()
+
     @classmethod
     def __get_pydantic_core_schema__(
         cls, source_type: Type[Any], handler: GetCoreSchemaHandler
@@ -682,6 +686,10 @@ class BaseState(metaclass=_BaseStateMeta):
         finally:
             self.__is_atomic__ = prev
             self.__snapshot__()
+
+    def __vellum_encode__(self) -> Dict[str, Any]:
+        """Return a JSON-serializable representation of this state."""
+        return dict(self)
 
     @classmethod
     def __get_pydantic_core_schema__(
