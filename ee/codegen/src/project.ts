@@ -63,6 +63,7 @@ import { PromptDeploymentNode } from "src/generators/nodes/prompt-deployment-nod
 import { SearchNode } from "src/generators/nodes/search-node";
 import { SubworkflowDeploymentNode } from "src/generators/nodes/subworkflow-deployment-node";
 import { TemplatingNode } from "src/generators/nodes/templating-node";
+import { IntegrationTriggerGenerator } from "src/generators/triggers/integration-trigger";
 import { WorkflowSandboxFile } from "src/generators/workflow-sandbox-file";
 import { WorkflowVersionExecConfigSerializer } from "src/serializers/vellum";
 import {
@@ -1004,7 +1005,6 @@ ${errors.slice(0, 3).map((err) => {
 
     integrationTriggers.forEach((trigger) => {
       if (trigger.type === "INTEGRATION") {
-        const { IntegrationTriggerGenerator } = require("./generators/triggers/integration-trigger");
         const triggerGenerator = new IntegrationTriggerGenerator({
           workflowContext: this.workflowContext,
           trigger,
@@ -1012,26 +1012,6 @@ ${errors.slice(0, 3).map((err) => {
         triggerPromises.push(triggerGenerator.persist());
       }
     });
-
-    // Generate triggers/__init__.py
-    const rootTriggersInitFile = codegen.initFile({
-      workflowContext: this.workflowContext,
-      modulePath: [...this.getModulePath(), GENERATED_TRIGGERS_MODULE_NAME],
-      statements: [],
-    });
-
-    integrationTriggers.forEach((trigger) => {
-      if (trigger.type === "INTEGRATION") {
-        rootTriggersInitFile.addReference(
-          python.reference({
-            name: trigger.className,
-            modulePath: trigger.modulePath,
-          })
-        );
-      }
-    });
-
-    triggerPromises.push(rootTriggersInitFile.persist());
 
     return triggerPromises;
   }

@@ -826,6 +826,11 @@ export type WorkflowTrigger =
       sourceHandleId: string;
     };
 
+export type IntegrationTrigger = Extract<
+  WorkflowTrigger,
+  { type: WorkflowTriggerType.INTEGRATION }
+>;
+
 export interface WorkflowRawData {
   nodes: WorkflowNode[];
   edges: WorkflowEdge[];
