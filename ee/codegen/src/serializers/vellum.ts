@@ -2292,7 +2292,6 @@ export declare namespace ScheduleTriggerSerializer {
 }
 
 const ComposioIntegrationTriggerExecConfigSerializer = objectSchema({
-  type: stringLiteralSchema("COMPOSIO"),
   slug: stringSchema(),
   setupAttributes: propertySchema(
     "setup_attributes",
@@ -2320,14 +2319,11 @@ export declare namespace IntegrationTriggerExecConfigSerializer {
 
 const IntegrationTriggerSerializer = objectSchema({
   id: stringSchema(),
-  type: stringLiteralSchema("INTEGRATION"),
   attributes: listSchema(NodeAttributeSerializer),
   execConfig: propertySchema(
     "exec_config",
     IntegrationTriggerExecConfigSerializer
   ),
-  className: propertySchema("class_name", stringSchema()),
-  modulePath: propertySchema("module_path", listSchema(stringSchema())),
 });
 
 export declare namespace IntegrationTriggerSerializer {
@@ -2336,8 +2332,6 @@ export declare namespace IntegrationTriggerSerializer {
     type: "INTEGRATION";
     attributes: NodeAttributeSerializer.Raw[];
     exec_config: IntegrationTriggerExecConfigSerializer.Raw;
-    class_name: string;
-    module_path: string[];
   }
 }
 

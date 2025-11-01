@@ -1158,9 +1158,6 @@ describe("Workflow", () => {
               setupAttributes: [],
               integrationName: "slack",
             },
-            className: "SlackMessageTrigger",
-            modulePath: ["tests", "fixtures", "triggers", "slack_message"],
-            sourceHandleId: triggerId, // Use trigger ID as handle ID
           },
         ],
       });

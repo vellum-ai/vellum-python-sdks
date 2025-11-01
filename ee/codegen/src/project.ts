@@ -62,6 +62,7 @@ import { PromptDeploymentNode } from "src/generators/nodes/prompt-deployment-nod
 import { SearchNode } from "src/generators/nodes/search-node";
 import { SubworkflowDeploymentNode } from "src/generators/nodes/subworkflow-deployment-node";
 import { TemplatingNode } from "src/generators/nodes/templating-node";
+import { IntegrationTriggerGenerator } from "src/generators/triggers/integration-trigger";
 import { WorkflowSandboxFile } from "src/generators/workflow-sandbox-file";
 import { WorkflowVersionExecConfigSerializer } from "src/serializers/vellum";
 import {
@@ -233,6 +234,7 @@ ${errors.slice(0, 3).map((err) => {
       workflow.getWorkflowFile().persist(),
       // nodes/*
       ...this.generateNodeFiles(nodes),
+      ...this.generateTriggerFiles(),
       // sandbox.py
       ...(this.sandboxInputs ? [this.generateSandboxFile().persist()] : []),
       this.writeAdditionalFiles(),
@@ -982,6 +984,27 @@ ${errors.slice(0, 3).map((err) => {
       // nodes/* and display/nodes/*
       ...nodePromises,
     ];
+  }
+
+  private generateTriggerFiles(): Promise<unknown>[] {
+    const triggers = this.workflowContext.triggers;
+    if (!triggers || triggers.length === 0) {
+      return [];
+    }
+
+    const triggerPromises: Promise<unknown>[] = [];
+
+    triggers.forEach((trigger) => {
+      if (trigger.type === "INTEGRATION") {
+        const triggerGenerator = new IntegrationTriggerGenerator({
+          workflowContext: this.workflowContext,
+          trigger,
+        });
+        triggerPromises.push(triggerGenerator.persist());
+      }
+    });
+
+    return triggerPromises;
   }
 
   private generateErrorLogFile(): ErrorLogFile {

@@ -292,7 +292,7 @@ exports[`Workflow > graph > should generate correct graph when workflow has a ma
 `;
 
 exports[`Workflow > graph > should generate correct graph when workflow has an IntegrationTrigger 1`] = `
-"SlackMessageTrigger >> FirstNode >> SecondNode
+"SlackNewMessage >> FirstNode >> SecondNode
 "
 `;
 

@@ -805,26 +805,28 @@ export interface ComposioIntegrationTriggerExecConfig {
 
 export type IntegrationTriggerExecConfig = ComposioIntegrationTriggerExecConfig;
 
+export interface BaseTrigger {
+  id: string;
+  attributes: NodeAttribute[];
+}
+
+export interface ManualTrigger extends BaseTrigger {
+  type: WorkflowTriggerType.MANUAL;
+}
+
+export interface ScheduledTrigger extends BaseTrigger {
+  type: WorkflowTriggerType.SCHEDULED;
+}
+
+export interface IntegrationTrigger extends BaseTrigger {
+  type: WorkflowTriggerType.INTEGRATION;
+  execConfig: IntegrationTriggerExecConfig;
+}
+
 export type WorkflowTrigger =
-  | {
-      id: string;
-      type: WorkflowTriggerType.MANUAL;
-      attributes: NodeAttribute[];
-    }
-  | {
-      id: string;
-      type: WorkflowTriggerType.SCHEDULED;
-      attributes: NodeAttribute[];
-    }
-  | {
-      id: string;
-      type: WorkflowTriggerType.INTEGRATION;
-      attributes: NodeAttribute[];
-      execConfig: IntegrationTriggerExecConfig;
-      className: string;
-      modulePath: string[];
-      sourceHandleId: string;
-    };
+  | ManualTrigger
+  | ScheduledTrigger
+  | IntegrationTrigger;
 
 export interface WorkflowRawData {
   nodes: WorkflowNode[];

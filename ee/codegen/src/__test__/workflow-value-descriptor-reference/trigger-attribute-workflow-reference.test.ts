@@ -109,9 +109,6 @@ describe("TriggerAttributeWorkflowReference", () => {
             setupAttributes: [],
             integrationName: "slack",
           },
-          className: "SlackMessageTrigger",
-          modulePath: ["tests", "fixtures", "triggers", "slack_message"],
-          sourceHandleId: "integration-trigger-id",
         },
       ],
     });
@@ -149,9 +146,6 @@ describe("TriggerAttributeWorkflowReference", () => {
             setupAttributes: [],
             integrationName: "slack",
           },
-          className: "SlackMessageTrigger",
-          modulePath: ["tests", "fixtures", "triggers", "slack_message"],
-          sourceHandleId: "integration-trigger-id",
         },
       ],
     });

@@ -46,12 +46,27 @@ describe("Casing utility functions", () => {
       ["complex mix_of-DifferentCases", "ComplexMixOfDifferentCases"],
       ["ALLCAPS input", "ALLCAPSInput"], // Preserve ALLCAPS as requested
       ["PascalCaseAlready", "PascalCaseAlready"],
+      ["SLACK_MESSAGE_TRIGGER", "SLACKMESSAGETRIGGER"],
+      ["APISuccessOutput", "APISuccessOutput"],
     ] as const;
 
     it.each<[string, string]>(testCases)(
       "should convert %s' to %s'",
       (input, expected) => {
         expect(createPythonClassName(input)).toBe(expected);
+      }
+    );
+  });
+
+  describe("createPythonClassName force:true", () => {
+    const testCases: [string, string][] = [
+      ["SLACK_MESSAGE_TRIGGER", "SlackMessageTrigger"],
+    ] as const;
+
+    it.each<[string, string]>(testCases)(
+      "should convert %s' to %s'",
+      (input, expected) => {
+        expect(createPythonClassName(input, { force: true })).toBe(expected);
       }
     );
   });
