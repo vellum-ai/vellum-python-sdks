@@ -1,7 +1,9 @@
 import pytest
 
+from vellum.workflows.expressions.add import AddExpression
 from vellum.workflows.expressions.begins_with import BeginsWithExpression
 from vellum.workflows.expressions.between import BetweenExpression
+from vellum.workflows.expressions.concat import ConcatExpression
 from vellum.workflows.expressions.contains import ContainsExpression
 from vellum.workflows.expressions.does_not_begin_with import DoesNotBeginWithExpression
 from vellum.workflows.expressions.does_not_contain import DoesNotContainExpression
@@ -17,6 +19,7 @@ from vellum.workflows.expressions.is_not_null import IsNotNullExpression
 from vellum.workflows.expressions.is_null import IsNullExpression
 from vellum.workflows.expressions.less_than import LessThanExpression
 from vellum.workflows.expressions.less_than_or_equal_to import LessThanOrEqualToExpression
+from vellum.workflows.expressions.minus import MinusExpression
 from vellum.workflows.expressions.not_between import NotBetweenExpression
 from vellum.workflows.expressions.not_in import NotInExpression
 from vellum_ee.workflows.display.utils.expressions import convert_descriptor_to_operator
@@ -38,6 +41,9 @@ def binary_expressions_with_lhs_and_rhs():
         (DoesNotEndWithExpression(lhs="123", rhs="456"), "doesNotEndWith"),
         (InExpression(lhs="123", rhs="456"), "in"),
         (NotInExpression(lhs="123", rhs="456"), "notIn"),
+        (AddExpression(lhs=5, rhs=3), "+"),
+        (MinusExpression(lhs=10, rhs=3), "-"),
+        (ConcatExpression(lhs=[1, 2], rhs=[3, 4]), "concat"),
     ]
 
 
