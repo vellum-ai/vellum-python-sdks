@@ -313,6 +313,134 @@ describe("WorkflowProjectGenerator", () => {
     });
   });
 
+  it("getTriggerPathToIdMapping returns path to id mapping for triggers", async () => {
+    const displayData = {
+      workflow_raw_data: {
+        nodes: [
+          {
+            id: "9663d2e9-8e18-448b-b963-cac4539db9d7",
+            type: "ENTRYPOINT",
+            data: {
+              label: "Entrypoint",
+              source_handle_id: "entry_source",
+              target_handle_id: "entry_target",
+            },
+            inputs: [],
+          },
+          {
+            id: "b2439bcb-8dee-44b6-85f1-37f294b0e0cb",
+            type: "TERMINAL",
+            data: {
+              label: "Output",
+              name: "output",
+              target_handle_id: "final-target",
+              output_id: "99408c96-eb09-44ff-ab92-a8c362c13b6b",
+              output_type: "STRING",
+              node_input_id: "ca9f8d73-34df-41fd-8efc-16f11282e092",
+            },
+            inputs: [
+              {
+                id: "ca9f8d73-34df-41fd-8efc-16f11282e092",
+                key: "node_input",
+                value: {
+                  rules: [
+                    {
+                      type: "CONSTANT_VALUE",
+                      data: {
+                        type: "STRING",
+                        value: "Hello, World!",
+                      },
+                    },
+                  ],
+                  combinator: "OR",
+                },
+              },
+            ],
+            display_data: {
+              position: {
+                x: 1622.0,
+                y: 0.0,
+              },
+              z_index: 5,
+              width: 522.0,
+              height: 296.0,
+            },
+            trigger: {
+              id: "final-target",
+              merge_behavior: "AWAIT_ANY",
+            },
+            outputs: [
+              {
+                id: "99408c96-eb09-44ff-ab92-a8c362c13b6b",
+                name: "value",
+                type: "STRING",
+              },
+            ],
+          },
+        ],
+        edges: [
+          {
+            source_node_id: "9663d2e9-8e18-448b-b963-cac4539db9d7",
+            source_handle_id: "entry_source",
+            target_node_id: "b2439bcb-8dee-44b6-85f1-37f294b0e0cb",
+            target_handle_id: "final-target",
+            type: "DEFAULT",
+            id: "edge_1",
+          },
+        ],
+      },
+      input_variables: [],
+      state_variables: [],
+      output_variables: [],
+      packages: [],
+      triggers: [
+        {
+          id: "trigger-1",
+          type: "INTEGRATION",
+          attributes: [
+            {
+              id: "attr-1-id",
+              name: "event_type",
+              value: null,
+            },
+          ],
+          exec_config: {
+            type: "COMPOSIO",
+            slug: "Github-Star-Event",
+            integration_name: "Github",
+            setup_attributes: [],
+          },
+        },
+        {
+          id: "trigger-2",
+          type: "SCHEDULED",
+          attributes: [
+            {
+              id: "attribute-id-1",
+              name: "attribute-1",
+              value: null,
+            },
+          ],
+        },
+      ],
+    };
+
+    const project = new WorkflowProjectGenerator({
+      absolutePathToOutputDirectory: tempDir,
+      workflowVersionExecConfigData: displayData,
+      moduleName: "code",
+      vellumApiKey: "<TEST_API_KEY>",
+    });
+
+    await project.generateCode();
+
+    const mapping = project.getTriggerPathToIdMapping();
+    expect(mapping).toEqual({
+      "code.triggers.github-star-event": "trigger-1",
+      "code.triggers.scheduled": "trigger-2",
+    });
+  });
+
   describe("generateCode", () => {
     const excludeFilesAtPaths: RegExp[] = [/\.pyc$/];
     const ignoreContentsOfFilesAtPaths: RegExp[] = [];

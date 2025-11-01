@@ -17,7 +17,11 @@ import {
   GENERATED_DISPLAY_MODULE_NAME,
   GENERATED_NODES_MODULE_NAME,
 } from "src/constants";
-import { createNodeContext, WorkflowContext } from "src/context";
+import {
+  createNodeContext,
+  createTriggerContext,
+  WorkflowContext,
+} from "src/context";
 import { InputVariableContext } from "src/context/input-variable-context";
 import { ApiNodeContext } from "src/context/node-context/api-node";
 import { BaseNodeContext } from "src/context/node-context/base";
@@ -622,6 +626,30 @@ ${errors.slice(0, 3).map((err) => {
       })
     );
 
+    // Create trigger contexts
+    if (this.workflowContext.triggers) {
+      this.workflowContext.triggers.forEach((trigger) => {
+        try {
+          createTriggerContext({
+            workflowContext: this.workflowContext,
+            triggerData: trigger,
+          });
+        } catch (error) {
+          if (error instanceof BaseCodegenError) {
+            this.workflowContext.addError(error);
+          } else {
+            console.error("Unexpected error creating trigger context", error);
+            this.workflowContext.addError(
+              new WorkflowGenerationError(
+                `Failed to create trigger context for trigger ${trigger.id}.`,
+                "WARNING"
+              )
+            );
+          }
+        }
+      });
+    }
+
     const inputs = codegen.inputs({
       workflowContext: this.workflowContext,
     });
@@ -1061,6 +1089,17 @@ ${errors.slice(0, 3).map((err) => {
           },
         ]
       )
+    );
+  }
+
+  public getTriggerPathToIdMapping(): Record<string, string> {
+    return Object.fromEntries(
+      Array.from(
+        this.workflowContext.globalTriggerContextsByTriggerId.entries()
+      ).map(([triggerId, triggerContext]) => [
+        triggerContext.triggerModulePath.join("."),
+        triggerId,
+      ])
     );
   }
 }

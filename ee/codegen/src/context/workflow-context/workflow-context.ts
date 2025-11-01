@@ -11,6 +11,7 @@ import { BaseNodeContext } from "src/context/node-context/base";
 import { OutputVariableContext } from "src/context/output-variable-context";
 import { PortContext } from "src/context/port-context";
 import { StateVariableContext } from "src/context/state-variable-context";
+import { BaseTriggerContext } from "src/context/trigger-context/base";
 import { generateSdkModulePaths } from "src/context/workflow-context/sdk-module-paths";
 import { SDK_MODULE_PATHS } from "src/context/workflow-context/types";
 import { WorkflowOutputContext } from "src/context/workflow-output-context";
@@ -42,6 +43,8 @@ type StateVariableContextsById = Map<string, StateVariableContext>;
 type OutputVariableContextsById = Map<string, OutputVariableContext>;
 
 type NodeContextsByNodeId = Map<string, BaseNodeContext<WorkflowDataNode>>;
+
+type TriggerContextsByTriggerId = Map<string, BaseTriggerContext<WorkflowTrigger>>;
 
 // A mapping between source handle ids and port contexts
 type PortContextById = Map<string, PortContext>;
@@ -112,6 +115,11 @@ export class WorkflowContext {
   // Track what node module names are used within this workflow so that we can ensure name uniqueness when adding
   // new nodes.
   private readonly nodeModuleNames: Set<string> = new Set();
+
+  // Maps trigger IDs to trigger contexts
+  // Tracks local and global contexts in the case of nested workflows.
+  public readonly triggerContextsByTriggerId: TriggerContextsByTriggerId;
+  public readonly globalTriggerContextsByTriggerId: TriggerContextsByTriggerId;
 
   // Track the custom workflow module name if it exists
   public readonly nestedWorkflowModuleName?: string;
@@ -218,6 +226,9 @@ export class WorkflowContext {
 
     this.nodeContextsByNodeId = new Map();
     this.globalNodeContextsByNodeId = globalNodeContextsByNodeId ?? new Map();
+
+    this.triggerContextsByTriggerId = new Map();
+    this.globalTriggerContextsByTriggerId = new Map();
 
     this.portContextById = portContextByName ?? new Map();
 
@@ -530,6 +541,31 @@ export class WorkflowContext {
     }
 
     return nodeContext;
+  }
+
+  public addTriggerContext(
+    triggerContext: BaseTriggerContext<WorkflowTrigger>
+  ): void {
+    const triggerId = triggerContext.getTriggerId();
+
+    if (this.globalTriggerContextsByTriggerId.get(triggerId)) {
+      this.addError(
+        new WorkflowGenerationError(
+          `Trigger context already exists for trigger ID: ${triggerId}`,
+          "WARNING"
+        )
+      );
+      return;
+    }
+
+    this.triggerContextsByTriggerId.set(triggerId, triggerContext);
+    this.globalTriggerContextsByTriggerId.set(triggerId, triggerContext);
+  }
+
+  public findTriggerContext(
+    triggerId: string
+  ): BaseTriggerContext<WorkflowTrigger> | undefined {
+    return this.globalTriggerContextsByTriggerId.get(triggerId);
   }
 
   public addPortContext(portContext: PortContext): void {
