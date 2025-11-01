@@ -3,6 +3,7 @@ from unittest import mock
 from uuid import uuid4
 from typing import Iterator, List
 
+from vellum.client.types.ad_hoc_expand_meta import AdHocExpandMeta
 from vellum.client.types.array_chat_message_content import ArrayChatMessageContent
 from vellum.client.types.chat_message import ChatMessage
 from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
@@ -225,7 +226,7 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
                 strict=None,
             )
         ],
-        "expand_meta": None,
+        "expand_meta": AdHocExpandMeta(finish_reason=True),
         "request_options": mock.ANY,
     }
 
@@ -357,7 +358,7 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
                 strict=None,
             )
         ],
-        "expand_meta": None,
+        "expand_meta": AdHocExpandMeta(finish_reason=True),
         "request_options": mock.ANY,
     }
 

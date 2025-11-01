@@ -4,6 +4,7 @@ from typing import Any, Iterator, List
 
 from vellum import (
     AdHocExecutePromptEvent,
+    AdHocExpandMeta,
     ChatMessagePromptBlock,
     FulfilledAdHocExecutePromptEvent,
     InitiatedAdHocExecutePromptEvent,
@@ -100,7 +101,7 @@ def test_workflow_with_two_nodes__happy_path(vellum_client, vellum_adhoc_prompt_
                 ],
             ),
         ],
-        expand_meta=None,
+        expand_meta=AdHocExpandMeta(cost=None, model_name=None, usage=None, finish_reason=True),
         functions=None,
         request_options=mock.ANY,
         settings=PromptSettings(timeout=1, stream_enabled=True),
