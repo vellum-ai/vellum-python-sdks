@@ -196,6 +196,12 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         has_manual_trigger = len(manual_trigger_edges) > 0
         has_only_integration_trigger = len(integration_trigger_edges) > 0 and not has_manual_trigger
 
+        # Check if workflow_display has an explicit entrypoint_node_id (not the default)
+        default_meta = WorkflowMetaDisplay.get_default(self._workflow)
+        is_explicit_entrypoint = (
+            self.display_context.workflow_display.entrypoint_node_id != default_meta.entrypoint_node_id
+        )
+
         entrypoint_node_id: Optional[UUID] = None
         entrypoint_node_source_handle_id: Optional[UUID] = None
 
@@ -235,7 +241,23 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 "base": None,
                 "definition": None,
             }
-        # else: has_only_integration_trigger - no ENTRYPOINT node needed
+        elif has_only_integration_trigger and is_explicit_entrypoint:
+            entrypoint_node_id = self.display_context.workflow_display.entrypoint_node_id
+            entrypoint_node_source_handle_id = self.display_context.workflow_display.entrypoint_node_source_handle_id
+
+            serialized_nodes[entrypoint_node_id] = {
+                "id": str(entrypoint_node_id),
+                "type": "ENTRYPOINT",
+                "inputs": [],
+                "data": {
+                    "label": "Entrypoint Node",
+                    "source_handle_id": str(entrypoint_node_source_handle_id),
+                },
+                "display_data": self.display_context.workflow_display.entrypoint_node_display.dict(),
+                "base": None,
+                "definition": None,
+            }
+        # else: has_only_integration_trigger without explicit entrypoint - no ENTRYPOINT node needed
 
         # Add all the nodes in the workflows
         for node in self._workflow.get_all_nodes():
@@ -383,7 +405,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             )
 
         # Add edges from trigger/entrypoint to first nodes
-        if has_only_integration_trigger:
+        if has_only_integration_trigger and not is_explicit_entrypoint:
             # Use trigger ID directly as sourceNodeId (no ENTRYPOINT node)
             trigger_class = integration_trigger_edges[0].trigger_class
             trigger_id = trigger_class.__id__
