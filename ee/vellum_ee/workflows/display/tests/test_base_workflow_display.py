@@ -1,6 +1,7 @@
 from uuid import UUID
 from typing import Any, Dict, List, cast
 
+from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes import BaseNode, InlineSubworkflowNode
 from vellum.workflows.outputs.base import BaseOutputs
@@ -534,8 +535,8 @@ def test_base_workflow_display__graph_with_trigger_and_regular_node():
     class SlackMessageTrigger(IntegrationTrigger):
         message: str
 
-        class Config:
-            provider = "COMPOSIO"
+        class Config(IntegrationTrigger.Config):
+            provider = VellumIntegrationProviderType.COMPOSIO
             integration_name = "SLACK"
             slug = "slack_message"
 
@@ -548,7 +549,7 @@ def test_base_workflow_display__graph_with_trigger_and_regular_node():
             final: str
 
     class TestWorkflow(BaseWorkflow):
-        graph = {  # type: ignore[assignment]
+        graph = {
             TopNode,
             SlackMessageTrigger >> BottomNode,
         }
@@ -580,17 +581,26 @@ def test_base_workflow_display__graph_with_trigger_and_regular_node():
     assert isinstance(entrypoint_node, dict)
     entrypoint_node_id = entrypoint_node["id"]
 
-    top_node = None
-    bottom_node = None
-    for node in nodes:
-        if isinstance(node, dict):
-            definition = node.get("definition")
-            if isinstance(definition, dict):
-                name = definition.get("name")
-                if name == "TopNode":
-                    top_node = node
-                elif name == "BottomNode":
-                    bottom_node = node
+    top_node = next(
+        (
+            node
+            for node in nodes
+            if isinstance(node, dict)
+            and isinstance(node.get("definition"), dict)
+            and cast(Dict[str, Any], node.get("definition")).get("name") == "TopNode"
+        ),
+        None,
+    )
+    bottom_node = next(
+        (
+            node
+            for node in nodes
+            if isinstance(node, dict)
+            and isinstance(node.get("definition"), dict)
+            and cast(Dict[str, Any], node.get("definition")).get("name") == "BottomNode"
+        ),
+        None,
+    )
 
     assert top_node is not None, "TopNode not found in serialized nodes"
     assert bottom_node is not None, "BottomNode not found in serialized nodes"
