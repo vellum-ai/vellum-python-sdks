@@ -2,6 +2,7 @@ from uuid import UUID
 from typing import Any, Dict, List, cast
 
 from vellum.workflows.constants import VellumIntegrationProviderType
+from vellum.workflows.graph import Graph
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes import BaseNode, InlineSubworkflowNode
 from vellum.workflows.outputs.base import BaseOutputs
@@ -550,7 +551,7 @@ def test_base_workflow_display__graph_with_trigger_and_regular_node():
 
     class TestWorkflow(BaseWorkflow):
         graph = {
-            TopNode,
+            Graph.from_node(TopNode),
             SlackMessageTrigger >> BottomNode,
         }
 
