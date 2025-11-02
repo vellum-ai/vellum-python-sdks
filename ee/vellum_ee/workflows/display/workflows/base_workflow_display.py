@@ -15,6 +15,7 @@ from vellum.workflows import BaseWorkflow
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.edges import Edge
+from vellum.workflows.edges.trigger_edge import TriggerEdge
 from vellum.workflows.events.workflow import NodeEventDisplayContext, WorkflowEventDisplayContext
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.inputs.dataset_row import DatasetRow
@@ -181,7 +182,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         edges: JsonArray = []
 
         # Get all trigger edges from the workflow's subgraphs to check if trigger exists
-        trigger_edges = []
+        trigger_edges: List[TriggerEdge] = []
         for subgraph in self._workflow.get_subgraphs():
             trigger_edges.extend(list(subgraph.trigger_edges))
 
