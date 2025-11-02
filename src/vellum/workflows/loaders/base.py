@@ -23,13 +23,12 @@ class BaseWorkflowFinder(importlib.abc.MetaPathFinder, ABC):
         pass
 
     @abstractmethod
-    def virtual_open(self, file_path: str, mode: str = "r") -> Optional[StringIO]:
+    def virtual_open(self, file_path: str) -> Optional[StringIO]:
         """
         Open a virtual file if it exists in this finder's namespace.
 
         Args:
             file_path: The absolute file path to open
-            mode: The file mode (only "r" is supported)
 
         Returns:
             A StringIO object containing the file contents, or None if the file is not found

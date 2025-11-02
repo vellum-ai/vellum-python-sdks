@@ -140,13 +140,12 @@ from .display import *
 
         return file_path, code
 
-    def virtual_open(self, file_path: str, mode: str = "r") -> Optional[StringIO]:
+    def virtual_open(self, file_path: str) -> Optional[StringIO]:
         """
         Open a virtual file if it exists in this loader's namespace.
 
         Args:
             file_path: The absolute file path to open
-            mode: The file mode (only "r" is supported)
 
         Returns:
             A StringIO object containing the file contents, or None if the file is not found
@@ -171,18 +170,17 @@ class VirtualFileFinder(BaseWorkflowFinder):
             return error_message.replace(self.namespace, self.source_module)
         return error_message
 
-    def virtual_open(self, file_path: str, mode: str = "r") -> Optional[StringIO]:
+    def virtual_open(self, file_path: str) -> Optional[StringIO]:
         """
         Open a virtual file by delegating to the loader.
 
         Args:
             file_path: The absolute file path to open
-            mode: The file mode (only "r" is supported)
 
         Returns:
             A StringIO object containing the file contents, or None if the file is not found
         """
-        return self.loader.virtual_open(file_path, mode)
+        return self.loader.virtual_open(file_path)
 
     def find_spec(self, fullname: str, path, target=None):
         module_info = self.loader._resolve_module(fullname)

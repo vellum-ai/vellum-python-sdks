@@ -70,7 +70,7 @@ def virtual_open(file_path: str, mode: str = "r"):
     """
     for finder in sys.meta_path:
         if isinstance(finder, BaseWorkflowFinder):
-            result = finder.virtual_open(file_path, mode)
+            result = finder.virtual_open(file_path)
             if result is not None:
                 return result
 
