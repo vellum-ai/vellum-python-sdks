@@ -1,7 +1,5 @@
-import { GENERATED_TRIGGERS_MODULE_NAME } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { WorkflowTrigger } from "src/types/vellum";
-import { createPythonClassName } from "src/utils/casing";
 
 export declare namespace BaseTriggerContext {
   interface Args<T extends WorkflowTrigger> {
