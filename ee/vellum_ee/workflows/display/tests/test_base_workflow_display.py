@@ -1,12 +1,15 @@
 from uuid import UUID
 from typing import Any, Dict, List, cast
 
+from vellum.workflows.constants import VellumIntegrationProviderType
+from vellum.workflows.graph import Graph
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes import BaseNode, InlineSubworkflowNode
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.ports.port import Port
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.state import BaseState
+from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.base import EdgeDisplay, WorkflowInputsDisplay
 from vellum_ee.workflows.display.editor.types import NodeDisplayData, NodeDisplayPosition
@@ -522,3 +525,99 @@ def test_serialize_workflow_with_node_icon_and_color():
     assert test_node is not None, "TestNode not found in serialized nodes"
     assert test_node["display_data"]["icon"] == "vellum:icon:cog"
     assert test_node["display_data"]["color"] == "navy"
+
+
+def test_base_workflow_display__graph_with_trigger_and_regular_node():
+    """
+    Tests that a workflow with both a trigger edge and a regular node edge serializes correctly.
+    """
+
+    # GIVEN a workflow with a trigger and regular nodes
+    class SlackMessageTrigger(IntegrationTrigger):
+        message: str
+
+        class Config(IntegrationTrigger.Config):
+            provider = VellumIntegrationProviderType.COMPOSIO
+            integration_name = "SLACK"
+            slug = "slack_message"
+
+    class TopNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result: str
+
+    class BottomNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            final: str
+
+    class TestWorkflow(BaseWorkflow):
+        graph = {
+            Graph.from_node(TopNode),
+            SlackMessageTrigger >> BottomNode,
+        }
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    exec_config = workflow_display.serialize()
+
+    # THEN the serialized workflow should have the expected structure
+    workflow_raw_data = exec_config["workflow_raw_data"]
+    assert isinstance(workflow_raw_data, dict)
+
+    nodes = workflow_raw_data["nodes"]
+    edges = workflow_raw_data["edges"]
+    triggers = exec_config["triggers"]
+
+    assert isinstance(nodes, list)
+    assert isinstance(edges, list)
+    assert isinstance(triggers, list)
+
+    assert len(triggers) == 1
+    trigger = triggers[0]
+    assert isinstance(trigger, dict)
+    trigger_id = trigger["id"]
+
+    entrypoint_nodes = [n for n in nodes if isinstance(n, dict) and n.get("type") == "ENTRYPOINT"]
+    assert len(entrypoint_nodes) == 1
+    entrypoint_node = entrypoint_nodes[0]
+    assert isinstance(entrypoint_node, dict)
+    entrypoint_node_id = entrypoint_node["id"]
+
+    top_node = next(
+        (
+            node
+            for node in nodes
+            if isinstance(node, dict)
+            and isinstance(node.get("definition"), dict)
+            and cast(Dict[str, Any], node.get("definition")).get("name") == "TopNode"
+        ),
+        None,
+    )
+    bottom_node = next(
+        (
+            node
+            for node in nodes
+            if isinstance(node, dict)
+            and isinstance(node.get("definition"), dict)
+            and cast(Dict[str, Any], node.get("definition")).get("name") == "BottomNode"
+        ),
+        None,
+    )
+
+    assert top_node is not None, "TopNode not found in serialized nodes"
+    assert bottom_node is not None, "BottomNode not found in serialized nodes"
+    top_node_id = top_node["id"]
+    bottom_node_id = bottom_node["id"]
+
+    entrypoint_edges = [e for e in edges if isinstance(e, dict) and e.get("source_node_id") == entrypoint_node_id]
+    assert len(entrypoint_edges) == 1, "Should have exactly one edge from the entrypoint node"
+
+    entrypoint_edge = entrypoint_edges[0]
+    assert isinstance(entrypoint_edge, dict)
+    assert entrypoint_edge["target_node_id"] == top_node_id, "Entrypoint edge should connect to TopNode"
+
+    trigger_edges = [e for e in edges if isinstance(e, dict) and e.get("source_node_id") == trigger_id]
+    assert len(trigger_edges) == 1, "Should have exactly one edge from the trigger"
+
+    trigger_edge = trigger_edges[0]
+    assert isinstance(trigger_edge, dict)
+    assert trigger_edge["target_node_id"] == bottom_node_id, "Trigger edge should connect to BottomNode"

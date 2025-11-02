@@ -7,7 +7,7 @@ import json
 import logging
 import os
 from uuid import UUID
-from typing import Any, Dict, ForwardRef, Generic, List, Optional, Tuple, Type, TypeVar, Union, cast, get_args
+from typing import Any, Dict, ForwardRef, Generic, List, Optional, Set, Tuple, Type, TypeVar, Union, cast, get_args
 
 from vellum.client import Vellum as VellumClient
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
@@ -15,6 +15,7 @@ from vellum.workflows import BaseWorkflow
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.edges import Edge
+from vellum.workflows.edges.trigger_edge import TriggerEdge
 from vellum.workflows.events.workflow import NodeEventDisplayContext, WorkflowEventDisplayContext
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.inputs.dataset_row import DatasetRow
@@ -181,7 +182,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         edges: JsonArray = []
 
         # Get all trigger edges from the workflow's subgraphs to check if trigger exists
-        trigger_edges = []
+        trigger_edges: List[TriggerEdge] = []
         for subgraph in self._workflow.get_subgraphs():
             trigger_edges.extend(list(subgraph.trigger_edges))
 
@@ -189,7 +190,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         manual_trigger_edges = [edge for edge in trigger_edges if issubclass(edge.trigger_class, ManualTrigger)]
         non_manual_trigger_edges = [edge for edge in trigger_edges if not issubclass(edge.trigger_class, ManualTrigger)]
         has_manual_trigger = len(manual_trigger_edges) > 0
-        has_non_manual_triggers = len(non_manual_trigger_edges) > 0
 
         entrypoint_node_id: Optional[UUID] = None
         entrypoint_node_source_handle_id: Optional[UUID] = None
@@ -377,41 +377,39 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 ValueError("Unable to serialize terminal nodes that are not referenced by workflow outputs.")
             )
 
+        triggered_entrypoints: Set[Type[BaseNode]] = set()
+        for trigger_edge in non_manual_trigger_edges:
+            triggered_entrypoints.add(trigger_edge.to_node)
+
         # Add edges from trigger/entrypoint to first nodes
-        if has_non_manual_triggers:
-            for trigger_edge in non_manual_trigger_edges:
+        for target_node, entrypoint_display in self.display_context.entrypoint_displays.items():
+            unadorned_target_node = get_unadorned_node(target_node)
+            # Skip edges to invalid nodes
+            if self._is_node_invalid(unadorned_target_node):
+                continue
+
+            target_node_display = self.display_context.node_displays[unadorned_target_node]
+
+            # Determine if this entrypoint should get an edge from a trigger or from the entrypoint node
+            if unadorned_target_node in triggered_entrypoints:
+                trigger_edge = next(edge for edge in non_manual_trigger_edges if edge.to_node == unadorned_target_node)
                 trigger_class = trigger_edge.trigger_class
                 trigger_id = trigger_class.__id__
                 trigger_source_handle_id = trigger_id
 
-                for target_node, entrypoint_display in self.display_context.entrypoint_displays.items():
-                    unadorned_target_node = get_unadorned_node(target_node)
-                    # Skip edges to invalid nodes
-                    if self._is_node_invalid(unadorned_target_node):
-                        continue
-
-                    target_node_display = self.display_context.node_displays[unadorned_target_node]
-                    trigger_edge_dict: Dict[str, Json] = {
-                        "id": str(entrypoint_display.edge_display.id),
-                        "source_node_id": str(trigger_id),
-                        "source_handle_id": str(trigger_source_handle_id),
-                        "target_node_id": str(target_node_display.node_id),
-                        "target_handle_id": str(target_node_display.get_trigger_id()),
-                        "type": "DEFAULT",
-                    }
-                    display_data = self._serialize_edge_display_data(entrypoint_display.edge_display)
-                    if display_data is not None:
-                        trigger_edge_dict["display_data"] = display_data
-                    edges.append(trigger_edge_dict)
-        elif entrypoint_node_id is not None:
-            # ManualTrigger or no trigger: edges from ENTRYPOINT node
-            for target_node, entrypoint_display in self.display_context.entrypoint_displays.items():
-                unadorned_target_node = get_unadorned_node(target_node)
-                # Skip edges to invalid nodes
-                if self._is_node_invalid(unadorned_target_node):
-                    continue
-
-                target_node_display = self.display_context.node_displays[unadorned_target_node]
+                trigger_edge_dict: Dict[str, Json] = {
+                    "id": str(entrypoint_display.edge_display.id),
+                    "source_node_id": str(trigger_id),
+                    "source_handle_id": str(trigger_source_handle_id),
+                    "target_node_id": str(target_node_display.node_id),
+                    "target_handle_id": str(target_node_display.get_trigger_id()),
+                    "type": "DEFAULT",
+                }
+                display_data = self._serialize_edge_display_data(entrypoint_display.edge_display)
+                if display_data is not None:
+                    trigger_edge_dict["display_data"] = display_data
+                edges.append(trigger_edge_dict)
+            elif entrypoint_node_id is not None:
                 entrypoint_edge_dict: Dict[str, Json] = {
                     "id": str(entrypoint_display.edge_display.id),
                     "source_node_id": str(entrypoint_node_id),
