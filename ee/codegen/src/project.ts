@@ -17,7 +17,11 @@ import {
   GENERATED_DISPLAY_MODULE_NAME,
   GENERATED_NODES_MODULE_NAME,
 } from "src/constants";
-import { createNodeContext, WorkflowContext } from "src/context";
+import {
+  createNodeContext,
+  createTriggerContext,
+  WorkflowContext,
+} from "src/context";
 import { InputVariableContext } from "src/context/input-variable-context";
 import { ApiNodeContext } from "src/context/node-context/api-node";
 import { BaseNodeContext } from "src/context/node-context/base";
@@ -238,6 +242,8 @@ ${errors.slice(0, 3).map((err) => {
       // sandbox.py
       ...(this.sandboxInputs ? [this.generateSandboxFile().persist()] : []),
       this.writeAdditionalFiles(),
+      // metadata.json
+      this.generateMetadataFile(),
     ]);
 
     // Code merge logic - copied from codegen-service
@@ -621,6 +627,16 @@ ${errors.slice(0, 3).map((err) => {
         }
       })
     );
+
+    // Create trigger contexts
+    if (this.workflowContext.triggers) {
+      this.workflowContext.triggers.forEach((trigger) => {
+        createTriggerContext({
+          workflowContext: this.workflowContext,
+          triggerData: trigger,
+        });
+      });
+    }
 
     const inputs = codegen.inputs({
       workflowContext: this.workflowContext,
@@ -1046,6 +1062,24 @@ ${errors.slice(0, 3).map((err) => {
     );
   }
 
+  private async generateMetadataFile(): Promise<void> {
+    const metadata = {
+      trigger_path_to_id_mapping: this.getTriggerPathToIdMapping(),
+      node_id_to_file_mapping: this.getNodeIdToFileMapping(),
+    };
+
+    const absolutePathToModuleDirectory = join(
+      this.workflowContext.absolutePathToOutputDirectory,
+      ...this.getModulePath()
+    );
+
+    const metadataFilePath = join(
+      absolutePathToModuleDirectory,
+      "metadata.json"
+    );
+    await writeFile(metadataFilePath, JSON.stringify(metadata, null, 2));
+  }
+
   public getPythonCodeMergeableNodeFiles(): Set<string> {
     return this.workflowContext.getPythonCodeMergeableNodeFiles();
   }
@@ -1061,6 +1095,17 @@ ${errors.slice(0, 3).map((err) => {
           },
         ]
       )
+    );
+  }
+
+  public getTriggerPathToIdMapping(): Record<string, string> {
+    return Object.fromEntries(
+      Array.from(
+        this.workflowContext.globalTriggerContextsByTriggerId.entries()
+      ).map(([triggerId, triggerContext]) => [
+        triggerContext.triggerModulePath.join("."),
+        triggerId,
+      ])
     );
   }
 }

@@ -2301,7 +2301,6 @@ export declare namespace ManualTriggerSerializer {
 
 const ScheduleTriggerSerializer = objectSchema({
   id: stringSchema(),
-  type: stringLiteralSchema("SCHEDULED"),
   attributes: listSchema(NodeAttributeSerializer),
   definition: CodeResourceDefinitionSerializer.optional(),
 });

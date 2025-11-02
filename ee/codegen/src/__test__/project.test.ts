@@ -314,7 +314,7 @@ describe("WorkflowProjectGenerator", () => {
   });
 
   describe("generateCode", () => {
-    const excludeFilesAtPaths: RegExp[] = [/\.pyc$/];
+    const excludeFilesAtPaths: RegExp[] = [/\.pyc$/, /metadata\.json$/];
     const ignoreContentsOfFilesAtPaths: RegExp[] = [];
     const fixtureMocks = {
       simple_guard_rail_node: SpyMocks.createMetricDefinitionMock(),
@@ -377,7 +377,8 @@ describe("WorkflowProjectGenerator", () => {
         await project.generateCode();
 
         const generatedFiles = getAllFilesInDir(
-          join(tempDir, ...project.getModulePath())
+          join(tempDir, ...project.getModulePath()),
+          excludeFilesAtPaths
         );
         const expectedFiles = getAllFilesInDir(codeDir, excludeFilesAtPaths);
 
@@ -422,7 +423,7 @@ describe("WorkflowProjectGenerator", () => {
     );
   });
   describe("generateCodeNodeDirectoryOnly", () => {
-    const excludeFilesAtPaths: RegExp[] = [/\.pyc$/];
+    const excludeFilesAtPaths: RegExp[] = [/\.pyc$/, /metadata\.json$/];
     const ignoreContentsOfFilesAtPaths: RegExp[] = [];
 
     it.each(
@@ -451,7 +452,8 @@ describe("WorkflowProjectGenerator", () => {
         await project.generateCode();
 
         const generatedFiles = getAllFilesInDir(
-          join(tempDir, ...project.getModulePath())
+          join(tempDir, ...project.getModulePath()),
+          excludeFilesAtPaths
         );
         const expectedFiles = getAllFilesInDir(codeDir, excludeFilesAtPaths);
 
@@ -509,6 +511,195 @@ describe("WorkflowProjectGenerator", () => {
         }
       }
     );
+
+    it("should generate metadata.json with node id to file mapping", async () => {
+      const displayData = {
+        workflow_raw_data: {
+          nodes: [
+            {
+              id: "entry",
+              type: "ENTRYPOINT",
+              data: {
+                label: "Entrypoint",
+                source_handle_id: "entry_source",
+                target_handle_id: "entry_target",
+              },
+              inputs: [],
+            },
+            {
+              id: "templating-node-id",
+              type: "TEMPLATING",
+              data: {
+                label: "Templating Node",
+                template_node_input_id: "template",
+                output_id: "output",
+                output_type: "STRING",
+                source_handle_id: "template_source",
+                target_handle_id: "template_target",
+              },
+              inputs: [
+                {
+                  id: "template",
+                  key: "template",
+                  value: {
+                    combinator: "OR",
+                    rules: [
+                      {
+                        type: "CONSTANT_VALUE",
+                        data: {
+                          type: "STRING",
+                          value: "Hello, World!",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+              definition: {
+                name: "TemplatingNode",
+                module: ["code", "nodes", "templating_node"],
+              },
+            },
+          ],
+          edges: [
+            {
+              source_node_id: "entry",
+              source_handle_id: "entry_source",
+              target_node_id: "templating-node-id",
+              target_handle_id: "template_target",
+              type: "DEFAULT",
+              id: "edge_1",
+            },
+          ],
+        },
+        input_variables: [],
+        state_variables: [],
+        output_variables: [],
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+      });
+
+      await project.generateCode();
+
+      const metadataPath = join(tempDir, "code", "metadata.json");
+      expect(fs.existsSync(metadataPath)).toBe(true);
+
+      const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
+      expect(metadata.node_id_to_file_mapping).toEqual({
+        "templating-node-id": {
+          name: "TemplatingNode",
+          module: ["code", "nodes", "templating_node"],
+        },
+      });
+    });
+
+    it("should generate metadata.json with trigger path to id mapping for scheduled trigger", async () => {
+      const displayData = {
+        workflow_raw_data: {
+          nodes: [
+            {
+              id: "entry",
+              type: "ENTRYPOINT",
+              data: {
+                label: "Entrypoint",
+                source_handle_id: "entry_source",
+                target_handle_id: "entry_target",
+              },
+              inputs: [],
+            },
+            {
+              id: "terminal-node",
+              type: "TERMINAL",
+              data: {
+                label: "Final Output",
+                name: "final-output",
+                target_handle_id: "terminal_target",
+                output_id: "terminal_output_id",
+                output_type: "STRING",
+                node_input_id: "terminal_input",
+              },
+              inputs: [
+                {
+                  id: "terminal_input",
+                  key: "node_input",
+                  value: {
+                    rules: [
+                      {
+                        type: "CONSTANT_VALUE",
+                        data: {
+                          type: "STRING",
+                          value: "Hello, World!",
+                        },
+                      },
+                    ],
+                    combinator: "OR",
+                  },
+                },
+              ],
+              trigger: {
+                id: "terminal_target",
+                merge_behavior: "AWAIT_ANY",
+              },
+              outputs: [
+                {
+                  id: "terminal_output_id",
+                  name: "value",
+                  type: "STRING",
+                },
+              ],
+            },
+          ],
+          edges: [
+            {
+              source_node_id: "entry",
+              source_handle_id: "entry_source",
+              target_node_id: "terminal-node",
+              target_handle_id: "terminal_target",
+              type: "DEFAULT",
+              id: "edge_1",
+            },
+          ],
+        },
+        input_variables: [],
+        state_variables: [],
+        output_variables: [],
+        triggers: [
+          {
+            id: "trigger-1",
+            type: "SCHEDULED",
+            attributes: [
+              {
+                id: "attribute-id-1",
+                name: "attribute-1",
+                value: null,
+              },
+            ],
+          },
+        ],
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+      });
+
+      await project.generateCode();
+
+      const metadataPath = join(tempDir, "code", "metadata.json");
+      expect(fs.existsSync(metadataPath)).toBe(true);
+
+      const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
+      expect(metadata.trigger_path_to_id_mapping).toEqual({
+        "code.triggers.scheduled": "trigger-1",
+      });
+    });
   });
   describe("failure cases", () => {
     let displayData = {
