@@ -9,7 +9,6 @@ from vellum.workflows.state.base import BaseState
 from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum_ee.workflows.display.base import EdgeDisplay, EntrypointDisplay, WorkflowMetaDisplay
 from vellum_ee.workflows.display.editor.types import NodeDisplayData
-from vellum_ee.workflows.display.utils.registry import register_workflow_display_class
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
@@ -53,8 +52,6 @@ def test_integration_trigger_with_explicit_entrypoint_node_id():
                 edge_display=EdgeDisplay(id=uuid4()),
             )
         }
-
-    register_workflow_display_class(TestWorkflow, TestWorkflowDisplay)
 
     result: dict = get_workflow_display(workflow_class=TestWorkflow).serialize()
 

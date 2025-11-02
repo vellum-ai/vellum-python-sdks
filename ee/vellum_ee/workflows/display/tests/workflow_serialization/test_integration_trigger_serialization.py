@@ -182,7 +182,7 @@ def test_trigger_module_paths_are_canonical():
 
 
 def test_integration_trigger_no_entrypoint_node():
-    """IntegrationTrigger-only workflows use trigger ID in edges."""
+    """IntegrationTrigger workflows now create ENTRYPOINT nodes and route edges through them."""
 
     class SlackMessageTrigger(IntegrationTrigger):
         message: str
@@ -212,33 +212,37 @@ def test_integration_trigger_no_entrypoint_node():
     assert "source_handle_id" in trigger, "Trigger should have source_handle_id"
     assert trigger["source_handle_id"] == trigger_id, "source_handle_id should match trigger_id"
 
-    # Verify no ENTRYPOINT node exists
+    # Verify ENTRYPOINT node exists
     workflow_raw_data = result["workflow_raw_data"]
     assert isinstance(workflow_raw_data, dict)
     nodes = workflow_raw_data["nodes"]
     assert isinstance(nodes, list)
     entrypoint_nodes = [n for n in nodes if isinstance(n, dict) and n.get("type") == "ENTRYPOINT"]
-    assert len(entrypoint_nodes) == 0, "IntegrationTrigger-only workflows should not have ENTRYPOINT nodes"
+    assert len(entrypoint_nodes) == 1, "IntegrationTrigger workflows should have an ENTRYPOINT node"
 
-    # Verify edges use trigger ID as sourceNodeId
+    entrypoint_node = entrypoint_nodes[0]
+    assert isinstance(entrypoint_node, dict)
+    entrypoint_node_id = entrypoint_node["id"]
+
+    # Verify edges use ENTRYPOINT node ID as sourceNodeId (not trigger ID)
     edges = workflow_raw_data["edges"]
     assert isinstance(edges, list)
-    trigger_edges = [e for e in edges if isinstance(e, dict) and e.get("source_node_id") == trigger_id]
-    assert len(trigger_edges) > 0, "Should have edges from trigger ID"
+    entrypoint_edges = [e for e in edges if isinstance(e, dict) and e.get("source_node_id") == entrypoint_node_id]
+    assert len(entrypoint_edges) > 0, "Should have edges from ENTRYPOINT node"
 
-    # Verify the edge connects trigger to first node
-    # ProcessNode should be the only non-terminal node
-    process_nodes = [n for n in nodes if isinstance(n, dict) and n.get("type") != "TERMINAL"]
+    # Verify the edge connects ENTRYPOINT to first node
+    # ProcessNode should be the only non-terminal, non-entrypoint node
+    process_nodes = [n for n in nodes if isinstance(n, dict) and n.get("type") not in ("TERMINAL", "ENTRYPOINT")]
     assert len(process_nodes) > 0, "Should have at least one process node"
     process_node = process_nodes[0]
     assert isinstance(process_node, dict)
     process_node_id = process_node["id"]
 
-    trigger_to_process_edge = next(
-        (e for e in trigger_edges if isinstance(e, dict) and e.get("target_node_id") == process_node_id),
+    entrypoint_to_process_edge = next(
+        (e for e in entrypoint_edges if isinstance(e, dict) and e.get("target_node_id") == process_node_id),
         None,
     )
-    assert trigger_to_process_edge is not None, "Should have edge from trigger to ProcessNode"
-    assert isinstance(trigger_to_process_edge, dict)
-    assert trigger_to_process_edge["source_node_id"] == trigger_id
-    assert trigger_to_process_edge["target_node_id"] == process_node_id
+    assert entrypoint_to_process_edge is not None, "Should have edge from ENTRYPOINT to ProcessNode"
+    assert isinstance(entrypoint_to_process_edge, dict)
+    assert entrypoint_to_process_edge["source_node_id"] == entrypoint_node_id
+    assert entrypoint_to_process_edge["target_node_id"] == process_node_id
