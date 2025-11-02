@@ -227,7 +227,7 @@ def test_integration_trigger_no_entrypoint_node():
     edges = workflow_raw_data["edges"]
     assert isinstance(edges, list)
     entrypoint_edges = [e for e in edges if isinstance(e, dict) and e.get("source_node_id") == entrypoint_node_id]
-    assert len(entrypoint_edges) == 0, "IntegrationTrigger workflows should have 0 edges from ENTRYPOINT node"
+    assert len(entrypoint_edges) == 0
 
     # Verify edges use trigger ID as sourceNodeId (not ENTRYPOINT)
     trigger_edges = [e for e in edges if isinstance(e, dict) and e.get("source_node_id") == trigger_id]
