@@ -81,7 +81,7 @@ from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.state.store import Store
 from vellum.workflows.triggers.base import BaseTrigger
 from vellum.workflows.types import CancelSignal
-from vellum.workflows.types.generics import InputsType, StateType
+from vellum.workflows.types.generics import InputsType, StateType, is_node_class
 from vellum.workflows.types.utils import get_original_base
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.workflows.event_filters import workflow_event_filter
@@ -127,9 +127,9 @@ class _BaseWorkflowMeta(type):
                 for item in graph_item:
                     if isinstance(item, Graph):
                         nodes.update(node for node in item.nodes)
-                    elif inspect.isclass(item) and issubclass(item, BaseNode):
+                    elif is_node_class(item):
                         nodes.add(item)
-            elif inspect.isclass(graph_item) and issubclass(graph_item, BaseNode):
+            elif is_node_class(graph_item):
                 nodes.add(graph_item)
             else:
                 raise TypeError(f"Unexpected graph type: {graph_item.__class__}")
@@ -166,7 +166,7 @@ class _BaseWorkflowMeta(type):
                             else:
                                 non_overlapping_nodes = graph_nodes - overlapping_nodes
                                 filtered_nodes.update(non_overlapping_nodes)
-                        elif isinstance(subitem, type) and issubclass(subitem, BaseNode):
+                        elif is_node_class(subitem):
                             if subitem not in overlapping_nodes:
                                 filtered_nodes.add(subitem)
                         else:
@@ -178,7 +178,7 @@ class _BaseWorkflowMeta(type):
                     if filtered_graphs_in_set:
                         filtered_graphs.add(filtered_graphs_in_set)
 
-                elif isinstance(item, type) and issubclass(item, BaseNode):
+                elif is_node_class(item):
                     if item not in overlapping_nodes:
                         filtered_graphs.add(item)
                 else:
@@ -288,12 +288,12 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             for item in graph:
                 if isinstance(item, Graph):
                     graphs.append(item)
-                elif issubclass(item, BaseNode):
+                elif is_node_class(item):
                     graphs.append(Graph.from_node(item))
                 else:
                     raise ValueError(f"Unexpected graph type: {type(item)}")
             return graphs
-        if issubclass(graph, BaseNode):
+        if is_node_class(graph):
             return [Graph.from_node(graph)]
         raise ValueError(f"Unexpected graph type: {type(graph)}")
 
