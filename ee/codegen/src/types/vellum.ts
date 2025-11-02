@@ -816,6 +816,7 @@ export type IntegrationTriggerExecConfig = ComposioIntegrationTriggerExecConfig;
 export interface BaseTrigger {
   id: string;
   attributes: NodeAttribute[];
+  definition?: CodeResourceDefinition;
 }
 
 export interface ManualTrigger extends BaseTrigger {
