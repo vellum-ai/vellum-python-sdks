@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 import importlib.abc
+from io import StringIO
+from typing import Optional
 
 
 class BaseWorkflowFinder(importlib.abc.MetaPathFinder, ABC):
@@ -17,5 +19,18 @@ class BaseWorkflowFinder(importlib.abc.MetaPathFinder, ABC):
 
         Returns:
             The formatted error message
+        """
+        pass
+
+    @abstractmethod
+    def virtual_open(self, file_path: str) -> Optional[StringIO]:
+        """
+        Open a virtual file if it exists in this finder's namespace.
+
+        Args:
+            file_path: The absolute file path to open
+
+        Returns:
+            A StringIO object containing the file contents, or None if the file is not found
         """
         pass

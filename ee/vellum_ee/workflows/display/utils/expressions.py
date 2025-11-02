@@ -1,6 +1,5 @@
 from dataclasses import asdict, is_dataclass
 import inspect
-from io import StringIO
 import sys
 from uuid import UUID
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, cast
@@ -42,6 +41,7 @@ from vellum.workflows.expressions.not_between import NotBetweenExpression
 from vellum.workflows.expressions.not_in import NotInExpression
 from vellum.workflows.expressions.or_ import OrExpression
 from vellum.workflows.expressions.parse_json import ParseJsonExpression
+from vellum.workflows.loaders.base import BaseWorkflowFinder
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.nodes.utils import get_unadorned_node
@@ -59,7 +59,6 @@ from vellum.workflows.types.generics import is_workflow_class
 from vellum.workflows.utils.functions import compile_function_definition
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.utils.exceptions import InvalidInputReferenceError, UnsupportedSerializationException
-from vellum_ee.workflows.server.virtual_file_loader import VirtualFileLoader
 
 if TYPE_CHECKING:
     from vellum_ee.workflows.display.types import WorkflowDisplayContext
@@ -67,16 +66,13 @@ if TYPE_CHECKING:
 
 def virtual_open(file_path: str, mode: str = "r"):
     """
-    Open a file, checking VirtualFileFinder instances first before falling back to regular open().
+    Open a file, checking BaseWorkflowFinder instances first before falling back to regular open().
     """
     for finder in sys.meta_path:
-        if hasattr(finder, "loader") and isinstance(finder.loader, VirtualFileLoader):
-            namespace = finder.loader.namespace
-            if file_path.startswith(namespace + "/"):
-                relative_path = file_path[len(namespace) + 1 :]
-                content = finder.loader._get_code(relative_path)
-                if content is not None:
-                    return StringIO(content)
+        if isinstance(finder, BaseWorkflowFinder):
+            result = finder.virtual_open(file_path)
+            if result is not None:
+                return result
 
     return open(file_path, mode)
 
