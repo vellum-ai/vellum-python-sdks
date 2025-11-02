@@ -224,13 +224,16 @@ def test_integration_trigger_no_entrypoint_node():
     assert isinstance(entrypoint_node, dict)
     entrypoint_node_id = entrypoint_node["id"]
 
-    # Verify edges use ENTRYPOINT node ID as sourceNodeId (not trigger ID)
     edges = workflow_raw_data["edges"]
     assert isinstance(edges, list)
     entrypoint_edges = [e for e in edges if isinstance(e, dict) and e.get("source_node_id") == entrypoint_node_id]
-    assert len(entrypoint_edges) > 0, "Should have edges from ENTRYPOINT node"
+    assert len(entrypoint_edges) == 0, "IntegrationTrigger workflows should have 0 edges from ENTRYPOINT node"
 
-    # Verify the edge connects ENTRYPOINT to first node
+    # Verify edges use trigger ID as sourceNodeId (not ENTRYPOINT)
+    trigger_edges = [e for e in edges if isinstance(e, dict) and e.get("source_node_id") == trigger_id]
+    assert len(trigger_edges) > 0, "Should have edges from trigger ID"
+
+    # Verify the edge connects trigger to first node
     # ProcessNode should be the only non-terminal, non-entrypoint node
     process_nodes = [n for n in nodes if isinstance(n, dict) and n.get("type") not in ("TERMINAL", "ENTRYPOINT")]
     assert len(process_nodes) > 0, "Should have at least one process node"
@@ -238,11 +241,11 @@ def test_integration_trigger_no_entrypoint_node():
     assert isinstance(process_node, dict)
     process_node_id = process_node["id"]
 
-    entrypoint_to_process_edge = next(
-        (e for e in entrypoint_edges if isinstance(e, dict) and e.get("target_node_id") == process_node_id),
+    trigger_to_process_edge = next(
+        (e for e in trigger_edges if isinstance(e, dict) and e.get("target_node_id") == process_node_id),
         None,
     )
-    assert entrypoint_to_process_edge is not None, "Should have edge from ENTRYPOINT to ProcessNode"
-    assert isinstance(entrypoint_to_process_edge, dict)
-    assert entrypoint_to_process_edge["source_node_id"] == entrypoint_node_id
-    assert entrypoint_to_process_edge["target_node_id"] == process_node_id
+    assert trigger_to_process_edge is not None, "Should have edge from trigger to ProcessNode"
+    assert isinstance(trigger_to_process_edge, dict)
+    assert trigger_to_process_edge["source_node_id"] == trigger_id
+    assert trigger_to_process_edge["target_node_id"] == process_node_id
