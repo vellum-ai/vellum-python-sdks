@@ -120,8 +120,6 @@ export class WorkflowContext {
   private readonly nodeModuleNames: Set<string> = new Set();
 
   // Maps trigger IDs to trigger contexts
-  // Tracks local and global contexts in the case of nested workflows.
-  public readonly triggerContextsByTriggerId: TriggerContextsByTriggerId;
   public readonly globalTriggerContextsByTriggerId: TriggerContextsByTriggerId;
 
   // Track the custom workflow module name if it exists
@@ -230,7 +228,6 @@ export class WorkflowContext {
     this.nodeContextsByNodeId = new Map();
     this.globalNodeContextsByNodeId = globalNodeContextsByNodeId ?? new Map();
 
-    this.triggerContextsByTriggerId = new Map();
     this.globalTriggerContextsByTriggerId = new Map();
 
     this.portContextById = portContextByName ?? new Map();
@@ -561,7 +558,6 @@ export class WorkflowContext {
       return;
     }
 
-    this.triggerContextsByTriggerId.set(triggerId, triggerContext);
     this.globalTriggerContextsByTriggerId.set(triggerId, triggerContext);
   }
 

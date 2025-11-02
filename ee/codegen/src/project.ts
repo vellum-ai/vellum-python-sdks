@@ -242,6 +242,8 @@ ${errors.slice(0, 3).map((err) => {
       // sandbox.py
       ...(this.sandboxInputs ? [this.generateSandboxFile().persist()] : []),
       this.writeAdditionalFiles(),
+      // metadata.json
+      this.generateMetadataFile(),
     ]);
 
     // Code merge logic - copied from codegen-service
@@ -629,24 +631,10 @@ ${errors.slice(0, 3).map((err) => {
     // Create trigger contexts
     if (this.workflowContext.triggers) {
       this.workflowContext.triggers.forEach((trigger) => {
-        try {
-          createTriggerContext({
-            workflowContext: this.workflowContext,
-            triggerData: trigger,
-          });
-        } catch (error) {
-          if (error instanceof BaseCodegenError) {
-            this.workflowContext.addError(error);
-          } else {
-            console.error("Unexpected error creating trigger context", error);
-            this.workflowContext.addError(
-              new WorkflowGenerationError(
-                `Failed to create trigger context for trigger ${trigger.id}.`,
-                "WARNING"
-              )
-            );
-          }
-        }
+        createTriggerContext({
+          workflowContext: this.workflowContext,
+          triggerData: trigger,
+        });
       });
     }
 
@@ -1072,6 +1060,24 @@ ${errors.slice(0, 3).map((err) => {
         }
       )
     );
+  }
+
+  private async generateMetadataFile(): Promise<void> {
+    const metadata = {
+      trigger_path_to_id_mapping: this.getTriggerPathToIdMapping(),
+      node_id_to_file_mapping: this.getNodeIdToFileMapping(),
+    };
+
+    const absolutePathToModuleDirectory = join(
+      this.workflowContext.absolutePathToOutputDirectory,
+      ...this.getModulePath()
+    );
+
+    const metadataFilePath = join(
+      absolutePathToModuleDirectory,
+      "metadata.json"
+    );
+    await writeFile(metadataFilePath, JSON.stringify(metadata, null, 2));
   }
 
   public getPythonCodeMergeableNodeFiles(): Set<string> {
