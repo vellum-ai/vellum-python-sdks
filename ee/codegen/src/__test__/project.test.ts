@@ -377,7 +377,8 @@ describe("WorkflowProjectGenerator", () => {
         await project.generateCode();
 
         const generatedFiles = getAllFilesInDir(
-          join(tempDir, ...project.getModulePath())
+          join(tempDir, ...project.getModulePath()),
+          excludeFilesAtPaths
         );
         const expectedFiles = getAllFilesInDir(codeDir, excludeFilesAtPaths);
 
@@ -422,7 +423,7 @@ describe("WorkflowProjectGenerator", () => {
     );
   });
   describe("generateCodeNodeDirectoryOnly", () => {
-    const excludeFilesAtPaths: RegExp[] = [/\.pyc$/];
+    const excludeFilesAtPaths: RegExp[] = [/\.pyc$/, /metadata\.json$/];
     const ignoreContentsOfFilesAtPaths: RegExp[] = [];
 
     it.each(
@@ -451,7 +452,8 @@ describe("WorkflowProjectGenerator", () => {
         await project.generateCode();
 
         const generatedFiles = getAllFilesInDir(
-          join(tempDir, ...project.getModulePath())
+          join(tempDir, ...project.getModulePath()),
+          excludeFilesAtPaths
         );
         const expectedFiles = getAllFilesInDir(codeDir, excludeFilesAtPaths);
 
