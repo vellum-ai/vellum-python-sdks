@@ -56,22 +56,27 @@ def _find_workflow_root_with_metadata(trigger_module: str) -> Optional[str]:
 
 
 @lru_cache(maxsize=128)
-def _get_trigger_path_to_id_mapping(module_root: str) -> Dict[str, UUID]:
+def _get_trigger_path_to_id_mapping(module_path: str) -> Dict[str, UUID]:
     """
-    Read trigger path to ID mapping from metadata.json.
+    Read trigger path to ID mapping from metadata.json for a given module.
 
-    This function is cached to avoid repeated file reads. It looks for metadata.json
-    in the workflow module directory and extracts the trigger_path_to_id_mapping.
+    This function is cached to avoid repeated file reads. It searches up the module
+    hierarchy for metadata.json and extracts the trigger_path_to_id_mapping.
 
     Args:
-        module_root: The root module path (e.g., "workflows.my_workflow")
+        module_path: The module path to search from (e.g., "workflows.my_workflow.triggers.my_trigger")
 
     Returns:
         Dictionary mapping trigger module paths to their UUIDs
     """
     try:
+        # Find the workflow root that contains metadata.json
+        workflow_root = _find_workflow_root_with_metadata(module_path)
+        if not workflow_root:
+            return {}
+
         # Convert module path to file path
-        module_dir = module_root.replace(".", os.path.sep)
+        module_dir = workflow_root.replace(".", os.path.sep)
         metadata_path = os.path.join(module_dir, "metadata.json")
 
         # Check if metadata.json exists
@@ -101,14 +106,12 @@ class BaseTriggerMeta(ABCMeta):
 
         # Try to override with ID from metadata.json if available
         # This approach is similar to how BaseNodeDisplay automatically sets node IDs
-        workflow_root = _find_workflow_root_with_metadata(trigger_class.__module__)
-        if workflow_root:
-            trigger_path_to_id_mapping = _get_trigger_path_to_id_mapping(workflow_root)
-            trigger_path = f"{trigger_class.__module__}.{trigger_class.__qualname__}"
+        trigger_path_to_id_mapping = _get_trigger_path_to_id_mapping(trigger_class.__module__)
+        trigger_path = f"{trigger_class.__module__}.{trigger_class.__qualname__}"
 
-            if trigger_path in trigger_path_to_id_mapping:
-                # Override the default ID with the one from metadata.json
-                trigger_class.__id__ = trigger_path_to_id_mapping[trigger_path]
+        if trigger_path in trigger_path_to_id_mapping:
+            # Override the default ID with the one from metadata.json
+            trigger_class.__id__ = trigger_path_to_id_mapping[trigger_path]
 
         return trigger_class
 

@@ -12,6 +12,7 @@ from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.triggers.base import _get_trigger_path_to_id_mapping
 from vellum.workflows.triggers.schedule import ScheduleTrigger
+from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 
@@ -136,7 +137,10 @@ def test_scheduled_trigger_serialization_without_metadata_json():
     assert trigger["type"] == "SCHEDULED"
 
     # AND the id is the trigger class's default __id__ (hash-based)
-    expected_default_id = str(WeeklyScheduleTrigger.__id__)
+    expected_module_path = (
+        f"{__name__}.test_scheduled_trigger_serialization_without_metadata_json.<locals>.WeeklyScheduleTrigger"
+    )
+    expected_default_id = str(uuid4_from_hash(expected_module_path))
     assert trigger["id"] == expected_default_id
 
     # AND attributes are serialized

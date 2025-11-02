@@ -5,7 +5,7 @@ import sys
 from vellum.workflows.loaders.base import BaseWorkflowFinder
 
 
-def virtual_open(file_path: str, mode: str = "r"):
+def virtual_open(file_path: str):
     """
     Open a file, checking BaseWorkflowFinder instances first before falling back to regular open().
 
@@ -14,7 +14,6 @@ def virtual_open(file_path: str, mode: str = "r"):
 
     Args:
         file_path: Path to the file to open
-        mode: File open mode (default: "r")
 
     Returns:
         A file-like object (either StringIO or a regular file handle)
@@ -26,4 +25,4 @@ def virtual_open(file_path: str, mode: str = "r"):
             if result is not None:
                 return result
 
-    return open(file_path, mode)
+    return open(file_path)
