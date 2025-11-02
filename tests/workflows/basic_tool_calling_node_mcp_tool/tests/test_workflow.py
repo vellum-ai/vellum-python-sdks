@@ -246,6 +246,24 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, mock_uuid4_generat
             name="create_repository", arguments={"name": "new_test_repo", "autoInit": True}
         )
 
+        assert mock_mcp_client_class.call_count == 5
+
+        for call in mock_mcp_client_class.call_args_list:
+            assert call.args == (
+                "https://api.githubcopilot.com/mcp/",
+                {"Authorization": "Bearer test_github_token_123"},
+            )
+
+        # AND verify that the MCP client methods were called correctly
+        assert mock_client_instance.initialize.call_count == 5
+        assert mock_client_instance.list_tools.call_count == 4
+        assert mock_client_instance.call_tool.call_count == 1
+
+        # AND call_tool was called with correct arguments
+        mock_client_instance.call_tool.assert_called_once_with(
+            name="create_repository", arguments={"name": "new_test_repo", "autoInit": True}
+        )
+
         second_call = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_args_list[1]
         assert second_call.kwargs == {
             "ml_model": "gpt-4o-mini",
