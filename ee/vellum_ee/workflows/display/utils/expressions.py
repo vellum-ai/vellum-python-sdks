@@ -1,6 +1,5 @@
 from dataclasses import asdict, is_dataclass
 import inspect
-from io import StringIO
 import sys
 from uuid import UUID
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, cast
@@ -70,14 +69,10 @@ def virtual_open(file_path: str, mode: str = "r"):
     Open a file, checking BaseWorkflowFinder instances first before falling back to regular open().
     """
     for finder in sys.meta_path:
-        if isinstance(finder, BaseWorkflowFinder) and hasattr(finder, "namespace") and hasattr(finder, "loader"):
-            namespace = finder.namespace
-            if file_path.startswith(namespace + "/"):
-                relative_path = file_path[len(namespace) + 1 :]
-                if hasattr(finder.loader, "_get_code"):
-                    content = finder.loader._get_code(relative_path)  # type: ignore[attr-defined]
-                    if content is not None:
-                        return StringIO(content)
+        if isinstance(finder, BaseWorkflowFinder):
+            result = finder.virtual_open(file_path, mode)
+            if result is not None:
+                return result
 
     return open(file_path, mode)
 
