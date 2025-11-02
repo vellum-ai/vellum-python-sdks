@@ -24,51 +24,38 @@ from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.client.types.vellum_variable import VellumVariable
 from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
-from vellum.workflows.constants import AuthorizationType
-from vellum.workflows.types.definition import MCPServer, MCPToolDefinition
 
 from tests.workflows.basic_tool_calling_node_mcp_tool.workflow import BasicToolCallingNodeMCPWorkflow, Inputs
 
 
 def test_run_workflow__happy_path(vellum_adhoc_prompt_client, mock_uuid4_generator, monkeypatch):
-    with mock.patch("vellum.workflows.utils.functions.MCPService") as mock_mcp_service, mock.patch(
-        "vellum.workflows.nodes.displayable.tool_calling_node.utils.MCPService"
-    ) as mock_mcp_service_tool_calling:
-        mock_service_instance = mock.Mock()
-        mock_service_instance.execute_tool.return_value = {
-            "content": [
+    with mock.patch("vellum.workflows.integrations.mcp_service.MCPHttpClient") as mock_mcp_client_class:
+        mock_client_instance = mock.Mock()
+        mock_client_instance.__aenter__ = mock.AsyncMock(return_value=mock_client_instance)
+        mock_client_instance.__aexit__ = mock.AsyncMock(return_value=None)
+        mock_client_instance.initialize = mock.AsyncMock(return_value=None)
+        mock_client_instance.list_tools = mock.AsyncMock(
+            return_value=[
                 {
-                    "type": "text",
-                    "text": '{"id":1028555060,"name":"new_test_repo"}',
+                    "name": "create_repository",
+                    "description": "Create a new GitHub repository in your account",
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {
+                            "name": {"type": "string", "description": "Repository name"},
+                            "autoInit": {"type": "boolean", "description": "Initialize with README"},
+                            "description": {"type": "string", "description": "Repository description"},
+                            "private": {"type": "boolean", "description": "Whether repo should be private"},
+                        },
+                        "required": ["name"],
+                    },
                 }
             ]
-        }
-        mock_service_instance.hydrate_tool_definitions.return_value = [
-            MCPToolDefinition(
-                name="create_repository",
-                server=MCPServer(
-                    name="github",
-                    url="https://api.githubcopilot.com/mcp/",
-                    authorization_type=AuthorizationType.BEARER_TOKEN,
-                    bearer_token_value="github_pat_some_token",
-                    api_key_header_key=None,
-                    api_key_header_value=None,
-                ),
-                description="Create a new GitHub repository in your account",
-                parameters={
-                    "properties": {
-                        "autoInit": {"description": "Initialize with README", "type": "boolean"},
-                        "description": {"description": "Repository description", "type": "string"},
-                        "name": {"description": "Repository name", "type": "string"},
-                        "private": {"description": "Whether repo should be private", "type": "boolean"},
-                    },
-                    "required": ["name"],
-                    "type": "object",
-                },
-            )
-        ]
-        mock_mcp_service.return_value = mock_service_instance
-        mock_mcp_service_tool_calling.return_value = mock_service_instance
+        )
+        mock_client_instance.call_tool = mock.AsyncMock(
+            return_value={"content": [{"type": "text", "text": '{"id":1028555060,"name":"new_test_repo"}'}]}
+        )
+        mock_mcp_client_class.return_value = mock_client_instance
 
         # Set the required environment variable
         monkeypatch.setenv("GITHUB_PERSONAL_ACCESS_TOKEN", "test_github_token_123")
@@ -254,31 +241,9 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, mock_uuid4_generat
             "request_options": mock.ANY,
         }
 
-        # AND the MCP service was called correctly for tool execution
-        mock_service_instance.execute_tool.assert_called_once_with(
-            tool_def=MCPToolDefinition(
-                name="create_repository",
-                server=MCPServer(
-                    name="github",
-                    url="https://api.githubcopilot.com/mcp/",
-                    authorization_type=AuthorizationType.BEARER_TOKEN,
-                    bearer_token_value="github_pat_some_token",
-                    api_key_header_key=None,
-                    api_key_header_value=None,
-                ),
-                description="Create a new GitHub repository in your account",
-                parameters={
-                    "properties": {
-                        "autoInit": {"description": "Initialize with README", "type": "boolean"},
-                        "description": {"description": "Repository description", "type": "string"},
-                        "name": {"description": "Repository name", "type": "string"},
-                        "private": {"description": "Whether repo should be private", "type": "boolean"},
-                    },
-                    "required": ["name"],
-                    "type": "object",
-                },
-            ),
-            arguments={"name": "new_test_repo", "autoInit": True},
+        # AND call_tool was called with correct arguments
+        mock_client_instance.call_tool.assert_called_once_with(
+            name="create_repository", arguments={"name": "new_test_repo", "autoInit": True}
         )
 
         second_call = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_args_list[1]
