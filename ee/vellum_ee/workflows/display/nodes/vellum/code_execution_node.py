@@ -25,7 +25,7 @@ def _read_file_from_path_with_virtual_support(node_filepath: str, script_filepat
     full_filepath = os.path.join(node_filepath_dir, normalized_script_filepath)
 
     try:
-        with virtual_open(full_filepath, "r") as file:
+        with virtual_open(full_filepath) as file:
             return file.read()
     except (FileNotFoundError, IsADirectoryError):
         return None

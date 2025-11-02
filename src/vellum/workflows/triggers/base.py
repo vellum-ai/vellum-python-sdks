@@ -1,10 +1,14 @@
 from abc import ABC, ABCMeta
+from functools import lru_cache
 import inspect
+import json
+import os
 from uuid import UUID
-from typing import TYPE_CHECKING, Any, ClassVar, Dict, Iterator, Tuple, Type, cast, get_origin
+from typing import TYPE_CHECKING, Any, ClassVar, Dict, Iterator, Optional, Tuple, Type, cast, get_origin
 
 from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.types.utils import get_class_attr_names, infer_types
+from vellum.workflows.utils.files import virtual_open
 from vellum.workflows.utils.uuids import uuid4_from_hash
 
 if TYPE_CHECKING:
@@ -27,12 +31,87 @@ def _is_annotated(cls: Type, name: str) -> bool:
     return False
 
 
+def _find_workflow_root_with_metadata(trigger_module: str) -> Optional[str]:
+    """
+    Find the workflow root module by searching for metadata.json up the module hierarchy.
+
+    Args:
+        trigger_module: The trigger's module path (e.g., "workflows.my_workflow.triggers.my_trigger")
+
+    Returns:
+        The workflow root module path if found, None otherwise
+    """
+    module_parts = trigger_module.split(".")
+
+    # Try searching up the module hierarchy for metadata.json
+    for i in range(len(module_parts), 0, -1):
+        potential_root = ".".join(module_parts[:i])
+        module_dir = potential_root.replace(".", os.path.sep)
+        metadata_path = os.path.join(module_dir, "metadata.json")
+
+        if os.path.exists(metadata_path):
+            return potential_root
+
+    return None
+
+
+@lru_cache(maxsize=128)
+def _get_trigger_path_to_id_mapping(module_path: str) -> Dict[str, UUID]:
+    """
+    Read trigger path to ID mapping from metadata.json for a given module.
+
+    This function is cached to avoid repeated file reads. It searches up the module
+    hierarchy for metadata.json and extracts the trigger_path_to_id_mapping.
+
+    Args:
+        module_path: The module path to search from (e.g., "workflows.my_workflow.triggers.my_trigger")
+
+    Returns:
+        Dictionary mapping trigger module paths to their UUIDs
+    """
+    try:
+        # Find the workflow root that contains metadata.json
+        workflow_root = _find_workflow_root_with_metadata(module_path)
+        if not workflow_root:
+            return {}
+
+        # Convert module path to file path
+        module_dir = workflow_root.replace(".", os.path.sep)
+        metadata_path = os.path.join(module_dir, "metadata.json")
+
+        # Check if metadata.json exists
+        if not os.path.exists(metadata_path):
+            return {}
+
+        # Use virtual_open to support both regular and virtual environments
+        with virtual_open(metadata_path) as f:
+            metadata_json = json.load(f)
+            trigger_mapping = metadata_json.get("trigger_path_to_id_mapping", {})
+
+            # Convert string IDs to UUIDs
+            return {path: UUID(id_str) for path, id_str in trigger_mapping.items()}
+
+    except (FileNotFoundError, json.JSONDecodeError, ValueError, KeyError):
+        # If there's any error reading or parsing the file, return empty dict
+        return {}
+
+
 class BaseTriggerMeta(ABCMeta):
     def __new__(mcs, name: str, bases: Tuple[Type, ...], dct: Dict[str, Any]) -> Any:
         cls = super().__new__(mcs, name, bases, dct)
         trigger_class = cast(Type["BaseTrigger"], cls)
 
+        # Set default ID based on module and class name
         trigger_class.__id__ = uuid4_from_hash(f"{trigger_class.__module__}.{trigger_class.__qualname__}")
+
+        # Try to override with ID from metadata.json if available
+        # This approach is similar to how BaseNodeDisplay automatically sets node IDs
+        trigger_path_to_id_mapping = _get_trigger_path_to_id_mapping(trigger_class.__module__)
+        trigger_path = f"{trigger_class.__module__}.{trigger_class.__qualname__}"
+
+        if trigger_path in trigger_path_to_id_mapping:
+            # Override the default ID with the one from metadata.json
+            trigger_class.__id__ = trigger_path_to_id_mapping[trigger_path]
 
         return trigger_class
 

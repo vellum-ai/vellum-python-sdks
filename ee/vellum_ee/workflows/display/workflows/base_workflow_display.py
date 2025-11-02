@@ -28,6 +28,7 @@ from vellum.workflows.references import OutputReference, WorkflowInputReference
 from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.triggers.manual import ManualTrigger
+from vellum.workflows.triggers.schedule import ScheduleTrigger
 from vellum.workflows.types.core import Json, JsonArray, JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.types.utils import get_original_base
@@ -529,13 +530,14 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                     f"{edge.trigger_class.__name__} in the same workflow."
                 )
 
-        # Get the trigger type from the mapping, or check if it's an IntegrationTrigger subclass
+        # Get the trigger type from the mapping, or check if it's a subclass
         trigger_type = trigger_type_mapping.get(trigger_class)
         if trigger_type is None:
-            # Check if it's an IntegrationTrigger subclass
-
+            # Check if it's an IntegrationTrigger or ScheduleTrigger subclass
             if issubclass(trigger_class, IntegrationTrigger):
                 trigger_type = WorkflowTriggerType.INTEGRATION
+            elif issubclass(trigger_class, ScheduleTrigger):
+                trigger_type = WorkflowTriggerType.SCHEDULED
             else:
                 raise ValueError(
                     f"Unknown trigger type: {trigger_class.__name__}. "
@@ -569,12 +571,12 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             "attributes": trigger_attributes,
         }
 
-        # For INTEGRATION triggers, include class name, module path, and source_handle_id
+        # For INTEGRATION and SCHEDULED triggers, include class name, module path, and source_handle_id
         # ManualTrigger doesn't need source_handle_id because edges come from ENTRYPOINT node
-        if trigger_type == WorkflowTriggerType.INTEGRATION:
+        if trigger_type in (WorkflowTriggerType.INTEGRATION, WorkflowTriggerType.SCHEDULED):
             trigger_data["class_name"] = trigger_class.__name__
             trigger_data["module_path"] = cast(Json, trigger_class.__module__.split("."))
-            trigger_data["source_handle_id"] = str(trigger_id)  # IntegrationTrigger acts as edge source
+            trigger_data["source_handle_id"] = str(trigger_id)  # Trigger acts as edge source
 
         return cast(JsonArray, [trigger_data])
 
