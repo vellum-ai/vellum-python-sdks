@@ -23,6 +23,8 @@ LogicalOperator = typing.Union[
         "between",
         "notBetween",
         "concat",
+        "+",
+        "-",
         "blank",
         "notBlank",
         "coalesce",
