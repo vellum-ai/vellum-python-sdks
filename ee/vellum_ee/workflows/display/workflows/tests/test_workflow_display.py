@@ -401,6 +401,8 @@ def test_serialize_workflow__nested_lazy_reference():
 
     # AND the outer node
     class OuterNode(BaseNode):
+        __legacy_id__ = True
+
         class Outputs(BaseNode.Outputs):
             bar: str
 
@@ -546,13 +548,13 @@ def test_serialize_workflow__array_reference():
             {
                 "type": "NODE_OUTPUT",
                 "node_id": "702a08b5-61e8-4a7a-a83d-77f49e39c5be",
-                "node_output_id": "419b6afa-fab5-493a-ba1e-4606f4641616",
+                "node_output_id": "37521463-db12-41a3-ad6f-753165880356",
             },
             {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "constant2"}},
             {
                 "type": "NODE_OUTPUT",
                 "node_id": "702a08b5-61e8-4a7a-a83d-77f49e39c5be",
-                "node_output_id": "d1cacc41-478d-49a3-a6b3-1ba2d51291e2",
+                "node_output_id": "b033bddf-987d-488d-8426-c5bb2dac7501",
             },
         ],
     }
@@ -575,7 +577,7 @@ def test_serialize_workflow__array_reference():
                     {
                         "type": "NODE_OUTPUT",
                         "node_id": "702a08b5-61e8-4a7a-a83d-77f49e39c5be",
-                        "node_output_id": "419b6afa-fab5-493a-ba1e-4606f4641616",
+                        "node_output_id": "37521463-db12-41a3-ad6f-753165880356",
                     },
                 ],
             },
@@ -586,7 +588,7 @@ def test_serialize_workflow__array_reference():
                     {
                         "type": "NODE_OUTPUT",
                         "node_id": "702a08b5-61e8-4a7a-a83d-77f49e39c5be",
-                        "node_output_id": "d1cacc41-478d-49a3-a6b3-1ba2d51291e2",
+                        "node_output_id": "b033bddf-987d-488d-8426-c5bb2dac7501",
                     },
                 ],
             },
@@ -716,7 +718,7 @@ def test_serialize_workflow__dict_reference():
                 "value": {
                     "type": "NODE_OUTPUT",
                     "node_id": "13b4f5c0-e6aa-4ef9-9a1a-79476bc32500",
-                    "node_output_id": "50a6bc11-afb3-49f2-879c-b28f5e16d974",
+                    "node_output_id": "0b63e869-e978-4ec9-9f47-0cc1c7e22076",
                 },
             },
             {
@@ -730,7 +732,7 @@ def test_serialize_workflow__dict_reference():
                 "value": {
                     "type": "NODE_OUTPUT",
                     "node_id": "13b4f5c0-e6aa-4ef9-9a1a-79476bc32500",
-                    "node_output_id": "50a6bc11-afb3-49f2-879c-b28f5e16d974",
+                    "node_output_id": "0b63e869-e978-4ec9-9f47-0cc1c7e22076",
                 },
             },
         ],
@@ -761,7 +763,7 @@ def test_serialize_workflow__dict_reference():
                             "value": {
                                 "type": "NODE_OUTPUT",
                                 "node_id": "13b4f5c0-e6aa-4ef9-9a1a-79476bc32500",
-                                "node_output_id": "50a6bc11-afb3-49f2-879c-b28f5e16d974",
+                                "node_output_id": "0b63e869-e978-4ec9-9f47-0cc1c7e22076",
                             },
                         },
                     ],
@@ -784,7 +786,7 @@ def test_serialize_workflow__dict_reference():
                             "value": {
                                 "type": "NODE_OUTPUT",
                                 "node_id": "13b4f5c0-e6aa-4ef9-9a1a-79476bc32500",
-                                "node_output_id": "50a6bc11-afb3-49f2-879c-b28f5e16d974",
+                                "node_output_id": "0b63e869-e978-4ec9-9f47-0cc1c7e22076",
                             },
                         },
                     ],

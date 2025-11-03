@@ -144,7 +144,7 @@ def test_base_node__default_id():
     my_id = MyNode.__id__
 
     # THEN it should equal the hash of `test_base_node__default_id.<locals>.MyNode`
-    assert my_id == UUID("8e71bea7-ce68-492f-9abe-477c788e6273")
+    assert my_id == UUID("3207dd3d-b26f-4476-969f-37697683f850")
 
 
 def test_base_node__node_resolution__descriptor_in_fern_pydantic():

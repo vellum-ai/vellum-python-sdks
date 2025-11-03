@@ -50,7 +50,7 @@ class MockNode(BaseNode):
         baz: str
 
 
-MOCK_NODE_OUTPUT_ID = "e4dc3136-0c27-4bda-b3ab-ea355d5219d6"
+MOCK_NODE_OUTPUT_ID = "a864331d-9b1c-43db-90e7-6b1998d8179d"
 
 
 def test_state_snapshot__node_attribute_edit():

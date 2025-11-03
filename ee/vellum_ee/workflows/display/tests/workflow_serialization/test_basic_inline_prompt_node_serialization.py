@@ -432,6 +432,8 @@ def test_serialize_workflow_with_descriptor_blocks():
         noun: str
 
     class UpstreamNode(BaseNode):
+        __legacy_id__ = True
+
         class Outputs(BaseNode.Outputs):
             results: list
 
@@ -486,6 +488,8 @@ def test_serialize_workflow_with_nested_descriptor_blocks():
         noun: str
 
     class UpstreamNode(BaseNode):
+        __legacy_id__ = True
+
         class Outputs(BaseNode.Outputs):
             results: list
 
