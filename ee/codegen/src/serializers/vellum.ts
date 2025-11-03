@@ -122,6 +122,7 @@ import {
   WorkflowStatePointer,
   WorkflowStateVariableWorkflowReference,
   WorkflowTrigger,
+  WorkflowTriggerDisplayData,
   WorkflowValueDescriptor,
   WorkspaceSecretPointer,
 } from "src/types/vellum";
@@ -705,6 +706,27 @@ export const WorkflowEdgeDisplayDataSerializer: ObjectSchema<
 export declare namespace WorkflowEdgeDisplayDataSerializer {
   interface Raw {
     z_index?: number | null;
+  }
+}
+
+export const WorkflowTriggerDisplayDataSerializer: ObjectSchema<
+  WorkflowTriggerDisplayDataSerializer.Raw,
+  WorkflowTriggerDisplayData
+> = objectSchema({
+  label: stringSchema(),
+  position: NodeDisplayPositionSerializer.nullable().optional(),
+  z_index: numberSchema().nullable().optional(),
+  icon: stringSchema().nullable().optional(),
+  color: stringSchema().nullable().optional(),
+});
+
+export declare namespace WorkflowTriggerDisplayDataSerializer {
+  interface Raw {
+    label: string;
+    position?: NodeDisplayPositionSerializer.Raw | null;
+    z_index?: number | null;
+    icon?: string | null;
+    color?: string | null;
   }
 }
 
@@ -2288,6 +2310,10 @@ const ManualTriggerSerializer = objectSchema({
   type: stringLiteralSchema("MANUAL"),
   attributes: listSchema(NodeAttributeSerializer),
   definition: CodeResourceDefinitionSerializer.optional(),
+  displayData: propertySchema(
+    "display_data",
+    WorkflowTriggerDisplayDataSerializer.nullable().optional()
+  ),
 });
 
 export declare namespace ManualTriggerSerializer {
@@ -2296,6 +2322,7 @@ export declare namespace ManualTriggerSerializer {
     type: "MANUAL";
     attributes: NodeAttributeSerializer.Raw[];
     definition?: CodeResourceDefinitionSerializer.Raw | null;
+    display_data?: WorkflowTriggerDisplayDataSerializer.Raw | null;
   }
 }
 
@@ -2303,6 +2330,10 @@ const ScheduleTriggerSerializer = objectSchema({
   id: stringSchema(),
   attributes: listSchema(NodeAttributeSerializer),
   definition: CodeResourceDefinitionSerializer.optional(),
+  displayData: propertySchema(
+    "display_data",
+    WorkflowTriggerDisplayDataSerializer.nullable().optional()
+  ),
 });
 
 export declare namespace ScheduleTriggerSerializer {
@@ -2311,6 +2342,7 @@ export declare namespace ScheduleTriggerSerializer {
     type: "SCHEDULED";
     attributes: NodeAttributeSerializer.Raw[];
     definition?: CodeResourceDefinitionSerializer.Raw | null;
+    display_data?: WorkflowTriggerDisplayDataSerializer.Raw | null;
   }
 }
 
@@ -2348,6 +2380,10 @@ const IntegrationTriggerSerializer = objectSchema({
     IntegrationTriggerExecConfigSerializer
   ),
   definition: CodeResourceDefinitionSerializer.optional(),
+  displayData: propertySchema(
+    "display_data",
+    WorkflowTriggerDisplayDataSerializer.nullable().optional()
+  ),
 });
 
 export declare namespace IntegrationTriggerSerializer {
@@ -2357,6 +2393,7 @@ export declare namespace IntegrationTriggerSerializer {
     attributes: NodeAttributeSerializer.Raw[];
     exec_config: IntegrationTriggerExecConfigSerializer.Raw;
     definition?: CodeResourceDefinitionSerializer.Raw | null;
+    display_data?: WorkflowTriggerDisplayDataSerializer.Raw | null;
   }
 }
 
