@@ -113,6 +113,7 @@ class WorkflowRunner(Generic[StateType]):
         timeout: Optional[float] = None,
         init_execution_context: Optional[ExecutionContext] = None,
         trigger: Optional[BaseTrigger] = None,
+        execution_id: Optional[UUID] = None,
     ):
         if state and external_inputs:
             raise ValueError("Can only run a Workflow providing one of state or external inputs, not both")
@@ -142,13 +143,13 @@ class WorkflowRunner(Generic[StateType]):
             node = next(iter(resolved_nodes))
             if state:
                 self._initial_state = deepcopy(state)
-                self._initial_state.meta.span_id = uuid4()
+                self._initial_state.meta.span_id = execution_id or uuid4()
                 self._initial_state.meta.workflow_definition = self.workflow.__class__
             else:
                 self._initial_state = self.workflow.get_state_at_node(node)
             self._entrypoints = resolved_nodes
         elif external_inputs:
-            self._initial_state = self.workflow.get_most_recent_state()
+            self._initial_state = self.workflow.get_most_recent_state(execution_id)
             for descriptor, value in external_inputs.items():
                 if not any(isinstance(value, type_) for type_ in descriptor.types):
                     raise NodeException(
@@ -208,10 +209,10 @@ class WorkflowRunner(Generic[StateType]):
             if state:
                 self._initial_state = deepcopy(state)
                 self._initial_state.meta.workflow_inputs = normalized_inputs
-                self._initial_state.meta.span_id = uuid4()
+                self._initial_state.meta.span_id = execution_id or uuid4()
                 self._initial_state.meta.workflow_definition = self.workflow.__class__
             else:
-                self._initial_state = self.workflow.get_default_state(normalized_inputs)
+                self._initial_state = self.workflow.get_default_state(normalized_inputs, execution_id)
                 self._should_emit_initial_state = False
 
             # Validate and bind trigger, then filter entrypoints
@@ -224,10 +225,10 @@ class WorkflowRunner(Generic[StateType]):
             if state:
                 self._initial_state = deepcopy(state)
                 self._initial_state.meta.workflow_inputs = normalized_inputs
-                self._initial_state.meta.span_id = uuid4()
+                self._initial_state.meta.span_id = execution_id or uuid4()
                 self._initial_state.meta.workflow_definition = self.workflow.__class__
             else:
-                self._initial_state = self.workflow.get_default_state(normalized_inputs)
+                self._initial_state = self.workflow.get_default_state(normalized_inputs, execution_id)
                 # We don't want to emit the initial state on the base case of Workflow Runs, since
                 # all of that data is redundant and is derivable. It also clearly communicates that
                 # there was no initial state provided by the user to invoke the workflow.

@@ -381,6 +381,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         entrypoint_nodes: Optional[RunFromNodeArg] = None,
         external_inputs: Optional[ExternalInputsArg] = None,
         previous_execution_id: Optional[Union[str, UUID]] = None,
+        execution_id: Optional[UUID] = None,
         cancel_signal: Optional[CancelSignal] = None,
         node_output_mocks: Optional[MockNodeExecutionArg] = None,
         max_concurrency: Optional[int] = None,
@@ -410,6 +411,9 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
 
         previous_execution_id: Optional[Union[str, UUID]] = None
             The execution ID of the previous execution to resume from.
+
+        execution_id: Optional[UUID] = None
+            The execution ID to use for this workflow run. Sets the initial state's span_id for fresh runs.
 
         cancel_signal: Optional[CancelSignal] = None
             A cancel signal that can be used to cancel the Workflow Execution.
@@ -447,6 +451,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             timeout=timeout,
             init_execution_context=self._execution_context,
             trigger=trigger,
+            execution_id=execution_id,
         )
         self._current_runner = runner
         events = runner.stream()
@@ -514,6 +519,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         entrypoint_nodes: Optional[RunFromNodeArg] = None,
         external_inputs: Optional[ExternalInputsArg] = None,
         previous_execution_id: Optional[Union[str, UUID]] = None,
+        execution_id: Optional[UUID] = None,
         cancel_signal: Optional[CancelSignal] = None,
         node_output_mocks: Optional[MockNodeExecutionArg] = None,
         max_concurrency: Optional[int] = None,
@@ -544,6 +550,9 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
 
         previous_execution_id: Optional[Union[str, UUID]] = None
             The execution ID of the previous execution to resume from.
+
+        execution_id: Optional[UUID] = None
+            The execution ID to use for this workflow run. Sets the initial state's span_id for fresh runs.
 
         cancel_signal: Optional[CancelSignal] = None
             A cancel signal that can be used to cancel the Workflow Execution.
@@ -582,6 +591,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             timeout=timeout,
             init_execution_context=self._execution_context,
             trigger=trigger,
+            execution_id=execution_id,
         )
         self._current_runner = runner
         runner_stream = runner.stream()
@@ -643,16 +653,22 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
     def get_default_inputs(self) -> InputsType:
         return self.get_inputs_class()()
 
-    def get_default_state(self, workflow_inputs: Optional[InputsType] = None) -> StateType:
-        return self.get_state_class()(
-            meta=StateMeta(
-                parent=self._parent_state,
-                workflow_inputs=workflow_inputs or self.get_default_inputs(),
-                workflow_definition=self.__class__,
-            )
+    def get_default_state(
+        self, workflow_inputs: Optional[InputsType] = None, execution_id: Optional[UUID] = None
+    ) -> StateType:
+        meta = StateMeta(
+            parent=self._parent_state,
+            workflow_inputs=workflow_inputs or self.get_default_inputs(),
+            workflow_definition=self.__class__,
         )
 
-    def get_state_at_node(self, node: Type[BaseNode]) -> StateType:
+        # Makes the uuid factory mocker work this way instead of setting in cosntructor
+        if execution_id:
+            meta.span_id = execution_id
+
+        return self.get_state_class()(meta=meta)
+
+    def get_state_at_node(self, node: Type[BaseNode], execution_id: Optional[UUID] = None) -> StateType:
         event_ts = datetime.min
         for event in self._store.events:
             if event.name == "node.execution.initiated" and event.node_definition == node:
@@ -666,11 +682,11 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             most_recent_state_snapshot = cast(StateType, snapshot)
 
         if not most_recent_state_snapshot:
-            return self.get_default_state()
+            return self.get_default_state(execution_id=execution_id)
 
         return most_recent_state_snapshot
 
-    def get_most_recent_state(self) -> StateType:
+    def get_most_recent_state(self, execution_id: Optional[UUID] = None) -> StateType:
         most_recent_state_snapshot: Optional[StateType] = None
 
         for snapshot in self._store.state_snapshots:
@@ -681,7 +697,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
                 most_recent_state_snapshot = next_state
 
         if not most_recent_state_snapshot:
-            return self.get_default_state()
+            return self.get_default_state(execution_id=execution_id)
 
         return most_recent_state_snapshot
 
