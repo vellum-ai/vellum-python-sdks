@@ -6,9 +6,6 @@ from tests.workflows.web_search.workflow import WebSearchWorkflow
 def test_serialize_web_search_workflow():
     # GIVEN a WebSearchWorkflow with a node that has various input types
     # - query from workflow input
-    # - api_key from VellumSecretReference
-    # - num_results as a constant integer
-    # - location as a constant string
 
     # WHEN we serialize the workflow through the display system
     workflow_display = get_workflow_display(workflow_class=WebSearchWorkflow)
@@ -58,12 +55,12 @@ def test_serialize_web_search_workflow():
         web_search_node["base"] == expected_base
     ), f"Base mismatch. Expected: {expected_base}, Found: {web_search_node['base']}"
 
-    # AND it should have all four serializable attributes defined in our display class
+    # AND it should have one serializable attribute defined in our display class
     web_search_attributes = web_search_node["attributes"]
     attribute_names = {attr["name"] for attr in web_search_attributes}
 
     # AND the attributes should match exactly what we defined in __serializable_inputs__
-    assert attribute_names == {"query", "api_key", "num_results", "location"}
+    assert attribute_names == {"query"}
 
     # AND it should have all three expected outputs from WebSearchNode
     assert {output["name"] for output in web_search_node["outputs"]} == {"text", "urls", "results"}
@@ -73,9 +70,3 @@ def test_serialize_web_search_workflow():
 
     # AND query should reference the workflow input
     assert attr_types_by_name["query"] == "WORKFLOW_INPUT"
-    # AND api_key should reference a Vellum secret
-    assert attr_types_by_name["api_key"] == "VELLUM_SECRET"
-    # AND num_results should be a constant value
-    assert attr_types_by_name["num_results"] == "CONSTANT_VALUE"
-    # AND location should be a constant value
-    assert attr_types_by_name["location"] == "CONSTANT_VALUE"

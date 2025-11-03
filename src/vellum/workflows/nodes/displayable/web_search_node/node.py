@@ -1,8 +1,5 @@
 import logging
-from typing import Any, ClassVar, Dict, List, Optional
-
-from requests import Request, RequestException, Session
-from requests.exceptions import JSONDecodeError
+from typing import Any, ClassVar, Dict, List
 
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
@@ -18,15 +15,9 @@ class WebSearchNode(BaseNode[StateType]):
     Used to perform web search using SerpAPI.
 
     query: str - The search query to execute
-    api_key: str - SerpAPI authentication key
-    num_results: int - Number of search results to return (default: 10)
-    location: Optional[str] - Geographic location filter for search
     """
 
     query: ClassVar[str] = ""
-    api_key: ClassVar[Optional[str]] = None
-    num_results: ClassVar[int] = 10
-    location: ClassVar[Optional[str]] = None
 
     class Outputs(BaseOutputs):
         """
@@ -48,69 +39,30 @@ class WebSearchNode(BaseNode[StateType]):
                 "Query is required and must be a non-empty string", code=WorkflowErrorCode.INVALID_INPUTS
             )
 
-        if self.api_key is None:
-            raise NodeException("API key is required", code=WorkflowErrorCode.INVALID_INPUTS)
-
-        if not isinstance(self.num_results, int) or self.num_results <= 0:
-            raise NodeException("num_results must be a positive integer", code=WorkflowErrorCode.INVALID_INPUTS)
-
     def run(self) -> Outputs:
         """Run the WebSearchNode to perform web search via SerpAPI."""
         self._validate()
 
-        api_key_value = self.api_key
-
-        params = {
-            "q": self.query,
-            "api_key": api_key_value,
-            "num": self.num_results,
-            "engine": "google",
-        }
-
-        if self.location:
-            params["location"] = self.location
-
-        headers = {}
-        client_headers = self._context.vellum_client._client_wrapper.get_headers()
-        headers["User-Agent"] = client_headers.get("User-Agent")
-
         try:
-            prepped = Request(method="GET", url="https://serpapi.com/search", params=params, headers=headers).prepare()
+            response = self._context.vellum_client.integrations.execute_integration_tool(
+                integration_name="SERPAPI",
+                integration_provider="COMPOSIO",
+                tool_name="SERPAPI_SEARCH",
+                arguments={"query": self.query},
+            )
         except Exception as e:
-            logger.exception("Failed to prepare SerpAPI request")
-            raise NodeException(f"Failed to prepare HTTP request: {e}", code=WorkflowErrorCode.PROVIDER_ERROR) from e
+            logger.exception("Failed to execute Composio SerpAPI tool")
+            raise NodeException(f"Failed to execute web search: {e}", code=WorkflowErrorCode.PROVIDER_ERROR) from e
 
-        try:
-            with Session() as session:
-                response = session.send(prepped, timeout=30)
-        except RequestException as e:
-            logger.exception("SerpAPI request failed")
-            raise NodeException(f"HTTP request failed: {e}", code=WorkflowErrorCode.PROVIDER_ERROR) from e
+        response_data = response.data
 
-        if response.status_code == 401:
-            logger.error("SerpAPI authentication failed")
-            raise NodeException("Invalid API key", code=WorkflowErrorCode.INVALID_INPUTS)
-        elif response.status_code == 429:
-            logger.warning("SerpAPI rate limit exceeded")
-            raise NodeException("Rate limit exceeded", code=WorkflowErrorCode.PROVIDER_ERROR)
-        elif response.status_code >= 400:
-            logger.error(f"SerpAPI returned error status: {response.status_code}")
-            raise NodeException(f"SerpAPI error: HTTP {response.status_code}", code=WorkflowErrorCode.PROVIDER_ERROR)
-
-        try:
-            json_response = response.json()
-        except JSONDecodeError as e:
-            logger.exception("Failed to parse SerpAPI response as JSON")
-            raise NodeException(
-                f"Invalid JSON response from SerpAPI: {e}", code=WorkflowErrorCode.PROVIDER_ERROR
-            ) from e
-
-        if "error" in json_response:
-            error_msg = json_response["error"]
+        if "error" in response_data:
+            error_msg = response_data["error"]
             logger.error(f"SerpAPI returned error: {error_msg}")
             raise NodeException(f"SerpAPI error: {error_msg}", code=WorkflowErrorCode.PROVIDER_ERROR)
 
-        organic_results = json_response.get("organic_results", [])
+        organic_results_raw = response_data.get("organic_results", [])
+        organic_results: List[Dict[str, Any]] = organic_results_raw if organic_results_raw is not None else []
 
         text_results = []
         urls = []
