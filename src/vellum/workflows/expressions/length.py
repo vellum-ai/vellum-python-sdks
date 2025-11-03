@@ -1,10 +1,21 @@
-from typing import Generic, TypeVar, Union
+from typing import Any, Generic, Protocol, TypeVar, Union, runtime_checkable
+from typing_extensions import TypeGuard
 
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.exceptions import InvalidExpressionException
 from vellum.workflows.descriptors.utils import resolve_value
 from vellum.workflows.state.base import BaseState
+
+
+@runtime_checkable
+class SupportsLen(Protocol):
+    def __len__(self) -> int: ...
+
+
+def has_len(obj: Any) -> TypeGuard[SupportsLen]:
+    return hasattr(obj, "__len__")
+
 
 _T = TypeVar("_T")
 
@@ -24,7 +35,7 @@ class LengthExpression(BaseDescriptor[int], Generic[_T]):
         if expression is undefined:
             raise InvalidExpressionException("Cannot get length of undefined value")
 
-        if not hasattr(expression, "__len__"):
+        if not has_len(expression):
             raise InvalidExpressionException(
                 f"Expected an object that supports `len()`, got `{expression.__class__.__name__}`"
             )
