@@ -39,7 +39,11 @@ class MonitoringContextStore:
             if context.parent_context and hasattr(context.parent_context, "span_id"):
                 span_id = context.parent_context.span_id
 
-            if not span_id and hasattr(current_thread, "get_parent_span_id"):
+            if (
+                not span_id
+                and hasattr(current_thread, "get_parent_span_id")
+                and callable(current_thread.get_parent_span_id)
+            ):
                 span_id = current_thread.get_parent_span_id()
 
             # Always use trace:span:thread format - require span_id
@@ -55,9 +59,9 @@ class MonitoringContextStore:
         # Get trace_id and span_id directly from the thread if it's a RelationalThread
         trace_id = None
         span_id = None
-        if hasattr(current_thread, "get_trace_id"):
+        if hasattr(current_thread, "get_trace_id") and callable(current_thread.get_trace_id):
             trace_id = current_thread.get_trace_id()
-        if hasattr(current_thread, "get_parent_span_id"):
+        if hasattr(current_thread, "get_parent_span_id") and callable(current_thread.get_parent_span_id):
             span_id = current_thread.get_parent_span_id()
 
         # Require both trace_id and span_id - no fallback searching
@@ -71,7 +75,7 @@ class MonitoringContextStore:
                 return self._contexts[current_key]
 
             # Try parent thread with same trace and span
-            if hasattr(current_thread, "get_parent_thread"):
+            if hasattr(current_thread, "get_parent_thread") and callable(current_thread.get_parent_thread):
                 parent_thread_id = current_thread.get_parent_thread()
                 if parent_thread_id:
                     parent_key = f"trace:{str(trace_id)}:span:{str(span_id)}:thread:{parent_thread_id}"
