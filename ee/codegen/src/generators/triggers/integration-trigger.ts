@@ -1,7 +1,7 @@
 import { python } from "@fern-api/python-ast";
 
-import { BaseTrigger } from "src/generators/triggers/base-trigger";
 import { VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH } from "src/constants";
+import { BaseTrigger } from "src/generators/triggers/base-trigger";
 import { createPythonClassName } from "src/utils/casing";
 
 import type { AstNode } from "@fern-api/python-ast/core/AstNode";
