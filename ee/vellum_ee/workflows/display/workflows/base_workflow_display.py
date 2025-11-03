@@ -189,7 +189,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
         # Determine if we need an ENTRYPOINT node and what ID to use
         manual_trigger_edges = [edge for edge in trigger_edges if issubclass(edge.trigger_class, ManualTrigger)]
-        non_manual_trigger_edges = [edge for edge in trigger_edges if not issubclass(edge.trigger_class, ManualTrigger)]
         has_manual_trigger = len(manual_trigger_edges) > 0
 
         entrypoint_node_id: Optional[UUID] = None
@@ -378,51 +377,76 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 ValueError("Unable to serialize terminal nodes that are not referenced by workflow outputs.")
             )
 
-        triggered_entrypoints: Set[Type[BaseNode]] = set()
-        for trigger_edge in non_manual_trigger_edges:
-            triggered_entrypoints.add(trigger_edge.to_node)
-
         # Add edges from trigger/entrypoint to first nodes
-        for target_node, entrypoint_display in self.display_context.entrypoint_displays.items():
+        nodes_with_trigger_edges: Set[Type[BaseNode]] = set()
+
+        for trigger_edge in trigger_edges:
+            target_node = trigger_edge.to_node
             unadorned_target_node = get_unadorned_node(target_node)
+            nodes_with_trigger_edges.add(unadorned_target_node)
+
             # Skip edges to invalid nodes
             if self._is_node_invalid(unadorned_target_node):
                 continue
 
             target_node_display = self.display_context.node_displays[unadorned_target_node]
 
-            # Determine if this entrypoint should get an edge from a trigger or from the entrypoint node
-            if unadorned_target_node in triggered_entrypoints:
-                trigger_edge = next(edge for edge in non_manual_trigger_edges if edge.to_node == unadorned_target_node)
-                trigger_class = trigger_edge.trigger_class
-                trigger_id = trigger_class.__id__
-                trigger_source_handle_id = trigger_id
+            # Get the entrypoint display for this target node (if it exists)
+            entrypoint_display = self.display_context.entrypoint_displays.get(target_node)
+            if entrypoint_display is None:
+                continue
 
-                trigger_edge_dict: Dict[str, Json] = {
-                    "id": str(entrypoint_display.edge_display.id),
-                    "source_node_id": str(trigger_id),
-                    "source_handle_id": str(trigger_source_handle_id),
-                    "target_node_id": str(target_node_display.node_id),
-                    "target_handle_id": str(target_node_display.get_trigger_id()),
-                    "type": "DEFAULT",
-                }
-                display_data = self._serialize_edge_display_data(entrypoint_display.edge_display)
-                if display_data is not None:
-                    trigger_edge_dict["display_data"] = display_data
-                edges.append(trigger_edge_dict)
-            elif entrypoint_node_id is not None:
-                entrypoint_edge_dict: Dict[str, Json] = {
-                    "id": str(entrypoint_display.edge_display.id),
-                    "source_node_id": str(entrypoint_node_id),
-                    "source_handle_id": str(entrypoint_node_source_handle_id),
-                    "target_node_id": str(target_node_display.node_id),
-                    "target_handle_id": str(target_node_display.get_trigger_id()),
-                    "type": "DEFAULT",
-                }
-                display_data = self._serialize_edge_display_data(entrypoint_display.edge_display)
-                if display_data is not None:
-                    entrypoint_edge_dict["display_data"] = display_data
-                edges.append(entrypoint_edge_dict)
+            trigger_class = trigger_edge.trigger_class
+            trigger_id = trigger_class.__id__
+
+            # Determine source node ID and handle ID based on trigger type
+            if issubclass(trigger_class, ManualTrigger):
+                source_node_id = entrypoint_node_id
+                source_handle_id = entrypoint_node_source_handle_id
+            else:
+                source_node_id = trigger_id
+                source_handle_id = trigger_id
+
+            trigger_edge_dict: Dict[str, Json] = {
+                "id": str(entrypoint_display.edge_display.id),
+                "source_node_id": str(source_node_id),
+                "source_handle_id": str(source_handle_id),
+                "target_node_id": str(target_node_display.node_id),
+                "target_handle_id": str(target_node_display.get_trigger_id()),
+                "type": "DEFAULT",
+            }
+            display_data = self._serialize_edge_display_data(entrypoint_display.edge_display)
+            if display_data is not None:
+                trigger_edge_dict["display_data"] = display_data
+            edges.append(trigger_edge_dict)
+
+        for target_node, entrypoint_display in self.display_context.entrypoint_displays.items():
+            unadorned_target_node = get_unadorned_node(target_node)
+
+            if unadorned_target_node in nodes_with_trigger_edges:
+                continue
+
+            # Skip edges to invalid nodes
+            if self._is_node_invalid(unadorned_target_node):
+                continue
+
+            if entrypoint_node_id is None:
+                continue
+
+            target_node_display = self.display_context.node_displays[unadorned_target_node]
+
+            entrypoint_edge_dict: Dict[str, Json] = {
+                "id": str(entrypoint_display.edge_display.id),
+                "source_node_id": str(entrypoint_node_id),
+                "source_handle_id": str(entrypoint_node_source_handle_id),
+                "target_node_id": str(target_node_display.node_id),
+                "target_handle_id": str(target_node_display.get_trigger_id()),
+                "type": "DEFAULT",
+            }
+            display_data = self._serialize_edge_display_data(entrypoint_display.edge_display)
+            if display_data is not None:
+                entrypoint_edge_dict["display_data"] = display_data
+            edges.append(entrypoint_edge_dict)
 
         for (source_node_port, target_node), edge_display in self.display_context.edge_displays.items():
             unadorned_source_node_port = get_unadorned_port(source_node_port)
@@ -518,67 +542,64 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             # No workflow-level trigger defined
             return None
 
-        # Get the trigger class from the first edge
-        trigger_class = trigger_edges[0].trigger_class
+        unique_trigger_classes = list(dict.fromkeys(edge.trigger_class for edge in trigger_edges))
 
-        # Validate that all trigger edges use the same trigger type
         trigger_type_mapping = get_trigger_type_mapping()
-        for edge in trigger_edges:
-            if edge.trigger_class != trigger_class:
-                raise ValueError(
-                    f"Mixed trigger types not supported. Found {trigger_class.__name__} and "
-                    f"{edge.trigger_class.__name__} in the same workflow."
-                )
+        serialized_triggers: List[JsonObject] = []
 
-        # Get the trigger type from the mapping, or check if it's a subclass
-        trigger_type = trigger_type_mapping.get(trigger_class)
-        if trigger_type is None:
-            # Check if it's an IntegrationTrigger or ScheduleTrigger subclass
-            if issubclass(trigger_class, IntegrationTrigger):
-                trigger_type = WorkflowTriggerType.INTEGRATION
-            elif issubclass(trigger_class, ScheduleTrigger):
-                trigger_type = WorkflowTriggerType.SCHEDULED
-            else:
-                raise ValueError(
-                    f"Unknown trigger type: {trigger_class.__name__}. "
-                    f"Please add it to the trigger type mapping in get_trigger_type_mapping()."
-                )
+        for trigger_class in unique_trigger_classes:
+            # Get the trigger type from the mapping, or check if it's a subclass
+            trigger_type = trigger_type_mapping.get(trigger_class)
+            if trigger_type is None:
+                # Check if it's a subclass of a known trigger type
+                if issubclass(trigger_class, ManualTrigger):
+                    trigger_type = WorkflowTriggerType.MANUAL
+                elif issubclass(trigger_class, IntegrationTrigger):
+                    trigger_type = WorkflowTriggerType.INTEGRATION
+                elif issubclass(trigger_class, ScheduleTrigger):
+                    trigger_type = WorkflowTriggerType.SCHEDULED
+                else:
+                    raise ValueError(
+                        f"Unknown trigger type: {trigger_class.__name__}. "
+                        f"Please add it to the trigger type mapping in get_trigger_type_mapping()."
+                    )
 
-        # Return as a list with a single trigger object matching Django schema
-        trigger_id = trigger_class.__id__
+            trigger_id = trigger_class.__id__
 
-        # Serialize trigger attributes like node outputs
-        attribute_references = trigger_class.attribute_references().values()
-        trigger_attributes: JsonArray = cast(
-            JsonArray,
-            [
-                cast(
-                    JsonObject,
-                    {
-                        "id": str(reference.id),
-                        "name": reference.name,
-                        "type": primitive_type_to_vellum_variable_type(reference),
-                        "value": None,
-                    },
-                )
-                for reference in sorted(attribute_references, key=lambda ref: ref.name)
-            ],
-        )
+            # Serialize trigger attributes like node outputs
+            attribute_references = trigger_class.attribute_references().values()
+            trigger_attributes: JsonArray = cast(
+                JsonArray,
+                [
+                    cast(
+                        JsonObject,
+                        {
+                            "id": str(reference.id),
+                            "name": reference.name,
+                            "type": primitive_type_to_vellum_variable_type(reference),
+                            "value": None,
+                        },
+                    )
+                    for reference in sorted(attribute_references, key=lambda ref: ref.name)
+                ],
+            )
 
-        trigger_data: JsonObject = {
-            "id": str(trigger_id),
-            "type": trigger_type.value,
-            "attributes": trigger_attributes,
-        }
+            trigger_data: JsonObject = {
+                "id": str(trigger_id),
+                "type": trigger_type.value,
+                "attributes": trigger_attributes,
+            }
 
-        # For INTEGRATION and SCHEDULED triggers, include class name, module path, and source_handle_id
-        # ManualTrigger doesn't need source_handle_id because edges come from ENTRYPOINT node
-        if trigger_type in (WorkflowTriggerType.INTEGRATION, WorkflowTriggerType.SCHEDULED):
-            trigger_data["class_name"] = trigger_class.__name__
-            trigger_data["module_path"] = cast(Json, trigger_class.__module__.split("."))
-            trigger_data["source_handle_id"] = str(trigger_id)  # Trigger acts as edge source
+            # For INTEGRATION and SCHEDULED triggers, include class name, module path, and source_handle_id
+            # ManualTrigger doesn't need source_handle_id because edges come from ENTRYPOINT node
+            if trigger_type in (WorkflowTriggerType.INTEGRATION, WorkflowTriggerType.SCHEDULED):
+                trigger_data["class_name"] = trigger_class.__name__
+                trigger_data["module_path"] = cast(Json, trigger_class.__module__.split("."))
+                trigger_data["source_handle_id"] = str(trigger_id)  # Trigger acts as edge source
 
-        return cast(JsonArray, [trigger_data])
+            serialized_triggers.append(trigger_data)
+
+        return cast(JsonArray, serialized_triggers)
 
     def _serialize_edge_display_data(self, edge_display: EdgeDisplay) -> Optional[JsonObject]:
         """Serialize edge display data, returning None if no display data is present."""
