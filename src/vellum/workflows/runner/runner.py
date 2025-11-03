@@ -175,7 +175,10 @@ class WorkflowRunner(Generic[StateType]):
             resolver_failed = True
             for resolver in self.workflow.resolvers:
                 try:
-                    load_state_result = resolver.load_state(previous_execution_id)
+                    load_state_result = resolver.load_state(
+                        previous_execution_id=previous_execution_id,
+                        execution_id=execution_id,
+                    )
                     if load_state_result is not None:
                         state_class = self.workflow.get_state_class()
                         if isinstance(load_state_result.state, state_class):
