@@ -45,12 +45,14 @@ def test_manual_and_slack_trigger_same_node():
     assert isinstance(triggers, list)
     assert len(triggers) == 2
 
-    manual_trigger = next((t for t in triggers if t["type"] == "MANUAL"), None)
+    manual_trigger = next((t for t in triggers if isinstance(t, dict) and t.get("type") == "MANUAL"), None)
     assert manual_trigger is not None, "Should have a Manual trigger"
+    assert isinstance(manual_trigger, dict)
     manual_trigger_id = manual_trigger["id"]
 
-    slack_trigger = next((t for t in triggers if t["type"] == "INTEGRATION"), None)
+    slack_trigger = next((t for t in triggers if isinstance(t, dict) and t.get("type") == "INTEGRATION"), None)
     assert slack_trigger is not None, "Should have a Slack trigger"
+    assert isinstance(slack_trigger, dict)
     slack_trigger_id = slack_trigger["id"]
 
     workflow_raw_data = result["workflow_raw_data"]
