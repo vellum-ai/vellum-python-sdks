@@ -114,6 +114,16 @@ class BaseNodeMeta(ABCMeta):
                     dct["Ports"] = type(f"{name}.Ports", (base.Ports,), ports_dct)
                     break
 
+        if "Display" not in dct:
+            for base in reversed(bases):
+                if issubclass(base, BaseNode):
+                    dct["Display"] = type(
+                        f"{name}.Display",
+                        (base.Display,),
+                        {"__module__": dct["__module__"]},
+                    )
+                    break
+
         if "Execution" not in dct:
             for base in reversed(bases):
                 if issubclass(base, BaseNode):

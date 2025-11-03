@@ -18,6 +18,7 @@ import {
   BaseCodegenError,
   NodeAttributeGenerationError,
 } from "src/generators/errors";
+import { NodeDisplay } from "src/generators/node-display";
 import { NodeDisplayData } from "src/generators/node-display-data";
 import { NodeInput } from "src/generators/node-inputs/node-input";
 import { NodePorts } from "src/generators/node-port";
@@ -633,6 +634,17 @@ export abstract class BaseNode<
     return undefined;
   }
 
+  protected getNodeDisplay(): AstNode | undefined {
+    if (this.nodeData.displayData) {
+      return new NodeDisplay({
+        nodeDisplayData: this.nodeData.displayData,
+        nodeContext: this.nodeContext,
+      });
+    }
+
+    return undefined;
+  }
+
   public generateNodeClass(): python.Class {
     const nodeContext = this.nodeContext;
 
@@ -662,6 +674,12 @@ export abstract class BaseNode<
 
       if (nodePorts) {
         nodeClass.add(nodePorts);
+      }
+
+      const nodeDisplay = this.getNodeDisplay();
+
+      if (nodeDisplay) {
+        nodeClass.add(nodeDisplay);
       }
 
       const nodeTriggers = this.getNodeTrigger();

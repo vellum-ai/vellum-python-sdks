@@ -1,0 +1,76 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`NodeDisplay > 'with icon and color' 1`] = `
+"class MyCustomNode(BaseNode):
+    default_attribute = "default-value"
+    default_attribute_2 = Inputs.input_1
+
+    class Outputs(BaseNode.Outputs):
+        output = "default-value"
+
+    class Display(BaseNode.Display):
+        icon = "🎨"
+        color = "#FF5733"
+
+    class Trigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ALL
+"
+`;
+
+exports[`NodeDisplay > 'with null icon and color' 1`] = `
+"class MyCustomNode(BaseNode):
+    default_attribute = "default-value"
+    default_attribute_2 = Inputs.input_1
+
+    class Outputs(BaseNode.Outputs):
+        output = "default-value"
+
+    class Trigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ALL
+"
+`;
+
+exports[`NodeDisplay > 'with only color' 1`] = `
+"class MyCustomNode(BaseNode):
+    default_attribute = "default-value"
+    default_attribute_2 = Inputs.input_1
+
+    class Outputs(BaseNode.Outputs):
+        output = "default-value"
+
+    class Display(BaseNode.Display):
+        color = "#00FF00"
+
+    class Trigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ALL
+"
+`;
+
+exports[`NodeDisplay > 'with only icon' 1`] = `
+"class MyCustomNode(BaseNode):
+    default_attribute = "default-value"
+    default_attribute_2 = Inputs.input_1
+
+    class Outputs(BaseNode.Outputs):
+        output = "default-value"
+
+    class Display(BaseNode.Display):
+        icon = "🔧"
+
+    class Trigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ALL
+"
+`;
+
+exports[`NodeDisplay > 'without icon or color' 1`] = `
+"class MyCustomNode(BaseNode):
+    default_attribute = "default-value"
+    default_attribute_2 = Inputs.input_1
+
+    class Outputs(BaseNode.Outputs):
+        output = "default-value"
+
+    class Trigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ALL
+"
+`;
