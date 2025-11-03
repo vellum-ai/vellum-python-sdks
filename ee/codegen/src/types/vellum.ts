@@ -195,6 +195,14 @@ export interface NodeDisplayData {
   color?: string | null;
 }
 
+export interface WorkflowTriggerDisplayData {
+  label: string;
+  position?: NodeDisplayPosition | null;
+  z_index?: number | null;
+  icon?: string | null;
+  color?: string | null;
+}
+
 export interface WorkflowEdgeDisplayData {
   z_index?: number;
 }
@@ -817,6 +825,7 @@ export interface BaseTrigger {
   id: string;
   attributes: NodeAttribute[];
   definition?: CodeResourceDefinition;
+  displayData?: WorkflowTriggerDisplayData | null;
 }
 
 export interface ManualTrigger extends BaseTrigger {
