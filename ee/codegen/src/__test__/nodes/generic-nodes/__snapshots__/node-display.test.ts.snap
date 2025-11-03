@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`NodeDisplay > with icon and color > generates Display nested class with both fields 1`] = `
+exports[`NodeDisplay > 'with icon and color' 1`] = `
 "class MyCustomNode(BaseNode):
     default_attribute = "default-value"
     default_attribute_2 = Inputs.input_1
@@ -17,7 +17,7 @@ exports[`NodeDisplay > with icon and color > generates Display nested class with
 "
 `;
 
-exports[`NodeDisplay > with only color > generates Display nested class with color field 1`] = `
+exports[`NodeDisplay > 'with only color' 1`] = `
 "class MyCustomNode(BaseNode):
     default_attribute = "default-value"
     default_attribute_2 = Inputs.input_1
@@ -33,7 +33,7 @@ exports[`NodeDisplay > with only color > generates Display nested class with col
 "
 `;
 
-exports[`NodeDisplay > with only icon > generates Display nested class with icon field 1`] = `
+exports[`NodeDisplay > 'with only icon' 1`] = `
 "class MyCustomNode(BaseNode):
     default_attribute = "default-value"
     default_attribute_2 = Inputs.input_1

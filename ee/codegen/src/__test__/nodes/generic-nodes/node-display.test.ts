@@ -10,13 +10,9 @@ import { GenericNode } from "src/generators/nodes/generic-node";
 
 describe("NodeDisplay", () => {
   let workflowContext: WorkflowContext;
-  let writer: Writer;
 
   beforeEach(() => {
     workflowContext = workflowContextFactory();
-    writer = new Writer();
-
-    // Add the input variables that the generic node factory uses
     workflowContext.addInputVariableContext(
       inputVariableContextFactory({
         inputVariableData: {
@@ -29,151 +25,52 @@ describe("NodeDisplay", () => {
     );
   });
 
-  describe("with icon and color", () => {
-    it("generates Display nested class with both fields", async () => {
-      const nodeData = genericNodeFactory({
-        label: "MyCustomNode",
-      });
+  it.each([
+    {
+      name: "with icon and color",
+      displayData: { icon: "🎨", color: "#FF5733" },
+      shouldGenerate: true,
+    },
+    {
+      name: "with only icon",
+      displayData: { icon: "🔧" },
+      shouldGenerate: true,
+    },
+    {
+      name: "with only color",
+      displayData: { color: "#00FF00" },
+      shouldGenerate: true,
+    },
+    {
+      name: "without icon or color",
+      displayData: { position: { x: 100, y: 200 } },
+      shouldGenerate: false,
+    },
+    {
+      name: "with null icon and color",
+      displayData: { icon: null, color: null },
+      shouldGenerate: false,
+    },
+  ])("$name", async ({ displayData, shouldGenerate }) => {
+    const nodeData = genericNodeFactory({ label: "MyCustomNode" });
+    nodeData.displayData = displayData;
 
-      // Add display data with icon and color
-      nodeData.displayData = {
-        icon: "🎨",
-        color: "#FF5733",
-      };
+    const nodeContext = (await createNodeContext({
+      workflowContext,
+      nodeData,
+    })) as GenericNodeContext;
 
-      const nodeContext = (await createNodeContext({
-        workflowContext,
-        nodeData,
-      })) as GenericNodeContext;
+    const node = new GenericNode({ workflowContext, nodeContext });
+    const nodeClass = node.generateNodeClass();
 
-      const node = new GenericNode({
-        workflowContext,
-        nodeContext,
-      });
+    const writer = new Writer();
+    nodeClass.write(writer);
+    const generated = await writer.toStringFormatted();
 
-      const nodeClass = node.generateNodeClass();
-      nodeClass.write(writer);
-
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
-    });
-  });
-
-  describe("with only icon", () => {
-    it("generates Display nested class with icon field", async () => {
-      const nodeData = genericNodeFactory({
-        label: "MyCustomNode",
-      });
-
-      // Add display data with only icon
-      nodeData.displayData = {
-        icon: "🔧",
-      };
-
-      const nodeContext = (await createNodeContext({
-        workflowContext,
-        nodeData,
-      })) as GenericNodeContext;
-
-      const node = new GenericNode({
-        workflowContext,
-        nodeContext,
-      });
-
-      const nodeClass = node.generateNodeClass();
-      nodeClass.write(writer);
-
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
-    });
-  });
-
-  describe("with only color", () => {
-    it("generates Display nested class with color field", async () => {
-      const nodeData = genericNodeFactory({
-        label: "MyCustomNode",
-      });
-
-      // Add display data with only color
-      nodeData.displayData = {
-        color: "#00FF00",
-      };
-
-      const nodeContext = (await createNodeContext({
-        workflowContext,
-        nodeData,
-      })) as GenericNodeContext;
-
-      const node = new GenericNode({
-        workflowContext,
-        nodeContext,
-      });
-
-      const nodeClass = node.generateNodeClass();
-      nodeClass.write(writer);
-
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
-    });
-  });
-
-  describe("without icon or color", () => {
-    it("does not generate Display nested class", async () => {
-      const nodeData = genericNodeFactory({
-        label: "MyCustomNode",
-      });
-
-      // Display data without icon or color
-      nodeData.displayData = {
-        position: { x: 100, y: 200 },
-      };
-
-      const nodeContext = (await createNodeContext({
-        workflowContext,
-        nodeData,
-      })) as GenericNodeContext;
-
-      const node = new GenericNode({
-        workflowContext,
-        nodeContext,
-      });
-
-      const nodeClass = node.generateNodeClass();
-      nodeClass.write(writer);
-
-      const generated = await writer.toStringFormatted();
-
-      // Verify no Display class is generated
+    if (shouldGenerate) {
+      expect(generated).toMatchSnapshot();
+    } else {
       expect(generated).not.toContain("class Display");
-    });
-  });
-
-  describe("with null icon and color", () => {
-    it("does not generate Display nested class", async () => {
-      const nodeData = genericNodeFactory({
-        label: "MyCustomNode",
-      });
-
-      // Explicit null values
-      nodeData.displayData = {
-        icon: null,
-        color: null,
-      };
-
-      const nodeContext = (await createNodeContext({
-        workflowContext,
-        nodeData,
-      })) as GenericNodeContext;
-
-      const node = new GenericNode({
-        workflowContext,
-        nodeContext,
-      });
-
-      const nodeClass = node.generateNodeClass();
-      nodeClass.write(writer);
-
-      const generated = await writer.toStringFormatted();
-
-      // Verify no Display class is generated
-      expect(generated).not.toContain("class Display");
-    });
+    }
   });
 });
