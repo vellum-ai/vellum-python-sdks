@@ -16,6 +16,9 @@ def test_manual_and_slack_trigger_same_node():
     we have edges for both triggers.
     """
 
+    class MyManualTrigger(ManualTrigger):
+        pass
+
     class SlackMessageTrigger(IntegrationTrigger):
         message: str
         channel: str
@@ -34,7 +37,7 @@ def test_manual_and_slack_trigger_same_node():
 
     class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
         graph = {
-            ManualTrigger >> ProcessNode,
+            MyManualTrigger >> ProcessNode,
             SlackMessageTrigger >> ProcessNode,
         }
 

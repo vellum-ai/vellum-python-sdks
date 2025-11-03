@@ -542,14 +542,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             # No workflow-level trigger defined
             return None
 
-        trigger_classes_seen = set()
-        unique_trigger_classes = []
-        for edge in trigger_edges:
-            if edge.trigger_class not in trigger_classes_seen:
-                trigger_classes_seen.add(edge.trigger_class)
-                unique_trigger_classes.append(edge.trigger_class)
+        unique_trigger_classes = list(dict.fromkeys(edge.trigger_class for edge in trigger_edges))
 
-        # Serialize each unique trigger class
         trigger_type_mapping = get_trigger_type_mapping()
         serialized_triggers: List[JsonObject] = []
 
@@ -557,8 +551,10 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             # Get the trigger type from the mapping, or check if it's a subclass
             trigger_type = trigger_type_mapping.get(trigger_class)
             if trigger_type is None:
-                # Check if it's an IntegrationTrigger or ScheduleTrigger subclass
-                if issubclass(trigger_class, IntegrationTrigger):
+                # Check if it's a subclass of a known trigger type
+                if issubclass(trigger_class, ManualTrigger):
+                    trigger_type = WorkflowTriggerType.MANUAL
+                elif issubclass(trigger_class, IntegrationTrigger):
                     trigger_type = WorkflowTriggerType.INTEGRATION
                 elif issubclass(trigger_class, ScheduleTrigger):
                     trigger_type = WorkflowTriggerType.SCHEDULED
