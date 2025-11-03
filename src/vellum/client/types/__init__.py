@@ -724,6 +724,7 @@ from .workflow_result_event_output_data_json import WorkflowResultEventOutputDat
 from .workflow_result_event_output_data_number import WorkflowResultEventOutputDataNumber
 from .workflow_result_event_output_data_search_results import WorkflowResultEventOutputDataSearchResults
 from .workflow_result_event_output_data_string import WorkflowResultEventOutputDataString
+from .workflow_sandbox_display_data import WorkflowSandboxDisplayData
 from .workflow_sandbox_example import WorkflowSandboxExample
 from .workflow_sandbox_parent_context import WorkflowSandboxParentContext
 from .workflow_stream_event import WorkflowStreamEvent
@@ -1425,6 +1426,7 @@ __all__ = [
     "WorkflowResultEventOutputDataNumber",
     "WorkflowResultEventOutputDataSearchResults",
     "WorkflowResultEventOutputDataString",
+    "WorkflowSandboxDisplayData",
     "WorkflowSandboxExample",
     "WorkflowSandboxParentContext",
     "WorkflowStreamEvent",

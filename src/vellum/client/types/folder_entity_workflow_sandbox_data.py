@@ -6,6 +6,7 @@ import typing
 import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 from .entity_status import EntityStatus
+from .workflow_sandbox_display_data import WorkflowSandboxDisplayData
 
 
 class FolderEntityWorkflowSandboxData(UniversalBaseModel):
@@ -16,6 +17,7 @@ class FolderEntityWorkflowSandboxData(UniversalBaseModel):
     status: EntityStatus
     description: typing.Optional[str] = None
     last_deployed_on: typing.Optional[dt.datetime] = None
+    display_data: typing.Optional[WorkflowSandboxDisplayData] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

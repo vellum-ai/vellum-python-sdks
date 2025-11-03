@@ -17,8 +17,13 @@ class SlimIntegrationAuthConfigRead(UniversalBaseModel):
 
     id: str
     integration: IntegrationAuthConfigIntegration
-    integration_credentials: typing.Optional[typing.List[IntegrationAuthConfigIntegrationCredential]] = None
     auth_type: typing.Optional[AuthTypeEnum] = None
+    integration_credentials: typing.Optional[typing.List[IntegrationAuthConfigIntegrationCredential]] = None
+    system_credential_eligible: typing.Optional[bool] = pydantic.Field(default=None)
+    """
+    Whether or not this auth config is eligible to use Vellum-managed system credentials to authenticate.
+    """
+
     default_access_type: typing.Optional[IntegrationCredentialAccessType] = None
 
     if IS_PYDANTIC_V2:
