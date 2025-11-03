@@ -1,6 +1,6 @@
 import dataclasses
-import inspect
 from functools import lru_cache
+import inspect
 from typing import TYPE_CHECKING, Annotated, Any, Callable, List, Literal, Optional, Type, Union, get_args, get_origin
 
 from pydantic import BaseModel
