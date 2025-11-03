@@ -110,6 +110,10 @@ class BaseInputs(metaclass=_BaseInputsMeta):
             if hasattr(self, input_descriptor.name):
                 yield (input_descriptor, getattr(self, input_descriptor.name))
 
+    def __vellum_encode__(self) -> Dict[str, Any]:
+        """Return a JSON-serializable representation of this inputs object."""
+        return {descriptor.name: value for descriptor, value in self if value is not undefined}
+
     @classmethod
     def __get_pydantic_core_schema__(
         cls, source_type: Type[Any], handler: GetCoreSchemaHandler
