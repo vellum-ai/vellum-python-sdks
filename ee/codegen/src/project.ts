@@ -66,7 +66,7 @@ import { PromptDeploymentNode } from "src/generators/nodes/prompt-deployment-nod
 import { SearchNode } from "src/generators/nodes/search-node";
 import { SubworkflowDeploymentNode } from "src/generators/nodes/subworkflow-deployment-node";
 import { TemplatingNode } from "src/generators/nodes/templating-node";
-import { IntegrationTriggerGenerator } from "src/generators/triggers/integration-trigger";
+import { IntegrationTrigger } from "src/generators/triggers/integration-trigger";
 import { WorkflowSandboxFile } from "src/generators/workflow-sandbox-file";
 import { WorkflowVersionExecConfigSerializer } from "src/serializers/vellum";
 import {
@@ -1012,7 +1012,7 @@ ${errors.slice(0, 3).map((err) => {
 
     triggers.forEach((trigger) => {
       if (trigger.type === "INTEGRATION") {
-        const triggerGenerator = new IntegrationTriggerGenerator({
+        const triggerGenerator = new IntegrationTrigger({
           workflowContext: this.workflowContext,
           trigger,
         });
