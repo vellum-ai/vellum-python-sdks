@@ -311,8 +311,6 @@ export class WorkflowContext {
           "WARNING"
         )
       );
-      this.entrypointNode = entrypointNodes[0];
-      return this.entrypointNode ?? null;
     }
 
     const entrypointNode = entrypointNodes[0];
