@@ -143,7 +143,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         for workflow_input_reference, workflow_input_display in self.display_context.workflow_input_displays.items():
             default = (
                 primitive_to_vellum_value(workflow_input_reference.instance)
-                if workflow_input_reference.instance
+                if workflow_input_reference.instance is not None and workflow_input_reference.instance is not undefined
                 else None
             )
 
@@ -163,7 +163,9 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         state_variables: JsonArray = []
         for state_value_reference, state_value_display in self.display_context.state_value_displays.items():
             default = (
-                primitive_to_vellum_value(state_value_reference.instance) if state_value_reference.instance else None
+                primitive_to_vellum_value(state_value_reference.instance)
+                if state_value_reference.instance is not None and state_value_reference.instance is not undefined
+                else None
             )
 
             is_required = self._is_reference_required(state_value_reference)

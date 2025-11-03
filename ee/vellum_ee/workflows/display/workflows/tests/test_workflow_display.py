@@ -862,7 +862,7 @@ def test_serialize_workflow__input_variables():
         "id": "09c3e825-8932-4d37-990a-b8a7c2a3bdec",
         "key": "empty_string",
         "type": "STRING",
-        "default": None,
+        "default": {"type": "STRING", "value": ""},
         "required": False,
         "extensions": {"color": None},
     }
@@ -935,7 +935,7 @@ def test_serialize_workflow__state_variables():
         "id": "0ed1f179-1734-487f-b3ed-9e6026390d90",
         "key": "empty_string",
         "type": "STRING",
-        "default": None,
+        "default": {"type": "STRING", "value": ""},
         "required": False,
         "extensions": {"color": None},
     }
