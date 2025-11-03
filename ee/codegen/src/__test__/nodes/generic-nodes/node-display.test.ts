@@ -49,7 +49,6 @@ describe("NodeDisplay", () => {
       const node = new GenericNode({
         workflowContext,
         nodeContext,
-        nodeData,
       });
 
       const nodeClass = node.generateNodeClass();
@@ -78,7 +77,6 @@ describe("NodeDisplay", () => {
       const node = new GenericNode({
         workflowContext,
         nodeContext,
-        nodeData,
       });
 
       const nodeClass = node.generateNodeClass();
@@ -107,7 +105,6 @@ describe("NodeDisplay", () => {
       const node = new GenericNode({
         workflowContext,
         nodeContext,
-        nodeData,
       });
 
       const nodeClass = node.generateNodeClass();
@@ -123,11 +120,9 @@ describe("NodeDisplay", () => {
         label: "MyCustomNode",
       });
 
-      // Display data without icon or color (or null values)
+      // Display data without icon or color
       nodeData.displayData = {
         position: { x: 100, y: 200 },
-        width: 400,
-        height: 300,
       };
 
       const nodeContext = (await createNodeContext({
@@ -138,7 +133,6 @@ describe("NodeDisplay", () => {
       const node = new GenericNode({
         workflowContext,
         nodeContext,
-        nodeData,
       });
 
       const nodeClass = node.generateNodeClass();
@@ -171,7 +165,6 @@ describe("NodeDisplay", () => {
       const node = new GenericNode({
         workflowContext,
         nodeContext,
-        nodeData,
       });
 
       const nodeClass = node.generateNodeClass();
