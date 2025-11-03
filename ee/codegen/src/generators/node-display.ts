@@ -8,6 +8,7 @@ import {
   NodeDisplayData as NodeDisplayDataType,
   WorkflowDataNode,
 } from "src/types/vellum";
+import { isNilOrEmpty } from "src/utils/typing";
 
 export declare namespace NodeDisplay {
   export interface Args {
@@ -37,14 +38,34 @@ export class NodeDisplay extends AstNode {
     nodeDisplayData: NodeDisplayDataType | undefined,
     nodeContext: BaseNodeContext<WorkflowDataNode>
   ): AstNode | undefined {
-    if (isNil(nodeDisplayData?.icon) && isNil(nodeDisplayData?.color)) {
-      return undefined;
-    }
-
     const baseNodeClassNameAlias =
       nodeContext.baseNodeClassName === nodeContext.nodeClassName
         ? `Base${nodeContext.baseNodeClassName}`
         : undefined;
+
+    const fields: AstNode[] = [];
+
+    if (!isNil(nodeDisplayData?.icon)) {
+      fields.push(
+        python.field({
+          name: "icon",
+          initializer: python.TypeInstantiation.str(nodeDisplayData.icon),
+        })
+      );
+    }
+
+    if (!isNil(nodeDisplayData?.color)) {
+      fields.push(
+        python.field({
+          name: "color",
+          initializer: python.TypeInstantiation.str(nodeDisplayData.color),
+        })
+      );
+    }
+
+    if (isNilOrEmpty(fields)) {
+      return undefined;
+    }
 
     const clazz = python.class_({
       name: "Display",
@@ -58,23 +79,7 @@ export class NodeDisplay extends AstNode {
       ],
     });
 
-    if (!isNil(nodeDisplayData?.icon)) {
-      clazz.add(
-        python.field({
-          name: "icon",
-          initializer: python.TypeInstantiation.str(nodeDisplayData.icon),
-        })
-      );
-    }
-
-    if (!isNil(nodeDisplayData?.color)) {
-      clazz.add(
-        python.field({
-          name: "color",
-          initializer: python.TypeInstantiation.str(nodeDisplayData.color),
-        })
-      );
-    }
+    fields.forEach((field) => clazz.add(field));
 
     return clazz;
   }

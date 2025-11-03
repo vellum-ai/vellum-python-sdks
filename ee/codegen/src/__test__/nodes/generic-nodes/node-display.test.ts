@@ -29,29 +29,24 @@ describe("NodeDisplay", () => {
     {
       name: "with icon and color",
       displayData: { icon: "🎨", color: "#FF5733" },
-      shouldGenerate: true,
     },
     {
       name: "with only icon",
       displayData: { icon: "🔧" },
-      shouldGenerate: true,
     },
     {
       name: "with only color",
       displayData: { color: "#00FF00" },
-      shouldGenerate: true,
     },
     {
       name: "without icon or color",
       displayData: { position: { x: 100, y: 200 } },
-      shouldGenerate: false,
     },
     {
       name: "with null icon and color",
       displayData: { icon: null, color: null },
-      shouldGenerate: false,
     },
-  ])("$name", async ({ displayData, shouldGenerate }) => {
+  ])("$name", async ({ displayData }) => {
     const nodeData = genericNodeFactory({ label: "MyCustomNode" });
     nodeData.displayData = displayData;
 
@@ -65,12 +60,7 @@ describe("NodeDisplay", () => {
 
     const writer = new Writer();
     nodeClass.write(writer);
-    const generated = await writer.toStringFormatted();
 
-    if (shouldGenerate) {
-      expect(generated).toMatchSnapshot();
-    } else {
-      expect(generated).not.toContain("class Display");
-    }
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
 });
