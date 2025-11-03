@@ -83,14 +83,6 @@ describe("WebSearchNode", () => {
               inputVariableId: "search-query-input-id",
             },
           },
-          {
-            id: "custom-num-results-id",
-            name: "num_results",
-            value: {
-              type: "CONSTANT_VALUE",
-              value: { type: "NUMBER", value: 5 },
-            },
-          },
         ],
       });
 
@@ -132,52 +124,6 @@ describe("WebSearchNode", () => {
               type: "NODE_OUTPUT",
               nodeId: "previous-search-node",
               nodeOutputId: "previous-node-output-id",
-            },
-          },
-          {
-            id: "num-results-constant",
-            name: "num_results",
-            value: {
-              type: "CONSTANT_VALUE",
-              value: { type: "NUMBER", value: 5 },
-            },
-          },
-        ],
-      });
-
-      const nodeContext = (await createNodeContext({
-        workflowContext,
-        nodeData,
-      })) as GenericNodeContext;
-
-      const testNode = new GenericNode({
-        workflowContext,
-        nodeContext,
-      });
-
-      testNode.getNodeFile().write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
-    });
-  });
-
-  describe("parameter validation", () => {
-    it("should handle string to number conversion for num_results", async () => {
-      const nodeData = webSearchNodeFactory({
-        nodeAttributes: [
-          {
-            id: "query-constant",
-            name: "query",
-            value: {
-              type: "CONSTANT_VALUE",
-              value: { type: "STRING", value: "AI news" },
-            },
-          },
-          {
-            id: "num-results-string",
-            name: "num_results",
-            value: {
-              type: "CONSTANT_VALUE",
-              value: { type: "STRING", value: "15" },
             },
           },
         ],

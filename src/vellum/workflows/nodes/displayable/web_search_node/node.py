@@ -15,11 +15,9 @@ class WebSearchNode(BaseNode[StateType]):
     Used to perform web search using SerpAPI.
 
     query: str - The search query to execute
-    num_results: int - Number of search results to return (default: 10)
     """
 
     query: ClassVar[str] = ""
-    num_results: ClassVar[int] = 10
 
     class Outputs(BaseOutputs):
         """
@@ -40,9 +38,6 @@ class WebSearchNode(BaseNode[StateType]):
             raise NodeException(
                 "Query is required and must be a non-empty string", code=WorkflowErrorCode.INVALID_INPUTS
             )
-
-        if not isinstance(self.num_results, int) or self.num_results <= 0:
-            raise NodeException("num_results must be a positive integer", code=WorkflowErrorCode.INVALID_INPUTS)
 
     def run(self) -> Outputs:
         """Run the WebSearchNode to perform web search via SerpAPI."""

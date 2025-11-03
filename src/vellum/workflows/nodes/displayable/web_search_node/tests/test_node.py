@@ -17,16 +17,14 @@ def base_node_setup(vellum_client):
 
     class Inputs(BaseInputs):
         query: str
-        num_results: int
 
     class State(BaseState):
         pass
 
     class TestableWebSearchNode(WebSearchNode):
         query = Inputs.query
-        num_results = Inputs.num_results
 
-    state = State(meta=StateMeta(workflow_inputs=Inputs(query="test query", num_results=3)))
+    state = State(meta=StateMeta(workflow_inputs=Inputs(query="test query")))
     context = MagicMock()
     context.vellum_client = vellum_client
     node = TestableWebSearchNode(state=state, context=context)
@@ -124,7 +122,6 @@ def test_empty_query_validation(vellum_client):
     # GIVEN a node with an empty query
     class TestNode(WebSearchNode):
         query = ""
-        num_results = 10
 
     context = MagicMock()
     context.vellum_client = vellum_client
@@ -137,27 +134,6 @@ def test_empty_query_validation(vellum_client):
     # THEN it should raise a validation error
     assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
     assert "Query is required" in str(exc_info.value)
-
-
-def test_invalid_num_results_validation(vellum_client):
-    """Test invalid num_results raises validation error."""
-
-    # GIVEN a node with invalid num_results
-    class TestNode(WebSearchNode):
-        query = "test query"
-        num_results = -1
-
-    context = MagicMock()
-    context.vellum_client = vellum_client
-    node = TestNode(state=BaseState(meta=StateMeta(workflow_inputs=BaseInputs())), context=context)
-
-    # WHEN we run the node
-    with pytest.raises(NodeException) as exc_info:
-        node.run()
-
-    # THEN it should raise a validation error
-    assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
-    assert "num_results must be a positive integer" in str(exc_info.value)
 
 
 def test_empty_organic_results(base_node_setup):
