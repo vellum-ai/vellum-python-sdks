@@ -653,16 +653,19 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
     def get_default_inputs(self) -> InputsType:
         return self.get_inputs_class()()
 
-    def get_default_state(self, workflow_inputs: Optional[InputsType] = None) -> StateType:
+    def get_default_state(
+        self, workflow_inputs: Optional[InputsType] = None, execution_id: Optional[UUID] = None
+    ) -> StateType:
         return self.get_state_class()(
             meta=StateMeta(
                 parent=self._parent_state,
                 workflow_inputs=workflow_inputs or self.get_default_inputs(),
                 workflow_definition=self.__class__,
+                span_id=execution_id,
             )
         )
 
-    def get_state_at_node(self, node: Type[BaseNode]) -> StateType:
+    def get_state_at_node(self, node: Type[BaseNode], execution_id: Optional[UUID] = None) -> StateType:
         event_ts = datetime.min
         for event in self._store.events:
             if event.name == "node.execution.initiated" and event.node_definition == node:
@@ -676,11 +679,11 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             most_recent_state_snapshot = cast(StateType, snapshot)
 
         if not most_recent_state_snapshot:
-            return self.get_default_state()
+            return self.get_default_state(execution_id=execution_id)
 
         return most_recent_state_snapshot
 
-    def get_most_recent_state(self) -> StateType:
+    def get_most_recent_state(self, execution_id: Optional[UUID] = None) -> StateType:
         most_recent_state_snapshot: Optional[StateType] = None
 
         for snapshot in self._store.state_snapshots:
@@ -691,7 +694,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
                 most_recent_state_snapshot = next_state
 
         if not most_recent_state_snapshot:
-            return self.get_default_state()
+            return self.get_default_state(execution_id=execution_id)
 
         return most_recent_state_snapshot
 
