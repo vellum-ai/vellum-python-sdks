@@ -1,5 +1,5 @@
 import logging
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List
 
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
@@ -16,12 +16,10 @@ class WebSearchNode(BaseNode[StateType]):
 
     query: str - The search query to execute
     num_results: int - Number of search results to return (default: 10)
-    location: Optional[str] - Geographic location filter for search
     """
 
     query: ClassVar[str] = ""
     num_results: ClassVar[int] = 10
-    location: ClassVar[Optional[str]] = None
 
     class Outputs(BaseOutputs):
         """

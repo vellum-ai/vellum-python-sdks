@@ -88,26 +88,6 @@ def test_successful_search_with_results(base_node_setup):
     )
 
 
-def test_search_with_location_parameter(base_node_setup):
-    """Test that location parameter is properly passed to SerpAPI."""
-    # GIVEN a location parameter is set
-    base_node_setup.location = "New York, NY"
-
-    mock_response = ComposioExecuteToolResponse(provider="COMPOSIO", data={"organic_results": []})
-    base_node_setup._context.vellum_client.integrations.execute_integration_tool = MagicMock(return_value=mock_response)
-
-    # WHEN we run the node
-    base_node_setup.run()
-
-    # THEN the Vellum client should have been called with the correct query
-    base_node_setup._context.vellum_client.integrations.execute_integration_tool.assert_called_once_with(
-        integration_name="SERPAPI",
-        integration_provider="COMPOSIO",
-        tool_name="SERPAPI_SEARCH",
-        arguments={"query": "test query"},
-    )
-
-
 def test_authentication_error_401(base_node_setup):
     """Test authentication error raises NodeException with PROVIDER_ERROR."""
     base_node_setup._context.vellum_client.integrations.execute_integration_tool = MagicMock(

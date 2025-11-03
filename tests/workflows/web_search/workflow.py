@@ -11,7 +11,6 @@ class WebSearchInputs(BaseInputs):
 class SimpleWebSearchNode(WebSearchNode):
     query = WebSearchInputs.search_query
     num_results = 5
-    location = "United States"
 
 
 class WebSearchWorkflow(BaseWorkflow[WebSearchInputs, BaseState]):

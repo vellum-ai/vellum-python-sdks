@@ -91,14 +91,6 @@ describe("WebSearchNode", () => {
               value: { type: "NUMBER", value: 5 },
             },
           },
-          {
-            id: "custom-location-id",
-            name: "location",
-            value: {
-              type: "CONSTANT_VALUE",
-              value: { type: "STRING", value: "California" },
-            },
-          },
         ],
       });
 
@@ -148,14 +140,6 @@ describe("WebSearchNode", () => {
             value: {
               type: "CONSTANT_VALUE",
               value: { type: "NUMBER", value: 5 },
-            },
-          },
-          {
-            id: "location-constant",
-            name: "location",
-            value: {
-              type: "CONSTANT_VALUE",
-              value: { type: "STRING", value: "New York" },
             },
           },
         ],
