@@ -81,12 +81,10 @@ exports[`WebSearchNode > value type variations > should handle NODE_OUTPUT for q
 "from vellum.workflows.nodes.displayable.web_search_node import (
     WebSearchNode as BaseWebSearchNode,
 )
-from vellum.workflows.references import EnvironmentVariableReference
 
 
 class WebSearchNode(BaseWebSearchNode):
     query = None
-    api_key = EnvironmentVariableReference(name="SERP_API_KEY")
     num_results = 5
     location = "New York"
 "
@@ -96,14 +94,12 @@ exports[`WebSearchNode > with custom attributes > should generate a web search n
 "from vellum.workflows.nodes.displayable.web_search_node import (
     WebSearchNode as BaseWebSearchNode,
 )
-from vellum.workflows.references import EnvironmentVariableReference
 
 from ..inputs import Inputs
 
 
 class WebSearchNode(BaseWebSearchNode):
     query = Inputs.query
-    api_key = EnvironmentVariableReference(name="CUSTOM_SERP_KEY")
     num_results = 5
     location = "California"
 "

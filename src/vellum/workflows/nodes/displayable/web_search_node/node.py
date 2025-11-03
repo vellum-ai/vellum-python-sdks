@@ -12,16 +12,14 @@ logger = logging.getLogger(__name__)
 
 class WebSearchNode(BaseNode[StateType]):
     """
-    Used to perform web search using SerpAPI via Composio.
+    Used to perform web search using SerpAPI.
 
     query: str - The search query to execute
-    api_key: str - Not used (kept for backward compatibility)
     num_results: int - Number of search results to return (default: 10)
     location: Optional[str] - Geographic location filter for search
     """
 
     query: ClassVar[str] = ""
-    api_key: ClassVar[Optional[str]] = None
     num_results: ClassVar[int] = 10
     location: ClassVar[Optional[str]] = None
 
@@ -49,7 +47,7 @@ class WebSearchNode(BaseNode[StateType]):
             raise NodeException("num_results must be a positive integer", code=WorkflowErrorCode.INVALID_INPUTS)
 
     def run(self) -> Outputs:
-        """Run the WebSearchNode to perform web search via Composio SerpAPI."""
+        """Run the WebSearchNode to perform web search via SerpAPI."""
         self._validate()
 
         try:

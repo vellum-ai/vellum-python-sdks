@@ -17,7 +17,6 @@ def base_node_setup(vellum_client):
 
     class Inputs(BaseInputs):
         query: str
-        api_key: str
         num_results: int
 
     class State(BaseState):
@@ -25,10 +24,9 @@ def base_node_setup(vellum_client):
 
     class TestableWebSearchNode(WebSearchNode):
         query = Inputs.query
-        api_key = Inputs.api_key
         num_results = Inputs.num_results
 
-    state = State(meta=StateMeta(workflow_inputs=Inputs(query="test query", api_key="test_api_key", num_results=3)))
+    state = State(meta=StateMeta(workflow_inputs=Inputs(query="test query", num_results=3)))
     context = MagicMock()
     context.vellum_client = vellum_client
     node = TestableWebSearchNode(state=state, context=context)
@@ -146,7 +144,6 @@ def test_empty_query_validation(vellum_client):
     # GIVEN a node with an empty query
     class TestNode(WebSearchNode):
         query = ""
-        api_key = "test_key"
         num_results = 10
 
     context = MagicMock()
@@ -162,38 +159,12 @@ def test_empty_query_validation(vellum_client):
     assert "Query is required" in str(exc_info.value)
 
 
-def test_missing_api_key_validation(vellum_client):
-    """Test missing API key does not raise validation error (backward compatibility)."""
-
-    # GIVEN a node with no API key
-    class TestNode(WebSearchNode):
-        query = "test query"
-        api_key = None
-        num_results = 10
-
-    context = MagicMock()
-    context.vellum_client = vellum_client
-    node = TestNode(state=BaseState(meta=StateMeta(workflow_inputs=BaseInputs())), context=context)
-
-    mock_response = ComposioExecuteToolResponse(provider="COMPOSIO", data={"organic_results": []})
-    context.vellum_client.integrations.execute_integration_tool = MagicMock(return_value=mock_response)
-
-    # WHEN we run the node
-    outputs = node.run()
-
-    # THEN it should succeed (API key is no longer required)
-    assert outputs.text == ""
-    assert outputs.urls == []
-    assert outputs.results == []
-
-
 def test_invalid_num_results_validation(vellum_client):
     """Test invalid num_results raises validation error."""
 
     # GIVEN a node with invalid num_results
     class TestNode(WebSearchNode):
         query = "test query"
-        api_key = "test_key"
         num_results = -1
 
     context = MagicMock()

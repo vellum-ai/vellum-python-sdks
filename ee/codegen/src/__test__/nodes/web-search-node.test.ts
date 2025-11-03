@@ -84,14 +84,6 @@ describe("WebSearchNode", () => {
             },
           },
           {
-            id: "custom-api-key-id",
-            name: "api_key",
-            value: {
-              type: "ENVIRONMENT_VARIABLE",
-              environmentVariable: "CUSTOM_SERP_KEY",
-            },
-          },
-          {
             id: "custom-num-results-id",
             name: "num_results",
             value: {
@@ -148,14 +140,6 @@ describe("WebSearchNode", () => {
               type: "NODE_OUTPUT",
               nodeId: "previous-search-node",
               nodeOutputId: "previous-node-output-id",
-            },
-          },
-          {
-            id: "api-key-secret",
-            name: "api_key",
-            value: {
-              type: "ENVIRONMENT_VARIABLE",
-              environmentVariable: "SERP_API_KEY",
             },
           },
           {
