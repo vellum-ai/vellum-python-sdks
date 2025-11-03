@@ -33,9 +33,7 @@ class VellumResolver(BaseWorkflowResolver):
 
         return state_class(**converted_data)
 
-    def load_state(
-        self, previous_execution_id: Optional[Union[UUID, str]] = None, execution_id: Optional[UUID] = None
-    ) -> Optional[LoadStateResult]:
+    def load_state(self, previous_execution_id: Optional[Union[UUID, str]] = None) -> Optional[LoadStateResult]:
         if isinstance(previous_execution_id, UUID):
             previous_execution_id = str(previous_execution_id)
 
@@ -63,9 +61,6 @@ class VellumResolver(BaseWorkflowResolver):
         else:
             logger.warning("No workflow class registered, falling back to BaseState")
             state = BaseState(**response.state)
-
-        if execution_id:
-            state.meta.span_id = execution_id
 
         if (
             response.previous_trace_id is None
