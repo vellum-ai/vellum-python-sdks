@@ -277,6 +277,7 @@ def get_mcp_tool_name(tool_def: MCPToolDefinition) -> str:
     return f"{server_name}__{tool_def.name}"
 
 
+@lru_cache(maxsize=1)
 def compile_mcp_tool_definition(server_def: MCPServer) -> List[MCPToolDefinition]:
     """Hydrate an MCPToolDefinition with detailed information from the MCP server.
 

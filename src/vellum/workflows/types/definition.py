@@ -213,6 +213,19 @@ class MCPServer(UniversalBaseModel):
         if name == "api_key_header_value" and isinstance(value, EnvironmentVariableReference):
             value.serialize_as_constant = True
 
+    def __hash__(self) -> int:
+        """Make MCPServer hashable for use with lru_cache."""
+        return hash(
+            (
+                self.url,
+                self.name,
+                self.authorization_type,
+                self.bearer_token_value,
+                self.api_key_header_key,
+                self.api_key_header_value,
+            )
+        )
+
 
 class MCPToolDefinition(UniversalBaseModel):
     name: str
