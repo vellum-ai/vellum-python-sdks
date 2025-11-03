@@ -170,27 +170,32 @@ def test_no_exception_when_no_previous_execution_id():
 
 def test_workflow_uses_constructor_execution_id_as_span_id():
     """
-    Tests that execution_id from constructor sets the span_id in workflow events.
+    Tests that execution_id parameter in run() sets the span_id in workflow events.
     """
 
+    workflow = TestWorkflowWithNoResolvers()
+
+    # AND an execution_id
     execution_id = uuid4()
-    workflow = TestWorkflowWithNoResolvers(execution_id=execution_id)
 
-    result = workflow.run()
+    # WHEN we run the workflow with execution_id
+    result = workflow.run(execution_id=execution_id)
 
+    # THEN the result span_id should match the execution_id
     assert result.span_id == execution_id
 
 
 def test_workflow_run_previous_execution_id_overrides_constructor_execution_id():
     """
-    Tests that previous_execution_id parameter in run() overrides constructor execution_id.
+    Tests that previous_execution_id parameter triggers resume behavior.
     """
 
-    constructor_execution_id = uuid4()
-    workflow = TestWorkflowWithNoResolvers(execution_id=constructor_execution_id)
+    workflow = TestWorkflowWithNoResolvers()
 
+    # AND a previous_execution_id
     run_execution_id = str(uuid4())
 
+    # WHEN we run the workflow with previous_execution_id
     # THEN it should raise an exception because no resolvers are configured
     with pytest.raises(WorkflowInitializationException) as exc_info:
         workflow.run(previous_execution_id=run_execution_id)

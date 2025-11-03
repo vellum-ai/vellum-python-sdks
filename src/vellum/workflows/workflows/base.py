@@ -252,7 +252,6 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         emitters: Optional[List[BaseWorkflowEmitter]] = None,
         resolvers: Optional[List[BaseWorkflowResolver]] = None,
         store: Optional[Store] = None,
-        execution_id: Optional[UUID] = None,
     ):
         self._parent_state = parent_state
         self._context = context or WorkflowContext()
@@ -263,7 +262,6 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         self._store = store or self._context.store_class()
         self._execution_context = self._context.execution_context
         self._current_runner: Optional[WorkflowRunner] = None
-        self._execution_id = execution_id
 
         # Register context with all emitters
         for emitter in self.emitters:
@@ -383,6 +381,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         entrypoint_nodes: Optional[RunFromNodeArg] = None,
         external_inputs: Optional[ExternalInputsArg] = None,
         previous_execution_id: Optional[Union[str, UUID]] = None,
+        execution_id: Optional[UUID] = None,
         cancel_signal: Optional[CancelSignal] = None,
         node_output_mocks: Optional[MockNodeExecutionArg] = None,
         max_concurrency: Optional[int] = None,
@@ -412,6 +411,9 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
 
         previous_execution_id: Optional[Union[str, UUID]] = None
             The execution ID of the previous execution to resume from.
+
+        execution_id: Optional[UUID] = None
+            The execution ID to use for this workflow run. Sets the initial state's span_id for fresh runs.
 
         cancel_signal: Optional[CancelSignal] = None
             A cancel signal that can be used to cancel the Workflow Execution.
@@ -449,7 +451,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             timeout=timeout,
             init_execution_context=self._execution_context,
             trigger=trigger,
-            execution_id=self._execution_id,
+            execution_id=execution_id,
         )
         self._current_runner = runner
         events = runner.stream()
@@ -517,6 +519,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         entrypoint_nodes: Optional[RunFromNodeArg] = None,
         external_inputs: Optional[ExternalInputsArg] = None,
         previous_execution_id: Optional[Union[str, UUID]] = None,
+        execution_id: Optional[UUID] = None,
         cancel_signal: Optional[CancelSignal] = None,
         node_output_mocks: Optional[MockNodeExecutionArg] = None,
         max_concurrency: Optional[int] = None,
@@ -547,6 +550,9 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
 
         previous_execution_id: Optional[Union[str, UUID]] = None
             The execution ID of the previous execution to resume from.
+
+        execution_id: Optional[UUID] = None
+            The execution ID to use for this workflow run. Sets the initial state's span_id for fresh runs.
 
         cancel_signal: Optional[CancelSignal] = None
             A cancel signal that can be used to cancel the Workflow Execution.
@@ -585,7 +591,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             timeout=timeout,
             init_execution_context=self._execution_context,
             trigger=trigger,
-            execution_id=self._execution_id,
+            execution_id=execution_id,
         )
         self._current_runner = runner
         runner_stream = runner.stream()
