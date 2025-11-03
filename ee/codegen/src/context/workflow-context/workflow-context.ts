@@ -305,7 +305,14 @@ export class WorkflowContext {
       (n): n is EntrypointNode => n.type === "ENTRYPOINT"
     );
     if (entrypointNodes.length > 1) {
-      throw new WorkflowGenerationError("Multiple entrypoint nodes found");
+      this.addError(
+        new WorkflowGenerationError(
+          "Multiple entrypoint nodes found",
+          "WARNING"
+        )
+      );
+      this.entrypointNode = entrypointNodes[0];
+      return this.entrypointNode ?? null;
     }
 
     const entrypointNode = entrypointNodes[0];
