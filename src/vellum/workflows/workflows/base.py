@@ -656,14 +656,17 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
     def get_default_state(
         self, workflow_inputs: Optional[InputsType] = None, execution_id: Optional[UUID] = None
     ) -> StateType:
-        return self.get_state_class()(
-            meta=StateMeta(
-                parent=self._parent_state,
-                workflow_inputs=workflow_inputs or self.get_default_inputs(),
-                workflow_definition=self.__class__,
-                span_id=execution_id,
-            )
+        meta = StateMeta(
+            parent=self._parent_state,
+            workflow_inputs=workflow_inputs or self.get_default_inputs(),
+            workflow_definition=self.__class__,
         )
+
+        # Makes the uuid factory mocker work this way instead of setting in cosntructor
+        if execution_id:
+            meta.span_id = execution_id
+
+        return self.get_state_class()(meta=meta)
 
     def get_state_at_node(self, node: Type[BaseNode], execution_id: Optional[UUID] = None) -> StateType:
         event_ts = datetime.min
