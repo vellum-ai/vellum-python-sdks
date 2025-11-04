@@ -85,13 +85,13 @@ def test_serialize_workflow_with_filepath():
         "data": {
             "label": "Simple Code Execution Node",
             "error_output_id": None,
-            "source_handle_id": "1248f512-cc1b-4daa-a444-3bf7a1f1b8f9",
-            "target_handle_id": "1248f512-cc1b-4daa-a444-3bf7a1f1b8f9",
+            "source_handle_id": "6aed9e19-9d26-457b-966d-0a9112f84070",
+            "target_handle_id": "f1ea9f65-e225-49cc-a779-6bd0797ba22a",
             "code_input_id": "e7a6c15f-083f-4775-8315-22b8fb62b9ba",
             "runtime_input_id": "1248f512-cc1b-4daa-a444-3bf7a1f1b8f9",
             "output_type": "NUMBER",
             "packages": [{"name": "openai", "version": "1.0.0"}],
-            "output_id": "8eea2893-1e79-4d1c-ba51-2e045968abfb",
+            "output_id": "730c8f17-891c-40b4-b43d-26672bd38eef",
             "log_output_id": "8eea2893-1e79-4d1c-ba51-2e045968abfb",
         },
         "display_data": {"position": {"x": 200.0, "y": -50.0}},
@@ -111,10 +111,10 @@ def test_serialize_workflow_with_filepath():
             "name": "SimpleCodeExecutionNode",
         },
         "trigger": {
-            "id": "1248f512-cc1b-4daa-a444-3bf7a1f1b8f9",
+            "id": "f1ea9f65-e225-49cc-a779-6bd0797ba22a",
             "merge_behavior": "AWAIT_ANY",
         },
-        "ports": [{"id": "1248f512-cc1b-4daa-a444-3bf7a1f1b8f9", "name": "default", "type": "DEFAULT"}],
+        "ports": [{"id": "6aed9e19-9d26-457b-966d-0a9112f84070", "name": "default", "type": "DEFAULT"}],
     }
     assert not DeepDiff(
         [
@@ -139,7 +139,7 @@ def test_serialize_workflow_with_filepath():
                                     "type": "NODE_OUTPUT",
                                     "data": {
                                         "node_id": "b4a0526b-0e31-4f63-892a-6d5197d09acf",
-                                        "output_id": "8eea2893-1e79-4d1c-ba51-2e045968abfb",
+                                        "output_id": "730c8f17-891c-40b4-b43d-26672bd38eef",
                                     },
                                 }
                             ],
@@ -200,17 +200,17 @@ def test_serialize_workflow_with_filepath():
     assert not DeepDiff(
         [
             {
-                "id": "32673715-d88c-4727-b284-21ae4efe3f85",
+                "id": "48e2c971-b780-436a-873a-3f775fc04ab3",
                 "source_node_id": "bd18f11c-5f7a-45d5-9970-0b1cf10d3761",
                 "source_handle_id": "118e4298-aa79-467c-b8b4-2df540905e86",
                 "target_node_id": "b4a0526b-0e31-4f63-892a-6d5197d09acf",
-                "target_handle_id": "1248f512-cc1b-4daa-a444-3bf7a1f1b8f9",
+                "target_handle_id": "f1ea9f65-e225-49cc-a779-6bd0797ba22a",
                 "type": "DEFAULT",
             },
             {
                 "id": "d1e66711-75b3-41c3-beb6-424894fdd307",
                 "source_node_id": "b4a0526b-0e31-4f63-892a-6d5197d09acf",
-                "source_handle_id": "1248f512-cc1b-4daa-a444-3bf7a1f1b8f9",
+                "source_handle_id": "6aed9e19-9d26-457b-966d-0a9112f84070",
                 "target_node_id": "994d5c2e-00d2-4dff-9a9d-804766d03698",
                 "target_handle_id": "30fb0f4a-61c3-49de-a0aa-7dfdcee6ea07",
                 "type": "DEFAULT",
@@ -218,7 +218,7 @@ def test_serialize_workflow_with_filepath():
             {
                 "id": "67d4c43e-80f9-4875-b6ab-9ecbba19fc7a",
                 "source_node_id": "b4a0526b-0e31-4f63-892a-6d5197d09acf",
-                "source_handle_id": "1248f512-cc1b-4daa-a444-3bf7a1f1b8f9",
+                "source_handle_id": "6aed9e19-9d26-457b-966d-0a9112f84070",
                 "target_node_id": "c6e3aced-1fc9-48d2-ae55-d2a880e359cb",
                 "target_handle_id": "1e126004-9de7-42c0-b1e1-87f9eb0642e2",
                 "type": "DEFAULT",
