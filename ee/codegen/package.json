@@ -37,7 +37,7 @@
     "@fern-fern/generator-exec-sdk": "file:./stubs/generator-exec-sdk",
     "lodash": "^4.17.21",
     "uuid": "^11.0.3",
-    "vellum-ai": "1.5.3"
+    "vellum-ai": "1.9.5"
   },
   "devDependencies": {
     "@octokit/auth-app": "^7.1.3",

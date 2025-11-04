@@ -106,7 +106,7 @@ class ChatHistoryVellumValue extends AstNode {
         }),
       ];
 
-      if (chatMessage.text !== undefined) {
+      if (chatMessage.text !== undefined && chatMessage.text !== null) {
         arguments_.push(
           python.methodArgument({
             name: "text",
