@@ -71,6 +71,12 @@ class VirtualFileLoader(importlib.abc.Loader):
 
     def _to_relative(self, fullname: str) -> Optional[str]:
         """Convert a fully qualified module name to a relative name without the namespace prefix."""
+        if self.source_module:
+            if fullname.startswith(self.source_module + "."):
+                return fullname[len(self.source_module) + 1 :]
+            elif fullname == self.source_module:
+                return ""
+
         if fullname.startswith(self.namespace + "."):
             return fullname[len(self.namespace) + 1 :]
         elif fullname == self.namespace:
@@ -81,6 +87,12 @@ class VirtualFileLoader(importlib.abc.Loader):
         return f"{fullname.replace('.', '/')}.py"
 
     def _get_code(self, file_path):
+        if self.source_module:
+            source_module_prefix = re.escape(self.source_module) + r"/"
+            file_key_name = re.sub(r"^" + source_module_prefix, "", file_path)
+            if file_key_name != file_path:
+                return self.files.get(file_key_name)
+
         file_key_name = re.sub(r"^" + re.escape(self.namespace) + r"/", "", file_path)
         return self.files.get(file_key_name)
 
