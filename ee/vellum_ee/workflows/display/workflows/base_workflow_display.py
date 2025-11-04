@@ -6,6 +6,7 @@ import inspect
 import json
 import logging
 import os
+import traceback
 from uuid import UUID
 from typing import Any, Dict, ForwardRef, Generic, List, Optional, Set, Tuple, Type, TypeVar, Union, cast, get_args
 
@@ -80,9 +81,14 @@ IGNORE_PATTERNS = [
 ]
 
 
+class WorkflowSerializationError(UniversalBaseModel):
+    message: str
+    stacktrace: str
+
+
 class WorkflowSerializationResult(UniversalBaseModel):
     exec_config: Dict[str, Any]
-    errors: List[str]
+    errors: List[WorkflowSerializationError]
     dataset: Optional[List[Dict[str, Any]]] = None
 
 
@@ -1118,7 +1124,13 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
         return WorkflowSerializationResult(
             exec_config=exec_config,
-            errors=[str(error) for error in workflow_display.display_context.errors],
+            errors=[
+                WorkflowSerializationError(
+                    message=str(error),
+                    stacktrace="".join(traceback.format_exception(type(error), error, error.__traceback__)),
+                )
+                for error in workflow_display.display_context.errors
+            ],
             dataset=dataset,
         )
 
