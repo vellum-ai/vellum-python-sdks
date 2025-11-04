@@ -15,6 +15,10 @@ class ConditionalNode(BaseNode[StateType], Generic[StateType]):
     Vellum's Conditional Node, and for most cases, you should extend `BaseNode.Ports` directly.
     """
 
+    class Display(BaseNode.Display):
+        icon = "vellum:icon:split"
+        color = "corn"
+
     class Trigger(BaseNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY
 

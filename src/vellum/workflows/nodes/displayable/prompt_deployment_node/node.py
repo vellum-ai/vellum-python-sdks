@@ -26,6 +26,10 @@ class PromptDeploymentNode(BasePromptDeploymentNode[StateType]):
     request_options: Optional[RequestOptions] - The request options to use for the Prompt Execution
     """
 
+    class Display(BasePromptDeploymentNode.Display):
+        icon = "vellum:icon:text-size"
+        color = "navy"
+
     class Trigger(BasePromptDeploymentNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY
 

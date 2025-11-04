@@ -11,5 +11,9 @@ class MergeNode(BaseNode[StateType], Generic[StateType]):
     with Vellum's Merge Node, and for most cases, you should extend from `BaseNode.Trigger` directly.
     """
 
+    class Display(BaseNode.Display):
+        icon = "vellum:icon:merge"
+        color = "tomato"
+
     class Trigger(BaseNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY

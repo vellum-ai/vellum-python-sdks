@@ -15,6 +15,10 @@ class ErrorNode(BaseNode[StateType], Generic[StateType]):
     error: Union[str, VellumError] - The error to raise.
     """
 
+    class Display(BaseNode.Display):
+        icon = "vellum:icon:hexagon-exclamation"
+        color = "lipstick"
+
     error: ClassVar[Union[str, WorkflowError, VellumError]]
 
     class Ports(NodePorts):

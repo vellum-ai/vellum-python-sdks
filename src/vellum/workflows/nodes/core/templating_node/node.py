@@ -47,6 +47,10 @@ class TemplatingNode(BaseNode[StateType], Generic[StateType, _OutputType], metac
     Useful for lightweight data transformations and complex string templating.
     """
 
+    class Display(BaseNode.Display):
+        icon = "vellum:icon:stamp"
+        color = "brown"
+
     # The Jinja template to render.
     template: ClassVar[str] = ""
 

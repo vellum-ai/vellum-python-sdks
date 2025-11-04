@@ -17,6 +17,10 @@ class WebSearchNode(BaseNode[StateType]):
     query: str - The search query to execute
     """
 
+    class Display(BaseNode.Display):
+        icon = "vellum:icon:magnifying-glass"
+        color = "lightBlue"
+
     query: ClassVar[str] = ""
 
     class Outputs(BaseOutputs):

@@ -78,6 +78,10 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
     request_options: Optional[RequestOptions] = None - The request options to use for the custom script.
     """
 
+    class Display(BaseNode.Display):
+        icon = "vellum:icon:rectangle-code"
+        color = "lime"
+
     filepath: ClassVar[Optional[str]] = None
     code: ClassVar[Optional[str]] = None
 

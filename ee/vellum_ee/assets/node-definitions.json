@@ -1,7 +1,7 @@
 {
   "nodes": [
     {
-      "id": "7adce764-e895-4add-acb2-02111f43ef6c",
+      "id": "55e74c90-9901-42fd-92c3-2dd0c5fd4876",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -10,7 +10,9 @@
         "comment": {
           "value": "\n    Used to execute an API call. This node exists to be backwards compatible with Vellum's API Node, and for most cases,\n    you should extend from `BaseAPINode` directly.\n\n    url: str - The URL to send the request to.\n    method: APIRequestMethod - The HTTP method to use for the request.\n    data: Optional[str] - The data to send in the request body.\n    json: Optional[\"JsonObject\"] - The JSON data to send in the request body.\n    headers: Optional[Dict[str, Union[str, VellumSecret]]] - The headers to send in the request.\n\n    authorization_type: Optional[AuthorizationType] = None - The type of authorization to use for the API call.\n    api_key_header_key: Optional[str] = None - The header key to use for the API key authorization.\n    bearer_token_value: Optional[Union[str, VellumSecretReference]] = None - The bearer token value to use\n    for the bearer token authorization.\n    ",
           "expanded": true
-        }
+        },
+        "icon": "vellum:icon:signal-stream",
+        "color": "lightBlue"
       },
       "base": {
         "name": "BaseAPINode",
@@ -36,37 +38,37 @@
         ]
       },
       "trigger": {
-        "id": "3ed8e5b0-ba9d-4c27-8633-372fbecd0440",
+        "id": "c2aa7c83-7eba-4996-acb4-85cd4f5bbf58",
         "merge_behavior": "AWAIT_ANY"
       },
       "ports": [
         {
-          "id": "e740bddb-fc69-4561-bc84-d749c511b5e2",
+          "id": "f165a94f-33f7-4c09-8896-9e683a39e11c",
           "name": "default",
           "type": "DEFAULT"
         }
       ],
       "outputs": [
         {
-          "id": "fd55dc40-4e55-4327-8a89-d4123bb775df",
+          "id": "c5737084-f688-4695-ab81-5f97a6b1a5c2",
           "name": "json",
           "type": "JSON",
           "value": null
         },
         {
-          "id": "357a9805-da18-400c-9ce5-152be1dd2ff8",
+          "id": "99a8d2c4-080f-4605-810e-f5084a52f019",
           "name": "headers",
           "type": "JSON",
           "value": null
         },
         {
-          "id": "4e8c472c-5f32-4d41-9746-4085b3e8b6ef",
+          "id": "a2a63a64-75f1-49ba-8743-4db660179ab3",
           "name": "status_code",
           "type": "NUMBER",
           "value": null
         },
         {
-          "id": "90d2ccc0-40da-40c5-895d-adf7d2de28d3",
+          "id": "baa40ce0-35e7-4439-b280-085aaf4f54da",
           "name": "text",
           "type": "STRING",
           "value": null
@@ -74,7 +76,7 @@
       ],
       "attributes": [
         {
-          "id": "71fb28a9-5a2d-432e-8fc6-53e23fbd23ec",
+          "id": "aacb36f1-c980-460d-8002-43bb57128e05",
           "name": "timeout",
           "value": {
             "type": "CONSTANT_VALUE",
@@ -87,7 +89,7 @@
       ]
     },
     {
-      "id": "e04e5bb5-3dbe-49b6-baf6-a132e255ce33",
+      "id": "43b3514f-3490-47d6-9b78-bbc4736f0159",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -96,7 +98,9 @@
         "comment": {
           "value": "\n    Used to execute an arbitrary script. This node exists to be backwards compatible with\n    Vellum's Code Execution Node, and for most cases, you should extend from `BaseNode` directly.\n\n    filepath: str - The path to the script to execute.\n    code_inputs: EntityInputsInterface - The inputs for the custom script.\n    runtime: CodeExecutionRuntime = \"PYTHON_3_12\" - The runtime to use for the custom script.\n    packages: Optional[Sequence[CodeExecutionPackage]] = None - The packages to use for the custom script.\n    request_options: Optional[RequestOptions] = None - The request options to use for the custom script.\n    ",
           "expanded": true
-        }
+        },
+        "icon": "vellum:icon:rectangle-code",
+        "color": "lime"
       },
       "base": {
         "name": "BaseNode",
@@ -120,19 +124,19 @@
         ]
       },
       "trigger": {
-        "id": "135de9c9-9b59-41c0-a60e-ef2a94816cce",
+        "id": "fb1b8b44-5e7a-481b-a163-96e7e08219d5",
         "merge_behavior": "AWAIT_ANY"
       },
       "ports": [
         {
-          "id": "50258641-c958-4ba1-aa90-948a23d7a00a",
+          "id": "e66138d5-e50d-40d8-bc27-00545ce5e283",
           "name": "default",
           "type": "DEFAULT"
         }
       ]
     },
     {
-      "id": "afb26eb8-efce-49c8-a0d4-77ace7079145",
+      "id": "5d3c60ce-7acf-4d8b-a68d-65cc0b561ac5",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -141,7 +145,9 @@
         "comment": {
           "value": "\n    Used to conditionally determine which port to invoke next. This node exists to be backwards compatible with\n    Vellum's Conditional Node, and for most cases, you should extend `BaseNode.Ports` directly.\n    ",
           "expanded": true
-        }
+        },
+        "icon": "vellum:icon:split",
+        "color": "corn"
       },
       "base": {
         "name": "BaseNode",
@@ -165,13 +171,13 @@
         ]
       },
       "trigger": {
-        "id": "e1e8e028-f853-47a8-9fa4-e80fb7558024",
+        "id": "2b5617b4-5cc0-4f9a-9369-24982e2cd8c0",
         "merge_behavior": "AWAIT_ANY"
       },
       "ports": []
     },
     {
-      "id": "934fa117-64d4-426f-aee9-668383ff43cf",
+      "id": "92e401f1-110f-4edc-8bb0-cad879e1ea08",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -180,7 +186,9 @@
         "comment": {
           "value": "\n    Used to raise an error to reject the surrounding Workflow.\n\n    error: Union[str, VellumError] - The error to raise.\n    ",
           "expanded": true
-        }
+        },
+        "icon": "vellum:icon:hexagon-exclamation",
+        "color": "lipstick"
       },
       "base": {
         "name": "BaseNode",
@@ -204,13 +212,13 @@
         ]
       },
       "trigger": {
-        "id": "b89f1c81-970d-4fc9-907c-bb43b8315764",
+        "id": "c1b30829-76af-4d99-bf83-b030c551a7cf",
         "merge_behavior": "AWAIT_ATTRIBUTES"
       },
       "ports": []
     },
     {
-      "id": "35fb894a-52c2-4094-adb0-e9029d36311a",
+      "id": "55d0f8e9-acbd-4d33-85ba-c7527348f62a",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -219,7 +227,9 @@
         "comment": {
           "value": "\n    Used to execute a Prompt defined inline.\n\n    prompt_inputs: EntityInputsInterface - The inputs for the Prompt\n    ml_model: str - Either the ML Model's UUID or its name.\n    blocks: List[PromptBlock] - The blocks that make up the Prompt\n    functions: Optional[List[FunctionDefinition]] - The functions to include in the Prompt\n    parameters: PromptParameters - The parameters for the Prompt\n    expand_meta: Optional[AdHocExpandMeta] - Expandable execution fields to include in the response\n    request_options: Optional[RequestOptions] - The request options to use for the Prompt Execution\n    ",
           "expanded": true
-        }
+        },
+        "icon": "vellum:icon:text-size",
+        "color": "navy"
       },
       "base": {
         "name": "BaseInlinePromptNode",
@@ -245,31 +255,31 @@
         ]
       },
       "trigger": {
-        "id": "49a04569-77f5-4db2-9052-97ac1397f9e1",
+        "id": "d14ff235-9e0a-4496-9fd4-ae4cf39fa518",
         "merge_behavior": "AWAIT_ANY"
       },
       "ports": [
         {
-          "id": "33f90d07-59d4-4930-ae0f-988d33e78f16",
+          "id": "66943bf3-3c32-42da-9d4f-faab541f4285",
           "name": "default",
           "type": "DEFAULT"
         }
       ],
       "outputs": [
         {
-          "id": "8dace061-cea7-4550-a444-cd8f6ed5d90a",
+          "id": "af7d71b0-227c-4957-8234-d1dc76e62554",
           "name": "json",
           "type": "JSON",
           "value": null
         },
         {
-          "id": "d905c263-003e-4177-bcb3-36e0ec64a0eb",
+          "id": "b283959e-b719-49d2-ab9a-15c804ab52e8",
           "name": "text",
           "type": "STRING",
           "value": null
         },
         {
-          "id": "9e81ee2b-3532-4cc3-9262-e73c5c5b315b",
+          "id": "73c02172-2bd1-482d-b7fe-acc67135f7d0",
           "name": "results",
           "type": "ARRAY",
           "value": null
@@ -277,7 +287,7 @@
       ],
       "attributes": [
         {
-          "id": "488bd158-580c-4796-acce-840ee4046de2",
+          "id": "e2455e77-82ad-460f-8735-10d427d4d448",
           "name": "functions",
           "value": {
             "type": "CONSTANT_VALUE",
@@ -288,7 +298,7 @@
           }
         },
         {
-          "id": "d901d3d0-468a-44de-8b2e-9826c615bee7",
+          "id": "bd29a2cd-4965-4741-a3c2-9d0c753efdd9",
           "name": "parameters",
           "value": {
             "type": "CONSTANT_VALUE",
@@ -309,17 +319,17 @@
           }
         },
         {
-          "id": "40f6daf8-16dd-41ee-8f85-4ed717db24be",
+          "id": "76f813d6-0025-4733-9d03-848c49c93d66",
           "name": "ml_model",
           "value": null
         },
         {
-          "id": "132bb416-5d07-48e5-9549-b631287e5751",
+          "id": "1216ae32-e051-4c48-bd7d-69f2a4527f12",
           "name": "blocks",
           "value": null
         },
         {
-          "id": "ef1331d9-54a6-4b87-8b27-6fd633b0ca4e",
+          "id": "b66dc0b6-9e4d-4bbb-9b3c-b85e14071de0",
           "name": "prompt_inputs",
           "value": {
             "type": "CONSTANT_VALUE",
@@ -332,52 +342,7 @@
       ]
     },
     {
-      "id": "0d0d880e-fa99-410d-ba53-424c3e17a405",
-      "display_data": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0
-        },
-        "comment": {
-          "value": "\n    Used to execute a Subworkflow defined inline.\n\n    subworkflow: Type[\"BaseWorkflow[InputsType, InnerStateType]\"] - The Subworkflow to execute\n    subworkflow_inputs: ClassVar[EntityInputsInterface] = {}\n    ",
-          "expanded": true
-        }
-      },
-      "base": {
-        "name": "BaseNode",
-        "module": [
-          "vellum",
-          "workflows",
-          "nodes",
-          "bases",
-          "base"
-        ]
-      },
-      "definition": {
-        "name": "InlineSubworkflowNode",
-        "module": [
-          "vellum",
-          "workflows",
-          "nodes",
-          "core",
-          "inline_subworkflow_node",
-          "node"
-        ]
-      },
-      "trigger": {
-        "id": "820f0c54-66bd-41a6-ae62-de700c51f11b",
-        "merge_behavior": "AWAIT_ATTRIBUTES"
-      },
-      "ports": [
-        {
-          "id": "957159c9-afaf-4b9e-947c-596963c85aa0",
-          "name": "default",
-          "type": "DEFAULT"
-        }
-      ]
-    },
-    {
-      "id": "7e409091-5b3d-4232-8744-146127d98837",
+      "id": "2dded52f-a449-48fd-b58f-f59801c24bae",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -386,7 +351,9 @@
         "comment": {
           "value": "\n    Used to execute a Metric Definition and surface a float output representing the score.\n\n    metric_definition: Union[UUID, str] - Either the Metric Definition's UUID or its name.\n    metric_inputs: EntityInputsInterface - The inputs for the Metric\n    release_tag: str - The release tag to use for the Metric\n    request_options: Optional[RequestOptions] - The request options to use for the Metric\n    ",
           "expanded": true
-        }
+        },
+        "icon": "vellum:icon:shield-check",
+        "color": "rose"
       },
       "base": {
         "name": "BaseNode",
@@ -410,64 +377,19 @@
         ]
       },
       "trigger": {
-        "id": "0dbad819-0060-4a73-ba19-570cabe71cfb",
+        "id": "1560db25-a416-4ce6-b175-d7bdfbdb27d8",
         "merge_behavior": "AWAIT_ANY"
       },
       "ports": [
         {
-          "id": "e12c1c34-81a2-40b9-aa3b-8c5fc8ef1d62",
+          "id": "94bc1403-af9f-4539-8208-1bbafbf09564",
           "name": "default",
           "type": "DEFAULT"
         }
       ]
     },
     {
-      "id": "62ba7250-8508-41f1-8f14-709902c0e734",
-      "display_data": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0
-        },
-        "comment": {
-          "value": "\n    Used to map over a list of items and execute a Subworkflow on each iteration.\n\n    items: List[MapNodeItemType] - The items to map over\n    max_concurrency: Optional[int] = None - The maximum number of concurrent subworkflow executions\n    subworkflow: Type[\"BaseWorkflow\"] - The Subworkflow to execute\n    ",
-          "expanded": true
-        }
-      },
-      "base": {
-        "name": "BaseAdornmentNode",
-        "module": [
-          "vellum",
-          "workflows",
-          "nodes",
-          "bases",
-          "base_adornment_node"
-        ]
-      },
-      "definition": {
-        "name": "MapNode",
-        "module": [
-          "vellum",
-          "workflows",
-          "nodes",
-          "core",
-          "map_node",
-          "node"
-        ]
-      },
-      "trigger": {
-        "id": "d9ed81b3-891d-41e7-8ca3-696776a3375f",
-        "merge_behavior": "AWAIT_ATTRIBUTES"
-      },
-      "ports": [
-        {
-          "id": "96668bcf-a8c4-4eb1-bd33-c6a436bfa1a4",
-          "name": "default",
-          "type": "DEFAULT"
-        }
-      ]
-    },
-    {
-      "id": "3e261c1b-1fb4-4fc3-b267-6aa049a44e5a",
+      "id": "7426f273-a43d-4448-a2d2-76d0ee0d069c",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -476,7 +398,9 @@
         "comment": {
           "value": "\n    Used to merge the control flow of multiple nodes into a single node. This node exists to be backwards compatible\n    with Vellum's Merge Node, and for most cases, you should extend from `BaseNode.Trigger` directly.\n    ",
           "expanded": true
-        }
+        },
+        "icon": "vellum:icon:merge",
+        "color": "tomato"
       },
       "base": {
         "name": "BaseNode",
@@ -500,19 +424,19 @@
         ]
       },
       "trigger": {
-        "id": "efb22dde-30e6-4a89-a591-926643b39efd",
+        "id": "3a91ba25-0dd0-4bc8-9f6d-c54ea4dccf64",
         "merge_behavior": "AWAIT_ANY"
       },
       "ports": [
         {
-          "id": "362a5142-cd38-449e-b979-2c2ee9c8b7f8",
+          "id": "50515fe3-4be8-43b9-8fc5-d52c1250115e",
           "name": "default",
           "type": "DEFAULT"
         }
       ]
     },
     {
-      "id": "b398afe2-b643-4a1b-8484-9001978ace4e",
+      "id": "16b8d82d-458d-48d9-b57e-a447b19f311a",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -521,7 +445,9 @@
         "comment": {
           "value": "\n    A no-op Node purely used to display a note in the Vellum UI.\n    ",
           "expanded": true
-        }
+        },
+        "icon": "vellum:icon:note",
+        "color": "cyan"
       },
       "base": {
         "name": "BaseNode",
@@ -545,19 +471,19 @@
         ]
       },
       "trigger": {
-        "id": "6356ce89-12cc-43aa-a831-d5bb600a1ec4",
+        "id": "2b6907b0-1adc-41e7-9d5b-3c6ccd9b973a",
         "merge_behavior": "AWAIT_ANY"
       },
       "ports": [
         {
-          "id": "6742b6e3-6f9f-4ed7-ac82-3ae583908a7f",
+          "id": "22dac74c-7ad6-4a6f-97ae-0034124721ce",
           "name": "default",
           "type": "DEFAULT"
         }
       ]
     },
     {
-      "id": "92896f06-febf-48a2-9151-aa7ef28391b9",
+      "id": "3ae7366b-28ce-4d6b-8ec1-c6366b1e1a8b",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -566,7 +492,9 @@
         "comment": {
           "value": "\n    Used to execute a Workflow Deployment.\n\n    subworkflow_inputs: EntityInputsInterface - The inputs for the Subworkflow\n    deployment: Union[UUID, str] - Either the Workflow Deployment's UUID or its name.\n    release_tag: str = LATEST_RELEASE_TAG - The release tag to use for the Workflow Execution\n    external_id: Optional[str] = OMIT - Optionally include a unique identifier for tracking purposes.\n        Must be unique within a given Workflow Deployment.\n    expand_meta: Optional[WorkflowExpandMetaRequest] = OMIT - Expandable execution fields to include in the response\n    metadata: Optional[Dict[str, Optional[Any]]] = OMIT - The metadata to use for the Workflow Execution\n    request_options: Optional[RequestOptions] = None - The request options to use for the Workflow Execution\n    ",
           "expanded": true
-        }
+        },
+        "icon": "vellum:icon:diagram-sankey",
+        "color": "grass"
       },
       "base": {
         "name": "BaseNode",
@@ -590,19 +518,19 @@
         ]
       },
       "trigger": {
-        "id": "3d1f9cbf-d029-4928-a537-81cd28197d7f",
+        "id": "a6eecf28-5c21-4406-80bb-917c6de84050",
         "merge_behavior": "AWAIT_ANY"
       },
       "ports": [
         {
-          "id": "01990b8d-8790-4eb1-baa5-bccc85e927a2",
+          "id": "8fc8d25b-c9b5-4db7-a632-d4eb1eb3e9fd",
           "name": "default",
           "type": "DEFAULT"
         }
       ]
     },
     {
-      "id": "e1c8d236-6131-4218-aed8-45f986723227",
+      "id": "d2f9a8ec-3023-46bb-aca3-dd67ffb61e18",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -611,7 +539,9 @@
         "comment": {
           "value": "\n    Used to execute a Prompt Deployment and surface a string output and json output if applicable for convenience.\n\n    prompt_inputs: EntityInputsInterface - The inputs for the Prompt\n    deployment: Union[UUID, str] - Either the Prompt Deployment's UUID or its name.\n    release_tag: str - The release tag to use for the Prompt Execution\n    external_id: Optional[str] - Optionally include a unique identifier for tracking purposes.\n        Must be unique within a given Prompt Deployment.\n    expand_meta: Optional[PromptDeploymentExpandMetaRequest] - Expandable execution fields to include in the response\n    raw_overrides: Optional[RawPromptExecutionOverridesRequest] - The raw overrides to use for the Prompt Execution\n    expand_raw: Optional[Sequence[str]] - Expandable raw fields to include in the response\n    metadata: Optional[Dict[str, Optional[Any]]] - The metadata to use for the Prompt Execution\n    request_options: Optional[RequestOptions] - The request options to use for the Prompt Execution\n    ",
           "expanded": true
-        }
+        },
+        "icon": "vellum:icon:text-size",
+        "color": "navy"
       },
       "base": {
         "name": "BasePromptDeploymentNode",
@@ -636,31 +566,31 @@
         ]
       },
       "trigger": {
-        "id": "108f42bf-7b50-4076-9064-0422a63af13f",
+        "id": "7d209a9c-14a5-4b74-949c-d3e681750049",
         "merge_behavior": "AWAIT_ANY"
       },
       "ports": [
         {
-          "id": "d332037f-c991-4b27-b00d-81d9deccee10",
+          "id": "d51b7c72-3e1f-400c-ba1c-1125b1047d9a",
           "name": "default",
           "type": "DEFAULT"
         }
       ],
       "outputs": [
         {
-          "id": "3fe76779-0df2-4c4c-b50f-a04e5c0d86aa",
+          "id": "09c6ba90-4d69-4848-aa0b-74bdfcdd5a97",
           "name": "json",
           "type": "JSON",
           "value": null
         },
         {
-          "id": "a3aee62b-7d57-46a6-a881-461f844c1c2a",
+          "id": "5ef5e3c6-1578-46da-89f6-6da3dd01fb5f",
           "name": "text",
           "type": "STRING",
           "value": null
         },
         {
-          "id": "22285807-128a-4edb-bf6a-7d63026fe2cf",
+          "id": "48513658-a72b-4db4-ad49-75a48a6cd084",
           "name": "results",
           "type": "ARRAY",
           "value": null
@@ -668,7 +598,7 @@
       ]
     },
     {
-      "id": "e263c10c-1c98-4941-aa75-32f272b5b6f2",
+      "id": "0ac6bdba-dbae-4ce5-b815-3d670aae0572",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -677,7 +607,9 @@
         "comment": {
           "value": "\n    Used to perform a hybrid search against a Document Index in Vellum.\n\n    document_index: Union[UUID, str] - Either the UUID or name of the Vellum Document Index that you'd like to search\n        against\n    query: str - The query to search for\n    options: Optional[SearchRequestOptionsRequest] = None - Runtime configuration for the search\n    request_options: Optional[RequestOptions] = None - The request options to use for the search\n    chunk_separator: str = \"\n\n#####\n\n\" - The separator to use when joining the text of each search result\n    ",
           "expanded": true
-        }
+        },
+        "icon": "vellum:icon:magnifying-glass-waveform",
+        "color": "purple"
       },
       "base": {
         "name": "BaseSearchNode",
@@ -702,81 +634,14 @@
         ]
       },
       "trigger": {
-        "id": "49188541-ce42-437c-aa95-b6766efcc18b",
+        "id": "37e64cf0-e604-4045-b8a0-d17e68c037e1",
         "merge_behavior": "AWAIT_ANY"
       },
       "ports": [
         {
-          "id": "2b77d240-037f-4533-9931-b37da6350509",
+          "id": "8dea61c3-107c-4f17-bcba-dbbdc1185360",
           "name": "default",
           "type": "DEFAULT"
-        }
-      ]
-    },
-    {
-      "id": "5889dc6f-44ef-48e4-a6bf-567722717565",
-      "label": "Set State Node",
-      "attributes": [
-        {
-          "id": "b6a50d3c-e21e-4042-acde-ee366f009899",
-          "name": "operations",
-          "value": {
-            "type": "CONSTANT_VALUE",
-            "value": {
-              "type": "JSON",
-              "value": {}
-            }
-          }
-        }
-      ],
-      "display_data": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0
-        },
-        "comment": {
-          "value": "\n    A node that sets multiple state values at once.\n\n    This node accepts a dictionary mapping state paths to values and sets them all.\n    Values can be actual values or descriptors.\n\n    Example:\n        operations = {\n            \"chat_history\": State.chat_history.concat(LazyReference(\"MyAgentNode.Outputs.chat_history\")),\n            \"counter\": State.counter + 1,\n            \"total_tokens\": State.user_tokens.add(State.assistant_tokens)\n        }\n\n    Args:\n        operations: Dictionary mapping state attribute names to values (descriptors or actual values)\n    ",
-          "expanded": true
-        }
-      },
-      "base": {
-        "name": "BaseNode",
-        "module": [
-          "vellum",
-          "workflows",
-          "nodes",
-          "bases",
-          "base"
-        ]
-      },
-      "definition": {
-        "name": "SetStateNode",
-        "module": [
-          "vellum",
-          "workflows",
-          "nodes",
-          "displayable",
-          "set_state_node",
-          "node"
-        ]
-      },
-      "trigger": {
-        "id": "cd37f826-00b1-499e-a9ea-985c35c18526",
-        "merge_behavior": "AWAIT_ATTRIBUTES"
-      },
-      "ports": [
-        {
-          "id": "1da045dd-7a6f-4279-85b1-d21892376a87",
-          "name": "default",
-          "type": "DEFAULT"
-        }
-      ],
-      "outputs": [
-        {
-          "id": "57687d69-eb14-48fe-b919-abb044c85c35",
-          "name": "results",
-          "type": "JSON",
-          "value": null
         }
       ]
     },
@@ -790,7 +655,9 @@
         "comment": {
           "value": "Used to render a Jinja template.\n\n    Useful for lightweight data transformations and complex string templating.\n    ",
           "expanded": true
-        }
+        },
+        "icon": "vellum:icon:stamp",
+        "color": "brown"
       },
       "base": {
         "name": "BaseNode",
@@ -826,11 +693,11 @@
       ]
     },
     {
-      "id": "da621f7c-396c-4f3f-ab56-91785d63b296",
+      "id": "035842e0-34ed-43af-97de-a706e40912ae",
       "label": "Tool Calling Node",
       "attributes": [
         {
-          "id": "62d1e757-6cda-449d-9a8a-9a01fe58cebf",
+          "id": "df3761db-067a-4fe9-9fc3-ba270786fcf6",
           "name": "ml_model",
           "value": {
             "type": "CONSTANT_VALUE",
@@ -841,7 +708,7 @@
           }
         },
         {
-          "id": "48989903-c416-4ec0-8f13-9e81d2ba23bd",
+          "id": "66133945-f7fd-43bb-8b46-0761e2b58241",
           "name": "blocks",
           "value": {
             "type": "CONSTANT_VALUE",
@@ -852,7 +719,7 @@
           }
         },
         {
-          "id": "88922cc2-ca22-4ef2-8e1e-86a1ca8a914f",
+          "id": "0079b429-3b1c-4f7c-9ccf-185ace4dcbb2",
           "name": "functions",
           "value": {
             "type": "CONSTANT_VALUE",
@@ -863,7 +730,7 @@
           }
         },
         {
-          "id": "a4ce87c9-381b-4bf8-adc6-973f3216c97c",
+          "id": "ebda56e6-2ace-472c-a106-36cb69264e96",
           "name": "prompt_inputs",
           "value": {
             "type": "CONSTANT_VALUE",
@@ -874,7 +741,7 @@
           }
         },
         {
-          "id": "c8c3271c-b764-44b4-8c08-3d24b8d9efc9",
+          "id": "2534a586-5b37-41f3-a9a4-8162b8538df4",
           "name": "parameters",
           "value": {
             "type": "CONSTANT_VALUE",
@@ -895,7 +762,7 @@
           }
         },
         {
-          "id": "a28d660a-c1e8-460d-aa8d-cc163277d9c2",
+          "id": "118ef72a-0767-4659-8ddf-58a071f95988",
           "name": "max_prompt_iterations",
           "value": {
             "type": "CONSTANT_VALUE",
@@ -906,7 +773,7 @@
           }
         },
         {
-          "id": "3c49713b-21e7-4032-84a1-709f50a1ddde",
+          "id": "d7ef5296-1e48-4d05-b97a-77f16d46fd50",
           "name": "settings",
           "value": {
             "type": "CONSTANT_VALUE",
@@ -925,7 +792,9 @@
         "comment": {
           "value": "\n    A Node that dynamically invokes the provided functions to the underlying Prompt\n\n    Attributes:\n        ml_model: str - The model to use for tool calling (e.g., \"gpt-4o-mini\")\n        blocks: List[PromptBlock] - The prompt blocks to use (same format as InlinePromptNode)\n        functions: List[Tool] - The functions that can be called\n        prompt_inputs: Optional[EntityInputsInterface] - Mapping of input variable names to values\n        parameters: PromptParameters - The parameters for the Prompt\n        max_prompt_iterations: Optional[int] - Maximum number of prompt iterations before stopping\n    ",
           "expanded": true
-        }
+        },
+        "icon": "vellum:icon:wrench",
+        "color": "teal"
       },
       "base": {
         "name": "BaseNode",
@@ -949,25 +818,25 @@
         ]
       },
       "trigger": {
-        "id": "bad829ce-f4b5-4089-ad68-34391e8e0c0f",
+        "id": "f9b4a4ce-68ae-45f4-9e29-38b588abdf97",
         "merge_behavior": "AWAIT_ATTRIBUTES"
       },
       "ports": [
         {
-          "id": "5daf2078-7486-4e8a-9ca7-7ca23a096232",
+          "id": "72157fce-fc16-44d8-a00d-506738a20730",
           "name": "default",
           "type": "DEFAULT"
         }
       ],
       "outputs": [
         {
-          "id": "bd83c7f1-fc8d-4441-abcf-95641aa03fcb",
+          "id": "c18a8725-21e1-4736-a77c-76d0fc035176",
           "name": "text",
           "type": "STRING",
           "value": null
         },
         {
-          "id": "bb08b1a9-9745-475a-b030-6bb5b2146984",
+          "id": "5a9ad073-c670-43d2-9198-a08e9fdda7ad",
           "name": "chat_history",
           "type": "CHAT_HISTORY",
           "value": null
@@ -975,11 +844,11 @@
       ]
     },
     {
-      "id": "4884c875-4cd0-41b3-a9f1-f79ce798d18b",
+      "id": "187ed9ed-ca2b-49e4-943d-ee8da5fad973",
       "label": "Web Search Node",
       "attributes": [
         {
-          "id": "5aaa3650-72b4-4c94-aa46-6956b06edfe5",
+          "id": "b5ba3c60-e02c-46c8-b470-d86c4f8f42af",
           "name": "query",
           "value": {
             "type": "CONSTANT_VALUE",
@@ -998,7 +867,9 @@
         "comment": {
           "value": "\n    Used to perform web search using SerpAPI.\n\n    query: str - The search query to execute\n    ",
           "expanded": true
-        }
+        },
+        "icon": "vellum:icon:magnifying-glass",
+        "color": "lightBlue"
       },
       "base": {
         "name": "BaseNode",
@@ -1022,31 +893,31 @@
         ]
       },
       "trigger": {
-        "id": "a3aee423-bd9d-4910-b27b-8009e3950a45",
+        "id": "036c7a0c-fff3-44f7-b49b-429d8f44f212",
         "merge_behavior": "AWAIT_ATTRIBUTES"
       },
       "ports": [
         {
-          "id": "ed9a2b1f-9276-4b74-85e0-338aa8a20cbd",
+          "id": "ef824748-d00d-41e7-b7b4-d0edc536c3af",
           "name": "default",
           "type": "DEFAULT"
         }
       ],
       "outputs": [
         {
-          "id": "71bb6f36-d0cc-4c01-8dc2-1a0b98429c81",
+          "id": "704a4ba3-1afe-482d-876a-91dcdbe90fb7",
           "name": "text",
           "type": "STRING",
           "value": null
         },
         {
-          "id": "9df3ddf0-675f-48d5-b4b2-e3a805bbf450",
+          "id": "574b2ebe-f250-4024-b517-3cd47704c70e",
           "name": "urls",
           "type": "JSON",
           "value": null
         },
         {
-          "id": "87994bf1-d8d7-40d0-a715-90b1e399c5f2",
+          "id": "9798a067-3589-4a2a-a811-6019873cbbfe",
           "name": "results",
           "type": "JSON",
           "value": null
@@ -1054,7 +925,7 @@
       ]
     },
     {
-      "id": "c3d3aadd-fb99-4e86-905a-c40be63da688",
+      "id": "bf31cc42-b5e4-4191-a453-7191743ac200",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -1063,7 +934,9 @@
         "comment": {
           "value": "\n    Used to directly reference the output of another node.\n    This provides backward compatibility with Vellum's Final Output Node.\n    ",
           "expanded": true
-        }
+        },
+        "icon": "vellum:icon:circle-stop",
+        "color": "teal"
       },
       "base": {
         "name": "BaseNode",
@@ -1087,13 +960,13 @@
         ]
       },
       "trigger": {
-        "id": "9ed1cb78-949a-42b0-8e84-98c20eb6146b",
+        "id": "0b2da045-2a4c-4939-8b5c-661652c759d4",
         "merge_behavior": "AWAIT_ANY"
       },
       "ports": [],
       "outputs": [
         {
-          "id": "c65369bf-7dbc-4f66-87c5-381c965ffb5d",
+          "id": "7f41909e-9ce1-4fde-ba77-a13dda301ece",
           "name": "value",
           "type": "STRING",
           "value": null
@@ -1101,5 +974,14 @@
       ]
     }
   ],
-  "errors": []
+  "errors": [
+    {
+      "node": "InlineSubworkflowNode",
+      "error": "AttributeError: type object 'undefined' has no attribute 'get_inputs_class'"
+    },
+    {
+      "node": "MapNode",
+      "error": "IndexError: tuple index out of range"
+    }
+  ]
 }
