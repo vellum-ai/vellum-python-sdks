@@ -25,7 +25,11 @@ export function getTriggerClassInfo(
     case WorkflowTriggerType.SCHEDULED:
       return {
         className: "ScheduleTrigger",
-        modulePath: [...VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH, "scheduled"],
+        modulePath: [
+          ...workflowContext.modulePath.slice(0, -1),
+          GENERATED_TRIGGERS_MODULE_NAME,
+          "scheduled",
+        ],
       };
     case WorkflowTriggerType.INTEGRATION:
       return {

@@ -37,7 +37,7 @@ describe("getTriggerClassInfo", () => {
 
     expect(result).toEqual({
       className: "ScheduleTrigger",
-      modulePath: ["vellum", "workflows", "triggers", "scheduled"],
+      modulePath: ["code", "triggers", "scheduled"],
     });
   });
 

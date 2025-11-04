@@ -22,7 +22,7 @@ export class ScheduledTrigger extends BaseTrigger<ScheduledTriggerType> {
   }
 
   protected getBaseTriggerClassName(): string {
-    return "BaseTrigger";
+    return "ScheduleTrigger";
   }
 
   protected getTriggerClassBody(): AstNode[] {
