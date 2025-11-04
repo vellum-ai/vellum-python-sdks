@@ -19,7 +19,7 @@
         "definition": null
       },
       {
-        "id": "d23a040c-cc1c-46a0-8368-7a9dcb79aa44",
+        "id": "ed5f7a91-c079-41bd-9dda-95e3dfb9ea64",
         "label": "Composio Tool Calling Node",
         "type": "GENERIC",
         "display_data": {
@@ -54,12 +54,12 @@
           ]
         },
         "trigger": {
-          "id": "8f664dfb-0542-434c-ab85-ff59151bf488",
+          "id": "7bf54b77-88ec-4586-96cf-79c3f66faf2a",
           "merge_behavior": "AWAIT_ATTRIBUTES"
         },
         "ports": [
           {
-            "id": "527188f1-6724-4fb5-be79-cc0be61ee888",
+            "id": "ef6bfede-692e-4e22-ab88-bdcefd741927",
             "name": "default",
             "type": "DEFAULT"
           }
@@ -165,13 +165,13 @@
         ],
         "outputs": [
           {
-            "id": "e05cc145-34ca-4007-bba9-2eed26cadda6",
+            "id": "41e22c3b-980c-47a0-a1c7-a472d2ed604b",
             "name": "text",
             "type": "STRING",
             "value": null
           },
           {
-            "id": "5625e421-ca8f-4477-8312-e7c99172be32",
+            "id": "d278b1bc-dd58-4da0-bf58-84b03b1f5438",
             "name": "chat_history",
             "type": "CHAT_HISTORY",
             "value": null
@@ -198,8 +198,8 @@
                 {
                   "type": "NODE_OUTPUT",
                   "data": {
-                    "node_id": "d23a040c-cc1c-46a0-8368-7a9dcb79aa44",
-                    "output_id": "e05cc145-34ca-4007-bba9-2eed26cadda6"
+                    "node_id": "ed5f7a91-c079-41bd-9dda-95e3dfb9ea64",
+                    "output_id": "41e22c3b-980c-47a0-a1c7-a472d2ed604b"
                   }
                 }
               ],
@@ -246,8 +246,8 @@
                 {
                   "type": "NODE_OUTPUT",
                   "data": {
-                    "node_id": "d23a040c-cc1c-46a0-8368-7a9dcb79aa44",
-                    "output_id": "5625e421-ca8f-4477-8312-e7c99172be32"
+                    "node_id": "ed5f7a91-c079-41bd-9dda-95e3dfb9ea64",
+                    "output_id": "d278b1bc-dd58-4da0-bf58-84b03b1f5438"
                   }
                 }
               ],
@@ -280,22 +280,22 @@
         "id": "b234c076-43ad-4572-ba2e-5fee370ccf4a",
         "source_node_id": "63884a7b-c01c-4cbc-b8d4-abe0a8796f6b",
         "source_handle_id": "eba8fd73-57ab-4d7b-8f75-b54dbe5fc8ba",
-        "target_node_id": "d23a040c-cc1c-46a0-8368-7a9dcb79aa44",
-        "target_handle_id": "8f664dfb-0542-434c-ab85-ff59151bf488",
+        "target_node_id": "ed5f7a91-c079-41bd-9dda-95e3dfb9ea64",
+        "target_handle_id": "7bf54b77-88ec-4586-96cf-79c3f66faf2a",
         "type": "DEFAULT"
       },
       {
         "id": "6a6ac98a-faf5-4ddf-aac1-4bfec7b69e24",
-        "source_node_id": "d23a040c-cc1c-46a0-8368-7a9dcb79aa44",
-        "source_handle_id": "527188f1-6724-4fb5-be79-cc0be61ee888",
+        "source_node_id": "ed5f7a91-c079-41bd-9dda-95e3dfb9ea64",
+        "source_handle_id": "ef6bfede-692e-4e22-ab88-bdcefd741927",
         "target_node_id": "88e59503-f7fb-48cc-b535-3cd1db07627a",
         "target_handle_id": "645fee43-832a-4622-89fd-b2ead42a2ec0",
         "type": "DEFAULT"
       },
       {
         "id": "de285875-d306-4b45-87b5-1c9fc4123f8c",
-        "source_node_id": "d23a040c-cc1c-46a0-8368-7a9dcb79aa44",
-        "source_handle_id": "527188f1-6724-4fb5-be79-cc0be61ee888",
+        "source_node_id": "ed5f7a91-c079-41bd-9dda-95e3dfb9ea64",
+        "source_handle_id": "ef6bfede-692e-4e22-ab88-bdcefd741927",
         "target_node_id": "8834dd6c-d3cc-49fa-aec8-6a6d23ca2d6a",
         "target_handle_id": "0e22c690-31a4-4e70-b0ad-c351e862d644",
         "type": "DEFAULT"
@@ -323,16 +323,16 @@
         "output_variable_id": "9a233225-16ef-48b4-8cf6-d8a6c1ae72ce",
         "value": {
           "type": "NODE_OUTPUT",
-          "node_id": "d23a040c-cc1c-46a0-8368-7a9dcb79aa44",
-          "node_output_id": "e05cc145-34ca-4007-bba9-2eed26cadda6"
+          "node_id": "ed5f7a91-c079-41bd-9dda-95e3dfb9ea64",
+          "node_output_id": "41e22c3b-980c-47a0-a1c7-a472d2ed604b"
         }
       },
       {
         "output_variable_id": "5ebf2c00-cb24-421b-9a23-5e0e2673f1ef",
         "value": {
           "type": "NODE_OUTPUT",
-          "node_id": "d23a040c-cc1c-46a0-8368-7a9dcb79aa44",
-          "node_output_id": "5625e421-ca8f-4477-8312-e7c99172be32"
+          "node_id": "ed5f7a91-c079-41bd-9dda-95e3dfb9ea64",
+          "node_output_id": "d278b1bc-dd58-4da0-bf58-84b03b1f5438"
         }
       }
     ]
