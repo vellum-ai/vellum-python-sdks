@@ -28,30 +28,6 @@ export class ScheduledTrigger extends BaseTrigger<ScheduledTriggerType> {
   protected getTriggerClassBody(): AstNode[] {
     const body: AstNode[] = [];
 
-    body.push(
-      python.field({
-        name: "current_run_at",
-        type: python.Type.reference(
-          python.reference({
-            name: "datetime",
-            modulePath: ["datetime"],
-          })
-        ),
-      })
-    );
-
-    body.push(
-      python.field({
-        name: "next_run_at",
-        type: python.Type.reference(
-          python.reference({
-            name: "datetime",
-            modulePath: ["datetime"],
-          })
-        ),
-      })
-    );
-
     body.push(this.createConfigClass());
 
     return body;
