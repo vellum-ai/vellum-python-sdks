@@ -300,11 +300,11 @@ def test_serialize_workflow_with_code():
 
     code_execution_node = workflow_raw_data["nodes"][1]
     assert code_execution_node == {
-        "id": "b4a0526b-0e31-4f63-892a-6d5197d09acf",
+        "id": "ae9c5da6-242e-4e0d-abe6-344e2ada3ce3",
         "type": "CODE_EXECUTION",
         "inputs": [
             {
-                "id": "e7a6c15f-083f-4775-8315-22b8fb62b9ba",
+                "id": "331db512-0127-46ad-aeed-1abacb287a9e",
                 "key": "code",
                 "value": {
                     "rules": [
@@ -317,7 +317,7 @@ def test_serialize_workflow_with_code():
                 },
             },
             {
-                "id": "1248f512-cc1b-4daa-a444-3bf7a1f1b8f9",
+                "id": "dd7e4f60-858a-457d-9ad3-50a25871650f",
                 "key": "runtime",
                 "value": {
                     "rules": [{"type": "CONSTANT_VALUE", "data": {"type": "STRING", "value": "PYTHON_3_11_6"}}],
@@ -328,14 +328,14 @@ def test_serialize_workflow_with_code():
         "data": {
             "label": "Simple Code Execution Node",
             "error_output_id": None,
-            "source_handle_id": "1248f512-cc1b-4daa-a444-3bf7a1f1b8f9",
-            "target_handle_id": "1248f512-cc1b-4daa-a444-3bf7a1f1b8f9",
-            "code_input_id": "e7a6c15f-083f-4775-8315-22b8fb62b9ba",
-            "runtime_input_id": "1248f512-cc1b-4daa-a444-3bf7a1f1b8f9",
+            "source_handle_id": "d2560e23-cbb6-4b73-b082-294982da72aa",
+            "target_handle_id": "e4a738e8-bbcf-47d2-b7c9-6a034dd412f0",
+            "code_input_id": "331db512-0127-46ad-aeed-1abacb287a9e",
+            "runtime_input_id": "dd7e4f60-858a-457d-9ad3-50a25871650f",
             "output_type": "NUMBER",
             "packages": [],
-            "output_id": "8eea2893-1e79-4d1c-ba51-2e045968abfb",
-            "log_output_id": "8eea2893-1e79-4d1c-ba51-2e045968abfb",
+            "output_id": "9b2b939b-c840-4e01-99c1-43a3418d7fb7",
+            "log_output_id": "e3536bf9-cf37-4d16-b835-770a9ee6cc53",
         },
         "display_data": {"position": {"x": 200.0, "y": -50.0}},
         "base": {
@@ -347,10 +347,10 @@ def test_serialize_workflow_with_code():
             "module": ["tests", "workflows", "basic_code_execution_node", "workflow_with_code"],
         },
         "trigger": {
-            "id": "1248f512-cc1b-4daa-a444-3bf7a1f1b8f9",
+            "id": "e4a738e8-bbcf-47d2-b7c9-6a034dd412f0",
             "merge_behavior": "AWAIT_ANY",
         },
-        "ports": [{"id": "1248f512-cc1b-4daa-a444-3bf7a1f1b8f9", "name": "default", "type": "DEFAULT"}],
+        "ports": [{"id": "d2560e23-cbb6-4b73-b082-294982da72aa", "name": "default", "type": "DEFAULT"}],
     }
     assert not DeepDiff(
         [
@@ -374,8 +374,8 @@ def test_serialize_workflow_with_code():
                                 {
                                     "type": "NODE_OUTPUT",
                                     "data": {
-                                        "node_id": "b4a0526b-0e31-4f63-892a-6d5197d09acf",
-                                        "output_id": "8eea2893-1e79-4d1c-ba51-2e045968abfb",
+                                        "node_id": "ae9c5da6-242e-4e0d-abe6-344e2ada3ce3",
+                                        "output_id": "9b2b939b-c840-4e01-99c1-43a3418d7fb7",
                                     },
                                 }
                             ],
@@ -410,8 +410,8 @@ def test_serialize_workflow_with_code():
                                 {
                                     "type": "NODE_OUTPUT",
                                     "data": {
-                                        "node_id": "b4a0526b-0e31-4f63-892a-6d5197d09acf",
-                                        "output_id": "8eea2893-1e79-4d1c-ba51-2e045968abfb",
+                                        "node_id": "ae9c5da6-242e-4e0d-abe6-344e2ada3ce3",
+                                        "output_id": "e3536bf9-cf37-4d16-b835-770a9ee6cc53",
                                     },
                                 }
                             ],
@@ -436,25 +436,25 @@ def test_serialize_workflow_with_code():
     assert not DeepDiff(
         [
             {
-                "id": "72f2a432-621f-4a3a-8b41-17a5168cba69",
+                "id": "22dbd9cd-446a-4053-a815-a9a991f69282",
                 "source_node_id": "22555158-d8ba-41b4-a6fc-87c3b25bd073",
                 "source_handle_id": "e82390bb-c68c-48c1-9f87-7fbfff494c45",
-                "target_node_id": "b4a0526b-0e31-4f63-892a-6d5197d09acf",
-                "target_handle_id": "1248f512-cc1b-4daa-a444-3bf7a1f1b8f9",
+                "target_node_id": "ae9c5da6-242e-4e0d-abe6-344e2ada3ce3",
+                "target_handle_id": "e4a738e8-bbcf-47d2-b7c9-6a034dd412f0",
                 "type": "DEFAULT",
             },
             {
                 "id": "2ac757e4-87c3-402c-928f-a3845df10c9f",
-                "source_node_id": "b4a0526b-0e31-4f63-892a-6d5197d09acf",
-                "source_handle_id": "1248f512-cc1b-4daa-a444-3bf7a1f1b8f9",
+                "source_node_id": "ae9c5da6-242e-4e0d-abe6-344e2ada3ce3",
+                "source_handle_id": "d2560e23-cbb6-4b73-b082-294982da72aa",
                 "target_node_id": "eccf97c7-e766-471f-9703-4d2595800e66",
                 "target_handle_id": "6b7d7f2c-5cc8-4005-9e66-cdb2c97b1998",
                 "type": "DEFAULT",
             },
             {
                 "id": "fcc6353a-265c-4a65-9e70-4eb92a04e4e1",
-                "source_node_id": "b4a0526b-0e31-4f63-892a-6d5197d09acf",
-                "source_handle_id": "1248f512-cc1b-4daa-a444-3bf7a1f1b8f9",
+                "source_node_id": "ae9c5da6-242e-4e0d-abe6-344e2ada3ce3",
+                "source_handle_id": "d2560e23-cbb6-4b73-b082-294982da72aa",
                 "target_node_id": "52f285fe-1f52-4920-b01b-499762b95220",
                 "target_handle_id": "de8f2cc2-8c32-4782-87d5-4eb5afcd42e3",
                 "type": "DEFAULT",
