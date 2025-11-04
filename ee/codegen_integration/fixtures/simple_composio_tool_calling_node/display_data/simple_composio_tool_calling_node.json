@@ -67,7 +67,7 @@
         "adornments": null,
         "attributes": [
           {
-            "id": "53408f92-55c3-4026-9d30-6e4b48749d28",
+            "id": "69f1e830-f5d2-48d7-96c4-31688e40383e",
             "name": "ml_model",
             "value": {
               "type": "CONSTANT_VALUE",
@@ -78,7 +78,7 @@
             }
           },
           {
-            "id": "8a2bbdb1-2cf3-42f9-a5f1-8bcae4f9984c",
+            "id": "cfc38f09-c286-4399-9b74-13123d21f4bc",
             "name": "functions",
             "value": {
               "type": "CONSTANT_VALUE",
@@ -98,7 +98,7 @@
             }
           },
           {
-            "id": "41d5256a-a581-4d60-8423-d2430bd1fd28",
+            "id": "536da46f-9431-417c-8156-1296a2f2b08a",
             "name": "blocks",
             "value": {
               "type": "CONSTANT_VALUE",
@@ -109,7 +109,7 @@
             }
           },
           {
-            "id": "15eb0342-8217-4dd9-98f3-59cbf04cf67d",
+            "id": "8696d605-c4ad-4f1b-8d35-a76e21f71a92",
             "name": "prompt_inputs",
             "value": {
               "type": "CONSTANT_VALUE",
@@ -120,7 +120,7 @@
             }
           },
           {
-            "id": "ca41b03b-77fa-4e73-aee6-aff160ba90d5",
+            "id": "ebcae1d9-58c3-494d-a15a-dd98f8a3bb9c",
             "name": "parameters",
             "value": {
               "type": "CONSTANT_VALUE",
@@ -141,7 +141,7 @@
             }
           },
           {
-            "id": "e48b9774-d67b-4ef6-b28a-e97a41961131",
+            "id": "de6b8ca8-08da-4570-9238-1c03c21752b9",
             "name": "max_prompt_iterations",
             "value": {
               "type": "CONSTANT_VALUE",
@@ -152,7 +152,7 @@
             }
           },
           {
-            "id": "ee141a5d-a680-4045-b6c2-7da0bf408779",
+            "id": "b2dc5a62-2b8a-4e23-b76c-89e947fdcd33",
             "name": "settings",
             "value": {
               "type": "CONSTANT_VALUE",
@@ -277,7 +277,7 @@
     ],
     "edges": [
       {
-        "id": "b234c076-43ad-4572-ba2e-5fee370ccf4a",
+        "id": "60875b60-8763-444c-85a1-c156b8a72f9e",
         "source_node_id": "63884a7b-c01c-4cbc-b8d4-abe0a8796f6b",
         "source_handle_id": "eba8fd73-57ab-4d7b-8f75-b54dbe5fc8ba",
         "target_node_id": "ed5f7a91-c079-41bd-9dda-95e3dfb9ea64",
