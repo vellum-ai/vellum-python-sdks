@@ -1,0 +1,66 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`TriggerDisplay > 'with icon and color' 1`] = `
+"class MyCustomTrigger(IntegrationTrigger):
+    message: str
+
+    class Config(IntegrationTrigger.Config):
+        type = "COMPOSIO"
+        integration_name = "slack"
+        slug = "my_custom_trigger"
+
+    class Display(IntegrationTrigger.Display):
+        icon = "🎨"
+        color = "#FF5733"
+"
+`;
+
+exports[`TriggerDisplay > 'with null icon and color' 1`] = `
+"class MyCustomTrigger(IntegrationTrigger):
+    message: str
+
+    class Config(IntegrationTrigger.Config):
+        type = "COMPOSIO"
+        integration_name = "slack"
+        slug = "my_custom_trigger"
+"
+`;
+
+exports[`TriggerDisplay > 'with only color' 1`] = `
+"class MyCustomTrigger(IntegrationTrigger):
+    message: str
+
+    class Config(IntegrationTrigger.Config):
+        type = "COMPOSIO"
+        integration_name = "slack"
+        slug = "my_custom_trigger"
+
+    class Display(IntegrationTrigger.Display):
+        color = "#00FF00"
+"
+`;
+
+exports[`TriggerDisplay > 'with only icon' 1`] = `
+"class MyCustomTrigger(IntegrationTrigger):
+    message: str
+
+    class Config(IntegrationTrigger.Config):
+        type = "COMPOSIO"
+        integration_name = "slack"
+        slug = "my_custom_trigger"
+
+    class Display(IntegrationTrigger.Display):
+        icon = "🔧"
+"
+`;
+
+exports[`TriggerDisplay > 'without icon or color' 1`] = `
+"class MyCustomTrigger(IntegrationTrigger):
+    message: str
+
+    class Config(IntegrationTrigger.Config):
+        type = "COMPOSIO"
+        integration_name = "slack"
+        slug = "my_custom_trigger"
+"
+`;

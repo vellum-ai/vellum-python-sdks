@@ -6,6 +6,7 @@ import {
 } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
+import { TriggerDisplay } from "src/generators/trigger-display";
 
 import type { AstNode } from "@fern-api/python-ast/core/AstNode";
 import type { WorkflowTrigger } from "src/types/vellum";
@@ -57,81 +58,14 @@ export abstract class BaseTrigger<
    * @returns The Display class AstNode, or undefined if no Display class is needed
    */
   protected createDisplayClass(): AstNode | undefined {
-    const displayData = this.trigger.displayData;
-
-    if (!displayData) {
-      return undefined;
+    if (this.trigger.displayData) {
+      return new TriggerDisplay({
+        triggerDisplayData: this.trigger.displayData,
+        baseTriggerClassName: this.getBaseTriggerClassName(),
+      });
     }
 
-    const fields: AstNode[] = [];
-
-    fields.push(
-      python.field({
-        name: "label",
-        initializer: python.TypeInstantiation.str(displayData.label),
-      })
-    );
-
-    if (displayData.position != null) {
-      fields.push(
-        python.field({
-          name: "x",
-          initializer: python.TypeInstantiation.float(displayData.position.x),
-        })
-      );
-      fields.push(
-        python.field({
-          name: "y",
-          initializer: python.TypeInstantiation.float(displayData.position.y),
-        })
-      );
-    }
-
-    if (displayData.z_index != null) {
-      fields.push(
-        python.field({
-          name: "z_index",
-          initializer: python.TypeInstantiation.int(displayData.z_index),
-        })
-      );
-    }
-
-    if (displayData.icon != null) {
-      fields.push(
-        python.field({
-          name: "icon",
-          initializer: python.TypeInstantiation.str(displayData.icon),
-        })
-      );
-    }
-
-    if (displayData.color != null) {
-      fields.push(
-        python.field({
-          name: "color",
-          initializer: python.TypeInstantiation.str(displayData.color),
-        })
-      );
-    }
-
-    if (fields.length === 0) {
-      return undefined;
-    }
-
-    const displayClass = python.class_({
-      name: "Display",
-      extends_: [
-        python.reference({
-          name: this.getBaseTriggerClassName(),
-          modulePath: VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH,
-          attribute: ["Display"],
-        }),
-      ],
-    });
-
-    fields.forEach((field) => displayClass.add(field));
-
-    return displayClass;
+    return undefined;
   }
 
   getModulePath(): string[] {

@@ -98,6 +98,16 @@ def _get_trigger_path_to_id_mapping(module_path: str) -> Dict[str, UUID]:
 
 class BaseTriggerMeta(ABCMeta):
     def __new__(mcs, name: str, bases: Tuple[Type, ...], dct: Dict[str, Any]) -> Any:
+        if "Display" not in dct:
+            for base in reversed(bases):
+                if hasattr(base, "Display"):
+                    dct["Display"] = type(
+                        f"{name}.Display",
+                        (base.Display,),
+                        {"__module__": dct["__module__"]},
+                    )
+                    break
+
         cls = super().__new__(mcs, name, bases, dct)
         trigger_class = cast(Type["BaseTrigger"], cls)
 
@@ -278,6 +288,12 @@ class BaseTrigger(ABC, metaclass=BaseTriggerMeta):
     """
 
     __id__: UUID
+
+    class Display:
+        """Optional display metadata for visual representation."""
+
+        icon: Optional[str] = None
+        color: Optional[str] = None
 
     def __init__(self, **kwargs: Any):
         """
