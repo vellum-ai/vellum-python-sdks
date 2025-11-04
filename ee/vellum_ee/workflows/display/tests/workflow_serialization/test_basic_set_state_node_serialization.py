@@ -66,8 +66,8 @@ def test_serialize_workflow():
                         "operator": "concat",
                         "rhs": {
                             "type": "NODE_OUTPUT",
-                            "node_id": "140f8146-5ab5-432d-bf1c-3798d0b9ff3e",
-                            "node_output_id": "41b0c042-8f67-4667-82c7-754a6b0528d4",
+                            "node_id": "32f69de2-53e8-4151-b036-4e831669cf1d",
+                            "node_output_id": "611ad55f-6c6d-420b-b5a2-b50a06812254",
                         },
                     },
                 },
