@@ -292,6 +292,10 @@ class BaseTrigger(ABC, metaclass=BaseTriggerMeta):
     class Display:
         """Optional display metadata for visual representation."""
 
+        label: str = "Scheduled Trigger"
+        x: float = 0.0
+        y: float = 0.0
+        z_index: float = 0.0
         icon: Optional[str] = None
         color: Optional[str] = None
 
