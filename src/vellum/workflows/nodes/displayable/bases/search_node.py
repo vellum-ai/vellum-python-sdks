@@ -43,8 +43,6 @@ class BaseSearchNode(BaseNode[StateType], Generic[StateType]):
     request_options: Optional[RequestOptions] = None - The request options to use for the search
     """
 
-    __legacy_id__ = True
-
     # The query to search for.
     query: ClassVar[str]
 

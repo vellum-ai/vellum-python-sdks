@@ -78,7 +78,6 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
     request_options: Optional[RequestOptions] = None - The request options to use for the custom script.
     """
 
-    __legacy_id__ = True
     filepath: ClassVar[Optional[str]] = None
     code: ClassVar[Optional[str]] = None
 
