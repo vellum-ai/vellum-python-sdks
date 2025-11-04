@@ -981,3 +981,77 @@ class StartNodeDisplay(BaseNodeDisplay[StartNode]):
     finally:
         if finder in sys.meta_path:
             sys.meta_path.remove(finder)
+
+
+def test_load_from_module__chained_nodes_with_absolute_imports():
+    """
+    Tests that a workflow with chained nodes using absolute imports works correctly.
+    This test is expected to fail on main as absolute imports are not yet supported.
+    """
+
+    # GIVEN a workflow module with two chained base nodes using absolute imports
+    namespace = str(uuid4())
+    files = {
+        "__init__.py": "",
+        "workflow.py": f"""
+from vellum.workflows import BaseWorkflow
+from {namespace}.nodes.first_node import FirstNode
+from {namespace}.nodes.second_node import SecondNode
+
+class Workflow(BaseWorkflow):
+    graph = FirstNode >> SecondNode
+
+    class Outputs(BaseWorkflow.Outputs):
+        final_output = SecondNode.Outputs.result
+""",
+        "nodes/__init__.py": "",
+        "nodes/first_node.py": """
+from vellum.workflows.nodes import BaseNode
+
+class FirstNode(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        value: str
+
+    def run(self) -> "FirstNode.Outputs":
+        return self.Outputs(value="Hello from FirstNode")
+""",
+        "nodes/second_node.py": f"""
+from vellum.workflows.nodes import BaseNode
+from {namespace}.nodes.first_node import FirstNode
+
+class SecondNode(BaseNode):
+    input_value = FirstNode.Outputs.value
+
+    class Outputs(BaseNode.Outputs):
+        result: str
+
+    def run(self) -> "SecondNode.Outputs":
+        return self.Outputs(result=f"{{self.input_value}} -> SecondNode")
+""",
+    }
+
+    # AND the virtual file loader is registered
+    finder = VirtualFileFinder(files, namespace)
+    sys.meta_path.append(finder)
+
+    try:
+        # WHEN the workflow is loaded
+        Workflow = BaseWorkflow.load_from_module(namespace)
+        workflow = Workflow()
+
+        # THEN the workflow is successfully initialized
+        assert workflow
+
+        # WHEN we run the workflow
+        terminal_event = workflow.run()
+
+        # THEN the workflow should have completed successfully
+        assert terminal_event.name == "workflow.execution.fulfilled"
+
+        # AND the outputs should be as expected
+        assert terminal_event.outputs == {
+            "final_output": "Hello from FirstNode -> SecondNode",
+        }
+    finally:
+        if finder in sys.meta_path:
+            sys.meta_path.remove(finder)
