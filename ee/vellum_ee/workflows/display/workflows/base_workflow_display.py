@@ -352,10 +352,13 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                     )
 
             elif isinstance(workflow_output.instance, OutputReference):
-                terminal_node_id = workflow_output.instance.outputs_class.__parent_class__.__id__
-                serialized_terminal_node = serialized_nodes.get(terminal_node_id)
-                if serialized_terminal_node and isinstance(serialized_terminal_node["data"], dict):
-                    serialized_terminal_node["data"]["name"] = workflow_output_display.name
+                # Get the node class from the output reference
+                terminal_node_class = workflow_output.instance.outputs_class.__parent_class__
+                terminal_node_display = self.display_context.node_displays.get(terminal_node_class)
+                if terminal_node_display:
+                    serialized_terminal_node = serialized_nodes.get(terminal_node_display.node_id)
+                    if serialized_terminal_node and isinstance(serialized_terminal_node["data"], dict):
+                        serialized_terminal_node["data"]["name"] = workflow_output_display.name
 
             output_values.append(
                 {

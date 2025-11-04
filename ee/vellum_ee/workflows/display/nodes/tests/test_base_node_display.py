@@ -13,7 +13,7 @@ from vellum_ee.workflows.display.types import WorkflowDisplayContext
 @pytest.fixture
 def node_with_implicit_properties():
     class MyNode(BaseNode):
-        pass
+        __legacy_id__ = True
 
     class MyNodeDisplay(BaseNodeDisplay[MyNode]):
         pass

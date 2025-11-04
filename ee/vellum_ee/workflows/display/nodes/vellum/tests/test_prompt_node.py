@@ -23,6 +23,8 @@ def test_serialize_node__lazy_reference_in_prompt_inputs():
         ml_model = "gpt-4o"
 
     class OtherNode(BaseNode):
+        __legacy_id__ = True
+
         class Outputs:
             result: str
 
