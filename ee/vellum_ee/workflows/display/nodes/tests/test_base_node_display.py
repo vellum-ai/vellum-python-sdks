@@ -13,7 +13,7 @@ from vellum_ee.workflows.display.types import WorkflowDisplayContext
 @pytest.fixture
 def node_with_implicit_properties():
     class MyNode(BaseNode):
-        pass
+        __legacy_id__ = True
 
     class MyNodeDisplay(BaseNodeDisplay[MyNode]):
         pass
@@ -56,6 +56,8 @@ def test_get_id(node_info):
 def test_serialize_condition__accessor_expression():
     # GIVEN a node with an accessor expression in a Port
     class MyNode(BaseNode):
+        __legacy_id__ = True
+
         class Ports(BaseNode.Ports):
             foo = Port.on_if(ConstantValueReference({"hello": "world"})["hello"])
 

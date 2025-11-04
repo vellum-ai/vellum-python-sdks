@@ -14,6 +14,7 @@ class State(BaseState):
 
 
 class StartNode(BaseNode):
+    __legacy_id__ = True
     example_input = Inputs.example
     example_state = State.example
 

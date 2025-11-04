@@ -61,19 +61,19 @@ def test_serialize_workflow():
 
     final_output_node = workflow_raw_data["nodes"][1]
     assert final_output_node == {
-        "id": "620ec17b-e330-4212-b619-3c39dc63fb22",
+        "id": "3944559b-fb23-45fe-90db-4a4c7f88bd63",
         "type": "TERMINAL",
         "data": {
             "label": "Basic Final Output Node",
             "name": "value",
-            "target_handle_id": "0173d3c6-11d1-44b7-b070-ca9ff5119046",
-            "output_id": "aa63e3f6-fde3-4d19-84ef-29982d44d709",
+            "target_handle_id": "24099320-8607-431b-acf2-de593cce3b43",
+            "output_id": "f331936d-2cce-4dd7-ab02-b650bc5260df",
             "output_type": "STRING",
-            "node_input_id": "5322567a-f40c-400a-96b3-c3b054db543e",
+            "node_input_id": "ea92ef63-e7f0-4ee6-87da-206a96ca202c",
         },
         "inputs": [
             {
-                "id": "5322567a-f40c-400a-96b3-c3b054db543e",
+                "id": "ea92ef63-e7f0-4ee6-87da-206a96ca202c",
                 "key": "node_input",
                 "value": {
                     "rules": [
@@ -97,14 +97,14 @@ def test_serialize_workflow():
         },
         "outputs": [
             {
-                "id": "aa63e3f6-fde3-4d19-84ef-29982d44d709",
+                "id": "f331936d-2cce-4dd7-ab02-b650bc5260df",
                 "name": "value",
                 "type": "STRING",
                 "value": {"type": "WORKFLOW_INPUT", "input_variable_id": "e39a7b63-de15-490a-ae9b-8112c767aea0"},
             }
         ],
         "trigger": {
-            "id": "0173d3c6-11d1-44b7-b070-ca9ff5119046",
+            "id": "24099320-8607-431b-acf2-de593cce3b43",
             "merge_behavior": "AWAIT_ANY",
         },
         "ports": [],

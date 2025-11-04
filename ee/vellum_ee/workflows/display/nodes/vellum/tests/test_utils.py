@@ -30,6 +30,7 @@ class Inputs(BaseInputs):
 
 
 class MyNodeA(BaseNode):
+    __legacy_id__ = True
     example_node_input = Inputs.example_workflow_input
 
     class Outputs(BaseOutputs):

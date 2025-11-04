@@ -11,6 +11,8 @@ def test_try_node_display__serialize_with_error_output() -> None:
     # GIVEN a Base Node wrapped with a TryNode
     @TryNode.wrap()
     class MyNode(BaseNode):
+        __legacy_id__ = True
+
         class Outputs(BaseNode.Outputs):
             hello = "world"
 

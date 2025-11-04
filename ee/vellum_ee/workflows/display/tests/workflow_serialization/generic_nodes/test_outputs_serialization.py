@@ -15,6 +15,8 @@ class Inputs(BaseInputs):
 
 def test_serialize_node__annotated_output(serialize_node):
     class AnnotatedOutputGenericNode(BaseNode):
+        __legacy_id__ = True
+
         class Outputs(BaseNode.Outputs):
             output: int
 
@@ -59,6 +61,8 @@ def test_serialize_node__annotated_output(serialize_node):
 
 def test_serialize_node__workflow_input(serialize_node):
     class WorkflowInputGenericNode(BaseNode):
+        __legacy_id__ = True
+
         class Outputs(BaseNode.Outputs):
             output = Inputs.input
 
@@ -110,6 +114,8 @@ def test_serialize_node__workflow_input(serialize_node):
 
 def test_serialize_node__node_output_reference(serialize_node):
     class NodeWithOutput(BaseNode):
+        __legacy_id__ = True
+
         class Outputs(BaseNode.Outputs):
             output = Inputs.input
 
@@ -117,6 +123,8 @@ def test_serialize_node__node_output_reference(serialize_node):
         pass
 
     class GenericNodeReferencingOutput(BaseNode):
+        __legacy_id__ = True
+
         class Outputs(BaseNode.Outputs):
             output = NodeWithOutput.Outputs.output
 

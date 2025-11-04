@@ -159,6 +159,7 @@ class ToolPromptNode(InlinePromptNode[ToolCallingState]):
 class RouterNode(BaseNode[ToolCallingState]):
     """Router node that handles routing to function nodes based on outputs."""
 
+    __legacy_id__ = True
     pass
 
 
@@ -215,6 +216,7 @@ class DynamicInlineSubworkflowNode(
 class FunctionNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
     """Node that executes a regular Python function with function call output."""
 
+    __legacy_id__ = True
     function_definition: Callable[..., Any]
 
     def run(self) -> Iterator[BaseOutput]:
@@ -234,6 +236,7 @@ class FunctionNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
 class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
     """Node that executes a Composio tool with function call output."""
 
+    __legacy_id__ = True
     composio_tool: ComposioToolDefinition
 
     def run(self) -> Iterator[BaseOutput]:
@@ -261,6 +264,7 @@ class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
 class MCPNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
     """Node that executes an MCP tool with function call output."""
 
+    __legacy_id__ = True
     mcp_tool: MCPToolDefinition
 
     def run(self) -> Iterator[BaseOutput]:
@@ -281,6 +285,7 @@ class MCPNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
 class VellumIntegrationNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
     """Node that executes a Vellum Integration tool with function call output."""
 
+    __legacy_id__ = True
     vellum_integration_tool: VellumIntegrationToolDefinition
 
     def run(self) -> Iterator[BaseOutput]:
@@ -319,6 +324,8 @@ class VellumIntegrationNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
 
 class ElseNode(BaseNode[ToolCallingState]):
     """Node that executes when no function conditions match."""
+
+    __legacy_id__ = True
 
     class Ports(BaseNode.Ports):
         # Redefined in the create_else_node function, but defined here to resolve mypy errors

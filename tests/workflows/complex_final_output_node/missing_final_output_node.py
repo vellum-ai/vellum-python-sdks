@@ -16,6 +16,8 @@ class FirstFinalOutputNode(FinalOutputNode):
 
 
 class PassthroughNode(BaseNode):
+    __legacy_id__ = True
+
     class Outputs(BaseNode.Outputs):
         value = Inputs.beta
 

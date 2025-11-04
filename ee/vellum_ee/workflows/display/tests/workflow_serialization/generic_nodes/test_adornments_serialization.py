@@ -23,6 +23,7 @@ class Inputs(BaseInputs):
 def test_serialize_node__retry(serialize_node):
     @RetryNode.wrap(max_attempts=3)
     class InnerRetryGenericNode(BaseNode):
+        __legacy_id__ = True
         input = Inputs.input
 
         class Outputs(BaseOutputs):
@@ -133,6 +134,7 @@ def test_serialize_node__retry__no_display():
 def test_serialize_node__try(serialize_node):
     @TryNode.wrap()
     class InnerTryGenericNode(BaseNode):
+        __legacy_id__ = True
         input = Inputs.input
 
         class Outputs(BaseOutputs):
@@ -227,7 +229,7 @@ def test_serialize_node__stacked():
     @TryNode.wrap()
     @RetryNode.wrap(max_attempts=5)
     class InnerStackedGenericNode(BaseNode):
-        pass
+        __legacy_id__ = True
 
     # AND a workflow that uses the adornment node
     class StackedWorkflow(BaseWorkflow):

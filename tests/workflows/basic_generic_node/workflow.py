@@ -9,6 +9,8 @@ class Inputs(BaseInputs):
 
 
 class BasicGenericNode(BaseNode):
+    __legacy_id__ = True
+
     class Outputs(BaseNode.Outputs):
         output = Inputs.input
 

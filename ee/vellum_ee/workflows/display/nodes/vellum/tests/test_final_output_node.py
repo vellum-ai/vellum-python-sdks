@@ -8,6 +8,8 @@ from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class imp
 def test_final_output_node_display__serialize_with_valid_types():
     # GIVEN a node that outputs a str
     class StringNode(BaseNode):
+        __legacy_id__ = True
+
         class Outputs:
             result: str
 
@@ -44,6 +46,8 @@ def test_final_output_node_display__serialize_with_valid_types():
 def test_final_output_node_display__serialize_with_invalid_types_should_raise_error():
     # GIVEN a node that outputs a str
     class StringNode(BaseNode):
+        __legacy_id__ = True
+
         class Outputs:
             result: str
 

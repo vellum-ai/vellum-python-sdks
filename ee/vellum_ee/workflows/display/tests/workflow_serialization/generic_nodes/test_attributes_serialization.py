@@ -27,6 +27,7 @@ class Inputs(BaseInputs):
 
 def test_serialize_node__constant_value(serialize_node):
     class ConstantValueGenericNode(BaseNode):
+        __legacy_id__ = True
         attr: str = "hello"
 
     serialized_node = serialize_node(ConstantValueGenericNode)
@@ -97,6 +98,7 @@ def test_serialize_node__constant_boolean_value(serialize_node, boolean_value, e
 
 def test_serialize_node__constant_value_reference(serialize_node):
     class ConstantValueReferenceGenericNode(BaseNode):
+        __legacy_id__ = True
         attr: str = ConstantValueReference("hello")
 
     serialized_node = serialize_node(ConstantValueReferenceGenericNode)
@@ -139,6 +141,7 @@ def test_serialize_node__constant_value_reference(serialize_node):
 
 def test_serialize_node__lazy_reference(serialize_node):
     class LazyReferenceGenericNode(BaseNode):
+        __legacy_id__ = True
         attr: str = LazyReference(lambda: ConstantValueReference("hello"))
 
     serialized_node = serialize_node(LazyReferenceGenericNode)
@@ -156,6 +159,7 @@ def test_serialize_node__lazy_reference(serialize_node):
 def test_serialize_node__lazy_reference_with_string():
     # GIVEN two nodes with one lazily referencing the other
     class LazyReferenceGenericNode(BaseNode):
+        __legacy_id__ = True
         attr = LazyReference[str]("OtherNode.Outputs.result")
 
     class OtherNode(BaseNode):
@@ -184,7 +188,7 @@ def test_serialize_node__lazy_reference_with_string():
             "value": {
                 "type": "NODE_OUTPUT",
                 "node_id": str(OtherNode.__id__),
-                "node_output_id": "7a3406a1-6f11-4568-8aa0-e5dba6534dc2",
+                "node_output_id": "3c28ab49-1c7c-42cc-8175-be17bf05b5e7",
             },
         }
     ]
@@ -192,6 +196,7 @@ def test_serialize_node__lazy_reference_with_string():
 
 def test_serialize_node__workflow_input(serialize_node):
     class WorkflowInputGenericNode(BaseNode):
+        __legacy_id__ = True
         attr: str = Inputs.input
 
     input_id = uuid4()
@@ -246,6 +251,7 @@ def test_serialize_node__workflow_input_as_nested_chat_history():
 
     # AND a node referencing the workflow input
     class GenericNode(BaseNode):
+        __legacy_id__ = True
         attr = {
             "hello": Inputs.chat_history,
         }
@@ -313,6 +319,8 @@ def test_serialize_node__workflow_input_as_nested_chat_history():
 
 def test_serialize_node__node_output(serialize_node):
     class NodeWithOutput(BaseNode):
+        __legacy_id__ = True
+
         class Outputs(BaseNode.Outputs):
             output = Inputs.input
 
@@ -320,6 +328,7 @@ def test_serialize_node__node_output(serialize_node):
         pass
 
     class GenericNodeReferencingOutput(BaseNode):
+        __legacy_id__ = True
         attr = NodeWithOutput.Outputs.output
 
     workflow_input_id = uuid4()
@@ -375,6 +384,7 @@ def test_serialize_node__node_output(serialize_node):
 
 def test_serialize_node__vellum_secret(serialize_node):
     class VellumSecretGenericNode(BaseNode):
+        __legacy_id__ = True
         attr = VellumSecretReference(name="hello")
 
     input_id = uuid4()
@@ -421,12 +431,13 @@ def test_serialize_node__vellum_secret(serialize_node):
 
 def test_serialize_node__node_execution(serialize_node):
     class NodeWithExecutions(BaseNode):
-        pass
+        __legacy_id__ = True
 
     class NodeWithExecutionsDisplay(BaseNodeDisplay[NodeWithExecutions]):
         pass
 
     class GenericNodeReferencingExecutions(BaseNode):
+        __legacy_id__ = True
         attr: int = NodeWithExecutions.Execution.count
 
     workflow_input_id = uuid4()
@@ -492,6 +503,8 @@ def test_serialize_node__environment_variable(serialize_node):
 
 def test_serialize_node__coalesce(serialize_node):
     class CoalesceNodeA(BaseNode):
+        __legacy_id__ = True
+
         class Outputs(BaseNode.Outputs):
             output: str
 
@@ -499,6 +512,8 @@ def test_serialize_node__coalesce(serialize_node):
         pass
 
     class CoalesceNodeB(BaseNode):
+        __legacy_id__ = True
+
         class Outputs(BaseNode.Outputs):
             output: str
 
@@ -506,6 +521,7 @@ def test_serialize_node__coalesce(serialize_node):
         pass
 
     class CoalesceNodeFinal(BaseNode):
+        __legacy_id__ = True
         attr = CoalesceNodeA.Outputs.output.coalesce(CoalesceNodeB.Outputs.output)
 
     class CoalesceNodeFinalDisplay(BaseNodeDisplay[CoalesceNodeFinal]):
