@@ -75,17 +75,14 @@ export abstract class BaseTrigger<
     if (displayData.position != null) {
       fields.push(
         python.field({
-          name: "position",
-          initializer: python.TypeInstantiation.dict([
-            {
-              key: python.TypeInstantiation.str("x"),
-              value: python.TypeInstantiation.int(displayData.position.x),
-            },
-            {
-              key: python.TypeInstantiation.str("y"),
-              value: python.TypeInstantiation.int(displayData.position.y),
-            },
-          ]),
+          name: "x",
+          initializer: python.TypeInstantiation.float(displayData.position.x),
+        })
+      );
+      fields.push(
+        python.field({
+          name: "y",
+          initializer: python.TypeInstantiation.float(displayData.position.y),
         })
       );
     }
