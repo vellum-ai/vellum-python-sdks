@@ -2328,7 +2328,6 @@ export declare namespace ManualTriggerSerializer {
 
 const ScheduleTriggerSerializer = objectSchema({
   id: stringSchema(),
-  type: stringLiteralSchema("SCHEDULED"),
   cron: stringSchema(),
   timezone: stringSchema(),
   attributes: listSchema(NodeAttributeSerializer),

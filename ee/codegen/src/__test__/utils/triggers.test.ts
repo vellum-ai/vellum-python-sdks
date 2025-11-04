@@ -29,6 +29,8 @@ describe("getTriggerClassInfo", () => {
       id: "scheduled-trigger-id",
       type: WorkflowTriggerType.SCHEDULED,
       attributes: [],
+      cron: "* * * * *",
+      timezone: "UTC",
     };
 
     const result = getTriggerClassInfo(trigger, workflowContextFactory());
