@@ -20,7 +20,7 @@ def test_base_trigger__has_display_class():
     assert hasattr(display_class, "icon")
     assert hasattr(display_class, "color")
 
-    assert display_class.label == "Scheduled Trigger"
+    assert display_class.label == "Trigger"
     assert display_class.x == 0.0
     assert display_class.y == 0.0
     assert display_class.z_index == 0.0
