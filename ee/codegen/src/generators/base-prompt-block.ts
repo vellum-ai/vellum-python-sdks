@@ -5,11 +5,15 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 import { isNil } from "lodash";
 import {
+  AudioPromptBlock,
   ChatMessagePromptBlock,
+  DocumentPromptBlock,
+  ImagePromptBlock,
   JinjaPromptBlock,
   PlainTextPromptBlock,
   RichTextPromptBlock,
   VariablePromptBlock,
+  VideoPromptBlock,
 } from "vellum-ai/api";
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
@@ -29,7 +33,11 @@ export type PromptBlock =
   | ChatMessagePromptBlock
   | VariablePromptBlock
   | PlainTextPromptBlock
-  | RichTextPromptBlock;
+  | RichTextPromptBlock
+  | AudioPromptBlock
+  | VideoPromptBlock
+  | ImagePromptBlock
+  | DocumentPromptBlock;
 
 export declare namespace BasePromptBlock {
   interface Args<
