@@ -211,7 +211,7 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
 
     @classmethod
     def __annotate_outputs_class__(cls, outputs_class: Type[BaseOutputs], reference: OutputReference) -> None:
-        parameter_type = reference.types[0]
+        parameter_type = reference.types[0] if len(reference.types) > 0 else object
         annotation = List[parameter_type]  # type: ignore[valid-type]
 
         previous_annotations = {prev: annotation for prev in outputs_class.__annotations__ if not prev.startswith("_")}
