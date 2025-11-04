@@ -341,7 +341,7 @@ def test_serialize_workflow(vellum_client):
     assert not DeepDiff(
         [
             {
-                "id": "3c7551f5-0a76-4274-953e-c048b15f560a",
+                "id": "5e0e62cf-cdd9-4c47-ad19-ccbcdb41deac",
                 "source_node_id": "3a6b1467-5c83-4bcd-86a0-6415bc32d23b",
                 "source_handle_id": "8eaa7f02-25ff-4a00-9b0a-5185718d89b3",
                 "target_node_id": "6783c80f-5fc0-4712-a251-ce59d3c14ff2",
