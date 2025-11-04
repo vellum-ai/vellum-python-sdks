@@ -114,6 +114,16 @@ export default {
           value: null,
         },
       ],
+      display_data: {
+        label: "Slack Message Trigger",
+        position: {
+          x: 100,
+          y: 200,
+        },
+        z_index: 1,
+        icon: "slack",
+        color: "#4A154B",
+      },
     },
   ],
   assertions: ["workflow.py", "triggers/slack_message_trigger.py"],
