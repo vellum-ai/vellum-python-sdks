@@ -70,3 +70,40 @@ def test_minus_expression_types():
     expression = MinusExpression(lhs=10, rhs=3)
 
     assert expression.types == (object,)
+
+
+def test_sub_operator_numbers():
+    """
+    Tests that __sub__ operator correctly subtracts two numbers.
+    """
+
+    state = TestState()
+
+    expression = TestState.number_value - 3
+
+    result = expression.resolve(state)
+    assert result == 7
+
+
+def test_sub_operator_floats():
+    """
+    Tests that __sub__ operator correctly subtracts two floats.
+    """
+
+    state = TestState()
+
+    expression = TestState.float_value - 5.5
+
+    result = expression.resolve(state)
+    assert result == 10.0
+
+
+def test_sub_operator_returns_minus_expression():
+    """
+    Tests that __sub__ operator returns a MinusExpression.
+    """
+
+    expression = TestState.number_value - 3
+
+    # THEN it should return a MinusExpression
+    assert isinstance(expression, MinusExpression)
