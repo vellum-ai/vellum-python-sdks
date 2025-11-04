@@ -420,3 +420,14 @@ class BaseDescriptor(Generic[_T]):
         from vellum.workflows.expressions.minus import MinusExpression
 
         return MinusExpression(lhs=self, rhs=other)
+
+    @overload
+    def __sub__(self, other: "BaseDescriptor[_O]") -> "MinusExpression[_T, _O]": ...
+
+    @overload
+    def __sub__(self, other: _O) -> "MinusExpression[_T, _O]": ...
+
+    def __sub__(self, other: "Union[BaseDescriptor[_O], _O]") -> "MinusExpression[_T, _O]":
+        from vellum.workflows.expressions.minus import MinusExpression
+
+        return MinusExpression(lhs=self, rhs=other)
