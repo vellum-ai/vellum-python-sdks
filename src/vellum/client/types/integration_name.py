@@ -53,6 +53,7 @@ IntegrationName = typing.Union[
         "STRIPE",
         "SUPABASE",
         "TAVILY",
+        "TELEGRAM",
         "WEBFLOW",
         "ZENDESK",
         "DROPBOX",
