@@ -885,7 +885,7 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
             "inputs": [
                 {
                     "id": "3afbc787-fe7d-4411-934e-32c6ad101676",
-                    "key": "f497b2bf-7d35-43af-b162-ced2d8abd46f.field",
+                    "key": "12944986-8e31-4501-bc74-4eb00f2d7d2a.field",
                     "value": {
                         "rules": [
                             {
@@ -898,7 +898,7 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
                 },
                 {
                     "id": "c9d3791a-da39-42b4-83cd-2205cd2beece",
-                    "key": "f497b2bf-7d35-43af-b162-ced2d8abd46f.value",
+                    "key": "12944986-8e31-4501-bc74-4eb00f2d7d2a.value",
                     "value": {
                         "rules": [
                             {
@@ -919,10 +919,10 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
                         "type": "IF",
                         "source_handle_id": "90f7bb16-87b5-48dd-a14a-5dc12e8347d6",
                         "data": {
-                            "id": "650e7105-3e76-43ca-858f-b290970b438b",
+                            "id": "08c6312c-bfe3-4254-affd-8650e48c7f47",
                             "rules": [
                                 {
-                                    "id": "f497b2bf-7d35-43af-b162-ced2d8abd46f",
+                                    "id": "12944986-8e31-4501-bc74-4eb00f2d7d2a",
                                     "rules": None,
                                     "combinator": None,
                                     "negated": False,
@@ -1013,7 +1013,7 @@ def test_conditional_node_serialize_all_operators_with_expression(descriptor, op
             "inputs": [
                 {
                     "id": "3afbc787-fe7d-4411-934e-32c6ad101676",
-                    "key": "f497b2bf-7d35-43af-b162-ced2d8abd46f.field",
+                    "key": "12944986-8e31-4501-bc74-4eb00f2d7d2a.field",
                     "value": {
                         "rules": [
                             {
@@ -1034,10 +1034,10 @@ def test_conditional_node_serialize_all_operators_with_expression(descriptor, op
                         "type": "IF",
                         "source_handle_id": "90f7bb16-87b5-48dd-a14a-5dc12e8347d6",
                         "data": {
-                            "id": "650e7105-3e76-43ca-858f-b290970b438b",
+                            "id": "08c6312c-bfe3-4254-affd-8650e48c7f47",
                             "rules": [
                                 {
-                                    "id": "f497b2bf-7d35-43af-b162-ced2d8abd46f",
+                                    "id": "12944986-8e31-4501-bc74-4eb00f2d7d2a",
                                     "rules": None,
                                     "combinator": None,
                                     "negated": False,
@@ -1127,7 +1127,7 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
             "inputs": [
                 {
                     "id": "3afbc787-fe7d-4411-934e-32c6ad101676",
-                    "key": "f497b2bf-7d35-43af-b162-ced2d8abd46f.field",
+                    "key": "12944986-8e31-4501-bc74-4eb00f2d7d2a.field",
                     "value": {
                         "rules": [
                             {
@@ -1140,7 +1140,7 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
                 },
                 {
                     "id": "c9d3791a-da39-42b4-83cd-2205cd2beece",
-                    "key": "f497b2bf-7d35-43af-b162-ced2d8abd46f.value",
+                    "key": "12944986-8e31-4501-bc74-4eb00f2d7d2a.value",
                     "value": {
                         "rules": [
                             {
@@ -1161,10 +1161,10 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
                         "type": "IF",
                         "source_handle_id": "90f7bb16-87b5-48dd-a14a-5dc12e8347d6",
                         "data": {
-                            "id": "650e7105-3e76-43ca-858f-b290970b438b",
+                            "id": "08c6312c-bfe3-4254-affd-8650e48c7f47",
                             "rules": [
                                 {
-                                    "id": "f497b2bf-7d35-43af-b162-ced2d8abd46f",
+                                    "id": "12944986-8e31-4501-bc74-4eb00f2d7d2a",
                                     "rules": None,
                                     "combinator": None,
                                     "negated": False,
