@@ -880,7 +880,7 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
     conditional_node = workflow_raw_data["nodes"][1]
     assert not DeepDiff(
         {
-            "id": "a9143814-6bb0-4cb3-a817-4fc076417121",
+            "id": "9d1b29dc-b795-415f-8a56-bea2c77bbf1a",
             "type": "CONDITIONAL",
             "inputs": [
                 {
@@ -912,7 +912,7 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
             ],
             "data": {
                 "label": "Simple Conditional Node",
-                "target_handle_id": "c6e99e94-bc8e-47a4-b75c-cc96c6bedbb0",
+                "target_handle_id": "82348aaa-655f-47ef-8a7c-96a618b0aab0",
                 "conditions": [
                     {
                         "id": "a4c32611-fd58-4b98-9d08-313cfd1c214e",
@@ -957,7 +957,7 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
                 "module": ["tests", "workflows", "basic_conditional_node", "workflow_with_only_one_conditional_node"],
             },
             "trigger": {
-                "id": "c6e99e94-bc8e-47a4-b75c-cc96c6bedbb0",
+                "id": "82348aaa-655f-47ef-8a7c-96a618b0aab0",
                 "merge_behavior": "AWAIT_ANY",
             },
             "ports": [
@@ -1008,7 +1008,7 @@ def test_conditional_node_serialize_all_operators_with_expression(descriptor, op
     conditional_node = workflow_raw_data["nodes"][1]
     assert not DeepDiff(
         {
-            "id": "a9143814-6bb0-4cb3-a817-4fc076417121",
+            "id": "9d1b29dc-b795-415f-8a56-bea2c77bbf1a",
             "type": "CONDITIONAL",
             "inputs": [
                 {
@@ -1027,7 +1027,7 @@ def test_conditional_node_serialize_all_operators_with_expression(descriptor, op
             ],
             "data": {
                 "label": "Simple Conditional Node",
-                "target_handle_id": "c6e99e94-bc8e-47a4-b75c-cc96c6bedbb0",
+                "target_handle_id": "82348aaa-655f-47ef-8a7c-96a618b0aab0",
                 "conditions": [
                     {
                         "id": "a4c32611-fd58-4b98-9d08-313cfd1c214e",
@@ -1072,7 +1072,7 @@ def test_conditional_node_serialize_all_operators_with_expression(descriptor, op
                 "module": ["tests", "workflows", "basic_conditional_node", "workflow_with_only_one_conditional_node"],
             },
             "trigger": {
-                "id": "c6e99e94-bc8e-47a4-b75c-cc96c6bedbb0",
+                "id": "82348aaa-655f-47ef-8a7c-96a618b0aab0",
                 "merge_behavior": "AWAIT_ANY",
             },
             "ports": [
@@ -1122,7 +1122,7 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
     conditional_node = workflow_raw_data["nodes"][1]
     assert not DeepDiff(
         {
-            "id": "a9143814-6bb0-4cb3-a817-4fc076417121",
+            "id": "9d1b29dc-b795-415f-8a56-bea2c77bbf1a",
             "type": "CONDITIONAL",
             "inputs": [
                 {
@@ -1154,7 +1154,7 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
             ],
             "data": {
                 "label": "Simple Conditional Node",
-                "target_handle_id": "c6e99e94-bc8e-47a4-b75c-cc96c6bedbb0",
+                "target_handle_id": "82348aaa-655f-47ef-8a7c-96a618b0aab0",
                 "conditions": [
                     {
                         "id": "a4c32611-fd58-4b98-9d08-313cfd1c214e",
@@ -1199,7 +1199,7 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
                 "module": ["tests", "workflows", "basic_conditional_node", "workflow_with_only_one_conditional_node"],
             },
             "trigger": {
-                "id": "c6e99e94-bc8e-47a4-b75c-cc96c6bedbb0",
+                "id": "82348aaa-655f-47ef-8a7c-96a618b0aab0",
                 "merge_behavior": "AWAIT_ANY",
             },
             "ports": [

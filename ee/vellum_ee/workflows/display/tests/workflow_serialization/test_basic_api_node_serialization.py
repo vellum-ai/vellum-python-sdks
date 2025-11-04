@@ -146,7 +146,7 @@ def test_serialize_workflow(vellum_client):
                     },
                 },
                 {
-                    "id": "57c31247-998a-430d-bb62-bf50eca7df35",
+                    "id": "416e4be7-f186-4ace-9619-637c54eeffb7",
                     "key": "additional_header_key",
                     "value": {
                         "rules": [{"type": "CONSTANT_VALUE", "data": {"type": "STRING", "value": "additional_header"}}],
@@ -154,7 +154,7 @@ def test_serialize_workflow(vellum_client):
                     },
                 },
                 {
-                    "id": "47b32274-f19b-4c15-b788-55c069c311c5",
+                    "id": "f2803619-eda1-4941-8d6a-288c87aca215",
                     "key": "additional_header_value",
                     "value": {
                         "rules": [
@@ -188,8 +188,8 @@ def test_serialize_workflow(vellum_client):
                 "api_key_header_value_input_id": "7d728938-fd08-4224-81b4-5d5bc3d3bd57",
                 "additional_headers": [
                     {
-                        "header_key_input_id": "57c31247-998a-430d-bb62-bf50eca7df35",
-                        "header_value_input_id": "47b32274-f19b-4c15-b788-55c069c311c5",
+                        "header_key_input_id": "416e4be7-f186-4ace-9619-637c54eeffb7",
+                        "header_value_input_id": "f2803619-eda1-4941-8d6a-288c87aca215",
                     }
                 ],
                 "text_output_id": "f7190a6b-0c13-4a5a-9087-d8e6feb84eca",
