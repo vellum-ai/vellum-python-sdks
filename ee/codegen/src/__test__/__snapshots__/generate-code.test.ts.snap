@@ -136,7 +136,8 @@ class ScheduleTrigger(BaseTrigger):
 
     class Display(BaseTrigger.Display):
         label = "Scheduled Trigger"
-        position = {"x": 0, "y": 0}
+        x = 0
+        y = 0
         z_index = 0
 "
 `;
