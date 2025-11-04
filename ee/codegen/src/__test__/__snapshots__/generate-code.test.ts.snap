@@ -133,6 +133,13 @@ class SlackMessageTrigger(IntegrationTrigger):
         type = "COMPOSIO"
         integration_name = "slack"
         slug = "SLACK_MESSAGE_TRIGGER"
+
+    class Display(IntegrationTrigger.Display):
+        label = "Slack Message Trigger"
+        position = {"x": 100, "y": 200}
+        z_index = 1
+        icon = "slack"
+        color = "#4A154B"
 "
 `;
 
