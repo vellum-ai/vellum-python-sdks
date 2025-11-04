@@ -176,10 +176,11 @@ class WorkflowRunner(Generic[StateType]):
             for resolver in self.workflow.resolvers:
                 try:
                     load_state_result = resolver.load_state(previous_execution_id)
-                    if execution_id:
-                        load_state_result.state.meta.span_id = execution_id
 
                     if load_state_result is not None:
+                        if execution_id:
+                            load_state_result.state.meta.span_id = execution_id
+
                         state_class = self.workflow.get_state_class()
                         if isinstance(load_state_result.state, state_class):
                             self._initial_state = load_state_result.state
