@@ -884,7 +884,7 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
             "type": "CONDITIONAL",
             "inputs": [
                 {
-                    "id": "738a274f-962d-466e-9aee-7774d3e05ab9",
+                    "id": "3afbc787-fe7d-4411-934e-32c6ad101676",
                     "key": "f497b2bf-7d35-43af-b162-ced2d8abd46f.field",
                     "value": {
                         "rules": [
@@ -897,7 +897,7 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
                     },
                 },
                 {
-                    "id": "f30bceb4-39bf-433a-9229-b6871dbdbe00",
+                    "id": "c9d3791a-da39-42b4-83cd-2205cd2beece",
                     "key": "f497b2bf-7d35-43af-b162-ced2d8abd46f.value",
                     "value": {
                         "rules": [
@@ -915,9 +915,9 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
                 "target_handle_id": "82348aaa-655f-47ef-8a7c-96a618b0aab0",
                 "conditions": [
                     {
-                        "id": "a4c32611-fd58-4b98-9d08-313cfd1c214e",
+                        "id": "4d325440-5c08-4669-9ac2-df56dc97205c",
                         "type": "IF",
-                        "source_handle_id": "2ff87aa6-37cf-43dd-af9d-13b9198ab70a",
+                        "source_handle_id": "90f7bb16-87b5-48dd-a14a-5dc12e8347d6",
                         "data": {
                             "id": "650e7105-3e76-43ca-858f-b290970b438b",
                             "rules": [
@@ -926,9 +926,9 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
                                     "rules": None,
                                     "combinator": None,
                                     "negated": False,
-                                    "field_node_input_id": "738a274f-962d-466e-9aee-7774d3e05ab9",
+                                    "field_node_input_id": "3afbc787-fe7d-4411-934e-32c6ad101676",
                                     "operator": f"{operator}",
-                                    "value_node_input_id": "f30bceb4-39bf-433a-9229-b6871dbdbe00",
+                                    "value_node_input_id": "c9d3791a-da39-42b4-83cd-2205cd2beece",
                                 }
                             ],
                             "combinator": "AND",
@@ -939,9 +939,9 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
                         },
                     },
                     {
-                        "id": "342e5497-ea2b-4e5c-99cf-e6492f133a3c",
+                        "id": "5d164388-d76d-4bf1-9a88-a9fb8e797cbe",
                         "type": "ELSE",
-                        "source_handle_id": "9a7e8c2e-0228-4321-8f74-61cb5778f3df",
+                        "source_handle_id": "a66da8a4-7148-4554-a63c-38d20643cbb7",
                         "data": None,
                     },
                 ],
@@ -962,7 +962,7 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
             },
             "ports": [
                 {
-                    "id": "2ff87aa6-37cf-43dd-af9d-13b9198ab70a",
+                    "id": "90f7bb16-87b5-48dd-a14a-5dc12e8347d6",
                     "name": "text_str",
                     "type": "IF",
                     "expression": {
@@ -973,7 +973,7 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
                     },
                 },
                 {
-                    "id": "9a7e8c2e-0228-4321-8f74-61cb5778f3df",
+                    "id": "a66da8a4-7148-4554-a63c-38d20643cbb7",
                     "name": "text_fallthrough",
                     "type": "ELSE",
                     "expression": None,
@@ -1012,7 +1012,7 @@ def test_conditional_node_serialize_all_operators_with_expression(descriptor, op
             "type": "CONDITIONAL",
             "inputs": [
                 {
-                    "id": "738a274f-962d-466e-9aee-7774d3e05ab9",
+                    "id": "3afbc787-fe7d-4411-934e-32c6ad101676",
                     "key": "f497b2bf-7d35-43af-b162-ced2d8abd46f.field",
                     "value": {
                         "rules": [
@@ -1030,9 +1030,9 @@ def test_conditional_node_serialize_all_operators_with_expression(descriptor, op
                 "target_handle_id": "82348aaa-655f-47ef-8a7c-96a618b0aab0",
                 "conditions": [
                     {
-                        "id": "a4c32611-fd58-4b98-9d08-313cfd1c214e",
+                        "id": "4d325440-5c08-4669-9ac2-df56dc97205c",
                         "type": "IF",
-                        "source_handle_id": "2ff87aa6-37cf-43dd-af9d-13b9198ab70a",
+                        "source_handle_id": "90f7bb16-87b5-48dd-a14a-5dc12e8347d6",
                         "data": {
                             "id": "650e7105-3e76-43ca-858f-b290970b438b",
                             "rules": [
@@ -1041,9 +1041,9 @@ def test_conditional_node_serialize_all_operators_with_expression(descriptor, op
                                     "rules": None,
                                     "combinator": None,
                                     "negated": False,
-                                    "field_node_input_id": "738a274f-962d-466e-9aee-7774d3e05ab9",
+                                    "field_node_input_id": "3afbc787-fe7d-4411-934e-32c6ad101676",
                                     "operator": f"{operator}",
-                                    "value_node_input_id": "f30bceb4-39bf-433a-9229-b6871dbdbe00",
+                                    "value_node_input_id": "c9d3791a-da39-42b4-83cd-2205cd2beece",
                                 }
                             ],
                             "combinator": "AND",
@@ -1054,9 +1054,9 @@ def test_conditional_node_serialize_all_operators_with_expression(descriptor, op
                         },
                     },
                     {
-                        "id": "342e5497-ea2b-4e5c-99cf-e6492f133a3c",
+                        "id": "5d164388-d76d-4bf1-9a88-a9fb8e797cbe",
                         "type": "ELSE",
-                        "source_handle_id": "9a7e8c2e-0228-4321-8f74-61cb5778f3df",
+                        "source_handle_id": "a66da8a4-7148-4554-a63c-38d20643cbb7",
                         "data": None,
                     },
                 ],
@@ -1077,7 +1077,7 @@ def test_conditional_node_serialize_all_operators_with_expression(descriptor, op
             },
             "ports": [
                 {
-                    "id": "2ff87aa6-37cf-43dd-af9d-13b9198ab70a",
+                    "id": "90f7bb16-87b5-48dd-a14a-5dc12e8347d6",
                     "name": "text_str",
                     "type": "IF",
                     "expression": {
@@ -1087,7 +1087,7 @@ def test_conditional_node_serialize_all_operators_with_expression(descriptor, op
                     },
                 },
                 {
-                    "id": "9a7e8c2e-0228-4321-8f74-61cb5778f3df",
+                    "id": "a66da8a4-7148-4554-a63c-38d20643cbb7",
                     "name": "text_fallthrough",
                     "type": "ELSE",
                     "expression": None,
@@ -1126,7 +1126,7 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
             "type": "CONDITIONAL",
             "inputs": [
                 {
-                    "id": "738a274f-962d-466e-9aee-7774d3e05ab9",
+                    "id": "3afbc787-fe7d-4411-934e-32c6ad101676",
                     "key": "f497b2bf-7d35-43af-b162-ced2d8abd46f.field",
                     "value": {
                         "rules": [
@@ -1139,7 +1139,7 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
                     },
                 },
                 {
-                    "id": "f30bceb4-39bf-433a-9229-b6871dbdbe00",
+                    "id": "c9d3791a-da39-42b4-83cd-2205cd2beece",
                     "key": "f497b2bf-7d35-43af-b162-ced2d8abd46f.value",
                     "value": {
                         "rules": [
@@ -1157,9 +1157,9 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
                 "target_handle_id": "82348aaa-655f-47ef-8a7c-96a618b0aab0",
                 "conditions": [
                     {
-                        "id": "a4c32611-fd58-4b98-9d08-313cfd1c214e",
+                        "id": "4d325440-5c08-4669-9ac2-df56dc97205c",
                         "type": "IF",
-                        "source_handle_id": "2ff87aa6-37cf-43dd-af9d-13b9198ab70a",
+                        "source_handle_id": "90f7bb16-87b5-48dd-a14a-5dc12e8347d6",
                         "data": {
                             "id": "650e7105-3e76-43ca-858f-b290970b438b",
                             "rules": [
@@ -1168,9 +1168,9 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
                                     "rules": None,
                                     "combinator": None,
                                     "negated": False,
-                                    "field_node_input_id": "738a274f-962d-466e-9aee-7774d3e05ab9",
+                                    "field_node_input_id": "3afbc787-fe7d-4411-934e-32c6ad101676",
                                     "operator": f"{operator}",
-                                    "value_node_input_id": "f30bceb4-39bf-433a-9229-b6871dbdbe00",
+                                    "value_node_input_id": "c9d3791a-da39-42b4-83cd-2205cd2beece",
                                 }
                             ],
                             "combinator": "AND",
@@ -1181,9 +1181,9 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
                         },
                     },
                     {
-                        "id": "342e5497-ea2b-4e5c-99cf-e6492f133a3c",
+                        "id": "5d164388-d76d-4bf1-9a88-a9fb8e797cbe",
                         "type": "ELSE",
-                        "source_handle_id": "9a7e8c2e-0228-4321-8f74-61cb5778f3df",
+                        "source_handle_id": "a66da8a4-7148-4554-a63c-38d20643cbb7",
                         "data": None,
                     },
                 ],
@@ -1204,7 +1204,7 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
             },
             "ports": [
                 {
-                    "id": "2ff87aa6-37cf-43dd-af9d-13b9198ab70a",
+                    "id": "90f7bb16-87b5-48dd-a14a-5dc12e8347d6",
                     "name": "text_str",
                     "type": "IF",
                     "expression": {
@@ -1216,7 +1216,7 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
                     },
                 },
                 {
-                    "id": "9a7e8c2e-0228-4321-8f74-61cb5778f3df",
+                    "id": "a66da8a4-7148-4554-a63c-38d20643cbb7",
                     "name": "text_fallthrough",
                     "type": "ELSE",
                     "expression": None,

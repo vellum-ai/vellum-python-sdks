@@ -69,7 +69,7 @@ def test_serialize_workflow__await_all():
                 "label": "Await All Merge Node",
                 "merge_strategy": "AWAIT_ALL",
                 "target_handles": [
-                    {"id": "716971c3-bea6-4c90-ba44-7d9547354fec"},
+                    {"id": "6efa2972-58e7-4690-94de-dbbccb3635cc"},
                     {"id": "6efa2972-58e7-4690-94de-dbbccb3635cc"},
                 ],
                 "source_handle_id": "da1bdfe9-8e99-4d06-842f-a76af95a713a",
@@ -159,7 +159,7 @@ def test_serialize_workflow__await_all():
                 "type": "DEFAULT",
             },
             {
-                "id": "8ff20817-974e-4a3a-bb65-f0ad73557649",
+                "id": "a1f2b10a-fb47-4db3-80fa-3223df47e5cf",
                 "source_node_id": "59243c65-053f-4ea6-9157-3f3edb1477bf",
                 "source_handle_id": "b9c5f52b-b714-46e8-a09c-38b4e770dd36",
                 "target_node_id": "f07c263c-65a3-4b58-83c1-f4a29123f167",
@@ -167,15 +167,15 @@ def test_serialize_workflow__await_all():
                 "type": "DEFAULT",
             },
             {
-                "id": "0d8c801c-d76a-437a-831a-530885b75f96",
+                "id": "1dc5c57f-26e6-4f68-b255-370e1e365883",
                 "source_node_id": "127ef456-91bc-43c6-bd8b-1772db5e3cb5",
                 "source_handle_id": "b0bd17f3-4ce6-4232-9666-ec8afa161bf2",
                 "target_node_id": "f07c263c-65a3-4b58-83c1-f4a29123f167",
-                "target_handle_id": "716971c3-bea6-4c90-ba44-7d9547354fec",
+                "target_handle_id": "6efa2972-58e7-4690-94de-dbbccb3635cc",
                 "type": "DEFAULT",
             },
             {
-                "id": "70c1005d-339a-41bc-b6c2-10bc30a0281c",
+                "id": "6a0474e0-6f07-4c77-86b1-f99e72b52de5",
                 "source_node_id": "f07c263c-65a3-4b58-83c1-f4a29123f167",
                 "source_handle_id": "da1bdfe9-8e99-4d06-842f-a76af95a713a",
                 "target_node_id": "634f0202-9ea9-4c62-b152-1a58c595cffb",
