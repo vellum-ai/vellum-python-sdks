@@ -67,6 +67,7 @@ import { SearchNode } from "src/generators/nodes/search-node";
 import { SubworkflowDeploymentNode } from "src/generators/nodes/subworkflow-deployment-node";
 import { TemplatingNode } from "src/generators/nodes/templating-node";
 import { IntegrationTrigger } from "src/generators/triggers/integration-trigger";
+import { ScheduledTrigger } from "src/generators/triggers/scheduled-trigger";
 import { WorkflowSandboxFile } from "src/generators/workflow-sandbox-file";
 import { WorkflowVersionExecConfigSerializer } from "src/serializers/vellum";
 import {
@@ -1017,6 +1018,12 @@ ${errors.slice(0, 3).map((err) => {
           trigger,
         });
         triggerPromises.push(triggerGenerator.persist());
+      } else if (trigger.type === "SCHEDULED") {
+        const scheduledTrigger = new ScheduledTrigger({
+          workflowContext: this.workflowContext,
+          trigger,
+        });
+        triggerPromises.push(scheduledTrigger.persist());
       }
     });
 

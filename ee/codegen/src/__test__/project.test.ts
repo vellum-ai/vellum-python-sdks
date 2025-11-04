@@ -672,6 +672,8 @@ describe("WorkflowProjectGenerator", () => {
           {
             id: "trigger-1",
             type: "SCHEDULED",
+            cron: "* * * * *",
+            timezone: "UTC",
             attributes: [
               {
                 id: "attribute-id-1",
