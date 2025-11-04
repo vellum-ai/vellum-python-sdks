@@ -598,6 +598,22 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 "attributes": trigger_attributes,
             }
 
+            # Serialize display_data from trigger's Display class if present
+            if hasattr(trigger_class, "Display"):
+                display_class = trigger_class.Display
+                display_data: JsonObject = {}
+
+                # Add icon if present
+                if hasattr(display_class, "icon") and display_class.icon is not None:
+                    display_data["icon"] = display_class.icon
+
+                # Add color if present
+                if hasattr(display_class, "color") and display_class.color is not None:
+                    display_data["color"] = display_class.color
+
+                if display_data:
+                    trigger_data["display_data"] = display_data
+
             # For INTEGRATION and SCHEDULED triggers, include class name, module path, and source_handle_id
             # ManualTrigger doesn't need source_handle_id because edges come from ENTRYPOINT node
             if trigger_type in (WorkflowTriggerType.INTEGRATION, WorkflowTriggerType.SCHEDULED):
