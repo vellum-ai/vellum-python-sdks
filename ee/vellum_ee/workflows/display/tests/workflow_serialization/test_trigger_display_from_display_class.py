@@ -4,14 +4,18 @@ from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.state.base import BaseState
-from vellum.workflows.triggers.manual import ManualTrigger
+from vellum.workflows.triggers.schedule import ScheduleTrigger
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 
 def test_serialize_basetrigger_with_display_class():
     """Tests that BaseTrigger.Display class attributes serialize correctly."""
 
-    class MyTrigger(ManualTrigger):
+    class MyTrigger(ScheduleTrigger):
+        class Config:
+            cron = "0 9 * * *"
+            timezone = "UTC"
+
         class Display:
             icon = "vellum:icon:gear"
             color = "purple"
@@ -23,7 +27,7 @@ def test_serialize_basetrigger_with_display_class():
         graph = MyTrigger >> SimpleNode
 
     # WHEN we serialize the workflow
-    result = get_workflow_display(workflow_class=TestWorkflow).serialize()
+    result: dict = get_workflow_display(workflow_class=TestWorkflow).serialize()
 
     assert "triggers" in result
     triggers = result["triggers"]
@@ -42,7 +46,11 @@ def test_serialize_basetrigger_with_display_class():
 def test_serialize_trigger_with_only_icon():
     """Tests that triggers with only icon serialize correctly."""
 
-    class IconOnlyTrigger(ManualTrigger):
+    class IconOnlyTrigger(ScheduleTrigger):
+        class Config:
+            cron = "0 9 * * *"
+            timezone = "UTC"
+
         class Display:
             icon = "vellum:icon:star"
 
@@ -53,7 +61,7 @@ def test_serialize_trigger_with_only_icon():
         graph = IconOnlyTrigger >> SimpleNode
 
     # WHEN we serialize the workflow
-    result = get_workflow_display(workflow_class=TestWorkflow).serialize()
+    result: dict = get_workflow_display(workflow_class=TestWorkflow).serialize()
 
     triggers = result["triggers"]
     assert len(triggers) == 1
@@ -66,7 +74,11 @@ def test_serialize_trigger_with_only_icon():
 def test_serialize_trigger_with_only_color():
     """Tests that triggers with only color serialize correctly."""
 
-    class ColorOnlyTrigger(ManualTrigger):
+    class ColorOnlyTrigger(ScheduleTrigger):
+        class Config:
+            cron = "0 9 * * *"
+            timezone = "UTC"
+
         class Display:
             color = "#FF5733"
 
@@ -77,7 +89,7 @@ def test_serialize_trigger_with_only_color():
         graph = ColorOnlyTrigger >> SimpleNode
 
     # WHEN we serialize the workflow
-    result = get_workflow_display(workflow_class=TestWorkflow).serialize()
+    result: dict = get_workflow_display(workflow_class=TestWorkflow).serialize()
 
     triggers = result["triggers"]
     assert len(triggers) == 1
@@ -90,8 +102,10 @@ def test_serialize_trigger_with_only_color():
 def test_serialize_trigger_without_display_class():
     """Tests that triggers without Display class don't have display_data."""
 
-    class PlainTrigger(ManualTrigger):
-        pass
+    class PlainTrigger(ScheduleTrigger):
+        class Config:
+            cron = "0 9 * * *"
+            timezone = "UTC"
 
     class SimpleNode(BaseNode):
         pass
@@ -100,7 +114,7 @@ def test_serialize_trigger_without_display_class():
         graph = PlainTrigger >> SimpleNode
 
     # WHEN we serialize the workflow
-    result = get_workflow_display(workflow_class=TestWorkflow).serialize()
+    result: dict = get_workflow_display(workflow_class=TestWorkflow).serialize()
 
     triggers = result["triggers"]
     assert len(triggers) == 1
@@ -113,7 +127,11 @@ def test_serialize_trigger_without_display_class():
 def test_serialize_trigger_with_none_values():
     """Tests that triggers with None icon/color don't serialize those fields."""
 
-    class NoneValuesTrigger(ManualTrigger):
+    class NoneValuesTrigger(ScheduleTrigger):
+        class Config:
+            cron = "0 9 * * *"
+            timezone = "UTC"
+
         class Display:
             icon = None
             color = None
@@ -125,7 +143,7 @@ def test_serialize_trigger_with_none_values():
         graph = NoneValuesTrigger >> SimpleNode
 
     # WHEN we serialize the workflow
-    result = get_workflow_display(workflow_class=TestWorkflow).serialize()
+    result: dict = get_workflow_display(workflow_class=TestWorkflow).serialize()
 
     triggers = result["triggers"]
     assert len(triggers) == 1
