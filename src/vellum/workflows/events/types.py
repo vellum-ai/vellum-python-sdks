@@ -74,6 +74,9 @@ class WorkflowSandboxParentContext(BaseParentContext):
 
 class APIRequestParentContext(BaseParentContext):
     type: Literal["API_REQUEST"] = "API_REQUEST"
+    api_actor_id: Optional[str] = None
+    api_actor_type: Optional[str] = None
+    api_actor_label: Optional[str] = None
 
 
 class UnknownParentContext(BaseParentContext):
