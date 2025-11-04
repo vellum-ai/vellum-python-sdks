@@ -53,11 +53,9 @@ export class BinaryExpression extends AstNode {
     } else if (this.operator === "and") {
       writer.write(" & ");
     } else if (this.operator === "+") {
-      writer.write(".add(");
-      openParenthesis = true;
+      writer.write("+");
     } else if (this.operator === "-") {
-      writer.write(".minus(");
-      openParenthesis = true;
+      writer.write("-");
     } else {
       writer.write(`.${this.operator}(`);
       openParenthesis = true;

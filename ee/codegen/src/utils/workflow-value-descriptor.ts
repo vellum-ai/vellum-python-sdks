@@ -44,6 +44,9 @@ export function convertOperatorType(
     or: "or",
     and: "and",
     isError: "is_error",
+    concat: "concat",
+    "+": "+",
+    "-": "-",
   };
 
   return operatorMappings[operator] || "equals"; // return default operator if not found
