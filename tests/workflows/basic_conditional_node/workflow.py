@@ -11,26 +11,36 @@ class Inputs(BaseInputs):
 
 
 class QuestionPassthroughNode(BaseNode):
+    __legacy_id__ = True
+
     class Outputs(BaseNode.Outputs):
         question = Inputs.category
 
 
 class ComplaintPassthroughNode(BaseNode):
+    __legacy_id__ = True
+
     class Outputs(BaseNode.Outputs):
         complaint = Inputs.category
 
 
 class ComplimentPassthroughNode(BaseNode):
+    __legacy_id__ = True
+
     class Outputs(BaseNode.Outputs):
         compliment = Inputs.category
 
 
 class StatementPassthroughNode(BaseNode):
+    __legacy_id__ = True
+
     class Outputs(BaseNode.Outputs):
         statement = Inputs.category
 
 
 class FallthroughPassthroughNode(BaseNode):
+    __legacy_id__ = True
+
     class Outputs(BaseNode.Outputs):
         fallthrough = Inputs.category
 

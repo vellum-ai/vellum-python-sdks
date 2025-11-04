@@ -64,7 +64,7 @@
         ],
         "outputs": [
           {
-            "id": "925c5cf8-25d0-429f-b849-2a98e542fe5d",
+            "id": "96af83b6-30b3-4ce3-8a8a-2bd245df9a8b",
             "name": "result",
             "type": "STRING",
             "value": {
@@ -95,7 +95,7 @@
                   "type": "NODE_OUTPUT",
                   "data": {
                     "node_id": "3669684e-500e-4034-be4a-7ee70824b272",
-                    "output_id": "925c5cf8-25d0-429f-b849-2a98e542fe5d"
+                    "output_id": "96af83b6-30b3-4ce3-8a8a-2bd245df9a8b"
                   }
                 }
               ],
@@ -144,7 +144,7 @@
             "value": {
               "type": "NODE_OUTPUT",
               "node_id": "3669684e-500e-4034-be4a-7ee70824b272",
-              "node_output_id": "925c5cf8-25d0-429f-b849-2a98e542fe5d"
+              "node_output_id": "96af83b6-30b3-4ce3-8a8a-2bd245df9a8b"
             }
           }
         ]

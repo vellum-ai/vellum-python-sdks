@@ -42,7 +42,6 @@ from vellum.workflows.expressions.or_ import OrExpression
 from vellum.workflows.expressions.parse_json import ParseJsonExpression
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
-from vellum.workflows.nodes.displayable.final_output_node import FinalOutputNode
 from vellum.workflows.nodes.utils import get_unadorned_node
 from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.references.environment_variable import EnvironmentVariableReference
@@ -297,17 +296,12 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
         upstream_node_class = value.outputs_class.__parent_class__
         if not issubclass(upstream_node_class, BaseNode):
             raise ValueError(f"Output references must be to a node, not {upstream_node_class}")
-
-        if issubclass(upstream_node_class, FinalOutputNode):
-            node_id = upstream_node_class.__id__
-        else:
-            unadorned_upstream_node_class = get_unadorned_node(upstream_node_class)
-            upstream_node = display_context.global_node_displays[unadorned_upstream_node_class]
-            node_id = upstream_node.node_id
+        unadorned_upstream_node_class = get_unadorned_node(upstream_node_class)
+        upstream_node = display_context.global_node_displays[unadorned_upstream_node_class]
 
         return {
             "type": "NODE_OUTPUT",
-            "node_id": str(node_id),
+            "node_id": str(upstream_node.node_id),
             "node_output_id": str(output_display.id),
         }
 

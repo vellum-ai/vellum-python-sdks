@@ -15,6 +15,8 @@ class Inputs(BaseInputs):
 
 def test_serialize_node__annotated_output(serialize_node):
     class AnnotatedOutputGenericNode(BaseNode):
+        __legacy_id__ = True
+
         class Outputs(BaseNode.Outputs):
             output: int
 
@@ -45,7 +47,7 @@ def test_serialize_node__annotated_output(serialize_node):
             "attributes": [],
             "outputs": [
                 {
-                    "id": "6d08f5f4-cb29-4240-899a-d811e547a30b",
+                    "id": "0fd1356f-ca4e-4e85-b923-8a0164bfc451",
                     "name": "output",
                     "type": "NUMBER",
                     "value": None,
@@ -59,6 +61,8 @@ def test_serialize_node__annotated_output(serialize_node):
 
 def test_serialize_node__workflow_input(serialize_node):
     class WorkflowInputGenericNode(BaseNode):
+        __legacy_id__ = True
+
         class Outputs(BaseNode.Outputs):
             output = Inputs.input
 
@@ -93,7 +97,7 @@ def test_serialize_node__workflow_input(serialize_node):
             "attributes": [],
             "outputs": [
                 {
-                    "id": "70c7e4c8-2ad3-4093-b69f-a83b4e2a8167",
+                    "id": "b62c0cbe-48d5-465d-8d9e-4ff82847f8c7",
                     "name": "output",
                     "type": "STRING",
                     "value": {
@@ -110,6 +114,8 @@ def test_serialize_node__workflow_input(serialize_node):
 
 def test_serialize_node__node_output_reference(serialize_node):
     class NodeWithOutput(BaseNode):
+        __legacy_id__ = True
+
         class Outputs(BaseNode.Outputs):
             output = Inputs.input
 
@@ -117,6 +123,8 @@ def test_serialize_node__node_output_reference(serialize_node):
         pass
 
     class GenericNodeReferencingOutput(BaseNode):
+        __legacy_id__ = True
+
         class Outputs(BaseNode.Outputs):
             output = NodeWithOutput.Outputs.output
 
@@ -156,7 +164,7 @@ def test_serialize_node__node_output_reference(serialize_node):
             "attributes": [],
             "outputs": [
                 {
-                    "id": "72f37d68-c927-4f4e-8b25-72e8cb2c7f5c",
+                    "id": "46e6e98e-9ecf-4880-86f9-6390f0851c31",
                     "name": "output",
                     "type": "STRING",
                     "value": {

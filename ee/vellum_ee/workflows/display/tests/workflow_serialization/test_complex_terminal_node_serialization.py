@@ -108,7 +108,7 @@ def test_serialize_workflow__missing_final_output_node():
                                     "type": "NODE_OUTPUT",
                                     "data": {
                                         "node_id": "32d88cab-e9fa-4a56-9bc2-fb6e1fd0897f",
-                                        "output_id": "ae21fc3f-dd81-4174-b08a-97bc96422a8f",
+                                        "output_id": "04df0e76-690a-4ae1-ab52-fe825a334dcc",
                                     },
                                 }
                             ],

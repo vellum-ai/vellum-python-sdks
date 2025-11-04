@@ -202,13 +202,13 @@ def test_serialize_workflow():
                                                 ],
                                                 "outputs": [
                                                     {
-                                                        "id": "272eccdb-6903-4f32-8159-8bfb87c65c2e",
+                                                        "id": "3f4c753e-f057-47bb-9748-7968283cc8aa",
                                                         "name": "temperature",
                                                         "type": "NUMBER",
                                                         "value": None,
                                                     },
                                                     {
-                                                        "id": "8616509d-fecb-4bbf-afdc-bd4c5de35ce7",
+                                                        "id": "2a4a62b3-cd26-4d2c-b3f1-eaa5f9dd22dd",
                                                         "name": "reasoning",
                                                         "type": "STRING",
                                                         "value": None,
@@ -236,7 +236,7 @@ def test_serialize_workflow():
                                                                     "type": "NODE_OUTPUT",
                                                                     "data": {
                                                                         "node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",  # noqa: E501
-                                                                        "output_id": "272eccdb-6903-4f32-8159-8bfb87c65c2e",  # noqa: E501
+                                                                        "output_id": "3f4c753e-f057-47bb-9748-7968283cc8aa",  # noqa: E501
                                                                     },
                                                                 }
                                                             ],
@@ -279,7 +279,7 @@ def test_serialize_workflow():
                                                                     "type": "NODE_OUTPUT",
                                                                     "data": {
                                                                         "node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",  # noqa: E501
-                                                                        "output_id": "8616509d-fecb-4bbf-afdc-bd4c5de35ce7",  # noqa: E501
+                                                                        "output_id": "2a4a62b3-cd26-4d2c-b3f1-eaa5f9dd22dd",  # noqa: E501
                                                                     },
                                                                 }
                                                             ],
@@ -344,7 +344,7 @@ def test_serialize_workflow():
                                                 "value": {
                                                     "type": "NODE_OUTPUT",
                                                     "node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
-                                                    "node_output_id": "272eccdb-6903-4f32-8159-8bfb87c65c2e",
+                                                    "node_output_id": "3f4c753e-f057-47bb-9748-7968283cc8aa",
                                                 },
                                             },
                                             {
@@ -352,7 +352,7 @@ def test_serialize_workflow():
                                                 "value": {
                                                     "type": "NODE_OUTPUT",
                                                     "node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
-                                                    "node_output_id": "8616509d-fecb-4bbf-afdc-bd4c5de35ce7",
+                                                    "node_output_id": "2a4a62b3-cd26-4d2c-b3f1-eaa5f9dd22dd",
                                                 },
                                             },
                                         ],
