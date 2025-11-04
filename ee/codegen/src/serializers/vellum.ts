@@ -2328,6 +2328,9 @@ export declare namespace ManualTriggerSerializer {
 
 const ScheduleTriggerSerializer = objectSchema({
   id: stringSchema(),
+  type: stringLiteralSchema("SCHEDULED"),
+  cron: stringSchema(),
+  timezone: stringSchema(),
   attributes: listSchema(NodeAttributeSerializer),
   definition: CodeResourceDefinitionSerializer.optional(),
   displayData: propertySchema(
@@ -2340,6 +2343,8 @@ export declare namespace ScheduleTriggerSerializer {
   interface Raw {
     id: string;
     type: "SCHEDULED";
+    cron: string;
+    timezone: string;
     attributes: NodeAttributeSerializer.Raw[];
     definition?: CodeResourceDefinitionSerializer.Raw | null;
     display_data?: WorkflowTriggerDisplayDataSerializer.Raw | null;

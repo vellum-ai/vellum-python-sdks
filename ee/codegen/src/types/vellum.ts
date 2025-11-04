@@ -834,6 +834,8 @@ export interface ManualTrigger extends BaseTrigger {
 
 export interface ScheduledTrigger extends BaseTrigger {
   type: WorkflowTriggerType.SCHEDULED;
+  cron: string;
+  timezone: string;
 }
 
 export interface IntegrationTrigger extends BaseTrigger {
