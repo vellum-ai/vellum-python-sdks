@@ -122,7 +122,7 @@ def test_serialize_workflow(vellum_client):
                 },
             },
             {
-                "id": "8a7495b1-a7fc-405f-8ef6-ba05dd3f9e5c",
+                "id": "3487e51a-e7fe-4b2c-a1f9-f72c83a329db",
                 "key": "date",
                 "value": {
                     "rules": [
