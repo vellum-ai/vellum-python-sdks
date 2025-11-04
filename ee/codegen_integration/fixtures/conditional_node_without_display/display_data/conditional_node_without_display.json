@@ -104,7 +104,7 @@
         ]
       },
       {
-        "id": "5d3c60ce-7acf-4d8b-a68d-65cc0b561ac5",
+        "id": "c48282eb-b80a-46c0-b74d-50177a469638",
         "type": "CONDITIONAL",
         "inputs": [
           {
@@ -142,12 +142,12 @@
         ],
         "data": {
           "label": "Conditional Node",
-          "target_handle_id": "2b5617b4-5cc0-4f9a-9369-24982e2cd8c0",
+          "target_handle_id": "2766ffaa-2840-4fa3-83a0-c4c01df34836",
           "conditions": [
             {
               "id": "bc3aa54a-5b5d-4df9-81c7-86f190a89f51",
               "type": "IF",
-              "source_handle_id": "2b060475-daa1-49a5-9cb6-bbfe8fae9c7d",
+              "source_handle_id": "482b2fea-da60-403d-8c72-6328030c54d0",
               "data": {
                 "id": "bd9e4223-4602-4fe4-9f78-f9774504da62",
                 "rules": [
@@ -206,12 +206,12 @@
           ]
         },
         "trigger": {
-          "id": "2b5617b4-5cc0-4f9a-9369-24982e2cd8c0",
+          "id": "2766ffaa-2840-4fa3-83a0-c4c01df34836",
           "merge_behavior": "AWAIT_ANY"
         },
         "ports": [
           {
-            "id": "2b060475-daa1-49a5-9cb6-bbfe8fae9c7d",
+            "id": "482b2fea-da60-403d-8c72-6328030c54d0",
             "name": "if_1",
             "type": "IF",
             "expression": {
@@ -318,19 +318,19 @@
     "edges": [
       {
         "type": "DEFAULT",
-        "id": "bf7426a4-6e16-4de7-a00d-230a718a6cb5",
-        "source_node_id": "5d3c60ce-7acf-4d8b-a68d-65cc0b561ac5",
-        "source_handle_id": "2b060475-daa1-49a5-9cb6-bbfe8fae9c7d",
+        "id": "7edba832-e4a9-4310-89c4-4f45b4589e14",
+        "source_node_id": "c48282eb-b80a-46c0-b74d-50177a469638",
+        "source_handle_id": "482b2fea-da60-403d-8c72-6328030c54d0",
         "target_node_id": "6698be8b-f21d-4410-8d51-b88488846e93",
         "target_handle_id": "4173f341-3f9e-4319-971f-546f1f72b55c"
       },
       {
         "type": "DEFAULT",
-        "id": "23c59540-24a2-4de2-bd41-3ce3e598d0eb",
+        "id": "3504cfd1-46d4-4b75-8efd-a0afee7f1a77",
         "source_node_id": "ee9b5234-247b-49d1-bed4-490312f18838",
         "source_handle_id": "8f4460f0-717b-4972-a6f4-ac164e5e204e",
-        "target_node_id": "5d3c60ce-7acf-4d8b-a68d-65cc0b561ac5",
-        "target_handle_id": "2b5617b4-5cc0-4f9a-9369-24982e2cd8c0"
+        "target_node_id": "c48282eb-b80a-46c0-b74d-50177a469638",
+        "target_handle_id": "2766ffaa-2840-4fa3-83a0-c4c01df34836"
       },
       {
         "type": "DEFAULT",
