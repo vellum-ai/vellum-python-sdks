@@ -69,7 +69,7 @@ def test_serialize_workflow__await_all():
                 "label": "Await All Merge Node",
                 "merge_strategy": "AWAIT_ALL",
                 "target_handles": [
-                    {"id": "6efa2972-58e7-4690-94de-dbbccb3635cc"},
+                    {"id": "716971c3-bea6-4c90-ba44-7d9547354fec"},
                     {"id": "6efa2972-58e7-4690-94de-dbbccb3635cc"},
                 ],
                 "source_handle_id": "da1bdfe9-8e99-4d06-842f-a76af95a713a",
@@ -163,7 +163,7 @@ def test_serialize_workflow__await_all():
                 "source_node_id": "59243c65-053f-4ea6-9157-3f3edb1477bf",
                 "source_handle_id": "b9c5f52b-b714-46e8-a09c-38b4e770dd36",
                 "target_node_id": "f07c263c-65a3-4b58-83c1-f4a29123f167",
-                "target_handle_id": "6efa2972-58e7-4690-94de-dbbccb3635cc",
+                "target_handle_id": "716971c3-bea6-4c90-ba44-7d9547354fec",
                 "type": "DEFAULT",
             },
             {
