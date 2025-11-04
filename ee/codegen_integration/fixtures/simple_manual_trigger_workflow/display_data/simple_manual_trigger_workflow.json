@@ -64,7 +64,7 @@
         ],
         "outputs": [
           {
-            "id": "96af83b6-30b3-4ce3-8a8a-2bd245df9a8b",
+            "id": "925c5cf8-25d0-429f-b849-2a98e542fe5d",
             "name": "result",
             "type": "STRING",
             "value": {
@@ -75,19 +75,19 @@
         ]
       },
       {
-        "id": "2c368766-015e-4d2f-8f57-01937038a4b2",
+        "id": "c053d073-2145-4103-b14d-5344fd971e56",
         "type": "TERMINAL",
         "data": {
           "label": "Final Output",
           "name": "final_output",
-          "target_handle_id": "af15d1e2-2ea2-485c-933a-142db6f9b2d4",
-          "output_id": "f04ec2cc-fd32-42b7-aac8-273bfaa3a283",
+          "target_handle_id": "c9ae7ed8-3344-4abe-aeb6-fb43f1da738d",
+          "output_id": "f3bc94ce-4bc1-4e9f-8961-ba09280ede25",
           "output_type": "STRING",
-          "node_input_id": "287431be-000d-498d-9dd0-b8dddbce5a5a"
+          "node_input_id": "91ba0008-7a90-467a-841c-a6f7bdd779de"
         },
         "inputs": [
           {
-            "id": "287431be-000d-498d-9dd0-b8dddbce5a5a",
+            "id": "91ba0008-7a90-467a-841c-a6f7bdd779de",
             "key": "node_input",
             "value": {
               "rules": [
@@ -95,7 +95,7 @@
                   "type": "NODE_OUTPUT",
                   "data": {
                     "node_id": "3669684e-500e-4034-be4a-7ee70824b272",
-                    "output_id": "96af83b6-30b3-4ce3-8a8a-2bd245df9a8b"
+                    "output_id": "925c5cf8-25d0-429f-b849-2a98e542fe5d"
                   }
                 }
               ],
@@ -132,19 +132,19 @@
           ]
         },
         "trigger": {
-          "id": "af15d1e2-2ea2-485c-933a-142db6f9b2d4",
+          "id": "c9ae7ed8-3344-4abe-aeb6-fb43f1da738d",
           "merge_behavior": "AWAIT_ANY"
         },
         "ports": [],
         "outputs": [
           {
-            "id": "f04ec2cc-fd32-42b7-aac8-273bfaa3a283",
+            "id": "f3bc94ce-4bc1-4e9f-8961-ba09280ede25",
             "name": "value",
             "type": "STRING",
             "value": {
               "type": "NODE_OUTPUT",
               "node_id": "3669684e-500e-4034-be4a-7ee70824b272",
-              "node_output_id": "96af83b6-30b3-4ce3-8a8a-2bd245df9a8b"
+              "node_output_id": "925c5cf8-25d0-429f-b849-2a98e542fe5d"
             }
           }
         ]
@@ -160,11 +160,11 @@
         "type": "DEFAULT"
       },
       {
-        "id": "55ad304f-eddc-40d7-ad19-1e6a2b5fc02a",
+        "id": "8540346f-782d-4629-9bd6-2e860af0b1e9",
         "source_node_id": "3669684e-500e-4034-be4a-7ee70824b272",
         "source_handle_id": "ab742d8d-e6d6-4ef0-832c-712d3844a62a",
-        "target_node_id": "2c368766-015e-4d2f-8f57-01937038a4b2",
-        "target_handle_id": "af15d1e2-2ea2-485c-933a-142db6f9b2d4",
+        "target_node_id": "c053d073-2145-4103-b14d-5344fd971e56",
+        "target_handle_id": "c9ae7ed8-3344-4abe-aeb6-fb43f1da738d",
         "type": "DEFAULT"
       }
     ],
@@ -190,8 +190,8 @@
         "output_variable_id": "16b9fa94-c99b-4290-a57c-2acb5283051f",
         "value": {
           "type": "NODE_OUTPUT",
-          "node_id": "2c368766-015e-4d2f-8f57-01937038a4b2",
-          "node_output_id": "f04ec2cc-fd32-42b7-aac8-273bfaa3a283"
+          "node_id": "c053d073-2145-4103-b14d-5344fd971e56",
+          "node_output_id": "f3bc94ce-4bc1-4e9f-8961-ba09280ede25"
         }
       }
     ]
