@@ -74,7 +74,7 @@ def test_serialize_workflow_with_filepath():
                 },
             },
             {
-                "id": "dd7e4f60-858a-457d-9ad3-50a25871650f",
+                "id": "167a0eb0-3bb7-4f9c-9517-15eda41b7b58",
                 "key": "runtime",
                 "value": {
                     "rules": [{"type": "CONSTANT_VALUE", "data": {"type": "STRING", "value": "PYTHON_3_11_6"}}],
@@ -88,7 +88,7 @@ def test_serialize_workflow_with_filepath():
             "source_handle_id": "832f81ec-427b-42a8-825c-e62c43c1f961",
             "target_handle_id": "e02a2701-22c0-4533-8b00-175998e7350a",
             "code_input_id": "f2e8a4fa-b54e-41e9-b314-0e5443519ac7",
-            "runtime_input_id": "dd7e4f60-858a-457d-9ad3-50a25871650f",
+            "runtime_input_id": "167a0eb0-3bb7-4f9c-9517-15eda41b7b58",
             "output_type": "NUMBER",
             "packages": [{"name": "openai", "version": "1.0.0"}],
             "output_id": "0fde9607-353f-42c2-85c4-20f720ebc1ec",
@@ -317,7 +317,7 @@ def test_serialize_workflow_with_code():
                 },
             },
             {
-                "id": "dd7e4f60-858a-457d-9ad3-50a25871650f",
+                "id": "167a0eb0-3bb7-4f9c-9517-15eda41b7b58",
                 "key": "runtime",
                 "value": {
                     "rules": [{"type": "CONSTANT_VALUE", "data": {"type": "STRING", "value": "PYTHON_3_11_6"}}],
@@ -331,7 +331,7 @@ def test_serialize_workflow_with_code():
             "source_handle_id": "832f81ec-427b-42a8-825c-e62c43c1f961",
             "target_handle_id": "e02a2701-22c0-4533-8b00-175998e7350a",
             "code_input_id": "f2e8a4fa-b54e-41e9-b314-0e5443519ac7",
-            "runtime_input_id": "dd7e4f60-858a-457d-9ad3-50a25871650f",
+            "runtime_input_id": "167a0eb0-3bb7-4f9c-9517-15eda41b7b58",
             "output_type": "NUMBER",
             "packages": [],
             "output_id": "0fde9607-353f-42c2-85c4-20f720ebc1ec",
@@ -553,7 +553,7 @@ def test_serialize_workflow__try_wrapped():
                 },
             },
             {
-                "id": "dd7e4f60-858a-457d-9ad3-50a25871650f",
+                "id": "167a0eb0-3bb7-4f9c-9517-15eda41b7b58",
                 "key": "runtime",
                 "value": {
                     "rules": [{"type": "CONSTANT_VALUE", "data": {"type": "STRING", "value": "PYTHON_3_11_6"}}],
@@ -567,7 +567,7 @@ def test_serialize_workflow__try_wrapped():
             "source_handle_id": "832f81ec-427b-42a8-825c-e62c43c1f961",
             "target_handle_id": "e02a2701-22c0-4533-8b00-175998e7350a",
             "code_input_id": "f2e8a4fa-b54e-41e9-b314-0e5443519ac7",
-            "runtime_input_id": "dd7e4f60-858a-457d-9ad3-50a25871650f",
+            "runtime_input_id": "167a0eb0-3bb7-4f9c-9517-15eda41b7b58",
             "output_type": "NUMBER",
             "packages": [{"name": "openai", "version": "1.0.0", "repository": "test-repo"}],
             "output_id": "0fde9607-353f-42c2-85c4-20f720ebc1ec",
