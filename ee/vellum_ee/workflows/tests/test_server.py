@@ -18,6 +18,24 @@ from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWork
 from vellum_ee.workflows.server.virtual_file_loader import VirtualFileFinder
 
 
+@pytest.fixture
+def virtual_file_loader():
+    """Fixture to manage VirtualFileFinder registration and cleanup."""
+    finders = []
+
+    def _register(files, namespace, source_module=None):
+        finder = VirtualFileFinder(files, namespace, source_module=source_module)
+        sys.meta_path.append(finder)
+        finders.append(finder)
+        return finder
+
+    yield _register
+
+    for finder in reversed(finders):
+        if finder in sys.meta_path:
+            sys.meta_path.remove(finder)
+
+
 def test_load_workflow_event_display_context():
     from vellum.workflows.events.workflow import WorkflowEventDisplayContext
 
@@ -981,3 +999,73 @@ class StartNodeDisplay(BaseNodeDisplay[StartNode]):
     finally:
         if finder in sys.meta_path:
             sys.meta_path.remove(finder)
+
+
+def test_load_from_module__chained_nodes_with_absolute_imports(virtual_file_loader):
+    """
+    Tests that a workflow with chained nodes using absolute imports works correctly.
+    This test is expected to fail on main as absolute imports are not yet supported.
+    """
+
+    # GIVEN a workflow module with two chained base nodes using absolute imports
+    namespace = str(uuid4())
+    source_module = "test_workflow_abs"
+    files = {
+        "__init__.py": "",
+        "workflow.py": f"""
+from vellum.workflows import BaseWorkflow
+from {source_module}.nodes.first_node import FirstNode
+from {source_module}.nodes.second_node import SecondNode
+
+class Workflow(BaseWorkflow):
+    graph = FirstNode >> SecondNode
+
+    class Outputs(BaseWorkflow.Outputs):
+        final_output = SecondNode.Outputs.result
+""",
+        "nodes/__init__.py": "",
+        "nodes/first_node.py": """
+from vellum.workflows.nodes import BaseNode
+
+class FirstNode(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        value: str
+
+    def run(self) -> "FirstNode.Outputs":
+        return self.Outputs(value="Hello from FirstNode")
+""",
+        "nodes/second_node.py": f"""
+from vellum.workflows.nodes import BaseNode
+from {source_module}.nodes.first_node import FirstNode
+
+class SecondNode(BaseNode):
+    input_value = FirstNode.Outputs.value
+
+    class Outputs(BaseNode.Outputs):
+        result: str
+
+    def run(self) -> "SecondNode.Outputs":
+        return self.Outputs(result=f"{{self.input_value}} -> SecondNode")
+""",
+    }
+
+    # AND the virtual file loader is registered
+    virtual_file_loader(files, namespace, source_module=source_module)
+
+    # WHEN the workflow is loaded
+    Workflow = BaseWorkflow.load_from_module(namespace)
+    workflow = Workflow()
+
+    # THEN the workflow is successfully initialized
+    assert workflow
+
+    # WHEN we run the workflow
+    terminal_event = workflow.run()
+
+    # THEN the workflow should have completed successfully
+    assert terminal_event.name == "workflow.execution.fulfilled"
+
+    # AND the outputs should be as expected
+    assert terminal_event.outputs == {
+        "final_output": "Hello from FirstNode -> SecondNode",
+    }
