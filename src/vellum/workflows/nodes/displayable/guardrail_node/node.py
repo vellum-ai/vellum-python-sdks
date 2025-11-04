@@ -22,6 +22,7 @@ class GuardrailNode(BaseNode[StateType], Generic[StateType]):
     request_options: Optional[RequestOptions] - The request options to use for the Metric
     """
 
+    __legacy_id__ = True
     metric_definition: ClassVar[Union[UUID, str]]
 
     metric_inputs: ClassVar[EntityInputsInterface] = {}
