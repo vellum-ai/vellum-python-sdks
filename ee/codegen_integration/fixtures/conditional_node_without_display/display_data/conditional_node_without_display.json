@@ -83,7 +83,6 @@
         "definition": {
           "name": "TemplatingNode",
           "module": [
-            "ee",
             "codegen_integration",
             "fixtures",
             "conditional_node_without_display",
@@ -105,12 +104,12 @@
         ]
       },
       {
-        "id": "34cc073e-9088-48d8-9522-37728ba4619f",
+        "id": "5d3c60ce-7acf-4d8b-a68d-65cc0b561ac5",
         "type": "CONDITIONAL",
         "inputs": [
           {
-            "id": "e47c4302-80d4-4334-9c87-39eb35292b07",
-            "key": "550b56f6-3acc-43e9-b91a-305f014892ff.field",
+            "id": "9808cef8-0c0c-4320-a497-1b08144d6dcd",
+            "key": "8c5057ea-5ca2-4a78-9276-ad26f6ae6794.field",
             "value": {
               "rules": [
                 {
@@ -125,8 +124,8 @@
             }
           },
           {
-            "id": "3e059d57-53ea-4bee-8d94-bea0e18c072d",
-            "key": "550b56f6-3acc-43e9-b91a-305f014892ff.value",
+            "id": "139e3aab-43cc-4ac1-9578-2ced863014ff",
+            "key": "8c5057ea-5ca2-4a78-9276-ad26f6ae6794.value",
             "value": {
               "rules": [
                 {
@@ -143,23 +142,23 @@
         ],
         "data": {
           "label": "Conditional Node",
-          "target_handle_id": "67035dd5-208a-4f79-b6a2-06af05604cc7",
+          "target_handle_id": "2b5617b4-5cc0-4f9a-9369-24982e2cd8c0",
           "conditions": [
             {
-              "id": "b8aa74d3-afab-4f76-aabd-eba4db934d00",
+              "id": "bc3aa54a-5b5d-4df9-81c7-86f190a89f51",
               "type": "IF",
-              "source_handle_id": "a9b25698-0e93-44e2-a9d3-50d2b1ea7ea9",
+              "source_handle_id": "2b060475-daa1-49a5-9cb6-bbfe8fae9c7d",
               "data": {
-                "id": "57729761-b8c1-4265-8f9e-517042411aa2",
+                "id": "bd9e4223-4602-4fe4-9f78-f9774504da62",
                 "rules": [
                   {
-                    "id": "550b56f6-3acc-43e9-b91a-305f014892ff",
+                    "id": "8c5057ea-5ca2-4a78-9276-ad26f6ae6794",
                     "rules": null,
                     "combinator": null,
                     "negated": false,
-                    "field_node_input_id": "e47c4302-80d4-4334-9c87-39eb35292b07",
+                    "field_node_input_id": "9808cef8-0c0c-4320-a497-1b08144d6dcd",
                     "operator": "!=",
-                    "value_node_input_id": "3e059d57-53ea-4bee-8d94-bea0e18c072d"
+                    "value_node_input_id": "139e3aab-43cc-4ac1-9578-2ced863014ff"
                   }
                 ],
                 "combinator": "AND",
@@ -170,9 +169,9 @@
               }
             },
             {
-              "id": "26ca1cc4-4f3c-4152-a1cd-ef53b368d294",
+              "id": "a044cfd7-0a8c-4893-a22c-1971f839e3dc",
               "type": "ELSE",
-              "source_handle_id": "d1f71220-6ff1-41fe-b340-a390a61736b3",
+              "source_handle_id": "067343a4-3784-497f-867c-210927f6f5fe",
               "data": null
             }
           ],
@@ -198,7 +197,6 @@
         "definition": {
           "name": "ConditionalNode",
           "module": [
-            "ee",
             "codegen_integration",
             "fixtures",
             "conditional_node_without_display",
@@ -208,12 +206,12 @@
           ]
         },
         "trigger": {
-          "id": "67035dd5-208a-4f79-b6a2-06af05604cc7",
+          "id": "2b5617b4-5cc0-4f9a-9369-24982e2cd8c0",
           "merge_behavior": "AWAIT_ANY"
         },
         "ports": [
           {
-            "id": "a9b25698-0e93-44e2-a9d3-50d2b1ea7ea9",
+            "id": "2b060475-daa1-49a5-9cb6-bbfe8fae9c7d",
             "name": "if_1",
             "type": "IF",
             "expression": {
@@ -234,7 +232,7 @@
             }
           },
           {
-            "id": "d1f71220-6ff1-41fe-b340-a390a61736b3",
+            "id": "067343a4-3784-497f-867c-210927f6f5fe",
             "name": "else_1",
             "type": "ELSE",
             "expression": null
@@ -242,19 +240,19 @@
         ]
       },
       {
-        "id": "08114008-f400-4433-b4fd-883f3affe007",
+        "id": "6698be8b-f21d-4410-8d51-b88488846e93",
         "type": "TERMINAL",
         "data": {
           "label": "Final Output",
           "name": "final_output",
-          "target_handle_id": "f818a541-096d-45a1-8296-74aeb4f33a1c",
-          "output_id": "97085003-0993-4ed3-a66c-987dc9d75954",
+          "target_handle_id": "4173f341-3f9e-4319-971f-546f1f72b55c",
+          "output_id": "f4be5d96-dcb9-43c3-a26a-8145f2e6d461",
           "output_type": "STRING",
-          "node_input_id": "3efda785-2398-4785-b734-dffe4499b8be"
+          "node_input_id": "9c95fac4-ed98-4976-aaf0-051e5aa5cdeb"
         },
         "inputs": [
           {
-            "id": "3efda785-2398-4785-b734-dffe4499b8be",
+            "id": "9c95fac4-ed98-4976-aaf0-051e5aa5cdeb",
             "key": "node_input",
             "value": {
               "rules": [
@@ -290,7 +288,6 @@
         "definition": {
           "name": "FinalOutput",
           "module": [
-            "ee",
             "codegen_integration",
             "fixtures",
             "conditional_node_without_display",
@@ -300,13 +297,13 @@
           ]
         },
         "trigger": {
-          "id": "f818a541-096d-45a1-8296-74aeb4f33a1c",
+          "id": "4173f341-3f9e-4319-971f-546f1f72b55c",
           "merge_behavior": "AWAIT_ANY"
         },
         "ports": [],
         "outputs": [
           {
-            "id": "97085003-0993-4ed3-a66c-987dc9d75954",
+            "id": "f4be5d96-dcb9-43c3-a26a-8145f2e6d461",
             "name": "value",
             "type": "STRING",
             "value": {
@@ -320,28 +317,28 @@
     ],
     "edges": [
       {
+        "type": "DEFAULT",
+        "id": "bf7426a4-6e16-4de7-a00d-230a718a6cb5",
+        "source_node_id": "5d3c60ce-7acf-4d8b-a68d-65cc0b561ac5",
+        "source_handle_id": "2b060475-daa1-49a5-9cb6-bbfe8fae9c7d",
+        "target_node_id": "6698be8b-f21d-4410-8d51-b88488846e93",
+        "target_handle_id": "4173f341-3f9e-4319-971f-546f1f72b55c"
+      },
+      {
+        "type": "DEFAULT",
+        "id": "23c59540-24a2-4de2-bd41-3ce3e598d0eb",
+        "source_node_id": "ee9b5234-247b-49d1-bed4-490312f18838",
+        "source_handle_id": "8f4460f0-717b-4972-a6f4-ac164e5e204e",
+        "target_node_id": "5d3c60ce-7acf-4d8b-a68d-65cc0b561ac5",
+        "target_handle_id": "2b5617b4-5cc0-4f9a-9369-24982e2cd8c0"
+      },
+      {
+        "type": "DEFAULT",
         "id": "b4ac99ee-b85a-400b-bc36-00aa12e8f9d4",
         "source_node_id": "63884a7b-c01c-4cbc-b8d4-abe0a8796f6b",
         "source_handle_id": "eba8fd73-57ab-4d7b-8f75-b54dbe5fc8ba",
         "target_node_id": "ee9b5234-247b-49d1-bed4-490312f18838",
-        "target_handle_id": "005e1cd2-5452-4e1f-be6a-ac9fe3c02b9b",
-        "type": "DEFAULT"
-      },
-      {
-        "id": "913c2171-b7d1-4ee0-a75d-92ac624eb1ab",
-        "source_node_id": "ee9b5234-247b-49d1-bed4-490312f18838",
-        "source_handle_id": "8f4460f0-717b-4972-a6f4-ac164e5e204e",
-        "target_node_id": "34cc073e-9088-48d8-9522-37728ba4619f",
-        "target_handle_id": "67035dd5-208a-4f79-b6a2-06af05604cc7",
-        "type": "DEFAULT"
-      },
-      {
-        "id": "3a1a08e7-354a-41d8-83a8-508515f8da62",
-        "source_node_id": "34cc073e-9088-48d8-9522-37728ba4619f",
-        "source_handle_id": "a9b25698-0e93-44e2-a9d3-50d2b1ea7ea9",
-        "target_node_id": "08114008-f400-4433-b4fd-883f3affe007",
-        "target_handle_id": "f818a541-096d-45a1-8296-74aeb4f33a1c",
-        "type": "DEFAULT"
+        "target_handle_id": "005e1cd2-5452-4e1f-be6a-ac9fe3c02b9b"
       }
     ],
     "display_data": {
@@ -354,7 +351,6 @@
     "definition": {
       "name": "Workflow",
       "module": [
-        "ee",
         "codegen_integration",
         "fixtures",
         "conditional_node_without_display",
@@ -367,8 +363,8 @@
         "output_variable_id": "16b9fa94-c99b-4290-a57c-2acb5283051f",
         "value": {
           "type": "NODE_OUTPUT",
-          "node_id": "08114008-f400-4433-b4fd-883f3affe007",
-          "node_output_id": "97085003-0993-4ed3-a66c-987dc9d75954"
+          "node_id": "6698be8b-f21d-4410-8d51-b88488846e93",
+          "node_output_id": "f4be5d96-dcb9-43c3-a26a-8145f2e6d461"
         }
       }
     ]
@@ -378,8 +374,8 @@
       "id": "bbd9e32f-7496-449e-9654-645e4024ad81",
       "key": "text",
       "type": "STRING",
-      "default": null,
       "required": true,
+      "default": null,
       "extensions": {
         "color": null
       }

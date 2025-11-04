@@ -19,13 +19,55 @@
         "definition": null
       },
       {
-        "id": "2b31717e-eef8-4622-896f-4434752e38e5",
+        "id": "d23a040c-cc1c-46a0-8368-7a9dcb79aa44",
         "label": "Composio Tool Calling Node",
         "type": "GENERIC",
+        "display_data": {
+          "position": {
+            "x": 200.0,
+            "y": -50.0
+          },
+          "comment": {
+            "expanded": true,
+            "value": "\n    A tool calling node that uses a ComposioTool for GitHub issue creation.\n    "
+          }
+        },
+        "base": {
+          "name": "ToolCallingNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "tool_calling_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "ComposioToolCallingNode",
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "simple_composio_tool_calling_node",
+            "code",
+            "workflow"
+          ]
+        },
+        "trigger": {
+          "id": "8f664dfb-0542-434c-ab85-ff59151bf488",
+          "merge_behavior": "AWAIT_ATTRIBUTES"
+        },
+        "ports": [
+          {
+            "id": "527188f1-6724-4fb5-be79-cc0be61ee888",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ],
         "adornments": null,
         "attributes": [
           {
-            "id": "5ca89755-855d-40ad-9280-e9fa45ee27eb",
+            "id": "53408f92-55c3-4026-9d30-6e4b48749d28",
             "name": "ml_model",
             "value": {
               "type": "CONSTANT_VALUE",
@@ -36,7 +78,7 @@
             }
           },
           {
-            "id": "9fdb1140-d4b6-4f3e-8eeb-341001919b18",
+            "id": "8a2bbdb1-2cf3-42f9-a5f1-8bcae4f9984c",
             "name": "functions",
             "value": {
               "type": "CONSTANT_VALUE",
@@ -56,7 +98,7 @@
             }
           },
           {
-            "id": "1962d71d-f689-4767-83b1-e703ccc2a4a8",
+            "id": "41d5256a-a581-4d60-8423-d2430bd1fd28",
             "name": "blocks",
             "value": {
               "type": "CONSTANT_VALUE",
@@ -67,7 +109,7 @@
             }
           },
           {
-            "id": "6e6db1bb-26e6-49e8-be48-1ed04abfd8df",
+            "id": "15eb0342-8217-4dd9-98f3-59cbf04cf67d",
             "name": "prompt_inputs",
             "value": {
               "type": "CONSTANT_VALUE",
@@ -78,7 +120,7 @@
             }
           },
           {
-            "id": "e6af9f37-145b-4eb8-aeae-da8d890b0e37",
+            "id": "ca41b03b-77fa-4e73-aee6-aff160ba90d5",
             "name": "parameters",
             "value": {
               "type": "CONSTANT_VALUE",
@@ -99,7 +141,7 @@
             }
           },
           {
-            "id": "3f0739af-62e5-4712-aae3-8d13141b657d",
+            "id": "e48b9774-d67b-4ef6-b28a-e97a41961131",
             "name": "max_prompt_iterations",
             "value": {
               "type": "CONSTANT_VALUE",
@@ -110,7 +152,7 @@
             }
           },
           {
-            "id": "e2289ab2-2aa2-486b-a5ae-6fb92d6b7b2f",
+            "id": "ee141a5d-a680-4045-b6c2-7da0bf408779",
             "name": "settings",
             "value": {
               "type": "CONSTANT_VALUE",
@@ -121,58 +163,15 @@
             }
           }
         ],
-        "display_data": {
-          "position": {
-            "x": 200.0,
-            "y": -50.0
-          },
-          "comment": {
-            "value": "\n    A tool calling node that uses a ComposioTool for GitHub issue creation.\n    ",
-            "expanded": true
-          }
-        },
-        "base": {
-          "name": "ToolCallingNode",
-          "module": [
-            "vellum",
-            "workflows",
-            "nodes",
-            "displayable",
-            "tool_calling_node",
-            "node"
-          ]
-        },
-        "definition": {
-          "name": "ComposioToolCallingNode",
-          "module": [
-            "ee",
-            "codegen_integration",
-            "fixtures",
-            "simple_composio_tool_calling_node",
-            "code",
-            "workflow"
-          ]
-        },
-        "trigger": {
-          "id": "5488a709-03eb-4d45-b736-39ccacb08dd9",
-          "merge_behavior": "AWAIT_ATTRIBUTES"
-        },
-        "ports": [
-          {
-            "id": "f3c5257e-c9c5-4c03-b9ab-66034216d128",
-            "name": "default",
-            "type": "DEFAULT"
-          }
-        ],
         "outputs": [
           {
-            "id": "2f6394f3-4f90-473c-9915-91986fb05501",
+            "id": "e05cc145-34ca-4007-bba9-2eed26cadda6",
             "name": "text",
             "type": "STRING",
             "value": null
           },
           {
-            "id": "5eb46477-0d84-40cc-b24d-c4190c3f6203",
+            "id": "5625e421-ca8f-4477-8312-e7c99172be32",
             "name": "chat_history",
             "type": "CHAT_HISTORY",
             "value": null
@@ -199,8 +198,8 @@
                 {
                   "type": "NODE_OUTPUT",
                   "data": {
-                    "node_id": "2b31717e-eef8-4622-896f-4434752e38e5",
-                    "output_id": "2f6394f3-4f90-473c-9915-91986fb05501"
+                    "node_id": "d23a040c-cc1c-46a0-8368-7a9dcb79aa44",
+                    "output_id": "e05cc145-34ca-4007-bba9-2eed26cadda6"
                   }
                 }
               ],
@@ -247,8 +246,8 @@
                 {
                   "type": "NODE_OUTPUT",
                   "data": {
-                    "node_id": "2b31717e-eef8-4622-896f-4434752e38e5",
-                    "output_id": "5eb46477-0d84-40cc-b24d-c4190c3f6203"
+                    "node_id": "d23a040c-cc1c-46a0-8368-7a9dcb79aa44",
+                    "output_id": "5625e421-ca8f-4477-8312-e7c99172be32"
                   }
                 }
               ],
@@ -278,25 +277,25 @@
     ],
     "edges": [
       {
-        "id": "1f0d54be-3bbe-4539-9859-0815f5e812c4",
+        "id": "b234c076-43ad-4572-ba2e-5fee370ccf4a",
         "source_node_id": "63884a7b-c01c-4cbc-b8d4-abe0a8796f6b",
         "source_handle_id": "eba8fd73-57ab-4d7b-8f75-b54dbe5fc8ba",
-        "target_node_id": "2b31717e-eef8-4622-896f-4434752e38e5",
-        "target_handle_id": "5488a709-03eb-4d45-b736-39ccacb08dd9",
+        "target_node_id": "d23a040c-cc1c-46a0-8368-7a9dcb79aa44",
+        "target_handle_id": "8f664dfb-0542-434c-ab85-ff59151bf488",
         "type": "DEFAULT"
       },
       {
         "id": "6a6ac98a-faf5-4ddf-aac1-4bfec7b69e24",
-        "source_node_id": "2b31717e-eef8-4622-896f-4434752e38e5",
-        "source_handle_id": "f3c5257e-c9c5-4c03-b9ab-66034216d128",
+        "source_node_id": "d23a040c-cc1c-46a0-8368-7a9dcb79aa44",
+        "source_handle_id": "527188f1-6724-4fb5-be79-cc0be61ee888",
         "target_node_id": "88e59503-f7fb-48cc-b535-3cd1db07627a",
         "target_handle_id": "645fee43-832a-4622-89fd-b2ead42a2ec0",
         "type": "DEFAULT"
       },
       {
         "id": "de285875-d306-4b45-87b5-1c9fc4123f8c",
-        "source_node_id": "2b31717e-eef8-4622-896f-4434752e38e5",
-        "source_handle_id": "f3c5257e-c9c5-4c03-b9ab-66034216d128",
+        "source_node_id": "d23a040c-cc1c-46a0-8368-7a9dcb79aa44",
+        "source_handle_id": "527188f1-6724-4fb5-be79-cc0be61ee888",
         "target_node_id": "8834dd6c-d3cc-49fa-aec8-6a6d23ca2d6a",
         "target_handle_id": "0e22c690-31a4-4e70-b0ad-c351e862d644",
         "type": "DEFAULT"
@@ -312,7 +311,6 @@
     "definition": {
       "name": "Workflow",
       "module": [
-        "ee",
         "codegen_integration",
         "fixtures",
         "simple_composio_tool_calling_node",
@@ -325,16 +323,16 @@
         "output_variable_id": "9a233225-16ef-48b4-8cf6-d8a6c1ae72ce",
         "value": {
           "type": "NODE_OUTPUT",
-          "node_id": "2b31717e-eef8-4622-896f-4434752e38e5",
-          "node_output_id": "2f6394f3-4f90-473c-9915-91986fb05501"
+          "node_id": "d23a040c-cc1c-46a0-8368-7a9dcb79aa44",
+          "node_output_id": "e05cc145-34ca-4007-bba9-2eed26cadda6"
         }
       },
       {
         "output_variable_id": "5ebf2c00-cb24-421b-9a23-5e0e2673f1ef",
         "value": {
           "type": "NODE_OUTPUT",
-          "node_id": "2b31717e-eef8-4622-896f-4434752e38e5",
-          "node_output_id": "5eb46477-0d84-40cc-b24d-c4190c3f6203"
+          "node_id": "d23a040c-cc1c-46a0-8368-7a9dcb79aa44",
+          "node_output_id": "5625e421-ca8f-4477-8312-e7c99172be32"
         }
       }
     ]
