@@ -291,7 +291,7 @@ def push_command(
         raise e
 
     if dry_run:
-        error_messages = serialization_result.errors
+        error_messages = [error.message for error in serialization_result.errors]
         error_message = "\n".join(error_messages) if error_messages else "No errors found."
         logger.info(
             f"""\
