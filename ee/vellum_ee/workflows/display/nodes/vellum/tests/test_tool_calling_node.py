@@ -396,7 +396,7 @@ def test_serialize_tool_router_node():
                     },
                     "type": "BINARY_EXPRESSION",
                 },
-                "id": "afb4b09d-659b-459e-9a28-cf73ba6e0574",
+                "id": "81d85d92-7f51-4f41-84be-8e2b0eeb4f59",
                 "name": "my_function",
                 "type": "IF",
             },
