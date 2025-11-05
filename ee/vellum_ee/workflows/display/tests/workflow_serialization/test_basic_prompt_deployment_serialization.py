@@ -103,7 +103,7 @@ def test_serialize_workflow(vellum_client):
         "type": "PROMPT",
         "inputs": [
             {
-                "id": "947d7ead-0fad-4e5f-aa3a-d06029ac94bc",
+                "id": "0d1460e4-f207-4a69-bcea-7a3c7b325c02",
                 "key": "city",
                 "value": {
                     "rules": [
@@ -116,7 +116,7 @@ def test_serialize_workflow(vellum_client):
                 },
             },
             {
-                "id": "3deebdd7-2900-4d8c-93f2-e5b90649ac42",
+                "id": "6379398c-3c29-4327-9346-4d386a467f16",
                 "key": "date",
                 "value": {
                     "rules": [
@@ -131,11 +131,11 @@ def test_serialize_workflow(vellum_client):
         ],
         "data": {
             "label": "Example Prompt Deployment Node",
-            "output_id": "4d38b850-79e3-4b85-9158-a41d0c535410",
+            "output_id": "b9d579e2-b3ee-4524-917f-7329fc09af59",
             "error_output_id": None,
-            "array_output_id": "0cf47d33-6d5f-466f-b826-e814f1d0348b",
-            "source_handle_id": "2f26c7e0-283d-4f04-b639-adebb56bc679",
-            "target_handle_id": "b7605c48-0937-4ecc-914e-0d1058130e65",
+            "array_output_id": "547b4a00-eb16-4df5-92f4-cdd2fe7a0848",
+            "source_handle_id": "7e29137d-af96-402c-8108-9a00e087d18e",
+            "target_handle_id": "7e29137d-af96-402c-8108-9a00e087d18e",
             "variant": "DEPLOYMENT",
             "prompt_deployment_id": deployment.id,
             "release_tag": "LATEST",
@@ -151,14 +151,14 @@ def test_serialize_workflow(vellum_client):
             "module": ["tests", "workflows", "basic_text_prompt_deployment", "workflow"],
         },
         "trigger": {
-            "id": "b7605c48-0937-4ecc-914e-0d1058130e65",
+            "id": "7e29137d-af96-402c-8108-9a00e087d18e",
             "merge_behavior": "AWAIT_ANY",
         },
-        "ports": [{"id": "2f26c7e0-283d-4f04-b639-adebb56bc679", "name": "default", "type": "DEFAULT"}],
+        "ports": [{"id": "7e29137d-af96-402c-8108-9a00e087d18e", "name": "default", "type": "DEFAULT"}],
         "outputs": [
-            {"id": "180355a8-e67c-4ce6-9ac3-e5dbb75a6629", "name": "json", "type": "JSON", "value": None},
-            {"id": "4d38b850-79e3-4b85-9158-a41d0c535410", "name": "text", "type": "STRING", "value": None},
-            {"id": "0cf47d33-6d5f-466f-b826-e814f1d0348b", "name": "results", "type": "ARRAY", "value": None},
+            {"id": "62bbe13a-9571-4165-9463-22092a04e450", "name": "json", "type": "JSON", "value": None},
+            {"id": "b9d579e2-b3ee-4524-917f-7329fc09af59", "name": "text", "type": "STRING", "value": None},
+            {"id": "547b4a00-eb16-4df5-92f4-cdd2fe7a0848", "name": "results", "type": "ARRAY", "value": None},
         ],
     }
 
@@ -188,7 +188,7 @@ def test_serialize_workflow(vellum_client):
                         {
                             "data": {
                                 "node_id": "56c74024-19a3-4c0d-a5f5-23e1e9f11b21",
-                                "output_id": "4d38b850-79e3-4b85-9158-a41d0c535410",
+                                "output_id": "b9d579e2-b3ee-4524-917f-7329fc09af59",
                             },
                             "type": "NODE_OUTPUT",
                         }
@@ -219,13 +219,13 @@ def test_serialize_workflow(vellum_client):
             "id": "8961d02b-074e-45ab-9f77-4e94606a4344",
             "source_handle_id": "7065a943-1cab-4afd-9690-e678c5b74a2f",
             "source_node_id": "d680afbd-de64-4cf6-aa50-912686c48c64",
-            "target_handle_id": "b7605c48-0937-4ecc-914e-0d1058130e65",
+            "target_handle_id": "7e29137d-af96-402c-8108-9a00e087d18e",
             "target_node_id": "56c74024-19a3-4c0d-a5f5-23e1e9f11b21",
             "type": "DEFAULT",
         },
         {
             "id": "c2cbf6ef-8582-45c8-a643-fc6ae8fe482f",
-            "source_handle_id": "2f26c7e0-283d-4f04-b639-adebb56bc679",
+            "source_handle_id": "7e29137d-af96-402c-8108-9a00e087d18e",
             "source_node_id": "56c74024-19a3-4c0d-a5f5-23e1e9f11b21",
             "target_handle_id": "dced939a-9122-4290-8482-7daa9525dad6",
             "target_node_id": "64ff72c7-8ffc-4e1f-b7a7-e7cd0697f576",
@@ -336,7 +336,7 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
         "type": "PROMPT",
         "inputs": [
             {
-                "id": "947d7ead-0fad-4e5f-aa3a-d06029ac94bc",
+                "id": "0d1460e4-f207-4a69-bcea-7a3c7b325c02",
                 "key": "city",
                 "value": {
                     "rules": [
@@ -349,7 +349,7 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
                 },
             },
             {
-                "id": "3deebdd7-2900-4d8c-93f2-e5b90649ac42",
+                "id": "6379398c-3c29-4327-9346-4d386a467f16",
                 "key": "date",
                 "value": {
                     "rules": [
@@ -364,11 +364,11 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
         ],
         "data": {
             "label": "Example Prompt Deployment Node",
-            "output_id": "4d38b850-79e3-4b85-9158-a41d0c535410",
+            "output_id": "b9d579e2-b3ee-4524-917f-7329fc09af59",
             "error_output_id": None,
-            "array_output_id": "0cf47d33-6d5f-466f-b826-e814f1d0348b",
-            "source_handle_id": "2f26c7e0-283d-4f04-b639-adebb56bc679",
-            "target_handle_id": "b7605c48-0937-4ecc-914e-0d1058130e65",
+            "array_output_id": "547b4a00-eb16-4df5-92f4-cdd2fe7a0848",
+            "source_handle_id": "7e29137d-af96-402c-8108-9a00e087d18e",
+            "target_handle_id": "7e29137d-af96-402c-8108-9a00e087d18e",
             "variant": "DEPLOYMENT",
             "prompt_deployment_id": deployment.id,
             "release_tag": "LATEST",
@@ -389,14 +389,14 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
             ],
         },
         "trigger": {
-            "id": "b7605c48-0937-4ecc-914e-0d1058130e65",
+            "id": "7e29137d-af96-402c-8108-9a00e087d18e",
             "merge_behavior": "AWAIT_ANY",
         },
-        "ports": [{"id": "2f26c7e0-283d-4f04-b639-adebb56bc679", "name": "default", "type": "DEFAULT"}],
+        "ports": [{"id": "7e29137d-af96-402c-8108-9a00e087d18e", "name": "default", "type": "DEFAULT"}],
         "outputs": [
-            {"id": "180355a8-e67c-4ce6-9ac3-e5dbb75a6629", "name": "json", "type": "JSON", "value": None},
-            {"id": "4d38b850-79e3-4b85-9158-a41d0c535410", "name": "text", "type": "STRING", "value": None},
-            {"id": "0cf47d33-6d5f-466f-b826-e814f1d0348b", "name": "results", "type": "ARRAY", "value": None},
+            {"id": "62bbe13a-9571-4165-9463-22092a04e450", "name": "json", "type": "JSON", "value": None},
+            {"id": "b9d579e2-b3ee-4524-917f-7329fc09af59", "name": "text", "type": "STRING", "value": None},
+            {"id": "547b4a00-eb16-4df5-92f4-cdd2fe7a0848", "name": "results", "type": "ARRAY", "value": None},
         ],
     }
 
@@ -456,7 +456,7 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
                             "type": "NODE_OUTPUT",
                             "data": {
                                 "node_id": "56c74024-19a3-4c0d-a5f5-23e1e9f11b21",
-                                "output_id": "180355a8-e67c-4ce6-9ac3-e5dbb75a6629",
+                                "output_id": "62bbe13a-9571-4165-9463-22092a04e450",
                             },
                         }
                     ],
@@ -540,13 +540,13 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
             "source_node_id": "32c7f398-277c-456b-9279-aa1f867fb637",
             "source_handle_id": "cc0f4028-1039-4063-971d-7dacbb01b379",
             "target_node_id": "56c74024-19a3-4c0d-a5f5-23e1e9f11b21",
-            "target_handle_id": "b7605c48-0937-4ecc-914e-0d1058130e65",
+            "target_handle_id": "7e29137d-af96-402c-8108-9a00e087d18e",
             "type": "DEFAULT",
         },
         {
             "id": "a46909ec-9572-43c6-a134-0bd7e2c09f99",
             "source_node_id": "56c74024-19a3-4c0d-a5f5-23e1e9f11b21",
-            "source_handle_id": "2f26c7e0-283d-4f04-b639-adebb56bc679",
+            "source_handle_id": "7e29137d-af96-402c-8108-9a00e087d18e",
             "target_node_id": "51cbe21d-0232-4362-bc54-5bc283297aa6",
             "target_handle_id": "58427684-3848-498a-8299-c6b0fc70265d",
             "type": "DEFAULT",

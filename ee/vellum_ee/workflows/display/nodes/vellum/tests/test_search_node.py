@@ -47,7 +47,7 @@ def test_search_filters_with_input_reference():
     )
 
     assert serialized_metadata_filter == {
-        "id": "4a9f96aa-ba3b-4c4e-9ce4-370fe64f717f",
+        "id": "75cd40e5-dd40-4d45-bff6-b6a674007033",
         "key": "metadata_filters",
         "value": {
             "combinator": "OR",
@@ -59,7 +59,7 @@ def test_search_filters_with_input_reference():
                             "combinator": "AND",
                             "conditions": [
                                 {
-                                    "lhs_variable_id": "9aedaffa-c2a4-4c37-9969-184e1ff43ded",
+                                    "lhs_variable_id": "08f0f43d-6374-4922-945c-25353fdc4f94",
                                     "operator": "=",
                                     "rhs_variable_id": "c2151ef1-ad98-4940-b0e9-28dabe47a951",
                                     "type": "LOGICAL_CONDITION",
@@ -77,7 +77,7 @@ def test_search_filters_with_input_reference():
 
     # AND the LHS filter references should be present as node inputs
     serialized_lhs_input = next(
-        inp for inp in serialized_search_node["inputs"] if inp["id"] == "9aedaffa-c2a4-4c37-9969-184e1ff43ded"
+        inp for inp in serialized_search_node["inputs"] if inp["id"] == "08f0f43d-6374-4922-945c-25353fdc4f94"
     )
     assert serialized_lhs_input["value"] == {
         "combinator": "OR",

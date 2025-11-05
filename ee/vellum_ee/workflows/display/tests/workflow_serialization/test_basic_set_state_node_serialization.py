@@ -52,13 +52,13 @@ def test_serialize_workflow():
     )
 
     assert operations_attribute == {
-        "id": "6db6c831-c674-4dbb-a8b5-ab505008d15a",
+        "id": "933beba4-7455-4563-a447-b0d06e3d2589",
         "name": "operations",
         "value": {
             "type": "DICTIONARY_REFERENCE",
             "entries": [
                 {
-                    "id": "07ea37d3-64d6-4b0f-a64d-8c55ccebf806",
+                    "id": "6caeb2fb-c634-4cad-a97c-fc444cbaa6fb",
                     "key": "chat_history",
                     "value": {
                         "type": "BINARY_EXPRESSION",
@@ -72,7 +72,7 @@ def test_serialize_workflow():
                     },
                 },
                 {
-                    "id": "271b5fac-a384-403b-857c-79d3872e4dd5",
+                    "id": "04964b4f-65bc-436e-943d-fef8b5d0dc60",
                     "key": "counter",
                     "value": {
                         "type": "BINARY_EXPRESSION",
