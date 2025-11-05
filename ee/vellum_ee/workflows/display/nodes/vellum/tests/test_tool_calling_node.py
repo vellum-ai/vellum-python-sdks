@@ -53,7 +53,7 @@ def test_serialize_node__prompt_inputs__constant_value():
     )
 
     assert prompt_inputs_attribute == {
-        "id": "3d9a4d2e-c9bd-4417-8a0c-52f15efdbe30",
+        "id": "fb85d86d-f291-4a0d-b867-f7545df7af59",
         "name": "prompt_inputs",
         "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": {"foo": "bar"}}},
     }
@@ -181,7 +181,7 @@ def test_serialize_node__tool_calling_node__mcp_server_api_key():
     )
 
     assert functions_attribute == {
-        "id": "6c0f7d4f-3c8a-4201-b588-8398d3c97480",
+        "id": "ff00c2d6-f99c-458b-9bcd-181f8e43b2d1",
         "name": "functions",
         "value": {
             "type": "CONSTANT_VALUE",
@@ -234,7 +234,7 @@ def test_serialize_node__tool_calling_node__mcp_server_no_authorization():
     )
 
     assert functions_attribute == {
-        "id": "c8957551-cb3d-49af-8053-acd256c1d852",
+        "id": "a8a0133f-7913-451a-89da-f8dea5f352a2",
         "name": "functions",
         "value": {
             "type": "CONSTANT_VALUE",
@@ -469,7 +469,7 @@ def test_serialize_node__tool_calling_node__subworkflow_with_parent_input_refere
     assert code_exec_node is not None
     text_input = next((input for input in code_exec_node["inputs"] if input["key"] == "text"), None)
     assert text_input == {
-        "id": "da92a1c4-d37c-4008-a1ab-c0bcc0cd20d0",
+        "id": "9f3a85b5-a0c7-4b72-beef-d68b4eb2a428",
         "key": "text",
         "value": {
             "rules": [
