@@ -1149,8 +1149,8 @@ describe("Workflow", () => {
             id: triggerId,
             type: WorkflowTriggerType.INTEGRATION,
             attributes: [
-              { id: "attr-1", name: "message", value: null },
-              { id: "attr-2", name: "channel", value: null },
+              { id: "attr-1", type: "STRING", key: "message" },
+              { id: "attr-2", type: "STRING", key: "channel" },
             ],
             execConfig: {
               type: IntegrationProvider.COMPOSIO,

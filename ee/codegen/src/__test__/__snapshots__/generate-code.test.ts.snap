@@ -104,6 +104,48 @@ class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
 "
 `;
 
+exports[`generateCode > should generate code for %1 linear-integration-trigger.ts > triggers/linear_comment_event_trigger.py 1`] = `
+"from vellum.workflows.triggers import IntegrationTrigger
+
+
+class LinearCommentEventTrigger(IntegrationTrigger):
+    action: str
+    data: str
+    type: str
+    url: str
+
+    class Config(IntegrationTrigger.Config):
+        type = "COMPOSIO"
+        integration_name = "LINEAR"
+        slug = "LINEAR_COMMENT_EVENT_TRIGGER"
+        setupAttributes = {"team_id": "dfasadf"}
+
+    class Display(IntegrationTrigger.Display):
+        label = "Linear Integration Trigger"
+        x = 100
+        y = 200
+        z_index = 1
+        icon = "linear"
+        color = "#4A154B"
+"
+`;
+
+exports[`generateCode > should generate code for %1 linear-integration-trigger.ts > workflow.py 1`] = `
+"from vellum.workflows import BaseWorkflow
+
+from .nodes.bottom_node import BottomNode
+from .nodes.top_node import TopNode
+from .triggers.linear_comment_event_trigger import LinearCommentEventTrigger
+
+
+class Workflow(BaseWorkflow):
+    graph = {
+        TopNode,
+        LinearCommentEventTrigger >> BottomNode,
+    }
+"
+`;
+
 exports[`generateCode > should generate code for %1 map-node-output-disappear.ts > nodes/outer_map_workflow/nodes/inner_map_workflow/__init__.py 1`] = `
 "from vellum.workflows.nodes.displayable import MapNode
 

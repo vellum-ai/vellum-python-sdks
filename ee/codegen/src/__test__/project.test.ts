@@ -677,8 +677,8 @@ describe("WorkflowProjectGenerator", () => {
             attributes: [
               {
                 id: "attribute-id-1",
-                name: "attribute-1",
-                value: null,
+                key: "attribute-1",
+                type: "STRING",
               },
             ],
           },

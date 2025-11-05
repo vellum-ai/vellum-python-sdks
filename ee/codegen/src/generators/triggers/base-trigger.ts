@@ -173,7 +173,7 @@ export abstract class BaseTrigger<
   protected createAttributeFields(): AstNode[] {
     return this.trigger.attributes.map((attr) =>
       python.field({
-        name: attr.name,
+        name: attr.key,
         type: python.Type.str(),
       })
     );

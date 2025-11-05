@@ -823,7 +823,7 @@ export type IntegrationTriggerExecConfig = ComposioIntegrationTriggerExecConfig;
 
 export interface BaseTrigger {
   id: string;
-  attributes: NodeAttribute[];
+  attributes: VellumVariable[];
   definition?: CodeResourceDefinition;
   displayData?: WorkflowTriggerDisplayData | null;
 }
