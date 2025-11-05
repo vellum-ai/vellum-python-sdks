@@ -240,9 +240,9 @@ def test_serialize_node__unreferenced_variable_block__still_serializes():
         "blocks"
     ] == [
         {
-            "id": "fecbb5f3-e0a3-42ed-9774-6c68fd5db50c",
+            "id": "2ce1605d-411f-4e94-a8a8-e85deb677b26",
             "block_type": "VARIABLE",
-            "input_variable_id": "2ce1605d-411f-4e94-a8a8-e85deb677b26",
+            "input_variable_id": "d70ce218-604d-4534-bd38-55a617ac0b8a",
             "state": "ENABLED",
             "cache_config": None,
         }
