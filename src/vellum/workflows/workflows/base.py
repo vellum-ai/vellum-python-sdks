@@ -72,7 +72,7 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.loaders.base import BaseWorkflowFinder
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.mocks import MockNodeExecutionArg
-from vellum.workflows.nodes.utils import get_wrapped_node
+from vellum.workflows.nodes.utils import get_unadorned_node
 from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.resolvers.base import BaseWorkflowResolver
 from vellum.workflows.runner import WorkflowRunner
@@ -624,7 +624,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             The resolved node class
 
         Raises:
-            ValueError: If the node reference cannot be resolved
+            WorkflowInitializationException: If the node reference cannot be resolved
         """
         if inspect.isclass(node_ref) and issubclass(node_ref, BaseNode):
             return node_ref
@@ -632,19 +632,16 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         candidate_nodes: List[Type[BaseNode]] = []
         for node in self.get_nodes():
             candidate_nodes.append(node)
-            wrapped_node = get_wrapped_node(node)
-            while wrapped_node:
+            wrapped_node = get_unadorned_node(node)
+            if wrapped_node != node:
                 candidate_nodes.append(wrapped_node)
-                wrapped_node = get_wrapped_node(wrapped_node)
 
         if isinstance(node_ref, UUID):
             for node in candidate_nodes:
                 if node.__id__ == node_ref:
                     return node
-            raise ValueError(
-                f"No node found with UUID {node_ref}. "
-                f"Available nodes: {[f'{n.__name__} ({n.__id__})' for n in candidate_nodes]}"
-            )
+            identifier = str(node_ref)
+            raise WorkflowInitializationException(message=f"Node '{identifier}' not found in workflow")
 
         if isinstance(node_ref, str):
             try:
@@ -653,17 +650,14 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
                 node_class = getattr(module, class_name)
                 if inspect.isclass(node_class) and issubclass(node_class, BaseNode):
                     return node_class
-                raise ValueError(f"'{node_ref}' is not a valid BaseNode subclass")
-            except (ValueError, ModuleNotFoundError, AttributeError) as e:
+                raise WorkflowInitializationException(message=f"Node '{node_ref}' not found in workflow")
+            except (ValueError, ModuleNotFoundError, AttributeError):
                 for node in candidate_nodes:
                     if f"{node.__module__}.{node.__name__}" == node_ref:
                         return node
-                raise ValueError(
-                    f"Could not resolve node reference '{node_ref}': {e}. "
-                    f"Available nodes: {[f'{n.__module__}.{n.__name__}' for n in candidate_nodes]}"
-                )
+                raise WorkflowInitializationException(message=f"Node '{node_ref}' not found in workflow")
 
-        raise ValueError(f"Invalid node reference type: {type(node_ref)}")
+        raise WorkflowInitializationException(message=f"Node '{node_ref}' not found in workflow")
 
     def run_node(
         self, node: Union[Type[BaseNode], UUID, str], *, inputs: Optional[Dict[str, Any]] = None
