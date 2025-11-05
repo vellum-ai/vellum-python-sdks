@@ -249,3 +249,57 @@ def test_integration_trigger_no_entrypoint_node():
     assert isinstance(trigger_to_process_edge, dict)
     assert trigger_to_process_edge["source_node_id"] == trigger_id
     assert trigger_to_process_edge["target_node_id"] == process_node_id
+
+
+def test_integration_trigger_serialization_display_data():
+    """IntegrationTrigger with Display class serializes all display attributes correctly."""
+
+    # GIVEN an integration trigger with comprehensive Display attributes
+    class SlackMessageTriggerWithDisplay(IntegrationTrigger):
+        message: str
+        channel: str
+        user: str
+
+        class Config:
+            provider = "COMPOSIO"
+            integration_name = "SLACK"
+            slug = "slack_new_message"
+
+        class Display(IntegrationTrigger.Display):
+            label = "Slack Message"
+            x = 150.5
+            y = 250.75
+            z_index = 5
+            icon = "vellum:icon:integrations/COMPOSIO/SLACK"
+            color = "#4A154B"
+
+    class ProcessNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result = SlackMessageTriggerWithDisplay.message
+
+        def run(self) -> Outputs:
+            return self.Outputs()
+
+    # AND a workflow that uses the trigger
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = SlackMessageTriggerWithDisplay >> ProcessNode
+
+    # WHEN we serialize the workflow
+    result: dict = get_workflow_display(workflow_class=TestWorkflow).serialize()
+
+    # THEN we get the expected trigger
+    assert "triggers" in result
+    triggers = result["triggers"]
+    assert isinstance(triggers, list)
+    assert len(triggers) == 1
+
+    trigger = triggers[0]
+    assert isinstance(trigger, dict)
+    assert trigger["type"] == "INTEGRATION"
+
+    # AND display_data is serialized with icon and color
+    assert "display_data" in trigger
+    display_data = trigger["display_data"]
+    assert isinstance(display_data, dict)
+    assert display_data["icon"] == "vellum:icon:integrations/COMPOSIO/SLACK"
+    assert display_data["color"] == "#4A154B"

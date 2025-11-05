@@ -155,3 +155,52 @@ def test_scheduled_trigger_serialization_without_metadata_json():
     assert "attributes" in trigger
     attributes = trigger["attributes"]
     assert isinstance(attributes, list)
+
+
+def test_scheduled_trigger_serialization_display_data():
+    """ScheduleTrigger with Display class serializes all display attributes correctly."""
+
+    # GIVEN a scheduled trigger with comprehensive Display attributes
+    class DailyTriggerWithDisplay(ScheduleTrigger):
+        class Config:
+            cron = "0 9 * * *"
+            timezone = "UTC"
+
+        class Display(ScheduleTrigger.Display):
+            label = "Daily Schedule"
+            x = 100.5
+            y = 200.75
+            z_index = 3
+            icon = "vellum:icon:calendar"
+            color = "#4A90E2"
+
+    class ProcessNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            timestamp = DailyTriggerWithDisplay.current_run_at
+
+        def run(self) -> Outputs:
+            return self.Outputs()
+
+    # AND a workflow that uses the trigger
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = DailyTriggerWithDisplay >> ProcessNode
+
+    # WHEN we serialize the workflow
+    result: dict = get_workflow_display(workflow_class=TestWorkflow).serialize()
+
+    # THEN we get the expected trigger
+    assert "triggers" in result
+    triggers = result["triggers"]
+    assert isinstance(triggers, list)
+    assert len(triggers) == 1
+
+    trigger = triggers[0]
+    assert isinstance(trigger, dict)
+    assert trigger["type"] == "SCHEDULED"
+
+    # AND display_data is serialized with icon and color
+    assert "display_data" in trigger
+    display_data = trigger["display_data"]
+    assert isinstance(display_data, dict)
+    assert display_data["icon"] == "vellum:icon:calendar"
+    assert display_data["color"] == "#4A90E2"
