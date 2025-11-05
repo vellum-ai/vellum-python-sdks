@@ -47,7 +47,7 @@ describe("getTriggerClassInfo", () => {
       type: WorkflowTriggerType.INTEGRATION,
       attributes: [
         { id: "attr-1", type: "STRING", key: "message" },
-        { id: "attr-2", type: "STRING", key: "channel"},
+        { id: "attr-2", type: "STRING", key: "channel" },
       ],
       execConfig: {
         type: IntegrationProvider.COMPOSIO,
