@@ -659,7 +659,8 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
       return false;
     }
     // Check if all outputs in nodeData match the base node definition outputs
-    // Compare by name and type to ensure customized outputs are preserved
+    // Compare by name, type, and value to ensure customized outputs are preserved
+    // Base node definitions always have value: null, so we check if any output has a non-null value
     const baseOutputNames = baseNodeDef.outputs.map((o) => o.name);
     const baseOutputTypes = baseNodeDef.outputs.map((o) => o.type);
 
@@ -672,8 +673,14 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
       if (baseIndex === -1) {
         return false;
       }
-      // Compare type
-      return baseOutputTypes[baseIndex] === output.type;
+      if (baseOutputTypes[baseIndex] !== output.type) {
+        return false;
+      }
+      const baseOutput = baseNodeDef.outputs[baseIndex];
+      if (!baseOutput) {
+        return false;
+      }
+      return output.value === null || output.value === undefined;
     });
   }
 
