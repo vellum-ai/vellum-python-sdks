@@ -11,16 +11,12 @@ class Inputs(BaseInputs):
 
 
 class StartNode(BaseNode):
-    __legacy_id__ = True
-
     class Ports(BaseNode.Ports):
         success = Port.on_if(Inputs.threshold.greater_than(10))
         fail = Port.on_else()
 
 
 class SuccessNode(BaseNode):
-    __legacy_id__ = True
-
     class Outputs(BaseNode.Outputs):
         result = Inputs.threshold
 

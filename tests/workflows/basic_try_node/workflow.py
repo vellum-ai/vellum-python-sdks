@@ -9,8 +9,6 @@ from vellum.workflows.nodes.core.try_node.node import TryNode
 
 @TryNode.wrap()
 class StartNode(BaseNode):
-    __legacy_id__ = True
-
     class Outputs(BaseNode.Outputs):
         value: int
 

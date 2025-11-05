@@ -16,7 +16,6 @@ class NestedInputs(BaseInputs):
 
 
 class StartNode(BaseNode):
-    __legacy_id__ = True
     metro = NestedInputs.metro
     date = Inputs.date
 
