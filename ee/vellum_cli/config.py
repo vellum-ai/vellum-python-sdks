@@ -8,7 +8,7 @@ from typing import Dict, List, Literal, Optional, Union
 import tomli
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
-from vellum.workflows.state.encoder import DefaultStateEncoder
+from vellum.utils.json_encoder import VellumJsonEncoder
 
 LOCKFILE_PATH = "vellum.lock.json"
 PYPROJECT_TOML_PATH = "pyproject.toml"
@@ -149,7 +149,7 @@ class VellumCliConfig(UniversalBaseModel):
     def save(self) -> None:
         lockfile_path = os.path.join(os.getcwd(), LOCKFILE_PATH)
         with open(lockfile_path, "w") as f:
-            json.dump(self.model_dump(), f, indent=2, cls=DefaultStateEncoder)
+            json.dump(self.model_dump(), f, indent=2, cls=VellumJsonEncoder)
             # Makes sure the file ends with a newline, consistent with most autoformatters
             f.write("\n")
 

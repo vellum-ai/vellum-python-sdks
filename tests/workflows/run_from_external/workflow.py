@@ -7,6 +7,7 @@ import threading
 from uuid import UUID, uuid4
 from typing import Iterator, Optional, Union
 
+from vellum.utils.json_encoder import VellumJsonEncoder
 from vellum.workflows.emitters.base import BaseWorkflowEmitter
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.events.node import NodeExecutionInitiatedBody, NodeExecutionInitiatedEvent
@@ -17,7 +18,6 @@ from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.resolvers.base import BaseWorkflowResolver
 from vellum.workflows.resolvers.types import LoadStateResult
 from vellum.workflows.state.base import BaseState, StateMeta
-from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.workflows.base import BaseWorkflow
 
 mock_file_store = os.path.join(tempfile.gettempdir(), f"mock_store_{uuid4()}.json")
@@ -42,7 +42,7 @@ class MockFileEmitter(BaseWorkflowEmitter):
                 data["events"].append(event.model_dump())
 
             with open(mock_file_store, "w") as f:
-                json.dump(data, f, cls=DefaultStateEncoder)
+                json.dump(data, f, cls=VellumJsonEncoder)
 
     def snapshot_state(self, state: BaseState) -> None:
         with mock_file_lock:
@@ -52,7 +52,7 @@ class MockFileEmitter(BaseWorkflowEmitter):
 
             data["snapshots"].append(state)
             with open(mock_file_store, "w") as f:
-                json.dump(data, f, cls=DefaultStateEncoder)
+                json.dump(data, f, cls=VellumJsonEncoder)
 
     def join(self) -> None:
         pass

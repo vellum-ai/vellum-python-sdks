@@ -4,17 +4,17 @@ from typing import Any, Dict, Optional
 from jinja2.sandbox import SandboxedEnvironment
 from pydantic import BaseModel
 
+from vellum.utils.json_encoder import VellumJsonEncoder
 from vellum.utils.templating.constants import FilterFunc
 from vellum.utils.templating.exceptions import JinjaTemplateError
-from vellum.workflows.state.encoder import DefaultStateEncoder
 
 
 def finalize(obj: Any) -> str:
     if isinstance(obj, (dict, list)):
-        return json.dumps(obj, cls=DefaultStateEncoder)
+        return json.dumps(obj, cls=VellumJsonEncoder)
 
     if isinstance(obj, BaseModel):
-        return json.dumps(obj.model_dump(), cls=DefaultStateEncoder)
+        return json.dumps(obj.model_dump(), cls=VellumJsonEncoder)
 
     return str(obj)
 
@@ -33,7 +33,7 @@ def render_sandboxed_jinja_template(
             finalize=finalize,
         )
         environment.policies["json.dumps_kwargs"] = {
-            "cls": DefaultStateEncoder,
+            "cls": VellumJsonEncoder,
         }
 
         if jinja_custom_filters:

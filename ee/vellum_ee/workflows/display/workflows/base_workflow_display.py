@@ -12,6 +12,7 @@ from typing import Any, Dict, ForwardRef, Generic, List, Optional, Set, Tuple, T
 
 from vellum.client import Vellum as VellumClient
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
+from vellum.utils.json_encoder import VellumJsonEncoder
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -26,7 +27,6 @@ from vellum.workflows.nodes.displayable.final_output_node.node import FinalOutpu
 from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port, get_wrapped_node
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, WorkflowInputReference
-from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.triggers.manual import ManualTrigger
 from vellum.workflows.triggers.schedule import ScheduleTrigger
@@ -1129,10 +1129,10 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                     dataset = []
                     for i, inputs_obj in enumerate(dataset_attr):
                         if isinstance(inputs_obj, DatasetRow):
-                            serialized_inputs = json.loads(json.dumps(inputs_obj.inputs, cls=DefaultStateEncoder))
+                            serialized_inputs = json.loads(json.dumps(inputs_obj.inputs, cls=VellumJsonEncoder))
                             dataset.append({"label": inputs_obj.label, "inputs": serialized_inputs})
                         elif isinstance(inputs_obj, BaseInputs):
-                            serialized_inputs = json.loads(json.dumps(inputs_obj, cls=DefaultStateEncoder))
+                            serialized_inputs = json.loads(json.dumps(inputs_obj, cls=VellumJsonEncoder))
                             dataset.append({"label": f"Scenario {i + 1}", "inputs": serialized_inputs})
         except (ImportError, AttributeError):
             pass

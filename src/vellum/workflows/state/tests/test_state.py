@@ -4,12 +4,12 @@ import json
 from queue import Queue
 from typing import Dict, List, cast
 
+from vellum.utils.json_encoder import VellumJsonEncoder
 from vellum.workflows.constants import undefined
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.delta import SetStateDelta, StateDelta
-from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.types.code_execution_node_wrappers import DictWrapper
 
 
@@ -147,7 +147,7 @@ def test_state_json_serialization__with_node_output_updates():
     state.meta.node_outputs[MockNode.Outputs.baz] = "hello"
 
     # WHEN we serialize the state
-    json_state = json.loads(json.dumps(state, cls=DefaultStateEncoder))
+    json_state = json.loads(json.dumps(state, cls=VellumJsonEncoder))
 
     # THEN the state is serialized correctly
     assert json_state["meta"]["node_outputs"] == {MOCK_NODE_OUTPUT_ID: "hello"}
@@ -188,7 +188,7 @@ def test_state_json_serialization__with_queue():
     state.meta.node_outputs[MockNode.Outputs.baz] = queue
 
     # WHEN we serialize the state
-    json_state = json.loads(json.dumps(state, cls=DefaultStateEncoder))
+    json_state = json.loads(json.dumps(state, cls=VellumJsonEncoder))
 
     # THEN the state is serialized correctly with the queue turned into a list
     assert json_state["meta"]["node_outputs"] == {MOCK_NODE_OUTPUT_ID: ["test1", "test2"]}

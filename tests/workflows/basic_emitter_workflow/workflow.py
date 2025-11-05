@@ -1,6 +1,7 @@
 import json
 from typing import Iterator, List
 
+from vellum.utils.json_encoder import VellumJsonEncoder
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.emitters import BaseWorkflowEmitter
 from vellum.workflows.events import WorkflowEvent
@@ -8,7 +9,6 @@ from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.state import BaseState
-from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.types.core import JsonObject
 
 
@@ -50,7 +50,7 @@ class ExampleEmitter(BaseWorkflowEmitter):
         self._events.append(event)
 
     def snapshot_state(self, state: BaseState) -> None:
-        json_state = json.loads(json.dumps(state, cls=DefaultStateEncoder))
+        json_state = json.loads(json.dumps(state, cls=VellumJsonEncoder))
         self._state_snapshots.append(json_state)
 
     def join(self) -> None:

@@ -32,8 +32,8 @@ from vellum.client.types.vellum_value import VellumValue
 from vellum.client.types.vellum_value_request import VellumValueRequest
 from vellum.client.types.video_vellum_value import VideoVellumValue
 from vellum.client.types.video_vellum_value_request import VideoVellumValueRequest
+from vellum.utils.json_encoder import VellumJsonEncoder
 from vellum.workflows.errors.types import WorkflowError, workflow_error_to_vellum_error
-from vellum.workflows.state.encoder import DefaultStateEncoder
 
 VELLUM_VALUE_REQUEST_TUPLE = (
     StringVellumValueRequest,
@@ -103,7 +103,7 @@ def primitive_to_vellum_value(value: Any) -> VellumValue:
         return value  # type: ignore
 
     try:
-        json_value = json.dumps(value, cls=DefaultStateEncoder)
+        json_value = json.dumps(value, cls=VellumJsonEncoder)
     except json.JSONDecodeError:
         raise ValueError(f"Unsupported variable type: {value.__class__.__name__}")
 

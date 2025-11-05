@@ -14,6 +14,7 @@ from vellum.client.types.prompt_parameters import PromptParameters
 from vellum.client.types.prompt_settings import PromptSettings
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
+from vellum.utils.json_encoder import VellumJsonEncoder
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
@@ -30,7 +31,6 @@ from vellum.workflows.nodes.displayable.tool_calling_node.state import ToolCalli
 from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.ports.port import Port
 from vellum.workflows.state import BaseState
-from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior
 from vellum.workflows.types.definition import (
     ComposioToolDefinition,
@@ -101,7 +101,7 @@ class FunctionCallNodeMixin:
         state.chat_history.append(
             ChatMessage(
                 role="FUNCTION",
-                content=StringChatMessageContent(value=json.dumps(result, cls=DefaultStateEncoder)),
+                content=StringChatMessageContent(value=json.dumps(result, cls=VellumJsonEncoder)),
                 source=function_call_id,
             )
         )
