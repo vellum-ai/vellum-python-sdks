@@ -2308,7 +2308,7 @@ export const WorkflowOutputValueSerializer: ObjectSchema<
 const ManualTriggerSerializer = objectSchema({
   id: stringSchema(),
   type: stringLiteralSchema("MANUAL"),
-  attributes: listSchema(NodeAttributeSerializer),
+  attributes: listSchema(VellumVariableSerializer),
   definition: CodeResourceDefinitionSerializer.optional(),
   displayData: propertySchema(
     "display_data",
@@ -2320,7 +2320,7 @@ export declare namespace ManualTriggerSerializer {
   interface Raw {
     id: string;
     type: "MANUAL";
-    attributes: NodeAttributeSerializer.Raw[];
+    attributes: VellumVariableSerializer.Raw[];
     definition?: CodeResourceDefinitionSerializer.Raw | null;
     display_data?: WorkflowTriggerDisplayDataSerializer.Raw | null;
   }
@@ -2330,7 +2330,7 @@ const ScheduleTriggerSerializer = objectSchema({
   id: stringSchema(),
   cron: stringSchema(),
   timezone: stringSchema(),
-  attributes: listSchema(NodeAttributeSerializer),
+  attributes: listSchema(VellumVariableSerializer),
   definition: CodeResourceDefinitionSerializer.optional(),
   displayData: propertySchema(
     "display_data",
@@ -2344,7 +2344,7 @@ export declare namespace ScheduleTriggerSerializer {
     type: "SCHEDULED";
     cron: string;
     timezone: string;
-    attributes: NodeAttributeSerializer.Raw[];
+    attributes: VellumVariableSerializer.Raw[];
     definition?: CodeResourceDefinitionSerializer.Raw | null;
     display_data?: WorkflowTriggerDisplayDataSerializer.Raw | null;
   }
@@ -2378,7 +2378,7 @@ export declare namespace IntegrationTriggerExecConfigSerializer {
 
 const IntegrationTriggerSerializer = objectSchema({
   id: stringSchema(),
-  attributes: listSchema(NodeAttributeSerializer),
+  attributes: listSchema(VellumVariableSerializer),
   execConfig: propertySchema(
     "exec_config",
     IntegrationTriggerExecConfigSerializer
@@ -2394,7 +2394,7 @@ export declare namespace IntegrationTriggerSerializer {
   interface Raw {
     id: string;
     type: "INTEGRATION";
-    attributes: NodeAttributeSerializer.Raw[];
+    attributes: VellumVariableSerializer.Raw[];
     exec_config: IntegrationTriggerExecConfigSerializer.Raw;
     definition?: CodeResourceDefinitionSerializer.Raw | null;
     display_data?: WorkflowTriggerDisplayDataSerializer.Raw | null;

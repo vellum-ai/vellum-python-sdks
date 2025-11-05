@@ -76,8 +76,8 @@ export default {
       },
       {
         id: "edge-2",
-        source_node_id: "slack-message-trigger",
-        source_handle_id: "slack-message-trigger",
+        source_node_id: "linear-integration-trigger",
+        source_handle_id: "linear-integration-trigger",
         target_node_id: "bottom-node",
         target_handle_id: "bottom-target",
         type: "DEFAULT",
@@ -89,42 +89,59 @@ export default {
   output_variables: [],
   triggers: [
     {
-      id: "slack-message-trigger",
+      id: "linear-integration-trigger",
       type: "INTEGRATION",
       exec_config: {
         type: "COMPOSIO",
-        integration_name: "slack",
-        slug: "SLACK_MESSAGE_TRIGGER",
-        setup_attributes: [],
+        integration_name: "LINEAR",
+        slug: "LINEAR_COMMENT_EVENT_TRIGGER",
+        setup_attributes: [
+          {
+            id: "aca3336a-6733-4c67-bd9c-162c77ca400e",
+            key: "team_id",
+            type: "STRING",
+            required: true,
+            default: {
+              type: "STRING",
+              value: "dfasadf",
+            },
+            extensions: null,
+          },
+        ],
       },
       attributes: [
         {
-          id: "message-attribute-id",
-          key: "message",
+          id: "action-attribute-id",
+          key: "action",
           type: "STRING",
         },
         {
-          id: "channel-attribute-id",
-          key: "channel",
+          id: "data-attribute-id",
+          key: "data",
+          type: "JSON",
+        },
+        {
+          id: "type-attribute-id",
+          key: "type",
           type: "STRING",
         },
         {
-          id: "timestamp-attribute-id",
-          key: "timestamp",
+          id: "url-attribute-id",
+          key: "url",
           type: "STRING",
         },
       ],
       display_data: {
-        label: "Slack Message Trigger",
+        label: "Linear Integration Trigger",
         position: {
           x: 100,
           y: 200,
         },
         z_index: 1,
-        icon: "slack",
+        icon: "linear",
         color: "#4A154B",
       },
     },
   ],
-  assertions: ["workflow.py", "triggers/slack_message_trigger.py"],
+  assertions: ["workflow.py", "triggers/linear_comment_event_trigger.py"],
 };

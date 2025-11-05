@@ -37,7 +37,7 @@ export class TriggerAttributeWorkflowReference extends BaseNodeInputWorkflowRefe
     return python.reference({
       name: triggerClassInfo.className,
       modulePath: triggerClassInfo.modulePath,
-      attribute: [attribute.name],
+      attribute: [attribute.key],
     });
   }
 }

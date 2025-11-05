@@ -19,8 +19,8 @@ describe("TriggerAttributeWorkflowReference", () => {
           id: "manual-trigger-id",
           type: WorkflowTriggerType.MANUAL,
           attributes: [
-            { id: "input-id", name: "input" },
-            { id: "config-id", name: "config" },
+            { id: "input-id", type: "STRING", key: "input" },
+            { id: "config-id", type: "STRING", key: "config" },
           ],
         },
       ],
@@ -100,8 +100,8 @@ describe("TriggerAttributeWorkflowReference", () => {
           id: "integration-trigger-id",
           type: WorkflowTriggerType.INTEGRATION,
           attributes: [
-            { id: "message-id", name: "message", value: null },
-            { id: "channel-id", name: "channel", value: null },
+            { id: "message-id", type: "STRING", key: "message" },
+            { id: "channel-id", type: "STRING", key: "channel" },
           ],
           execConfig: {
             type: IntegrationProvider.COMPOSIO,
@@ -137,8 +137,8 @@ describe("TriggerAttributeWorkflowReference", () => {
           id: "integration-trigger-id",
           type: WorkflowTriggerType.INTEGRATION,
           attributes: [
-            { id: "message-id", name: "message", value: null },
-            { id: "channel-id", name: "channel", value: null },
+            { id: "message-id", type: "STRING", key: "message" },
+            { id: "channel-id", type: "STRING", key: "channel" },
           ],
           execConfig: {
             type: IntegrationProvider.COMPOSIO,
