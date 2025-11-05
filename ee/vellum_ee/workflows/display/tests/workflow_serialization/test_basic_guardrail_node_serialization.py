@@ -70,11 +70,11 @@ def test_serialize_workflow():
 
     guardrail_node = workflow_raw_data["nodes"][1]
     assert guardrail_node == {
-        "id": "5573f078-cced-48f3-bafd-782d48e260c7",
+        "id": "7fef2bbc-cdfc-4f66-80eb-2a52ee52da5f",
         "type": "METRIC",
         "inputs": [
             {
-                "id": "7fef2bbc-cdfc-4f66-80eb-2a52ee52da5f",
+                "id": "dad627f3-d46d-4f12-b3d0-4aa25a5f24b5",
                 "key": "expected",
                 "value": {
                     "rules": [
@@ -102,7 +102,7 @@ def test_serialize_workflow():
         ],
         "data": {
             "label": "Example Guardrail Node",
-            "source_handle_id": "53c299c7-1df2-4d54-bb0d-559a4947c16d",
+            "source_handle_id": "baa8baa7-8849-4b96-a90d-c0545a60d3a8",
             "target_handle_id": "53c299c7-1df2-4d54-bb0d-559a4947c16d",
             "error_output_id": None,
             "metric_definition_id": "example_metric_definition",
@@ -121,7 +121,7 @@ def test_serialize_workflow():
             "id": "53c299c7-1df2-4d54-bb0d-559a4947c16d",
             "merge_behavior": "AWAIT_ANY",
         },
-        "ports": [{"id": "53c299c7-1df2-4d54-bb0d-559a4947c16d", "name": "default", "type": "DEFAULT"}],
+        "ports": [{"id": "baa8baa7-8849-4b96-a90d-c0545a60d3a8", "name": "default", "type": "DEFAULT"}],
     }
 
     final_output_node = workflow_raw_data["nodes"][2]
@@ -157,8 +157,8 @@ def test_serialize_workflow():
                         {
                             "type": "NODE_OUTPUT",
                             "data": {
-                                "node_id": "5573f078-cced-48f3-bafd-782d48e260c7",
-                                "output_id": "0cce9413-687e-43e9-af04-a488334688fa",
+                                "node_id": "7fef2bbc-cdfc-4f66-80eb-2a52ee52da5f",
+                                "output_id": "eb9c8043-4c04-467b-944e-633c54de6876",
                             },
                         }
                     ],
@@ -173,17 +173,17 @@ def test_serialize_workflow():
     serialized_edges = workflow_raw_data["edges"]
     assert serialized_edges == [
         {
-            "id": "7bab1cc9-eedd-4e76-8bc1-0437b842c3bd",
+            "id": "4737867f-1967-45a1-966b-a0bda81a583d",
             "source_node_id": "54c5c7d0-ab86-4ae9-b0b8-ea9ca7b87c14",
             "source_handle_id": "41840690-8d85-486e-a864-b0661ccf0f2e",
-            "target_node_id": "5573f078-cced-48f3-bafd-782d48e260c7",
+            "target_node_id": "7fef2bbc-cdfc-4f66-80eb-2a52ee52da5f",
             "target_handle_id": "53c299c7-1df2-4d54-bb0d-559a4947c16d",
             "type": "DEFAULT",
         },
         {
             "id": "5c456a17-a92b-4dad-9569-306043707c9f",
-            "source_node_id": "5573f078-cced-48f3-bafd-782d48e260c7",
-            "source_handle_id": "53c299c7-1df2-4d54-bb0d-559a4947c16d",
+            "source_node_id": "7fef2bbc-cdfc-4f66-80eb-2a52ee52da5f",
+            "source_handle_id": "baa8baa7-8849-4b96-a90d-c0545a60d3a8",
             "target_node_id": "cbc7197e-67c9-4af5-b781-879c8fd3e4c9",
             "target_handle_id": "001b97f6-2bc8-4d1e-9572-028dcf17df4e",
             "type": "DEFAULT",
