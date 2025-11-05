@@ -124,8 +124,8 @@ def test_serialize_workflow():
                             {
                                 "type": "NODE_OUTPUT",
                                 "data": {
-                                    "node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
-                                    "output_id": "84b59a1a-82bf-46bb-9826-9b393402d0fe",
+                                    "node_id": "f9e52c4e-68b2-4ac0-b801-433fecc52d6b",
+                                    "output_id": "ab045894-45ce-40fc-b770-0d9f0146090f",
                                 },
                             }
                         ],
@@ -164,8 +164,8 @@ def test_serialize_workflow():
                             {
                                 "type": "NODE_OUTPUT",
                                 "data": {
-                                    "node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
-                                    "output_id": "f305c61e-6e8f-4cea-a53e-92656136b545",
+                                    "node_id": "f9e52c4e-68b2-4ac0-b801-433fecc52d6b",
+                                    "output_id": "3fdce851-f1ac-4d53-bb1b-74e1899edaff",
                                 },
                             }
                         ],
@@ -188,25 +188,25 @@ def test_serialize_workflow():
     assert not DeepDiff(
         [
             {
-                "id": "26003bf1-b5a3-41f4-a419-c7ef5a7595df",
+                "id": "9cd49d57-d99f-4648-813d-fe84f29a0e3b",
                 "source_node_id": "32684932-7c7c-4b1c-aed2-553de29bf3f7",
                 "source_handle_id": "e4136ee4-a51a-4ca3-9a3a-aa96f5de2347",
-                "target_node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
-                "target_handle_id": "6492efcf-4437-4af1-9ad7-269795ccb27a",
+                "target_node_id": "f9e52c4e-68b2-4ac0-b801-433fecc52d6b",
+                "target_handle_id": "b257ad5b-03f1-446e-be6a-b0bed6923fa9",
                 "type": "DEFAULT",
             },
             {
                 "id": "b0a57a5f-a1e4-4dc9-85dd-946f08304738",
-                "source_node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
-                "source_handle_id": "1e739e86-a285-4438-9725-a152c15a63e3",
+                "source_node_id": "f9e52c4e-68b2-4ac0-b801-433fecc52d6b",
+                "source_handle_id": "e1282a29-dad1-4db4-ac4d-4c4a08b15d02",
                 "target_node_id": "ca8bb585-c9a8-4bf7-bf9d-534b600fe23b",
                 "target_handle_id": "8a4a7efd-0e18-43ed-ba32-803e22e3ba0a",
                 "type": "DEFAULT",
             },
             {
                 "id": "e4366583-94a5-40b0-9b6f-1e965695b1fe",
-                "source_node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
-                "source_handle_id": "1e739e86-a285-4438-9725-a152c15a63e3",
+                "source_node_id": "f9e52c4e-68b2-4ac0-b801-433fecc52d6b",
+                "source_handle_id": "e1282a29-dad1-4db4-ac4d-4c4a08b15d02",
                 "target_node_id": "27fdaa45-b8ce-464d-be50-cf71cc56bc10",
                 "target_handle_id": "e7a09eb2-c9fb-4d57-b436-9cd9384c8960",
                 "type": "DEFAULT",
