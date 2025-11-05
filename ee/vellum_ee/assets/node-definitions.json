@@ -342,6 +342,51 @@
       ]
     },
     {
+      "id": "9d62e15c-a640-4a65-b52c-ce0cbaa23a71",
+      "display_data": {
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "comment": {
+          "value": "\n    Used to execute a Subworkflow defined inline.\n\n    subworkflow: Type[\"BaseWorkflow[InputsType, InnerStateType]\"] - The Subworkflow to execute\n    subworkflow_inputs: ClassVar[EntityInputsInterface] = {}\n    ",
+          "expanded": true
+        }
+      },
+      "base": {
+        "name": "BaseNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
+      },
+      "definition": {
+        "name": "InlineSubworkflowNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "core",
+          "inline_subworkflow_node",
+          "node"
+        ]
+      },
+      "trigger": {
+        "id": "d7c92c2f-d761-43e7-a7e6-34fd74b3b8b3",
+        "merge_behavior": "AWAIT_ATTRIBUTES"
+      },
+      "ports": [
+        {
+          "id": "bb1e4a4f-60e7-4519-b127-80183008a3f7",
+          "name": "default",
+          "type": "DEFAULT"
+        }
+      ]
+    },
+    {
       "id": "2dded52f-a449-48fd-b58f-f59801c24bae",
       "display_data": {
         "position": {
@@ -925,7 +970,7 @@
       ]
     },
     {
-      "id": "bf31cc42-b5e4-4191-a453-7191743ac200",
+      "id": "c3d3aadd-fb99-4e86-905a-c40be63da688",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -960,13 +1005,13 @@
         ]
       },
       "trigger": {
-        "id": "0b2da045-2a4c-4939-8b5c-661652c759d4",
+        "id": "9ed1cb78-949a-42b0-8e84-98c20eb6146b",
         "merge_behavior": "AWAIT_ANY"
       },
       "ports": [],
       "outputs": [
         {
-          "id": "7f41909e-9ce1-4fde-ba77-a13dda301ece",
+          "id": "c65369bf-7dbc-4f66-87c5-381c965ffb5d",
           "name": "value",
           "type": "STRING",
           "value": null
@@ -975,10 +1020,6 @@
     }
   ],
   "errors": [
-    {
-      "node": "InlineSubworkflowNode",
-      "error": "AttributeError: type object 'undefined' has no attribute 'get_inputs_class'"
-    },
     {
       "node": "MapNode",
       "error": "IndexError: tuple index out of range"
