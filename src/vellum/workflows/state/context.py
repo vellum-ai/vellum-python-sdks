@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from functools import cached_property
+import json
 from queue import Queue
 from uuid import UUID, uuid4
 from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Type
@@ -234,7 +235,7 @@ class WorkflowContext:
         self, deployment_name: str, release_tag: str
     ) -> Optional[WorkflowDeploymentMetadata]:
         """
-        Fetch deployment metadata from the Vellum API.
+        Fetch deployment metadata from metadata.json in generated_files.
 
         Args:
             deployment_name: The name of the workflow deployment
@@ -243,34 +244,48 @@ class WorkflowContext:
         Returns:
             WorkflowDeploymentMetadata if successful, None otherwise
         """
-        try:
-            # Fetch deployment details
-            deployment = self.vellum_client.workflow_deployments.retrieve(deployment_name)
-
-            deployment_id = UUID(deployment.id)
-
-            # Fetch release tag details
-            release_tag_info = self.vellum_client.workflow_deployments.retrieve_workflow_release_tag(
-                deployment.id, release_tag
-            )
-
-            # Fetch workflow version
-            release = self.vellum_client.workflow_deployments.retrieve_workflow_deployment_release(
-                str(deployment_id), release_tag
-            )
-
-            return WorkflowDeploymentMetadata(
-                deployment_id=deployment_id,
-                deployment_name=deployment.name,
-                deployment_history_item_id=UUID(deployment.last_deployed_history_item_id),
-                release_tag_id=UUID(release_tag_info.release.id),
-                release_tag_name=release_tag_info.name,
-                workflow_version_id=UUID(release.workflow_version.id),
-            )
-        except Exception:
-            # If we fail to fetch metadata, return None - the workflow can still run
-            # but won't have the full parent context hierarchy
+        if not self._generated_files:
             return None
+
+        expected_prefix = generate_workflow_deployment_prefix(deployment_name, release_tag)
+        metadata_path = f"{expected_prefix}/metadata.json"
+
+        metadata_content = self._generated_files.get(metadata_path)
+        if metadata_content:
+            try:
+                metadata_json = json.loads(metadata_content)
+
+                deployment_id = metadata_json.get("deployment_id")
+                deployment_name_from_metadata = metadata_json.get("deployment_name")
+                deployment_history_item_id = metadata_json.get("deployment_history_item_id")
+                release_tag_id = metadata_json.get("release_tag_id")
+                release_tag_name_from_metadata = metadata_json.get("release_tag_name")
+                workflow_version_id = metadata_json.get("workflow_version_id")
+
+                if all(
+                    [
+                        deployment_id,
+                        deployment_name_from_metadata,
+                        deployment_history_item_id,
+                        release_tag_id,
+                        release_tag_name_from_metadata,
+                        workflow_version_id,
+                    ]
+                ):
+                    return WorkflowDeploymentMetadata(
+                        deployment_id=UUID(deployment_id),
+                        deployment_name=deployment_name_from_metadata,
+                        deployment_history_item_id=UUID(deployment_history_item_id),
+                        release_tag_id=UUID(release_tag_id),
+                        release_tag_name=release_tag_name_from_metadata,
+                        workflow_version_id=UUID(workflow_version_id),
+                    )
+            except (json.JSONDecodeError, ValueError, KeyError):
+                # If we fail to parse metadata, return None - the workflow can still run
+                # but won't have the full parent context hierarchy
+                pass
+
+        return None
 
     @classmethod
     def create_from(cls, context):
