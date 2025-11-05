@@ -87,7 +87,7 @@ def test_serialize_workflow(vellum_client):
     tool_calling_node = workflow_raw_data["nodes"][1]
     function_attributes = next(attr for attr in tool_calling_node["attributes"] if attr["name"] == "functions")
     assert function_attributes == {
-        "id": "73a94e3c-1935-4308-a68a-ecd5441804b7",
+        "id": "a6c4a9d7-9615-478d-adb3-6577847c738d",
         "name": "functions",
         "value": {
             "type": "CONSTANT_VALUE",
