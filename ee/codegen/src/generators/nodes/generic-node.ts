@@ -659,14 +659,22 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
       return false;
     }
     // Check if all outputs in nodeData match the base node definition outputs
-    const baseOutputNames = new Set(baseNodeDef.outputs.map((o) => o.name));
-    const nodeOutputNames = new Set(this.nodeData.outputs.map((o) => o.name));
+    // Compare by name and type to ensure customized outputs are preserved
+    const baseOutputNames = baseNodeDef.outputs.map((o) => o.name);
+    const baseOutputTypes = baseNodeDef.outputs.map((o) => o.type);
 
-    return (
-      baseOutputNames.size === nodeOutputNames.size &&
-      this.nodeData.outputs.length === baseNodeDef.outputs.length &&
-      this.nodeData.outputs.every((output) => baseOutputNames.has(output.name))
-    );
+    if (this.nodeData.outputs.length !== baseNodeDef.outputs.length) {
+      return false;
+    }
+
+    return this.nodeData.outputs.every((output) => {
+      const baseIndex = baseOutputNames.indexOf(output.name);
+      if (baseIndex === -1) {
+        return false;
+      }
+      // Compare type
+      return baseOutputTypes[baseIndex] === output.type;
+    });
   }
 
   getNodeClassBodyStatements(): AstNode[] {
