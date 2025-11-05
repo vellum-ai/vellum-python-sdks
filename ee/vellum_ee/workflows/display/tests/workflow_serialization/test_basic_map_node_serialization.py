@@ -77,7 +77,7 @@ def test_serialize_workflow():
     map_node = workflow_raw_data["nodes"][1]
     assert not DeepDiff(
         {
-            "id": "bf83099a-40df-4445-b90d-1f6f1067ebe3",
+            "id": "f2f94af1-fcbe-497c-80ce-80952c8903c8",
             "type": "MAP",
             "inputs": [
                 {
@@ -97,8 +97,8 @@ def test_serialize_workflow():
             "data": {
                 "label": "Map Fruits Node",
                 "error_output_id": None,
-                "source_handle_id": "a2171a61-0657-43ad-b6d9-cf93ce3270d0",
-                "target_handle_id": "b5e8182e-20c5-482b-b4c5-4dde48c01472",
+                "source_handle_id": "aff8a80e-7ce7-43d2-9c9e-9d137efd3b33",
+                "target_handle_id": "e16e9d55-5f26-4d89-8c7a-939f1f463d80",
                 "variant": "INLINE",
                 "workflow_raw_data": {
                     "nodes": [
@@ -288,10 +288,10 @@ def test_serialize_workflow():
                 "module": ["tests", "workflows", "basic_map_node", "workflow"],
             },
             "trigger": {
-                "id": "b5e8182e-20c5-482b-b4c5-4dde48c01472",
+                "id": "e16e9d55-5f26-4d89-8c7a-939f1f463d80",
                 "merge_behavior": "AWAIT_ATTRIBUTES",
             },
-            "ports": [{"id": "a2171a61-0657-43ad-b6d9-cf93ce3270d0", "name": "default", "type": "DEFAULT"}],
+            "ports": [{"id": "aff8a80e-7ce7-43d2-9c9e-9d137efd3b33", "name": "default", "type": "DEFAULT"}],
         },
         map_node,
         ignore_order=True,
@@ -318,7 +318,7 @@ def test_serialize_workflow():
                             {
                                 "type": "NODE_OUTPUT",
                                 "data": {
-                                    "node_id": "bf83099a-40df-4445-b90d-1f6f1067ebe3",
+                                    "node_id": "f2f94af1-fcbe-497c-80ce-80952c8903c8",
                                     "output_id": "2a957315-fae0-4366-8a35-f0b315c5eade",
                                 },
                             }
@@ -352,17 +352,17 @@ def test_serialize_workflow():
     assert not DeepDiff(
         [
             {
-                "id": "f39477f3-445a-412e-a8ab-371baa8ae990",
+                "id": "528eb20a-9db4-4c01-87c0-39b9f5f09753",
                 "source_node_id": "c0aa464d-1685-4f15-a051-31b426fec92e",
                 "source_handle_id": "844d992e-60ab-4af2-a8ff-52cd858386f7",
-                "target_node_id": "bf83099a-40df-4445-b90d-1f6f1067ebe3",
-                "target_handle_id": "b5e8182e-20c5-482b-b4c5-4dde48c01472",
+                "target_node_id": "f2f94af1-fcbe-497c-80ce-80952c8903c8",
+                "target_handle_id": "e16e9d55-5f26-4d89-8c7a-939f1f463d80",
                 "type": "DEFAULT",
             },
             {
                 "id": "47a34f6e-d139-4702-aa46-6212bb8a150f",
-                "source_node_id": "bf83099a-40df-4445-b90d-1f6f1067ebe3",
-                "source_handle_id": "a2171a61-0657-43ad-b6d9-cf93ce3270d0",
+                "source_node_id": "f2f94af1-fcbe-497c-80ce-80952c8903c8",
+                "source_handle_id": "aff8a80e-7ce7-43d2-9c9e-9d137efd3b33",
                 "target_node_id": "bacc5d55-07d4-4a0a-a69e-831524480de5",
                 "target_handle_id": "720dd872-2f3d-47b9-8245-89387f04f300",
                 "type": "DEFAULT",
