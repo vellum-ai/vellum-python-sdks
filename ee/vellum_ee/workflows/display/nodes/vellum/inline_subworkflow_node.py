@@ -7,6 +7,7 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes import InlineSubworkflowNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.types.core import JsonObject
+from vellum.workflows.types.generics import is_workflow_class
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
@@ -34,7 +35,7 @@ class BaseInlineSubworkflowNodeDisplay(
         node_id = self.node_id
 
         subworkflow_class = raise_if_descriptor(node.subworkflow)
-        if subworkflow_class is None:
+        if subworkflow_class is undefined or not is_workflow_class(subworkflow_class):
             display_context.add_error(
                 NodeValidationError(
                     "InlineSubworkflowNode requires a subworkflow to be defined",
@@ -78,6 +79,9 @@ class BaseInlineSubworkflowNodeDisplay(
         display_context: WorkflowDisplayContext,
         subworkflow: Type[BaseWorkflow],
     ) -> Tuple[List[NodeInput], List[VellumVariable]]:
+        if subworkflow is undefined or not is_workflow_class(subworkflow):
+            subworkflow = BaseWorkflow
+
         subworkflow_inputs_class = subworkflow.get_inputs_class()
         subworkflow_inputs = raise_if_descriptor(node.subworkflow_inputs)
 
