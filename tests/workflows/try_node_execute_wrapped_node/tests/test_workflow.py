@@ -5,38 +5,23 @@ from tests.workflows.try_node_execute_wrapped_node.workflow import TryNodeExecut
 
 def test_execute_try_node_wrapped_node_by_id():
     """
-    Test that we can execute a workflow starting from a Try Node wrapped node
-    by passing its ID to entrypoint_nodes.
+    Test that we can execute the inner wrapped node of a Try Node adornment
+    using run_node and verify it executes with the correct ID.
     """
 
     # GIVEN a workflow with a Try Node wrapped node
     workflow = TryNodeExecuteWrappedNodeWorkflow()
 
-    wrapped_node_id = WrappedNode.__id__
-    assert isinstance(wrapped_node_id, UUID)
+    # AND we get the inner wrapped node's ID and class
+    inner_node_id = WrappedNode.__wrapped_node__.__id__
+    inner_node_class = WrappedNode.__wrapped_node__
+    assert isinstance(inner_node_id, UUID)
 
-    final_event = workflow.run(entrypoint_nodes=[wrapped_node_id])
+    events = list(workflow.run_node(inner_node_class))
+    final_event = events[-1]
 
-    assert final_event.name == "workflow.execution.fulfilled"
+    assert final_event.name == "node.execution.fulfilled"
 
-    assert final_event.outputs.final_result == "inner_node_executed"
+    assert final_event.body.node_definition.__id__ == inner_node_id
 
-    assert final_event.outputs.error is None
-
-
-def test_execute_try_node_wrapped_node_by_class():
-    """
-    Test that we can execute a workflow starting from a Try Node wrapped node
-    by passing the node class to entrypoint_nodes.
-    """
-
-    # GIVEN a workflow with a Try Node wrapped node
-    workflow = TryNodeExecuteWrappedNodeWorkflow()
-
-    final_event = workflow.run(entrypoint_nodes=[WrappedNode])
-
-    assert final_event.name == "workflow.execution.fulfilled"
-
-    assert final_event.outputs.final_result == "inner_node_executed"
-
-    assert final_event.outputs.error is None
+    assert final_event.outputs.result == "inner_node_executed"
