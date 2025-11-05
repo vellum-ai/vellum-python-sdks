@@ -356,5 +356,12 @@ describe("SubworkflowDeploymentNode", () => {
       node.getNodeFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
+
+    it(`getNodeInputsFile`, async () => {
+      const inputsFile = node.getNodeInputsFile();
+      expect(inputsFile).not.toBeNull();
+      inputsFile?.write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
   });
 });

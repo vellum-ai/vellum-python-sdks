@@ -3,6 +3,7 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { SubworkflowDeploymentNodeContext } from "src/context/node-context/subworkflow-deployment-node";
+import { BasePersistedFile } from "src/generators/base-persisted-file";
 import {
   NodeAttributeGenerationError,
   NodeDefinitionGenerationError,
@@ -44,6 +45,43 @@ export class SubworkflowDeploymentNode extends BaseNode<
     return `${INPUTS_PREFIX}.${nodeInputKey}`;
   }
 
+  public async persist(): Promise<void> {
+    const inputsFile = this.getNodeInputsFile();
+    const persistPromises = [
+      this.getNodeFile().persist(),
+      this.getNodeDisplayFile().persist(),
+    ];
+
+    if (inputsFile) {
+      persistPromises.push(inputsFile.persist());
+    }
+
+    await Promise.all(persistPromises);
+  }
+
+  public getNodeInputsFile(): NodeInputsFile | null {
+    const workflowVersion =
+      this.nodeContext.workflowDeploymentRelease?.workflowVersion;
+    if (!workflowVersion) {
+      return null;
+    }
+
+    if (!hasInputsClassEnabled(workflowVersion, this.nodeData.id)) {
+      return null;
+    }
+
+    const inputVariables = workflowVersion.inputVariables;
+    if (inputVariables.length === 0) {
+      return null;
+    }
+
+    if (this.nodeInputsByKey.size === 0) {
+      return null;
+    }
+
+    return new NodeInputsFile({ node: this });
+  }
+
   getNodeClassBodyStatements(): AstNode[] {
     const statements: AstNode[] = [];
 
@@ -80,14 +118,8 @@ export class SubworkflowDeploymentNode extends BaseNode<
       })
     );
 
-    const subworkflowInputsClass = this.generateSubworkflowInputsClass();
-    if (subworkflowInputsClass) {
-      statements.push(subworkflowInputsClass);
-    }
-
-    statements.push(
-      this.generateSubworkflowInputsInitializer(subworkflowInputsClass)
-    );
+    const hasInputsFile = this.getNodeInputsFile() !== null;
+    statements.push(this.generateSubworkflowInputsInitializer(hasInputsFile));
 
     const outputsClass = this.generateOutputsClass();
     if (outputsClass) {
@@ -143,7 +175,7 @@ export class SubworkflowDeploymentNode extends BaseNode<
     return outputsClass;
   }
 
-  private generateSubworkflowInputsClass(): python.Class | null {
+  public generateSubworkflowInputsClass(): python.Class | null {
     if (!this.nodeContext.workflowDeploymentRelease) {
       return null;
     }
@@ -216,10 +248,10 @@ export class SubworkflowDeploymentNode extends BaseNode<
   }
 
   private generateSubworkflowInputsInitializer(
-    subworkflowInputsClass: python.Class | null
+    hasInputsFile: boolean
   ): python.Field {
     if (
-      subworkflowInputsClass &&
+      hasInputsFile &&
       this.nodeContext.workflowDeploymentRelease &&
       this.nodeInputsByKey.size > 0
     ) {
@@ -251,6 +283,7 @@ export class SubworkflowDeploymentNode extends BaseNode<
         initializer: python.instantiateClass({
           classReference: python.reference({
             name: SUBWORKFLOW_INPUTS_CLASS_NAME,
+            modulePath: [...this.nodeContext.nodeModulePath, "inputs"],
           }),
           arguments_,
         }),
@@ -342,5 +375,36 @@ export class SubworkflowDeploymentNode extends BaseNode<
 
   protected getErrorOutputId(): string | undefined {
     return this.nodeData.data.errorOutputId;
+  }
+}
+
+declare namespace NodeInputsFile {
+  interface Args {
+    node: SubworkflowDeploymentNode;
+  }
+}
+
+class NodeInputsFile extends BasePersistedFile {
+  private readonly node: SubworkflowDeploymentNode;
+
+  constructor({ node }: NodeInputsFile.Args) {
+    super({ workflowContext: node.workflowContext, isInitFile: false });
+    this.node = node;
+  }
+
+  protected getModulePath(): string[] {
+    return [...this.node.getNodeModulePath(), "inputs"];
+  }
+
+  protected getFileStatements(): AstNode[] {
+    const inputsClass = this.node.generateSubworkflowInputsClass();
+    if (!inputsClass) {
+      return [];
+    }
+    return [inputsClass];
+  }
+
+  public async persist(): Promise<void> {
+    await super.persist();
   }
 }
