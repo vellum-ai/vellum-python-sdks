@@ -1070,7 +1070,12 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
     @classmethod
     def infer_workflow_class(cls) -> Type[BaseWorkflow]:
         original_base = get_original_base(cls)
-        workflow_class = get_args(original_base)[0]
+        args = get_args(original_base)
+
+        if not args:
+            return BaseWorkflow
+
+        workflow_class = args[0]
         if isinstance(workflow_class, TypeVar):
             bounded_class = workflow_class.__bound__
             if inspect.isclass(bounded_class) and issubclass(bounded_class, BaseWorkflow):
@@ -1079,7 +1084,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             if isinstance(bounded_class, ForwardRef) and bounded_class.__forward_arg__ == BaseWorkflow.__name__:
                 return BaseWorkflow
 
-        if issubclass(workflow_class, BaseWorkflow):
+        if inspect.isclass(workflow_class) and issubclass(workflow_class, BaseWorkflow):
             return workflow_class
 
         raise ValueError(f"Workflow {cls.__name__} must be a subclass of {BaseWorkflow.__name__}")

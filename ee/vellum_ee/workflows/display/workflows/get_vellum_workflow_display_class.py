@@ -3,8 +3,12 @@ from typing import TYPE_CHECKING, Generic, Optional, Type, TypeVar
 
 from vellum.client import Vellum as VellumClient
 from vellum.workflows.types.generics import WorkflowType
+from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
-from vellum_ee.workflows.display.utils.registry import get_from_workflow_display_registry
+from vellum_ee.workflows.display.utils.registry import (
+    get_default_workflow_display_class,
+    get_from_workflow_display_registry,
+)
 
 if TYPE_CHECKING:
     from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
@@ -15,9 +19,19 @@ def _get_workflow_display_class(*, workflow_class: Type[WorkflowType]) -> Type["
     if workflow_display_class:
         return workflow_display_class
 
-    base_workflow_display_class = _get_workflow_display_class(
-        workflow_class=workflow_class.__bases__[0],
-    )
+    # Find the first base class that is a subclass of BaseWorkflow
+    workflow_base_classes = [
+        base
+        for base in getattr(workflow_class, "__bases__", ())
+        if isinstance(base, type) and issubclass(base, BaseWorkflow)
+    ]
+
+    if workflow_base_classes:
+        base_workflow_display_class = _get_workflow_display_class(
+            workflow_class=workflow_base_classes[0],
+        )
+    else:
+        base_workflow_display_class = get_default_workflow_display_class()
 
     # mypy gets upset at dynamic TypeVar's, but it's technically allowed by python
     _WorkflowClassType = TypeVar(f"_{workflow_class.__name__}Type", bound=workflow_class)  # type: ignore[misc]
