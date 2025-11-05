@@ -17,7 +17,6 @@ class WebSearchNode(BaseNode[StateType]):
     query: str - The search query to execute
     """
 
-    __legacy_id__ = True
     query: ClassVar[str] = ""
 
     class Outputs(BaseOutputs):

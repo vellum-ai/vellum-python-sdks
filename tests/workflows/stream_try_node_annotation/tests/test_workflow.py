@@ -1,6 +1,5 @@
 from vellum.workflows.nodes.utils import ADORNMENT_MODULE_NAME
 from vellum.workflows.types.definition import CodeResourceDefinition, VellumCodeResourceDefinition
-from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 from tests.workflows.stream_try_node_annotation.workflow import InnerNode, Inputs, StreamingTryExample
@@ -43,7 +42,7 @@ def test_workflow_stream__happy_path():
     assert node_initiated_events[0].node_definition == InnerNode
     assert node_initiated_events[0].model_dump(mode="json")["body"]["node_definition"] == {
         "name": "TryNode",
-        "id": str(uuid4_from_hash(InnerNode.__qualname__)),
+        "id": str(InnerNode.__id__),
         "module": [
             "tests",
             "workflows",

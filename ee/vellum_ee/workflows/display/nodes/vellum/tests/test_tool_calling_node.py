@@ -86,13 +86,13 @@ def test_serialize_node__prompt_inputs__input_reference():
     )
 
     assert prompt_inputs_attribute == {
-        "id": "6cde4776-7f4a-411c-95a8-69c8b3a64b42",
+        "id": "80ed13f9-64d2-47ee-bb91-3378de7ad2c0",
         "name": "prompt_inputs",
         "value": {
             "type": "DICTIONARY_REFERENCE",
             "entries": [
                 {
-                    "id": "845009c8-03f8-4de4-b956-841309457d37",
+                    "id": "981b8cdf-c08d-42a1-a226-76de8acf192f",
                     "key": "foo",
                     "value": {"type": "WORKFLOW_INPUT", "input_variable_id": "e3657390-fd3c-4fea-8cdd-fc5ea79f3278"},
                 }
@@ -128,18 +128,18 @@ def test_serialize_node__prompt_inputs__mixed_values():
     )
 
     assert prompt_inputs_attribute == {
-        "id": "c4ca6e3d-0f71-4802-a618-1e87880cb7cf",
+        "id": "7352d310-204c-4291-8757-a84a6e68591a",
         "name": "prompt_inputs",
         "value": {
             "type": "DICTIONARY_REFERENCE",
             "entries": [
                 {
-                    "id": "a4016385-3cab-4c01-b9d2-7865cd54bdb0",
+                    "id": "05c092c7-4031-43b7-8c3d-b1a317ca271d",
                     "key": "foo",
                     "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "bar"}},
                 },
                 {
-                    "id": "828928b1-24e3-4457-9d6f-4f0692dfa355",
+                    "id": "b0de6603-fcdd-44a3-b33a-56f05bd03bb4",
                     "key": "baz",
                     "value": {"type": "WORKFLOW_INPUT", "input_variable_id": "8d57cf1d-147c-427b-9a5e-e5f6ab76e2eb"},
                 },
@@ -300,8 +300,8 @@ def test_serialize_tool_router_node():
                 "id": "cd208919-c66b-451b-a739-bcf7d3451dea",
                 "name": "prompt_outputs",
                 "value": {
-                    "node_id": "19e664fc-3b57-48d2-b47a-b143b475406a",
-                    "node_output_id": "c2a5a7f7-a234-45dc-adee-bc6fc0bd28dd",
+                    "node_id": "c75146e1-ea10-4f58-90fd-887322725496",
+                    "node_output_id": "baef5c93-612a-453d-b739-223041ef0429",
                     "type": "NODE_OUTPUT",
                 },
             }
@@ -330,8 +330,8 @@ def test_serialize_tool_router_node():
                             "operator": "<",
                             "rhs": {
                                 "lhs": {
-                                    "node_id": "19e664fc-3b57-48d2-b47a-b143b475406a",
-                                    "node_output_id": "c2a5a7f7-a234-45dc-adee-bc6fc0bd28dd",
+                                    "node_id": "c75146e1-ea10-4f58-90fd-887322725496",
+                                    "node_output_id": "baef5c93-612a-453d-b739-223041ef0429",
                                     "type": "NODE_OUTPUT",
                                 },
                                 "operator": "length",
@@ -344,8 +344,8 @@ def test_serialize_tool_router_node():
                             "lhs": {
                                 "lhs": {
                                     "lhs": {
-                                        "node_id": "19e664fc-3b57-48d2-b47a-b143b475406a",
-                                        "node_output_id": "c2a5a7f7-a234-45dc-adee-bc6fc0bd28dd",
+                                        "node_id": "c75146e1-ea10-4f58-90fd-887322725496",
+                                        "node_output_id": "baef5c93-612a-453d-b739-223041ef0429",
                                         "type": "NODE_OUTPUT",
                                     },
                                     "operator": "accessField",
@@ -371,8 +371,8 @@ def test_serialize_tool_router_node():
                             "lhs": {
                                 "lhs": {
                                     "lhs": {
-                                        "node_id": "19e664fc-3b57-48d2-b47a-b143b475406a",
-                                        "node_output_id": "c2a5a7f7-a234-45dc-adee-bc6fc0bd28dd",
+                                        "node_id": "c75146e1-ea10-4f58-90fd-887322725496",
+                                        "node_output_id": "baef5c93-612a-453d-b739-223041ef0429",
                                         "type": "NODE_OUTPUT",
                                     },
                                     "operator": "accessField",
@@ -534,13 +534,13 @@ def test_serialize_tool_prompt_node_with_inline_workflow():
         (attr for attr in attributes if isinstance(attr, dict) and attr["name"] == "prompt_inputs"), None
     )
     assert prompt_inputs_attr == {
-        "id": "bc1320a2-23e4-4238-8b00-efbf88e91856",
+        "id": "d218d7c7-41f4-46d4-a9ed-89640cba1b9b",
         "name": "prompt_inputs",
         "value": {
             "type": "DICTIONARY_REFERENCE",
             "entries": [
                 {
-                    "id": "b1dfaf2b-b9fb-4fea-ad04-a988e5223d06",
+                    "id": "c181c554-a97f-4254-9bc8-1c30a8f3fb5f",
                     "key": "chat_history",
                     "value": {
                         "type": "BINARY_EXPRESSION",
@@ -628,7 +628,7 @@ def test_serialize_tool_prompt_node_with_workflow_deployment(vellum_client):
     assert isinstance(attributes, list)
     functions_attr = next((attr for attr in attributes if isinstance(attr, dict) and attr["name"] == "functions"), None)
     assert functions_attr == {
-        "id": "6326ccc4-7cf6-4235-ba3c-a6e860b0c48b",
+        "id": "f482dc81-e320-402d-83df-f60d278797d8",
         "name": "functions",
         "value": {
             "type": "CONSTANT_VALUE",

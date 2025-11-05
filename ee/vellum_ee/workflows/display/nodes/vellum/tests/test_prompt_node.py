@@ -45,7 +45,7 @@ def test_serialize_node__lazy_reference_in_prompt_inputs():
 
     assert lazy_reference_node["inputs"] == [
         {
-            "id": "aa81c1bc-d5d8-4ae8-8946-e9f4d0c1ab5f",
+            "id": "e80bda60-b6b7-4c53-ad99-41d0bd47d3bd",
             "key": "attr",
             "value": {
                 "combinator": "OR",
@@ -84,7 +84,7 @@ def _display_class_with_node_input_ids_by_name_with_inputs_prefix(Node: Type[Inl
 @pytest.mark.parametrize(
     ["GetDisplayClass", "expected_input_id"],
     [
-        (_no_display_class, "9b036991-67ff-4cd0-a4d7-b4ed581e8b6d"),
+        (_no_display_class, "f435df49-a8bf-4de0-bb49-ff5bb92de30e"),
         (_display_class_with_node_input_ids_by_name, "fba6a4d5-835a-4e99-afb7-f6a4aed15110"),
         (_display_class_with_node_input_ids_by_name_with_inputs_prefix, "fba6a4d5-835a-4e99-afb7-f6a4aed15110"),
     ],
@@ -163,7 +163,7 @@ def test_serialize_node__prompt_inputs__state_reference():
 
     assert my_prompt_node["inputs"] == [
         {
-            "id": "e47e0a80-afbb-4888-b06b-8dc78edd8572",
+            "id": "7c5d23b3-c5ed-4ed6-a685-43fbe9a9baf8",
             "key": "foo",
             "value": {
                 "rules": [],
@@ -171,7 +171,7 @@ def test_serialize_node__prompt_inputs__state_reference():
             },
         },
         {
-            "id": "b83c40f7-0159-442f-af03-e80870363c52",
+            "id": "e138f06e-d705-46bc-8ac4-c844b0e9131a",
             "key": "bar",
             "value": {
                 "rules": [
@@ -193,13 +193,13 @@ def test_serialize_node__prompt_inputs__state_reference():
         attribute for attribute in my_prompt_node["attributes"] if attribute["name"] == "prompt_inputs"
     )
     assert prompt_inputs_attribute == {
-        "id": "3b6e1363-e41b-458e-ad28-95a61fdedac1",
+        "id": "768704cc-812b-4a06-8348-ed46160a48f9",
         "name": "prompt_inputs",
         "value": {
             "type": "DICTIONARY_REFERENCE",
             "entries": [
                 {
-                    "id": "52559b9e-4e8e-438a-8246-cfa30c98d5d1",
+                    "id": "4a601d66-dc7d-4e48-a933-52a13fdc8d80",
                     "key": "foo",
                     "value": {
                         "type": "WORKFLOW_STATE",
@@ -207,7 +207,7 @@ def test_serialize_node__prompt_inputs__state_reference():
                     },
                 },
                 {
-                    "id": "3750feb9-5d5c-4150-b62d-a9924f466888",
+                    "id": "341f8329-5d5f-417b-a20d-e88234a17c49",
                     "key": "bar",
                     "value": {
                         "type": "CONSTANT_VALUE",
@@ -240,9 +240,9 @@ def test_serialize_node__unreferenced_variable_block__still_serializes():
         "blocks"
     ] == [
         {
-            "id": "fecbb5f3-e0a3-42ed-9774-6c68fd5db50c",
+            "id": "2ce1605d-411f-4e94-a8a8-e85deb677b26",
             "block_type": "VARIABLE",
-            "input_variable_id": "ea3f6348-8553-4375-bd27-527df4e4f3c2",
+            "input_variable_id": "d70ce218-604d-4534-bd38-55a617ac0b8a",
             "state": "ENABLED",
             "cache_config": None,
         }
@@ -276,13 +276,13 @@ def test_serialize_node__port_groups():
     )
     ports = my_prompt_node["ports"]
     assert len(ports) == 2
-    assert ports[0]["id"] == "149d97a4-3da3-44a9-95f7-ea7b8d38b877"
-    assert ports[1]["id"] == "71f2d2b3-194f-4492-bc1c-a5ca1f60fb0a"
+    assert ports[0]["id"] == "4a1a1b86-f9f5-4364-a9cd-4929d4202e1d"
+    assert ports[1]["id"] == "54e7594b-8ca3-4c45-9dd7-e0b973d7800f"
     assert ports[0]["name"] == "apple"
     assert ports[1]["name"] == "banana"
 
     # AND the legacy source_handle_id should be the default port
-    assert my_prompt_node["data"]["source_handle_id"] == "149d97a4-3da3-44a9-95f7-ea7b8d38b877"
+    assert my_prompt_node["data"]["source_handle_id"] == "4a1a1b86-f9f5-4364-a9cd-4929d4202e1d"
 
 
 def test_serialize_node__prompt_parameters__dynamic_references():
@@ -327,52 +327,52 @@ def test_serialize_node__prompt_parameters__dynamic_references():
     assert parameters_attribute["value"]["type"] == "DICTIONARY_REFERENCE"
     assert parameters_attribute["value"]["entries"] == [
         {
-            "id": "24703d3a-ee6c-4b1b-80f8-6c19ef16723a",
+            "id": "652844a5-1f66-4211-ab0d-77c0c7d29a8a",
             "key": "stop",
             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
         },
         {
-            "id": "88a3bf5d-f42b-4895-850e-ad843945a003",
+            "id": "52def0d8-9d2b-4ff3-b9b7-e0212de3987d",
             "key": "temperature",
             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
         },
         {
-            "id": "ede3e0c2-3033-4d0a-bd72-e52595bdc916",
+            "id": "3444b1bc-5cd3-413a-8023-6dfe08e1a7c6",
             "key": "max_tokens",
             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
         },
         {
-            "id": "0013cd8f-7658-4908-80fc-b8995d8ca4cc",
+            "id": "36956dde-3a3d-47f3-982d-ee38e8b9d900",
             "key": "top_p",
             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
         },
         {
-            "id": "98eb2e57-d4ec-4c27-b39b-0b8086918a0f",
+            "id": "6755f4a6-ab90-4004-b3f7-495d06cdbdfa",
             "key": "top_k",
             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
         },
         {
-            "id": "04accc66-888c-4145-8b4f-d8ff99e38172",
+            "id": "ba427da5-55c8-4daf-a84e-4ac62784aa5e",
             "key": "frequency_penalty",
             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
         },
         {
-            "id": "9236d564-0637-48de-8423-cdf3617dd6b4",
+            "id": "736ccb67-efec-4958-a4c0-12f8c068856f",
             "key": "presence_penalty",
             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
         },
         {
-            "id": "74f3e80a-3935-45af-a9b3-d49e310a4c03",
+            "id": "1162f136-b72e-4848-8424-d1357053eb16",
             "key": "logit_bias",
             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
         },
         {
-            "id": "69a7ebf7-d21a-44e9-a0fa-43eb9b2815df",
+            "id": "56958af3-ed56-409d-bf1d-a357f01b917d",
             "key": "custom_parameters",
             "value": {
                 "entries": [
                     {
-                        "id": "e709dc4d-f2db-4dc9-b912-401b52fbb7b4",
+                        "id": "6e93e248-f818-4770-ba6a-fa859c28799b",
                         "key": "json_schema",
                         "value": {
                             "input_variable_id": "c02d1201-86d1-4364-b3b3-4fc6824db8a4",

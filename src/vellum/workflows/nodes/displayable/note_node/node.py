@@ -10,8 +10,6 @@ class NoteNode(BaseNode[StateType], Generic[StateType]):
     A no-op Node purely used to display a note in the Vellum UI.
     """
 
-    __legacy_id__ = True
-
     class Trigger(BaseNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY
 

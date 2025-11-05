@@ -99,11 +99,11 @@ def test_serialize_workflow(vellum_client):
 
     prompt_node = workflow_raw_data["nodes"][1]
     assert prompt_node == {
-        "id": "56c74024-19a3-4c0d-a5f5-23e1e9f11b21",
+        "id": "a114abf2-cb76-49b5-8001-6c8df56d39ff",
         "type": "PROMPT",
         "inputs": [
             {
-                "id": "947d7ead-0fad-4e5f-aa3a-d06029ac94bc",
+                "id": "c58d2244-a52e-4edb-84c5-efc334dea6f9",
                 "key": "city",
                 "value": {
                     "rules": [
@@ -116,7 +116,7 @@ def test_serialize_workflow(vellum_client):
                 },
             },
             {
-                "id": "3deebdd7-2900-4d8c-93f2-e5b90649ac42",
+                "id": "d00707fb-b584-40bc-aecd-db11490bea3e",
                 "key": "date",
                 "value": {
                     "rules": [
@@ -131,11 +131,11 @@ def test_serialize_workflow(vellum_client):
         ],
         "data": {
             "label": "Example Prompt Deployment Node",
-            "output_id": "4d38b850-79e3-4b85-9158-a41d0c535410",
+            "output_id": "f07b3521-4ba1-4a3c-8629-3a269406f519",
             "error_output_id": None,
-            "array_output_id": "0cf47d33-6d5f-466f-b826-e814f1d0348b",
-            "source_handle_id": "2f26c7e0-283d-4f04-b639-adebb56bc679",
-            "target_handle_id": "b7605c48-0937-4ecc-914e-0d1058130e65",
+            "array_output_id": "14d71e78-94a5-4c46-bad8-bec827a4f1e4",
+            "source_handle_id": "6699f465-dc6c-4fa7-8038-7ff49419b953",
+            "target_handle_id": "1407e51f-cb29-4a86-beeb-cc1870dc5525",
             "variant": "DEPLOYMENT",
             "prompt_deployment_id": deployment.id,
             "release_tag": "LATEST",
@@ -151,14 +151,14 @@ def test_serialize_workflow(vellum_client):
             "module": ["tests", "workflows", "basic_text_prompt_deployment", "workflow"],
         },
         "trigger": {
-            "id": "b7605c48-0937-4ecc-914e-0d1058130e65",
+            "id": "1407e51f-cb29-4a86-beeb-cc1870dc5525",
             "merge_behavior": "AWAIT_ANY",
         },
-        "ports": [{"id": "2f26c7e0-283d-4f04-b639-adebb56bc679", "name": "default", "type": "DEFAULT"}],
+        "ports": [{"id": "6699f465-dc6c-4fa7-8038-7ff49419b953", "name": "default", "type": "DEFAULT"}],
         "outputs": [
-            {"id": "180355a8-e67c-4ce6-9ac3-e5dbb75a6629", "name": "json", "type": "JSON", "value": None},
-            {"id": "4d38b850-79e3-4b85-9158-a41d0c535410", "name": "text", "type": "STRING", "value": None},
-            {"id": "0cf47d33-6d5f-466f-b826-e814f1d0348b", "name": "results", "type": "ARRAY", "value": None},
+            {"id": "66687de8-3e00-4290-9177-54be727fef44", "name": "json", "type": "JSON", "value": None},
+            {"id": "f07b3521-4ba1-4a3c-8629-3a269406f519", "name": "text", "type": "STRING", "value": None},
+            {"id": "14d71e78-94a5-4c46-bad8-bec827a4f1e4", "name": "results", "type": "ARRAY", "value": None},
         ],
     }
 
@@ -187,8 +187,8 @@ def test_serialize_workflow(vellum_client):
                     "rules": [
                         {
                             "data": {
-                                "node_id": "56c74024-19a3-4c0d-a5f5-23e1e9f11b21",
-                                "output_id": "4d38b850-79e3-4b85-9158-a41d0c535410",
+                                "node_id": "a114abf2-cb76-49b5-8001-6c8df56d39ff",
+                                "output_id": "f07b3521-4ba1-4a3c-8629-3a269406f519",
                             },
                             "type": "NODE_OUTPUT",
                         }
@@ -216,17 +216,17 @@ def test_serialize_workflow(vellum_client):
     serialized_edges = workflow_raw_data["edges"]
     assert serialized_edges == [
         {
-            "id": "8961d02b-074e-45ab-9f77-4e94606a4344",
+            "id": "89a6042d-2bfd-4512-9f75-bf11db3c493c",
             "source_handle_id": "7065a943-1cab-4afd-9690-e678c5b74a2f",
             "source_node_id": "d680afbd-de64-4cf6-aa50-912686c48c64",
-            "target_handle_id": "b7605c48-0937-4ecc-914e-0d1058130e65",
-            "target_node_id": "56c74024-19a3-4c0d-a5f5-23e1e9f11b21",
+            "target_handle_id": "1407e51f-cb29-4a86-beeb-cc1870dc5525",
+            "target_node_id": "a114abf2-cb76-49b5-8001-6c8df56d39ff",
             "type": "DEFAULT",
         },
         {
             "id": "c2cbf6ef-8582-45c8-a643-fc6ae8fe482f",
-            "source_handle_id": "2f26c7e0-283d-4f04-b639-adebb56bc679",
-            "source_node_id": "56c74024-19a3-4c0d-a5f5-23e1e9f11b21",
+            "source_handle_id": "6699f465-dc6c-4fa7-8038-7ff49419b953",
+            "source_node_id": "a114abf2-cb76-49b5-8001-6c8df56d39ff",
             "target_handle_id": "dced939a-9122-4290-8482-7daa9525dad6",
             "target_node_id": "64ff72c7-8ffc-4e1f-b7a7-e7cd0697f576",
             "type": "DEFAULT",
@@ -332,11 +332,11 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
 
     prompt_node = workflow_raw_data["nodes"][1]
     assert prompt_node == {
-        "id": "56c74024-19a3-4c0d-a5f5-23e1e9f11b21",
+        "id": "0d1460e4-f207-4a69-bcea-7a3c7b325c02",
         "type": "PROMPT",
         "inputs": [
             {
-                "id": "947d7ead-0fad-4e5f-aa3a-d06029ac94bc",
+                "id": "b99dec61-8c38-4b6b-96fa-cb83d5c9a9ef",
                 "key": "city",
                 "value": {
                     "rules": [
@@ -349,7 +349,7 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
                 },
             },
             {
-                "id": "3deebdd7-2900-4d8c-93f2-e5b90649ac42",
+                "id": "6379398c-3c29-4327-9346-4d386a467f16",
                 "key": "date",
                 "value": {
                     "rules": [
@@ -364,11 +364,11 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
         ],
         "data": {
             "label": "Example Prompt Deployment Node",
-            "output_id": "4d38b850-79e3-4b85-9158-a41d0c535410",
+            "output_id": "b9d579e2-b3ee-4524-917f-7329fc09af59",
             "error_output_id": None,
-            "array_output_id": "0cf47d33-6d5f-466f-b826-e814f1d0348b",
-            "source_handle_id": "2f26c7e0-283d-4f04-b639-adebb56bc679",
-            "target_handle_id": "b7605c48-0937-4ecc-914e-0d1058130e65",
+            "array_output_id": "547b4a00-eb16-4df5-92f4-cdd2fe7a0848",
+            "source_handle_id": "7e29137d-af96-402c-8108-9a00e087d18e",
+            "target_handle_id": "f8017ad7-14f2-4e6f-8456-a081db5ed7cd",
             "variant": "DEPLOYMENT",
             "prompt_deployment_id": deployment.id,
             "release_tag": "LATEST",
@@ -389,14 +389,14 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
             ],
         },
         "trigger": {
-            "id": "b7605c48-0937-4ecc-914e-0d1058130e65",
+            "id": "f8017ad7-14f2-4e6f-8456-a081db5ed7cd",
             "merge_behavior": "AWAIT_ANY",
         },
-        "ports": [{"id": "2f26c7e0-283d-4f04-b639-adebb56bc679", "name": "default", "type": "DEFAULT"}],
+        "ports": [{"id": "7e29137d-af96-402c-8108-9a00e087d18e", "name": "default", "type": "DEFAULT"}],
         "outputs": [
-            {"id": "180355a8-e67c-4ce6-9ac3-e5dbb75a6629", "name": "json", "type": "JSON", "value": None},
-            {"id": "4d38b850-79e3-4b85-9158-a41d0c535410", "name": "text", "type": "STRING", "value": None},
-            {"id": "0cf47d33-6d5f-466f-b826-e814f1d0348b", "name": "results", "type": "ARRAY", "value": None},
+            {"id": "62bbe13a-9571-4165-9463-22092a04e450", "name": "json", "type": "JSON", "value": None},
+            {"id": "b9d579e2-b3ee-4524-917f-7329fc09af59", "name": "text", "type": "STRING", "value": None},
+            {"id": "547b4a00-eb16-4df5-92f4-cdd2fe7a0848", "name": "results", "type": "ARRAY", "value": None},
         ],
     }
 
@@ -455,8 +455,8 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
                         {
                             "type": "NODE_OUTPUT",
                             "data": {
-                                "node_id": "56c74024-19a3-4c0d-a5f5-23e1e9f11b21",
-                                "output_id": "180355a8-e67c-4ce6-9ac3-e5dbb75a6629",
+                                "node_id": "0d1460e4-f207-4a69-bcea-7a3c7b325c02",
+                                "output_id": "62bbe13a-9571-4165-9463-22092a04e450",
                             },
                         }
                     ],
@@ -536,17 +536,17 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
     serialized_edges = workflow_raw_data["edges"]
     assert serialized_edges == [
         {
-            "id": "2c49ffa6-7b9a-49a0-a932-009534556480",
+            "id": "33e0220a-969a-4d38-86ac-0fe596ab2d88",
             "source_node_id": "32c7f398-277c-456b-9279-aa1f867fb637",
             "source_handle_id": "cc0f4028-1039-4063-971d-7dacbb01b379",
-            "target_node_id": "56c74024-19a3-4c0d-a5f5-23e1e9f11b21",
-            "target_handle_id": "b7605c48-0937-4ecc-914e-0d1058130e65",
+            "target_node_id": "0d1460e4-f207-4a69-bcea-7a3c7b325c02",
+            "target_handle_id": "f8017ad7-14f2-4e6f-8456-a081db5ed7cd",
             "type": "DEFAULT",
         },
         {
-            "id": "a46909ec-9572-43c6-a134-0bd7e2c09f99",
-            "source_node_id": "56c74024-19a3-4c0d-a5f5-23e1e9f11b21",
-            "source_handle_id": "2f26c7e0-283d-4f04-b639-adebb56bc679",
+            "id": "24f69a26-333c-4cf4-b12a-55979672923a",
+            "source_node_id": "0d1460e4-f207-4a69-bcea-7a3c7b325c02",
+            "source_handle_id": "7e29137d-af96-402c-8108-9a00e087d18e",
             "target_node_id": "51cbe21d-0232-4362-bc54-5bc283297aa6",
             "target_handle_id": "58427684-3848-498a-8299-c6b0fc70265d",
             "type": "DEFAULT",

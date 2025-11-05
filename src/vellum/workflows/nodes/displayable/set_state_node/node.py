@@ -27,8 +27,6 @@ class SetStateNode(BaseNode[StateType], Generic[StateType]):
         operations: Dictionary mapping state attribute names to values (descriptors or actual values)
     """
 
-    __legacy_id__ = True
-
     # Dictionary mapping state paths to values
     operations: ClassVar[Dict[str, Any]] = {}
 

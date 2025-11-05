@@ -78,7 +78,6 @@ class BaseAdornmentNode(
     wrapped node is stored in the `__wrapped_node__` attribute and is redefined as a single-node subworkflow.
     """
 
-    __legacy_id__ = True
     __wrapped_node__: Optional[Type["BaseNode"]] = None
     subworkflow: Type["BaseWorkflow"]
 
