@@ -82,7 +82,7 @@ def test_serialize_workflow():
                 },
             },
             {
-                "id": "9bab7f1b-3a4b-46bf-8b30-e3016ac38f51",
+                "id": "dd991fc6-5690-496b-b63e-b1a1219f3682",
                 "key": "weights",
                 "value": {
                     "rules": [
@@ -95,7 +95,7 @@ def test_serialize_workflow():
                 },
             },
             {
-                "id": "9bab7f1b-3a4b-46bf-8b30-e3016ac38f51",
+                "id": "52f6c3ab-cd96-4ca7-bfb1-7554c431b318",
                 "key": "limit",
                 "value": {
                     "rules": [{"type": "CONSTANT_VALUE", "data": {"type": "JSON", "value": None}}],
@@ -206,7 +206,7 @@ def test_serialize_workflow():
                     "rules": [
                         {
                             "type": "INPUT_VARIABLE",
-                            "data": {"input_variable_id": "f374640e-a5c0-470e-ac71-c36c2b198c00"},
+                            "data": {"input_variable_id": "cd081063-ab26-4ec7-99b3-af7e035a16e3"},
                         }
                     ],
                     "combinator": "OR",
@@ -216,14 +216,14 @@ def test_serialize_workflow():
         "data": {
             "label": "Simple Search Node",
             "results_output_id": "184c5214-29be-4029-8ece-2991972e0822",
-            "text_output_id": "3f3bd066-ce73-46ee-84f1-d8ece69ecd8c",
+            "text_output_id": "9bab7f1b-3a4b-46bf-8b30-e3016ac38f51",
             "error_output_id": None,
             "source_handle_id": "928c79f2-bc07-43ee-9420-380a3bd36fb8",
             "target_handle_id": "85db938d-9a85-4f08-8bbf-b795db2c40d5",
             "query_node_input_id": "1dbfd1d9-8e8e-47b6-bb65-c578385ef978",
             "document_index_node_input_id": "8f197069-4729-4db3-811c-9a522685dfba",
-            "weights_node_input_id": "9bab7f1b-3a4b-46bf-8b30-e3016ac38f51",
-            "limit_node_input_id": "9bab7f1b-3a4b-46bf-8b30-e3016ac38f51",
+            "weights_node_input_id": "dd991fc6-5690-496b-b63e-b1a1219f3682",
+            "limit_node_input_id": "52f6c3ab-cd96-4ca7-bfb1-7554c431b318",
             "separator_node_input_id": "e1822f91-ca9c-46c9-8dcd-cce83fe331ce",
             "result_merging_enabled_node_input_id": "3ee2bc2a-d72a-471a-8dd6-5e5028db8bfe",
             "external_id_filters_node_input_id": "5c766934-13f7-4a0f-a751-21e25fd2ca30",
@@ -267,7 +267,7 @@ def test_serialize_workflow():
                             "type": "NODE_OUTPUT",
                             "data": {
                                 "node_id": "89c8bee0-8015-4d73-9112-e436ab086567",
-                                "output_id": "3f3bd066-ce73-46ee-84f1-d8ece69ecd8c",
+                                "output_id": "9bab7f1b-3a4b-46bf-8b30-e3016ac38f51",
                             },
                         }
                     ],
@@ -287,7 +287,7 @@ def test_serialize_workflow():
     serialized_edges = workflow_raw_data["edges"]
     assert serialized_edges == [
         {
-            "id": "06533904-4897-4a7a-aa8d-50419b3d33ae",
+            "id": "16500e66-1e19-4ee3-a197-baf9c2926ae4",
             "source_node_id": "06671b25-5c6b-4675-8c74-6c396a608728",
             "source_handle_id": "df80b4aa-2ba1-49a2-8375-fb1f78eee31f",
             "target_node_id": "89c8bee0-8015-4d73-9112-e436ab086567",
