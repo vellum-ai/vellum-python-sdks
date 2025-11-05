@@ -39,7 +39,7 @@ def test_serialize_workflow():
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
     tool_calling_node = workflow_raw_data["nodes"][1]
     assert tool_calling_node == {
-        "id": "21f29cac-da87-495f-bba1-093d423f4e46",
+        "id": "5702a9fb-7329-4652-a5d3-01f87632aa32",
         "label": "Get Current Weather Node",
         "type": "GENERIC",
         "display_data": {
@@ -57,12 +57,12 @@ def test_serialize_workflow():
             "name": "GetCurrentWeatherNode",
             "module": ["tests", "workflows", "basic_tool_calling_node_inline_workflow", "workflow"],
         },
-        "trigger": {"id": "2414743b-b1dd-4552-8abf-9b7481df9762", "merge_behavior": "AWAIT_ATTRIBUTES"},
-        "ports": [{"id": "3cd6d78c-9dad-42aa-ad38-31f67057c379", "name": "default", "type": "DEFAULT"}],
+        "trigger": {"id": "2e5bd6ea-c3b1-484f-bd51-72affc0446b3", "merge_behavior": "AWAIT_ATTRIBUTES"},
+        "ports": [{"id": "4a409117-9d9e-4c3c-a309-d1f3a2f984ff", "name": "default", "type": "DEFAULT"}],
         "adornments": None,
         "attributes": [
             {
-                "id": "44420e39-966f-4c59-bdf8-6365a61c5d2a",
+                "id": "e175bdd6-8794-4072-bc25-d3601c5a1cd2",
                 "name": "ml_model",
                 "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "gpt-4o-mini"}},
             },
@@ -114,7 +114,7 @@ def test_serialize_workflow():
                                                 "block_type": "VARIABLE",
                                                 "state": None,
                                                 "cache_config": None,
-                                                "input_variable": "8eb8b551-9b48-43b3-861f-52adb5c585a8",
+                                                "input_variable": "0265b353-d345-44c3-902d-cc65a80b85c5",
                                             }
                                         ],
                                     }
@@ -401,7 +401,7 @@ def test_serialize_workflow():
                     "type": "DICTIONARY_REFERENCE",
                     "entries": [
                         {
-                            "id": "8eb8b551-9b48-43b3-861f-52adb5c585a8",
+                            "id": "0265b353-d345-44c3-902d-cc65a80b85c5",
                             "key": "question",
                             "value": {
                                 "type": "WORKFLOW_INPUT",
@@ -444,7 +444,7 @@ def test_serialize_workflow():
             },
         ],
         "outputs": [
-            {"id": "e62bc785-a914-4066-b79e-8c89a5d0ec6c", "name": "text", "type": "STRING", "value": None},
+            {"id": "8bb610bb-85c4-404a-a854-e08c810310e1", "name": "text", "type": "STRING", "value": None},
             {
                 "id": "0de13dac-1d38-493a-b1a6-d78aa2e9483d",
                 "name": "chat_history",
