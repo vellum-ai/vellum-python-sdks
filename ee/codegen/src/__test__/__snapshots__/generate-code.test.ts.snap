@@ -105,8 +105,7 @@ class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
 `;
 
 exports[`generateCode > should generate code for %1 linear-integration-trigger.ts > triggers/linear_comment_event_trigger.py 1`] = `
-"from vellum.workflows.constants import VellumIntegrationProviderType
-from vellum.workflows.triggers import IntegrationTrigger
+"from vellum.workflows.triggers import IntegrationTrigger
 
 
 class LinearCommentEventTrigger(IntegrationTrigger):
@@ -116,7 +115,7 @@ class LinearCommentEventTrigger(IntegrationTrigger):
     url: str
 
     class Config(IntegrationTrigger.Config):
-        provider = VellumIntegrationProviderType.COMPOSIO
+        provider = "COMPOSIO"
         integration_name = "LINEAR"
         slug = "LINEAR_COMMENT_EVENT_TRIGGER"
         setupAttributes = {"team_id": "dfasadf"}
@@ -197,8 +196,7 @@ class Workflow(BaseWorkflow):
 `;
 
 exports[`generateCode > should generate code for %1 slack-message-trigger.ts > triggers/slack_message_trigger.py 1`] = `
-"from vellum.workflows.constants import VellumIntegrationProviderType
-from vellum.workflows.triggers import IntegrationTrigger
+"from vellum.workflows.triggers import IntegrationTrigger
 
 
 class SlackMessageTrigger(IntegrationTrigger):
@@ -207,7 +205,7 @@ class SlackMessageTrigger(IntegrationTrigger):
     timestamp: str
 
     class Config(IntegrationTrigger.Config):
-        provider = VellumIntegrationProviderType.COMPOSIO
+        provider = "COMPOSIO"
         integration_name = "slack"
         slug = "SLACK_MESSAGE_TRIGGER"
 
