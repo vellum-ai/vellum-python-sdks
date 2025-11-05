@@ -18,8 +18,8 @@ class SetStateNodeDisplay(BaseNodeDisplay[SetStateNode]):
     node_id = UUID("set-state-node-id")
     attribute_ids_by_name = {"operations": UUID("operations-attribute-id")}
     output_display = {
-        SetStateNode.Outputs.result: NodeOutputDisplay(
-            id=UUID("result-output-id"), name="result"
+        SetStateNode.Outputs.results: NodeOutputDisplay(
+            id=UUID("result-output-id"), name="results"
         )
     }
     port_displays = {
@@ -49,6 +49,6 @@ class SetStateNode(BaseSetStateNode[State]):
     }
 
     class Outputs(BaseSetStateNode.Outputs):
-        result: Any
+        results: Any
 "
 `;

@@ -2031,7 +2031,7 @@ export function setStateNodeFactory({
     outputs: nodeOutputs ?? [
       {
         id: "result-output-id",
-        name: "result",
+        name: "results",
         type: "JSON",
       },
     ],
