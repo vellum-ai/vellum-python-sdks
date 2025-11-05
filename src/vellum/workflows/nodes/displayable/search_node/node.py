@@ -1,11 +1,11 @@
 import json
 from typing import ClassVar
 
+from vellum.utils.json_encoder import VellumJsonEncoder
 from vellum.workflows.constants import undefined
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.bases import BaseSearchNode as BaseSearchNode
-from vellum.workflows.state.encoder import DefaultStateEncoder
 from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.generics import StateType
 
@@ -45,7 +45,7 @@ class SearchNode(BaseSearchNode[StateType]):
             )
 
         if not isinstance(self.query, str):
-            self.query = json.dumps(self.query, cls=DefaultStateEncoder)
+            self.query = json.dumps(self.query, cls=VellumJsonEncoder)
 
         results = self._perform_search().results
         text = self.chunk_separator.join([r.text for r in results])
