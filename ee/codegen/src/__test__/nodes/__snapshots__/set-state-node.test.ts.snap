@@ -32,9 +32,7 @@ class SetStateNodeDisplay(BaseNodeDisplay[SetStateNode]):
 `;
 
 exports[`SetStateNode > basic > getNodeFile 1`] = `
-"from typing import Any
-
-from vellum.workflows.nodes.displayable.set_state_node import (
+"from vellum.workflows.nodes.displayable.set_state_node import (
     SetStateNode as BaseSetStateNode,
 )
 
@@ -47,8 +45,5 @@ class SetStateNode(BaseSetStateNode[State]):
         "chat_history": State.chat_history.concat(MyCustomNode.Outputs.chat_history),
         "counter": State.counter + 1,
     }
-
-    class Outputs(BaseSetStateNode.Outputs):
-        results: Any
 "
 `;
