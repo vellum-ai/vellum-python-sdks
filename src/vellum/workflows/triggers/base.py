@@ -52,33 +52,32 @@ def _convert_to_relative_module_path(absolute_module_path: str, workflow_root: s
         return "." + remaining_path
 
 
-def _get_trigger_id_from_metadata(trigger_module: str, trigger_class_name: str) -> Optional[UUID]:
+def _get_trigger_id_from_metadata(trigger_class: Type["BaseTrigger"]) -> Optional[UUID]:
     """
-    Get the trigger ID from metadata.json for a given trigger module and class.
+    Get the trigger ID from metadata.json for a given trigger class.
 
     Args:
-        trigger_module: The trigger's module path (e.g., "workflow_id.triggers.scheduled")
-        trigger_class_name: The trigger's class name (e.g., "ScheduleTrigger")
+        trigger_class: The trigger class to look up
 
     Returns:
         The UUID from metadata.json, or None if not found
     """
-    workflow_root = _find_workflow_root_with_metadata(trigger_module)
+    workflow_root = _find_workflow_root_with_metadata(trigger_class.__module__)
     if not workflow_root:
         return None
 
-    trigger_path_to_id_mapping = _get_trigger_path_to_id_mapping(trigger_module)
+    trigger_path_to_id_mapping = _get_trigger_path_to_id_mapping(trigger_class.__module__)
     if not trigger_path_to_id_mapping:
         return None
 
     # Convert module path to relative path and append class name
-    # e.g., "workflow_id.triggers.scheduled" + "ScheduleTrigger" -> ".triggers.scheduled.ScheduleTrigger"
-    relative_module_path = _convert_to_relative_module_path(trigger_module, workflow_root)
+    # e.g., "root_module.triggers.scheduled" + "ScheduleTrigger" -> ".triggers.scheduled.ScheduleTrigger"
+    relative_module_path = _convert_to_relative_module_path(trigger_class.__module__, workflow_root)
     if not relative_module_path:
         return None
 
     # Append class name to get full trigger path
-    relative_trigger_path = f"{relative_module_path}.{trigger_class_name}"
+    relative_trigger_path = f"{relative_module_path}.{trigger_class.__qualname__}"
     return trigger_path_to_id_mapping.get(relative_trigger_path)
 
 
@@ -169,7 +168,7 @@ class BaseTriggerMeta(ABCMeta):
         trigger_class.__id__ = uuid4_from_hash(f"{trigger_class.__module__}.{trigger_class.__qualname__}")
 
         # Try to override with ID from metadata.json if available
-        metadata_id = _get_trigger_id_from_metadata(trigger_class.__module__, trigger_class.__qualname__)
+        metadata_id = _get_trigger_id_from_metadata(trigger_class)
         if metadata_id:
             trigger_class.__id__ = metadata_id
 
