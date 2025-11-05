@@ -12,12 +12,11 @@ def test_execute_try_node_wrapped_node_by_id():
     # GIVEN a workflow with a Try Node wrapped node
     workflow = TryNodeExecuteWrappedNodeWorkflow()
 
-    # AND we get the inner wrapped node's ID and class
+    # AND we get the inner wrapped node's ID
     inner_node_id = WrappedNode.__wrapped_node__.__id__
-    inner_node_class = WrappedNode.__wrapped_node__
     assert isinstance(inner_node_id, UUID)
 
-    events = list(workflow.run_node(inner_node_class))
+    events = list(workflow.run_node(inner_node_id))
     final_event = events[-1]
 
     assert final_event.name == "node.execution.fulfilled"
