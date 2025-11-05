@@ -24,8 +24,8 @@ def test_set_state_node_with_single_value():
     node = SetMessage(state=state)
     outputs = node.run()
 
-    # THEN the result should be the set value
-    assert outputs.result == {"message": "Hello, World!"}
+    # THEN the results should be the set value
+    assert outputs.results == {"message": "Hello, World!"}
 
     # AND the state should be updated
     assert state.message == "Hello, World!"
@@ -57,8 +57,8 @@ def test_set_state_node_with_multiple_values():
     assert state.counter == 1
     assert state.total_tokens == 15
 
-    # AND the result should contain all updates
-    assert outputs.result == {"counter": 1, "total_tokens": 15}
+    # AND the results should contain all updates
+    assert outputs.results == {"counter": 1, "total_tokens": 15}
 
 
 def test_set_state_node_with_chat_history_and_concat():
@@ -87,8 +87,8 @@ def test_set_state_node_with_chat_history_and_concat():
     assert state.chat_history[1].role == "USER"
     assert state.chat_history[1].text == "Hello"
 
-    # AND the result should contain the updated chat history
-    assert outputs.result == {
+    # AND the results should contain the updated chat history
+    assert outputs.results == {
         "chat_history": [ChatMessage(role="ASSISTANT", text="Hi there"), ChatMessage(role="USER", text="Hello")]
     }
 
@@ -109,8 +109,8 @@ def test_set_state_node_with_empty_dict():
     node = EmptySetState(state=state)
     outputs = node.run()
 
-    # THEN the result should be an empty dict
-    assert outputs.result == {}
+    # THEN the results should be an empty dict
+    assert outputs.results == {}
 
     # AND state should be unchanged
     assert state.counter == 0
@@ -137,8 +137,8 @@ def test_set_state_node_modifies_existing_values():
     assert state.counter == 20
     assert state.message == "new"
 
-    # AND result should contain the new values with the correct structure
-    assert outputs.result == {"counter": 20, "message": "new"}
+    # AND results should contain the new values with the correct structure
+    assert outputs.results == {"counter": 20, "message": "new"}
 
 
 def test_set_state_not_existing_value():
@@ -188,7 +188,7 @@ def test_set_state_node_atomic_order_independent_resolution():
 
     assert state.a == 2
     assert state.b == 2
-    assert outputs.result == {"a": 2, "b": 2}
+    assert outputs.results == {"a": 2, "b": 2}
 
 
 def test_set_state_node_no_partial_update_on_error():

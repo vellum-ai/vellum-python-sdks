@@ -39,7 +39,7 @@ class SetStateNode(BaseNode[StateType], Generic[StateType]):
         result: Dict[str, Any] - Dictionary of all state updates
         """
 
-        result: Dict[str, Any]
+        results: Dict[str, Any]
 
     def run(self) -> Outputs:
         """
@@ -70,4 +70,4 @@ class SetStateNode(BaseNode[StateType], Generic[StateType]):
             for path, resolved_value in resolved_updates.items():
                 setattr(self.state, path, resolved_value)
 
-        return self.Outputs(result=resolved_updates)
+        return self.Outputs(results=resolved_updates)
