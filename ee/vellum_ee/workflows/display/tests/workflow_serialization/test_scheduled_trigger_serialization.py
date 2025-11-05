@@ -32,27 +32,37 @@ def mock_metadata_json(trigger_class_name: str, trigger_id: UUID) -> Iterator[Tu
     with tempfile.TemporaryDirectory() as tmpdir:
         # Create metadata.json with trigger mapping
         metadata_path = os.path.join(tmpdir, "metadata.json")
-        trigger_module_path = f"{__name__}.{trigger_class_name}"
+
+        test_module_parts = __name__.split(".")
+        workflow_root_module = ".".join(test_module_parts[:-1])  # Remove last part
+
+        relative_module_path = "." + test_module_parts[-1]
 
         with open(metadata_path, "w") as f:
             json.dump(
                 {
                     "trigger_path_to_id_mapping": {
-                        trigger_module_path: str(trigger_id),
+                        # Use relative module path (just the module, not the class name)
+                        relative_module_path: str(trigger_id),
                     }
                 },
                 f,
             )
 
-        # Mock the workflow root finder to return our temp directory
-        # Mock os.path.exists to return True for our metadata.json
-        with patch("vellum.workflows.triggers.base._find_workflow_root_with_metadata", return_value=tmpdir):
-            with patch("vellum.workflows.triggers.base.os.path.exists", return_value=True):
-                with patch("vellum.workflows.triggers.base.virtual_open", open):
-                    # Clear the LRU cache to ensure fresh read
-                    _get_trigger_path_to_id_mapping.cache_clear()
+        # Create a custom mock for virtual_open that returns our tmpdir file
+        def mock_virtual_open(path):
+            # Regardless of the path requested, return our test metadata.json
+            return open(metadata_path)
 
-                    yield trigger_module_path, trigger_id
+        # Mock the workflow root finder to return the parent module path
+        with patch(
+            "vellum.workflows.triggers.base._find_workflow_root_with_metadata", return_value=workflow_root_module
+        ):
+            with patch("vellum.workflows.triggers.base.virtual_open", side_effect=mock_virtual_open):
+                # Clear the LRU cache to ensure fresh read
+                _get_trigger_path_to_id_mapping.cache_clear()
+
+                yield __name__, trigger_id
 
 
 def test_scheduled_trigger_serialization_with_metadata_json():
@@ -62,13 +72,11 @@ def test_scheduled_trigger_serialization_with_metadata_json():
     expected_trigger_id = UUID("12345678-1234-1234-1234-123456789abc")
 
     # AND we have metadata.json set up with the trigger mapping
-    # Note: Use the full qualified name including the test function name and <locals>
     with mock_metadata_json(
         "test_scheduled_trigger_serialization_with_metadata_json.<locals>.DailyScheduleTrigger",
         expected_trigger_id,
     ):
-        # Define the trigger class AFTER setting up mocks
-        # This ensures the metaclass reads from our mocked metadata.json
+
         class DailyScheduleTrigger(ScheduleTrigger):
             class Config:
                 cron = "0 9 * * *"  # Every day at 9am

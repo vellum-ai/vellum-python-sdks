@@ -49,8 +49,15 @@ def _find_workflow_root_with_metadata(trigger_module: str) -> Optional[str]:
         module_dir = potential_root.replace(".", os.path.sep)
         metadata_path = os.path.join(module_dir, "metadata.json")
 
-        if os.path.exists(metadata_path):
-            return potential_root
+        # Try to open the file using virtual_open to support both regular and virtual filesystems
+        # virtual_open checks BaseWorkflowFinder instances before falling back to regular open()
+        try:
+            file_handle = virtual_open(metadata_path)
+            if file_handle is not None:
+                file_handle.close()
+                return potential_root
+        except (FileNotFoundError, OSError):
+            pass
 
     return None
 
@@ -78,10 +85,6 @@ def _get_trigger_path_to_id_mapping(module_path: str) -> Dict[str, UUID]:
         # Convert module path to file path
         module_dir = workflow_root.replace(".", os.path.sep)
         metadata_path = os.path.join(module_dir, "metadata.json")
-
-        # Check if metadata.json exists
-        if not os.path.exists(metadata_path):
-            return {}
 
         # Use virtual_open to support both regular and virtual environments
         with virtual_open(metadata_path) as f:
@@ -114,15 +117,20 @@ class BaseTriggerMeta(ABCMeta):
         # Set default ID based on module and class name
         trigger_class.__id__ = uuid4_from_hash(f"{trigger_class.__module__}.{trigger_class.__qualname__}")
 
-        # Try to override with ID from metadata.json if available
-        # This approach is similar to how BaseNodeDisplay automatically sets node IDs
         trigger_path_to_id_mapping = _get_trigger_path_to_id_mapping(trigger_class.__module__)
-        trigger_path = f"{trigger_class.__module__}.{trigger_class.__qualname__}"
 
-        if trigger_path in trigger_path_to_id_mapping:
-            # Override the default ID with the one from metadata.json
-            trigger_class.__id__ = trigger_path_to_id_mapping[trigger_path]
+        # Convert absolute module path to relative path for lookup
+        workflow_root = _find_workflow_root_with_metadata(trigger_class.__module__)
+        if workflow_root and trigger_class.__module__.startswith(workflow_root):
+            remaining_path = trigger_class.__module__[len(workflow_root) :]
+            if remaining_path.startswith("."):
+                relative_trigger_module_path = remaining_path
+            else:
+                relative_trigger_module_path = "." + remaining_path
 
+            if relative_trigger_module_path in trigger_path_to_id_mapping:
+                # Override the default ID with the one from metadata.json
+                trigger_class.__id__ = trigger_path_to_id_mapping[relative_trigger_module_path]
         return trigger_class
 
     """
@@ -308,6 +316,9 @@ class BaseTrigger(ABC, metaclass=BaseTriggerMeta):
                      Subclasses may use these to populate trigger attributes.
         """
         self._event_data = kwargs
+
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
     @classmethod
     def attribute_references(cls) -> Dict[str, "TriggerAttributeReference[Any]"]:
