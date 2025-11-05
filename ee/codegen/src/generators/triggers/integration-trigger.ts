@@ -40,7 +40,7 @@ export class IntegrationTrigger extends BaseTrigger<IntegrationTriggerType> {
 
     configFields.push(
       python.field({
-        name: "type",
+        name: "provider",
         initializer: python.TypeInstantiation.str(this.trigger.execConfig.type),
       })
     );

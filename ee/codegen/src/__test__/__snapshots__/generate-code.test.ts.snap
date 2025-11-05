@@ -115,7 +115,7 @@ class LinearCommentEventTrigger(IntegrationTrigger):
     url: str
 
     class Config(IntegrationTrigger.Config):
-        type = "COMPOSIO"
+        provider = "COMPOSIO"
         integration_name = "LINEAR"
         slug = "LINEAR_COMMENT_EVENT_TRIGGER"
         setupAttributes = {"team_id": "dfasadf"}
@@ -205,7 +205,7 @@ class SlackMessageTrigger(IntegrationTrigger):
     timestamp: str
 
     class Config(IntegrationTrigger.Config):
-        type = "COMPOSIO"
+        provider = "COMPOSIO"
         integration_name = "slack"
         slug = "SLACK_MESSAGE_TRIGGER"
 
