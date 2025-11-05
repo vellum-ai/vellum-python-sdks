@@ -699,7 +699,7 @@ describe("WorkflowProjectGenerator", () => {
 
       const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
       expect(metadata.trigger_path_to_id_mapping).toEqual({
-        "code.triggers.scheduled": "trigger-1",
+        "code.triggers.scheduled.ScheduleTrigger": "trigger-1",
       });
     });
   });

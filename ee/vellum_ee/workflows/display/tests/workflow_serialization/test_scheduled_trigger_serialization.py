@@ -37,13 +37,15 @@ def mock_metadata_json(trigger_class_name: str, trigger_id: UUID) -> Iterator[Tu
         workflow_root_module = ".".join(test_module_parts[:-1])  # Remove last part
 
         relative_module_path = "." + test_module_parts[-1]
+        # Include the full trigger path with class name to match TypeScript codegen
+        relative_trigger_path = f"{relative_module_path}.{trigger_class_name}"
 
         with open(metadata_path, "w") as f:
             json.dump(
                 {
                     "trigger_path_to_id_mapping": {
-                        # Use relative module path (just the module, not the class name)
-                        relative_module_path: str(trigger_id),
+                        # Use full trigger path including class name
+                        relative_trigger_path: str(trigger_id),
                     }
                 },
                 f,

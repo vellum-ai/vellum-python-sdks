@@ -1110,7 +1110,10 @@ ${errors.slice(0, 3).map((err) => {
       Array.from(
         this.workflowContext.globalTriggerContextsByTriggerId.entries()
       ).map(([triggerId, triggerContext]) => [
-        triggerContext.triggerModulePath.join("."),
+        [
+          ...triggerContext.triggerModulePath,
+          triggerContext.triggerClassName,
+        ].join("."),
         triggerId,
       ])
     );
