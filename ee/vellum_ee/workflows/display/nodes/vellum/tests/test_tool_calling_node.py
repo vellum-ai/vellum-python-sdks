@@ -300,8 +300,8 @@ def test_serialize_tool_router_node():
                 "id": "cd208919-c66b-451b-a739-bcf7d3451dea",
                 "name": "prompt_outputs",
                 "value": {
-                    "node_id": "19e664fc-3b57-48d2-b47a-b143b475406a",
-                    "node_output_id": "c75146e1-ea10-4f58-90fd-887322725496",
+                    "node_id": "c75146e1-ea10-4f58-90fd-887322725496",
+                    "node_output_id": "baef5c93-612a-453d-b739-223041ef0429",
                     "type": "NODE_OUTPUT",
                 },
             }
@@ -330,8 +330,8 @@ def test_serialize_tool_router_node():
                             "operator": "<",
                             "rhs": {
                                 "lhs": {
-                                    "node_id": "19e664fc-3b57-48d2-b47a-b143b475406a",
-                                    "node_output_id": "c75146e1-ea10-4f58-90fd-887322725496",
+                                    "node_id": "c75146e1-ea10-4f58-90fd-887322725496",
+                                    "node_output_id": "baef5c93-612a-453d-b739-223041ef0429",
                                     "type": "NODE_OUTPUT",
                                 },
                                 "operator": "length",
@@ -344,8 +344,8 @@ def test_serialize_tool_router_node():
                             "lhs": {
                                 "lhs": {
                                     "lhs": {
-                                        "node_id": "19e664fc-3b57-48d2-b47a-b143b475406a",
-                                        "node_output_id": "c75146e1-ea10-4f58-90fd-887322725496",
+                                        "node_id": "c75146e1-ea10-4f58-90fd-887322725496",
+                                        "node_output_id": "baef5c93-612a-453d-b739-223041ef0429",
                                         "type": "NODE_OUTPUT",
                                     },
                                     "operator": "accessField",
@@ -371,8 +371,8 @@ def test_serialize_tool_router_node():
                             "lhs": {
                                 "lhs": {
                                     "lhs": {
-                                        "node_id": "19e664fc-3b57-48d2-b47a-b143b475406a",
-                                        "node_output_id": "c75146e1-ea10-4f58-90fd-887322725496",
+                                        "node_id": "c75146e1-ea10-4f58-90fd-887322725496",
+                                        "node_output_id": "baef5c93-612a-453d-b739-223041ef0429",
                                         "type": "NODE_OUTPUT",
                                     },
                                     "operator": "accessField",
