@@ -21,11 +21,14 @@ from vellum.client.types.prompt_parameters import PromptParameters
 from vellum.client.types.prompt_request_chat_history_input import PromptRequestChatHistoryInput
 from vellum.client.types.prompt_request_json_input import PromptRequestJsonInput
 from vellum.client.types.prompt_request_string_input import PromptRequestStringInput
+from vellum.client.types.rejected_execute_prompt_event import RejectedExecutePromptEvent
 from vellum.client.types.rich_text_prompt_block import RichTextPromptBlock
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
 from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
+from vellum.client.types.vellum_error import VellumError
 from vellum.client.types.vellum_variable import VellumVariable
+from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.nodes.displayable.tool_calling_node import ToolCallingNode
 from vellum.workflows.nodes.displayable.tool_calling_node.utils import ToolPromptNode
 from vellum.workflows.workflows.base import BaseWorkflow
@@ -730,3 +733,40 @@ def test_tool_calling_node__tool_error_includes_stacktrace(vellum_adhoc_prompt_c
     assert rejected_event.body.stacktrace is not None
     assert "NodeException" in rejected_event.body.stacktrace
     assert "Error executing function 'error_tool': This tool always fails" in rejected_event.body.stacktrace
+
+
+def test_tool_calling_node__prompt_node_invalid_inputs_error_propagation(vellum_adhoc_prompt_client, vellum_client):
+    """
+    Test that INVALID_INPUTS error code from the prompt node propagates to the tool calling node level.
+    """
+
+    def generate_prompt_events(*_args, **_kwargs) -> Iterator[ExecutePromptEvent]:
+        execution_id = str(uuid4())
+
+        events: List[ExecutePromptEvent] = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            RejectedExecutePromptEvent(
+                execution_id=execution_id,
+                error=VellumError(
+                    code="INVALID_INPUTS",
+                    message="Invalid inputs provided to prompt node",
+                ),
+            ),
+        ]
+        yield from events
+
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
+
+    # GIVEN a basic tool calling node workflow
+    workflow = BasicToolCallingNodeWorkflow()
+
+    # WHEN the workflow is run with inputs that cause the prompt node to reject with INVALID_INPUTS
+    events = list(workflow.stream(Inputs(query="test query"), event_filter=all_workflow_event_filter))
+
+    # THEN we should find a node rejection event
+    node_rejected_events = [e for e in events if e.name == "node.execution.rejected"]
+    assert len(node_rejected_events) > 0
+
+    # AND the rejected event should have INVALID_INPUTS error code (not INTERNAL_ERROR)
+    rejected_event = node_rejected_events[-1]
+    assert rejected_event.body.error.code == WorkflowErrorCode.INVALID_INPUTS

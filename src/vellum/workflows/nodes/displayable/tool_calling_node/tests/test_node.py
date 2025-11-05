@@ -482,9 +482,9 @@ def test_tool_node_error_message_includes_function_name():
     assert "Something went wrong" in e.message
 
 
-def test_tool_calling_node_400_error_returns_internal_error(vellum_adhoc_prompt_client):
+def test_tool_calling_node_400_error_returns_invalid_inputs(vellum_adhoc_prompt_client):
     """
-    Test that ToolCallingNode returns INTERNAL_ERROR when the underlying prompt node returns a 400 error.
+    Test that ToolCallingNode preserves INVALID_INPUTS error code when the underlying prompt node returns a 400 error.
     """
 
     # GIVEN a ToolCallingNode with minimal configuration
@@ -510,10 +510,10 @@ def test_tool_calling_node_400_error_returns_internal_error(vellum_adhoc_prompt_
     with pytest.raises(NodeException) as exc_info:
         list(node.run())
 
-    # AND the error code should be INTERNAL_ERROR (not INVALID_INPUTS)
+    # THEN the error code should be INVALID_INPUTS (preserved from the prompt node)
     e = exc_info.value
-    assert e.code == WorkflowErrorCode.INTERNAL_ERROR
-    assert e.message == "Internal server error"
+    assert e.code == WorkflowErrorCode.INVALID_INPUTS
+    assert e.message == "Invalid request parameters"
 
 
 def test_vellum_integration_node_500_error_feeds_back_to_model(vellum_adhoc_prompt_client, vellum_client):

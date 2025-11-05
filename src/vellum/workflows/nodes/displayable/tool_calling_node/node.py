@@ -135,17 +135,6 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
                 exception = NodeException.of(event.error)
 
         if exception:
-            # In the case of the Prompt Node receiving invalid inputs or schemas, that is a bug with the
-            # internals of the Agent Node. In the future, we should distinguish further by also checking
-            # that this exception came from the Tool Calling Node's prompt node instead of anything
-            # internal to a user defined tool.
-            if exception.code == WorkflowErrorCode.INVALID_INPUTS:
-                raise NodeException(
-                    message="Internal server error",
-                    code=WorkflowErrorCode.INTERNAL_ERROR,
-                    raw_data=exception.raw_data,
-                    stacktrace=exception.stacktrace,
-                ) from exception
             raise exception
 
         if outputs is None:
