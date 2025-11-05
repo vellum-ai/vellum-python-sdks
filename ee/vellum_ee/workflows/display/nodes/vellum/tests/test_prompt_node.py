@@ -193,13 +193,13 @@ def test_serialize_node__prompt_inputs__state_reference():
         attribute for attribute in my_prompt_node["attributes"] if attribute["name"] == "prompt_inputs"
     )
     assert prompt_inputs_attribute == {
-        "id": "3b6e1363-e41b-458e-ad28-95a61fdedac1",
+        "id": "768704cc-812b-4a06-8348-ed46160a48f9",
         "name": "prompt_inputs",
         "value": {
             "type": "DICTIONARY_REFERENCE",
             "entries": [
                 {
-                    "id": "52559b9e-4e8e-438a-8246-cfa30c98d5d1",
+                    "id": "4a601d66-dc7d-4e48-a933-52a13fdc8d80",
                     "key": "foo",
                     "value": {
                         "type": "WORKFLOW_STATE",
@@ -207,7 +207,7 @@ def test_serialize_node__prompt_inputs__state_reference():
                     },
                 },
                 {
-                    "id": "3750feb9-5d5c-4150-b62d-a9924f466888",
+                    "id": "341f8329-5d5f-417b-a20d-e88234a17c49",
                     "key": "bar",
                     "value": {
                         "type": "CONSTANT_VALUE",
@@ -277,7 +277,7 @@ def test_serialize_node__port_groups():
     ports = my_prompt_node["ports"]
     assert len(ports) == 2
     assert ports[0]["id"] == "4a1a1b86-f9f5-4364-a9cd-4929d4202e1d"
-    assert ports[1]["id"] == "71f2d2b3-194f-4492-bc1c-a5ca1f60fb0a"
+    assert ports[1]["id"] == "54e7594b-8ca3-4c45-9dd7-e0b973d7800f"
     assert ports[0]["name"] == "apple"
     assert ports[1]["name"] == "banana"
 

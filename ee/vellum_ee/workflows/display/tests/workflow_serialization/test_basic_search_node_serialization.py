@@ -57,11 +57,11 @@ def test_serialize_workflow():
 
     search_node = workflow_raw_data["nodes"][1]
     assert search_node == {
-        "id": "ab3a1413-c7b5-4cb0-a2d4-f5ab7d1d65b4",
+        "id": "89c8bee0-8015-4d73-9112-e436ab086567",
         "type": "SEARCH",
         "inputs": [
             {
-                "id": "89c8bee0-8015-4d73-9112-e436ab086567",
+                "id": "1dbfd1d9-8e8e-47b6-bb65-c578385ef978",
                 "key": "query",
                 "value": {
                     "rules": [
@@ -82,7 +82,7 @@ def test_serialize_workflow():
                 },
             },
             {
-                "id": "52f6c3ab-cd96-4ca7-bfb1-7554c431b318",
+                "id": "9bab7f1b-3a4b-46bf-8b30-e3016ac38f51",
                 "key": "weights",
                 "value": {
                     "rules": [
@@ -95,7 +95,7 @@ def test_serialize_workflow():
                 },
             },
             {
-                "id": "52f6c3ab-cd96-4ca7-bfb1-7554c431b318",
+                "id": "9bab7f1b-3a4b-46bf-8b30-e3016ac38f51",
                 "key": "limit",
                 "value": {
                     "rules": [{"type": "CONSTANT_VALUE", "data": {"type": "JSON", "value": None}}],
@@ -215,15 +215,15 @@ def test_serialize_workflow():
         ],
         "data": {
             "label": "Simple Search Node",
-            "results_output_id": "e27fa934-589a-48f7-92a9-dcc90710ec7b",
+            "results_output_id": "184c5214-29be-4029-8ece-2991972e0822",
             "text_output_id": "3f3bd066-ce73-46ee-84f1-d8ece69ecd8c",
             "error_output_id": None,
             "source_handle_id": "928c79f2-bc07-43ee-9420-380a3bd36fb8",
             "target_handle_id": "85db938d-9a85-4f08-8bbf-b795db2c40d5",
-            "query_node_input_id": "89c8bee0-8015-4d73-9112-e436ab086567",
+            "query_node_input_id": "1dbfd1d9-8e8e-47b6-bb65-c578385ef978",
             "document_index_node_input_id": "8f197069-4729-4db3-811c-9a522685dfba",
-            "weights_node_input_id": "52f6c3ab-cd96-4ca7-bfb1-7554c431b318",
-            "limit_node_input_id": "52f6c3ab-cd96-4ca7-bfb1-7554c431b318",
+            "weights_node_input_id": "9bab7f1b-3a4b-46bf-8b30-e3016ac38f51",
+            "limit_node_input_id": "9bab7f1b-3a4b-46bf-8b30-e3016ac38f51",
             "separator_node_input_id": "e1822f91-ca9c-46c9-8dcd-cce83fe331ce",
             "result_merging_enabled_node_input_id": "3ee2bc2a-d72a-471a-8dd6-5e5028db8bfe",
             "external_id_filters_node_input_id": "5c766934-13f7-4a0f-a751-21e25fd2ca30",
@@ -266,7 +266,7 @@ def test_serialize_workflow():
                         {
                             "type": "NODE_OUTPUT",
                             "data": {
-                                "node_id": "ab3a1413-c7b5-4cb0-a2d4-f5ab7d1d65b4",
+                                "node_id": "89c8bee0-8015-4d73-9112-e436ab086567",
                                 "output_id": "3f3bd066-ce73-46ee-84f1-d8ece69ecd8c",
                             },
                         }
@@ -290,13 +290,13 @@ def test_serialize_workflow():
             "id": "06533904-4897-4a7a-aa8d-50419b3d33ae",
             "source_node_id": "06671b25-5c6b-4675-8c74-6c396a608728",
             "source_handle_id": "df80b4aa-2ba1-49a2-8375-fb1f78eee31f",
-            "target_node_id": "ab3a1413-c7b5-4cb0-a2d4-f5ab7d1d65b4",
+            "target_node_id": "89c8bee0-8015-4d73-9112-e436ab086567",
             "target_handle_id": "85db938d-9a85-4f08-8bbf-b795db2c40d5",
             "type": "DEFAULT",
         },
         {
             "id": "cb918deb-f546-47b5-8b6b-db0d22a29fd1",
-            "source_node_id": "ab3a1413-c7b5-4cb0-a2d4-f5ab7d1d65b4",
+            "source_node_id": "89c8bee0-8015-4d73-9112-e436ab086567",
             "source_handle_id": "928c79f2-bc07-43ee-9420-380a3bd36fb8",
             "target_node_id": "4e466510-6756-403f-a182-56e5a2b85d94",
             "target_handle_id": "cd8c736f-1b77-493d-b857-d8feb5c03b15",
