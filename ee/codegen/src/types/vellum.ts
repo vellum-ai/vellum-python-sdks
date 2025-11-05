@@ -1083,7 +1083,6 @@ export type MCPServerFunctionArgs = {
   bearer_token_value?: string | null;
   api_key_header_key?: string | null;
   api_key_header_value?: string | null;
-  additional_headers?: Record<string, string> | null;
 };
 
 export type VellumIntegrationToolFunctionArgs = {
