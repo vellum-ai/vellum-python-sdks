@@ -400,7 +400,7 @@ def test_serialize_tool_router_node():
                 "name": "my_function",
                 "type": "IF",
             },
-            {"expression": None, "id": "4ecd916e-b5d0-407e-aab4-35551c76d02c", "name": "default", "type": "ELSE"},
+            {"expression": None, "id": "e344f6c9-a796-472d-b5dd-3fcdc016ebcc", "name": "default", "type": "ELSE"},
         ],
         "trigger": {"id": "73a96f44-c2dd-40cc-96f6-49b9f914b166", "merge_behavior": "AWAIT_ATTRIBUTES"},
         "type": "GENERIC",
