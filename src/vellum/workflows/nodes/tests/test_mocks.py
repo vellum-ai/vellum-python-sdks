@@ -54,7 +54,7 @@ def test_mocks__parse_from_app():
                     },
                     "then_outputs": [
                         {
-                            "output_id": "9e6dc5d3-8ea0-4346-8a2a-7cce5495755b",
+                            "output_id": "bbd955e8-b939-45f9-8617-f1405dddd2b3",
                             "value": {
                                 "id": "27006b2a-fa81-430c-a0b2-c66a9351fc68",
                                 "type": "CONSTANT_VALUE",
@@ -62,7 +62,7 @@ def test_mocks__parse_from_app():
                             },
                         },
                         {
-                            "output_id": "60305ffd-60b0-42aa-b54e-4fdae0f8c28a",
+                            "output_id": "e50bf6e9-417b-4c04-babb-94e7dccb9f2c",
                             "value": {
                                 "id": "4559c778-6e27-4cfe-a460-734ba62a5082",
                                 "type": "CONSTANT_VALUE",
