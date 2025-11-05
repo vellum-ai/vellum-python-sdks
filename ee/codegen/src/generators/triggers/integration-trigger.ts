@@ -40,8 +40,15 @@ export class IntegrationTrigger extends BaseTrigger<IntegrationTriggerType> {
 
     configFields.push(
       python.field({
-        name: "type",
-        initializer: python.TypeInstantiation.str(this.trigger.execConfig.type),
+        name: "provider",
+        initializer: python.reference({
+          name: "VellumIntegrationProviderType",
+          modulePath: [
+            ...this.workflowContext.sdkModulePathNames.WORKFLOWS_MODULE_PATH,
+            "constants",
+          ],
+          attribute: [this.trigger.execConfig.type.toUpperCase()],
+        }),
       })
     );
 
