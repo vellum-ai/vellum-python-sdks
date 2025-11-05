@@ -22,7 +22,10 @@ import { FunctionFile } from "src/generators/function-file";
 import { GenericNodeDisplayData } from "src/generators/generic-node-display-data";
 import { InitFile } from "src/generators/init-file";
 import { NodeOutputs } from "src/generators/node-outputs";
-import { BaseNode } from "src/generators/nodes/bases/base";
+import {
+  BaseNode,
+  findNodeDefinitionByBaseClassName,
+} from "src/generators/nodes/bases/base";
 import { AttributeType, NODE_ATTRIBUTES } from "src/generators/nodes/constants";
 import { PromptBlock } from "src/generators/prompt-block";
 import { PromptParameters } from "src/generators/prompt-parameters-request";
@@ -647,24 +650,23 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
   }
 
   private hasRedundantOutputs(): boolean {
-    if (
-      this.nodeContext.baseNodeClassName !== "ToolCallingNode" ||
-      this.nodeData.outputs.length !== 2
-    ) {
+    const baseClassName = this.nodeData.base?.name;
+    if (!baseClassName) {
       return false;
     }
+    const baseNodeDef = findNodeDefinitionByBaseClassName(baseClassName);
+    if (!baseNodeDef?.outputs || !this.nodeData.outputs) {
+      return false;
+    }
+    // Check if all outputs in nodeData match the base node definition outputs
+    const baseOutputNames = new Set(baseNodeDef.outputs.map((o) => o.name));
+    const nodeOutputNames = new Set(this.nodeData.outputs.map((o) => o.name));
 
-    const outputNames = this.nodeData.outputs.map((output) => output.name);
-    const outputTypes = this.nodeData.outputs.map((output) => output.type);
-
-    const hasText =
-      outputNames.includes("text") &&
-      outputTypes[outputNames.indexOf("text")] === "STRING";
-    const hasChatHistory =
-      outputNames.includes("chat_history") &&
-      outputTypes[outputNames.indexOf("chat_history")] === "CHAT_HISTORY";
-
-    return hasText && hasChatHistory;
+    return (
+      baseOutputNames.size === nodeOutputNames.size &&
+      this.nodeData.outputs.length === baseNodeDef.outputs.length &&
+      this.nodeData.outputs.every((output) => baseOutputNames.has(output.name))
+    );
   }
 
   getNodeClassBodyStatements(): AstNode[] {

@@ -43,7 +43,7 @@ import { isNilOrEmpty } from "src/utils/typing";
 
 type NodeDefinition = (typeof nodeDefinitions.nodes)[number];
 
-function findNodeDefinitionByBaseClassName(
+export function findNodeDefinitionByBaseClassName(
   baseClassName: string
 ): NodeDefinition | undefined {
   return nodeDefinitions.nodes.find(
