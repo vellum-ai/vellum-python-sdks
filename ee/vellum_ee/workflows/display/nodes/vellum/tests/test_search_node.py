@@ -61,7 +61,7 @@ def test_search_filters_with_input_reference():
                                 {
                                     "lhs_variable_id": "08f0f43d-6374-4922-945c-25353fdc4f94",
                                     "operator": "=",
-                                    "rhs_variable_id": "c2151ef1-ad98-4940-b0e9-28dabe47a951",
+                                    "rhs_variable_id": "59c278e2-6371-4392-b912-fe15af5e907e",
                                     "type": "LOGICAL_CONDITION",
                                 }
                             ],
@@ -91,7 +91,7 @@ def test_search_filters_with_input_reference():
 
     # AND the RHS filter references should be present as node inputs
     serialized_rhs_input = next(
-        inp for inp in serialized_search_node["inputs"] if inp["id"] == "c2151ef1-ad98-4940-b0e9-28dabe47a951"
+        inp for inp in serialized_search_node["inputs"] if inp["id"] == "59c278e2-6371-4392-b912-fe15af5e907e"
     )
     assert serialized_rhs_input["value"] == {
         "combinator": "OR",
