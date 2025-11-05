@@ -11,7 +11,5 @@ class MergeNode(BaseNode[StateType], Generic[StateType]):
     with Vellum's Merge Node, and for most cases, you should extend from `BaseNode.Trigger` directly.
     """
 
-    __legacy_id__ = True
-
     class Trigger(BaseNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY

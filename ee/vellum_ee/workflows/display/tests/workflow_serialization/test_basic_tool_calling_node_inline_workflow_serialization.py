@@ -39,7 +39,7 @@ def test_serialize_workflow():
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
     tool_calling_node = workflow_raw_data["nodes"][1]
     assert tool_calling_node == {
-        "id": "21f29cac-da87-495f-bba1-093d423f4e46",
+        "id": "5702a9fb-7329-4652-a5d3-01f87632aa32",
         "label": "Get Current Weather Node",
         "type": "GENERIC",
         "display_data": {
@@ -57,17 +57,17 @@ def test_serialize_workflow():
             "name": "GetCurrentWeatherNode",
             "module": ["tests", "workflows", "basic_tool_calling_node_inline_workflow", "workflow"],
         },
-        "trigger": {"id": "2414743b-b1dd-4552-8abf-9b7481df9762", "merge_behavior": "AWAIT_ATTRIBUTES"},
-        "ports": [{"id": "3cd6d78c-9dad-42aa-ad38-31f67057c379", "name": "default", "type": "DEFAULT"}],
+        "trigger": {"id": "2e5bd6ea-c3b1-484f-bd51-72affc0446b3", "merge_behavior": "AWAIT_ATTRIBUTES"},
+        "ports": [{"id": "4a409117-9d9e-4c3c-a309-d1f3a2f984ff", "name": "default", "type": "DEFAULT"}],
         "adornments": None,
         "attributes": [
             {
-                "id": "44420e39-966f-4c59-bdf8-6365a61c5d2a",
+                "id": "e175bdd6-8794-4072-bc25-d3601c5a1cd2",
                 "name": "ml_model",
                 "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "gpt-4o-mini"}},
             },
             {
-                "id": "669cfb4b-8c25-460e-8952-b63d91302cbc",
+                "id": "01a4afb0-401e-4f2e-8da7-e642775d7c2f",
                 "name": "blocks",
                 "value": {
                     "type": "CONSTANT_VALUE",
@@ -114,7 +114,7 @@ def test_serialize_workflow():
                                                 "block_type": "VARIABLE",
                                                 "state": None,
                                                 "cache_config": None,
-                                                "input_variable": "8eb8b551-9b48-43b3-861f-52adb5c585a8",
+                                                "input_variable": "0265b353-d345-44c3-902d-cc65a80b85c5",
                                             }
                                         ],
                                     }
@@ -125,7 +125,7 @@ def test_serialize_workflow():
                 },
             },
             {
-                "id": "78324739-ff89-47a5-902b-10da0cb95c6d",
+                "id": "102d8447-5232-4e96-8192-9b1ca0f02650",
                 "name": "functions",
                 "value": {
                     "type": "CONSTANT_VALUE",
@@ -395,13 +395,13 @@ def test_serialize_workflow():
                 },
             },
             {
-                "id": "0f6dc102-3460-4963-91fa-7ba85d65ef7a",
+                "id": "21744ac9-c6d4-42c2-b88c-aeee4d38287c",
                 "name": "prompt_inputs",
                 "value": {
                     "type": "DICTIONARY_REFERENCE",
                     "entries": [
                         {
-                            "id": "8eb8b551-9b48-43b3-861f-52adb5c585a8",
+                            "id": "0265b353-d345-44c3-902d-cc65a80b85c5",
                             "key": "question",
                             "value": {
                                 "type": "WORKFLOW_INPUT",
@@ -412,7 +412,7 @@ def test_serialize_workflow():
                 },
             },
             {
-                "id": "229cd1ca-dc2f-4586-b933-c4d4966f7bd1",
+                "id": "c1bb1f53-4eac-4ad1-967f-032359b57fa0",
                 "name": "parameters",
                 "value": {
                     "type": "CONSTANT_VALUE",
@@ -433,20 +433,20 @@ def test_serialize_workflow():
                 },
             },
             {
-                "id": "1668419e-a193-43a5-8a97-3394e89bf278",
+                "id": "011c3cad-8520-4ff9-a8ca-054d3d6ab099",
                 "name": "max_prompt_iterations",
                 "value": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 25.0}},
             },
             {
-                "id": "f92dc3ec-a19a-4491-a98a-2b2df322e2e3",
+                "id": "ac4fe808-74e9-4ecc-b03c-08271461b9aa",
                 "name": "settings",
                 "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
             },
         ],
         "outputs": [
-            {"id": "e62bc785-a914-4066-b79e-8c89a5d0ec6c", "name": "text", "type": "STRING", "value": None},
+            {"id": "8bb610bb-85c4-404a-a854-e08c810310e1", "name": "text", "type": "STRING", "value": None},
             {
-                "id": "4674f1d9-e3af-411f-8a55-40a3a3ab5394",
+                "id": "0de13dac-1d38-493a-b1a6-d78aa2e9483d",
                 "name": "chat_history",
                 "type": "CHAT_HISTORY",
                 "value": None,
