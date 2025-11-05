@@ -77,11 +77,11 @@ def test_serialize_workflow():
     prompt_node = workflow_raw_data["nodes"][1]
     assert not DeepDiff(
         {
-            "id": "8450dd06-975a-41a4-a564-808ee8808fe6",
+            "id": "f800ecab-fe14-498f-88cf-8f67b3f04338",
             "type": "PROMPT",
             "inputs": [
                 {
-                    "id": "f7fca55e-93e9-4009-9227-acf839c7990d",
+                    "id": "15381676-75eb-4688-8ae1-7f9f937d6bb0",
                     "key": "noun",
                     "value": {
                         "rules": [
@@ -96,11 +96,11 @@ def test_serialize_workflow():
             ],
             "data": {
                 "label": "Example Base Inline Prompt Node With Functions",
-                "output_id": "ead0ccb5-092f-4d9b-a9ec-5eb83d498188",
+                "output_id": "71f6717e-31b5-478c-b204-9da91dfa6a29",
                 "error_output_id": None,
-                "array_output_id": "628df199-a049-40b9-a29b-a378edd759bb",
-                "source_handle_id": "d4a097ab-e22d-42f1-b6bc-2ed96856377a",
-                "target_handle_id": "c2dccecb-8a41-40a8-95af-325d3ab8bfe5",
+                "array_output_id": "f5180d8d-89e4-479d-8baf-f6db8f9defa6",
+                "source_handle_id": "6fad8947-ecce-498f-8160-46af26b75a81",
+                "target_handle_id": "7040f290-6b61-4519-86f5-d004c38a6905",
                 "variant": "INLINE",
                 "exec_config": {
                     "parameters": {
@@ -115,7 +115,7 @@ def test_serialize_workflow():
                         "custom_parameters": None,
                     },
                     "input_variables": [
-                        {"id": "f7fca55e-93e9-4009-9227-acf839c7990d", "key": "noun", "type": "STRING"}
+                        {"id": "15381676-75eb-4688-8ae1-7f9f937d6bb0", "key": "noun", "type": "STRING"}
                     ],
                     "prompt_template_block_data": {
                         "version": 1,
@@ -133,18 +133,18 @@ def test_serialize_workflow():
                                                 "template": "What's your favorite {{noun}}?",
                                                 "template_type": "STRING",
                                             },
-                                            "id": "467fe2b1-312b-40db-8869-9c6ada7c7077",
+                                            "id": "9aa7793c-80a9-4321-b69a-5c0d819702d4",
                                             "cache_config": None,
                                             "state": "ENABLED",
                                         }
                                     ],
                                 },
-                                "id": "1d1e117d-19dc-4282-b1e3-9534014fb6e5",
+                                "id": "e8835fe3-f6c4-4140-8dda-cd455c2749ad",
                                 "cache_config": None,
                                 "state": "ENABLED",
                             },
                             {
-                                "id": "9b34f084-449d-423f-8691-37518b1ee9ca",
+                                "id": "d02e499e-8a37-47a0-bf29-d1ef418b64a6",
                                 "block_type": "FUNCTION_DEFINITION",
                                 "properties": {
                                     "function_name": "favorite_noun",
@@ -169,23 +169,23 @@ def test_serialize_workflow():
                 "module": ["tests", "workflows", "basic_inline_prompt_node_with_functions", "workflow"],
             },
             "trigger": {
-                "id": "c2dccecb-8a41-40a8-95af-325d3ab8bfe5",
+                "id": "7040f290-6b61-4519-86f5-d004c38a6905",
                 "merge_behavior": "AWAIT_ANY",
             },
             "outputs": [
-                {"id": "9557bd86-702d-4b45-b8c1-c3980bffe28f", "name": "json", "type": "JSON", "value": None},
-                {"id": "ead0ccb5-092f-4d9b-a9ec-5eb83d498188", "name": "text", "type": "STRING", "value": None},
-                {"id": "628df199-a049-40b9-a29b-a378edd759bb", "name": "results", "type": "ARRAY", "value": None},
+                {"id": "3170eef8-02ec-458d-b2f0-a916241227e4", "name": "json", "type": "JSON", "value": None},
+                {"id": "71f6717e-31b5-478c-b204-9da91dfa6a29", "name": "text", "type": "STRING", "value": None},
+                {"id": "f5180d8d-89e4-479d-8baf-f6db8f9defa6", "name": "results", "type": "ARRAY", "value": None},
             ],
-            "ports": [{"id": "d4a097ab-e22d-42f1-b6bc-2ed96856377a", "name": "default", "type": "DEFAULT"}],
+            "ports": [{"id": "6fad8947-ecce-498f-8160-46af26b75a81", "name": "default", "type": "DEFAULT"}],
             "attributes": [
                 {
-                    "id": "6cd5395c-6e46-4bc9-b98c-8f8924554555",
+                    "id": "7d5ff6a6-ff5f-4ed5-8ac6-d8138bf5f013",
                     "name": "ml_model",
                     "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "gpt-4o"}},
                 },
                 {
-                    "id": "25f935f3-363f-4ead-a5a0-db234ca67e1e",
+                    "id": "5fa00fe1-1b5d-4152-becf-88dec77d9225",
                     "name": "blocks",
                     "value": {
                         "type": "CONSTANT_VALUE",
@@ -213,13 +213,13 @@ def test_serialize_workflow():
                     },
                 },
                 {
-                    "id": "ffabe7d2-8ab6-4201-9d41-c4d7be1386e1",
+                    "id": "51aceca7-ce5a-46c4-a52c-7a809b06cdd4",
                     "name": "prompt_inputs",
                     "value": {
                         "type": "DICTIONARY_REFERENCE",
                         "entries": [
                             {
-                                "id": "6eb6687c-f894-4398-8e62-7dc89e96a0a4",
+                                "id": "cec57542-894a-4c2d-8aa3-3496dddbc519",
                                 "key": "noun",
                                 "value": {
                                     "type": "WORKFLOW_INPUT",
@@ -230,7 +230,7 @@ def test_serialize_workflow():
                     },
                 },
                 {
-                    "id": "8107682b-2ca0-4967-88f9-284455936575",
+                    "id": "4ae711ff-fdac-4896-bba9-9a957a5d0329",
                     "name": "functions",
                     "value": {
                         "type": "CONSTANT_VALUE",
@@ -252,7 +252,7 @@ def test_serialize_workflow():
                     },
                 },
                 {
-                    "id": "2b98319f-f43d-42d9-a8b0-b148d5de0a2c",
+                    "id": "36fee5be-69e0-48cb-8aff-db1fe22aed6f",
                     "name": "parameters",
                     "value": {
                         "type": "CONSTANT_VALUE",
@@ -300,8 +300,8 @@ def test_serialize_workflow():
                             {
                                 "type": "NODE_OUTPUT",
                                 "data": {
-                                    "node_id": "8450dd06-975a-41a4-a564-808ee8808fe6",
-                                    "output_id": "628df199-a049-40b9-a29b-a378edd759bb",
+                                    "node_id": "f800ecab-fe14-498f-88cf-8f67b3f04338",
+                                    "output_id": "f5180d8d-89e4-479d-8baf-f6db8f9defa6",
                                 },
                             }
                         ],
@@ -325,25 +325,25 @@ def test_serialize_workflow():
     assert not DeepDiff(
         [
             {
-                "id": "924f693f-3f4c-466a-8cde-648ba3baf9fd",
+                "id": "bd2af66e-7724-45e1-8ab6-d37d5b2769f5",
                 "source_node_id": "382842a3-0490-4dee-b87b-eef86766f07c",
                 "source_handle_id": "8294baa6-8bf4-4b54-a56b-407b64851b77",
-                "target_node_id": "8450dd06-975a-41a4-a564-808ee8808fe6",
-                "target_handle_id": "c2dccecb-8a41-40a8-95af-325d3ab8bfe5",
+                "target_node_id": "f800ecab-fe14-498f-88cf-8f67b3f04338",
+                "target_handle_id": "7040f290-6b61-4519-86f5-d004c38a6905",
                 "type": "DEFAULT",
             },
             {
                 "id": "05ca58fb-e02d-48d4-9207-2dad0833a25b",
-                "source_node_id": "8450dd06-975a-41a4-a564-808ee8808fe6",
-                "source_handle_id": "d4a097ab-e22d-42f1-b6bc-2ed96856377a",
+                "source_node_id": "f800ecab-fe14-498f-88cf-8f67b3f04338",
+                "source_handle_id": "6fad8947-ecce-498f-8160-46af26b75a81",
                 "target_node_id": "42318326-3ae8-417f-9609-f6d8ae47eafb",
                 "target_handle_id": "46c99277-2b4b-477d-851c-ea497aef6b16",
                 "type": "DEFAULT",
             },
             {
                 "id": "0b1a2960-4cd5-4045-844f-42b6c87487aa",
-                "source_node_id": "8450dd06-975a-41a4-a564-808ee8808fe6",
-                "source_handle_id": "d4a097ab-e22d-42f1-b6bc-2ed96856377a",
+                "source_node_id": "f800ecab-fe14-498f-88cf-8f67b3f04338",
+                "source_handle_id": "6fad8947-ecce-498f-8160-46af26b75a81",
                 "target_node_id": "1f4e3b7b-6af1-42c8-ab33-05b0f01e2b62",
                 "target_handle_id": "7d94907f-c840-4ced-b813-ee3b17f2a8a9",
                 "type": "DEFAULT",
