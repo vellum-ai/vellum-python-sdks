@@ -297,7 +297,7 @@ def test_serialize_tool_router_node():
         "adornments": None,
         "attributes": [
             {
-                "id": "cd208919-c66b-451b-a739-bcf7d3451dea",
+                "id": "ea36d8ff-3f6e-41eb-8a7b-ba3ca8e05f49",
                 "name": "prompt_outputs",
                 "value": {
                     "node_id": "c75146e1-ea10-4f58-90fd-887322725496",
@@ -315,7 +315,7 @@ def test_serialize_tool_router_node():
             "name": "RouterNode",
         },
         "display_data": {"position": {"x": 0.0, "y": 0.0}},
-        "id": "690c66e1-1e18-4984-b695-84beb0157541",
+        "id": "d2884fa0-2d3d-4220-a335-bdcef56a00d5",
         "label": "Router Node",
         "outputs": [],
         "ports": [
@@ -400,9 +400,9 @@ def test_serialize_tool_router_node():
                 "name": "my_function",
                 "type": "IF",
             },
-            {"expression": None, "id": "e344f6c9-a796-472d-b5dd-3fcdc016ebcc", "name": "default", "type": "ELSE"},
+            {"expression": None, "id": "a433bba4-a0d6-44f3-b53b-0d5231e442cf", "name": "default", "type": "ELSE"},
         ],
-        "trigger": {"id": "73a96f44-c2dd-40cc-96f6-49b9f914b166", "merge_behavior": "AWAIT_ATTRIBUTES"},
+        "trigger": {"id": "9055a5d0-68a1-40cf-bc05-a8c65bd19abe", "merge_behavior": "AWAIT_ATTRIBUTES"},
         "type": "GENERIC",
     }
 
