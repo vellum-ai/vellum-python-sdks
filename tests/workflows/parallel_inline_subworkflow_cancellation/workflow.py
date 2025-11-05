@@ -48,6 +48,3 @@ class ParallelInlineSubworkflowCancellationWorkflow(BaseWorkflow):
     """Workflow with a fast failing node and a slow inline subworkflow running in parallel."""
 
     graph = {FastFailingNode, SlowInlineSubworkflowNode}
-
-    class Outputs(BaseWorkflow.Outputs):
-        pass
