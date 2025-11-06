@@ -1,7 +1,7 @@
 {
   "nodes": [
     {
-      "id": "55e74c90-9901-42fd-92c3-2dd0c5fd4876",
+      "id": "7adce764-e895-4add-acb2-02111f43ef6c",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -36,37 +36,37 @@
         ]
       },
       "trigger": {
-        "id": "c2aa7c83-7eba-4996-acb4-85cd4f5bbf58",
+        "id": "3ed8e5b0-ba9d-4c27-8633-372fbecd0440",
         "merge_behavior": "AWAIT_ANY"
       },
       "ports": [
         {
-          "id": "f165a94f-33f7-4c09-8896-9e683a39e11c",
+          "id": "e740bddb-fc69-4561-bc84-d749c511b5e2",
           "name": "default",
           "type": "DEFAULT"
         }
       ],
       "outputs": [
         {
-          "id": "99a8d2c4-080f-4605-810e-f5084a52f019",
-          "name": "headers",
-          "type": "JSON",
-          "value": null
-        },
-        {
-          "id": "c5737084-f688-4695-ab81-5f97a6b1a5c2",
+          "id": "fd55dc40-4e55-4327-8a89-d4123bb775df",
           "name": "json",
           "type": "JSON",
           "value": null
         },
         {
-          "id": "a2a63a64-75f1-49ba-8743-4db660179ab3",
+          "id": "357a9805-da18-400c-9ce5-152be1dd2ff8",
+          "name": "headers",
+          "type": "JSON",
+          "value": null
+        },
+        {
+          "id": "4e8c472c-5f32-4d41-9746-4085b3e8b6ef",
           "name": "status_code",
           "type": "NUMBER",
           "value": null
         },
         {
-          "id": "baa40ce0-35e7-4439-b280-085aaf4f54da",
+          "id": "90d2ccc0-40da-40c5-895d-adf7d2de28d3",
           "name": "text",
           "type": "STRING",
           "value": null
@@ -74,7 +74,7 @@
       ],
       "attributes": [
         {
-          "id": "aacb36f1-c980-460d-8002-43bb57128e05",
+          "id": "71fb28a9-5a2d-432e-8fc6-53e23fbd23ec",
           "name": "timeout",
           "value": {
             "type": "CONSTANT_VALUE",
@@ -87,7 +87,7 @@
       ]
     },
     {
-      "id": "43b3514f-3490-47d6-9b78-bbc4736f0159",
+      "id": "e04e5bb5-3dbe-49b6-baf6-a132e255ce33",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -100,13 +100,7 @@
       },
       "base": {
         "name": "BaseNode",
-        "module": [
-          "vellum",
-          "workflows",
-          "nodes",
-          "bases",
-          "base"
-        ]
+        "module": ["vellum", "workflows", "nodes", "bases", "base"]
       },
       "definition": {
         "name": "CodeExecutionNode",
@@ -120,19 +114,19 @@
         ]
       },
       "trigger": {
-        "id": "fb1b8b44-5e7a-481b-a163-96e7e08219d5",
+        "id": "135de9c9-9b59-41c0-a60e-ef2a94816cce",
         "merge_behavior": "AWAIT_ANY"
       },
       "ports": [
         {
-          "id": "e66138d5-e50d-40d8-bc27-00545ce5e283",
+          "id": "50258641-c958-4ba1-aa90-948a23d7a00a",
           "name": "default",
           "type": "DEFAULT"
         }
       ]
     },
     {
-      "id": "5d3c60ce-7acf-4d8b-a68d-65cc0b561ac5",
+      "id": "afb26eb8-efce-49c8-a0d4-77ace7079145",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -145,13 +139,7 @@
       },
       "base": {
         "name": "BaseNode",
-        "module": [
-          "vellum",
-          "workflows",
-          "nodes",
-          "bases",
-          "base"
-        ]
+        "module": ["vellum", "workflows", "nodes", "bases", "base"]
       },
       "definition": {
         "name": "ConditionalNode",
@@ -165,13 +153,13 @@
         ]
       },
       "trigger": {
-        "id": "2b5617b4-5cc0-4f9a-9369-24982e2cd8c0",
+        "id": "e1e8e028-f853-47a8-9fa4-e80fb7558024",
         "merge_behavior": "AWAIT_ANY"
       },
       "ports": []
     },
     {
-      "id": "92e401f1-110f-4edc-8bb0-cad879e1ea08",
+      "id": "934fa117-64d4-426f-aee9-668383ff43cf",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -184,33 +172,20 @@
       },
       "base": {
         "name": "BaseNode",
-        "module": [
-          "vellum",
-          "workflows",
-          "nodes",
-          "bases",
-          "base"
-        ]
+        "module": ["vellum", "workflows", "nodes", "bases", "base"]
       },
       "definition": {
         "name": "ErrorNode",
-        "module": [
-          "vellum",
-          "workflows",
-          "nodes",
-          "core",
-          "error_node",
-          "node"
-        ]
+        "module": ["vellum", "workflows", "nodes", "core", "error_node", "node"]
       },
       "trigger": {
-        "id": "c1b30829-76af-4d99-bf83-b030c551a7cf",
+        "id": "b89f1c81-970d-4fc9-907c-bb43b8315764",
         "merge_behavior": "AWAIT_ATTRIBUTES"
       },
       "ports": []
     },
     {
-      "id": "55d0f8e9-acbd-4d33-85ba-c7527348f62a",
+      "id": "35fb894a-52c2-4094-adb0-e9029d36311a",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -245,31 +220,31 @@
         ]
       },
       "trigger": {
-        "id": "d14ff235-9e0a-4496-9fd4-ae4cf39fa518",
+        "id": "49a04569-77f5-4db2-9052-97ac1397f9e1",
         "merge_behavior": "AWAIT_ANY"
       },
       "ports": [
         {
-          "id": "66943bf3-3c32-42da-9d4f-faab541f4285",
+          "id": "33f90d07-59d4-4930-ae0f-988d33e78f16",
           "name": "default",
           "type": "DEFAULT"
         }
       ],
       "outputs": [
         {
-          "id": "af7d71b0-227c-4957-8234-d1dc76e62554",
+          "id": "8dace061-cea7-4550-a444-cd8f6ed5d90a",
           "name": "json",
           "type": "JSON",
           "value": null
         },
         {
-          "id": "b283959e-b719-49d2-ab9a-15c804ab52e8",
+          "id": "d905c263-003e-4177-bcb3-36e0ec64a0eb",
           "name": "text",
           "type": "STRING",
           "value": null
         },
         {
-          "id": "73c02172-2bd1-482d-b7fe-acc67135f7d0",
+          "id": "9e81ee2b-3532-4cc3-9262-e73c5c5b315b",
           "name": "results",
           "type": "ARRAY",
           "value": null
@@ -277,7 +252,7 @@
       ],
       "attributes": [
         {
-          "id": "e2455e77-82ad-460f-8735-10d427d4d448",
+          "id": "488bd158-580c-4796-acce-840ee4046de2",
           "name": "functions",
           "value": {
             "type": "CONSTANT_VALUE",
@@ -288,7 +263,7 @@
           }
         },
         {
-          "id": "bd29a2cd-4965-4741-a3c2-9d0c753efdd9",
+          "id": "d901d3d0-468a-44de-8b2e-9826c615bee7",
           "name": "parameters",
           "value": {
             "type": "CONSTANT_VALUE",
@@ -309,29 +284,17 @@
           }
         },
         {
-          "id": "76f813d6-0025-4733-9d03-848c49c93d66",
+          "id": "40f6daf8-16dd-41ee-8f85-4ed717db24be",
           "name": "ml_model",
-          "value": {
-            "type": "CONSTANT_VALUE",
-            "value": {
-              "type": "JSON",
-              "value": null
-            }
-          }
+          "value": null
         },
         {
-          "id": "1216ae32-e051-4c48-bd7d-69f2a4527f12",
+          "id": "132bb416-5d07-48e5-9549-b631287e5751",
           "name": "blocks",
-          "value": {
-            "type": "CONSTANT_VALUE",
-            "value": {
-              "type": "JSON",
-              "value": null
-            }
-          }
+          "value": null
         },
         {
-          "id": "b66dc0b6-9e4d-4bbb-9b3c-b85e14071de0",
+          "id": "ef1331d9-54a6-4b87-8b27-6fd633b0ca4e",
           "name": "prompt_inputs",
           "value": {
             "type": "CONSTANT_VALUE",
@@ -344,7 +307,7 @@
       ]
     },
     {
-      "id": "9d62e15c-a640-4a65-b52c-ce0cbaa23a71",
+      "id": "0d0d880e-fa99-410d-ba53-424c3e17a405",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -357,13 +320,7 @@
       },
       "base": {
         "name": "BaseNode",
-        "module": [
-          "vellum",
-          "workflows",
-          "nodes",
-          "bases",
-          "base"
-        ]
+        "module": ["vellum", "workflows", "nodes", "bases", "base"]
       },
       "definition": {
         "name": "InlineSubworkflowNode",
@@ -377,19 +334,19 @@
         ]
       },
       "trigger": {
-        "id": "d7c92c2f-d761-43e7-a7e6-34fd74b3b8b3",
+        "id": "820f0c54-66bd-41a6-ae62-de700c51f11b",
         "merge_behavior": "AWAIT_ATTRIBUTES"
       },
       "ports": [
         {
-          "id": "bb1e4a4f-60e7-4519-b127-80183008a3f7",
+          "id": "957159c9-afaf-4b9e-947c-596963c85aa0",
           "name": "default",
           "type": "DEFAULT"
         }
       ]
     },
     {
-      "id": "2dded52f-a449-48fd-b58f-f59801c24bae",
+      "id": "7e409091-5b3d-4232-8744-146127d98837",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -402,13 +359,7 @@
       },
       "base": {
         "name": "BaseNode",
-        "module": [
-          "vellum",
-          "workflows",
-          "nodes",
-          "bases",
-          "base"
-        ]
+        "module": ["vellum", "workflows", "nodes", "bases", "base"]
       },
       "definition": {
         "name": "GuardrailNode",
@@ -422,19 +373,19 @@
         ]
       },
       "trigger": {
-        "id": "1560db25-a416-4ce6-b175-d7bdfbdb27d8",
+        "id": "0dbad819-0060-4a73-ba19-570cabe71cfb",
         "merge_behavior": "AWAIT_ANY"
       },
       "ports": [
         {
-          "id": "94bc1403-af9f-4539-8208-1bbafbf09564",
+          "id": "e12c1c34-81a2-40b9-aa3b-8c5fc8ef1d62",
           "name": "default",
           "type": "DEFAULT"
         }
       ]
     },
     {
-      "id": "527a10bc-30b2-4e36-91d6-91c8e865bac8",
+      "id": "62ba7250-8508-41f1-8f14-709902c0e734",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -457,29 +408,22 @@
       },
       "definition": {
         "name": "MapNode",
-        "module": [
-          "vellum",
-          "workflows",
-          "nodes",
-          "core",
-          "map_node",
-          "node"
-        ]
+        "module": ["vellum", "workflows", "nodes", "core", "map_node", "node"]
       },
       "trigger": {
-        "id": "3a702aac-7b68-47d3-92e1-264883e9532c",
+        "id": "d9ed81b3-891d-41e7-8ca3-696776a3375f",
         "merge_behavior": "AWAIT_ATTRIBUTES"
       },
       "ports": [
         {
-          "id": "0ae85239-a159-48af-b39c-2484eac901df",
+          "id": "96668bcf-a8c4-4eb1-bd33-c6a436bfa1a4",
           "name": "default",
           "type": "DEFAULT"
         }
       ]
     },
     {
-      "id": "7426f273-a43d-4448-a2d2-76d0ee0d069c",
+      "id": "3e261c1b-1fb4-4fc3-b267-6aa049a44e5a",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -492,13 +436,7 @@
       },
       "base": {
         "name": "BaseNode",
-        "module": [
-          "vellum",
-          "workflows",
-          "nodes",
-          "bases",
-          "base"
-        ]
+        "module": ["vellum", "workflows", "nodes", "bases", "base"]
       },
       "definition": {
         "name": "MergeNode",
@@ -512,19 +450,19 @@
         ]
       },
       "trigger": {
-        "id": "3a91ba25-0dd0-4bc8-9f6d-c54ea4dccf64",
+        "id": "efb22dde-30e6-4a89-a591-926643b39efd",
         "merge_behavior": "AWAIT_ANY"
       },
       "ports": [
         {
-          "id": "50515fe3-4be8-43b9-8fc5-d52c1250115e",
+          "id": "362a5142-cd38-449e-b979-2c2ee9c8b7f8",
           "name": "default",
           "type": "DEFAULT"
         }
       ]
     },
     {
-      "id": "16b8d82d-458d-48d9-b57e-a447b19f311a",
+      "id": "b398afe2-b643-4a1b-8484-9001978ace4e",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -537,13 +475,7 @@
       },
       "base": {
         "name": "BaseNode",
-        "module": [
-          "vellum",
-          "workflows",
-          "nodes",
-          "bases",
-          "base"
-        ]
+        "module": ["vellum", "workflows", "nodes", "bases", "base"]
       },
       "definition": {
         "name": "NoteNode",
@@ -557,19 +489,19 @@
         ]
       },
       "trigger": {
-        "id": "2b6907b0-1adc-41e7-9d5b-3c6ccd9b973a",
+        "id": "6356ce89-12cc-43aa-a831-d5bb600a1ec4",
         "merge_behavior": "AWAIT_ANY"
       },
       "ports": [
         {
-          "id": "22dac74c-7ad6-4a6f-97ae-0034124721ce",
+          "id": "6742b6e3-6f9f-4ed7-ac82-3ae583908a7f",
           "name": "default",
           "type": "DEFAULT"
         }
       ]
     },
     {
-      "id": "3ae7366b-28ce-4d6b-8ec1-c6366b1e1a8b",
+      "id": "92896f06-febf-48a2-9151-aa7ef28391b9",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -582,13 +514,7 @@
       },
       "base": {
         "name": "BaseNode",
-        "module": [
-          "vellum",
-          "workflows",
-          "nodes",
-          "bases",
-          "base"
-        ]
+        "module": ["vellum", "workflows", "nodes", "bases", "base"]
       },
       "definition": {
         "name": "SubworkflowDeploymentNode",
@@ -602,19 +528,19 @@
         ]
       },
       "trigger": {
-        "id": "a6eecf28-5c21-4406-80bb-917c6de84050",
+        "id": "3d1f9cbf-d029-4928-a537-81cd28197d7f",
         "merge_behavior": "AWAIT_ANY"
       },
       "ports": [
         {
-          "id": "8fc8d25b-c9b5-4db7-a632-d4eb1eb3e9fd",
+          "id": "01990b8d-8790-4eb1-baa5-bccc85e927a2",
           "name": "default",
           "type": "DEFAULT"
         }
       ]
     },
     {
-      "id": "d2f9a8ec-3023-46bb-aca3-dd67ffb61e18",
+      "id": "e1c8d236-6131-4218-aed8-45f986723227",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -648,31 +574,31 @@
         ]
       },
       "trigger": {
-        "id": "7d209a9c-14a5-4b74-949c-d3e681750049",
+        "id": "108f42bf-7b50-4076-9064-0422a63af13f",
         "merge_behavior": "AWAIT_ANY"
       },
       "ports": [
         {
-          "id": "d51b7c72-3e1f-400c-ba1c-1125b1047d9a",
+          "id": "d332037f-c991-4b27-b00d-81d9deccee10",
           "name": "default",
           "type": "DEFAULT"
         }
       ],
       "outputs": [
         {
-          "id": "09c6ba90-4d69-4848-aa0b-74bdfcdd5a97",
+          "id": "3fe76779-0df2-4c4c-b50f-a04e5c0d86aa",
           "name": "json",
           "type": "JSON",
           "value": null
         },
         {
-          "id": "5ef5e3c6-1578-46da-89f6-6da3dd01fb5f",
+          "id": "a3aee62b-7d57-46a6-a881-461f844c1c2a",
           "name": "text",
           "type": "STRING",
           "value": null
         },
         {
-          "id": "48513658-a72b-4db4-ad49-75a48a6cd084",
+          "id": "22285807-128a-4edb-bf6a-7d63026fe2cf",
           "name": "results",
           "type": "ARRAY",
           "value": null
@@ -680,7 +606,7 @@
       ]
     },
     {
-      "id": "0ac6bdba-dbae-4ce5-b815-3d670aae0572",
+      "id": "e263c10c-1c98-4941-aa75-32f272b5b6f2",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -714,14 +640,75 @@
         ]
       },
       "trigger": {
-        "id": "37e64cf0-e604-4045-b8a0-d17e68c037e1",
+        "id": "49188541-ce42-437c-aa95-b6766efcc18b",
         "merge_behavior": "AWAIT_ANY"
       },
       "ports": [
         {
-          "id": "8dea61c3-107c-4f17-bcba-dbbdc1185360",
+          "id": "2b77d240-037f-4533-9931-b37da6350509",
           "name": "default",
           "type": "DEFAULT"
+        }
+      ]
+    },
+    {
+      "id": "5889dc6f-44ef-48e4-a6bf-567722717565",
+      "label": "Set State Node",
+      "attributes": [
+        {
+          "id": "b6a50d3c-e21e-4042-acde-ee366f009899",
+          "name": "operations",
+          "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+              "type": "JSON",
+              "value": {}
+            }
+          }
+        }
+      ],
+      "display_data": {
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "comment": {
+          "value": "\n    A node that sets multiple state values at once.\n\n    This node accepts a dictionary mapping state paths to values and sets them all.\n    Values can be actual values or descriptors.\n\n    Example:\n        operations = {\n            \"chat_history\": State.chat_history.concat(LazyReference(\"MyAgentNode.Outputs.chat_history\")),\n            \"counter\": State.counter + 1,\n            \"total_tokens\": State.user_tokens.add(State.assistant_tokens)\n        }\n\n    Args:\n        operations: Dictionary mapping state attribute names to values (descriptors or actual values)\n    ",
+          "expanded": true
+        }
+      },
+      "base": {
+        "name": "BaseNode",
+        "module": ["vellum", "workflows", "nodes", "bases", "base"]
+      },
+      "definition": {
+        "name": "SetStateNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "displayable",
+          "set_state_node",
+          "node"
+        ]
+      },
+      "trigger": {
+        "id": "cd37f826-00b1-499e-a9ea-985c35c18526",
+        "merge_behavior": "AWAIT_ATTRIBUTES"
+      },
+      "ports": [
+        {
+          "id": "1da045dd-7a6f-4279-85b1-d21892376a87",
+          "name": "default",
+          "type": "DEFAULT"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "57687d69-eb14-48fe-b919-abb044c85c35",
+          "name": "results",
+          "type": "JSON",
+          "value": null
         }
       ]
     },
@@ -739,13 +726,7 @@
       },
       "base": {
         "name": "BaseNode",
-        "module": [
-          "vellum",
-          "workflows",
-          "nodes",
-          "bases",
-          "base"
-        ]
+        "module": ["vellum", "workflows", "nodes", "bases", "base"]
       },
       "definition": {
         "name": "TemplatingNode",
@@ -771,11 +752,11 @@
       ]
     },
     {
-      "id": "035842e0-34ed-43af-97de-a706e40912ae",
+      "id": "da621f7c-396c-4f3f-ab56-91785d63b296",
       "label": "Tool Calling Node",
       "attributes": [
         {
-          "id": "df3761db-067a-4fe9-9fc3-ba270786fcf6",
+          "id": "62d1e757-6cda-449d-9a8a-9a01fe58cebf",
           "name": "ml_model",
           "value": {
             "type": "CONSTANT_VALUE",
@@ -786,7 +767,7 @@
           }
         },
         {
-          "id": "66133945-f7fd-43bb-8b46-0761e2b58241",
+          "id": "48989903-c416-4ec0-8f13-9e81d2ba23bd",
           "name": "blocks",
           "value": {
             "type": "CONSTANT_VALUE",
@@ -797,7 +778,7 @@
           }
         },
         {
-          "id": "0079b429-3b1c-4f7c-9ccf-185ace4dcbb2",
+          "id": "88922cc2-ca22-4ef2-8e1e-86a1ca8a914f",
           "name": "functions",
           "value": {
             "type": "CONSTANT_VALUE",
@@ -808,7 +789,7 @@
           }
         },
         {
-          "id": "ebda56e6-2ace-472c-a106-36cb69264e96",
+          "id": "a4ce87c9-381b-4bf8-adc6-973f3216c97c",
           "name": "prompt_inputs",
           "value": {
             "type": "CONSTANT_VALUE",
@@ -819,7 +800,7 @@
           }
         },
         {
-          "id": "2534a586-5b37-41f3-a9a4-8162b8538df4",
+          "id": "c8c3271c-b764-44b4-8c08-3d24b8d9efc9",
           "name": "parameters",
           "value": {
             "type": "CONSTANT_VALUE",
@@ -840,7 +821,7 @@
           }
         },
         {
-          "id": "118ef72a-0767-4659-8ddf-58a071f95988",
+          "id": "a28d660a-c1e8-460d-aa8d-cc163277d9c2",
           "name": "max_prompt_iterations",
           "value": {
             "type": "CONSTANT_VALUE",
@@ -851,7 +832,7 @@
           }
         },
         {
-          "id": "d7ef5296-1e48-4d05-b97a-77f16d46fd50",
+          "id": "3c49713b-21e7-4032-84a1-709f50a1ddde",
           "name": "settings",
           "value": {
             "type": "CONSTANT_VALUE",
@@ -874,13 +855,7 @@
       },
       "base": {
         "name": "BaseNode",
-        "module": [
-          "vellum",
-          "workflows",
-          "nodes",
-          "bases",
-          "base"
-        ]
+        "module": ["vellum", "workflows", "nodes", "bases", "base"]
       },
       "definition": {
         "name": "ToolCallingNode",
@@ -894,25 +869,25 @@
         ]
       },
       "trigger": {
-        "id": "f9b4a4ce-68ae-45f4-9e29-38b588abdf97",
+        "id": "bad829ce-f4b5-4089-ad68-34391e8e0c0f",
         "merge_behavior": "AWAIT_ATTRIBUTES"
       },
       "ports": [
         {
-          "id": "72157fce-fc16-44d8-a00d-506738a20730",
+          "id": "5daf2078-7486-4e8a-9ca7-7ca23a096232",
           "name": "default",
           "type": "DEFAULT"
         }
       ],
       "outputs": [
         {
-          "id": "c18a8725-21e1-4736-a77c-76d0fc035176",
+          "id": "bd83c7f1-fc8d-4441-abcf-95641aa03fcb",
           "name": "text",
           "type": "STRING",
           "value": null
         },
         {
-          "id": "5a9ad073-c670-43d2-9198-a08e9fdda7ad",
+          "id": "bb08b1a9-9745-475a-b030-6bb5b2146984",
           "name": "chat_history",
           "type": "CHAT_HISTORY",
           "value": null
@@ -920,50 +895,17 @@
       ]
     },
     {
-      "id": "187ed9ed-ca2b-49e4-943d-ee8da5fad973",
+      "id": "4884c875-4cd0-41b3-a9f1-f79ce798d18b",
       "label": "Web Search Node",
       "attributes": [
         {
-          "id": "b5ba3c60-e02c-46c8-b470-d86c4f8f42af",
+          "id": "5aaa3650-72b4-4c94-aa46-6956b06edfe5",
           "name": "query",
           "value": {
             "type": "CONSTANT_VALUE",
             "value": {
               "type": "STRING",
               "value": ""
-            }
-          }
-        },
-        {
-          "id": "222408bc-7dae-4bb8-9aba-a1ac36bdc759",
-          "name": "api_key",
-          "value": {
-            "type": "CONSTANT_VALUE",
-            "value": {
-              "type": "JSON",
-              "value": null
-            }
-          }
-        },
-        {
-          "id": "795a0bbc-bb98-4bc8-a9d9-88b0cb796d23",
-          "name": "num_results",
-          "value": {
-            "type": "CONSTANT_VALUE",
-            "value": {
-              "type": "NUMBER",
-              "value": 10.0
-            }
-          }
-        },
-        {
-          "id": "e1648557-ca03-4a81-ab5b-86495284b325",
-          "name": "location",
-          "value": {
-            "type": "CONSTANT_VALUE",
-            "value": {
-              "type": "JSON",
-              "value": null
             }
           }
         }
@@ -974,19 +916,13 @@
           "y": 0.0
         },
         "comment": {
-          "value": "\n    Used to perform web search using SerpAPI.\n\n    query: str - The search query to execute\n    api_key: str - SerpAPI authentication key\n    num_results: int - Number of search results to return (default: 10)\n    location: Optional[str] - Geographic location filter for search\n    ",
+          "value": "\n    Used to perform web search using SerpAPI.\n\n    query: str - The search query to execute\n    ",
           "expanded": true
         }
       },
       "base": {
         "name": "BaseNode",
-        "module": [
-          "vellum",
-          "workflows",
-          "nodes",
-          "bases",
-          "base"
-        ]
+        "module": ["vellum", "workflows", "nodes", "bases", "base"]
       },
       "definition": {
         "name": "WebSearchNode",
@@ -1000,31 +936,31 @@
         ]
       },
       "trigger": {
-        "id": "036c7a0c-fff3-44f7-b49b-429d8f44f212",
+        "id": "a3aee423-bd9d-4910-b27b-8009e3950a45",
         "merge_behavior": "AWAIT_ATTRIBUTES"
       },
       "ports": [
         {
-          "id": "ef824748-d00d-41e7-b7b4-d0edc536c3af",
+          "id": "ed9a2b1f-9276-4b74-85e0-338aa8a20cbd",
           "name": "default",
           "type": "DEFAULT"
         }
       ],
       "outputs": [
         {
-          "id": "704a4ba3-1afe-482d-876a-91dcdbe90fb7",
+          "id": "71bb6f36-d0cc-4c01-8dc2-1a0b98429c81",
           "name": "text",
           "type": "STRING",
           "value": null
         },
         {
-          "id": "574b2ebe-f250-4024-b517-3cd47704c70e",
+          "id": "9df3ddf0-675f-48d5-b4b2-e3a805bbf450",
           "name": "urls",
           "type": "JSON",
           "value": null
         },
         {
-          "id": "9798a067-3589-4a2a-a811-6019873cbbfe",
+          "id": "87994bf1-d8d7-40d0-a715-90b1e399c5f2",
           "name": "results",
           "type": "JSON",
           "value": null
@@ -1032,7 +968,7 @@
       ]
     },
     {
-      "id": "bf31cc42-b5e4-4191-a453-7191743ac200",
+      "id": "c3d3aadd-fb99-4e86-905a-c40be63da688",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -1045,13 +981,7 @@
       },
       "base": {
         "name": "BaseNode",
-        "module": [
-          "vellum",
-          "workflows",
-          "nodes",
-          "bases",
-          "base"
-        ]
+        "module": ["vellum", "workflows", "nodes", "bases", "base"]
       },
       "definition": {
         "name": "FinalOutputNode",
@@ -1065,18 +995,16 @@
         ]
       },
       "trigger": {
-        "id": "0b2da045-2a4c-4939-8b5c-661652c759d4",
+        "id": "9ed1cb78-949a-42b0-8e84-98c20eb6146b",
         "merge_behavior": "AWAIT_ANY"
       },
       "ports": [],
       "outputs": [
         {
-          "id": "7f41909e-9ce1-4fde-ba77-a13dda301ece",
+          "id": "c65369bf-7dbc-4f66-87c5-381c965ffb5d",
           "name": "value",
           "type": "STRING",
-          "value": {
-            "__undefined__": true
-          }
+          "value": null
         }
       ]
     }
