@@ -1,6 +1,7 @@
 import { python } from "@fern-api/python-ast";
 
 import { BaseTrigger } from "src/generators/triggers/base-trigger";
+import { createPythonClassName, toPythonSafeSnakeCase } from "src/utils/casing";
 
 import type { AstNode } from "@fern-api/python-ast/core/AstNode";
 import type { ScheduledTrigger as ScheduledTriggerType } from "src/types/vellum";
@@ -14,11 +15,15 @@ export declare namespace ScheduledTrigger {
 
 export class ScheduledTrigger extends BaseTrigger<ScheduledTriggerType> {
   protected generateClassName(): string {
-    return "ScheduleTrigger";
+    const label = this.trigger.displayData?.label || "ScheduleTrigger";
+    return createPythonClassName(label, {
+      force: true,
+    });
   }
 
   protected getModuleName(): string {
-    return "scheduled";
+    const label = this.trigger.displayData?.label || "scheduled";
+    return toPythonSafeSnakeCase(label);
   }
 
   protected getBaseTriggerClassName(): string {
