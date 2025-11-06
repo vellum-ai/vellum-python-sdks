@@ -68,7 +68,7 @@ def test_serialize_workflow():
     }
 
     try_node = workflow_raw_data["nodes"][1]
-    assert try_node["id"] == "1381c078-efa2-4255-89a1-7b4cb742c7fc"
+    assert try_node["id"] == "25cb9a9f-a046-4efc-931f-00248240a02e"
 
 
 def test_serialize_workflow__standalone():

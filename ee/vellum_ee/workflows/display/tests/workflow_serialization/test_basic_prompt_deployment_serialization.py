@@ -402,11 +402,11 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
 
     templating_node = workflow_raw_data["nodes"][2]
     assert templating_node == {
-        "id": "51cbe21d-0232-4362-bc54-5bc283297aa6",
+        "id": "ac2de275-729f-4fba-9701-97beba80df34",
         "type": "TEMPLATING",
         "inputs": [
             {
-                "id": "7c775379-d589-4d79-b876-dcd224d72966",
+                "id": "198f6350-237a-4103-b571-311738b7743f",
                 "key": "template",
                 "value": {
                     "rules": [
@@ -422,7 +422,7 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
                 },
             },
             {
-                "id": "dec1317a-6900-4858-a5fb-c849254b2c91",
+                "id": "2439a747-3b8d-44e9-85c1-99b903d69997",
                 "key": "city",
                 "value": {
                     "rules": [
@@ -435,7 +435,7 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
                 },
             },
             {
-                "id": "4cc5b9f1-075d-45fd-a978-f530c29c5682",
+                "id": "d85dfd04-f304-4bbf-9d24-52d9ef8f45cc",
                 "key": "date",
                 "value": {
                     "rules": [
@@ -448,7 +448,7 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
                 },
             },
             {
-                "id": "77b352e0-1b77-4d48-9f6f-04ce17fe7286",
+                "id": "a555cbb1-cea9-4454-add0-61609b38a376",
                 "key": "weather",
                 "value": {
                     "rules": [
@@ -466,11 +466,11 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
         ],
         "data": {
             "label": "Example Templating Node",
-            "output_id": "6834cae4-8173-4fa6-88f7-bc09d335bdd1",
+            "output_id": "c8ad13db-d601-4c24-bef7-0196baa8079c",
             "error_output_id": None,
-            "source_handle_id": "39317827-df43-4f5a-bfbc-20bffc839748",
-            "target_handle_id": "58427684-3848-498a-8299-c6b0fc70265d",
-            "template_node_input_id": "7c775379-d589-4d79-b876-dcd224d72966",
+            "source_handle_id": "bfe059fb-987f-47dd-bfbb-c71fdf1e4971",
+            "target_handle_id": "fbd5aa14-b615-42c9-a85a-23eb1a6b5436",
+            "template_node_input_id": "198f6350-237a-4103-b571-311738b7743f",
             "output_type": "STRING",
         },
         "display_data": {"position": {"x": 400.0, "y": -50.0}},
@@ -488,10 +488,10 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
             ],
         },
         "trigger": {
-            "id": "58427684-3848-498a-8299-c6b0fc70265d",
+            "id": "fbd5aa14-b615-42c9-a85a-23eb1a6b5436",
             "merge_behavior": "AWAIT_ATTRIBUTES",
         },
-        "ports": [{"id": "39317827-df43-4f5a-bfbc-20bffc839748", "name": "default", "type": "DEFAULT"}],
+        "ports": [{"id": "bfe059fb-987f-47dd-bfbb-c71fdf1e4971", "name": "default", "type": "DEFAULT"}],
     }
 
     final_output_node = workflow_raw_data["nodes"][3]
@@ -515,8 +515,8 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
                         {
                             "type": "NODE_OUTPUT",
                             "data": {
-                                "node_id": "51cbe21d-0232-4362-bc54-5bc283297aa6",
-                                "output_id": "6834cae4-8173-4fa6-88f7-bc09d335bdd1",
+                                "node_id": "ac2de275-729f-4fba-9701-97beba80df34",
+                                "output_id": "c8ad13db-d601-4c24-bef7-0196baa8079c",
                             },
                         }
                     ],
@@ -544,17 +544,17 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
             "type": "DEFAULT",
         },
         {
-            "id": "24f69a26-333c-4cf4-b12a-55979672923a",
+            "id": "8eb009df-4daf-4ff6-8dc2-ff71a2829e2b",
             "source_node_id": "0d1460e4-f207-4a69-bcea-7a3c7b325c02",
             "source_handle_id": "7e29137d-af96-402c-8108-9a00e087d18e",
-            "target_node_id": "51cbe21d-0232-4362-bc54-5bc283297aa6",
-            "target_handle_id": "58427684-3848-498a-8299-c6b0fc70265d",
+            "target_node_id": "ac2de275-729f-4fba-9701-97beba80df34",
+            "target_handle_id": "fbd5aa14-b615-42c9-a85a-23eb1a6b5436",
             "type": "DEFAULT",
         },
         {
             "id": "1f720900-e5e1-49b7-9910-6ede79f6afd2",
-            "source_node_id": "51cbe21d-0232-4362-bc54-5bc283297aa6",
-            "source_handle_id": "39317827-df43-4f5a-bfbc-20bffc839748",
+            "source_node_id": "ac2de275-729f-4fba-9701-97beba80df34",
+            "source_handle_id": "bfe059fb-987f-47dd-bfbb-c71fdf1e4971",
             "target_node_id": "53de824d-a41d-4294-b511-c969932b05af",
             "target_handle_id": "fee3d395-38c3-485f-ab61-1a0fdf71c4ce",
             "type": "DEFAULT",

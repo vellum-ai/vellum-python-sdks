@@ -47,8 +47,6 @@ class TemplatingNode(BaseNode[StateType], Generic[StateType, _OutputType], metac
     Useful for lightweight data transformations and complex string templating.
     """
 
-    __legacy_id__ = True
-
     # The Jinja template to render.
     template: ClassVar[str] = ""
 

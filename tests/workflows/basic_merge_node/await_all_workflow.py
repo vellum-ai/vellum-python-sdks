@@ -21,8 +21,6 @@ class AwaitAllMergeNode(MergeNode):
 
 
 class FirstPassthroughNode(BaseNode):
-    __legacy_id__ = True
-
     class Outputs(BaseNode.Outputs):
         pass
 
@@ -31,8 +29,6 @@ class FirstPassthroughNode(BaseNode):
 
 
 class SecondPassthroughNode(BaseNode):
-    __legacy_id__ = True
-
     class Outputs(BaseNode.Outputs):
         pass
 
@@ -41,8 +37,6 @@ class SecondPassthroughNode(BaseNode):
 
 
 class FinalPassthroughNode(BaseNode):
-    __legacy_id__ = True
-
     class Outputs(BaseNode.Outputs):
         value: str
 

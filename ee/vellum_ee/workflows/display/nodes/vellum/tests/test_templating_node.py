@@ -29,7 +29,7 @@ def _display_class_with_node_input_ids_by_name_with_inputs_prefix(Node: Type[Tem
 @pytest.mark.parametrize(
     ["GetDisplayClass", "expected_input_id"],
     [
-        (_no_display_class, "91d982a9-6c41-42ac-aff9-7b623c450a55"),
+        (_no_display_class, "9567c1a5-fe6b-40b7-b268-72d48d3774d9"),
         (_display_class_with_node_input_ids_by_name, "fba6a4d5-835a-4e99-afb7-f6a4aed15110"),
         (_display_class_with_node_input_ids_by_name_with_inputs_prefix, "fba6a4d5-835a-4e99-afb7-f6a4aed15110"),
     ],
@@ -62,7 +62,7 @@ def test_serialize_node__templating_node_inputs(GetDisplayClass, expected_input_
 
     assert my_templating_node["inputs"] == [
         {
-            "id": "b7d971ee-9156-46b2-9bf0-9292875211f8",
+            "id": "b16c661b-b662-4f3f-8a99-9df615e396b9",
             "key": "template",
             "value": {
                 "combinator": "OR",
