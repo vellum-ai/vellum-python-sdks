@@ -1,0 +1,49 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`SetStateNode > basic > getNodeDisplayFile 1`] = `
+"from uuid import UUID
+
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.nodes import BaseNodeDisplay
+from vellum_ee.workflows.display.nodes.types import (
+    NodeOutputDisplay,
+    PortDisplayOverrides,
+)
+
+from ...nodes.set_state_node import SetStateNode
+
+
+class SetStateNodeDisplay(BaseNodeDisplay[SetStateNode]):
+    label = "Set State Node"
+    node_id = UUID("set-state-node-id")
+    attribute_ids_by_name = {"operations": UUID("operations-attribute-id")}
+    output_display = {
+        SetStateNode.Outputs.results: NodeOutputDisplay(
+            id=UUID("result-output-id"), name="results"
+        )
+    }
+    port_displays = {
+        SetStateNode.Ports.default_port: PortDisplayOverrides(
+            id=UUID("set-state-port-id")
+        )
+    }
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
+"
+`;
+
+exports[`SetStateNode > basic > getNodeFile 1`] = `
+"from vellum.workflows.nodes.displayable.set_state_node import (
+    SetStateNode as BaseSetStateNode,
+)
+
+from .my_custom_node import MyCustomNode
+from ..state import State
+
+
+class SetStateNode(BaseSetStateNode[State]):
+    operations = {
+        "chat_history": State.chat_history.concat(MyCustomNode.Outputs.chat_history),
+        "counter": State.counter + 1,
+    }
+"
+`;

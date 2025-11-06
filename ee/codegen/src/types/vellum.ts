@@ -1029,7 +1029,10 @@ export type OperatorMapping =
   | "access_field"
   | "or"
   | "and"
-  | "is_error";
+  | "is_error"
+  | "concat"
+  | "+"
+  | "-";
 
 export interface IterableConfig {
   endWithComma?: boolean;

@@ -1489,6 +1489,7 @@ export function genericNodeFactory({
   nodeOutputs,
   adornments,
   base,
+  definition,
 }: {
   id?: string;
   label?: string;
@@ -1498,6 +1499,7 @@ export function genericNodeFactory({
   nodeOutputs?: NodeOutput[];
   adornments?: AdornmentNode[];
   base?: CodeResourceDefinition;
+  definition?: CodeResourceDefinition;
 } = {}): GenericNode {
   const label = _label ?? "MyCustomNode";
   const nodeData: GenericNode = {
@@ -1508,7 +1510,7 @@ export function genericNodeFactory({
       module: ["vellum", "workflows", "nodes", "bases", "base"],
       name: "BaseNode",
     },
-    definition: {
+    definition: definition ?? {
       name: label,
       module: ["my_nodes", "my_custom_node"],
     },
@@ -1939,6 +1941,100 @@ export function toolCallingNodeFactory({
       },
     ],
     outputs: nodeOutputs ?? [],
+    adornments: adornments,
+  };
+  return nodeData;
+}
+
+export function setStateNodeFactory({
+  id,
+  label: _label,
+  nodeTrigger,
+  nodePorts,
+  nodeAttributes,
+  nodeOutputs,
+  adornments,
+}: {
+  id?: string;
+  label?: string;
+  nodeTrigger?: NodeTrigger;
+  nodePorts?: NodePort[];
+  nodeAttributes?: NodeAttribute[];
+  nodeOutputs?: NodeOutput[];
+  adornments?: AdornmentNode[];
+} = {}): GenericNode {
+  const label = _label ?? "Set State Node";
+  const nodeData: GenericNode = {
+    id: id ?? "set-state-node-id",
+    label,
+    type: WorkflowNodeType.GENERIC,
+    base: {
+      name: "SetStateNode",
+      module: ["vellum", "workflows", "nodes", "displayable", "set_state_node"],
+    },
+    definition: undefined,
+    trigger: nodeTrigger ?? {
+      id: "trigger-id",
+      mergeBehavior: "AWAIT_ATTRIBUTES",
+    },
+    ports: nodePorts ?? [
+      {
+        id: "set-state-port-id",
+        name: "default",
+        type: "DEFAULT",
+      },
+    ],
+    attributes: nodeAttributes ?? [
+      {
+        id: "operations-attribute-id",
+        name: "operations",
+        value: {
+          type: "DICTIONARY_REFERENCE",
+          entries: [
+            {
+              id: "07ea37d3-64d6-4b0f-a64d-8c55ccebf806",
+              key: "chat_history",
+              value: {
+                type: "BINARY_EXPRESSION",
+                lhs: {
+                  type: "WORKFLOW_STATE",
+                  stateVariableId: "state-chat-history-id",
+                },
+                operator: "concat",
+                rhs: {
+                  type: "NODE_OUTPUT",
+                  nodeId: "chat-history-node-id",
+                  nodeOutputId: "chat-history-node-output-id",
+                },
+              },
+            },
+            {
+              id: "271b5fac-a384-403b-857c-79d3872e4dd5",
+              key: "counter",
+              value: {
+                type: "BINARY_EXPRESSION",
+                lhs: {
+                  type: "WORKFLOW_STATE",
+                  stateVariableId: "state-counter-id",
+                },
+                operator: "+",
+                rhs: {
+                  type: "CONSTANT_VALUE",
+                  value: { type: "NUMBER", value: 1.0 },
+                },
+              },
+            },
+          ],
+        },
+      },
+    ],
+    outputs: nodeOutputs ?? [
+      {
+        id: "result-output-id",
+        name: "results",
+        type: "JSON",
+      },
+    ],
     adornments: adornments,
   };
   return nodeData;
