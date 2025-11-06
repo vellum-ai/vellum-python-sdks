@@ -171,7 +171,7 @@
       "ports": []
     },
     {
-      "id": "92e401f1-110f-4edc-8bb0-cad879e1ea08",
+      "id": "934fa117-64d4-426f-aee9-668383ff43cf",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -204,7 +204,7 @@
         ]
       },
       "trigger": {
-        "id": "c1b30829-76af-4d99-bf83-b030c551a7cf",
+        "id": "b89f1c81-970d-4fc9-907c-bb43b8315764",
         "merge_behavior": "AWAIT_ATTRIBUTES"
       },
       "ports": []
@@ -332,7 +332,7 @@
       ]
     },
     {
-      "id": "9d62e15c-a640-4a65-b52c-ce0cbaa23a71",
+      "id": "0d0d880e-fa99-410d-ba53-424c3e17a405",
       "display_data": {
         "position": {
           "x": 0.0,
@@ -365,12 +365,12 @@
         ]
       },
       "trigger": {
-        "id": "d7c92c2f-d761-43e7-a7e6-34fd74b3b8b3",
+        "id": "820f0c54-66bd-41a6-ae62-de700c51f11b",
         "merge_behavior": "AWAIT_ATTRIBUTES"
       },
       "ports": [
         {
-          "id": "bb1e4a4f-60e7-4519-b127-80183008a3f7",
+          "id": "957159c9-afaf-4b9e-947c-596963c85aa0",
           "name": "default",
           "type": "DEFAULT"
         }
