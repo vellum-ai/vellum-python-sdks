@@ -70,12 +70,71 @@ export class VellumVariable extends AstNode {
   private generateInitializerIfDefault(
     variable: VellumVariableWithName
   ): AstNode | undefined {
-    return variable.default && !isNil(variable.default.value)
+    if (!variable.default) {
+      return variable.default == null
+        ? python.TypeInstantiation.none()
+        : undefined;
+    }
+
+    // Check if the default value is an empty list or empty dict
+    // Use Field(default_factory=list) for empty lists to avoid mutable default issues
+    // Use Field(default_factory=dict) for empty dicts to avoid mutable default issues
+    const isEmptyList =
+      Array.isArray(variable.default.value) &&
+      variable.default.value.length === 0;
+    const isEmptyDict =
+      variable.default.value !== null &&
+      typeof variable.default.value === "object" &&
+      !Array.isArray(variable.default.value) &&
+      Object.keys(variable.default.value).length === 0;
+
+    if (isEmptyList) {
+      // Use Field(default_factory=list) for empty lists
+      const fieldReference = python.reference({
+        name: "Field",
+        modulePath: ["pydantic"],
+      });
+      this.addReference(fieldReference);
+
+      return python.instantiateClass({
+        classReference: fieldReference,
+        arguments_: [
+          python.methodArgument({
+            name: "default_factory",
+            value: python.reference({
+              name: "list",
+            }),
+          }),
+        ],
+      });
+    }
+
+    if (isEmptyDict) {
+      // Use Field(default_factory=dict) for empty dicts
+      const fieldReference = python.reference({
+        name: "Field",
+        modulePath: ["pydantic"],
+      });
+      this.addReference(fieldReference);
+
+      return python.instantiateClass({
+        classReference: fieldReference,
+        arguments_: [
+          python.methodArgument({
+            name: "default_factory",
+            value: python.reference({
+              name: "dict",
+            }),
+          }),
+        ],
+      });
+    }
+
+    // For non-empty defaults, use the regular VellumValue
+    return !isNil(variable.default.value)
       ? new VellumValue({
           vellumValue: variable.default,
         })
-      : variable.default == null
-      ? python.TypeInstantiation.none()
       : undefined;
   }
 

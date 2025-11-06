@@ -1259,6 +1259,69 @@ describe("WorkflowProjectGenerator", () => {
 
       expectProjectFileToMatchSnapshot(["code", "sandbox.py"]);
     });
+
+    it("should generate correct inputs for empty list and dict defaults", async () => {
+      const displayDataWithDefaults = {
+        workflow_raw_data: {
+          nodes: [
+            {
+              id: "entry",
+              type: "ENTRYPOINT",
+              data: {
+                label: "Entrypoint",
+                source_handle_id: "entry_source",
+                target_handle_id: "entry_target",
+              },
+              inputs: [],
+            },
+          ],
+          edges: [],
+        },
+        input_variables: [
+          {
+            key: "empty_list_input",
+            type: "ARRAY",
+            id: "empty-list-input",
+            required: true,
+            default: { type: "ARRAY", value: [] },
+          },
+          {
+            key: "empty_dict_input",
+            type: "JSON",
+            id: "empty-dict-input",
+            required: true,
+            default: { type: "JSON", value: {} },
+          },
+          {
+            key: "empty_list_input_optional",
+            type: "ARRAY",
+            id: "empty-list-input-optional",
+            required: false,
+            default: { type: "ARRAY", value: [] },
+          },
+          {
+            key: "empty_dict_input_optional",
+            type: "JSON",
+            id: "empty-dict-input-optional",
+            required: false,
+            default: { type: "JSON", value: {} },
+          },
+        ],
+        state_variables: [],
+        output_variables: [],
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayDataWithDefaults,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+      });
+
+      await project.generateCode();
+
+      expectProjectFileToMatchSnapshot(["code", "inputs.py"]);
+    });
   });
   describe("runner config with no container image", () => {
     const displayData = {
