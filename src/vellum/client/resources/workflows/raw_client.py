@@ -72,7 +72,7 @@ class RawWorkflowsClient:
         """
         with self._client_wrapper.httpx_client.stream(
             f"v1/workflows/{jsonable_encoder(id)}/pull",
-            base_url=self._client_wrapper.get_environment().default,
+            base_url=self._client_wrapper.get_environment().predict,
             method="GET",
             params={
                 "exclude_code": exclude_code,
@@ -234,6 +234,7 @@ class RawWorkflowsClient:
         self,
         *,
         files: typing.Dict[str, typing.Optional[typing.Any]],
+        module: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[typing.Dict[str, typing.Optional[typing.Any]]]:
         """
@@ -242,6 +243,8 @@ class RawWorkflowsClient:
         Parameters
         ----------
         files : typing.Dict[str, typing.Optional[typing.Any]]
+
+        module : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -257,6 +260,7 @@ class RawWorkflowsClient:
             method="POST",
             json={
                 "files": files,
+                "module": module,
             },
             headers={
                 "content-type": "application/json",
@@ -330,7 +334,7 @@ class AsyncRawWorkflowsClient:
         """
         async with self._client_wrapper.httpx_client.stream(
             f"v1/workflows/{jsonable_encoder(id)}/pull",
-            base_url=self._client_wrapper.get_environment().default,
+            base_url=self._client_wrapper.get_environment().predict,
             method="GET",
             params={
                 "exclude_code": exclude_code,
@@ -493,6 +497,7 @@ class AsyncRawWorkflowsClient:
         self,
         *,
         files: typing.Dict[str, typing.Optional[typing.Any]],
+        module: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[typing.Dict[str, typing.Optional[typing.Any]]]:
         """
@@ -501,6 +506,8 @@ class AsyncRawWorkflowsClient:
         Parameters
         ----------
         files : typing.Dict[str, typing.Optional[typing.Any]]
+
+        module : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -516,6 +523,7 @@ class AsyncRawWorkflowsClient:
             method="POST",
             json={
                 "files": files,
+                "module": module,
             },
             headers={
                 "content-type": "application/json",

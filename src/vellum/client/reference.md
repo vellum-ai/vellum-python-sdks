@@ -7401,6 +7401,14 @@ client.workflows.serialize_workflow_files(
 <dl>
 <dd>
 
+**module:** `typing.Optional[str]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
     
 </dd>

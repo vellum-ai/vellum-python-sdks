@@ -183,6 +183,7 @@ class WorkflowsClient:
         self,
         *,
         files: typing.Dict[str, typing.Optional[typing.Any]],
+        module: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Dict[str, typing.Optional[typing.Any]]:
         """
@@ -191,6 +192,8 @@ class WorkflowsClient:
         Parameters
         ----------
         files : typing.Dict[str, typing.Optional[typing.Any]]
+
+        module : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -212,7 +215,9 @@ class WorkflowsClient:
             files={"files": {"key": "value"}},
         )
         """
-        _response = self._raw_client.serialize_workflow_files(files=files, request_options=request_options)
+        _response = self._raw_client.serialize_workflow_files(
+            files=files, module=module, request_options=request_options
+        )
         return _response.data
 
 
@@ -388,6 +393,7 @@ class AsyncWorkflowsClient:
         self,
         *,
         files: typing.Dict[str, typing.Optional[typing.Any]],
+        module: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Dict[str, typing.Optional[typing.Any]]:
         """
@@ -396,6 +402,8 @@ class AsyncWorkflowsClient:
         Parameters
         ----------
         files : typing.Dict[str, typing.Optional[typing.Any]]
+
+        module : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -425,5 +433,7 @@ class AsyncWorkflowsClient:
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.serialize_workflow_files(files=files, request_options=request_options)
+        _response = await self._raw_client.serialize_workflow_files(
+            files=files, module=module, request_options=request_options
+        )
         return _response.data

@@ -728,6 +728,7 @@ from .workflow_sandbox_display_data import WorkflowSandboxDisplayData
 from .workflow_sandbox_example import WorkflowSandboxExample
 from .workflow_sandbox_parent_context import WorkflowSandboxParentContext
 from .workflow_stream_event import WorkflowStreamEvent
+from .workspace_display_config import WorkspaceDisplayConfig
 from .workspace_read import WorkspaceRead
 from .workspace_secret_read import WorkspaceSecretRead
 
@@ -1430,6 +1431,7 @@ __all__ = [
     "WorkflowSandboxExample",
     "WorkflowSandboxParentContext",
     "WorkflowStreamEvent",
+    "WorkspaceDisplayConfig",
     "WorkspaceRead",
     "WorkspaceSecretRead",
 ]

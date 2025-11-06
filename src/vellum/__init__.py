@@ -704,6 +704,7 @@ from .client.types import (
     WorkflowSandboxExample,
     WorkflowSandboxParentContext,
     WorkflowStreamEvent,
+    WorkspaceDisplayConfig,
     WorkspaceRead,
     WorkspaceSecretRead,
 )
@@ -1467,6 +1468,7 @@ __all__ = [
     "WorkflowSandboxExample",
     "WorkflowSandboxParentContext",
     "WorkflowStreamEvent",
+    "WorkspaceDisplayConfig",
     "WorkspaceRead",
     "WorkspaceSecretRead",
     "__version__",
