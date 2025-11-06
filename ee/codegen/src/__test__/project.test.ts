@@ -2372,6 +2372,12 @@ baz = foo + bar
       expectProjectFileToExist(["code", "nodes", "prompt.py"]);
       expectProjectFileToExist(["code", "display", "nodes", "prompt.py"]);
       expectProjectFileToMatchSnapshot(["code", "nodes", "prompt.py"]);
+      expectProjectFileToMatchSnapshot([
+        "code",
+        "display",
+        "nodes",
+        "prompt.py",
+      ]);
     });
 
     it("should generate try adornment node with correct attributes", async () => {
