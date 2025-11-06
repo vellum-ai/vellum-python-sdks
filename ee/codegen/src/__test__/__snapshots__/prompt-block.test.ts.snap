@@ -1,5 +1,50 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`PromptBlock > AUDIO > should generate a basic audio block 1`] = `
+"AudioPromptBlock(
+    src="https://example.com/audio.mp3",
+    metadata={
+        "key": "value",
+        "detail": "high",
+    },
+)
+"
+`;
+
+exports[`PromptBlock > CHAT_MESSAGE with file input block > should generate a chat message block with static file input blocks 1`] = `
+"ChatMessagePromptBlock(
+    chat_role="USER", blocks=[ImagePromptBlock(src="https://example.com/image.png")]
+)
+"
+`;
+
+exports[`PromptBlock > DOCUMENT > should generate a basic document block 1`] = `
+"DocumentPromptBlock(
+    src="https://example.com/document.pdf",
+    metadata={
+        "key": "value",
+        "detail": "high",
+    },
+)
+"
+`;
+
+exports[`PromptBlock > IMAGE > should generate a basic image block 1`] = `
+"ImagePromptBlock(src="https://example.com/image.png")
+"
+`;
+
+exports[`PromptBlock > IMAGE with metadata > should generate an image block with metadata 1`] = `
+"ImagePromptBlock(
+    src="https://example.com/image.png",
+    metadata={
+        "key": "value",
+        "detail": "high",
+    },
+)
+"
+`;
+
 exports[`PromptBlock > JINJA > should generate a basic jinja block 1`] = `
 "JinjaPromptBlock(template="""Hello, {{ name }}!""")
 "
@@ -15,5 +60,16 @@ exports[`PromptBlock > JINJA > should generate a jinja block with a cache config
 
 exports[`PromptBlock > JINJA > should handle double quotes in jinja template 1`] = `
 "JinjaPromptBlock(template="""\\"Hello\\" \\"World\\"""")
+"
+`;
+
+exports[`PromptBlock > VIDEO > should generate a basic video block 1`] = `
+"VideoPromptBlock(
+    src="https://example.com/video.mp4",
+    metadata={
+        "key": "value",
+        "detail": "high",
+    },
+)
 "
 `;
