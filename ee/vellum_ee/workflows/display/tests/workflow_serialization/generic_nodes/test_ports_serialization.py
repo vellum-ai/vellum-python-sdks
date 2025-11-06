@@ -22,7 +22,7 @@ def test_serialize_node__basic(serialize_node):
     serialized_node = serialize_node(BasicGenericNode)
     assert not DeepDiff(
         {
-            "id": "8d7cbfe4-72ca-4367-a401-8d28723d2f00",
+            "id": "7fc62d68-0a27-4506-b4ea-e40bc116c0c5",
             "label": "Basic Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -39,10 +39,10 @@ def test_serialize_node__basic(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "b95cca96-b570-42ac-ace8-51ca0f627881", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "454606d2-204a-4b29-b0dd-59233c9e5a0e", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "8bec8d0c-113f-4110-afcb-4a6e566e7236",
+                    "id": "4173b79f-ebdd-4026-8046-01d20dcf2b13",
                     "name": "default",
                     "type": "DEFAULT",
                 }
@@ -69,7 +69,7 @@ def test_serialize_node__if(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "bba4b15a-dea0-48c9-a79b-4e12e99db00f",
+            "id": "108e36a6-a773-4bc7-b6c4-38997e3690c5",
             "label": "If Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -86,10 +86,10 @@ def test_serialize_node__if(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "46e21bcc-47e1-457f-8134-ead575253b74", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "6769e811-fc56-4bab-9ebb-4b4b4b5ef023", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "9889fe69-62f8-4bb3-aac6-425b75700bea",
+                    "id": "cec9e02a-4097-4e0a-b62d-60da4f17db67",
                     "type": "IF",
                     "name": "if_branch",
                     "expression": {
@@ -132,7 +132,7 @@ def test_serialize_node__if_else(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "25c9c3f1-4014-47ac-90cf-5216de10d05c",
+            "id": "6b16a6e3-cbe4-4672-b2bb-31ef930b0d97",
             "label": "If Else Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -149,10 +149,10 @@ def test_serialize_node__if_else(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "664c941c-275c-474c-9a5c-8501b934e86d", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "b4a3e968-0f88-457c-b91e-e6c490b669de", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "6fd9edea-9c1f-4463-aeb9-bfdde3231ee0",
+                    "id": "b3394650-f12e-443c-8abe-675bfb632cf5",
                     "type": "IF",
                     "name": "if_branch",
                     "expression": {
@@ -172,7 +172,7 @@ def test_serialize_node__if_else(serialize_node):
                     },
                 },
                 {
-                    "id": "7f9ea016-22da-49b3-be46-b80fb96beedf",
+                    "id": "7c213f16-ae88-4080-8b44-2084d4280c3f",
                     "type": "ELSE",
                     "name": "else_branch",
                     "expression": None,
@@ -202,7 +202,7 @@ def test_serialize_node__if_elif_else(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "7b2b9cfc-12aa-432c-940d-cbe53e71de9c",
+            "id": "da8860e8-e1ea-4e57-977b-7a8ef43415ee",
             "label": "If Elif Else Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -219,10 +219,10 @@ def test_serialize_node__if_elif_else(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "bba33909-beeb-4ebd-ad77-46b617ab07b0", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "1b86a845-df3a-4544-ae5b-a23887e735b1", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "19a1cc62-1f18-49b0-8026-7c82709e34db",
+                    "id": "d0fa9794-bd46-4238-b61f-6b03ba7053ba",
                     "type": "IF",
                     "name": "if_branch",
                     "expression": {
@@ -242,7 +242,7 @@ def test_serialize_node__if_elif_else(serialize_node):
                     },
                 },
                 {
-                    "id": "dc0b680e-d7b3-4a44-a37d-df22b310bda3",
+                    "id": "5b4afa12-5c0d-4e6a-b304-d56baf4738dc",
                     "type": "ELIF",
                     "name": "elif_branch",
                     "expression": {
@@ -262,7 +262,7 @@ def test_serialize_node__if_elif_else(serialize_node):
                     },
                 },
                 {
-                    "id": "16d0b698-1353-4eb3-9768-4a6e5ed4b1da",
+                    "id": "055fc9f8-3510-47d2-8dcf-d7bd0ea15fd6",
                     "type": "ELSE",
                     "expression": None,
                     "name": "else_branch",
@@ -303,7 +303,7 @@ def test_serialize_node__node_output_reference(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "ac067acc-6a6f-44b1-ae84-428e965ce691",
+            "id": "e5387a2f-ccff-43b2-8b29-8f4ba9beb01e",
             "label": "Generic Node Referencing Output",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -320,17 +320,17 @@ def test_serialize_node__node_output_reference(serialize_node):
                 ],
             },
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
-            "trigger": {"id": "c8804b97-9f84-41b6-ade8-aa74544d6846", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "c43b6517-102a-44bc-83c8-37d42861d3e6", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "500075dc-fc65-428a-b3c0-a410f8c7f8cf",
+                    "id": "6258cb70-4cfc-4bc8-a26c-df14a50bc72a",
                     "type": "IF",
                     "name": "if_branch",
                     "expression": {
                         "type": "BINARY_EXPRESSION",
                         "lhs": {
                             "type": "NODE_OUTPUT",
-                            "node_id": "21213d1e-991c-405a-b4fa-a1e01c4dd088",
+                            "node_id": "242ad818-12ec-449f-87b4-d2bc513e2148",
                             "node_output_id": str(node_output_id),
                         },
                         "operator": "=",
@@ -367,7 +367,7 @@ def test_serialize_node__vellum_secret_reference(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "feb4b331-e25f-4a5c-9840-c5575b1efd5c",
+            "id": "b1e770cb-31dd-461f-9041-8470c9f3e098",
             "label": "Generic Node Referencing Secret",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -384,10 +384,10 @@ def test_serialize_node__vellum_secret_reference(serialize_node):
                 ],
             },
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
-            "trigger": {"id": "93cc612b-c020-420b-94ef-62d9687c212c", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "96f50af1-8178-47b8-b8c0-97ca10e62845", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "3b6b4048-8622-446d-9772-2766357d7b18",
+                    "id": "aaad042f-02ce-400a-aad5-c9064925937b",
                     "type": "IF",
                     "name": "if_branch",
                     "expression": {
@@ -434,7 +434,7 @@ def test_serialize_node__execution_count_reference(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "0b4fe8a6-6d0c-464e-9372-10110e2b0e13",
+            "id": "5e6512c2-7a97-4b44-abed-64cee4388df5",
             "label": "Generic Node Referencing Executions",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -451,17 +451,17 @@ def test_serialize_node__execution_count_reference(serialize_node):
                 ],
             },
             "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
-            "trigger": {"id": "ccc61dda-a947-47ac-b484-78f971ae1148", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "4a120ba5-2384-4854-a9fb-b9fe68bcd52a", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "79d0cfa3-c8f9-4434-a2f8-5e416d66437a",
+                    "id": "575af12c-c700-438c-9123-198cca866535",
                     "type": "IF",
                     "name": "if_branch",
                     "expression": {
                         "type": "BINARY_EXPRESSION",
                         "lhs": {
                             "type": "EXECUTION_COUNTER",
-                            "node_id": "235c66f9-c76b-4df0-9bff-cfba2ef1ad18",
+                            "node_id": "075e9647-b657-4a6e-ab21-c3a7f1a68ada",
                         },
                         "operator": "=",
                         "rhs": {
@@ -496,7 +496,7 @@ def test_serialize_node__null(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "1838ce1f-9c07-4fd0-9fd4-2a3a841ea402",
+            "id": "05d96ec5-4a05-43ca-a1c2-e92a49ac9520",
             "label": "Null Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -513,10 +513,10 @@ def test_serialize_node__null(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "ad543514-516f-47ac-a363-1bbfccb0dfa9", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "bc28e72e-b75b-487c-8b8f-345c062d848d", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "7f1fb75d-0c8b-4ebc-8c59-4ae68f1a68e1",
+                    "id": "b0b5f49f-7d02-4b45-9c8b-b4b5440a0e8e",
                     "type": "IF",
                     "name": "if_branch",
                     "expression": {
@@ -555,7 +555,7 @@ def test_serialize_node__between(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "f2f5a1f2-a12d-4ce0-bfe9-42190ffe5328",
+            "id": "f32ab40b-7de2-4dc4-b5ef-41a753bf8bb4",
             "label": "Between Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -572,10 +572,10 @@ def test_serialize_node__between(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "36799ad9-5c1a-4bb6-be13-aee5487c021b", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "99c92fd8-66af-4910-8f1c-773fa4c7fc42", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "b745c089-1023-46dc-b2b6-ba75ac37563a",
+                    "id": "9894ea65-ecbd-4d31-9ede-b65debebc908",
                     "type": "IF",
                     "name": "if_branch",
                     "expression": {
@@ -624,7 +624,7 @@ def test_serialize_node__or(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "5386abad-3378-4378-b3a8-831b4b77dc23",
+            "id": "8971f041-6b61-4d02-b02b-9d221f224ea2",
             "label": "Or Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -641,10 +641,10 @@ def test_serialize_node__or(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "f2837ac2-2132-4af2-b8bb-30de9b0a2815", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "69c1fb9e-2b89-46f2-a1b0-c7bd2e55d812", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "0bd64819-b866-4333-82e0-8ac672c09b79",
+                    "id": "0306137d-1af9-430e-8582-08054d1ed350",
                     "type": "IF",
                     "name": "if_branch",
                     "expression": {
@@ -708,7 +708,7 @@ def test_serialize_node__and_then_or(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "4d3995b1-437b-48d9-8878-9f57a8b725f1",
+            "id": "ce9daa70-0e06-4ee4-b611-cd5702e92eed",
             "label": "And Then Or Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -725,10 +725,10 @@ def test_serialize_node__and_then_or(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "aa7747fe-4b59-4994-a5c4-0ccc8065f93d", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "eddecfb5-4bdf-4193-b8c2-bc7bf1bd96b1", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "8bb89da2-a752-4541-8f90-1276c44910a8",
+                    "id": "c87cfe7b-a6a9-43eb-a890-4785ee1783e7",
                     "type": "IF",
                     "name": "if_branch",
                     "expression": {
@@ -811,7 +811,7 @@ def test_serialize_node__parenthesized_and_then_or(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "223864c9-0088-4c05-9b7d-e5b1c9ec936d",
+            "id": "c311e689-f06c-47a9-88dc-ca2e1f0ae455",
             "label": "Parenthesized And Then Or Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -828,10 +828,10 @@ def test_serialize_node__parenthesized_and_then_or(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "71601746-3722-423c-8fc0-d15a6bb6ddd4", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "3d9cd609-7801-4ce5-b70c-2afcc88d8af3", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "30478083-924d-469e-ad55-df28bc282cdb",
+                    "id": "b58e5bcb-cfcd-4249-b80d-447dc4b096f0",
                     "type": "IF",
                     "name": "if_branch",
                     "expression": {
@@ -914,7 +914,7 @@ def test_serialize_node__or_then_and(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "a946342e-4ede-4e96-8e3d-f396748d9f7c",
+            "id": "4394a83e-897c-4fe1-a76c-6e8853a619a9",
             "label": "Or Then And Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -931,10 +931,10 @@ def test_serialize_node__or_then_and(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "9c875b19-fce1-4eef-80ea-19651dec1a76", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "ef0b522b-f9c0-4767-b7ea-f0fb15b213ed", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "7f442cce-0b99-482c-aec8-8eed6ccadde2",
+                    "id": "2770f76e-f20e-40c6-86a0-8efbc08a8265",
                     "type": "IF",
                     "name": "if_branch",
                     "expression": {
@@ -1016,7 +1016,7 @@ def test_serialize_node__parse_json(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "bfc3f81b-242a-4f43-9e1c-648223d77768",
+            "id": "60a14037-a8cf-47ad-b34b-47ec9dbf9715",
             "label": "Parse Json Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -1033,10 +1033,10 @@ def test_serialize_node__parse_json(serialize_node):
                     "test_ports_serialization",
                 ],
             },
-            "trigger": {"id": "ecff8eef-b928-48e7-ac26-841322ff2752", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "trigger": {"id": "2d711e0e-7b50-4eaf-ad2c-f6d7441b75f0", "merge_behavior": "AWAIT_ATTRIBUTES"},
             "ports": [
                 {
-                    "id": "5a88bac8-89b3-4d81-b539-2f977a36a9c0",
+                    "id": "9eedb158-20a0-456e-b436-d9a7460b791e",
                     "type": "IF",
                     "name": "if_branch",
                     "expression": {
