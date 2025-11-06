@@ -233,7 +233,6 @@ def test_vellum_workflow_display__serialize_with_parse_json_expression():
     from vellum.workflows.references.constant import ConstantValueReference
 
     class JsonNode(BaseNode):
-        __legacy_id__ = True
 
         class Outputs(BaseNode.Outputs):
             json_result = ConstantValueReference('{"key": "value"}').parse_json()
@@ -298,7 +297,6 @@ def test_vellum_workflow_display__serialize_with_parse_json_expression():
 def test_serialize__port_with_lazy_reference():
     # GIVEN a node with a lazy reference in a Port
     class MyNode(BaseNode):
-        __legacy_id__ = True
 
         class Ports(BaseNode.Ports):
             foo = Port.on_if(LazyReference(lambda: MyNode.Outputs.bar))

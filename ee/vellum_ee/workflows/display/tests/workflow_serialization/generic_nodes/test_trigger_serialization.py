@@ -15,7 +15,7 @@ class Inputs(BaseInputs):
 
 def test_serialize_node__basic(serialize_node):
     class BasicGenericNode(BaseNode):
-        __legacy_id__ = True
+        pass
 
     serialized_node = serialize_node(BasicGenericNode)
     assert not DeepDiff(
@@ -56,7 +56,6 @@ def test_serialize_node__basic(serialize_node):
 
 def test_serialize_node__await_any(serialize_node):
     class AwaitAnyGenericNode(BaseNode):
-        __legacy_id__ = True
 
         class Trigger(BaseNode.Trigger):
             merge_behavior = MergeBehavior.AWAIT_ANY
@@ -100,7 +99,6 @@ def test_serialize_node__await_any(serialize_node):
 
 def test_serialize_node__await_all(serialize_node):
     class AwaitAllGenericNode(BaseNode):
-        __legacy_id__ = True
 
         class Trigger(BaseNode.Trigger):
             merge_behavior = MergeBehavior.AWAIT_ALL

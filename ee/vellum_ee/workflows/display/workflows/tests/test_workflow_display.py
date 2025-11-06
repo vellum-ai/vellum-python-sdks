@@ -401,7 +401,6 @@ def test_serialize_workflow__nested_lazy_reference():
 
     # AND the outer node
     class OuterNode(BaseNode):
-        __legacy_id__ = True
 
         class Outputs(BaseNode.Outputs):
             bar: str
@@ -502,14 +501,12 @@ def test_serialize_workflow__array_values():
 def test_serialize_workflow__array_reference():
     # GIVEN a node with array containing non-constant values (node references)
     class FirstNode(BaseNode):
-        __legacy_id__ = True
 
         class Outputs(BaseNode.Outputs):
             value1: str
             value2: str
 
     class SecondNode(BaseNode):
-        __legacy_id__ = True
 
         class Outputs(BaseNode.Outputs):
             # Array containing a mix of constants and node references
@@ -666,13 +663,11 @@ def test_serialize_workflow__dict_values():
 def test_serialize_workflow__dict_reference():
     # GIVEN a node with a dictionary containing non-constant values (node references)
     class FirstNode(BaseNode):
-        __legacy_id__ = True
 
         class Outputs(BaseNode.Outputs):
             value1: str
 
     class SecondNode(BaseNode):
-        __legacy_id__ = True
 
         class Outputs(BaseNode.Outputs):
             # Dictionary containing a mix of constants and node references

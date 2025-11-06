@@ -13,7 +13,6 @@ class Inputs(BaseInputs):
 
 
 class Iteration(BaseNode):
-    __legacy_id__ = True
     item = MapNode.SubworkflowInputs.item
     index = MapNode.SubworkflowInputs.index
 

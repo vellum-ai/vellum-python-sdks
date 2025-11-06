@@ -17,7 +17,7 @@ class Inputs(BaseInputs):
 
 def test_serialize_node__basic(serialize_node):
     class BasicGenericNode(BaseNode):
-        __legacy_id__ = True
+        pass
 
     serialized_node = serialize_node(BasicGenericNode)
     assert not DeepDiff(
@@ -58,7 +58,6 @@ def test_serialize_node__basic(serialize_node):
 
 def test_serialize_node__if(serialize_node):
     class IfGenericNode(BaseNode):
-        __legacy_id__ = True
 
         class Ports(BaseNode.Ports):
             if_branch = Port.on_if(Inputs.input.equals("hello"))
@@ -121,7 +120,6 @@ def test_serialize_node__if(serialize_node):
 
 def test_serialize_node__if_else(serialize_node):
     class IfElseGenericNode(BaseNode):
-        __legacy_id__ = True
 
         class Ports(BaseNode.Ports):
             if_branch = Port.on_if(Inputs.input.equals("hello"))
@@ -190,7 +188,6 @@ def test_serialize_node__if_else(serialize_node):
 
 def test_serialize_node__if_elif_else(serialize_node):
     class IfElifElseGenericNode(BaseNode):
-        __legacy_id__ = True
 
         class Ports(BaseNode.Ports):
             if_branch = Port.on_if(Inputs.input.equals("hello"))
@@ -281,7 +278,6 @@ def test_serialize_node__if_elif_else(serialize_node):
 
 def test_serialize_node__node_output_reference(serialize_node):
     class NodeWithOutput(BaseNode):
-        __legacy_id__ = True
 
         class Outputs(BaseNode.Outputs):
             output = Inputs.input
@@ -290,7 +286,6 @@ def test_serialize_node__node_output_reference(serialize_node):
         pass
 
     class GenericNodeReferencingOutput(BaseNode):
-        __legacy_id__ = True
 
         class Ports(BaseNode.Ports):
             if_branch = Port.on_if(NodeWithOutput.Outputs.output.equals("hello"))
@@ -360,7 +355,6 @@ def test_serialize_node__node_output_reference(serialize_node):
 
 def test_serialize_node__vellum_secret_reference(serialize_node):
     class GenericNodeReferencingSecret(BaseNode):
-        __legacy_id__ = True
 
         class Ports(BaseNode.Ports):
             if_branch = Port.on_if(VellumSecretReference(name="hello").equals("hello"))
@@ -421,13 +415,12 @@ def test_serialize_node__vellum_secret_reference(serialize_node):
 
 def test_serialize_node__execution_count_reference(serialize_node):
     class NodeWithExecutions(BaseNode):
-        __legacy_id__ = True
+        pass
 
     class NodeWithExecutionsDisplay(BaseNodeDisplay[NodeWithExecutions]):
-        __legacy_id__ = True
+        pass
 
     class GenericNodeReferencingExecutions(BaseNode):
-        __legacy_id__ = True
 
         class Ports(BaseNode.Ports):
             if_branch = Port.on_if(NodeWithExecutions.Execution.count.equals(5))
@@ -492,7 +485,6 @@ def test_serialize_node__execution_count_reference(serialize_node):
 
 def test_serialize_node__null(serialize_node):
     class NullGenericNode(BaseNode):
-        __legacy_id__ = True
 
         class Ports(BaseNode.Ports):
             if_branch = Port.on_if(Inputs.input.is_null())
@@ -551,7 +543,6 @@ def test_serialize_node__between(serialize_node):
         input: int
 
     class BetweenGenericNode(BaseNode):
-        __legacy_id__ = True
 
         class Ports(BaseNode.Ports):
             if_branch = Port.on_if(IntegerInputs.input.between(1, 10))
@@ -622,7 +613,6 @@ def test_serialize_node__between(serialize_node):
 
 def test_serialize_node__or(serialize_node):
     class OrGenericNode(BaseNode):
-        __legacy_id__ = True
 
         class Ports(BaseNode.Ports):
             if_branch = Port.on_if(Inputs.input.equals("hello") | Inputs.input.equals("world"))
@@ -704,7 +694,6 @@ def test_serialize_node__or(serialize_node):
 
 def test_serialize_node__and_then_or(serialize_node):
     class AndThenOrGenericNode(BaseNode):
-        __legacy_id__ = True
 
         class Ports(BaseNode.Ports):
             if_branch = Port.on_if(
@@ -808,7 +797,6 @@ def test_serialize_node__and_then_or(serialize_node):
 
 def test_serialize_node__parenthesized_and_then_or(serialize_node):
     class ParenthesizedAndThenOrGenericNode(BaseNode):
-        __legacy_id__ = True
 
         class Ports(BaseNode.Ports):
             if_branch = Port.on_if(
@@ -912,7 +900,6 @@ def test_serialize_node__parenthesized_and_then_or(serialize_node):
 
 def test_serialize_node__or_then_and(serialize_node):
     class OrThenAndGenericNode(BaseNode):
-        __legacy_id__ = True
 
         class Ports(BaseNode.Ports):
             if_branch = Port.on_if(
@@ -1017,7 +1004,6 @@ def test_serialize_node__or_then_and(serialize_node):
 def test_serialize_node__parse_json(serialize_node):
 
     class ParseJsonGenericNode(BaseNode):
-        __legacy_id__ = True
 
         class Ports(BaseNode.Ports):
             if_branch = Port.on_if(Inputs.input.parse_json().equals({"key": "value"}))
