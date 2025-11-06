@@ -203,6 +203,35 @@ class FirstNode(BaseNode):
 "
 `;
 
+exports[`WorkflowProjectGenerator > adornments > should correctly generate code for a prompt node with retry adornment > code/display/nodes/prompt.py 1`] = `
+"from uuid import UUID
+
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.nodes import BaseInlinePromptNodeDisplay, BaseRetryNodeDisplay
+from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
+
+from ...nodes.prompt import Prompt
+
+
+@BaseRetryNodeDisplay.wrap(node_id=UUID("65483f3d-59a3-4a8d-a8ab-70e6797cc474"))
+class PromptDisplay(BaseInlinePromptNodeDisplay[Prompt]):
+    label = "Prompt"
+    node_id = UUID("82d5c288-aab8-4d27-bceb-4ba7bc688c34")
+    output_id = UUID("e054f21d-33e1-4c76-8b1d-b22c393f6c7d")
+    array_output_id = UUID("191a66c6-3e38-45e0-b5dd-5e644fdec8b0")
+    target_handle_id = UUID("0f3f518a-ce24-4355-8568-94e1bf295725")
+    node_input_ids_by_name = {"prompt_inputs.text": UUID("043a9f22-17c2-4d51-b106-753842a0c0b9")}
+    output_display = {
+        Prompt.Outputs.text: NodeOutputDisplay(id=UUID("e054f21d-33e1-4c76-8b1d-b22c393f6c7d"), name="text"),
+        Prompt.Outputs.results: NodeOutputDisplay(id=UUID("191a66c6-3e38-45e0-b5dd-5e644fdec8b0"), name="results"),
+    }
+    port_displays = {Prompt.Ports.default: PortDisplayOverrides(id=UUID("c678ddd0-f646-4bd3-9557-9ad63f6d8f3c"))}
+    display_data = NodeDisplayData(
+        position=NodeDisplayPosition(x=1971.8034185919948, y=205.60253395092258), width=480, height=175
+    )
+"
+`;
+
 exports[`WorkflowProjectGenerator > adornments > should correctly generate code for a prompt node with retry adornment > code/nodes/prompt.py 1`] = `
 "from vellum import (
     ChatMessagePromptBlock,
