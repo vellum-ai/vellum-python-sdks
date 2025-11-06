@@ -100,7 +100,13 @@
       },
       "base": {
         "name": "BaseNode",
-        "module": ["vellum", "workflows", "nodes", "bases", "base"]
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
       },
       "definition": {
         "name": "CodeExecutionNode",
@@ -139,7 +145,13 @@
       },
       "base": {
         "name": "BaseNode",
-        "module": ["vellum", "workflows", "nodes", "bases", "base"]
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
       },
       "definition": {
         "name": "ConditionalNode",
@@ -172,11 +184,24 @@
       },
       "base": {
         "name": "BaseNode",
-        "module": ["vellum", "workflows", "nodes", "bases", "base"]
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
       },
       "definition": {
         "name": "ErrorNode",
-        "module": ["vellum", "workflows", "nodes", "core", "error_node", "node"]
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "core",
+          "error_node",
+          "node"
+        ]
       },
       "trigger": {
         "id": "b89f1c81-970d-4fc9-907c-bb43b8315764",
@@ -320,7 +345,13 @@
       },
       "base": {
         "name": "BaseNode",
-        "module": ["vellum", "workflows", "nodes", "bases", "base"]
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
       },
       "definition": {
         "name": "InlineSubworkflowNode",
@@ -359,7 +390,13 @@
       },
       "base": {
         "name": "BaseNode",
-        "module": ["vellum", "workflows", "nodes", "bases", "base"]
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
       },
       "definition": {
         "name": "GuardrailNode",
@@ -408,7 +445,14 @@
       },
       "definition": {
         "name": "MapNode",
-        "module": ["vellum", "workflows", "nodes", "core", "map_node", "node"]
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "core",
+          "map_node",
+          "node"
+        ]
       },
       "trigger": {
         "id": "d9ed81b3-891d-41e7-8ca3-696776a3375f",
@@ -436,7 +480,13 @@
       },
       "base": {
         "name": "BaseNode",
-        "module": ["vellum", "workflows", "nodes", "bases", "base"]
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
       },
       "definition": {
         "name": "MergeNode",
@@ -475,7 +525,13 @@
       },
       "base": {
         "name": "BaseNode",
-        "module": ["vellum", "workflows", "nodes", "bases", "base"]
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
       },
       "definition": {
         "name": "NoteNode",
@@ -514,7 +570,13 @@
       },
       "base": {
         "name": "BaseNode",
-        "module": ["vellum", "workflows", "nodes", "bases", "base"]
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
       },
       "definition": {
         "name": "SubworkflowDeploymentNode",
@@ -679,7 +741,13 @@
       },
       "base": {
         "name": "BaseNode",
-        "module": ["vellum", "workflows", "nodes", "bases", "base"]
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
       },
       "definition": {
         "name": "SetStateNode",
@@ -726,7 +794,13 @@
       },
       "base": {
         "name": "BaseNode",
-        "module": ["vellum", "workflows", "nodes", "bases", "base"]
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
       },
       "definition": {
         "name": "TemplatingNode",
@@ -855,7 +929,13 @@
       },
       "base": {
         "name": "BaseNode",
-        "module": ["vellum", "workflows", "nodes", "bases", "base"]
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
       },
       "definition": {
         "name": "ToolCallingNode",
@@ -922,7 +1002,13 @@
       },
       "base": {
         "name": "BaseNode",
-        "module": ["vellum", "workflows", "nodes", "bases", "base"]
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
       },
       "definition": {
         "name": "WebSearchNode",
@@ -981,7 +1067,13 @@
       },
       "base": {
         "name": "BaseNode",
-        "module": ["vellum", "workflows", "nodes", "bases", "base"]
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
       },
       "definition": {
         "name": "FinalOutputNode",
