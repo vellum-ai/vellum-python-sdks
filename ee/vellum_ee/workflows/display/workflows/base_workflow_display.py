@@ -575,6 +575,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             trigger_id = trigger_class.__id__
 
             # Serialize trigger attributes like node outputs
+            trigger_data: JsonObject
             if trigger_type == WorkflowTriggerType.SCHEDULED:
                 # For scheduled triggers, attributes should be empty
                 # and cron/timezone should be top level
@@ -583,7 +584,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 cron_value = getattr(config_class, "cron", None)
                 timezone_value = getattr(config_class, "timezone", None)
 
-                trigger_data: JsonObject = {
+                trigger_data = {
                     "id": str(trigger_id),
                     "type": trigger_type.value,
                     "cron": cron_value,
@@ -609,7 +610,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                     ],
                 )
 
-                trigger_data: JsonObject = {
+                trigger_data = {
                     "id": str(trigger_id),
                     "type": trigger_type.value,
                     "attributes": trigger_attributes,
