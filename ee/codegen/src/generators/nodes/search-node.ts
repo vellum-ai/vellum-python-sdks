@@ -80,9 +80,11 @@ export class SearchNode extends BaseNode<
         limitValue?.type === "CONSTANT_VALUE" &&
         limitValue.data.type !== "NUMBER"
       ) {
-        throw new NodeAttributeGenerationError(
-          `Limit param input should be a CONSTANT_VALUE and of type NUMBER, got ${limitValue.data.type} instead`,
-          "WARNING"
+        this.workflowContext.addError(
+          new NodeAttributeGenerationError(
+            `Limit param input should be a CONSTANT_VALUE and of type NUMBER, got ${limitValue.data.type} instead`,
+            "WARNING"
+          )
         );
       } else {
         bodyStatements.push(
@@ -132,16 +134,17 @@ export class SearchNode extends BaseNode<
     const weightsRule =
       this.findNodeInputByName("weights")?.nodeInputData?.value.rules[0];
     if (!weightsRule || weightsRule.type !== "CONSTANT_VALUE") {
-      throw new NodeAttributeGenerationError(
-        "weights input is required",
-        "WARNING"
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError("weights input is required", "WARNING")
       );
+      return python.TypeInstantiation.none();
     }
 
     // Accept null/empty JSON values and add a warning instead of throwing
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const rawValue: any = (weightsRule as any).data?.value;
-    if (rawValue == null) {
+    type WeightsRuleData = { data?: { value?: unknown } };
+    const rawValueUnknown: unknown = (weightsRule as WeightsRuleData).data
+      ?.value;
+    if (rawValueUnknown == null) {
       this.workflowContext.addError(
         new NodeAttributeGenerationError(
           "weights input is null; defaulting to None",
@@ -151,25 +154,37 @@ export class SearchNode extends BaseNode<
       return python.TypeInstantiation.none();
     }
 
-    // TODO: Determine what we want to cast JSON values to
-    //  https://app.shortcut.com/vellum/story/5459
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { semantic_similarity, keywords } = rawValue as Record<
-      string,
-      unknown
-    >;
-    if (typeof semantic_similarity !== "number") {
-      throw new NodeAttributeGenerationError(
-        "semantic_similarity weight must be a number",
-        "WARNING"
+    if (typeof rawValueUnknown !== "object" || Array.isArray(rawValueUnknown)) {
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          "weights input must be a JSON object",
+          "WARNING"
+        )
       );
+      return python.TypeInstantiation.none();
+    }
+
+    const weightsObject = rawValueUnknown as Record<string, unknown>;
+    const semantic_similarity = weightsObject["semantic_similarity"];
+    const keywords = weightsObject["keywords"];
+    if (typeof semantic_similarity !== "number") {
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          "semantic_similarity weight must be a number",
+          "WARNING"
+        )
+      );
+      return python.TypeInstantiation.none();
     }
 
     if (typeof keywords !== "number") {
-      throw new NodeAttributeGenerationError(
-        "keywords weight must be a number",
-        "WARNING"
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          "keywords weight must be a number",
+          "WARNING"
+        )
       );
+      return python.TypeInstantiation.none();
     }
 
     const searchWeightsRequest = python.instantiateClass({
@@ -196,18 +211,46 @@ export class SearchNode extends BaseNode<
     const resultMergingRule = this.findNodeInputByName("result_merging_enabled")
       ?.nodeInputData?.value.rules[0];
     if (!resultMergingRule || resultMergingRule.type !== "CONSTANT_VALUE") {
-      throw new NodeAttributeGenerationError(
-        "result_merging_enabled input is required",
-        "WARNING"
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          "result_merging_enabled input is required",
+          "WARNING"
+        )
       );
+      return python.instantiateClass({
+        classReference: python.reference({
+          name: "SearchResultMergingRequest",
+          modulePath: VELLUM_CLIENT_MODULE_PATH,
+        }),
+        arguments_: [
+          python.methodArgument({
+            name: "enabled",
+            value: python.TypeInstantiation.bool(false),
+          }),
+        ],
+      });
     }
 
     const resultMergingEnabled = resultMergingRule.data.value;
     if (typeof resultMergingEnabled !== "string") {
-      throw new NodeAttributeGenerationError(
-        "result_merging_enabled must be a boolean",
-        "WARNING"
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          "result_merging_enabled must be a boolean",
+          "WARNING"
+        )
       );
+      return python.instantiateClass({
+        classReference: python.reference({
+          name: "SearchResultMergingRequest",
+          modulePath: VELLUM_CLIENT_MODULE_PATH,
+        }),
+        arguments_: [
+          python.methodArgument({
+            name: "enabled",
+            value: python.TypeInstantiation.bool(false),
+          }),
+        ],
+      });
     }
 
     return python.instantiateClass({
