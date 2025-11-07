@@ -157,11 +157,8 @@ class BaseNodeMeta(ABCMeta):
         node_class.Trigger.node_class = node_class
         node_class.ExternalInputs.__parent_class__ = node_class
 
-        # Check if this node uses legacy ID generation (qualname only) or new ID generation (module + qualname)
-        if getattr(node_class, "__legacy_id__", False):
-            node_class.__id__ = uuid4_from_hash(node_class.__qualname__)
-        else:
-            node_class.__id__ = uuid4_from_hash(f"{node_class.__module__}.{node_class.__qualname__}")
+        # Use new ID generation (module + qualname)
+        node_class.__id__ = uuid4_from_hash(f"{node_class.__module__}.{node_class.__qualname__}")
 
         node_class.__output_ids__ = {
             ref.name: uuid4_from_hash(f"{node_class.__id__}|{ref.name}")
@@ -310,9 +307,6 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
     state: StateType
     _context: WorkflowContext
     _inputs: MappingProxyType[NodeReference, Any]
-
-    # Controls whether to use legacy ID generation (qualname only) or new ID generation (module + qualname)
-    __legacy_id__ = False
 
     class ExternalInputs(BaseInputs):
         __descriptor_class__ = ExternalInputReference
