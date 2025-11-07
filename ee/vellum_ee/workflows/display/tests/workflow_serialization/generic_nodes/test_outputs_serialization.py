@@ -23,7 +23,7 @@ def test_serialize_node__annotated_output(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "e33ddf79-f48c-4057-ba17-d41a3a60ac98",
+            "id": "6337349e-5718-4732-b717-b6be650c6664",
             "label": "Annotated Output Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -40,13 +40,13 @@ def test_serialize_node__annotated_output(serialize_node):
                     "test_outputs_serialization",
                 ],
             },
-            "trigger": {"id": "e66c7dde-02c9-4f6d-84a6-16117b54cd88", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "d83b7a5d-bbac-47ee-9277-1fbed71e83e8", "type": "DEFAULT", "name": "default"}],
+            "trigger": {"id": "e23d58ad-012b-48a2-80bc-81fe740b5785", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "2d86f771-e1b6-4e58-8af1-9b12604e9bb6", "type": "DEFAULT", "name": "default"}],
             "adornments": None,
             "attributes": [],
             "outputs": [
                 {
-                    "id": "0fd1356f-ca4e-4e85-b923-8a0164bfc451",
+                    "id": "6d08f5f4-cb29-4240-899a-d811e547a30b",
                     "name": "output",
                     "type": "NUMBER",
                     "value": None,
@@ -72,7 +72,7 @@ def test_serialize_node__workflow_input(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "8ad5d3b2-4d4d-494f-ab5c-caa650a397e9",
+            "id": "b8b45ce8-b897-4347-a8ad-45e0576fcf59",
             "label": "Workflow Input Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -89,13 +89,13 @@ def test_serialize_node__workflow_input(serialize_node):
                     "test_outputs_serialization",
                 ],
             },
-            "trigger": {"id": "f8a79f35-b083-47d1-80ee-5efc2baa54e5", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "78878dd7-87fc-4f93-b340-0e1155260f23", "type": "DEFAULT", "name": "default"}],
+            "trigger": {"id": "6fb30c9c-b9f0-452f-99f5-58d484b89882", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "8997d239-eefb-4006-8961-a8241829b433", "type": "DEFAULT", "name": "default"}],
             "adornments": None,
             "attributes": [],
             "outputs": [
                 {
-                    "id": "b62c0cbe-48d5-465d-8d9e-4ff82847f8c7",
+                    "id": "70c7e4c8-2ad3-4093-b69f-a83b4e2a8167",
                     "name": "output",
                     "type": "STRING",
                     "value": {
@@ -137,7 +137,7 @@ def test_serialize_node__node_output_reference(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "e5387a2f-ccff-43b2-8b29-8f4ba9beb01e",
+            "id": "a3a63eb0-ed79-41c1-9bd2-c4b3d69c3017",
             "label": "Generic Node Referencing Output",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -154,18 +154,18 @@ def test_serialize_node__node_output_reference(serialize_node):
                     "test_outputs_serialization",
                 ],
             },
-            "trigger": {"id": "c43b6517-102a-44bc-83c8-37d42861d3e6", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "383dc10a-d8f3-4bac-b995-8b95bc6deb21", "type": "DEFAULT", "name": "default"}],
+            "trigger": {"id": "b12c8ed6-42e2-4dad-9a39-adb1650a6f85", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "3953fe95-7ea9-49ce-a45f-cc55c0f0b9a4", "type": "DEFAULT", "name": "default"}],
             "adornments": None,
             "attributes": [],
             "outputs": [
                 {
-                    "id": "46e6e98e-9ecf-4880-86f9-6390f0851c31",
+                    "id": "72f37d68-c927-4f4e-8b25-72e8cb2c7f5c",
                     "name": "output",
                     "type": "STRING",
                     "value": {
                         "type": "NODE_OUTPUT",
-                        "node_id": "242ad818-12ec-449f-87b4-d2bc513e2148",
+                        "node_id": "40fcba1f-9b25-4fed-8f15-a2fd80ff85a1",
                         "node_output_id": str(node_output_id),
                     },
                 }

@@ -202,7 +202,7 @@ def test_serialize_node__workflow_input(serialize_node):
 
     assert not DeepDiff(
         {
-            "id": "8ad5d3b2-4d4d-494f-ab5c-caa650a397e9",
+            "id": "b8b45ce8-b897-4347-a8ad-45e0576fcf59",
             "label": "Workflow Input Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -219,8 +219,8 @@ def test_serialize_node__workflow_input(serialize_node):
                     "test_attributes_serialization",
                 ],
             },
-            "trigger": {"id": "f8a79f35-b083-47d1-80ee-5efc2baa54e5", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "78878dd7-87fc-4f93-b340-0e1155260f23", "type": "DEFAULT", "name": "default"}],
+            "trigger": {"id": "6fb30c9c-b9f0-452f-99f5-58d484b89882", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "8997d239-eefb-4006-8961-a8241829b433", "type": "DEFAULT", "name": "default"}],
             "adornments": None,
             "attributes": [
                 {
