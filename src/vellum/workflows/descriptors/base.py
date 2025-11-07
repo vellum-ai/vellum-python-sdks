@@ -47,7 +47,7 @@ class BaseDescriptor(Generic[_T]):
     _name: str
     _types: Tuple[Type[_T], ...]
     _instance: Optional[_T]
-    _is_sensitive: bool
+    _is_sensitive: bool = False
 
     def __init__(
         self, *, name: str, types: Tuple[Type[_T], ...], instance: Optional[_T] = None, is_sensitive: bool = False

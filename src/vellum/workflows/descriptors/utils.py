@@ -42,7 +42,7 @@ def resolve_value(
     if isinstance(value, BaseDescriptor):
         resolved_value = value.resolve(state)
         if memo is not None:
-            if getattr(value, "_is_sensitive", False):
+            if value.is_sensitive:
                 memo[path] = value
             else:
                 memo[path] = resolved_value
