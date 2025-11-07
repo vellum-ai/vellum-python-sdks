@@ -554,4 +554,58 @@ describe("TextSearchNode", () => {
       expect(errors[0]?.severity).toEqual("WARNING");
     });
   });
+
+  describe("null weights", () => {
+    beforeEach(async () => {
+      workflowContext = workflowContextFactory({ strict: false });
+      workflowContext.addInputVariableContext(
+        inputVariableContextFactory({
+          inputVariableData: {
+            id: "a6ef8809-346e-469c-beed-2e5c4e9844c5",
+            key: "query",
+            type: "STRING",
+          },
+          workflowContext,
+        })
+      );
+      workflowContext.addInputVariableContext(
+        inputVariableContextFactory({
+          inputVariableData: {
+            id: "c95cccdc-8881-4528-bc63-97d9df6e1d87",
+            key: "var1",
+            type: "STRING",
+          },
+          workflowContext,
+        })
+      );
+
+      const nodeData = searchNodeDataFactory({
+        weightsInput: {
+          type: "CONSTANT_VALUE",
+          data: { type: "JSON", value: null },
+        },
+      }).build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as TextSearchNodeContext;
+
+      node = new SearchNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it("adds a warning to workflow context", async () => {
+      node.getNodeFile().write(writer);
+      await writer.toStringFormatted();
+      const errors = workflowContext.getErrors();
+      expect(errors).toHaveLength(1);
+      expect(errors[0]?.message).toBe(
+        "weights input is null; defaulting to None"
+      );
+      expect(errors[0]?.severity).toEqual("WARNING");
+    });
+  });
 });
