@@ -1,5 +1,6 @@
 import os
 
+from vellum.workflows.references.environment_variable import EnvironmentVariableReference
 from vellum.workflows.workflows.event_filters import root_workflow_event_filter
 
 from tests.workflows.environment_variable_node_inputs.workflow import (
@@ -34,18 +35,12 @@ def test_environment_variable_resolves_correctly():
 
     api_key_ref = NodeWithEnvironmentVariable.api_key
     assert api_key_ref in node_initiated_event.inputs
-    assert node_initiated_event.inputs[api_key_ref] == {
-        "type": "ENVIRONMENT_VARIABLE",
-        "environment_variable": "TEST_API_KEY",
-    }
+    assert node_initiated_event.inputs[api_key_ref] == EnvironmentVariableReference(name="TEST_API_KEY")
 
     # AND the nested environment variable should also be obfuscated
     other_keys_foo_ref = NodeWithEnvironmentVariable.other_keys["foo"]
     assert other_keys_foo_ref in node_initiated_event.inputs
-    assert node_initiated_event.inputs[other_keys_foo_ref] == {
-        "type": "ENVIRONMENT_VARIABLE",
-        "environment_variable": "FOO_API_KEY",
-    }
+    assert node_initiated_event.inputs[other_keys_foo_ref] == EnvironmentVariableReference(name="FOO_API_KEY")
 
     event_dict = node_initiated_event.model_dump()
     assert "body" in event_dict
@@ -79,18 +74,12 @@ def test_environment_variable_obfuscated_in_node_inputs():
     # THEN the _inputs should contain obfuscated representations, not the resolved values
     api_key_ref = NodeWithEnvironmentVariable.api_key
     assert api_key_ref in node._inputs
-    assert node._inputs[api_key_ref] == {
-        "type": "ENVIRONMENT_VARIABLE",
-        "environment_variable": "TEST_API_KEY",
-    }
+    assert node._inputs[api_key_ref] == EnvironmentVariableReference(name="TEST_API_KEY")
 
     # AND the nested environment variable should also be obfuscated
     other_keys_foo_ref = NodeWithEnvironmentVariable.other_keys["foo"]
     assert other_keys_foo_ref in node._inputs
-    assert node._inputs[other_keys_foo_ref] == {
-        "type": "ENVIRONMENT_VARIABLE",
-        "environment_variable": "FOO_API_KEY",
-    }
+    assert node._inputs[other_keys_foo_ref] == EnvironmentVariableReference(name="FOO_API_KEY")
 
     assert node.api_key == "secret-key-12345"
     assert node.other_keys["foo"] == "foo-secret-67890"

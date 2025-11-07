@@ -47,11 +47,15 @@ class BaseDescriptor(Generic[_T]):
     _name: str
     _types: Tuple[Type[_T], ...]
     _instance: Optional[_T]
+    _is_sensitive: bool
 
-    def __init__(self, *, name: str, types: Tuple[Type[_T], ...], instance: Optional[_T] = None) -> None:
+    def __init__(
+        self, *, name: str, types: Tuple[Type[_T], ...], instance: Optional[_T] = None, is_sensitive: bool = False
+    ) -> None:
         self._name = name
         self._types = types
         self._instance = instance
+        self._is_sensitive = is_sensitive
 
     @property
     def name(self) -> str:
@@ -67,6 +71,10 @@ class BaseDescriptor(Generic[_T]):
 
     def resolve(self, state: "BaseState") -> _T:
         raise NotImplementedError("Descriptor must implement resolve method")
+
+    @property
+    def is_sensitive(self) -> bool:
+        return self._is_sensitive
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, type(self)):

@@ -38,7 +38,6 @@ from vellum.workflows.outputs import BaseOutput, BaseOutputs
 from vellum.workflows.ports.node_ports import NodePorts
 from vellum.workflows.ports.port import Port
 from vellum.workflows.references import ExternalInputReference
-from vellum.workflows.references.environment_variable import EnvironmentVariableReference
 from vellum.workflows.references.execution_count import ExecutionCountReference
 from vellum.workflows.references.node import NodeReference
 from vellum.workflows.references.output import OutputReference
@@ -538,51 +537,9 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
             path_parts = key.split(".")
             node_attribute_descriptor = getattr(self.__class__, path_parts[0])
             inputs_key = reduce(lambda acc, part: acc[part], path_parts[1:], node_attribute_descriptor)
-
-            original_value = self._get_original_value_at_path(node_attribute_descriptor.instance, path_parts[1:])
-
-            if isinstance(original_value, EnvironmentVariableReference):
-                all_inputs[inputs_key] = self._obfuscate_env_var_reference(original_value)
-            else:
-                all_inputs[inputs_key] = value
+            all_inputs[inputs_key] = value
 
         self._inputs = MappingProxyType(all_inputs)
-
-    @staticmethod
-    def _get_original_value_at_path(obj: Any, path_parts: list) -> Any:
-        """
-        Walk through a nested object structure following the given path parts.
-        Handles dicts, lists, tuples, dataclasses, and pydantic models.
-        """
-        current = obj
-        for part in path_parts:
-            if isinstance(current, dict):
-                current = current[part]
-            elif isinstance(current, (list, tuple)):
-                current = current[int(part)]
-            else:
-                current = getattr(current, part)
-        return current
-
-    @staticmethod
-    def _obfuscate_env_var_reference(env_ref: EnvironmentVariableReference) -> Dict[str, Any]:
-        """
-        Create a JSON-serializable obfuscated representation of an EnvironmentVariableReference.
-        Uses the same format as the display serializer for consistency.
-        """
-        if env_ref.serialize_as_constant:
-            return {
-                "type": "CONSTANT_VALUE",
-                "value": {
-                    "type": "STRING",
-                    "value": env_ref.name,
-                },
-            }
-        else:
-            return {
-                "type": "ENVIRONMENT_VARIABLE",
-                "environment_variable": env_ref.name,
-            }
 
     def run(self) -> NodeRunResponse:
         return self.Outputs()
