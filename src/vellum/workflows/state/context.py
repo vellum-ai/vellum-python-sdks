@@ -185,49 +185,51 @@ class WorkflowContext:
             return None
 
         expected_prefix = generate_workflow_deployment_prefix(deployment_name, release_tag)
-
-        deployment_metadata = self._fetch_deployment_metadata(deployment_name, release_tag)
+        WorkflowClass: Optional[Type["BaseWorkflow"]] = None
 
         try:
             from vellum.workflows.workflows.base import BaseWorkflow
 
             WorkflowClass = BaseWorkflow.load_from_module(f"{self.namespace}.{expected_prefix}")
             WorkflowClass.is_dynamic = True
-            # Return the class, not an instance, so caller can instantiate within proper execution context
-            return (WorkflowClass, deployment_metadata)
         except Exception:
             pass
 
-        try:
-            major_version = __version__.split(".")[0]
-            version_range = f">={major_version}.0.0,<={__version__}"
+        if WorkflowClass is None:
+            try:
+                major_version = __version__.split(".")[0]
+                version_range = f">={major_version}.0.0,<={__version__}"
 
-            response = self.vellum_client.workflows.pull(
-                deployment_name,
-                release_tag=release_tag,
-                version=version_range,
-                request_options={"additional_headers": {"X-Vellum-Always-Success": "true"}},
-            )
+                response = self.vellum_client.workflows.pull(
+                    deployment_name,
+                    release_tag=release_tag,
+                    version=version_range,
+                    request_options={"additional_headers": {"X-Vellum-Always-Success": "true"}},
+                )
 
-            if isinstance(response, dict) and response.get("success") is False:
-                return None
+                if isinstance(response, dict) and response.get("success") is False:
+                    return None
 
-            zip_bytes = b"".join(response)
-            pulled_files = extract_zip_files(zip_bytes)
+                zip_bytes = b"".join(response)
+                pulled_files = extract_zip_files(zip_bytes)
 
-            for file_name, content in pulled_files.items():
-                prefixed_file_name = f"{expected_prefix}/{file_name}"
-                self._generated_files[prefixed_file_name] = content
+                for file_name, content in pulled_files.items():
+                    prefixed_file_name = f"{expected_prefix}/{file_name}"
+                    self._generated_files[prefixed_file_name] = content
 
-            from vellum.workflows.workflows.base import BaseWorkflow
+                from vellum.workflows.workflows.base import BaseWorkflow
 
-            WorkflowClass = BaseWorkflow.load_from_module(f"{self.namespace}.{expected_prefix}")
-            WorkflowClass.is_dynamic = True
-            # Return the class, not an instance, so caller can instantiate within proper execution context
+                WorkflowClass = BaseWorkflow.load_from_module(f"{self.namespace}.{expected_prefix}")
+                WorkflowClass.is_dynamic = True
+
+            except Exception:
+                pass
+
+        # If we successfully loaded the workflow class, fetch metadata from generated_files (important-comment)
+        # This ensures we pick up metadata.json if a pull just populated it
+        if WorkflowClass is not None:
+            deployment_metadata = self._fetch_deployment_metadata(deployment_name, release_tag)
             return (WorkflowClass, deployment_metadata)
-
-        except Exception:
-            pass
 
         return None
 
