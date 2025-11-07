@@ -30,6 +30,7 @@ from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.events.node import NodeExecutionStreamingEvent
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.executable import BaseExecutable
+from vellum.workflows.expressions.accessor import AccessorExpression
 from vellum.workflows.graph import Graph
 from vellum.workflows.graph.graph import GraphTarget
 from vellum.workflows.inputs.base import BaseInputs
@@ -306,7 +307,7 @@ NodeRunResponse = Union[BaseOutputs, Iterator[BaseOutput]]
 class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
     state: StateType
     _context: WorkflowContext
-    _inputs: MappingProxyType[NodeReference, Any]
+    _inputs: MappingProxyType[Union[NodeReference, AccessorExpression], Any]
 
     class ExternalInputs(BaseInputs):
         __descriptor_class__ = ExternalInputReference

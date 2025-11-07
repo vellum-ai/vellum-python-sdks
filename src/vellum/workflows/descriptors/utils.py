@@ -42,7 +42,10 @@ def resolve_value(
     if isinstance(value, BaseDescriptor):
         resolved_value = value.resolve(state)
         if memo is not None:
-            memo[path] = resolved_value
+            if value.is_sensitive:
+                memo[path] = value
+            else:
+                memo[path] = resolved_value
         return resolved_value
 
     if isinstance(value, property) or callable(value):
