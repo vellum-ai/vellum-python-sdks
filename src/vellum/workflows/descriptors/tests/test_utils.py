@@ -1,10 +1,13 @@
 import pytest
+from typing import Any, Dict
 
 from vellum.client.types.vellum_error import VellumError
 from vellum.workflows.descriptors.utils import resolve_value
 from vellum.workflows.errors.types import WorkflowError, WorkflowErrorCode
+from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.references.constant import ConstantValueReference
+from vellum.workflows.references.node import NodeReference
 from vellum.workflows.state.base import BaseState
 
 
@@ -196,3 +199,23 @@ class DummyNode(BaseNode[FixtureState]):
 def test_resolve_value__happy_path(descriptor, expected_value):
     actual_value = resolve_value(descriptor, FixtureState())
     assert actual_value == expected_value
+
+
+def test_resolve_value__node_reference_without_is_sensitive__raises_node_exception():
+    """
+    Tests that resolve_value handles NodeReference (which bypasses BaseDescriptor.__init__) gracefully.
+    """
+
+    # GIVEN a NodeReference that doesn't have _is_sensitive defined
+    node_ref = NodeReference(name="test_node", types=(str,), node_class=DummyNode)
+
+    # AND a state object
+    state = FixtureState()
+
+    # AND a memo dict to track resolved values (important-comment)
+    memo: Dict[str, Any] = {}
+
+    # WHEN we call resolve_value with this NodeReference (important-comment)
+    # THEN it should raise NodeException (not AttributeError)
+    with pytest.raises(NodeException, match="NodeDescriptors cannot be resolved during runtime"):
+        resolve_value(node_ref, state, path="test.path", memo=memo)
