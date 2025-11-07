@@ -20,6 +20,7 @@ from vellum.client.types.initiated_execute_prompt_event import InitiatedExecuteP
 from vellum.client.types.prompt_output import PromptOutput
 from vellum.client.types.prompt_request_chat_history_input import PromptRequestChatHistoryInput
 from vellum.client.types.prompt_request_json_input import PromptRequestJsonInput
+from vellum.client.types.rich_text_prompt_block import RichTextPromptBlock
 from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.workflows.context import execution_context
 from vellum.workflows.errors.types import WorkflowErrorCode
@@ -298,5 +299,70 @@ def test_inline_prompt_node__parent_context(mock_httpx_transport, mock_complex_p
             "block_type": "CHAT_MESSAGE",
             "chat_role": "USER",
             "blocks": [],
+        }
+    ]
+
+
+@pytest.mark.timeout(5)
+def test_execute_prompt__anthropic_blocks_serialization(mock_httpx_transport):
+    """
+    Tests that blocks are serialized correctly for Anthropic API requests.
+    """
+
+    # GIVEN a prompt node with a SYSTEM chat message containing RICH_TEXT blocks
+    class MyNode(InlinePromptNode):
+        ml_model = "claude-3-5-sonnet-20241022"
+        blocks = [
+            ChatMessagePromptBlock(
+                chat_role="SYSTEM",
+                blocks=[
+                    RichTextPromptBlock(
+                        blocks=[],
+                    )
+                ],
+            )
+        ]
+        prompt_inputs = {}
+
+    # AND a known response from the httpx client
+    expected_outputs: List[PromptOutput] = [
+        StringVellumValue(value="Test response"),
+    ]
+    execution_id = str(uuid4())
+    events: List[ExecutePromptEvent] = [
+        InitiatedExecutePromptEvent(execution_id=execution_id),
+        FulfilledExecutePromptEvent(
+            execution_id=execution_id,
+            outputs=expected_outputs,
+        ),
+    ]
+    text = "\n".join(e.model_dump_json() for e in events)
+
+    mock_httpx_transport.handle_request.return_value = Response(
+        status_code=200,
+        text=text,
+    )
+
+    # WHEN the node is run
+    outputs = list(MyNode().run())
+
+    # THEN the last output is as expected
+    assert outputs[-1].value == "Test response"
+
+    # AND the request was sent to the Anthropic API with the correct block structure
+    call_request_args = mock_httpx_transport.handle_request.call_args_list[0][0][0]
+    call_request = json.loads(call_request_args.read().decode("utf-8"))
+
+    # AND the blocks are serialized with the expected structure
+    assert call_request["blocks"] == [
+        {
+            "blocks": [
+                {
+                    "blocks": [],
+                    "block_type": "RICH_TEXT",
+                }
+            ],
+            "block_type": "CHAT_MESSAGE",
+            "chat_role": "SYSTEM",
         }
     ]
