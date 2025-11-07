@@ -132,7 +132,10 @@ export class SearchNode extends BaseNode<
     const weightsRule =
       this.findNodeInputByName("weights")?.nodeInputData?.value.rules[0];
     if (!weightsRule || weightsRule.type !== "CONSTANT_VALUE") {
-      throw new NodeAttributeGenerationError("weights input is required", "WARNING");
+      throw new NodeAttributeGenerationError(
+        "weights input is required",
+        "WARNING"
+      );
     }
 
     // Accept null/empty JSON values and add a warning instead of throwing
