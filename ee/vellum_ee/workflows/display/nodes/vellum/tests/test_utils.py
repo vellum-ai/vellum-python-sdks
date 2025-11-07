@@ -30,7 +30,6 @@ class Inputs(BaseInputs):
 
 
 class MyNodeA(BaseNode):
-    __legacy_id__ = True
     example_node_input = Inputs.example_workflow_input
 
     class Outputs(BaseOutputs):
@@ -58,7 +57,7 @@ class MyNodeB(BaseNode):
             [
                 NodeOutputPointer(
                     data=NodeOutputData(
-                        node_id="b48fa5e0-d7d3-4fe3-ae48-615415011cc5",
+                        node_id="f2f8f47a-25de-474c-95d7-df4f9b4cb5ac",
                         output_id="4b16a629-11a1-4b3f-a965-a57b872d13b8",
                     )
                 )
@@ -69,7 +68,7 @@ class MyNodeB(BaseNode):
             [
                 NodeOutputPointer(
                     data=NodeOutputData(
-                        node_id="b48fa5e0-d7d3-4fe3-ae48-615415011cc5",
+                        node_id="f2f8f47a-25de-474c-95d7-df4f9b4cb5ac",
                         output_id="4b16a629-11a1-4b3f-a965-a57b872d13b8",
                     ),
                 ),
@@ -93,7 +92,7 @@ class MyNodeB(BaseNode):
             [
                 NodeOutputPointer(
                     data=NodeOutputData(
-                        node_id="b48fa5e0-d7d3-4fe3-ae48-615415011cc5",
+                        node_id="f2f8f47a-25de-474c-95d7-df4f9b4cb5ac",
                         output_id="4b16a629-11a1-4b3f-a965-a57b872d13b8",
                     ),
                 ),

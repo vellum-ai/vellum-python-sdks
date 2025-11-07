@@ -23,7 +23,6 @@ class Inputs(BaseInputs):
 def test_serialize_node__retry(serialize_node):
     @RetryNode.wrap(max_attempts=3)
     class InnerRetryGenericNode(BaseNode):
-        __legacy_id__ = True
         input = Inputs.input
 
         class Outputs(BaseOutputs):
@@ -47,7 +46,7 @@ def test_serialize_node__retry(serialize_node):
     )
     assert not DeepDiff(
         {
-            "id": "188b50aa-e518-4b7b-a5e0-e2585fb1d7b5",
+            "id": "93572a37-c28e-41ec-8ed0-328200d3fc5e",
             "label": "Inner Retry Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 0.0, "y": 0.0}},
@@ -64,8 +63,8 @@ def test_serialize_node__retry(serialize_node):
                     "test_adornments_serialization",
                 ],
             },
-            "trigger": {"id": "75fbe874-c00b-4fc2-9ade-52f4fe9209fa", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "078650c9-f775-4cd0-a08c-23af9983a361", "name": "default", "type": "DEFAULT"}],
+            "trigger": {"id": "f642862d-2f8a-47b1-b23f-21f26ccfb2cc", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "66374ff9-7b8a-4255-ab48-8971cf4101ba", "name": "default", "type": "DEFAULT"}],
             "adornments": [
                 {
                     "id": "5be7d260-74f7-4734-b31b-a46a94539586",
@@ -100,13 +99,13 @@ def test_serialize_node__retry(serialize_node):
             ],
             "attributes": [
                 {
-                    "id": "278df25e-58b5-43c3-b346-cf6444d893a5",
+                    "id": "016fa09c-3b6f-49c3-a177-5f1bb1afbeb2",
                     "name": "input",
                     "value": {"type": "WORKFLOW_INPUT", "input_variable_id": str(input_id)},
                 }
             ],
             "outputs": [
-                {"id": "dc89dc0d-c0bd-47fd-88aa-ec7b262aa2f1", "name": "output", "type": "STRING", "value": None}
+                {"id": "78eece53-8a20-40a1-8a86-ffebe256282b", "name": "output", "type": "STRING", "value": None}
             ],
         },
         serialized_node,
@@ -134,7 +133,6 @@ def test_serialize_node__retry__no_display():
 def test_serialize_node__try(serialize_node):
     @TryNode.wrap()
     class InnerTryGenericNode(BaseNode):
-        __legacy_id__ = True
         input = Inputs.input
 
         class Outputs(BaseOutputs):
@@ -172,8 +170,8 @@ def test_serialize_node__try(serialize_node):
                     "test_adornments_serialization",
                 ],
             },
-            "trigger": {"id": "bbb343ff-2b7a-4793-a8cf-fb05132ca46a", "merge_behavior": "AWAIT_ATTRIBUTES"},
-            "ports": [{"id": "8d25f244-4b12-4f8b-b202-8948698679a0", "name": "default", "type": "DEFAULT"}],
+            "trigger": {"id": "596c162f-98fd-499a-a2ff-aa576cd8458a", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [{"id": "ee8c7891-0125-4f5c-b5b0-6e3f51bc0e09", "name": "default", "type": "DEFAULT"}],
             "adornments": [
                 {
                     "id": "3344083c-a32c-4a32-920b-0fb5093448fa",
@@ -193,13 +191,13 @@ def test_serialize_node__try(serialize_node):
             ],
             "attributes": [
                 {
-                    "id": "51aa0077-4060-496b-8e2e-e79d56ee6a32",
+                    "id": "66a1a015-948e-4b9d-8746-f766fa70a445",
                     "name": "input",
                     "value": {"type": "WORKFLOW_INPUT", "input_variable_id": str(input_id)},
                 }
             ],
             "outputs": [
-                {"id": "ce9f8b86-6d26-4c03-8bfa-a31aa2cd97f1", "name": "output", "type": "STRING", "value": None}
+                {"id": "d8d0c9a8-0804-4b43-a874-28a7e7d6aec8", "name": "output", "type": "STRING", "value": None}
             ],
         },
         serialized_node,
@@ -229,7 +227,7 @@ def test_serialize_node__stacked():
     @TryNode.wrap()
     @RetryNode.wrap(max_attempts=5)
     class InnerStackedGenericNode(BaseNode):
-        __legacy_id__ = True
+        pass
 
     # AND a workflow that uses the adornment node
     class StackedWorkflow(BaseWorkflow):
@@ -249,7 +247,7 @@ def test_serialize_node__stacked():
     ][0]
     assert not DeepDiff(
         {
-            "id": "074833b0-e142-4bbc-8dec-209a35e178a3",
+            "id": "957df57c-42bc-44af-9a31-ce7ac3bb1b8a",
             "label": "Inner Stacked Generic Node",
             "type": "GENERIC",
             "display_data": {"position": {"x": 200.0, "y": -50.0}},
@@ -267,10 +265,10 @@ def test_serialize_node__stacked():
                 ],
             },
             "trigger": {
-                "id": "6e4af17f-bbee-4777-b10d-af042cd6e16a",
+                "id": "65595aa4-f5d7-4462-8074-2bd8eb9dc6ee",
                 "merge_behavior": "AWAIT_ATTRIBUTES",
             },
-            "ports": [{"id": "408cd5fb-3a3e-4eb2-9889-61111bd6a129", "name": "default", "type": "DEFAULT"}],
+            "ports": [{"id": "aebdab62-838e-427a-9de9-301c98472bd4", "name": "default", "type": "DEFAULT"}],
             "adornments": [
                 {
                     "id": "2e22c747-9b17-4029-b2ee-e22e22056e1f",

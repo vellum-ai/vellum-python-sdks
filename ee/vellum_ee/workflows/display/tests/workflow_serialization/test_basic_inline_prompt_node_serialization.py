@@ -378,7 +378,6 @@ def test_serialize_workflow_with_descriptor_functions():
         noun: str
 
     class MockMCPClientNode(BaseNode):
-        __legacy_id__ = True
 
         class Outputs(BaseNode.Outputs):
             tools: list[FunctionDefinition]
@@ -421,8 +420,8 @@ def test_serialize_workflow_with_descriptor_functions():
     assert isinstance(functions_attr, dict), "functions attribute should be present in serialized attributes"
 
     assert functions_attr["value"] == {
-        "node_id": "cb1186e0-8ff1-4145-823e-96b3fc05a39a",
-        "node_output_id": "470fadb9-b8b5-477e-a502-5209d398bcf9",
+        "node_id": "483d3104-ce08-47fb-98ff-cb1813ab9885",
+        "node_output_id": "c7ab8632-0cad-40e2-a49e-bf2731bb7f60",
         "type": "NODE_OUTPUT",
     }
 
@@ -434,7 +433,6 @@ def test_serialize_workflow_with_descriptor_blocks():
         noun: str
 
     class UpstreamNode(BaseNode):
-        __legacy_id__ = True
 
         class Outputs(BaseNode.Outputs):
             results: list
@@ -490,7 +488,6 @@ def test_serialize_workflow_with_nested_descriptor_blocks():
         noun: str
 
     class UpstreamNode(BaseNode):
-        __legacy_id__ = True
 
         class Outputs(BaseNode.Outputs):
             results: list
@@ -563,8 +560,8 @@ def test_serialize_workflow_with_nested_descriptor_blocks():
                         "items": [
                             {
                                 "lhs": {
-                                    "node_id": "9fe5d3a3-7d26-4692-aa2d-e67c673b0c2b",
-                                    "node_output_id": "92f9a1b7-d33b-4f00-b4c2-e6f58150e166",
+                                    "node_id": "e83d975b-3a41-4164-b644-b4e75ef60b98",
+                                    "node_output_id": "ff10b7e3-1f60-43d8-bd6e-6843b2eb870e",
                                     "type": "NODE_OUTPUT",
                                 },
                                 "operator": "accessField",

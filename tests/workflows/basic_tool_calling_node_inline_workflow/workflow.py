@@ -16,7 +16,6 @@ class Inputs(BaseInputs):
 
 
 class StartNode(BaseNode):
-    __legacy_id__ = True
     city = Inputs.city
     date = Inputs.date
 
