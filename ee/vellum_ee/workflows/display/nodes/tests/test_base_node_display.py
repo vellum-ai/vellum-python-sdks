@@ -18,7 +18,7 @@ def node_with_implicit_properties():
     class MyNodeDisplay(BaseNodeDisplay[MyNode]):
         pass
 
-    expected_id = UUID("ace7f746-4fe6-45c7-8207-fc8a4d0c7f6f")
+    expected_id = UUID("8628fe5e-620d-4935-92f1-a9ed7ed7fd92")
 
     return MyNodeDisplay, expected_id
 
@@ -67,7 +67,7 @@ def test_serialize_condition__accessor_expression():
     # THEN the condition should be serialized correctly
     assert data["ports"] == [
         {
-            "id": "7de6ea94-7f6c-475e-8f38-ec8ac317fd19",
+            "id": "c5a19e2d-3476-4d51-ae8f-a00f101dec30",
             "name": "foo",
             "type": "IF",
             "expression": {

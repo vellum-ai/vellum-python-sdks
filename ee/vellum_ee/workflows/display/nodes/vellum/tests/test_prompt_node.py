@@ -52,7 +52,7 @@ def test_serialize_node__lazy_reference_in_prompt_inputs():
                         "type": "NODE_OUTPUT",
                         "data": {
                             "node_id": str(OtherNode.__id__),
-                            "output_id": "7f377cb8-4eca-4f1c-9239-9925f9495d84",
+                            "output_id": "fa5eaae0-fd4a-48db-a3c8-8893653106cb",
                         },
                     }
                 ],

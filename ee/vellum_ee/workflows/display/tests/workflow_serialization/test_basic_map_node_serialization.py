@@ -138,7 +138,7 @@ def test_serialize_workflow():
                             "adornments": None,
                             "attributes": [
                                 {
-                                    "id": "4306b0ce-f31c-4c8f-8122-659d40e60ffe",
+                                    "id": "52a43441-9162-40b1-96c6-445250af1c34",
                                     "name": "item",
                                     "value": {
                                         "type": "WORKFLOW_INPUT",
@@ -146,7 +146,7 @@ def test_serialize_workflow():
                                     },
                                 },
                                 {
-                                    "id": "bca02056-0fd9-44c6-8aa9-743dd1180d48",
+                                    "id": "dadea752-95db-4e5f-a0d4-f3920376ee8f",
                                     "name": "index",
                                     "value": {
                                         "type": "WORKFLOW_INPUT",
@@ -209,7 +209,7 @@ def test_serialize_workflow():
                     ],
                     "edges": [
                         {
-                            "id": "b59c050b-0f6a-4153-ab58-fa051222fa05",
+                            "id": "8b52ffcb-1ccf-41eb-ad89-705c6abc2369",
                             "source_node_id": "ff9bfe6e-839d-4d40-b8fc-313b3bbd0ab0",
                             "source_handle_id": "520d3616-8369-4e79-9da5-3febae299c2a",
                             "target_node_id": "9dffa9e5-00e3-4d20-8ab8-ad0412f35bf2",

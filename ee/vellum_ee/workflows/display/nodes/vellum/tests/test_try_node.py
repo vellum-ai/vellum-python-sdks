@@ -42,7 +42,7 @@ def test_try_node_display__serialize_with_error_output() -> None:
             {
                 "data": {
                     "node_id": str(MyNode.__wrapped_node__.__id__),
-                    "output_id": "c8fbe459-c9ee-4639-a82d-961180cf9411",
+                    "output_id": "75bb6e13-0cf0-4651-9141-658be1d5acaa",
                 },
                 "type": "NODE_OUTPUT",
             }
@@ -54,7 +54,7 @@ def test_try_node_display__serialize_with_error_output() -> None:
             {
                 "data": {
                     "node_id": str(MyNode.__wrapped_node__.__id__),
-                    "output_id": "efe6e307-3ea4-4862-a26f-4c4416bb4537",
+                    "output_id": "16b4d0ee-d309-4622-b812-3bd8f8c8a73c",
                 },
                 "type": "NODE_OUTPUT",
             }

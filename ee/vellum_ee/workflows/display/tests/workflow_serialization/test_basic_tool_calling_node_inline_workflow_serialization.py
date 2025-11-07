@@ -152,7 +152,7 @@ def test_serialize_workflow():
                                                 "definition": None,
                                             },
                                             {
-                                                "id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
+                                                "id": "07a83d1a-7948-4a23-9f46-9a60382d3a48",
                                                 "label": "Start Node",
                                                 "type": "GENERIC",
                                                 "should_file_merge": True,
@@ -171,12 +171,12 @@ def test_serialize_workflow():
                                                     ],
                                                 },
                                                 "trigger": {
-                                                    "id": "6492efcf-4437-4af1-9ad7-269795ccb27a",
+                                                    "id": "8a7854a7-a595-44ce-8197-1f9cd2c78f10",
                                                     "merge_behavior": "AWAIT_ATTRIBUTES",
                                                 },
                                                 "ports": [
                                                     {
-                                                        "id": "1e739e86-a285-4438-9725-a152c15a63e3",
+                                                        "id": "ee444f1a-b126-4480-8eb2-d22506640763",
                                                         "name": "default",
                                                         "type": "DEFAULT",
                                                     }
@@ -184,7 +184,7 @@ def test_serialize_workflow():
                                                 "adornments": None,
                                                 "attributes": [
                                                     {
-                                                        "id": "60ad78cd-fc78-4e08-926d-5a095b34d4f5",
+                                                        "id": "b5e2d415-4368-43c1-826c-ff6511bf6942",
                                                         "name": "city",
                                                         "value": {
                                                             "type": "WORKFLOW_INPUT",
@@ -192,7 +192,7 @@ def test_serialize_workflow():
                                                         },
                                                     },
                                                     {
-                                                        "id": "c5f2d66c-5bb6-4d2a-8e4d-5356318cd3ba",
+                                                        "id": "5b3ed6d0-8cd6-41b6-ad55-d380b41f943b",
                                                         "name": "date",
                                                         "value": {
                                                             "type": "WORKFLOW_INPUT",
@@ -202,13 +202,13 @@ def test_serialize_workflow():
                                                 ],
                                                 "outputs": [
                                                     {
-                                                        "id": "3f4c753e-f057-47bb-9748-7968283cc8aa",
+                                                        "id": "272eccdb-6903-4f32-8159-8bfb87c65c2e",
                                                         "name": "temperature",
                                                         "type": "NUMBER",
                                                         "value": None,
                                                     },
                                                     {
-                                                        "id": "2a4a62b3-cd26-4d2c-b3f1-eaa5f9dd22dd",
+                                                        "id": "8616509d-fecb-4bbf-afdc-bd4c5de35ce7",
                                                         "name": "reasoning",
                                                         "type": "STRING",
                                                         "value": None,
@@ -235,8 +235,8 @@ def test_serialize_workflow():
                                                                 {
                                                                     "type": "NODE_OUTPUT",
                                                                     "data": {
-                                                                        "node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",  # noqa: E501
-                                                                        "output_id": "3f4c753e-f057-47bb-9748-7968283cc8aa",  # noqa: E501
+                                                                        "node_id": "07a83d1a-7948-4a23-9f46-9a60382d3a48",  # noqa: E501
+                                                                        "output_id": "272eccdb-6903-4f32-8159-8bfb87c65c2e",  # noqa: E501
                                                                     },
                                                                 }
                                                             ],
@@ -278,8 +278,8 @@ def test_serialize_workflow():
                                                                 {
                                                                     "type": "NODE_OUTPUT",
                                                                     "data": {
-                                                                        "node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",  # noqa: E501
-                                                                        "output_id": "2a4a62b3-cd26-4d2c-b3f1-eaa5f9dd22dd",  # noqa: E501
+                                                                        "node_id": "07a83d1a-7948-4a23-9f46-9a60382d3a48",  # noqa: E501
+                                                                        "output_id": "8616509d-fecb-4bbf-afdc-bd4c5de35ce7",  # noqa: E501
                                                                     },
                                                                 }
                                                             ],
@@ -304,25 +304,25 @@ def test_serialize_workflow():
                                         ],
                                         "edges": [
                                             {
-                                                "id": "a37781d1-f7a5-4386-a67d-0c3d5c929602",
+                                                "id": "1c333b1c-a1b7-437e-9dfc-bdca8db2cff5",
                                                 "source_node_id": "6358dcfe-b162-4e19-99ca-401d1ada9bdc",
                                                 "source_handle_id": "c344fdee-282b-40c9-8c97-6dd08830948c",
-                                                "target_node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
-                                                "target_handle_id": "6492efcf-4437-4af1-9ad7-269795ccb27a",
+                                                "target_node_id": "07a83d1a-7948-4a23-9f46-9a60382d3a48",
+                                                "target_handle_id": "8a7854a7-a595-44ce-8197-1f9cd2c78f10",
                                                 "type": "DEFAULT",
                                             },
                                             {
                                                 "id": "3c5d8990-48f5-42e1-893e-bc8308d2110a",
-                                                "source_node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
-                                                "source_handle_id": "1e739e86-a285-4438-9725-a152c15a63e3",
+                                                "source_node_id": "07a83d1a-7948-4a23-9f46-9a60382d3a48",
+                                                "source_handle_id": "ee444f1a-b126-4480-8eb2-d22506640763",
                                                 "target_node_id": "0779b232-82ab-4dbe-a340-6a85e6ab3368",
                                                 "target_handle_id": "9e077063-c394-4c7b-b0c6-e6686df67984",
                                                 "type": "DEFAULT",
                                             },
                                             {
                                                 "id": "de0b8090-a26e-4e09-9173-9f7400a5be4c",
-                                                "source_node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
-                                                "source_handle_id": "1e739e86-a285-4438-9725-a152c15a63e3",
+                                                "source_node_id": "07a83d1a-7948-4a23-9f46-9a60382d3a48",
+                                                "source_handle_id": "ee444f1a-b126-4480-8eb2-d22506640763",
                                                 "target_node_id": "31b74695-3f1c-47cf-8be8-a4d86cc589e8",
                                                 "target_handle_id": "8b525943-6c27-414b-a329-e29c0b217f72",
                                                 "type": "DEFAULT",
@@ -343,16 +343,16 @@ def test_serialize_workflow():
                                                 "output_variable_id": "99afb757-2782-465d-ab55-80ccf50552b9",
                                                 "value": {
                                                     "type": "NODE_OUTPUT",
-                                                    "node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
-                                                    "node_output_id": "3f4c753e-f057-47bb-9748-7968283cc8aa",
+                                                    "node_id": "07a83d1a-7948-4a23-9f46-9a60382d3a48",
+                                                    "node_output_id": "272eccdb-6903-4f32-8159-8bfb87c65c2e",
                                                 },
                                             },
                                             {
                                                 "output_variable_id": "7444a019-081a-4e10-a528-3249299159f7",
                                                 "value": {
                                                     "type": "NODE_OUTPUT",
-                                                    "node_id": "1381c078-efa2-4255-89a1-7b4cb742c7fc",
-                                                    "node_output_id": "2a4a62b3-cd26-4d2c-b3f1-eaa5f9dd22dd",
+                                                    "node_id": "07a83d1a-7948-4a23-9f46-9a60382d3a48",
+                                                    "node_output_id": "8616509d-fecb-4bbf-afdc-bd4c5de35ce7",
                                                 },
                                             },
                                         ],

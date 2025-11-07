@@ -548,14 +548,14 @@ def test_serialize_workflow__array_reference():
             {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "constant1"}},
             {
                 "type": "NODE_OUTPUT",
-                "node_id": "702a08b5-61e8-4a7a-a83d-77f49e39c5be",
-                "node_output_id": "419b6afa-fab5-493a-ba1e-4606f4641616",
+                "node_id": "9a6037fd-e023-4331-8097-5144bacfc110",
+                "node_output_id": "37521463-db12-41a3-ad6f-753165880356",
             },
             {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "constant2"}},
             {
                 "type": "NODE_OUTPUT",
-                "node_id": "702a08b5-61e8-4a7a-a83d-77f49e39c5be",
-                "node_output_id": "d1cacc41-478d-49a3-a6b3-1ba2d51291e2",
+                "node_id": "9a6037fd-e023-4331-8097-5144bacfc110",
+                "node_output_id": "b033bddf-987d-488d-8426-c5bb2dac7501",
             },
         ],
     }
@@ -577,8 +577,8 @@ def test_serialize_workflow__array_reference():
                     {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "constant1"}},
                     {
                         "type": "NODE_OUTPUT",
-                        "node_id": "702a08b5-61e8-4a7a-a83d-77f49e39c5be",
-                        "node_output_id": "419b6afa-fab5-493a-ba1e-4606f4641616",
+                        "node_id": "9a6037fd-e023-4331-8097-5144bacfc110",
+                        "node_output_id": "37521463-db12-41a3-ad6f-753165880356",
                     },
                 ],
             },
@@ -588,8 +588,8 @@ def test_serialize_workflow__array_reference():
                     {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "constant2"}},
                     {
                         "type": "NODE_OUTPUT",
-                        "node_id": "702a08b5-61e8-4a7a-a83d-77f49e39c5be",
-                        "node_output_id": "d1cacc41-478d-49a3-a6b3-1ba2d51291e2",
+                        "node_id": "9a6037fd-e023-4331-8097-5144bacfc110",
+                        "node_output_id": "b033bddf-987d-488d-8426-c5bb2dac7501",
                     },
                 ],
             },
@@ -711,31 +711,31 @@ def test_serialize_workflow__dict_reference():
         "type": "DICTIONARY_REFERENCE",
         "entries": [
             {
-                "id": "7689f0df-e0bc-4e53-a63f-dbee027f58b9",
+                "id": "c717464d-127e-4970-a3d8-31761dd83deb",
                 "key": "key1",
                 "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "constant1"}},
             },
             {
-                "id": "89e01555-b0b5-42d5-a0a7-bce72716cf65",
+                "id": "ca19400f-9cce-4b4f-860f-63c98f43ad88",
                 "key": "key2",
                 "value": {
                     "type": "NODE_OUTPUT",
-                    "node_id": "13b4f5c0-e6aa-4ef9-9a1a-79476bc32500",
-                    "node_output_id": "50a6bc11-afb3-49f2-879c-b28f5e16d974",
+                    "node_id": "0f81f7b9-392b-4f0e-8584-0ff040fba961",
+                    "node_output_id": "0b63e869-e978-4ec9-9f47-0cc1c7e22076",
                 },
             },
             {
-                "id": "2dc84109-b85c-4732-aa60-8c10a1a377d2",
+                "id": "10df74b1-56f8-4414-8042-3d4f5a51314d",
                 "key": "key3",
                 "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "constant2"}},
             },
             {
-                "id": "d1b3ce75-1b1e-45e3-b798-beafe6c4826f",
+                "id": "4803c0f8-e582-4693-b9c3-1d6d54f999b1",
                 "key": "key4",
                 "value": {
                     "type": "NODE_OUTPUT",
-                    "node_id": "13b4f5c0-e6aa-4ef9-9a1a-79476bc32500",
-                    "node_output_id": "50a6bc11-afb3-49f2-879c-b28f5e16d974",
+                    "node_id": "0f81f7b9-392b-4f0e-8584-0ff040fba961",
+                    "node_output_id": "0b63e869-e978-4ec9-9f47-0cc1c7e22076",
                 },
             },
         ],
@@ -750,46 +750,46 @@ def test_serialize_workflow__dict_reference():
         "type": "DICTIONARY_REFERENCE",
         "entries": [
             {
-                "id": "7689f0df-e0bc-4e53-a63f-dbee027f58b9",
+                "id": "c717464d-127e-4970-a3d8-31761dd83deb",
                 "key": "key1",
                 "value": {
                     "type": "DICTIONARY_REFERENCE",
                     "entries": [
                         {
-                            "id": "7689f0df-e0bc-4e53-a63f-dbee027f58b9",
+                            "id": "c717464d-127e-4970-a3d8-31761dd83deb",
                             "key": "key1",
                             "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "constant1"}},
                         },
                         {
-                            "id": "89e01555-b0b5-42d5-a0a7-bce72716cf65",
+                            "id": "ca19400f-9cce-4b4f-860f-63c98f43ad88",
                             "key": "key2",
                             "value": {
                                 "type": "NODE_OUTPUT",
-                                "node_id": "13b4f5c0-e6aa-4ef9-9a1a-79476bc32500",
-                                "node_output_id": "50a6bc11-afb3-49f2-879c-b28f5e16d974",
+                                "node_id": "0f81f7b9-392b-4f0e-8584-0ff040fba961",
+                                "node_output_id": "0b63e869-e978-4ec9-9f47-0cc1c7e22076",
                             },
                         },
                     ],
                 },
             },
             {
-                "id": "89e01555-b0b5-42d5-a0a7-bce72716cf65",
+                "id": "ca19400f-9cce-4b4f-860f-63c98f43ad88",
                 "key": "key2",
                 "value": {
                     "type": "DICTIONARY_REFERENCE",
                     "entries": [
                         {
-                            "id": "7689f0df-e0bc-4e53-a63f-dbee027f58b9",
+                            "id": "c717464d-127e-4970-a3d8-31761dd83deb",
                             "key": "key1",
                             "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "constant2"}},
                         },
                         {
-                            "id": "89e01555-b0b5-42d5-a0a7-bce72716cf65",
+                            "id": "ca19400f-9cce-4b4f-860f-63c98f43ad88",
                             "key": "key2",
                             "value": {
                                 "type": "NODE_OUTPUT",
-                                "node_id": "13b4f5c0-e6aa-4ef9-9a1a-79476bc32500",
-                                "node_output_id": "50a6bc11-afb3-49f2-879c-b28f5e16d974",
+                                "node_id": "0f81f7b9-392b-4f0e-8584-0ff040fba961",
+                                "node_output_id": "0b63e869-e978-4ec9-9f47-0cc1c7e22076",
                             },
                         },
                     ],

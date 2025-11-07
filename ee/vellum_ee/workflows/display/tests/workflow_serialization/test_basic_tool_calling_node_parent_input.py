@@ -70,8 +70,8 @@ def test_serialize_workflow():
                                 },
                                 "dummy_input": {
                                     "type": "NODE_OUTPUT",
-                                    "node_id": "8e89ae10-a709-45ec-89f8-242f92e4a83f",
-                                    "node_output_id": "0cd09f0a-c142-4d5d-acc7-b93cd30ca58d",
+                                    "node_id": "72f78142-e0a2-40a9-ae70-0230ccf3b503",
+                                    "node_output_id": "6e639661-d0dc-4586-9393-e64e95e0d3ef",
                                 },
                                 "constant_input": {
                                     "type": "CONSTANT_VALUE",

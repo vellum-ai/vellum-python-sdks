@@ -146,7 +146,7 @@ def test_serialize_node__lazy_reference(serialize_node):
 
     assert attributes == [
         {
-            "id": "7ae37eb4-18c8-49e1-b5ac-6369ce7ed5dd",
+            "id": "7d98966d-8ef0-4fc4-ac90-2f1d46da0ba4",
             "name": "attr",
             "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "hello"}},
         }
@@ -179,7 +179,7 @@ def test_serialize_node__lazy_reference_with_string():
 
     assert lazy_reference_node["attributes"] == [
         {
-            "id": "98833d71-42a8-47e9-81c4-6a35646e3d3c",
+            "id": "c8da84b7-fd1b-4629-a80b-a31eabada2a9",
             "name": "attr",
             "value": {
                 "type": "NODE_OUTPUT",
