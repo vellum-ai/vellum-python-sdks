@@ -5,12 +5,14 @@ from vellum.workflows.workflows.base import BaseWorkflow
 
 class NodeWithEnvironmentVariable(BaseNode):
     api_key = EnvironmentVariables.get("TEST_API_KEY")
+    other_keys = {"foo": EnvironmentVariables.get("FOO_API_KEY")}
 
     class Outputs(BaseNode.Outputs):
         api_key: str
+        foo_key: str
 
     def run(self) -> Outputs:
-        return self.Outputs(api_key=self.api_key)
+        return self.Outputs(api_key=self.api_key, foo_key=self.other_keys["foo"])
 
 
 class EnvironmentVariableNodeInputsWorkflow(BaseWorkflow):

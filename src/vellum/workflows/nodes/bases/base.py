@@ -30,6 +30,7 @@ from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.events.node import NodeExecutionStreamingEvent
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.executable import BaseExecutable
+from vellum.workflows.expressions.accessor import AccessorExpression
 from vellum.workflows.graph import Graph
 from vellum.workflows.graph.graph import GraphTarget
 from vellum.workflows.inputs.base import BaseInputs
@@ -307,7 +308,7 @@ NodeRunResponse = Union[BaseOutputs, Iterator[BaseOutput]]
 class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
     state: StateType
     _context: WorkflowContext
-    _inputs: MappingProxyType[NodeReference, Any]
+    _inputs: MappingProxyType[Union[NodeReference, AccessorExpression], Any]
 
     class ExternalInputs(BaseInputs):
         __descriptor_class__ = ExternalInputReference
@@ -519,7 +520,6 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
                 else:
                     setattr(base, leaf, input_value)
 
-        original_descriptors: Dict[str, Any] = {}
         for descriptor in self.__class__:
             if descriptor.instance is undefined:
                 setattr(self, descriptor.name, undefined)
@@ -528,9 +528,6 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
             if any(isinstance(t, type) and issubclass(t, BaseDescriptor) for t in descriptor.types):
                 # We don't want to resolve attributes that are _meant_ to be descriptors
                 continue
-
-            if isinstance(descriptor.instance, EnvironmentVariableReference):
-                original_descriptors[descriptor.name] = descriptor.instance
 
             resolved_value = resolve_value(descriptor.instance, self.state, path=descriptor.name, memo=inputs_memo)
             setattr(self, descriptor.name, resolved_value)
@@ -542,13 +539,50 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
             node_attribute_descriptor = getattr(self.__class__, path_parts[0])
             inputs_key = reduce(lambda acc, part: acc[part], path_parts[1:], node_attribute_descriptor)
 
-            descriptor_name = path_parts[0]
-            if descriptor_name in original_descriptors:
-                all_inputs[inputs_key] = original_descriptors[descriptor_name]
+            original_value = self._get_original_value_at_path(node_attribute_descriptor.instance, path_parts[1:])
+
+            if isinstance(original_value, EnvironmentVariableReference):
+                all_inputs[inputs_key] = self._obfuscate_env_var_reference(original_value)
             else:
                 all_inputs[inputs_key] = value
 
         self._inputs = MappingProxyType(all_inputs)
+
+    @staticmethod
+    def _get_original_value_at_path(obj: Any, path_parts: list) -> Any:
+        """
+        Walk through a nested object structure following the given path parts.
+        Handles dicts, lists, tuples, dataclasses, and pydantic models.
+        """
+        current = obj
+        for part in path_parts:
+            if isinstance(current, dict):
+                current = current[part]
+            elif isinstance(current, (list, tuple)):
+                current = current[int(part)]
+            else:
+                current = getattr(current, part)
+        return current
+
+    @staticmethod
+    def _obfuscate_env_var_reference(env_ref: EnvironmentVariableReference) -> Dict[str, Any]:
+        """
+        Create a JSON-serializable obfuscated representation of an EnvironmentVariableReference.
+        Uses the same format as the display serializer for consistency.
+        """
+        if env_ref.serialize_as_constant:
+            return {
+                "type": "CONSTANT_VALUE",
+                "value": {
+                    "type": "STRING",
+                    "value": env_ref.name,
+                },
+            }
+        else:
+            return {
+                "type": "ENVIRONMENT_VARIABLE",
+                "environment_variable": env_ref.name,
+            }
 
     def run(self) -> NodeRunResponse:
         return self.Outputs()
