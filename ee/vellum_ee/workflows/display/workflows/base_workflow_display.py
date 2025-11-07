@@ -575,28 +575,46 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             trigger_id = trigger_class.__id__
 
             # Serialize trigger attributes like node outputs
-            attribute_references = trigger_class.attribute_references().values()
-            trigger_attributes: JsonArray = cast(
-                JsonArray,
-                [
-                    cast(
-                        JsonObject,
-                        {
-                            "id": str(reference.id),
-                            "name": reference.name,
-                            "type": primitive_type_to_vellum_variable_type(reference),
-                            "value": None,
-                        },
-                    )
-                    for reference in sorted(attribute_references, key=lambda ref: ref.name)
-                ],
-            )
+            trigger_data: JsonObject
+            if trigger_type == WorkflowTriggerType.SCHEDULED:
+                # For scheduled triggers, attributes should be empty
+                # and cron/timezone should be top level
 
-            trigger_data: JsonObject = {
-                "id": str(trigger_id),
-                "type": trigger_type.value,
-                "attributes": trigger_attributes,
-            }
+                config_class = trigger_class.Config
+                cron_value = getattr(config_class, "cron", None)
+                timezone_value = getattr(config_class, "timezone", None)
+
+                trigger_data = {
+                    "id": str(trigger_id),
+                    "type": trigger_type.value,
+                    "cron": cron_value,
+                    "timezone": timezone_value,
+                    "attributes": [],
+                }
+            else:
+                # For other triggers, serialize attributes from attribute_references
+                attribute_references = trigger_class.attribute_references().values()
+                trigger_attributes: JsonArray = cast(
+                    JsonArray,
+                    [
+                        cast(
+                            JsonObject,
+                            {
+                                "id": str(reference.id),
+                                "name": reference.name,
+                                "type": primitive_type_to_vellum_variable_type(reference),
+                                "value": None,
+                            },
+                        )
+                        for reference in sorted(attribute_references, key=lambda ref: ref.name)
+                    ],
+                )
+
+                trigger_data = {
+                    "id": str(trigger_id),
+                    "type": trigger_type.value,
+                    "attributes": trigger_attributes,
+                }
 
             # Serialize display_data from trigger's Display class
             display_class = trigger_class.Display

@@ -6,6 +6,8 @@ from unittest.mock import patch
 from uuid import UUID
 from typing import Iterator, Tuple
 
+from deepdiff import DeepDiff
+
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
@@ -206,3 +208,58 @@ def test_scheduled_trigger_serialization_display_data():
     assert isinstance(display_data, dict)
     assert display_data["icon"] == "vellum:icon:calendar"
     assert display_data["color"] == "#4A90E2"
+
+
+def test_scheduled_trigger_serialization_full():
+    # GIVEN a scheduled trigger with comprehensive Display attributes
+    class DailyTriggerWithDisplay(ScheduleTrigger):
+        class Config:
+            cron = "0 9 * * *"
+            timezone = "UTC"
+
+        class Display(ScheduleTrigger.Display):
+            label = "Daily Schedule"
+            x = 100.5
+            y = 200.75
+            z_index = 3
+            icon = "vellum:icon:calendar"
+            color = "#4A90E2"
+
+    class ProcessNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            timestamp = DailyTriggerWithDisplay.current_run_at
+
+        def run(self) -> Outputs:
+            return self.Outputs()
+
+    # AND a workflow that uses the trigger
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = DailyTriggerWithDisplay >> ProcessNode
+
+    # WHEN we serialize the workflow
+    result: dict = get_workflow_display(workflow_class=TestWorkflow).serialize()
+
+    # THEN we get the expected trigger
+    assert len(result["triggers"]) == 1
+    trigger = result["triggers"][0]
+    assert not DeepDiff(
+        trigger,
+        {
+            "id": "f3e5eddb-75da-42e6-9abf-d616f30c145c",
+            "type": "SCHEDULED",
+            "cron": "0 9 * * *",
+            "timezone": "UTC",
+            "attributes": [],
+            "display_data": {"icon": "vellum:icon:calendar", "color": "#4A90E2"},
+            "class_name": "DailyTriggerWithDisplay",
+            "module_path": [
+                "vellum_ee",
+                "workflows",
+                "display",
+                "tests",
+                "workflow_serialization",
+                "test_scheduled_trigger_serialization",
+            ],
+            "source_handle_id": "f3e5eddb-75da-42e6-9abf-d616f30c145c",
+        },
+    )
