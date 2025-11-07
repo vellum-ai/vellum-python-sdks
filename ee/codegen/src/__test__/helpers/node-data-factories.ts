@@ -125,6 +125,7 @@ export function searchNodeDataFactory(args?: {
   limitInput?: ConstantValuePointer;
   queryInput?: NodeInput;
   includeDocumentIndexInput?: boolean;
+  weightsInput?: ConstantValuePointer;
 }): NodeDataFactoryBuilder<SearchNode> {
   const errorOutputId = args?.errorOutputId;
   const includeDocumentIndexInput = args?.includeDocumentIndexInput ?? true;
@@ -246,7 +247,7 @@ export function searchNodeDataFactory(args?: {
         key: "weights",
         value: {
           rules: [
-            {
+            args?.weightsInput ?? {
               type: "CONSTANT_VALUE",
               data: {
                 type: "JSON",

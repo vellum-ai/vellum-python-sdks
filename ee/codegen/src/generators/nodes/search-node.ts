@@ -81,7 +81,8 @@ export class SearchNode extends BaseNode<
         limitValue.data.type !== "NUMBER"
       ) {
         throw new NodeAttributeGenerationError(
-          `Limit param input should be a CONSTANT_VALUE and of type NUMBER, got ${limitValue.data.type} instead`
+          `Limit param input should be a CONSTANT_VALUE and of type NUMBER, got ${limitValue.data.type} instead`,
+          "WARNING"
         );
       } else {
         bodyStatements.push(
@@ -127,29 +128,44 @@ export class SearchNode extends BaseNode<
     return bodyStatements;
   }
 
-  private getSearchWeightsRequest(): ClassInstantiation {
+  private getSearchWeightsRequest(): AstNode {
     const weightsRule =
       this.findNodeInputByName("weights")?.nodeInputData?.value.rules[0];
     if (!weightsRule || weightsRule.type !== "CONSTANT_VALUE") {
-      throw new NodeAttributeGenerationError("weights input is required");
+      throw new NodeAttributeGenerationError("weights input is required", "WARNING");
+    }
+
+    // Accept null/empty JSON values and add a warning instead of throwing
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rawValue: any = (weightsRule as any).data?.value;
+    if (rawValue == null) {
+      this.workflowContext.addError(
+        new NodeAttributeGenerationError(
+          "weights input is null; defaulting to None",
+          "WARNING"
+        )
+      );
+      return python.TypeInstantiation.none();
     }
 
     // TODO: Determine what we want to cast JSON values to
     //  https://app.shortcut.com/vellum/story/5459
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { semantic_similarity, keywords } = weightsRule.data.value as Record<
+    const { semantic_similarity, keywords } = rawValue as Record<
       string,
       unknown
     >;
     if (typeof semantic_similarity !== "number") {
       throw new NodeAttributeGenerationError(
-        "semantic_similarity weight must be a number"
+        "semantic_similarity weight must be a number",
+        "WARNING"
       );
     }
 
     if (typeof keywords !== "number") {
       throw new NodeAttributeGenerationError(
-        "keywords weight must be a number"
+        "keywords weight must be a number",
+        "WARNING"
       );
     }
 
@@ -178,14 +194,16 @@ export class SearchNode extends BaseNode<
       ?.nodeInputData?.value.rules[0];
     if (!resultMergingRule || resultMergingRule.type !== "CONSTANT_VALUE") {
       throw new NodeAttributeGenerationError(
-        "result_merging_enabled input is required"
+        "result_merging_enabled input is required",
+        "WARNING"
       );
     }
 
     const resultMergingEnabled = resultMergingRule.data.value;
     if (typeof resultMergingEnabled !== "string") {
       throw new NodeAttributeGenerationError(
-        "result_merging_enabled must be a boolean"
+        "result_merging_enabled must be a boolean",
+        "WARNING"
       );
     }
 
