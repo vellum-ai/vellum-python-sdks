@@ -37,6 +37,7 @@ from vellum.workflows.outputs import BaseOutput, BaseOutputs
 from vellum.workflows.ports.node_ports import NodePorts
 from vellum.workflows.ports.port import Port
 from vellum.workflows.references import ExternalInputReference
+from vellum.workflows.references.environment_variable import EnvironmentVariableReference
 from vellum.workflows.references.execution_count import ExecutionCountReference
 from vellum.workflows.references.node import NodeReference
 from vellum.workflows.references.output import OutputReference
@@ -518,6 +519,7 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
                 else:
                     setattr(base, leaf, input_value)
 
+        original_descriptors: Dict[str, Any] = {}
         for descriptor in self.__class__:
             if descriptor.instance is undefined:
                 setattr(self, descriptor.name, undefined)
@@ -526,6 +528,9 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
             if any(isinstance(t, type) and issubclass(t, BaseDescriptor) for t in descriptor.types):
                 # We don't want to resolve attributes that are _meant_ to be descriptors
                 continue
+
+            if isinstance(descriptor.instance, EnvironmentVariableReference):
+                original_descriptors[descriptor.name] = descriptor.instance
 
             resolved_value = resolve_value(descriptor.instance, self.state, path=descriptor.name, memo=inputs_memo)
             setattr(self, descriptor.name, resolved_value)
@@ -536,7 +541,12 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
             path_parts = key.split(".")
             node_attribute_descriptor = getattr(self.__class__, path_parts[0])
             inputs_key = reduce(lambda acc, part: acc[part], path_parts[1:], node_attribute_descriptor)
-            all_inputs[inputs_key] = value
+
+            descriptor_name = path_parts[0]
+            if descriptor_name in original_descriptors:
+                all_inputs[inputs_key] = original_descriptors[descriptor_name]
+            else:
+                all_inputs[inputs_key] = value
 
         self._inputs = MappingProxyType(all_inputs)
 
