@@ -202,7 +202,9 @@
                     "y": 240.84267524293904
                   },
                   "width": 480,
-                  "height": 179
+                  "height": 179,
+                  "icon": "vellum:icon:magnifying-glass-waveform",
+                  "color": "purple"
                 },
                 "base": {
                   "name": "SearchNode",
@@ -275,7 +277,9 @@
                     "y": 208.7778595317725
                   },
                   "width": 456,
-                  "height": 233
+                  "height": 233,
+                  "icon": "vellum:icon:circle-stop",
+                  "color": "teal"
                 },
                 "base": {
                   "name": "FinalOutputNode",
@@ -458,7 +462,9 @@
             "y": 210
           },
           "width": 480,
-          "height": 233
+          "height": 233,
+          "icon": "vellum:icon:circle-stop",
+          "color": "teal"
         },
         "base": {
           "name": "FinalOutputNode",

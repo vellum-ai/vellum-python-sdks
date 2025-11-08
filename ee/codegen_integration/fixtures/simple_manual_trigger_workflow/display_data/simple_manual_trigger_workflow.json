@@ -107,7 +107,9 @@
           "position": {
             "x": 400.0,
             "y": -50.0
-          }
+          },
+          "icon": "vellum:icon:circle-stop",
+          "color": "teal"
         },
         "base": {
           "name": "FinalOutputNode",

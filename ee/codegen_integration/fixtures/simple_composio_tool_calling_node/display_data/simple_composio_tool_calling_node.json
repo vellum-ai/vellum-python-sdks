@@ -30,7 +30,9 @@
           "comment": {
             "expanded": true,
             "value": "\n    A tool calling node that uses a ComposioTool for GitHub issue creation.\n    "
-          }
+          },
+          "icon": "vellum:icon:wrench",
+          "color": "teal"
         },
         "base": {
           "name": "ToolCallingNode",
