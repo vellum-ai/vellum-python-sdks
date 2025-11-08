@@ -77,6 +77,11 @@ class VellumEmitter(BaseWorkflowEmitter):
     def _flush_events(self) -> None:
         """
         Send all queued events as a batch to Vellum's infrastructure.
+
+        Events are sent asynchronously in a background daemon thread. This ensures
+        monitoring events never block workflow completion, even if the HTTP request
+        takes 10+ seconds. The thread runs independently and doesn't need to be
+        waited for - it will complete the HTTP request in the background.
         """
         with self._queue_lock:
             if not self._event_queue:
@@ -86,10 +91,15 @@ class VellumEmitter(BaseWorkflowEmitter):
             self._event_queue.clear()
             self._debounce_timer = None
 
-        try:
-            self._send_events(events_to_send)
-        except Exception as e:
-            logger.exception(f"Failed to send batched events: {e}")
+        # Send events in a background daemon thread
+        def send_async():
+            try:
+                self._send_events(events_to_send)
+            except Exception as e:
+                logger.exception(f"Failed to send batched events: {e}")
+
+        thread = threading.Thread(target=send_async, daemon=True)
+        thread.start()
 
     def __del__(self) -> None:
         """
@@ -141,10 +151,16 @@ class VellumEmitter(BaseWorkflowEmitter):
 
     def join(self) -> None:
         """
-        Wait for any background threads or timers used by this emitter to complete.
-        This ensures all pending work is finished before the workflow terminates.
-        """
-        self._flush_events()
+        Flush any pending events and cancel the debounce timer.
 
+        Note: This does NOT wait for HTTP requests to complete. Events are sent
+        asynchronously in daemon threads, so workflow.join() returns immediately
+        and vembda can close the response stream. The HTTP request continues
+        in the background thread independently.
+        """
+        # Cancel timer first to prevent race condition
         if self._debounce_timer and self._debounce_timer.is_alive():
-            self._debounce_timer.join()
+            self._debounce_timer.cancel()
+
+        # Flush events (sends async, doesn't block)
+        self._flush_events()

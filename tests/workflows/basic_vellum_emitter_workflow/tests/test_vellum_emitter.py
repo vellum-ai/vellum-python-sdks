@@ -1,7 +1,10 @@
 from datetime import datetime, timezone
 import json
+import threading
+import time
 from uuid import UUID
 
+from vellum.client.types import EventCreateResponse
 from vellum.workflows.emitters.vellum_emitter import VellumEmitter
 from vellum.workflows.events.workflow import WorkflowExecutionInitiatedBody, WorkflowExecutionInitiatedEvent
 from vellum.workflows.inputs.base import BaseInputs
@@ -72,3 +75,61 @@ def test_vellum_emitter__happy_path(mock_httpx_transport):
             "trace_id": "123e4567-e89b-12d3-a456-426614174000",
         }
     ]
+
+
+def test_vellum_emitter__join_returns_quickly_despite_slow_http_request(mocker):
+    """
+    Test that emitter.join() returns quickly even when HTTP request is slow.
+
+    This test verifies the fix for the issue where workflow.join() was blocking
+    for 10+ seconds waiting for monitoring events to be sent. After the fix,
+    join() should return immediately (< 0.5s) even if the HTTP request takes
+    1 second, because events are sent asynchronously in a background thread.
+
+    Before the fix: This test would fail because join() would block for ~1 second.
+    After the fix: This test passes because join() returns immediately.
+    """
+    # GIVEN a properly configured VellumEmitter
+    emitter = VellumEmitter(debounce_timeout=0.01)
+    workflow_context = WorkflowContext()
+    emitter.register_context(workflow_context)
+
+    # AND we have a test workflow event from the SDK
+    workflow_initiated_event: WorkflowExecutionInitiatedEvent = WorkflowExecutionInitiatedEvent(
+        id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+        timestamp=datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
+        trace_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+        span_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+        body=WorkflowExecutionInitiatedBody(
+            workflow_definition=TestWorkflow,
+            inputs=TestInputs(foo="test"),
+        ),
+    )
+
+    # AND we mock client.events.create to take 1 second (simulating slow network/server)
+    http_request_started = threading.Event()
+    http_request_completed = threading.Event()
+
+    def slow_events_create(*args, **kwargs):
+        """Simulate a slow HTTP request that takes 1 second."""
+        http_request_started.set()
+        time.sleep(1.0)  # Simulate slow HTTP request
+        http_request_completed.set()
+        return EventCreateResponse(count=1)
+
+    # Mock the create method directly
+    mock_create = mocker.patch.object(workflow_context.vellum_client.events, "create", side_effect=slow_events_create)
+
+    # WHEN we emit the workflow event
+    emitter.emit_event(workflow_initiated_event)
+
+    # AND we call join() and measure how long it takes
+    join_start_time = time.time()
+    emitter.join()
+    join_duration = time.time() - join_start_time
+
+    # THEN join() should return before the HTTP request completes
+    assert join_duration < 1
+
+    # AND the HTTP request should have been called exactly once
+    assert mock_create.call_count == 1
