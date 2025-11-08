@@ -344,7 +344,7 @@ class BaseTrigger(ABC, metaclass=BaseTriggerMeta):
         label: str = "Trigger"
         x: float = 0.0
         y: float = 0.0
-        z_index: float = 0.0
+        z_index: int = 0
         icon: Optional[str] = None
         color: Optional[str] = None
 

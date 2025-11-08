@@ -353,6 +353,7 @@ describe("WorkflowProjectGenerator", () => {
           "simple_subworkflow_deployment_node",
           "simple_workflow_node_with_output_values",
           "faa_q_and_a_bot",
+            "simple_scheduled_trigger"
         ],
         fixtureMocks: fixtureMocks,
       })

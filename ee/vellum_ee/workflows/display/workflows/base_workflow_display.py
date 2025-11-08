@@ -143,6 +143,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             "nodes/*",
             "state.py",
             "workflow.py",
+            "triggers/*",
         ]
 
         input_variables: JsonArray = []
@@ -431,9 +432,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         for target_node, entrypoint_display in self.display_context.entrypoint_displays.items():
             unadorned_target_node = get_unadorned_node(target_node)
 
-            if unadorned_target_node in nodes_with_trigger_edges:
-                continue
-
             # Skip edges to invalid nodes
             if self._is_node_invalid(unadorned_target_node):
                 continue
@@ -622,6 +620,26 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             display_class = trigger_class.Display
             display_data: JsonObject = {}
 
+            # Add label if present
+            if hasattr(display_class, "label") and display_class.label is not None:
+                display_data["label"] = display_class.label
+
+            # Add x and y coordinates if present
+            if (
+                hasattr(display_class, "x")
+                and display_class.x is not None
+                and hasattr(display_class, "y")
+                and display_class.y is not None
+            ):
+                display_data["position"] = {
+                    "x": display_class.x,
+                    "y": display_class.y,
+                }
+
+            # Add z index if present
+            if hasattr(display_class, "z_index") and display_class.z_index is not None:
+                display_data["z_index"] = display_class.z_index
+
             # Add icon if present
             if hasattr(display_class, "icon") and display_class.icon is not None:
                 display_data["icon"] = display_class.icon
@@ -632,13 +650,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
             if display_data:
                 trigger_data["display_data"] = display_data
-
-            # For INTEGRATION and SCHEDULED triggers, include class name, module path, and source_handle_id
-            # ManualTrigger doesn't need source_handle_id because edges come from ENTRYPOINT node
-            if trigger_type in (WorkflowTriggerType.INTEGRATION, WorkflowTriggerType.SCHEDULED):
-                trigger_data["class_name"] = trigger_class.__name__
-                trigger_data["module_path"] = cast(Json, trigger_class.__module__.split("."))
-                trigger_data["source_handle_id"] = str(trigger_id)  # Trigger acts as edge source
 
             serialized_triggers.append(trigger_data)
 
