@@ -820,6 +820,260 @@ describe("WorkflowProjectGenerator", () => {
         "code.triggers.scheduled.ScheduleTrigger|code.nodes.final_output.FinalOutput": "edge_2",
       });
     });
+
+    it("should generate metadata.json with complex entrypoint/trigger/node edge id mappings", async () => {
+      // Graph:
+      //   ENTRYPOINT -> Custom -> { Custom2, Custom3 } -> FinalOutput
+      //   ScheduleTrigger -> Custom
+      const displayData = {
+        workflow_raw_data: {
+          nodes: [
+            {
+              id: "entry",
+              type: "ENTRYPOINT",
+              data: {
+                label: "Entrypoint",
+                source_handle_id: "entry_source",
+                target_handle_id: "entry_target",
+              },
+              inputs: [],
+            },
+            {
+              id: "custom-node",
+              type: "TEMPLATING",
+              data: {
+                label: "Custom",
+                template_node_input_id: "custom_template",
+                output_id: "custom_output",
+                output_type: "STRING",
+                source_handle_id: "custom_source",
+                target_handle_id: "custom_target",
+              },
+              inputs: [
+                {
+                  id: "custom_template",
+                  key: "template",
+                  value: {
+                    combinator: "OR",
+                    rules: [
+                      {
+                        type: "CONSTANT_VALUE",
+                        data: {
+                          type: "STRING",
+                          value: "Hello, World!",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+              definition: {
+                name: "Custom",
+                module: ["code", "nodes", "custom"],
+              },
+            },
+            {
+              id: "custom2-node",
+              type: "TEMPLATING",
+              data: {
+                label: "Custom2",
+                template_node_input_id: "custom2_template",
+                output_id: "custom2_output",
+                output_type: "STRING",
+                source_handle_id: "custom2_source",
+                target_handle_id: "custom2_target",
+              },
+              inputs: [
+                {
+                  id: "custom2_template",
+                  key: "template",
+                  value: {
+                    combinator: "OR",
+                    rules: [
+                      {
+                        type: "CONSTANT_VALUE",
+                        data: {
+                          type: "STRING",
+                          value: "Hi",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+              definition: {
+                name: "Custom2",
+                module: ["code", "nodes", "custom2"],
+              },
+            },
+            {
+              id: "custom3-node",
+              type: "TEMPLATING",
+              data: {
+                label: "Custom3",
+                template_node_input_id: "custom3_template",
+                output_id: "custom3_output",
+                output_type: "STRING",
+                source_handle_id: "custom3_source",
+                target_handle_id: "custom3_target",
+              },
+              inputs: [
+                {
+                  id: "custom3_template",
+                  key: "template",
+                  value: {
+                    combinator: "OR",
+                    rules: [
+                      {
+                        type: "CONSTANT_VALUE",
+                        data: {
+                          type: "STRING",
+                          value: "Howdy",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+              definition: {
+                name: "Custom3",
+                module: ["code", "nodes", "custom3"],
+              },
+            },
+            {
+              id: "terminal-node",
+              type: "TERMINAL",
+              data: {
+                label: "Final Output",
+                name: "final-output",
+                target_handle_id: "terminal_target",
+                output_id: "terminal_output_id",
+                output_type: "STRING",
+                node_input_id: "terminal_input",
+              },
+              inputs: [
+                {
+                  id: "terminal_input",
+                  key: "node_input",
+                  value: {
+                    rules: [
+                      {
+                        type: "CONSTANT_VALUE",
+                        data: {
+                          type: "STRING",
+                          value: "Done",
+                        },
+                      },
+                    ],
+                    combinator: "OR",
+                  },
+                },
+              ],
+              definition: {
+                name: "FinalOutput",
+                module: ["code", "nodes", "final_output"],
+              },
+            },
+          ],
+          edges: [
+            // ENTRYPOINT -> Custom
+            {
+              source_node_id: "entry",
+              source_handle_id: "entry_source",
+              target_node_id: "custom-node",
+              target_handle_id: "custom_target",
+              type: "DEFAULT",
+              id: "edge_e_custom",
+            },
+            // ScheduleTrigger -> Custom
+            {
+              source_node_id: "trigger-1",
+              source_handle_id: "trigger-1",
+              target_node_id: "custom-node",
+              target_handle_id: "custom_target",
+              type: "DEFAULT",
+              id: "edge_t_custom",
+            },
+            // Custom -> Custom2
+            {
+              source_node_id: "custom-node",
+              source_handle_id: "custom_source",
+              target_node_id: "custom2-node",
+              target_handle_id: "custom2_target",
+              type: "DEFAULT",
+              id: "edge_c_c2",
+            },
+            // Custom -> Custom3
+            {
+              source_node_id: "custom-node",
+              source_handle_id: "custom_source",
+              target_node_id: "custom3-node",
+              target_handle_id: "custom3_target",
+              type: "DEFAULT",
+              id: "edge_c_c3",
+            },
+            // Custom2 -> FinalOutput
+            {
+              source_node_id: "custom2-node",
+              source_handle_id: "custom2_source",
+              target_node_id: "terminal-node",
+              target_handle_id: "terminal_target",
+              type: "DEFAULT",
+              id: "edge_c2_term",
+            },
+            // Custom3 -> FinalOutput
+            {
+              source_node_id: "custom3-node",
+              source_handle_id: "custom3_source",
+              target_node_id: "terminal-node",
+              target_handle_id: "terminal_target",
+              type: "DEFAULT",
+              id: "edge_c3_term",
+            },
+          ],
+        },
+        input_variables: [],
+        state_variables: [],
+        output_variables: [],
+        triggers: [
+          {
+            id: "trigger-1",
+            type: "SCHEDULED",
+            cron: "* * * * *",
+            timezone: "UTC",
+            attributes: [],
+          },
+        ],
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+      });
+
+      await project.generateCode();
+
+      const metadataPath = join(tempDir, "code", "metadata.json");
+      expect(fs.existsSync(metadataPath)).toBe(true);
+
+      const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
+      // Top-level entrypoint id should match UI id
+      expect(metadata.entrypoint).toBe("entry");
+      // ENTRYPOINT -> Custom
+      expect(metadata.entrypoint_edges_to_id).toEqual({
+        "entry|code.nodes.custom.Custom": "edge_e_custom",
+      });
+      // All non-entrypoint edges (trigger and node->node) by path
+      expect(metadata.edges_to_id_mapping).toEqual({
+        "code.triggers.scheduled.ScheduleTrigger|code.nodes.custom.Custom": "edge_t_custom",
+        "code.nodes.custom.Custom|code.nodes.custom2.Custom2": "edge_c_c2",
+        "code.nodes.custom.Custom|code.nodes.custom3.Custom3": "edge_c_c3",
+        "code.nodes.custom2.Custom2|code.nodes.final_output.FinalOutput": "edge_c2_term",
+        "code.nodes.custom3.Custom3|code.nodes.final_output.FinalOutput": "edge_c3_term",
+      });
+    });
   });
   describe("failure cases", () => {
     let displayData = {

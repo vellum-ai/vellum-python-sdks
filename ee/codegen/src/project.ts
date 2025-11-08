@@ -7,6 +7,7 @@ import { python } from "@fern-api/python-ast";
 import { Comment } from "@fern-api/python-ast/Comment";
 import { StarImport } from "@fern-api/python-ast/StarImport";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
+import { isNil } from "lodash";
 import { VellumEnvironmentUrls } from "vellum-ai";
 
 import * as codegen from "./codegen";
@@ -45,6 +46,7 @@ import { WorkflowOutputContext } from "src/context/workflow-output-context";
 import { ErrorLogFile, InitFile, Inputs, Workflow } from "src/generators";
 import {
   BaseCodegenError,
+  MissingEntrypointIdError,
   NodeDefinitionGenerationError,
   ProjectSerializationError,
   WorkflowGenerationError,
@@ -1091,12 +1093,6 @@ ${errors.slice(0, 3).map((err) => {
      *              target_node_path  := "<module_path>.<ClassName>" of the target node
      *     Value: "<ui_edge_id>"
      *
-     * - trigger_edges_to_id:
-     *     Key:   "<trigger_path>|<target_node_path>"
-     *            where:
-     *              trigger_path      := "<trigger_module_path>.<TriggerClassName>"
-     *              target_node_path  := "<module_path>.<ClassName>" of the target node
-     *     Value: "<ui_edge_id>"
      * edges_to_id_mapping:
      *   Key:   "<source_path>|<target_node_path>"
      *          where:
@@ -1157,10 +1153,18 @@ ${errors.slice(0, 3).map((err) => {
     );
   }
 
-  /** Returns the UI entrypoint node id (string) if present, else empty string. */
-  public getEntrypointId(): string {
+  public getEntrypointId(): string | undefined {
     const entrypointNode = this.workflowContext.tryGetEntrypointNode();
-    return entrypointNode?.id ?? "";
+    if (isNil(entrypointNode)) {
+      this.workflowContext.addError(
+        new MissingEntrypointIdError(
+          "Cannot determine entrypoint id for the given workflow"
+        )
+      );
+      return undefined;
+    } else {
+      return entrypointNode.id;
+    }
   }
 
   /**
@@ -1179,16 +1183,19 @@ ${errors.slice(0, 3).map((err) => {
       return result;
     }
 
-    const edgesFromEntrypoint = this.workflowContext.workflowRawData.edges.filter(
-      (e) => e.sourceNodeId === entrypointNode.id
-    );
+    const edgesFromEntrypoint =
+      this.workflowContext.workflowRawData.edges.filter(
+        (e) => e.sourceNodeId === entrypointNode.id
+      );
 
     edgesFromEntrypoint.forEach((edge) => {
       const target = this.workflowContext.findNodeContext(edge.targetNodeId);
       if (!target) {
         return;
       }
-      const targetPath = [...target.nodeModulePath, target.nodeClassName].join(".");
+      const targetPath = [...target.nodeModulePath, target.nodeClassName].join(
+        "."
+      );
       const key = `${entrypointNode.id}|${targetPath}`;
       result[key] = edge.id;
     });
@@ -1197,36 +1204,47 @@ ${errors.slice(0, 3).map((err) => {
   }
 
   /**
-   * Build mapping for TRIGGER -> target edges using path-based keys.
+   * Build mapping for all non-entrypoint edges using path-based keys.
    *
-   * Key:   "<trigger_path>|<target_node_path>"
+   * Key:   "<source_path>|<target_node_path>"
    * Value: "<ui_edge_id>"
    *
-   * trigger_path     := "<trigger_module_path>.<TriggerClassName>"
+   * source_path      := "<trigger_module_path>.<TriggerClassName>" for trigger edges
+   *                     or "<module_path>.<NodeClassName>" for node->node edges
    * target_node_path := "<module_path>.<ClassName>" for the target node
    */
   public getEdgesToIdMapping(): Record<string, string> {
     const result: Record<string, string> = {};
 
-    const triggerIds = new Set((this.workflowContext.triggers ?? []).map((t) => t.id));
     const entrypointNode = this.workflowContext.tryGetEntrypointNode();
 
     // Consider all edges except those from ENTRYPOINT (handled separately)
-    const nonEntrypointEdges = this.workflowContext.workflowRawData.edges.filter(
-      (e) => !(entrypointNode && e.sourceNodeId === entrypointNode.id)
-    );
+    const nonEntrypointEdges =
+      this.workflowContext.workflowRawData.edges.filter(
+        (e) => !(entrypointNode && e.sourceNodeId === entrypointNode.id)
+      );
 
     nonEntrypointEdges.forEach((edge) => {
       // Resolve source path as either trigger path or node path
       let sourcePath: string | undefined;
 
-      const triggerContext = this.workflowContext.findTriggerContext(edge.sourceNodeId);
+      const triggerContext = this.workflowContext.findTriggerContext(
+        edge.sourceNodeId
+      );
       if (triggerContext) {
-        sourcePath = [...triggerContext.triggerModulePath, triggerContext.triggerClassName].join(".");
+        sourcePath = [
+          ...triggerContext.triggerModulePath,
+          triggerContext.triggerClassName,
+        ].join(".");
       } else {
-        const sourceNodeContext = this.workflowContext.findNodeContext(edge.sourceNodeId);
+        const sourceNodeContext = this.workflowContext.findNodeContext(
+          edge.sourceNodeId
+        );
         if (sourceNodeContext) {
-          sourcePath = [...sourceNodeContext.nodeModulePath, sourceNodeContext.nodeClassName].join(".");
+          sourcePath = [
+            ...sourceNodeContext.nodeModulePath,
+            sourceNodeContext.nodeClassName,
+          ].join(".");
         }
       }
 
@@ -1235,7 +1253,9 @@ ${errors.slice(0, 3).map((err) => {
         return;
       }
 
-      const targetPath = [...target.nodeModulePath, target.nodeClassName].join(".");
+      const targetPath = [...target.nodeModulePath, target.nodeClassName].join(
+        "."
+      );
       const key = `${sourcePath}|${targetPath}`;
       result[key] = edge.id;
     });
