@@ -702,6 +702,120 @@ describe("WorkflowProjectGenerator", () => {
         "code.triggers.scheduled.ScheduleTrigger": "trigger-1",
       });
     });
+
+    it("should generate metadata.json with entrypoint and trigger edge id mappings (path-based keys)", async () => {
+      const displayData = {
+        workflow_raw_data: {
+          nodes: [
+            {
+              id: "entry",
+              type: "ENTRYPOINT",
+              data: {
+                label: "Entrypoint",
+                source_handle_id: "entry_source",
+                target_handle_id: "entry_target",
+              },
+              inputs: [],
+            },
+            {
+              id: "terminal-node",
+              type: "TERMINAL",
+              data: {
+                label: "Final Output",
+                name: "final-output",
+                target_handle_id: "terminal_target",
+                output_id: "terminal_output_id",
+                output_type: "STRING",
+                node_input_id: "terminal_input",
+              },
+              inputs: [
+                {
+                  id: "terminal_input",
+                  key: "node_input",
+                  value: {
+                    rules: [
+                      {
+                        type: "CONSTANT_VALUE",
+                        data: {
+                          type: "STRING",
+                          value: "Hello, World!",
+                        },
+                      },
+                    ],
+                    combinator: "OR",
+                  },
+                },
+              ],
+              trigger: {
+                id: "terminal_target",
+                merge_behavior: "AWAIT_ANY",
+              },
+              outputs: [
+                {
+                  id: "terminal_output_id",
+                  name: "value",
+                  type: "STRING",
+                },
+              ],
+            },
+          ],
+          edges: [
+            {
+              source_node_id: "entry",
+              source_handle_id: "entry_source",
+              target_node_id: "terminal-node",
+              target_handle_id: "terminal_target",
+              type: "DEFAULT",
+              id: "edge_1",
+            },
+            {
+              source_node_id: "trigger-1",
+              source_handle_id: "trigger-1",
+              target_node_id: "terminal-node",
+              target_handle_id: "terminal_target",
+              type: "DEFAULT",
+              id: "edge_2",
+            },
+          ],
+        },
+        input_variables: [],
+        state_variables: [],
+        output_variables: [],
+        triggers: [
+          {
+            id: "trigger-1",
+            type: "SCHEDULED",
+            cron: "* * * * *",
+            timezone: "UTC",
+            attributes: [],
+          },
+        ],
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+      });
+
+      await project.generateCode();
+
+      const metadataPath = join(tempDir, "code", "metadata.json");
+      expect(fs.existsSync(metadataPath)).toBe(true);
+
+      const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
+      // Top-level entrypoint id should match UI id
+      expect(metadata.entrypoint).toBe("entry");
+      // ENTRYPOINT -> Node mapping uses "<entrypoint>|<target_node_path>"
+      expect(metadata.entrypoint_edges_to_id).toEqual({
+        "entry|code.nodes.final_output.FinalOutput": "edge_1",
+      });
+      // TRIGGER -> Node mapping uses "<trigger_path>|<target_node_path>"
+      expect(metadata.trigger_edges_to_id).toEqual({
+        "code.triggers.scheduled.ScheduleTrigger|code.nodes.final_output.FinalOutput": "edge_2",
+      });
+    });
   });
   describe("failure cases", () => {
     let displayData = {

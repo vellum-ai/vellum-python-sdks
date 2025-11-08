@@ -1070,9 +1070,40 @@ ${errors.slice(0, 3).map((err) => {
   }
 
   private async generateMetadataFile(): Promise<void> {
+    /**
+     * Metadata persisted alongside generated code to ensure stable, UI-aligned identifiers
+     * without relying on Python display classes.
+     *
+     * - trigger_path_to_id_mapping:
+     *     Key:   "<trigger_module_path>.<TriggerClassName>"
+     *     Value: "<ui_trigger_id>"
+     *
+     * - node_id_to_file_mapping:
+     *     Existing mapping of node ids to their code resource definition (module + class name).
+     *
+     * - entrypoint:
+     *     The UI entrypoint node id. Python should use this exact id for ENTRYPOINT edges.
+     *
+     * - entrypoint_edges_to_id:
+     *     Key:   "<entrypoint>|<target_node_path>"
+     *            where:
+     *              entrypoint        := metadata.entrypoint (UI entrypoint node id)
+     *              target_node_path  := "<module_path>.<ClassName>" of the target node
+     *     Value: "<ui_edge_id>"
+     *
+     * - trigger_edges_to_id:
+     *     Key:   "<trigger_path>|<target_node_path>"
+     *            where:
+     *              trigger_path      := "<trigger_module_path>.<TriggerClassName>"
+     *              target_node_path  := "<module_path>.<ClassName>" of the target node
+     *     Value: "<ui_edge_id>"
+     */
     const metadata = {
       trigger_path_to_id_mapping: this.getTriggerPathToIdMapping(),
       node_id_to_file_mapping: this.getNodeIdToFileMapping(),
+      entrypoint: this.getEntrypointId(),
+      entrypoint_edges_to_id: this.getEntrypointEdgesToIdMapping(),
+      trigger_edges_to_id: this.getTriggerEdgesToIdMapping(),
     };
 
     const absolutePathToModuleDirectory = join(
@@ -1117,5 +1148,83 @@ ${errors.slice(0, 3).map((err) => {
         triggerId,
       ])
     );
+  }
+
+  /** Returns the UI entrypoint node id (string) if present, else empty string. */
+  public getEntrypointId(): string {
+    const entrypointNode = this.workflowContext.tryGetEntrypointNode();
+    return entrypointNode?.id ?? "";
+  }
+
+  /**
+   * Build mapping for ENTRYPOINT -> target edges using path-based keys.
+   *
+   * Key:   "<entrypoint>|<target_node_path>"
+   * Value: "<ui_edge_id>"
+   *
+   * target_node_path := "<module_path>.<ClassName>" based on the target node's codegen context.
+   */
+  public getEntrypointEdgesToIdMapping(): Record<string, string> {
+    const result: Record<string, string> = {};
+
+    const entrypointNode = this.workflowContext.tryGetEntrypointNode();
+    if (!entrypointNode) {
+      return result;
+    }
+
+    const edgesFromEntrypoint = this.workflowContext.workflowRawData.edges.filter(
+      (e) => e.sourceNodeId === entrypointNode.id
+    );
+
+    edgesFromEntrypoint.forEach((edge) => {
+      const target = this.workflowContext.findNodeContext(edge.targetNodeId);
+      if (!target) {
+        return;
+      }
+      const targetPath = [...target.nodeModulePath, target.nodeClassName].join(".");
+      const key = `${entrypointNode.id}|${targetPath}`;
+      result[key] = edge.id;
+    });
+
+    return result;
+  }
+
+  /**
+   * Build mapping for TRIGGER -> target edges using path-based keys.
+   *
+   * Key:   "<trigger_path>|<target_node_path>"
+   * Value: "<ui_edge_id>"
+   *
+   * trigger_path     := "<trigger_module_path>.<TriggerClassName>"
+   * target_node_path := "<module_path>.<ClassName>" for the target node
+   */
+  public getTriggerEdgesToIdMapping(): Record<string, string> {
+    const result: Record<string, string> = {};
+
+    const triggerIds = new Set((this.workflowContext.triggers ?? []).map((t) => t.id));
+    if (triggerIds.size === 0) {
+      return result;
+    }
+
+    const triggerEdges = this.workflowContext.workflowRawData.edges.filter((e) =>
+      triggerIds.has(e.sourceNodeId)
+    );
+
+    triggerEdges.forEach((edge) => {
+      const triggerContext = this.workflowContext.findTriggerContext(edge.sourceNodeId);
+      const target = this.workflowContext.findNodeContext(edge.targetNodeId);
+      if (!triggerContext || !target) {
+        return;
+      }
+
+      const triggerPath = [...triggerContext.triggerModulePath, triggerContext.triggerClassName].join(
+        "."
+      );
+      const targetPath = [...target.nodeModulePath, target.nodeClassName].join(".");
+      const key = `${triggerPath}|${targetPath}`;
+      result[key] = edge.id;
+    });
+
+    return result;
   }
 }
