@@ -473,6 +473,12 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
         # Step 1: Start with BaseNode.Display attributes as base
         base_kwargs: Dict[str, Any] = {}
 
+        # Add Display class attributes if they exist
+        if self._node.Display.icon is not None:
+            base_kwargs["icon"] = self._node.Display.icon
+        if self._node.Display.color is not None:
+            base_kwargs["color"] = self._node.Display.color
+
         # Add docstring as comment if present
         if docstring:
             base_kwargs["comment"] = NodeDisplayComment(value=docstring, expanded=True)
