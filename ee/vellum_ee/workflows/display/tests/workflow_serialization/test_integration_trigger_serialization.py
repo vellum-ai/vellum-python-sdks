@@ -54,7 +54,7 @@ def test_vellum_integration_trigger_serialization():
     assert isinstance(attributes, list)
     assert len(attributes) == 3
 
-    attribute_names = {attr["name"] for attr in attributes if isinstance(attr, dict)}
+    attribute_names = {attr["key"] for attr in attributes if isinstance(attr, dict)}
     assert attribute_names == {"message", "channel", "user"}
 
     # RED: These assertions should fail because we haven't implemented class_name and module_path yet
@@ -101,7 +101,7 @@ def test_vellum_integration_trigger_id_consistency():
     trigger_id = trigger["id"]
     trigger_attributes = trigger["attributes"]
     assert isinstance(trigger_attributes, list)
-    trigger_attrs = {attr["name"]: attr["id"] for attr in trigger_attributes if isinstance(attr, dict)}
+    trigger_attrs = {attr["key"]: attr["id"] for attr in trigger_attributes if isinstance(attr, dict)}
 
     # Find node with trigger attribute references
     workflow_raw_data = result["workflow_raw_data"]
