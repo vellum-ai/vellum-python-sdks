@@ -41,7 +41,11 @@ class PullContentsMetadata(UniversalBaseModel):
     runner_config: Optional[RunnerConfig] = None
     deployment_id: Optional[UUID] = None
     deployment_name: Optional[str] = None
+    deployment_history_item_id: Optional[UUID] = None
+    release_tag_id: Optional[UUID] = None
+    release_tag_name: Optional[str] = None
     workflow_sandbox_id: Optional[UUID] = None
+    workflow_version_id: Optional[UUID] = None
 
 
 def _resolve_workflow_config(

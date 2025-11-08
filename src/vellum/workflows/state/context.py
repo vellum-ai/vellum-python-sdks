@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from functools import cached_property
+import json
 from queue import Queue
 from uuid import UUID, uuid4
 from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Type
@@ -184,49 +185,51 @@ class WorkflowContext:
             return None
 
         expected_prefix = generate_workflow_deployment_prefix(deployment_name, release_tag)
-
-        deployment_metadata = self._fetch_deployment_metadata(deployment_name, release_tag)
+        WorkflowClass: Optional[Type["BaseWorkflow"]] = None
 
         try:
             from vellum.workflows.workflows.base import BaseWorkflow
 
             WorkflowClass = BaseWorkflow.load_from_module(f"{self.namespace}.{expected_prefix}")
             WorkflowClass.is_dynamic = True
-            # Return the class, not an instance, so caller can instantiate within proper execution context
-            return (WorkflowClass, deployment_metadata)
         except Exception:
             pass
 
-        try:
-            major_version = __version__.split(".")[0]
-            version_range = f">={major_version}.0.0,<={__version__}"
+        if WorkflowClass is None:
+            try:
+                major_version = __version__.split(".")[0]
+                version_range = f">={major_version}.0.0,<={__version__}"
 
-            response = self.vellum_client.workflows.pull(
-                deployment_name,
-                release_tag=release_tag,
-                version=version_range,
-                request_options={"additional_headers": {"X-Vellum-Always-Success": "true"}},
-            )
+                response = self.vellum_client.workflows.pull(
+                    deployment_name,
+                    release_tag=release_tag,
+                    version=version_range,
+                    request_options={"additional_headers": {"X-Vellum-Always-Success": "true"}},
+                )
 
-            if isinstance(response, dict) and response.get("success") is False:
-                return None
+                if isinstance(response, dict) and response.get("success") is False:
+                    return None
 
-            zip_bytes = b"".join(response)
-            pulled_files = extract_zip_files(zip_bytes)
+                zip_bytes = b"".join(response)
+                pulled_files = extract_zip_files(zip_bytes)
 
-            for file_name, content in pulled_files.items():
-                prefixed_file_name = f"{expected_prefix}/{file_name}"
-                self._generated_files[prefixed_file_name] = content
+                for file_name, content in pulled_files.items():
+                    prefixed_file_name = f"{expected_prefix}/{file_name}"
+                    self._generated_files[prefixed_file_name] = content
 
-            from vellum.workflows.workflows.base import BaseWorkflow
+                from vellum.workflows.workflows.base import BaseWorkflow
 
-            WorkflowClass = BaseWorkflow.load_from_module(f"{self.namespace}.{expected_prefix}")
-            WorkflowClass.is_dynamic = True
-            # Return the class, not an instance, so caller can instantiate within proper execution context
+                WorkflowClass = BaseWorkflow.load_from_module(f"{self.namespace}.{expected_prefix}")
+                WorkflowClass.is_dynamic = True
+
+            except Exception:
+                pass
+
+        # If we successfully loaded the workflow class, fetch metadata from generated_files (important-comment)
+        # This ensures we pick up metadata.json if a pull just populated it
+        if WorkflowClass is not None:
+            deployment_metadata = self._fetch_deployment_metadata(deployment_name, release_tag)
             return (WorkflowClass, deployment_metadata)
-
-        except Exception:
-            pass
 
         return None
 
@@ -234,7 +237,7 @@ class WorkflowContext:
         self, deployment_name: str, release_tag: str
     ) -> Optional[WorkflowDeploymentMetadata]:
         """
-        Fetch deployment metadata from the Vellum API.
+        Fetch deployment metadata from metadata.json in generated_files.
 
         Args:
             deployment_name: The name of the workflow deployment
@@ -243,34 +246,48 @@ class WorkflowContext:
         Returns:
             WorkflowDeploymentMetadata if successful, None otherwise
         """
-        try:
-            # Fetch deployment details
-            deployment = self.vellum_client.workflow_deployments.retrieve(deployment_name)
-
-            deployment_id = UUID(deployment.id)
-
-            # Fetch release tag details
-            release_tag_info = self.vellum_client.workflow_deployments.retrieve_workflow_release_tag(
-                deployment.id, release_tag
-            )
-
-            # Fetch workflow version
-            release = self.vellum_client.workflow_deployments.retrieve_workflow_deployment_release(
-                str(deployment_id), release_tag
-            )
-
-            return WorkflowDeploymentMetadata(
-                deployment_id=deployment_id,
-                deployment_name=deployment.name,
-                deployment_history_item_id=UUID(deployment.last_deployed_history_item_id),
-                release_tag_id=UUID(release_tag_info.release.id),
-                release_tag_name=release_tag_info.name,
-                workflow_version_id=UUID(release.workflow_version.id),
-            )
-        except Exception:
-            # If we fail to fetch metadata, return None - the workflow can still run
-            # but won't have the full parent context hierarchy
+        if not self._generated_files:
             return None
+
+        expected_prefix = generate_workflow_deployment_prefix(deployment_name, release_tag)
+        metadata_path = f"{expected_prefix}/metadata.json"
+
+        metadata_content = self._generated_files.get(metadata_path)
+        if metadata_content:
+            try:
+                metadata_json = json.loads(metadata_content)
+
+                deployment_id = metadata_json.get("deployment_id")
+                deployment_name_from_metadata = metadata_json.get("deployment_name")
+                deployment_history_item_id = metadata_json.get("deployment_history_item_id")
+                release_tag_id = metadata_json.get("release_tag_id")
+                release_tag_name_from_metadata = metadata_json.get("release_tag_name")
+                workflow_version_id = metadata_json.get("workflow_version_id")
+
+                if all(
+                    [
+                        deployment_id,
+                        deployment_name_from_metadata,
+                        deployment_history_item_id,
+                        release_tag_id,
+                        release_tag_name_from_metadata,
+                        workflow_version_id,
+                    ]
+                ):
+                    return WorkflowDeploymentMetadata(
+                        deployment_id=UUID(deployment_id),
+                        deployment_name=deployment_name_from_metadata,
+                        deployment_history_item_id=UUID(deployment_history_item_id),
+                        release_tag_id=UUID(release_tag_id),
+                        release_tag_name=release_tag_name_from_metadata,
+                        workflow_version_id=UUID(workflow_version_id),
+                    )
+            except (json.JSONDecodeError, ValueError, KeyError):
+                # If we fail to parse metadata, return None - the workflow can still run
+                # but won't have the full parent context hierarchy
+                pass
+
+        return None
 
     @classmethod
     def create_from(cls, context):
