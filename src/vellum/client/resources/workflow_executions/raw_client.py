@@ -9,6 +9,9 @@ from ...core.http_response import AsyncHttpResponse, HttpResponse
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.pydantic_utilities import parse_obj_as
 from ...core.request_options import RequestOptions
+from ...errors.misdirected_request_error import MisdirectedRequestError
+from ...errors.not_found_error import NotFoundError
+from ...types.update_active_workspace_response import UpdateActiveWorkspaceResponse
 from ...types.workflow_execution_detail import WorkflowExecutionDetail
 
 
@@ -63,6 +66,28 @@ class RawWorkflowExecutionsClient:
                     ),
                 )
                 return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 421:
+                raise MisdirectedRequestError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        UpdateActiveWorkspaceResponse,
+                        parse_obj_as(
+                            type_=UpdateActiveWorkspaceResponse,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
@@ -120,6 +145,28 @@ class AsyncRawWorkflowExecutionsClient:
                     ),
                 )
                 return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 421:
+                raise MisdirectedRequestError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        UpdateActiveWorkspaceResponse,
+                        parse_obj_as(
+                            type_=UpdateActiveWorkspaceResponse,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)

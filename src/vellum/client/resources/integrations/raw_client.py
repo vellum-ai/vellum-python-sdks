@@ -186,6 +186,7 @@ class RawIntegrationsClient:
         offset: typing.Optional[int] = None,
         ordering: typing.Optional[str] = None,
         search: typing.Optional[str] = None,
+        supports_integration_triggers: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[PaginatedSlimIntegrationReadList]:
         """
@@ -208,6 +209,8 @@ class RawIntegrationsClient:
         search : typing.Optional[str]
             A search term.
 
+        supports_integration_triggers : typing.Optional[str]
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -226,6 +229,7 @@ class RawIntegrationsClient:
                 "offset": offset,
                 "ordering": ordering,
                 "search": search,
+                "supports_integration_triggers": supports_integration_triggers,
             },
             request_options=request_options,
         )
@@ -450,6 +454,7 @@ class AsyncRawIntegrationsClient:
         offset: typing.Optional[int] = None,
         ordering: typing.Optional[str] = None,
         search: typing.Optional[str] = None,
+        supports_integration_triggers: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[PaginatedSlimIntegrationReadList]:
         """
@@ -472,6 +477,8 @@ class AsyncRawIntegrationsClient:
         search : typing.Optional[str]
             A search term.
 
+        supports_integration_triggers : typing.Optional[str]
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -490,6 +497,7 @@ class AsyncRawIntegrationsClient:
                 "offset": offset,
                 "ordering": ordering,
                 "search": search,
+                "supports_integration_triggers": supports_integration_triggers,
             },
             request_options=request_options,
         )

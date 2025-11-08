@@ -603,6 +603,7 @@ from .token_overlapping_window_chunker_config_request import TokenOverlappingWin
 from .token_overlapping_window_chunking import TokenOverlappingWindowChunking
 from .token_overlapping_window_chunking_request import TokenOverlappingWindowChunkingRequest
 from .unit_enum import UnitEnum
+from .update_active_workspace_response import UpdateActiveWorkspaceResponse
 from .upload_document_response import UploadDocumentResponse
 from .upsert_test_suite_test_case_request import UpsertTestSuiteTestCaseRequest
 from .variable_prompt_block import VariablePromptBlock
@@ -1306,6 +1307,7 @@ __all__ = [
     "TokenOverlappingWindowChunking",
     "TokenOverlappingWindowChunkingRequest",
     "UnitEnum",
+    "UpdateActiveWorkspaceResponse",
     "UploadDocumentResponse",
     "UpsertTestSuiteTestCaseRequest",
     "VariablePromptBlock",

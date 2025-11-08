@@ -139,6 +139,7 @@ class IntegrationsClient:
         offset: typing.Optional[int] = None,
         ordering: typing.Optional[str] = None,
         search: typing.Optional[str] = None,
+        supports_integration_triggers: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> PaginatedSlimIntegrationReadList:
         """
@@ -160,6 +161,8 @@ class IntegrationsClient:
 
         search : typing.Optional[str]
             A search term.
+
+        supports_integration_triggers : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -185,6 +188,7 @@ class IntegrationsClient:
             offset=offset,
             ordering=ordering,
             search=search,
+            supports_integration_triggers=supports_integration_triggers,
             request_options=request_options,
         )
         return _response.data
@@ -359,6 +363,7 @@ class AsyncIntegrationsClient:
         offset: typing.Optional[int] = None,
         ordering: typing.Optional[str] = None,
         search: typing.Optional[str] = None,
+        supports_integration_triggers: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> PaginatedSlimIntegrationReadList:
         """
@@ -380,6 +385,8 @@ class AsyncIntegrationsClient:
 
         search : typing.Optional[str]
             A search term.
+
+        supports_integration_triggers : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -413,6 +420,7 @@ class AsyncIntegrationsClient:
             offset=offset,
             ordering=ordering,
             search=search,
+            supports_integration_triggers=supports_integration_triggers,
             request_options=request_options,
         )
         return _response.data
