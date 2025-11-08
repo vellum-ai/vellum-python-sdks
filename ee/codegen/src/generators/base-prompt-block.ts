@@ -11,6 +11,8 @@ import {
   VideoPromptBlock,
 } from "vellum-ai/api";
 
+import { Json } from "./json";
+
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { WorkflowContext } from "src/context/workflow-context";
 import { AstNode } from "src/generators/extensions/ast-node";
@@ -68,7 +70,195 @@ export abstract class BasePromptBlock<
     this.astNode = this.generateAstNode(promptBlock);
   }
 
-  protected abstract generateAstNode(promptBlock: T): ClassInstantiation;
+  protected generateAstNode(promptBlock: T): ClassInstantiation {
+    switch (promptBlock.blockType) {
+      case "JINJA":
+        return this.generateJinjaPromptBlock(
+          promptBlock as Extract<T, { blockType: "JINJA" }>
+        );
+      case "CHAT_MESSAGE":
+        return this.generateChatMessagePromptBlock(
+          promptBlock as Extract<T, { blockType: "CHAT_MESSAGE" }>
+        );
+      case "VARIABLE":
+        return this.generateVariablePromptBlock(
+          promptBlock as Extract<T, { blockType: "VARIABLE" }>
+        );
+      case "RICH_TEXT":
+        return this.generateRichTextPromptBlock(
+          promptBlock as Extract<T, { blockType: "RICH_TEXT" }>
+        );
+      case "PLAIN_TEXT":
+        return this.generatePlainTextPromptBlock(
+          promptBlock as Extract<T, { blockType: "PLAIN_TEXT" }>
+        );
+      case "AUDIO":
+        return this.generateAudioPromptBlock(
+          promptBlock as Extract<T, { blockType: "AUDIO" }>
+        );
+      case "VIDEO":
+        return this.generateVideoPromptBlock(
+          promptBlock as Extract<T, { blockType: "VIDEO" }>
+        );
+      case "IMAGE":
+        return this.generateImagePromptBlock(
+          promptBlock as Extract<T, { blockType: "IMAGE" }>
+        );
+      case "DOCUMENT":
+        return this.generateDocumentPromptBlock(
+          promptBlock as Extract<T, { blockType: "DOCUMENT" }>
+        );
+    }
+  }
+
+  protected abstract generateJinjaPromptBlock(
+    promptBlock: Extract<T, { blockType: "JINJA" }>
+  ): ClassInstantiation;
+  protected abstract generateChatMessagePromptBlock(
+    promptBlock: Extract<T, { blockType: "CHAT_MESSAGE" }>
+  ): ClassInstantiation;
+  protected abstract generateVariablePromptBlock(
+    promptBlock: Extract<T, { blockType: "VARIABLE" }>
+  ): ClassInstantiation;
+  protected abstract generateRichTextPromptBlock(
+    promptBlock: Extract<T, { blockType: "RICH_TEXT" }>
+  ): ClassInstantiation;
+  protected abstract generatePlainTextPromptBlock(
+    promptBlock: Extract<T, { blockType: "PLAIN_TEXT" }>
+  ): ClassInstantiation;
+  protected generateAudioPromptBlock(
+    promptBlock: Extract<T, { blockType: "AUDIO" }>
+  ): ClassInstantiation {
+    const classArgs: MethodArgument[] = [
+      ...this.constructCommonClassArguments(promptBlock),
+      ...this.generateCommonFileInputArguments(promptBlock),
+    ];
+
+    const audioBlock = python.instantiateClass({
+      classReference: this.getPromptBlockRef(promptBlock),
+      arguments_: classArgs,
+    });
+
+    this.inheritReferences(audioBlock);
+    return audioBlock;
+  }
+
+  protected generateVideoPromptBlock(
+    promptBlock: Extract<T, { blockType: "VIDEO" }>
+  ): ClassInstantiation {
+    const classArgs: MethodArgument[] = [
+      ...this.constructCommonClassArguments(promptBlock),
+      ...this.generateCommonFileInputArguments(promptBlock),
+    ];
+
+    const videoBlock = python.instantiateClass({
+      classReference: this.getPromptBlockRef(promptBlock),
+      arguments_: classArgs,
+    });
+
+    this.inheritReferences(videoBlock);
+    return videoBlock;
+  }
+
+  protected generateImagePromptBlock(
+    promptBlock: Extract<T, { blockType: "IMAGE" }>
+  ): ClassInstantiation {
+    const classArgs: MethodArgument[] = [
+      ...this.constructCommonClassArguments(promptBlock),
+      ...this.generateCommonFileInputArguments(promptBlock),
+    ];
+
+    const imageBlock = python.instantiateClass({
+      classReference: this.getPromptBlockRef(promptBlock),
+      arguments_: classArgs,
+    });
+
+    this.inheritReferences(imageBlock);
+    return imageBlock;
+  }
+
+  protected generateDocumentPromptBlock(
+    promptBlock: Extract<T, { blockType: "DOCUMENT" }>
+  ): ClassInstantiation {
+    const classArgs: MethodArgument[] = [
+      ...this.constructCommonClassArguments(promptBlock),
+      ...this.generateCommonFileInputArguments(promptBlock),
+    ];
+
+    const documentBlock = python.instantiateClass({
+      classReference: this.getPromptBlockRef(promptBlock),
+      arguments_: classArgs,
+    });
+
+    this.inheritReferences(documentBlock);
+    return documentBlock;
+  }
+
+  protected getPromptBlockRef(promptBlock: T): python.Reference {
+    let pathName;
+    switch (promptBlock.blockType) {
+      case "JINJA":
+        pathName = "JinjaPromptBlock";
+        break;
+      case "CHAT_MESSAGE":
+        pathName = "ChatMessagePromptBlock";
+        break;
+      case "VARIABLE":
+        pathName = "VariablePromptBlock";
+        break;
+      case "RICH_TEXT":
+        pathName = "RichTextPromptBlock";
+        break;
+      case "PLAIN_TEXT":
+        pathName = "PlainTextPromptBlock";
+        break;
+      case "AUDIO":
+        pathName = "AudioPromptBlock";
+        break;
+      case "VIDEO":
+        pathName = "VideoPromptBlock";
+        break;
+      case "IMAGE":
+        pathName = "ImagePromptBlock";
+        break;
+      case "DOCUMENT":
+        pathName = "DocumentPromptBlock";
+        break;
+    }
+    return python.reference({
+      name: pathName,
+      modulePath: VELLUM_CLIENT_MODULE_PATH,
+    });
+  }
+
+  protected generateCommonFileInputArguments(
+    promptBlock:
+      | Extract<T, { blockType: "AUDIO" }>
+      | Extract<T, { blockType: "VIDEO" }>
+      | Extract<T, { blockType: "IMAGE" }>
+      | Extract<T, { blockType: "DOCUMENT" }>
+  ): MethodArgument[] {
+    const classArgs: MethodArgument[] = [];
+
+    classArgs.push(
+      new MethodArgument({
+        name: "src",
+        value: python.TypeInstantiation.str(promptBlock.src),
+      })
+    );
+
+    if (promptBlock.metadata) {
+      const metadataJson = new Json(promptBlock.metadata);
+      classArgs.push(
+        new MethodArgument({
+          name: "metadata",
+          value: metadataJson,
+        })
+      );
+    }
+
+    return classArgs;
+  }
 
   protected constructCommonClassArguments(promptBlock: T): MethodArgument[] {
     const args: MethodArgument[] = [];
