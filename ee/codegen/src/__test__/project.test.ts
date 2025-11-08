@@ -641,6 +641,10 @@ describe("WorkflowProjectGenerator", () => {
                   },
                 },
               ],
+              definition: {
+                name: "FinalOutput",
+                module: ["code", "nodes", "final_output"],
+              },
               trigger: {
                 id: "terminal_target",
                 merge_behavior: "AWAIT_ANY",
@@ -703,7 +707,7 @@ describe("WorkflowProjectGenerator", () => {
       });
     });
 
-    it("should generate metadata.json with entrypoint and trigger edge id mappings (path-based keys)", async () => {
+    it("should generate metadata.json with entrypoint and trigger edge id mappings", async () => {
       const displayData = {
         workflow_raw_data: {
           nodes: [
@@ -811,8 +815,8 @@ describe("WorkflowProjectGenerator", () => {
       expect(metadata.entrypoint_edges_to_id).toEqual({
         "entry|code.nodes.final_output.FinalOutput": "edge_1",
       });
-      // TRIGGER -> Node mapping uses "<trigger_path>|<target_node_path>"
-      expect(metadata.trigger_edges_to_id).toEqual({
+      // General edges mapping (TRIGGER or NODE source) uses "<source_path>|<target_node_path>"
+      expect(metadata.edges_to_id_mapping).toEqual({
         "code.triggers.scheduled.ScheduleTrigger|code.nodes.final_output.FinalOutput": "edge_2",
       });
     });
