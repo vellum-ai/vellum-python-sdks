@@ -2,6 +2,8 @@ from unittest import mock
 from uuid import uuid4
 from typing import Any, Iterator, List
 
+import httpx
+
 from vellum import (
     AdHocExecutePromptEvent,
     AdHocExpandMeta,
@@ -211,3 +213,27 @@ def test_run_workflow__rejected_has_raw_data(vellum_adhoc_prompt_client):
 
     # AND the error.raw_data should be present on the rejected event
     assert terminal_event.error.raw_data == expected_raw_data
+
+
+def test_run_workflow__connection_error(vellum_adhoc_prompt_client):
+    """
+    Confirm that a connection error results in a rejected event instead of a hang.
+
+    This test addresses APO-2091 where connection errors were causing hangs instead of
+    gracefully emitting a rejected workflow event.
+    """
+
+    # GIVEN a workflow that's set up to hit a Prompt
+    workflow = BasicInlinePromptWorkflow()
+
+    # AND the prompt API call will raise a connection error
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = httpx.TransportError("Connection refused")
+
+    # WHEN we run the workflow
+    terminal_event = workflow.run(inputs=WorkflowInputs(noun="color"))
+
+    # THEN the workflow should have a rejected terminal event (not a hang)
+    assert terminal_event.name == "workflow.execution.rejected"
+
+    # AND the error should indicate a provider connection failure
+    assert "Failed to connect to the model provider" in terminal_event.error.message

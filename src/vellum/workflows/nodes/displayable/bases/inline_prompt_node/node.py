@@ -3,6 +3,8 @@ import json
 from uuid import uuid4
 from typing import Callable, ClassVar, Generator, Generic, Iterator, List, Optional, Set, Tuple, Union
 
+import httpx
+
 from vellum import (
     AdHocExecutePromptEvent,
     AdHocExpandMeta,
@@ -225,11 +227,21 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
             prompt_event_stream = self._get_prompt_event_stream()
         except ApiError as e:
             self._handle_api_error(e)
+        except httpx.TransportError as e:
+            raise NodeException(
+                message=f"Failed to connect to the model provider: {str(e)}",
+                code=WorkflowErrorCode.PROVIDER_ERROR,
+            )
 
         try:
             first_event = next(prompt_event_stream)
         except ApiError as e:
             self._handle_api_error(e)
+        except httpx.TransportError as e:
+            raise NodeException(
+                message=f"Failed to connect to the model provider: {str(e)}",
+                code=WorkflowErrorCode.PROVIDER_ERROR,
+            )
         else:
             if first_event.state == "REJECTED":
                 workflow_error = vellum_error_to_workflow_error(first_event.error)
