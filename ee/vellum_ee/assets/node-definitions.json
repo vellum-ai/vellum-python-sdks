@@ -736,6 +736,73 @@
       ]
     },
     {
+      "id": "5889dc6f-44ef-48e4-a6bf-567722717565",
+      "label": "Set State Node",
+      "attributes": [
+        {
+          "id": "b6a50d3c-e21e-4042-acde-ee366f009899",
+          "name": "operations",
+          "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+              "type": "JSON",
+              "value": {}
+            }
+          }
+        }
+      ],
+      "display_data": {
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "comment": {
+          "value": "\n    A node that sets multiple state values at once.\n\n    This node accepts a dictionary mapping state paths to values and sets them all.\n    Values can be actual values or descriptors.\n\n    Example:\n        operations = {\n            \"chat_history\": State.chat_history.concat(LazyReference(\"MyAgentNode.Outputs.chat_history\")),\n            \"counter\": State.counter + 1,\n            \"total_tokens\": State.user_tokens.add(State.assistant_tokens)\n        }\n\n    Args:\n        operations: Dictionary mapping state attribute names to values (descriptors or actual values)\n    ",
+          "expanded": true
+        }
+      },
+      "base": {
+        "name": "BaseNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "bases",
+          "base"
+        ]
+      },
+      "definition": {
+        "name": "SetStateNode",
+        "module": [
+          "vellum",
+          "workflows",
+          "nodes",
+          "displayable",
+          "set_state_node",
+          "node"
+        ]
+      },
+      "trigger": {
+        "id": "cd37f826-00b1-499e-a9ea-985c35c18526",
+        "merge_behavior": "AWAIT_ATTRIBUTES"
+      },
+      "ports": [
+        {
+          "id": "1da045dd-7a6f-4279-85b1-d21892376a87",
+          "name": "default",
+          "type": "DEFAULT"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "57687d69-eb14-48fe-b919-abb044c85c35",
+          "name": "results",
+          "type": "JSON",
+          "value": null
+        }
+      ]
+    },
+    {
       "id": "fe698d74-3819-4632-b81c-6172e6267f50",
       "display_data": {
         "position": {
