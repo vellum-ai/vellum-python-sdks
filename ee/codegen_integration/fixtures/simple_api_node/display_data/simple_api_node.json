@@ -238,9 +238,7 @@
             "value": "This is my API Node",
             "expanded": true
           },
-          "z_index": null,
-          "icon": "vellum:icon:signal-stream",
-          "color": "lightBlue"
+          "z_index": null
         },
         "base": {
           "name": "APINode",
@@ -350,9 +348,7 @@
             "y": 210.0
           },
           "width": 467,
-          "height": 234,
-          "icon": "vellum:icon:circle-stop",
-          "color": "teal"
+          "height": 234
         },
         "base": {
           "name": "FinalOutputNode",

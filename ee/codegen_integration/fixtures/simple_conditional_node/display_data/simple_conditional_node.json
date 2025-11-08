@@ -154,9 +154,7 @@
             "y": 292.2355134030261
           },
           "width": 480,
-          "height": 234,
-          "icon": "vellum:icon:split",
-          "color": "corn"
+          "height": 234
         },
         "base": {
           "module": [
@@ -267,9 +265,7 @@
             "y": 210
           },
           "width": 464,
-          "height": 234,
-          "icon": "vellum:icon:circle-stop",
-          "color": "teal"
+          "height": 234
         },
         "base": {
           "module": [

@@ -138,9 +138,7 @@
             "y": 288.95993689582167
           },
           "width": 480,
-          "height": 126,
-          "icon": "vellum:icon:text-size",
-          "color": "navy"
+          "height": 126
         },
         "outputs": [
           {
@@ -334,9 +332,7 @@
             "y": 208.9757993384785
           },
           "width": 474,
-          "height": 234,
-          "icon": "vellum:icon:circle-stop",
-          "color": "teal"
+          "height": 234
         },
         "outputs": [
           {

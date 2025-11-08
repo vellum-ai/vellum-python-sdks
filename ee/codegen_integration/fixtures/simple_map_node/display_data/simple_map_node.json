@@ -90,9 +90,7 @@
             "y": 384.6100572199606
           },
           "width": 480,
-          "height": 224,
-          "icon": "vellum:icon:rectangle-code",
-          "color": "lime"
+          "height": 224
         },
         "base": {
           "module": [
@@ -221,9 +219,7 @@
                     "y": 241.3446029681764
                   },
                   "width": 480,
-                  "height": 278,
-                  "icon": "vellum:icon:stamp",
-                  "color": "brown"
+                  "height": 278
                 },
                 "base": {
                   "module": [
@@ -418,9 +414,7 @@
                     "y": 212.0475201437282
                   },
                   "width": 480,
-                  "height": 180,
-                  "icon": "vellum:icon:magnifying-glass-waveform",
-                  "color": "purple"
+                  "height": 180
                 },
                 "base": {
                   "name": "SearchNode",
@@ -493,9 +487,7 @@
                     "y": 210
                   },
                   "width": 463,
-                  "height": 234,
-                  "icon": "vellum:icon:circle-stop",
-                  "color": "teal"
+                  "height": 234
                 },
                 "base": {
                   "name": "FinalOutputNode",
@@ -669,14 +661,7 @@
         },
         "base": {
           "name": "MapNode",
-          "module": [
-            "vellum",
-            "workflows",
-            "nodes",
-            "core",
-            "map_node",
-            "node"
-          ]
+          "module": ["vellum", "workflows", "nodes", "core", "map_node", "node"]
         },
         "definition": {
           "name": "MapNode",
@@ -736,9 +721,7 @@
             "y": 58.5
           },
           "width": 454,
-          "height": 234,
-          "icon": "vellum:icon:circle-stop",
-          "color": "teal"
+          "height": 234
         },
         "base": {
           "name": "FinalOutputNode",

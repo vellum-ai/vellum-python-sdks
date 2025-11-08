@@ -53,9 +53,7 @@
           "position": {
             "x": 1873.116343490305,
             "y": 239.74958448753466
-          },
-          "icon": "vellum:icon:diagram-sankey",
-          "color": "grass"
+          }
         },
         "base": {
           "name": "SubworkflowDeploymentNode",
@@ -125,9 +123,7 @@
             "y": 211.25540166204985
           },
           "width": 471,
-          "height": 234,
-          "icon": "vellum:icon:circle-stop",
-          "color": "teal"
+          "height": 234
         },
         "base": {
           "name": "FinalOutputNode",

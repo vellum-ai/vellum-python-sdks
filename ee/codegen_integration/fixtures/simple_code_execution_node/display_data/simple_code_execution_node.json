@@ -127,9 +127,7 @@
           "comment": {
             "expanded": true,
             "value": "This is my code execution node"
-          },
-          "icon": "vellum:icon:rectangle-code",
-          "color": "lime"
+          }
         },
         "ports": [
           {
@@ -196,9 +194,7 @@
             "y": 235.35180055401668
           },
           "width": 480,
-          "height": 234,
-          "icon": "vellum:icon:circle-stop",
-          "color": "teal"
+          "height": 234
         },
         "outputs": [
           {

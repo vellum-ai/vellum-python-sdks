@@ -56,9 +56,7 @@
             "y": 438.20962675410783
           },
           "width": 480,
-          "height": 224,
-          "icon": "vellum:icon:stamp",
-          "color": "brown"
+          "height": 224
         },
         "base": {
           "module": [
@@ -117,9 +115,7 @@
             "y": 205.20096952908594
           },
           "width": 476,
-          "height": 180,
-          "icon": "vellum:icon:merge",
-          "color": "tomato"
+          "height": 180
         },
         "base": {
           "module": [
@@ -223,9 +219,7 @@
             "y": 185.8336045706372
           },
           "width": 480,
-          "height": 278,
-          "icon": "vellum:icon:stamp",
-          "color": "brown"
+          "height": 278
         },
         "base": {
           "module": [
@@ -296,9 +290,7 @@
             "y": 174.57146814404433
           },
           "width": 480,
-          "height": 234,
-          "icon": "vellum:icon:circle-stop",
-          "color": "teal"
+          "height": 234
         },
         "base": {
           "module": [
@@ -376,9 +368,7 @@
             "y": -124.21640253267435
           },
           "width": 480,
-          "height": 224,
-          "icon": "vellum:icon:stamp",
-          "color": "brown"
+          "height": 224
         },
         "base": {
           "module": [

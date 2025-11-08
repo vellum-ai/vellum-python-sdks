@@ -117,9 +117,7 @@
             "y": 288.95993689582167
           },
           "width": 480,
-          "height": 126,
-          "icon": "vellum:icon:text-size",
-          "color": "navy"
+          "height": 126
         },
         "trigger": {
           "id": "e31c38be-ef5a-4c20-ab8b-9315f3e75ff8",
@@ -341,9 +339,7 @@
             "y": 208.9757993384785
           },
           "width": 474,
-          "height": 234,
-          "icon": "vellum:icon:circle-stop",
-          "color": "teal"
+          "height": 234
         },
         "base": {
           "module": [

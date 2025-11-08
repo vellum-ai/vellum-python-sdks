@@ -69,9 +69,7 @@
             "y": 180.75743992606283
           },
           "width": 464,
-          "height": 224,
-          "icon": "vellum:icon:shield-check",
-          "color": "rose"
+          "height": 224
         },
         "base": {
           "name": "GuardrailNode",
@@ -142,9 +140,7 @@
             "y": 210
           },
           "width": 458,
-          "height": 234,
-          "icon": "vellum:icon:circle-stop",
-          "color": "teal"
+          "height": 234
         },
         "base": {
           "name": "FinalOutputNode",

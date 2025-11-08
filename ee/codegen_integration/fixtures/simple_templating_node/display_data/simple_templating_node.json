@@ -56,9 +56,7 @@
             "y": 296.65438885041556
           },
           "width": 480,
-          "height": 224,
-          "icon": "vellum:icon:stamp",
-          "color": "brown"
+          "height": 224
         },
         "base": {
           "module": [
@@ -128,9 +126,7 @@
             "y": 210
           },
           "width": 478,
-          "height": 234,
-          "icon": "vellum:icon:circle-stop",
-          "color": "teal"
+          "height": 234
         },
         "base": {
           "module": [
