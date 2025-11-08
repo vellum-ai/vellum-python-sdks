@@ -592,7 +592,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                     "attributes": [],
                 }
             else:
-                # For other triggers, serialize attributes from attribute_references
+                # For other triggers, serialize attributes from attribute_references as VellumVariables
                 attribute_references = trigger_class.attribute_references().values()
                 trigger_attributes: JsonArray = cast(
                     JsonArray,
@@ -601,9 +601,11 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                             JsonObject,
                             {
                                 "id": str(reference.id),
-                                "name": reference.name,
+                                "key": reference.name,
                                 "type": primitive_type_to_vellum_variable_type(reference),
-                                "value": None,
+                                "required": False,
+                                "default": None,
+                                "extensions": None,
                             },
                         )
                         for reference in sorted(attribute_references, key=lambda ref: ref.name)
