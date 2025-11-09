@@ -4,6 +4,7 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
 import { isNil } from "lodash";
 
 import { BaseNodeContext } from "src/context/node-context/base";
+import { BASE_NODE_DISPLAY_DEFAULTS } from "src/generators/nodes/display-defaults";
 import {
   NodeDisplayData as NodeDisplayDataType,
   WorkflowDataNode,
@@ -43,9 +44,15 @@ export class NodeDisplay extends AstNode {
         ? `Base${nodeContext.baseNodeClassName}`
         : undefined;
 
+    const baseDisplayDefaults =
+      BASE_NODE_DISPLAY_DEFAULTS[nodeContext.baseNodeClassName] || {};
+
     const fields: AstNode[] = [];
 
-    if (!isNil(nodeDisplayData?.icon)) {
+    if (
+      !isNil(nodeDisplayData?.icon) &&
+      nodeDisplayData.icon !== baseDisplayDefaults.icon
+    ) {
       fields.push(
         python.field({
           name: "icon",
@@ -54,7 +61,10 @@ export class NodeDisplay extends AstNode {
       );
     }
 
-    if (!isNil(nodeDisplayData?.color)) {
+    if (
+      !isNil(nodeDisplayData?.color) &&
+      nodeDisplayData.color !== baseDisplayDefaults.color
+    ) {
       fields.push(
         python.field({
           name: "color",
