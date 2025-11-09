@@ -41,10 +41,12 @@ runner = WorkflowSandboxRunner(
                     content=ArrayChatMessageContent(
                         value=[
                             ImageChatMessageContent(
-                                src="https://picsum.photos/id/419/200/300",
-                                metadata={
-                                    "detail": "high",
-                                },
+                                value=VellumImage(
+                                    src="https://picsum.photos/id/419/200/300",
+                                    metadata={
+                                        "detail": "high",
+                                    },
+                                ),
                             ),
                         ]
                     ),
