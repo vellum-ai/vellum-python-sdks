@@ -12,6 +12,7 @@ from .merge_node import MergeNode
 from .note_node import NoteNode
 from .prompt_deployment_node import PromptDeploymentNode
 from .search_node import SearchNode
+from .set_state_node import SetStateNode
 from .subworkflow_deployment_node import SubworkflowDeploymentNode
 from .tool_calling_node import ToolCallingNode
 from .web_search_node import WebSearchNode
@@ -30,6 +31,7 @@ __all__ = [
     "SubworkflowDeploymentNode",
     "PromptDeploymentNode",
     "SearchNode",
+    "SetStateNode",
     "TemplatingNode",
     "ToolCallingNode",
     "WebSearchNode",

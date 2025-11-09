@@ -22,6 +22,10 @@ class APINode(BaseAPINode):
     for the bearer token authorization.
     """
 
+    class Display(BaseAPINode.Display):
+        icon = "vellum:icon:signal-stream"
+        color = "lightBlue"
+
     authorization_type: Optional[AuthorizationType] = None
     api_key_header_key: Optional[str] = None
     api_key_header_value: Optional[Union[str, VellumSecret]] = None

@@ -23,6 +23,10 @@ class InlinePromptNode(BaseInlinePromptNode[StateType], Generic[StateType]):
     request_options: Optional[RequestOptions] - The request options to use for the Prompt Execution
     """
 
+    class Display(BaseInlinePromptNode.Display):
+        icon = "vellum:icon:text-size"
+        color = "navy"
+
     class Trigger(BaseInlinePromptNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY
 

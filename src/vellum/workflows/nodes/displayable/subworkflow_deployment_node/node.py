@@ -48,6 +48,10 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
     request_options: Optional[RequestOptions] = None - The request options to use for the Workflow Execution
     """
 
+    class Display(BaseNode.Display):
+        icon = "vellum:icon:diagram-sankey"
+        color = "grass"
+
     # Either the Workflow Deployment's UUID or its name.
     deployment: ClassVar[Union[UUID, str]]
     subworkflow_inputs: ClassVar[Union[EntityInputsInterface, BaseInputs]] = {}

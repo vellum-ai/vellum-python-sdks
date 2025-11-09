@@ -22,6 +22,10 @@ class GuardrailNode(BaseNode[StateType], Generic[StateType]):
     request_options: Optional[RequestOptions] - The request options to use for the Metric
     """
 
+    class Display(BaseNode.Display):
+        icon = "vellum:icon:shield-check"
+        color = "rose"
+
     metric_definition: ClassVar[Union[UUID, str]]
 
     metric_inputs: ClassVar[EntityInputsInterface] = {}

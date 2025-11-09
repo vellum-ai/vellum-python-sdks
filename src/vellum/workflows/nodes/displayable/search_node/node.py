@@ -22,6 +22,10 @@ class SearchNode(BaseSearchNode[StateType]):
     chunk_separator: str = "\n\n#####\n\n" - The separator to use when joining the text of each search result
     """
 
+    class Display(BaseSearchNode.Display):
+        icon = "vellum:icon:magnifying-glass-waveform"
+        color = "purple"
+
     chunk_separator: ClassVar[str] = "\n\n#####\n\n"
 
     class Trigger(BaseSearchNode.Trigger):
