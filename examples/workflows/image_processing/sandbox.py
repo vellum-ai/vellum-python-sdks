@@ -1,4 +1,4 @@
-from vellum import ArrayChatMessageContent, ChatMessage, ImageChatMessageContent
+from vellum import ArrayChatMessageContent, ChatMessage, ImageChatMessageContent, VellumImage
 from vellum.workflows.sandbox import WorkflowSandboxRunner
 
 from .inputs import Inputs
@@ -20,10 +20,12 @@ runner = WorkflowSandboxRunner(
                     content=ArrayChatMessageContent(
                         value=[
                             ImageChatMessageContent(
-                                src="https://picsum.photos/id/296/200/300",
-                                metadata={
-                                    "detail": "high",
-                                },
+                                value=VellumImage(
+                                    src="https://picsum.photos/id/296/200/300",
+                                    metadata={
+                                        "detail": "high",
+                                    },
+                                ),
                             ),
                         ]
                     ),
