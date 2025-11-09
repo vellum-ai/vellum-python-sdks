@@ -72,28 +72,6 @@ from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class imp
 
 logger = logging.getLogger(__name__)
 
-
-def _omit_class_default_display_attrs(node: Type[BaseNode], serialized_node: JsonObject) -> None:
-    display_data = serialized_node.get("display_data")
-    if not isinstance(display_data, dict):
-        return
-
-    unadorned_node = get_unadorned_node(node)
-    node_to_check = unadorned_node if unadorned_node else node
-
-    if not hasattr(node_to_check, "Display"):
-        return
-
-    node_display_icon = getattr(node_to_check.Display, "icon", None)
-    node_display_color = getattr(node_to_check.Display, "color", None)
-
-    if display_data.get("icon") == node_display_icon:
-        display_data.pop("icon", None)
-
-    if display_data.get("color") == node_display_color:
-        display_data.pop("color", None)
-
-
 IGNORE_PATTERNS = [
     "*.pyc",
     "__pycache__",
@@ -274,7 +252,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                     self.display_context.add_validation_error(validation_error)
 
                 serialized_node = node_display.serialize(self.display_context)
-                _omit_class_default_display_attrs(node, serialized_node)
             except (NotImplementedError, UserFacingException) as e:
                 self.display_context.add_error(e)
                 self.display_context.add_invalid_node(node)
