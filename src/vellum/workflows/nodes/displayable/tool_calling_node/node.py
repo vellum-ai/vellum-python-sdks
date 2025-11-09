@@ -45,7 +45,7 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
 
     class Display(BaseNode.Display):
         icon = "vellum:icon:wrench"
-        color = "teal"
+        color = "gold"
 
     ml_model: ClassVar[str] = "gpt-4o-mini"
     blocks: ClassVar[List[Union[PromptBlock, Dict[str, Any]]]] = []
