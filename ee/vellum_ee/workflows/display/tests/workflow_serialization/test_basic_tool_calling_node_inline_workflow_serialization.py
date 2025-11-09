@@ -1,3 +1,5 @@
+from typing import Any
+
 from deepdiff import DeepDiff
 
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
@@ -38,7 +40,8 @@ def test_serialize_workflow():
     # AND its raw data should be what we expect
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
     tool_calling_node = workflow_raw_data["nodes"][1]
-    assert tool_calling_node == {
+    # Type annotation helps mypy avoid expensive type inference on large dict literal
+    expected_tool_calling_node: dict[str, Any] = {
         "id": "5702a9fb-7329-4652-a5d3-01f87632aa32",
         "label": "Get Current Weather Node",
         "type": "GENERIC",
@@ -453,3 +456,4 @@ def test_serialize_workflow():
             },
         ],
     }
+    assert tool_calling_node == expected_tool_calling_node
