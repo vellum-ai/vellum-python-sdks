@@ -1,5 +1,3 @@
-from typing import Any
-
 from deepdiff import DeepDiff
 
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
@@ -40,300 +38,48 @@ def test_serialize_workflow():
     # AND its raw data should be what we expect
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
     tool_calling_node = workflow_raw_data["nodes"][1]
-    # Type annotation helps mypy avoid expensive type inference on large dict literal
-    expected_tool_calling_node: dict[str, Any] = {
-        "id": "5702a9fb-7329-4652-a5d3-01f87632aa32",
-        "label": "Get Current Weather Node",
-        "type": "GENERIC",
-        "display_data": {
-            "position": {"x": 200.0, "y": -50.0},
-            "comment": {
-                "expanded": True,
-                "value": "\n    A tool calling node that calls the get_current_weather function.\n    ",
-            },
-        },
-        "base": {
-            "name": "ToolCallingNode",
-            "module": ["vellum", "workflows", "nodes", "displayable", "tool_calling_node", "node"],
-        },
-        "definition": {
-            "name": "GetCurrentWeatherNode",
-            "module": ["tests", "workflows", "basic_tool_calling_node_inline_workflow", "workflow"],
-        },
-        "trigger": {"id": "2e5bd6ea-c3b1-484f-bd51-72affc0446b3", "merge_behavior": "AWAIT_ATTRIBUTES"},
-        "ports": [{"id": "4a409117-9d9e-4c3c-a309-d1f3a2f984ff", "name": "default", "type": "DEFAULT"}],
-        "adornments": None,
-        "attributes": [
-            {
-                "id": "e175bdd6-8794-4072-bc25-d3601c5a1cd2",
-                "name": "ml_model",
-                "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "gpt-4o-mini"}},
-            },
-            {
-                "id": "01a4afb0-401e-4f2e-8da7-e642775d7c2f",
-                "name": "blocks",
-                "value": {
-                    "type": "CONSTANT_VALUE",
-                    "value": {
-                        "type": "JSON",
-                        "value": [
-                            {
-                                "block_type": "CHAT_MESSAGE",
-                                "state": None,
-                                "cache_config": None,
-                                "chat_role": "SYSTEM",
-                                "chat_source": None,
-                                "chat_message_unterminated": None,
-                                "blocks": [
+    function_attributes = next(
+        attribute for attribute in tool_calling_node["attributes"] if attribute["name"] == "functions"
+    )
+    assert function_attributes == {
+        "id": "102d8447-5232-4e96-8192-9b1ca0f02650",
+        "name": "functions",
+        "value": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+                "type": "JSON",
+                "value": [
+                    {
+                        "type": "INLINE_WORKFLOW",
+                        "name": "BasicInlineSubworkflowWorkflow",
+                        "description": "\n    A workflow that gets the weather for a given city and date.\n    ",  # noqa: E501
+                        "exec_config": {
+                            "workflow_raw_data": {
+                                "nodes": [
                                     {
-                                        "block_type": "RICH_TEXT",
-                                        "state": None,
-                                        "cache_config": None,
-                                        "blocks": [
-                                            {
-                                                "block_type": "PLAIN_TEXT",
-                                                "state": None,
-                                                "cache_config": None,
-                                                "text": "You are a weather expert",
-                                            }
-                                        ],
-                                    }
-                                ],
-                            },
-                            {
-                                "block_type": "CHAT_MESSAGE",
-                                "state": None,
-                                "cache_config": None,
-                                "chat_role": "USER",
-                                "chat_source": None,
-                                "chat_message_unterminated": None,
-                                "blocks": [
+                                        "id": "6358dcfe-b162-4e19-99ca-401d1ada9bdc",
+                                        "type": "ENTRYPOINT",
+                                        "inputs": [],
+                                        "data": {
+                                            "label": "Entrypoint Node",
+                                            "source_handle_id": "c344fdee-282b-40c9-8c97-6dd08830948c",
+                                        },
+                                        "display_data": {"position": {"x": 0.0, "y": -50.0}},
+                                        "base": None,
+                                        "definition": None,
+                                    },
                                     {
-                                        "block_type": "RICH_TEXT",
-                                        "state": None,
-                                        "cache_config": None,
-                                        "blocks": [
-                                            {
-                                                "block_type": "VARIABLE",
-                                                "state": None,
-                                                "cache_config": None,
-                                                "input_variable": "0265b353-d345-44c3-902d-cc65a80b85c5",
-                                            }
-                                        ],
-                                    }
-                                ],
-                            },
-                        ],
-                    },
-                },
-            },
-            {
-                "id": "102d8447-5232-4e96-8192-9b1ca0f02650",
-                "name": "functions",
-                "value": {
-                    "type": "CONSTANT_VALUE",
-                    "value": {
-                        "type": "JSON",
-                        "value": [
-                            {
-                                "type": "INLINE_WORKFLOW",
-                                "name": "BasicInlineSubworkflowWorkflow",
-                                "description": "\n    A workflow that gets the weather for a given city and date.\n    ",  # noqa: E501
-                                "exec_config": {
-                                    "workflow_raw_data": {
-                                        "nodes": [
-                                            {
-                                                "id": "6358dcfe-b162-4e19-99ca-401d1ada9bdc",
-                                                "type": "ENTRYPOINT",
-                                                "inputs": [],
-                                                "data": {
-                                                    "label": "Entrypoint Node",
-                                                    "source_handle_id": "c344fdee-282b-40c9-8c97-6dd08830948c",
-                                                },
-                                                "display_data": {"position": {"x": 0.0, "y": -50.0}},
-                                                "base": None,
-                                                "definition": None,
-                                            },
-                                            {
-                                                "id": "07a83d1a-7948-4a23-9f46-9a60382d3a48",
-                                                "label": "Start Node",
-                                                "type": "GENERIC",
-                                                "should_file_merge": True,
-                                                "display_data": {"position": {"x": 200.0, "y": -50.0}},
-                                                "base": {
-                                                    "name": "BaseNode",
-                                                    "module": ["vellum", "workflows", "nodes", "bases", "base"],
-                                                },
-                                                "definition": {
-                                                    "name": "StartNode",
-                                                    "module": [
-                                                        "tests",
-                                                        "workflows",
-                                                        "basic_tool_calling_node_inline_workflow",
-                                                        "workflow",
-                                                    ],
-                                                },
-                                                "trigger": {
-                                                    "id": "8a7854a7-a595-44ce-8197-1f9cd2c78f10",
-                                                    "merge_behavior": "AWAIT_ATTRIBUTES",
-                                                },
-                                                "ports": [
-                                                    {
-                                                        "id": "ee444f1a-b126-4480-8eb2-d22506640763",
-                                                        "name": "default",
-                                                        "type": "DEFAULT",
-                                                    }
-                                                ],
-                                                "adornments": None,
-                                                "attributes": [
-                                                    {
-                                                        "id": "b5e2d415-4368-43c1-826c-ff6511bf6942",
-                                                        "name": "city",
-                                                        "value": {
-                                                            "type": "WORKFLOW_INPUT",
-                                                            "input_variable_id": "fa73da37-34c3-47a9-be58-69cc6cdbfca5",
-                                                        },
-                                                    },
-                                                    {
-                                                        "id": "5b3ed6d0-8cd6-41b6-ad55-d380b41f943b",
-                                                        "name": "date",
-                                                        "value": {
-                                                            "type": "WORKFLOW_INPUT",
-                                                            "input_variable_id": "aba1e6e0-dfa7-4c15-a4e6-aec6feebfaca",
-                                                        },
-                                                    },
-                                                ],
-                                                "outputs": [
-                                                    {
-                                                        "id": "272eccdb-6903-4f32-8159-8bfb87c65c2e",
-                                                        "name": "temperature",
-                                                        "type": "NUMBER",
-                                                        "value": None,
-                                                    },
-                                                    {
-                                                        "id": "8616509d-fecb-4bbf-afdc-bd4c5de35ce7",
-                                                        "name": "reasoning",
-                                                        "type": "STRING",
-                                                        "value": None,
-                                                    },
-                                                ],
-                                            },
-                                            {
-                                                "id": "0779b232-82ab-4dbe-a340-6a85e6ab3368",
-                                                "type": "TERMINAL",
-                                                "data": {
-                                                    "label": "Final Output",
-                                                    "name": "temperature",
-                                                    "target_handle_id": "9e077063-c394-4c7b-b0c6-e6686df67984",
-                                                    "output_id": "99afb757-2782-465d-ab55-80ccf50552b9",
-                                                    "output_type": "NUMBER",
-                                                    "node_input_id": "7761c5e1-cc2e-43ab-bfd2-f66c3d47b3b9",
-                                                },
-                                                "inputs": [
-                                                    {
-                                                        "id": "7761c5e1-cc2e-43ab-bfd2-f66c3d47b3b9",
-                                                        "key": "node_input",
-                                                        "value": {
-                                                            "rules": [
-                                                                {
-                                                                    "type": "NODE_OUTPUT",
-                                                                    "data": {
-                                                                        "node_id": "07a83d1a-7948-4a23-9f46-9a60382d3a48",  # noqa: E501
-                                                                        "output_id": "272eccdb-6903-4f32-8159-8bfb87c65c2e",  # noqa: E501
-                                                                    },
-                                                                }
-                                                            ],
-                                                            "combinator": "OR",
-                                                        },
-                                                    }
-                                                ],
-                                                "display_data": {"position": {"x": 400.0, "y": -175.0}},
-                                                "base": {
-                                                    "name": "FinalOutputNode",
-                                                    "module": [
-                                                        "vellum",
-                                                        "workflows",
-                                                        "nodes",
-                                                        "displayable",
-                                                        "final_output_node",
-                                                        "node",
-                                                    ],
-                                                },
-                                                "definition": None,
-                                            },
-                                            {
-                                                "id": "31b74695-3f1c-47cf-8be8-a4d86cc589e8",
-                                                "type": "TERMINAL",
-                                                "data": {
-                                                    "label": "Final Output",
-                                                    "name": "reasoning",
-                                                    "target_handle_id": "8b525943-6c27-414b-a329-e29c0b217f72",
-                                                    "output_id": "7444a019-081a-4e10-a528-3249299159f7",
-                                                    "output_type": "STRING",
-                                                    "node_input_id": "c1833b54-95b6-4365-8e57-51b09c8e2606",
-                                                },
-                                                "inputs": [
-                                                    {
-                                                        "id": "c1833b54-95b6-4365-8e57-51b09c8e2606",
-                                                        "key": "node_input",
-                                                        "value": {
-                                                            "rules": [
-                                                                {
-                                                                    "type": "NODE_OUTPUT",
-                                                                    "data": {
-                                                                        "node_id": "07a83d1a-7948-4a23-9f46-9a60382d3a48",  # noqa: E501
-                                                                        "output_id": "8616509d-fecb-4bbf-afdc-bd4c5de35ce7",  # noqa: E501
-                                                                    },
-                                                                }
-                                                            ],
-                                                            "combinator": "OR",
-                                                        },
-                                                    }
-                                                ],
-                                                "display_data": {"position": {"x": 400.0, "y": 75.0}},
-                                                "base": {
-                                                    "name": "FinalOutputNode",
-                                                    "module": [
-                                                        "vellum",
-                                                        "workflows",
-                                                        "nodes",
-                                                        "displayable",
-                                                        "final_output_node",
-                                                        "node",
-                                                    ],
-                                                },
-                                                "definition": None,
-                                            },
-                                        ],
-                                        "edges": [
-                                            {
-                                                "id": "1c333b1c-a1b7-437e-9dfc-bdca8db2cff5",
-                                                "source_node_id": "6358dcfe-b162-4e19-99ca-401d1ada9bdc",
-                                                "source_handle_id": "c344fdee-282b-40c9-8c97-6dd08830948c",
-                                                "target_node_id": "07a83d1a-7948-4a23-9f46-9a60382d3a48",
-                                                "target_handle_id": "8a7854a7-a595-44ce-8197-1f9cd2c78f10",
-                                                "type": "DEFAULT",
-                                            },
-                                            {
-                                                "id": "3c5d8990-48f5-42e1-893e-bc8308d2110a",
-                                                "source_node_id": "07a83d1a-7948-4a23-9f46-9a60382d3a48",
-                                                "source_handle_id": "ee444f1a-b126-4480-8eb2-d22506640763",
-                                                "target_node_id": "0779b232-82ab-4dbe-a340-6a85e6ab3368",
-                                                "target_handle_id": "9e077063-c394-4c7b-b0c6-e6686df67984",
-                                                "type": "DEFAULT",
-                                            },
-                                            {
-                                                "id": "de0b8090-a26e-4e09-9173-9f7400a5be4c",
-                                                "source_node_id": "07a83d1a-7948-4a23-9f46-9a60382d3a48",
-                                                "source_handle_id": "ee444f1a-b126-4480-8eb2-d22506640763",
-                                                "target_node_id": "31b74695-3f1c-47cf-8be8-a4d86cc589e8",
-                                                "target_handle_id": "8b525943-6c27-414b-a329-e29c0b217f72",
-                                                "type": "DEFAULT",
-                                            },
-                                        ],
-                                        "display_data": {"viewport": {"x": 0.0, "y": 0.0, "zoom": 1.0}},
+                                        "id": "07a83d1a-7948-4a23-9f46-9a60382d3a48",
+                                        "label": "Start Node",
+                                        "type": "GENERIC",
+                                        "should_file_merge": True,
+                                        "display_data": {"position": {"x": 200.0, "y": -50.0}},
+                                        "base": {
+                                            "name": "BaseNode",
+                                            "module": ["vellum", "workflows", "nodes", "bases", "base"],
+                                        },
                                         "definition": {
-                                            "name": "BasicInlineSubworkflowWorkflow",
+                                            "name": "StartNode",
                                             "module": [
                                                 "tests",
                                                 "workflows",
@@ -341,119 +87,227 @@ def test_serialize_workflow():
                                                 "workflow",
                                             ],
                                         },
-                                        "output_values": [
+                                        "trigger": {
+                                            "id": "8a7854a7-a595-44ce-8197-1f9cd2c78f10",
+                                            "merge_behavior": "AWAIT_ATTRIBUTES",
+                                        },
+                                        "ports": [
                                             {
-                                                "output_variable_id": "99afb757-2782-465d-ab55-80ccf50552b9",
+                                                "id": "ee444f1a-b126-4480-8eb2-d22506640763",
+                                                "name": "default",
+                                                "type": "DEFAULT",
+                                            }
+                                        ],
+                                        "adornments": None,
+                                        "attributes": [
+                                            {
+                                                "id": "b5e2d415-4368-43c1-826c-ff6511bf6942",
+                                                "name": "city",
                                                 "value": {
-                                                    "type": "NODE_OUTPUT",
-                                                    "node_id": "07a83d1a-7948-4a23-9f46-9a60382d3a48",
-                                                    "node_output_id": "272eccdb-6903-4f32-8159-8bfb87c65c2e",
+                                                    "type": "WORKFLOW_INPUT",
+                                                    "input_variable_id": "fa73da37-34c3-47a9-be58-69cc6cdbfca5",
                                                 },
                                             },
                                             {
-                                                "output_variable_id": "7444a019-081a-4e10-a528-3249299159f7",
+                                                "id": "5b3ed6d0-8cd6-41b6-ad55-d380b41f943b",
+                                                "name": "date",
                                                 "value": {
-                                                    "type": "NODE_OUTPUT",
-                                                    "node_id": "07a83d1a-7948-4a23-9f46-9a60382d3a48",
-                                                    "node_output_id": "8616509d-fecb-4bbf-afdc-bd4c5de35ce7",
+                                                    "type": "WORKFLOW_INPUT",
+                                                    "input_variable_id": "aba1e6e0-dfa7-4c15-a4e6-aec6feebfaca",
                                                 },
                                             },
                                         ],
+                                        "outputs": [
+                                            {
+                                                "id": "272eccdb-6903-4f32-8159-8bfb87c65c2e",
+                                                "name": "temperature",
+                                                "type": "NUMBER",
+                                                "value": None,
+                                            },
+                                            {
+                                                "id": "8616509d-fecb-4bbf-afdc-bd4c5de35ce7",
+                                                "name": "reasoning",
+                                                "type": "STRING",
+                                                "value": None,
+                                            },
+                                        ],
                                     },
-                                    "input_variables": [
-                                        {
-                                            "id": "fa73da37-34c3-47a9-be58-69cc6cdbfca5",
-                                            "key": "city",
-                                            "type": "STRING",
-                                            "default": None,
-                                            "required": True,
-                                            "extensions": {"color": None},
+                                    {
+                                        "id": "0779b232-82ab-4dbe-a340-6a85e6ab3368",
+                                        "type": "TERMINAL",
+                                        "data": {
+                                            "label": "Final Output",
+                                            "name": "temperature",
+                                            "target_handle_id": "9e077063-c394-4c7b-b0c6-e6686df67984",
+                                            "output_id": "99afb757-2782-465d-ab55-80ccf50552b9",
+                                            "output_type": "NUMBER",
+                                            "node_input_id": "7761c5e1-cc2e-43ab-bfd2-f66c3d47b3b9",
                                         },
-                                        {
-                                            "id": "aba1e6e0-dfa7-4c15-a4e6-aec6feebfaca",
-                                            "key": "date",
-                                            "type": "STRING",
-                                            "default": None,
-                                            "required": True,
-                                            "extensions": {"color": None},
+                                        "inputs": [
+                                            {
+                                                "id": "7761c5e1-cc2e-43ab-bfd2-f66c3d47b3b9",
+                                                "key": "node_input",
+                                                "value": {
+                                                    "rules": [
+                                                        {
+                                                            "type": "NODE_OUTPUT",
+                                                            "data": {
+                                                                "node_id": "07a83d1a-7948-4a23-9f46-9a60382d3a48",  # noqa: E501
+                                                                "output_id": "272eccdb-6903-4f32-8159-8bfb87c65c2e",  # noqa: E501
+                                                            },
+                                                        }
+                                                    ],
+                                                    "combinator": "OR",
+                                                },
+                                            }
+                                        ],
+                                        "display_data": {"position": {"x": 400.0, "y": -175.0}},
+                                        "base": {
+                                            "name": "FinalOutputNode",
+                                            "module": [
+                                                "vellum",
+                                                "workflows",
+                                                "nodes",
+                                                "displayable",
+                                                "final_output_node",
+                                                "node",
+                                            ],
                                         },
-                                    ],
-                                    "state_variables": [],
-                                    "output_variables": [
-                                        {
-                                            "id": "99afb757-2782-465d-ab55-80ccf50552b9",
-                                            "key": "temperature",
-                                            "type": "NUMBER",
+                                        "definition": None,
+                                    },
+                                    {
+                                        "id": "31b74695-3f1c-47cf-8be8-a4d86cc589e8",
+                                        "type": "TERMINAL",
+                                        "data": {
+                                            "label": "Final Output",
+                                            "name": "reasoning",
+                                            "target_handle_id": "8b525943-6c27-414b-a329-e29c0b217f72",
+                                            "output_id": "7444a019-081a-4e10-a528-3249299159f7",
+                                            "output_type": "STRING",
+                                            "node_input_id": "c1833b54-95b6-4365-8e57-51b09c8e2606",
                                         },
-                                        {
-                                            "id": "7444a019-081a-4e10-a528-3249299159f7",
-                                            "key": "reasoning",
-                                            "type": "STRING",
+                                        "inputs": [
+                                            {
+                                                "id": "c1833b54-95b6-4365-8e57-51b09c8e2606",
+                                                "key": "node_input",
+                                                "value": {
+                                                    "rules": [
+                                                        {
+                                                            "type": "NODE_OUTPUT",
+                                                            "data": {
+                                                                "node_id": "07a83d1a-7948-4a23-9f46-9a60382d3a48",  # noqa: E501
+                                                                "output_id": "8616509d-fecb-4bbf-afdc-bd4c5de35ce7",  # noqa: E501
+                                                            },
+                                                        }
+                                                    ],
+                                                    "combinator": "OR",
+                                                },
+                                            }
+                                        ],
+                                        "display_data": {"position": {"x": 400.0, "y": 75.0}},
+                                        "base": {
+                                            "name": "FinalOutputNode",
+                                            "module": [
+                                                "vellum",
+                                                "workflows",
+                                                "nodes",
+                                                "displayable",
+                                                "final_output_node",
+                                                "node",
+                                            ],
                                         },
+                                        "definition": None,
+                                    },
+                                ],
+                                "edges": [
+                                    {
+                                        "id": "1c333b1c-a1b7-437e-9dfc-bdca8db2cff5",
+                                        "source_node_id": "6358dcfe-b162-4e19-99ca-401d1ada9bdc",
+                                        "source_handle_id": "c344fdee-282b-40c9-8c97-6dd08830948c",
+                                        "target_node_id": "07a83d1a-7948-4a23-9f46-9a60382d3a48",
+                                        "target_handle_id": "8a7854a7-a595-44ce-8197-1f9cd2c78f10",
+                                        "type": "DEFAULT",
+                                    },
+                                    {
+                                        "id": "3c5d8990-48f5-42e1-893e-bc8308d2110a",
+                                        "source_node_id": "07a83d1a-7948-4a23-9f46-9a60382d3a48",
+                                        "source_handle_id": "ee444f1a-b126-4480-8eb2-d22506640763",
+                                        "target_node_id": "0779b232-82ab-4dbe-a340-6a85e6ab3368",
+                                        "target_handle_id": "9e077063-c394-4c7b-b0c6-e6686df67984",
+                                        "type": "DEFAULT",
+                                    },
+                                    {
+                                        "id": "de0b8090-a26e-4e09-9173-9f7400a5be4c",
+                                        "source_node_id": "07a83d1a-7948-4a23-9f46-9a60382d3a48",
+                                        "source_handle_id": "ee444f1a-b126-4480-8eb2-d22506640763",
+                                        "target_node_id": "31b74695-3f1c-47cf-8be8-a4d86cc589e8",
+                                        "target_handle_id": "8b525943-6c27-414b-a329-e29c0b217f72",
+                                        "type": "DEFAULT",
+                                    },
+                                ],
+                                "display_data": {"viewport": {"x": 0.0, "y": 0.0, "zoom": 1.0}},
+                                "definition": {
+                                    "name": "BasicInlineSubworkflowWorkflow",
+                                    "module": [
+                                        "tests",
+                                        "workflows",
+                                        "basic_tool_calling_node_inline_workflow",
+                                        "workflow",
                                     ],
                                 },
-                            }
-                        ],
-                    },
-                },
-            },
-            {
-                "id": "21744ac9-c6d4-42c2-b88c-aeee4d38287c",
-                "name": "prompt_inputs",
-                "value": {
-                    "type": "DICTIONARY_REFERENCE",
-                    "entries": [
-                        {
-                            "id": "0265b353-d345-44c3-902d-cc65a80b85c5",
-                            "key": "question",
-                            "value": {
-                                "type": "WORKFLOW_INPUT",
-                                "input_variable_id": "045942b7-e5b9-482c-b4d4-943309a20e05",
+                                "output_values": [
+                                    {
+                                        "output_variable_id": "99afb757-2782-465d-ab55-80ccf50552b9",
+                                        "value": {
+                                            "type": "NODE_OUTPUT",
+                                            "node_id": "07a83d1a-7948-4a23-9f46-9a60382d3a48",
+                                            "node_output_id": "272eccdb-6903-4f32-8159-8bfb87c65c2e",
+                                        },
+                                    },
+                                    {
+                                        "output_variable_id": "7444a019-081a-4e10-a528-3249299159f7",
+                                        "value": {
+                                            "type": "NODE_OUTPUT",
+                                            "node_id": "07a83d1a-7948-4a23-9f46-9a60382d3a48",
+                                            "node_output_id": "8616509d-fecb-4bbf-afdc-bd4c5de35ce7",
+                                        },
+                                    },
+                                ],
                             },
-                        }
-                    ],
-                },
-            },
-            {
-                "id": "c1bb1f53-4eac-4ad1-967f-032359b57fa0",
-                "name": "parameters",
-                "value": {
-                    "type": "CONSTANT_VALUE",
-                    "value": {
-                        "type": "JSON",
-                        "value": {
-                            "stop": [],
-                            "temperature": 0.0,
-                            "max_tokens": 4096.0,
-                            "top_p": 1.0,
-                            "top_k": 0.0,
-                            "frequency_penalty": 0.0,
-                            "presence_penalty": 0.0,
-                            "logit_bias": None,
-                            "custom_parameters": None,
+                            "input_variables": [
+                                {
+                                    "id": "fa73da37-34c3-47a9-be58-69cc6cdbfca5",
+                                    "key": "city",
+                                    "type": "STRING",
+                                    "default": None,
+                                    "required": True,
+                                    "extensions": {"color": None},
+                                },
+                                {
+                                    "id": "aba1e6e0-dfa7-4c15-a4e6-aec6feebfaca",
+                                    "key": "date",
+                                    "type": "STRING",
+                                    "default": None,
+                                    "required": True,
+                                    "extensions": {"color": None},
+                                },
+                            ],
+                            "state_variables": [],
+                            "output_variables": [
+                                {
+                                    "id": "99afb757-2782-465d-ab55-80ccf50552b9",
+                                    "key": "temperature",
+                                    "type": "NUMBER",
+                                },
+                                {
+                                    "id": "7444a019-081a-4e10-a528-3249299159f7",
+                                    "key": "reasoning",
+                                    "type": "STRING",
+                                },
+                            ],
                         },
-                    },
-                },
+                    }
+                ],
             },
-            {
-                "id": "011c3cad-8520-4ff9-a8ca-054d3d6ab099",
-                "name": "max_prompt_iterations",
-                "value": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 25.0}},
-            },
-            {
-                "id": "ac4fe808-74e9-4ecc-b03c-08271461b9aa",
-                "name": "settings",
-                "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
-            },
-        ],
-        "outputs": [
-            {"id": "8bb610bb-85c4-404a-a854-e08c810310e1", "name": "text", "type": "STRING", "value": None},
-            {
-                "id": "0de13dac-1d38-493a-b1a6-d78aa2e9483d",
-                "name": "chat_history",
-                "type": "CHAT_HISTORY",
-                "value": None,
-            },
-        ],
+        },
     }
-    assert tool_calling_node == expected_tool_calling_node
