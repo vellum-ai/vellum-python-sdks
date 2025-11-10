@@ -358,14 +358,14 @@ def test_tool_calling_node_workflow_is_dynamic(vellum_adhoc_prompt_client):
         prompt_inputs = {}
 
     # GIVEN a workflow with just a tool calling node
-    class ToolCallingWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+    class AgentWorkflow(BaseWorkflow[BaseInputs, BaseState]):
         graph = TestToolCallingNode
 
         class Outputs(BaseWorkflow.Outputs):
             text: str = TestToolCallingNode.Outputs.text
             chat_history: List[ChatMessage] = TestToolCallingNode.Outputs.chat_history
 
-    workflow = ToolCallingWorkflow()
+    workflow = AgentWorkflow()
 
     # WHEN the workflow is executed and we capture all events
     events = list(workflow.stream(event_filter=all_workflow_event_filter))

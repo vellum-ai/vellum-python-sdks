@@ -80,7 +80,7 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
 
             from vellum.workflows.workflows.base import BaseWorkflow
 
-            class ToolCallingWorkflow(BaseWorkflow[BaseInputs, ToolCallingState]):
+            class AgentWorkflow(BaseWorkflow[BaseInputs, ToolCallingState]):
                 graph = self._graph
                 is_dynamic = True
 
@@ -89,7 +89,7 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
                     chat_history: List[ChatMessage] = ToolCallingState.chat_history
                     results: List[PromptOutput] = self.tool_prompt_node.Outputs.results
 
-            subworkflow = ToolCallingWorkflow(
+            subworkflow = AgentWorkflow(
                 parent_state=self.state,
                 context=WorkflowContext.create_from(self._context),
             )
@@ -108,7 +108,7 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
 
             if not is_workflow_event(event):
                 continue
-            if event.workflow_definition != ToolCallingWorkflow:
+            if event.workflow_definition != AgentWorkflow:
                 continue
 
             if event.name == "workflow.execution.streaming":
