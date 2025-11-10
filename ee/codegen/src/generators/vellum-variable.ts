@@ -93,7 +93,7 @@ export class VellumVariable extends AstNode {
       });
       this.addReference(fieldReference);
 
-      const isEmpty = variable.default.value.length === 0;
+      const isEmpty = (variable.default.value as unknown[]).length === 0;
       const defaultFactoryValue = isEmpty
         ? python.reference({
             name: "list",
@@ -124,7 +124,8 @@ export class VellumVariable extends AstNode {
       });
       this.addReference(fieldReference);
 
-      const isEmpty = Object.keys(variable.default.value).length === 0;
+      const isEmpty =
+        Object.keys(variable.default.value as object).length === 0;
       const defaultFactoryValue = isEmpty
         ? python.reference({
             name: "dict",
