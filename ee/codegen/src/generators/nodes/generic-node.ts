@@ -22,10 +22,7 @@ import { FunctionFile } from "src/generators/function-file";
 import { GenericNodeDisplayData } from "src/generators/generic-node-display-data";
 import { InitFile } from "src/generators/init-file";
 import { NodeOutputs } from "src/generators/node-outputs";
-import {
-  BaseNode,
-  findNodeDefinitionByBaseClassName,
-} from "src/generators/nodes/bases/base";
+import { BaseNode } from "src/generators/nodes/bases/base";
 import { AttributeType, NODE_ATTRIBUTES } from "src/generators/nodes/constants";
 import { PromptBlock } from "src/generators/prompt-block";
 import { PromptParameters } from "src/generators/prompt-parameters-request";
@@ -53,6 +50,7 @@ import {
   toPythonSafeSnakeCase,
   toValidPythonIdentifier,
 } from "src/utils/casing";
+import { findNodeDefinitionByBaseClassName } from "src/utils/node-definitions";
 
 export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
   private functionsToGenerate: Array<{

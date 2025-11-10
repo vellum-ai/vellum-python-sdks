@@ -16,6 +16,7 @@ import { createNodeContext, WorkflowContext } from "src/context";
 import { ApiNodeContext } from "src/context/node-context/api-node";
 import { EntityNotFoundError } from "src/generators/errors";
 import { ApiNode } from "src/generators/nodes/api-node";
+import { findNodeDefinitionByBaseClassName } from "src/utils/node-definitions";
 
 describe("ApiNode", () => {
   let workflowContext: WorkflowContext;
@@ -420,6 +421,36 @@ describe("ApiNode", () => {
       });
 
       node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("display class with base defaults", () => {
+    it("should skip Display class when icon and color match base class defaults", async () => {
+      const apiNodeDef = findNodeDefinitionByBaseClassName("APINode");
+      if (!apiNodeDef?.display_data?.icon || !apiNodeDef.display_data?.color) {
+        throw new Error(
+          "APINode definition not found or missing display_data in node-definitions.json"
+        );
+      }
+
+      const nodeData = apiNodeFactory().build();
+      nodeData.displayData = {
+        icon: apiNodeDef.display_data.icon,
+        color: apiNodeDef.display_data.color,
+      };
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as ApiNodeContext;
+
+      node = new ApiNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeDisplayFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });

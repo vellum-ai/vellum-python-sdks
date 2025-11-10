@@ -4,11 +4,11 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
 import { isNil } from "lodash";
 
 import { BaseNodeContext } from "src/context/node-context/base";
-import { BASE_NODE_DISPLAY_DEFAULTS } from "src/generators/nodes/display-defaults";
 import {
   NodeDisplayData as NodeDisplayDataType,
   WorkflowDataNode,
 } from "src/types/vellum";
+import { findNodeDefinitionByBaseClassName } from "src/utils/node-definitions";
 import { isNilOrEmpty } from "src/utils/typing";
 
 export declare namespace NodeDisplay {
@@ -44,8 +44,11 @@ export class NodeDisplay extends AstNode {
         ? `Base${nodeContext.baseNodeClassName}`
         : undefined;
 
-    const baseDisplayDefaults =
-      BASE_NODE_DISPLAY_DEFAULTS[nodeContext.baseNodeClassName] || {};
+    const baseNodeDefinition = findNodeDefinitionByBaseClassName(
+      nodeContext.baseNodeClassName
+    );
+    const baseDisplayDefaults: { icon?: string | null; color?: string | null } =
+      baseNodeDefinition?.display_data || {};
 
     const fields: AstNode[] = [];
 

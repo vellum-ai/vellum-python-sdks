@@ -246,6 +246,72 @@ class APINode(BaseAPINode):
 "
 `;
 
+exports[`ApiNode > display class with base defaults > should skip Display class when icon and color match base class defaults 1`] = `
+"from uuid import UUID
+
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.nodes import BaseAPINodeDisplay
+from vellum_ee.workflows.display.nodes.types import (
+    NodeOutputDisplay,
+    PortDisplayOverrides,
+)
+
+from ...nodes.api_node import APINode
+
+
+class APINodeDisplay(BaseAPINodeDisplay[APINode]):
+    label = "API Node"
+    node_id = UUID("2cd960a3-cb8a-43ed-9e3f-f003fc480951")
+    target_handle_id = UUID("06573a05-e6f0-48b9-bc6e-07e06d0bc1b1")
+    additional_header_key_input_ids = {
+        "foo": UUID("8ad006f3-d19e-4af1-931f-3e955152cd91"),
+        "bar": UUID("3075be8c-248b-421d-9266-7779297be883"),
+        "baz": UUID("13c2dd5e-cdd0-431b-aa91-46ad8da1cb51"),
+    }
+    additional_header_value_input_ids = {
+        "foo": UUID("36865dca-40b4-432c-bab4-1e11bb9f4083"),
+        "bar": UUID("00baaee1-b785-403d-b391-f68b3aea334f"),
+        "baz": UUID("408c2b3d-7c30-4e01-a2e3-276753beadbc"),
+    }
+    node_input_ids_by_name = {
+        "method": UUID("9bf086d4-feed-47ff-9736-a5a6aa3a11cc"),
+        "url": UUID("480a4c12-22d6-4223-a38a-85db5eda118c"),
+        "json": UUID("74865eb7-cdaf-4d40-a499-0a6505e72680"),
+        "authorization_type": UUID("de330dac-05b1-4e78-bee7-7452203af3d5"),
+        "bearer_token_value": UUID("931502c1-23a5-4e2a-a75e-80736c42f3c9"),
+        "api_key_header_key": UUID("96c8343d-cc94-4df0-9001-eb2905a00be7"),
+        "api_key_header_value": UUID("bfc2e790-66fd-42fd-acf7-3b2c785c1a0a"),
+        "additional_header_key_1": UUID("8ad006f3-d19e-4af1-931f-3e955152cd91"),
+        "additional_header_value_1": UUID("36865dca-40b4-432c-bab4-1e11bb9f4083"),
+        "additional_header_key_2": UUID("3075be8c-248b-421d-9266-7779297be883"),
+        "additional_header_value_2": UUID("00baaee1-b785-403d-b391-f68b3aea334f"),
+        "additional_header_key_3": UUID("13c2dd5e-cdd0-431b-aa91-46ad8da1cb51"),
+        "additional_header_value_3": UUID("408c2b3d-7c30-4e01-a2e3-276753beadbc"),
+    }
+    output_display = {
+        APINode.Outputs.json: NodeOutputDisplay(
+            id=UUID("af576eaa-d39d-4c19-8992-1f01a65a709a"), name="json"
+        ),
+        APINode.Outputs.status_code: NodeOutputDisplay(
+            id=UUID("69250713-617d-42a4-9326-456c70d0ef20"), name="status_code"
+        ),
+        APINode.Outputs.text: NodeOutputDisplay(
+            id=UUID("81b270c0-4deb-4db3-aae5-138f79531b2b"), name="text"
+        ),
+    }
+    port_displays = {
+        APINode.Ports.default: PortDisplayOverrides(
+            id=UUID("c38a71f6-3ffb-45fa-9eea-93c6984a9e3e")
+        )
+    }
+    display_data = NodeDisplayData(
+        position=NodeDisplayPosition(x=0, y=0),
+        icon="vellum:icon:signal-stream",
+        color="lightBlue",
+    )
+"
+`;
+
 exports[`ApiNode > reject on error enabled > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
