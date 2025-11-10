@@ -811,8 +811,10 @@ describe("WorkflowProjectGenerator", () => {
       const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
       // All edge IDs (including entrypoint) live under edges_to_id_mapping
       expect(metadata.edges_to_id_mapping).toEqual({
-        "vellum.workflows.triggers.manual.Manual|code.nodes.final_output.FinalOutput.Trigger": "edge_1",
-        "code.triggers.scheduled.ScheduleTrigger|code.nodes.final_output.FinalOutput.Trigger": "edge_2",
+        "vellum.workflows.triggers.manual.Manual|code.nodes.final_output.FinalOutput.Trigger":
+          "edge_1",
+        "code.triggers.scheduled.ScheduleTrigger|code.nodes.final_output.FinalOutput.Trigger":
+          "edge_2",
       });
     });
 
@@ -1056,12 +1058,18 @@ describe("WorkflowProjectGenerator", () => {
       const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
       // All edges captured under edges_to_id_mapping (including entrypoint)
       expect(metadata.edges_to_id_mapping).toEqual({
-        "vellum.workflows.triggers.manual.Manual|code.nodes.custom.Custom.Trigger": "edge_e_custom",
-        "code.triggers.scheduled.ScheduleTrigger|code.nodes.custom.Custom.Trigger": "edge_t_custom",
-        "code.nodes.custom.Custom.Ports.custom_source|code.nodes.custom2.Custom2.Trigger": "edge_c_c2",
-        "code.nodes.custom.Custom.Ports.custom_source|code.nodes.custom3.Custom3.Trigger": "edge_c_c3",
-        "code.nodes.custom2.Custom2.Ports.custom2_source|code.nodes.final_output.FinalOutput.Trigger": "edge_c2_term",
-        "code.nodes.custom3.Custom3.Ports.custom3_source|code.nodes.final_output.FinalOutput.Trigger": "edge_c3_term",
+        "vellum.workflows.triggers.manual.Manual|code.nodes.custom.Custom.Trigger":
+          "edge_e_custom",
+        "code.triggers.scheduled.ScheduleTrigger|code.nodes.custom.Custom.Trigger":
+          "edge_t_custom",
+        "code.nodes.custom.Custom.Ports.custom_source|code.nodes.custom2.Custom2.Trigger":
+          "edge_c_c2",
+        "code.nodes.custom.Custom.Ports.custom_source|code.nodes.custom3.Custom3.Trigger":
+          "edge_c_c3",
+        "code.nodes.custom2.Custom2.Ports.custom2_source|code.nodes.final_output.FinalOutput.Trigger":
+          "edge_c2_term",
+        "code.nodes.custom3.Custom3.Ports.custom3_source|code.nodes.final_output.FinalOutput.Trigger":
+          "edge_c3_term",
       });
     });
   });
