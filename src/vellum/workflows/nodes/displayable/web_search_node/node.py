@@ -1,6 +1,8 @@
 import logging
-from typing import Any, ClassVar, Dict, List
+from typing import Any, ClassVar, Dict, List, Optional
 
+from vellum.client.core.pydantic_utilities import UniversalBaseModel
+from vellum.core import ApiError
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
@@ -8,6 +10,12 @@ from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.types.generics import StateType
 
 logger = logging.getLogger(__name__)
+
+
+class WebSearchResult(UniversalBaseModel):
+    title: str
+    url: str
+    snippet: Optional[str] = None
 
 
 class WebSearchNode(BaseNode[StateType]):
@@ -36,54 +44,93 @@ class WebSearchNode(BaseNode[StateType]):
         urls: List[str]
         results: List[Dict[str, Any]]
 
-    def _validate(self) -> None:
-        """Validate node inputs."""
+    def _validate_query(self) -> str:
         if not self.query or not isinstance(self.query, str) or not self.query.strip():
             raise NodeException(
                 "Query is required and must be a non-empty string", code=WorkflowErrorCode.INVALID_INPUTS
             )
 
+        return self.query.strip()
+
     def run(self) -> Outputs:
         """Run the WebSearchNode to perform web search via SerpAPI."""
-        self._validate()
+        query = self._validate_query()
 
         try:
             response = self._context.vellum_client.integrations.execute_integration_tool(
                 integration_name="SERPAPI",
                 integration_provider="COMPOSIO",
                 tool_name="SERPAPI_SEARCH",
-                arguments={"query": self.query},
+                arguments={"query": query},
             )
-        except Exception as e:
-            logger.exception("Failed to execute Composio SerpAPI tool")
-            raise NodeException(f"Failed to execute web search: {e}", code=WorkflowErrorCode.PROVIDER_ERROR) from e
+        except ApiError as e:
+            if e.status_code == 403 and isinstance(e.body, dict):
+                raise NodeException(
+                    message=e.body.get("detail", "You must provide authenticate with the search provider."),
+                    code=WorkflowErrorCode.PROVIDER_CREDENTIALS_UNAVAILABLE,
+                ) from e
+            elif e.status_code == 404 and isinstance(e.body, dict):
+                error_message = e.body.get("detail", "Tool not found")
+                raise NodeException(message=error_message, code=WorkflowErrorCode.PROVIDER_ERROR) from e
 
-        response_data = response.data
+            error_message = (
+                e.body.get("detail", f"Failed to execute SerpAPI search: {str(e)}")
+                if isinstance(e.body, dict)
+                else f"Failed to execute SerpAPI search: {str(e)}"
+            )
+            raise NodeException(message=error_message, code=WorkflowErrorCode.INTERNAL_ERROR) from e
 
-        if "error" in response_data:
-            error_msg = response_data["error"]
+        web_search_results = self._parse_serpapi_results(response.data)
+        return self._web_search_results_to_outputs(web_search_results)
+
+    def _parse_serpapi_results(self, data: Dict) -> Outputs:
+        if "error" in data:
+            error_msg = data["error"]
             logger.error(f"SerpAPI returned error: {error_msg}")
             raise NodeException(f"SerpAPI error: {error_msg}", code=WorkflowErrorCode.PROVIDER_ERROR)
 
-        organic_results_raw = response_data.get("organic_results", [])
-        organic_results: List[Dict[str, Any]] = organic_results_raw if organic_results_raw is not None else []
+        try:
+            results: Dict = data["results"]
+            organic_results: List[Dict] = results["organic_results"]
+        except KeyError as e:
+            raise NodeException("Unable to parse web search response", code=WorkflowErrorCode.PROVIDER_ERROR) from e
 
-        text_results = []
-        urls = []
-
+        web_search_results: List[WebSearchResult] = []
         for result in organic_results:
-            title = result.get("title", "")
-            snippet = result.get("snippet", "")
-            link = result.get("link", "")
+            title = result["title"]
+            url = result["link"]
+            snippet = result.get("snippet")
 
-            if title and snippet:
-                text_results.append(f"{title}: {snippet}")
-            elif title:
-                text_results.append(title)
-            elif snippet:
-                text_results.append(snippet)
+            web_search_results.append(
+                WebSearchResult(
+                    title=title,
+                    url=url,
+                    snippet=snippet,
+                )
+            )
 
-            if link:
-                urls.append(link)
+        return web_search_results
 
-        return self.Outputs(text="\n\n".join(text_results), urls=urls, results=organic_results)
+    def _web_search_results_to_outputs(self, web_search_results: List[WebSearchResult]) -> Outputs:
+        text: str = ""
+        urls: List[str] = []
+        results: List[Dict] = []
+
+        for web_search_result in web_search_results:
+            if text:
+                text += "\n\n"
+
+            text += f"Title: {web_search_result.title}"
+            if web_search_result.snippet:
+                text += f"\nSnippet: {web_search_result.snippet}"
+            if web_search_result.url:
+                text += f"\nURL: {web_search_result.url}"
+                urls.append(web_search_result.url)
+
+            results.append(web_search_result.model_dump(mode="json"))
+
+        return self.Outputs(
+            text=text,
+            urls=urls,
+            results=results,
+        )
