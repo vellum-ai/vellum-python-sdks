@@ -603,7 +603,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                                 "id": str(reference.id),
                                 "key": reference.name,
                                 "type": primitive_type_to_vellum_variable_type(reference),
-                                "required": False,
+                                "required": True,
                                 "default": None,
                                 "extensions": None,
                             },
