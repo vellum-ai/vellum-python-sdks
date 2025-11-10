@@ -33,6 +33,7 @@ from vellum.workflows.triggers.schedule import ScheduleTrigger
 from vellum.workflows.types.core import Json, JsonArray, JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.types.utils import get_original_base
+from vellum.workflows.utils.files import virtual_open
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
 from vellum.workflows.vellum_client import create_vellum_client
@@ -78,6 +79,7 @@ IGNORE_PATTERNS = [
     ".*",
     "node_modules/*",
     "*.log",
+    "metadata.json",
 ]
 
 
@@ -190,6 +192,52 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
         serialized_nodes: Dict[UUID, JsonObject] = {}
         edges: JsonArray = []
+
+        def _find_workflow_root_with_metadata(module_path: str) -> Optional[str]:
+            parts = module_path.split(".")
+            for i in range(len(parts), 0, -1):
+                potential_root = ".".join(parts[:i])
+                file_path = os.path.join(potential_root.replace(".", os.path.sep), "metadata.json")
+                try:
+                    f = virtual_open(file_path)
+                    if f is not None:
+                        f.close()
+                        return potential_root
+                except (FileNotFoundError, OSError):
+                    continue
+            return None
+
+        def _load_edges_to_id_mapping(module_path: str) -> Dict[str, str]:
+            try:
+                root = _find_workflow_root_with_metadata(module_path)
+                if not root:
+                    return {}
+                file_path = os.path.join(root.replace(".", os.path.sep), "metadata.json")
+                with virtual_open(file_path) as f:
+                    data = json.load(f)
+                    edges_map = data.get("edges_to_id_mapping")
+                    return edges_map if isinstance(edges_map, dict) else {}
+            except Exception:
+                return {}
+
+        def _trigger_edge_key(trigger_cls: Type, target_node: Type[BaseNode]) -> str:
+            trigger_path = f"{trigger_cls.__module__}.{trigger_cls.__name__}"
+            target_path = f"{target_node.__module__}.{target_node.__name__}.Trigger"
+            return f"{trigger_path}|{target_path}"
+
+        def _entrypoint_edge_key(target_node: Type[BaseNode]) -> str:
+            manual_path = "vellum.workflows.triggers.manual.Manual"
+            target_path = f"{target_node.__module__}.{target_node.__name__}.Trigger"
+            return f"{manual_path}|{target_path}"
+
+        def _regular_edge_key(
+            source_node_cls: Type[BaseNode], source_handle_id: UUID, target_node: Type[BaseNode]
+        ) -> str:
+            source_path = f"{source_node_cls.__module__}.{source_node_cls.__name__}.Ports.{str(source_handle_id)}"
+            target_path = f"{target_node.__module__}.{target_node.__name__}.Trigger"
+            return f"{source_path}|{target_path}"
+
+        edges_to_id_mapping: Dict[str, str] = _load_edges_to_id_mapping(self._workflow.__module__)
 
         # Get all trigger edges from the workflow's subgraphs to check if trigger exists
         trigger_edges: List[TriggerEdge] = []
@@ -386,9 +434,38 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 ValueError("Unable to serialize terminal nodes that are not referenced by workflow outputs.")
             )
 
-        # Add edges from trigger/entrypoint to first nodes
+        # Add edges from entrypoint first to preserve expected ordering
         nodes_with_trigger_edges: Set[Type[BaseNode]] = set()
 
+        for target_node, entrypoint_display in self.display_context.entrypoint_displays.items():
+            unadorned_target_node = get_unadorned_node(target_node)
+
+            # Skip edges to invalid nodes
+            if self._is_node_invalid(unadorned_target_node):
+                continue
+
+            if entrypoint_node_id is None:
+                continue
+
+            target_node_display = self.display_context.node_displays[unadorned_target_node]
+
+            mapping_key = _entrypoint_edge_key(unadorned_target_node)
+            stable_edge_id = edges_to_id_mapping.get(mapping_key)
+
+            entrypoint_edge_dict: Dict[str, Json] = {
+                "id": str(stable_edge_id) if stable_edge_id else str(entrypoint_display.edge_display.id),
+                "source_node_id": str(entrypoint_node_id),
+                "source_handle_id": str(entrypoint_node_source_handle_id),
+                "target_node_id": str(target_node_display.node_id),
+                "target_handle_id": str(target_node_display.get_trigger_id()),
+                "type": "DEFAULT",
+            }
+            display_data = self._serialize_edge_display_data(entrypoint_display.edge_display)
+            if display_data is not None:
+                entrypoint_edge_dict["display_data"] = display_data
+            edges.append(entrypoint_edge_dict)
+
+        # Then add trigger edges
         for trigger_edge in trigger_edges:
             target_node = trigger_edge.to_node
             unadorned_target_node = get_unadorned_node(target_node)
@@ -416,8 +493,12 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 source_node_id = trigger_id
                 source_handle_id = trigger_id
 
+            # Prefer stable id from metadata mapping if present
+            mapping_key = _trigger_edge_key(trigger_class, unadorned_target_node)
+            stable_edge_id = edges_to_id_mapping.get(mapping_key)
+
             trigger_edge_dict: Dict[str, Json] = {
-                "id": str(entrypoint_display.edge_display.id),
+                "id": str(stable_edge_id) if stable_edge_id else str(entrypoint_display.edge_display.id),
                 "source_node_id": str(source_node_id),
                 "source_handle_id": str(source_handle_id),
                 "target_node_id": str(target_node_display.node_id),
@@ -428,31 +509,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             if display_data is not None:
                 trigger_edge_dict["display_data"] = display_data
             edges.append(trigger_edge_dict)
-
-        for target_node, entrypoint_display in self.display_context.entrypoint_displays.items():
-            unadorned_target_node = get_unadorned_node(target_node)
-
-            # Skip edges to invalid nodes
-            if self._is_node_invalid(unadorned_target_node):
-                continue
-
-            if entrypoint_node_id is None:
-                continue
-
-            target_node_display = self.display_context.node_displays[unadorned_target_node]
-
-            entrypoint_edge_dict: Dict[str, Json] = {
-                "id": str(entrypoint_display.edge_display.id),
-                "source_node_id": str(entrypoint_node_id),
-                "source_handle_id": str(entrypoint_node_source_handle_id),
-                "target_node_id": str(target_node_display.node_id),
-                "target_handle_id": str(target_node_display.get_trigger_id()),
-                "type": "DEFAULT",
-            }
-            display_data = self._serialize_edge_display_data(entrypoint_display.edge_display)
-            if display_data is not None:
-                entrypoint_edge_dict["display_data"] = display_data
-            edges.append(entrypoint_edge_dict)
 
         for (source_node_port, target_node), edge_display in self.display_context.edge_displays.items():
             unadorned_source_node_port = get_unadorned_port(source_node_port)
@@ -467,8 +523,13 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             source_node_port_display = self.display_context.port_displays[unadorned_source_node_port]
             target_node_display = self.display_context.node_displays[unadorned_target_node]
 
+            mapping_key = _regular_edge_key(
+                unadorned_source_node_port.node_class, source_node_port_display.id, unadorned_target_node
+            )
+            stable_edge_id = edges_to_id_mapping.get(mapping_key)
+
             regular_edge_dict: Dict[str, Json] = {
-                "id": str(edge_display.id),
+                "id": str(stable_edge_id) if stable_edge_id else str(edge_display.id),
                 "source_node_id": str(source_node_port_display.node_id),
                 "source_handle_id": str(source_node_port_display.id),
                 "target_node_id": str(target_node_display.node_id),
