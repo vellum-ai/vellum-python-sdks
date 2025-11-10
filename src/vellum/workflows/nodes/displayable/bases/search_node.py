@@ -2,6 +2,8 @@ from decimal import Decimal
 from uuid import UUID
 from typing import ClassVar, Generic, List, Optional, Union
 
+import httpx
+
 from vellum import (
     NotFoundError,
     SearchFiltersRequest,
@@ -105,6 +107,11 @@ class BaseSearchNode(BaseNode[StateType], Generic[StateType]):
             raise NodeException(
                 message=f"Document Index '{self.document_index}' not found",
                 code=WorkflowErrorCode.INVALID_INPUTS,
+            )
+        except httpx.TransportError:
+            raise NodeException(
+                message="Failed to connect to Vellum server",
+                code=WorkflowErrorCode.INTERNAL_ERROR,
             )
         except ApiError as e:
             raw_data = e.body if isinstance(e.body, dict) else None
