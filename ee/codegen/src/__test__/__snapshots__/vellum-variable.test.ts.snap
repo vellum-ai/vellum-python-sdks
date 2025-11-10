@@ -5,6 +5,16 @@ exports[`VellumVariableField > ArrayVellumVariable snapshot 1`] = `
 "
 `;
 
+exports[`VellumVariableField > ArrayVellumVariable with empty list default uses Field(default_factory=list) when false 1`] = `
+"test: Optional[List[VellumValue]] = Field(default_factory=list)
+"
+`;
+
+exports[`VellumVariableField > ArrayVellumVariable with empty list default uses Field(default_factory=list) when true 1`] = `
+"test: List[VellumValue] = Field(default_factory=list)
+"
+`;
+
 exports[`VellumVariableField > AudioVellumVariable snapshot 1`] = `
 "test: VellumAudio
 "
@@ -37,6 +47,16 @@ exports[`VellumVariableField > ImageVellumVariable snapshot 1`] = `
 
 exports[`VellumVariableField > JsonVellumVariable snapshot 1`] = `
 "test: Any
+"
+`;
+
+exports[`VellumVariableField > JsonVellumVariable with empty dict default uses Field(default_factory=dict) when false 1`] = `
+"test: Optional[Any] = Field(default_factory=dict)
+"
+`;
+
+exports[`VellumVariableField > JsonVellumVariable with empty dict default uses Field(default_factory=dict) when true 1`] = `
+"test: Any = Field(default_factory=dict)
 "
 `;
 
