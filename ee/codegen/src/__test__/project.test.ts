@@ -809,15 +809,10 @@ describe("WorkflowProjectGenerator", () => {
       expect(fs.existsSync(metadataPath)).toBe(true);
 
       const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
-      // Top-level entrypoint id should match UI id
-      expect(metadata.entrypoint).toBe("entry");
-      // ENTRYPOINT -> Node mapping uses "<entrypoint>|<target_node_path>"
-      expect(metadata.entrypoint_edges_to_id).toEqual({
-        "entry|code.nodes.final_output.FinalOutput": "edge_1",
-      });
-      // General edges mapping (TRIGGER or NODE source) uses "<source_path>|<target_node_path>"
+      // All edge IDs (including entrypoint) live under edges_to_id_mapping
       expect(metadata.edges_to_id_mapping).toEqual({
-        "code.triggers.scheduled.ScheduleTrigger|code.nodes.final_output.FinalOutput": "edge_2",
+        "vellum.workflows.triggers.manual.Manual|code.nodes.final_output.FinalOutput.Trigger": "edge_1",
+        "code.triggers.scheduled.ScheduleTrigger|code.nodes.final_output.FinalOutput.Trigger": "edge_2",
       });
     });
 
@@ -1059,19 +1054,14 @@ describe("WorkflowProjectGenerator", () => {
       expect(fs.existsSync(metadataPath)).toBe(true);
 
       const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
-      // Top-level entrypoint id should match UI id
-      expect(metadata.entrypoint).toBe("entry");
-      // ENTRYPOINT -> Custom
-      expect(metadata.entrypoint_edges_to_id).toEqual({
-        "entry|code.nodes.custom.Custom": "edge_e_custom",
-      });
-      // All non-entrypoint edges (trigger and node->node) by path
+      // All edges captured under edges_to_id_mapping (including entrypoint)
       expect(metadata.edges_to_id_mapping).toEqual({
-        "code.triggers.scheduled.ScheduleTrigger|code.nodes.custom.Custom": "edge_t_custom",
-        "code.nodes.custom.Custom|code.nodes.custom2.Custom2": "edge_c_c2",
-        "code.nodes.custom.Custom|code.nodes.custom3.Custom3": "edge_c_c3",
-        "code.nodes.custom2.Custom2|code.nodes.final_output.FinalOutput": "edge_c2_term",
-        "code.nodes.custom3.Custom3|code.nodes.final_output.FinalOutput": "edge_c3_term",
+        "vellum.workflows.triggers.manual.Manual|code.nodes.custom.Custom.Trigger": "edge_e_custom",
+        "code.triggers.scheduled.ScheduleTrigger|code.nodes.custom.Custom.Trigger": "edge_t_custom",
+        "code.nodes.custom.Custom.Ports.custom_source|code.nodes.custom2.Custom2.Trigger": "edge_c_c2",
+        "code.nodes.custom.Custom.Ports.custom_source|code.nodes.custom3.Custom3.Trigger": "edge_c_c3",
+        "code.nodes.custom2.Custom2.Ports.custom2_source|code.nodes.final_output.FinalOutput.Trigger": "edge_c2_term",
+        "code.nodes.custom3.Custom3.Ports.custom3_source|code.nodes.final_output.FinalOutput.Trigger": "edge_c3_term",
       });
     });
   });
