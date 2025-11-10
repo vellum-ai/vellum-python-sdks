@@ -1311,6 +1311,42 @@ class Inputs(BaseInputs):
 "
 `;
 
+exports[`WorkflowProjectGenerator > include sandbox > should generate correct inputs for non-empty list and dict defaults > code/inputs.py 1`] = `
+"from pydantic import Field
+from typing import Any, List, Optional
+
+from vellum import VellumValue
+from vellum.workflows.inputs import BaseInputs
+
+
+class Inputs(BaseInputs):
+    non_empty_list_input: List[VellumValue] = Field(
+        default_factory=lambda: [
+            "item1",
+            "item2",
+        ]
+    )
+    non_empty_dict_input: Any = Field(
+        default_factory=lambda: {
+            "key1": "value1",
+            "key2": "value2",
+        }
+    )
+    non_empty_list_input_optional: Optional[List[VellumValue]] = Field(
+        default_factory=lambda: [
+            42,
+        ]
+    )
+    non_empty_dict_input_optional: Optional[Any] = Field(
+        default_factory=lambda: {
+            "nested": {
+                "key": "value",
+            },
+        }
+    )
+"
+`;
+
 exports[`WorkflowProjectGenerator > include sandbox > should include a sandbox.py file when passed sandboxInputs > code/sandbox.py 1`] = `
 "from vellum import ArrayChatMessageContent, ChatMessage, StringChatMessageContent
 from vellum.workflows.inputs import DatasetRow
