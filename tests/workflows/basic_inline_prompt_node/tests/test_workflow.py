@@ -235,5 +235,5 @@ def test_run_workflow__connection_error(vellum_adhoc_prompt_client):
     # THEN the workflow should have a rejected terminal event (not a hang)
     assert terminal_event.name == "workflow.execution.rejected"
 
-    # AND the error should indicate a provider connection failure
-    assert "Failed to connect to the model provider" in terminal_event.error.message
+    # AND the error should indicate a Vellum server connection failure
+    assert terminal_event.error.message == "Failed to connect to Vellum server"

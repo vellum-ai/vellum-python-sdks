@@ -2,6 +2,8 @@ import json
 from uuid import UUID, uuid4
 from typing import TYPE_CHECKING, Any, ClassVar, Dict, Generic, Iterator, List, Optional, Set, Type, Union, cast
 
+import httpx
+
 from vellum import (
     ChatMessage,
     WorkflowExpandMetaRequest,
@@ -298,6 +300,11 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
                 metadata=self.metadata,
                 request_options=request_options,
             )
+        except httpx.TransportError:
+            raise NodeException(
+                message="Failed to connect to Vellum server",
+                code=WorkflowErrorCode.INTERNAL_ERROR,
+            )
         except ApiError as e:
             self._handle_api_error(e)
 
@@ -305,6 +312,11 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
         # and use the exception handling to catch other api level errors
         try:
             next(subworkflow_stream)
+        except httpx.TransportError:
+            raise NodeException(
+                message="Failed to connect to Vellum server",
+                code=WorkflowErrorCode.INTERNAL_ERROR,
+            )
         except ApiError as e:
             self._handle_api_error(e)
 

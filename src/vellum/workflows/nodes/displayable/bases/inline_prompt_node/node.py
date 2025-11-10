@@ -227,20 +227,20 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
             prompt_event_stream = self._get_prompt_event_stream()
         except ApiError as e:
             self._handle_api_error(e)
-        except httpx.TransportError as e:
+        except httpx.TransportError:
             raise NodeException(
-                message=f"Failed to connect to the model provider: {str(e)}",
-                code=WorkflowErrorCode.PROVIDER_ERROR,
+                message="Failed to connect to Vellum server",
+                code=WorkflowErrorCode.INTERNAL_ERROR,
             )
 
         try:
             first_event = next(prompt_event_stream)
         except ApiError as e:
             self._handle_api_error(e)
-        except httpx.TransportError as e:
+        except httpx.TransportError:
             raise NodeException(
-                message=f"Failed to connect to the model provider: {str(e)}",
-                code=WorkflowErrorCode.PROVIDER_ERROR,
+                message="Failed to connect to Vellum server",
+                code=WorkflowErrorCode.INTERNAL_ERROR,
             )
         else:
             if first_event.state == "REJECTED":
