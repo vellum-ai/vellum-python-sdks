@@ -951,7 +951,7 @@
           "expanded": true
         },
         "icon": "vellum:icon:wrench",
-        "color": "teal"
+        "color": "gold"
       },
       "base": {
         "name": "BaseNode",
