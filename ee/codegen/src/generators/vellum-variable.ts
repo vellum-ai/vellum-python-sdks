@@ -76,15 +76,12 @@ export class VellumVariable extends AstNode {
         : undefined;
     }
 
-    // Check if the default value is a list or dict
-    // Use Field(default_factory=...) for lists and dicts to avoid mutable default issues
-    const isList = Array.isArray(variable.default.value);
-    const isDict =
-      variable.default.value !== null &&
-      typeof variable.default.value === "object" &&
-      !Array.isArray(variable.default.value);
+    // Check if the default type is ARRAY or JSON
+    // Use Field(default_factory=...) for ARRAY and JSON types to avoid mutable default issues
+    const isArrayType = variable.default.type === "ARRAY";
+    const isJsonType = variable.default.type === "JSON";
 
-    if (isList) {
+    if (isArrayType && Array.isArray(variable.default.value)) {
       // Use Field(default_factory=list) for empty lists
       // Use Field(default_factory=lambda: [...]) for non-empty lists
       const fieldReference = python.reference({
@@ -115,7 +112,12 @@ export class VellumVariable extends AstNode {
       });
     }
 
-    if (isDict) {
+    if (
+      isJsonType &&
+      variable.default.value !== null &&
+      typeof variable.default.value === "object" &&
+      !Array.isArray(variable.default.value)
+    ) {
       // Use Field(default_factory=dict) for empty dicts
       // Use Field(default_factory=lambda: {...}) for non-empty dicts
       const fieldReference = python.reference({
