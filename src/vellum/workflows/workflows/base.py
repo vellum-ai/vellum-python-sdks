@@ -630,7 +630,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             return node_ref
 
         candidate_nodes: List[Type[BaseNode]] = []
-        for node in self.get_nodes():
+        for node in self.get_all_nodes():
             candidate_nodes.append(node)
             wrapped_node = get_unadorned_node(node)
             if wrapped_node != node:
