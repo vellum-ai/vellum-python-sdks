@@ -131,22 +131,30 @@ export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
           (input) => input.id === this.nodeData.data.apiKeyHeaderValueInputId
         );
         if (!valueInput) {
-          throw new NodeAttributeGenerationError(
-            `No inputs have api header value id of ${this.nodeData.data.apiKeyHeaderValueInputId}`
+          this.workflowContext.addError(
+            new NodeAttributeGenerationError(
+              `No inputs have api header value id of ${this.nodeData.data.apiKeyHeaderValueInputId}`,
+              "WARNING"
+            )
           );
+        } else {
+          const value = this.nodeInputsByKey.get(valueInput.key);
+          if (!value) {
+            this.workflowContext.addError(
+              new NodeAttributeGenerationError(
+                `No inputs have key of ${valueInput.key}`,
+                "WARNING"
+              )
+            );
+          } else {
+            statements.push(
+              python.field({
+                name: "api_key_header_value",
+                initializer: value,
+              })
+            );
+          }
         }
-        const value = this.nodeInputsByKey.get(valueInput.key);
-        if (!value) {
-          throw new NodeAttributeGenerationError(
-            `No inputs have key of ${valueInput.key}`
-          );
-        }
-        statements.push(
-          python.field({
-            name: "api_key_header_value",
-            initializer: value,
-          })
-        );
       }
 
       if (this.nodeData.data.bearerTokenValueInputId) {
@@ -154,22 +162,30 @@ export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
           (input) => input.id === this.nodeData.data.bearerTokenValueInputId
         );
         if (!valueInput) {
-          throw new NodeAttributeGenerationError(
-            `No inputs have bearer token header value id of ${this.nodeData.data.bearerTokenValueInputId}`
+          this.workflowContext.addError(
+            new NodeAttributeGenerationError(
+              `No inputs have bearer token header value id of ${this.nodeData.data.bearerTokenValueInputId}`,
+              "WARNING"
+            )
           );
+        } else {
+          const value = this.nodeInputsByKey.get(valueInput.key);
+          if (!value) {
+            this.workflowContext.addError(
+              new NodeAttributeGenerationError(
+                `No inputs have key of ${valueInput.key}`,
+                "WARNING"
+              )
+            );
+          } else {
+            statements.push(
+              python.field({
+                name: "bearer_token_value",
+                initializer: value,
+              })
+            );
+          }
         }
-        const value = this.nodeInputsByKey.get(valueInput.key);
-        if (!value) {
-          throw new NodeAttributeGenerationError(
-            `No inputs have key of ${valueInput.key}`
-          );
-        }
-        statements.push(
-          python.field({
-            name: "bearer_token_value",
-            initializer: value,
-          })
-        );
       }
     }
 
