@@ -263,10 +263,6 @@ class APINode(BaseAPINode):
     authorization_type = AuthorizationType.API_KEY
     api_key_header_value = "<my-api-value>"
     bearer_token_value = "<my-bearer-token>"
-
-    class Display(BaseAPINode.Display):
-        icon = "vellum:icon:signal-stream"
-        color = "lightBlue"
 "
 `;
 
