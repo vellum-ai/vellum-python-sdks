@@ -5,7 +5,8 @@ from .triggers.scheduled import Scheduled
 
 
 class Workflow(BaseWorkflow):
-    graph = {
+    # TODO: Uncomment trigger test once we fix mypy issue with graph: https://linear.app/vellum/issue/APO-2127/fix-mypy-issue-of-graph-types
+    graph = {  # type: ignore[assignment]
         Output,
         Scheduled >> Output,
     }

@@ -94,7 +94,7 @@ plugins = [
     "vellum.plugins.vellum_mypy",
 ]
 check_untyped_defs = true
-exclude = ["venv", "examples/workflows", "ee/codegen/python_file_merging/tests/fixtures", "ee/codegen_integration/fixtures/simple_scheduled_trigger"]  #TODO: Uncomment trigger test once we fix mypy issue with graph: https://linear.app/vellum/issue/APO-2127/fix-mypy-issue-of-graph-types
+exclude = ["venv", "examples/workflows", "ee/codegen/python_file_merging/tests/fixtures"]
 overrides = [
     { module = "deepdiff.*", ignore_missing_imports = true },
     { module = "docker.*", ignore_missing_imports = true },
