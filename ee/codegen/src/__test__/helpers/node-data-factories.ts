@@ -27,6 +27,7 @@ import {
   MapNode,
   MergeNode,
   NodeAttribute,
+  NodeDisplayData,
   NodeInput,
   NodeInputValuePointerRule,
   NodeOutput,
@@ -1020,6 +1021,7 @@ export interface ApiNodeFactoryProps {
   statusCodeOutputId?: string;
   id?: string;
   attributes?: NodeAttribute[];
+  displayData?: NodeDisplayData;
 }
 
 export function apiNodeFactory({
@@ -1034,6 +1036,7 @@ export function apiNodeFactory({
   method = "POST",
   body = {},
   attributes,
+  displayData,
 }: ApiNodeFactoryProps = {}): NodeDataFactoryBuilder<ApiNode> {
   const bearerTokenInput = bearerToken ?? {
     id: "931502c1-23a5-4e2a-a75e-80736c42f3c9",
@@ -1298,7 +1301,7 @@ export function apiNodeFactory({
     },
     inputs: inputs,
     attributes: attributes,
-    displayData: {
+    displayData: displayData ?? {
       width: 462,
       height: 288,
       position: {

@@ -47,14 +47,14 @@ export class NodeDisplay extends AstNode {
     const baseNodeDefinition = findNodeDefinitionByBaseClassName(
       nodeContext.baseNodeClassName
     );
-    const baseDisplayDefaults: { icon?: string | null; color?: string | null } =
-      baseNodeDefinition?.display_data || {};
+    const baseDisplayDefaults: NodeDisplayDataType | undefined =
+      baseNodeDefinition?.display_data;
 
     const fields: AstNode[] = [];
 
     if (
       !isNil(nodeDisplayData?.icon) &&
-      nodeDisplayData.icon !== baseDisplayDefaults.icon
+      nodeDisplayData.icon !== baseDisplayDefaults?.icon
     ) {
       fields.push(
         python.field({
@@ -66,7 +66,7 @@ export class NodeDisplay extends AstNode {
 
     if (
       !isNil(nodeDisplayData?.color) &&
-      nodeDisplayData.color !== baseDisplayDefaults.color
+      nodeDisplayData.color !== baseDisplayDefaults?.color
     ) {
       fields.push(
         python.field({

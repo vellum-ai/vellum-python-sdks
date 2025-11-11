@@ -428,17 +428,13 @@ describe("ApiNode", () => {
   describe("display class with base defaults", () => {
     it("should skip Display class when icon and color match base class defaults", async () => {
       const apiNodeDef = findNodeDefinitionByBaseClassName("APINode");
-      if (!apiNodeDef?.display_data?.icon || !apiNodeDef.display_data?.color) {
-        throw new Error(
-          "APINode definition not found or missing display_data in node-definitions.json"
-        );
-      }
 
-      const nodeData = apiNodeFactory().build();
-      nodeData.displayData = {
-        icon: apiNodeDef.display_data.icon,
-        color: apiNodeDef.display_data.color,
-      };
+      const nodeData = apiNodeFactory({
+        displayData: {
+          icon: apiNodeDef?.display_data?.icon,
+          color: apiNodeDef?.display_data?.color,
+        },
+      }).build();
 
       const nodeContext = (await createNodeContext({
         workflowContext,
@@ -450,7 +446,7 @@ describe("ApiNode", () => {
         nodeContext,
       });
 
-      node.getNodeDisplayFile().write(writer);
+      node.getNodeFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
