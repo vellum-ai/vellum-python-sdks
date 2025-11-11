@@ -49,7 +49,15 @@ from vellum.workflows.events.node import (
     NodeExecutionRejectedBody,
     NodeExecutionStreamingBody,
 )
-from vellum.workflows.events.types import BaseEvent, NodeParentContext, ParentContext, SpanLink, WorkflowParentContext
+from vellum.workflows.events.types import (
+    BaseEvent,
+    NodeParentContext,
+    ParentContext,
+    SpanLink,
+    WorkflowDeploymentIntegrationTriggerContext,
+    WorkflowDeploymentScheduledTriggerContext,
+    WorkflowParentContext,
+)
 from vellum.workflows.events.workflow import (
     WorkflowEventStream,
     WorkflowExecutionFulfilledBody,
@@ -77,6 +85,7 @@ from vellum.workflows.state.delta import StateDelta
 from vellum.workflows.triggers.base import BaseTrigger
 from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.triggers.manual import ManualTrigger
+from vellum.workflows.triggers.schedule import ScheduleTrigger
 from vellum.workflows.types.core import CancelSignal
 from vellum.workflows.types.generics import InputsType, OutputsType, StateType
 
@@ -262,6 +271,25 @@ class WorkflowRunner(Generic[StateType]):
         self._cancel_signal = cancel_signal
         self._timeout = timeout
         self._execution_context = init_execution_context or get_execution_context()
+
+        # If a trigger was provided, attach a trigger context
+        if trigger:
+            cls = trigger.__class__
+            existing_parent = self._execution_context.parent_context
+            if issubclass(cls, IntegrationTrigger):
+                self._execution_context.parent_context = WorkflowDeploymentIntegrationTriggerContext(
+                    span_id=uuid4(),
+                    trigger_id=cls.__id__,
+                    trigger_definition=cls,
+                    parent=existing_parent,
+                )
+            elif issubclass(cls, ScheduleTrigger):
+                self._execution_context.parent_context = WorkflowDeploymentScheduledTriggerContext(
+                    span_id=uuid4(),
+                    trigger_id=cls.__id__,
+                    trigger_definition=cls,
+                    parent=existing_parent,
+                )
 
         setattr(
             self._initial_state,
