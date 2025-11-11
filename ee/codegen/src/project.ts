@@ -1134,8 +1134,7 @@ ${errors.slice(0, 3).map((err) => {
   }
 
   public getTriggerPathToIdMapping(): Record<string, string> {
-    const workflowRootModulePath =
-      this.workflowContext.modulePath.slice(0, -1);
+    const workflowRootModulePath = this.workflowContext.modulePath.slice(0, -1);
 
     return Object.fromEntries(
       Array.from(
@@ -1148,7 +1147,10 @@ ${errors.slice(0, 3).map((err) => {
           (part, index) => modulePathParts[index] === part
         );
 
-        if (prefixMatches && modulePathParts.length >= workflowRootModulePath.length) {
+        if (
+          prefixMatches &&
+          modulePathParts.length >= workflowRootModulePath.length
+        ) {
           relativeModuleParts = modulePathParts.slice(
             workflowRootModulePath.length
           );
