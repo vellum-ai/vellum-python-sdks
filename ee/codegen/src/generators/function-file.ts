@@ -48,7 +48,9 @@ export class FunctionWithDecorator extends AstNode {
       const defAndAfter = this.functionSrc.substring(defStartIndex);
 
       // Write content before 'def' (preserving any leading content)
-      writer.write("\n");
+      if (beforeDef.length > 0) {
+        writer.write("\n");
+      }
       writer.write(beforeDef);
 
       // Write decorator with proper spacing
