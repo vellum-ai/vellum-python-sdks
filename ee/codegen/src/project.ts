@@ -7,6 +7,7 @@ import { python } from "@fern-api/python-ast";
 import { Comment } from "@fern-api/python-ast/Comment";
 import { StarImport } from "@fern-api/python-ast/StarImport";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
+import { isNil } from "lodash";
 import { VellumEnvironmentUrls } from "vellum-ai";
 
 import * as codegen from "./codegen";
@@ -45,6 +46,7 @@ import { WorkflowOutputContext } from "src/context/workflow-output-context";
 import { ErrorLogFile, InitFile, Inputs, Workflow } from "src/generators";
 import {
   BaseCodegenError,
+  MissingEntrypointIdError,
   NodeDefinitionGenerationError,
   ProjectSerializationError,
   WorkflowGenerationError,
@@ -1070,9 +1072,35 @@ ${errors.slice(0, 3).map((err) => {
   }
 
   private async generateMetadataFile(): Promise<void> {
+    /**
+     * Metadata persisted alongside generated code to ensure stable, UI-aligned identifiers
+     * without relying on Python display classes.
+     *
+     * - trigger_path_to_id_mapping:
+     *     Key:   "<trigger_module_path>.<TriggerClassName>"
+     *     Value: "<ui_trigger_id>"
+     *
+     * - node_id_to_file_mapping:
+     *     Existing mapping of node ids to their code resource definition (module + class name).
+     *
+     * - entrypoint:
+     *     The UI entrypoint node id (kept for compatibility). Edge IDs for entrypoint flows
+     *     are now included in edges_to_id_mapping using the manual trigger path as the source.
+     *
+     * edges_to_id_mapping:
+     *   Key:   "<source_path>|<target_node_path>"
+     *          where:
+     *            source_path       := "<trigger_module_path>.<TriggerClassName>" for trigger edges
+     *                                  or "<module_path>.<NodeClassName>.Ports.<source_handle_id>"
+     *                                     for node->node edges (handle id disambiguates multiple edges)
+     *            target_node_path  := "<module_path>.<ClassName>.Trigger" for the target node
+     *   Value: "<ui_edge_id>"
+     **/
     const metadata = {
       trigger_path_to_id_mapping: this.getTriggerPathToIdMapping(),
       node_id_to_file_mapping: this.getNodeIdToFileMapping(),
+      entrypoint: this.getEntrypointId(),
+      edges_to_id_mapping: this.getEdgesToIdMapping(),
     };
 
     const absolutePathToModuleDirectory = join(
@@ -1117,5 +1145,87 @@ ${errors.slice(0, 3).map((err) => {
         triggerId,
       ])
     );
+  }
+
+  public getEntrypointId(): string | undefined {
+    const entrypointNode = this.workflowContext.tryGetEntrypointNode();
+    if (isNil(entrypointNode)) {
+      this.workflowContext.addError(
+        new MissingEntrypointIdError(
+          "Cannot determine entrypoint id for the given workflow",
+          "WARNING"
+        )
+      );
+      return undefined;
+    } else {
+      return entrypointNode.id;
+    }
+  }
+
+  /**
+   * Build mapping for all non-entrypoint edges using path-based keys.
+   *
+   * Key:   "<source_path>|<target_node_path>"
+   * Value: "<ui_edge_id>"
+   *
+   * source_path      := "<trigger_module_path>.<TriggerClassName>" for trigger edges
+   *                     or "<module_path>.<NodeClassName>" for node->node edges
+   * target_node_path := "<module_path>.<ClassName>" for the target node
+   */
+  public getEdgesToIdMapping(): Record<string, string> {
+    const result: Record<string, string> = {};
+
+    const entrypointNode = this.workflowContext.tryGetEntrypointNode();
+
+    const allEdges = this.workflowContext.workflowRawData.edges;
+
+    allEdges.forEach((edge) => {
+      // Resolve source path as either trigger path or node path (including per-edge discriminator)
+      let sourcePath: string | undefined;
+
+      // Treat ENTRYPOINT edges as manual trigger edges to create a stable, path-based key
+      if (entrypointNode && edge.sourceNodeId === entrypointNode.id) {
+        sourcePath = "vellum.workflows.triggers.manual.Manual";
+      } else {
+        const triggerContext = this.workflowContext.findTriggerContext(
+          edge.sourceNodeId
+        );
+        if (triggerContext) {
+          sourcePath = [
+            ...triggerContext.triggerModulePath,
+            triggerContext.triggerClassName,
+          ].join(".");
+        } else {
+          const sourceNodeContext = this.workflowContext.findNodeContext(
+            edge.sourceNodeId
+          );
+          if (sourceNodeContext) {
+            // Incorporate the source handle to disambiguate multiple edges from the same source node
+            // Use the handle id as the per-edge discriminator to avoid collisions.
+            const sourceNodeBasePath = [
+              ...sourceNodeContext.nodeModulePath,
+              sourceNodeContext.nodeClassName,
+            ].join(".");
+            sourcePath = `${sourceNodeBasePath}.Ports.${edge.sourceHandleId}`;
+          }
+        }
+      }
+
+      const target = this.workflowContext.findNodeContext(edge.targetNodeId);
+      if (!sourcePath || !target) {
+        return;
+      }
+
+      // Targets of data edges and trigger edges connect to the node's trigger input
+      const targetNodeBasePath = [
+        ...target.nodeModulePath,
+        target.nodeClassName,
+      ].join(".");
+      const targetPath = `${targetNodeBasePath}.Trigger`;
+      const key = `${sourcePath}|${targetPath}`;
+      result[key] = edge.id;
+    });
+
+    return result;
   }
 }

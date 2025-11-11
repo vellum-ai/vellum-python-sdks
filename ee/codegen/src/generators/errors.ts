@@ -14,7 +14,8 @@ export type CodegenErrorCode =
   | "ENTITY_NOT_FOUND_ERROR"
   | "POST_PROCESSING_ERROR"
   | "VALUE_GENERATION_ERROR"
-  | "FILE_FORMATTING_ERROR";
+  | "FILE_FORMATTING_ERROR"
+  | "MISSING_ENTRYPOINT_ID_ERROR";
 
 export type CodegenErrorSeverity = "ERROR" | "WARNING";
 
@@ -162,4 +163,11 @@ export class ValueGenerationError extends BaseCodegenError {
  */
 export class FileFormattingError extends BaseCodegenError {
   code = "FILE_FORMATTING_ERROR" as const;
+}
+
+/**
+ * An error that raises when an entrypoint id cannot be found
+ */
+export class MissingEntrypointIdError extends BaseCodegenError {
+  code = "MISSING_ENTRYPOINT_ID_ERROR" as const;
 }
