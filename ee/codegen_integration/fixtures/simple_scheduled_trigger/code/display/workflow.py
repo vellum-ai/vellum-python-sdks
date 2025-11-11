@@ -31,16 +31,7 @@ class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
             viewport=WorkflowDisplayDataViewport(x=49, y=345.9705304518664, zoom=0.962671905697446)
         ),
     )
-    entrypoint_displays = {
-        Output: EntrypointDisplay(
-            id=UUID("49befc94-10a2-47ae-965b-a4a07c21305e"),
-            edge_display=EdgeDisplay(id=UUID("42a1cc56-f544-4864-afa5-33d399d4e7eb")),
-        ),
-        Output: EntrypointDisplay(
-            id=UUID("49befc94-10a2-47ae-965b-a4a07c21305e"),
-            edge_display=EdgeDisplay(id=UUID("43083a12-5c4a-4839-ad92-8221f54ddfd3")),
-        ),
-    }
+    entrypoint_displays = {}
     output_displays = {
         Workflow.Outputs.output: WorkflowOutputDisplay(id=UUID("cb1ba284-84cf-4fb1-a57d-9fdb742646a0"), name="output")
     }

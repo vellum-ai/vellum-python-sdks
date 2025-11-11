@@ -44,7 +44,6 @@ _fixture_paths = _get_fixtures(
         # TODO: Remove once serialization support is in
         "simple_workflow_node_with_output_values",
     },
-    include_fixtures="simple_scheduled_trigger",
 )
 _fixture_ids = [os.path.basename(path) for path in _fixture_paths]
 
@@ -92,7 +91,11 @@ def mock_trigger_metadata():
     _get_trigger_path_to_id_mapping.cache_clear()
 
     metadata_content = {
-        "trigger_path_to_id_mapping": {".triggers.scheduled.Scheduled": "c484ce55-a392-4a1b-8c10-1233b81c4539"}
+        "trigger_path_to_id_mapping": {".triggers.scheduled.Scheduled": "c484ce55-a392-4a1b-8c10-1233b81c4539"},
+        "edges_to_id_mapping": {
+            "vellum.workflows.triggers.manual.Manual|codegen_integration.fixtures.simple_scheduled_trigger.code.nodes.output.Output.Trigger": "42a1cc56-f544-4864-afa5-33d399d4e7eb",  # noqa: E501
+            "codegen_integration.fixtures.simple_scheduled_trigger.code.triggers.scheduled.Scheduled|codegen_integration.fixtures.simple_scheduled_trigger.code.nodes.output.Output.Trigger": "43083a12-5c4a-4839-ad92-8221f54ddfd3",  # noqa: E501
+        },
     }
 
     original_virtual_open = __import__("vellum.workflows.utils.files", fromlist=["virtual_open"]).virtual_open
@@ -107,10 +110,10 @@ def mock_trigger_metadata():
         # Fall back to original implementation
         return original_virtual_open(file_path)
 
-    # Patch both where virtual_open is defined and where it's imported
+    # Patch virtual_open
     with patch("vellum.workflows.utils.files.virtual_open", side_effect=mock_virtual_open), patch(
         "vellum.workflows.triggers.base.virtual_open", side_effect=mock_virtual_open
-    ):
+    ), patch("vellum_ee.workflows.display.workflows.base_workflow_display.virtual_open", side_effect=mock_virtual_open):
 
         # Reload any already-imported trigger modules to pick up the mocked metadata
         modules_to_reload = [name for name in sys.modules if "fixtures" in name and "triggers" in name]
