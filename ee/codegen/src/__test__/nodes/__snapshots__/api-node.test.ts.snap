@@ -246,6 +246,26 @@ class APINode(BaseAPINode):
 "
 `;
 
+exports[`ApiNode > display class with base defaults > should skip Display class when icon and color match base class defaults 1`] = `
+"from vellum.workflows.constants import APIRequestMethod, AuthorizationType
+from vellum.workflows.nodes.displayable import APINode as BaseAPINode
+
+
+class APINode(BaseAPINode):
+    url = "https://example.vellum.ai"
+    method = APIRequestMethod.POST
+    headers = {
+        "foo": "foo-value",
+        "bar": "bar-value",
+        "baz": "baz-value",
+    }
+    api_key_header_key = None
+    authorization_type = AuthorizationType.API_KEY
+    api_key_header_value = "<my-api-value>"
+    bearer_token_value = "<my-bearer-token>"
+"
+`;
+
 exports[`ApiNode > reject on error enabled > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 

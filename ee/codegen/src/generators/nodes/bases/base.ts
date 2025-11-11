@@ -2,7 +2,6 @@ import { python } from "@fern-api/python-ast";
 import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
-import nodeDefinitions from "src/assets/node-definitions.json";
 import * as codegen from "src/codegen";
 import {
   OUTPUTS_CLASS_NAME,
@@ -38,18 +37,9 @@ import {
   WorkflowValueDescriptor as WorkflowValueDescriptorType,
 } from "src/types/vellum";
 import { toValidPythonIdentifier } from "src/utils/casing";
+import { findNodeDefinitionByBaseClassName } from "src/utils/node-definitions";
 import { doesModulePathStartWith } from "src/utils/paths";
 import { isNilOrEmpty } from "src/utils/typing";
-
-type NodeDefinition = (typeof nodeDefinitions.nodes)[number];
-
-export function findNodeDefinitionByBaseClassName(
-  baseClassName: string
-): NodeDefinition | undefined {
-  return nodeDefinitions.nodes.find(
-    (node) => node.definition?.name === baseClassName
-  );
-}
 
 export declare namespace BaseNode {
   interface Args<T extends WorkflowDataNode, V extends BaseNodeContext<T>> {

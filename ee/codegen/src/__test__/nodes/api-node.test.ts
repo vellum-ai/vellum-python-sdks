@@ -423,4 +423,28 @@ describe("ApiNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+
+  describe("display class with base defaults", () => {
+    it("should skip Display class when icon and color match base class defaults", async () => {
+      const nodeData = apiNodeFactory({
+        displayData: {
+          icon: "vellum:icon:signal-stream",
+          color: "lightBlue",
+        },
+      }).build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as ApiNodeContext;
+
+      node = new ApiNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });

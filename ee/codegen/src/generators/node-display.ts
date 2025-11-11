@@ -8,6 +8,7 @@ import {
   NodeDisplayData as NodeDisplayDataType,
   WorkflowDataNode,
 } from "src/types/vellum";
+import { findNodeDefinitionByBaseClassName } from "src/utils/node-definitions";
 import { isNilOrEmpty } from "src/utils/typing";
 
 export declare namespace NodeDisplay {
@@ -43,9 +44,18 @@ export class NodeDisplay extends AstNode {
         ? `Base${nodeContext.baseNodeClassName}`
         : undefined;
 
+    const baseNodeDefinition = findNodeDefinitionByBaseClassName(
+      nodeContext.baseNodeClassName
+    );
+    const baseDisplayDefaults: NodeDisplayDataType | undefined =
+      baseNodeDefinition?.display_data;
+
     const fields: AstNode[] = [];
 
-    if (!isNil(nodeDisplayData?.icon)) {
+    if (
+      !isNil(nodeDisplayData?.icon) &&
+      nodeDisplayData.icon !== baseDisplayDefaults?.icon
+    ) {
       fields.push(
         python.field({
           name: "icon",
@@ -54,7 +64,10 @@ export class NodeDisplay extends AstNode {
       );
     }
 
-    if (!isNil(nodeDisplayData?.color)) {
+    if (
+      !isNil(nodeDisplayData?.color) &&
+      nodeDisplayData.color !== baseDisplayDefaults?.color
+    ) {
       fields.push(
         python.field({
           name: "color",
