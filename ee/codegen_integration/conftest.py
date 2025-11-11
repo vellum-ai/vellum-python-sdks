@@ -113,7 +113,9 @@ def mock_trigger_metadata():
     # Patch virtual_open
     with patch("vellum.workflows.utils.files.virtual_open", side_effect=mock_virtual_open), patch(
         "vellum.workflows.triggers.base.virtual_open", side_effect=mock_virtual_open
-    ), patch("vellum_ee.workflows.display.workflows.base_workflow_display.virtual_open", side_effect=mock_virtual_open):
+    ), patch("vellum_ee.workflows.display.utils.metadata.virtual_open", side_effect=mock_virtual_open), patch(
+        "vellum_ee.workflows.display.utils.expressions.virtual_open", side_effect=mock_virtual_open
+    ):
 
         # Reload any already-imported trigger modules to pick up the mocked metadata
         modules_to_reload = [name for name in sys.modules if "fixtures" in name and "triggers" in name]
