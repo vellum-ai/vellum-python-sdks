@@ -199,6 +199,7 @@ export interface WorkflowTriggerDisplayData {
   label: string;
   position?: NodeDisplayPosition | null;
   z_index?: number | null;
+  comment?: NodeDisplayComment | null;
   icon?: string | null;
   color?: string | null;
 }

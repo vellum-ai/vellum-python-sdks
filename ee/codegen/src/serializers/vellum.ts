@@ -716,6 +716,7 @@ export const WorkflowTriggerDisplayDataSerializer: ObjectSchema<
   label: stringSchema(),
   position: NodeDisplayPositionSerializer.nullable().optional(),
   z_index: numberSchema().nullable().optional(),
+  comment: NodeDisplayCommentSerializer.nullable().optional(),
   icon: stringSchema().nullable().optional(),
   color: stringSchema().nullable().optional(),
 });
@@ -725,6 +726,7 @@ export declare namespace WorkflowTriggerDisplayDataSerializer {
     label: string;
     position?: NodeDisplayPositionSerializer.Raw | null;
     z_index?: number | null;
+    comment?: NodeDisplayCommentSerializer.Raw | null;
     icon?: string | null;
     color?: string | null;
   }

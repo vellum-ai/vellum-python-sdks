@@ -10,6 +10,7 @@ from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.types.utils import get_class_attr_names, infer_types
 from vellum.workflows.utils.files import virtual_open
 from vellum.workflows.utils.uuids import uuid4_from_hash
+from vellum_ee.workflows.display.editor import NodeDisplayComment
 
 if TYPE_CHECKING:
     from vellum.workflows.graph.graph import Graph, GraphTarget
@@ -347,6 +348,7 @@ class BaseTrigger(ABC, metaclass=BaseTriggerMeta):
         z_index: int = 0
         icon: Optional[str] = None
         color: Optional[str] = None
+        comment: Optional[NodeDisplayComment] = None
 
     def __init__(self, **kwargs: Any):
         """

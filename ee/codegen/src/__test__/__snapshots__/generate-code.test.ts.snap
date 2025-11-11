@@ -163,7 +163,8 @@ class InnerMapNode(MapNode):
 `;
 
 exports[`generateCode > should generate code for %1 scheduled-trigger.ts > triggers/scheduled.py 1`] = `
-"from vellum.workflows.triggers import ScheduleTrigger
+"from vellum_ee.workflows.display.editor import NodeDisplayComment
+from vellum.workflows.triggers import ScheduleTrigger
 
 
 class ScheduledTrigger(ScheduleTrigger):
@@ -176,6 +177,7 @@ class ScheduledTrigger(ScheduleTrigger):
         x = 0
         y = 0
         z_index = 0
+        comment = NodeDisplayComment(value="This is a scheduled trigger")
 "
 `;
 
