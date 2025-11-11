@@ -1077,7 +1077,7 @@ ${errors.slice(0, 3).map((err) => {
      * without relying on Python display classes.
      *
      * - trigger_path_to_id_mapping:
-     *     Key:   "<trigger_module_path>.<TriggerClassName>"
+     *     Key:   ".<relative_trigger_module_path>.<TriggerClassName>"
      *     Value: "<ui_trigger_id>"
      *
      * - node_id_to_file_mapping:
@@ -1134,16 +1134,36 @@ ${errors.slice(0, 3).map((err) => {
   }
 
   public getTriggerPathToIdMapping(): Record<string, string> {
+    const workflowRootModulePath =
+      this.workflowContext.modulePath.slice(0, -1);
+
     return Object.fromEntries(
       Array.from(
         this.workflowContext.globalTriggerContextsByTriggerId.entries()
-      ).map(([triggerId, triggerContext]) => [
-        [
-          ...triggerContext.triggerModulePath,
-          triggerContext.triggerClassName,
-        ].join("."),
-        triggerId,
-      ])
+      ).map(([triggerId, triggerContext]) => {
+        const modulePathParts = triggerContext.triggerModulePath;
+
+        let relativeModuleParts: string[];
+        const prefixMatches = workflowRootModulePath.every(
+          (part, index) => modulePathParts[index] === part
+        );
+
+        if (prefixMatches && modulePathParts.length >= workflowRootModulePath.length) {
+          relativeModuleParts = modulePathParts.slice(
+            workflowRootModulePath.length
+          );
+        } else {
+          relativeModuleParts = [...modulePathParts];
+        }
+
+        const modulePath = relativeModuleParts.join(".");
+        const triggerPath =
+          relativeModuleParts.length > 0
+            ? `.${modulePath}.${triggerContext.triggerClassName}`
+            : `${modulePath}.${triggerContext.triggerClassName}`;
+
+        return [triggerPath, triggerId];
+      })
     );
   }
 
