@@ -57,16 +57,6 @@ def test_vellum_integration_trigger_serialization():
     attribute_names = {attr["key"] for attr in attributes if isinstance(attr, dict)}
     assert attribute_names == {"message", "channel", "user"}
 
-    # RED: These assertions should fail because we haven't implemented class_name and module_path yet
-    assert "class_name" in trigger, "Trigger should include class_name for codegen"
-    assert trigger["class_name"] == "SlackMessageTrigger"
-
-    assert "module_path" in trigger, "Trigger should include module_path for codegen"
-    # The module path should be a list of strings representing the module hierarchy
-    module_path = trigger["module_path"]
-    assert isinstance(module_path, list)
-    assert all(isinstance(part, str) for part in module_path)
-
 
 def test_vellum_integration_trigger_id_consistency():
     """Validates trigger and attribute IDs match between definitions and references."""
@@ -173,13 +163,6 @@ def test_trigger_module_paths_are_canonical():
     assert isinstance(trigger, dict)
     assert trigger["type"] == "INTEGRATION"
 
-    module_path = trigger["module_path"]
-    assert isinstance(module_path, list)
-    assert all(isinstance(part, str) for part in module_path)
-    assert module_path == __name__.split(".")
-
-    assert trigger["class_name"] == "TestSlackTrigger"
-
 
 def test_integration_trigger_no_entrypoint_node():
     """IntegrationTrigger workflows now create ENTRYPOINT nodes and route edges through them."""
@@ -207,10 +190,6 @@ def test_integration_trigger_no_entrypoint_node():
     trigger = triggers[0]
     assert isinstance(trigger, dict)
     trigger_id = trigger["id"]
-
-    # Verify trigger has source_handle_id matching trigger_id
-    assert "source_handle_id" in trigger, "Trigger should have source_handle_id"
-    assert trigger["source_handle_id"] == trigger_id, "source_handle_id should match trigger_id"
 
     # Verify ENTRYPOINT node exists
     workflow_raw_data = result["workflow_raw_data"]

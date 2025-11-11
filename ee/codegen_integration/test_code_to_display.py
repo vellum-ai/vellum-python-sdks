@@ -8,7 +8,7 @@ from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWork
 
 
 @pytest.mark.usefixtures("workspace_secret_client", "deployment_client")
-def test_code_to_display_data(code_to_display_fixture_paths):
+def test_code_to_display_data(code_to_display_fixture_paths, mock_trigger_metadata):
     """Confirms that code representations of workflows are correctly serialized into their display representations."""
 
     expected_display_data_file_path, code_dir = code_to_display_fixture_paths

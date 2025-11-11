@@ -121,7 +121,7 @@ def test_serialize_trigger_without_display_class():
     trigger = triggers[0]
     display_data = trigger.get("display_data")
     if display_data is not None:
-        assert display_data == {}
+        assert display_data == {"label": "Trigger", "position": {"x": 0.0, "y": 0.0}, "z_index": 0}
 
 
 def test_serialize_trigger_with_none_values():

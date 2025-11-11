@@ -353,6 +353,7 @@ describe("WorkflowProjectGenerator", () => {
           "simple_subworkflow_deployment_node",
           "simple_workflow_node_with_output_values",
           "faa_q_and_a_bot",
+          "simple_scheduled_trigger",
         ],
         fixtureMocks: fixtureMocks,
       })
@@ -703,7 +704,7 @@ describe("WorkflowProjectGenerator", () => {
 
       const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
       expect(metadata.trigger_path_to_id_mapping).toEqual({
-        "code.triggers.scheduled.ScheduleTrigger": "trigger-1",
+        ".triggers.scheduled.ScheduleTrigger": "trigger-1",
       });
     });
 
