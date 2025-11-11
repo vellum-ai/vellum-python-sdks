@@ -61,9 +61,4 @@ export class ScheduledTrigger extends BaseTrigger<ScheduledTriggerType> {
 
     return configClass;
   }
-
-  protected getClassDocstring(): string | undefined {
-    return `Trigger representing time-based workflow invocation.
-Supports Cron-based schedules (e.g., "0 9 * * MON" for every Monday at 9am)`;
-  }
 }

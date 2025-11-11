@@ -2,7 +2,7 @@ import { python } from "@fern-api/python-ast";
 
 import { VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH } from "src/constants";
 import { BaseTrigger } from "src/generators/triggers/base-trigger";
-import { createPythonClassName } from "src/utils/casing";
+import { createPythonClassName, toPythonSafeSnakeCase } from "src/utils/casing";
 
 import type { AstNode } from "@fern-api/python-ast/core/AstNode";
 import type { IntegrationTrigger as IntegrationTriggerType } from "src/types/vellum";
@@ -16,13 +16,14 @@ export declare namespace IntegrationTriggerGenerator {
 
 export class IntegrationTrigger extends BaseTrigger<IntegrationTriggerType> {
   protected generateClassName(): string {
-    return createPythonClassName(this.trigger.execConfig.slug, {
+    const label = this.trigger.displayData?.label || "IntegrationTrigger";
+    return createPythonClassName(label, {
       force: true,
     });
   }
 
   protected getModuleName(): string {
-    return this.trigger.execConfig.slug.toLowerCase();
+    return toPythonSafeSnakeCase(this.trigger.execConfig.slug);
   }
 
   protected getBaseTriggerClassName(): string {

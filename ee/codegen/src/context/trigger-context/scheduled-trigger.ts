@@ -1,6 +1,7 @@
 import { GENERATED_TRIGGERS_MODULE_NAME } from "src/constants";
 import { BaseTriggerContext } from "src/context/trigger-context/base";
 import { ScheduledTrigger } from "src/types/vellum";
+import { createPythonClassName } from "src/utils/casing";
 
 export class ScheduledTriggerContext extends BaseTriggerContext<ScheduledTrigger> {
   protected getTriggerModuleInfo(): {
@@ -8,8 +9,15 @@ export class ScheduledTriggerContext extends BaseTriggerContext<ScheduledTrigger
     className: string;
     modulePath: string[];
   } {
-    const moduleName = "scheduled";
-    const className = "ScheduleTrigger";
+    const rawModuleName = "scheduled";
+    let moduleName = rawModuleName;
+    let numRenameAttempts = 0;
+    while (this.workflowContext.isTriggerModuleNameUsed(moduleName)) {
+      moduleName = `${rawModuleName}_${numRenameAttempts + 1}`;
+      numRenameAttempts += 1;
+    }
+    const label = this.triggerData.displayData?.label || "ScheduleTrigger";
+    const className = createPythonClassName(label, { force: true });
 
     const modulePath = [
       ...this.workflowContext.modulePath.slice(0, -1),
