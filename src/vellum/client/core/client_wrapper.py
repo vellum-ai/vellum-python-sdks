@@ -27,10 +27,10 @@ class BaseClientWrapper:
 
     def get_headers(self) -> typing.Dict[str, str]:
         headers: typing.Dict[str, str] = {
-            "User-Agent": "vellum-ai/1.10.1",
+            "User-Agent": "vellum-ai/1.10.2",
             "X-Fern-Language": "Python",
             "X-Fern-SDK-Name": "vellum-ai",
-            "X-Fern-SDK-Version": "1.10.1",
+            "X-Fern-SDK-Version": "1.10.2",
             **(self.get_custom_headers() or {}),
         }
         if self._api_version is not None:
