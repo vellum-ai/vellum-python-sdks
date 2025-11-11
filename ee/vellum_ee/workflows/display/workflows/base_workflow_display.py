@@ -709,7 +709,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             if hasattr(display_class, "color") and display_class.color is not None:
                 display_data["color"] = display_class.color
 
-            if display_data:
+            # Don't include display_data for manual triggers
+            if display_data and trigger_type != WorkflowTriggerType.MANUAL:
                 trigger_data["display_data"] = display_data
 
             serialized_triggers.append(trigger_data)
