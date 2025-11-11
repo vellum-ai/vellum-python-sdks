@@ -31,17 +31,17 @@ export function getTriggerClassInfo(
         className: "ManualTrigger",
         modulePath: [...VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH, "manual"],
       };
-      case WorkflowTriggerType.SCHEDULED: {
-        const label = trigger.displayData?.label || "ScheduleTrigger";
-        return {
-          className: createPythonClassName(label, { force: true }),
-          modulePath: [
-            ...workflowContext.modulePath.slice(0, -1),
-            GENERATED_TRIGGERS_MODULE_NAME,
-            toPythonSafeSnakeCase(trigger.displayData?.label || "scheduled"),
-          ],
-        };
-      }
+    case WorkflowTriggerType.SCHEDULED: {
+      const label = trigger.displayData?.label || "ScheduleTrigger";
+      return {
+        className: createPythonClassName(label, { force: true }),
+        modulePath: [
+          ...workflowContext.modulePath.slice(0, -1),
+          GENERATED_TRIGGERS_MODULE_NAME,
+          toPythonSafeSnakeCase(trigger.displayData?.label || "scheduled"),
+        ],
+      };
+    }
     case WorkflowTriggerType.INTEGRATION:
       return {
         className: createPythonClassName(trigger.execConfig.slug, {
