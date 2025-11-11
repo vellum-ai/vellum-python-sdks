@@ -250,16 +250,12 @@ def test_scheduled_trigger_serialization_full():
             "cron": "0 9 * * *",
             "timezone": "UTC",
             "attributes": [],
-            "display_data": {"icon": "vellum:icon:calendar", "color": "#4A90E2"},
-            "class_name": "DailyTriggerWithDisplay",
-            "module_path": [
-                "vellum_ee",
-                "workflows",
-                "display",
-                "tests",
-                "workflow_serialization",
-                "test_scheduled_trigger_serialization",
-            ],
-            "source_handle_id": "f3e5eddb-75da-42e6-9abf-d616f30c145c",
+            "display_data": {
+                "label": "Daily Schedule",
+                "position": {"x": 100.5, "y": 200.75},
+                "z_index": 3,
+                "icon": "vellum:icon:calendar",
+                "color": "#4A90E2",
+            },
         },
     )
