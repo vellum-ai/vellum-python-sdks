@@ -33,7 +33,6 @@ class BaseParentContext(UniversalBaseModel):
     span_id: UUID
     parent: Optional["ParentContext"] = None
     type: str
-    trigger_id: Optional[UUID] = None
 
 
 class BaseDeploymentParentContext(BaseParentContext):
@@ -89,14 +88,14 @@ class ExternalParentContext(BaseParentContext):
     type: Literal["EXTERNAL"] = "EXTERNAL"
 
 
-class WorkflowDeploymentScheduledTriggerContext(BaseParentContext):
+class ScheduledTriggerContext(BaseParentContext):
     type: Literal["SCHEDULED"] = "SCHEDULED"
-    trigger_definition: Optional[VellumCodeResourceDefinition] = None
+    trigger_id: UUID
 
 
-class WorkflowDeploymentIntegrationTriggerContext(BaseParentContext):
+class IntegrationTriggerContext(BaseParentContext):
     type: Literal["INTEGRATION"] = "INTEGRATION"
-    trigger_definition: Optional[VellumCodeResourceDefinition] = None
+    trigger_id: UUID
 
 
 class SpanLink(UniversalBaseModel):
@@ -164,8 +163,8 @@ ParentContext = Annotated[
         WorkflowSandboxParentContext,
         APIRequestParentContext,
         ExternalParentContext,
-        WorkflowDeploymentScheduledTriggerContext,
-        WorkflowDeploymentIntegrationTriggerContext,
+        ScheduledTriggerContext,
+        IntegrationTriggerContext,
         UnknownParentContext,
     ],
     ParentContextDiscriminator(),
