@@ -122,8 +122,12 @@ def infer_types(object_: Type, attr_name: str, localns: Optional[Dict[str, Any]]
 
         raise AttributeError(f"Failed to infer type from attribute {attr_name} on {object_.__name__}")
     except TypeError:
+        # Python 3.13+: object class doesn't have __annotations__ by default
+        # Use getattr with default to safely access annotations
+        annotations = getattr(object_, "__annotations__", {})
+        annotation_value = annotations.get(attr_name, "<unknown>")
         raise AttributeError(
-            f"Found 3.9+ typing syntax for field '{attr_name}' on class '{object_.__name__}' – {object_.__annotations__[attr_name]}. Type annotations must be compatible with python version 3.8. "  # noqa: E501
+            f"Found 3.9+ typing syntax for field '{attr_name}' on class '{object_.__name__}' – {annotation_value}. Type annotations must be compatible with python version 3.8. "  # noqa: E501
         )
 
 
