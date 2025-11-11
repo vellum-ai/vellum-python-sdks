@@ -33,6 +33,7 @@ class BaseParentContext(UniversalBaseModel):
     span_id: UUID
     parent: Optional["ParentContext"] = None
     type: str
+    trigger_id: Optional[UUID] = None
 
 
 class BaseDeploymentParentContext(BaseParentContext):
@@ -90,10 +91,12 @@ class ExternalParentContext(BaseParentContext):
 
 class WorkflowDeploymentScheduledTriggerContext(BaseParentContext):
     type: Literal["SCHEDULED"] = "SCHEDULED"
+    trigger_definition: Optional[VellumCodeResourceDefinition] = None
 
 
 class WorkflowDeploymentIntegrationTriggerContext(BaseParentContext):
     type: Literal["INTEGRATION"] = "INTEGRATION"
+    trigger_definition: Optional[VellumCodeResourceDefinition] = None
 
 
 class SpanLink(UniversalBaseModel):
