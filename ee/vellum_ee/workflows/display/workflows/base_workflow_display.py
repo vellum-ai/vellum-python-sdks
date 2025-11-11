@@ -431,8 +431,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             target_node_display = self.display_context.node_displays[unadorned_target_node]
 
             # Get the entrypoint display for this target node (if it exists)
-            entrypoint_display = self.display_context.entrypoint_displays.get(target_node)
-            if entrypoint_display is None:
+            target_entrypoint_display = self.display_context.entrypoint_displays.get(target_node)
+            if target_entrypoint_display is None:
                 continue
 
             trigger_class = trigger_edge.trigger_class
@@ -450,14 +450,14 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             stable_edge_id = get_trigger_edge_id(trigger_class, unadorned_target_node, self._workflow.__module__)
 
             trigger_edge_dict: Dict[str, Json] = {
-                "id": str(stable_edge_id) if stable_edge_id else str(entrypoint_display.edge_display.id),
+                "id": str(stable_edge_id) if stable_edge_id else str(target_entrypoint_display.edge_display.id),
                 "source_node_id": str(source_node_id),
                 "source_handle_id": str(source_handle_id),
                 "target_node_id": str(target_node_display.node_id),
                 "target_handle_id": str(target_node_display.get_trigger_id()),
                 "type": "DEFAULT",
             }
-            display_data = self._serialize_edge_display_data(entrypoint_display.edge_display)
+            display_data = self._serialize_edge_display_data(target_entrypoint_display.edge_display)
             if display_data is not None:
                 trigger_edge_dict["display_data"] = display_data
             edges.append(trigger_edge_dict)
