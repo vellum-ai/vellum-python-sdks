@@ -78,6 +78,7 @@ IntegrationName = typing.Union[
         "COINBASE",
         "DISCORD",
         "DOCUSIGN",
+        "TRELLO",
     ],
     typing.Any,
 ]
