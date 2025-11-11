@@ -887,6 +887,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     const functionFile = new FunctionFile({
       workflowContext: this.workflowContext,
       functionSrc: f.src,
+      functionName: f.name,
       decorator,
       modulePath: [...this.nodeContext.nodeModulePath, f.name],
     });
