@@ -83,7 +83,7 @@ class WebSearchNode(BaseNode[StateType]):
         web_search_results = self._parse_serpapi_results(response.data)
         return self._web_search_results_to_outputs(web_search_results)
 
-    def _parse_serpapi_results(self, data: Dict) -> Outputs:
+    def _parse_serpapi_results(self, data: Dict) -> List[WebSearchResult]:
         if "error" in data:
             error_msg = data["error"]
             logger.error(f"SerpAPI returned error: {error_msg}")
