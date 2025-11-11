@@ -174,6 +174,9 @@ class DeploymentDefinition(CompilableDefinition):
             deployment_definition: DeploymentDefinition instance
             vellum_client: Vellum client instance
         """
+        if vellum_client is None:
+            raise ValueError("Vellum client is required to compile a deployment definition into a function definition.")
+
         release_info = self.get_release_info(vellum_client)
 
         name = release_info["name"]
