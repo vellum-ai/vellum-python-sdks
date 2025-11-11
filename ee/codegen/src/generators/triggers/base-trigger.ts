@@ -135,10 +135,13 @@ export abstract class BaseTrigger<
   }
 
   getModulePath(): string[] {
+    // Prefer the module name resolved by the trigger context (ensures deduplication)
+    const triggerContext = this.workflowContext.findTriggerContext(this.trigger.id);
+    const moduleNameFromContext = triggerContext?.triggerModuleName ?? this.getModuleName();
     return [
       ...this.workflowContext.modulePath.slice(0, -1),
       GENERATED_TRIGGERS_MODULE_NAME,
-      this.getModuleName(),
+      moduleNameFromContext,
     ];
   }
 

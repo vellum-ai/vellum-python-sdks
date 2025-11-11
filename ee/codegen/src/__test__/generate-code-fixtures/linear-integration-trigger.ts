@@ -132,7 +132,7 @@ export default {
         },
       ],
       display_data: {
-        label: "Linear Integration Trigger",
+        label: "Linear Comment Event Trigger",
         position: {
           x: 100,
           y: 200,

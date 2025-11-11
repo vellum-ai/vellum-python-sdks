@@ -1,4 +1,4 @@
-import { createPythonClassName } from "./casing";
+import { createPythonClassName, toPythonSafeSnakeCase } from "./casing";
 
 import {
   GENERATED_TRIGGERS_MODULE_NAME,
@@ -16,6 +16,15 @@ export function getTriggerClassInfo(
   trigger: WorkflowTrigger,
   workflowContext: WorkflowContext
 ): TriggerClassInfo {
+  // If a trigger context exists for this trigger, use it as the source of truth
+  const triggerContext = workflowContext.findTriggerContext(trigger.id);
+  if (triggerContext) {
+    return {
+      className: triggerContext.triggerClassName,
+      modulePath: triggerContext.triggerModulePath,
+    };
+  }
+
   switch (trigger.type) {
     case WorkflowTriggerType.MANUAL:
       return {
@@ -39,7 +48,7 @@ export function getTriggerClassInfo(
         modulePath: [
           ...workflowContext.modulePath.slice(0, -1),
           GENERATED_TRIGGERS_MODULE_NAME,
-          trigger.execConfig.slug.toLowerCase(),
+          toPythonSafeSnakeCase(trigger.execConfig.slug),
         ],
       };
   }

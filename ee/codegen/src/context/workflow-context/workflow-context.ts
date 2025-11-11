@@ -122,6 +122,9 @@ export class WorkflowContext {
   // Maps trigger IDs to trigger contexts
   public readonly globalTriggerContextsByTriggerId: TriggerContextsByTriggerId;
 
+  // Track what trigger module names are used so we can ensure uniqueness across triggers
+  private readonly triggerModuleNames: Set<string> = new Set();
+
   // Track the custom workflow module name if it exists
   public readonly nestedWorkflowModuleName?: string;
 
@@ -564,12 +567,21 @@ export class WorkflowContext {
     }
 
     this.globalTriggerContextsByTriggerId.set(triggerId, triggerContext);
+    this.addUsedTriggerModuleName(triggerContext.triggerModuleName);
   }
 
   public findTriggerContext(
     triggerId: string
   ): BaseTriggerContext<WorkflowTrigger> | undefined {
     return this.globalTriggerContextsByTriggerId.get(triggerId);
+  }
+
+  public isTriggerModuleNameUsed(triggerModuleName: string): boolean {
+    return this.triggerModuleNames.has(triggerModuleName);
+  }
+
+  private addUsedTriggerModuleName(triggerModuleName: string): void {
+    this.triggerModuleNames.add(triggerModuleName);
   }
 
   public addPortContext(portContext: PortContext): void {
