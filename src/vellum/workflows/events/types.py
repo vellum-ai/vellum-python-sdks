@@ -33,7 +33,6 @@ class BaseParentContext(UniversalBaseModel):
     span_id: UUID
     parent: Optional["ParentContext"] = None
     type: str
-    trigger_id: Optional[UUID] = None
 
 
 class BaseDeploymentParentContext(BaseParentContext):
