@@ -108,7 +108,7 @@ class WorkflowExecutionInitiatedBody(_BaseWorkflowExecutionBody, Generic[InputsT
     # This field can be populated with arbitrary server metadata during event enrichment
     server_metadata: Optional[Dict[str, Any]] = None
 
-    workflow_trigger_id: Optional[UUID] = None
+    trigger_id: Optional[UUID] = None
 
     @field_serializer("inputs")
     def serialize_inputs(self, inputs: InputsType, _info: Any) -> Dict[str, Any]:
