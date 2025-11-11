@@ -22,36 +22,41 @@ TypeResolver = Callable[[str, List[MypyType]], MypyType]
 NODE_ATTRIBUTE_REGEX = r"^[a-z].*$"
 BASE_NODE_FULLNAME = "vellum.workflows.nodes.bases.base.BaseNode"
 
-DESCRIPTOR_PATHS: list[tuple[str, str, str]] = [
+# Pre-compile regex patterns for better performance
+NODE_ATTRIBUTE_PATTERN = re.compile(NODE_ATTRIBUTE_REGEX)
+NON_UNDERSCORE_PATTERN = re.compile(r"^[^_].*$")
+COUNT_PATTERN = re.compile(r"^count$")
+
+DESCRIPTOR_PATHS: list[tuple[str, str, re.Pattern[str]]] = [
     (
         "vellum.workflows.outputs.base.BaseOutputs",
         "vellum.workflows.references.output.OutputReference",
-        r"^[^_].*$",
+        NON_UNDERSCORE_PATTERN,
     ),
     (
         f"{BASE_NODE_FULLNAME}.ExternalInputs",
         "vellum.workflows.references.external_input.ExternalInputReference",
-        r"^[^_].*$",
+        NON_UNDERSCORE_PATTERN,
     ),
     (
         f"{BASE_NODE_FULLNAME}.Execution",
         "vellum.workflows.references.execution_count.ExecutionCountReference",
-        r"^count$",
+        COUNT_PATTERN,
     ),
     (
         "vellum.workflows.state.base.BaseState",
         "vellum.workflows.references.state_value.StateValueReference",
-        r"^[^_].*$",
+        NON_UNDERSCORE_PATTERN,
     ),
     (
         "vellum.workflows.inputs.base.BaseInputs",
         "vellum.workflows.references.workflow_input.WorkflowInputReference",
-        r"^[^_].*$",
+        NON_UNDERSCORE_PATTERN,
     ),
     (
         BASE_NODE_FULLNAME,
         "vellum.workflows.references.node.NodeReference",
-        NODE_ATTRIBUTE_REGEX,
+        NODE_ATTRIBUTE_PATTERN,
     ),
 ]
 
@@ -128,8 +133,8 @@ class VellumMypyPlugin(Plugin):
         if not isinstance(ctx.context, MemberExpr):
             return ctx.default_attr_type
 
-        for base_path, descriptor_path, attribute_regex in DESCRIPTOR_PATHS:
-            if not re.match(attribute_regex, ctx.context.name):
+        for base_path, descriptor_path, attribute_pattern in DESCRIPTOR_PATHS:
+            if not attribute_pattern.match(ctx.context.name):
                 continue
 
             if not _is_subclass(ctx.type.ret_type.type, base_path):
@@ -248,7 +253,7 @@ class VellumMypyPlugin(Plugin):
             if not isinstance(sym.node, Var):
                 continue
 
-            if not re.match(NODE_ATTRIBUTE_REGEX, key):
+            if not NODE_ATTRIBUTE_PATTERN.match(key):
                 continue
 
             type_ = sym.node.type
@@ -281,8 +286,8 @@ class VellumMypyPlugin(Plugin):
                 continue
 
             is_arg_registered = False
-            for base_path, _, attribute_regex in DESCRIPTOR_PATHS:
-                if not re.match(attribute_regex, arg.name):
+            for base_path, _, attribute_pattern in DESCRIPTOR_PATHS:
+                if not attribute_pattern.match(arg.name):
                     continue
 
                 if not isinstance(arg.expr, (NameExpr, MemberExpr)):
@@ -302,7 +307,7 @@ class VellumMypyPlugin(Plugin):
             if not is_arg_registered:
                 # Need to check node outputs that are inherited
                 if (
-                    re.match(r"^[^_].*$", arg.name)
+                    NON_UNDERSCORE_PATTERN.match(arg.name)
                     and isinstance(arg.expr, MemberExpr)
                     and isinstance(arg.expr.expr, NameExpr)
                     and isinstance(arg.expr.expr.node, TypeInfo)
