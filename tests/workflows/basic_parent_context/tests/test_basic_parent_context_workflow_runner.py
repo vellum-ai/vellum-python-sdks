@@ -49,6 +49,7 @@ def test_stream_workflow__happy_path_inital_context():
         },
         "parent": None,
         "type": "WORKFLOW_NODE",
+        "trigger_id": None,
     }
     initial_parent_context_json["parent"] = {
         "span_id": uuid4(),
