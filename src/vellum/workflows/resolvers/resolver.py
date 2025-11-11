@@ -62,24 +62,10 @@ class VellumResolver(BaseWorkflowResolver):
             logger.warning("No workflow class registered, falling back to BaseState")
             state = BaseState(**response.state)
 
-        if (
-            response.previous_trace_id is None
-            or response.root_trace_id is None
-            or response.previous_span_id is None
-            or response.root_span_id is None
-        ):
-            return LoadStateResult(
-                state=state,
-                previous_trace_id=response.trace_id,
-                previous_span_id=response.span_id,
-                root_trace_id=response.trace_id,
-                root_span_id=response.span_id,
-            )
-
         return LoadStateResult(
             state=state,
             previous_trace_id=response.trace_id,
             previous_span_id=response.span_id,
-            root_trace_id=response.root_trace_id,
-            root_span_id=response.root_span_id,
+            root_trace_id=response.root_trace_id or response.trace_id,
+            root_span_id=response.root_span_id or response.span_id,
         )

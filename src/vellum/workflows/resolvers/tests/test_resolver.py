@@ -44,11 +44,12 @@ def test_load_state_with_context_success():
 
     previous_trace_id = str(uuid4())
     previous_span_id = str(uuid4())
+    trace_id = str(uuid4())
     root_trace_id = str(uuid4())
     root_span_id = str(uuid4())
 
     mock_response = WorkflowResolvedState(
-        trace_id=str(uuid4()),
+        trace_id=trace_id,
         timestamp=datetime.now(),
         span_id=str(execution_id),
         state=state_dict,
@@ -79,8 +80,8 @@ def test_load_state_with_context_success():
     assert str(result.state.meta.span_id) != prev_span_id
 
     # AND should have span link info
-    assert result.previous_trace_id == previous_trace_id
-    assert result.previous_span_id == previous_span_id
+    assert result.previous_trace_id == trace_id
+    assert result.previous_span_id == str(execution_id)
     assert result.root_trace_id == root_trace_id
     assert result.root_span_id == root_span_id
 
