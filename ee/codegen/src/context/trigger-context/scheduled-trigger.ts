@@ -1,7 +1,7 @@
 import { GENERATED_TRIGGERS_MODULE_NAME } from "src/constants";
 import { BaseTriggerContext } from "src/context/trigger-context/base";
-import { createPythonClassName } from "src/utils/casing";
 import { ScheduledTrigger } from "src/types/vellum";
+import { createPythonClassName } from "src/utils/casing";
 
 export class ScheduledTriggerContext extends BaseTriggerContext<ScheduledTrigger> {
   protected getTriggerModuleInfo(): {
