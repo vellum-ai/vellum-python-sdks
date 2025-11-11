@@ -690,6 +690,13 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             if hasattr(display_class, "color") and display_class.color is not None:
                 display_data["color"] = display_class.color
 
+            # Add comment if present
+            if hasattr(display_class, "comment") and display_class.comment is not None:
+                display_data["comment"] = {
+                    "value": display_class.comment.value,
+                    "expanded": display_class.comment.expanded,
+                }
+
             # Don't include display_data for manual triggers
             if display_data and trigger_type != WorkflowTriggerType.MANUAL:
                 trigger_data["display_data"] = display_data

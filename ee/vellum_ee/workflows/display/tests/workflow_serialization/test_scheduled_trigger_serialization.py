@@ -15,6 +15,7 @@ from vellum.workflows.state.base import BaseState
 from vellum.workflows.triggers.base import _get_trigger_path_to_id_mapping
 from vellum.workflows.triggers.schedule import ScheduleTrigger
 from vellum.workflows.utils.uuids import uuid4_from_hash
+from vellum_ee.workflows.display.editor import NodeDisplayComment
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 
@@ -224,6 +225,7 @@ def test_scheduled_trigger_serialization_full():
             z_index = 3
             icon = "vellum:icon:calendar"
             color = "#4A90E2"
+            comment = NodeDisplayComment(value="This is scheduled trigger", expanded=True)
 
     class ProcessNode(BaseNode):
         class Outputs(BaseNode.Outputs):
@@ -256,6 +258,10 @@ def test_scheduled_trigger_serialization_full():
                 "z_index": 3,
                 "icon": "vellum:icon:calendar",
                 "color": "#4A90E2",
+                "comment": {
+                    "value": "This is scheduled trigger",
+                    "expanded": True,
+                },
             },
         },
     )
