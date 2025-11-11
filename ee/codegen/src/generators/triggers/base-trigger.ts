@@ -2,10 +2,12 @@ import { python } from "@fern-api/python-ast";
 
 import {
   GENERATED_TRIGGERS_MODULE_NAME,
+  VELLUM_WORKFLOW_EDITOR_TYPES_PATH,
   VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH,
 } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
+import { isNilOrEmpty } from "src/utils/typing";
 
 import type { AstNode } from "@fern-api/python-ast/core/AstNode";
 import type { WorkflowTrigger } from "src/types/vellum";
@@ -110,6 +112,46 @@ export abstract class BaseTrigger<
         python.field({
           name: "color",
           initializer: python.TypeInstantiation.str(displayData.color),
+        })
+      );
+    }
+
+    if (displayData.comment != null) {
+      const commentArgs: python.MethodArgument[] = [];
+      const { expanded, value } = displayData.comment;
+
+      if (expanded) {
+        commentArgs.push(
+          python.methodArgument({
+            name: "expanded",
+            value: python.TypeInstantiation.bool(expanded),
+          })
+        );
+      }
+
+      if (value) {
+        commentArgs.push(
+          python.methodArgument({
+            name: "value",
+            value: python.TypeInstantiation.str(value),
+          })
+        );
+      }
+
+      if (isNilOrEmpty(commentArgs)) {
+        return undefined;
+      }
+
+      fields.push(
+        python.field({
+          name: "comment",
+          initializer: python.instantiateClass({
+            classReference: python.reference({
+              name: "NodeDisplayComment",
+              modulePath: VELLUM_WORKFLOW_EDITOR_TYPES_PATH,
+            }),
+            arguments_: commentArgs,
+          }),
         })
       );
     }

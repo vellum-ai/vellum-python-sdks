@@ -104,6 +104,10 @@ export default {
         z_index: 0,
         icon: null,
         color: null,
+        comment: {
+          value: "This is a scheduled trigger",
+          expanded: false,
+        },
       },
     },
   ],
