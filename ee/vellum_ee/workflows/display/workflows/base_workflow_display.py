@@ -388,11 +388,38 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 ValueError("Unable to serialize terminal nodes that are not referenced by workflow outputs.")
             )
 
-        # Add edges from entrypoint first to preserve expected ordering
+        # Identify nodes that already have trigger edges so we can avoid duplicating entrypoint edges
         nodes_with_trigger_edges: Set[Type[BaseNode]] = set()
+        for trigger_edge in trigger_edges:
+            try:
+                nodes_with_trigger_edges.add(get_unadorned_node(trigger_edge.to_node))
+            except Exception:
+                continue
+
+        # Determine which nodes have explicit non-trigger entrypoints in the graph
+        non_trigger_entrypoint_nodes: Set[Type[BaseNode]] = set()
+        for subgraph in self._workflow.get_subgraphs():
+            # If the subgraph contains trigger edges, its entrypoints were derived from triggers
+            if any(True for _ in subgraph.trigger_edges):
+                continue
+            for entrypoint in subgraph.entrypoints:
+                try:
+                    non_trigger_entrypoint_nodes.add(get_unadorned_node(entrypoint))
+                except Exception:
+                    continue
+
+        # Add edges from entrypoint first to preserve expected ordering
 
         for target_node, entrypoint_display in self.display_context.entrypoint_displays.items():
             unadorned_target_node = get_unadorned_node(target_node)
+
+            # Skip the auto-generated entrypoint edge when a trigger already targets this node,
+            # unless the graph explicitly defines a non-trigger entrypoint for it.
+            if (
+                unadorned_target_node in nodes_with_trigger_edges
+                and unadorned_target_node not in non_trigger_entrypoint_nodes
+            ):
+                continue
 
             # Skip edges to invalid nodes
             if self._is_node_invalid(unadorned_target_node):
