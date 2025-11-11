@@ -60,7 +60,6 @@ from vellum.workflows.utils.functions import (
     compile_inline_workflow_function_definition,
     compile_mcp_tool_definition,
     compile_vellum_integration_tool_definition,
-    compile_workflow_deployment_function_definition,
     get_mcp_tool_name,
 )
 from vellum.workflows.utils.pydantic_schema import normalize_json
@@ -142,10 +141,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                     normalized_functions.append(function)
                 elif isinstance(function, DeploymentDefinition):
                     normalized_functions.append(
-                        compile_workflow_deployment_function_definition(
-                            function,
-                            vellum_client=self._context.vellum_client,
-                        )
+                        function.compile_function_definition(vellum_client=self._context.vellum_client)
                     )
                 elif is_workflow_class(function):
                     normalized_functions.append(compile_inline_workflow_function_definition(function))
