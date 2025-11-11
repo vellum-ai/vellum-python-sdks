@@ -497,6 +497,48 @@ def get_current_weather(location: str, unit: str) -> str:
 "
 `;
 
+exports[`WorkflowProjectGenerator > function > should generate correct use tool inputs decorator - 'hello_world first' > code/nodes/tool_call/get_current_weather.py 1`] = `
+"from vellum.workflows.utils.functions import use_tool_inputs
+
+from ...inputs import Inputs
+
+import json
+
+def hello_world(name: str) -> str:
+    """
+    Say hello to someone.
+    """
+    return f"Hello, {name}!"
+
+
+@use_tool_inputs(location=Inputs.location)
+def get_current_weather(location: str, unit: str) -> str:
+    """
+    Get the current weather in a given location.
+    """
+    return f"The current weather in {location} is sunny with a temperature of 70 degrees {unit}."
+
+"
+`;
+
+exports[`WorkflowProjectGenerator > function > should generate correct use tool inputs decorator - 'simple' > code/nodes/tool_call/get_current_weather.py 1`] = `
+"from vellum.workflows.utils.functions import use_tool_inputs
+
+from ...inputs import Inputs
+
+import json
+
+
+@use_tool_inputs(location=Inputs.location)
+def get_current_weather(location: str, unit: str) -> str:
+    """
+    Get the current weather in a given location.
+    """
+    return f"The current weather in {location} is sunny with a temperature of 70 degrees {unit}."
+
+"
+`;
+
 exports[`WorkflowProjectGenerator > function > should generate empty function array if no functions are defined > code/nodes/tool_call/__init__.py 1`] = `
 "from vellum import ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
 from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode

@@ -4813,6 +4813,139 @@ baz = foo + bar
         "__init__.py",
       ]);
     });
+    it.each([
+      {
+        testName: "simple",
+        src: 'import json\n\ndef get_current_weather(location: str, unit: str) -> str:\n    """\n    Get the current weather in a given location.\n    """\n    return f"The current weather in {location} is sunny with a temperature of 70 degrees {unit}."\n',
+      },
+      {
+        testName: "hello_world first",
+        src: 'import json\n\ndef hello_world(name: str) -> str:\n    """\n    Say hello to someone.\n    """\n    return f"Hello, {name}!"\n\ndef get_current_weather(location: str, unit: str) -> str:\n    """\n    Get the current weather in a given location.\n    """\n    return f"The current weather in {location} is sunny with a temperature of 70 degrees {unit}."\n',
+      },
+    ])(
+      "should generate correct use tool inputs decorator - $testName",
+      async ({ src }) => {
+        const displayData = {
+          workflow_raw_data: {
+            edges: [],
+            nodes: [
+              {
+                id: "entrypoint",
+                base: null,
+                data: {
+                  label: "Entrypoint Node",
+                  source_handle_id: "d8144c82-8b1a-4181-b068-6aaf69d21b73",
+                },
+                type: "ENTRYPOINT",
+                inputs: [],
+              },
+              {
+                id: "tool-calling-node",
+                base: {
+                  name: "ToolCallingNode",
+                  module: [
+                    "vellum",
+                    "workflows",
+                    "nodes",
+                    "displayable",
+                    "tool_calling_node",
+                    "node",
+                  ],
+                },
+                type: "GENERIC",
+                label: "GetCurrentWeatherNode",
+                ports: [
+                  {
+                    id: "7b97f998-4be5-478d-94c4-9423db5f6392",
+                    name: "default",
+                    type: "DEFAULT",
+                  },
+                ],
+                outputs: [],
+                trigger: {
+                  id: "d8d60185-e88a-467b-84f4-e5fddd8b3209",
+                  merge_behavior: "AWAIT_ATTRIBUTES",
+                },
+                adornments: null,
+                attributes: [
+                  {
+                    id: "7b1ab802-3228-43b3-a493-734c94794710",
+                    name: "functions",
+                    value: {
+                      type: "CONSTANT_VALUE",
+                      value: {
+                        type: "JSON",
+                        value: [
+                          {
+                            type: "CODE_EXECUTION",
+                            src: src,
+                            name: "get_current_weather",
+                            description:
+                              "Get the current weather in a given location.",
+                            definition: {
+                              name: "get_current_weather",
+                              state: null,
+                              forced: null,
+                              strict: null,
+                              inputs: {
+                                location: {
+                                  type: "WORKFLOW_INPUT",
+                                  input_variable_id:
+                                    "4bf1f0e7-76c6-4204-9f8c-bd9c3b73a8db",
+                                },
+                              },
+                              parameters: {
+                                type: "object",
+                                required: ["location", "unit"],
+                                properties: {
+                                  unit: { type: "string" },
+                                  location: { type: "string" },
+                                },
+                              },
+                              description: null,
+                              cache_config: null,
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  },
+                ],
+                definition: {
+                  name: "GetCurrentWeatherNode",
+                  module: ["testing", "nodes", "tool_call"],
+                },
+              },
+            ],
+
+            output_values: [],
+          },
+          input_variables: [
+            {
+              id: "4bf1f0e7-76c6-4204-9f8c-bd9c3b73a8db",
+              key: "location",
+              type: "STRING",
+            },
+          ],
+          state_variables: [],
+          output_variables: [],
+        };
+        const project = new WorkflowProjectGenerator({
+          absolutePathToOutputDirectory: tempDir,
+          workflowVersionExecConfigData: displayData,
+          moduleName: "code",
+          vellumApiKey: "<TEST_API_KEY>",
+        });
+
+        await project.generateCode();
+        expectProjectFileToMatchSnapshot([
+          "code",
+          "nodes",
+          "tool_call",
+          "get_current_weather.py",
+        ]);
+      }
+    );
     it("should generate empty function array if no functions are defined", async () => {
       const displayData = {
         workflow_raw_data: {
