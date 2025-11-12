@@ -173,7 +173,7 @@ def test_workflow_with_only_manual_trigger_accepts_manual_trigger_instance():
     assert result.outputs.result == "No trigger workflow"
 
 
-def test_workflow_initiated_event_has_integration_trigger_parent_context():
+def test_workflow_initiated_event_has_trigger():
     # GIVEN a workflow with an IntegrationTrigger (Slack)
     workflow = SimpleSlackWorkflow()
     trigger = SlackMessageTrigger(message="hello", channel="C1", user="U1")
@@ -186,17 +186,7 @@ def test_workflow_initiated_event_has_integration_trigger_parent_context():
     initiated = events[0]
     assert initiated.name == "workflow.execution.initiated"
 
-    # AND the initiated parent context is of type integration
-    assert initiated.parent is not None
-    assert initiated.parent.type == "INTEGRATION"
-
-    # AND the trigger_id matches the trigger class id
-    assert getattr(initiated.parent, "trigger_id", None) == SlackMessageTrigger.__id__  # type: ignore[attr-defined]
-
-    # AND the trigger_definition is present # type: ignore[attr-defined]
+    # AND the initiated event has the trigger field
     trigger_definition = initiated.body.trigger
     assert trigger_definition is not None
     assert trigger_definition.__name__ == "SlackMessageTrigger"
-
-    # AND the final event should fulfill
-    assert events[-1].name == "workflow.execution.fulfilled"

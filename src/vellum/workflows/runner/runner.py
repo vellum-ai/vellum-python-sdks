@@ -49,15 +49,7 @@ from vellum.workflows.events.node import (
     NodeExecutionRejectedBody,
     NodeExecutionStreamingBody,
 )
-from vellum.workflows.events.types import (
-    BaseEvent,
-    IntegrationTriggerContext,
-    NodeParentContext,
-    ParentContext,
-    ScheduledTriggerContext,
-    SpanLink,
-    WorkflowParentContext,
-)
+from vellum.workflows.events.types import BaseEvent, NodeParentContext, ParentContext, SpanLink, WorkflowParentContext
 from vellum.workflows.events.workflow import (
     WorkflowEventStream,
     WorkflowExecutionFulfilledBody,
@@ -82,7 +74,6 @@ from vellum.workflows.references import ExternalInputReference, OutputReference
 from vellum.workflows.references.state_value import StateValueReference
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.delta import StateDelta
-from vellum.workflows.triggers import ScheduleTrigger
 from vellum.workflows.triggers.base import BaseTrigger
 from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.triggers.manual import ManualTrigger
@@ -272,19 +263,6 @@ class WorkflowRunner(Generic[StateType]):
         self._timeout = timeout
         self._execution_context = init_execution_context or get_execution_context()
         self._trigger = trigger
-
-        if trigger:
-            cls = trigger.__class__
-            if issubclass(cls, IntegrationTrigger):
-                self._execution_context.parent_context = IntegrationTriggerContext(
-                    span_id=uuid4(),
-                    trigger_id=cls.__id__,
-                )
-            elif issubclass(cls, ScheduleTrigger):
-                self._execution_context.parent_context = ScheduledTriggerContext(
-                    span_id=uuid4(),
-                    trigger_id=cls.__id__,
-                )
 
         setattr(
             self._initial_state,

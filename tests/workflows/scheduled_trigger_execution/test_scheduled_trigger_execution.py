@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from tests.workflows.scheduled_trigger_execution.workflows.simple_workflow import MySchedule, SimpleScheduledWorkflow
 
 
-def test_workflow_initiated_event_has_scheduled_trigger_parent_context():
+def test_workflow_initiated_event_has_trigger():
     # GIVEN a simple workflow using ScheduleTrigger
     workflow = SimpleScheduledWorkflow()
     trigger = MySchedule(current_run_at=datetime.now(), next_run_at=datetime.now() + timedelta(minutes=1))
@@ -16,17 +16,7 @@ def test_workflow_initiated_event_has_scheduled_trigger_parent_context():
     initiated = events[0]
     assert initiated.name == "workflow.execution.initiated"
 
-    # AND the initiated parent context is of type scheduled
-    assert initiated.parent is not None
-    assert initiated.parent.type == "SCHEDULED"
-
-    # AND the trigger_id matches the trigger class id
-    assert getattr(initiated.parent, "trigger_id", None) == MySchedule.__id__  # type: ignore[attr-defined]
-
-    # AND the trigger_definition is present # type: ignore[attr-defined]
+    # AND the initiated event has the trigger field
     trigger_definition = initiated.body.trigger
     assert trigger_definition is not None
     assert trigger_definition.__name__ == "MySchedule"
-
-    # AND the final event should fulfill
-    assert events[-1].name == "workflow.execution.fulfilled"
