@@ -888,8 +888,12 @@ type WorkflowSandboxInput =
 export type WorkflowSandboxInputs = WorkflowSandboxInput[];
 export type WorkflowSandboxDatasetRow =
   | WorkflowSandboxInputs
-  | { label: string; inputs: WorkflowSandboxInputs }
-  | { label: string };
+  | {
+      label: string;
+      inputs: WorkflowSandboxInputs;
+      workflow_trigger_id?: string;
+    }
+  | { label: string; workflow_trigger_id?: string };
 
 export interface UnaryWorkflowExpression {
   type: "UNARY_EXPRESSION";

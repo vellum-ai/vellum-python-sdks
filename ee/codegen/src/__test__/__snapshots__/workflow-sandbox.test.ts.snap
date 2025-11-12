@@ -1,5 +1,32 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Workflow Sandbox > write > should generate DatasetRow with workflow_trigger_id when provided 1`] = `
+"from uuid import UUID
+
+from vellum.workflows.inputs import DatasetRow
+from vellum.workflows.sandbox import WorkflowSandboxRunner
+
+from .inputs import Inputs
+from .workflow import TestWorkflow
+
+dataset = [
+    DatasetRow(
+        label="Scenario with Trigger ID",
+        inputs=Inputs(test_input="test-value"),
+        workflow_trigger_id=UUID("550e8400-e29b-41d4-a716-446655440000"),
+    ),
+    DatasetRow(
+        label="Scenario without Trigger ID", inputs=Inputs(test_input="test-value-2")
+    ),
+]
+
+runner = WorkflowSandboxRunner(workflow=TestWorkflow(), dataset=dataset)
+
+if __name__ == "__main__":
+    runner.run()
+"
+`;
+
 exports[`Workflow Sandbox > write > should generate DatasetRow without inputs parameter when dataset row has label but no inputs 1`] = `
 "from vellum.workflows.inputs import DatasetRow
 from vellum.workflows.sandbox import WorkflowSandboxRunner

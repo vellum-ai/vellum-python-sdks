@@ -98,6 +98,9 @@ if __name__ == "__main__":
     const label: string = Array.isArray(row)
       ? `Example ${index + 1}`
       : row.label;
+    const workflowTriggerId: string | undefined = Array.isArray(row)
+      ? undefined
+      : row.workflow_trigger_id;
 
     const hasInputs = inputs.length > 0;
     const arguments_: python.MethodArgument[] = [
@@ -143,6 +146,15 @@ if __name__ == "__main__":
         python.methodArgument({
           name: "inputs",
           value: inputsInstance,
+        })
+      );
+    }
+
+    if (!isNil(workflowTriggerId)) {
+      arguments_.push(
+        python.methodArgument({
+          name: "workflow_trigger_id",
+          value: python.TypeInstantiation.uuid(workflowTriggerId),
         })
       );
     }

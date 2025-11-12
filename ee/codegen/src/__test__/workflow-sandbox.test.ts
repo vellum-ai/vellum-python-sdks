@@ -172,5 +172,66 @@ describe("Workflow Sandbox", () => {
       expect(result).toContain('DatasetRow(label="Test Label Only")');
       expect(result).not.toContain("inputs=");
     });
+
+    it("should generate DatasetRow with workflow_trigger_id when provided", async () => {
+      const writer = new Writer();
+      const uniqueWorkflowContext = workflowContextFactory();
+      const inputVariable: VellumVariable = {
+        id: "1",
+        key: "test_input",
+        type: "STRING",
+      };
+
+      uniqueWorkflowContext.addInputVariableContext(
+        inputVariableContextFactory({
+          inputVariableData: inputVariable,
+          workflowContext: uniqueWorkflowContext,
+        })
+      );
+
+      const sandboxInputs: WorkflowSandboxDatasetRow[] = [
+        {
+          label: "Scenario with Trigger ID",
+          inputs: [
+            {
+              name: inputVariable.key,
+              type: "STRING",
+              value: "test-value",
+            },
+          ],
+          workflow_trigger_id: "550e8400-e29b-41d4-a716-446655440000",
+        },
+        {
+          label: "Scenario without Trigger ID",
+          inputs: [
+            {
+              name: inputVariable.key,
+              type: "STRING",
+              value: "test-value-2",
+            },
+          ],
+        },
+      ];
+
+      const sandbox = codegen.workflowSandboxFile({
+        workflowContext: uniqueWorkflowContext,
+        sandboxInputs,
+      });
+
+      sandbox.write(writer);
+      const result = await writer.toStringFormatted();
+
+      expect(result).toMatchSnapshot();
+      expect(result).toContain(
+        'workflow_trigger_id=UUID("550e8400-e29b-41d4-a716-446655440000")'
+      );
+      const lines = result.split("\n");
+      const secondDatasetRowIndex = lines.findIndex((line) =>
+        line.includes('label="Scenario without Trigger ID"')
+      );
+      expect(secondDatasetRowIndex).toBeGreaterThan(-1);
+      const secondDatasetRowLine = lines[secondDatasetRowIndex];
+      expect(secondDatasetRowLine).not.toContain("workflow_trigger_id");
+    });
   });
 });
