@@ -119,6 +119,12 @@ class WorkflowExecutionInitiatedBody(_BaseWorkflowExecutionBody, Generic[InputsT
     def serialize_initial_state(self, initial_state: Optional[StateType], _info: Any) -> Optional[Dict[str, Any]]:
         return default_serializer(initial_state)
 
+    @field_serializer("trigger")
+    def serialize_trigger(self, trigger: Optional[Type[BaseTrigger]], _info: Any) -> Optional[Dict[str, Any]]:
+        if trigger is None:
+            return None
+        return serialize_type_encoder_with_id(trigger)
+
 
 class WorkflowExecutionInitiatedEvent(_BaseWorkflowEvent, Generic[InputsType, StateType]):
     name: Literal["workflow.execution.initiated"] = "workflow.execution.initiated"
