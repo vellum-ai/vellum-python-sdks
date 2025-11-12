@@ -171,3 +171,22 @@ def test_workflow_with_only_manual_trigger_accepts_manual_trigger_instance():
     # THEN it should execute successfully
     assert result.name == "workflow.execution.fulfilled"
     assert result.outputs.result == "No trigger workflow"
+
+
+def test_workflow_initiated_event_has_trigger():
+    # GIVEN a workflow with an IntegrationTrigger (Slack)
+    workflow = SimpleSlackWorkflow()
+    trigger = SlackMessageTrigger(message="hello", channel="C1", user="U1")
+
+    # WHEN streaming events
+    events = list(workflow.stream(trigger=trigger))
+
+    # THEN the first event is workflow.execution.initiated
+    assert len(events) >= 1
+    initiated = events[0]
+    assert initiated.name == "workflow.execution.initiated"
+
+    # AND the initiated event has the trigger field
+    trigger_definition = initiated.body.trigger
+    assert trigger_definition is not None
+    assert trigger_definition.__name__ == "SlackMessageTrigger"

@@ -262,6 +262,7 @@ class WorkflowRunner(Generic[StateType]):
         self._cancel_signal = cancel_signal
         self._timeout = timeout
         self._execution_context = init_execution_context or get_execution_context()
+        self._trigger = trigger
 
         setattr(
             self._initial_state,
@@ -949,6 +950,7 @@ class WorkflowRunner(Generic[StateType]):
                 workflow_definition=self.workflow.__class__,
                 inputs=self._initial_state.meta.workflow_inputs,
                 initial_state=deepcopy(self._initial_state) if self._should_emit_initial_state else None,
+                trigger=self._trigger.__class__ if self._trigger else None,
             ),
             parent=self._execution_context.parent_context,
             links=links,
