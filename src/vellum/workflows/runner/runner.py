@@ -51,11 +51,11 @@ from vellum.workflows.events.node import (
 )
 from vellum.workflows.events.types import (
     BaseEvent,
+    IntegrationTriggerContext,
     NodeParentContext,
     ParentContext,
+    ScheduledTriggerContext,
     SpanLink,
-    WorkflowDeploymentIntegrationTriggerContext,
-    WorkflowDeploymentScheduledTriggerContext,
     WorkflowParentContext,
 )
 from vellum.workflows.events.workflow import (
@@ -82,10 +82,10 @@ from vellum.workflows.references import ExternalInputReference, OutputReference
 from vellum.workflows.references.state_value import StateValueReference
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.delta import StateDelta
+from vellum.workflows.triggers import ScheduleTrigger
 from vellum.workflows.triggers.base import BaseTrigger
 from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.triggers.manual import ManualTrigger
-from vellum.workflows.triggers.schedule import ScheduleTrigger
 from vellum.workflows.types.core import CancelSignal
 from vellum.workflows.types.generics import InputsType, OutputsType, StateType
 
@@ -271,24 +271,19 @@ class WorkflowRunner(Generic[StateType]):
         self._cancel_signal = cancel_signal
         self._timeout = timeout
         self._execution_context = init_execution_context or get_execution_context()
+        self._trigger = trigger
 
-        # If a trigger was provided, attach a trigger context
         if trigger:
             cls = trigger.__class__
-            existing_parent = self._execution_context.parent_context
             if issubclass(cls, IntegrationTrigger):
-                self._execution_context.parent_context = WorkflowDeploymentIntegrationTriggerContext(
+                self._execution_context.parent_context = IntegrationTriggerContext(
                     span_id=uuid4(),
                     trigger_id=cls.__id__,
-                    trigger_definition=cls,
-                    parent=existing_parent,
                 )
             elif issubclass(cls, ScheduleTrigger):
-                self._execution_context.parent_context = WorkflowDeploymentScheduledTriggerContext(
+                self._execution_context.parent_context = ScheduledTriggerContext(
                     span_id=uuid4(),
                     trigger_id=cls.__id__,
-                    trigger_definition=cls,
-                    parent=existing_parent,
                 )
 
         setattr(
@@ -977,6 +972,7 @@ class WorkflowRunner(Generic[StateType]):
                 workflow_definition=self.workflow.__class__,
                 inputs=self._initial_state.meta.workflow_inputs,
                 initial_state=deepcopy(self._initial_state) if self._should_emit_initial_state else None,
+                trigger=self._trigger.__class__ if self._trigger else None,
             ),
             parent=self._execution_context.parent_context,
             links=links,

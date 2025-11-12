@@ -193,17 +193,10 @@ def test_workflow_initiated_event_has_integration_trigger_parent_context():
     # AND the trigger_id matches the trigger class id
     assert getattr(initiated.parent, "trigger_id", None) == SlackMessageTrigger.__id__  # type: ignore[attr-defined]
 
-    # AND the trigger_definition is present
-    trigger_def = getattr(initiated.parent, "trigger_definition", None)  # type: ignore[attr-defined]
-    assert trigger_def is not None
-    assert trigger_def.name == "SlackMessageTrigger"
-    assert trigger_def.module == [
-        "tests",
-        "workflows",
-        "integration_trigger_execution",
-        "nodes",
-        "slack_message_trigger",
-    ]
+    # AND the trigger_definition is present # type: ignore[attr-defined]
+    trigger = initiated.body.trigger
+    assert trigger is not None
+    assert trigger.__name__ == "SlackMessageTrigger"
 
     # AND the final event should fulfill
     assert events[-1].name == "workflow.execution.fulfilled"
