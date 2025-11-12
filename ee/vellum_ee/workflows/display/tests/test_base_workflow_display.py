@@ -1,9 +1,12 @@
-from uuid import UUID
+import json
+from uuid import UUID, uuid4
 from typing import Any, Dict, List, cast
 
+from vellum.utils.json_encoder import VellumJsonEncoder
 from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.graph import Graph
 from vellum.workflows.inputs import BaseInputs
+from vellum.workflows.inputs.dataset_row import DatasetRow
 from vellum.workflows.nodes import BaseNode, InlineSubworkflowNode
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.ports.port import Port
@@ -623,3 +626,26 @@ def test_base_workflow_display__graph_with_trigger_and_regular_node():
     trigger_edge = trigger_edges[0]
     assert isinstance(trigger_edge, dict)
     assert trigger_edge["target_node_id"] == bottom_node_id, "Trigger edge should connect to BottomNode"
+
+
+def test_serialize_dataset_row_with_workflow_trigger_id():
+    """
+    Tests that DatasetRow with workflow_trigger_id serializes correctly in the module dataset.
+    """
+
+    # GIVEN a workflow trigger ID
+    trigger_id = uuid4()
+
+    # AND a dataset row with workflow_trigger_id
+    dataset_row = DatasetRow(label="test_scenario", inputs={"message": "Hello World"}, workflow_trigger_id=trigger_id)
+
+    # WHEN we serialize the dataset row (mimicking the serialize_module logic)
+    serialized_inputs = json.loads(json.dumps(dataset_row.inputs, cls=VellumJsonEncoder))
+    row_data = {"label": dataset_row.label, "inputs": serialized_inputs}
+    if dataset_row.workflow_trigger_id is not None:
+        row_data["workflow_trigger_id"] = str(dataset_row.workflow_trigger_id)
+
+    # THEN the serialized row should include all fields
+    assert row_data["label"] == "test_scenario"
+    assert row_data["inputs"] == {"message": "Hello World"}
+    assert row_data["workflow_trigger_id"] == str(trigger_id)

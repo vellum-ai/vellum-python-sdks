@@ -1211,7 +1211,10 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                     for i, inputs_obj in enumerate(dataset_attr):
                         if isinstance(inputs_obj, DatasetRow):
                             serialized_inputs = json.loads(json.dumps(inputs_obj.inputs, cls=VellumJsonEncoder))
-                            dataset.append({"label": inputs_obj.label, "inputs": serialized_inputs})
+                            row_data = {"label": inputs_obj.label, "inputs": serialized_inputs}
+                            if inputs_obj.workflow_trigger_id is not None:
+                                row_data["workflow_trigger_id"] = str(inputs_obj.workflow_trigger_id)
+                            dataset.append(row_data)
                         elif isinstance(inputs_obj, BaseInputs):
                             serialized_inputs = json.loads(json.dumps(inputs_obj, cls=VellumJsonEncoder))
                             dataset.append({"label": f"Scenario {i + 1}", "inputs": serialized_inputs})

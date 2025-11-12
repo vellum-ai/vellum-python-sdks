@@ -1,3 +1,4 @@
+from uuid import uuid4
 from typing import Optional
 
 from vellum.client.types.chat_message import ChatMessage
@@ -146,3 +147,22 @@ def test_dataset_row_with_dict_inputs():
     assert serialized_dict["label"] == "test_label"
     assert serialized_dict["inputs"]["message"] == "Hello World"
     assert serialized_dict["inputs"]["count"] == 42
+
+
+def test_dataset_row_with_workflow_trigger_id():
+    """
+    Test that DatasetRow can be created with a workflow_trigger_id.
+    """
+
+    # GIVEN a workflow trigger ID
+    trigger_id = uuid4()
+
+    # AND a DatasetRow with this trigger ID
+    dataset_row = DatasetRow(label="test_label", inputs={"message": "test"}, workflow_trigger_id=trigger_id)
+
+    # THEN the workflow_trigger_id should be set
+    assert dataset_row.workflow_trigger_id == trigger_id
+
+    # AND the serialized dict should contain the trigger ID
+    serialized_dict = dataset_row.model_dump()
+    assert serialized_dict["workflow_trigger_id"] == trigger_id

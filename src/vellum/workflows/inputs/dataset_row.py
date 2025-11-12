@@ -1,4 +1,5 @@
-from typing import Any, Dict, Union
+from uuid import UUID
+from typing import Any, Dict, Optional, Union
 
 from pydantic import Field, field_serializer
 
@@ -13,10 +14,12 @@ class DatasetRow(UniversalBaseModel):
     Attributes:
         label: String label for the dataset row
         inputs: BaseInputs instance or dict containing the input data
+        workflow_trigger_id: Optional UUID identifying the workflow trigger
     """
 
     label: str
     inputs: Union[BaseInputs, Dict[str, Any]] = Field(default_factory=BaseInputs)
+    workflow_trigger_id: Optional[UUID] = None
 
     @field_serializer("inputs")
     def serialize_inputs(self, inputs: Union[BaseInputs, Dict[str, Any]]) -> Dict[str, Any]:

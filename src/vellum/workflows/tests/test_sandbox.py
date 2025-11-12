@@ -1,4 +1,5 @@
 import pytest
+from uuid import uuid4
 from typing import List
 
 from vellum.workflows.inputs.base import BaseInputs
@@ -100,3 +101,50 @@ def test_sandbox_runner_with_dict_inputs(mock_logger):
         "----------------------------------",
         "final_output: Hello from dict",
     ]
+
+
+def test_sandbox_runner_with_workflow_trigger_id(mock_logger):
+    """
+    Test that WorkflowSandboxRunner can run with DatasetRow containing workflow_trigger_id.
+    """
+
+    # GIVEN we capture the logs to stdout
+    logs = []
+    mock_logger.return_value.info.side_effect = lambda msg: logs.append(msg)
+
+    class Inputs(BaseInputs):
+        message: str
+
+    class StartNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result = Inputs.message
+
+    class Workflow(BaseWorkflow[Inputs, BaseState]):
+        graph = StartNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_output = StartNode.Outputs.result
+
+    # AND a workflow trigger ID
+    trigger_id = uuid4()
+
+    # AND a dataset with workflow_trigger_id
+    dataset = [
+        DatasetRow(label="test_row", inputs={"message": "Hello with trigger"}, workflow_trigger_id=trigger_id),
+    ]
+
+    # WHEN we run the sandbox with the DatasetRow containing workflow_trigger_id
+    runner = WorkflowSandboxRunner(workflow=Workflow(), dataset=dataset)
+    runner.run()
+
+    # THEN the workflow should run successfully
+    assert logs == [
+        "Just started Node: StartNode",
+        "Just finished Node: StartNode",
+        "Workflow fulfilled!",
+        "----------------------------------",
+        "final_output: Hello with trigger",
+    ]
+
+    # AND the dataset row should still have the trigger ID
+    assert dataset[0].workflow_trigger_id == trigger_id
