@@ -94,6 +94,7 @@ mock_node_uuid = str(MockNode.__id__)
                     "initial_state": None,
                     "workflow_version_exec_config": None,
                     "server_metadata": None,
+                    "trigger": None,
                 },
                 "parent": None,
                 "links": None,

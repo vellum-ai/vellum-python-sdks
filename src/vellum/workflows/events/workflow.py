@@ -12,6 +12,7 @@ from vellum.workflows.references import ExternalInputReference
 from vellum.workflows.types.definition import CodeResourceDefinition, serialize_type_encoder_with_id
 from vellum.workflows.types.generics import InputsType, OutputsType, StateType
 
+from ..triggers import BaseTrigger
 from .node import (
     NodeExecutionFulfilledEvent,
     NodeExecutionInitiatedEvent,
@@ -108,6 +109,8 @@ class WorkflowExecutionInitiatedBody(_BaseWorkflowExecutionBody, Generic[InputsT
     # This field can be populated with arbitrary server metadata during event enrichment
     server_metadata: Optional[Dict[str, Any]] = None
 
+    trigger: Optional[Type[BaseTrigger]] = None
+
     @field_serializer("inputs")
     def serialize_inputs(self, inputs: InputsType, _info: Any) -> Dict[str, Any]:
         return default_serializer(inputs)
@@ -115,6 +118,12 @@ class WorkflowExecutionInitiatedBody(_BaseWorkflowExecutionBody, Generic[InputsT
     @field_serializer("initial_state")
     def serialize_initial_state(self, initial_state: Optional[StateType], _info: Any) -> Optional[Dict[str, Any]]:
         return default_serializer(initial_state)
+
+    @field_serializer("trigger")
+    def serialize_trigger(self, trigger: Optional[Type[BaseTrigger]], _info: Any) -> Optional[Dict[str, Any]]:
+        if trigger is None:
+            return None
+        return serialize_type_encoder_with_id(trigger)
 
 
 class WorkflowExecutionInitiatedEvent(_BaseWorkflowEvent, Generic[InputsType, StateType]):
