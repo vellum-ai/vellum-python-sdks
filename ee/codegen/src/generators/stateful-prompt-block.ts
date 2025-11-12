@@ -1,95 +1,23 @@
 import { python } from "@fern-api/python-ast";
-import { ClassInstantiation } from "@fern-api/python-ast/ClassInstantiation";
 import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
 import { isNil } from "lodash";
 
-import { Json } from "./json";
-
-import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import {
   BasePromptBlock,
   PromptTemplateBlockExcludingFunctionDefinition,
 } from "src/generators/base-prompt-block";
 import {
-  AudioPromptTemplateBlock,
   ChatMessagePromptTemplateBlock,
-  DocumentPromptTemplateBlock,
-  ImagePromptTemplateBlock,
   JinjaPromptTemplateBlock,
   PlainTextPromptTemplateBlock,
   RichTextPromptTemplateBlock,
   VariablePromptTemplateBlock,
-  VideoPromptTemplateBlock,
 } from "src/types/vellum";
 
 // Flesh out unit tests for various prompt configurations
 // https://app.shortcut.com/vellum/story/5249
 export class StatefulPromptBlock extends BasePromptBlock<PromptTemplateBlockExcludingFunctionDefinition> {
-  protected generateAstNode(
-    promptBlock: PromptTemplateBlockExcludingFunctionDefinition
-  ): ClassInstantiation {
-    switch (promptBlock.blockType) {
-      case "JINJA":
-        return this.generateJinjaPromptBlock(promptBlock);
-      case "CHAT_MESSAGE":
-        return this.generateChatMessagePromptBlock(promptBlock);
-      case "VARIABLE":
-        return this.generateVariablePromptBlock(promptBlock);
-      case "RICH_TEXT":
-        return this.generateRichTextPromptBlock(promptBlock);
-      case "PLAIN_TEXT":
-        return this.generatePlainTextPromptBlock(promptBlock);
-      case "AUDIO":
-        return this.generateAudioPromptBlock(promptBlock);
-      case "VIDEO":
-        return this.generateVideoPromptBlock(promptBlock);
-      case "IMAGE":
-        return this.generateImagePromptBlock(promptBlock);
-      case "DOCUMENT":
-        return this.generateDocumentPromptBlock(promptBlock);
-    }
-  }
-
-  private getPromptBlockRef(
-    promptBlock: PromptTemplateBlockExcludingFunctionDefinition
-  ): python.Reference {
-    let pathName;
-    switch (promptBlock.blockType) {
-      case "JINJA":
-        pathName = "JinjaPromptBlock";
-        break;
-      case "CHAT_MESSAGE":
-        pathName = "ChatMessagePromptBlock";
-        break;
-      case "VARIABLE":
-        pathName = "VariablePromptBlock";
-        break;
-      case "RICH_TEXT":
-        pathName = "RichTextPromptBlock";
-        break;
-      case "PLAIN_TEXT":
-        pathName = "PlainTextPromptBlock";
-        break;
-      case "AUDIO":
-        pathName = "AudioPromptBlock";
-        break;
-      case "VIDEO":
-        pathName = "VideoPromptBlock";
-        break;
-      case "IMAGE":
-        pathName = "ImagePromptBlock";
-        break;
-      case "DOCUMENT":
-        pathName = "DocumentPromptBlock";
-        break;
-    }
-    return python.reference({
-      name: pathName,
-      modulePath: VELLUM_CLIENT_MODULE_PATH,
-    });
-  }
-
-  private generateJinjaPromptBlock(
+  protected generateJinjaPromptBlock(
     promptBlock: JinjaPromptTemplateBlock
   ): python.ClassInstantiation {
     const classArgs: MethodArgument[] = [
@@ -125,7 +53,7 @@ export class StatefulPromptBlock extends BasePromptBlock<PromptTemplateBlockExcl
     return jinjaBlock;
   }
 
-  private generateChatMessagePromptBlock(
+  protected generateChatMessagePromptBlock(
     promptBlock: ChatMessagePromptTemplateBlock
   ): python.ClassInstantiation {
     const classArgs: MethodArgument[] = [
@@ -191,7 +119,7 @@ export class StatefulPromptBlock extends BasePromptBlock<PromptTemplateBlockExcl
     return chatBlock;
   }
 
-  private generateVariablePromptBlock(
+  protected generateVariablePromptBlock(
     promptBlock: VariablePromptTemplateBlock
   ): python.ClassInstantiation {
     const classArgs: MethodArgument[] = [
@@ -217,7 +145,7 @@ export class StatefulPromptBlock extends BasePromptBlock<PromptTemplateBlockExcl
     return variableBlock;
   }
 
-  private generatePlainTextPromptBlock(
+  protected generatePlainTextPromptBlock(
     promptBlock: PlainTextPromptTemplateBlock
   ): python.ClassInstantiation {
     const classArgs: MethodArgument[] = [
@@ -245,7 +173,7 @@ export class StatefulPromptBlock extends BasePromptBlock<PromptTemplateBlockExcl
     return plainBlock;
   }
 
-  private generateRichTextPromptBlock(
+  protected generateRichTextPromptBlock(
     promptBlock: RichTextPromptTemplateBlock
   ): python.ClassInstantiation {
     const classArgs: MethodArgument[] = [
@@ -274,102 +202,5 @@ export class StatefulPromptBlock extends BasePromptBlock<PromptTemplateBlockExcl
 
     this.inheritReferences(richBlock);
     return richBlock;
-  }
-
-  private generateCommonFileInputArguments(
-    promptBlock:
-      | AudioPromptTemplateBlock
-      | VideoPromptTemplateBlock
-      | ImagePromptTemplateBlock
-      | DocumentPromptTemplateBlock
-  ): MethodArgument[] {
-    const classArgs: MethodArgument[] = [];
-
-    classArgs.push(
-      new MethodArgument({
-        name: "src",
-        value: python.TypeInstantiation.str(promptBlock.src),
-      })
-    );
-
-    if (promptBlock.metadata) {
-      const metadataJson = new Json(promptBlock.metadata);
-      classArgs.push(
-        new MethodArgument({
-          name: "metadata",
-          value: metadataJson,
-        })
-      );
-    }
-
-    return classArgs;
-  }
-
-  private generateAudioPromptBlock(
-    promptBlock: AudioPromptTemplateBlock
-  ): python.ClassInstantiation {
-    const classArgs: MethodArgument[] = [
-      ...this.constructCommonClassArguments(promptBlock),
-      ...this.generateCommonFileInputArguments(promptBlock),
-    ];
-
-    const audioBlock = python.instantiateClass({
-      classReference: this.getPromptBlockRef(promptBlock),
-      arguments_: classArgs,
-    });
-
-    this.inheritReferences(audioBlock);
-    return audioBlock;
-  }
-
-  private generateVideoPromptBlock(
-    promptBlock: VideoPromptTemplateBlock
-  ): python.ClassInstantiation {
-    const classArgs: MethodArgument[] = [
-      ...this.constructCommonClassArguments(promptBlock),
-      ...this.generateCommonFileInputArguments(promptBlock),
-    ];
-
-    const videoBlock = python.instantiateClass({
-      classReference: this.getPromptBlockRef(promptBlock),
-      arguments_: classArgs,
-    });
-
-    this.inheritReferences(videoBlock);
-    return videoBlock;
-  }
-
-  private generateImagePromptBlock(
-    promptBlock: ImagePromptTemplateBlock
-  ): python.ClassInstantiation {
-    const classArgs: MethodArgument[] = [
-      ...this.constructCommonClassArguments(promptBlock),
-      ...this.generateCommonFileInputArguments(promptBlock),
-    ];
-
-    const imageBlock = python.instantiateClass({
-      classReference: this.getPromptBlockRef(promptBlock),
-      arguments_: classArgs,
-    });
-
-    this.inheritReferences(imageBlock);
-    return imageBlock;
-  }
-
-  private generateDocumentPromptBlock(
-    promptBlock: DocumentPromptTemplateBlock
-  ): python.ClassInstantiation {
-    const classArgs: MethodArgument[] = [
-      ...this.constructCommonClassArguments(promptBlock),
-      ...this.generateCommonFileInputArguments(promptBlock),
-    ];
-
-    const documentBlock = python.instantiateClass({
-      classReference: this.getPromptBlockRef(promptBlock),
-      arguments_: classArgs,
-    });
-
-    this.inheritReferences(documentBlock);
-    return documentBlock;
   }
 }
