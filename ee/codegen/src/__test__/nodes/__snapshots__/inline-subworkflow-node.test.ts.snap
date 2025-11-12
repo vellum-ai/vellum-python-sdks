@@ -158,3 +158,17 @@ class MyNode1Display(BaseTemplatingNodeDisplay[MyNode1]):
     display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
+
+exports[`InlineSubworkflowNode > with state > inline subworkflow node file with state should include all three generic type parameters 1`] = `
+"from vellum.workflows.nodes.displayable import InlineSubworkflowNode as BaseInlineSubworkflowNode
+from vellum.workflows.state import BaseState
+
+from .inputs import Inputs
+from .workflow import InlineSubworkflowNodeWorkflow
+from ...state import State
+
+
+class InlineSubworkflowNode(BaseInlineSubworkflowNode[State, Inputs, BaseState]):
+    subworkflow = InlineSubworkflowNodeWorkflow
+"
+`;
