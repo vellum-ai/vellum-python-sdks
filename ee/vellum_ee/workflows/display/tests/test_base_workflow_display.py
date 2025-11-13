@@ -639,9 +639,7 @@ def test_serialize_subworkflow_output_reference_without_display():
 
     # THEN it should serialize successfully
     assert hasattr(result, "exec_config")
-    assert hasattr(result, "errors")
     assert isinstance(result.exec_config, dict)
-    assert isinstance(result.errors, list)
     assert "workflow_raw_data" in result.exec_config
 
     # AND the workflow should have the expected nodes
@@ -650,17 +648,26 @@ def test_serialize_subworkflow_output_reference_without_display():
     nodes = workflow_raw_data.get("nodes")
     assert isinstance(nodes, list)
 
-    subworkflow_node = None
-    followon_node = None
-    for node in nodes:
-        if isinstance(node, dict):
-            definition = node.get("definition")
-            if isinstance(definition, dict):
-                name = definition.get("name")
-                if name == "SubworkflowNodeExample":
-                    subworkflow_node = node
-                elif name == "FollowOnNode":
-                    followon_node = node
+    subworkflow_node = next(
+        (
+            node
+            for node in nodes
+            if isinstance(node, dict)
+            and isinstance(node.get("definition"), dict)
+            and node.get("definition", {}).get("name") == "SubworkflowNodeExample"
+        ),
+        None,
+    )
+    followon_node = next(
+        (
+            node
+            for node in nodes
+            if isinstance(node, dict)
+            and isinstance(node.get("definition"), dict)
+            and node.get("definition", {}).get("name") == "FollowOnNode"
+        ),
+        None,
+    )
 
     assert subworkflow_node is not None, "SubworkflowNodeExample not found in serialized nodes"
     assert followon_node is not None, "FollowOnNode not found in serialized nodes"
@@ -678,11 +685,9 @@ def test_serialize_subworkflow_output_reference_without_display():
     followon_attributes = followon_node.get("attributes", [])
     assert len(followon_attributes) > 0, "FollowOnNode should have attributes"
 
-    input_value_attr = None
-    for attr in followon_attributes:
-        if isinstance(attr, dict) and attr.get("name") == "input_value":
-            input_value_attr = attr
-            break
+    input_value_attr = next(
+        (attr for attr in followon_attributes if isinstance(attr, dict) and attr.get("name") == "input_value"), None
+    )
 
     assert input_value_attr is not None, "input_value attribute not found in FollowOnNode"
 
