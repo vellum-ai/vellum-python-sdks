@@ -1072,6 +1072,10 @@ ${errors.slice(0, 3).map((err) => {
   }
 
   private async generateMetadataFile(): Promise<void> {
+    if (this.workflowContext.parentNode) {
+      return;
+    }
+
     /**
      * Metadata persisted alongside generated code to ensure stable, UI-aligned identifiers
      * without relying on Python display classes.
