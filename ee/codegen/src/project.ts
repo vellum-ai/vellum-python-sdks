@@ -1096,6 +1096,12 @@ ${errors.slice(0, 3).map((err) => {
      *            target_node_path  := "<module_path>.<ClassName>.Trigger" for the target node
      *   Value: "<ui_edge_id>"
      **/
+
+    // Skip metadata json for subworkflows for now
+    if (this.workflowContext.parentNode) {
+      return;
+    }
+
     const metadata = {
       trigger_path_to_id_mapping: this.getTriggerPathToIdMapping(),
       node_id_to_file_mapping: this.getNodeIdToFileMapping(),
