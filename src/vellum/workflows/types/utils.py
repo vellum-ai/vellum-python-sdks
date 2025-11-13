@@ -22,6 +22,7 @@ from typing import (
 )
 
 from vellum import ArrayVellumValue, ArrayVellumValueRequest, ChatMessagePromptBlock
+from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.types.core import Json, SpecialGenericAlias, UnderGenericAlias, UnionGenericAlias
 
@@ -125,7 +126,7 @@ def infer_types(object_: Type, attr_name: str, localns: Optional[Dict[str, Any]]
         # Python 3.13+: object class doesn't have __annotations__ by default
         # Use getattr with default to safely access annotations
         annotations = getattr(object_, "__annotations__", {})
-        annotation_value = annotations.get(attr_name, "<unknown>")
+        annotation_value = annotations.get(attr_name, undefined)
         raise AttributeError(
             f"Found 3.9+ typing syntax for field '{attr_name}' on class '{object_.__name__}' – {annotation_value}. Type annotations must be compatible with python version 3.8. "  # noqa: E501
         )
