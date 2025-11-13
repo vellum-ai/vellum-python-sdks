@@ -408,7 +408,23 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
                 },
             }
         else:
-            return {"type": "DICTIONARY_REFERENCE", "entries": cast(JsonArray, serialized_entries)}
+            # Check if this dictionary has a "role" field with USER or ASSISTANT, indicating it's a ChatMessage
+            role_entry = next((entry for entry in serialized_entries if entry["key"] == "role"), None)
+            definition = None
+            if (
+                role_entry
+                and role_entry["value"].get("type") == "CONSTANT_VALUE"
+                and role_entry["value"]["value"].get("value") in ("USER", "ASSISTANT")
+            ):
+                definition = {
+                    "name": "ChatMessage",
+                    "module": ["vellum", "client", "types"],
+                }
+
+            result = {"type": "DICTIONARY_REFERENCE", "entries": cast(JsonArray, serialized_entries)}
+            if definition:
+                result["definition"] = definition
+            return result
 
     if is_workflow_class(value):
         from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
