@@ -3,6 +3,10 @@ from pathlib import Path
 import shutil
 import sys
 import tempfile
+import uuid
+from uuid import UUID
+
+from pytest_mock import MockerFixture
 
 from vellum.workflows.exceptions import WorkflowInitializationException
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
@@ -18,6 +22,18 @@ def temp_module_path():
     finally:
         sys.path.remove(temp_dir)
         shutil.rmtree(temp_dir)
+
+
+@pytest.fixture
+def metadata_trigger_factory(mocker: MockerFixture):
+    def _factory(metadata_trigger_id: UUID) -> UUID:
+        mocker.patch(
+            "vellum.workflows.triggers.base._get_trigger_id_from_metadata",
+            return_value=metadata_trigger_id,
+        )
+        return metadata_trigger_id
+
+    return _factory
 
 
 def test_serialize_module_with_dataset():
@@ -48,6 +64,25 @@ def test_serialize_module_with_actual_dataset():
 
     assert result.dataset[1]["label"] == "Custom Test"
     assert result.dataset[1]["inputs"]["message"] == "DatasetRow Test"
+
+
+def test_serialize_module_with_actual_dataset_with_trigger(metadata_trigger_factory):
+    """Test that serialize_module correctly serializes dataset with trigger"""
+    module_path = "tests.workflows.test_dataset_with_trigger_serialization"
+
+    metadata_trigger_id = uuid.uuid4()
+    metadata_trigger_factory(metadata_trigger_id)
+
+    result = BaseWorkflowDisplay.serialize_module(module_path)
+
+    assert hasattr(result, "dataset")
+
+    assert result.dataset is not None
+    assert isinstance(result.dataset, list)
+    assert len(result.dataset) == 1
+
+    assert result.dataset[0]["label"] == "Scenario 1"
+    assert result.dataset[0]["workflow_trigger_id"] == str(metadata_trigger_id)
 
 
 def test_serialize_module_happy_path():

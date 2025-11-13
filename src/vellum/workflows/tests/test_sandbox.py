@@ -1,5 +1,5 @@
 import pytest
-from uuid import uuid4
+from datetime import datetime
 from typing import List
 
 from vellum.workflows.inputs.base import BaseInputs
@@ -7,6 +7,7 @@ from vellum.workflows.inputs.dataset_row import DatasetRow
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.sandbox import WorkflowSandboxRunner
 from vellum.workflows.state.base import BaseState
+from vellum.workflows.triggers import ScheduleTrigger
 from vellum.workflows.workflows.base import BaseWorkflow
 
 
@@ -103,37 +104,40 @@ def test_sandbox_runner_with_dict_inputs(mock_logger):
     ]
 
 
-def test_sandbox_runner_with_workflow_trigger_id(mock_logger):
+def test_sandbox_runner_with_workflow_trigger(mock_logger):
     """
-    Test that WorkflowSandboxRunner can run with DatasetRow containing workflow_trigger_id.
+    Test that WorkflowSandboxRunner can run with DatasetRow containing workflow_trigger.
     """
 
     # GIVEN we capture the logs to stdout
     logs = []
     mock_logger.return_value.info.side_effect = lambda msg: logs.append(msg)
 
-    class Inputs(BaseInputs):
-        message: str
+    class MySchedule(ScheduleTrigger):
+        class Config(ScheduleTrigger.Config):
+            cron = "* * * * *"
+            timezone = "UTC"
 
     class StartNode(BaseNode):
         class Outputs(BaseNode.Outputs):
-            result = Inputs.message
+            result = MySchedule.current_run_at
 
-    class Workflow(BaseWorkflow[Inputs, BaseState]):
-        graph = StartNode
+    class Workflow(BaseWorkflow):
+        graph = MySchedule >> StartNode
 
         class Outputs(BaseWorkflow.Outputs):
             final_output = StartNode.Outputs.result
 
-    # AND a workflow trigger ID
-    trigger_id = uuid4()
-
-    # AND a dataset with workflow_trigger_id
+    # AND a dataset with workflow_trigger
     dataset = [
-        DatasetRow(label="test_row", inputs={"message": "Hello with trigger"}, workflow_trigger_id=trigger_id),
+        DatasetRow(
+            label="test_row",
+            inputs={"current_run_at": datetime.min, "next_run_at": datetime.now()},
+            workflow_trigger=MySchedule,
+        ),
     ]
 
-    # WHEN we run the sandbox with the DatasetRow containing workflow_trigger_id
+    # WHEN we run the sandbox with the DatasetRow containing workflow_trigger
     runner = WorkflowSandboxRunner(workflow=Workflow(), dataset=dataset)
     runner.run()
 
@@ -143,8 +147,8 @@ def test_sandbox_runner_with_workflow_trigger_id(mock_logger):
         "Just finished Node: StartNode",
         "Workflow fulfilled!",
         "----------------------------------",
-        "final_output: Hello with trigger",
+        "final_output: 0001-01-01 00:00:00",
     ]
 
-    # AND the dataset row should still have the trigger ID
-    assert dataset[0].workflow_trigger_id == trigger_id
+    # AND the dataset row should still have the trigger class
+    assert dataset[0].workflow_trigger == MySchedule

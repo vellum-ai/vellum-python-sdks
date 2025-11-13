@@ -1,4 +1,4 @@
-from typing import Any, Dict, Generic, Optional, Sequence, Union
+from typing import Any, Dict, Generic, Optional, Sequence, Type, Union
 
 import dotenv
 
@@ -6,6 +6,7 @@ from vellum.workflows.events.workflow import WorkflowEventStream
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.inputs.dataset_row import DatasetRow
 from vellum.workflows.logging import load_logger
+from vellum.workflows.triggers.base import BaseTrigger
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.workflows.event_filters import root_workflow_event_filter
 
@@ -52,8 +53,10 @@ class WorkflowSandboxRunner(Generic[WorkflowType]):
         selected_inputs = self._inputs[index]
 
         raw_inputs: Union[BaseInputs, Dict[str, Any]]
+        trigger_class: Optional[Type[BaseTrigger]] = None
         if isinstance(selected_inputs, DatasetRow):
             raw_inputs = selected_inputs.inputs
+            trigger_class = selected_inputs.workflow_trigger
         else:
             raw_inputs = selected_inputs
 
@@ -64,9 +67,15 @@ class WorkflowSandboxRunner(Generic[WorkflowType]):
         else:
             inputs_for_stream = raw_inputs
 
+        trigger_instance: Optional[BaseTrigger] = None
+        if trigger_class is not None:
+            # Instantiate the trigger with the inputs
+            trigger_instance = trigger_class(**raw_inputs) if isinstance(raw_inputs, dict) else trigger_class()
+
         events = self._workflow.stream(
             inputs=inputs_for_stream,
             event_filter=root_workflow_event_filter,
+            trigger=trigger_instance,
         )
 
         self._process_events(events)
