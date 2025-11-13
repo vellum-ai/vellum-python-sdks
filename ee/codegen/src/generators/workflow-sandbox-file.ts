@@ -10,6 +10,7 @@ import {
 } from "src/types/vellum";
 import { removeEscapeCharacters } from "src/utils/casing";
 import { getGeneratedInputsModulePath } from "src/utils/paths";
+import { getTriggerClassInfo } from "src/utils/triggers";
 
 export declare namespace WorkflowSandboxFile {
   interface Args extends BasePersistedFile.Args {
@@ -98,6 +99,9 @@ if __name__ == "__main__":
     const label: string = Array.isArray(row)
       ? `Example ${index + 1}`
       : row.label;
+    const workflowTriggerId: string | undefined = Array.isArray(row)
+      ? undefined
+      : row.workflow_trigger_id;
 
     const hasInputs = inputs.length > 0;
     const arguments_: python.MethodArgument[] = [
@@ -147,12 +151,53 @@ if __name__ == "__main__":
       );
     }
 
+    if (!isNil(workflowTriggerId)) {
+      const triggerReference = this.getTriggerReference(workflowTriggerId);
+
+      if (triggerReference) {
+        arguments_.push(
+          python.methodArgument({
+            name: "trigger",
+            value: triggerReference,
+          })
+        );
+      }
+    }
+
     return python.instantiateClass({
       classReference: python.reference({
         name: "DatasetRow",
         modulePath: ["vellum", "workflows", "inputs"],
       }),
       arguments_,
+    });
+  }
+
+  private getTriggerReference(
+    workflowTriggerId: string
+  ): python.Reference | undefined {
+    const triggerContext =
+      this.workflowContext.findTriggerContext(workflowTriggerId);
+
+    if (triggerContext) {
+      return python.reference({
+        name: triggerContext.triggerClassName,
+        modulePath: triggerContext.triggerModulePath,
+      });
+    }
+
+    const triggers = this.workflowContext.triggers ?? [];
+    const trigger = triggers.find((t) => t.id === workflowTriggerId);
+
+    if (!trigger) {
+      return undefined;
+    }
+
+    const triggerClassInfo = getTriggerClassInfo(trigger, this.workflowContext);
+
+    return python.reference({
+      name: triggerClassInfo.className,
+      modulePath: triggerClassInfo.modulePath,
     });
   }
 }

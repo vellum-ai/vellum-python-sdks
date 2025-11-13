@@ -6,7 +6,11 @@ import { workflowContextFactory } from "./helpers";
 import { inputVariableContextFactory } from "./helpers/input-variable-context-factory";
 
 import * as codegen from "src/codegen";
-import { WorkflowSandboxDatasetRow } from "src/types/vellum";
+import {
+  WorkflowSandboxDatasetRow,
+  WorkflowTrigger,
+  WorkflowTriggerType,
+} from "src/types/vellum";
 
 describe("Workflow Sandbox", () => {
   const generateSandboxFile = async (
@@ -171,6 +175,75 @@ describe("Workflow Sandbox", () => {
       expect(result).toMatchSnapshot();
       expect(result).toContain('DatasetRow(label="Test Label Only")');
       expect(result).not.toContain("inputs=");
+    });
+
+    it("should generate DatasetRow with trigger when workflow_trigger_id is provided", async () => {
+      const writer = new Writer();
+      const triggerId = "550e8400-e29b-41d4-a716-446655440000";
+      const triggers: WorkflowTrigger[] = [
+        {
+          id: triggerId,
+          type: WorkflowTriggerType.SCHEDULED,
+          attributes: [],
+          cron: "* * * * *",
+          timezone: "UTC",
+        },
+      ];
+      const uniqueWorkflowContext = workflowContextFactory({ triggers });
+      const inputVariable: VellumVariable = {
+        id: "1",
+        key: "test_input",
+        type: "STRING",
+      };
+
+      uniqueWorkflowContext.addInputVariableContext(
+        inputVariableContextFactory({
+          inputVariableData: inputVariable,
+          workflowContext: uniqueWorkflowContext,
+        })
+      );
+
+      const sandboxInputs: WorkflowSandboxDatasetRow[] = [
+        {
+          label: "Scenario with Trigger ID",
+          inputs: [
+            {
+              name: inputVariable.key,
+              type: "STRING",
+              value: "test-value",
+            },
+          ],
+          workflow_trigger_id: triggerId,
+        },
+        {
+          label: "Scenario without Trigger ID",
+          inputs: [
+            {
+              name: inputVariable.key,
+              type: "STRING",
+              value: "test-value-2",
+            },
+          ],
+        },
+      ];
+
+      const sandbox = codegen.workflowSandboxFile({
+        workflowContext: uniqueWorkflowContext,
+        sandboxInputs,
+      });
+
+      sandbox.write(writer);
+      const result = await writer.toStringFormatted();
+
+      expect(result).toMatchSnapshot();
+      expect(result).toContain("trigger=ScheduleTrigger");
+      const lines = result.split("\n");
+      const secondDatasetRowIndex = lines.findIndex((line) =>
+        line.includes('label="Scenario without Trigger ID"')
+      );
+      expect(secondDatasetRowIndex).toBeGreaterThan(-1);
+      const secondDatasetRowLine = lines[secondDatasetRowIndex];
+      expect(secondDatasetRowLine).not.toContain("trigger=");
     });
   });
 });
