@@ -623,3 +623,78 @@ def test_base_workflow_display__graph_with_trigger_and_regular_node():
     trigger_edge = trigger_edges[0]
     assert isinstance(trigger_edge, dict)
     assert trigger_edge["target_node_id"] == bottom_node_id, "Trigger edge should connect to BottomNode"
+
+
+def test_serialize_subworkflow_output_reference_without_display():
+    """
+    Tests that a workflow with a subworkflow node followed by a generic node
+    that references the subworkflow output can be serialized correctly without a display directory.
+    """
+
+    # GIVEN a workflow module with a subworkflow node and a follow-on node
+    module_path = "tests.workflows.subworkflow_output_reference_without_display"
+
+    # WHEN we serialize the module
+    result = BaseWorkflowDisplay.serialize_module(module_path)
+
+    # THEN it should serialize successfully
+    assert hasattr(result, "exec_config")
+    assert hasattr(result, "errors")
+    assert isinstance(result.exec_config, dict)
+    assert isinstance(result.errors, list)
+    assert "workflow_raw_data" in result.exec_config
+
+    # AND the workflow should have the expected nodes
+    workflow_raw_data = result.exec_config["workflow_raw_data"]
+    assert isinstance(workflow_raw_data, dict)
+    nodes = workflow_raw_data.get("nodes")
+    assert isinstance(nodes, list)
+
+    subworkflow_node = None
+    followon_node = None
+    for node in nodes:
+        if isinstance(node, dict):
+            definition = node.get("definition")
+            if isinstance(definition, dict):
+                name = definition.get("name")
+                if name == "SubworkflowNodeExample":
+                    subworkflow_node = node
+                elif name == "FollowOnNode":
+                    followon_node = node
+
+    assert subworkflow_node is not None, "SubworkflowNodeExample not found in serialized nodes"
+    assert followon_node is not None, "FollowOnNode not found in serialized nodes"
+
+    # AND the subworkflow node should have output variables
+    subworkflow_data = subworkflow_node.get("data", {})
+    subworkflow_outputs = subworkflow_data.get("output_variables", [])
+    assert len(subworkflow_outputs) > 0, "SubworkflowNodeExample should have output variables"
+
+    result_output = next((out for out in subworkflow_outputs if out.get("key") == "result"), None)
+    assert result_output is not None, "SubworkflowNodeExample should have 'result' output"
+    expected_output_id = result_output["id"]
+
+    # AND the follow-on node should have an attribute that references the subworkflow output
+    followon_attributes = followon_node.get("attributes", [])
+    assert len(followon_attributes) > 0, "FollowOnNode should have attributes"
+
+    input_value_attr = None
+    for attr in followon_attributes:
+        if isinstance(attr, dict) and attr.get("name") == "input_value":
+            input_value_attr = attr
+            break
+
+    assert input_value_attr is not None, "input_value attribute not found in FollowOnNode"
+
+    # AND the attribute value should reference the subworkflow node's output
+    value = input_value_attr.get("value")
+    assert isinstance(value, dict)
+    assert value.get("type") == "NODE_OUTPUT"
+    assert value.get("node_id") == subworkflow_node.get("id")
+
+    # AND the node_output_id should match the actual output ID from the subworkflow
+    actual_output_id = value.get("node_output_id")
+    assert actual_output_id == expected_output_id, (
+        f"node_output_id mismatch: expected {expected_output_id}, got {actual_output_id}. "
+        "The reference to the subworkflow output is broken."
+    )

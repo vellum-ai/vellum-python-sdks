@@ -777,6 +777,35 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             inner_node_display = self._get_node_display(inner_node)
             self._enrich_global_node_output_displays(inner_node, inner_node_display, node_output_displays)
 
+        from vellum.workflows.constants import undefined
+        from vellum.workflows.nodes import InlineSubworkflowNode
+        from vellum.workflows.types.generics import is_workflow_class
+        from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
+        from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
+
+        if issubclass(node, InlineSubworkflowNode):
+            subworkflow_class = raise_if_descriptor(node.subworkflow)
+            if subworkflow_class is not undefined and is_workflow_class(subworkflow_class):
+                subworkflow_display = get_workflow_display(
+                    workflow_class=subworkflow_class,
+                    parent_display_context=self._parent_display_context,
+                )
+
+                for node_output in node.Outputs:
+                    if node_output in node_output_displays:
+                        continue
+
+                    for subworkflow_output_descriptor in subworkflow_class.Outputs:  # type: ignore[union-attr]
+                        if subworkflow_output_descriptor.name == node_output.name:
+                            workflow_output_display = subworkflow_display.display_context.workflow_output_displays[
+                                subworkflow_output_descriptor
+                            ]
+                            node_output_displays[node_output] = NodeOutputDisplay(
+                                id=workflow_output_display.id, name=node_output.name
+                            )
+                            break
+                return
+
         for node_output in node.Outputs:
             if node_output in node_output_displays:
                 continue
