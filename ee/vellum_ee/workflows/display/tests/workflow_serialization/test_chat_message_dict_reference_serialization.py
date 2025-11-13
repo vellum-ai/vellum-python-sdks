@@ -36,15 +36,25 @@ def test_serialize_chat_message_dict_reference_with_definition():
     serialized_workflow = workflow_display.serialize()
 
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
+    assert isinstance(workflow_raw_data, dict)
+    nodes = workflow_raw_data["nodes"]
+    assert isinstance(nodes, list)
+
     set_state_node = next(
         node
-        for node in workflow_raw_data["nodes"]
-        if node.get("type") == "GENERIC" and node.get("label") == "Store User Message"
+        for node in nodes
+        if isinstance(node, dict) and node.get("type") == "GENERIC" and node.get("label") == "Store User Message"
     )
 
+    assert isinstance(set_state_node, dict)
+    assert "attributes" in set_state_node
+    attributes = set_state_node["attributes"]
+    assert isinstance(attributes, list)
+
     operations_attribute = next(
-        attribute for attribute in set_state_node["attributes"] if attribute["name"] == "operations"
+        attribute for attribute in attributes if isinstance(attribute, dict) and attribute.get("name") == "operations"
     )
+    assert isinstance(operations_attribute, dict)
 
     assert operations_attribute == {
         "id": "b1a79be0-9b4f-4236-aaba-a0ebd56e2079",
