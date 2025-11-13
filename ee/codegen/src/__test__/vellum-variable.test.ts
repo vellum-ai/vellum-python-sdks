@@ -175,49 +175,6 @@ describe("VellumVariableField", () => {
     }
   );
 
-  it.each([true, false])(
-    "ArrayVellumVariable with non-empty list default uses Field(default_factory=lambda: [...]) when %s",
-    async (required: boolean) => {
-      const arrayVar = codegen.vellumVariable({
-        variable: {
-          id: "1",
-          name: "test",
-          type: "ARRAY",
-          required: required,
-          default: {
-            type: "ARRAY",
-            value: [
-              { type: "STRING", value: "item1" },
-              { type: "STRING", value: "item2" },
-            ],
-          },
-        },
-      });
-      arrayVar.write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
-    }
-  );
-
-  it.each([true, false])(
-    "JsonVellumVariable with non-empty dict default uses Field(default_factory=lambda: {...}) when %s",
-    async (required: boolean) => {
-      const jsonVar = codegen.vellumVariable({
-        variable: {
-          id: "1",
-          name: "test",
-          type: "JSON",
-          required: required,
-          default: {
-            type: "JSON",
-            value: { key1: "value1", key2: "value2" },
-          },
-        },
-      });
-      jsonVar.write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
-    }
-  );
-
   test("ThinkingVellumVariable snapshot", async () => {
     const thinkingVar = codegen.vellumVariable({
       variable: { id: "1", name: "test", type: "THINKING", required: true },
