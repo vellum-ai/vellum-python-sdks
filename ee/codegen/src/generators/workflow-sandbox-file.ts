@@ -10,6 +10,7 @@ import {
 } from "src/types/vellum";
 import { removeEscapeCharacters } from "src/utils/casing";
 import { getGeneratedInputsModulePath } from "src/utils/paths";
+import { getTriggerClassInfo } from "src/utils/triggers";
 
 export declare namespace WorkflowSandboxFile {
   interface Args extends BasePersistedFile.Args {
@@ -151,12 +152,16 @@ if __name__ == "__main__":
     }
 
     if (!isNil(workflowTriggerId)) {
-      arguments_.push(
-        python.methodArgument({
-          name: "workflow_trigger_id",
-          value: python.TypeInstantiation.uuid(workflowTriggerId),
-        })
-      );
+      const triggerReference = this.getTriggerReference(workflowTriggerId);
+
+      if (triggerReference) {
+        arguments_.push(
+          python.methodArgument({
+            name: "trigger",
+            value: triggerReference,
+          })
+        );
+      }
     }
 
     return python.instantiateClass({
@@ -165,6 +170,34 @@ if __name__ == "__main__":
         modulePath: ["vellum", "workflows", "inputs"],
       }),
       arguments_,
+    });
+  }
+
+  private getTriggerReference(
+    workflowTriggerId: string
+  ): python.Reference | undefined {
+    const triggerContext =
+      this.workflowContext.findTriggerContext(workflowTriggerId);
+
+    if (triggerContext) {
+      return python.reference({
+        name: triggerContext.triggerClassName,
+        modulePath: triggerContext.triggerModulePath,
+      });
+    }
+
+    const triggers = this.workflowContext.triggers ?? [];
+    const trigger = triggers.find((t) => t.id === workflowTriggerId);
+
+    if (!trigger) {
+      return undefined;
+    }
+
+    const triggerClassInfo = getTriggerClassInfo(trigger, this.workflowContext);
+
+    return python.reference({
+      name: triggerClassInfo.className,
+      modulePath: triggerClassInfo.modulePath,
     });
   }
 }
