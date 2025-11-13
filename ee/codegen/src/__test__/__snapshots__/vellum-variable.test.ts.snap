@@ -15,6 +15,26 @@ exports[`VellumVariableField > ArrayVellumVariable with empty list default uses 
 "
 `;
 
+exports[`VellumVariableField > ArrayVellumVariable with non-empty list default uses Field(default_factory=lambda: [...]) when false 1`] = `
+"test: Optional[List[VellumValue]] = Field(
+    default_factory=lambda: [
+        "item1",
+        "item2",
+    ]
+)
+"
+`;
+
+exports[`VellumVariableField > ArrayVellumVariable with non-empty list default uses Field(default_factory=lambda: [...]) when true 1`] = `
+"test: List[VellumValue] = Field(
+    default_factory=lambda: [
+        "item1",
+        "item2",
+    ]
+)
+"
+`;
+
 exports[`VellumVariableField > AudioVellumVariable snapshot 1`] = `
 "test: VellumAudio
 "
@@ -57,6 +77,26 @@ exports[`VellumVariableField > JsonVellumVariable with empty dict default uses F
 
 exports[`VellumVariableField > JsonVellumVariable with empty dict default uses Field(default_factory=dict) when true 1`] = `
 "test: Any = Field(default_factory=dict)
+"
+`;
+
+exports[`VellumVariableField > JsonVellumVariable with non-empty dict default uses Field(default_factory=lambda: {...}) when false 1`] = `
+"test: Optional[Any] = Field(
+    default_factory=lambda: {
+        "key1": "value1",
+        "key2": "value2",
+    }
+)
+"
+`;
+
+exports[`VellumVariableField > JsonVellumVariable with non-empty dict default uses Field(default_factory=lambda: {...}) when true 1`] = `
+"test: Any = Field(
+    default_factory=lambda: {
+        "key1": "value1",
+        "key2": "value2",
+    }
+)
 "
 `;
 
