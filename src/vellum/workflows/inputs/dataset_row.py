@@ -1,9 +1,10 @@
-from typing import Any, Dict, Union
+from typing import Any, Dict, Optional, Type, Union
 
 from pydantic import Field, field_serializer
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.inputs.base import BaseInputs
+from vellum.workflows.triggers import BaseTrigger
 
 
 class DatasetRow(UniversalBaseModel):
@@ -13,10 +14,12 @@ class DatasetRow(UniversalBaseModel):
     Attributes:
         label: String label for the dataset row
         inputs: BaseInputs instance or dict containing the input data
+        workflow_trigger_id: Optional Trigger identifying the workflow trigger class for this scenario
     """
 
     label: str
     inputs: Union[BaseInputs, Dict[str, Any]] = Field(default_factory=BaseInputs)
+    workflow_trigger: Optional[Type[BaseTrigger]] = None
 
     @field_serializer("inputs")
     def serialize_inputs(self, inputs: Union[BaseInputs, Dict[str, Any]]) -> Dict[str, Any]:
