@@ -1,5 +1,4 @@
 from vellum.workflows import BaseWorkflow
-from vellum.workflows.constants import undefined
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable import FinalOutputNode
 from vellum.workflows.state import BaseState
@@ -9,10 +8,10 @@ class UndefinedOutputNode(BaseNode):
     """Node that returns an undefined output."""
 
     class Outputs(BaseNode.Outputs):
-        result = undefined
+        result: dict
 
     def run(self) -> Outputs:
-        return self.Outputs()
+        return self.Outputs()  # type: ignore[call-arg]
 
 
 class JsonAccessNode(FinalOutputNode[BaseState, str]):
