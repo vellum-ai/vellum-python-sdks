@@ -59,8 +59,8 @@ def test_base_inputs_with_field_default_factory_empty_list():
 
     # GIVEN some input class with Field(default_factory=list) for JSON array
     class TestInputs(BaseInputs):
-        json_array_input: Any = Field(default_factory=list)
-        array_input: list[str] = Field(default_factory=list)
+        json_array_input: Any = Field(default_factory=list)  # type: ignore[arg-type]
+        array_input: list[str] = Field(default_factory=list)  # type: ignore[arg-type]
 
     # WHEN we create two instances without providing values
     inputs1 = TestInputs()
@@ -114,7 +114,7 @@ def test_base_inputs_with_field_default_factory_empty_dict():
 
     # GIVEN some input class with Field(default_factory=dict) for JSON dict
     class TestInputs(BaseInputs):
-        json_dict_input: Any = Field(default_factory=dict)
+        json_dict_input: Any = Field(default_factory=dict)  # type: ignore[arg-type]
 
     # WHEN we create two instances without providing values
     inputs1 = TestInputs()

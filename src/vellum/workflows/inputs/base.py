@@ -98,7 +98,7 @@ class BaseInputs(metaclass=_BaseInputsMeta):
                 if isinstance(default_value, FieldInfo):
                     if default_value.default_factory is not None:
                         # Call the factory function to create a new instance
-                        value = default_value.default_factory()
+                        value = default_value.default_factory()  # type: ignore[call-arg]
                     elif hasattr(default_value, "default") and default_value.default is not ...:
                         # Use the default value directly
                         value = default_value.default
