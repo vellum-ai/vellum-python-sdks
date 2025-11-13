@@ -819,6 +819,157 @@ describe("WorkflowProjectGenerator", () => {
       });
     });
 
+    it("should not generate metadata.json for inline subworkflows", async () => {
+      // GIVEN a workflow with an inline subworkflow
+      const displayData = {
+        workflow_raw_data: {
+          nodes: [
+            {
+              id: "entry",
+              type: "ENTRYPOINT",
+              data: {
+                label: "Entrypoint",
+                source_handle_id: "entry_source",
+                target_handle_id: "entry_target",
+              },
+              inputs: [],
+            },
+            {
+              id: "subworkflow-node",
+              type: "SUBWORKFLOW",
+              data: {
+                workflow_raw_data: {
+                  nodes: [
+                    {
+                      id: "subworkflow-entry",
+                      type: "ENTRYPOINT",
+                      data: {
+                        label: "Subworkflow Entrypoint",
+                        source_handle_id: "subworkflow_entry_source",
+                      },
+                      inputs: [],
+                    },
+                    {
+                      id: "subworkflow-templating",
+                      type: "TEMPLATING",
+                      data: {
+                        label: "Templating Node",
+                        template_node_input_id: "subworkflow_template",
+                        output_id: "subworkflow_output",
+                        output_type: "STRING",
+                        source_handle_id: "subworkflow_templating_source",
+                        target_handle_id: "subworkflow_templating_target",
+                      },
+                      inputs: [
+                        {
+                          id: "subworkflow_template",
+                          key: "template",
+                          value: {
+                            combinator: "OR",
+                            rules: [
+                              {
+                                type: "CONSTANT_VALUE",
+                                data: {
+                                  type: "STRING",
+                                  value: "Subworkflow result",
+                                },
+                              },
+                            ],
+                          },
+                        },
+                      ],
+                      definition: {
+                        name: "TemplatingNode",
+                        module: [
+                          "code",
+                          "nodes",
+                          "subworkflow_node",
+                          "nodes",
+                          "templating_node",
+                        ],
+                      },
+                    },
+                  ],
+                  edges: [
+                    {
+                      source_node_id: "subworkflow-entry",
+                      source_handle_id: "subworkflow_entry_source",
+                      target_node_id: "subworkflow-templating",
+                      target_handle_id: "subworkflow_templating_target",
+                      type: "DEFAULT",
+                      id: "subworkflow_edge_1",
+                    },
+                  ],
+                  definition: {
+                    name: "SubworkflowNodeWorkflow",
+                    module: ["code", "nodes", "subworkflow_node", "workflow"],
+                  },
+                  output_values: [],
+                },
+                input_variables: [],
+                output_variables: [],
+                label: "Inline Subworkflow",
+                source_handle_id: "subworkflow_source",
+                target_handle_id: "subworkflow_target",
+                variant: "INLINE",
+              },
+              inputs: [],
+              definition: {
+                name: "SubworkflowNode",
+                module: ["code", "nodes", "subworkflow_node"],
+              },
+              trigger: {
+                id: "subworkflow_target",
+                merge_behavior: "AWAIT_ATTRIBUTES",
+              },
+              ports: [
+                {
+                  id: "subworkflow_source",
+                  name: "default",
+                  type: "DEFAULT",
+                },
+              ],
+            },
+          ],
+          edges: [
+            {
+              source_node_id: "entry",
+              source_handle_id: "entry_source",
+              target_node_id: "subworkflow-node",
+              target_handle_id: "subworkflow_target",
+              type: "DEFAULT",
+              id: "edge_1",
+            },
+          ],
+        },
+        input_variables: [],
+        state_variables: [],
+        output_variables: [],
+      };
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+      });
+
+      await project.generateCode();
+
+      const mainMetadataPath = join(tempDir, "code", "metadata.json");
+      expect(fs.existsSync(mainMetadataPath)).toBe(true);
+
+      // AND metadata.json should NOT exist for the inline subworkflow
+      const subworkflowMetadataPath = join(
+        tempDir,
+        "code",
+        "nodes",
+        "subworkflow_node",
+        "metadata.json"
+      );
+      expect(fs.existsSync(subworkflowMetadataPath)).toBe(false);
+    });
+
     it("should generate metadata.json with complex entrypoint/trigger/node edge id mappings", async () => {
       // Graph:
       //   ENTRYPOINT -> Custom -> { Custom2, Custom3 } -> FinalOutput
