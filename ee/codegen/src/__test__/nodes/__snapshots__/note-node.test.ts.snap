@@ -30,3 +30,30 @@ class NoteNode(BaseNoteNode):
     pass
 "
 `;
+
+exports[`NoteNode > should have a pass > getNodeDisplayFile 1`] = `
+"from uuid import UUID
+
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.nodes import BaseNoteNodeDisplay
+
+from ...nodes.note import Note
+
+
+class NoteDisplay(BaseNoteNodeDisplay[Note]):
+    label = "Note"
+    node_id = UUID("<note-node-id>")
+    text = "test-text"
+    style = None
+    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
+"
+`;
+
+exports[`NoteNode > should have a pass > getNodeFile 1`] = `
+"from vellum.workflows.nodes.displayable import NoteNode
+
+
+class Note(NoteNode):
+    pass
+"
+`;

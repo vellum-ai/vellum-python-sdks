@@ -9,8 +9,8 @@ import { NoteNode as NoteNodeType } from "src/types/vellum";
 
 export class NoteNode extends BaseNode<NoteNodeType, NoteNodeContext> {
   getNodeClassBodyStatements(): AstNode[] {
-    // Note Nodes intentionally have no body statements.
-    return [];
+    // Note Nodes intentionally have no body statements, but Python requires at least one statement.
+    return [python.codeBlock("pass")];
   }
 
   getNodeDisplayClassBodyStatements(): AstNode[] {
