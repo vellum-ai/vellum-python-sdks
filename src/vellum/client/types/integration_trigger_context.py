@@ -12,6 +12,7 @@ class IntegrationTriggerContext(UniversalBaseModel):
     parent: typing.Optional["ParentContext"] = None
     links: typing.Optional[typing.List["SpanLink"]] = None
     type: typing.Literal["INTEGRATION"] = "INTEGRATION"
+    trigger_id: typing.Optional[str] = None
     span_id: str
 
     if IS_PYDANTIC_V2:

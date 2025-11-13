@@ -57,6 +57,7 @@ IntegrationName = typing.Union[
         "PEOPLEDATALABS",
         "PERPLEXITY",
         "POSTHOG",
+        "PRODUCTBOARD",
         "REDDIT",
         "SEMRUSH",
         "SEMANTICSCHOLAR",

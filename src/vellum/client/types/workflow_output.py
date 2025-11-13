@@ -3,7 +3,9 @@
 import typing
 
 from .workflow_output_array import WorkflowOutputArray
+from .workflow_output_audio import WorkflowOutputAudio
 from .workflow_output_chat_history import WorkflowOutputChatHistory
+from .workflow_output_document import WorkflowOutputDocument
 from .workflow_output_error import WorkflowOutputError
 from .workflow_output_function_call import WorkflowOutputFunctionCall
 from .workflow_output_image import WorkflowOutputImage
@@ -11,6 +13,7 @@ from .workflow_output_json import WorkflowOutputJson
 from .workflow_output_number import WorkflowOutputNumber
 from .workflow_output_search_results import WorkflowOutputSearchResults
 from .workflow_output_string import WorkflowOutputString
+from .workflow_output_video import WorkflowOutputVideo
 
 WorkflowOutput = typing.Union[
     WorkflowOutputString,
@@ -22,4 +25,7 @@ WorkflowOutput = typing.Union[
     WorkflowOutputError,
     WorkflowOutputFunctionCall,
     WorkflowOutputImage,
+    WorkflowOutputAudio,
+    WorkflowOutputVideo,
+    WorkflowOutputDocument,
 ]

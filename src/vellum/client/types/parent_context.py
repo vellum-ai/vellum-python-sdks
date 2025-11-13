@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import typing
+from pydantic import Field
 
 if typing.TYPE_CHECKING:
     from .api_request_parent_context import ApiRequestParentContext
@@ -14,14 +15,17 @@ if typing.TYPE_CHECKING:
     from .workflow_deployment_parent_context import WorkflowDeploymentParentContext
     from .workflow_parent_context import WorkflowParentContext
     from .workflow_sandbox_parent_context import WorkflowSandboxParentContext
-ParentContext = typing.Union[
-    "WorkflowParentContext",
-    "NodeParentContext",
-    "WorkflowDeploymentParentContext",
-    "WorkflowSandboxParentContext",
-    "PromptDeploymentParentContext",
-    "ApiRequestParentContext",
-    "ExternalParentContext",
-    "ScheduledTriggerContext",
-    "IntegrationTriggerContext",
+ParentContext = typing.Annotated[
+    typing.Union[
+        "WorkflowParentContext",
+        "NodeParentContext",
+        "WorkflowDeploymentParentContext",
+        "WorkflowSandboxParentContext",
+        "PromptDeploymentParentContext",
+        "ApiRequestParentContext",
+        "ExternalParentContext",
+        "ScheduledTriggerContext",
+        "IntegrationTriggerContext",
+    ],
+    Field(discriminator="type")
 ]

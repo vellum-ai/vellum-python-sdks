@@ -4,12 +4,22 @@ import typing
 
 import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
+from .vellum_document import VellumDocument
 
 
-class BaseOutput(UniversalBaseModel):
-    value: typing.Optional[typing.Optional[typing.Any]] = None
-    delta: typing.Optional[typing.Optional[typing.Any]] = None
-    name: str
+class WorkflowOutputDocument(UniversalBaseModel):
+    """
+    A document output from a Workflow execution.
+    """
+
+    id: str
+    name: str = pydantic.Field()
+    """
+    The output's name, as defined in the workflow
+    """
+
+    type: typing.Literal["DOCUMENT"] = "DOCUMENT"
+    value: typing.Optional[VellumDocument] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

@@ -691,7 +691,9 @@ from .workflow_node_result_event import WorkflowNodeResultEvent
 from .workflow_node_result_event_state import WorkflowNodeResultEventState
 from .workflow_output import WorkflowOutput
 from .workflow_output_array import WorkflowOutputArray
+from .workflow_output_audio import WorkflowOutputAudio
 from .workflow_output_chat_history import WorkflowOutputChatHistory
+from .workflow_output_document import WorkflowOutputDocument
 from .workflow_output_error import WorkflowOutputError
 from .workflow_output_function_call import WorkflowOutputFunctionCall
 from .workflow_output_image import WorkflowOutputImage
@@ -699,6 +701,7 @@ from .workflow_output_json import WorkflowOutputJson
 from .workflow_output_number import WorkflowOutputNumber
 from .workflow_output_search_results import WorkflowOutputSearchResults
 from .workflow_output_string import WorkflowOutputString
+from .workflow_output_video import WorkflowOutputVideo
 from .workflow_parent_context import WorkflowParentContext
 from .workflow_push_deployment_config_request import WorkflowPushDeploymentConfigRequest
 from .workflow_push_exec_config import WorkflowPushExecConfig
@@ -1395,7 +1398,9 @@ __all__ = [
     "WorkflowNodeResultEventState",
     "WorkflowOutput",
     "WorkflowOutputArray",
+    "WorkflowOutputAudio",
     "WorkflowOutputChatHistory",
+    "WorkflowOutputDocument",
     "WorkflowOutputError",
     "WorkflowOutputFunctionCall",
     "WorkflowOutputImage",
@@ -1403,6 +1408,7 @@ __all__ = [
     "WorkflowOutputNumber",
     "WorkflowOutputSearchResults",
     "WorkflowOutputString",
+    "WorkflowOutputVideo",
     "WorkflowParentContext",
     "WorkflowPushDeploymentConfigRequest",
     "WorkflowPushExecConfig",

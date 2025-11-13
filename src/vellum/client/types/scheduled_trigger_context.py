@@ -12,6 +12,7 @@ class ScheduledTriggerContext(UniversalBaseModel):
     parent: typing.Optional["ParentContext"] = None
     links: typing.Optional[typing.List["SpanLink"]] = None
     type: typing.Literal["SCHEDULED"] = "SCHEDULED"
+    trigger_id: typing.Optional[str] = None
     span_id: str
 
     if IS_PYDANTIC_V2:
