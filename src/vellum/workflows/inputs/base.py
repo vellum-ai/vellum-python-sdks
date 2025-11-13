@@ -2,6 +2,7 @@ from typing import Any, Dict, Iterator, Set, Tuple, Type, Union, get_args, get_o
 from typing_extensions import dataclass_transform
 
 from pydantic import GetCoreSchemaHandler
+from pydantic.fields import FieldInfo
 from pydantic_core import core_schema
 
 from vellum.workflows.constants import undefined
@@ -90,6 +91,21 @@ class BaseInputs(metaclass=_BaseInputsMeta):
             value = kwargs.get(name)
             has_default = name in vars(self.__class__)
 
+            # If no value provided, check for default
+            if value is None and has_default:
+                default_value = vars(self.__class__)[name]
+                # Check if default is a FieldInfo with default_factory
+                if isinstance(default_value, FieldInfo):
+                    if default_value.default_factory is not None:
+                        # Call the factory function to create a new instance
+                        value = default_value.default_factory()
+                    elif hasattr(default_value, "default") and default_value.default is not ...:
+                        # Use the default value directly
+                        value = default_value.default
+                else:
+                    # Regular default value
+                    value = default_value
+
             if value is None and not has_default:
                 # Check if field_type allows None
                 origin = get_origin(field_type)
@@ -101,8 +117,8 @@ class BaseInputs(metaclass=_BaseInputsMeta):
                         workflow_definition=self.__class__.__parent_class__,
                     )
 
-            # If value provided in kwargs, set it on the instance
-            if name in kwargs:
+            # Set the value on the instance (either from kwargs or default)
+            if name in kwargs or (has_default and value is not None):
                 setattr(self, name, value)
 
     def __iter__(self) -> Iterator[Tuple[InputReference, Any]]:
