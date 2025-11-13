@@ -1,4 +1,5 @@
 import dataclasses
+from functools import lru_cache
 import inspect
 from typing import TYPE_CHECKING, Annotated, Any, Callable, List, Literal, Optional, Type, Union, get_args, get_origin
 
@@ -277,6 +278,7 @@ def get_mcp_tool_name(tool_def: MCPToolDefinition) -> str:
     return f"{server_name}__{tool_def.name}"
 
 
+@lru_cache(maxsize=1)
 def compile_mcp_tool_definition(server_def: MCPServer) -> List[MCPToolDefinition]:
     """Hydrate an MCPToolDefinition with detailed information from the MCP server.
 
