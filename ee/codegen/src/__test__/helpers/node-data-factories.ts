@@ -366,6 +366,7 @@ export function noteNodeDataFactory(): NodeDataFactoryBuilder<NoteNode> {
         fontWeight: "bold",
       },
     },
+    displayData: {},
   };
   return new NodeDataFactoryBuilder<NoteNode>(nodeData);
 }
