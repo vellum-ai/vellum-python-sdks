@@ -913,11 +913,13 @@ export const DictionaryWorkflowReferenceSerializer: ObjectSchema<
   Omit<DictionaryWorkflowReference, "type">
 > = objectSchema({
   entries: listSchema(DictionaryWorkflowReferenceEntrySerializer),
+  definition: CodeResourceDefinitionSerializer.nullable().optional(),
 });
 
 export declare namespace DictionaryWorkflowReferenceSerializer {
   interface Raw {
     entries: DictionaryWorkflowReferenceEntrySerializer.Raw[];
+    definition?: CodeResourceDefinitionSerializer.Raw | null;
   }
 }
 
