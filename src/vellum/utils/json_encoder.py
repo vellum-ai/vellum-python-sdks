@@ -7,6 +7,14 @@ from uuid import UUID
 from typing import Any, Callable, Dict, Protocol, Type
 
 from pydantic import BaseModel
+from pydantic.fields import FieldInfo
+from pydantic_core import PydanticUndefined
+
+# Handle Pydantic v1 compatibility
+try:
+    from pydantic.fields import Undefined as PydanticV1Undefined  # type: ignore[attr-defined]
+except ImportError:
+    PydanticV1Undefined = None  # type: ignore[assignment,misc]
 
 
 class VellumJsonEncodable(Protocol):
@@ -27,6 +35,8 @@ class VellumJsonEncoder(JSONEncoder):
     This encoder supports:
     - Objects implementing VellumJsonEncodable protocol
     - Pydantic BaseModel instances
+    - Pydantic FieldInfo objects (serializes to default value or None)
+    - PydanticUndefined (serializes to None)
     - UUIDs, sets, datetimes, enums
     - Dataclasses and Queue objects
     - Custom encoder registry via encoders dict
@@ -64,6 +74,20 @@ class VellumJsonEncoder(JSONEncoder):
 
         if isinstance(obj, Exception):
             return str(obj)
+
+        # Handle Pydantic FieldInfo objects
+        if isinstance(obj, FieldInfo):
+            # Serialize the default value if it exists and is not undefined (v1 or v2), otherwise None
+            is_undefined = obj.default is PydanticUndefined or (
+                PydanticV1Undefined is not None and obj.default is PydanticV1Undefined
+            )
+            if not is_undefined and obj.default is not None:
+                return obj.default
+            return None
+
+        # Handle PydanticUndefined value
+        if obj is PydanticUndefined:
+            return None
 
         if obj.__class__ in self.encoders:
             return self.encoders[obj.__class__](obj)
