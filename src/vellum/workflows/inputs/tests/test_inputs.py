@@ -37,12 +37,27 @@ def test_base_inputs_explicit_none():
     # WHEN we explicitly pass None for optional fields
     inputs = TestInputs(optional_string=None)
 
-    # THEN None should be set as the value
     assert inputs.optional_string is None
     assert inputs.optional_string_with_default is None
 
 
-def test_base_inputs_explicit_none_should_raise_on_required_fields():
+@pytest.mark.parametrize("field_type", [str, Optional[str]])
+def test_base_inputs_explicit_none_should_raise_on_fields_without_defaults(field_type):
+    """
+    Test that None cannot be explicitly set as a value for required fields.
+    """
+
+    class TestInputs(BaseInputs):
+        required_string: field_type
+
+    with pytest.raises(WorkflowInitializationException) as exc_info:
+        TestInputs()  # type: ignore[call-arg]
+
+    assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
+    assert "Required input variables required_string should have defined value" == str(exc_info.value)
+
+
+def test_base_inputs_explicit_none_should_raise_on_required_fields_with_none():
     """
     Test that None cannot be explicitly set as a value for required fields.
     """
@@ -51,7 +66,7 @@ def test_base_inputs_explicit_none_should_raise_on_required_fields():
         required_string: str
 
     with pytest.raises(WorkflowInitializationException) as exc_info:
-        TestInputs(required_string=None)  # type: ignore
+        TestInputs(required_string=None)  # type: ignore[call-arg]
 
     assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
     assert "Required input variables required_string should have defined value" == str(exc_info.value)
