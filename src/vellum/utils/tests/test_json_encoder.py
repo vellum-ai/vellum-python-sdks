@@ -1,6 +1,6 @@
 import json
 
-from pydantic import Field
+from pydantic import BaseModel, Field
 from pydantic.fields import FieldInfo
 
 from vellum.utils.json_encoder import VellumJsonEncoder
@@ -67,3 +67,26 @@ class TestVellumJsonEncoder:
         # Note: When a FieldInfo has default_factory instead of default,
         # the default attribute will be PydanticUndefined, which should serialize to None.
         assert result == '{"test": null}'
+
+    def test_encode_basemodel_with_default_factory(self):
+        """
+        Tests that BaseModel instances with default_factory fields serialize correctly.
+
+        This demonstrates that when pushing workflows to Vellum, the default_factory
+        values are preserved because Pydantic invokes the factory during model instantiation.
+        """
+
+        class ConfigModel(BaseModel):
+            settings: dict = Field(default_factory=lambda: {"key1": "value1", "key2": "value2"})
+            name: str = "test"
+
+        model_instance = ConfigModel()
+
+        assert model_instance.settings == {"key1": "value1", "key2": "value2"}
+
+        # AND when we serialize the model instance with VellumJsonEncoder
+        result = json.dumps(model_instance, cls=VellumJsonEncoder)
+
+        deserialized = json.loads(result)
+        assert deserialized["settings"] == {"key1": "value1", "key2": "value2"}
+        assert deserialized["name"] == "test"
