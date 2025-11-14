@@ -967,6 +967,7 @@ export interface DictionaryWorkflowReferenceEntry {
 export interface DictionaryWorkflowReference {
   type: "DICTIONARY_REFERENCE";
   entries: DictionaryWorkflowReferenceEntry[];
+  definition?: CodeResourceDefinition | null;
 }
 
 export interface ArrayWorkflowReference {
