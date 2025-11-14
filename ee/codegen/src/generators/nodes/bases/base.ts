@@ -625,7 +625,11 @@ export abstract class BaseNode<
   }
 
   protected getNodeDisplay(): AstNode | undefined {
-    if (this.nodeData.displayData) {
+    // {} is truthy but won't produce any output
+    if (
+      this.nodeData.displayData &&
+      Object.keys(this.nodeData.displayData).length > 0
+    ) {
       return new NodeDisplay({
         nodeDisplayData: this.nodeData.displayData,
         nodeContext: this.nodeContext,
@@ -657,25 +661,36 @@ export abstract class BaseNode<
     });
 
     try {
-      this.getNodeClassBodyStatements().forEach((statement) =>
-        nodeClass.add(statement)
-      );
-      const nodePorts = this.getNodePorts();
+      // statement is private in python.Class
+      // so we need to check if the class has any statements
+      let hasStatements = false;
 
+      this.getNodeClassBodyStatements().forEach((statement) => {
+        nodeClass.add(statement);
+        hasStatements = true;
+      });
+
+      const nodePorts = this.getNodePorts();
       if (nodePorts) {
         nodeClass.add(nodePorts);
+        hasStatements = true;
       }
 
       const nodeDisplay = this.getNodeDisplay();
-
       if (nodeDisplay) {
         nodeClass.add(nodeDisplay);
+        hasStatements = true;
       }
 
       const nodeTriggers = this.getNodeTrigger();
-
       if (nodeTriggers) {
         nodeClass.add(nodeTriggers);
+        hasStatements = true;
+      }
+
+      // Python requires at least one statement in a class body
+      if (!hasStatements) {
+        nodeClass.add(python.codeBlock("pass"));
       }
     } catch (error) {
       if (error instanceof BaseCodegenError) {
