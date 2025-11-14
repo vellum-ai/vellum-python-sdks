@@ -659,7 +659,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                     "attributes": trigger_attributes,
                 }
 
-                if trigger_type == WorkflowTriggerType.INTEGRATION:
+                if trigger_type == WorkflowTriggerType.INTEGRATION and issubclass(trigger_class, IntegrationTrigger):
                     exec_config = self._serialize_integration_trigger_exec_config(trigger_class)
                     trigger_data["exec_config"] = exec_config
 
