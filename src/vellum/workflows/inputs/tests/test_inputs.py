@@ -32,7 +32,7 @@ def test_base_inputs_explicit_none():
     # GIVEN some input class with optional fields and fields with defaults
     class TestInputs(BaseInputs):
         optional_string: Optional[str]
-        optional_string_with_default: str = None
+        optional_string_with_default: Optional[str] = None
 
     # WHEN we explicitly pass None for optional fields
     inputs = TestInputs(optional_string=None)
