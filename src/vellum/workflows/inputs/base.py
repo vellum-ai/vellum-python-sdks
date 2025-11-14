@@ -88,11 +88,11 @@ class BaseInputs(metaclass=_BaseInputsMeta):
         """
         for name, field_type in self.__class__.__annotations__.items():
             # Get the value (either from kwargs or class default)
-            value = kwargs.get(name)
+            value = kwargs.get(name, undefined)
             has_default = name in vars(self.__class__)
 
             # If no value provided, check for default
-            if value is None and has_default:
+            if value is undefined and has_default:
                 default_value = vars(self.__class__)[name]
                 # Check if default is a FieldInfo with default_factory
                 if isinstance(default_value, FieldInfo):
@@ -106,7 +106,7 @@ class BaseInputs(metaclass=_BaseInputsMeta):
                     # Regular default value
                     value = default_value
 
-            if value is None and not has_default:
+            if value is undefined and not has_default:
                 # Check if field_type allows None
                 origin = get_origin(field_type)
                 args = get_args(field_type)
@@ -118,7 +118,7 @@ class BaseInputs(metaclass=_BaseInputsMeta):
                     )
 
             # Set the value on the instance (either from kwargs or default)
-            if name in kwargs or (has_default and value is not None):
+            if value is not undefined:
                 setattr(self, name, value)
 
     def __iter__(self) -> Iterator[Tuple[InputReference, Any]]:
