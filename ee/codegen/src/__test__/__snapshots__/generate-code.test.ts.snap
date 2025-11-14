@@ -118,7 +118,7 @@ class LinearCommentEventTrigger(IntegrationTrigger):
         provider = "COMPOSIO"
         integration_name = "LINEAR"
         slug = "LINEAR_COMMENT_EVENT_TRIGGER"
-        setupAttributes = {"team_id": "dfasadf"}
+        setup_attributes = {"team_id": "dfasadf"}
 
     class Display(IntegrationTrigger.Display):
         label = "Linear Comment Event Trigger"
@@ -284,7 +284,7 @@ class LinearIntegrationTrigger(IntegrationTrigger):
         provider = "COMPOSIO"
         integration_name = "LINEAR"
         slug = "LINEAR_COMMENT_EVENT_TRIGGER"
-        setupAttributes = {"team_id": "dfasadf"}
+        setup_attributes = {"team_id": "dfasadf"}
 
     class Display(IntegrationTrigger.Display):
         label = "Linear Integration Trigger"
@@ -310,7 +310,7 @@ class LinearIntegrationTrigger2(IntegrationTrigger):
         provider = "COMPOSIO"
         integration_name = "LINEAR"
         slug = "LINEAR_COMMENT_EVENT_TRIGGER"
-        setupAttributes = {"team_id": "dfasadf"}
+        setup_attributes = {"team_id": "dfasadf"}
 
     class Display(IntegrationTrigger.Display):
         label = "Linear Integration Trigger 2"

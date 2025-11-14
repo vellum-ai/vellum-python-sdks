@@ -1,4 +1,5 @@
 from copy import copy
+from enum import Enum
 import fnmatch
 from functools import cached_property
 import importlib
@@ -658,6 +659,10 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                     "attributes": trigger_attributes,
                 }
 
+                if trigger_type == WorkflowTriggerType.INTEGRATION and issubclass(trigger_class, IntegrationTrigger):
+                    exec_config = self._serialize_integration_trigger_exec_config(trigger_class)
+                    trigger_data["exec_config"] = exec_config
+
             # Serialize display_data from trigger's Display class
             display_class = trigger_class.Display
             display_data: JsonObject = {}
@@ -710,6 +715,67 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         if edge_display.z_index is not None:
             return {"z_index": edge_display.z_index}
         return None
+
+    def _serialize_integration_trigger_exec_config(self, trigger_class: Type[IntegrationTrigger]) -> JsonObject:
+        config_class = trigger_class.Config
+
+        provider = getattr(config_class, "provider", None)
+        if isinstance(provider, Enum):
+            provider = provider.value
+        elif provider is not None:
+            provider = str(provider)
+        slug = getattr(config_class, "slug", None)
+        integration_name = getattr(config_class, "integration_name", None)
+
+        setup_attributes: List[JsonObject] = []
+        raw_setup_attributes = getattr(config_class, "setup_attributes", None)
+
+        if isinstance(raw_setup_attributes, dict):
+            for key, value in raw_setup_attributes.items():
+                attribute_id = str(uuid4_from_hash(f"{trigger_class.__id__}|setup_attribute|{key}"))
+
+                default_json: Optional[JsonObject] = None
+                attribute_type = "STRING"
+
+                if value is not None:
+                    try:
+                        vellum_value = primitive_to_vellum_value(value)
+                        default_json = cast(JsonObject, self._model_dump(vellum_value))
+                        attribute_type = cast(str, default_json.get("type", attribute_type))
+                    except ValueError:
+                        default_json = None
+
+                setup_attributes.append(
+                    cast(
+                        JsonObject,
+                        {
+                            "id": attribute_id,
+                            "key": str(key),
+                            "type": attribute_type,
+                            "required": True,
+                            "default": default_json,
+                            "extensions": {"color": None, "description": None},
+                        },
+                    )
+                )
+
+        return cast(
+            JsonObject,
+            {
+                "type": provider,
+                "slug": slug,
+                "integration_name": integration_name,
+                "setup_attributes": setup_attributes,
+            },
+        )
+
+    @staticmethod
+    def _model_dump(value: Any) -> Any:
+        if hasattr(value, "model_dump"):
+            return value.model_dump(mode="json")
+        if hasattr(value, "dict"):
+            return value.dict()
+        return value
 
     def _apply_auto_layout(self, nodes_dict_list: List[Dict[str, Any]], edges: List[Json]) -> None:
         """Apply auto-layout to nodes that are all positioned at (0,0)."""

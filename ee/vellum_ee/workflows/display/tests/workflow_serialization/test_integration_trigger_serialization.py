@@ -23,6 +23,7 @@ def test_vellum_integration_trigger_serialization():
             provider = "COMPOSIO"
             integration_name = "SLACK"
             slug = "slack_new_message"
+            setup_attributes = {"team_id": "72485c1d-b72e-48e6-88de-a952968ae2a2"}
 
     class ProcessNode(BaseNode):
         """Node that processes the trigger."""
@@ -56,6 +57,27 @@ def test_vellum_integration_trigger_serialization():
 
     attribute_names = {attr["key"] for attr in attributes if isinstance(attr, dict)}
     assert attribute_names == {"message", "channel", "user"}
+
+    exec_config = trigger["exec_config"]
+    assert isinstance(exec_config, dict)
+    assert exec_config["type"] == "COMPOSIO"
+    assert exec_config["slug"] == "slack_new_message"
+    assert exec_config["integration_name"] == "SLACK"
+
+    setup_attributes = exec_config["setup_attributes"]
+    assert isinstance(setup_attributes, list)
+    assert len(setup_attributes) == 1
+    setup_attribute = setup_attributes[0]
+
+    assert setup_attribute["key"] == "team_id"
+    assert setup_attribute["type"] == "STRING"
+    assert setup_attribute["required"] is True
+
+    default_value = setup_attribute["default"]
+    assert isinstance(default_value, dict)
+    assert default_value["type"] == "STRING"
+    assert default_value["value"] == "72485c1d-b72e-48e6-88de-a952968ae2a2"
+    assert setup_attribute["extensions"] == {"color": None, "description": None}
 
 
 def test_vellum_integration_trigger_id_consistency():

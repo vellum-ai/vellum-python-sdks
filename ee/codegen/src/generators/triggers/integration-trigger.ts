@@ -65,7 +65,7 @@ export class IntegrationTrigger extends BaseTrigger<IntegrationTriggerType> {
     if (this.trigger.execConfig.setupAttributes.length > 0) {
       configFields.push(
         python.field({
-          name: "setupAttributes",
+          name: "setup_attributes",
           initializer: python.TypeInstantiation.dict(
             this.trigger.execConfig.setupAttributes.map((attr) => ({
               key: python.TypeInstantiation.str(attr.key),
