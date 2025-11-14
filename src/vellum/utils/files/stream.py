@@ -88,9 +88,10 @@ def stream_vellum_file(
                 raise FileNotFoundError(f"Uploaded file not found: {vellum_uploaded_file_id}") from e
             raise FileRetrievalError(f"Failed to retrieve uploaded file: {vellum_uploaded_file_id}") from e
 
-        file_url = uploaded_file.file_url
-        if not file_url:
+        if not uploaded_file.file_url:
             raise FileRetrievalError(f"Uploaded file has no accessible URL: {vellum_uploaded_file_id}")
+
+        file_url = uploaded_file.file_url
 
     # Case 3: Direct URL
     elif re.match(URL_PATTERN, src):
