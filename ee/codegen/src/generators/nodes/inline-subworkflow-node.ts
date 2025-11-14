@@ -14,6 +14,56 @@ export class InlineSubworkflowNode extends BaseNestedWorkflowNode<
   SubworkflowNodeType,
   InlineSubworkflowNodeContext
 > {
+  protected getNodeBaseGenericTypes(): AstNode[] | undefined {
+    const [firstStateVariableContext] = Array.from(
+      this.workflowContext.stateVariableContextsById.values()
+    );
+
+    // Only override if state is specified - otherwise fall back to base behavior
+    if (!firstStateVariableContext) {
+      return undefined;
+    }
+
+    const stateType = this.getStateTypeOrBaseState();
+
+    // Get the nested workflow context to access its inputs and state types
+    const nestedWorkflowContext = this.getNestedWorkflowContextByName(
+      BaseNestedWorkflowNode.subworkflowNestedProjectName
+    );
+
+    // InputsType: Reference to the Inputs class from the nested workflow
+    const inputsType = python.Type.reference(
+      python.reference({
+        name: "Inputs",
+        modulePath: [
+          ...nestedWorkflowContext.modulePath.slice(0, -1),
+          "inputs",
+        ],
+      })
+    );
+
+    // InnerStateType: Get state type from nested workflow, or BaseState if none
+    const [nestedFirstStateVariableContext] = Array.from(
+      nestedWorkflowContext.stateVariableContextsById.values()
+    );
+
+    const innerStateType = nestedFirstStateVariableContext
+      ? python.Type.reference(
+          python.reference({
+            name: nestedFirstStateVariableContext.definition.name,
+            modulePath: nestedFirstStateVariableContext.definition.module,
+          })
+        )
+      : python.Type.reference(
+          python.reference({
+            name: "BaseState",
+            modulePath: ["vellum", "workflows", "state"],
+          })
+        );
+
+    return [stateType, inputsType, innerStateType];
+  }
+
   getInnerWorkflowData(): WorkflowRawData {
     if (this.nodeData.data.variant !== "INLINE") {
       throw new NodeDefinitionGenerationError(

@@ -2,13 +2,14 @@ import { mkdir, readFile, rm } from "fs/promises";
 import { join } from "path";
 
 import { v4 as uuidv4 } from "uuid";
-import { beforeEach } from "vitest";
+import { afterEach, beforeEach } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
 import {
   inlineSubworkflowNodeDataFactory,
   templatingNodeFactory,
 } from "src/__test__/helpers/node-data-factories";
+import { stateVariableContextFactory } from "src/__test__/helpers/state-variable-context-factory";
 import { makeTempDir } from "src/__test__/helpers/temp-dir";
 import { createNodeContext } from "src/context";
 import { InlineSubworkflowNodeContext } from "src/context/node-context/inline-subworkflow-node";
@@ -222,6 +223,59 @@ describe("InlineSubworkflowNode", () => {
           "utf-8"
         )
       ).toMatchSnapshot();
+    });
+  });
+
+  describe("with state", () => {
+    beforeEach(async () => {
+      const workflowContext = workflowContextFactory({
+        absolutePathToOutputDirectory: tempDir,
+        moduleName: "code",
+      });
+
+      // Add state variable to the workflow context
+      workflowContext.addStateVariableContext(
+        stateVariableContextFactory({
+          stateVariableData: {
+            id: "state-var-id",
+            key: "state",
+            type: "STRING",
+          },
+          workflowContext,
+        })
+      );
+
+      const nodeData = inlineSubworkflowNodeDataFactory().build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as InlineSubworkflowNodeContext;
+
+      const node = new InlineSubworkflowNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      await node.persist();
+    });
+
+    it(`inline subworkflow node file with state should include all three generic type parameters`, async () => {
+      const content = await readFile(
+        join(
+          tempDir,
+          "code",
+          "nodes",
+          "inline_subworkflow_node",
+          "__init__.py"
+        ),
+        "utf-8"
+      );
+      expect(content).toMatchSnapshot();
+      // Verify it includes all three generic types: StateType, InputsType, and InnerStateType
+      expect(content).toContain("InlineSubworkflowNode[State");
+      expect(content).toContain("from ...state import State");
+      expect(content).toContain("from .workflow import");
     });
   });
 });
