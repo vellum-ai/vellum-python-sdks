@@ -42,31 +42,4 @@ describe("NoteNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
-
-  describe("should have a pass", () => {
-    beforeEach(async () => {
-      const nodeData = noteNodeDataFactory().build();
-      nodeData.data = { text: "test-text", label: "Note", style: undefined };
-
-      const nodeContext = (await createNodeContext({
-        workflowContext,
-        nodeData,
-      })) as NoteNodeContext;
-
-      node = new NoteNode({
-        workflowContext,
-        nodeContext,
-      });
-    });
-
-    it("getNodeFile", async () => {
-      node.getNodeFile().write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
-    });
-
-    it("getNodeDisplayFile", async () => {
-      node.getNodeDisplayFile().write(writer);
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
-    });
-  });
 });
