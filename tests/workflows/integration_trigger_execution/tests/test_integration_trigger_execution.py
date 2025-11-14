@@ -58,17 +58,18 @@ def test_stream_execution_with_trigger_event():
 
 
 def test_error_when_trigger_event_missing():
-    """Test that workflow raises error when IntegrationTrigger present but trigger missing."""
-    # GIVEN a workflow with SlackMessageTrigger
+    """Test that workflow with IntegrationTrigger that references attributes fails without trigger data."""
+    # GIVEN a workflow with SlackMessageTrigger that references trigger attributes
     workflow = SimpleSlackWorkflow()
 
     # WHEN we run the workflow without trigger
-    # THEN it should raise WorkflowInitializationException
-    with pytest.raises(WorkflowInitializationException) as exc_info:
-        workflow.run()
+    result = workflow.run()
 
-    assert "IntegrationTrigger" in str(exc_info.value)
-    assert "trigger" in str(exc_info.value)
+    # THEN it should be rejected due to missing trigger attributes
+    assert result.name == "workflow.execution.rejected"
+
+    # AND the error should indicate missing trigger attribute
+    assert "Missing trigger attribute" in result.body.error.message
 
 
 def test_error_when_trigger_event_provided_but_no_integration_trigger():

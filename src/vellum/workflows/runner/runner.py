@@ -240,7 +240,7 @@ class WorkflowRunner(Generic[StateType]):
             self._entrypoints = self.workflow.get_entrypoints()
 
             # Check if workflow requires a trigger but none was provided
-            self._validate_no_trigger_provided()
+            self._validate_no_trigger_provided(inputs)
 
         # This queue is responsible for sending events from WorkflowRunner to the outside world
         self._workflow_event_outer_queue: Queue[WorkflowEvent] = Queue()
@@ -369,12 +369,18 @@ class WorkflowRunner(Generic[StateType]):
         if specific_entrypoints:
             self._entrypoints = specific_entrypoints
 
-    def _validate_no_trigger_provided(self) -> None:
+    def _validate_no_trigger_provided(self, inputs: Optional[InputsType] = None) -> None:
         """
         Validate that workflow can run without a trigger.
 
         If workflow has IntegrationTrigger(s) but no ManualTrigger, it requires a trigger instance.
         If workflow has both, filter entrypoints to ManualTrigger path only.
+
+        Special case: If workflow has exactly one IntegrationTrigger, no ManualTrigger, and no inputs
+        are provided, automatically instantiate the trigger with empty kwargs and use it as the entrypoint.
+
+        Args:
+            inputs: The inputs provided to the workflow run
 
         Raises:
             WorkflowInitializationException: If workflow requires trigger but none was provided
@@ -388,6 +394,15 @@ class WorkflowRunner(Generic[StateType]):
 
         if workflow_integration_triggers:
             if not self._has_manual_trigger():
+                # Special case: If exactly one IntegrationTrigger and no inputs provided,
+                if len(workflow_integration_triggers) == 1 and inputs is None:
+                    trigger_class = workflow_integration_triggers[0]
+                    default_trigger = trigger_class()
+                    self._validate_and_bind_trigger(default_trigger)
+                    self._filter_entrypoints_for_trigger(default_trigger)
+                    self._trigger = default_trigger
+                    return
+
                 # Workflow has ONLY IntegrationTrigger - this is an error
                 raise WorkflowInitializationException(
                     message="Workflow has IntegrationTrigger which requires trigger parameter",
