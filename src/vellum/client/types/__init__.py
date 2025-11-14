@@ -605,6 +605,7 @@ from .token_overlapping_window_chunking_request import TokenOverlappingWindowChu
 from .unit_enum import UnitEnum
 from .update_active_workspace_response import UpdateActiveWorkspaceResponse
 from .upload_document_response import UploadDocumentResponse
+from .uploaded_file_read import UploadedFileRead
 from .upsert_test_suite_test_case_request import UpsertTestSuiteTestCaseRequest
 from .variable_prompt_block import VariablePromptBlock
 from .vellum_audio import VellumAudio
@@ -1312,6 +1313,7 @@ __all__ = [
     "UnitEnum",
     "UpdateActiveWorkspaceResponse",
     "UploadDocumentResponse",
+    "UploadedFileRead",
     "UpsertTestSuiteTestCaseRequest",
     "VariablePromptBlock",
     "VellumAudio",

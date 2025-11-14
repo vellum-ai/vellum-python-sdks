@@ -6164,6 +6164,78 @@ client.test_suites.delete_test_suite_test_case(
 </dl>
 </details>
 
+## UploadedFiles
+<details><summary><code>client.uploaded_files.<a href="src/vellum/resources/uploaded_files/client.py">retrieve</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieve a previously uploaded file by its ID
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import Vellum
+
+client = Vellum(
+    api_version="YOUR_API_VERSION",
+    api_key="YOUR_API_KEY",
+)
+client.uploaded_files.retrieve(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — A UUID string identifying this uploaded file.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## WorkflowDeployments
 <details><summary><code>client.workflow_deployments.<a href="src/vellum/resources/workflow_deployments/client.py">list</a>(...)</code></summary>
 <dl>

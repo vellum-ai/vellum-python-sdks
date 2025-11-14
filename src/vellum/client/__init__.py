@@ -27,6 +27,7 @@ from .resources.prompts.client import AsyncPromptsClient, PromptsClient
 from .resources.sandboxes.client import AsyncSandboxesClient, SandboxesClient
 from .resources.test_suite_runs.client import AsyncTestSuiteRunsClient, TestSuiteRunsClient
 from .resources.test_suites.client import AsyncTestSuitesClient, TestSuitesClient
+from .resources.uploaded_files.client import AsyncUploadedFilesClient, UploadedFilesClient
 from .resources.workflow_deployments.client import AsyncWorkflowDeploymentsClient, WorkflowDeploymentsClient
 from .resources.workflow_executions.client import AsyncWorkflowExecutionsClient, WorkflowExecutionsClient
 from .resources.workflow_sandboxes.client import AsyncWorkflowSandboxesClient, WorkflowSandboxesClient
@@ -151,6 +152,7 @@ class Vellum:
         self.sandboxes = SandboxesClient(client_wrapper=self._client_wrapper)
         self.test_suite_runs = TestSuiteRunsClient(client_wrapper=self._client_wrapper)
         self.test_suites = TestSuitesClient(client_wrapper=self._client_wrapper)
+        self.uploaded_files = UploadedFilesClient(client_wrapper=self._client_wrapper)
         self.workflow_deployments = WorkflowDeploymentsClient(client_wrapper=self._client_wrapper)
         self.workflow_executions = WorkflowExecutionsClient(client_wrapper=self._client_wrapper)
         self.workflow_sandboxes = WorkflowSandboxesClient(client_wrapper=self._client_wrapper)
@@ -1029,6 +1031,7 @@ class AsyncVellum:
         self.sandboxes = AsyncSandboxesClient(client_wrapper=self._client_wrapper)
         self.test_suite_runs = AsyncTestSuiteRunsClient(client_wrapper=self._client_wrapper)
         self.test_suites = AsyncTestSuitesClient(client_wrapper=self._client_wrapper)
+        self.uploaded_files = AsyncUploadedFilesClient(client_wrapper=self._client_wrapper)
         self.workflow_deployments = AsyncWorkflowDeploymentsClient(client_wrapper=self._client_wrapper)
         self.workflow_executions = AsyncWorkflowExecutionsClient(client_wrapper=self._client_wrapper)
         self.workflow_sandboxes = AsyncWorkflowSandboxesClient(client_wrapper=self._client_wrapper)
