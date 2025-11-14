@@ -48,7 +48,7 @@ def test_base_inputs_explicit_none_should_raise_on_fields_without_defaults(field
     """
 
     class TestInputs(BaseInputs):
-        required_string: field_type
+        required_string: field_type  # type: ignore[valid-type]
 
     with pytest.raises(WorkflowInitializationException) as exc_info:
         TestInputs()  # type: ignore[call-arg]
@@ -66,7 +66,7 @@ def test_base_inputs_explicit_none_should_raise_on_required_fields_with_none():
         required_string: str
 
     with pytest.raises(WorkflowInitializationException) as exc_info:
-        TestInputs(required_string=None)  # type: ignore[call-arg]
+        TestInputs(required_string=None)  # type: ignore[arg-type]
 
     assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
     assert "Required input variables required_string should have defined value" == str(exc_info.value)

@@ -74,7 +74,7 @@ class BaseInputs(metaclass=_BaseInputsMeta):
         Initialize BaseInputs with provided keyword arguments.
 
         Validation logic:
-        1. Ensures all required fields (non-Optional types) either:
+        1. Ensures all required fields (values without defaults, regardless of Optional or not) either:
         - Have a value provided in kwargs, or
         - Have a default value defined in the class
         2. Validates that no None values are provided for required fields
