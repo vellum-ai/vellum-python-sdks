@@ -729,8 +729,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
         setup_attributes: List[JsonObject] = []
         raw_setup_attributes = getattr(config_class, "setup_attributes", None)
-        if raw_setup_attributes is None and hasattr(config_class, "setupAttributes"):
-            raw_setup_attributes = getattr(config_class, "setupAttributes")
 
         if isinstance(raw_setup_attributes, dict):
             for key, value in raw_setup_attributes.items():
