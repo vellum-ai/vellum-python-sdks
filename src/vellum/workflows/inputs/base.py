@@ -106,16 +106,28 @@ class BaseInputs(metaclass=_BaseInputsMeta):
                     # Regular default value
                     value = default_value
 
+            # Check if field_type allows None
+            origin = get_origin(field_type)
+            args = get_args(field_type)
+            is_optional = origin is Union and type(None) in args
+
             if value is undefined and not has_default:
-                # Check if field_type allows None
-                origin = get_origin(field_type)
-                args = get_args(field_type)
-                if not (origin is Union and type(None) in args):
+                if not is_optional:
                     raise WorkflowInitializationException(
                         message=f"Required input variables {name} should have defined value",
                         code=WorkflowErrorCode.INVALID_INPUTS,
                         workflow_definition=self.__class__.__parent_class__,
                     )
+                # If field is Optional and no value provided, set to None
+                value = None
+
+            # Validate that None is not provided for non-Optional fields
+            if value is None and not is_optional:
+                raise WorkflowInitializationException(
+                    message=f"Required input variables {name} should have defined value",
+                    code=WorkflowErrorCode.INVALID_INPUTS,
+                    workflow_definition=self.__class__.__parent_class__,
+                )
 
             # Set the value on the instance (either from kwargs or default)
             if value is not undefined:
