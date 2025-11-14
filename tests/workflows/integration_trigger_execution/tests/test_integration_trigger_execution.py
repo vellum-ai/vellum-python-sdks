@@ -58,17 +58,15 @@ def test_stream_execution_with_trigger_event():
 
 
 def test_error_when_trigger_event_missing():
-    """Test that workflow raises error when IntegrationTrigger present but trigger missing."""
+    """Test that workflow rejects when IntegrationTrigger present but trigger missing."""
     # GIVEN a workflow with SlackMessageTrigger
     workflow = SimpleSlackWorkflow()
 
     # WHEN we run the workflow without trigger
-    # THEN it should raise WorkflowInitializationException
-    with pytest.raises(WorkflowInitializationException) as exc_info:
-        workflow.run()
+    result = workflow.run()
 
-    assert "IntegrationTrigger" in str(exc_info.value)
-    assert "trigger" in str(exc_info.value)
+    # THEN it should reject with INVALID_INPUTS error
+    assert result.name == "workflow.execution.rejected"
 
 
 def test_error_when_trigger_event_provided_but_no_integration_trigger():
@@ -107,17 +105,15 @@ def test_no_trigger_workflow_runs_without_trigger_event():
 
 
 def test_workflow_with_multiple_triggers_manual_path():
-    """Test workflow with both ManualTrigger and IntegrationTrigger - manual path."""
+    """Test workflow with both ManualTrigger and IntegrationTrigger rejects without trigger."""
     # GIVEN a workflow with both ManualTrigger and IntegrationTrigger
     workflow = MultiTriggerWorkflow()
 
-    # WHEN we run the workflow without trigger_event (manual trigger path)
+    # WHEN we run the workflow without trigger
     result = workflow.run()
 
-    # THEN it should execute successfully via ManualTrigger path
-    assert result.name == "workflow.execution.fulfilled"
-    # The manual path node should execute
-    assert result.outputs.manual_result == "Manual execution"
+    # THEN it should reject since no trigger was provided
+    assert result.name == "workflow.execution.rejected"
 
 
 def test_workflow_with_multiple_triggers_slack_path():

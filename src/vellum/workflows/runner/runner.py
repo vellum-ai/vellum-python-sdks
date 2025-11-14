@@ -386,20 +386,6 @@ class WorkflowRunner(Generic[StateType]):
                 if issubclass(trigger_type, IntegrationTrigger):
                     workflow_integration_triggers.append(trigger_type)
 
-        if workflow_integration_triggers:
-            if not self._has_manual_trigger():
-                # Workflow has ONLY IntegrationTrigger - this is an error
-                raise WorkflowInitializationException(
-                    message="Workflow has IntegrationTrigger which requires trigger parameter",
-                    workflow_definition=self.workflow.__class__,
-                    code=WorkflowErrorCode.INVALID_INPUTS,
-                )
-
-            # Workflow has both IntegrationTrigger and ManualTrigger - filter to ManualTrigger path
-            manual_entrypoints = self._get_entrypoints_for_trigger_type(ManualTrigger)
-            if manual_entrypoints:
-                self._entrypoints = manual_entrypoints
-
     @contextmanager
     def _httpx_logger_with_span_id(self) -> Iterator[None]:
         """
