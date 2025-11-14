@@ -65,6 +65,5 @@ class TestVellumJsonEncoder:
 
         result = json.dumps(data, cls=VellumJsonEncoder)
         # Note: When a FieldInfo has default_factory instead of default,
-        # the default attribute will be PydanticUndefined, which should serialize to None
-        # The actual default_factory is only called when instantiating a model
+        # the default attribute will be PydanticUndefined, which should serialize to None.
         assert result == '{"test": null}'
