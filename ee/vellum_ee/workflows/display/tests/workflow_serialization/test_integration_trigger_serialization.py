@@ -23,7 +23,7 @@ def test_vellum_integration_trigger_serialization():
             provider = "COMPOSIO"
             integration_name = "SLACK"
             slug = "slack_new_message"
-            setupAttributes = {"team_id": "72485c1d-b72e-48e6-88de-a952968ae2a2"}
+            setup_attributes = {"team_id": "72485c1d-b72e-48e6-88de-a952968ae2a2"}
 
     class ProcessNode(BaseNode):
         """Node that processes the trigger."""
