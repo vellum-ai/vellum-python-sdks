@@ -1,5 +1,7 @@
 import pytest
-from typing import Optional
+from typing import Any, Optional
+
+from pydantic import Field
 
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import WorkflowInitializationException
@@ -47,6 +49,115 @@ def test_base_inputs_with_default():
 
     # THEN it should use the default value
     assert inputs.string_with_default == "default_value"
+
+
+def test_base_inputs_with_field_default_factory_empty_list():
+    """
+    Test that Field(default_factory=list) works correctly for JSON array inputs.
+    This ensures that each instance gets a separate list instance, avoiding mutable default issues.
+    """
+
+    # GIVEN some input class with Field(default_factory=list) for JSON array
+    class TestInputs(BaseInputs):
+        json_array_input: Any = Field(default_factory=list)  # type: ignore[arg-type]
+        array_input: list[str] = Field(default_factory=list)  # type: ignore[arg-type]
+
+    # WHEN we create two instances without providing values
+    inputs1 = TestInputs()
+    inputs2 = TestInputs()
+
+    # THEN they should get separate list instances
+    assert inputs1.json_array_input is not inputs2.json_array_input
+    assert isinstance(inputs1.json_array_input, list)
+    assert isinstance(inputs2.json_array_input, list)
+
+    # WHEN we modify one instance
+    inputs1.json_array_input.append("test1")
+    inputs2.json_array_input.append("test2")
+
+    # THEN the other instance should be unaffected
+    assert inputs1.json_array_input == ["test1"]
+    assert inputs2.json_array_input == ["test2"]
+
+
+def test_base_inputs_with_field_default_factory_non_empty_list():
+    """
+    Test that Field(default_factory=list) works correctly for non-empty list inputs.
+    """
+
+    # GIVEN some input class with Field(default_factory=list) for non-empty list
+    class TestInputs(BaseInputs):
+        non_empty_list_input: list[str] = Field(default_factory=lambda: ["test1", "test2"])
+
+    # WHEN we create an instance without providing values
+    inputs1 = TestInputs()
+    inputs2 = TestInputs()
+
+    # THEN it should use the default value
+    assert inputs1.non_empty_list_input == ["test1", "test2"]
+    assert inputs2.non_empty_list_input == ["test1", "test2"]
+
+    # WHEN we modify one instance
+    inputs1.non_empty_list_input.append("test3")
+    inputs2.non_empty_list_input.append("test4")
+
+    # THEN the other instance should be unaffected
+    assert inputs1.non_empty_list_input == ["test1", "test2", "test3"]
+    assert inputs2.non_empty_list_input == ["test1", "test2", "test4"]
+
+
+def test_base_inputs_with_field_default_factory_empty_dict():
+    """
+    Test that Field(default_factory=dict) works correctly for JSON dict inputs.
+    This ensures that each instance gets a separate dict instance, avoiding mutable default issues.
+    """
+
+    # GIVEN some input class with Field(default_factory=dict) for JSON dict
+    class TestInputs(BaseInputs):
+        json_dict_input: Any = Field(default_factory=dict)  # type: ignore[arg-type]
+
+    # WHEN we create two instances without providing values
+    inputs1 = TestInputs()
+    inputs2 = TestInputs()
+
+    # THEN they should get separate dict instances
+    assert inputs1.json_dict_input is not inputs2.json_dict_input
+    assert isinstance(inputs1.json_dict_input, dict)
+    assert isinstance(inputs2.json_dict_input, dict)
+
+    # WHEN we modify one instance
+    inputs1.json_dict_input["key1"] = "value1"
+    inputs2.json_dict_input["key2"] = "value2"
+
+    # THEN the other instance should be unaffected
+    assert inputs1.json_dict_input == {"key1": "value1"}
+    assert inputs2.json_dict_input == {"key2": "value2"}
+
+
+def test_base_inputs_with_field_default_factory_non_empty_dict():
+    """
+    Test that Field(default_factory=dict) works correctly for non-empty dict inputs.
+    """
+
+    # GIVEN some input class with Field(default_factory=dict) for non-empty dict
+    class TestInputs(BaseInputs):
+        non_empty_dict_input: dict[str, str] = Field(default_factory=lambda: {"key1": "value1", "key2": "value2"})
+
+    # WHEN we create an instance without providing values
+    inputs1 = TestInputs()
+    inputs2 = TestInputs()
+
+    # THEN it should use the default value
+    assert inputs1.non_empty_dict_input == {"key1": "value1", "key2": "value2"}
+    assert inputs2.non_empty_dict_input == {"key1": "value1", "key2": "value2"}
+
+    # WHEN we modify one instance
+    inputs1.non_empty_dict_input["key3"] = "value3"
+    inputs2.non_empty_dict_input["key4"] = "value4"
+
+    # THEN the other instance should be unaffected
+    assert inputs1.non_empty_dict_input == {"key1": "value1", "key2": "value2", "key3": "value3"}
+    assert inputs2.non_empty_dict_input == {"key1": "value1", "key2": "value2", "key4": "value4"}
 
 
 def test_base_inputs__supports_inherited_inputs():
