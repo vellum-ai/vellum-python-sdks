@@ -76,61 +76,80 @@ export class VellumVariable extends AstNode {
         : undefined;
     }
 
-    // Check if the default value is an empty list or empty dict
-    // Use Field(default_factory=list) for empty lists to avoid mutable default issues
-    // Use Field(default_factory=dict) for empty dicts to avoid mutable default issues
-    const isEmptyList =
-      Array.isArray(variable.default.value) &&
-      variable.default.value.length === 0;
-    const isEmptyDict =
+    // Check if the default type is ARRAY or JSON
+    // Use Field(default_factory=...) for ARRAY and JSON types to avoid mutable default issues
+    const isArrayType = variable.default.type === "ARRAY";
+    const isJsonType = variable.default.type === "JSON";
+
+    if (isArrayType && Array.isArray(variable.default.value)) {
+      // Use Field(default_factory=list) for empty lists
+      // Use Field(default_factory=lambda: [...]) for non-empty lists
+      const fieldReference = python.reference({
+        name: "Field",
+        modulePath: ["pydantic"],
+      });
+      this.addReference(fieldReference);
+
+      const isEmpty = (variable.default.value as unknown[]).length === 0;
+      const defaultFactoryValue = isEmpty
+        ? python.reference({
+            name: "list",
+          })
+        : python.lambda({
+            body: new VellumValue({
+              vellumValue: variable.default,
+            }),
+          });
+
+      return python.instantiateClass({
+        classReference: fieldReference,
+        arguments_: [
+          python.methodArgument({
+            name: "default_factory",
+            value: defaultFactoryValue,
+          }),
+        ],
+      });
+    }
+
+    if (
+      isJsonType &&
       variable.default.value !== null &&
       typeof variable.default.value === "object" &&
-      !Array.isArray(variable.default.value) &&
-      Object.keys(variable.default.value).length === 0;
-
-    if (isEmptyList) {
-      // Use Field(default_factory=list) for empty lists
-      const fieldReference = python.reference({
-        name: "Field",
-        modulePath: ["pydantic"],
-      });
-      this.addReference(fieldReference);
-
-      return python.instantiateClass({
-        classReference: fieldReference,
-        arguments_: [
-          python.methodArgument({
-            name: "default_factory",
-            value: python.reference({
-              name: "list",
-            }),
-          }),
-        ],
-      });
-    }
-
-    if (isEmptyDict) {
+      !Array.isArray(variable.default.value)
+    ) {
       // Use Field(default_factory=dict) for empty dicts
+      // Use Field(default_factory=lambda: {...}) for non-empty dicts
       const fieldReference = python.reference({
         name: "Field",
         modulePath: ["pydantic"],
       });
       this.addReference(fieldReference);
 
+      const isEmpty =
+        Object.keys(variable.default.value as object).length === 0;
+      const defaultFactoryValue = isEmpty
+        ? python.reference({
+            name: "dict",
+          })
+        : python.lambda({
+            body: new VellumValue({
+              vellumValue: variable.default,
+            }),
+          });
+
       return python.instantiateClass({
         classReference: fieldReference,
         arguments_: [
           python.methodArgument({
             name: "default_factory",
-            value: python.reference({
-              name: "dict",
-            }),
+            value: defaultFactoryValue,
           }),
         ],
       });
     }
 
-    // For non-empty defaults, use the regular VellumValue
+    // For other types with defaults, use the regular VellumValue
     return !isNil(variable.default.value)
       ? new VellumValue({
           vellumValue: variable.default,
