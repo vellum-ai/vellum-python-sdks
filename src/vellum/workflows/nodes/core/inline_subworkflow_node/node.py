@@ -13,7 +13,6 @@ from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.core import EntityInputsInterface
 from vellum.workflows.types.generics import InputsType, StateType
-from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 if TYPE_CHECKING:
@@ -161,4 +160,4 @@ class InlineSubworkflowNode(
         if cls.__output_ids__ is None:
             cls.__output_ids__ = {}
 
-        cls.__output_ids__[reference.name] = uuid4_from_hash(f"{cls.__id__}|{reference.name}")
+        cls.__output_ids__[reference.name] = reference.id
