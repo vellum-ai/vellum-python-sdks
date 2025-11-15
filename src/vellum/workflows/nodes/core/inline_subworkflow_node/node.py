@@ -1,3 +1,4 @@
+from threading import Event as ThreadingEvent
 from typing import TYPE_CHECKING, Any, ClassVar, Dict, Generic, Iterator, Optional, Set, Tuple, Type, TypeVar, Union
 
 from vellum.workflows.constants import undefined
@@ -74,6 +75,8 @@ class InlineSubworkflowNode(
     subworkflow_inputs: ClassVar[Union[EntityInputsInterface, BaseInputs, Type[undefined]]] = undefined
 
     def run(self) -> Iterator[BaseOutput]:
+        self._child_cancel_signal = ThreadingEvent()
+
         with execution_context(parent_context=get_parent_context()):
             subworkflow = self.subworkflow(
                 parent_state=self.state,
@@ -83,6 +86,7 @@ class InlineSubworkflowNode(
                 inputs=self._compile_subworkflow_inputs(),
                 event_filter=all_workflow_event_filter,
                 node_output_mocks=self._context._get_all_node_output_mocks(),
+                cancel_signal=self._child_cancel_signal,
             )
 
         outputs: Optional[BaseOutputs] = None
@@ -130,6 +134,13 @@ class InlineSubworkflowNode(
                     name=output_descriptor.name,
                     value=output_value,
                 )
+
+    def cancel(self, message: str) -> None:
+        """
+        Propagate cancellation to the nested workflow by setting its cancel signal.
+        """
+        if hasattr(self, "_child_cancel_signal"):
+            self._child_cancel_signal.set()
 
     def _compile_subworkflow_inputs(self) -> InputsType:
         if self.subworkflow is None:
