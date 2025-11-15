@@ -6,11 +6,10 @@ from vellum.workflows.constants import undefined
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes import InlineSubworkflowNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
-from vellum.workflows.references.output import OutputReference
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.types.generics import is_workflow_class
 from vellum.workflows.workflows.base import BaseWorkflow
-from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay, NodeOutputDisplay
+from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
@@ -144,22 +143,3 @@ class BaseInlineSubworkflowNodeDisplay(
             )
 
         return workflow_outputs
-
-    def get_node_output_display(self, output: OutputReference) -> NodeOutputDisplay:
-        display_class_module = type(self).__module__
-        is_dynamically_generated = display_class_module == "vellum_ee.workflows.display.nodes.base_node_display"
-
-        if not is_dynamically_generated:
-            explicit_display = self.output_display.get(output)
-            if explicit_display:
-                return explicit_display
-
-        subworkflow_class = raise_if_descriptor(self._node.subworkflow)
-        if subworkflow_class is undefined or not is_workflow_class(subworkflow_class):
-            return super().get_node_output_display(output)
-
-        for subworkflow_output in subworkflow_class.Outputs:  # type: ignore[union-attr]
-            if subworkflow_output.name == output.name:
-                return NodeOutputDisplay(id=subworkflow_output.id, name=output.name)
-
-        return super().get_node_output_display(output)
