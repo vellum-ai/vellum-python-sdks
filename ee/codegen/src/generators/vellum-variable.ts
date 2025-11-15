@@ -81,7 +81,8 @@ export class VellumVariable extends AstNode {
     const isArrayType = variable.default.type === "ARRAY";
     const isJsonType = variable.default.type === "JSON";
 
-    if (isArrayType && Array.isArray(variable.default.value)) {
+    // Handle arrays: both ARRAY type and JSON type with array values need Field(default_factory=list)
+    if ((isArrayType || isJsonType) && Array.isArray(variable.default.value)) {
       // Use Field(default_factory=list) for empty lists
       // Use Field(default_factory=lambda: [...]) for non-empty lists
       const fieldReference = python.reference({
