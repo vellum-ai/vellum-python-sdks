@@ -157,7 +157,7 @@ def _get_pydantic_model_definition(model_class: type) -> Optional[JsonObject]:
 
     return {
         "name": name,
-        "module": module_path,
+        "module": cast(JsonArray, module_path),
     }
 
 
