@@ -145,6 +145,22 @@ def get_child_descriptor(value: LazyReference, display_context: "WorkflowDisplay
     return value._get()
 
 
+def _get_pydantic_model_definition(model_class: type) -> Optional[JsonObject]:
+    """Extract module path definition from a Pydantic model class."""
+    if not inspect.isclass(model_class) or not issubclass(model_class, BaseModel):
+        return None
+
+    module = model_class.__module__
+    name = model_class.__name__
+
+    module_path = module.split(".")
+
+    return {
+        "name": name,
+        "module": module_path,
+    }
+
+
 def _serialize_condition(
     executable_id: UUID, display_context: "WorkflowDisplayContext", condition: BaseDescriptor
 ) -> JsonObject:
@@ -235,7 +251,9 @@ def serialize_key(key: Any) -> str:
         return str(key)
 
 
-def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContext", value: Any) -> Optional[JsonObject]:
+def serialize_value(
+    executable_id: UUID, display_context: "WorkflowDisplayContext", value: Any, source_type: Optional[type] = None
+) -> Optional[JsonObject]:
     """
     Serialize a value to a JSON object. Returns `None` if the value resolves to `undefined`.
     This is safe because all valid values are a JSON object, including the `None` constant:
@@ -245,6 +263,7 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
         executable_id: node id or workflow id
         display_context: workflow display context
         value: value to serialize
+        source_type: optional type that this value originated from (e.g., a Pydantic model class)
 
     Returns:
         serialized value
@@ -408,18 +427,10 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
                 },
             }
         else:
-            # Check if this dictionary has a "role" field with USER or ASSISTANT, indicating it's a ChatMessage
-            role_entry = next((entry for entry in serialized_entries if entry["key"] == "role"), None)
+            # If this dict came from a Pydantic model, extract its definition
             definition: Optional[JsonObject] = None
-            if (
-                role_entry
-                and role_entry["value"].get("type") == "CONSTANT_VALUE"
-                and role_entry["value"]["value"].get("value") in ("USER", "ASSISTANT")
-            ):
-                definition = {
-                    "name": "ChatMessage",
-                    "module": ["vellum", "client", "types"],
-                }
+            if source_type is not None:
+                definition = _get_pydantic_model_definition(source_type)
 
             return {
                 "type": "DICTIONARY_REFERENCE",
@@ -454,7 +465,8 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
     if isinstance(value, BaseModel):
         context = {"executable_id": executable_id, "client": display_context.client}
         dict_value = value.model_dump(context=context)
-        return serialize_value(executable_id, display_context, dict_value)
+        # Pass the model class as source_type so we can include its definition
+        return serialize_value(executable_id, display_context, dict_value, source_type=value.__class__)
 
     if callable(value):
         function_definition = compile_function_definition(value)

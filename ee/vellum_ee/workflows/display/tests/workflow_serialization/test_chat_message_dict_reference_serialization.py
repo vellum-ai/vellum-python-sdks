@@ -96,7 +96,10 @@ def test_serialize_chat_message_dict_reference_with_definition():
                                     "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
                                 },
                             ],
-                            "definition": {"name": "ChatMessage", "module": ["vellum", "client", "types"]},
+                            "definition": {
+                                "name": "ChatMessage",
+                                "module": ["vellum", "client", "types", "chat_message"],
+                            },
                         },
                     },
                 }
