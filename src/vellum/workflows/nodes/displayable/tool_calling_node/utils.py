@@ -112,7 +112,6 @@ class FunctionCallNodeMixin:
 
 class ToolPromptNode(InlinePromptNode[ToolCallingState]):
     max_prompt_iterations: Optional[int] = 25
-    __vellum_exclude_from_console__: bool = True  # Exclude from console drawer display
 
     class Trigger(InlinePromptNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
@@ -468,6 +467,7 @@ def create_router_node(
             {
                 "Ports": Ports,
                 "prompt_outputs": tool_prompt_node.Outputs.results,
+                "__vellum_exclude_from_console__": True,
                 "__module__": __name__,
             },
         ),
