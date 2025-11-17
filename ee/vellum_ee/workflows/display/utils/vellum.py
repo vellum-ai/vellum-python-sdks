@@ -10,6 +10,7 @@ from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.nodes.utils import get_unadorned_node
 from vellum.workflows.references import OutputReference, WorkflowInputReference
+from vellum.workflows.references.environment_variable import EnvironmentVariableReference
 from vellum.workflows.references.execution_count import ExecutionCountReference
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.references.node import NodeReference
@@ -68,12 +69,23 @@ class ExecutionCounterPointer(UniversalBaseModel):
     data: ExecutionCounterData
 
 
+class EnvironmentVariableData(UniversalBaseModel):
+    type: VellumVariableType
+    environment_variable_name: str
+
+
+class EnvironmentVariablePointer(UniversalBaseModel):
+    type: Literal["ENVIRONMENT_VARIABLE"] = "ENVIRONMENT_VARIABLE"
+    data: EnvironmentVariableData
+
+
 NodeInputValuePointerRule = Union[
     NodeOutputPointer,
     InputVariablePointer,
     ConstantValuePointer,
     WorkspaceSecretPointer,
     ExecutionCounterPointer,
+    EnvironmentVariablePointer,
 ]
 
 
@@ -151,6 +163,13 @@ def create_node_input_value_pointer_rule(
         node_class_display = display_context.node_displays[value.node_class]
         return ExecutionCounterPointer(
             data=ExecutionCounterData(node_id=str(node_class_display.node_id)),
+        )
+    if isinstance(value, EnvironmentVariableReference):
+        return EnvironmentVariablePointer(
+            data=EnvironmentVariableData(
+                type="STRING",
+                environment_variable_name=value.name,
+            ),
         )
 
     if not isinstance(value, BaseDescriptor):
