@@ -1,3 +1,4 @@
+import threading
 import time
 
 from vellum.workflows import BaseWorkflow
@@ -14,7 +15,7 @@ class FastFailingNode(BaseNode):
         value: str
 
     def run(self) -> Outputs:
-        time.sleep(0.01)
+        time.sleep(0.1)
         raise NodeException(code=WorkflowErrorCode.USER_DEFINED_ERROR, message="Fast node failed")
 
 
@@ -25,8 +26,14 @@ class SlowNode(BaseNode):
         value: str
 
     def run(self) -> Outputs:
-        time.sleep(0.5)
+        self._cancelled = threading.Event()
+        if self._cancelled.wait(timeout=0.5):
+            raise NodeException(code=WorkflowErrorCode.NODE_CANCELLED, message="Slow node cancelled")
+
         return self.Outputs(value="slow complete")
+
+    def __cancel__(self, message: str) -> None:
+        self._cancelled.set()
 
 
 class SlowSubworkflow(BaseWorkflow):

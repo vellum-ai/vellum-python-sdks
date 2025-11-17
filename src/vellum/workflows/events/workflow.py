@@ -59,6 +59,10 @@ class _BaseWorkflowExecutionBody(UniversalBaseModel):
     def serialize_workflow_definition(self, workflow_definition: Type, _info: Any) -> Dict[str, Any]:
         return serialize_type_encoder_with_id(workflow_definition)
 
+    @property
+    def definition_name(self) -> str:
+        return self.workflow_definition.__name__
+
 
 class _BaseWorkflowEvent(BaseEvent):
     body: _BaseWorkflowExecutionBody

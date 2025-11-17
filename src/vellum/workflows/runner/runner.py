@@ -263,6 +263,7 @@ class WorkflowRunner(Generic[StateType]):
         self._timeout = timeout
         self._execution_context = init_execution_context or get_execution_context()
         self._trigger = trigger
+        self._is_cancelling = False
 
         setattr(
             self._initial_state,
@@ -664,6 +665,7 @@ class WorkflowRunner(Generic[StateType]):
     ) -> NodeExecutionRejectedEvent:
         logger.info(f"{prefix}: {exception}")
         captured_stacktrace = traceback.format_exc()
+        print("handle run node exception", self.workflow.__class__.__name__, node.__class__.__name__)
 
         return NodeExecutionRejectedEvent(
             trace_id=execution.trace_id,
@@ -870,7 +872,7 @@ class WorkflowRunner(Generic[StateType]):
 
         return None
 
-    def _emit_node_cancellation_events(
+    def _cancel_active_nodes(
         self,
         error_message: str,
     ) -> None:
@@ -880,32 +882,9 @@ class WorkflowRunner(Generic[StateType]):
         Args:
             error_message: The error message to include in the cancellation events
         """
-        parent_context = WorkflowParentContext(
-            span_id=self._initial_state.meta.span_id,
-            workflow_definition=self.workflow.__class__,
-            parent=self._execution_context.parent_context,
-        )
-        captured_stacktrace = "".join(traceback.format_stack())
-        active_span_ids = list(self._active_nodes_by_execution_id.keys())
-        for span_id in active_span_ids:
-            active_node = self._active_nodes_by_execution_id.pop(span_id, None)
-            if active_node is not None:
-                active_node.node.__cancel__(error_message)
-
-                rejection_event = NodeExecutionRejectedEvent(
-                    trace_id=self._execution_context.trace_id,
-                    span_id=span_id,
-                    body=NodeExecutionRejectedBody(
-                        node_definition=active_node.node.__class__,
-                        error=WorkflowError(
-                            code=WorkflowErrorCode.NODE_CANCELLED,
-                            message=error_message,
-                        ),
-                        stacktrace=captured_stacktrace,
-                    ),
-                    parent=parent_context,
-                )
-                self._workflow_event_outer_queue.put(rejection_event)
+        self._is_cancelling = True
+        for active_node in self._active_nodes_by_execution_id.values():
+            active_node.node.__cancel__(error_message)
 
     def _initiate_workflow_event(self) -> WorkflowExecutionInitiatedEvent:
         links: Optional[List[SpanLink]] = None
@@ -1059,18 +1038,21 @@ class WorkflowRunner(Generic[StateType]):
                 break
 
             event = self._workflow_event_inner_queue.get()
+            print("outer flow event", self.workflow.__class__.__name__, event.name, event.body.definition_name)
 
             self._workflow_event_outer_queue.put(event)
 
             with execution_context(parent_context=current_parent, trace_id=self._execution_context.trace_id):
                 rejection_event = self._handle_work_item_event(event)
 
-            if rejection_event:
+            if rejection_event and not self._is_cancelling:
                 failed_node_name = rejection_event.body.node_definition.__name__
-                self._emit_node_cancellation_events(
+                self._cancel_active_nodes(
                     error_message=f"Node execution cancelled due to {failed_node_name} failure",
                 )
-                break
+                self._workflow_event_inner_queue.put(
+                    self._reject_workflow_event(rejection_event.error, rejection_event.body.stacktrace)
+                )
 
         # Handle any remaining events
         try:
@@ -1079,9 +1061,6 @@ class WorkflowRunner(Generic[StateType]):
 
                 with execution_context(parent_context=current_parent, trace_id=self._execution_context.trace_id):
                     rejection_event = self._handle_work_item_event(event)
-
-                if rejection_event:
-                    break
         except Empty:
             pass
 
@@ -1100,10 +1079,7 @@ class WorkflowRunner(Generic[StateType]):
             )
             return
 
-        if rejection_event:
-            self._workflow_event_outer_queue.put(
-                self._reject_workflow_event(rejection_event.error, rejection_event.body.stacktrace)
-            )
+        if self._is_cancelling:
             return
 
         fulfilled_outputs = self.workflow.Outputs()
@@ -1139,11 +1115,14 @@ class WorkflowRunner(Generic[StateType]):
 
         while not kill_switch.wait(timeout=0.1):
             if self._cancel_signal.is_set():
-                self._emit_node_cancellation_events(
+                self._cancel_active_nodes(
                     error_message="Workflow run cancelled",
                 )
 
                 captured_stacktrace = "".join(traceback.format_stack())
+                print(
+                    "cancel thread rejection event put", self.workflow.__class__.__name__, "workflow.execution.rejected"
+                )
                 self._workflow_event_outer_queue.put(
                     self._reject_workflow_event(
                         WorkflowError(
@@ -1162,7 +1141,7 @@ class WorkflowRunner(Generic[StateType]):
         if kill_switch.wait(timeout=self._timeout):
             return
 
-        self._emit_node_cancellation_events(
+        self._cancel_active_nodes(
             error_message=f"Workflow execution exceeded timeout of {self._timeout} seconds",
         )
 

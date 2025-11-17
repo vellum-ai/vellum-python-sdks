@@ -75,11 +75,11 @@ class InlineSubworkflowNode(
         self._child_cancel_signal = ThreadingEvent()
 
         with execution_context(parent_context=get_parent_context()):
-            subworkflow = self.subworkflow(
+            self._subworkflow_instance = self.subworkflow(
                 parent_state=self.state,
                 context=WorkflowContext.create_from(self._context),
             )
-            subworkflow_stream = subworkflow.stream(
+            subworkflow_stream = self._subworkflow_instance.stream(
                 inputs=self._compile_subworkflow_inputs(),
                 event_filter=all_workflow_event_filter,
                 node_output_mocks=self._context._get_all_node_output_mocks(),
@@ -91,6 +91,7 @@ class InlineSubworkflowNode(
         fulfilled_output_names: Set[str] = set()
 
         for event in subworkflow_stream:
+            print("subevent", event.name, event.body.definition_name)
             self._context._emit_subworkflow_event(event)
             if exception:
                 continue
@@ -136,8 +137,10 @@ class InlineSubworkflowNode(
         """
         Propagate cancellation to the nested workflow by setting its cancel signal.
         """
+        print("cancelling subworkflow node")
         if hasattr(self, "_child_cancel_signal"):
             self._child_cancel_signal.set()
+        self._subworkflow_instance.join()
 
     def _compile_subworkflow_inputs(self) -> InputsType:
         if self.subworkflow is None:
