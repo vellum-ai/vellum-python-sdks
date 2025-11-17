@@ -251,7 +251,7 @@ describe("DictionaryWorkflowReference", () => {
               ],
               definition: {
                 name: "ChatMessage",
-                module: ["vellum", "client", "types"],
+                module: ["vellum", "client", "types", "chat_message"],
               },
             },
           },
