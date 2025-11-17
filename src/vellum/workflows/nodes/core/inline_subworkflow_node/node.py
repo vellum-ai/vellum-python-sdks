@@ -135,7 +135,7 @@ class InlineSubworkflowNode(
                     value=output_value,
                 )
 
-    def cancel(self, message: str) -> None:
+    def __cancel__(self, message: str) -> None:
         """
         Propagate cancellation to the nested workflow by setting its cancel signal.
         """

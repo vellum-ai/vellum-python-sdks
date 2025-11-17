@@ -549,7 +549,7 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
     def run(self) -> NodeRunResponse:
         return self.Outputs()
 
-    def cancel(self, message: str) -> None:
+    def __cancel__(self, message: str) -> None:
         """
         Called when the node should be cancelled. Override this method to propagate
         cancellation to nested workflows or other resources.

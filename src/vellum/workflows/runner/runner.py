@@ -761,9 +761,6 @@ class WorkflowRunner(Generic[StateType]):
         node_class: Type[BaseNode],
         invoked_by: Optional[UUID] = None,
     ) -> None:
-        if self._cancel_signal and self._cancel_signal.is_set():
-            return
-
         with state.__lock__:
             for descriptor in node_class.ExternalInputs:
                 if not isinstance(descriptor, ExternalInputReference):
@@ -906,7 +903,7 @@ class WorkflowRunner(Generic[StateType]):
         for span_id in active_span_ids:
             active_node = self._active_nodes_by_execution_id.pop(span_id, None)
             if active_node is not None:
-                active_node.node.cancel(error_message)
+                active_node.node.__cancel__(error_message)
 
                 rejection_event = NodeExecutionRejectedEvent(
                     trace_id=self._execution_context.trace_id,
