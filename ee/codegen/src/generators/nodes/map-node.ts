@@ -12,6 +12,29 @@ export class MapNode extends BaseNestedWorkflowNode<
   MapNodeType,
   MapNodeContext
 > {
+  protected getNodeBaseGenericTypes(): AstNode[] | undefined {
+    const [firstStateVariableContext] = Array.from(
+      this.workflowContext.stateVariableContextsById.values()
+    );
+
+    // Only override if state is specified - otherwise fall back to base behavior
+    // which generates class MapNode(BaseMapNode): without generics
+    if (!firstStateVariableContext) {
+      return undefined;
+    }
+
+    const stateType = this.getStateTypeOrBaseState();
+    // MapNode requires two generic types: StateType and MapNodeItemType
+    // We use Any as the item type since extracting the exact type from List[ItemType]
+    // would require complex type inference
+    const itemType = python.Type.reference(
+      python.reference({
+        name: "Any",
+        modulePath: ["typing"],
+      })
+    );
+    return [stateType, itemType];
+  }
   getInnerWorkflowData(): WorkflowRawData {
     if (this.nodeData.data.variant !== "INLINE") {
       throw new NodeDefinitionGenerationError(

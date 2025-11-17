@@ -107,3 +107,23 @@ class MapNode(BaseMapNode):
     max_concurrency = 4
 "
 `;
+
+exports[`MapNode > with state > map node file with state should include second generic type parameter 1`] = `
+"from typing import Any
+
+from vellum.workflows.nodes.displayable import MapNode as BaseMapNode
+
+from .workflow import MapNodeWorkflow
+from ...state import State
+
+
+class MapNode(BaseMapNode[State, Any]):
+    items = [
+        "apple",
+        "banana",
+        "cherry",
+    ]
+    subworkflow = MapNodeWorkflow
+    max_concurrency = 4
+"
+`;
