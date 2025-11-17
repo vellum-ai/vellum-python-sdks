@@ -54,9 +54,11 @@ class WorkflowSandboxRunner(Generic[WorkflowType]):
 
         raw_inputs: Union[BaseInputs, Dict[str, Any]]
         trigger_class: Optional[Type[BaseTrigger]] = None
+        node_output_mocks = None
         if isinstance(selected_inputs, DatasetRow):
             raw_inputs = selected_inputs.inputs
             trigger_class = selected_inputs.workflow_trigger
+            node_output_mocks = selected_inputs.node_output_mocks
         else:
             raw_inputs = selected_inputs
 
@@ -76,6 +78,7 @@ class WorkflowSandboxRunner(Generic[WorkflowType]):
             inputs=inputs_for_stream,
             event_filter=root_workflow_event_filter,
             trigger=trigger_instance,
+            node_output_mocks=node_output_mocks,
         )
 
         self._process_events(events)

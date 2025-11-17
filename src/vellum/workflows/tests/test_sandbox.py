@@ -1,5 +1,6 @@
 import pytest
 from datetime import datetime
+from unittest.mock import MagicMock
 from typing import List
 
 from vellum.workflows.inputs.base import BaseInputs
@@ -152,3 +153,47 @@ def test_sandbox_runner_with_workflow_trigger(mock_logger):
 
     # AND the dataset row should still have the trigger class
     assert dataset[0].workflow_trigger == MySchedule
+
+
+def test_sandbox_runner_with_node_output_mocks(mock_logger, mocker):
+    """
+    Tests that WorkflowSandboxRunner passes node_output_mocks from DatasetRow to workflow.stream().
+    """
+
+    class Inputs(BaseInputs):
+        message: str
+
+    class TestNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result: str
+
+    class Workflow(BaseWorkflow[Inputs, BaseState]):
+        graph = TestNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_output = TestNode.Outputs.result
+
+    mock_outputs = TestNode.Outputs(result="mocked_result")
+
+    # AND a dataset with node_output_mocks
+    dataset = [
+        DatasetRow(
+            label="test_with_mocks",
+            inputs={"message": "test"},
+            node_output_mocks=[mock_outputs],
+        ),
+    ]
+
+    workflow_instance = Workflow()
+    original_stream = workflow_instance.stream
+    stream_mock = MagicMock(return_value=original_stream(inputs=Inputs(message="test")))
+    mocker.patch.object(workflow_instance, "stream", stream_mock)
+
+    # WHEN we run the sandbox with the DatasetRow containing node_output_mocks
+    runner = WorkflowSandboxRunner(workflow=workflow_instance, dataset=dataset)
+    runner.run()
+
+    stream_mock.assert_called_once()
+    call_kwargs = stream_mock.call_args.kwargs
+    assert "node_output_mocks" in call_kwargs
+    assert call_kwargs["node_output_mocks"] == [mock_outputs]
