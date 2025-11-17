@@ -159,7 +159,7 @@ class ToolPromptNode(InlinePromptNode[ToolCallingState]):
 class RouterNode(BaseNode[ToolCallingState]):
     """Router node that handles routing to function nodes based on outputs."""
 
-    pass
+    __vellum_exclude_from_console__: bool = True  # Exclude from console drawer display
 
 
 class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode[ToolCallingState], FunctionCallNodeMixin):
@@ -467,7 +467,6 @@ def create_router_node(
             {
                 "Ports": Ports,
                 "prompt_outputs": tool_prompt_node.Outputs.results,
-                "__vellum_exclude_from_console__": True,
                 "__module__": __name__,
             },
         ),
