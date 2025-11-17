@@ -890,6 +890,8 @@ class WorkflowRunner(Generic[StateType]):
         for span_id in active_span_ids:
             active_node = self._active_nodes_by_execution_id.pop(span_id, None)
             if active_node is not None:
+                active_node.node.__cancel__(error_message)
+
                 rejection_event = NodeExecutionRejectedEvent(
                     trace_id=self._execution_context.trace_id,
                     span_id=span_id,
