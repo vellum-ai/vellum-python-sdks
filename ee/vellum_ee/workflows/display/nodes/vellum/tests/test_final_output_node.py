@@ -1,3 +1,5 @@
+from typing import List
+
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.nodes.displayable.final_output_node import FinalOutputNode
@@ -78,3 +80,49 @@ def test_final_output_node_display__serialize_with_invalid_types_should_raise_er
 
     # AND the serialized workflow should still be created
     assert "workflow_raw_data" in serialized_workflow
+
+
+def test_final_output_node_display__serialize_with_list_str_type():
+    """
+    Tests that FinalOutputNode with list[str] as second type parameter serializes correctly.
+    """
+
+    # GIVEN a node that outputs a list of strings
+    class ListNode(BaseNode):
+
+        class Outputs:
+            result: List[str]
+
+    # AND a FinalOutputNode with list[str] as the second type parameter
+    class ListOutput(FinalOutputNode[BaseState, List[str]]):
+        class Outputs(FinalOutputNode.Outputs):
+            value = ListNode.Outputs.result
+
+    # AND a workflow referencing the node
+    class MyWorkflow(BaseWorkflow):
+        graph = ListNode >> ListOutput
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_result = ListOutput.Outputs.value
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=MyWorkflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN serialization should succeed without raising validation errors
+    assert "workflow_raw_data" in serialized_workflow
+    assert "nodes" in serialized_workflow["workflow_raw_data"]
+
+    # AND the terminal node should be properly serialized
+    terminal_node = next(
+        node for node in serialized_workflow["workflow_raw_data"]["nodes"] if node["type"] == "TERMINAL"
+    )
+    assert terminal_node is not None
+    assert terminal_node["id"] == str(ListOutput.__id__)
+
+    # AND the output type should be correctly serialized as JSON
+    assert terminal_node["data"]["output_type"] == "JSON"
+
+    # AND the outputs should contain the correct type information
+    assert len(terminal_node["outputs"]) == 1
+    assert terminal_node["outputs"][0]["type"] == "JSON"
