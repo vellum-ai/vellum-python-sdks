@@ -17,8 +17,7 @@ exports[`DictionaryWorkflowReference > should generate correct AST for dictionar
 
 exports[`DictionaryWorkflowReference > should generate correct AST for dictionary with definition 1`] = `
 "{
-    "chat_history": State.chat_history
-    + ChatMessage(text=Inputs.text, role="USER", content=None, source=None),
+    "chat_history": State.chat_history + ChatMessage(text=Inputs.text, role="USER"),
 }
 "
 `;
