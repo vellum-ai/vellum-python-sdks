@@ -50,7 +50,6 @@ from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
-from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.types import (
     EdgeDisplays,
     EntrypointDisplays,
@@ -274,7 +273,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
             serialized_nodes[dict_key] = serialized_node
 
-        synthetic_output_edges: JsonArray = []
         output_variables: JsonArray = []
         output_values: JsonArray = []
         final_output_nodes = [
@@ -282,92 +280,19 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         ]
         final_output_node_outputs = {node.Outputs.value for node in final_output_nodes}
         unreferenced_final_output_node_outputs = final_output_node_outputs.copy()
-        final_output_node_base: JsonObject = {
-            "name": FinalOutputNode.__name__,
-            "module": cast(JsonArray, FinalOutputNode.__module__.split(".")),
-        }
 
-        # Add a synthetic Terminal Node and track the Workflow's output variables for each Workflow output
+        # Track the Workflow's output variables for each Workflow output
         for workflow_output, workflow_output_display in self.display_context.workflow_output_displays.items():
-            final_output_node_id = uuid4_from_hash(f"{self.workflow_id}|node_id|{workflow_output.name}")
             inferred_type = infer_vellum_variable_type(workflow_output)
             # Remove the terminal node output from the unreferenced set
             if isinstance(workflow_output.instance, OutputReference):
                 unreferenced_final_output_node_outputs.discard(workflow_output.instance)
 
-            if workflow_output.instance not in final_output_node_outputs:
-                # Create a synthetic terminal node only if there is no terminal node for this output
-                try:
-                    node_input = create_node_input(
-                        final_output_node_id,
-                        "node_input",
-                        # This is currently the wrapper node's output, but we want the wrapped node
-                        workflow_output.instance,
-                        self.display_context,
-                    )
-                except ValueError as e:
-                    raise ValueError(f"Failed to serialize output '{workflow_output.name}': {str(e)}") from e
-
-                source_node_display: Optional[BaseNodeDisplay]
-                if not node_input.value.rules:
-                    source_node_display = None
-                else:
-                    first_rule = node_input.value.rules[0]
-                    if first_rule.type == "NODE_OUTPUT":
-                        source_node_id = UUID(first_rule.data.node_id)
-                        try:
-                            source_node_display = [
-                                node_display
-                                for node_display in self.display_context.node_displays.values()
-                                if node_display.node_id == source_node_id
-                            ][0]
-                        except IndexError:
-                            source_node_display = None
-                    else:
-                        source_node_display = None
-
-                synthetic_target_handle_id = str(
-                    uuid4_from_hash(f"{self.workflow_id}|target_handle_id|{workflow_output_display.name}")
-                )
-                synthetic_display_data = NodeDisplayData().dict()
-                synthetic_node_label = "Final Output"
-                serialized_nodes[final_output_node_id] = {
-                    "id": str(final_output_node_id),
-                    "type": "TERMINAL",
-                    "data": {
-                        "label": synthetic_node_label,
-                        "name": workflow_output_display.name,
-                        "target_handle_id": synthetic_target_handle_id,
-                        "output_id": str(workflow_output_display.id),
-                        "output_type": inferred_type,
-                        "node_input_id": str(node_input.id),
-                    },
-                    "inputs": [node_input.dict()],
-                    "display_data": synthetic_display_data,
-                    "base": final_output_node_base,
-                    "definition": None,
-                }
-
-                if source_node_display:
-                    source_handle_id = source_node_display.get_source_handle_id(
-                        port_displays=self.display_context.port_displays
-                    )
-
-                    synthetic_output_edges.append(
-                        {
-                            "id": str(uuid4_from_hash(f"{self.workflow_id}|edge_id|{workflow_output_display.name}")),
-                            "source_node_id": str(source_node_display.node_id),
-                            "source_handle_id": str(source_handle_id),
-                            "target_node_id": str(final_output_node_id),
-                            "target_handle_id": synthetic_target_handle_id,
-                            "type": "DEFAULT",
-                        }
-                    )
-
-            elif isinstance(workflow_output.instance, OutputReference):
+            # Update the name of the terminal node if this output references a FinalOutputNode
+            if workflow_output.instance in final_output_node_outputs:
                 terminal_node_id = workflow_output.instance.outputs_class.__parent_class__.__id__
                 serialized_terminal_node = serialized_nodes.get(terminal_node_id)
-                if serialized_terminal_node and isinstance(serialized_terminal_node["data"], dict):
+                if serialized_terminal_node and isinstance(serialized_terminal_node.get("data"), dict):
                     serialized_terminal_node["data"]["name"] = workflow_output_display.name
 
             output_values.append(
@@ -527,8 +452,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             if display_data is not None:
                 regular_edge_dict["display_data"] = display_data
             edges.append(regular_edge_dict)
-
-        edges.extend(synthetic_output_edges)
 
         nodes_list = list(serialized_nodes.values())
         nodes_dict_list = [cast(Dict[str, Any], node) for node in nodes_list if isinstance(node, dict)]
