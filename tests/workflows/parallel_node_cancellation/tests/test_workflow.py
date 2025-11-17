@@ -28,3 +28,16 @@ def test_parallel_node_cancellation__streaming():
     assert top_node_rejection.error.message == "Top node failed"
 
     assert bottom_node_rejection.error.code == WorkflowErrorCode.NODE_CANCELLED
+
+    third_to_last_event = events[-3]
+    assert third_to_last_event == top_node_rejection, "Expected third to last event to be top node rejection"
+
+    second_to_last_event = events[-2]
+    assert second_to_last_event == bottom_node_rejection, "Expected second to last event to be bottom node rejection"
+
+    last_event = events[-1]
+    assert (
+        last_event.name == "workflow.execution.rejected"
+    ), f"Expected last event to be workflow rejection, got {last_event.name}"
+    assert last_event.error.code == top_node_rejection.error.code
+    assert last_event.error.message == top_node_rejection.error.message
