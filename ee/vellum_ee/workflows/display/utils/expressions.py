@@ -145,6 +145,22 @@ def get_child_descriptor(value: LazyReference, display_context: "WorkflowDisplay
     return value._get()
 
 
+def _get_pydantic_model_definition(model_class: type) -> Optional[JsonObject]:
+    """Extract module path definition from a Pydantic model class."""
+    if not inspect.isclass(model_class) or not issubclass(model_class, BaseModel):
+        return None
+
+    module = model_class.__module__
+    name = model_class.__name__
+
+    module_path = module.split(".")
+
+    return {
+        "name": name,
+        "module": cast(JsonArray, module_path),
+    }
+
+
 def _serialize_condition(
     executable_id: UUID, display_context: "WorkflowDisplayContext", condition: BaseDescriptor
 ) -> JsonObject:
@@ -408,7 +424,10 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
                 },
             }
         else:
-            return {"type": "DICTIONARY_REFERENCE", "entries": cast(JsonArray, serialized_entries)}
+            return {
+                "type": "DICTIONARY_REFERENCE",
+                "entries": cast(JsonArray, serialized_entries),
+            }
 
     if is_workflow_class(value):
         from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
@@ -437,7 +456,10 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
     if isinstance(value, BaseModel):
         context = {"executable_id": executable_id, "client": display_context.client}
         dict_value = value.model_dump(context=context)
-        return serialize_value(executable_id, display_context, dict_value)
+        dict_ref = serialize_value(executable_id, display_context, dict_value)
+        if dict_ref is not None and dict_ref.get("type") == "DICTIONARY_REFERENCE":
+            dict_ref["definition"] = _get_pydantic_model_definition(value.__class__)
+        return dict_ref
 
     if callable(value):
         function_definition = compile_function_definition(value)

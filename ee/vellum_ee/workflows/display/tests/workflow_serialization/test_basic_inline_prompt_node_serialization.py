@@ -573,6 +573,10 @@ def test_serialize_workflow_with_nested_descriptor_blocks():
                     },
                 },
             ],
+            "definition": {
+                "name": "ChatMessagePromptBlock",
+                "module": ["vellum", "client", "types", "chat_message_prompt_block"],
+            },
             "type": "DICTIONARY_REFERENCE",
         }
     ]
