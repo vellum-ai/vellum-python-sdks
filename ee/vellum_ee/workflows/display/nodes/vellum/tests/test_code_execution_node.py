@@ -3,6 +3,7 @@ from uuid import UUID
 from typing import Type
 
 from vellum.client.core.api_error import ApiError
+from vellum.workflows.environment import EnvironmentVariables
 from vellum.workflows.nodes.displayable.code_execution_node.node import CodeExecutionNode
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.workflows.base import BaseWorkflow
@@ -170,6 +171,56 @@ def test_serialize_node__with_non_exist_code_input_path():
     with pytest.raises(NodeValidationError) as exc_info:
         workflow_display.serialize()
     assert "Filepath 'non_existent_file.py' does not exist" in str(exc_info.value)
+
+
+def test_serialize_node__with_environment_variable_references():
+    """
+    Tests that environment variable references in code node inputs serialize correctly.
+    """
+
+    # GIVEN a code node with environment variable references in code_inputs
+    class MyCodeExecutionNode(CodeExecutionNode):
+        code_inputs = {
+            "api_key": EnvironmentVariables.get("MY_API_KEY"),
+            "other_config": {"nested_key": EnvironmentVariables.get("NESTED_KEY")},
+        }
+
+    # AND a workflow with the code node
+    class Workflow(BaseWorkflow):
+        graph = MyCodeExecutionNode
+
+    # WHEN the workflow is serialized
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the node should properly serialize the environment variable references
+    my_code_execution_node = next(
+        node for node in serialized_workflow["workflow_raw_data"]["nodes"] if node["type"] == "CODE_EXECUTION"
+    )
+
+    # AND the api_key input should be serialized as an ENVIRONMENT_VARIABLE
+    api_key_input = next(inp for inp in my_code_execution_node["inputs"] if inp["key"] == "api_key")
+    assert api_key_input["value"] == {
+        "combinator": "OR",
+        "rules": [
+            {
+                "type": "ENVIRONMENT_VARIABLE",
+                "data": {
+                    "environment_variable": "MY_API_KEY",
+                },
+            }
+        ],
+    }
+
+    # AND the nested environment variable should also be serialized correctly
+    other_config_input = next(inp for inp in my_code_execution_node["inputs"] if inp["key"] == "other_config")
+    assert other_config_input["value"]["combinator"] == "OR"
+    assert len(other_config_input["value"]["rules"]) == 1
+    assert other_config_input["value"]["rules"][0]["type"] == "CONSTANT_VALUE"
+    # The nested dict should contain the environment variable reference
+    nested_data = other_config_input["value"]["rules"][0]["data"]
+    assert nested_data["type"] == "JSON"
+    assert "nested_key" in nested_data["value"]
 
 
 def test_serialize_node__with_non_exist_code_input_path_with_dry_run():
