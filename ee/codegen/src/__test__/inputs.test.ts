@@ -276,6 +276,14 @@ describe("Inputs", () => {
           ],
         } as Vellum.SearchResultsVellumValue,
       },
+      {
+        type: VellumVariableType.Json,
+        key: "json_array_input",
+        default: {
+          type: "JSON",
+          value: [],
+        } as Vellum.JsonVellumValue,
+      },
     ])(
       "should generate correct code when default is a $type",
       async ({ type, key, default: defaultValue }) => {

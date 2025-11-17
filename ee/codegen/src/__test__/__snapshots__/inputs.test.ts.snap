@@ -180,6 +180,18 @@ class Inputs(BaseInputs):
 "
 `;
 
+exports[`Inputs > write > should generate correct code when default is a 'JSON' 2`] = `
+"from pydantic import Field
+from typing import Any
+
+from vellum.workflows.inputs import BaseInputs
+
+
+class Inputs(BaseInputs):
+    json_array_input: Any = Field(default_factory=list)
+"
+`;
+
 exports[`Inputs > write > should generate correct code when default is a 'NUMBER' 1`] = `
 "from typing import Union
 
