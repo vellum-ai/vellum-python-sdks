@@ -112,6 +112,7 @@ class FunctionCallNodeMixin:
 
 class ToolPromptNode(InlinePromptNode[ToolCallingState]):
     max_prompt_iterations: Optional[int] = 25
+    __vellum_exclude_from_console__: bool = True  # Exclude from console drawer display
 
     class Trigger(InlinePromptNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
@@ -319,6 +320,8 @@ class VellumIntegrationNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
 
 class ElseNode(BaseNode[ToolCallingState]):
     """Node that executes when no function conditions match."""
+
+    __vellum_exclude_from_console__: bool = True  # Exclude from console drawer display
 
     class Ports(BaseNode.Ports):
         # Redefined in the create_else_node function, but defined here to resolve mypy errors

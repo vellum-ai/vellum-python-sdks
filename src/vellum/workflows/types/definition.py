@@ -29,6 +29,11 @@ def serialize_type_encoder_with_id(obj: Union[type, "CodeResourceDefinition"]) -
         return {
             "id": getattr(obj, "__id__"),
             **serialize_type_encoder(obj),
+            **(
+                {"exclude_from_console": getattr(obj, "__vellum_exclude_from_console__")}
+                if hasattr(obj, "__vellum_exclude_from_console__")
+                else {}
+            ),
         }
     elif isinstance(obj, CodeResourceDefinition):
         return obj.model_dump(mode="json")
