@@ -206,8 +206,7 @@ def test_serialize_node__with_environment_variable_references():
             {
                 "type": "ENVIRONMENT_VARIABLE",
                 "data": {
-                    "type": "STRING",
-                    "environment_variable_name": "MY_API_KEY",
+                    "environment_variable": "MY_API_KEY",
                 },
             }
         ],
