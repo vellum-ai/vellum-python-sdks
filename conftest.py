@@ -82,7 +82,8 @@ def mock_uuid4_generator(mocker: MockerFixture) -> Callable[[str], UUIDGenerator
 
 @pytest.fixture
 def vellum_client_class(mocker: MockerFixture) -> Any:
-    vellum_client_class = mocker.patch("vellum.workflows.vellum_client.Vellum")
+    vellum_client_class = mocker.patch("vellum.utils.vellum_client.Vellum")
+    mocker.patch("vellum.workflows.vellum_client.Vellum", vellum_client_class)
     return vellum_client_class
 
 
