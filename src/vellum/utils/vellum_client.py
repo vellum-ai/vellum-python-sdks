@@ -1,8 +1,7 @@
 import os
 from typing import List, Optional
 
-from vellum.client import Vellum
-from vellum.client.environment import VellumEnvironment
+from vellum import Vellum, VellumEnvironment
 from vellum.client.types.api_version_enum import ApiVersionEnum
 
 
