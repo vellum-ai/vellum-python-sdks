@@ -9,6 +9,7 @@ import { WorkflowValueDescriptor } from "src/generators/workflow-value-descripto
 import {
   WorkflowDataNode,
   WorkflowValueDescriptor as WorkflowValueDescriptorType,
+  WorkflowTriggerType,
 } from "src/types/vellum";
 
 describe("WorkflowValueDescriptor", () => {
@@ -301,6 +302,37 @@ describe("WorkflowValueDescriptor", () => {
         workflowContext,
       });
 
+      valueDescriptor.write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("trigger attribute reference", () => {
+    it("generates trigger attribute reference", async () => {
+      const contextWithTrigger = workflowContextFactory({
+        triggers: [
+          {
+            id: "trigger-1",
+            type: WorkflowTriggerType.SCHEDULED,
+            attributes: [{ id: "attr-1", type: "STRING", key: "current_run_at" }, { id: "attr-1", type: "STRING", key: "next_run_at" }],
+            cron: "* * * * *",
+            timezone: "UTC",
+          },
+        ],
+      });
+
+      const descriptor: WorkflowValueDescriptorType = {
+        type: "TRIGGER_ATTRIBUTE",
+        triggerId: "trigger-1",
+        attributeId: "attr-1",
+      };
+
+      const valueDescriptor = new WorkflowValueDescriptor({
+        workflowValueDescriptor: descriptor,
+        workflowContext: contextWithTrigger,
+      });
+
+      const writer = new Writer();
       valueDescriptor.write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
