@@ -140,7 +140,7 @@ def test_upload_vellum_file_with_custom_client(file_type):
     custom_client.uploaded_files.create.return_value = Mock(id=uploaded_file_id)
 
     # WHEN uploading the file with the custom client
-    result = upload_vellum_file(vellum_file, client=custom_client)
+    result = upload_vellum_file(vellum_file, vellum_client=custom_client)
 
     # THEN the custom client should be used for the upload
     assert result.src == f"vellum:uploaded-file:{uploaded_file_id}"

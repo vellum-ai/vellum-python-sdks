@@ -21,8 +21,9 @@ logger = logging.getLogger(__name__)
 
 def upload_vellum_file(
     vellum_file: VellumFileTypes,
+    *,
     filename: Optional[str] = None,
-    client: Optional[VellumClient] = None,
+    vellum_client: Optional[VellumClient] = None,
 ) -> VellumFileTypes:
     """
     Upload a file to Vellum and return a new VellumFile with the uploaded source.
@@ -34,7 +35,7 @@ def upload_vellum_file(
     Args:
         vellum_file: A VellumDocument, VellumImage, VellumAudio, or VellumVideo instance
         filename: Optional filename to use when uploading. If not provided, the API will determine a default.
-        client: An optional Vellum client instance. If not provided, a default client will be created.
+        vellum_client: An optional Vellum client instance. If not provided, a default client will be created.
 
     Returns:
         VellumFileTypes: A new VellumFile of the same type with the vellum:uploaded-file:{id} source
@@ -70,7 +71,7 @@ def upload_vellum_file(
         )
         return vellum_file
 
-    vellum_client = client or create_vellum_client()
+    vellum_client = vellum_client or create_vellum_client()
 
     # Case 2: Base64 Data URL
     data_url_match = re.match(BASE64_DATA_URL_PATTERN, src)
