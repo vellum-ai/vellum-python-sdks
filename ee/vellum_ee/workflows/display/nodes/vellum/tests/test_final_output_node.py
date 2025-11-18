@@ -1,5 +1,3 @@
-import pytest
-
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.nodes.displayable.final_output_node import FinalOutputNode
@@ -82,9 +80,6 @@ def test_final_output_node_display__serialize_with_invalid_types_should_raise_er
     assert "workflow_raw_data" in serialized_workflow
 
 
-@pytest.mark.xfail(
-    reason="list[str] should serialize as REFERENCE with inline JSON Schema; current serializer returns JSON"
-)
 def test_final_output_node_display__serialize_with_list_str_type():
     """
     Tests that FinalOutputNode with list[str] as second type parameter serializes correctly.

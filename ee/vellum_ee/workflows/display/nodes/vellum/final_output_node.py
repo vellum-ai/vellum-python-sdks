@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import ClassVar, Generic, Optional, TypeVar
+from typing import Any, ClassVar, Dict, Generic, Optional, TypeVar, get_args, get_origin
 
 from vellum.workflows.nodes.displayable.final_output_node import FinalOutputNode
 from vellum.workflows.types.core import JsonObject
@@ -13,6 +13,21 @@ from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
 _FinalOutputNodeType = TypeVar("_FinalOutputNodeType", bound=FinalOutputNode)
 
 NODE_INPUT_KEY = "node_input"
+
+
+def _generate_json_schema_for_type(python_type: Any) -> Optional[Dict[str, Any]]:
+    """
+    Generate a JSON Schema for a given Python type.
+    Currently supports list[str] and can be extended for other types.
+    """
+    origin = get_origin(python_type)
+    if origin in (list, type(list)):
+        args = get_args(python_type)
+        if len(args) == 1:
+            item_type = args[0]
+            if item_type is str:
+                return {"type": "array", "items": {"type": "string"}}
+    return None
 
 
 class BaseFinalOutputNodeDisplay(BaseNodeDisplay[_FinalOutputNodeType], Generic[_FinalOutputNodeType]):
@@ -31,6 +46,24 @@ class BaseFinalOutputNodeDisplay(BaseNodeDisplay[_FinalOutputNodeType], Generic[
             self._get_node_input_id(),
         )
         inferred_type = infer_vellum_variable_type(node.Outputs.value)
+
+        output_obj: Dict[str, Any] = {
+            "id": str(self._get_output_id()),
+            "name": node.Outputs.value.name,
+            "type": inferred_type,
+            "value": serialize_value(node_id, display_context, node.Outputs.value.instance),
+        }
+
+        if inferred_type == "REFERENCE":
+            # Get the Python type from the descriptor
+            python_type = node.Outputs.value.types[0] if node.Outputs.value.types else None
+            if python_type:
+                schema = _generate_json_schema_for_type(python_type)
+                if schema:
+                    output_obj["reference"] = {
+                        "type": "INLINE_TYPE_REFERENCE",
+                        "schema": schema,
+                    }
 
         return {
             "id": str(node_id),

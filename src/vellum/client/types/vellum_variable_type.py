@@ -18,6 +18,7 @@ VellumVariableType = typing.Union[
         "DOCUMENT",
         "NULL",
         "THINKING",
+        "REFERENCE",
     ],
     typing.Any,
 ]
