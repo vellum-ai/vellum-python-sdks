@@ -26,7 +26,6 @@ from .nodes import (
     WebSearchNode,
 )
 from .nodes.displayable.tool_calling_node import ToolCallingNode
-from .outputs.base import BaseOutputs
 from .ports import Port
 from .references.environment_variable import EnvironmentVariableReference
 from .references.lazy import LazyReference
@@ -44,7 +43,6 @@ __all__ = [
     "BaseInlinePromptNode",
     "BaseInputs",
     "BaseNode",
-    "BaseOutputs",
     "BasePromptDeploymentNode",
     "BaseSearchNode",
     "BaseState",
