@@ -1,8 +1,9 @@
 from uuid import UUID
-from typing import Any, ClassVar, Dict, Generic, Optional, TypeVar, get_args, get_origin
+from typing import Any, ClassVar, Dict, Generic, Optional, TypeVar
 
 from vellum.workflows.nodes.displayable.final_output_node import FinalOutputNode
 from vellum.workflows.types.core import JsonObject
+from vellum.workflows.utils.functions import compile_annotation
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import to_kebab_case
@@ -13,21 +14,6 @@ from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
 _FinalOutputNodeType = TypeVar("_FinalOutputNodeType", bound=FinalOutputNode)
 
 NODE_INPUT_KEY = "node_input"
-
-
-def _generate_json_schema_for_type(python_type: Any) -> Optional[Dict[str, Any]]:
-    """
-    Generate a JSON Schema for a given Python type.
-    Currently supports list[str] and can be extended for other types.
-    """
-    origin = get_origin(python_type)
-    if origin in (list, type(list)):
-        args = get_args(python_type)
-        if len(args) == 1:
-            item_type = args[0]
-            if item_type is str:
-                return {"type": "array", "items": {"type": "string"}}
-    return None
 
 
 class BaseFinalOutputNodeDisplay(BaseNodeDisplay[_FinalOutputNodeType], Generic[_FinalOutputNodeType]):
@@ -58,12 +44,12 @@ class BaseFinalOutputNodeDisplay(BaseNodeDisplay[_FinalOutputNodeType], Generic[
             # Get the Python type from the descriptor
             python_type = node.Outputs.value.types[0] if node.Outputs.value.types else None
             if python_type:
-                schema = _generate_json_schema_for_type(python_type)
-                if schema:
-                    output_obj["reference"] = {
-                        "type": "INLINE_TYPE_REFERENCE",
-                        "schema": schema,
-                    }
+                defs: Dict[str, Any] = {}
+                schema = compile_annotation(python_type, defs)
+                output_obj["reference"] = {
+                    "type": "INLINE_TYPE_REFERENCE",
+                    "schema": schema,
+                }
 
         return {
             "id": str(node_id),

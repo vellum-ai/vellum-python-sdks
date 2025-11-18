@@ -222,6 +222,5 @@ def _builtin_list_to_vellum_type(type_: Type) -> Union[str, None]:
                 item_type, VellumValueRequest
             ):
                 return "ARRAY"
-            if _is_type_optionally_equal(item_type, str):
-                return "REFERENCE"
+            return "REFERENCE"
     return None
