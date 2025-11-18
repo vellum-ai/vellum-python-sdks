@@ -4,6 +4,7 @@ from .code_execution_node import BaseCodeExecutionNodeDisplay
 from .conditional_node import BaseConditionalNodeDisplay
 from .error_node import BaseErrorNodeDisplay
 from .final_output_node import BaseFinalOutputNodeDisplay
+from .function_node import FunctionNodeDisplay
 from .guardrail_node import BaseGuardrailNodeDisplay
 from .inline_prompt_node import BaseInlinePromptNodeDisplay
 from .inline_subworkflow_node import BaseInlineSubworkflowNodeDisplay
@@ -12,7 +13,6 @@ from .merge_node import BaseMergeNodeDisplay
 from .note_node import BaseNoteNodeDisplay
 from .prompt_deployment_node import BasePromptDeploymentNodeDisplay
 from .retry_node import BaseRetryNodeDisplay
-from .router_node import RouterNodeDisplay
 from .search_node import BaseSearchNodeDisplay
 from .subworkflow_deployment_node import BaseSubworkflowDeploymentNodeDisplay
 from .templating_node import BaseTemplatingNodeDisplay
@@ -26,6 +26,7 @@ __all__ = [
     "BaseConditionalNodeDisplay",
     "BaseErrorNodeDisplay",
     "BaseFinalOutputNodeDisplay",
+    "FunctionNodeDisplay",
     "BaseGuardrailNodeDisplay",
     "BaseInlinePromptNodeDisplay",
     "BaseInlineSubworkflowNodeDisplay",
@@ -34,7 +35,6 @@ __all__ = [
     "BaseNoteNodeDisplay",
     "BasePromptDeploymentNodeDisplay",
     "BaseRetryNodeDisplay",
-    "RouterNodeDisplay",
     "BaseSearchNodeDisplay",
     "BaseSubworkflowDeploymentNodeDisplay",
     "BaseTemplatingNodeDisplay",

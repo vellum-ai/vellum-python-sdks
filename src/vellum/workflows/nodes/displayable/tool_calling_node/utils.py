@@ -159,9 +159,7 @@ class ToolPromptNode(InlinePromptNode[ToolCallingState]):
 class RouterNode(BaseNode[ToolCallingState]):
     """Router node that handles routing to function nodes based on outputs."""
 
-    class Display:
-        icon = "vellum:icon:split"
-        color = "corn"
+    pass
 
 
 class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode[ToolCallingState], FunctionCallNodeMixin):
@@ -218,6 +216,10 @@ class FunctionNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
     """Node that executes a regular Python function with function call output."""
 
     function_definition: Callable[..., Any]
+
+    class Display(BaseNode.Display):
+        icon = "vellum:icon:rectangle-code"
+        color = "purple"
 
     def run(self) -> Iterator[BaseOutput]:
         arguments = self._extract_function_arguments()
@@ -471,10 +473,6 @@ def create_router_node(
             },
         ),
     )
-
-    node.Display.icon = RouterNode.Display.icon
-    node.Display.color = RouterNode.Display.color
-
     return node
 
 
