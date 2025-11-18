@@ -314,7 +314,10 @@ describe("WorkflowValueDescriptor", () => {
           {
             id: "trigger-1",
             type: WorkflowTriggerType.SCHEDULED,
-            attributes: [{ id: "attr-1", type: "STRING", key: "current_run_at" }, { id: "attr-1", type: "STRING", key: "next_run_at" }],
+            attributes: [
+              { id: "attr-1", type: "STRING", key: "current_run_at" },
+              { id: "attr-1", type: "STRING", key: "next_run_at" },
+            ],
             cron: "* * * * *",
             timezone: "UTC",
           },
