@@ -1,20 +1,17 @@
-"""Tests for VellumFileMixin extensions."""
-
 import base64
 from unittest.mock import Mock, patch
 
-from vellum.client.core.pydantic_utilities import UniversalBaseModel
-from vellum.client.types.vellum_file_extensions import VellumFileMixin
+from vellum.utils.files import VellumFileMixin
 
 # Sample content for testing
 SAMPLE_TEXT_CONTENT = b"Hello, this is a test document!"
 
 
-class TestDocument(UniversalBaseModel, VellumFileMixin):
+class TestDocument(VellumFileMixin):
     """Test class that demonstrates how VellumFileMixin is used in postprocess.
 
     This mirrors the pattern used in postprocess.ts where file types inherit from
-    both UniversalBaseModel and VellumFileMixin.
+    VellumFileMixin (which extends UniversalBaseModel), replacing UniversalBaseModel.
     """
 
     src: str
