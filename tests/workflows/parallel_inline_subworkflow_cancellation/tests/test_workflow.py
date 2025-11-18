@@ -12,7 +12,6 @@ from tests.workflows.parallel_inline_subworkflow_cancellation.workflow import (
 )
 
 
-@pytest.mark.xfail(reason="Substantial changes are needed in Workflow Rejection to get this test to pass")
 def test_parallel_inline_subworkflow_cancellation__streaming():
     """
     Tests that when one parallel node fails, the other parallel inline subworkflow node
@@ -24,10 +23,13 @@ def test_parallel_inline_subworkflow_cancellation__streaming():
 
     stream = workflow.stream(event_filter=all_workflow_event_filter)
     events = list(stream)
+    workflow.join()
 
     rejection_events = [e for e in events if e.name == "node.execution.rejected"]
 
-    assert len(rejection_events) >= 3, f"Expected at least 3 rejection events, got {len(rejection_events)}"
+    assert (
+        len(rejection_events) == 3
+    ), f"Expected 3 rejection events, got {[e.node_definition.__name__ for e in rejection_events]}"
 
     fast_failing_rejection = next((e for e in rejection_events if e.node_definition == FastFailingNode), None)
     assert fast_failing_rejection is not None, "Expected FastFailingNode rejection event"
