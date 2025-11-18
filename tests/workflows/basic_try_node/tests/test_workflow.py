@@ -4,8 +4,9 @@ from pytest_mock import MockerFixture
 
 from vellum.workflows.constants import undefined
 from vellum.workflows.errors.types import WorkflowError, WorkflowErrorCode
+from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
-from tests.workflows.basic_try_node.workflow import SimpleTryExample
+from tests.workflows.basic_try_node.workflow import SimpleTryExample, StartNode
 
 
 @pytest.fixture
@@ -49,3 +50,58 @@ def test_run_workflow__catch_error(mock_random_int):
         message="This is a flaky node", code=WorkflowErrorCode.NODE_EXECUTION
     )
     assert terminal_event.outputs.final_value is undefined
+
+
+def test_stream_workflow__catch_error(mock_random_int):
+    """
+    Verify that when the inner node fails, the inner node rejects, the inner workflow rejects,
+    the outer node fulfills, and the outer workflow fulfills.
+    """
+
+    # GIVEN a workflow that references a try node annotation
+    workflow = SimpleTryExample()
+
+    # AND the underlying node fails
+    mock_random_int.return_value = 2
+
+    # WHEN the workflow is streamed
+    stream = workflow.stream(event_filter=all_workflow_event_filter)
+    events = list(stream)
+
+    InnerWorkflow = StartNode.subworkflow.instance
+    WrappedNode = StartNode.__wrapped_node__
+
+    # AND the inner node should reject
+    inner_node_rejected_events = [
+        e for e in events if e.name == "node.execution.rejected" and e.node_definition == WrappedNode
+    ]
+    assert len(inner_node_rejected_events) == 1
+    assert inner_node_rejected_events[0].error.code == WorkflowErrorCode.NODE_EXECUTION
+    assert inner_node_rejected_events[0].error.message == "This is a flaky node"
+
+    # AND the inner workflow should reject
+    inner_workflow_rejected_events = [
+        e for e in events if e.name == "workflow.execution.rejected" and e.workflow_definition == InnerWorkflow
+    ]
+    assert len(inner_workflow_rejected_events) == 1
+    assert inner_workflow_rejected_events[0].error.code == WorkflowErrorCode.NODE_EXECUTION
+    assert inner_workflow_rejected_events[0].error.message == "This is a flaky node"
+
+    # AND the outer node (TryNode) should fulfill
+    outer_node_fulfilled_events = [
+        e for e in events if e.name == "node.execution.fulfilled" and e.node_definition == StartNode
+    ]
+    assert len(outer_node_fulfilled_events) == 1
+    assert outer_node_fulfilled_events[0].outputs.error == WorkflowError(
+        message="This is a flaky node", code=WorkflowErrorCode.NODE_EXECUTION
+    )
+
+    # AND the outer workflow should fulfill
+    outer_workflow_fulfilled_events = [
+        e for e in events if e.name == "workflow.execution.fulfilled" and e.workflow_definition == SimpleTryExample
+    ]
+    assert len(outer_workflow_fulfilled_events) == 1
+    assert outer_workflow_fulfilled_events[0].outputs.error == WorkflowError(
+        message="This is a flaky node", code=WorkflowErrorCode.NODE_EXECUTION
+    )
+    assert outer_workflow_fulfilled_events[0].outputs.final_value is undefined
