@@ -101,3 +101,26 @@ def test_vellum_file_mixin_read_method():
 
     # THEN the content should match
     assert result == content
+
+
+def test_vellum_file_mixin_upload_method():
+    """Test that VellumFileMixin.upload() method works."""
+    # GIVEN a test document with base64 content using the mixin (like postprocess does)
+    content = b"Hello, this is a test document!"
+    base64_content = base64.b64encode(content).decode("utf-8")
+    src = f"data:text/plain;base64,{base64_content}"
+    test_file = TestDocument(src=src)
+    uploaded_file_id = "12345678-1234-1234-1234-123456789abc"
+
+    # WHEN uploading using the mixin's .upload() method
+    with patch("vellum.utils.files.upload.create_vellum_client") as mock_create_client:
+        mock_client = Mock()
+        mock_client.uploaded_files.create.return_value = Mock(id=uploaded_file_id)
+        mock_create_client.return_value = mock_client
+
+        result = test_file.upload()
+
+        # THEN the file should be uploaded and return a new instance with uploaded source
+        assert result.src == f"vellum:uploaded-file:{uploaded_file_id}"
+        assert isinstance(result, TestDocument)
+        mock_client.uploaded_files.create.assert_called_once()
