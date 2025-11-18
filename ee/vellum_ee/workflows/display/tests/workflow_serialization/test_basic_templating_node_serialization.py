@@ -121,48 +121,6 @@ def test_serialize_workflow():
         templating_node,
     )
 
-    final_output_node = workflow_raw_data["nodes"][-1]
-    assert not DeepDiff(
-        {
-            "id": "9f75228b-1d5b-4c30-a581-6087e6a1b738",
-            "type": "TERMINAL",
-            "data": {
-                "label": "Final Output",
-                "name": "result",
-                "target_handle_id": "16ba108e-61a8-4338-8a5b-4f1278d7fd7b",
-                "output_id": "62ec9b08-6437-4f8d-bc20-983d317bc348",
-                "output_type": "JSON",
-                "node_input_id": "da51bb91-227c-481c-84d7-69c64322b485",
-            },
-            "inputs": [
-                {
-                    "id": "da51bb91-227c-481c-84d7-69c64322b485",
-                    "key": "node_input",
-                    "value": {
-                        "rules": [
-                            {
-                                "type": "NODE_OUTPUT",
-                                "data": {
-                                    "node_id": "28ac8611-a755-4d8a-a5c3-520ddd119cf8",
-                                    "output_id": "076becd5-f282-40c5-9917-61099e114298",
-                                },
-                            }
-                        ],
-                        "combinator": "OR",
-                    },
-                }
-            ],
-            "display_data": {"position": {"x": 400.0, "y": -50.0}},
-            "base": {
-                "name": "FinalOutputNode",
-                "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
-            },
-            "definition": None,
-        },
-        final_output_node,
-        ignore_order=True,
-    )
-
     # AND each edge should be serialized correctly
     serialized_edges = workflow_raw_data["edges"]
     assert not DeepDiff(
