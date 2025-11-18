@@ -6,6 +6,7 @@ from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.mocks import MockNodeExecution
 from vellum.workflows.outputs.base import BaseOutputs
+from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.triggers import BaseTrigger
 
 
@@ -66,35 +67,30 @@ class DatasetRow(UniversalBaseModel):
         result = []
         for mock in node_output_mocks:
             if isinstance(mock, MockNodeExecution):
-                node_id = mock.then_outputs.__class__.__parent_class__.__id__
-                then_outputs_dict = {
-                    descriptor.name: value
-                    for descriptor, value in mock.then_outputs
-                    if descriptor.name and not descriptor.name.startswith("__")
-                }
-                normalized_mock = {
-                    "node_id": node_id,
-                    "when_condition": {
-                        "type": "CONSTANT_VALUE",
-                        "value": {"type": "JSON", "value": True},
-                    },
-                    "then_outputs": then_outputs_dict,
-                }
+                mock_exec = mock
             else:
-                node_id = mock.__class__.__parent_class__.__id__
-                then_outputs_dict = {
-                    descriptor.name: value
-                    for descriptor, value in mock
-                    if descriptor.name and not descriptor.name.startswith("__")
-                }
-                normalized_mock = {
-                    "node_id": node_id,
-                    "when_condition": {
-                        "type": "CONSTANT_VALUE",
-                        "value": {"type": "JSON", "value": True},
-                    },
-                    "then_outputs": then_outputs_dict,
-                }
+                mock_exec = MockNodeExecution(
+                    when_condition=ConstantValueReference(True),
+                    then_outputs=mock,
+                )
+
+            node_id = mock_exec.then_outputs.__class__.__parent_class__.__id__
+
+            then_outputs_dict = {
+                descriptor.name: value
+                for descriptor, value in mock_exec.then_outputs
+                if descriptor.name and not descriptor.name.startswith("__")
+            }
+
+            # Build the normalized mock with node_id, when_condition, and then_outputs
+            normalized_mock = {
+                "node_id": node_id,
+                "when_condition": {
+                    "type": "CONSTANT_VALUE",
+                    "value": {"type": "JSON", "value": True},
+                },
+                "then_outputs": then_outputs_dict,
+            }
 
             result.append(normalized_mock)
 
