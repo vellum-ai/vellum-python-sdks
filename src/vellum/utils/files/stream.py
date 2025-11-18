@@ -4,16 +4,18 @@ import base64
 from contextlib import contextmanager
 from io import BytesIO
 import re
-from typing import Generator, Iterator, Optional
+from typing import TYPE_CHECKING, Generator, Iterator, Optional
 
 import requests
 
-from vellum.client import Vellum as VellumClient
 from vellum.client.core.api_error import ApiError
 from vellum.utils.files.constants import BASE64_DATA_URL_PATTERN, URL_PATTERN, VELLUM_FILE_SRC_PATTERN
 from vellum.utils.files.exceptions import FileNotFoundError, FileRetrievalError, InvalidFileSourceError
 from vellum.utils.files.types import VellumFileTypes
-from vellum.workflows.vellum_client import create_vellum_client
+from vellum.utils.vellum_client import create_vellum_client
+
+if TYPE_CHECKING:
+    from vellum.client import Vellum as VellumClient
 
 
 @contextmanager
@@ -21,7 +23,7 @@ def stream_vellum_file(
     vellum_file: VellumFileTypes,
     *,
     chunk_size: int = 8192,
-    vellum_client: Optional[VellumClient] = None,
+    vellum_client: Optional["VellumClient"] = None,
 ) -> Generator[Iterator[bytes], None, None]:
     """
     Stream the file content in chunks using a context manager.
