@@ -19,8 +19,9 @@ from vellum.workflows.vellum_client import create_vellum_client
 @contextmanager
 def stream_vellum_file(
     vellum_file: VellumFileTypes,
+    *,
     chunk_size: int = 8192,
-    client: Optional[VellumClient] = None,
+    vellum_client: Optional[VellumClient] = None,
 ) -> Generator[Iterator[bytes], None, None]:
     """
     Stream the file content in chunks using a context manager.
@@ -31,7 +32,7 @@ def stream_vellum_file(
     Args:
         vellum_file: A VellumDocument, VellumImage, VellumAudio, or VellumVideo instance
         chunk_size: Size of chunks to yield in bytes (default 8KB)
-        client: An optional Vellum client instance. If not provided, a default client will be created.
+        vellum_client: An optional Vellum client instance. If not provided, a default client will be created.
 
     Yields:
         Iterator[bytes]: Chunks of file content
@@ -79,7 +80,7 @@ def stream_vellum_file(
     match = re.match(VELLUM_FILE_SRC_PATTERN, src, re.IGNORECASE)
     if match:
         vellum_uploaded_file_id = match.group(1)
-        vellum_client = client or create_vellum_client()
+        vellum_client = vellum_client or create_vellum_client()
 
         try:
             uploaded_file = vellum_client.uploaded_files.retrieve(vellum_uploaded_file_id)
