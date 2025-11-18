@@ -1,20 +1,16 @@
 import os
-from typing import TYPE_CHECKING, List, Optional
+from typing import List, Optional
 
+from vellum.client import Vellum
+from vellum.client.environment import VellumEnvironment
 from vellum.client.types.api_version_enum import ApiVersionEnum
-
-if TYPE_CHECKING:
-    from vellum.client import Vellum
-    from vellum.client.environment import VellumEnvironment
 
 
 def create_vellum_client(
     api_key: Optional[str] = None,
     api_url: Optional[str] = None,
     api_version: Optional[ApiVersionEnum] = None,
-) -> "Vellum":
-    from vellum.client import Vellum
-
+) -> Vellum:
     if api_key is None:
         api_key = os.getenv("VELLUM_API_KEY", default="")
 
@@ -25,9 +21,7 @@ def create_vellum_client(
     )
 
 
-def create_vellum_environment(api_url: Optional[str] = None) -> "VellumEnvironment":
-    from vellum.client.environment import VellumEnvironment
-
+def create_vellum_environment(api_url: Optional[str] = None) -> VellumEnvironment:
     return VellumEnvironment(
         default=_resolve_env([api_url, "VELLUM_DEFAULT_API_URL", "VELLUM_API_URL"], "https://api.vellum.ai"),
         documents=_resolve_env([api_url, "VELLUM_DOCUMENTS_API_URL", "VELLUM_API_URL"], "https://documents.vellum.ai"),
