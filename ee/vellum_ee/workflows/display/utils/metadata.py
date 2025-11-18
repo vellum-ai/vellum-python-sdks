@@ -116,3 +116,31 @@ def get_regular_edge_id(
     target_path = f"{target_node.__module__}.{target_node.__name__}.Trigger"
     edge_key = f"{source_path}|{target_path}"
     return edges_mapping.get(edge_key)
+
+
+def load_dataset_row_index_to_id_mapping(module_path: str) -> Dict[int, str]:
+    """
+    Load dataset row index to ID mapping from metadata.json for a given module.
+
+    This function searches up the module hierarchy for metadata.json and extracts
+    the dataset_row_index_to_id_mapping.
+
+    Args:
+        module_path: The module path to search from (e.g., "workflows.my_workflow")
+
+    Returns:
+        Dictionary mapping dataset row indices (as integers) to their ID strings
+    """
+    try:
+        root = find_workflow_root_with_metadata(module_path)
+        if not root:
+            return {}
+        file_path = os.path.join(root.replace(".", os.path.sep), "metadata.json")
+        with virtual_open(file_path) as f:
+            data = json.load(f)
+            mapping = data.get("dataset_row_index_to_id_mapping")
+            if isinstance(mapping, dict):
+                return {int(k): v for k, v in mapping.items()}
+            return {}
+    except Exception:
+        return {}

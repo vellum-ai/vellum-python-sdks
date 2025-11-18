@@ -14,12 +14,14 @@ class DatasetRow(UniversalBaseModel):
     Universal base model representing a dataset row with a label and inputs.
 
     Attributes:
+        id: Optional unique identifier for the dataset row
         label: String label for the dataset row
         inputs: BaseInputs instance or dict containing the input data
         workflow_trigger_id: Optional Trigger identifying the workflow trigger class for this scenario
         node_output_mocks: Optional sequence of node output mocks for testing scenarios
     """
 
+    id: Optional[str] = None
     label: str
     inputs: Union[BaseInputs, Dict[str, Any]] = Field(default_factory=BaseInputs)
     workflow_trigger: Optional[Type[BaseTrigger]] = None
