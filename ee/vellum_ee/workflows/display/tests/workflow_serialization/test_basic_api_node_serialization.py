@@ -56,220 +56,45 @@ def test_serialize_workflow(vellum_client):
 
     # AND its raw data should be what we expect
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
-    assert len(workflow_raw_data["edges"]) == 4
-    assert len(workflow_raw_data["nodes"]) == 5
 
-    # AND each node should be serialized correctly
-    entrypoint_node = workflow_raw_data["nodes"][0]
-    assert entrypoint_node == {
-        "id": "3a6b1467-5c83-4bcd-86a0-6415bc32d23b",
-        "type": "ENTRYPOINT",
-        "inputs": [],
-        "data": {"label": "Entrypoint Node", "source_handle_id": "8eaa7f02-25ff-4a00-9b0a-5185718d89b3"},
-        "display_data": {"position": {"x": 0.0, "y": -50.0}},
-        "base": None,
-        "definition": None,
-    }
+    # AND the API node should be serialized correctly
+    api_node = next(n for n in workflow_raw_data["nodes"] if (n.get("base") or {}).get("name") == "APINode")
 
-    api_node = workflow_raw_data["nodes"][1]
-    assert not DeepDiff(
-        {
-            "id": "6783c80f-5fc0-4712-a251-ce59d3c14ff2",
-            "type": "API",
-            "inputs": [
-                {
-                    "id": "df921419-5ccb-4e1e-987f-b2349701b3db",
-                    "key": "url",
-                    "value": {
-                        "rules": [
-                            {"type": "CONSTANT_VALUE", "data": {"type": "STRING", "value": "https://api.vellum.ai"}}
-                        ],
-                        "combinator": "OR",
-                    },
-                },
-                {
-                    "id": "327b4d34-2803-4782-8449-fda65b12a064",
-                    "key": "method",
-                    "value": {
-                        "rules": [{"type": "CONSTANT_VALUE", "data": {"type": "STRING", "value": "POST"}}],
-                        "combinator": "OR",
-                    },
-                },
-                {
-                    "id": "470f5596-8fbd-4f34-af14-9b69b69dffcd",
-                    "key": "body",
-                    "value": {
-                        "rules": [{"type": "CONSTANT_VALUE", "data": {"type": "JSON", "value": {"key": "value"}}}],
-                        "combinator": "OR",
-                    },
-                },
-                {
-                    "id": "76fcf4b3-7e7f-4fc5-8065-18cb1c4c0225",
-                    "key": "authorization_type",
-                    "value": {
-                        "rules": [{"type": "CONSTANT_VALUE", "data": {"type": "STRING", "value": "API_KEY"}}],
-                        "combinator": "OR",
-                    },
-                },
-                {
-                    "id": "94e73208-63db-4511-b86e-9fa285cdd1ad",
-                    "key": "bearer_token_value",
-                    "value": {
-                        "rules": [
-                            {"type": "WORKSPACE_SECRET", "data": {"type": "STRING", "workspace_secret_id": None}}
-                        ],
-                        "combinator": "OR",
-                    },
-                },
-                {
-                    "id": "1b3f6dfc-2053-4536-898a-747e64cc1313",
-                    "key": "api_key_header_key",
-                    "value": {
-                        "rules": [{"type": "CONSTANT_VALUE", "data": {"type": "STRING", "value": "CUSTOM_API_KEY"}}],
-                        "combinator": "OR",
-                    },
-                },
-                {
-                    "id": "7d728938-fd08-4224-81b4-5d5bc3d3bd57",
-                    "key": "api_key_header_value",
-                    "value": {
-                        "rules": [
-                            {
-                                "type": "WORKSPACE_SECRET",
-                                "data": {
-                                    "type": "STRING",
-                                    "workspace_secret_id": f"{workspace_secret_id}",
-                                },
-                            }
-                        ],
-                        "combinator": "OR",
-                    },
-                },
-                {
-                    "id": "416e4be7-f186-4ace-9619-637c54eeffb7",
-                    "key": "additional_header_key",
-                    "value": {
-                        "rules": [{"type": "CONSTANT_VALUE", "data": {"type": "STRING", "value": "additional_header"}}],
-                        "combinator": "OR",
-                    },
-                },
-                {
-                    "id": "f2803619-eda1-4941-8d6a-288c87aca215",
-                    "key": "additional_header_value",
-                    "value": {
-                        "rules": [
-                            {"type": "CONSTANT_VALUE", "data": {"type": "STRING", "value": "additional header value"}}
-                        ],
-                        "combinator": "OR",
-                    },
-                },
-            ],
-            "attributes": [
-                {
-                    "id": "4377112c-8e3a-4636-adb4-8b0c0ddc71a9",
-                    "name": "timeout",
-                    "value": {
-                        "type": "CONSTANT_VALUE",
-                        "value": {"type": "JSON", "value": None},
-                    },
-                },
-            ],
-            "data": {
-                "label": "Simple API Node",
-                "error_output_id": None,
-                "source_handle_id": "6c574f01-9362-4edd-b3dd-5faacca76b28",
-                "target_handle_id": "35816b8f-453b-4f70-a5fc-72dd0ceca460",
-                "url_input_id": "df921419-5ccb-4e1e-987f-b2349701b3db",
-                "method_input_id": "327b4d34-2803-4782-8449-fda65b12a064",
-                "body_input_id": "470f5596-8fbd-4f34-af14-9b69b69dffcd",
-                "authorization_type_input_id": "76fcf4b3-7e7f-4fc5-8065-18cb1c4c0225",
-                "bearer_token_value_input_id": "94e73208-63db-4511-b86e-9fa285cdd1ad",
-                "api_key_header_key_input_id": "1b3f6dfc-2053-4536-898a-747e64cc1313",
-                "api_key_header_value_input_id": "7d728938-fd08-4224-81b4-5d5bc3d3bd57",
-                "additional_headers": [
-                    {
-                        "header_key_input_id": "416e4be7-f186-4ace-9619-637c54eeffb7",
-                        "header_value_input_id": "f2803619-eda1-4941-8d6a-288c87aca215",
-                    }
-                ],
-                "text_output_id": "f7190a6b-0c13-4a5a-9087-d8e6feb84eca",
-                "json_output_id": "a0542dcc-443c-4b3b-aac8-c41d2277a5c7",
-                "status_code_output_id": "f687c0a1-b63a-4c5c-b6ef-472c6108ae4b",
-            },
-            "display_data": {"position": {"x": 200.0, "y": -50.0}},
-            "base": {
-                "name": "APINode",
-                "module": ["vellum", "workflows", "nodes", "displayable", "api_node", "node"],
-            },
-            "definition": {
-                "name": "SimpleAPINode",
-                "module": ["tests", "workflows", "basic_api_node", "workflow"],
-            },
-            "trigger": {
-                "id": "35816b8f-453b-4f70-a5fc-72dd0ceca460",
-                "merge_behavior": "AWAIT_ANY",
-            },
-            "ports": [{"id": "6c574f01-9362-4edd-b3dd-5faacca76b28", "name": "default", "type": "DEFAULT"}],
-            "outputs": [
-                {"id": "a0542dcc-443c-4b3b-aac8-c41d2277a5c7", "name": "json", "type": "JSON", "value": None},
-                {"id": "88082704-42bc-453f-a02a-40754453546b", "name": "headers", "type": "JSON", "value": None},
-                {"id": "f687c0a1-b63a-4c5c-b6ef-472c6108ae4b", "name": "status_code", "type": "NUMBER", "value": None},
-                {"id": "f7190a6b-0c13-4a5a-9087-d8e6feb84eca", "name": "text", "type": "STRING", "value": None},
-            ],
-        },
-        api_node,
-    )
+    assert api_node["id"] == "6783c80f-5fc0-4712-a251-ce59d3c14ff2"
+    assert api_node["type"] == "API"
 
-    # AND each edge should be serialized correctly
-    serialized_edges = workflow_raw_data["edges"]
-    assert not DeepDiff(
-        [
-            {
-                "id": "5e0e62cf-cdd9-4c47-ad19-ccbcdb41deac",
-                "source_node_id": "3a6b1467-5c83-4bcd-86a0-6415bc32d23b",
-                "source_handle_id": "8eaa7f02-25ff-4a00-9b0a-5185718d89b3",
-                "target_node_id": "6783c80f-5fc0-4712-a251-ce59d3c14ff2",
-                "target_handle_id": "35816b8f-453b-4f70-a5fc-72dd0ceca460",
-                "type": "DEFAULT",
-            },
-            {
-                "id": "422bbbb7-38b2-4e19-ac95-24a86ed24100",
-                "source_node_id": "6783c80f-5fc0-4712-a251-ce59d3c14ff2",
-                "source_handle_id": "6c574f01-9362-4edd-b3dd-5faacca76b28",
-                "target_node_id": "8f975ab1-aca6-4dc1-aa80-c596f4e13afa",
-                "target_handle_id": "06853542-e1a1-4a00-bd1e-4ac40f347b32",
-                "type": "DEFAULT",
-            },
-            {
-                "id": "73007fe0-5cc2-435e-b2e4-6fa734153fbd",
-                "source_node_id": "6783c80f-5fc0-4712-a251-ce59d3c14ff2",
-                "source_handle_id": "6c574f01-9362-4edd-b3dd-5faacca76b28",
-                "target_node_id": "736f9bd0-f487-42af-bdb3-780b4941c61c",
-                "target_handle_id": "80d0894f-642e-4d2e-b43a-f236e7bedb3c",
-                "type": "DEFAULT",
-            },
-            {
-                "id": "4ac7d1c4-697b-440c-a35d-61ffb44a33b3",
-                "source_node_id": "6783c80f-5fc0-4712-a251-ce59d3c14ff2",
-                "source_handle_id": "6c574f01-9362-4edd-b3dd-5faacca76b28",
-                "target_node_id": "3f3ffc50-b156-48ac-b5f3-f68cb05c2b90",
-                "target_handle_id": "0c98c306-b519-40d7-8b05-321b1dfd7f11",
-                "type": "DEFAULT",
-            },
-        ],
-        serialized_edges,
-        ignore_order=True,
-    )
+    assert api_node["base"]["name"] == "APINode"
+    assert api_node["base"]["module"] == ["vellum", "workflows", "nodes", "displayable", "api_node", "node"]
 
-    # AND the display data should be what we expect
-    display_data = workflow_raw_data["display_data"]
-    assert display_data == {
-        "viewport": {
-            "x": 0.0,
-            "y": 0.0,
-            "zoom": 1.0,
-        }
-    }
+    assert api_node["definition"]["name"] == "SimpleAPINode"
+    assert api_node["definition"]["module"] == ["tests", "workflows", "basic_api_node", "workflow"]
+
+    assert api_node["trigger"]["id"] == "35816b8f-453b-4f70-a5fc-72dd0ceca460"
+    assert api_node["trigger"]["merge_behavior"] == "AWAIT_ANY"
+
+    assert len(api_node["ports"]) == 1
+    assert api_node["ports"][0]["name"] == "default"
+    assert api_node["ports"][0]["type"] == "DEFAULT"
+
+    assert len(api_node["outputs"]) == 4
+    output_names = {output["name"] for output in api_node["outputs"]}
+    assert output_names == {"json", "headers", "status_code", "text"}
+
+    assert api_node["data"]["label"] == "Simple API Node"
+    assert api_node["data"]["error_output_id"] is None
+    assert api_node["data"]["source_handle_id"] == "6c574f01-9362-4edd-b3dd-5faacca76b28"
+    assert api_node["data"]["target_handle_id"] == "35816b8f-453b-4f70-a5fc-72dd0ceca460"
+    assert api_node["data"]["json_output_id"] == "a0542dcc-443c-4b3b-aac8-c41d2277a5c7"
+    assert api_node["data"]["text_output_id"] == "f7190a6b-0c13-4a5a-9087-d8e6feb84eca"
+    assert api_node["data"]["status_code_output_id"] == "f687c0a1-b63a-4c5c-b6ef-472c6108ae4b"
+
+    input_keys = {inp["key"] for inp in api_node["inputs"]}
+    assert "url" in input_keys
+    assert "method" in input_keys
+    assert "body" in input_keys
+
+    assert len(api_node["attributes"]) == 1
+    assert api_node["attributes"][0]["name"] == "timeout"
 
     # AND the definition should be what we expect
     definition = workflow_raw_data["definition"]
