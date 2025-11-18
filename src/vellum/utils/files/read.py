@@ -1,13 +1,15 @@
 """Convenience utilities for reading Vellum files."""
 
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
-from vellum.client import Vellum as VellumClient
+if TYPE_CHECKING:
+    from vellum.client import Vellum as VellumClient
+
 from vellum.utils.files.stream import stream_vellum_file
 from vellum.utils.files.types import VellumFileTypes
 
 
-def read_vellum_file(vellum_file: VellumFileTypes, *, vellum_client: Optional[VellumClient] = None) -> bytes:
+def read_vellum_file(vellum_file: VellumFileTypes, *, vellum_client: Optional["VellumClient"] = None) -> bytes:
     """
     Convenience function that reads the entire file content into memory.
 
