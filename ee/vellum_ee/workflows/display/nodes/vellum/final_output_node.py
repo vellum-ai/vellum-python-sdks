@@ -8,7 +8,6 @@ from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import to_kebab_case
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
-from vellum_ee.workflows.display.utils.expressions import serialize_value
 from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
 
 _FinalOutputNodeType = TypeVar("_FinalOutputNodeType", bound=FinalOutputNode)
@@ -46,14 +45,6 @@ class BaseFinalOutputNodeDisplay(BaseNodeDisplay[_FinalOutputNodeType], Generic[
             },
             "inputs": [node_input.dict()],
             **self.serialize_generic_fields(display_context),
-            "outputs": [
-                {
-                    "id": str(self._get_output_id()),
-                    "name": node.Outputs.value.name,
-                    "type": inferred_type,
-                    "value": serialize_value(node_id, display_context, node.Outputs.value.instance),
-                }
-            ],
         }
 
     def _get_output_id(self) -> UUID:
