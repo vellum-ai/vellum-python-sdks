@@ -151,7 +151,7 @@ def test_read_vellum_file_from_vellum_uploaded_file(file_type):
 
     vellum_file = file_type(src=src)
 
-    with patch("vellum.utils.files.stream.create_vellum_client") as mock_create_client, patch(
+    with patch("vellum.workflows.vellum_client.create_vellum_client") as mock_create_client, patch(
         "vellum.utils.files.stream.requests.get"
     ) as mock_get:
         # Mock the Vellum client
@@ -193,7 +193,7 @@ def test_read_vellum_file_vellum_uploaded_file_missing_url():
     vellum_file = VellumDocument(src=src)
 
     # Mock the create_vellum_client to return a client with an uploaded file without a file_url
-    with patch("vellum.utils.files.stream.create_vellum_client") as mock_create_client:
+    with patch("vellum.workflows.vellum_client.create_vellum_client") as mock_create_client:
         mock_client = Mock()
         uploaded_file_mock = Mock()
         uploaded_file_mock.file_url = None

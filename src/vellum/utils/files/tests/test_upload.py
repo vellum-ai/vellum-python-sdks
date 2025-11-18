@@ -19,7 +19,7 @@ SAMPLE_VIDEO_CONTENT = b"\x00\x00\x00\x20ftypmp42"  # Minimal MP4 header
 def mock_vellum_client():
     """Fixture that provides a mock Vellum client."""
     mock_client = Mock()
-    with patch("vellum.utils.files.upload.create_vellum_client", return_value=mock_client):
+    with patch("vellum.workflows.vellum_client.create_vellum_client", return_value=mock_client):
         yield mock_client
 
 
