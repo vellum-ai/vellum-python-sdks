@@ -67,7 +67,12 @@ from vellum_ee.workflows.display.types import (
 from vellum_ee.workflows.display.utils.auto_layout import auto_layout_nodes
 from vellum_ee.workflows.display.utils.exceptions import UserFacingException
 from vellum_ee.workflows.display.utils.expressions import serialize_value
-from vellum_ee.workflows.display.utils.metadata import get_entrypoint_edge_id, get_regular_edge_id, get_trigger_edge_id
+from vellum_ee.workflows.display.utils.metadata import (
+    get_entrypoint_edge_id,
+    get_regular_edge_id,
+    get_trigger_edge_id,
+    load_dataset_row_index_to_id_mapping,
+)
 from vellum_ee.workflows.display.utils.registry import register_workflow_display_class
 from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
@@ -1274,6 +1279,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                 dataset_attr = getattr(sandbox_module, "dataset")
                 if dataset_attr and isinstance(dataset_attr, list):
                     dataset = []
+                    dataset_row_index_to_id = load_dataset_row_index_to_id_mapping(module)
                     for i, inputs_obj in enumerate(dataset_attr):
                         if isinstance(inputs_obj, DatasetRow):
                             serialized_inputs = json.loads(json.dumps(inputs_obj.inputs, cls=VellumJsonEncoder))
@@ -1281,6 +1287,12 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                             trigger_class = inputs_obj.workflow_trigger
                             if trigger_class is not None:
                                 row_data["workflow_trigger_id"] = str(trigger_class.__id__)
+
+                            if i in dataset_row_index_to_id:
+                                row_data["id"] = dataset_row_index_to_id[i]
+                            elif inputs_obj.id is not None:
+                                row_data["id"] = inputs_obj.id
+
                             dataset.append(row_data)
                         elif isinstance(inputs_obj, BaseInputs):
                             serialized_inputs = json.loads(json.dumps(inputs_obj, cls=VellumJsonEncoder))

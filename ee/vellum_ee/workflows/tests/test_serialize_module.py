@@ -179,6 +179,34 @@ def test_serialize_module_with_pydantic_array():
     assert test_items[0]["value"] == 100
 
 
+def test_serialize_module_with_dataset_row_id_from_metadata():
+    """
+    Tests that serialize_module correctly reads dataset row IDs from metadata.json.
+
+    Verifies that IDs are included in the serialized dataset.
+    """
+    module_path = "tests.workflows.test_dataset_row_id_serialization"
+
+    result = BaseWorkflowDisplay.serialize_module(module_path)
+
+    assert hasattr(result, "dataset")
+    assert result.dataset is not None
+    assert isinstance(result.dataset, list)
+    assert len(result.dataset) == 3
+
+    assert result.dataset[0]["label"] == "Scenario 1"
+    assert result.dataset[0]["inputs"]["message"] == "World"
+    assert result.dataset[0]["id"] == "dataset-row-id-1"
+
+    assert result.dataset[1]["label"] == "Scenario 2"
+    assert result.dataset[1]["inputs"]["message"] == "Test"
+    assert result.dataset[1]["id"] == "dataset-row-id-2"
+
+    assert result.dataset[2]["label"] == "Scenario 3 without ID"
+    assert result.dataset[2]["inputs"]["message"] == "No ID"
+    assert "id" not in result.dataset[2]
+
+
 def test_serialize_module__with_invalid_nested_set_graph(temp_module_path):
     """
     Tests that serialize_module raises a clear user-facing exception for workflows with nested sets in graph attribute.
