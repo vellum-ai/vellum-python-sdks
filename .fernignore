@@ -13,6 +13,7 @@ src/vellum/prompts
 src/vellum/utils
 src/vellum/workflows
 src/vellum/client/utils.py
+src/vellum/client/types/vellum_file_extensions.py
 src/vellum/client/tests
 scripts
 tests/workflows
