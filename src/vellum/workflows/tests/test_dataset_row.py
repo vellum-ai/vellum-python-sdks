@@ -3,6 +3,7 @@ from typing import Optional
 from vellum.client.types.chat_message import ChatMessage
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.inputs.dataset_row import DatasetRow
+from vellum.workflows.outputs.base import BaseOutputs
 
 
 def test_dataset_row_serialization():
@@ -146,3 +147,38 @@ def test_dataset_row_with_dict_inputs():
     assert serialized_dict["label"] == "test_label"
     assert serialized_dict["inputs"]["message"] == "Hello World"
     assert serialized_dict["inputs"]["count"] == 42
+
+
+def test_dataset_row_with_node_output_mocks():
+    """
+    Test that DatasetRow can be created with node_output_mocks and properly serialized.
+    """
+
+    # GIVEN a DatasetRow with node output mocks
+    class TestOutputs(BaseOutputs):
+        result: str
+
+    mock_output = TestOutputs(result="mocked output")
+
+    class TestInputs(BaseInputs):
+        message: str
+
+    test_inputs = TestInputs(message="test message")
+
+    dataset_row = DatasetRow(label="test_with_mocks", inputs=test_inputs, node_output_mocks=[mock_output])
+
+    serialized_dict = dataset_row.model_dump()
+
+    # THEN the serialized dict should contain the label and inputs
+    assert serialized_dict["label"] == "test_with_mocks"
+    assert serialized_dict["inputs"]["message"] == "test message"
+
+    # AND the node_output_mocks should be present in the serialized dict
+    assert "node_output_mocks" in serialized_dict
+    assert serialized_dict["node_output_mocks"] is not None
+    assert len(serialized_dict["node_output_mocks"]) == 1
+
+    # AND the mock output should be a BaseOutputs instance with the correct data
+    mock_data = serialized_dict["node_output_mocks"][0]
+    assert isinstance(mock_data, BaseOutputs)
+    assert getattr(mock_data, "result") == "mocked output"
