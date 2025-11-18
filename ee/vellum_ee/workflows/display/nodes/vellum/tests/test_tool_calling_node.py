@@ -314,7 +314,7 @@ def test_serialize_tool_router_node():
             "module": ["vellum", "workflows", "nodes", "displayable", "tool_calling_node", "utils"],
             "name": "RouterNode",
         },
-        "display_data": {"position": {"x": 0.0, "y": 0.0}},
+        "display_data": {"position": {"x": 0.0, "y": 0.0}, "icon": "vellum:icon:split", "color": "corn"},
         "id": "d2884fa0-2d3d-4220-a335-bdcef56a00d5",
         "label": "Router Node",
         "outputs": [],

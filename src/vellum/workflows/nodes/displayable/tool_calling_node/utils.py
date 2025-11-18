@@ -159,7 +159,9 @@ class ToolPromptNode(InlinePromptNode[ToolCallingState]):
 class RouterNode(BaseNode[ToolCallingState]):
     """Router node that handles routing to function nodes based on outputs."""
 
-    pass
+    class Display:
+        icon = "vellum:icon:split"
+        color = "corn"
 
 
 class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode[ToolCallingState], FunctionCallNodeMixin):
@@ -469,6 +471,10 @@ def create_router_node(
             },
         ),
     )
+
+    node.Display.icon = RouterNode.Display.icon
+    node.Display.color = RouterNode.Display.color
+
     return node
 
 
