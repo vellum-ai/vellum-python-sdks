@@ -49,3 +49,8 @@ exports[`WorkflowValueDescriptor > expressions that begin with constant values >
 "ConstantValueReference("Some error message").is_error()
 "
 `;
+
+exports[`WorkflowValueDescriptor > trigger attribute reference > generates trigger attribute reference 1`] = `
+"ScheduleTrigger.current_run_at
+"
+`;

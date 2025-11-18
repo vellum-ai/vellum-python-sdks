@@ -74,6 +74,7 @@ export function isReference(
     workflowValueDescriptor.type === "ENVIRONMENT_VARIABLE" ||
     workflowValueDescriptor.type === "EXECUTION_COUNTER" ||
     workflowValueDescriptor.type === "DICTIONARY_REFERENCE" ||
-    workflowValueDescriptor.type === "ARRAY_REFERENCE"
+    workflowValueDescriptor.type === "ARRAY_REFERENCE" ||
+    workflowValueDescriptor.type === "TRIGGER_ATTRIBUTE"
   );
 }
