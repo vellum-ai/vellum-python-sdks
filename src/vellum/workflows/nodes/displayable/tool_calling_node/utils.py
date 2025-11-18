@@ -217,10 +217,6 @@ class FunctionNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
 
     function_definition: Callable[..., Any]
 
-    class Display(BaseNode.Display):
-        icon = "vellum:icon:rectangle-code"
-        color = "purple"
-
     def run(self) -> Iterator[BaseOutput]:
         arguments = self._extract_function_arguments()
 
