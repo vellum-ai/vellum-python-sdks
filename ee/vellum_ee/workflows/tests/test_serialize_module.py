@@ -207,6 +207,30 @@ def test_serialize_module_with_dataset_row_id_from_metadata():
     assert "id" not in result.dataset[2]
 
 
+def test_serialize_module_with_base_inputs_and_metadata():
+    """
+    Tests that BaseInputs rows get IDs from metadata.json mapping.
+
+    Verifies round-trip preservation for workflows using plain BaseInputs entries.
+    """
+    module_path = "tests.workflows.test_base_inputs_with_metadata"
+
+    result = BaseWorkflowDisplay.serialize_module(module_path)
+
+    assert hasattr(result, "dataset")
+    assert result.dataset is not None
+    assert isinstance(result.dataset, list)
+    assert len(result.dataset) == 2
+
+    assert result.dataset[0]["label"] == "Scenario 1"
+    assert result.dataset[0]["inputs"]["message"] == "World"
+    assert result.dataset[0]["id"] == "base-inputs-id-1"
+
+    assert result.dataset[1]["label"] == "Scenario 2"
+    assert result.dataset[1]["inputs"]["message"] == "Test"
+    assert result.dataset[1]["id"] == "base-inputs-id-2"
+
+
 def test_serialize_module__with_invalid_nested_set_graph(temp_module_path):
     """
     Tests that serialize_module raises a clear user-facing exception for workflows with nested sets in graph attribute.

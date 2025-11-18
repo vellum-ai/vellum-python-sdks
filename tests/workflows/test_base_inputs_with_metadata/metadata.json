@@ -1,0 +1,9 @@
+{
+  "node_id_to_file_mapping": {},
+  "entrypoint": "test-entrypoint-id",
+  "edges_to_id_mapping": {},
+  "dataset_row_index_to_id_mapping": {
+    "0": "base-inputs-id-1",
+    "1": "base-inputs-id-2"
+  }
+}

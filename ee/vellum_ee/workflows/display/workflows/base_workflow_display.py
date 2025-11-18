@@ -1287,16 +1287,18 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                             trigger_class = inputs_obj.workflow_trigger
                             if trigger_class is not None:
                                 row_data["workflow_trigger_id"] = str(trigger_class.__id__)
-
-                            if i in dataset_row_index_to_id:
-                                row_data["id"] = dataset_row_index_to_id[i]
-                            elif inputs_obj.id is not None:
-                                row_data["id"] = inputs_obj.id
-
-                            dataset.append(row_data)
                         elif isinstance(inputs_obj, BaseInputs):
                             serialized_inputs = json.loads(json.dumps(inputs_obj, cls=VellumJsonEncoder))
-                            dataset.append({"label": f"Scenario {i + 1}", "inputs": serialized_inputs})
+                            row_data = {"label": f"Scenario {i + 1}", "inputs": serialized_inputs}
+                        else:
+                            continue
+
+                        if i in dataset_row_index_to_id:
+                            row_data["id"] = dataset_row_index_to_id[i]
+                        elif isinstance(inputs_obj, DatasetRow) and inputs_obj.id is not None:
+                            row_data["id"] = inputs_obj.id
+
+                        dataset.append(row_data)
         except (ImportError, AttributeError):
             pass
 
