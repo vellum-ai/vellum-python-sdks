@@ -1087,7 +1087,7 @@ ${errors.slice(0, 3).map((err) => {
      *     The UI entrypoint node id (kept for compatibility). Edge IDs for entrypoint flows
      *     are now included in edges_to_id_mapping using the manual trigger path as the source.
      *
-     * edges_to_id_mapping:
+     * - edges_to_id_mapping:
      *   Key:   "<source_path>|<target_node_path>"
      *          where:
      *            source_path       := "<trigger_module_path>.<TriggerClassName>" for trigger edges
@@ -1095,6 +1095,10 @@ ${errors.slice(0, 3).map((err) => {
      *                                     for node->node edges (handle id disambiguates multiple edges)
      *            target_node_path  := "<module_path>.<ClassName>.Trigger" for the target node
      *   Value: "<ui_edge_id>"
+     *
+     * - dataset_row_index_to_id_mapping:
+     *     Key:   Dataset row index (0-based) as a string
+     *     Value: "<ui_dataset_row_id>"
      **/
 
     // Skip metadata json for subworkflows for now
@@ -1107,6 +1111,7 @@ ${errors.slice(0, 3).map((err) => {
       node_id_to_file_mapping: this.getNodeIdToFileMapping(),
       entrypoint: this.getEntrypointId(),
       edges_to_id_mapping: this.getEdgesToIdMapping(),
+      dataset_row_index_to_id_mapping: this.getDatasetRowIndexToIdMapping(),
     };
 
     const absolutePathToModuleDirectory = join(
@@ -1252,6 +1257,22 @@ ${errors.slice(0, 3).map((err) => {
       const targetPath = `${targetNodeBasePath}.Trigger`;
       const key = `${sourcePath}|${targetPath}`;
       result[key] = edge.id;
+    });
+
+    return result;
+  }
+
+  public getDatasetRowIndexToIdMapping(): Record<string, string> {
+    if (!this.sandboxInputs || this.sandboxInputs.length === 0) {
+      return {};
+    }
+
+    const result: Record<string, string> = {};
+
+    this.sandboxInputs.forEach((row, index) => {
+      if (!Array.isArray(row) && row.id) {
+        result[index.toString()] = row.id;
+      }
     });
 
     return result;
