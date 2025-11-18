@@ -135,6 +135,7 @@ mock_node_uuid = str(MockNode.__id__)
                         "id": mock_node_uuid,
                         "name": "MockNode",
                         "module": module_root + ["events", "tests", "test_event"],
+                        "exclude_from_monitoring": False,
                     },
                     "inputs": {
                         "node_foo": "bar",
@@ -148,6 +149,7 @@ mock_node_uuid = str(MockNode.__id__)
                         "id": mock_node_uuid,
                         "name": "MockNode",
                         "module": module_root + ["events", "tests", "test_event"],
+                        "exclude_from_monitoring": False,
                     },
                     "parent": {
                         "workflow_definition": {
@@ -341,6 +343,7 @@ mock_node_uuid = str(MockNode.__id__)
                         "id": mock_node_uuid,
                         "name": "MockNode",
                         "module": module_root + ["events", "tests", "test_event"],
+                        "exclude_from_monitoring": False,
                     },
                     "output": {
                         "name": "example",
@@ -377,6 +380,7 @@ mock_node_uuid = str(MockNode.__id__)
                         "id": mock_node_uuid,
                         "name": "MockNode",
                         "module": module_root + ["events", "tests", "test_event"],
+                        "exclude_from_monitoring": False,
                     },
                     "outputs": {
                         "example": "foo",
@@ -418,6 +422,7 @@ mock_node_uuid = str(MockNode.__id__)
                         "id": mock_node_uuid,
                         "name": "MockNode",
                         "module": module_root + ["events", "tests", "test_event"],
+                        "exclude_from_monitoring": False,
                     },
                     "outputs": {},
                     "invoked_ports": [
@@ -457,6 +462,7 @@ mock_node_uuid = str(MockNode.__id__)
                         "id": mock_node_uuid,
                         "name": "MockNode",
                         "module": module_root + ["events", "tests", "test_event"],
+                        "exclude_from_monitoring": False,
                     },
                     "outputs": {"example": "foo"},
                     "mocked": True,

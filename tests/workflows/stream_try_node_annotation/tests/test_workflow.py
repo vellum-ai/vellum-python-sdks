@@ -51,6 +51,7 @@ def test_workflow_stream__happy_path():
             "InnerNode",
             ADORNMENT_MODULE_NAME,
         ],
+        "exclude_from_monitoring": False,
     }
     assert node_initiated_events[0].parent is not None
     assert node_initiated_events[0].parent.type == "WORKFLOW"
