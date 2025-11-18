@@ -708,6 +708,143 @@ describe("WorkflowProjectGenerator", () => {
       });
     });
 
+    it("should generate metadata.json with dataset row index to id mapping", async () => {
+      const displayData = {
+        workflow_raw_data: {
+          nodes: [
+            {
+              id: "entry",
+              type: "ENTRYPOINT",
+              data: {
+                label: "Entrypoint",
+                source_handle_id: "entry_source",
+                target_handle_id: "entry_target",
+              },
+              inputs: [],
+            },
+            {
+              id: "terminal-node",
+              type: "TERMINAL",
+              data: {
+                label: "Final Output",
+                name: "final-output",
+                target_handle_id: "terminal_target",
+                output_id: "terminal_output_id",
+                output_type: "STRING",
+                node_input_id: "terminal_input",
+              },
+              inputs: [
+                {
+                  id: "terminal_input",
+                  key: "node_input",
+                  value: {
+                    rules: [
+                      {
+                        type: "CONSTANT_VALUE",
+                        data: {
+                          type: "STRING",
+                          value: "Hello, World!",
+                        },
+                      },
+                    ],
+                    combinator: "OR",
+                  },
+                },
+              ],
+              definition: {
+                name: "FinalOutput",
+                module: ["code", "nodes", "final_output"],
+              },
+              trigger: {
+                id: "terminal_target",
+                merge_behavior: "AWAIT_ANY",
+              },
+              outputs: [
+                {
+                  id: "terminal_output_id",
+                  name: "value",
+                  type: "STRING",
+                },
+              ],
+            },
+          ],
+          edges: [
+            {
+              source_node_id: "entry",
+              source_handle_id: "entry_source",
+              target_node_id: "terminal-node",
+              target_handle_id: "terminal_target",
+              type: "DEFAULT",
+              id: "edge_1",
+            },
+          ],
+        },
+        input_variables: [
+          {
+            id: "input-1",
+            key: "test_input",
+            type: "STRING",
+          },
+        ],
+        state_variables: [],
+        output_variables: [],
+      };
+
+      const sandboxInputs = [
+        {
+          id: "dataset-row-id-1",
+          label: "Scenario 1",
+          inputs: [
+            {
+              name: "test_input",
+              type: "STRING",
+              value: "value-1",
+            },
+          ],
+        },
+        {
+          id: "dataset-row-id-2",
+          label: "Scenario 2",
+          inputs: [
+            {
+              name: "test_input",
+              type: "STRING",
+              value: "value-2",
+            },
+          ],
+        },
+        {
+          label: "Scenario 3 without ID",
+          inputs: [
+            {
+              name: "test_input",
+              type: "STRING",
+              value: "value-3",
+            },
+          ],
+        },
+      ];
+
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+        sandboxInputs,
+      });
+
+      await project.generateCode();
+
+      const metadataPath = join(tempDir, "code", "metadata.json");
+      expect(fs.existsSync(metadataPath)).toBe(true);
+
+      const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
+      expect(metadata.dataset_row_index_to_id_mapping).toEqual({
+        "0": "dataset-row-id-1",
+        "1": "dataset-row-id-2",
+      });
+    });
+
     it("should generate metadata.json with entrypoint and trigger edge id mappings", async () => {
       const displayData = {
         workflow_raw_data: {
