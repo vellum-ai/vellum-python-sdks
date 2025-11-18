@@ -1,3 +1,4 @@
+from .constants import APIRequestMethod, AuthorizationType
 from .errors.types import WorkflowErrorCode
 from .exceptions import NodeException
 from .inputs import BaseInputs, DatasetRow
@@ -24,6 +25,7 @@ from .nodes import (
     TryNode,
     WebSearchNode,
 )
+from .nodes.displayable.tool_calling_node import ToolCallingNode
 from .ports import Port
 from .references.environment_variable import EnvironmentVariableReference
 from .references.lazy import LazyReference
@@ -36,6 +38,8 @@ from .workflows import BaseWorkflow
 
 __all__ = [
     "APINode",
+    "APIRequestMethod",
+    "AuthorizationType",
     "BaseInlinePromptNode",
     "BaseInputs",
     "BaseNode",
@@ -66,6 +70,7 @@ __all__ = [
     "SearchNode",
     "SubworkflowDeploymentNode",
     "TemplatingNode",
+    "ToolCallingNode",
     "TryNode",
     "VellumIntegrationToolDefinition",
     "WebSearchNode",
