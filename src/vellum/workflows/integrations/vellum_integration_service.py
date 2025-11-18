@@ -1,11 +1,11 @@
 from typing import Any, Dict
 
+from vellum import Vellum
 from vellum.client.core.api_error import ApiError
 from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.types.definition import VellumIntegrationToolDetails
-from vellum.workflows.vellum_client import Vellum
 
 
 class VellumIntegrationService:
