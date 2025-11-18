@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Sequence, Type, Union
+from typing import Any, Dict, List, Optional, Sequence, Type, Union
 
 from pydantic import Field, field_serializer
 
@@ -43,5 +43,59 @@ class DatasetRow(UniversalBaseModel):
         for input_descriptor, value in inputs:
             if not input_descriptor.name.startswith("__"):
                 result[input_descriptor.name] = value
+
+        return result
+
+    @field_serializer("node_output_mocks")
+    def serialize_node_output_mocks(
+        self, node_output_mocks: Optional[Sequence[Union[BaseOutputs, MockNodeExecution]]]
+    ) -> Optional[List[Dict[str, Any]]]:
+        """
+        Custom serializer for node_output_mocks that normalizes both BaseOutputs and MockNodeExecution
+        to a consistent dict format with node_id, when_condition, and then_outputs.
+
+        Args:
+            node_output_mocks: Optional sequence of BaseOutputs or MockNodeExecution instances
+
+        Returns:
+            List of normalized mock execution dicts, or None if input is None
+        """
+        if node_output_mocks is None:
+            return None
+
+        result = []
+        for mock in node_output_mocks:
+            if isinstance(mock, MockNodeExecution):
+                node_id = mock.then_outputs.__class__.__parent_class__.__id__
+                then_outputs_dict = {
+                    descriptor.name: value
+                    for descriptor, value in mock.then_outputs
+                    if descriptor.name and not descriptor.name.startswith("__")
+                }
+                normalized_mock = {
+                    "node_id": node_id,
+                    "when_condition": {
+                        "type": "CONSTANT_VALUE",
+                        "value": {"type": "JSON", "value": True},
+                    },
+                    "then_outputs": then_outputs_dict,
+                }
+            else:
+                node_id = mock.__class__.__parent_class__.__id__
+                then_outputs_dict = {
+                    descriptor.name: value
+                    for descriptor, value in mock
+                    if descriptor.name and not descriptor.name.startswith("__")
+                }
+                normalized_mock = {
+                    "node_id": node_id,
+                    "when_condition": {
+                        "type": "CONSTANT_VALUE",
+                        "value": {"type": "JSON", "value": True},
+                    },
+                    "then_outputs": then_outputs_dict,
+                }
+
+            result.append(normalized_mock)
 
         return result

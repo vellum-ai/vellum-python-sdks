@@ -183,4 +183,8 @@ def test_dataset_row_with_node_output_mocks():
 
     # AND the mock output should be serialized as a dict with the correct structure
     mock_data = serialized_dict["node_output_mocks"][0]
-    assert mock_data == {"result": "mocked output"}
+    assert mock_data == {
+        "node_id": DummyNode.__id__,
+        "when_condition": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": True}},
+        "then_outputs": {"result": "mocked output"},
+    }
