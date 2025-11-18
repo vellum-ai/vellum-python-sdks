@@ -106,6 +106,55 @@ class RawUploadedFilesClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
+    def update(
+        self, id: str, *, file: core.File, request_options: typing.Optional[RequestOptions] = None
+    ) -> HttpResponse[UploadedFileRead]:
+        """
+        Update an uploaded file by its ID
+
+        Parameters
+        ----------
+        id : str
+            A UUID string identifying this uploaded file.
+
+        file : core.File
+            See core.File for more documentation
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[UploadedFileRead]
+
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"v1/uploaded-files/{jsonable_encoder(id)}",
+            base_url=self._client_wrapper.get_environment().default,
+            method="PUT",
+            data={},
+            files={
+                "file": file,
+            },
+            request_options=request_options,
+            omit=OMIT,
+            force_multipart=True,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    UploadedFileRead,
+                    parse_obj_as(
+                        type_=UploadedFileRead,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
 
 class AsyncRawUploadedFilesClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
@@ -181,6 +230,55 @@ class AsyncRawUploadedFilesClient:
             base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    UploadedFileRead,
+                    parse_obj_as(
+                        type_=UploadedFileRead,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
+    async def update(
+        self, id: str, *, file: core.File, request_options: typing.Optional[RequestOptions] = None
+    ) -> AsyncHttpResponse[UploadedFileRead]:
+        """
+        Update an uploaded file by its ID
+
+        Parameters
+        ----------
+        id : str
+            A UUID string identifying this uploaded file.
+
+        file : core.File
+            See core.File for more documentation
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[UploadedFileRead]
+
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"v1/uploaded-files/{jsonable_encoder(id)}",
+            base_url=self._client_wrapper.get_environment().default,
+            method="PUT",
+            data={},
+            files={
+                "file": file,
+            },
+            request_options=request_options,
+            omit=OMIT,
+            force_multipart=True,
         )
         try:
             if 200 <= _response.status_code < 300:

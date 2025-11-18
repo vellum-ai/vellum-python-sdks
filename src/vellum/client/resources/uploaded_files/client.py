@@ -83,6 +83,31 @@ class UploadedFilesClient:
         _response = self._raw_client.retrieve(id, request_options=request_options)
         return _response.data
 
+    def update(
+        self, id: str, *, file: core.File, request_options: typing.Optional[RequestOptions] = None
+    ) -> UploadedFileRead:
+        """
+        Update an uploaded file by its ID
+
+        Parameters
+        ----------
+        id : str
+            A UUID string identifying this uploaded file.
+
+        file : core.File
+            See core.File for more documentation
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        UploadedFileRead
+
+        """
+        _response = self._raw_client.update(id, file=file, request_options=request_options)
+        return _response.data
+
 
 class AsyncUploadedFilesClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
@@ -159,4 +184,29 @@ class AsyncUploadedFilesClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.retrieve(id, request_options=request_options)
+        return _response.data
+
+    async def update(
+        self, id: str, *, file: core.File, request_options: typing.Optional[RequestOptions] = None
+    ) -> UploadedFileRead:
+        """
+        Update an uploaded file by its ID
+
+        Parameters
+        ----------
+        id : str
+            A UUID string identifying this uploaded file.
+
+        file : core.File
+            See core.File for more documentation
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        UploadedFileRead
+
+        """
+        _response = await self._raw_client.update(id, file=file, request_options=request_options)
         return _response.data
