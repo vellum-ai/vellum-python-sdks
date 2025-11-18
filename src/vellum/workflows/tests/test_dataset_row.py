@@ -3,6 +3,7 @@ from typing import Optional
 from vellum.client.types.chat_message import ChatMessage
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.inputs.dataset_row import DatasetRow
+from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.outputs.base import BaseOutputs
 
 
@@ -154,11 +155,13 @@ def test_dataset_row_with_node_output_mocks():
     Test that DatasetRow can be created with node_output_mocks and properly serialized.
     """
 
-    # GIVEN a DatasetRow with node output mocks
-    class TestOutputs(BaseOutputs):
-        result: str
+    # GIVEN a node with outputs
+    class DummyNode(BaseNode):
+        class Outputs(BaseOutputs):
+            result: str
 
-    mock_output = TestOutputs(result="mocked output")
+    # AND a DatasetRow with node output mocks
+    mock_output = DummyNode.Outputs(result="mocked output")
 
     class TestInputs(BaseInputs):
         message: str
@@ -178,7 +181,6 @@ def test_dataset_row_with_node_output_mocks():
     assert serialized_dict["node_output_mocks"] is not None
     assert len(serialized_dict["node_output_mocks"]) == 1
 
-    # AND the mock output should be a BaseOutputs instance with the correct data
+    # AND the mock output should be serialized as a dict with the correct structure
     mock_data = serialized_dict["node_output_mocks"][0]
-    assert isinstance(mock_data, BaseOutputs)
-    assert getattr(mock_data, "result") == "mocked output"
+    assert mock_data == {"result": "mocked output"}
