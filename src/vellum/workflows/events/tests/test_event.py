@@ -535,8 +535,8 @@ def test_workflow_event_generator_stream_initialization_exception():
     assert initiated_event.span_id == rejected_event.span_id
 
 
-def test_node_execution_initiated_event_includes_exclude_from_console():
-    """Test exclude_from_console is included in node_definition when node has __vellum_exclude_from_console__."""
+def test_node_execution_initiated_event_includes_exclude_from_monitoring():
+    """Test exclude_from_monitoring is included in node_definition when node has __exclude_from_monitoring__."""
     router_node_event = NodeExecutionInitiatedEvent(
         id=UUID("123e4567-e89b-12d3-a456-426614174001"),
         timestamp=datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
@@ -549,8 +549,8 @@ def test_node_execution_initiated_event_includes_exclude_from_console():
     )
 
     serialized = router_node_event.model_dump(mode="json")
-    assert "exclude_from_console" in serialized["body"]["node_definition"]
-    assert serialized["body"]["node_definition"]["exclude_from_console"] is True
+    assert "exclude_from_monitoring" in serialized["body"]["node_definition"]
+    assert serialized["body"]["node_definition"]["exclude_from_monitoring"] is True
 
     # Test with ElseNode
     else_node_event = NodeExecutionInitiatedEvent(
@@ -565,5 +565,5 @@ def test_node_execution_initiated_event_includes_exclude_from_console():
     )
 
     serialized = else_node_event.model_dump(mode="json")
-    assert "exclude_from_console" in serialized["body"]["node_definition"]
-    assert serialized["body"]["node_definition"]["exclude_from_console"] is True
+    assert "exclude_from_monitoring" in serialized["body"]["node_definition"]
+    assert serialized["body"]["node_definition"]["exclude_from_monitoring"] is True

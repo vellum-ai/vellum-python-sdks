@@ -30,8 +30,8 @@ def serialize_type_encoder_with_id(obj: Union[type, "CodeResourceDefinition"]) -
             "id": getattr(obj, "__id__"),
             **serialize_type_encoder(obj),
             **(
-                {"exclude_from_console": getattr(obj, "__vellum_exclude_from_console__")}
-                if hasattr(obj, "__vellum_exclude_from_console__")
+                {"exclude_from_monitoring": getattr(obj, "__exclude_from_monitoring__")}
+                if hasattr(obj, "__exclude_from_monitoring__")
                 else {}
             ),
         }
