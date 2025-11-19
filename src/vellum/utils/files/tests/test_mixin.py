@@ -19,6 +19,7 @@ class TestDocument(VellumFileMixin):
 
 def test_vellum_file_mixin_stream_method():
     """Test that VellumFileMixin.stream() method works."""
+
     # GIVEN a test document with base64 content using the mixin (like postprocess does)
     content = b"Hello, this is a test document!"
     base64_content = base64.b64encode(content).decode("utf-8")
@@ -38,6 +39,7 @@ def test_vellum_file_mixin_stream_method():
 
 def test_vellum_file_mixin_stream_method_with_custom_chunk_size():
     """Test that VellumFileMixin.stream() respects custom chunk_size parameter."""
+
     # GIVEN a test document with content using the mixin (like postprocess does)
     content = b"This is a longer document that will be split into multiple chunks."
     base64_content = base64.b64encode(content).decode("utf-8")
@@ -62,6 +64,7 @@ def test_vellum_file_mixin_stream_method_with_custom_chunk_size():
 
 def test_vellum_file_mixin_stream_method_from_url():
     """Test that VellumFileMixin.stream() method works for files from URLs."""
+
     # GIVEN a test document with a URL source using the mixin (like postprocess does)
     content = b"URL fetched content that will be streamed"
     url = "https://example.com/file.dat"
@@ -90,6 +93,7 @@ def test_vellum_file_mixin_stream_method_from_url():
 
 def test_vellum_file_mixin_read_method():
     """Test that VellumFileMixin.read() method works."""
+
     # GIVEN a test document with base64 content using the mixin (like postprocess does)
     content = b"Hello, this is a test document!"
     base64_content = base64.b64encode(content).decode("utf-8")
@@ -105,6 +109,7 @@ def test_vellum_file_mixin_read_method():
 
 def test_vellum_file_mixin_upload_method():
     """Test that VellumFileMixin.upload() method works."""
+
     # GIVEN a test document with base64 content using the mixin (like postprocess does)
     content = b"Hello, this is a test document!"
     base64_content = base64.b64encode(content).decode("utf-8")
@@ -124,3 +129,77 @@ def test_vellum_file_mixin_upload_method():
         assert result.src == f"vellum:uploaded-file:{uploaded_file_id}"
         assert isinstance(result, TestDocument)
         mock_client.uploaded_files.create.assert_called_once()
+
+
+def test_vellum_file_mixin_get_signed_url_method():
+    """Test that VellumFileMixin.get_signed_url() method works."""
+
+    # GIVEN a test document with base64 content using the mixin (like postprocess does)
+    content = b"Hello, this is a test document!"
+    base64_content = base64.b64encode(content).decode("utf-8")
+    src = f"data:text/plain;base64,{base64_content}"
+    test_file = TestDocument(src=src)
+    uploaded_file_id = "12345678-1234-1234-1234-123456789abc"
+    signed_url = "https://storage.vellum.ai/files/signed?token=abc123"
+
+    # WHEN getting the signed URL using the mixin's .get_signed_url() method
+    with patch("vellum.utils.vellum_client.create_vellum_client") as mock_create_client:
+        mock_client = Mock()
+        mock_client.uploaded_files.create.return_value = Mock(id=uploaded_file_id)
+        mock_client.uploaded_files.retrieve.return_value = Mock(file_url=signed_url)
+        mock_create_client.return_value = mock_client
+
+        result = test_file.get_signed_url()
+
+        # THEN the file should be uploaded and signed URL returned
+        assert result == signed_url
+        mock_client.uploaded_files.create.assert_called_once()
+        mock_client.uploaded_files.retrieve.assert_called_once_with(uploaded_file_id)
+
+
+def test_vellum_file_mixin_get_signed_url_method_with_custom_client():
+    """Test that VellumFileMixin.get_signed_url() respects custom vellum_client parameter."""
+
+    # GIVEN a test document with base64 content using the mixin (like postprocess does)
+    content = b"Hello, this is a test document!"
+    base64_content = base64.b64encode(content).decode("utf-8")
+    src = f"data:text/plain;base64,{base64_content}"
+    test_file = TestDocument(src=src)
+    uploaded_file_id = "aaaa1111-bbbb-2222-cccc-3333dddd4444"
+    signed_url = "https://custom.storage.com/signed"
+
+    # Create custom client
+    custom_client = Mock()
+    custom_client.uploaded_files.create.return_value = Mock(id=uploaded_file_id)
+    custom_client.uploaded_files.retrieve.return_value = Mock(file_url=signed_url)
+
+    # WHEN getting the signed URL using the mixin with a custom client
+    result = test_file.get_signed_url(vellum_client=custom_client)
+
+    # THEN the custom client should be used
+    assert result == signed_url
+    custom_client.uploaded_files.create.assert_called_once()
+    custom_client.uploaded_files.retrieve.assert_called_once_with(uploaded_file_id)
+
+
+def test_vellum_file_mixin_get_signed_url_method_already_uploaded():
+    """Test that VellumFileMixin.get_signed_url() works for already uploaded files."""
+
+    # GIVEN a test document that's already uploaded using the mixin
+    file_id = "12345678-1234-1234-1234-123456789abc"
+    src = f"vellum:uploaded-file:{file_id}"
+    test_file = TestDocument(src=src)
+    signed_url = "https://storage.vellum.ai/files/signed"
+
+    # WHEN getting the signed URL using the mixin's .get_signed_url() method
+    with patch("vellum.utils.vellum_client.create_vellum_client") as mock_create_client:
+        mock_client = Mock()
+        mock_client.uploaded_files.retrieve.return_value = Mock(file_url=signed_url)
+        mock_create_client.return_value = mock_client
+
+        result = test_file.get_signed_url()
+
+        # THEN the signed URL should be returned without uploading again
+        assert result == signed_url
+        mock_client.uploaded_files.create.assert_not_called()
+        mock_client.uploaded_files.retrieve.assert_called_once_with(file_id)
