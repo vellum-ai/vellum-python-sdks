@@ -9,14 +9,14 @@ import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel, update_forward_refs
 from .execution_vellum_value import ExecutionVellumValue
 from .workflow_event_error import WorkflowEventError
-from .workflow_node_result_event_state import WorkflowNodeResultEventState
 from .workflow_output import WorkflowOutput
 from .workflow_result_event_output_data import WorkflowResultEventOutputData
+from .workflow_result_event_state import WorkflowResultEventState
 
 
 class WorkflowResultEvent(UniversalBaseModel):
     id: str
-    state: WorkflowNodeResultEventState
+    state: WorkflowResultEventState
     ts: dt.datetime
     output: typing.Optional[WorkflowResultEventOutputData] = None
     error: typing.Optional[WorkflowEventError] = None
