@@ -150,12 +150,20 @@ export class VellumVariable extends AstNode {
       });
     }
 
-    // For other types with defaults, use the regular VellumValue
-    return !isNil(variable.default.value)
-      ? new VellumValue({
-          vellumValue: variable.default,
-        })
-      : undefined;
+    // For non-empty defaults, use the regular VellumValue
+    // If default.value is null, generate = None only for optional fields
+    // Required fields should not have = None as default
+    if (isNil(variable.default.value)) {
+      // Only generate = None for optional fields (required === false)
+      if (variable.required === false) {
+        return python.TypeInstantiation.none();
+      }
+      // For required fields with null default, don't set an initializer
+      return undefined;
+    }
+    return new VellumValue({
+      vellumValue: variable.default,
+    });
   }
 
   public write(writer: Writer): void {
