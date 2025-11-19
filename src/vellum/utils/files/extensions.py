@@ -42,8 +42,8 @@ def ensure_filename_with_extension(filename: Optional[str], mime_type: str) -> s
         _, ext = os.path.splitext(filename)
         has_extension = bool(ext)
 
-    # If filename already has an extension, keep it
-    if has_extension:
+    # If the provided filename already has an extension, keep it
+    if filename and has_extension:
         return filename
 
     # Otherwise, infer extension from MIME type
