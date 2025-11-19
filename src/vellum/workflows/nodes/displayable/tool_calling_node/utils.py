@@ -159,7 +159,7 @@ class ToolPromptNode(InlinePromptNode[ToolCallingState]):
 class RouterNode(BaseNode[ToolCallingState]):
     """Router node that handles routing to function nodes based on outputs."""
 
-    pass
+    __exclude_from_monitoring__: bool = True  # Exclude from monitoring views
 
 
 class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode[ToolCallingState], FunctionCallNodeMixin):
@@ -319,6 +319,8 @@ class VellumIntegrationNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
 
 class ElseNode(BaseNode[ToolCallingState]):
     """Node that executes when no function conditions match."""
+
+    __exclude_from_monitoring__: bool = True  # Exclude from monitoring views
 
     class Ports(BaseNode.Ports):
         # Redefined in the create_else_node function, but defined here to resolve mypy errors

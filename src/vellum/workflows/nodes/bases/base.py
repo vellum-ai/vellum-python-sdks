@@ -309,6 +309,8 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
     _context: WorkflowContext
     _inputs: MappingProxyType[Union[NodeReference, AccessorExpression], Any]
 
+    __exclude_from_monitoring__: bool = False
+
     class ExternalInputs(BaseInputs):
         __descriptor_class__ = ExternalInputReference
 

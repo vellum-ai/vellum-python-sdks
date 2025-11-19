@@ -78,6 +78,7 @@ def test_run_workflow__happy_path(mock_uuid4_generator, mock_datetime_now):
         "name": "StartNode",
         "id": str(StartNode.__id__),
         "module": ["tests", "workflows", "basic_emitter_workflow", "workflow"],
+        "exclude_from_monitoring": False,
     }
 
     assert default_serializer(events[2].state) == {
