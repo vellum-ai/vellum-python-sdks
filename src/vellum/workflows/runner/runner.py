@@ -50,7 +50,14 @@ from vellum.workflows.events.node import (
     NodeExecutionRejectedBody,
     NodeExecutionStreamingBody,
 )
-from vellum.workflows.events.types import BaseEvent, NodeParentContext, ParentContext, SpanLink, WorkflowParentContext
+from vellum.workflows.events.types import (
+    BaseEvent,
+    NodeParentContext,
+    ParentContext,
+    SpanLink,
+    WorkflowParentContext,
+    default_serializer,
+)
 from vellum.workflows.events.workflow import (
     WorkflowEventStream,
     WorkflowExecutionFulfilledBody,
@@ -583,6 +590,16 @@ class WorkflowRunner(Generic[StateType]):
 
                 with execution_context(parent_context=updated_parent_context, trace_id=execution.trace_id):
                     for output in node_run_response:
+                        try:
+                            default_serializer(output)
+                        except (TypeError, ValueError) as exc:
+                            raise NodeException(
+                                message=(
+                                    f"Node {node.__class__.__name__} produced output: "
+                                    f"'{output.name}' that could not be serialized to JSON: {exc}"
+                                ),
+                                code=WorkflowErrorCode.INVALID_OUTPUTS,
+                            ) from exc
                         invoked_ports = output > ports
                         if output.is_initiated:
                             yield from initiate_node_streaming_output(output)
@@ -616,6 +633,20 @@ class WorkflowRunner(Generic[StateType]):
                                 ),
                                 parent=execution.parent_context,
                             )
+
+            for descriptor, output_value in outputs:
+                if output_value is undefined:
+                    continue
+                try:
+                    default_serializer(output_value)
+                except (TypeError, ValueError) as exc:
+                    raise NodeException(
+                        message=(
+                            f"Node {node.__class__.__name__} produced output '{descriptor.name}' "
+                            f"that could not be serialized to JSON: {exc}"
+                        ),
+                        code=WorkflowErrorCode.INVALID_OUTPUTS,
+                    ) from exc
 
             node.state.meta.node_execution_cache.fulfill_node_execution(node.__class__, span_id)
 
