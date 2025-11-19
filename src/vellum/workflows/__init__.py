@@ -32,6 +32,7 @@ from .references.lazy import LazyReference
 from .runner import WorkflowRunner
 from .sandbox import WorkflowSandboxRunner
 from .state.base import BaseState
+from .triggers import IntegrationTrigger
 from .types.core import Json, MergeBehavior
 from .types.definition import DeploymentDefinition, MCPServer, VellumIntegrationToolDefinition
 from .workflows import BaseWorkflow
@@ -57,6 +58,7 @@ __all__ = [
     "GuardrailNode",
     "InlinePromptNode",
     "InlineSubworkflowNode",
+    "IntegrationTrigger",
     "Json",
     "LazyReference",
     "MapNode",
