@@ -105,3 +105,13 @@ def test_stream_workflow__catch_error(mock_random_int):
         message="This is a flaky node", code=WorkflowErrorCode.NODE_EXECUTION
     )
     assert outer_workflow_fulfilled_events[0].outputs.final_value is undefined
+
+    # AND the events should occur in the correct order
+    inner_node_rejected_index = events.index(inner_node_rejected_events[0])
+    inner_workflow_rejected_index = events.index(inner_workflow_rejected_events[0])
+    outer_node_fulfilled_index = events.index(outer_node_fulfilled_events[0])
+    outer_workflow_fulfilled_index = events.index(outer_workflow_fulfilled_events[0])
+
+    assert inner_node_rejected_index < inner_workflow_rejected_index
+    assert inner_workflow_rejected_index < outer_node_fulfilled_index
+    assert outer_node_fulfilled_index < outer_workflow_fulfilled_index
