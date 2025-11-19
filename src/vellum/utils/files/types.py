@@ -1,7 +1,8 @@
 """Type definitions for Vellum files."""
 
-from typing import Union
+from typing import TYPE_CHECKING, Union
 
-from vellum import VellumAudio, VellumDocument, VellumImage, VellumVideo
+if TYPE_CHECKING:
+    from vellum import VellumAudio, VellumDocument, VellumImage, VellumVideo
 
-VellumFileTypes = Union[VellumDocument, VellumImage, VellumVideo, VellumAudio]
+VellumFileTypes = Union["VellumDocument", "VellumImage", "VellumVideo", "VellumAudio"]

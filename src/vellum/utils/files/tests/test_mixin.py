@@ -113,7 +113,7 @@ def test_vellum_file_mixin_upload_method():
     uploaded_file_id = "12345678-1234-1234-1234-123456789abc"
 
     # WHEN uploading using the mixin's .upload() method
-    with patch("vellum.utils.files.upload.create_vellum_client") as mock_create_client:
+    with patch("vellum.utils.vellum_client.create_vellum_client") as mock_create_client:
         mock_client = Mock()
         mock_client.uploaded_files.create.return_value = Mock(id=uploaded_file_id)
         mock_create_client.return_value = mock_client

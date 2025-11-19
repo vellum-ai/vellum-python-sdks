@@ -4,17 +4,18 @@ import base64
 from io import BytesIO
 import logging
 import re
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 import requests
 
-from vellum.client import Vellum as VellumClient
 from vellum.client.core.api_error import ApiError
 from vellum.client.core.file import File
 from vellum.utils.files.constants import BASE64_DATA_URL_PATTERN, URL_PATTERN, VELLUM_FILE_SRC_PATTERN
 from vellum.utils.files.exceptions import FileNotFoundError, FileRetrievalError, InvalidFileSourceError
 from vellum.utils.files.types import VellumFileTypes
-from vellum.workflows.vellum_client import create_vellum_client
+
+if TYPE_CHECKING:
+    from vellum.client import Vellum as VellumClient
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +24,7 @@ def upload_vellum_file(
     vellum_file: VellumFileTypes,
     *,
     filename: Optional[str] = None,
-    vellum_client: Optional[VellumClient] = None,
+    vellum_client: Optional["VellumClient"] = None,
 ) -> VellumFileTypes:
     """
     Upload a file to Vellum and return a new VellumFile with the uploaded source.
@@ -71,7 +72,10 @@ def upload_vellum_file(
         )
         return vellum_file
 
-    vellum_client = vellum_client or create_vellum_client()
+    if vellum_client is None:
+        from vellum.utils.vellum_client import create_vellum_client
+
+        vellum_client = create_vellum_client()
 
     # Case 2: Base64 Data URL
     data_url_match = re.match(BASE64_DATA_URL_PATTERN, src)
