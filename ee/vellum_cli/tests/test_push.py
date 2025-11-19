@@ -1399,7 +1399,7 @@ def test_push__validation_error_during_serialization(mock_module, mocker):
                 {
                     "type": "missing",
                     "loc": ("field",),
-                    "msg": "Field required",
+                    "msg": "Field required",  # type: ignore[typeddict-item]
                     "input": {"invalid": "data"},
                 }
             ],
