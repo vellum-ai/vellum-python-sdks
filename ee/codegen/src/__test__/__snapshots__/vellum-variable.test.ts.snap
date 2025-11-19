@@ -45,6 +45,16 @@ exports[`VellumVariableField > ChatHistoryVellumVariable snapshot 1`] = `
 "
 `;
 
+exports[`VellumVariableField > ChatHistoryVellumVariable with empty list default uses Field(default_factory=list) when false 1`] = `
+"test: Optional[List[ChatMessage]] = Field(default_factory=list)
+"
+`;
+
+exports[`VellumVariableField > ChatHistoryVellumVariable with empty list default uses Field(default_factory=list) when true 1`] = `
+"test: List[ChatMessage] = Field(default_factory=list)
+"
+`;
+
 exports[`VellumVariableField > DocumentVellumVariable snapshot 1`] = `
 "test: VellumDocument
 "

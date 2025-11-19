@@ -78,13 +78,25 @@ export class VellumVariable extends AstNode {
         : undefined;
     }
 
-    // Check if the default type is ARRAY or JSON
-    // Use Field(default_factory=...) for ARRAY and JSON types to avoid mutable default issues
+    // Check if the default type is ARRAY, JSON, or CHAT_HISTORY
+    // Use Field(default_factory=...) for list types to avoid mutable default issues
     const isArrayType = variable.default.type === "ARRAY";
     const isJsonType = variable.default.type === "JSON";
+    const isChatHistoryType = variable.default.type === "CHAT_HISTORY";
 
-    // Handle arrays: both ARRAY type and JSON type with array values need Field(default_factory=list)
-    if ((isArrayType || isJsonType) && Array.isArray(variable.default.value)) {
+    // Also check if the variable type itself is a list type (CHAT_HISTORY or ARRAY)
+    // and the default value is an empty array
+    const isVariableListType =
+      variable.type === "CHAT_HISTORY" || variable.type === "ARRAY";
+
+    // Handle arrays: ARRAY, JSON with array values, and CHAT_HISTORY need Field(default_factory=list)
+    if (
+      ((isArrayType || isJsonType || isChatHistoryType) &&
+        Array.isArray(variable.default.value)) ||
+      (isVariableListType &&
+        Array.isArray(variable.default.value) &&
+        variable.default.value.length === 0)
+    ) {
       // Use Field(default_factory=list) for empty lists
       // Use Field(default_factory=lambda: [...]) for non-empty lists
       const fieldReference = python.reference({
