@@ -31,12 +31,14 @@ export declare namespace VellumVariable {
 
 export class VellumVariable extends AstNode {
   private readonly field: python.Field;
+  private readonly defaultRequired?: boolean;
 
   constructor({ variable, defaultRequired }: VellumVariable.Args) {
     super();
 
     const baseType = getVellumVariablePrimitiveType(variable.type);
     const name = variable.name ?? variable.key;
+    this.defaultRequired = defaultRequired;
 
     // NULL type do not need to be optional
     // variable.required === false is used to indicate that the variable is optional
@@ -154,8 +156,10 @@ export class VellumVariable extends AstNode {
     // If default.value is null, generate = None only for optional fields
     // Required fields should not have = None as default
     if (isNil(variable.default.value)) {
-      // Only generate = None for optional fields (required === false)
-      if (variable.required === false) {
+      const isOptional =
+        variable.required === false ||
+        (variable.required === undefined && this.defaultRequired === false);
+      if (isOptional) {
         return python.TypeInstantiation.none();
       }
       // For required fields with null default, don't set an initializer
