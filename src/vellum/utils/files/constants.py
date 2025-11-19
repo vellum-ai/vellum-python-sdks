@@ -14,3 +14,34 @@ BASE64_DATA_URL_PATTERN = (
 
 # Regex pattern to match HTTP/HTTPS URLs
 URL_PATTERN = r"^(https?://[^\s]+)$"
+
+# Fallback MIME type to file extension mappings for types that mimetypes.guess_extension
+# might not handle well or returns undesirable extensions
+MIME_TYPE_TO_EXTENSION = {
+    "application/octet-stream": ".bin",
+    "text/plain": ".txt",
+    # Markdown variants
+    "text/markdown": ".md",
+    "text/x-markdown": ".md",
+    # YAML variants
+    "application/x-yaml": ".yaml",
+    "text/yaml": ".yaml",
+    "application/yaml": ".yaml",
+    # Compression formats
+    "application/gzip": ".gz",
+    "application/x-gzip": ".gz",
+}
+
+# File extension overrides to prefer more common extensions
+EXTENSION_OVERRIDES = {
+    # Image formats - prefer shorter extensions
+    ".jpe": ".jpg",
+    ".jpeg": ".jpg",
+    ".tif": ".tiff",
+    # HTML - prefer .html over .htm
+    ".htm": ".html",
+    # XML - prefer .xml over .xsl (mimetypes returns .xsl for application/xml)
+    ".xsl": ".xml",
+    # YAML - prefer .yaml over .yml for consistency
+    ".yml": ".yaml",
+}

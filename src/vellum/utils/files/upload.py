@@ -12,6 +12,7 @@ from vellum.client.core.api_error import ApiError
 from vellum.client.core.file import File
 from vellum.utils.files.constants import BASE64_DATA_URL_PATTERN, URL_PATTERN, VELLUM_FILE_SRC_PATTERN
 from vellum.utils.files.exceptions import FileNotFoundError, FileRetrievalError, InvalidFileSourceError
+from vellum.utils.files.extensions import ensure_filename_with_extension
 from vellum.utils.files.types import VellumFileTypes
 
 if TYPE_CHECKING:
@@ -35,7 +36,9 @@ def upload_vellum_file(
 
     Args:
         vellum_file: A VellumDocument, VellumImage, VellumAudio, or VellumVideo instance
-        filename: Optional filename to use when uploading. If not provided, the API will determine a default.
+        filename: Optional filename to use when uploading. If not provided, defaults to "file"
+                 with an appropriate extension inferred from the MIME type. If provided without
+                 an extension, the extension will be automatically added based on the MIME type.
         vellum_client: An optional Vellum client instance. If not provided, a default client will be created.
 
     Returns:
@@ -55,9 +58,13 @@ def upload_vellum_file(
         doc = VellumDocument(src="https://example.com/doc.pdf")
         uploaded_doc = upload_vellum_file(doc, filename="my_document.pdf")
 
-        # Upload a base64-encoded image
+        # Upload a base64-encoded image (filename automatically inferred as "file.png")
         image = VellumImage(src="data:image/png;base64,iVBORw0KGgo...")
-        uploaded_image = upload_vellum_file(image, filename="screenshot.png")
+        uploaded_image = upload_vellum_file(image)
+
+        # Upload with filename without extension (extension automatically added)
+        doc = VellumDocument(src="data:application/pdf;base64,...")
+        uploaded_doc = upload_vellum_file(doc, filename="report")  # becomes "report.pdf"
         ```
     """
     src = vellum_file.src
@@ -84,7 +91,9 @@ def upload_vellum_file(
         base64_content = data_url_match.group(3)
         decoded = base64.b64decode(base64_content)
 
-        file_content: File = (filename, BytesIO(decoded), mime_type)
+        # Ensure filename has appropriate extension
+        resolved_filename = ensure_filename_with_extension(filename, mime_type)
+        file_content: File = (resolved_filename, BytesIO(decoded), mime_type)
 
         try:
             uploaded_file = vellum_client.uploaded_files.create(file=file_content)
@@ -120,7 +129,9 @@ def upload_vellum_file(
     content = response.content
     content_type = response.headers.get("content-type", "application/octet-stream")
 
-    file_content = (filename, BytesIO(content), content_type)
+    # Ensure filename has appropriate extension
+    resolved_filename = ensure_filename_with_extension(filename, content_type)
+    file_content = (resolved_filename, BytesIO(content), content_type)
 
     try:
         uploaded_file = vellum_client.uploaded_files.create(file=file_content)

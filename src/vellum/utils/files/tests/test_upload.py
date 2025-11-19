@@ -270,7 +270,7 @@ def test_upload_vellum_file_case_insensitive_vellum_src(src_pattern, file_type):
 
 
 def test_upload_vellum_file_none_filename(mock_vellum_client):
-    """Test uploading file with filename=None (API handles it)."""
+    """Test uploading file with filename=None defaults to 'file' with inferred extension."""
 
     # GIVEN a VellumFile and filename=None
     base64_content = base64.b64encode(SAMPLE_TEXT_CONTENT).decode("utf-8")
@@ -282,8 +282,28 @@ def test_upload_vellum_file_none_filename(mock_vellum_client):
     # WHEN uploading the file with filename=None
     result = upload_vellum_file(vellum_file, filename=None)
 
-    # THEN the file should be uploaded with None as the filename
+    # THEN the file should be uploaded with 'file.txt' as the filename (inferred from MIME type)
     assert result.src == f"vellum:uploaded-file:{uploaded_file_id}"
     call_args = mock_vellum_client.uploaded_files.create.call_args
     uploaded_file_tuple = call_args.kwargs["file"]
-    assert uploaded_file_tuple[0] is None
+    assert uploaded_file_tuple[0] == "file.txt"
+
+
+def test_upload_vellum_file_filename_without_extension(mock_vellum_client):
+    """Test uploading file with filename without extension auto-adds extension."""
+
+    # GIVEN a VellumFile and a filename without extension
+    base64_content = base64.b64encode(SAMPLE_TEXT_CONTENT).decode("utf-8")
+    src = f"data:application/pdf;base64,{base64_content}"
+    vellum_file = VellumDocument(src=src)
+    uploaded_file_id = "no-ext-filename-test"
+    mock_vellum_client.uploaded_files.create.return_value = Mock(id=uploaded_file_id)
+
+    # WHEN uploading the file with a filename without extension
+    result = upload_vellum_file(vellum_file, filename="report")
+
+    # THEN the file should be uploaded with extension added based on MIME type
+    assert result.src == f"vellum:uploaded-file:{uploaded_file_id}"
+    call_args = mock_vellum_client.uploaded_files.create.call_args
+    uploaded_file_tuple = call_args.kwargs["file"]
+    assert uploaded_file_tuple[0] == "report.pdf"
