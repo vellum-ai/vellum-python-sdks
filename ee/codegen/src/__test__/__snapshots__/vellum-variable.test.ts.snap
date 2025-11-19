@@ -140,6 +140,16 @@ exports[`VellumVariableField > ThinkingVellumVariable snapshot 1`] = `
 "
 `;
 
+exports[`VellumVariableField > VellumVariable with null default value (required: false) 1`] = `
+"test: Optional[str] = None
+"
+`;
+
+exports[`VellumVariableField > VellumVariable with null default value (required: true) 1`] = `
+"test: str
+"
+`;
+
 exports[`VellumVariableField > VideoVellumVariable snapshot 1`] = `
 "test: VellumVideo
 "

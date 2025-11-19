@@ -218,6 +218,23 @@ describe("VellumVariableField", () => {
     }
   );
 
+  it.each([true, false])(
+    "VellumVariable with null default value (required: %s)",
+    async (required: boolean) => {
+      const stringVar = codegen.vellumVariable({
+        variable: {
+          id: "1",
+          name: "test",
+          type: "STRING",
+          required: required,
+          default: { type: "STRING", value: null },
+        },
+      });
+      stringVar.write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    }
+  );
+
   test("ThinkingVellumVariable snapshot", async () => {
     const thinkingVar = codegen.vellumVariable({
       variable: { id: "1", name: "test", type: "THINKING", required: true },
