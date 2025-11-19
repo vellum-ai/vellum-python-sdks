@@ -114,16 +114,19 @@ class Inputs(BaseInputs):
 `;
 
 exports[`Inputs > write > should generate correct code when default is a 'CHAT_HISTORY' 1`] = `
-"from typing import List
+"from pydantic import Field
+from typing import List
 
 from vellum import ChatMessage
 from vellum.workflows.inputs import BaseInputs
 
 
 class Inputs(BaseInputs):
-    chat_history_input: List[ChatMessage] = [
-        ChatMessage(role="USER", text="foo bar"),
-    ]
+    chat_history_input: List[ChatMessage] = Field(
+        default_factory=lambda: [
+            ChatMessage(role="USER", text="foo bar"),
+        ]
+    )
 "
 `;
 
