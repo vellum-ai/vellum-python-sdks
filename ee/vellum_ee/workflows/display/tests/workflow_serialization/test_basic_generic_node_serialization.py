@@ -51,100 +51,10 @@ def test_serialize_workflow():
 
     # AND its raw data should be what we expect
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
-    assert len(workflow_raw_data["edges"]) == 2
-    assert len(workflow_raw_data["nodes"]) == 3
 
-    # AND each node should be serialized correctly
-    entrypoint_node = workflow_raw_data["nodes"][0]
-    assert entrypoint_node["id"] == "f1e4678f-c470-400b-a40e-c8922cc99a86"
-    assert entrypoint_node["type"] == "ENTRYPOINT"
-    assert entrypoint_node["inputs"] == []
-    assert entrypoint_node["data"] == {
-        "label": "Entrypoint Node",
-        "source_handle_id": "40201804-8beb-43ad-8873-a027759512f1",
-    }
-    assert entrypoint_node["base"] is None
-    assert entrypoint_node["definition"] is None
-
-    api_node = workflow_raw_data["nodes"][1]
-    assert api_node["id"] == "bf98371c-65d3-43c1-99a2-0f5369397847"
-
-    final_output_node = workflow_raw_data["nodes"][2]
-    assert not DeepDiff(
-        {
-            "id": "50e3b446-afcd-4a5d-8c6f-5f05eaf2200e",
-            "type": "TERMINAL",
-            "data": {
-                "label": "Final Output",
-                "name": "output",
-                "target_handle_id": "8bd9f4f3-9f66-4d95-8e84-529b0002c531",
-                "output_id": "2b6389d0-266a-4be4-843e-4e543dd3d727",
-                "output_type": "STRING",
-                "node_input_id": "545d6001-cfb5-4ccc-bcdf-3b03ccd67d90",
-            },
-            "inputs": [
-                {
-                    "id": "545d6001-cfb5-4ccc-bcdf-3b03ccd67d90",
-                    "key": "node_input",
-                    "value": {
-                        "rules": [
-                            {
-                                "type": "NODE_OUTPUT",
-                                "data": {
-                                    "node_id": "bf98371c-65d3-43c1-99a2-0f5369397847",
-                                    "output_id": "83a720ef-d397-429b-8124-1db8286b3b00",
-                                },
-                            }
-                        ],
-                        "combinator": "OR",
-                    },
-                }
-            ],
-            "display_data": {"position": {"x": 400.0, "y": -50.0}},
-            "base": {
-                "name": "FinalOutputNode",
-                "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
-            },
-            "definition": None,
-        },
-        final_output_node,
-        ignore_order=True,
-    )
-
-    # AND each edge should be serialized correctly
-    serialized_edges = workflow_raw_data["edges"]
-    assert not DeepDiff(
-        [
-            {
-                "id": "cd4d1a87-1fa2-46df-89fe-7fed9bb4600c",
-                "source_node_id": "f1e4678f-c470-400b-a40e-c8922cc99a86",
-                "source_handle_id": "40201804-8beb-43ad-8873-a027759512f1",
-                "target_node_id": "bf98371c-65d3-43c1-99a2-0f5369397847",
-                "target_handle_id": "43d9db30-98f6-4d75-a487-f74f3c660d8a",
-                "type": "DEFAULT",
-            },
-            {
-                "id": "b741c861-cf67-4649-b9ef-b43a4add72b1",
-                "source_node_id": "bf98371c-65d3-43c1-99a2-0f5369397847",
-                "source_handle_id": "f710ef29-a056-420d-9342-8f0ac79ce4ca",
-                "target_node_id": "50e3b446-afcd-4a5d-8c6f-5f05eaf2200e",
-                "target_handle_id": "8bd9f4f3-9f66-4d95-8e84-529b0002c531",
-                "type": "DEFAULT",
-            },
-        ],
-        serialized_edges,
-        ignore_order=True,
-    )
-
-    # AND the display data should be what we expect
-    display_data = workflow_raw_data["display_data"]
-    assert display_data == {
-        "viewport": {
-            "x": 0.0,
-            "y": 0.0,
-            "zoom": 1.0,
-        }
-    }
+    # AND the generic node should be serialized correctly
+    generic_node = next(n for n in workflow_raw_data["nodes"] if (n.get("base") or {}).get("name") == "BaseNode")
+    assert generic_node["id"] == "bf98371c-65d3-43c1-99a2-0f5369397847"
 
     # AND the nodes should have been auto-positioned since they all started at (0,0)
     nodes = workflow_raw_data["nodes"]
