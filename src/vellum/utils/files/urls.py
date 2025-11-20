@@ -4,7 +4,9 @@ import logging
 import re
 from typing import TYPE_CHECKING, Optional
 
+from vellum.client.core.api_error import ApiError
 from vellum.utils.files.constants import VELLUM_FILE_SRC_PATTERN
+from vellum.utils.files.exceptions import FileRetrievalError, InvalidFileSourceError
 from vellum.utils.files.types import VellumFileTypes
 from vellum.utils.files.upload import upload_vellum_file
 
@@ -45,7 +47,7 @@ def get_signed_url(
         vellum_uploaded_file_id = match.group(1)
 
     if not vellum_uploaded_file_id:
-        raise ValueError("Failed to determine id of uploaded file.")
+        raise InvalidFileSourceError("Failed to determine id of uploaded file.")
 
     if vellum_client is None:
         from vellum.utils.vellum_client import create_vellum_client
@@ -53,9 +55,13 @@ def get_signed_url(
         vellum_client = create_vellum_client()
 
     # Fetch the signed URL for this file from Vellum
-    vellum_uploaded_file = vellum_client.uploaded_files.retrieve(vellum_uploaded_file_id)
+    try:
+        vellum_uploaded_file = vellum_client.uploaded_files.retrieve(vellum_uploaded_file_id)
+    except ApiError as e:
+        raise FileRetrievalError("Failed to retrieve file from Vellum") from e
+
     signed_url = vellum_uploaded_file.file_url
     if not signed_url:
-        raise ValueError("Failed to retrieve signed URL for uploaded file.")
+        raise FileRetrievalError("Failed to retrieve signed URL for uploaded file.")
 
     return signed_url

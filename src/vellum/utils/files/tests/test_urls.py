@@ -4,6 +4,7 @@ from unittest.mock import Mock, patch
 
 from vellum import VellumAudio, VellumDocument, VellumImage, VellumVideo
 from vellum.client.core.api_error import ApiError
+from vellum.utils.files.exceptions import FileRetrievalError, InvalidFileSourceError
 from vellum.utils.files.urls import get_signed_url
 
 # Sample content for testing
@@ -150,7 +151,7 @@ def test_get_signed_url_with_custom_client(mock_upload, file_type):
 
 
 def test_get_signed_url_invalid_uploaded_file_format(mock_vellum_client):
-    """Test that ValueError is raised when uploaded file ID cannot be parsed."""
+    """Test that InvalidFileSourceError is raised when uploaded file ID cannot be parsed."""
 
     # GIVEN a VellumFile with a malformed vellum:uploaded-file: src
     # This should never happen in practice but we test error handling
@@ -164,8 +165,8 @@ def test_get_signed_url_invalid_uploaded_file_format(mock_vellum_client):
         mock_upload.return_value = VellumDocument(src="vellum:uploaded-file:not-a-valid-uuid")
 
         # WHEN getting the signed URL
-        # THEN a ValueError should be raised
-        with pytest.raises(ValueError, match="Failed to determine id of uploaded file"):
+        # THEN an InvalidFileSourceError should be raised
+        with pytest.raises(InvalidFileSourceError, match="Failed to determine id of uploaded file"):
             get_signed_url(vellum_file)
 
 
@@ -181,8 +182,25 @@ def test_get_signed_url_api_error_on_retrieve(mock_vellum_client):
     mock_vellum_client.uploaded_files.retrieve.side_effect = ApiError(status_code=404, body="File not found")
 
     # WHEN getting the signed URL
-    # THEN the API error should propagate
-    with pytest.raises(ApiError):
+    # THEN a FileRetrievalError should be raised wrapping the API error
+    with pytest.raises(FileRetrievalError, match="Failed to retrieve file from Vellum"):
+        get_signed_url(vellum_file)
+
+
+def test_get_signed_url_missing_signed_url(mock_vellum_client):
+    """Test that FileRetrievalError is raised when signed URL is None."""
+
+    # GIVEN a VellumFile that is already uploaded
+    file_id = "12345678-1234-1234-1234-123456789abc"
+    src = f"vellum:uploaded-file:{file_id}"
+    vellum_file = VellumDocument(src=src)
+
+    # Configure mock client to return None for file_url
+    mock_vellum_client.uploaded_files.retrieve.return_value = Mock(file_url=None)
+
+    # WHEN getting the signed URL
+    # THEN a FileRetrievalError should be raised
+    with pytest.raises(FileRetrievalError, match="Failed to retrieve signed URL"):
         get_signed_url(vellum_file)
 
 
