@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Sequence, Type, Union
+from typing import Any, Dict, List, Optional, Sequence, Type, Union
 
 from pydantic import Field, field_serializer
 
@@ -6,6 +6,7 @@ from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.mocks import MockNodeExecution
 from vellum.workflows.outputs.base import BaseOutputs
+from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.triggers import BaseTrigger
 
 
@@ -45,5 +46,36 @@ class DatasetRow(UniversalBaseModel):
         for input_descriptor, value in inputs:
             if not input_descriptor.name.startswith("__"):
                 result[input_descriptor.name] = value
+
+        return result
+
+    @field_serializer("node_output_mocks")
+    def serialize_node_output_mocks(
+        self, node_output_mocks: Optional[Sequence[Union[BaseOutputs, MockNodeExecution]]]
+    ) -> Optional[List[Dict[str, Any]]]:
+        """
+        Custom serializer for node_output_mocks that normalizes both BaseOutputs and MockNodeExecution
+        to a consistent dict format with node_id, when_condition, and then_outputs.
+
+        Args:
+            node_output_mocks: Optional sequence of BaseOutputs or MockNodeExecution instances
+
+        Returns:
+            List of normalized mock execution dicts, or None if input is None
+        """
+        if node_output_mocks is None:
+            return None
+
+        result = []
+        for mock in node_output_mocks:
+            if isinstance(mock, MockNodeExecution):
+                mock_exec = mock
+            else:
+                mock_exec = MockNodeExecution(
+                    when_condition=ConstantValueReference(True),
+                    then_outputs=mock,
+                )
+
+            result.append(mock_exec.model_dump())
 
         return result

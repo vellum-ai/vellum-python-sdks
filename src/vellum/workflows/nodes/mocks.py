@@ -1,14 +1,15 @@
 from functools import reduce
 from uuid import UUID
-from typing import TYPE_CHECKING, Any, List, Literal, Optional, Sequence, Type, Union
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Literal, Optional, Sequence, Type, Union
 
-from pydantic import ConfigDict, ValidationError
+from pydantic import ConfigDict, SerializationInfo, ValidationError, field_serializer, model_serializer
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.array_vellum_value import ArrayVellumValue
 from vellum.client.types.vellum_value import VellumValue
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.events.types import default_serializer
 from vellum.workflows.exceptions import WorkflowInitializationException
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.references.constant import ConstantValueReference
@@ -105,6 +106,25 @@ class MockNodeExecution(UniversalBaseModel):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
+    @model_serializer(mode="wrap")
+    def serialize_full_model(self, handler: Callable[[Any], Any], info: SerializationInfo) -> Dict[str, Any]:
+        """Serialize the model and add node_id field computed from then_outputs."""
+        serialized = handler(self)
+        serialized["node_id"] = str(self.then_outputs.__class__.__parent_class__.__id__)
+        return serialized
+
+    @field_serializer("then_outputs")
+    def serialize_then_outputs(self, then_outputs: BaseOutputs, _info: SerializationInfo) -> Dict[str, Any]:
+        return default_serializer(then_outputs)
+
+    @field_serializer("when_condition")
+    def serialize_when_condition(self, when_condition: BaseDescriptor, info: SerializationInfo) -> Dict[str, Any]:
+        # This allows `ee` to pass in workflow display context through the pydantic context
+        if isinstance(info.context, dict) and "serializer" in info.context and callable(info.context["serializer"]):
+            return info.context["serializer"](when_condition)
+
+        return default_serializer(when_condition)
+
     @staticmethod
     def validate_all(
         raw_mock_workflow_node_configs: Optional[List[Any]],
@@ -134,9 +154,9 @@ class MockNodeExecution(UniversalBaseModel):
         # We need to support the old way that the Vellum App's WorkflowRunner used to define Node Mocks in order to
         # avoid needing to update the mock resolution strategy that it and the frontend uses. The path towards
         # cleaning this up will go as follows:
-        # 1. Release Mock support in SDK-Enabled Workflows
-        # 2. Deprecate Mock support in non-SDK enabled Workflows, encouraging users to migrate to SDK-enabled Workflows
-        # 3. Remove the old mock resolution strategy
+        # 1. ✅ Release Mock support in SDK-Enabled Workflows
+        # 2. ✅ Deprecate Mock support in non-SDK enabled Workflows, encouraging users to migrate to SDK Workflows
+        # 3. ✅ Remove the old mock resolution strategy
         # 4. Update this SDK to handle the new mock resolution strategy with WorkflowValueDescriptors
         # 5. Cutover the Vellum App to the new mock resolution strategy
         # 6. Remove the old mock resolution strategy from this SDK

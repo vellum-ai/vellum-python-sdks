@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, Dict, Generic, TypeVar
 
 from vellum.workflows.descriptors.base import BaseDescriptor
 
@@ -19,3 +19,6 @@ class ConstantValueReference(BaseDescriptor[_T], Generic[_T]):
 
     def resolve(self, state: "BaseState") -> _T:
         return self._value
+
+    def __vellum_encode__(self) -> Dict[str, Any]:
+        return {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": self._value}}
