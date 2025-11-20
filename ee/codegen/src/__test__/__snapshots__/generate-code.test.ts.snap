@@ -168,7 +168,7 @@ from vellum.workflows.triggers import ScheduleTrigger
 
 
 class ScheduledTrigger(ScheduleTrigger):
-    class Config:
+    class Config(ScheduleTrigger.Config):
         cron = "* * * * *"
         timezone = "UTC"
 
