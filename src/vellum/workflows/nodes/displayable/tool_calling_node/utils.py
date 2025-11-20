@@ -266,6 +266,9 @@ class MCPNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
 
     mcp_tool: MCPToolDefinition
 
+    class Outputs(BaseNode.Outputs):
+        result: Any
+
     def run(self) -> Iterator[BaseOutput]:
         arguments = self._extract_function_arguments()
 
@@ -278,13 +281,16 @@ class MCPNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
         # Add result to chat history
         self._add_function_result_to_chat_history(result, self.state)
 
-        yield from []
+        yield BaseOutput(name="result", value=result)
 
 
 class VellumIntegrationNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
     """Node that executes a Vellum Integration tool with function call output."""
 
     vellum_integration_tool: VellumIntegrationToolDefinition
+
+    class Outputs(BaseNode.Outputs):
+        result: Any
 
     def run(self) -> Iterator[BaseOutput]:
         arguments = self._extract_function_arguments()
@@ -317,7 +323,7 @@ class VellumIntegrationNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
         # Add result to chat history
         self._add_function_result_to_chat_history(result, self.state)
 
-        yield from []
+        yield BaseOutput(name="result", value=result)
 
 
 class ElseNode(BaseNode[ToolCallingState]):

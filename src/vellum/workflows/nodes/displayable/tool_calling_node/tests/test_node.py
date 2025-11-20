@@ -1,5 +1,6 @@
 import pytest
 import json
+from unittest import mock
 from uuid import uuid4
 from typing import Any, Iterator, List, cast
 
@@ -16,7 +17,7 @@ from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
 from vellum.workflows import BaseWorkflow
-from vellum.workflows.constants import VellumIntegrationProviderType
+from vellum.workflows.constants import AuthorizationType, VellumIntegrationProviderType
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
@@ -25,6 +26,7 @@ from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallin
 from vellum.workflows.nodes.displayable.tool_calling_node.state import ToolCallingState
 from vellum.workflows.nodes.displayable.tool_calling_node.utils import (
     create_function_node,
+    create_mcp_tool_node,
     create_router_node,
     create_tool_prompt_node,
 )
@@ -32,7 +34,12 @@ from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.ports.utils import validate_ports
 from vellum.workflows.state.base import BaseState, StateMeta
 from vellum.workflows.state.context import WorkflowContext
-from vellum.workflows.types.definition import DeploymentDefinition, VellumIntegrationToolDefinition
+from vellum.workflows.types.definition import (
+    DeploymentDefinition,
+    MCPServer,
+    MCPToolDefinition,
+    VellumIntegrationToolDefinition,
+)
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 
@@ -533,6 +540,141 @@ def test_tool_node_error_message_includes_function_name():
     assert "my_tool_function" in e.message
     assert "wrapper" not in e.message.lower()
     assert "Something went wrong" in e.message
+
+
+def test_mcp_node_outputs_result():
+    """Test that MCPNode yields output with name 'result' matching the Outputs class."""
+
+    # GIVEN an MCP tool definition
+    mcp_server = MCPServer(
+        name="test_server",
+        url="https://test.server.com",
+        authorization_type=AuthorizationType.BEARER_TOKEN,
+    )
+    mcp_tool = MCPToolDefinition(
+        name="test_tool",
+        server=mcp_server,
+        description="A test MCP tool",
+        parameters={},
+    )
+
+    # AND a tool prompt node
+    tool_prompt_node = create_tool_prompt_node(
+        ml_model="test-model",
+        blocks=[],
+        functions=[mcp_tool],
+        prompt_inputs=None,
+        parameters=DEFAULT_PROMPT_PARAMETERS,
+    )
+
+    mcp_node_class = create_mcp_tool_node(
+        tool_def=mcp_tool,
+        tool_prompt_node=tool_prompt_node,
+    )
+
+    # AND a state with a function call
+    state = ToolCallingState(
+        meta=StateMeta(
+            node_outputs={
+                tool_prompt_node.Outputs.results: [
+                    FunctionCallVellumValue(
+                        value=FunctionCall(
+                            arguments={"key": "value"},
+                            id="call_mcp_test",
+                            name="test_tool",
+                            state="FULFILLED",
+                        ),
+                    )
+                ],
+            },
+        )
+    )
+
+    mcp_node = mcp_node_class(state=state)
+
+    # AND mock MCPService to return a result
+    with mock.patch("vellum.workflows.nodes.displayable.tool_calling_node.utils.MCPService") as mock_mcp_service_class:
+        mock_mcp_service = mock.Mock()
+        mock_mcp_service.execute_tool.return_value = {"result": "mcp_test_result"}
+        mock_mcp_service_class.return_value = mock_mcp_service
+
+        # WHEN the MCP node runs
+        outputs = list(mcp_node.run())
+
+        # THEN there should be exactly one output with name "result"
+        assert len(outputs) == 1
+        result_output = outputs[0]
+        assert isinstance(result_output, BaseOutput)
+        assert result_output.name == "result"
+        assert result_output.is_fulfilled is True
+        assert result_output.value == {"result": "mcp_test_result"}
+
+
+def test_vellum_integration_node_outputs_result(vellum_client):
+    """Test that VellumIntegrationNode yields output with name 'result' matching the Outputs class."""
+
+    # GIVEN a VellumIntegrationToolDefinition
+    github_tool = VellumIntegrationToolDefinition(
+        provider=VellumIntegrationProviderType.COMPOSIO,
+        integration_name="GITHUB",
+        name="create_issue",
+        description="Create a new issue in a GitHub repository",
+    )
+
+    # AND a tool prompt node
+    tool_prompt_node = create_tool_prompt_node(
+        ml_model="test-model",
+        blocks=[],
+        functions=[github_tool],
+        prompt_inputs=None,
+        parameters=DEFAULT_PROMPT_PARAMETERS,
+    )
+
+    function_node_class = create_function_node(
+        function=github_tool,
+        tool_prompt_node=tool_prompt_node,
+    )
+
+    # AND a state with a function call
+    state = ToolCallingState(
+        meta=StateMeta(
+            node_outputs={
+                tool_prompt_node.Outputs.results: [
+                    FunctionCallVellumValue(
+                        value=FunctionCall(
+                            arguments={"owner": "test-owner", "repo": "test-repo", "title": "Test Issue"},
+                            id="call_vellum_test",
+                            name="create_issue",
+                            state="FULFILLED",
+                        ),
+                    )
+                ],
+            },
+        )
+    )
+
+    # AND mock the vellum client's integration service
+    mock_response = mock.Mock()
+    mock_response.data = {"id": 123, "url": "https://github.com/test-owner/test-repo/issues/123"}
+    vellum_client.integrations.execute_integration_tool.return_value = mock_response
+
+    # AND create a context with the vellum client
+    context = WorkflowContext()
+    context.vellum_client = vellum_client
+
+    function_node = function_node_class(state=state)
+    function_node._context = context
+
+    # WHEN the VellumIntegration node runs
+    outputs = list(function_node.run())
+
+    # THEN there should be exactly one output with name "result"
+    assert len(outputs) == 1
+    result_output = outputs[0]
+    assert isinstance(result_output, BaseOutput)
+    assert result_output.name == "result"
+    assert result_output.is_fulfilled is True
+    assert result_output.value == {"id": 123, "url": "https://github.com/test-owner/test-repo/issues/123"}
 
 
 def test_tool_calling_node_400_error_returns_internal_error(vellum_adhoc_prompt_client):
