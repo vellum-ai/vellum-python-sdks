@@ -1,4 +1,5 @@
 from datetime import datetime
+from unittest import mock
 
 from vellum.client.types.prompt_parameters import PromptParameters
 from vellum.client.types.release_review_reviewer import ReleaseReviewReviewer
@@ -29,6 +30,7 @@ from vellum.workflows.types.definition import (
     DeploymentDefinition,
     EnvironmentVariableReference,
     MCPServer,
+    MCPToolDefinition,
 )
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
@@ -451,6 +453,89 @@ def test_serialize_function_node():
     assert isinstance(display_data, dict)
     assert display_data["icon"] == "vellum:icon:rectangle-code"
     assert display_data["color"] == "purple"
+
+
+def test_serialize_tool_prompt_node_with_mcp_tools():
+    """
+    Test that the tool prompt node created by create_tool_prompt_node serializes correctly with MCP tools.
+    """
+
+    # GIVEN an MCP server for tool calling
+    mcp_server = MCPServer(
+        name="my-mcp-server",
+        url="https://my-mcp-server.com",
+        authorization_type=AuthorizationType.API_KEY,
+        api_key_header_key="my-api-key-header-key",
+        api_key_header_value=EnvironmentVariableReference(name="my-api-key-header-value"),
+    )
+
+    # AND mock MCP tool definitions (since compile_mcp_tool_definition tries to connect to server)
+    mock_tool_definitions = [
+        MCPToolDefinition(
+            name="test_tool_1",
+            server=mcp_server,
+            description="Test tool 1 description",
+            parameters={"type": "object", "properties": {"arg1": {"type": "string"}}},
+        ),
+        MCPToolDefinition(
+            name="test_tool_2",
+            server=mcp_server,
+            description="Test tool 2 description",
+            parameters={"type": "object", "properties": {"arg2": {"type": "number"}}},
+        ),
+    ]
+
+    # WHEN we create a tool prompt node using create_tool_prompt_node with MCP server
+    tool_prompt_node = create_tool_prompt_node(
+        ml_model="gpt-4o-mini",
+        blocks=[],
+        functions=[mcp_server],
+        prompt_inputs=None,
+        parameters=PromptParameters(),
+    )
+
+    tool_prompt_node_display_class = get_node_display_class(tool_prompt_node)
+    tool_prompt_node_display = tool_prompt_node_display_class()
+
+    class Workflow(BaseWorkflow[BaseInputs, ToolCallingState]):
+        graph = tool_prompt_node
+
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+    display_context = workflow_display.display_context
+
+    # WHEN we serialize the tool prompt node (with mock to avoid actual MCP server connection)
+    with mock.patch(
+        "vellum_ee.workflows.display.nodes.vellum.inline_prompt_node.compile_mcp_tool_definition",
+        return_value=mock_tool_definitions,
+    ):
+        serialized_tool_prompt_node = tool_prompt_node_display.serialize(display_context)
+
+    # THEN the tool prompt node should serialize as type PROMPT with exec_config
+    assert serialized_tool_prompt_node["type"] == "PROMPT"
+    assert "exec_config" in serialized_tool_prompt_node["data"]
+
+    # AND the exec_config should contain prompt_template_block_data with function definitions
+    exec_config = serialized_tool_prompt_node["data"]["exec_config"]
+    assert "prompt_template_block_data" in exec_config
+    blocks = exec_config["prompt_template_block_data"]["blocks"]
+
+    # AND there should be FUNCTION_DEFINITION blocks (MCP servers compile to multiple tools)
+    function_blocks = [block for block in blocks if block.get("block_type") == "FUNCTION_DEFINITION"]
+    assert len(function_blocks) == 2  # Should have 2 tools from the mock
+
+    # AND each function block should have the required properties
+    for function_block in function_blocks:
+        assert "function_name" in function_block["properties"]
+        assert "function_description" in function_block["properties"]
+        assert "function_parameters" in function_block["properties"]
+        # function_forced and function_strict should not be present (omitted when None)
+        assert "function_forced" not in function_block["properties"]
+        assert "function_strict" not in function_block["properties"]
+
+    # AND function names should match the MCP tool names with server prefix (hyphens converted to underscores)
+    function_names = [block["properties"]["function_name"] for block in function_blocks]
+    assert "my_mcp_server__test_tool_1" in function_names
+    assert "my_mcp_server__test_tool_2" in function_names
 
 
 def test_serialize_node__tool_calling_node__subworkflow_with_parent_input_reference():
