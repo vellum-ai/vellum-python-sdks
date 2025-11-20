@@ -2,13 +2,16 @@ import uuid
 
 from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.workflows import BaseWorkflow
+from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes import InlinePromptNode
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.mocks import MockNodeExecution
+from vellum.workflows.state.base import BaseState
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 
 
+# This test represents the legacy shape of our mocks.
 def test_mocks__parse_from_app():
     # GIVEN a PromptNode
     class PromptNode(InlinePromptNode):
@@ -203,5 +206,113 @@ def test_mocks__use_id_from_display():
         when_condition=StartNode.Execution.count.greater_than_or_equal_to(0.0),
         then_outputs=StartNode.Outputs(
             foo="Hello",
+        ),
+    )
+
+
+def test_mocks__parse_from_app__descriptors():
+    # GIVEN a Base Node
+    class StartNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            foo: str
+
+    # AND workflow inputs
+    class Inputs(BaseInputs):
+        bar: str
+
+    # AND workflow state
+    class State(BaseState):
+        baz: str
+
+    # AND a workflow class with that Node
+    class MyWorkflow(BaseWorkflow[Inputs, State]):
+        graph = StartNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_value = StartNode.Outputs.foo
+
+    # AND a mock workflow node execution from the app
+    raw_mock_workflow_node_executions = [
+        {
+            "node_id": str(StartNode.__id__),
+            "when_condition": {
+                "type": "BINARY_EXPRESSION",
+                "operator": ">=",
+                "lhs": {
+                    "type": "EXECUTION_COUNTER",
+                    "node_id": str(StartNode.__id__),
+                },
+                "rhs": {
+                    "type": "CONSTANT_VALUE",
+                    "value": "1",
+                },
+            },
+            "then_outputs": {
+                "foo": "Hello foo",
+            },
+        },
+        {
+            "node_id": str(StartNode.__id__),
+            "when_condition": {
+                "type": "BINARY_EXPRESSION",
+                "operator": "==",
+                "lhs": {
+                    "type": "INPUT_VARIABLE",
+                    "input_variable_id": Inputs.bar.id,
+                },
+                "rhs": {
+                    "type": "CONSTANT_VALUE",
+                    "value": "bar",
+                },
+            },
+            "then_outputs": {
+                "foo": "Hello bar",
+            },
+        },
+        {
+            "node_id": str(StartNode.__id__),
+            "when_condition": {
+                "type": "BINARY_EXPRESSION",
+                "operator": "!=",
+                "lhs": {
+                    "type": "INPUT_VARIABLE",
+                    "state_variable_id": State.baz.id,
+                },
+                "rhs": {
+                    "type": "CONSTANT_VALUE",
+                    "value": "baz",
+                },
+            },
+            "then_outputs": {
+                "foo": "Hello baz",
+            },
+        },
+    ]
+
+    # WHEN we parsed the raw data on `MockNodeExecution`
+    node_output_mocks = MockNodeExecution.validate_all(
+        raw_mock_workflow_node_executions,
+        MyWorkflow,
+    )
+
+    # THEN we get the expected list of MockNodeExecution objects
+    assert node_output_mocks
+    assert len(node_output_mocks) == 3
+    assert node_output_mocks[0] == MockNodeExecution(
+        when_condition=Inputs.bar.equals("bar"),
+        then_outputs=StartNode.Outputs(
+            foo="Hello",
+        ),
+    )
+    assert node_output_mocks[1] == MockNodeExecution(
+        when_condition=StartNode.Execution.count.greater_than_or_equal_to(0.0),
+        then_outputs=StartNode.Outputs(
+            foo="Hello bar",
+        ),
+    )
+    assert node_output_mocks[2] == MockNodeExecution(
+        when_condition=State.baz.not_equals("baz"),
+        then_outputs=StartNode.Outputs(
+            foo="Hello baz",
         ),
     )
