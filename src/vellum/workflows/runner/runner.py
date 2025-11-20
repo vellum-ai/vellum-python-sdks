@@ -572,16 +572,6 @@ class WorkflowRunner(Generic[StateType]):
 
                 with execution_context(parent_context=updated_parent_context, trace_id=execution.trace_id):
                     for output in node_run_response:
-                        try:
-                            default_serializer(output)
-                        except (TypeError, ValueError) as exc:
-                            raise NodeException(
-                                message=(
-                                    f"Node {node.__class__.__name__} produced output: "
-                                    f"'{output.name}' that could not be serialized to JSON: {exc}"
-                                ),
-                                code=WorkflowErrorCode.INVALID_OUTPUTS,
-                            ) from exc
                         invoked_ports = output > ports
                         if output.is_initiated:
                             yield from initiate_node_streaming_output(output)

@@ -48,6 +48,12 @@ class VellumJsonEncoder(JSONEncoder):
         if hasattr(obj, "__vellum_encode__") and callable(getattr(obj, "__vellum_encode__")):
             return obj.__vellum_encode__()
 
+        if isinstance(obj, (bytes, bytearray)):
+            raise TypeError(
+                "bytes are not JSON-serializable; convert to text (e.g., .decode('utf-8')) "
+                "or base64-encode before returning from a node output"
+            )
+
         if isinstance(obj, UUID):
             return str(obj)
 
