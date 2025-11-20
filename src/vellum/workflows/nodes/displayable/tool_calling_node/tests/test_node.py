@@ -28,7 +28,7 @@ from vellum.workflows.nodes.displayable.tool_calling_node.utils import (
     create_router_node,
     create_tool_prompt_node,
 )
-from vellum.workflows.outputs.base import BaseOutputs
+from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.ports.utils import validate_ports
 from vellum.workflows.state.base import BaseState, StateMeta
 from vellum.workflows.state.context import WorkflowContext
@@ -428,6 +428,59 @@ def test_tool_node_preserves_node_exception():
     assert e.code == WorkflowErrorCode.INVALID_INPUTS
     assert e.raw_data == {"key": "value"}
     assert "Custom error" in e.message
+
+
+def test_function_node_outputs_result():
+    """Test that FunctionNode yields output with name 'result' matching the Outputs class."""
+
+    # GIVEN a simple function that returns a value
+    def my_tool_function() -> str:
+        return "test_result"
+
+    # AND a tool prompt node with that function
+    tool_prompt_node = create_tool_prompt_node(
+        ml_model="test-model",
+        blocks=[],
+        functions=[my_tool_function],
+        prompt_inputs=None,
+        parameters=DEFAULT_PROMPT_PARAMETERS,
+    )
+
+    function_node_class = create_function_node(
+        function=my_tool_function,
+        tool_prompt_node=tool_prompt_node,
+    )
+
+    # AND a state with a function call
+    state = ToolCallingState(
+        meta=StateMeta(
+            node_outputs={
+                tool_prompt_node.Outputs.results: [
+                    FunctionCallVellumValue(
+                        value=FunctionCall(
+                            arguments={},
+                            id="call_789",
+                            name="my_tool_function",
+                            state="FULFILLED",
+                        ),
+                    )
+                ],
+            },
+        )
+    )
+
+    function_node = function_node_class(state=state)
+
+    # WHEN the function node runs
+    outputs = list(function_node.run())
+
+    # THEN there should be exactly one output with name "result"
+    assert len(outputs) == 1
+    result_output = outputs[0]
+    assert isinstance(result_output, BaseOutput)
+    assert result_output.name == "result"
+    assert result_output.is_fulfilled is True
+    assert result_output.value == "test_result"
 
 
 def test_tool_node_error_message_includes_function_name():

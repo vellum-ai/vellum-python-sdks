@@ -217,6 +217,9 @@ class FunctionNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
 
     function_definition: Callable[..., Any]
 
+    class Outputs(BaseNode.Outputs):
+        result: Any
+
     def run(self) -> Iterator[BaseOutput]:
         arguments = self._extract_function_arguments()
 
@@ -228,7 +231,7 @@ class FunctionNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
         # Add the result to the chat history
         self._add_function_result_to_chat_history(result, self.state)
 
-        yield from []
+        yield BaseOutput(name="result", value=result)
 
 
 class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
