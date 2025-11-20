@@ -17,7 +17,11 @@ from vellum.workflows.nodes.displayable.code_execution_node.node import CodeExec
 from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
 from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
 from vellum.workflows.nodes.displayable.tool_calling_node.state import ToolCallingState
-from vellum.workflows.nodes.displayable.tool_calling_node.utils import create_router_node, create_tool_prompt_node
+from vellum.workflows.nodes.displayable.tool_calling_node.utils import (
+    create_function_node,
+    create_router_node,
+    create_tool_prompt_node,
+)
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.definition import (
@@ -405,6 +409,48 @@ def test_serialize_tool_router_node():
         "trigger": {"id": "9055a5d0-68a1-40cf-bc05-a8c65bd19abe", "merge_behavior": "AWAIT_ATTRIBUTES"},
         "type": "GENERIC",
     }
+
+
+def test_serialize_function_node():
+    """
+    Test that the function node created by create_function_node serializes with icon and color.
+    """
+
+    # GIVEN a simple function for tool calling
+    def my_function(arg1: str) -> str:
+        return f"Result: {arg1}"
+
+    tool_prompt_node = create_tool_prompt_node(
+        ml_model="gpt-4o-mini",
+        blocks=[],
+        functions=[my_function],
+        prompt_inputs=None,
+        parameters=PromptParameters(),
+    )
+
+    # WHEN we create a function node using create_function_node
+    function_node = create_function_node(
+        function=my_function,
+        tool_prompt_node=tool_prompt_node,
+    )
+
+    function_node_display_class = get_node_display_class(function_node)
+    function_node_display = function_node_display_class()
+
+    class Workflow(BaseWorkflow[BaseInputs, ToolCallingState]):
+        graph = tool_prompt_node >> function_node
+
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+    display_context = workflow_display.display_context
+
+    # WHEN we serialize the function node
+    serialized_function_node = function_node_display.serialize(display_context)
+
+    # THEN the function node should include icon and color in display_data
+    display_data = serialized_function_node["display_data"]
+    assert isinstance(display_data, dict)
+    assert display_data["icon"] == "vellum:icon:rectangle-code"
+    assert display_data["color"] == "purple"
 
 
 def test_serialize_node__tool_calling_node__subworkflow_with_parent_input_reference():

@@ -4,6 +4,7 @@ from .code_execution_node import BaseCodeExecutionNodeDisplay
 from .conditional_node import BaseConditionalNodeDisplay
 from .error_node import BaseErrorNodeDisplay
 from .final_output_node import BaseFinalOutputNodeDisplay
+from .function_node import FunctionNodeDisplay
 from .guardrail_node import BaseGuardrailNodeDisplay
 from .inline_prompt_node import BaseInlinePromptNodeDisplay
 from .inline_subworkflow_node import BaseInlineSubworkflowNodeDisplay
@@ -25,6 +26,7 @@ __all__ = [
     "BaseConditionalNodeDisplay",
     "BaseErrorNodeDisplay",
     "BaseFinalOutputNodeDisplay",
+    "FunctionNodeDisplay",
     "BaseGuardrailNodeDisplay",
     "BaseInlinePromptNodeDisplay",
     "BaseInlineSubworkflowNodeDisplay",
