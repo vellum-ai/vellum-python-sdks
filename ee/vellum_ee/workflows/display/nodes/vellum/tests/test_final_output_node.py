@@ -118,15 +118,14 @@ def test_final_output_node_display__serialize_with_list_str_type():
     assert terminal_node is not None
     assert terminal_node["id"] == str(ListOutput.__id__)
 
-    # AND the output type should be correctly serialized as REFERENCE
-    assert terminal_node["data"]["output_type"] == "REFERENCE"
+    # AND the output type should be correctly serialized as ARRAY
+    assert terminal_node["data"]["output_type"] == "ARRAY"
 
     # AND the outputs should contain the correct type information
     assert len(terminal_node["outputs"]) == 1
-    assert terminal_node["outputs"][0]["type"] == "REFERENCE"
+    assert terminal_node["outputs"][0]["type"] == "ARRAY"
 
     # AND the output should have an inline type reference with JSON Schema
-    assert terminal_node["outputs"][0]["reference"]["type"] == "INLINE_TYPE_REFERENCE"
-    schema = terminal_node["outputs"][0]["reference"]["schema"]
+    schema = terminal_node["outputs"][0]["schema"]
     assert schema["type"] == "array"
     assert schema["items"]["type"] == "string"

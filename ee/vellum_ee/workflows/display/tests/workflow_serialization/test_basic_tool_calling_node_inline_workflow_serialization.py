@@ -169,12 +169,14 @@ def test_serialize_workflow():
                 "name": "temperature",
                 "type": "NUMBER",
                 "value": None,
+                "schema": {"type": "number"},
             },
             {
                 "id": "8616509d-fecb-4bbf-afdc-bd4c5de35ce7",
                 "name": "reasoning",
                 "type": "STRING",
                 "value": None,
+                "schema": {"type": "string"},
             },
         ],
     }

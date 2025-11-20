@@ -187,14 +187,15 @@ def test_compile_function_definition__dataclasses():
     compiled_function = compile_function_definition(my_function)
 
     # THEN it should return the compiled function definition
+    ref_name = f"{__name__}.test_compile_function_definition__dataclasses.<locals>.MyDataClass"
     assert compiled_function == FunctionDefinition(
         name="my_function",
         parameters={
             "type": "object",
-            "properties": {"c": {"$ref": "#/$defs/MyDataClass"}},
+            "properties": {"c": {"$ref": f"#/$defs/{ref_name}"}},
             "required": ["c"],
             "$defs": {
-                "MyDataClass": {
+                ref_name: {
                     "type": "object",
                     "properties": {"a": {"type": "integer"}, "b": {"type": "string"}},
                     "required": ["a", "b"],
@@ -217,14 +218,15 @@ def test_compile_function_definition__pydantic():
     compiled_function = compile_function_definition(my_function)
 
     # THEN it should return the compiled function definition
+    ref_name = f"{__name__}.test_compile_function_definition__pydantic.<locals>.MyPydanticModel"
     assert compiled_function == FunctionDefinition(
         name="my_function",
         parameters={
             "type": "object",
-            "properties": {"c": {"$ref": "#/$defs/MyPydanticModel"}},
+            "properties": {"c": {"$ref": f"#/$defs/{ref_name}"}},
             "required": ["c"],
             "$defs": {
-                "MyPydanticModel": {
+                ref_name: {
                     "type": "object",
                     "properties": {
                         "a": {"type": "integer", "description": "The first number"},
@@ -251,14 +253,15 @@ def test_compile_function_definition__default_dataclass():
     compiled_function = compile_function_definition(my_function)
 
     # THEN it should return the compiled function definition
+    ref_name = f"{__name__}.test_compile_function_definition__default_dataclass.<locals>.MyDataClass"
     assert compiled_function == FunctionDefinition(
         name="my_function",
         parameters={
             "type": "object",
-            "properties": {"c": {"$ref": "#/$defs/MyDataClass", "default": {"a": 1, "b": "hello"}}},
+            "properties": {"c": {"$ref": f"#/$defs/{ref_name}", "default": {"a": 1, "b": "hello"}}},
             "required": [],
             "$defs": {
-                "MyDataClass": {
+                ref_name: {
                     "type": "object",
                     "properties": {"a": {"type": "integer"}, "b": {"type": "string"}},
                     "required": ["a", "b"],
@@ -281,14 +284,15 @@ def test_compile_function_definition__default_pydantic():
     compiled_function = compile_function_definition(my_function)
 
     # THEN it should return the compiled function definition
+    ref_name = f"{__name__}.test_compile_function_definition__default_pydantic.<locals>.MyPydanticModel"
     assert compiled_function == FunctionDefinition(
         name="my_function",
         parameters={
             "type": "object",
-            "properties": {"c": {"$ref": "#/$defs/MyPydanticModel", "default": {"a": 1, "b": "hello"}}},
+            "properties": {"c": {"$ref": f"#/$defs/{ref_name}", "default": {"a": 1, "b": "hello"}}},
             "required": [],
             "$defs": {
-                "MyPydanticModel": {
+                ref_name: {
                     "type": "object",
                     "properties": {"a": {"type": "integer"}, "b": {"type": "string"}},
                     "required": ["a", "b"],

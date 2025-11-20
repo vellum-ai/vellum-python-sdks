@@ -50,6 +50,7 @@ def test_serialize_node__annotated_output(serialize_node):
                     "name": "output",
                     "type": "NUMBER",
                     "value": None,
+                    "schema": {"type": "integer"},
                 }
             ],
         },
@@ -102,6 +103,7 @@ def test_serialize_node__workflow_input(serialize_node):
                         "type": "WORKFLOW_INPUT",
                         "input_variable_id": str(input_id),
                     },
+                    "schema": {"type": "string"},
                 }
             ],
         },
@@ -168,6 +170,7 @@ def test_serialize_node__node_output_reference(serialize_node):
                         "node_id": "40fcba1f-9b25-4fed-8f15-a2fd80ff85a1",
                         "node_output_id": str(node_output_id),
                     },
+                    "schema": {"type": "string"},
                 }
             ],
         },

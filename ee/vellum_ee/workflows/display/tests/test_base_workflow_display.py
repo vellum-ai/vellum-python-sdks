@@ -280,6 +280,7 @@ def test_vellum_workflow_display__serialize_with_parse_json_expression():
         "id": "e73fd6b1-1109-4a97-8510-c9ba8e6f5dbe",
         "name": "json_result",
         "type": "JSON",
+        "schema": {},
         "value": {
             "type": "UNARY_EXPRESSION",
             "lhs": {

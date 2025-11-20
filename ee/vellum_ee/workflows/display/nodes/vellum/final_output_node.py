@@ -1,9 +1,8 @@
 from uuid import UUID
-from typing import Any, ClassVar, Dict, Generic, Optional, TypeVar
+from typing import ClassVar, Generic, Optional, TypeVar
 
 from vellum.workflows.nodes.displayable.final_output_node import FinalOutputNode
 from vellum.workflows.types.core import JsonObject
-from vellum.workflows.utils.functions import compile_annotation
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import to_kebab_case
@@ -32,24 +31,6 @@ class BaseFinalOutputNodeDisplay(BaseNodeDisplay[_FinalOutputNodeType], Generic[
             self._get_node_input_id(),
         )
         inferred_type = infer_vellum_variable_type(node.Outputs.value)
-
-        output_obj: Dict[str, Any] = {
-            "id": str(self._get_output_id()),
-            "name": node.Outputs.value.name,
-            "type": inferred_type,
-            "value": serialize_value(node_id, display_context, node.Outputs.value.instance),
-        }
-
-        if inferred_type == "REFERENCE":
-            # Get the Python type from the descriptor
-            python_type = node.Outputs.value.types[0] if node.Outputs.value.types else None
-            if python_type:
-                defs: Dict[str, Any] = {}
-                schema = compile_annotation(python_type, defs)
-                output_obj["reference"] = {
-                    "type": "INLINE_TYPE_REFERENCE",
-                    "schema": schema,
-                }
 
         return {
             "id": str(node_id),

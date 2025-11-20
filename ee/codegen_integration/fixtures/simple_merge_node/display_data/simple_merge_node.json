@@ -328,7 +328,8 @@
               "type": "NODE_OUTPUT",
               "node_id": "7f7823e9-b97a-4bbe-bfcf-40aed8db24c9",
               "node_output_id": "a18fbec8-4530-4ca9-a265-e9323dc45fc4"
-            }
+            },
+            "schema": {"type": "string"}
           }
         ]
       },

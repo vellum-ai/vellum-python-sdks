@@ -48,8 +48,9 @@ def test_serialize_workflow_with_list_vellum_document():
 
     input_var = input_variables[0]
     assert input_var["key"] == "documents"
-    assert input_var["type"] == "JSON"
+    assert input_var["type"] == "ARRAY"
     # NOTE: Once custom type serialization is supported, we will want to represent this using an openapi spec
+    assert "schema" not in input_var
     assert input_var["required"] is True
     assert input_var["default"] is None
     assert input_var["extensions"] == {"color": None}

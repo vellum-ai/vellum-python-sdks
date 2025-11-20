@@ -355,7 +355,8 @@
               "type": "NODE_OUTPUT",
               "node_id": "e5ff9360-a29c-437b-a9c1-05fc52df2834",
               "node_output_id": "d56d7c49-7b45-4933-9779-2bd7f82c2141"
-            }
+            },
+            "schema": {"type": "string"}
           }
         ]
       }

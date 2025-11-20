@@ -522,7 +522,8 @@
                       "type": "NODE_OUTPUT",
                       "node_id": "4b0a7578-e5ec-4d72-b396-62abdecbd101",
                       "node_output_id": "503aa2c1-6b99-43e8-98f7-1fef458a8d29"
-                    }
+                    },
+                    "schema": {"type": "string"}
                   }
                 ],
                 "trigger": {
@@ -754,7 +755,8 @@
               "type": "NODE_OUTPUT",
               "node_id": "72cb9f1e-aedd-47af-861e-4f38d27053b6",
               "node_output_id": "bffc4749-00b8-44db-90ee-db655cbc7e62"
-            }
+            },
+            "schema": {}
           }
         ],
         "trigger": {

@@ -343,7 +343,8 @@
               "type": "NODE_OUTPUT",
               "node_id": "7e09927b-6d6f-4829-92c9-54e66bdcaf80",
               "node_output_id": "2d4f1826-de75-499a-8f84-0a690c8136ad"
-            }
+            },
+            "schema": {"type": "string"}
           }
         ],
         "trigger": {

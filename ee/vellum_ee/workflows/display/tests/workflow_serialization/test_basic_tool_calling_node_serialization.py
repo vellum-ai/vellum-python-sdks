@@ -213,12 +213,19 @@ def test_serialize_workflow():
             },
         ],
         "outputs": [
-            {"id": "d0d0cd85-8546-4d90-bdc1-86c751ba04e5", "name": "text", "type": "STRING", "value": None},
+            {
+                "id": "d0d0cd85-8546-4d90-bdc1-86c751ba04e5",
+                "name": "text",
+                "type": "STRING",
+                "value": None,
+                "schema": {"type": "string"},
+            },
             {
                 "id": "33a737c2-d347-48d4-bf62-e36c06aebf0c",
                 "name": "chat_history",
                 "type": "CHAT_HISTORY",
                 "value": None,
+                "schema": {"type": "array", "items": {"$ref": "#/$defs/vellum.client.types.chat_message.ChatMessage"}},
             },
         ],
     }
