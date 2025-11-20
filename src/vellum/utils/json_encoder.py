@@ -1,3 +1,4 @@
+import base64
 from dataclasses import asdict, is_dataclass
 from datetime import datetime
 import enum
@@ -49,10 +50,10 @@ class VellumJsonEncoder(JSONEncoder):
             return obj.__vellum_encode__()
 
         if isinstance(obj, (bytes, bytearray)):
-            raise TypeError(
-                "bytes are not JSON-serializable; convert to text (e.g., .decode('utf-8')) "
-                "or base64-encode before returning from a node output"
-            )
+            try:
+                return obj.decode("utf-8")
+            except UnicodeDecodeError:
+                return base64.b64encode(obj).decode("ascii")
 
         if isinstance(obj, UUID):
             return str(obj)

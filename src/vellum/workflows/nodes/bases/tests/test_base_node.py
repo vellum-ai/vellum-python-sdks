@@ -6,7 +6,7 @@ from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.string_vellum_value_request import StringVellumValueRequest
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.tests.test_utils import FixtureState
-from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.events.types import default_serializer
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes import FinalOutputNode
 from vellum.workflows.nodes.bases.base import BaseNode
@@ -383,9 +383,10 @@ def test_base_node__ports_inheritance__cumulative_ports():
     assert ports == ["bar"]
 
 
-def test_base_node__bytes_output_raises_serialization_error():
-    """Test that returning bytes in node outputs rejects the workflow execution."""
+def test_base_node__bytes_output_converts_to_string():
+    """Test that returning bytes in node outputs automatically converts to string."""
 
+    # GIVEN a node that returns bytes
     class BytesOutputNode(BaseNode):
         class Outputs(BaseNode.Outputs):
             result: str
@@ -394,15 +395,23 @@ def test_base_node__bytes_output_raises_serialization_error():
             b = b"hello"
             return self.Outputs(result=b)  # type: ignore[arg-type]
 
+    class OutputNode(FinalOutputNode):
+        class Outputs(FinalOutputNode.Outputs):
+            result = BytesOutputNode.Outputs.result
+
     class BytesWorkflow(BaseWorkflow):
-        graph = BytesOutputNode
+        graph = BytesOutputNode >> OutputNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            result = OutputNode.Outputs.result
 
     workflow = BytesWorkflow()
 
     # WHEN we run the workflow
     result = workflow.run()
 
-    # THEN the execution is rejected with a helpful error
-    assert result.name == "workflow.execution.rejected"
-    assert result.error.code == WorkflowErrorCode.INVALID_OUTPUTS
-    assert "bytes" in result.error.message.lower()
+    # THEN the execution is fulfilled successfully
+    assert result.name == "workflow.execution.fulfilled"
+
+    # AND the bytes are converted to a UTF-8 string when serialized
+    assert default_serializer(result.outputs.result) == "hello"
