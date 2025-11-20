@@ -12,7 +12,7 @@ def test_serialize_basetrigger_with_display_class():
     """Tests that BaseTrigger.Display class attributes serialize correctly."""
 
     class MyTrigger(ScheduleTrigger):
-        class Config:
+        class Config(ScheduleTrigger.Config):
             cron = "0 9 * * *"
             timezone = "UTC"
 
@@ -47,7 +47,7 @@ def test_serialize_trigger_with_only_icon():
     """Tests that triggers with only icon serialize correctly."""
 
     class IconOnlyTrigger(ScheduleTrigger):
-        class Config:
+        class Config(ScheduleTrigger.Config):
             cron = "0 9 * * *"
             timezone = "UTC"
 
@@ -75,7 +75,7 @@ def test_serialize_trigger_with_only_color():
     """Tests that triggers with only color serialize correctly."""
 
     class ColorOnlyTrigger(ScheduleTrigger):
-        class Config:
+        class Config(ScheduleTrigger.Config):
             cron = "0 9 * * *"
             timezone = "UTC"
 
@@ -103,7 +103,7 @@ def test_serialize_trigger_without_display_class():
     """Tests that triggers without Display class don't have display_data."""
 
     class PlainTrigger(ScheduleTrigger):
-        class Config:
+        class Config(ScheduleTrigger.Config):
             cron = "0 9 * * *"
             timezone = "UTC"
 
@@ -128,7 +128,7 @@ def test_serialize_trigger_with_none_values():
     """Tests that triggers with None icon/color don't serialize those fields."""
 
     class NoneValuesTrigger(ScheduleTrigger):
-        class Config:
+        class Config(ScheduleTrigger.Config):
             cron = "0 9 * * *"
             timezone = "UTC"
 

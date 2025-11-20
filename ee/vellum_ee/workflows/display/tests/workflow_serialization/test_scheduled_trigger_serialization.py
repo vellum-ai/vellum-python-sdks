@@ -83,7 +83,7 @@ def test_scheduled_trigger_serialization_with_metadata_json():
     ):
 
         class DailyScheduleTrigger(ScheduleTrigger):
-            class Config:
+            class Config(ScheduleTrigger.Config):
                 cron = "0 9 * * *"  # Every day at 9am
                 timezone = "America/New_York"
 
@@ -121,7 +121,7 @@ def test_scheduled_trigger_serialization_without_metadata_json():
 
     # GIVEN a scheduled trigger defined without metadata.json
     class WeeklyScheduleTrigger(ScheduleTrigger):
-        class Config:
+        class Config(ScheduleTrigger.Config):
             cron = "0 9 * * MON"  # Every Monday at 9am
             timezone = "UTC"
 
@@ -167,7 +167,7 @@ def test_scheduled_trigger_serialization_display_data():
 
     # GIVEN a scheduled trigger with comprehensive Display attributes
     class DailyTriggerWithDisplay(ScheduleTrigger):
-        class Config:
+        class Config(ScheduleTrigger.Config):
             cron = "0 9 * * *"
             timezone = "UTC"
 
@@ -214,7 +214,7 @@ def test_scheduled_trigger_serialization_display_data():
 def test_scheduled_trigger_serialization_full():
     # GIVEN a scheduled trigger with comprehensive Display attributes
     class DailyTriggerWithDisplay(ScheduleTrigger):
-        class Config:
+        class Config(ScheduleTrigger.Config):
             cron = "0 9 * * *"
             timezone = "UTC"
 
