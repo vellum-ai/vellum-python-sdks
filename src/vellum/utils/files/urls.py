@@ -2,6 +2,7 @@
 
 import logging
 import re
+import typing
 from typing import TYPE_CHECKING, Optional
 
 from vellum.client.core.api_error import ApiError
@@ -19,6 +20,7 @@ logger = logging.getLogger(__name__)
 def get_signed_url(
     vellum_file: VellumFileTypes,
     *,
+    expiry_seconds: typing.Optional[int] = 7 * 24 * 60 * 60,  # 7 days
     vellum_client: Optional["VellumClient"] = None,
 ) -> str:
     """
@@ -30,6 +32,7 @@ def get_signed_url(
 
     Args:
         vellum_file: A VellumDocument, VellumImage, VellumAudio, or VellumVideo instance
+        expiry_seconds: The number of seconds until the signed URL expires. Defaults to 7 days.
         vellum_client: An optional Vellum client instance. If not provided, a default client will be created.
 
     Returns:
@@ -56,7 +59,9 @@ def get_signed_url(
 
     # Fetch the signed URL for this file from Vellum
     try:
-        vellum_uploaded_file = vellum_client.uploaded_files.retrieve(vellum_uploaded_file_id)
+        vellum_uploaded_file = vellum_client.uploaded_files.retrieve(
+            vellum_uploaded_file_id, expiry_seconds=expiry_seconds
+        )
     except ApiError as e:
         raise FileRetrievalError("Failed to retrieve file from Vellum") from e
 
