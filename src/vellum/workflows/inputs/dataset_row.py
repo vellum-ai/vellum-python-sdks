@@ -51,7 +51,7 @@ class DatasetRow(UniversalBaseModel):
 
     @field_serializer("node_output_mocks")
     def serialize_node_output_mocks(
-        self, node_output_mocks: Optional[Sequence[Union[BaseOutputs, MockNodeExecution]]]
+        self, node_output_mocks: Optional[Sequence[Union[BaseOutputs, MockNodeExecution]]], info
     ) -> Optional[List[Dict[str, Any]]]:
         """
         Custom serializer for node_output_mocks that normalizes both BaseOutputs and MockNodeExecution
@@ -59,6 +59,7 @@ class DatasetRow(UniversalBaseModel):
 
         Args:
             node_output_mocks: Optional sequence of BaseOutputs or MockNodeExecution instances
+            info: Serialization info containing context
 
         Returns:
             List of normalized mock execution dicts, or None if input is None
@@ -76,6 +77,6 @@ class DatasetRow(UniversalBaseModel):
                     then_outputs=mock,
                 )
 
-            result.append(mock_exec.model_dump())
+            result.append(mock_exec.model_dump(context=info.context))
 
         return result

@@ -232,6 +232,45 @@ def test_serialize_module_with_base_inputs_and_metadata():
     assert result.dataset[1]["id"] == "base-inputs-id-2"
 
 
+def test_serialize_module_with_node_output_mock_when_conditions():
+    """
+    Tests that serialize_module correctly serializes node output mocks with when conditions.
+
+    Verifies that when conditions involving workflow inputs and node execution counters
+    are properly serialized in the dataset.
+    """
+    module_path = "tests.workflows.test_node_output_mock_when_conditions"
+
+    # WHEN we serialize the module
+    result = BaseWorkflowDisplay.serialize_module(module_path)
+
+    assert hasattr(result, "dataset")
+    assert result.dataset is not None
+    assert isinstance(result.dataset, list)
+    assert len(result.dataset) == 2
+
+    first_scenario = result.dataset[0]
+    assert first_scenario["label"] == "Scenario 1"
+    assert first_scenario["inputs"]["threshold"] == 5
+
+    assert "node_output_mocks" in first_scenario
+    assert isinstance(first_scenario["node_output_mocks"], list)
+    assert len(first_scenario["node_output_mocks"]) == 2
+
+    first_mock = first_scenario["node_output_mocks"][0]
+    assert "when_condition" in first_mock
+    assert "then_outputs" in first_mock
+    assert "node_id" in first_mock
+
+    second_scenario = result.dataset[1]
+    assert second_scenario["label"] == "Scenario 2"
+    assert second_scenario["inputs"]["threshold"] == 10
+
+    assert "node_output_mocks" in second_scenario
+    assert isinstance(second_scenario["node_output_mocks"], list)
+    assert len(second_scenario["node_output_mocks"]) == 1
+
+
 def test_serialize_module__with_invalid_nested_set_graph(temp_module_path):
     """
     Tests that serialize_module raises a clear user-facing exception for workflows with nested sets in graph attribute.
