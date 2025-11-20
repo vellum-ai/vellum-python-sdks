@@ -530,6 +530,41 @@ def test_serialize_inline_prompt_node__mcp_server_not_serialized():
     ]
 
 
+def test_serialize_tool_prompt_node():
+    """
+    Test that the tool prompt node created by create_tool_prompt_node serializes with icon and color.
+    """
+
+    # GIVEN a simple function for tool calling
+    def my_function(arg1: str) -> str:
+        return f"Result: {arg1}"
+
+    # WHEN we create a tool prompt node using create_tool_prompt_node
+    tool_prompt_node = create_tool_prompt_node(
+        ml_model="gpt-4o-mini",
+        blocks=[],
+        functions=[my_function],
+        prompt_inputs=None,
+        parameters=PromptParameters(),
+    )
+
+    tool_prompt_node_display_class = get_node_display_class(tool_prompt_node)
+    tool_prompt_node_display = tool_prompt_node_display_class()
+
+    class Workflow(BaseWorkflow[BaseInputs, ToolCallingState]):
+        graph = tool_prompt_node
+
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+    display_context = workflow_display.display_context
+
+    # WHEN we serialize the tool prompt node
+    serialized_tool_prompt_node = tool_prompt_node_display.serialize(display_context)
+
+    # THEN the tool prompt node should include icon and color in display_data
+    display_data = serialized_tool_prompt_node["display_data"]
+    assert isinstance(display_data, dict)
+    assert display_data["icon"] == "vellum:icon:text-size"
+    assert display_data["color"] == "navy"
 def test_serialize_node__tool_calling_node__subworkflow_with_parent_input_reference():
     """
     Test that a tool calling node with a subworkflow that references parent inputs serializes correctly

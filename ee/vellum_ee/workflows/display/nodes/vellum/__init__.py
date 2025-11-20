@@ -16,6 +16,7 @@ from .retry_node import BaseRetryNodeDisplay
 from .search_node import BaseSearchNodeDisplay
 from .subworkflow_deployment_node import BaseSubworkflowDeploymentNodeDisplay
 from .templating_node import BaseTemplatingNodeDisplay
+from .tool_prompt_node import BaseToolPromptNodeDisplay
 from .try_node import BaseTryNodeDisplay
 
 # All node display classes must be imported here to be registered in BaseNodeDisplay's node display registry
@@ -38,5 +39,6 @@ __all__ = [
     "BaseSearchNodeDisplay",
     "BaseSubworkflowDeploymentNodeDisplay",
     "BaseTemplatingNodeDisplay",
+    "BaseToolPromptNodeDisplay",
     "BaseTryNodeDisplay",
 ]
