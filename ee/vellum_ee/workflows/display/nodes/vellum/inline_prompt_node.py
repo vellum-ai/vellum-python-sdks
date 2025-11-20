@@ -5,7 +5,12 @@ from vellum import FunctionDefinition, PromptBlock, RichTextChildBlock, VellumVa
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.nodes import InlinePromptNode
 from vellum.workflows.types.core import JsonObject
-from vellum.workflows.types.definition import DeploymentDefinition, MCPServer, VellumIntegrationToolDefinition
+from vellum.workflows.types.definition import (
+    DeploymentDefinition,
+    MCPServer,
+    MCPToolDefinition,
+    VellumIntegrationToolDefinition,
+)
 from vellum.workflows.types.generics import is_workflow_class
 from vellum.workflows.utils.functions import (
     compile_function_definition,
@@ -80,15 +85,13 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
                 if not isinstance(block, BaseDescriptor)
             ]
 
-        functions = (
-            [
-                block
-                for i, function in enumerate(function_definitions)
-                for block in self._generate_function_tools(function, i, display_context)
-            ]
-            if isinstance(function_definitions, list)
-            else []
-        )
+        # First, compile all functions into a flat list of definitions (expanding MCP servers)
+        compiled_definitions = self._compile_function_definitions(function_definitions, display_context)
+
+        # Then, generate JSON blocks from the compiled definitions with sequential indices
+        functions = [
+            self._generate_function_block(definition, index) for index, definition in enumerate(compiled_definitions)
+        ]
         blocks.extend(functions)
 
         serialized_node: JsonObject = {
@@ -154,63 +157,92 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
 
         return node_inputs, prompt_inputs
 
-    def _generate_function_tools(
+    def _compile_function_definitions(
         self,
-        function: Union[
-            FunctionDefinition,
-            Callable,
-            DeploymentDefinition,
-            Type["BaseWorkflow"],
-            VellumIntegrationToolDefinition,
-            MCPServer,
-        ],
-        index: int,
-        display_context: WorkflowDisplayContext,
-    ) -> List[JsonObject]:
-        """Generate function tool blocks. Returns a list because MCPServer compiles to multiple tools."""
-        if isinstance(function, MCPServer):
-            # MCP servers compile to multiple tool definitions
-            tool_definitions = compile_mcp_tool_definition(function)
-            return [
-                {
-                    "id": str(uuid4_from_hash(f"{self.node_id}-FUNCTION_DEFINITION-{index + i}")),
-                    "block_type": "FUNCTION_DEFINITION",
-                    "properties": {
-                        "function_name": get_mcp_tool_name(tool_def),
-                        "function_description": tool_def.description,
-                        "function_parameters": tool_def.parameters,
-                    },
-                }
-                for i, tool_def in enumerate(tool_definitions)
+        function_definitions: Optional[
+            List[
+                Union[
+                    FunctionDefinition,
+                    Callable,
+                    DeploymentDefinition,
+                    Type["BaseWorkflow"],
+                    VellumIntegrationToolDefinition,
+                    MCPServer,
+                ]
             ]
+        ],
+        display_context: WorkflowDisplayContext,
+    ) -> List[Union[FunctionDefinition, MCPToolDefinition]]:
+        """Compile all functions into a flat list of definitions, expanding MCP servers.
 
-        # Normalize other function types to FunctionDefinition
-        if isinstance(function, FunctionDefinition):
-            normalized_function = function
-        elif is_workflow_class(function):
-            normalized_function = compile_inline_workflow_function_definition(function)
-        elif callable(function):
-            normalized_function = compile_function_definition(function)
-        elif isinstance(function, DeploymentDefinition):
-            normalized_function = compile_workflow_deployment_function_definition(function, display_context.client)
-        elif isinstance(function, VellumIntegrationToolDefinition):
-            normalized_function = compile_vellum_integration_tool_definition(function, display_context.client)
-        else:
-            raise ValueError(f"Unsupported function type: {type(function)}")
+        Args:
+            function_definitions: List of function definitions to compile
+            display_context: The workflow display context
 
-        return [
-            {
+        Returns:
+            Flat list of compiled function definitions (FunctionDefinition or MCPToolDefinition)
+        """
+        if not isinstance(function_definitions, list):
+            return []
+
+        compiled: List[Union[FunctionDefinition, MCPToolDefinition]] = []
+        for function in function_definitions:
+            if isinstance(function, MCPServer):
+                # MCP servers compile to multiple tool definitions
+                tool_definitions = compile_mcp_tool_definition(function)
+                compiled.extend(tool_definitions)
+            elif isinstance(function, FunctionDefinition):
+                compiled.append(function)
+            elif is_workflow_class(function):
+                compiled.append(compile_inline_workflow_function_definition(function))
+            elif callable(function):
+                compiled.append(compile_function_definition(function))
+            elif isinstance(function, DeploymentDefinition):
+                compiled.append(compile_workflow_deployment_function_definition(function, display_context.client))
+            elif isinstance(function, VellumIntegrationToolDefinition):
+                compiled.append(compile_vellum_integration_tool_definition(function, display_context.client))
+            else:
+                raise ValueError(f"Unsupported function type: {type(function)}")
+
+        return compiled
+
+    def _generate_function_block(
+        self,
+        definition: Union[FunctionDefinition, MCPToolDefinition],
+        index: int,
+    ) -> JsonObject:
+        """Generate a JSON block for a single function definition.
+
+        Args:
+            definition: The compiled function definition (FunctionDefinition or MCPToolDefinition)
+            index: The sequential index for this definition
+
+        Returns:
+            JSON block for the function definition
+        """
+        if isinstance(definition, MCPToolDefinition):
+            return {
                 "id": str(uuid4_from_hash(f"{self.node_id}-FUNCTION_DEFINITION-{index}")),
                 "block_type": "FUNCTION_DEFINITION",
                 "properties": {
-                    "function_name": normalized_function.name,
-                    "function_description": normalized_function.description,
-                    "function_parameters": normalized_function.parameters,
-                    "function_forced": normalized_function.forced,
-                    "function_strict": normalized_function.strict,
+                    "function_name": get_mcp_tool_name(definition),
+                    "function_description": definition.description,
+                    "function_parameters": definition.parameters,
                 },
             }
-        ]
+        else:
+            # FunctionDefinition
+            return {
+                "id": str(uuid4_from_hash(f"{self.node_id}-FUNCTION_DEFINITION-{index}")),
+                "block_type": "FUNCTION_DEFINITION",
+                "properties": {
+                    "function_name": definition.name,
+                    "function_description": definition.description,
+                    "function_parameters": definition.parameters,
+                    "function_forced": definition.forced,
+                    "function_strict": definition.strict,
+                },
+            }
 
     def _generate_prompt_block(
         self,
