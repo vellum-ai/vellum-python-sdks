@@ -74,24 +74,6 @@ class DatasetRow(UniversalBaseModel):
                     then_outputs=mock,
                 )
 
-            node_id = mock_exec.then_outputs.__class__.__parent_class__.__id__
-
-            then_outputs_dict = {
-                descriptor.name: value
-                for descriptor, value in mock_exec.then_outputs
-                if descriptor.name and not descriptor.name.startswith("__")
-            }
-
-            # Build the normalized mock with node_id, when_condition, and then_outputs
-            normalized_mock = {
-                "node_id": node_id,
-                "when_condition": {
-                    "type": "CONSTANT_VALUE",
-                    "value": {"type": "JSON", "value": True},
-                },
-                "then_outputs": then_outputs_dict,
-            }
-
-            result.append(normalized_mock)
+            result.append(mock_exec.model_dump())
 
         return result
