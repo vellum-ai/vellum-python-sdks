@@ -136,7 +136,7 @@ def upload_vellum_file(
     try:
         uploaded_file = vellum_client.uploaded_files.create(file=file_content)
     except ApiError as e:
-        raise FileRetrievalError(f"Failed to upload file to Vellum: {str(e)}") from e
+        raise FileRetrievalError("Failed to upload file to Vellum") from e
 
     new_src = f"vellum:uploaded-file:{uploaded_file.id}"
     return _copy_with_new_src(vellum_file, new_src)

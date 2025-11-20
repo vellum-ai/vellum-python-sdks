@@ -4,6 +4,7 @@ from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.utils.files.read import read_vellum_file
 from vellum.utils.files.stream import stream_vellum_file
 from vellum.utils.files.upload import upload_vellum_file
+from vellum.utils.files.urls import get_signed_url
 
 
 class VellumFileMixin(UniversalBaseModel):
@@ -67,17 +68,40 @@ class VellumFileMixin(UniversalBaseModel):
         vellum_client: Optional[Any] = None,
     ) -> Any:
         """
-        Upload the file to Vellum and return a new instance with the uploaded source.
+        Upload a file to Vellum and return a new VellumFile with the uploaded source.
 
-        This method takes the file (with a src that could be a base64 data URL,
+        This function takes any VellumFile object (with a src that could be a base64 data URL,
         HTTP/HTTPS URL, or existing vellum:uploaded-file: identifier), downloads its content,
         and uploads it to Vellum's storage.
 
         Args:
-            filename: Optional filename to use when uploading. If not provided, the API will determine a default.
+            vellum_file: A VellumDocument, VellumImage, VellumAudio, or VellumVideo instance
+            filename: Optional filename to use when uploading. If not provided, defaults to "file"
+                     with an appropriate extension inferred from the MIME type. If provided without
+                     an extension, the extension will be automatically added based on the MIME type.
             vellum_client: An optional Vellum client instance. If not provided, a default client will be created.
 
         Returns:
             A new instance with the vellum:uploaded-file:{id} source
         """
         return upload_vellum_file(self, filename=filename, vellum_client=vellum_client)
+
+    def get_signed_url(
+        self: Any,
+        *,
+        vellum_client: Optional[Any] = None,
+    ) -> str:
+        """
+        Retrieved a signed url for a file that's been uploaded to Vellum
+
+        This function takes any VellumFile object (with a src that could be a base64 data URL,
+        HTTP/HTTPS URL, or existing vellum:uploaded-file: identifier), uploads it to Vellum (if not already uploaded),
+        and returns a signed url for accessing the file.
+
+        Args:
+            vellum_client: An optional Vellum client instance. If not provided, a default client will be created.
+
+        Returns:
+            str: A signed URL for accessing the uploaded file
+        """
+        return get_signed_url(self, vellum_client=vellum_client)
