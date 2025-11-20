@@ -143,6 +143,7 @@ from .execute_api_response import ExecuteApiResponse
 from .execute_api_response_json import ExecuteApiResponseJson
 from .execute_prompt_event import ExecutePromptEvent
 from .execute_prompt_response import ExecutePromptResponse
+from .execute_workflow_async_response import ExecuteWorkflowAsyncResponse
 from .execute_workflow_response import ExecuteWorkflowResponse
 from .execute_workflow_workflow_result_event import ExecuteWorkflowWorkflowResultEvent
 from .execution_array_vellum_value import ExecutionArrayVellumValue
@@ -872,6 +873,7 @@ __all__ = [
     "ExecuteApiResponseJson",
     "ExecutePromptEvent",
     "ExecutePromptResponse",
+    "ExecuteWorkflowAsyncResponse",
     "ExecuteWorkflowResponse",
     "ExecuteWorkflowWorkflowResultEvent",
     "ExecutionArrayVellumValue",

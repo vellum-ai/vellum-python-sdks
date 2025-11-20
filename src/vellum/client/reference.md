@@ -625,6 +625,134 @@ client.execute_workflow(
 </dl>
 </details>
 
+<details><summary><code>client.<a href="src/vellum/client.py">execute_workflow_async</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Executes a deployed Workflow asynchronously and returns the execution ID.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import Vellum, WorkflowRequestStringInputRequest
+
+client = Vellum(
+    api_version="YOUR_API_VERSION",
+    api_key="YOUR_API_KEY",
+)
+client.execute_workflow_async(
+    inputs=[
+        WorkflowRequestStringInputRequest(
+            name="x",
+            value="value",
+        ),
+        WorkflowRequestStringInputRequest(
+            name="x",
+            value="value",
+        ),
+    ],
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**inputs:** `typing.Sequence[WorkflowRequestInputRequest]` — The list of inputs defined in the Workflow's Deployment with their corresponding values.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**workflow_deployment_id:** `typing.Optional[str]` — The ID of the Workflow Deployment. Must provide either this or workflow_deployment_name.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**workflow_deployment_name:** `typing.Optional[str]` — The name of the Workflow Deployment. Must provide either this or workflow_deployment_id.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**release_tag:** `typing.Optional[str]` — Optionally specify a release tag if you want to pin to a specific release of the Workflow Deployment
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**external_id:** `typing.Optional[str]` — Optionally include a unique identifier for tracking purposes. Must be unique within a given Workspace.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**previous_execution_id:** `typing.Optional[str]` — The ID of a previous Workflow Execution to reference for initial State loading.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Arbitrary JSON metadata associated with this request. Can be used to capture additional monitoring data such as user id, session id, etc. for future analysis.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.<a href="src/vellum/client.py">execute_workflow_stream</a>(...)</code></summary>
 <dl>
 <dd>

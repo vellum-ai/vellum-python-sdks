@@ -25,6 +25,7 @@ from .types.execute_api_request_headers_value import ExecuteApiRequestHeadersVal
 from .types.execute_api_response import ExecuteApiResponse
 from .types.execute_prompt_event import ExecutePromptEvent
 from .types.execute_prompt_response import ExecutePromptResponse
+from .types.execute_workflow_async_response import ExecuteWorkflowAsyncResponse
 from .types.execute_workflow_response import ExecuteWorkflowResponse
 from .types.generate_options_request import GenerateOptionsRequest
 from .types.generate_request import GenerateRequest
@@ -585,6 +586,121 @@ class RawVellum:
                     ExecuteWorkflowResponse,
                     parse_obj_as(
                         type_=ExecuteWorkflowResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 500:
+                raise InternalServerError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
+    def execute_workflow_async(
+        self,
+        *,
+        inputs: typing.Sequence[WorkflowRequestInputRequest],
+        workflow_deployment_id: typing.Optional[str] = OMIT,
+        workflow_deployment_name: typing.Optional[str] = OMIT,
+        release_tag: typing.Optional[str] = OMIT,
+        external_id: typing.Optional[str] = OMIT,
+        previous_execution_id: typing.Optional[str] = OMIT,
+        metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> HttpResponse[ExecuteWorkflowAsyncResponse]:
+        """
+        Executes a deployed Workflow asynchronously and returns the execution ID.
+
+        Parameters
+        ----------
+        inputs : typing.Sequence[WorkflowRequestInputRequest]
+            The list of inputs defined in the Workflow's Deployment with their corresponding values.
+
+        workflow_deployment_id : typing.Optional[str]
+            The ID of the Workflow Deployment. Must provide either this or workflow_deployment_name.
+
+        workflow_deployment_name : typing.Optional[str]
+            The name of the Workflow Deployment. Must provide either this or workflow_deployment_id.
+
+        release_tag : typing.Optional[str]
+            Optionally specify a release tag if you want to pin to a specific release of the Workflow Deployment
+
+        external_id : typing.Optional[str]
+            Optionally include a unique identifier for tracking purposes. Must be unique within a given Workspace.
+
+        previous_execution_id : typing.Optional[str]
+            The ID of a previous Workflow Execution to reference for initial State loading.
+
+        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Arbitrary JSON metadata associated with this request. Can be used to capture additional monitoring data such as user id, session id, etc. for future analysis.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[ExecuteWorkflowAsyncResponse]
+
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "v1/execute-workflow-async",
+            base_url=self._client_wrapper.get_environment().predict,
+            method="POST",
+            json={
+                "inputs": convert_and_respect_annotation_metadata(
+                    object_=inputs, annotation=typing.Sequence[WorkflowRequestInputRequest], direction="write"
+                ),
+                "workflow_deployment_id": workflow_deployment_id,
+                "workflow_deployment_name": workflow_deployment_name,
+                "release_tag": release_tag,
+                "external_id": external_id,
+                "previous_execution_id": previous_execution_id,
+                "metadata": metadata,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    ExecuteWorkflowAsyncResponse,
+                    parse_obj_as(
+                        type_=ExecuteWorkflowAsyncResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -1808,6 +1924,121 @@ class AsyncRawVellum:
                     ExecuteWorkflowResponse,
                     parse_obj_as(
                         type_=ExecuteWorkflowResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 400:
+                raise BadRequestError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 500:
+                raise InternalServerError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
+    async def execute_workflow_async(
+        self,
+        *,
+        inputs: typing.Sequence[WorkflowRequestInputRequest],
+        workflow_deployment_id: typing.Optional[str] = OMIT,
+        workflow_deployment_name: typing.Optional[str] = OMIT,
+        release_tag: typing.Optional[str] = OMIT,
+        external_id: typing.Optional[str] = OMIT,
+        previous_execution_id: typing.Optional[str] = OMIT,
+        metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AsyncHttpResponse[ExecuteWorkflowAsyncResponse]:
+        """
+        Executes a deployed Workflow asynchronously and returns the execution ID.
+
+        Parameters
+        ----------
+        inputs : typing.Sequence[WorkflowRequestInputRequest]
+            The list of inputs defined in the Workflow's Deployment with their corresponding values.
+
+        workflow_deployment_id : typing.Optional[str]
+            The ID of the Workflow Deployment. Must provide either this or workflow_deployment_name.
+
+        workflow_deployment_name : typing.Optional[str]
+            The name of the Workflow Deployment. Must provide either this or workflow_deployment_id.
+
+        release_tag : typing.Optional[str]
+            Optionally specify a release tag if you want to pin to a specific release of the Workflow Deployment
+
+        external_id : typing.Optional[str]
+            Optionally include a unique identifier for tracking purposes. Must be unique within a given Workspace.
+
+        previous_execution_id : typing.Optional[str]
+            The ID of a previous Workflow Execution to reference for initial State loading.
+
+        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Arbitrary JSON metadata associated with this request. Can be used to capture additional monitoring data such as user id, session id, etc. for future analysis.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[ExecuteWorkflowAsyncResponse]
+
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "v1/execute-workflow-async",
+            base_url=self._client_wrapper.get_environment().predict,
+            method="POST",
+            json={
+                "inputs": convert_and_respect_annotation_metadata(
+                    object_=inputs, annotation=typing.Sequence[WorkflowRequestInputRequest], direction="write"
+                ),
+                "workflow_deployment_id": workflow_deployment_id,
+                "workflow_deployment_name": workflow_deployment_name,
+                "release_tag": release_tag,
+                "external_id": external_id,
+                "previous_execution_id": previous_execution_id,
+                "metadata": metadata,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    ExecuteWorkflowAsyncResponse,
+                    parse_obj_as(
+                        type_=ExecuteWorkflowAsyncResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
