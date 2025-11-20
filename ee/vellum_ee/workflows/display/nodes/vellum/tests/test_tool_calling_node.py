@@ -1,5 +1,6 @@
 from datetime import datetime
 from unittest import mock
+from typing import Any, Dict
 
 from vellum.client.types.prompt_parameters import PromptParameters
 from vellum.client.types.release_review_reviewer import ReleaseReviewReviewer
@@ -510,32 +511,158 @@ def test_serialize_tool_prompt_node_with_mcp_tools():
     ):
         serialized_tool_prompt_node = tool_prompt_node_display.serialize(display_context)
 
-    # THEN the tool prompt node should serialize as type PROMPT with exec_config
-    assert serialized_tool_prompt_node["type"] == "PROMPT"
-    assert "exec_config" in serialized_tool_prompt_node["data"]
-
     # AND the exec_config should contain prompt_template_block_data with function definitions
-    exec_config = serialized_tool_prompt_node["data"]["exec_config"]
-    assert "prompt_template_block_data" in exec_config
-    blocks = exec_config["prompt_template_block_data"]["blocks"]
+    assert isinstance(serialized_tool_prompt_node, dict)
+    assert isinstance(serialized_tool_prompt_node["data"], dict)
+    assert isinstance(serialized_tool_prompt_node["data"]["exec_config"], dict)
+    exec_config: Dict[str, Any] = serialized_tool_prompt_node["data"]["exec_config"]
+    assert isinstance(exec_config["prompt_template_block_data"], dict)
+    prompt_template_block_data: Dict[str, Any] = exec_config["prompt_template_block_data"]
 
-    # AND there should be FUNCTION_DEFINITION blocks (MCP servers compile to multiple tools)
-    function_blocks = [block for block in blocks if block.get("block_type") == "FUNCTION_DEFINITION"]
+    # AND there should be FUNCTION_DEFINITION blocks
+    function_blocks = [
+        entry
+        for entry in prompt_template_block_data["blocks"]
+        if isinstance(entry, dict) and entry.get("block_type") == "FUNCTION_DEFINITION"
+    ]
     assert len(function_blocks) == 2  # Should have 2 tools from the mock
 
     # AND each function block should have the required properties
-    for function_block in function_blocks:
-        assert "function_name" in function_block["properties"]
-        assert "function_description" in function_block["properties"]
-        assert "function_parameters" in function_block["properties"]
-        # function_forced and function_strict should not be present (omitted when None)
-        assert "function_forced" not in function_block["properties"]
-        assert "function_strict" not in function_block["properties"]
+    assert function_blocks == [
+        {
+            "id": "e57611b4-306e-4be8-990f-5e6759f564d9",
+            "block_type": "FUNCTION_DEFINITION",
+            "properties": {
+                "function_name": "my_mcp_server__test_tool_1",
+                "function_description": "Test tool 1 description",
+                "function_parameters": {"type": "object", "properties": {"arg1": {"type": "string"}}},
+            },
+        },
+        {
+            "id": "91ee0b0e-5af9-41e4-bc80-d836d6aee16e",
+            "block_type": "FUNCTION_DEFINITION",
+            "properties": {
+                "function_name": "my_mcp_server__test_tool_2",
+                "function_description": "Test tool 2 description",
+                "function_parameters": {"type": "object", "properties": {"arg2": {"type": "number"}}},
+            },
+        },
+    ]
 
-    # AND function names should match the MCP tool names with server prefix (hyphens converted to underscores)
-    function_names = [block["properties"]["function_name"] for block in function_blocks]
-    assert "my_mcp_server__test_tool_1" in function_names
-    assert "my_mcp_server__test_tool_2" in function_names
+
+def test_serialize_tool_prompt_node_with_mcp_tools_followed_by_regular_function():
+    """
+    Test that tool prompt nodes with MCP tools followed by regular functions have unique block IDs.
+
+    This test specifically verifies the fix for UUID collision where an MCP server at index 0
+    with 2 tools would create IDs with suffixes 0 and 1, and the next function at index 1
+    would also create ID with suffix 1, causing duplicates.
+    """
+
+    # GIVEN an MCP server for tool calling that yields 2 tools
+    mcp_server = MCPServer(
+        name="my-mcp-server",
+        url="https://my-mcp-server.com",
+        authorization_type=AuthorizationType.API_KEY,
+        api_key_header_key="my-api-key-header-key",
+        api_key_header_value=EnvironmentVariableReference(name="my-api-key-header-value"),
+    )
+
+    # AND mock MCP tool definitions (since compile_mcp_tool_definition tries to connect to server)
+    mock_tool_definitions = [
+        MCPToolDefinition(
+            name="test_tool_1",
+            server=mcp_server,
+            description="Test tool 1 description",
+            parameters={"type": "object", "properties": {"arg1": {"type": "string"}}},
+        ),
+        MCPToolDefinition(
+            name="test_tool_2",
+            server=mcp_server,
+            description="Test tool 2 description",
+            parameters={"type": "object", "properties": {"arg2": {"type": "number"}}},
+        ),
+    ]
+
+    # AND a regular function
+    def my_function(arg1: str) -> str:
+        return f"Result: {arg1}"
+
+    # WHEN we create a tool prompt node using create_tool_prompt_node with MCP server followed by regular function
+    tool_prompt_node = create_tool_prompt_node(
+        ml_model="gpt-4o-mini",
+        blocks=[],
+        functions=[mcp_server, my_function],  # MCP server first, then regular function
+        prompt_inputs=None,
+        parameters=PromptParameters(),
+    )
+
+    tool_prompt_node_display_class = get_node_display_class(tool_prompt_node)
+    tool_prompt_node_display = tool_prompt_node_display_class()
+
+    class Workflow(BaseWorkflow[BaseInputs, ToolCallingState]):
+        graph = tool_prompt_node
+
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+    display_context = workflow_display.display_context
+
+    # WHEN we serialize the tool prompt node (with mock to avoid actual MCP server connection)
+    with mock.patch(
+        "vellum_ee.workflows.display.nodes.vellum.inline_prompt_node.compile_mcp_tool_definition",
+        return_value=mock_tool_definitions,
+    ):
+        serialized_tool_prompt_node = tool_prompt_node_display.serialize(display_context)
+
+    # AND the exec_config should contain prompt_template_block_data with function definitions
+    assert isinstance(serialized_tool_prompt_node, dict)
+    assert isinstance(serialized_tool_prompt_node["data"], dict)
+    assert isinstance(serialized_tool_prompt_node["data"]["exec_config"], dict)
+    exec_config: Dict[str, Any] = serialized_tool_prompt_node["data"]["exec_config"]
+    assert isinstance(exec_config["prompt_template_block_data"], dict)
+    prompt_template_block_data: Dict[str, Any] = exec_config["prompt_template_block_data"]
+
+    # AND there should be FUNCTION_DEFINITION entries (2 from MCP server + 1 from regular function = 3 total)
+    function_definitions = [
+        entry
+        for entry in prompt_template_block_data["blocks"]
+        if isinstance(entry, dict) and entry.get("block_type") == "FUNCTION_DEFINITION"
+    ]
+    assert len(function_definitions) == 3
+    assert function_definitions == [
+        {
+            "id": "e57611b4-306e-4be8-990f-5e6759f564d9",
+            "block_type": "FUNCTION_DEFINITION",
+            "properties": {
+                "function_name": "my_mcp_server__test_tool_1",
+                "function_description": "Test tool 1 description",
+                "function_parameters": {"type": "object", "properties": {"arg1": {"type": "string"}}},
+            },
+        },
+        {
+            "id": "91ee0b0e-5af9-41e4-bc80-d836d6aee16e",
+            "block_type": "FUNCTION_DEFINITION",
+            "properties": {
+                "function_name": "my_mcp_server__test_tool_2",
+                "function_description": "Test tool 2 description",
+                "function_parameters": {"type": "object", "properties": {"arg2": {"type": "number"}}},
+            },
+        },
+        {
+            "id": "cfc15155-ce9c-4701-8085-0a1f37dd5545",
+            "block_type": "FUNCTION_DEFINITION",
+            "properties": {
+                "function_name": "my_function",
+                "function_description": None,
+                "function_parameters": {
+                    "type": "object",
+                    "properties": {"arg1": {"type": "string"}},
+                    "required": ["arg1"],
+                },
+                "function_forced": None,
+                "function_strict": None,
+            },
+        },
+    ]
 
 
 def test_serialize_node__tool_calling_node__subworkflow_with_parent_input_reference():
