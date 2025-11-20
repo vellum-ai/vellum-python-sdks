@@ -2,7 +2,6 @@
 
 import logging
 import re
-import typing
 from typing import TYPE_CHECKING, Optional
 
 from vellum.client.core.api_error import ApiError
@@ -20,7 +19,7 @@ logger = logging.getLogger(__name__)
 def get_signed_url(
     vellum_file: VellumFileTypes,
     *,
-    expiry_seconds: typing.Optional[int] = 7 * 24 * 60 * 60,  # 7 days
+    expiry_seconds: int = 7 * 24 * 60 * 60,  # 7 days
     vellum_client: Optional["VellumClient"] = None,
 ) -> str:
     """

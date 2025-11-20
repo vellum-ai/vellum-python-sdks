@@ -1,4 +1,3 @@
-import typing
 from typing import Any, ContextManager, Iterator, Optional
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
@@ -90,7 +89,7 @@ class VellumFileMixin(UniversalBaseModel):
     def get_signed_url(
         self: Any,
         *,
-        expiry_seconds: typing.Optional[int] = 7 * 24 * 60 * 60,  # 7 days
+        expiry_seconds: int = 7 * 24 * 60 * 60,  # 7 days
         vellum_client: Optional[Any] = None,
     ) -> str:
         """
