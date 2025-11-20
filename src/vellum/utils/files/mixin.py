@@ -1,3 +1,4 @@
+import typing
 from typing import Any, ContextManager, Iterator, Optional
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
@@ -89,6 +90,7 @@ class VellumFileMixin(UniversalBaseModel):
     def get_signed_url(
         self: Any,
         *,
+        expiry_seconds: typing.Optional[int] = 7 * 24 * 60 * 60,  # 7 days
         vellum_client: Optional[Any] = None,
     ) -> str:
         """
@@ -99,9 +101,10 @@ class VellumFileMixin(UniversalBaseModel):
         and returns a signed url for accessing the file.
 
         Args:
+            expiry_seconds: The number of seconds until the signed URL expires. Defaults to 7 days.
             vellum_client: An optional Vellum client instance. If not provided, a default client will be created.
 
         Returns:
             str: A signed URL for accessing the uploaded file
         """
-        return get_signed_url(self, vellum_client=vellum_client)
+        return get_signed_url(self, expiry_seconds=expiry_seconds, vellum_client=vellum_client)

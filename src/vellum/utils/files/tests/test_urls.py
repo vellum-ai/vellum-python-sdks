@@ -40,7 +40,7 @@ def test_get_signed_url_from_base64(mock_vellum_client, file_type):
     # THEN the file should be uploaded and signed URL returned
     assert result == signed_url
     mock_vellum_client.uploaded_files.create.assert_called_once()
-    mock_vellum_client.uploaded_files.retrieve.assert_called_once_with(uploaded_file_id)
+    mock_vellum_client.uploaded_files.retrieve.assert_called_once_with(uploaded_file_id, expiry_seconds=604800)
 
 
 @pytest.mark.parametrize("file_type", [VellumDocument, VellumImage, VellumAudio, VellumVideo])
@@ -70,7 +70,7 @@ def test_get_signed_url_from_http_url(mock_get, mock_vellum_client, file_type):
     assert result == signed_url
     mock_get.assert_called_once_with(url, stream=True)
     mock_vellum_client.uploaded_files.create.assert_called_once()
-    mock_vellum_client.uploaded_files.retrieve.assert_called_once_with(uploaded_file_id)
+    mock_vellum_client.uploaded_files.retrieve.assert_called_once_with(uploaded_file_id, expiry_seconds=604800)
 
 
 @pytest.mark.parametrize("file_type", [VellumDocument, VellumImage, VellumAudio, VellumVideo])
@@ -92,7 +92,7 @@ def test_get_signed_url_already_uploaded(mock_vellum_client, file_type):
     # THEN the signed URL should be returned without uploading again
     assert result == signed_url
     mock_vellum_client.uploaded_files.create.assert_not_called()
-    mock_vellum_client.uploaded_files.retrieve.assert_called_once_with(file_id)
+    mock_vellum_client.uploaded_files.retrieve.assert_called_once_with(file_id, expiry_seconds=604800)
 
 
 @pytest.mark.parametrize(
@@ -119,7 +119,7 @@ def test_get_signed_url_case_insensitive_vellum_src(mock_vellum_client, src_patt
 
     # THEN the signed URL should be returned regardless of case
     assert result == signed_url
-    mock_vellum_client.uploaded_files.retrieve.assert_called_once_with(file_id)
+    mock_vellum_client.uploaded_files.retrieve.assert_called_once_with(file_id, expiry_seconds=604800)
 
 
 @pytest.mark.parametrize("file_type", [VellumDocument, VellumImage, VellumAudio, VellumVideo])
@@ -147,7 +147,7 @@ def test_get_signed_url_with_custom_client(mock_upload, file_type):
     # THEN the custom client should be used
     assert result == signed_url
     mock_upload.assert_called_once_with(vellum_file, vellum_client=custom_client)
-    custom_client.uploaded_files.retrieve.assert_called_once_with(uploaded_file_id)
+    custom_client.uploaded_files.retrieve.assert_called_once_with(uploaded_file_id, expiry_seconds=604800)
 
 
 def test_get_signed_url_invalid_uploaded_file_format(mock_vellum_client):
@@ -221,7 +221,7 @@ def test_get_signed_url_uses_default_client_when_not_provided(mock_vellum_client
 
     # THEN the default client should be created and used
     assert result == signed_url
-    mock_vellum_client.uploaded_files.retrieve.assert_called_once_with(file_id)
+    mock_vellum_client.uploaded_files.retrieve.assert_called_once_with(file_id, expiry_seconds=604800)
 
 
 @pytest.mark.parametrize("file_type", [VellumDocument, VellumImage, VellumAudio, VellumVideo])
@@ -249,4 +249,4 @@ def test_get_signed_url_preserves_file_type(mock_upload, mock_vellum_client, fil
     assert result == signed_url
     # The file type should be consistent throughout the process
     mock_upload.assert_called_once_with(vellum_file, vellum_client=None)
-    mock_vellum_client.uploaded_files.retrieve.assert_called_once_with(uploaded_file_id)
+    mock_vellum_client.uploaded_files.retrieve.assert_called_once_with(uploaded_file_id, expiry_seconds=604800)

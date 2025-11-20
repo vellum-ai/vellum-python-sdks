@@ -154,7 +154,7 @@ def test_vellum_file_mixin_get_signed_url_method():
         # THEN the file should be uploaded and signed URL returned
         assert result == signed_url
         mock_client.uploaded_files.create.assert_called_once()
-        mock_client.uploaded_files.retrieve.assert_called_once_with(uploaded_file_id)
+        mock_client.uploaded_files.retrieve.assert_called_once_with(uploaded_file_id, expiry_seconds=604800)
 
 
 def test_vellum_file_mixin_get_signed_url_method_with_custom_client():
@@ -179,7 +179,7 @@ def test_vellum_file_mixin_get_signed_url_method_with_custom_client():
     # THEN the custom client should be used
     assert result == signed_url
     custom_client.uploaded_files.create.assert_called_once()
-    custom_client.uploaded_files.retrieve.assert_called_once_with(uploaded_file_id)
+    custom_client.uploaded_files.retrieve.assert_called_once_with(uploaded_file_id, expiry_seconds=604800)
 
 
 def test_vellum_file_mixin_get_signed_url_method_already_uploaded():
@@ -202,4 +202,4 @@ def test_vellum_file_mixin_get_signed_url_method_already_uploaded():
         # THEN the signed URL should be returned without uploading again
         assert result == signed_url
         mock_client.uploaded_files.create.assert_not_called()
-        mock_client.uploaded_files.retrieve.assert_called_once_with(file_id)
+        mock_client.uploaded_files.retrieve.assert_called_once_with(file_id, expiry_seconds=604800)
