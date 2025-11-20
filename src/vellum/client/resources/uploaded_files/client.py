@@ -51,7 +51,13 @@ class UploadedFilesClient:
         _response = self._raw_client.create(file=file, request_options=request_options)
         return _response.data
 
-    def retrieve(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> UploadedFileRead:
+    def retrieve(
+        self,
+        id: str,
+        *,
+        expiry_seconds: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> UploadedFileRead:
         """
         Retrieve a previously uploaded file by its ID
 
@@ -59,6 +65,9 @@ class UploadedFilesClient:
         ----------
         id : str
             A UUID string identifying this uploaded file.
+
+        expiry_seconds : typing.Optional[int]
+            The number of seconds until the signed URL expires. Must be > 0 and <= 2592000 (30 days). Non-numeric or out-of-range values fall back to the default (604800 seconds or 7 days).
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -80,7 +89,7 @@ class UploadedFilesClient:
             id="id",
         )
         """
-        _response = self._raw_client.retrieve(id, request_options=request_options)
+        _response = self._raw_client.retrieve(id, expiry_seconds=expiry_seconds, request_options=request_options)
         return _response.data
 
     def update(
@@ -146,7 +155,13 @@ class AsyncUploadedFilesClient:
         _response = await self._raw_client.create(file=file, request_options=request_options)
         return _response.data
 
-    async def retrieve(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> UploadedFileRead:
+    async def retrieve(
+        self,
+        id: str,
+        *,
+        expiry_seconds: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> UploadedFileRead:
         """
         Retrieve a previously uploaded file by its ID
 
@@ -154,6 +169,9 @@ class AsyncUploadedFilesClient:
         ----------
         id : str
             A UUID string identifying this uploaded file.
+
+        expiry_seconds : typing.Optional[int]
+            The number of seconds until the signed URL expires. Must be > 0 and <= 2592000 (30 days). Non-numeric or out-of-range values fall back to the default (604800 seconds or 7 days).
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -183,7 +201,7 @@ class AsyncUploadedFilesClient:
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.retrieve(id, request_options=request_options)
+        _response = await self._raw_client.retrieve(id, expiry_seconds=expiry_seconds, request_options=request_options)
         return _response.data
 
     async def update(

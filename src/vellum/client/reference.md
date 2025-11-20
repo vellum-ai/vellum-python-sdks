@@ -6352,6 +6352,14 @@ client.uploaded_files.retrieve(
 <dl>
 <dd>
 
+**expiry_seconds:** `typing.Optional[int]` — The number of seconds until the signed URL expires. Must be > 0 and <= 2592000 (30 days). Non-numeric or out-of-range values fall back to the default (604800 seconds or 7 days).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
     
 </dd>

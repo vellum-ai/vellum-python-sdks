@@ -67,7 +67,11 @@ class RawUploadedFilesClient:
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
     def retrieve(
-        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
+        self,
+        id: str,
+        *,
+        expiry_seconds: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[UploadedFileRead]:
         """
         Retrieve a previously uploaded file by its ID
@@ -76,6 +80,9 @@ class RawUploadedFilesClient:
         ----------
         id : str
             A UUID string identifying this uploaded file.
+
+        expiry_seconds : typing.Optional[int]
+            The number of seconds until the signed URL expires. Must be > 0 and <= 2592000 (30 days). Non-numeric or out-of-range values fall back to the default (604800 seconds or 7 days).
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -89,6 +96,9 @@ class RawUploadedFilesClient:
             f"v1/uploaded-files/{jsonable_encoder(id)}",
             base_url=self._client_wrapper.get_environment().default,
             method="GET",
+            params={
+                "expiry_seconds": expiry_seconds,
+            },
             request_options=request_options,
         )
         try:
@@ -207,7 +217,11 @@ class AsyncRawUploadedFilesClient:
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
     async def retrieve(
-        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
+        self,
+        id: str,
+        *,
+        expiry_seconds: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[UploadedFileRead]:
         """
         Retrieve a previously uploaded file by its ID
@@ -216,6 +230,9 @@ class AsyncRawUploadedFilesClient:
         ----------
         id : str
             A UUID string identifying this uploaded file.
+
+        expiry_seconds : typing.Optional[int]
+            The number of seconds until the signed URL expires. Must be > 0 and <= 2592000 (30 days). Non-numeric or out-of-range values fall back to the default (604800 seconds or 7 days).
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -229,6 +246,9 @@ class AsyncRawUploadedFilesClient:
             f"v1/uploaded-files/{jsonable_encoder(id)}",
             base_url=self._client_wrapper.get_environment().default,
             method="GET",
+            params={
+                "expiry_seconds": expiry_seconds,
+            },
             request_options=request_options,
         )
         try:

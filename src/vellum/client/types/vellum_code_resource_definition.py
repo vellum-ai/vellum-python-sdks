@@ -13,6 +13,11 @@ class VellumCodeResourceDefinition(UniversalBaseModel):
     The module that this resource is defined in.
     """
 
+    exclude_from_monitoring: typing.Optional[bool] = pydantic.Field(default=None)
+    """
+    Whether this node should be excluded from monitoring views.
+    """
+
     id: str
 
     if IS_PYDANTIC_V2:
