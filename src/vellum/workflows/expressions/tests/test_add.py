@@ -70,3 +70,27 @@ def test_add_expression_types():
     expression = AddExpression(lhs=5, rhs=3)
 
     assert expression.types == (object,)
+
+
+def test_add_expression_list_plus_non_list():
+    """
+    Tests that AddExpression correctly handles list + non-list by wrapping non-list in a list.
+    This allows State.chat_history + ChatMessage(...) to work.
+    """
+
+    state = TestState()
+
+    # GIVEN a list and a non-list value
+    my_list = [1, 2, 3]
+    single_item = 4
+
+    # WHEN we create an AddExpression and resolve it
+    expression = AddExpression(lhs=my_list, rhs=single_item)
+    result = expression.resolve(state)
+
+    # THEN the result should be the list with the item appended
+    assert result == [1, 2, 3, 4]
+    assert isinstance(result, list)
+
+    # AND the original list should be unchanged
+    assert my_list == [1, 2, 3]
