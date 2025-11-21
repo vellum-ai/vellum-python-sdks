@@ -297,7 +297,8 @@
             "value": {
               "type": "WORKFLOW_INPUT",
               "input_variable_id": "5f64210f-ec43-48ce-ae40-40a9ba4c4c11"
-            }
+            },
+            "schema": {"type": "string"}
           }
         ],
         "trigger": {

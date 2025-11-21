@@ -66,6 +66,15 @@ class BaseDescriptor(Generic[_T]):
         return self._types
 
     @property
+    def normalized_type(self) -> Type:
+        all_types = self._types
+        if len(all_types) == 1:
+            return all_types[0]
+        else:
+            # Union should be considered a type, but mypy doesn't agree
+            return Union[all_types]  # type: ignore[return-value]
+
+    @property
     def instance(self) -> Optional[_T]:
         return self._instance
 

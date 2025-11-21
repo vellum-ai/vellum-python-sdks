@@ -30,12 +30,14 @@ from vellum.workflows.references.node import NodeReference
 from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.types.generics import NodeType
 from vellum.workflows.types.utils import get_original_base
+from vellum.workflows.utils.functions import compile_annotation
 from vellum.workflows.utils.names import pascal_to_title_case
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
 from vellum_ee.workflows.display.editor.types import NodeDisplayComment, NodeDisplayData
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
+from vellum_ee.workflows.display.utils.exceptions import NodeValidationError
 from vellum_ee.workflows.display.utils.expressions import serialize_value
 from vellum_ee.workflows.display.utils.registry import register_node_display_class
 
@@ -275,6 +277,16 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 if output in self.output_display
                 else str(uuid4_from_hash(f"{self.node_id}|{output.name}"))
             )
+            try:
+                schema = compile_annotation(output.normalized_type, {})
+            except Exception as e:
+                display_context.add_error(
+                    NodeValidationError(
+                        message=f"Failed to compile output schema for output '{output.name}': {e}",
+                        node_class_name=self._node.__name__,
+                    )
+                )
+                schema = None
 
             outputs.append(
                 {
@@ -282,6 +294,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                     "name": output.name,
                     "type": output_type,
                     "value": value,
+                    "schema": schema,
                 }
             )
 

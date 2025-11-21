@@ -24,7 +24,7 @@ from vellum import (
 )
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
-from vellum.workflows.types.core import Json
+from vellum.workflows.types.core import is_json_type
 
 
 def primitive_type_to_vellum_variable_type(type_: Union[Type, BaseDescriptor]) -> VellumVariableType:
@@ -46,17 +46,7 @@ def primitive_type_to_vellum_variable_type(type_: Union[Type, BaseDescriptor]) -
             return "JSON"
 
         if len(types) != 1:
-            # Check explicitly for our internal JSON type.
-            # Matches the type found at vellum.workflows.utils.vellum_variables.Json
-            actual_types_with_explicit_ref = [
-                bool,
-                int,
-                float,
-                str,
-                typing.List[Json],
-                typing.Dict[str, Json],
-            ]
-            if types == actual_types_with_explicit_ref:
+            if is_json_type(types):
                 return "JSON"
             # Number now supports float and int
             elif types == [float, int]:
@@ -218,8 +208,7 @@ def _builtin_list_to_vellum_type(type_: Type) -> Union[str, None]:
                 item_type, SearchResultRequest
             ):
                 return "SEARCH_RESULTS"
-            if _is_type_optionally_equal(item_type, VellumValue) or _is_type_optionally_equal(
-                item_type, VellumValueRequest
-            ):
-                return "ARRAY"
+
+            return "ARRAY"
+
     return None

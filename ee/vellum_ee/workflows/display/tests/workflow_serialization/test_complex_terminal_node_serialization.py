@@ -79,6 +79,7 @@ def test_serialize_workflow__missing_final_output_node():
                             "type": "WORKFLOW_INPUT",
                             "input_variable_id": "da086239-d743-4246-b666-5c91e22fb88c",
                         },
+                        "schema": {"type": "string"},
                     }
                 ],
                 "trigger": {

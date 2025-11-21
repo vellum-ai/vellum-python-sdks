@@ -2002,25 +2002,31 @@
             "id": "25c44c2c-c672-4805-976a-dc043d83a387",
             "name": "headers",
             "type": "JSON",
-            "value": null
+            "value": null,
+            "schema": {"type": "object", "additionalProperties": {"type": "string"}}
           },
           {
             "id": "c3c38fac-f413-4dad-863d-3d388231ba22",
             "name": "json",
             "type": "JSON",
-            "value": null
+            "value": null,
+            "schema": {
+              "$ref": "#/$defs/vellum.workflows.types.core.Json"
+            }
           },
           {
             "id": "4d3e2c1d-ac9f-43a4-81fc-b652239986a0",
             "name": "status_code",
             "type": "NUMBER",
-            "value": null
+            "value": null,
+            "schema": {"type": "integer"}
           },
           {
             "id": "0c945315-0607-4ef6-8051-f4b6498e9526",
             "name": "text",
             "type": "STRING",
-            "value": null
+            "value": null,
+            "schema": {"type": "string"}
           }
         ]
       },
@@ -3044,7 +3050,8 @@
                 "node_id": "235b2e34-c6a3-48aa-b2cc-090571b41ea8",
                 "node_output_id": "7b1ca9d1-d829-4329-b9f3-a864c3ce4230"
               }
-            }
+            },
+            "schema": {"type": "string"}
           }
         ]
       }

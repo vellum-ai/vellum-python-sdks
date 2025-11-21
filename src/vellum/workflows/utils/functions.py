@@ -1,6 +1,20 @@
 import dataclasses
+from datetime import datetime
 import inspect
-from typing import TYPE_CHECKING, Annotated, Any, Callable, List, Literal, Optional, Type, Union, get_args, get_origin
+from typing import (
+    TYPE_CHECKING,
+    Annotated,
+    Any,
+    Callable,
+    ForwardRef,
+    List,
+    Literal,
+    Optional,
+    Type,
+    Union,
+    get_args,
+    get_origin,
+)
 
 from pydantic import BaseModel
 from pydantic_core import PydanticUndefined
@@ -11,6 +25,7 @@ from vellum.client.types.function_definition import FunctionDefinition
 from vellum.workflows.integrations.composio_service import ComposioService
 from vellum.workflows.integrations.mcp_service import MCPService
 from vellum.workflows.integrations.vellum_integration_service import VellumIntegrationService
+from vellum.workflows.types.core import is_json_type
 from vellum.workflows.types.definition import (
     ComposioToolDefinition,
     DeploymentDefinition,
@@ -41,11 +56,24 @@ for k, v in list(type_map.items()):
         type_map[k.__name__] = v
 
 
+def _get_def_name(annotation: Type) -> str:
+    return f"{annotation.__module__}.{annotation.__qualname__}"
+
+
 def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
     if annotation is None:
         return {"type": "null"}
 
+    if annotation is Any:
+        return {}
+
+    if annotation is datetime:
+        return {"type": "string", "format": "date-time"}
+
     if get_origin(annotation) is Union:
+        if is_json_type(get_args(annotation)):
+            return {"$ref": "#/$defs/vellum.workflows.types.core.Json"}
+
         return {"anyOf": [compile_annotation(a, defs) for a in get_args(annotation)]}
 
     if get_origin(annotation) is Literal:
@@ -84,7 +112,8 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
             return result
 
     if dataclasses.is_dataclass(annotation) and isinstance(annotation, type):
-        if annotation.__name__ not in defs:
+        def_name = _get_def_name(annotation)
+        if def_name not in defs:
             properties = {}
             required = []
             for field in dataclasses.fields(annotation):
@@ -93,11 +122,12 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
                     required.append(field.name)
                 else:
                     properties[field.name]["default"] = _compile_default_value(field.default)
-            defs[annotation.__name__] = {"type": "object", "properties": properties, "required": required}
-        return {"$ref": f"#/$defs/{annotation.__name__}"}
+            defs[def_name] = {"type": "object", "properties": properties, "required": required}
+        return {"$ref": f"#/$defs/{def_name}"}
 
     if inspect.isclass(annotation) and issubclass(annotation, BaseModel):
-        if annotation.__name__ not in defs:
+        def_name = _get_def_name(annotation)
+        if def_name not in defs:
             properties = {}
             required = []
             for field_name, field_info in annotation.model_fields.items():
@@ -111,9 +141,16 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
                     required.append(field_name)
                 else:
                     properties[field_name]["default"] = _compile_default_value(field_info.default)
-            defs[annotation.__name__] = {"type": "object", "properties": properties, "required": required}
+            defs[def_name] = {"type": "object", "properties": properties, "required": required}
 
-        return {"$ref": f"#/$defs/{annotation.__name__}"}
+        return {"$ref": f"#/$defs/{def_name}"}
+
+    if type(annotation) is ForwardRef:
+        # Ignore forward references for now
+        return {}
+
+    if annotation not in type_map:
+        raise ValueError(f"Failed to compile type: {annotation}")
 
     return {"type": type_map[annotation]}
 

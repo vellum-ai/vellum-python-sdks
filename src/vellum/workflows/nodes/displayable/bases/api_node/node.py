@@ -40,7 +40,7 @@ class BaseAPINode(BaseNode, Generic[StateType]):
     timeout: Optional[int] = None
 
     class Outputs(BaseOutputs):
-        json: Optional[Json]
+        json: Json
         headers: Dict[str, str]
         status_code: int
         text: str

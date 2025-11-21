@@ -101,6 +101,7 @@ def test_serialize_workflow():
                 "name": "value",
                 "type": "STRING",
                 "value": {"type": "WORKFLOW_INPUT", "input_variable_id": "e39a7b63-de15-490a-ae9b-8112c767aea0"},
+                "schema": {"type": "string"},
             }
         ],
         "trigger": {

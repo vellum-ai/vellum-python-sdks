@@ -100,7 +100,8 @@
                 "type": "STRING",
                 "value": "fdsaiofidasoj"
               }
-            }
+            },
+            "schema": {"type": "string"}
           }
         ],
         "ports": []

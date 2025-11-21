@@ -168,13 +168,15 @@
             "id": "41e22c3b-980c-47a0-a1c7-a472d2ed604b",
             "name": "text",
             "type": "STRING",
-            "value": null
+            "value": null,
+            "schema": {"type": "string"}
           },
           {
             "id": "d278b1bc-dd58-4da0-bf58-84b03b1f5438",
             "name": "chat_history",
             "type": "CHAT_HISTORY",
-            "value": null
+            "value": null,
+            "schema": {"type": "array", "items": {"$ref": "#/$defs/vellum.client.types.chat_message.ChatMessage"}}
           }
         ]
       },

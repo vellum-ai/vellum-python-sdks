@@ -27,7 +27,7 @@ def test_serialize_workflow():
             {
                 "id": "db2eb237-38e4-417a-8bfc-5bda0f3165ca",
                 "key": "fruits",
-                "type": "JSON",
+                "type": "ARRAY",
                 "required": True,
                 "default": None,
                 "extensions": {"color": None},
@@ -45,7 +45,7 @@ def test_serialize_workflow():
             {
                 "id": "145b0b68-224b-4f83-90e6-eea3457e6c3e",
                 "key": "final_value",
-                "type": "JSON",
+                "type": "ARRAY",
             },
         ],
         output_variables,

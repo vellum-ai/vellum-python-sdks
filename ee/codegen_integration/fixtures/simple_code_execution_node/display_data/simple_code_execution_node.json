@@ -205,7 +205,8 @@
               "type": "NODE_OUTPUT",
               "node_id": "97240cb9-94a0-4a1a-b69e-3c2d96ebb1e2",
               "node_output_id": "9d1dae27-6e6a-40bf-a401-611c974d4143"
-            }
+            },
+            "schema": {"type": "string"}
           }
         ],
         "trigger": {

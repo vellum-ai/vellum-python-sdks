@@ -50,7 +50,7 @@ def test_serialize_workflow():
     assert len(output_variables) == 2
     assert not DeepDiff(
         [
-            {"id": "15a0ab89-8ed4-43b9-afa2-3c0b29d4dc3e", "key": "results", "type": "JSON"},
+            {"id": "15a0ab89-8ed4-43b9-afa2-3c0b29d4dc3e", "key": "results", "type": "ARRAY"},
             {"id": "0ef1608e-1737-41cc-9b90-a8e124138f70", "key": "json", "type": "JSON"},
         ],
         output_variables,

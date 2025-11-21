@@ -160,7 +160,8 @@
             "value": {
               "type": "WORKFLOW_INPUT",
               "input_variable_id": "93b9d3fb-251c-4a53-a1d5-4bd8e61947c5"
-            }
+            },
+            "schema": {"type": "string"}
           }
         ]
       }

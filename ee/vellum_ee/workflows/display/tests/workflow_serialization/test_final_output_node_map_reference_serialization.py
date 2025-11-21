@@ -79,7 +79,7 @@ def test_serialize_workflow__final_output_node_referencing_map_node():
     output = outputs[0]
     # AND the output should have the correct structure with NODE_OUTPUT reference instead of None
     assert output["name"] == "value"
-    assert output["type"] == "JSON"
+    assert output["type"] == "ARRAY"
 
     # AND the value should be a NODE_OUTPUT reference, not None
     assert output["value"] is not None, f"Expected NODE_OUTPUT reference but got None. Full output: {output}"
