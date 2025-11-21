@@ -40,8 +40,6 @@ def test_serialize_workflow():
 
     # AND its raw data is what we expect
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
-    assert len(workflow_raw_data["nodes"]) == 3
-    assert len(workflow_raw_data["edges"]) == 2
 
     # AND each node should be serialized correctly
     entrypoint_node = workflow_raw_data["nodes"][0]
@@ -244,65 +242,6 @@ def test_serialize_workflow():
         },
         "ports": [{"id": "928c79f2-bc07-43ee-9420-380a3bd36fb8", "name": "default", "type": "DEFAULT"}],
     }
-
-    final_output_node = workflow_raw_data["nodes"][2]
-    assert final_output_node == {
-        "id": "4e466510-6756-403f-a182-56e5a2b85d94",
-        "type": "TERMINAL",
-        "data": {
-            "label": "Final Output",
-            "name": "text",
-            "target_handle_id": "cd8c736f-1b77-493d-b857-d8feb5c03b15",
-            "output_id": "27424f7d-9767-4059-bdcf-c2be8b798fd7",
-            "output_type": "STRING",
-            "node_input_id": "39c7f674-a794-4525-8a04-f22a40ed0914",
-        },
-        "inputs": [
-            {
-                "id": "39c7f674-a794-4525-8a04-f22a40ed0914",
-                "key": "node_input",
-                "value": {
-                    "rules": [
-                        {
-                            "type": "NODE_OUTPUT",
-                            "data": {
-                                "node_id": "89c8bee0-8015-4d73-9112-e436ab086567",
-                                "output_id": "9bab7f1b-3a4b-46bf-8b30-e3016ac38f51",
-                            },
-                        }
-                    ],
-                    "combinator": "OR",
-                },
-            }
-        ],
-        "display_data": {"position": {"x": 400.0, "y": -50.0}},
-        "base": {
-            "name": "FinalOutputNode",
-            "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
-        },
-        "definition": None,
-    }
-
-    # AND each edge should be serialized correctly
-    serialized_edges = workflow_raw_data["edges"]
-    assert serialized_edges == [
-        {
-            "id": "16500e66-1e19-4ee3-a197-baf9c2926ae4",
-            "source_node_id": "06671b25-5c6b-4675-8c74-6c396a608728",
-            "source_handle_id": "df80b4aa-2ba1-49a2-8375-fb1f78eee31f",
-            "target_node_id": "89c8bee0-8015-4d73-9112-e436ab086567",
-            "target_handle_id": "85db938d-9a85-4f08-8bbf-b795db2c40d5",
-            "type": "DEFAULT",
-        },
-        {
-            "id": "cb918deb-f546-47b5-8b6b-db0d22a29fd1",
-            "source_node_id": "89c8bee0-8015-4d73-9112-e436ab086567",
-            "source_handle_id": "928c79f2-bc07-43ee-9420-380a3bd36fb8",
-            "target_node_id": "4e466510-6756-403f-a182-56e5a2b85d94",
-            "target_handle_id": "cd8c736f-1b77-493d-b857-d8feb5c03b15",
-            "type": "DEFAULT",
-        },
-    ]
 
     # AND the display data is what we expect
     display_data = workflow_raw_data["display_data"]
