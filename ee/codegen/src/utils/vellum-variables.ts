@@ -4,6 +4,37 @@ import * as Vellum from "vellum-ai/api";
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { assertUnreachable } from "src/utils/typing";
 
+/**
+ * Converts a JSON Schema to a Python type annotation.
+ * Currently supports basic types: string, number, integer, boolean, array, object, null.
+ */
+export function jsonSchemaToType(schema: Record<string, unknown>): python.Type {
+  const schemaType = schema.type;
+
+  if (schemaType === "string") {
+    return python.Type.str();
+  } else if (schemaType === "integer") {
+    return python.Type.int();
+  } else if (schemaType === "number") {
+    return python.Type.union([python.Type.float(), python.Type.int()]);
+  } else if (schemaType === "boolean") {
+    return python.Type.bool();
+  } else if (schemaType === "array") {
+    const items = schema.items as Record<string, unknown> | undefined;
+    if (items) {
+      const itemType = jsonSchemaToType(items);
+      return python.Type.list(itemType);
+    }
+    return python.Type.list(python.Type.any());
+  } else if (schemaType === "object") {
+    return python.Type.dict(python.Type.str(), python.Type.any());
+  } else if (schemaType === "null") {
+    return python.Type.none();
+  }
+
+  return python.Type.any();
+}
+
 export function getVellumVariablePrimitiveType(
   vellumVariableType: Vellum.VellumVariableType
 ): python.Type {
