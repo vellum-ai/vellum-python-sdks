@@ -495,8 +495,8 @@ def test_serialize_inline_prompt_node__mcp_server_not_serialized():
     # THEN the serialized node should have exec_config with prompt_template_block_data
     assert isinstance(serialized_node, dict)
     assert serialized_node["type"] == "PROMPT"
-    assert "exec_config" in serialized_node["data"]
     assert isinstance(serialized_node["data"], dict)
+    assert "exec_config" in serialized_node["data"]
     exec_config = serialized_node["data"]["exec_config"]
     assert isinstance(exec_config, dict)
     assert "prompt_template_block_data" in exec_config

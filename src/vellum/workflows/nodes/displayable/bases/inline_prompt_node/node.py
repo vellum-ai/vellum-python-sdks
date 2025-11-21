@@ -87,7 +87,18 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
     blocks: ClassVar[List[PromptBlock]]
 
     # The functions/tools that a Prompt has access to
-    functions: Optional[List[Union[FunctionDefinition, Callable]]] = None
+    functions: Optional[
+        List[
+            Union[
+                FunctionDefinition,
+                Callable,
+                DeploymentDefinition,
+                Type["BaseWorkflow"],
+                VellumIntegrationToolDefinition,
+                MCPServer,
+            ]
+        ]
+    ] = None
 
     parameters: PromptParameters = DEFAULT_PROMPT_PARAMETERS
     expand_meta: Optional[AdHocExpandMeta] = AdHocExpandMeta(finish_reason=True)
