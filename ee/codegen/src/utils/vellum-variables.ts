@@ -13,8 +13,10 @@ export function jsonSchemaToType(schema: Record<string, unknown>): python.Type {
 
   if (schemaType === "string") {
     return python.Type.str();
-  } else if (schemaType === "number" || schemaType === "integer") {
-    return schemaType === "integer" ? python.Type.int() : python.Type.union([python.Type.float(), python.Type.int()]);
+  } else if (schemaType === "integer") {
+    return python.Type.int();
+  } else if (schemaType === "number") {
+    return python.Type.union([python.Type.float(), python.Type.int()]);
   } else if (schemaType === "boolean") {
     return python.Type.bool();
   } else if (schemaType === "array") {

@@ -17,10 +17,10 @@ export class FinalOutputNode extends BaseNode<
     const stateType = this.getStateTypeOrBaseState();
 
     let primitiveOutputType: python.Type;
-    const outputWithSchema = this.nodeData.outputs?.find(output => output.schema);
+    const valueOutput = this.nodeData.outputs?.find(output => output.name === 'value');
 
-    if (outputWithSchema?.schema) {
-      primitiveOutputType = jsonSchemaToType(outputWithSchema.schema);
+    if (valueOutput?.schema) {
+      primitiveOutputType = jsonSchemaToType(valueOutput.schema);
     } else {
       primitiveOutputType = getVellumVariablePrimitiveType(
         this.nodeData.data.outputType
