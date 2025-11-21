@@ -8,6 +8,7 @@ from uuid import uuid4
 
 from click.testing import CliRunner
 from httpx import Response
+from pydantic import ValidationError
 
 from vellum.client.core.api_error import ApiError
 from vellum.client.types.workflow_push_response import WorkflowPushResponse
@@ -1375,3 +1376,48 @@ def test_push__workspace_option__nonexistent_workspace_should_fail(mock_module):
     assert "Available workspaces:" in result.output
     assert "default" in result.output
     assert "my_custom_workspace" in result.output
+
+
+def test_push__validation_error_during_serialization(mock_module, mocker):
+    """
+    Tests that a ValidationError raised during workflow serialization is handled gracefully
+    with a user-friendly error message.
+    """
+    # GIVEN a single workflow configured
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+
+    # AND a workflow exists in the module successfully
+    _ensure_workflow_py(temp_dir, module)
+
+    # AND BaseWorkflowDisplay.serialize_module raises a ValidationError
+    mock_serialize_module = mocker.patch(
+        "vellum_ee.workflows.display.workflows.base_workflow_display.BaseWorkflowDisplay.serialize_module",
+        side_effect=ValidationError.from_exception_data(
+            "WorkflowConfig",
+            [
+                {
+                    "type": "missing",
+                    "loc": ("field",),
+                    "msg": "Field required",  # type: ignore[typeddict-item]
+                    "input": {"invalid": "data"},
+                }
+            ],
+        ),
+    )
+
+    # WHEN calling `vellum push`
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["push", module])
+
+    # THEN it should exit with an error
+    assert result.exit_code == 1
+
+    # AND serialize_module should have been called
+    mock_serialize_module.assert_called_once()
+
+    # AND the error message should contain the validation error title
+    assert f"Validation error while trying to push {module}" in result.output
+
+    # AND the error message should contain the validation error details
+    assert "Field required" in result.output

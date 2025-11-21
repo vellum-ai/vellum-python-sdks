@@ -132,11 +132,25 @@ def push_command(
 
     # Remove this once we could serialize using the artifact in Vembda
     # https://app.shortcut.com/vellum/story/5585
-    serialization_result = BaseWorkflowDisplay.serialize_module(
-        workflow_config.module,
-        client=client,
-        dry_run=dry_run or False,
-    )
+    try:
+        serialization_result = BaseWorkflowDisplay.serialize_module(
+            workflow_config.module,
+            client=client,
+            dry_run=dry_run or False,
+        )
+    except ValidationError as e:
+        handle_cli_error(
+            logger,
+            title=f"Validation error while trying to push {workflow_config.module}",
+            message=str(e),
+        )
+    except Exception as e:
+        handle_cli_error(
+            logger,
+            title=f"Error while trying to push {workflow_config.module}",
+            message=str(e),
+        )
+
     exec_config = serialization_result.exec_config
 
     container_tag = workflow_config.container_image_tag
