@@ -2,6 +2,7 @@ from uuid import UUID
 from typing import TYPE_CHECKING, Callable, Dict, Generic, List, Optional, Tuple, Type, TypeVar, Union
 
 from vellum import FunctionDefinition, PromptBlock, RichTextChildBlock, VellumVariable
+from vellum.workflows import MCPServer
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.nodes import InlinePromptNode
 from vellum.workflows.types.core import JsonObject
@@ -82,6 +83,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
             [
                 self._generate_function_tools(function, i, display_context)
                 for i, function in enumerate(function_definitions)
+                if not isinstance(function, MCPServer)  # we don't need to serialize MCP servers
             ]
             if isinstance(function_definitions, list)
             else []
