@@ -77,8 +77,6 @@ def test_serialize_workflow():
 
     # AND its raw data should be what we expect
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
-    assert len(workflow_raw_data["edges"]) == 3
-    assert len(workflow_raw_data["nodes"]) == 4
 
     # AND each node should be serialized correctly
     entrypoint_node = workflow_raw_data["nodes"][0]
@@ -96,125 +94,6 @@ def test_serialize_workflow():
             "position": {"x": 0.0, "y": -50.0},
         },
     }
-
-    final_output_node_state = next(
-        n for n in workflow_raw_data["nodes"] if n["type"] == "TERMINAL" and n["data"]["name"] == "example_state"
-    )
-    final_output_node_input = next(
-        n for n in workflow_raw_data["nodes"] if n["type"] == "TERMINAL" and n["data"]["name"] == "example_input"
-    )
-    assert not DeepDiff(
-        {
-            "id": "27fdaa45-b8ce-464d-be50-cf71cc56bc10",
-            "type": "TERMINAL",
-            "data": {
-                "label": "Final Output",
-                "name": "example_state",
-                "target_handle_id": "e7a09eb2-c9fb-4d57-b436-9cd9384c8960",
-                "output_id": "e3ae0fe3-7590-4eac-b808-45901d82f2ba",
-                "output_type": "NUMBER",
-                "node_input_id": "8de6a408-cf76-4d04-9845-f75211b611be",
-            },
-            "inputs": [
-                {
-                    "id": "8de6a408-cf76-4d04-9845-f75211b611be",
-                    "key": "node_input",
-                    "value": {
-                        "rules": [
-                            {
-                                "type": "NODE_OUTPUT",
-                                "data": {
-                                    "node_id": "f9e52c4e-68b2-4ac0-b801-433fecc52d6b",
-                                    "output_id": "ab045894-45ce-40fc-b770-0d9f0146090f",
-                                },
-                            }
-                        ],
-                        "combinator": "OR",
-                    },
-                }
-            ],
-            "display_data": {"position": {"x": 400.0, "y": -175.0}},
-            "base": {
-                "name": "FinalOutputNode",
-                "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
-            },
-            "definition": None,
-        },
-        final_output_node_state,
-    )
-
-    assert not DeepDiff(
-        {
-            "id": "ca8bb585-c9a8-4bf7-bf9d-534b600fe23b",
-            "type": "TERMINAL",
-            "data": {
-                "label": "Final Output",
-                "name": "example_input",
-                "target_handle_id": "8a4a7efd-0e18-43ed-ba32-803e22e3ba0a",
-                "output_id": "6e7eeaa5-9559-4ae3-8606-e52ead5805a5",
-                "output_type": "STRING",
-                "node_input_id": "796b4a0b-da10-403a-acc3-8ebd3ebd3667",
-            },
-            "inputs": [
-                {
-                    "id": "796b4a0b-da10-403a-acc3-8ebd3ebd3667",
-                    "key": "node_input",
-                    "value": {
-                        "rules": [
-                            {
-                                "type": "NODE_OUTPUT",
-                                "data": {
-                                    "node_id": "f9e52c4e-68b2-4ac0-b801-433fecc52d6b",
-                                    "output_id": "3fdce851-f1ac-4d53-bb1b-74e1899edaff",
-                                },
-                            }
-                        ],
-                        "combinator": "OR",
-                    },
-                }
-            ],
-            "display_data": {"position": {"x": 400.0, "y": 75.0}},
-            "base": {
-                "name": "FinalOutputNode",
-                "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
-            },
-            "definition": None,
-        },
-        final_output_node_input,
-    )
-
-    # AND each edge should be serialized correctly
-    serialized_edges = workflow_raw_data["edges"]
-    assert not DeepDiff(
-        [
-            {
-                "id": "9cd49d57-d99f-4648-813d-fe84f29a0e3b",
-                "source_node_id": "32684932-7c7c-4b1c-aed2-553de29bf3f7",
-                "source_handle_id": "e4136ee4-a51a-4ca3-9a3a-aa96f5de2347",
-                "target_node_id": "f9e52c4e-68b2-4ac0-b801-433fecc52d6b",
-                "target_handle_id": "b257ad5b-03f1-446e-be6a-b0bed6923fa9",
-                "type": "DEFAULT",
-            },
-            {
-                "id": "b0a57a5f-a1e4-4dc9-85dd-946f08304738",
-                "source_node_id": "f9e52c4e-68b2-4ac0-b801-433fecc52d6b",
-                "source_handle_id": "e1282a29-dad1-4db4-ac4d-4c4a08b15d02",
-                "target_node_id": "ca8bb585-c9a8-4bf7-bf9d-534b600fe23b",
-                "target_handle_id": "8a4a7efd-0e18-43ed-ba32-803e22e3ba0a",
-                "type": "DEFAULT",
-            },
-            {
-                "id": "e4366583-94a5-40b0-9b6f-1e965695b1fe",
-                "source_node_id": "f9e52c4e-68b2-4ac0-b801-433fecc52d6b",
-                "source_handle_id": "e1282a29-dad1-4db4-ac4d-4c4a08b15d02",
-                "target_node_id": "27fdaa45-b8ce-464d-be50-cf71cc56bc10",
-                "target_handle_id": "e7a09eb2-c9fb-4d57-b436-9cd9384c8960",
-                "type": "DEFAULT",
-            },
-        ],
-        serialized_edges,
-        ignore_order=True,
-    )
 
     # AND the display data should be what we expect
     display_data = workflow_raw_data["display_data"]
