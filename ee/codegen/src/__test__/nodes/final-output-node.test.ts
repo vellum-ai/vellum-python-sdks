@@ -182,4 +182,45 @@ describe("FinalOutputNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+
+  describe("should use schema field for type annotation when available", () => {
+    beforeEach(async () => {
+      workflowContext = workflowContextFactory({ strict: false });
+      const nodeData = finalOutputNodeFactory().build();
+
+      nodeData.outputs = [
+        {
+          id: "output-id",
+          name: "value",
+          type: "ARRAY",
+          schema: {
+            type: "array",
+            items: {
+              type: "string"
+            }
+          }
+        }
+      ];
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as FinalOutputNodeContext;
+
+      node = new FinalOutputNode({
+        workflowContext,
+        nodeContext,
+      });
+    });
+
+    it("getNodeFile", async () => {
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("getNodeDisplayFile", async () => {
+      node.getNodeDisplayFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });

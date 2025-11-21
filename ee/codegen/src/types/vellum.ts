@@ -744,6 +744,7 @@ export interface NodeOutput {
   name: string;
   type: VellumVariableType;
   value?: WorkflowValueDescriptor;
+  schema?: Record<string, unknown>;
 }
 
 export interface GenericNode extends BaseWorkflowNode {
