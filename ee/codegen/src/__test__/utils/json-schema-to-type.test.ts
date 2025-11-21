@@ -44,7 +44,7 @@ describe("jsonSchemaToType", () => {
     expect(writer.toString()).toBe("None");
   });
 
-  it("should convert array schema with string items to List[str] type", () => {
+  it("should convert array schema with string items to list[str] type", () => {
     const schema = {
       type: "array",
       items: {
@@ -53,14 +53,14 @@ describe("jsonSchemaToType", () => {
     };
     const result = jsonSchemaToType(schema);
     result.write(writer);
-    expect(writer.toString()).toBe("List[str]");
+    expect(writer.toString()).toBe("list[str]");
   });
 
-  it("should convert array schema without items to List[Any] type", () => {
+  it("should convert array schema without items to list[Any] type", () => {
     const schema = { type: "array" };
     const result = jsonSchemaToType(schema);
     result.write(writer);
-    expect(writer.toString()).toBe("List[Any]");
+    expect(writer.toString()).toBe("list[Any]");
   });
 
   it("should convert object schema to Dict[str, Any] type", () => {
@@ -82,7 +82,7 @@ describe("jsonSchemaToType", () => {
     };
     const result = jsonSchemaToType(schema);
     result.write(writer);
-    expect(writer.toString()).toBe("List[List[int]]");
+    expect(writer.toString()).toBe("list[list[int]]");
   });
 
   it("should return Any for unsupported schema types", () => {

@@ -5,6 +5,20 @@ import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { assertUnreachable } from "src/utils/typing";
 
 /**
+ * Creates a built-in list type annotation using lowercase `list[T]` instead of `List[T]` from typing.
+ * This is the modern Python 3.9+ syntax that doesn't require importing from typing.
+ */
+export function builtinListType(itemType: python.Type): python.Type {
+  return python.Type.reference(
+    python.reference({
+      name: "list",
+      modulePath: [],
+      genericTypes: [itemType],
+    })
+  );
+}
+
+/**
  * Converts a JSON Schema to a Python type annotation.
  * Currently supports basic types: string, number, integer, boolean, array, object, null.
  */
@@ -23,9 +37,9 @@ export function jsonSchemaToType(schema: Record<string, unknown>): python.Type {
     const items = schema.items as Record<string, unknown> | undefined;
     if (items) {
       const itemType = jsonSchemaToType(items);
-      return python.Type.list(itemType);
+      return builtinListType(itemType);
     }
-    return python.Type.list(python.Type.any());
+    return builtinListType(python.Type.any());
   } else if (schemaType === "object") {
     return python.Type.dict(python.Type.str(), python.Type.any());
   } else if (schemaType === "null") {
@@ -46,7 +60,7 @@ export function getVellumVariablePrimitiveType(
     case "JSON":
       return python.Type.any();
     case "CHAT_HISTORY":
-      return python.Type.list(
+      return builtinListType(
         python.Type.reference(
           python.reference({
             name: "ChatMessage",
@@ -55,7 +69,7 @@ export function getVellumVariablePrimitiveType(
         )
       );
     case "SEARCH_RESULTS":
-      return python.Type.list(
+      return builtinListType(
         python.Type.reference(
           python.reference({
             name: "SearchResult",
@@ -71,7 +85,7 @@ export function getVellumVariablePrimitiveType(
         })
       );
     case "ARRAY":
-      return python.Type.list(
+      return builtinListType(
         python.Type.reference(
           python.reference({
             name: "VellumValue",

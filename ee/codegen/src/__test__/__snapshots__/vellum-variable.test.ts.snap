@@ -1,22 +1,22 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`VellumVariableField > ArrayVellumVariable snapshot 1`] = `
-"test: List[VellumValue]
+"test: list[VellumValue]
 "
 `;
 
 exports[`VellumVariableField > ArrayVellumVariable with empty list default uses Field(default_factory=list) when false 1`] = `
-"test: Optional[List[VellumValue]] = Field(default_factory=list)
+"test: Optional[list[VellumValue]] = Field(default_factory=list)
 "
 `;
 
 exports[`VellumVariableField > ArrayVellumVariable with empty list default uses Field(default_factory=list) when true 1`] = `
-"test: List[VellumValue] = Field(default_factory=list)
+"test: list[VellumValue] = Field(default_factory=list)
 "
 `;
 
 exports[`VellumVariableField > ArrayVellumVariable with non-empty list default uses Field(default_factory=lambda: [...]) when false 1`] = `
-"test: Optional[List[VellumValue]] = Field(
+"test: Optional[list[VellumValue]] = Field(
     default_factory=lambda: [
         "item1",
         "item2",
@@ -26,7 +26,7 @@ exports[`VellumVariableField > ArrayVellumVariable with non-empty list default u
 `;
 
 exports[`VellumVariableField > ArrayVellumVariable with non-empty list default uses Field(default_factory=lambda: [...]) when true 1`] = `
-"test: List[VellumValue] = Field(
+"test: list[VellumValue] = Field(
     default_factory=lambda: [
         "item1",
         "item2",
@@ -41,17 +41,17 @@ exports[`VellumVariableField > AudioVellumVariable snapshot 1`] = `
 `;
 
 exports[`VellumVariableField > ChatHistoryVellumVariable snapshot 1`] = `
-"test: List[ChatMessage]
+"test: list[ChatMessage]
 "
 `;
 
 exports[`VellumVariableField > ChatHistoryVellumVariable with empty list default uses Field(default_factory=list) when false 1`] = `
-"test: Optional[List[ChatMessage]] = Field(default_factory=list)
+"test: Optional[list[ChatMessage]] = Field(default_factory=list)
 "
 `;
 
 exports[`VellumVariableField > ChatHistoryVellumVariable with empty list default uses Field(default_factory=list) when true 1`] = `
-"test: List[ChatMessage] = Field(default_factory=list)
+"test: list[ChatMessage] = Field(default_factory=list)
 "
 `;
 
@@ -87,11 +87,6 @@ exports[`VellumVariableField > JsonVellumVariable with empty dict default uses F
 
 exports[`VellumVariableField > JsonVellumVariable with empty dict default uses Field(default_factory=dict) when true 1`] = `
 "test: Any = Field(default_factory=dict)
-"
-`;
-
-exports[`VellumVariableField > JsonVellumVariable with empty list default uses Field(default_factory=list) 1`] = `
-"test: Any = Field(default_factory=list)
 "
 `;
 
@@ -136,7 +131,7 @@ exports[`VellumVariableField > OptionalVellumVariable defaultRequired=true snaps
 `;
 
 exports[`VellumVariableField > SearchResultsVellumVariable snapshot 1`] = `
-"test: List[SearchResult]
+"test: list[SearchResult]
 "
 `;
 

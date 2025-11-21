@@ -28,17 +28,16 @@ class Inputs(BaseInputs):
 `;
 
 exports[`Inputs > write > should generate correct code for complex input variables 1`] = `
-"from typing import List, Union
+"from typing import Union
 
-from vellum import ChatMessage, SearchResult
 from vellum.workflows.inputs import BaseInputs
 
 
 class Inputs(BaseInputs):
     query: str
     max_runtime: Union[float, int]
-    previous_chat_history: List[ChatMessage]
-    prior_results: List[SearchResult]
+    previous_chat_history: list[ChatMessage]
+    prior_results: list[SearchResult]
 "
 `;
 
@@ -87,14 +86,12 @@ class Inputs(BaseInputs):
 
 exports[`Inputs > write > should generate correct code when default is a 'ARRAY' 1`] = `
 "from pydantic import Field
-from typing import List
 
-from vellum import VellumValue
 from vellum.workflows.inputs import BaseInputs
 
 
 class Inputs(BaseInputs):
-    array_input: List[VellumValue] = Field(
+    array_input: list[VellumValue] = Field(
         default_factory=lambda: [
             "Example String",
             123,
@@ -115,14 +112,13 @@ class Inputs(BaseInputs):
 
 exports[`Inputs > write > should generate correct code when default is a 'CHAT_HISTORY' 1`] = `
 "from pydantic import Field
-from typing import List
 
 from vellum import ChatMessage
 from vellum.workflows.inputs import BaseInputs
 
 
 class Inputs(BaseInputs):
-    chat_history_input: List[ChatMessage] = Field(
+    chat_history_input: list[ChatMessage] = Field(
         default_factory=lambda: [
             ChatMessage(role="USER", text="foo bar"),
         ]
@@ -207,14 +203,12 @@ class Inputs(BaseInputs):
 `;
 
 exports[`Inputs > write > should generate correct code when default is a 'SEARCH_RESULTS' 1`] = `
-"from typing import List
-
-from vellum import Document, SearchResult
+"from vellum import Document, SearchResult
 from vellum.workflows.inputs import BaseInputs
 
 
 class Inputs(BaseInputs):
-    search_results_input: List[SearchResult] = [
+    search_results_input: list[SearchResult] = [
         SearchResult(
             text="Hello, World!",
             score=1,
