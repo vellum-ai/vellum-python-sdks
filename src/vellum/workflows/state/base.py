@@ -27,6 +27,11 @@ from typing_extensions import dataclass_transform
 from pydantic import GetCoreSchemaHandler, ValidationInfo, field_serializer, field_validator
 from pydantic_core import core_schema
 
+try:
+    from pydantic.fields import FieldInfo
+except ImportError:
+    FieldInfo = type(None)  # Fallback for older Pydantic versions
+
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.utils.uuid import is_valid_uuid
 from vellum.workflows.constants import undefined
@@ -557,6 +562,13 @@ class BaseState(metaclass=_BaseStateMeta):
         # Make all class attribute values snapshottable
         for name, value in self.__class__.__dict__.items():
             if not name.startswith("_") and name != "meta":
+                if isinstance(value, FieldInfo):
+                    if value.default_factory is not None:
+                        value = value.default_factory()  # type: ignore[call-arg]
+                    elif hasattr(value, "default") and value.default is not ...:
+                        value = value.default
+                    else:
+                        continue
                 # Bypass __is_quiet__ instead of `setattr`
                 snapshottable_value = _make_snapshottable(name, value, self.__snapshot__)
                 super().__setattr__(name, snapshottable_value)
