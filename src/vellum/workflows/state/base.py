@@ -25,12 +25,8 @@ from typing import (
 from typing_extensions import dataclass_transform
 
 from pydantic import GetCoreSchemaHandler, ValidationInfo, field_serializer, field_validator
+from pydantic.fields import FieldInfo
 from pydantic_core import core_schema
-
-try:
-    from pydantic.fields import FieldInfo
-except ImportError:
-    FieldInfo = type(None)  # Fallback for older Pydantic versions
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.utils.uuid import is_valid_uuid
