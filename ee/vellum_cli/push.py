@@ -130,8 +130,6 @@ def push_command(
     )
     sys.path.insert(0, os.getcwd())
 
-    # Remove this once we could serialize using the artifact in Vembda
-    # https://app.shortcut.com/vellum/story/5585
     try:
         serialization_result = BaseWorkflowDisplay.serialize_module(
             workflow_config.module,
@@ -224,8 +222,6 @@ def push_command(
 
     try:
         response = client.workflows.push(
-            # Remove this once we could serialize using the artifact in Vembda
-            # https://app.shortcut.com/vellum/story/5585
             exec_config=json.dumps(exec_config),
             workflow_sandbox_id=provided_id,
             artifact=artifact,
