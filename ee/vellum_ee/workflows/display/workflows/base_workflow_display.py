@@ -292,13 +292,25 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             if workflow_output.instance in final_output_node_outputs:
                 terminal_node_id = workflow_output.instance.outputs_class.__parent_class__.__id__
                 serialized_terminal_node = serialized_nodes.get(terminal_node_id)
-                if serialized_terminal_node and isinstance(serialized_terminal_node.get("data"), dict):
+                if (
+                    serialized_terminal_node
+                    and "data" in serialized_terminal_node
+                    and isinstance(serialized_terminal_node["data"], dict)
+                ):
                     serialized_terminal_node["data"]["name"] = workflow_output_display.name
+
+            try:
+                output_value = serialize_value(self.workflow_id, self.display_context, workflow_output.instance)
+            except UserFacingException as e:
+                self.display_context.add_error(
+                    UserFacingException(f"Failed to serialize output '{workflow_output.name}': {e}")
+                )
+                continue
 
             output_values.append(
                 {
                     "output_variable_id": str(workflow_output_display.id),
-                    "value": serialize_value(self.workflow_id, self.display_context, workflow_output.instance),
+                    "value": output_value,
                 }
             )
 

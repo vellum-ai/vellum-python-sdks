@@ -31,7 +31,7 @@ def test_serialize_workflow__missing_final_output_node():
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
     assert isinstance(workflow_raw_data, dict)
 
-    # AND we should create synthetic terminal nodes for each output variable
+    # AND we should NOT create synthetic terminal nodes for each output variable
     final_output_nodes = [node for node in workflow_raw_data["nodes"] if node["type"] == "TERMINAL"]
     assert not DeepDiff(
         [
@@ -79,6 +79,7 @@ def test_serialize_workflow__missing_final_output_node():
                             "type": "WORKFLOW_INPUT",
                             "input_variable_id": "da086239-d743-4246-b666-5c91e22fb88c",
                         },
+                        "schema": {"type": "string"},
                     }
                 ],
                 "trigger": {
@@ -87,45 +88,8 @@ def test_serialize_workflow__missing_final_output_node():
                 },
                 "ports": [],
             },
-            {
-                "id": "bb88768d-472e-4997-b7ea-de09163d1b4c",
-                "type": "TERMINAL",
-                "data": {
-                    "label": "Final Output",
-                    "name": "beta",
-                    "target_handle_id": "5e337b19-cef6-45af-802b-46da4ad7e794",
-                    "output_id": "5e6d3ea6-ef91-4937-8fff-f33e07446e6a",
-                    "output_type": "STRING",
-                    "node_input_id": "590161f1-20ed-4339-9ce3-61aade3a142a",
-                },
-                "inputs": [
-                    {
-                        "id": "590161f1-20ed-4339-9ce3-61aade3a142a",
-                        "key": "node_input",
-                        "value": {
-                            "rules": [
-                                {
-                                    "type": "NODE_OUTPUT",
-                                    "data": {
-                                        "node_id": "74b891e0-5573-4c7a-a0ef-c3c210187738",
-                                        "output_id": "ae21fc3f-dd81-4174-b08a-97bc96422a8f",
-                                    },
-                                }
-                            ],
-                            "combinator": "OR",
-                        },
-                    }
-                ],
-                "display_data": {"position": {"x": 400.0, "y": -50.0}},
-                "base": {
-                    "name": "FinalOutputNode",
-                    "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],
-                },
-                "definition": None,
-            },
         ],
         final_output_nodes,
-        ignore_order=True,
     )
 
 
