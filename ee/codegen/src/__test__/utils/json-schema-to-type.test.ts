@@ -48,8 +48,8 @@ describe("jsonSchemaToType", () => {
     const schema = {
       type: "array",
       items: {
-        type: "string"
-      }
+        type: "string",
+      },
     };
     const result = jsonSchemaToType(schema);
     result.write(writer);
@@ -76,9 +76,9 @@ describe("jsonSchemaToType", () => {
       items: {
         type: "array",
         items: {
-          type: "integer"
-        }
-      }
+          type: "integer",
+        },
+      },
     };
     const result = jsonSchemaToType(schema);
     result.write(writer);

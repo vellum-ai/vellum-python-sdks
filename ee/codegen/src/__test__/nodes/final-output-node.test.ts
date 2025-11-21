@@ -196,10 +196,10 @@ describe("FinalOutputNode", () => {
           schema: {
             type: "array",
             items: {
-              type: "string"
-            }
-          }
-        }
+              type: "string",
+            },
+          },
+        },
       ];
 
       const nodeContext = (await createNodeContext({

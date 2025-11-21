@@ -6,7 +6,10 @@ import { FinalOutputNodeContext } from "src/context/node-context/final-output-no
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { FinalOutputNode as FinalOutputNodeType } from "src/types/vellum";
-import { getVellumVariablePrimitiveType, jsonSchemaToType } from "src/utils/vellum-variables";
+import {
+  getVellumVariablePrimitiveType,
+  jsonSchemaToType,
+} from "src/utils/vellum-variables";
 
 export class FinalOutputNode extends BaseNode<
   FinalOutputNodeType,
@@ -17,7 +20,9 @@ export class FinalOutputNode extends BaseNode<
     const stateType = this.getStateTypeOrBaseState();
 
     let primitiveOutputType: python.Type;
-    const valueOutput = this.nodeData.outputs?.find(output => output.name === 'value');
+    const valueOutput = this.nodeData.outputs?.find(
+      (output) => output.name === "value"
+    );
 
     if (valueOutput?.schema) {
       primitiveOutputType = jsonSchemaToType(valueOutput.schema);
