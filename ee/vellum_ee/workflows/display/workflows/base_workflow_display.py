@@ -1287,21 +1287,20 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                             trigger_class = inputs_obj.workflow_trigger
                             if trigger_class is not None:
                                 row_data["workflow_trigger_id"] = str(trigger_class.__id__)
-                            if inputs_obj.node_output_mocks is not None:
-                                serializer_context = {
-                                    "serializer": lambda value: serialize_value(
-                                        workflow_display.workflow_id,
-                                        workflow_display.display_context,
-                                        value,
-                                    )
-                                }
-                                serialized_mocks = inputs_obj.model_dump(
+                            row_data.update(
+                                inputs_obj.model_dump(
                                     mode="json",
                                     include={"node_output_mocks"},
-                                    context=serializer_context,
+                                    context={
+                                        "serializer": lambda value: serialize_value(
+                                            workflow_display.workflow_id,
+                                            workflow_display.display_context,
+                                            value,
+                                        )
+                                    },
+                                    exclude_none=True,
                                 )
-                                if "node_output_mocks" in serialized_mocks:
-                                    row_data["node_output_mocks"] = serialized_mocks["node_output_mocks"]
+                            )
                         elif isinstance(inputs_obj, BaseInputs):
                             serialized_inputs = json.loads(json.dumps(inputs_obj, cls=VellumJsonEncoder))
                             row_data = {"label": f"Scenario {i + 1}", "inputs": serialized_inputs}

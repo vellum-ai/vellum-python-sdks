@@ -11,6 +11,8 @@ from pytest_mock import MockerFixture
 from vellum.workflows.exceptions import WorkflowInitializationException
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 
+from tests.workflows.test_node_output_mock_when_conditions.workflow import ProcessNode
+
 
 @pytest.fixture
 def temp_module_path():
@@ -258,9 +260,51 @@ def test_serialize_module_with_node_output_mock_when_conditions():
     assert len(first_scenario["node_output_mocks"]) == 2
 
     first_mock = first_scenario["node_output_mocks"][0]
-    assert "when_condition" in first_mock
-    assert "then_outputs" in first_mock
-    assert "node_id" in first_mock
+    workflow_input_id = first_mock["when_condition"]["lhs"]["lhs"]["input_variable_id"]
+    node_id = str(ProcessNode.__id__)
+
+    assert first_mock == {
+        "node_id": node_id,
+        "when_condition": {
+            "type": "BINARY_EXPRESSION",
+            "lhs": {
+                "type": "BINARY_EXPRESSION",
+                "lhs": {"type": "WORKFLOW_INPUT", "input_variable_id": workflow_input_id},
+                "operator": "=",
+                "rhs": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 5.0}},
+            },
+            "operator": "and",
+            "rhs": {
+                "type": "BINARY_EXPRESSION",
+                "lhs": {"type": "EXECUTION_COUNTER", "node_id": node_id},
+                "operator": "=",
+                "rhs": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 0.0}},
+            },
+        },
+        "then_outputs": {"result": "first_execution_threshold_5"},
+    }
+
+    second_mock = first_scenario["node_output_mocks"][1]
+    assert second_mock == {
+        "node_id": node_id,
+        "when_condition": {
+            "type": "BINARY_EXPRESSION",
+            "lhs": {
+                "type": "BINARY_EXPRESSION",
+                "lhs": {"type": "WORKFLOW_INPUT", "input_variable_id": workflow_input_id},
+                "operator": "=",
+                "rhs": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 5.0}},
+            },
+            "operator": "and",
+            "rhs": {
+                "type": "BINARY_EXPRESSION",
+                "lhs": {"type": "EXECUTION_COUNTER", "node_id": node_id},
+                "operator": "=",
+                "rhs": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 1.0}},
+            },
+        },
+        "then_outputs": {"result": "second_execution_threshold_5"},
+    }
 
     second_scenario = result.dataset[1]
     assert second_scenario["label"] == "Scenario 2"
@@ -269,6 +313,28 @@ def test_serialize_module_with_node_output_mock_when_conditions():
     assert "node_output_mocks" in second_scenario
     assert isinstance(second_scenario["node_output_mocks"], list)
     assert len(second_scenario["node_output_mocks"]) == 1
+
+    third_mock = second_scenario["node_output_mocks"][0]
+    assert third_mock == {
+        "node_id": node_id,
+        "when_condition": {
+            "type": "BINARY_EXPRESSION",
+            "lhs": {
+                "type": "BINARY_EXPRESSION",
+                "lhs": {"type": "WORKFLOW_INPUT", "input_variable_id": workflow_input_id},
+                "operator": "=",
+                "rhs": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 10.0}},
+            },
+            "operator": "and",
+            "rhs": {
+                "type": "BINARY_EXPRESSION",
+                "lhs": {"type": "EXECUTION_COUNTER", "node_id": node_id},
+                "operator": "=",
+                "rhs": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 0.0}},
+            },
+        },
+        "then_outputs": {"result": "first_execution_threshold_10"},
+    }
 
 
 def test_serialize_module__with_invalid_nested_set_graph(temp_module_path):
