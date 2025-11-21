@@ -9,13 +9,14 @@ import { assertUnreachable } from "src/utils/typing";
  * This is the modern Python 3.9+ syntax that doesn't require importing from typing.
  */
 export function builtinListType(itemType: python.Type): python.Type {
-  return python.Type.reference(
-    python.reference({
-      name: "list",
-      modulePath: [],
-      genericTypes: [itemType],
-    })
-  );
+  const listRef = python.reference({
+    name: "list",
+    modulePath: [],
+    genericTypes: [itemType],
+  });
+  const listType = python.Type.reference(listRef);
+  (listType as any).inheritReferences(itemType);
+  return listType;
 }
 
 /**

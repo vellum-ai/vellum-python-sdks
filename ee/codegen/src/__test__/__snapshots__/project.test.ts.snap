@@ -746,7 +746,8 @@ class FinalOutput1(FinalOutputNode[BaseState, str]):
 `;
 
 exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 'no packages' > code/nodes/final_output_2.py 1`] = `
-"from vellum.workflows.nodes.displayable import FinalOutputNode
+"from vellum import ChatMessage
+from vellum.workflows.nodes.displayable import FinalOutputNode
 from vellum.workflows.state import BaseState
 
 from .tool_call_get_current_weather_node import GetCurrentWeatherNode
@@ -1117,7 +1118,8 @@ class FinalOutput1(FinalOutputNode[BaseState, str]):
 `;
 
 exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 'with packages' > code/nodes/final_output_2.py 1`] = `
-"from vellum.workflows.nodes.displayable import FinalOutputNode
+"from vellum import ChatMessage
+from vellum.workflows.nodes.displayable import FinalOutputNode
 from vellum.workflows.state import BaseState
 
 from .tool_call_get_current_weather_node import GetCurrentWeatherNode
@@ -1335,6 +1337,7 @@ exports[`WorkflowProjectGenerator > include sandbox > should generate correct in
 "from pydantic import Field
 from typing import Any, Optional
 
+from vellum import VellumValue
 from vellum.workflows.inputs import BaseInputs
 
 
@@ -1350,6 +1353,7 @@ exports[`WorkflowProjectGenerator > include sandbox > should generate correct in
 "from pydantic import Field
 from typing import Any, Optional
 
+from vellum import VellumValue
 from vellum.workflows.inputs import BaseInputs
 
 

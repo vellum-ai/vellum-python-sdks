@@ -30,6 +30,7 @@ class Inputs(BaseInputs):
 exports[`Inputs > write > should generate correct code for complex input variables 1`] = `
 "from typing import Union
 
+from vellum import ChatMessage, SearchResult
 from vellum.workflows.inputs import BaseInputs
 
 
@@ -87,6 +88,7 @@ class Inputs(BaseInputs):
 exports[`Inputs > write > should generate correct code when default is a 'ARRAY' 1`] = `
 "from pydantic import Field
 
+from vellum import VellumValue
 from vellum.workflows.inputs import BaseInputs
 
 
