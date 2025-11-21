@@ -1,4 +1,3 @@
-import * as python from "@fern-api/python-ast";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
 import { jsonSchemaToType } from "src/utils/vellum-variables";
