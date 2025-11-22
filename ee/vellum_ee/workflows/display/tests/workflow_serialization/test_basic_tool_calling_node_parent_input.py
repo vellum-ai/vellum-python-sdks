@@ -77,11 +77,15 @@ def test_serialize_workflow():
                                     "type": "CONSTANT_VALUE",
                                     "value": {"type": "STRING", "value": "constant_input"},
                                 },
+                                "unused_input": {
+                                    "type": "CONSTANT_VALUE",
+                                    "value": {"type": "STRING", "value": "unused_input"},
+                                },
                             },
                             "forced": None,
                             "strict": None,
                         },
-                        "src": 'from vellum.workflows.utils.functions import use_tool_inputs\n\nfrom .inputs import ParentInputs\nfrom .nodes.dummy_node import DummyNode\n\n\n@use_tool_inputs(\n    parent_input=ParentInputs.parent_input,\n    dummy_input=DummyNode.Outputs.text,\n    constant_input="constant_input",\n)\ndef get_string(parent_input: str, dummy_input: str, constant_input: str, populated_input: str) -> str:\n    """\n    Get a string with the parent input, dummy input, and the populated input.\n    """\n    return f"parent input: {parent_input}, dummy input: {dummy_input}, constant input: {constant_input}, populated input: {populated_input}"  # noqa: E501\n',  # noqa: E501
+                        "src": 'from vellum.workflows.utils.functions import use_tool_inputs\n\nfrom .inputs import ParentInputs\nfrom .nodes.dummy_node import DummyNode\n\n\n@use_tool_inputs(\n    parent_input=ParentInputs.parent_input,\n    dummy_input=DummyNode.Outputs.text,\n    constant_input="constant_input",\n    unused_input="unused_input",  # this should not be passed to the function\n)\ndef get_string(parent_input: str, dummy_input: str, constant_input: str, populated_input: str) -> str:\n    """\n    Get a string with the parent input, dummy input, and the populated input.\n    """\n    return f"parent input: {parent_input}, dummy input: {dummy_input}, constant input: {constant_input}, populated input: {populated_input}"  # noqa: E501\n',  # noqa: E501
                     }
                 ],
             },
