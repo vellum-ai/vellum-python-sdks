@@ -1,7 +1,20 @@
 from itertools import chain
 import json
 from uuid import uuid4
-from typing import Callable, ClassVar, Generator, Generic, Iterator, List, Optional, Set, Tuple, Union
+from typing import (
+    TYPE_CHECKING,
+    Callable,
+    ClassVar,
+    Generator,
+    Generic,
+    Iterator,
+    List,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+    Union,
+)
 
 import httpx
 
@@ -67,6 +80,9 @@ from vellum.workflows.utils.functions import (
 )
 from vellum.workflows.utils.pydantic_schema import normalize_json
 
+if TYPE_CHECKING:
+    from vellum.workflows.workflows.base import BaseWorkflow
+
 
 class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
     """
@@ -87,7 +103,18 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
     blocks: ClassVar[List[PromptBlock]]
 
     # The functions/tools that a Prompt has access to
-    functions: Optional[List[Union[FunctionDefinition, Callable]]] = None
+    functions: Optional[
+        List[
+            Union[
+                FunctionDefinition,
+                Callable,
+                DeploymentDefinition,
+                Type["BaseWorkflow"],
+                VellumIntegrationToolDefinition,
+                MCPServer,
+            ]
+        ]
+    ] = None
 
     parameters: PromptParameters = DEFAULT_PROMPT_PARAMETERS
     expand_meta: Optional[AdHocExpandMeta] = AdHocExpandMeta(finish_reason=True)

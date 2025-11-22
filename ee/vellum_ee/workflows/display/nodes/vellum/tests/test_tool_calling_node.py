@@ -453,6 +453,83 @@ def test_serialize_function_node():
     assert display_data["color"] == "purple"
 
 
+def test_serialize_inline_prompt_node__mcp_server_not_serialized():
+    """
+    Test that MCP servers in inline prompt node functions are not serialized as function blocks.
+    MCP servers should be skipped during serialization (they return None from _generate_function_tools).
+    """
+
+    # GIVEN an MCP server
+    mcp_server = MCPServer(
+        name="my-mcp-server",
+        url="https://my-mcp-server.com",
+        authorization_type=AuthorizationType.API_KEY,
+        api_key_header_key="my-api-key-header-key",
+        api_key_header_value=EnvironmentVariableReference(name="my-api-key-header-value"),
+    )
+
+    # AND a regular function
+    def my_function(arg1: str) -> str:
+        return f"Result: {arg1}"
+
+    # AND an inline prompt node with both MCP server and regular function
+    class MyInlinePromptNode(InlinePromptNode):
+        ml_model = "gpt-4o-mini"
+        blocks = []
+        functions = [mcp_server, my_function]
+        prompt_inputs = None
+        parameters = PromptParameters()
+
+    # WHEN we serialize the inline prompt node
+    inline_prompt_node_display_class = get_node_display_class(MyInlinePromptNode)
+    inline_prompt_node_display = inline_prompt_node_display_class()
+
+    class Workflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = MyInlinePromptNode
+
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+    display_context = workflow_display.display_context
+
+    serialized_node = inline_prompt_node_display.serialize(display_context)
+
+    # THEN the serialized node should have exec_config with prompt_template_block_data
+    assert isinstance(serialized_node, dict)
+    assert serialized_node["type"] == "PROMPT"
+    assert isinstance(serialized_node["data"], dict)
+    assert "exec_config" in serialized_node["data"]
+    exec_config = serialized_node["data"]["exec_config"]
+    assert isinstance(exec_config, dict)
+    assert "prompt_template_block_data" in exec_config
+    prompt_template_block_data = exec_config["prompt_template_block_data"]
+    assert isinstance(prompt_template_block_data, dict)
+    blocks = prompt_template_block_data["blocks"]
+    assert isinstance(blocks, list)
+
+    # AND there should be only one FUNCTION_DEFINITION block (from the regular function)
+    # MCP server should not be serialized
+    function_blocks = [
+        block for block in blocks if isinstance(block, dict) and block.get("block_type") == "FUNCTION_DEFINITION"
+    ]
+    assert len(function_blocks) == 1
+    assert function_blocks == [
+        {
+            "id": "b6b7b0c2-78b6-498f-8f97-fdaa81e082ec",
+            "block_type": "FUNCTION_DEFINITION",
+            "properties": {
+                "function_name": "my_function",
+                "function_description": None,
+                "function_parameters": {
+                    "type": "object",
+                    "properties": {"arg1": {"type": "string"}},
+                    "required": ["arg1"],
+                },
+                "function_forced": None,
+                "function_strict": None,
+            },
+        }
+    ]
+
+
 def test_serialize_node__tool_calling_node__subworkflow_with_parent_input_reference():
     """
     Test that a tool calling node with a subworkflow that references parent inputs serializes correctly
