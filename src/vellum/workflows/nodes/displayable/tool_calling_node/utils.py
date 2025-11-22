@@ -78,17 +78,9 @@ class FunctionCallNodeMixin:
                 code=WorkflowErrorCode.NODE_EXECUTION,
             ) from e
 
-    def _extract_function_arguments(self) -> dict:
-        """Extract arguments from the arguments attribute."""
-        return getattr(self, "arguments", {})
-
-    def _extract_function_call_id(self) -> Optional[str]:
-        """Extract function call ID from the function_call_id attribute."""
-        return getattr(self, "function_call_id", None)
-
     def _add_function_result_to_chat_history(self, result: Any, state: ToolCallingState) -> None:
         """Add function execution result to chat history."""
-        function_call_id = self._extract_function_call_id()
+        function_call_id = self.function_call_id
         state.chat_history.append(
             ChatMessage(
                 role="FUNCTION",
@@ -157,11 +149,9 @@ class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode[ToolCallingStat
     """Node that executes a deployment definition with function call output."""
 
     def run(self) -> Iterator[BaseOutput]:
-        arguments = self._extract_function_arguments()
-
         # Mypy doesn't like instance assignments of class attributes. It's safe in our case tho bc it's what
         # we do in the `__init__` method.
-        self.subworkflow_inputs = arguments  # type:ignore[misc]
+        self.subworkflow_inputs = self.arguments  # type:ignore[misc]
 
         # Call the parent run method to execute the subworkflow
         outputs = {}
@@ -180,9 +170,7 @@ class DynamicInlineSubworkflowNode(
     """Node that executes an inline subworkflow with function call output."""
 
     def run(self) -> Iterator[BaseOutput]:
-        arguments = self._extract_function_arguments()
-
-        self.subworkflow_inputs = arguments  # type: ignore[misc]
+        self.subworkflow_inputs = self.arguments  # type: ignore[misc]
 
         # Call the parent run method to execute the subworkflow with proper streaming
         outputs = {}
@@ -205,10 +193,8 @@ class FunctionNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
         result: Any
 
     def run(self) -> Iterator[BaseOutput]:
-        arguments = self._extract_function_arguments()
-
         try:
-            result = self.function_definition(**arguments)
+            result = self.function_definition(**self.arguments)
         except Exception as e:
             self._handle_tool_exception(e, "function", self.function_definition.__name__)
 
@@ -224,18 +210,15 @@ class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
     composio_tool: ComposioToolDefinition
 
     def run(self) -> Iterator[BaseOutput]:
-        # Extract arguments from function call
-        arguments = self._extract_function_arguments()
-
         try:
             # Execute using ComposioService
             composio_service = ComposioService()
             if self.composio_tool.user_id is not None:
                 result = composio_service.execute_tool(
-                    tool_name=self.composio_tool.action, arguments=arguments, user_id=self.composio_tool.user_id
+                    tool_name=self.composio_tool.action, arguments=self.arguments, user_id=self.composio_tool.user_id
                 )
             else:
-                result = composio_service.execute_tool(tool_name=self.composio_tool.action, arguments=arguments)
+                result = composio_service.execute_tool(tool_name=self.composio_tool.action, arguments=self.arguments)
         except Exception as e:
             self._handle_tool_exception(e, "Composio tool", self.composio_tool.action)
 
@@ -254,11 +237,9 @@ class MCPNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
         result: Any
 
     def run(self) -> Iterator[BaseOutput]:
-        arguments = self._extract_function_arguments()
-
         try:
             mcp_service = MCPService()
-            result = mcp_service.execute_tool(tool_def=self.mcp_tool, arguments=arguments)
+            result = mcp_service.execute_tool(tool_def=self.mcp_tool, arguments=self.arguments)
         except Exception as e:
             self._handle_tool_exception(e, "MCP tool", self.mcp_tool.name)
 
@@ -277,7 +258,6 @@ class VellumIntegrationNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
         result: Any
 
     def run(self) -> Iterator[BaseOutput]:
-        arguments = self._extract_function_arguments()
         vellum_client = self._context.vellum_client
 
         try:
@@ -286,7 +266,7 @@ class VellumIntegrationNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
                 integration=self.vellum_integration_tool.integration_name,
                 provider=self.vellum_integration_tool.provider.value,
                 tool_name=self.vellum_integration_tool.name,
-                arguments=arguments,
+                arguments=self.arguments,
             )
         except NodeException as e:
             error_payload = {
