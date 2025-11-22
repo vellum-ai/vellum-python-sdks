@@ -1,20 +1,7 @@
 from itertools import chain
 import json
 from uuid import uuid4
-from typing import (
-    TYPE_CHECKING,
-    Callable,
-    ClassVar,
-    Generator,
-    Generic,
-    Iterator,
-    List,
-    Optional,
-    Set,
-    Tuple,
-    Type,
-    Union,
-)
+from typing import ClassVar, Generator, Generic, Iterator, List, Optional, Set, Tuple, Union
 
 import httpx
 
@@ -66,6 +53,7 @@ from vellum.workflows.types.definition import (
     ComposioToolDefinition,
     DeploymentDefinition,
     MCPServer,
+    Tool,
     VellumIntegrationToolDefinition,
 )
 from vellum.workflows.types.generics import StateType, is_workflow_class
@@ -80,9 +68,6 @@ from vellum.workflows.utils.functions import (
 )
 from vellum.workflows.utils.pydantic_schema import normalize_json
 
-if TYPE_CHECKING:
-    from vellum.workflows.workflows.base import BaseWorkflow
-
 
 class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
     """
@@ -91,7 +76,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
     prompt_inputs: EntityInputsInterface - The inputs for the Prompt
     ml_model: str - Either the ML Model's UUID or its name.
     blocks: List[PromptBlock] - The blocks that make up the Prompt
-    functions: Optional[List[FunctionDefinition]] - The functions to include in the Prompt
+    functions: Optional[List[Tool]] - The functions/tools to include in the Prompt
     parameters: PromptParameters - The parameters for the Prompt
     expand_meta: Optional[AdHocExpandMeta] - Expandable execution fields to include in the response
     request_options: Optional[RequestOptions] - The request options to use for the Prompt Execution
@@ -103,18 +88,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
     blocks: ClassVar[List[PromptBlock]]
 
     # The functions/tools that a Prompt has access to
-    functions: Optional[
-        List[
-            Union[
-                FunctionDefinition,
-                Callable,
-                DeploymentDefinition,
-                Type["BaseWorkflow"],
-                VellumIntegrationToolDefinition,
-                MCPServer,
-            ]
-        ]
-    ] = None
+    functions: Optional[List[Tool]] = None
 
     parameters: PromptParameters = DEFAULT_PROMPT_PARAMETERS
     expand_meta: Optional[AdHocExpandMeta] = AdHocExpandMeta(finish_reason=True)
