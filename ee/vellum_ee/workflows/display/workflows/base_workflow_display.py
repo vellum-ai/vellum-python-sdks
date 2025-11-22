@@ -25,7 +25,7 @@ from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_v
 from vellum.workflows.nodes.displayable.final_output_node.node import FinalOutputNode
 from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port, get_wrapped_node
 from vellum.workflows.ports import Port
-from vellum.workflows.references import OutputReference, WorkflowInputReference
+from vellum.workflows.references import OutputReference, StateValueReference, WorkflowInputReference
 from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.triggers.manual import ManualTrigger
 from vellum.workflows.triggers.schedule import ScheduleTrigger
@@ -948,7 +948,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         return WorkflowInputsDisplay(id=workflow_input_id, name=name, color=color)
 
     def _generate_state_value_display(
-        self, state_value: BaseDescriptor, overrides: Optional[StateValueDisplay] = None
+        self, state_value: StateValueReference, overrides: Optional[StateValueDisplay] = None
     ) -> StateValueDisplay:
         state_value_id: UUID
         name = None
@@ -958,7 +958,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             name = overrides.name
             color = overrides.color
         else:
-            state_value_id = uuid4_from_hash(f"{self.workflow_id}|state_values|id|{state_value.name}")
+            state_value_id = state_value.id
 
         return StateValueDisplay(id=state_value_id, name=name, color=color)
 

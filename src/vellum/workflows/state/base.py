@@ -65,7 +65,9 @@ class _BaseStateMeta(type):
         if not name.startswith("_"):
             instance = vars(cls).get(name, undefined)
             types = infer_types(cls, name)
-            return StateValueReference(name=name, types=types, instance=instance)
+            return StateValueReference(
+                name=name, types=types, instance=instance, state_class=cast(Type["BaseState"], cls)
+            )
 
         return super().__getattribute__(name)
 
