@@ -554,7 +554,7 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
         Returns:
             Dict of inputs to include in execution events
         """
-        return self._inputs
+        return dict(self._inputs)
 
     def __cancel__(self, message: str) -> None:
         """
