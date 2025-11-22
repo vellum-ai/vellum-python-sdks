@@ -9,6 +9,7 @@ from vellum.client.types.array_chat_message_content import ArrayChatMessageConte
 from vellum.client.types.array_chat_message_content_item import ArrayChatMessageContentItem
 from vellum.client.types.function_call_chat_message_content import FunctionCallChatMessageContent
 from vellum.client.types.function_call_chat_message_content_value import FunctionCallChatMessageContentValue
+from vellum.client.types.function_call_vellum_value import FunctionCallVellumValue
 from vellum.client.types.prompt_output import PromptOutput
 from vellum.client.types.prompt_parameters import PromptParameters
 from vellum.client.types.prompt_settings import PromptSettings
@@ -16,8 +17,10 @@ from vellum.client.types.string_chat_message_content import StringChatMessageCon
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.utils.json_encoder import VellumJsonEncoder
 from vellum.workflows.descriptors.base import BaseDescriptor
+from vellum.workflows.descriptors.utils import resolve_value
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
+from vellum.workflows.expressions.accessor import AccessorExpression
 from vellum.workflows.expressions.concat import ConcatExpression
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.integrations.composio_service import ComposioService
@@ -30,6 +33,7 @@ from vellum.workflows.nodes.displayable.subworkflow_deployment_node.node import 
 from vellum.workflows.nodes.displayable.tool_calling_node.state import ToolCallingState
 from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.ports.port import Port
+from vellum.workflows.references import NodeReference
 from vellum.workflows.state import BaseState
 from vellum.workflows.types.core import EntityInputsInterface, MergeBehavior
 from vellum.workflows.types.definition import (
@@ -108,6 +112,41 @@ class FunctionCallNodeMixin:
         with state.__quiet__():
             state.current_function_calls_processed += 1
             state.current_prompt_output_index += 1
+
+
+class FunctionCallArgumentsDescriptor(AccessorExpression):
+    """Descriptor that safely extracts function call arguments by finding the first FUNCTION_CALL output.
+
+    Inherits from AccessorExpression so it can be serialized automatically without special handling.
+    The accessor chain represents results[0]["value"]["arguments"] for serialization,
+    but resolve() overrides the behavior to find the first FUNCTION_CALL at runtime.
+    """
+
+    def __init__(self, function_call_output_ref: BaseDescriptor[List[PromptOutput]]) -> None:
+        # Build the accessor chain: results[0]["value"]["arguments"]
+        # This is what gets serialized
+        accessor_for_value = AccessorExpression(base=function_call_output_ref, field=0)
+        accessor_for_value_field = AccessorExpression(base=accessor_for_value, field="value")
+        # Initialize as an AccessorExpression with the final chain
+        super().__init__(
+            base=accessor_for_value_field,
+            field="arguments",
+        )
+        self._function_call_output_ref = function_call_output_ref
+
+    def resolve(self, state: BaseState) -> Dict[str, Any]:
+        """Resolve the arguments by finding the first FUNCTION_CALL output in the results.
+
+        Overrides AccessorExpression.resolve() to implement custom logic that finds
+        the first FUNCTION_CALL output instead of assuming it's at index 0.
+        """
+        function_call_output = resolve_value(self._function_call_output_ref, state)
+        if function_call_output and len(function_call_output) > 0:
+            # Find the first FUNCTION_CALL output (not just assume it's at index 0)
+            for prompt_output in function_call_output:
+                if isinstance(prompt_output, FunctionCallVellumValue) and prompt_output.value is not None:
+                    return prompt_output.value.arguments or {}
+        return {}
 
 
 class ToolPromptNode(InlinePromptNode[ToolCallingState]):
@@ -219,6 +258,17 @@ class FunctionNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
 
     class Outputs(BaseNode.Outputs):
         result: Any
+
+    def _get_inputs(self) -> Dict[Union[NodeReference, AccessorExpression], Any]:
+        """
+        Returns the inputs to include in execution events, filtering out function_call_output.
+        """
+        inputs = dict(self._inputs)
+        # Filter out function_call_output by name
+        for key in list(inputs.keys()):
+            if hasattr(key, "name") and key.name == "function_call_output":
+                inputs.pop(key, None)
+        return inputs
 
     def run(self) -> Iterator[BaseOutput]:
         arguments = self._extract_function_arguments()
@@ -573,6 +623,7 @@ def create_function_node(
             {
                 "function_definition": create_function_wrapper(function),
                 "function_call_output": tool_prompt_node.Outputs.results,
+                "arguments": FunctionCallArgumentsDescriptor(tool_prompt_node.Outputs.results),
                 "__module__": __name__,
             },
         )

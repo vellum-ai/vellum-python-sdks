@@ -26,6 +26,7 @@ from vellum.client.types.string_chat_message_content import StringChatMessageCon
 from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.client.types.vellum_variable import VellumVariable
+from vellum.workflows.events.node import NodeExecutionInitiatedEvent
 from vellum.workflows.nodes.displayable.tool_calling_node import ToolCallingNode
 from vellum.workflows.nodes.displayable.tool_calling_node.utils import ToolPromptNode
 from vellum.workflows.workflows.base import BaseWorkflow
@@ -730,3 +731,72 @@ def test_tool_calling_node__tool_error_includes_stacktrace(vellum_adhoc_prompt_c
     assert rejected_event.body.stacktrace is not None
     assert "NodeException" in rejected_event.body.stacktrace
     assert "Error executing function 'error_tool': This tool always fails" in rejected_event.body.stacktrace
+
+
+def test_function_node_execution_inputs_excludes_function_call_output(vellum_adhoc_prompt_client, mock_uuid4_generator):
+    """Test that FunctionNode execution events exclude function_call_output from inputs."""
+
+    def generate_prompt_events(*_args, **_kwargs) -> Iterator[ExecutePromptEvent]:
+        execution_id = str(uuid4())
+        call_count = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count
+        expected_outputs: List[PromptOutput]
+        if call_count == 1:
+            expected_outputs = [
+                FunctionCallVellumValue(
+                    value=FunctionCall(
+                        arguments={"location": "San Francisco", "unit": "celsius"},
+                        id="call_test",
+                        name="get_current_weather",
+                        state="FULFILLED",
+                    ),
+                ),
+            ]
+        else:
+            expected_outputs = [
+                StringVellumValue(
+                    value="Based on the function call, the current temperature in San Francisco is 70 degrees celsius."
+                )
+            ]
+
+        events: List[ExecutePromptEvent] = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            FulfilledExecutePromptEvent(
+                execution_id=execution_id,
+                outputs=expected_outputs,
+            ),
+        ]
+        yield from events
+
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
+
+    # Set up UUID generator - generate UUIDs for both prompt executions
+    uuid4_generator = mock_uuid4_generator("vellum.workflows.nodes.displayable.bases.inline_prompt_node.node.uuid4")
+    uuid4_generator()
+    uuid4_generator()
+
+    # GIVEN a workflow with a function node
+    workflow = BasicToolCallingNodeWorkflow()
+
+    # WHEN the workflow is executed
+    events = list(workflow.stream(event_filter=all_workflow_event_filter, inputs=Inputs(query="What's the weather?")))
+
+    # THEN find the FunctionNode execution initiated event
+    function_node_events = [
+        e
+        for e in events
+        if isinstance(e, NodeExecutionInitiatedEvent)
+        and e.node_definition.__name__ == "FunctionNode_get_current_weather"
+    ]
+
+    assert len(function_node_events) > 0, "Expected at least one FunctionNode execution event"
+
+    # AND the event inputs should NOT include function_call_output
+    function_node_event = function_node_events[0]
+    serialized_inputs = function_node_event.body.model_dump(mode="json")["inputs"]
+    # AND the inputs should only include arguments
+    assert serialized_inputs == {
+        "arguments": {
+            "location": "San Francisco",
+            "unit": "celsius",
+        },
+    }

@@ -546,6 +546,16 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
     def run(self) -> NodeRunResponse:
         return self.Outputs()
 
+    def _get_inputs(self) -> Dict[Union[NodeReference, AccessorExpression], Any]:
+        """
+        Returns the inputs to include in execution events.
+        Override this method to filter or modify inputs before they are serialized in events.
+
+        Returns:
+            Dict of inputs to include in execution events
+        """
+        return self._inputs
+
     def __cancel__(self, message: str) -> None:
         """
         Called when the node should be cancelled. Override this method to propagate
