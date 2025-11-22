@@ -476,33 +476,6 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
         register_node_display_class(node_class=node_class, node_display_class=cls)
 
-    @staticmethod
-    def _has_different_display_from_ancestors(node_class: Type[BaseNode], attr: str) -> bool:
-        """
-        Recursively check if the node's display attribute differs from any ancestor in the BaseNode inheritance chain.
-        This helps avoid filtering out display attributes that are the same as immediate parent
-        but different from ancestors.
-        """
-        current_value = getattr(node_class.Display, attr, None)
-        if current_value is None:
-            return False
-
-        # Check all base classes that are BaseNode subclasses
-        for base in node_class.__bases__:
-            if not issubclass(base, BaseNode):
-                continue
-
-            parent_value = getattr(base.Display, attr, None)
-            if parent_value != current_value:
-                # Found a parent with different value, so this node's value should be included
-                return True
-
-            # Recursively check parent's parents
-            if BaseNodeDisplay._has_different_display_from_ancestors(base, attr):
-                return True
-
-        return False
-
     def get_display_data(self) -> NodeDisplayData:
         """
         Get display data by first building from BaseNode.Display, then overriding with BaseNodeDisplay.
@@ -512,23 +485,12 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
         # Step 1: Start with BaseNode.Display attributes as base
         base_kwargs: Dict[str, Any] = {}
-        base_node = next((base for base in self._node.__bases__ if issubclass(base, BaseNode)), BaseNode)
 
-        # Add Display class attributes if they exist and differ from any ancestor
-        # Recursively check parent classes to avoid filtering out attributes that are
-        # the same as immediate parent but different from ancestors
+        # Add Display class attributes if they exist
         if self._node.Display.icon is not None:
-            if (
-                self._node.Display.icon != base_node.Display.icon
-                or BaseNodeDisplay._has_different_display_from_ancestors(self._node, "icon")
-            ):
-                base_kwargs["icon"] = self._node.Display.icon
+            base_kwargs["icon"] = self._node.Display.icon
         if self._node.Display.color is not None:
-            if (
-                self._node.Display.color != base_node.Display.color
-                or BaseNodeDisplay._has_different_display_from_ancestors(self._node, "color")
-            ):
-                base_kwargs["color"] = self._node.Display.color
+            base_kwargs["color"] = self._node.Display.color
 
         # Add docstring as comment if present
         if docstring:
