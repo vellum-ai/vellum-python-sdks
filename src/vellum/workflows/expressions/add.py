@@ -38,4 +38,7 @@ class AddExpression(BaseDescriptor[Any], Generic[LHS, RHS]):
         if not has_add(lhs):
             raise InvalidExpressionException(f"'{lhs.__class__.__name__}' must support the '+' operator")
 
+        if isinstance(lhs, list) and not isinstance(rhs, list):
+            return lhs + [rhs]
+
         return lhs + rhs
