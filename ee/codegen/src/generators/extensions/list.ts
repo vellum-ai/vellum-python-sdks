@@ -1,4 +1,3 @@
-import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 
@@ -7,9 +6,9 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
  * This is the modern Python 3.9+ syntax that doesn't require importing from typing.
  */
 export class BuiltinListType extends AstNode {
-  private readonly itemType: python.Type;
+  private readonly itemType: AstNode;
 
-  constructor(itemType: python.Type) {
+  constructor(itemType: AstNode) {
     super();
     this.itemType = itemType;
     this.inheritReferences(itemType);
@@ -21,6 +20,3 @@ export class BuiltinListType extends AstNode {
     writer.write("]");
   }
 }
-
-export const builtinListType = (itemType: python.Type): python.Type =>
-  new BuiltinListType(itemType) as unknown as python.Type;
