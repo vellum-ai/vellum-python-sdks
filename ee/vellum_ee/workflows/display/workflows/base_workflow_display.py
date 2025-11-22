@@ -1310,14 +1310,23 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
 
     def _validate_no_self_edges(self, edges: JsonArray) -> None:
         """
-        Validate that the workflow graph doesn't contain self-edges (infinite loops).
+        Validate that the workflow graph doesn't contain unconditional self-edges (infinite loops).
+
+        A node is considered to have an unconditional self-edge if it ONLY targets itself with no
+        other outgoing edges. Conditional loops (where a node has multiple outgoing edges including
+        one back to itself) are valid and not flagged.
 
         Args:
             edges: List of edge dictionaries from the serialized workflow
 
         Raises:
-            WorkflowValidationError: If a self-edge is detected
+            WorkflowValidationError: If an unconditional self-edge is detected
         """
+        from collections import defaultdict
+
+        valid_node_ids = {str(node_display.node_id) for node_display in self.display_context.node_displays.values()}
+
+        outgoing_targets: Dict[str, Set[str]] = defaultdict(set)
         for edge in edges:
             if not isinstance(edge, dict):
                 continue
@@ -1326,7 +1335,16 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             source_node_id = edge.get("source_node_id")
             target_node_id = edge.get("target_node_id")
 
-            if edge_type == "DEFAULT" and source_node_id == target_node_id:
+            if (
+                edge_type == "DEFAULT"
+                and isinstance(source_node_id, str)
+                and isinstance(target_node_id, str)
+                and source_node_id in valid_node_ids
+            ):
+                outgoing_targets[source_node_id].add(target_node_id)
+
+        for source_node_id, target_node_ids in outgoing_targets.items():
+            if source_node_id in target_node_ids and len(target_node_ids) == 1:
                 node_name = None
                 for node_class, node_display in self.display_context.node_displays.items():
                     if str(node_display.node_id) == source_node_id:
