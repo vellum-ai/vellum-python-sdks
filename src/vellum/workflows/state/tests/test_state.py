@@ -4,6 +4,8 @@ import json
 from queue import Queue
 from typing import Dict, List, cast
 
+from pydantic import Field
+
 from vellum.utils.json_encoder import VellumJsonEncoder
 from vellum.workflows.constants import undefined
 from vellum.workflows.nodes.bases import BaseNode
@@ -243,3 +245,53 @@ def test_state_deepcopy_handles_undefined_values():
 
     # THEN the undefined values are preserved
     assert deepcopied_state.meta.node_outputs[MockNode.Outputs.baz] == {"foo": undefined}
+
+
+def test_base_state_initializes_field_with_default_factory():
+    """Test that BaseState properly initializes fields with Field(default_factory=...)."""
+
+    # GIVEN a state class with fields using Field(default_factory=...)
+    class TestState(BaseState):
+        chat_history: List[str] = Field(default_factory=list)
+        items: Dict[str, int] = Field(default_factory=dict)
+        counter: int = Field(default_factory=lambda: 0)
+
+    # WHEN we create a state instance without providing values
+    state = TestState()
+
+    # THEN the fields should be initialized with the factory results, not FieldInfo objects
+    assert isinstance(state.chat_history, list)
+    assert state.chat_history == []
+    assert isinstance(state.items, dict)
+    assert state.items == {}
+    assert isinstance(state.counter, int)
+    assert state.counter == 0
+
+    # AND we should be able to modify them
+    state.chat_history.append("message1")
+    state.items["key1"] = 1
+    state.counter += 1
+
+    assert state.chat_history == ["message1"]
+    assert state.items == {"key1": 1}
+    assert state.counter == 1
+
+
+def test_base_state_field_with_default_factory_creates_separate_instances():
+    """Test that Field(default_factory=...) creates separate instances for each state."""
+
+    # GIVEN a state class with Field(default_factory=list)
+    class TestState(BaseState):
+        items: List[str] = Field(default_factory=list)
+
+    # WHEN we create two state instances
+    state1 = TestState()
+    state2 = TestState()
+
+    # THEN they should have separate list instances
+    assert state1.items is not state2.items
+
+    # AND modifying one should not affect the other
+    state1.items.append("item1")
+    assert state1.items == ["item1"]
+    assert state2.items == []
