@@ -36,23 +36,6 @@ from vellum.workflows.utils.vellum_variables import vellum_variable_type_to_open
 if TYPE_CHECKING:
     from vellum.workflows.workflows.base import BaseWorkflow
 
-type_map: dict[Any, str] = {
-    str: "string",
-    int: "integer",
-    float: "number",
-    bool: "boolean",
-    list: "array",
-    dict: "object",
-    None: "null",
-    type(None): "null",
-    inspect._empty: "null",
-    "None": "null",
-}
-
-for k, v in list(type_map.items()):
-    if isinstance(k, type):
-        type_map[k.__name__] = v
-
 
 def _get_def_name(annotation: Type) -> str:
     return f"{annotation.__module__}.{annotation.__qualname__}"
@@ -96,11 +79,8 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
             defs.update(nested_defs)
 
         return schema
-    except Exception:
-        # Fallback for types that TypeAdapter can't handle
-        if annotation not in type_map:
-            raise ValueError(f"Failed to compile type: {annotation}")
-        return {"type": type_map[annotation]}
+    except Exception as exc:
+        raise ValueError(f"Failed to compile schema for annotation {annotation!r}") from exc
 
 
 def _compile_default_value(default: Any) -> Any:
