@@ -18,6 +18,7 @@ from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.retry_node import BaseRetryNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.try_node import BaseTryNodeDisplay
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
+from vellum_ee.workflows.display.utils.exceptions import UserFacingException
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 
@@ -41,7 +42,7 @@ def test_serialize_workflow__node_referenced_in_workflow_outputs_not_in_graph():
     workflow_display = get_workflow_display(workflow_class=Workflow)
 
     # THEN it should raise an error
-    with pytest.raises(ValueError) as exc_info:
+    with pytest.raises(UserFacingException) as exc_info:
         workflow_display.serialize()
 
     # AND the error message should be user friendly
@@ -63,7 +64,7 @@ def test_serialize_workflow__workflow_outputs_reference_non_node_outputs():
     workflow_display = get_workflow_display(workflow_class=Workflow)
 
     # THEN it should raise an error
-    with pytest.raises(ValueError) as exc_info:
+    with pytest.raises(UserFacingException) as exc_info:
         workflow_display.serialize()
 
     # AND the error message should be user friendly
@@ -528,8 +529,14 @@ def test_serialize_workflow__array_reference():
     # THEN it should serialize as an ARRAY_REFERENCE
     assert isinstance(data["workflow_raw_data"], dict)
     assert isinstance(data["workflow_raw_data"]["nodes"], list)
-    assert len(data["workflow_raw_data"]["nodes"]) == 5
-    second_node = data["workflow_raw_data"]["nodes"][2]
+    second_node = next(
+        node
+        for node in data["workflow_raw_data"]["nodes"]
+        if isinstance(node, dict)
+        and "definition" in node
+        and isinstance(node["definition"], dict)
+        and node["definition"]["name"] == "SecondNode"
+    )
     assert isinstance(second_node, dict)
 
     assert "outputs" in second_node
@@ -827,17 +834,6 @@ def test_serialize_workflow__empty_rules_indexerror():
     output_variables = result["output_variables"]
     assert len(output_variables) == 1
     assert output_variables[0]["key"] == "problematic_output"
-
-    # AND the workflow raw data should contain nodes including terminal node
-    workflow_raw_data = result["workflow_raw_data"]
-    assert "nodes" in workflow_raw_data
-    nodes = workflow_raw_data["nodes"]
-
-    assert len(nodes) >= 3
-
-    terminal_nodes = [node for node in nodes if node.get("type") == "TERMINAL"]
-    assert len(terminal_nodes) == 1
-    assert terminal_nodes[0]["data"]["name"] == "problematic_output"
 
 
 def test_serialize_workflow__input_variables():

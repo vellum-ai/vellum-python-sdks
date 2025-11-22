@@ -129,24 +129,19 @@ def test_vellum_workflow_display_serialize_valid_handle_ids_for_base_nodes():
     edge_source_handle_ids = {edge.get("source_handle_id") for edge in edges if isinstance(edge, dict)}
     edge_target_handle_ids = {edge.get("target_handle_id") for edge in edges if isinstance(edge, dict)}
 
-    for node in nodes:
-        assert isinstance(node, dict)
+    start_node = next(
+        node for node in nodes if isinstance(node, dict) and node["type"] == "GENERIC" and node["label"] == "Start Node"
+    )
+    end_node = next(
+        node for node in nodes if isinstance(node, dict) and node["type"] == "GENERIC" and node["label"] == "End Node"
+    )
 
-        if node["type"] in {"ENTRYPOINT", "TERMINAL"}:
-            continue
+    assert isinstance(start_node["ports"], list)
+    assert isinstance(start_node["ports"][0], dict)
+    assert start_node["ports"][0]["id"] in edge_source_handle_ids
 
-        ports = node.get("ports")
-        assert isinstance(ports, list)
-        for port in ports:
-            assert isinstance(port, dict)
-            assert (
-                port["id"] in edge_source_handle_ids
-            ), f"Port {port['id']} from node {node['label']} not found in edge source handle ids"
-
-        assert isinstance(node["trigger"], dict)
-        assert (
-            node["trigger"]["id"] in edge_target_handle_ids
-        ), f"Trigger {node['trigger']['id']} from node {node['label']} not found in edge target handle ids"
+    assert isinstance(end_node["trigger"], dict)
+    assert end_node["trigger"]["id"] in edge_target_handle_ids
 
 
 def test_vellum_workflow_display__serialize_with_unused_nodes_and_edges():

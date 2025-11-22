@@ -57,7 +57,11 @@ from vellum.workflows.types.generics import is_workflow_class
 from vellum.workflows.utils.files import virtual_open
 from vellum.workflows.utils.functions import compile_function_definition
 from vellum.workflows.utils.uuids import uuid4_from_hash
-from vellum_ee.workflows.display.utils.exceptions import InvalidInputReferenceError, UnsupportedSerializationException
+from vellum_ee.workflows.display.utils.exceptions import (
+    InvalidInputReferenceError,
+    InvalidOutputReferenceError,
+    UnsupportedSerializationException,
+)
 
 if TYPE_CHECKING:
     from vellum_ee.workflows.display.types import WorkflowDisplayContext
@@ -307,6 +311,13 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
         }
 
     if isinstance(value, OutputReference):
+        if value not in display_context.global_node_output_displays:
+            if issubclass(value.outputs_class, BaseNode.Outputs):
+                raise InvalidOutputReferenceError(
+                    f"Reference to node '{value.outputs_class.__parent_class__.__name__}' not found in graph."
+                )
+            raise InvalidOutputReferenceError(f"Reference to outputs '{value.outputs_class.__qualname__}' is invalid.")
+
         output_display = display_context.global_node_output_displays[value]
 
         upstream_node_class = value.outputs_class.__parent_class__
