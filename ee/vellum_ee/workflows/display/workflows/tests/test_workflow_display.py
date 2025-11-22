@@ -900,7 +900,7 @@ def test_serialize_workflow__input_variables():
 
     input_4 = next(var for var in input_variables if isinstance(var, dict) and var["key"] == "input_4")
     assert input_4 == {
-        "id": "a2e2b0c5-8d8f-4c1f-8e0a-c0e5a3e5e5e5",
+        "id": "ebc13058-3599-414e-9944-38ce67a01a73",
         "key": "input_4",
         "type": "NUMBER",
         "default": {"type": "NUMBER", "value": 2.0},
@@ -953,7 +953,7 @@ def test_serialize_workflow__state_variables():
 
     state_2 = next(var for var in state_variables if isinstance(var, dict) and var["key"] == "state_2")
     assert state_2 == {
-        "id": "50c735de-f269-4d0a-b511-c9a1104451bb",
+        "id": "0a555e1b-26ce-4d51-942b-4d8081b5634b",
         "key": "state_2",
         "type": "STRING",
         "default": None,
@@ -963,7 +963,7 @@ def test_serialize_workflow__state_variables():
 
     state_3 = next(var for var in state_variables if isinstance(var, dict) and var["key"] == "state_3")
     assert state_3 == {
-        "id": "a2e2b0c5-8d8f-4c1f-8e0a-c0e5a3e5e5e5",
+        "id": "ebc13058-3599-414e-9944-38ce67a01a73",
         "key": "state_3",
         "type": "NUMBER",
         "default": {"type": "NUMBER", "value": 1.0},
@@ -973,7 +973,7 @@ def test_serialize_workflow__state_variables():
 
     state_4 = next(var for var in state_variables if isinstance(var, dict) and var["key"] == "state_4")
     assert state_4 == {
-        "id": "50c735de-f269-4d0a-b511-c9a1104451bb",
+        "id": "9ee1f04e-5e74-4dda-b9df-9d1fd16a73c7",
         "key": "state_4",
         "type": "NUMBER",
         "default": {"type": "NUMBER", "value": 2.0},
