@@ -900,7 +900,7 @@ def test_serialize_workflow__input_variables():
 
     input_4 = next(var for var in input_variables if isinstance(var, dict) and var["key"] == "input_4")
     assert input_4 == {
-        "id": "d945b6ae-2490-4bfb-9b1c-b1e484dfd4f6",
+        "id": "a2e2b0c5-8d8f-4c1f-8e0a-c0e5a3e5e5e5",
         "key": "input_4",
         "type": "NUMBER",
         "default": {"type": "NUMBER", "value": 2.0},
@@ -933,7 +933,7 @@ def test_serialize_workflow__state_variables():
 
     empty_string = next(var for var in state_variables if isinstance(var, dict) and var["key"] == "empty_string")
     assert empty_string == {
-        "id": "0ed1f179-1734-487f-b3ed-9e6026390d90",
+        "id": "7f59a459-5efd-422b-ad3f-121837c1f3f4",
         "key": "empty_string",
         "type": "STRING",
         "default": {"type": "STRING", "value": ""},
@@ -943,7 +943,7 @@ def test_serialize_workflow__state_variables():
 
     state_1 = next(var for var in state_variables if isinstance(var, dict) and var["key"] == "state_1")
     assert state_1 == {
-        "id": "83c5b71d-56eb-42a5-84df-97e3591370c2",
+        "id": "772353f1-69f4-43e2-8144-f52203e2cb9d",
         "key": "state_1",
         "type": "STRING",
         "default": {"type": "STRING", "value": "hello"},
@@ -953,7 +953,7 @@ def test_serialize_workflow__state_variables():
 
     state_2 = next(var for var in state_variables if isinstance(var, dict) and var["key"] == "state_2")
     assert state_2 == {
-        "id": "9b0cfeec-aa66-42b3-8f31-aa7eb8ac30ea",
+        "id": "50c735de-f269-4d0a-b511-c9a1104451bb",
         "key": "state_2",
         "type": "STRING",
         "default": None,
@@ -963,7 +963,7 @@ def test_serialize_workflow__state_variables():
 
     state_3 = next(var for var in state_variables if isinstance(var, dict) and var["key"] == "state_3")
     assert state_3 == {
-        "id": "3e19c570-6b46-4eab-ad81-d8d97028496f",
+        "id": "a2e2b0c5-8d8f-4c1f-8e0a-c0e5a3e5e5e5",
         "key": "state_3",
         "type": "NUMBER",
         "default": {"type": "NUMBER", "value": 1.0},

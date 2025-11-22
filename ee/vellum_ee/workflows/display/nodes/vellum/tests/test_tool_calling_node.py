@@ -328,7 +328,7 @@ def test_serialize_tool_router_node():
                     "lhs": {
                         "lhs": {
                             "lhs": {
-                                "state_variable_id": "0dd7f5a1-1d73-4153-9191-ca828ace4920",
+                                "state_variable_id": "c28700ba-ae70-4c20-900b-7076f2417a38",
                                 "type": "WORKFLOW_STATE",
                             },
                             "operator": "<",
@@ -354,7 +354,7 @@ def test_serialize_tool_router_node():
                                     },
                                     "operator": "accessField",
                                     "rhs": {
-                                        "state_variable_id": "0dd7f5a1-1d73-4153-9191-ca828ace4920",
+                                        "state_variable_id": "c28700ba-ae70-4c20-900b-7076f2417a38",
                                         "type": "WORKFLOW_STATE",
                                     },
                                     "type": "BINARY_EXPRESSION",
@@ -381,7 +381,7 @@ def test_serialize_tool_router_node():
                                     },
                                     "operator": "accessField",
                                     "rhs": {
-                                        "state_variable_id": "0dd7f5a1-1d73-4153-9191-ca828ace4920",
+                                        "state_variable_id": "c28700ba-ae70-4c20-900b-7076f2417a38",
                                         "type": "WORKFLOW_STATE",
                                     },
                                     "type": "BINARY_EXPRESSION",
@@ -671,7 +671,7 @@ def test_serialize_tool_prompt_node_with_inline_workflow():
                         "operator": "concat",
                         "rhs": {
                             "type": "WORKFLOW_STATE",
-                            "state_variable_id": "7a1caaf5-99df-487a-8b2d-6512df2d871a",
+                            "state_variable_id": "33b260cf-e681-4665-97df-c7d27350911b",
                         },
                     },
                 }

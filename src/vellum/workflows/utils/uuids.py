@@ -81,15 +81,13 @@ def get_workflow_input_id(inputs_class: "type[BaseInputs]", input_name: str) -> 
 def get_state_value_id(state_class: "type[BaseState]", state_value_name: str) -> UUID:
     """
     Generate a deterministic state value ID from a state class and state value name
-    using the class's parent workflow ID and state value name to ensure stability and uniqueness.
+    using the class's module name, qualname, and state value name to ensure stability and uniqueness.
 
     Args:
         state_class: The state class containing the state value
         state_value_name: The name of the state value
 
     Returns:
-        A deterministic UUID based on the workflow ID and state value name
+        A deterministic UUID based on the state class module, qualname, and state value name
     """
-    workflow_class = state_class.__parent_class__
-    workflow_id = workflow_class.__id__
-    return uuid4_from_hash(f"{workflow_id}|state_values|id|{state_value_name}")
+    return uuid4_from_hash(f"{state_class.__module__}|{state_class.__qualname__}|state_values|id|{state_value_name}")

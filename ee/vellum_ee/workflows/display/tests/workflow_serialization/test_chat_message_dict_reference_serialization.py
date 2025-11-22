@@ -67,7 +67,7 @@ def test_serialize_chat_message_dict_reference_with_definition():
                     "key": "chat_history",
                     "value": {
                         "type": "BINARY_EXPRESSION",
-                        "lhs": {"type": "WORKFLOW_STATE", "state_variable_id": "2ae688ad-8690-4765-a5fa-aecc7d6496e5"},
+                        "lhs": {"type": "WORKFLOW_STATE", "state_variable_id": "fee57802-d583-451a-9901-c6badc1bf6b5"},
                         "operator": "+",
                         "rhs": {
                             "type": "DICTIONARY_REFERENCE",

@@ -523,7 +523,7 @@ def test_inline_prompt_node__coalesce_expression_serialization():
     assert chat_history_entry["value"]["operator"] == "coalesce"
     assert chat_history_entry["value"]["lhs"] == {
         "type": "WORKFLOW_STATE",
-        "state_variable_id": "6012a4f7-a8ff-464d-bd62-7c41fde06fa4",
+        "state_variable_id": "ecd18f63-8f90-442b-a074-d42532f9152d",
     }
     assert chat_history_entry["value"]["rhs"] == {
         "type": "CONSTANT_VALUE",

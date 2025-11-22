@@ -209,10 +209,6 @@ class _BaseWorkflowMeta(type):
         if inputs_class is not BaseInputs and inputs_class.__parent_class__ is type(None):
             inputs_class.__parent_class__ = workflow_class
 
-        state_class = workflow_class.get_state_class()
-        if state_class is not BaseState and not hasattr(state_class, "__parent_class__"):
-            state_class.__parent_class__ = workflow_class
-
         workflow_class.Outputs.__parent_class__ = workflow_class
         workflow_class.__output_ids__ = {
             ref.name: uuid4_from_hash(f"{workflow_class.__id__}|id|{ref.name}") for ref in workflow_class.Outputs
