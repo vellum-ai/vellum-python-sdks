@@ -255,11 +255,11 @@ def test_serialize_module_with_node_output_mock_when_conditions():
     assert first_scenario["label"] == "Scenario 1"
     assert first_scenario["inputs"]["threshold"] == 5
 
-    assert "node_output_mocks" in first_scenario
-    assert isinstance(first_scenario["node_output_mocks"], list)
-    assert len(first_scenario["node_output_mocks"]) == 2
+    assert "mocks" in first_scenario
+    assert isinstance(first_scenario["mocks"], list)
+    assert len(first_scenario["mocks"]) == 2
 
-    first_mock = first_scenario["node_output_mocks"][0]
+    first_mock = first_scenario["mocks"][0]
     workflow_input_id = first_mock["when_condition"]["lhs"]["lhs"]["input_variable_id"]
     node_id = str(ProcessNode.__id__)
 
@@ -284,7 +284,7 @@ def test_serialize_module_with_node_output_mock_when_conditions():
         "then_outputs": {"result": "first_execution_threshold_5"},
     }
 
-    second_mock = first_scenario["node_output_mocks"][1]
+    second_mock = first_scenario["mocks"][1]
     assert second_mock == {
         "node_id": node_id,
         "when_condition": {
@@ -310,11 +310,11 @@ def test_serialize_module_with_node_output_mock_when_conditions():
     assert second_scenario["label"] == "Scenario 2"
     assert second_scenario["inputs"]["threshold"] == 10
 
-    assert "node_output_mocks" in second_scenario
-    assert isinstance(second_scenario["node_output_mocks"], list)
-    assert len(second_scenario["node_output_mocks"]) == 1
+    assert "mocks" in second_scenario
+    assert isinstance(second_scenario["mocks"], list)
+    assert len(second_scenario["mocks"]) == 1
 
-    third_mock = second_scenario["node_output_mocks"][0]
+    third_mock = second_scenario["mocks"][0]
     assert third_mock == {
         "node_id": node_id,
         "when_condition": {

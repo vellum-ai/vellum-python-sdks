@@ -152,7 +152,7 @@ def test_dataset_row_with_dict_inputs():
 
 def test_dataset_row_with_node_output_mocks():
     """
-    Test that DatasetRow can be created with node_output_mocks and properly serialized.
+    Test that DatasetRow can be created with mocks and properly serialized.
     """
 
     # GIVEN a node with outputs
@@ -168,7 +168,7 @@ def test_dataset_row_with_node_output_mocks():
 
     test_inputs = TestInputs(message="test message")
 
-    dataset_row = DatasetRow(label="test_with_mocks", inputs=test_inputs, node_output_mocks=[mock_output])
+    dataset_row = DatasetRow(label="test_with_mocks", inputs=test_inputs, mocks=[mock_output])
 
     serialized_dict = dataset_row.model_dump()
 
@@ -176,13 +176,13 @@ def test_dataset_row_with_node_output_mocks():
     assert serialized_dict["label"] == "test_with_mocks"
     assert serialized_dict["inputs"]["message"] == "test message"
 
-    # AND the node_output_mocks should be present in the serialized dict
-    assert "node_output_mocks" in serialized_dict
-    assert serialized_dict["node_output_mocks"] is not None
-    assert len(serialized_dict["node_output_mocks"]) == 1
+    # AND the mocks should be present in the serialized dict
+    assert "mocks" in serialized_dict
+    assert serialized_dict["mocks"] is not None
+    assert len(serialized_dict["mocks"]) == 1
 
     # AND the mock output should be serialized as a dict with the correct structure
-    mock_data = serialized_dict["node_output_mocks"][0]
+    mock_data = serialized_dict["mocks"][0]
     assert mock_data == {
         "node_id": str(DummyNode.__id__),
         "when_condition": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": True}},
