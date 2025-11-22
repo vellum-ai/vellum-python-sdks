@@ -398,7 +398,7 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
             "template_node_input_id": "198f6350-237a-4103-b571-311738b7743f",
             "output_type": "STRING",
         },
-        "display_data": {"position": {"x": 400.0, "y": -50.0}},
+        "display_data": {"position": {"x": 400.0, "y": -50.0}, "icon": "vellum:icon:stamp", "color": "brown"},
         "base": {
             "name": "TemplatingNode",
             "module": ["vellum", "workflows", "nodes", "core", "templating_node", "node"],

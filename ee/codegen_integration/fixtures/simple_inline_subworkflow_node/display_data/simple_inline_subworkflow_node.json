@@ -394,7 +394,9 @@
           "position": {
             "x": 1991.684833859175,
             "y": 178.94753425793772
-          }
+          },
+          "icon": "vellum:icon:diagram-sankey",
+          "color": "grass"
         },
         "base": {
           "name": "InlineSubworkflowNode",
