@@ -2,13 +2,17 @@ import { python } from "@fern-api/python-ast";
 import * as Vellum from "vellum-ai/api";
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
+import { PythonType } from "src/generators/extensions";
+import { BuiltinListType } from "src/generators/extensions/list";
 import { assertUnreachable } from "src/utils/typing";
 
 /**
  * Converts a JSON Schema to a Python type annotation.
  * Currently supports basic types: string, number, integer, boolean, array, object, null.
  */
-export function jsonSchemaToType(schema: Record<string, unknown>): python.Type {
+export function jsonSchemaToType(
+  schema: Record<string, unknown>
+): python.Type | PythonType {
   const schemaType = schema.type;
 
   if (schemaType === "string") {
@@ -23,9 +27,9 @@ export function jsonSchemaToType(schema: Record<string, unknown>): python.Type {
     const items = schema.items as Record<string, unknown> | undefined;
     if (items) {
       const itemType = jsonSchemaToType(items);
-      return python.Type.list(itemType);
+      return new BuiltinListType(itemType);
     }
-    return python.Type.list(python.Type.any());
+    return new BuiltinListType(python.Type.any());
   } else if (schemaType === "object") {
     return python.Type.dict(python.Type.str(), python.Type.any());
   } else if (schemaType === "null") {
@@ -37,7 +41,7 @@ export function jsonSchemaToType(schema: Record<string, unknown>): python.Type {
 
 export function getVellumVariablePrimitiveType(
   vellumVariableType: Vellum.VellumVariableType
-): python.Type {
+): python.Type | PythonType {
   switch (vellumVariableType) {
     case "STRING":
       return python.Type.str();
@@ -46,7 +50,7 @@ export function getVellumVariablePrimitiveType(
     case "JSON":
       return python.Type.any();
     case "CHAT_HISTORY":
-      return python.Type.list(
+      return new BuiltinListType(
         python.Type.reference(
           python.reference({
             name: "ChatMessage",
@@ -55,7 +59,7 @@ export function getVellumVariablePrimitiveType(
         )
       );
     case "SEARCH_RESULTS":
-      return python.Type.list(
+      return new BuiltinListType(
         python.Type.reference(
           python.reference({
             name: "SearchResult",
@@ -71,7 +75,7 @@ export function getVellumVariablePrimitiveType(
         })
       );
     case "ARRAY":
-      return python.Type.list(
+      return new BuiltinListType(
         python.Type.reference(
           python.reference({
             name: "VellumValue",

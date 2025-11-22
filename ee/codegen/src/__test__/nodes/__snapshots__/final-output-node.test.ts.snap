@@ -242,13 +242,11 @@ class FinalOutput2(FinalOutputNode[BaseState, str]):
 `;
 
 exports[`FinalOutputNode > should use schema field for type annotation when available > getNodeFile 1`] = `
-"from typing import List
-
-from vellum.workflows.nodes.displayable import FinalOutputNode as BaseFinalOutputNode
+"from vellum.workflows.nodes.displayable import FinalOutputNode as BaseFinalOutputNode
 from vellum.workflows.state import BaseState
 
 
-class FinalOutputNode(BaseFinalOutputNode[BaseState, List[str]]):
+class FinalOutputNode(BaseFinalOutputNode[BaseState, list[str]]):
     class Outputs(BaseFinalOutputNode.Outputs):
         pass
 "
