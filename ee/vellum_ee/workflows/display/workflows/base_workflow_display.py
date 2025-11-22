@@ -4,7 +4,6 @@ import fnmatch
 from functools import cached_property
 import importlib
 import inspect
-import json
 import logging
 import os
 import traceback
@@ -13,7 +12,6 @@ from typing import Any, Dict, ForwardRef, Generic, List, Optional, Set, Tuple, T
 
 from vellum.client import Vellum as VellumClient
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
-from vellum.utils.json_encoder import VellumJsonEncoder
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -1281,31 +1279,23 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                     dataset = []
                     dataset_row_index_to_id = load_dataset_row_index_to_id_mapping(module)
                     for i, inputs_obj in enumerate(dataset_attr):
-                        if isinstance(inputs_obj, DatasetRow):
-                            row_data = inputs_obj.model_dump(
-                                mode="json",
-                                by_alias=True,
-                                exclude_none=True,
-                                context={
-                                    "serializer": lambda value: serialize_value(
-                                        workflow_display.workflow_id,
-                                        workflow_display.display_context,
-                                        value,
-                                    )
-                                },
-                            )
-                            if "workflow_trigger" in row_data:
-                                row_data["workflow_trigger_id"] = row_data.pop("workflow_trigger")
-                            if row_data.get("workflow_trigger_id") is None:
-                                row_data.pop("workflow_trigger_id", None)
-                            if row_data.get("node_output_mocks") is None:
-                                row_data.pop("node_output_mocks", None)
-                            row_data.pop("id", None)
-                        elif isinstance(inputs_obj, BaseInputs):
-                            serialized_inputs = json.loads(json.dumps(inputs_obj, cls=VellumJsonEncoder))
-                            row_data = {"label": f"Scenario {i + 1}", "inputs": serialized_inputs}
-                        else:
-                            continue
+                        normalized_row = (
+                            DatasetRow(label=f"Scenario {i + 1}", inputs=inputs_obj)
+                            if isinstance(inputs_obj, BaseInputs)
+                            else inputs_obj
+                        )
+                        row_data = normalized_row.model_dump(
+                            mode="json",
+                            by_alias=True,
+                            exclude_none=True,
+                            context={
+                                "serializer": lambda value: serialize_value(
+                                    workflow_display.workflow_id,
+                                    workflow_display.display_context,
+                                    value,
+                                )
+                            },
+                        )
 
                         if i in dataset_row_index_to_id:
                             row_data["id"] = dataset_row_index_to_id[i]
