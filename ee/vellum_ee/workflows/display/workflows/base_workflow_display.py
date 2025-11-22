@@ -62,7 +62,7 @@ from vellum_ee.workflows.display.types import (
     WorkflowOutputDisplays,
 )
 from vellum_ee.workflows.display.utils.auto_layout import auto_layout_nodes
-from vellum_ee.workflows.display.utils.exceptions import UserFacingException
+from vellum_ee.workflows.display.utils.exceptions import UserFacingException, WorkflowValidationError
 from vellum_ee.workflows.display.utils.expressions import serialize_value
 from vellum_ee.workflows.display.utils.metadata import (
     get_entrypoint_edge_id,
@@ -464,6 +464,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             if display_data is not None:
                 regular_edge_dict["display_data"] = display_data
             edges.append(regular_edge_dict)
+
+        self._validate_no_self_edges(edges)
 
         nodes_list = list(serialized_nodes.values())
         nodes_dict_list = [cast(Dict[str, Any], node) for node in nodes_list if isinstance(node, dict)]
@@ -1305,6 +1307,37 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         is_optional = type(None) in reference.types
         is_required = not has_default and not is_optional
         return is_required
+
+    def _validate_no_self_edges(self, edges: JsonArray) -> None:
+        """
+        Validate that the workflow graph doesn't contain self-edges (infinite loops).
+
+        Args:
+            edges: List of edge dictionaries from the serialized workflow
+
+        Raises:
+            WorkflowValidationError: If a self-edge is detected
+        """
+        for edge in edges:
+            if not isinstance(edge, dict):
+                continue
+
+            edge_type = edge.get("type")
+            source_node_id = edge.get("source_node_id")
+            target_node_id = edge.get("target_node_id")
+
+            if edge_type == "DEFAULT" and source_node_id == target_node_id:
+                node_name = None
+                for node_class, node_display in self.display_context.node_displays.items():
+                    if str(node_display.node_id) == source_node_id:
+                        node_name = node_class.__name__
+                        break
+
+                if node_name:
+                    raise WorkflowValidationError(
+                        f"Graph contains a self-edge ({node_name} >> {node_name}).",
+                        self._workflow.__name__,
+                    )
 
     def _is_node_invalid(self, node: Type[BaseNode]) -> bool:
         """Check if a node failed to serialize and should be considered invalid."""
