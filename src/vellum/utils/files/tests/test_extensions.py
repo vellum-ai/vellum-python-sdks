@@ -1,6 +1,8 @@
 """Tests for file extension inference utilities."""
 
 import pytest
+from io import BytesIO
+from unittest.mock import patch
 
 from vellum.utils.files.extensions import ensure_filename_with_extension
 
@@ -52,3 +54,95 @@ def test_ensure_filename_with_extension(filename, mime_type, expected):
     """Test filename extension inference for various filename and MIME type combinations."""
     result = ensure_filename_with_extension(filename, mime_type)
     assert result == expected
+
+
+@patch("vellum.utils.files.extensions.magic")
+def test_ensure_filename_with_extension__with_pdf_bytes_and_octet_stream_mime(mock_magic):
+    """
+    Test that python-magic detects PDF from bytes when MIME type is application/octet-stream.
+    """
+    mock_magic.from_buffer.return_value = "application/pdf"
+
+    pdf_bytes = b"%PDF-1.4\n%\xe2\xe3\xcf\xd3\n"
+
+    result = ensure_filename_with_extension(None, "application/octet-stream", pdf_bytes)
+
+    # THEN the filename should have a .pdf extension
+    assert result == "file.pdf"
+
+
+@patch("vellum.utils.files.extensions.magic")
+def test_ensure_filename_with_extension__with_text_bytes_and_octet_stream_mime(mock_magic):
+    """
+    Test that python-magic detects text/plain from bytes when MIME type is application/octet-stream.
+    """
+    mock_magic.from_buffer.return_value = "text/plain"
+
+    text_bytes = b"Hello, this is a plain text file.\n"
+
+    result = ensure_filename_with_extension(None, "application/octet-stream", text_bytes)
+
+    # THEN the filename should have a .txt extension
+    assert result == "file.txt"
+
+
+@patch("vellum.utils.files.extensions.magic")
+def test_ensure_filename_with_extension__with_bytesio_and_octet_stream_mime(mock_magic):
+    """
+    Test that python-magic works with BytesIO objects and seeks back to original position.
+    """
+    mock_magic.from_buffer.return_value = "application/pdf"
+
+    pdf_bytes = b"%PDF-1.4\n%\xe2\xe3\xcf\xd3\n"
+    bytes_io = BytesIO(pdf_bytes)
+
+    assert bytes_io.tell() == 0
+
+    result = ensure_filename_with_extension("document", "application/octet-stream", bytes_io)
+
+    # THEN the filename should have a .pdf extension
+    assert result == "document.pdf"
+
+    assert bytes_io.tell() == 0
+
+
+def test_ensure_filename_with_extension__with_existing_extension_ignores_contents():
+    """
+    Test that existing filename extensions are preserved even when contents suggest a different type.
+    """
+    # GIVEN a filename with .txt extension
+    filename = "document.txt"
+
+    pdf_bytes = b"%PDF-1.4\n%\xe2\xe3\xcf\xd3\n"
+
+    result = ensure_filename_with_extension(filename, "application/octet-stream", pdf_bytes)
+
+    assert result == "document.txt"
+
+
+def test_ensure_filename_with_extension__with_non_octet_stream_mime_ignores_contents():
+    """
+    Test that python-magic is only used when MIME type is application/octet-stream.
+    """
+    mime_type = "image/jpeg"
+
+    pdf_bytes = b"%PDF-1.4\n%\xe2\xe3\xcf\xd3\n"
+
+    result = ensure_filename_with_extension(None, mime_type, pdf_bytes)
+
+    assert result == "file.jpg"
+
+
+@patch("vellum.utils.files.extensions.magic")
+def test_ensure_filename_with_extension__with_charset_in_detected_mime(mock_magic):
+    """
+    Test that charset parameters are stripped from python-magic detected MIME types.
+    """
+    mock_magic.from_buffer.return_value = "text/html; charset=utf-8"
+
+    html_bytes = b"<!DOCTYPE html><html><body>Hello</body></html>"
+
+    result = ensure_filename_with_extension(None, "application/octet-stream", html_bytes)
+
+    # THEN the filename should have an .html extension (charset should be stripped)
+    assert result == "file.html"
