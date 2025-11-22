@@ -7,6 +7,7 @@ import {
 } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
+import { Class } from "src/generators/extensions/class";
 import { isNilOrEmpty } from "src/utils/typing";
 
 import type { AstNode } from "@fern-api/python-ast/core/AstNode";
@@ -160,7 +161,7 @@ export abstract class BaseTrigger<
       return undefined;
     }
 
-    const displayClass = python.class_({
+    const displayClass = new Class({
       name: "Display",
       extends_: [
         python.reference({
@@ -191,7 +192,7 @@ export abstract class BaseTrigger<
   }
 
   getFileStatements(): AstNode[] {
-    const triggerClass = python.class_({
+    const triggerClass = new Class({
       name: this.className,
       extends_: [
         python.reference({

@@ -4,6 +4,7 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
 import { isNil } from "lodash";
 
 import { BaseNodeContext } from "src/context/node-context/base";
+import { Class } from "src/generators/extensions/class";
 import {
   NodeDisplayData as NodeDisplayDataType,
   WorkflowDataNode,
@@ -80,7 +81,7 @@ export class NodeDisplay extends AstNode {
       return undefined;
     }
 
-    const clazz = python.class_({
+    const clazz = new Class({
       name: "Display",
       extends_: [
         python.reference({

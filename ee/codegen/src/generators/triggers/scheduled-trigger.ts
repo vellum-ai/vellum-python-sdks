@@ -1,6 +1,7 @@
 import { python } from "@fern-api/python-ast";
 
 import { VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH } from "src/constants";
+import { Class } from "src/generators/extensions/class";
 import { BaseTrigger } from "src/generators/triggers/base-trigger";
 import { createPythonClassName, toPythonSafeSnakeCase } from "src/utils/casing";
 
@@ -40,7 +41,7 @@ export class ScheduledTrigger extends BaseTrigger<ScheduledTriggerType> {
   }
 
   private createConfigClass(): AstNode {
-    const configClass = python.class_({
+    const configClass = new Class({
       name: "Config",
       extends_: [
         python.reference({

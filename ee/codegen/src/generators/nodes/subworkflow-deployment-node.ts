@@ -7,6 +7,7 @@ import {
   NodeAttributeGenerationError,
   NodeDefinitionGenerationError,
 } from "src/generators/errors";
+import { Class } from "src/generators/extensions/class";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { codegen } from "src/index";
 import { SubworkflowNode as SubworkflowNodeType } from "src/types/vellum";
@@ -81,7 +82,7 @@ export class SubworkflowDeploymentNode extends BaseNode<
     return statements;
   }
 
-  private generateOutputsClass(): python.Class | null {
+  private generateOutputsClass(): Class | null {
     if (!this.nodeContext.workflowDeploymentRelease) {
       this.workflowContext.addError(
         new NodeAttributeGenerationError(
@@ -93,7 +94,7 @@ export class SubworkflowDeploymentNode extends BaseNode<
     }
 
     const nodeBaseClassRef = this.getNodeBaseClass();
-    const outputsClass = python.class_({
+    const outputsClass = new Class({
       name: OUTPUTS_CLASS_NAME,
       extends_: [
         python.reference({

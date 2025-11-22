@@ -17,6 +17,7 @@ import {
   BaseCodegenError,
   NodeAttributeGenerationError,
 } from "src/generators/errors";
+import { Class } from "src/generators/extensions/class";
 import { NodeDisplay } from "src/generators/node-display";
 import { NodeDisplayData } from "src/generators/node-display-data";
 import { NodeInput } from "src/generators/node-inputs/node-input";
@@ -635,7 +636,7 @@ export abstract class BaseNode<
     return undefined;
   }
 
-  public generateNodeClass(): python.Class {
+  public generateNodeClass(): Class {
     const nodeContext = this.nodeContext;
 
     let nodeBaseClass: python.Reference = this.getNodeBaseClass();
@@ -649,7 +650,7 @@ export abstract class BaseNode<
       });
     }
 
-    const nodeClass = python.class_({
+    const nodeClass = new Class({
       name: nodeContext.nodeClassName,
       extends_: [nodeBaseClass],
       docs: this.generateNodeComment(),
@@ -688,7 +689,7 @@ export abstract class BaseNode<
     return nodeClass;
   }
 
-  public generateNodeDisplayClasses(): python.Class[] {
+  public generateNodeDisplayClasses(): Class[] {
     const nodeContext = this.nodeContext;
     const decorators: python.Decorator[] = [];
     const errorOutputId = this.getErrorOutputId();
@@ -756,7 +757,7 @@ export abstract class BaseNode<
       );
     }
 
-    const nodeClass = python.class_({
+    const nodeClass = new Class({
       name: nodeContext.nodeDisplayClassName,
       extends_: [this.getNodeDisplayBaseClass()],
       decorators: decorators.length > 0 ? decorators : undefined,

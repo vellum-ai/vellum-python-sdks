@@ -3,6 +3,7 @@ import { isEqual } from "lodash";
 
 import { BasePersistedFile } from "./base-persisted-file";
 import { BaseState } from "./base-state";
+import { Class } from "./extensions/class";
 
 import * as codegen from "src/codegen";
 import { WorkflowContext } from "src/context";
@@ -16,7 +17,7 @@ export declare namespace State {
 
 export class State extends BasePersistedFile {
   public readonly baseStateClassReference: python.Reference;
-  public readonly stateClass: python.Class | undefined;
+  public readonly stateClass: Class | undefined;
 
   constructor({ workflowContext }: State.Args) {
     super({ workflowContext: workflowContext });
@@ -36,7 +37,7 @@ export class State extends BasePersistedFile {
     return [this.stateClass];
   }
 
-  private generateStateClass(): python.Class | undefined {
+  private generateStateClass(): Class | undefined {
     const stateVariableContextsById =
       this.workflowContext.stateVariableContextsById;
 
@@ -55,7 +56,7 @@ export class State extends BasePersistedFile {
       return;
     }
 
-    const stateClass = python.class_({
+    const stateClass = new Class({
       name: firstStateVariableContext.definition.name,
       extends_: [this.baseStateClassReference],
     });
