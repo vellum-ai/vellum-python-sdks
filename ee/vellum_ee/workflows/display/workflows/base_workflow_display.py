@@ -1296,6 +1296,11 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                             )
                             if "workflow_trigger" in row_data:
                                 row_data["workflow_trigger_id"] = row_data.pop("workflow_trigger")
+                            if row_data.get("workflow_trigger_id") is None:
+                                row_data.pop("workflow_trigger_id", None)
+                            if row_data.get("node_output_mocks") is None:
+                                row_data.pop("node_output_mocks", None)
+                            row_data.pop("id", None)
                         elif isinstance(inputs_obj, BaseInputs):
                             serialized_inputs = json.loads(json.dumps(inputs_obj, cls=VellumJsonEncoder))
                             row_data = {"label": f"Scenario {i + 1}", "inputs": serialized_inputs}
