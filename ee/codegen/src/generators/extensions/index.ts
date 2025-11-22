@@ -6,7 +6,10 @@
  * https://github.com/fern-api/fern/tree/main/generators/python-v2/ast
  */
 
+export * from "./class";
 export * from "./field";
 export * from "./list";
+export * from "./optional";
 export * from "./protected-python-file";
 export * from "./type";
+export * from "./union";

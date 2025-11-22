@@ -2,7 +2,7 @@ import { python } from "@fern-api/python-ast";
 import * as Vellum from "vellum-ai/api";
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
-import { PythonType } from "src/generators/extensions";
+import { PythonType, UnionType } from "src/generators/extensions";
 import { BuiltinListType } from "src/generators/extensions/list";
 import { assertUnreachable } from "src/utils/typing";
 
@@ -20,7 +20,7 @@ export function jsonSchemaToType(
   } else if (schemaType === "integer") {
     return python.Type.int();
   } else if (schemaType === "number") {
-    return python.Type.union([python.Type.float(), python.Type.int()]);
+    return python.Type.float();
   } else if (schemaType === "boolean") {
     return python.Type.bool();
   } else if (schemaType === "array") {
@@ -34,6 +34,8 @@ export function jsonSchemaToType(
     return python.Type.dict(python.Type.str(), python.Type.any());
   } else if (schemaType === "null") {
     return python.Type.none();
+  } else if ("anyOf" in schema && Array.isArray(schema.anyOf)) {
+    return new UnionType(schema.anyOf.map(jsonSchemaToType));
   }
 
   return python.Type.any();

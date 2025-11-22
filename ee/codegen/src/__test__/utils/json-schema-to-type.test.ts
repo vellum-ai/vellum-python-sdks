@@ -27,7 +27,7 @@ describe("jsonSchemaToType", () => {
     const schema = { type: "number" };
     const result = jsonSchemaToType(schema);
     result.write(writer);
-    expect(writer.toString()).toBe("Union[float, int]");
+    expect(writer.toString()).toBe("float");
   });
 
   it("should convert boolean schema to bool type", () => {
@@ -97,5 +97,12 @@ describe("jsonSchemaToType", () => {
     const result = jsonSchemaToType(schema);
     result.write(writer);
     expect(writer.toString()).toBe("Any");
+  });
+
+  it("should convert anyOf schema to Union[T1, T2, ...] type", () => {
+    const schema = { anyOf: [{ type: "string" }, { type: "integer" }] };
+    const result = jsonSchemaToType(schema);
+    result.write(writer);
+    expect(writer.toString()).toBe("Union[str, int]");
   });
 });
