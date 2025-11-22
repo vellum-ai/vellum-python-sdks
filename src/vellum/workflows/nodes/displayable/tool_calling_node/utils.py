@@ -421,8 +421,8 @@ def _create_function_call_expressions(
     current_output = tool_prompt_node.Outputs.results[ToolCallingState.current_prompt_output_index]
     # Extract arguments and function_call_id directly from the function call value
     # Using coalesce to provide safe fallbacks if the structure is unexpected
-    arguments_expr = current_output["value"]["arguments"].coalesce({})
-    function_call_id_expr = current_output["value"]["id"].coalesce(None)
+    arguments_expr: BaseDescriptor[dict] = current_output["value"]["arguments"].coalesce({})
+    function_call_id_expr: BaseDescriptor[Optional[str]] = current_output["value"]["id"].coalesce(None)
     return arguments_expr, function_call_id_expr
 
 
