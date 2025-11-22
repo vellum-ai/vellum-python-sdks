@@ -30,3 +30,12 @@ class InvalidOutputReferenceError(UserFacingException):
     """Exception raised when a node references a non-existent output."""
 
     pass
+
+
+class WorkflowValidationError(UserFacingException):
+    """Exception raised when a workflow fails validation during display serialization."""
+
+    def __init__(self, message: str, workflow_class_name: str):
+        self.message = message
+        self.workflow_class_name = workflow_class_name
+        super().__init__(f"Workflow validation error in {workflow_class_name}: {message}")
