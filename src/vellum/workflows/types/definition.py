@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 import importlib
 import inspect
 from types import FrameType
@@ -9,9 +10,11 @@ from pydantic import BeforeValidator, SerializationInfo, model_serializer
 from vellum import Vellum
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.code_resource_definition import CodeResourceDefinition as ClientCodeResourceDefinition
+from vellum.client.types.function_definition import FunctionDefinition
 from vellum.client.types.vellum_variable import VellumVariable
 from vellum.workflows.constants import AuthorizationType, VellumIntegrationProviderType
 from vellum.workflows.references.environment_variable import EnvironmentVariableReference
+from vellum.workflows.utils.vellum_variables import vellum_variable_type_to_openapi_type
 
 if TYPE_CHECKING:
     from vellum.workflows.workflows.base import BaseWorkflow
@@ -84,7 +87,28 @@ VellumCodeResourceDefinition = Annotated[
 ]
 
 
-class DeploymentDefinition(UniversalBaseModel):
+class CompilableDefinition(UniversalBaseModel, ABC):
+    """Base class for definitions that can be compiled into FunctionDefinition objects.
+
+    This class provides a common interface for different types of definitions that can
+    be compiled into Vellum FunctionDefinition objects. Subclasses must implement
+    the compile_function_definition method.
+    """
+
+    @abstractmethod
+    def compile_function_definition(self, vellum_client: Optional[Vellum] = None) -> FunctionDefinition:
+        """Compile this definition into a FunctionDefinition.
+
+        Args:
+            vellum_client: Optional Vellum client instance for API calls during compilation
+
+        Returns:
+            FunctionDefinition object representing this definition
+        """
+        pass
+
+
+class DeploymentDefinition(CompilableDefinition):
     deployment: str
     release_tag: str = "LATEST"
 
@@ -133,6 +157,53 @@ class DeploymentDefinition(UniversalBaseModel):
             "description": release.description or f"Workflow Deployment for {self.deployment}",
             "input_variables": release.workflow_version.input_variables,
         }
+
+    @staticmethod
+    def _compile_workflow_deployment_input(input_var: Any) -> dict[str, Any]:
+        """
+        Converts a deployment workflow input variable to a JSON schema type definition.
+        """
+        primitive_type = vellum_variable_type_to_openapi_type(input_var.type)
+        input_schema = {"type": primitive_type}
+
+        if input_var.default is not None:
+            input_schema["default"] = input_var.default.value
+
+        return input_schema
+
+    def compile_function_definition(self, vellum_client: Optional[Vellum] = None) -> FunctionDefinition:
+        """
+        Converts a deployment workflow config into our Vellum-native FunctionDefinition type.
+
+        Args:
+            deployment_definition: DeploymentDefinition instance
+            vellum_client: Vellum client instance
+        """
+        if vellum_client is None:
+            raise ValueError("Vellum client is required to compile a deployment definition into a function definition.")
+
+        release_info = self.get_release_info(vellum_client)
+
+        name = release_info["name"]
+        description = release_info["description"]
+        input_variables = release_info["input_variables"]
+
+        properties = {}
+        required = []
+
+        for input_var in input_variables:
+            properties[input_var.key] = self._compile_workflow_deployment_input(input_var)
+
+            if input_var.required and input_var.default is None:
+                required.append(input_var.key)
+
+        parameters = {"type": "object", "properties": properties, "required": required}
+
+        return FunctionDefinition(
+            name=name.replace("-", ""),
+            description=description,
+            parameters=parameters,
+        )
 
     @model_serializer(mode="wrap")
     def _serialize(self, handler, info: SerializationInfo):

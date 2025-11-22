@@ -12,7 +12,6 @@ from vellum.workflows.utils.functions import (
     compile_function_definition,
     compile_inline_workflow_function_definition,
     compile_vellum_integration_tool_definition,
-    compile_workflow_deployment_function_definition,
 )
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
@@ -168,7 +167,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
         elif callable(function):
             normalized_functions = compile_function_definition(function)
         elif isinstance(function, DeploymentDefinition):
-            normalized_functions = compile_workflow_deployment_function_definition(function, display_context.client)
+            normalized_functions = function.compile_function_definition(display_context.client)
         elif isinstance(function, VellumIntegrationToolDefinition):
             normalized_functions = compile_vellum_integration_tool_definition(function, display_context.client)
         else:
