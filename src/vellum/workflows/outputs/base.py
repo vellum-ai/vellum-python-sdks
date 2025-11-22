@@ -3,7 +3,7 @@ import inspect
 from typing import Any, Dict, Generic, Iterator, Set, Tuple, Type, TypeVar, Union, cast
 from typing_extensions import dataclass_transform
 
-from pydantic import GetCoreSchemaHandler
+from pydantic import GetCoreSchemaHandler, ValidationInfo
 from pydantic_core import core_schema
 
 from vellum.workflows.constants import undefined
@@ -12,7 +12,7 @@ from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.executable import BaseExecutable
 from vellum.workflows.references.output import OutputReference
-from vellum.workflows.types.generics import is_node_instance
+from vellum.workflows.types.generics import import_workflow_class, is_node_instance
 from vellum.workflows.types.utils import get_class_attr_names, infer_types
 
 _Delta = TypeVar("_Delta")
@@ -268,4 +268,35 @@ class BaseOutputs(metaclass=_BaseOutputsMeta):
     def __get_pydantic_core_schema__(
         cls, source_type: Type[Any], handler: GetCoreSchemaHandler
     ) -> core_schema.CoreSchema:
-        return core_schema.is_instance_schema(cls)
+        def validate(value: Any, info: ValidationInfo) -> Any:
+            if isinstance(value, cls):
+                return value
+
+            if not isinstance(value, dict):
+                raise TypeError(f"Value must be an instance of {cls.__name__} or a dict")
+
+            context = info.context
+            if not isinstance(context, dict):
+                raise TypeError(f"Unexpected type for context: {type(context)}")
+
+            workflow = context.get("workflow")
+            node_id = context.get("node_id")
+            base_workflow_class = import_workflow_class()
+            if (
+                not workflow
+                or not node_id
+                or not isinstance(node_id, str)
+                or not isinstance(workflow, type)
+                or not issubclass(workflow, base_workflow_class)
+            ):
+                return cls(**value)
+
+            node_class = workflow.resolve_node_ref(node_id)
+            return node_class.Outputs(**value)
+
+        return core_schema.union_schema(
+            [
+                core_schema.is_instance_schema(cls),
+                core_schema.with_info_after_validator_function(validate, core_schema.dict_schema()),
+            ]
+        )

@@ -29,6 +29,7 @@ from typing import (
 
 from pydantic import ValidationError
 
+from vellum.utils.uuid import is_valid_uuid
 from vellum.workflows.edges import Edge
 from vellum.workflows.emitters.base import BaseWorkflowEmitter
 from vellum.workflows.errors import WorkflowError, WorkflowErrorCode
@@ -612,7 +613,8 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         # https://app.shortcut.com/vellum/story/4327
         pass
 
-    def _resolve_node_ref(self, node_ref: Union[Type[BaseNode], UUID, str]) -> Type[BaseNode]:
+    @classmethod
+    def resolve_node_ref(cls, node_ref: Union[Type[BaseNode], UUID, str]) -> Type[BaseNode]:
         """
         Resolve a node reference (class, UUID, or string) to a node class.
 
@@ -630,18 +632,24 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             return node_ref
 
         candidate_nodes: List[Type[BaseNode]] = []
-        for node in self.get_all_nodes():
+        for node in cls.get_all_nodes():
             candidate_nodes.append(node)
             wrapped_node = get_unadorned_node(node)
             if wrapped_node != node:
                 candidate_nodes.append(wrapped_node)
 
         if isinstance(node_ref, UUID):
+            node_uuid = node_ref
+        elif is_valid_uuid(node_ref):
+            node_uuid = UUID(node_ref)
+        else:
+            node_uuid = None
+
+        if node_uuid:
             for node in candidate_nodes:
-                if node.__id__ == node_ref:
+                if node.__id__ == node_uuid:
                     return node
-            identifier = str(node_ref)
-            raise WorkflowInitializationException(message=f"Node '{identifier}' not found in workflow")
+            raise WorkflowInitializationException(message=f"Node '{node_uuid}' not found in workflow")
 
         if isinstance(node_ref, str):
             try:
@@ -676,7 +684,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         Raises:
             ValueError: If the node reference cannot be resolved
         """
-        resolved_node = self._resolve_node_ref(node)
+        resolved_node = self.resolve_node_ref(node)
         runner = WorkflowRunner(self)
         span_id = uuid4()
         node_instance = resolved_node(state=self.get_default_state(), context=self._context, inputs=inputs)

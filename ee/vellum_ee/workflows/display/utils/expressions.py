@@ -1,11 +1,12 @@
 from dataclasses import asdict, is_dataclass
 import inspect
 from uuid import UUID
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, cast
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Type, Union, cast, get_args
 
 from pydantic import BaseModel
 
 from vellum.client.types.logical_operator import LogicalOperator
+from vellum.utils.uuid import is_valid_uuid
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.expressions.accessor import AccessorExpression
@@ -40,6 +41,7 @@ from vellum.workflows.expressions.not_between import NotBetweenExpression
 from vellum.workflows.expressions.not_in import NotInExpression
 from vellum.workflows.expressions.or_ import OrExpression
 from vellum.workflows.expressions.parse_json import ParseJsonExpression
+from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.nodes.utils import get_unadorned_node
@@ -52,11 +54,13 @@ from vellum.workflows.references.state_value import StateValueReference
 from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.references.workflow_input import WorkflowInputReference
+from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.types.generics import is_workflow_class
 from vellum.workflows.utils.files import virtual_open
 from vellum.workflows.utils.functions import compile_function_definition
 from vellum.workflows.utils.uuids import uuid4_from_hash
+from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.utils.exceptions import (
     InvalidInputReferenceError,
     InvalidOutputReferenceError,
@@ -165,6 +169,30 @@ def _get_pydantic_model_definition(model_class: type) -> Optional[JsonObject]:
     }
 
 
+BinaryExpression = Union[
+    AddExpression,
+    AndExpression,
+    BeginsWithExpression,
+    CoalesceExpression,
+    ConcatExpression,
+    ContainsExpression,
+    DoesNotBeginWithExpression,
+    DoesNotContainExpression,
+    DoesNotEndWithExpression,
+    DoesNotEqualExpression,
+    EndsWithExpression,
+    EqualsExpression,
+    GreaterThanExpression,
+    GreaterThanOrEqualToExpression,
+    InExpression,
+    LessThanExpression,
+    LessThanOrEqualToExpression,
+    MinusExpression,
+    NotInExpression,
+    OrExpression,
+]
+
+
 def _serialize_condition(
     executable_id: UUID, display_context: "WorkflowDisplayContext", condition: BaseDescriptor
 ) -> JsonObject:
@@ -202,28 +230,7 @@ def _serialize_condition(
         }
     elif isinstance(
         condition,
-        (
-            AddExpression,
-            AndExpression,
-            BeginsWithExpression,
-            CoalesceExpression,
-            ConcatExpression,
-            ContainsExpression,
-            DoesNotBeginWithExpression,
-            DoesNotContainExpression,
-            DoesNotEndWithExpression,
-            DoesNotEqualExpression,
-            EndsWithExpression,
-            EqualsExpression,
-            GreaterThanExpression,
-            GreaterThanOrEqualToExpression,
-            InExpression,
-            LessThanExpression,
-            LessThanOrEqualToExpression,
-            MinusExpression,
-            NotInExpression,
-            OrExpression,
-        ),
+        get_args(BinaryExpression),
     ):
         lhs = serialize_value(executable_id, display_context, condition._lhs)
         rhs = serialize_value(executable_id, display_context, condition._rhs)
@@ -524,3 +531,127 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
     # If it's not any of the references we know about,
     # then try to serialize it as a nested value
     return _serialize_condition(executable_id, display_context, value)
+
+
+# This method is not yet exhaustive of all possible descriptor types. We started with the most
+# common ones needed to support node mocking.
+def base_descriptor_validator(value: dict, workflow: Type[BaseWorkflow]) -> BaseDescriptor:
+    descriptor_type = value.get("type")
+
+    if descriptor_type == "CONSTANT_VALUE":
+        return _constant_value_reference_validator(value.get("value"))
+
+    if descriptor_type == "WORKFLOW_INPUT":
+        return _workflow_input_reference_validator(value.get("input_variable_id"), workflow)
+
+    if descriptor_type == "WORKFLOW_STATE":
+        return _workflow_state_reference_validator(value.get("state_variable_id"), workflow)
+
+    if descriptor_type == "NODE_OUTPUT":
+        return _node_output_reference_validator(value.get("node_id"), value.get("node_output_id"), workflow)
+
+    if descriptor_type == "EXECUTION_COUNTER":
+        return _execution_counter_reference_validator(value.get("node_id"), workflow)
+
+    if descriptor_type == "BINARY_EXPRESSION":
+        return _binary_expression_validator(value, workflow)
+
+    raise ValueError(f"Unsupported descriptor type: {descriptor_type}")
+
+
+def _constant_value_reference_validator(constant: Any) -> ConstantValueReference:
+    if not isinstance(constant, dict):
+        raise ValueError(f"Unexpected type for constant reference: {type(constant)}")
+
+    return ConstantValueReference(constant.get("value"))
+
+
+def _workflow_input_reference_validator(workflow_input_id: Any, workflow: Type[BaseWorkflow]) -> WorkflowInputReference:
+    inputs_class = workflow.get_inputs_class()
+    if not issubclass(inputs_class, BaseInputs):
+        raise ValueError(f"Unexpected type for inputs class: {type(inputs_class)}")
+
+    input_reference = next(
+        (
+            input
+            for input in inputs_class
+            if isinstance(input, WorkflowInputReference) and str(input.id) == str(workflow_input_id)
+        ),
+        None,
+    )
+    if input_reference is None:
+        raise ValueError(f"Input reference not found: {workflow_input_id}")
+
+    return input_reference
+
+
+def _workflow_state_reference_validator(workflow_state_id: Any, workflow: Type[BaseWorkflow]) -> StateValueReference:
+    state_class = workflow.get_state_class()
+    if not issubclass(state_class, BaseState):
+        raise ValueError(f"Unexpected type for state class: {type(state_class)}")
+
+    state_reference = next((state for state in state_class if str(state.id) == str(workflow_state_id)), None)
+    if state_reference is None:
+        raise ValueError(f"State reference not found: {workflow_state_id}")
+
+    return state_reference
+
+
+def _node_output_reference_validator(
+    node_id: Any, node_output_id: Any, workflow: Type[BaseWorkflow]
+) -> OutputReference:
+    if not is_valid_uuid(node_id):
+        raise ValueError(f"Unexpected type for node id: {type(node_id)}")
+
+    if not is_valid_uuid(node_output_id):
+        raise ValueError(f"Unexpected type for node output id: {type(node_output_id)}")
+
+    node_class = workflow.resolve_node_ref(node_id)
+    if not issubclass(node_class, BaseNode):
+        raise ValueError(f"Unexpected type for node class: {type(node_class)}")
+
+    output_reference = next((output for output in node_class.Outputs if str(output.id) == str(node_output_id)), None)
+    if output_reference is None:
+        raise ValueError(f"Output reference not found: {node_output_id}")
+
+    return output_reference
+
+
+def _execution_counter_reference_validator(node_id: Any, workflow: Type[BaseWorkflow]) -> ExecutionCountReference:
+    node_class = workflow.resolve_node_ref(node_id)
+    return ExecutionCountReference(node_class)
+
+
+def _binary_expression_validator(binary_expression: dict, workflow: Type[BaseWorkflow]) -> BinaryExpression:
+    operator = binary_expression.get("operator")
+    raw_lhs = binary_expression.get("lhs")
+    if not isinstance(raw_lhs, dict):
+        raise ValueError(f"Unexpected type for lhs: {type(raw_lhs)}")
+
+    raw_rhs = binary_expression.get("rhs")
+    if not isinstance(raw_rhs, dict):
+        raise ValueError(f"Unexpected type for rhs: {type(raw_rhs)}")
+
+    lhs = base_descriptor_validator(raw_lhs, workflow)
+    rhs = base_descriptor_validator(raw_rhs, workflow)
+
+    if operator == "==":
+        return EqualsExpression(lhs=lhs, rhs=rhs)
+    elif operator == "!=":
+        return DoesNotEqualExpression(lhs=lhs, rhs=rhs)
+    elif operator == "<":
+        return LessThanExpression(lhs=lhs, rhs=rhs)
+    elif operator == ">":
+        return GreaterThanExpression(lhs=lhs, rhs=rhs)
+    elif operator == "<=":
+        return LessThanOrEqualToExpression(lhs=lhs, rhs=rhs)
+    elif operator == ">=":
+        return GreaterThanOrEqualToExpression(lhs=lhs, rhs=rhs)
+    elif operator == "contains":
+        return ContainsExpression(lhs=lhs, rhs=rhs)
+    elif operator == "beginsWith":
+        return BeginsWithExpression(lhs=lhs, rhs=rhs)
+    elif operator == "endsWith":
+        return EndsWithExpression(lhs=lhs, rhs=rhs)
+
+    raise ValueError(f"Unsupported binary expression operator: {operator}")

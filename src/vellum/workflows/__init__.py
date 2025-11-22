@@ -26,6 +26,7 @@ from .nodes import (
     WebSearchNode,
 )
 from .nodes.displayable.tool_calling_node import ToolCallingNode
+from .nodes.mocks import MockNodeExecution
 from .ports import Port
 from .references.environment_variable import EnvironmentVariableReference
 from .references.lazy import LazyReference
@@ -64,6 +65,7 @@ __all__ = [
     "MapNode",
     "MCPServer",
     "MergeBehavior",
+    "MockNodeExecution",
     "NodeException",
     "NoteNode",
     "Port",
