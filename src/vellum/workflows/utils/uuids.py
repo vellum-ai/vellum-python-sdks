@@ -3,6 +3,7 @@ from uuid import UUID
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from vellum.workflows.inputs.base import BaseInputs
     from vellum.workflows.triggers.base import BaseTrigger
 
 
@@ -57,3 +58,20 @@ def get_trigger_attribute_id(trigger_class: "type[BaseTrigger]", attribute_name:
     """
     trigger_id = trigger_class.__id__
     return uuid4_from_hash(f"{trigger_id}|{attribute_name}")
+
+
+def get_workflow_input_id(inputs_class: "type[BaseInputs]", input_name: str) -> UUID:
+    """
+    Generate a deterministic workflow input ID from an inputs class and input name
+    using the class's parent workflow ID and input name to ensure stability and uniqueness.
+
+    Args:
+        inputs_class: The inputs class containing the input
+        input_name: The name of the input
+
+    Returns:
+        A deterministic UUID based on the workflow ID and input name
+    """
+    workflow_class = inputs_class.__parent_class__
+    workflow_id = workflow_class.__id__
+    return uuid4_from_hash(f"{workflow_id}|inputs|id|{input_name}")

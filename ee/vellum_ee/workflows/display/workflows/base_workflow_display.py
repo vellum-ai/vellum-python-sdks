@@ -1008,7 +1008,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
             name = overrides.name
             color = overrides.color
         else:
-            workflow_input_id = uuid4_from_hash(f"{self.workflow_id}|inputs|id|{workflow_input.name}")
+            workflow_input_id = workflow_input.id
 
         return WorkflowInputsDisplay(id=workflow_input_id, name=name, color=color)
 
