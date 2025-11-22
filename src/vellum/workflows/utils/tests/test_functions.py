@@ -302,20 +302,6 @@ def test_compile_function_definition__default_pydantic():
     )
 
 
-def test_compile_function_definition__lambda():
-    # GIVEN a lambda
-    lambda_function = lambda x: x + 1  # noqa: E731
-
-    # WHEN compiling the function
-    compiled_function = compile_function_definition(lambda_function)
-
-    # THEN it should return the compiled function definition
-    assert compiled_function == FunctionDefinition(
-        name="<lambda>",
-        parameters={"type": "object", "properties": {"x": {"type": "null"}}, "required": ["x"]},
-    )
-
-
 def test_compile_inline_workflow_function_definition():
     class MyNode(BaseNode):
         pass

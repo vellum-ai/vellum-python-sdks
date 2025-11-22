@@ -17,7 +17,6 @@ from typing import (
 )
 
 from pydantic import BaseModel
-from pydantic_core import PydanticUndefined
 from pydash import snake_case
 
 from vellum import Vellum
@@ -58,6 +57,15 @@ for k, v in list(type_map.items()):
 
 def _get_def_name(annotation: Type) -> str:
     return f"{annotation.__module__}.{annotation.__qualname__}"
+
+
+def _strip_titles(value: Any) -> Any:
+    """Recursively remove 'title' keys from a schema dictionary."""
+    if isinstance(value, dict):
+        return {k: _strip_titles(v) for k, v in value.items() if k != "title"}
+    if isinstance(value, list):
+        return [_strip_titles(v) for v in value]
+    return value
 
 
 def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
@@ -128,20 +136,27 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
     if inspect.isclass(annotation) and issubclass(annotation, BaseModel):
         def_name = _get_def_name(annotation)
         if def_name not in defs:
-            properties = {}
-            required = []
-            for field_name, field_info in annotation.model_fields.items():
-                # field_info is a FieldInfo object which has an annotation attribute
-                properties[field_name] = compile_annotation(field_info.annotation, defs)
+            schema = annotation.model_json_schema()
+            schema = _strip_titles(schema)
 
-                if field_info.description is not None:
-                    properties[field_name]["description"] = field_info.description
+            # If the schema has nested $defs, we need to merge them into the top-level defs
+            if "$defs" in schema:
+                nested_defs = schema.pop("$defs")
+                for nested_def_name, nested_def_schema in nested_defs.items():
+                    # Use the fully qualified name for nested models
+                    nested_annotation = annotation.model_fields.get(nested_def_name)
+                    if (
+                        nested_annotation
+                        and nested_annotation.annotation
+                        and hasattr(nested_annotation.annotation, "__module__")
+                    ):
+                        qualified_name = _get_def_name(nested_annotation.annotation)
+                        defs[qualified_name] = _strip_titles(nested_def_schema)
+                    else:
+                        # Fallback to the name provided by Pydantic
+                        defs[nested_def_name] = _strip_titles(nested_def_schema)
 
-                if field_info.default is PydanticUndefined:
-                    required.append(field_name)
-                else:
-                    properties[field_name]["default"] = _compile_default_value(field_info.default)
-            defs[def_name] = {"type": "object", "properties": properties, "required": required}
+            defs[def_name] = schema
 
         return {"$ref": f"#/$defs/{def_name}"}
 
