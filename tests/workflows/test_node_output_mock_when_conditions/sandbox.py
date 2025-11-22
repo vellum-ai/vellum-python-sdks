@@ -11,7 +11,7 @@ dataset: List[Union[BaseInputs, DatasetRow]] = [
     DatasetRow(
         label="Scenario 1",
         inputs=Inputs(threshold=5),
-        node_output_mocks=[
+        mocks=[
             MockNodeExecution(
                 when_condition=(Inputs.threshold.equals(5) & ProcessNode.Execution.count.equals(0)),
                 then_outputs=ProcessNode.Outputs(result="first_execution_threshold_5"),
@@ -25,7 +25,7 @@ dataset: List[Union[BaseInputs, DatasetRow]] = [
     DatasetRow(
         label="Scenario 2",
         inputs=Inputs(threshold=10),
-        node_output_mocks=[
+        mocks=[
             MockNodeExecution(
                 when_condition=(Inputs.threshold.equals(10) & ProcessNode.Execution.count.equals(0)),
                 then_outputs=ProcessNode.Outputs(result="first_execution_threshold_10"),

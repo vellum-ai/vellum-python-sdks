@@ -157,7 +157,7 @@ def test_sandbox_runner_with_workflow_trigger(mock_logger):
 
 def test_sandbox_runner_with_node_output_mocks(mock_logger, mocker):
     """
-    Tests that WorkflowSandboxRunner passes node_output_mocks from DatasetRow to workflow.stream().
+    Tests that WorkflowSandboxRunner passes mocks from DatasetRow to workflow.stream().
     """
 
     class Inputs(BaseInputs):
@@ -175,12 +175,12 @@ def test_sandbox_runner_with_node_output_mocks(mock_logger, mocker):
 
     mock_outputs = TestNode.Outputs(result="mocked_result")
 
-    # AND a dataset with node_output_mocks
+    # AND a dataset with mocks
     dataset = [
         DatasetRow(
             label="test_with_mocks",
             inputs={"message": "test"},
-            node_output_mocks=[mock_outputs],
+            mocks=[mock_outputs],
         ),
     ]
 
@@ -189,7 +189,7 @@ def test_sandbox_runner_with_node_output_mocks(mock_logger, mocker):
     stream_mock = MagicMock(return_value=original_stream(inputs=Inputs(message="test")))
     mocker.patch.object(workflow_instance, "stream", stream_mock)
 
-    # WHEN we run the sandbox with the DatasetRow containing node_output_mocks
+    # WHEN we run the sandbox with the DatasetRow containing mocks
     runner = WorkflowSandboxRunner(workflow=workflow_instance, dataset=dataset)
     runner.run()
 

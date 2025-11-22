@@ -19,14 +19,14 @@ class DatasetRow(UniversalBaseModel):
         label: String label for the dataset row
         inputs: BaseInputs instance or dict containing the input data
         workflow_trigger_id: Optional Trigger identifying the workflow trigger class for this scenario
-        node_output_mocks: Optional sequence of node output mocks for testing scenarios
+        mocks: Optional sequence of node output mocks for testing scenarios
     """
 
     id: Optional[str] = None
     label: str
     inputs: Union[BaseInputs, Dict[str, Any]] = Field(default_factory=BaseInputs)
     workflow_trigger: Optional[Type[BaseTrigger]] = None
-    node_output_mocks: Optional[Sequence[Union[BaseOutputs, MockNodeExecution]]] = None
+    mocks: Optional[Sequence[Union[BaseOutputs, MockNodeExecution]]] = None
 
     @model_serializer(mode="wrap")
     def serialize_full_model(self, handler: Callable[[Any], Any], info: SerializationInfo) -> Dict[str, Any]:
@@ -35,8 +35,8 @@ class DatasetRow(UniversalBaseModel):
         if not isinstance(serialized, dict):
             return serialized
 
-        if "node_output_mocks" in serialized and serialized.get("node_output_mocks") is None:
-            serialized.pop("node_output_mocks")
+        if "mocks" in serialized and serialized.get("mocks") is None:
+            serialized.pop("mocks")
 
         if "workflow_trigger" in serialized:
             if serialized.get("workflow_trigger") is None:
@@ -83,26 +83,26 @@ class DatasetRow(UniversalBaseModel):
 
         return result
 
-    @field_serializer("node_output_mocks")
-    def serialize_node_output_mocks(
-        self, node_output_mocks: Optional[Sequence[Union[BaseOutputs, MockNodeExecution]]], info
+    @field_serializer("mocks")
+    def serialize_mocks(
+        self, mocks: Optional[Sequence[Union[BaseOutputs, MockNodeExecution]]], info
     ) -> Optional[List[Dict[str, Any]]]:
         """
-        Custom serializer for node_output_mocks that normalizes both BaseOutputs and MockNodeExecution
+        Custom serializer for mocks that normalizes both BaseOutputs and MockNodeExecution
         to a consistent dict format with node_id, when_condition, and then_outputs.
 
         Args:
-            node_output_mocks: Optional sequence of BaseOutputs or MockNodeExecution instances
+            mocks: Optional sequence of BaseOutputs or MockNodeExecution instances
             info: Serialization info containing context
 
         Returns:
             List of normalized mock execution dicts, or None if input is None
         """
-        if node_output_mocks is None:
+        if mocks is None:
             return None
 
         result = []
-        for mock in node_output_mocks:
+        for mock in mocks:
             if isinstance(mock, MockNodeExecution):
                 mock_exec = mock
             else:

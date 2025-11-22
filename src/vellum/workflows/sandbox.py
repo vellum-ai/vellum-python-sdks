@@ -58,7 +58,7 @@ class WorkflowSandboxRunner(Generic[WorkflowType]):
         if isinstance(selected_inputs, DatasetRow):
             raw_inputs = selected_inputs.inputs
             trigger_class = selected_inputs.workflow_trigger
-            node_output_mocks = selected_inputs.node_output_mocks
+            node_output_mocks = selected_inputs.mocks
         else:
             raw_inputs = selected_inputs
 
