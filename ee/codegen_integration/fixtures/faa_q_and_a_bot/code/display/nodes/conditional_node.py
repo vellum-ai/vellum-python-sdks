@@ -80,5 +80,9 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
         ConditionalNode.Ports.branch_4: PortDisplayOverrides(id=UUID("fec240f8-8baf-40f9-87e7-f268bff4ed94")),
     }
     display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=2084.4413934539916, y=503.21512629358983), width=480, height=283
+        position=NodeDisplayPosition(x=2084.4413934539916, y=503.21512629358983),
+        width=480,
+        height=283,
+        icon="vellum:icon:split",
+        color="corn",
     )

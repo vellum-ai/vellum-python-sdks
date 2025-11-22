@@ -27,5 +27,9 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
     }
     port_displays = {SearchNode.Ports.default: PortDisplayOverrides(id=UUID("7c8b42ff-7a21-4011-bf7b-44e06a5eb4c5"))}
     display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=1909.9521341463415, y=212.0475201437282), width=480, height=180
+        position=NodeDisplayPosition(x=1909.9521341463415, y=212.0475201437282),
+        width=480,
+        height=180,
+        icon="vellum:icon:magnifying-glass-waveform",
+        color="purple",
     )

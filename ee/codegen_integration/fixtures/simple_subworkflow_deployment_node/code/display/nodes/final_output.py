@@ -16,4 +16,10 @@ class FinalOutputDisplay(BaseFinalOutputNodeDisplay[FinalOutput]):
     output_display = {
         FinalOutput.Outputs.value: NodeOutputDisplay(id=UUID("4dc6e13e-92ba-436e-aa35-87e258f2f585"), name="value"),
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=2750, y=211.25540166204985), width=471, height=234)
+    display_data = NodeDisplayData(
+        position=NodeDisplayPosition(x=2750, y=211.25540166204985),
+        width=471,
+        height=234,
+        icon="vellum:icon:circle-stop",
+        color="teal",
+    )

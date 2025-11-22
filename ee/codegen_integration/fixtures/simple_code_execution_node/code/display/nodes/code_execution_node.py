@@ -31,5 +31,7 @@ class CodeExecutionNodeDisplay(BaseCodeExecutionNodeDisplay[CodeExecutionNode]):
         position=NodeDisplayPosition(x=1816.3157894736842, y=213.93599376731305),
         width=480,
         height=224,
+        icon="vellum:icon:rectangle-code",
+        color="lime",
         comment=NodeDisplayComment(expanded=True, value="This is my code execution node"),
     )
