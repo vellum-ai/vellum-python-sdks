@@ -2,22 +2,8 @@ import { python } from "@fern-api/python-ast";
 import * as Vellum from "vellum-ai/api";
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
+import { builtinListType } from "src/generators/extensions/list";
 import { assertUnreachable } from "src/utils/typing";
-
-/**
- * Creates a built-in list type annotation using lowercase `list[T]` instead of `List[T]` from typing.
- * This is the modern Python 3.9+ syntax that doesn't require importing from typing.
- */
-export function builtinListType(itemType: python.Type): python.Type {
-  const listRef = python.reference({
-    name: "list",
-    modulePath: [],
-    genericTypes: [itemType],
-  });
-  const listType = python.Type.reference(listRef);
-  (listType as any).inheritReferences(itemType);
-  return listType;
-}
 
 /**
  * Converts a JSON Schema to a Python type annotation.
