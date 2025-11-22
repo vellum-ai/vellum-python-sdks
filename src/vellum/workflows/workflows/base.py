@@ -272,8 +272,6 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         for resolver in self.resolvers:
             resolver.register_workflow_instance(self)
 
-        self.validate()
-
     @property
     def context(self) -> WorkflowContext:
         return self._context
@@ -605,13 +603,13 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
 
         return WorkflowEventGenerator(_generate_filtered_events(), runner_stream.span_id)
 
-    def validate(self) -> None:
+    @classmethod
+    def validate(cls) -> None:
         """
         Validates the Workflow, by running through our list of linter rules.
         """
-        # TODO: Implement rule that all entrypoints are non empty
-        # https://app.shortcut.com/vellum/story/4327
-        pass
+
+        cls._validate_no_self_edges()
 
     @classmethod
     def resolve_node_ref(cls, node_ref: Union[Type[BaseNode], UUID, str]) -> Type[BaseNode]:
@@ -912,6 +910,35 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
 
         for emitter in self.emitters:
             emitter.join()
+
+    @classmethod
+    def _validate_no_self_edges(cls) -> None:
+        """
+        Validate that the workflow graph doesn't contain unconditional self-edges (infinite loops).
+
+        A node is considered to have an unconditional self-edge if all of its ports target itself.
+
+        Args:
+            edges: List of edge dictionaries from the serialized workflow
+
+        Raises:
+            WorkflowInitializationException: If an unconditional self-edge is detected
+        """
+
+        for node in cls.get_all_nodes():
+            node_ports = [list(port.edges) for port in node.Ports]
+            if (
+                all(
+                    all(edge.to_node == node for edge in port_edges) and len(port_edges) > 0
+                    for port_edges in node_ports
+                )
+                and len(node_ports) > 0
+            ):
+                raise WorkflowInitializationException(
+                    message=f"Graph contains a self-edge ({node.__name__} >> {node.__name__}).",
+                    workflow_definition=cls,
+                    code=WorkflowErrorCode.INVALID_WORKFLOW,
+                )
 
 
 WorkflowExecutionInitiatedBody.model_rebuild()

@@ -18,6 +18,7 @@ from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.edges import Edge
 from vellum.workflows.edges.trigger_edge import TriggerEdge
 from vellum.workflows.events.workflow import NodeEventDisplayContext, WorkflowEventDisplayContext
+from vellum.workflows.exceptions import WorkflowInitializationException
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.inputs.dataset_row import DatasetRow
 from vellum.workflows.nodes.bases import BaseNode
@@ -62,7 +63,7 @@ from vellum_ee.workflows.display.types import (
     WorkflowOutputDisplays,
 )
 from vellum_ee.workflows.display.utils.auto_layout import auto_layout_nodes
-from vellum_ee.workflows.display.utils.exceptions import UserFacingException
+from vellum_ee.workflows.display.utils.exceptions import UserFacingException, WorkflowValidationError
 from vellum_ee.workflows.display.utils.expressions import serialize_value
 from vellum_ee.workflows.display.utils.metadata import (
     get_entrypoint_edge_id,
@@ -141,6 +142,13 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
         self._dry_run = dry_run
 
     def serialize(self) -> JsonObject:
+        try:
+            self._workflow.validate()
+        except WorkflowInitializationException as e:
+            self.display_context.add_error(
+                WorkflowValidationError(message=e.message, workflow_class_name=self._workflow.__name__)
+            )
+
         self._serialized_files = [
             "__init__.py",
             "display/*",
