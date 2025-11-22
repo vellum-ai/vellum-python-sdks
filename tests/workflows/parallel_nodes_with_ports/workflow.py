@@ -109,19 +109,17 @@ class ParallelNodesWithPorts(BaseWorkflow[Inputs, BaseState]):
     Workflow demonstrating {A, B} >> {C, D} pattern.
 
     Graph structure:
-        ({NodeA, NodeB} >> NodeC) >> {
+        {NodeA, NodeB} >> {
             NodeC.Ports.path_one >> NodeD,
             NodeC.Ports.path_two >> NodeE
         } >> FinalNode
 
-    Note: The pattern {A, B} >> {C.Ports.x >> D, ...} is rewritten as
-    ({A, B} >> C) >> {C.Ports.x >> D, ...} because Python's set >> set
-    operator is not supported. This creates a graph first, then fans out
-    via ports.
+    This pattern uses set >> set which may cause runtime errors in Python
+    due to the >> operator not being supported between two sets.
     """
 
     graph = (
-        ({NodeA, NodeB} >> NodeC)
+        {NodeA, NodeB}
         >> {
             NodeC.Ports.path_one >> NodeD,
             NodeC.Ports.path_two >> NodeE,
