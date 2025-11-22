@@ -234,9 +234,10 @@ class RawDocumentsClient:
         self,
         *,
         label: str,
-        contents: core.File,
         add_to_index_names: typing.Optional[typing.List[str]] = OMIT,
         external_id: typing.Optional[str] = OMIT,
+        contents: typing.Optional[core.File] = OMIT,
+        url: typing.Optional[str] = OMIT,
         keywords: typing.Optional[typing.List[str]] = OMIT,
         metadata: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -251,14 +252,17 @@ class RawDocumentsClient:
         label : str
             A human-friendly name for this document. Typically the filename.
 
-        contents : core.File
-            See core.File for more documentation
-
         add_to_index_names : typing.Optional[typing.List[str]]
             Optionally include the names of all indexes that you'd like this document to be included in
 
         external_id : typing.Optional[str]
             Optionally include an external ID for this document. This is useful if you want to re-upload the same document later when its contents change and would like it to be re-indexed.
+
+        contents : typing.Optional[core.File]
+            See core.File for more documentation
+
+        url : typing.Optional[str]
+            A URL from which the document can be downloaded. Either contents or url must be provided.
 
         keywords : typing.Optional[typing.List[str]]
             Optionally include a list of keywords that'll be associated with this document. Used when performing keyword searches.
@@ -282,11 +286,12 @@ class RawDocumentsClient:
                 "add_to_index_names": add_to_index_names,
                 "external_id": external_id,
                 "label": label,
+                "url": url,
                 "keywords": keywords,
                 "metadata": metadata,
             },
             files={
-                "contents": contents,
+                **({"contents": contents} if contents is not None else {}),
             },
             request_options=request_options,
             omit=OMIT,
@@ -555,9 +560,10 @@ class AsyncRawDocumentsClient:
         self,
         *,
         label: str,
-        contents: core.File,
         add_to_index_names: typing.Optional[typing.List[str]] = OMIT,
         external_id: typing.Optional[str] = OMIT,
+        contents: typing.Optional[core.File] = OMIT,
+        url: typing.Optional[str] = OMIT,
         keywords: typing.Optional[typing.List[str]] = OMIT,
         metadata: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -572,14 +578,17 @@ class AsyncRawDocumentsClient:
         label : str
             A human-friendly name for this document. Typically the filename.
 
-        contents : core.File
-            See core.File for more documentation
-
         add_to_index_names : typing.Optional[typing.List[str]]
             Optionally include the names of all indexes that you'd like this document to be included in
 
         external_id : typing.Optional[str]
             Optionally include an external ID for this document. This is useful if you want to re-upload the same document later when its contents change and would like it to be re-indexed.
+
+        contents : typing.Optional[core.File]
+            See core.File for more documentation
+
+        url : typing.Optional[str]
+            A URL from which the document can be downloaded. Either contents or url must be provided.
 
         keywords : typing.Optional[typing.List[str]]
             Optionally include a list of keywords that'll be associated with this document. Used when performing keyword searches.
@@ -603,11 +612,12 @@ class AsyncRawDocumentsClient:
                 "add_to_index_names": add_to_index_names,
                 "external_id": external_id,
                 "label": label,
+                "url": url,
                 "keywords": keywords,
                 "metadata": metadata,
             },
             files={
-                "contents": contents,
+                **({"contents": contents} if contents is not None else {}),
             },
             request_options=request_options,
             omit=OMIT,

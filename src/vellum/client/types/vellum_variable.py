@@ -5,7 +5,9 @@ from __future__ import annotations
 import typing
 
 import pydantic
+import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel, update_forward_refs
+from ..core.serialization import FieldMetadata
 from .vellum_variable_extensions import VellumVariableExtensions
 from .vellum_variable_type import VellumVariableType
 
@@ -17,6 +19,9 @@ class VellumVariable(UniversalBaseModel):
     required: typing.Optional[bool] = None
     default: typing.Optional["VellumValue"] = None
     extensions: typing.Optional[VellumVariableExtensions] = None
+    schema_: typing_extensions.Annotated[
+        typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]], FieldMetadata(alias="schema")
+    ] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
