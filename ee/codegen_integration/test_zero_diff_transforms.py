@@ -119,10 +119,7 @@ def test_zero_diff_transforms(module_name: str):
         )
         assert result.returncode == 0, f"Codegen failed: {result.stderr}"
 
-        # Find the generated module root by locating workflow.py
-        workflow_files = list(output_dir.rglob("workflow.py"))
-        assert len(workflow_files) == 1, f"Expected exactly one workflow.py, found {workflow_files}"
-        generated_root = workflow_files[0].parent
+        generated_root = output_dir / module_name
 
         original_only, generated_only, modified_diffs = _compute_diff(
             original_root=original_root,
@@ -136,9 +133,12 @@ def test_zero_diff_transforms(module_name: str):
         else:
             diff_text = ""
 
+        if result.stdout:
+            diff_text += f"\nCodegen output:\n{result.stdout}"
+
     # THEN there should be no differences between original and generated files
     assert not original_only and not generated_only and not modified_paths, (
-        "Expected zero diff between original and generated workflow files, but found:\n"
+        f"Expected zero diff for test workflow '{module_name}' between original and generated files, but found:\n"
         f"original_only={original_only}\n"
         f"generated_only={generated_only}\n"
         f"modified={modified_paths}\n"
