@@ -13,8 +13,9 @@ function parseArgs(argv: string[]): CliArgs {
   const args: Record<string, string> = {};
   for (let i = 0; i < argv.length; i++) {
     const key = argv[i];
-    const value = argv[i + 1];
+    if (!key) continue;
     if (!key.startsWith("--")) continue;
+    const value = argv[i + 1];
     if (!value || value.startsWith("--")) {
       throw new Error(`Missing value for ${key}`);
     }
