@@ -1,6 +1,6 @@
-from typing import Any, Dict, List, Optional, Sequence, Type, Union
+from typing import Any, Callable, Dict, List, Optional, Sequence, Type, Union
 
-from pydantic import Field, field_serializer
+from pydantic import Field, SerializationInfo, field_serializer, model_serializer
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.inputs.base import BaseInputs
@@ -28,6 +28,40 @@ class DatasetRow(UniversalBaseModel):
     workflow_trigger: Optional[Type[BaseTrigger]] = None
     node_output_mocks: Optional[Sequence[Union[BaseOutputs, MockNodeExecution]]] = None
 
+    @model_serializer(mode="wrap")
+    def serialize_full_model(self, handler: Callable[[Any], Any], info: SerializationInfo) -> Dict[str, Any]:
+        """Serialize the model and add node_id field computed from then_outputs."""
+        serialized = handler(self)
+        if not isinstance(serialized, dict):
+            return serialized
+
+        if "node_output_mocks" in serialized and serialized.get("node_output_mocks") is None:
+            serialized.pop("node_output_mocks")
+
+        if "workflow_trigger" in serialized:
+            if serialized.get("workflow_trigger") is None:
+                serialized.pop("workflow_trigger")
+            else:
+                serialized["workflow_trigger_id"] = serialized.pop("workflow_trigger")
+
+        if "id" in serialized and serialized.get("id") is None:
+            serialized.pop("id")
+
+        return serialized
+
+    @field_serializer("workflow_trigger")
+    def serialize_workflow_trigger(self, workflow_trigger: Optional[Type[BaseTrigger]]) -> Optional[str]:
+        """
+        Custom serializer for workflow_trigger that converts it to a string ID.
+
+        Args:
+            workflow_trigger: Optional workflow trigger class
+
+        Returns:
+            String representation of the trigger ID, or None if no trigger
+        """
+        return str(workflow_trigger.__id__) if workflow_trigger is not None else None
+
     @field_serializer("inputs")
     def serialize_inputs(self, inputs: Union[BaseInputs, Dict[str, Any]]) -> Dict[str, Any]:
         """
@@ -51,7 +85,7 @@ class DatasetRow(UniversalBaseModel):
 
     @field_serializer("node_output_mocks")
     def serialize_node_output_mocks(
-        self, node_output_mocks: Optional[Sequence[Union[BaseOutputs, MockNodeExecution]]]
+        self, node_output_mocks: Optional[Sequence[Union[BaseOutputs, MockNodeExecution]]], info
     ) -> Optional[List[Dict[str, Any]]]:
         """
         Custom serializer for node_output_mocks that normalizes both BaseOutputs and MockNodeExecution
@@ -59,6 +93,7 @@ class DatasetRow(UniversalBaseModel):
 
         Args:
             node_output_mocks: Optional sequence of BaseOutputs or MockNodeExecution instances
+            info: Serialization info containing context
 
         Returns:
             List of normalized mock execution dicts, or None if input is None
@@ -76,6 +111,6 @@ class DatasetRow(UniversalBaseModel):
                     then_outputs=mock,
                 )
 
-            result.append(mock_exec.model_dump())
+            result.append(mock_exec.model_dump(context=info.context))
 
         return result
