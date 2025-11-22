@@ -3,6 +3,7 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { FinalOutputNodeContext } from "src/context/node-context/final-output-node";
+import { PythonType } from "src/generators/extensions";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { FinalOutputNode as FinalOutputNodeType } from "src/types/vellum";
@@ -19,7 +20,7 @@ export class FinalOutputNode extends BaseNode<
   protected getNodeBaseGenericTypes(): AstNode[] {
     const stateType = this.getStateTypeOrBaseState();
 
-    let primitiveOutputType: python.Type;
+    let primitiveOutputType: python.Type | PythonType;
     const valueOutput = this.nodeData.outputs?.find(
       (output) => output.name === "value"
     );

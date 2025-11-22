@@ -1,8 +1,8 @@
 import { python } from "@fern-api/python-ast";
-import { AstNode } from "@fern-api/python-ast/python";
 import * as Vellum from "vellum-ai/api";
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
+import { PythonType } from "src/generators/extensions";
 import { BuiltinListType } from "src/generators/extensions/list";
 import { assertUnreachable } from "src/utils/typing";
 
@@ -10,7 +10,9 @@ import { assertUnreachable } from "src/utils/typing";
  * Converts a JSON Schema to a Python type annotation.
  * Currently supports basic types: string, number, integer, boolean, array, object, null.
  */
-export function jsonSchemaToType(schema: Record<string, unknown>): AstNode {
+export function jsonSchemaToType(
+  schema: Record<string, unknown>
+): python.Type | PythonType {
   const schemaType = schema.type;
 
   if (schemaType === "string") {
@@ -39,7 +41,7 @@ export function jsonSchemaToType(schema: Record<string, unknown>): AstNode {
 
 export function getVellumVariablePrimitiveType(
   vellumVariableType: Vellum.VellumVariableType
-): AstNode {
+): python.Type | PythonType {
   switch (vellumVariableType) {
     case "STRING":
       return python.Type.str();

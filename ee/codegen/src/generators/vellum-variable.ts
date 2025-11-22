@@ -1,9 +1,11 @@
 import { python } from "@fern-api/python-ast";
-import { Type } from "@fern-api/python-ast/Type";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { Writer } from "@fern-api/python-ast/core/Writer";
 import { isNil } from "lodash";
 import { VellumValue as VellumValueType } from "vellum-ai/api/types";
+
+import { Field } from "./extensions";
+import { OptionalType } from "./extensions/optional";
 
 import { VellumValue } from "src/generators/vellum-variable-value";
 import { getVellumVariablePrimitiveType } from "src/utils/vellum-variables";
@@ -30,7 +32,7 @@ export declare namespace VellumVariable {
 }
 
 export class VellumVariable extends AstNode {
-  private readonly field: python.Field;
+  private readonly field: python.Field | Field;
   private readonly defaultRequired?: boolean;
 
   constructor({ variable, defaultRequired }: VellumVariable.Args) {
@@ -49,15 +51,15 @@ export class VellumVariable extends AstNode {
       (variable.required === false ||
         (variable.required === undefined && defaultRequired === false))
     ) {
-      this.field = python.field({
+      this.field = new Field({
         name,
-        type: Type.optional(baseType),
+        type: new OptionalType(baseType),
         initializer: variable.default
           ? this.generateInitializerIfDefault(variable)
           : python.TypeInstantiation.none(),
       });
     } else {
-      this.field = python.field({
+      this.field = new Field({
         name,
         type: baseType,
         initializer: variable.default
