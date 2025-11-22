@@ -22,7 +22,7 @@ def test_serialize_workflow():
     state_variables = serialized_workflow["state_variables"]
     assert state_variables == [
         {
-            "id": "b5295650-be21-47a9-9ed7-e5a3bcdd9d9e",
+            "id": "948a902d-248d-4b00-8bf4-cdd202302f20",
             "key": "chat_history",
             "type": "CHAT_HISTORY",
             "default": {"type": "CHAT_HISTORY", "value": []},
@@ -30,7 +30,7 @@ def test_serialize_workflow():
             "extensions": {"color": None},
         },
         {
-            "id": "4bcfab50-c1c9-4efc-a033-6ed8ad377ada",
+            "id": "396a06f5-21da-4769-831a-d4fd613029ae",
             "key": "counter",
             "type": "NUMBER",
             "default": {"type": "NUMBER", "value": 0.0},
@@ -62,7 +62,7 @@ def test_serialize_workflow():
                     "key": "chat_history",
                     "value": {
                         "type": "BINARY_EXPRESSION",
-                        "lhs": {"type": "WORKFLOW_STATE", "state_variable_id": "b5295650-be21-47a9-9ed7-e5a3bcdd9d9e"},
+                        "lhs": {"type": "WORKFLOW_STATE", "state_variable_id": "948a902d-248d-4b00-8bf4-cdd202302f20"},
                         "operator": "concat",
                         "rhs": {
                             "type": "NODE_OUTPUT",
@@ -76,7 +76,7 @@ def test_serialize_workflow():
                     "key": "counter",
                     "value": {
                         "type": "BINARY_EXPRESSION",
-                        "lhs": {"type": "WORKFLOW_STATE", "state_variable_id": "4bcfab50-c1c9-4efc-a033-6ed8ad377ada"},
+                        "lhs": {"type": "WORKFLOW_STATE", "state_variable_id": "396a06f5-21da-4769-831a-d4fd613029ae"},
                         "operator": "+",
                         "rhs": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 1.0}},
                     },

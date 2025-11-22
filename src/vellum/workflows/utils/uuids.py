@@ -90,4 +90,4 @@ def get_state_value_id(state_class: "type[BaseState]", state_value_name: str) ->
     Returns:
         A deterministic UUID based on the state class module, qualname, and state value name
     """
-    return uuid4_from_hash(f"{state_class.__module__}|{state_class.__qualname__}|state_values|id|{state_value_name}")
+    return uuid4_from_hash(f"{state_class.__module__}.{state_class.__qualname__}|state_values|id|{state_value_name}")

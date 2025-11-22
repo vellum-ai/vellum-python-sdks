@@ -43,7 +43,7 @@ def test_serialize_workflow():
     assert not DeepDiff(
         [
             {
-                "id": "dcd0f094-e30e-435f-b89e-574f0ac547cd",
+                "id": "829a8335-d425-414e-9c0b-62e820156df5",
                 "key": "example",
                 "type": "NUMBER",
                 "default": {"type": "NUMBER", "value": 5.0},

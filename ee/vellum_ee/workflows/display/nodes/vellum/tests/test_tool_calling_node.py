@@ -328,7 +328,7 @@ def test_serialize_tool_router_node():
                     "lhs": {
                         "lhs": {
                             "lhs": {
-                                "state_variable_id": "c28700ba-ae70-4c20-900b-7076f2417a38",
+                                "state_variable_id": "30a4672a-96dc-471a-878c-90e0f1f7f043",
                                 "type": "WORKFLOW_STATE",
                             },
                             "operator": "<",
@@ -354,7 +354,7 @@ def test_serialize_tool_router_node():
                                     },
                                     "operator": "accessField",
                                     "rhs": {
-                                        "state_variable_id": "c28700ba-ae70-4c20-900b-7076f2417a38",
+                                        "state_variable_id": "30a4672a-96dc-471a-878c-90e0f1f7f043",
                                         "type": "WORKFLOW_STATE",
                                     },
                                     "type": "BINARY_EXPRESSION",
@@ -381,7 +381,7 @@ def test_serialize_tool_router_node():
                                     },
                                     "operator": "accessField",
                                     "rhs": {
-                                        "state_variable_id": "c28700ba-ae70-4c20-900b-7076f2417a38",
+                                        "state_variable_id": "30a4672a-96dc-471a-878c-90e0f1f7f043",
                                         "type": "WORKFLOW_STATE",
                                     },
                                     "type": "BINARY_EXPRESSION",
@@ -671,7 +671,7 @@ def test_serialize_tool_prompt_node_with_inline_workflow():
                         "operator": "concat",
                         "rhs": {
                             "type": "WORKFLOW_STATE",
-                            "state_variable_id": "33b260cf-e681-4665-97df-c7d27350911b",
+                            "state_variable_id": "c1d692a7-3d87-4283-8d9c-daee82c61854",
                         },
                     },
                 }
