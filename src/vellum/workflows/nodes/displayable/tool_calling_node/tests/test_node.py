@@ -210,6 +210,12 @@ def test_tool_calling_node_inline_workflow_context():
     )
     function_node._context = parent_context
 
+    # AND the _inputs should be populated with resolved values from state
+    assert function_node._inputs == {
+        function_node_class.arguments: {},
+        function_node_class.function_call_id: "call_test",
+    }
+
     # WHEN the function node runs
     outputs = list(function_node.run())
 
