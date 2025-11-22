@@ -183,14 +183,38 @@ def test_tool_calling_node_inline_workflow_context():
         tool_prompt_node=tool_prompt_node,
     )
 
+    # AND we create a state with a function call
+    state = ToolCallingState(
+        meta=StateMeta(
+            node_outputs={
+                tool_prompt_node.Outputs.results: [
+                    FunctionCallVellumValue(
+                        value=FunctionCall(
+                            arguments={},
+                            id="call_test",
+                            name="MyWorkflow",
+                            state="FULFILLED",
+                        ),
+                    )
+                ],
+            },
+        )
+    )
+
     # AND we create an instance with a context containing generated_files
-    function_node = function_node_class()
+    function_node = function_node_class(state=state)
 
     # Create a parent context with test data
     parent_context = WorkflowContext(
         generated_files={"script.py": "print('hello world')"},
     )
     function_node._context = parent_context
+
+    # AND the _inputs should be populated with resolved values from state
+    assert function_node._inputs == {
+        function_node_class.arguments: {},
+        function_node_class.function_call_id: "call_test",
+    }
 
     # WHEN the function node runs
     outputs = list(function_node.run())
