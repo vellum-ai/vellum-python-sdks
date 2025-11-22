@@ -887,6 +887,12 @@ type WorkflowSandboxInput =
   | ImageInputRequest
   | DocumentInputRequest;
 export type WorkflowSandboxInputs = WorkflowSandboxInput[];
+export interface WorkflowSandboxDatasetRowMock {
+  node_id: string;
+  when_condition?: Record<string, unknown>;
+  then_outputs: Record<string, unknown>;
+}
+
 export type WorkflowSandboxDatasetRow =
   | WorkflowSandboxInputs
   | {
@@ -894,8 +900,14 @@ export type WorkflowSandboxDatasetRow =
       label: string;
       inputs: WorkflowSandboxInputs;
       workflow_trigger_id?: string;
+      mocks?: WorkflowSandboxDatasetRowMock[];
     }
-  | { id?: string; label: string; workflow_trigger_id?: string };
+  | {
+      id?: string;
+      label: string;
+      workflow_trigger_id?: string;
+      mocks?: WorkflowSandboxDatasetRowMock[];
+    };
 
 export interface UnaryWorkflowExpression {
   type: "UNARY_EXPRESSION";

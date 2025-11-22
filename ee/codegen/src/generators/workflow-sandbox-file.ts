@@ -102,6 +102,11 @@ if __name__ == "__main__":
     const workflowTriggerId: string | undefined = Array.isArray(row)
       ? undefined
       : row.workflow_trigger_id;
+    const mocks = Array.isArray(row)
+      ? undefined
+      : "mocks" in row
+      ? row.mocks
+      : undefined;
 
     const hasInputs = inputs.length > 0;
     const arguments_: python.MethodArgument[] = [
@@ -164,6 +169,20 @@ if __name__ == "__main__":
       }
     }
 
+    if (!isNil(mocks) && mocks.length > 0) {
+      const mocksArray = python.TypeInstantiation.list(
+        mocks.map((mock) => this.getMockDict(mock)),
+        { endWithComma: true }
+      );
+
+      arguments_.push(
+        python.methodArgument({
+          name: "mocks",
+          value: mocksArray,
+        })
+      );
+    }
+
     return python.instantiateClass({
       classReference: python.reference({
         name: "DatasetRow",
@@ -171,6 +190,62 @@ if __name__ == "__main__":
       }),
       arguments_,
     });
+  }
+
+  private getMockDict(
+    mock: import("src/types/vellum").WorkflowSandboxDatasetRowMock
+  ): python.AstNode {
+    const entries: Array<{ key: python.AstNode; value: python.AstNode }> = [];
+
+    // Add node_id
+    entries.push({
+      key: python.TypeInstantiation.str("node_id"),
+      value: python.TypeInstantiation.str(mock.node_id),
+    });
+
+    // Add when_condition if present
+    if (!isNil(mock.when_condition)) {
+      entries.push({
+        key: python.TypeInstantiation.str("when_condition"),
+        value: this.jsonToPython(mock.when_condition),
+      });
+    }
+
+    // Add then_outputs
+    entries.push({
+      key: python.TypeInstantiation.str("then_outputs"),
+      value: this.jsonToPython(mock.then_outputs),
+    });
+
+    return python.TypeInstantiation.dict(entries);
+  }
+
+  private jsonToPython(value: unknown): python.AstNode {
+    if (value === null || value === undefined) {
+      return python.codeBlock("None");
+    }
+    if (typeof value === "boolean") {
+      return python.codeBlock(value ? "True" : "False");
+    }
+    if (typeof value === "number") {
+      return python.codeBlock(String(value));
+    }
+    if (typeof value === "string") {
+      return python.TypeInstantiation.str(value);
+    }
+    if (Array.isArray(value)) {
+      return python.TypeInstantiation.list(
+        value.map((item) => this.jsonToPython(item))
+      );
+    }
+    if (typeof value === "object") {
+      const entries = Object.entries(value).map(([key, val]) => ({
+        key: python.TypeInstantiation.str(key),
+        value: this.jsonToPython(val),
+      }));
+      return python.TypeInstantiation.dict(entries);
+    }
+    return python.codeBlock("None");
   }
 
   private getTriggerReference(
