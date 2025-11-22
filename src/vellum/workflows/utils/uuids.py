@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from vellum.workflows.inputs.base import BaseInputs
+    from vellum.workflows.state.base import BaseState
     from vellum.workflows.triggers.base import BaseTrigger
 
 
@@ -75,3 +76,18 @@ def get_workflow_input_id(inputs_class: "type[BaseInputs]", input_name: str) -> 
     workflow_class = inputs_class.__parent_class__
     workflow_id = workflow_class.__id__
     return uuid4_from_hash(f"{workflow_id}|inputs|id|{input_name}")
+
+
+def get_state_value_id(state_class: "type[BaseState]", state_value_name: str) -> UUID:
+    """
+    Generate a deterministic state value ID from a state class and state value name
+    using the class's module name, qualname, and state value name to ensure stability and uniqueness.
+
+    Args:
+        state_class: The state class containing the state value
+        state_value_name: The name of the state value
+
+    Returns:
+        A deterministic UUID based on the state class module, qualname, and state value name
+    """
+    return uuid4_from_hash(f"{state_class.__module__}.{state_class.__qualname__}|state_values|id|{state_value_name}")
