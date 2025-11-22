@@ -138,7 +138,9 @@
             "y": 288.95993689582167
           },
           "width": 480,
-          "height": 126
+          "height": 126,
+          "icon": "vellum:icon:text-size",
+          "color": "navy"
         },
         "outputs": [
           {
@@ -332,7 +334,9 @@
             "y": 208.9757993384785
           },
           "width": 474,
-          "height": 234
+          "height": 234,
+          "icon": "vellum:icon:circle-stop",
+          "color": "teal"
         },
         "outputs": [
           {
@@ -344,7 +348,9 @@
               "node_id": "7e09927b-6d6f-4829-92c9-54e66bdcaf80",
               "node_output_id": "2d4f1826-de75-499a-8f84-0a690c8136ad"
             },
-            "schema": {"type": "string"}
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "trigger": {

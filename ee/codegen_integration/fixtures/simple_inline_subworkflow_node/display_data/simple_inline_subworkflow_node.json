@@ -202,7 +202,9 @@
                     "y": 240.84267524293904
                   },
                   "width": 480,
-                  "height": 179
+                  "height": 179,
+                  "icon": "vellum:icon:magnifying-glass-waveform",
+                  "color": "purple"
                 },
                 "base": {
                   "name": "SearchNode",
@@ -275,7 +277,9 @@
                     "y": 208.7778595317725
                   },
                   "width": 456,
-                  "height": 233
+                  "height": 233,
+                  "icon": "vellum:icon:circle-stop",
+                  "color": "teal"
                 },
                 "base": {
                   "name": "FinalOutputNode",
@@ -316,7 +320,9 @@
                       "node_id": "e413adc6-40f8-4772-8b28-769954d68d26",
                       "node_output_id": "240f117b-f47f-4cdf-8c1d-b5fba7f71310"
                     },
-                    "schema": {"type": "string"}
+                    "schema": {
+                      "type": "string"
+                    }
                   }
                 ]
               }
@@ -459,7 +465,9 @@
             "y": 210
           },
           "width": 480,
-          "height": 233
+          "height": 233,
+          "icon": "vellum:icon:circle-stop",
+          "color": "teal"
         },
         "base": {
           "name": "FinalOutputNode",
@@ -498,7 +506,9 @@
               "node_id": "8c6d5fe5-e955-4598-9c35-0cd6f5eca47e",
               "node_output_id": "6ab3665f-881d-488b-9124-a6da40136c68"
             },
-            "schema": {"type": "string"}
+            "schema": {
+              "type": "string"
+            }
           }
         ]
       }

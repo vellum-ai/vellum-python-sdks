@@ -67,7 +67,9 @@
           "position": {
             "x": 200.0,
             "y": -50.0
-          }
+          },
+          "icon": "vellum:icon:stamp",
+          "color": "brown"
         },
         "base": {
           "name": "TemplatingNode",
@@ -181,7 +183,9 @@
           "position": {
             "x": 400.0,
             "y": -50.0
-          }
+          },
+          "icon": "vellum:icon:split",
+          "color": "corn"
         },
         "base": {
           "name": "ConditionalNode",
@@ -272,7 +276,9 @@
           "position": {
             "x": 600.0,
             "y": -50.0
-          }
+          },
+          "icon": "vellum:icon:circle-stop",
+          "color": "teal"
         },
         "base": {
           "name": "FinalOutputNode",
@@ -311,7 +317,9 @@
               "node_id": "a1705ad6-8be3-4abe-bb2d-38d945a18209",
               "node_output_id": "7faddd64-2e1d-4e76-b3b8-3b3cde1c1f95"
             },
-            "schema": {"type": "string"}
+            "schema": {
+              "type": "string"
+            }
           }
         ]
       }

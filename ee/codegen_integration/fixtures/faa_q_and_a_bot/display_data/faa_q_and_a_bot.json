@@ -71,7 +71,9 @@
             "y": 237.3190436953056
           },
           "width": 480,
-          "height": 221
+          "height": 221,
+          "icon": "vellum:icon:stamp",
+          "color": "brown"
         },
         "base": {
           "name": "TemplatingNode",
@@ -151,7 +153,9 @@
                   "name": "Classification",
                   "schema": {
                     "type": "object",
-                    "required": ["classification"],
+                    "required": [
+                      "classification"
+                    ],
                     "properties": {
                       "classification": {
                         "type": "string",
@@ -240,7 +244,9 @@
             "y": 545.562737655267
           },
           "width": 480,
-          "height": 168
+          "height": 168,
+          "icon": "vellum:icon:text-size",
+          "color": "navy"
         },
         "trigger": {
           "id": "b14f0322-965d-43c9-96d4-7bce9fd87067",
@@ -367,7 +373,9 @@
                       "name": "Classification",
                       "schema": {
                         "type": "object",
-                        "required": ["classification"],
+                        "required": [
+                          "classification"
+                        ],
                         "properties": {
                           "classification": {
                             "type": "string",
@@ -484,7 +492,9 @@
             "y": 540.5
           },
           "width": 480,
-          "height": 221
+          "height": 221,
+          "icon": "vellum:icon:stamp",
+          "color": "brown"
         },
         "base": {
           "name": "TemplatingNode",
@@ -712,7 +722,9 @@
             "y": 503.21512629358983
           },
           "width": 480,
-          "height": 283
+          "height": 283,
+          "icon": "vellum:icon:split",
+          "color": "corn"
         },
         "base": {
           "name": "ConditionalNode",
@@ -970,7 +982,9 @@
             "y": 271.25
           },
           "width": 452,
-          "height": 177
+          "height": 177,
+          "icon": "vellum:icon:magnifying-glass-waveform",
+          "color": "purple"
         },
         "base": {
           "name": "SearchNode",
@@ -1058,7 +1072,9 @@
             "y": -458.89620665696896
           },
           "width": 454,
-          "height": 221
+          "height": 221,
+          "icon": "vellum:icon:stamp",
+          "color": "brown"
         },
         "base": {
           "name": "TemplatingNode",
@@ -1383,7 +1399,9 @@
             "y": -39.95100525832629
           },
           "width": 480,
-          "height": 221
+          "height": 221,
+          "icon": "vellum:icon:text-size",
+          "color": "navy"
         },
         "base": {
           "name": "InlinePromptNode",
@@ -1636,7 +1654,9 @@
             "y": 1100.0
           },
           "width": 480,
-          "height": 168
+          "height": 168,
+          "icon": "vellum:icon:text-size",
+          "color": "navy"
         },
         "trigger": {
           "id": "ba029d72-7fc2-4e82-a5ad-6f364c84d72f",
@@ -1776,7 +1796,9 @@
             "y": 1043.0
           },
           "width": 461,
-          "height": 327
+          "height": 327,
+          "icon": "vellum:icon:stamp",
+          "color": "brown"
         },
         "base": {
           "name": "TemplatingNode",
@@ -1952,7 +1974,9 @@
             "y": 917.3816601522587
           },
           "width": 455,
-          "height": 230
+          "height": 230,
+          "icon": "vellum:icon:signal-stream",
+          "color": "lightBlue"
         },
         "base": {
           "name": "APINode",
@@ -1993,7 +2017,10 @@
             "name": "timeout",
             "value": {
               "type": "CONSTANT_VALUE",
-              "value": { "type": "JSON", "value": null }
+              "value": {
+                "type": "JSON",
+                "value": null
+              }
             }
           }
         ],
@@ -2003,7 +2030,12 @@
             "name": "headers",
             "type": "JSON",
             "value": null,
-            "schema": {"type": "object", "additionalProperties": {"type": "string"}}
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
           },
           {
             "id": "c3c38fac-f413-4dad-863d-3d388231ba22",
@@ -2019,14 +2051,18 @@
             "name": "status_code",
             "type": "NUMBER",
             "value": null,
-            "schema": {"type": "integer"}
+            "schema": {
+              "type": "integer"
+            }
           },
           {
             "id": "0c945315-0607-4ef6-8051-f4b6498e9526",
             "name": "text",
             "type": "STRING",
             "value": null,
-            "schema": {"type": "string"}
+            "schema": {
+              "type": "string"
+            }
           }
         ]
       },
@@ -2183,7 +2219,9 @@
             "y": 946.5
           },
           "width": 480,
-          "height": 168
+          "height": 168,
+          "icon": "vellum:icon:text-size",
+          "color": "navy"
         },
         "trigger": {
           "id": "371cc948-bf59-4eba-9356-b21649f76b5e",
@@ -2547,7 +2585,9 @@
             "y": 768.6879108547903
           },
           "width": 480,
-          "height": 170
+          "height": 170,
+          "icon": "vellum:icon:text-size",
+          "color": "navy"
         },
         "trigger": {
           "id": "35b77bfb-91d3-4e5b-8032-9786b9cc05c3",
@@ -2636,7 +2676,9 @@
           "position": {
             "x": 3914.0,
             "y": 631.0
-          }
+          },
+          "icon": "vellum:icon:diagram-sankey",
+          "color": "grass"
         },
         "base": {
           "name": "SubworkflowDeploymentNode",
@@ -2873,7 +2915,9 @@
             "y": 631.0
           },
           "width": 480,
-          "height": 168
+          "height": 168,
+          "icon": "vellum:icon:text-size",
+          "color": "navy"
         },
         "trigger": {
           "id": "3485b3fb-e4ee-47c9-b567-c5eab60c01f9",
@@ -2985,7 +3029,9 @@
             "y": 443.0
           },
           "width": 480,
-          "height": 271
+          "height": 271,
+          "icon": "vellum:icon:circle-stop",
+          "color": "teal"
         },
         "base": {
           "name": "FinalOutputNode",
@@ -3051,7 +3097,9 @@
                 "node_output_id": "7b1ca9d1-d829-4329-b9f3-a864c3ce4230"
               }
             },
-            "schema": {"type": "string"}
+            "schema": {
+              "type": "string"
+            }
           }
         ]
       }

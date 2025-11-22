@@ -154,7 +154,9 @@
             "y": 292.2355134030261
           },
           "width": 480,
-          "height": 234
+          "height": 234,
+          "icon": "vellum:icon:split",
+          "color": "corn"
         },
         "base": {
           "module": [
@@ -265,7 +267,9 @@
             "y": 210
           },
           "width": 464,
-          "height": 234
+          "height": 234,
+          "icon": "vellum:icon:circle-stop",
+          "color": "teal"
         },
         "base": {
           "module": [
@@ -298,7 +302,9 @@
               "type": "WORKFLOW_INPUT",
               "input_variable_id": "5f64210f-ec43-48ce-ae40-40a9ba4c4c11"
             },
-            "schema": {"type": "string"}
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "trigger": {

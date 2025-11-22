@@ -51,7 +51,9 @@
             "y": 223.1684037396122
           },
           "width": 480,
-          "height": 180
+          "height": 180,
+          "icon": "vellum:icon:hexagon-exclamation",
+          "color": "lipstick"
         },
         "base": {
           "name": "ErrorNode",
