@@ -35,7 +35,7 @@ setup-fern:
 
 file ?= .
 test:
-	poetry run pytest -rEf -s -vv $(file)
+	poetry run pytest -rEf -s -vv -n 4 $(file)
 
 test-ci:
 	poetry run pytest -rEf -s -vv $(file) --cov --cov-report=html --cov-report=term-missing
