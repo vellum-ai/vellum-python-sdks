@@ -176,7 +176,7 @@
             "name": "chat_history",
             "type": "CHAT_HISTORY",
             "value": null,
-            "schema": {"type": "array", "items": {"$ref": "#/$defs/vellum.client.types.chat_message.ChatMessage"}}
+            "schema": {"type": "array", "items": {"$ref": "#/$defs/ChatMessage"}}
           }
         ]
       }
