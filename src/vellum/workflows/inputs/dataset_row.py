@@ -28,6 +28,19 @@ class DatasetRow(UniversalBaseModel):
     workflow_trigger: Optional[Type[BaseTrigger]] = None
     node_output_mocks: Optional[Sequence[Union[BaseOutputs, MockNodeExecution]]] = None
 
+    @field_serializer("workflow_trigger")
+    def serialize_workflow_trigger(self, workflow_trigger: Optional[Type[BaseTrigger]]) -> Optional[str]:
+        """
+        Custom serializer for workflow_trigger that converts it to a string ID.
+
+        Args:
+            workflow_trigger: Optional workflow trigger class
+
+        Returns:
+            String representation of the trigger ID, or None if no trigger
+        """
+        return str(workflow_trigger.__id__) if workflow_trigger is not None else None
+
     @field_serializer("inputs")
     def serialize_inputs(self, inputs: Union[BaseInputs, Dict[str, Any]]) -> Dict[str, Any]:
         """

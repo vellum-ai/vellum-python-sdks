@@ -1282,25 +1282,20 @@ class BaseWorkflowDisplay(Generic[WorkflowType]):
                     dataset_row_index_to_id = load_dataset_row_index_to_id_mapping(module)
                     for i, inputs_obj in enumerate(dataset_attr):
                         if isinstance(inputs_obj, DatasetRow):
-                            serialized_inputs = json.loads(json.dumps(inputs_obj.inputs, cls=VellumJsonEncoder))
-                            row_data = {"label": inputs_obj.label, "inputs": serialized_inputs}
-                            trigger_class = inputs_obj.workflow_trigger
-                            if trigger_class is not None:
-                                row_data["workflow_trigger_id"] = str(trigger_class.__id__)
-                            row_data.update(
-                                inputs_obj.model_dump(
-                                    mode="json",
-                                    include={"node_output_mocks"},
-                                    context={
-                                        "serializer": lambda value: serialize_value(
-                                            workflow_display.workflow_id,
-                                            workflow_display.display_context,
-                                            value,
-                                        )
-                                    },
-                                    exclude_none=True,
-                                )
+                            row_data = inputs_obj.model_dump(
+                                mode="json",
+                                by_alias=True,
+                                exclude_none=True,
+                                context={
+                                    "serializer": lambda value: serialize_value(
+                                        workflow_display.workflow_id,
+                                        workflow_display.display_context,
+                                        value,
+                                    )
+                                },
                             )
+                            if "workflow_trigger" in row_data:
+                                row_data["workflow_trigger_id"] = row_data.pop("workflow_trigger")
                         elif isinstance(inputs_obj, BaseInputs):
                             serialized_inputs = json.loads(json.dumps(inputs_obj, cls=VellumJsonEncoder))
                             row_data = {"label": f"Scenario {i + 1}", "inputs": serialized_inputs}
