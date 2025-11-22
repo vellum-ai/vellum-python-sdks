@@ -53,8 +53,7 @@ logger = logging.getLogger(__name__)
 class FunctionCallNodeMixin:
     """Mixin providing common functionality for nodes that handle function calls."""
 
-    arguments: dict
-    function_call_id: Optional[str]
+    function_call_output: List[PromptOutput]
 
     def _handle_tool_exception(self, e: Exception, tool_type: str, tool_name: str) -> None:
         """
@@ -79,12 +78,22 @@ class FunctionCallNodeMixin:
             ) from e
 
     def _extract_function_arguments(self) -> dict:
-        """Extract arguments from the arguments attribute."""
-        return getattr(self, "arguments", {})
+        """Extract arguments from function call output."""
+        current_index = getattr(self, "state").current_prompt_output_index
+        if self.function_call_output and len(self.function_call_output) > current_index:
+            function_call = self.function_call_output[current_index]
+            if function_call.type == "FUNCTION_CALL" and function_call.value is not None:
+                return function_call.value.arguments or {}
+        return {}
 
     def _extract_function_call_id(self) -> Optional[str]:
-        """Extract function call ID from the function_call_id attribute."""
-        return getattr(self, "function_call_id", None)
+        """Extract function call ID from function call output."""
+        current_index = getattr(self, "state").current_prompt_output_index
+        if self.function_call_output and len(self.function_call_output) > current_index:
+            function_call = self.function_call_output[current_index]
+            if function_call.type == "FUNCTION_CALL" and function_call.value is not None:
+                return function_call.value.id
+        return None
 
     def _add_function_result_to_chat_history(self, result: Any, state: ToolCallingState) -> None:
         """Add function execution result to chat history."""
@@ -160,7 +169,14 @@ class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode[ToolCallingStat
         arguments = self._extract_function_arguments()
 
         # Mypy doesn't like instance assignments of class attributes. It's safe in our case tho bc it's what
-        # we do in the `__init__` method.
+        # we do in the `__init__` method. Long term, instead of the function_call_output attribute above, we
+        # want to do:
+        # ```python
+        # subworkflow_inputs = tool_prompt_node.Outputs.results[0]['value']['arguments'].if_(
+        #     tool_prompt_node.Outputs.results[0]['type'].equals('FUNCTION_CALL'),
+        #     {},
+        # )
+        # ```
         self.subworkflow_inputs = arguments  # type:ignore[misc]
 
         # Call the parent run method to execute the subworkflow
@@ -410,26 +426,6 @@ def create_tool_prompt_node(
     return node
 
 
-def _create_function_call_expressions(
-    tool_prompt_node: Type[ToolPromptNode],
-) -> tuple[BaseDescriptor[dict], BaseDescriptor[Optional[str]]]:
-    """
-    Create expressions to extract arguments and function_call_id from tool_prompt_node outputs.
-
-    Returns:
-        A tuple of (arguments_expression, function_call_id_expression)
-
-    Note: These expressions assume the output at current_prompt_output_index is a valid FUNCTION_CALL.
-    The router node ensures this before routing to function nodes.
-    """
-    current_output = tool_prompt_node.Outputs.results[ToolCallingState.current_prompt_output_index]
-    # Extract arguments and function_call_id directly from the function call value
-    # Using coalesce to provide safe fallbacks if the structure is unexpected
-    arguments_expr = current_output["value"]["arguments"].coalesce({})
-    function_call_id_expr = current_output["value"]["id"].coalesce(None)
-    return arguments_expr, function_call_id_expr
-
-
 def create_router_node(
     functions: List[Tool],
     tool_prompt_node: Type[InlinePromptNode[ToolCallingState]],
@@ -505,8 +501,6 @@ def create_function_node(
         function: The function to create a node for
         tool_prompt_node: The tool prompt node class
     """
-    arguments_expr, function_call_id_expr = _create_function_call_expressions(tool_prompt_node)
-
     if isinstance(function, DeploymentDefinition):
         deployment = function.deployment_id or function.deployment_name
         release_tag = function.release_tag
@@ -517,8 +511,7 @@ def create_function_node(
             {
                 "deployment": deployment,
                 "release_tag": release_tag,
-                "arguments": arguments_expr,
-                "function_call_id": function_call_id_expr,
+                "function_call_output": tool_prompt_node.Outputs.results,
                 "__module__": __name__,
             },
         )
@@ -531,8 +524,7 @@ def create_function_node(
             (ComposioNode,),
             {
                 "composio_tool": function,
-                "arguments": arguments_expr,
-                "function_call_id": function_call_id_expr,
+                "function_call_output": tool_prompt_node.Outputs.results,
                 "__module__": __name__,
             },
         )
@@ -543,8 +535,7 @@ def create_function_node(
             (VellumIntegrationNode,),
             {
                 "vellum_integration_tool": function,
-                "arguments": arguments_expr,
-                "function_call_id": function_call_id_expr,
+                "function_call_output": tool_prompt_node.Outputs.results,
                 "__module__": __name__,
             },
         )
@@ -556,8 +547,7 @@ def create_function_node(
             (DynamicInlineSubworkflowNode,),
             {
                 "subworkflow": function,
-                "arguments": arguments_expr,
-                "function_call_id": function_call_id_expr,
+                "function_call_output": tool_prompt_node.Outputs.results,
                 "__module__": __name__,
             },
         )
@@ -586,8 +576,7 @@ def create_function_node(
             (FunctionNode,),
             {
                 "function_definition": create_function_wrapper(function),
-                "arguments": arguments_expr,
-                "function_call_id": function_call_id_expr,
+                "function_call_output": tool_prompt_node.Outputs.results,
                 "__module__": __name__,
             },
         )
@@ -599,14 +588,12 @@ def create_mcp_tool_node(
     tool_def: MCPToolDefinition,
     tool_prompt_node: Type[ToolPromptNode],
 ) -> Type[BaseNode]:
-    arguments_expr, function_call_id_expr = _create_function_call_expressions(tool_prompt_node)
     node = type(
         f"MCPNode_{tool_def.name}",
         (MCPNode,),
         {
             "mcp_tool": tool_def,
-            "arguments": arguments_expr,
-            "function_call_id": function_call_id_expr,
+            "function_call_output": tool_prompt_node.Outputs.results,
             "__module__": __name__,
         },
     )
