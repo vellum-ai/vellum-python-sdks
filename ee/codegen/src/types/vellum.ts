@@ -889,7 +889,7 @@ type WorkflowSandboxInput =
 export type WorkflowSandboxInputs = WorkflowSandboxInput[];
 export interface WorkflowSandboxDatasetRowMock {
   node_id: string;
-  when_condition?: Record<string, unknown>;
+  when_condition?: WorkflowValueDescriptor;
   then_outputs: Record<string, unknown>;
 }
 

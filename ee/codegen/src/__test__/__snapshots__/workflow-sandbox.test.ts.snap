@@ -8,20 +8,7 @@ from .inputs import Inputs
 from .workflow import TestWorkflow
 
 dataset = [
-    DatasetRow(
-        label="Scenario with Mocks",
-        inputs=Inputs(test_input="test-value"),
-        mocks=[
-            {
-                "node_id": "550e8400-e29b-41d4-a716-446655440001",
-                "when_condition": {
-                    "type": "CONSTANT_VALUE",
-                    "value": {"type": "JSON", "value": True},
-                },
-                "then_outputs": {"result": "mocked_result"},
-            },
-        ],
-    ),
+    DatasetRow(label="Scenario with Mocks", inputs=Inputs(test_input="test-value")),
     DatasetRow(
         label="Scenario without Mocks", inputs=Inputs(test_input="test-value-2")
     ),

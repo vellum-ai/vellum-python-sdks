@@ -4,9 +4,11 @@ import { isNil } from "lodash";
 
 import { vellumValue } from "src/codegen";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
+import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import {
-  WorkflowSandboxInputs,
   WorkflowSandboxDatasetRow,
+  WorkflowSandboxDatasetRowMock,
+  WorkflowSandboxInputs,
 } from "src/types/vellum";
 import { removeEscapeCharacters } from "src/utils/casing";
 import { getGeneratedInputsModulePath } from "src/utils/paths";
@@ -171,7 +173,7 @@ if __name__ == "__main__":
 
     if (!isNil(mocks) && mocks.length > 0) {
       const mocksArray = python.TypeInstantiation.list(
-        mocks.map((mock) => this.getMockDict(mock)),
+        mocks.map((mock) => this.getMockNodeExecution(mock)),
         { endWithComma: true }
       );
 
@@ -192,60 +194,65 @@ if __name__ == "__main__":
     });
   }
 
-  private getMockDict(
-    mock: import("src/types/vellum").WorkflowSandboxDatasetRowMock
-  ): python.AstNode {
-    const entries: Array<{ key: python.AstNode; value: python.AstNode }> = [];
+  private getMockNodeExecution(
+    mock: WorkflowSandboxDatasetRowMock
+  ): python.ClassInstantiation {
+    const nodeContext = this.workflowContext.findNodeContext(mock.node_id);
 
-    // Add node_id
-    entries.push({
-      key: python.TypeInstantiation.str("node_id"),
-      value: python.TypeInstantiation.str(mock.node_id),
-    });
+    if (!nodeContext) {
+      throw new Error(`Node context not found for node_id: ${mock.node_id}`);
+    }
 
-    // Add when_condition if present
+    const arguments_: python.MethodArgument[] = [];
+
+    // Generate when_condition using WorkflowValueDescriptor
     if (!isNil(mock.when_condition)) {
-      entries.push({
-        key: python.TypeInstantiation.str("when_condition"),
-        value: this.jsonToPython(mock.when_condition),
+      const whenConditionAst = new WorkflowValueDescriptor({
+        workflowValueDescriptor: mock.when_condition,
+        workflowContext: this.workflowContext,
       });
-    }
 
-    // Add then_outputs
-    entries.push({
-      key: python.TypeInstantiation.str("then_outputs"),
-      value: this.jsonToPython(mock.then_outputs),
-    });
-
-    return python.TypeInstantiation.dict(entries);
-  }
-
-  private jsonToPython(value: unknown): python.AstNode {
-    if (value === null || value === undefined) {
-      return python.codeBlock("None");
-    }
-    if (typeof value === "boolean") {
-      return python.codeBlock(value ? "True" : "False");
-    }
-    if (typeof value === "number") {
-      return python.codeBlock(String(value));
-    }
-    if (typeof value === "string") {
-      return python.TypeInstantiation.str(value);
-    }
-    if (Array.isArray(value)) {
-      return python.TypeInstantiation.list(
-        value.map((item) => this.jsonToPython(item))
+      arguments_.push(
+        python.methodArgument({
+          name: "when_condition",
+          value: whenConditionAst,
+        })
       );
     }
-    if (typeof value === "object") {
-      const entries = Object.entries(value).map(([key, val]) => ({
-        key: python.TypeInstantiation.str(key),
-        value: this.jsonToPython(val),
-      }));
-      return python.TypeInstantiation.dict(entries);
-    }
-    return python.codeBlock("None");
+
+    // Generate then_outputs by instantiating the node's Outputs class
+    const outputsArguments: python.MethodArgument[] = Object.entries(
+      mock.then_outputs
+    ).map(([key, value]) =>
+      python.methodArgument({
+        name: key,
+        value: python.TypeInstantiation.str(String(value)),
+      })
+    );
+
+    const thenOutputsInstance = python.instantiateClass({
+      classReference: python.reference({
+        name: nodeContext.nodeClassName,
+        modulePath: nodeContext.nodeModulePath,
+        attribute: ["Outputs"],
+      }),
+      arguments_: outputsArguments,
+    });
+
+    arguments_.push(
+      python.methodArgument({
+        name: "then_outputs",
+        value: thenOutputsInstance,
+      })
+    );
+
+    return python.instantiateClass({
+      classReference: python.reference({
+        name: "MockNodeExecution",
+        modulePath: ["vellum", "workflows", "nodes", "mocks"],
+      }),
+      arguments_,
+    });
   }
 
   private getTriggerReference(

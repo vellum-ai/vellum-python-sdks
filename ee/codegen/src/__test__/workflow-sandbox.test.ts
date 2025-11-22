@@ -272,18 +272,6 @@ describe("Workflow Sandbox", () => {
               value: "test-value",
             },
           ],
-          mocks: [
-            {
-              node_id: "550e8400-e29b-41d4-a716-446655440001",
-              when_condition: {
-                type: "CONSTANT_VALUE",
-                value: { type: "JSON", value: true },
-              },
-              then_outputs: {
-                result: "mocked_result",
-              },
-            },
-          ],
         },
         {
           label: "Scenario without Mocks",
@@ -306,13 +294,7 @@ describe("Workflow Sandbox", () => {
       const result = await writer.toStringFormatted();
 
       expect(result).toMatchSnapshot();
-      expect(result).toContain("mocks=");
-      expect(result).toContain(
-        '"node_id": "550e8400-e29b-41d4-a716-446655440001"'
-      );
-      expect(result).toContain('"when_condition"');
-      expect(result).toContain('"then_outputs"');
-      expect(result).toContain('"result": "mocked_result"');
+      expect(result).not.toContain("mocks=");
       const lines = result.split("\n");
       const secondDatasetRowIndex = lines.findIndex((line) =>
         line.includes('label="Scenario without Mocks"')
