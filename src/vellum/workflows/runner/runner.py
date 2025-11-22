@@ -493,7 +493,7 @@ class WorkflowRunner(Generic[StateType]):
             span_id=span_id,
             body=NodeExecutionInitiatedBody(
                 node_definition=node.__class__,
-                inputs=node._inputs,
+                inputs=node._get_inputs(),
             ),
             parent=execution.parent_context,
         )
