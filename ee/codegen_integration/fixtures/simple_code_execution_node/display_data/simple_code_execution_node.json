@@ -127,7 +127,9 @@
           "comment": {
             "expanded": true,
             "value": "This is my code execution node"
-          }
+          },
+          "icon": "vellum:icon:rectangle-code",
+          "color": "lime"
         },
         "ports": [
           {
@@ -194,7 +196,9 @@
             "y": 235.35180055401668
           },
           "width": 480,
-          "height": 234
+          "height": 234,
+          "icon": "vellum:icon:circle-stop",
+          "color": "teal"
         },
         "outputs": [
           {
@@ -206,7 +210,9 @@
               "node_id": "97240cb9-94a0-4a1a-b69e-3c2d96ebb1e2",
               "node_output_id": "9d1dae27-6e6a-40bf-a401-611c974d4143"
             },
-            "schema": {"type": "string"}
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "trigger": {

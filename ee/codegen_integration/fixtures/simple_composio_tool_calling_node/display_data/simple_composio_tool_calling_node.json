@@ -30,7 +30,9 @@
           "comment": {
             "expanded": true,
             "value": "\n    A tool calling node that uses a ComposioTool for GitHub issue creation.\n    "
-          }
+          },
+          "icon": "vellum:icon:wrench",
+          "color": "gold"
         },
         "base": {
           "name": "ToolCallingNode",
@@ -169,14 +171,21 @@
             "name": "text",
             "type": "STRING",
             "value": null,
-            "schema": {"type": "string"}
+            "schema": {
+              "type": "string"
+            }
           },
           {
             "id": "d278b1bc-dd58-4da0-bf58-84b03b1f5438",
             "name": "chat_history",
             "type": "CHAT_HISTORY",
             "value": null,
-            "schema": {"type": "array", "items": {"$ref": "#/$defs/vellum.client.types.chat_message.ChatMessage"}}
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/vellum.client.types.chat_message.ChatMessage"
+              }
+            }
           }
         ]
       }

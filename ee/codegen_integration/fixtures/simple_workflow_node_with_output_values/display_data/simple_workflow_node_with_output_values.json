@@ -53,7 +53,9 @@
           },
           "comment": null,
           "width": 466.0,
-          "height": 224.0
+          "height": 224.0,
+          "icon": "vellum:icon:stamp",
+          "color": "brown"
         },
         "base": null,
         "definition": null,
@@ -118,7 +120,9 @@
           },
           "comment": null,
           "width": 471.0,
-          "height": 234.0
+          "height": 234.0,
+          "icon": "vellum:icon:circle-stop",
+          "color": "teal"
         },
         "base": null,
         "definition": null,
@@ -136,7 +140,9 @@
               "node_id": "d0538e54-b623-4a71-a5cd-24b1ed5ce223",
               "node_output_id": "c66c362b-bb83-4333-a691-b72dc9a8734d"
             },
-            "schema": {"type": "string"}
+            "schema": {
+              "type": "string"
+            }
           }
         ]
       }

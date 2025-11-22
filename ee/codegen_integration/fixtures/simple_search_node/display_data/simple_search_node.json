@@ -10,7 +10,13 @@
         },
         "definition": {
           "bases": [],
-          "module": ["vellum", "workflows", "nodes", "bases", "base"],
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "bases",
+            "base"
+          ],
           "name": "BaseNode"
         },
         "inputs": [],
@@ -258,7 +264,9 @@
             "y": 223.1684037396122
           },
           "width": 480,
-          "height": 180
+          "height": 180,
+          "icon": "vellum:icon:magnifying-glass-waveform",
+          "color": "purple"
         },
         "definition": {
           "bases": [
@@ -320,7 +328,9 @@
             "y": 210.0
           },
           "width": 480,
-          "height": 234
+          "height": 234,
+          "icon": "vellum:icon:circle-stop",
+          "color": "teal"
         },
         "definition": {
           "bases": [
@@ -356,7 +366,9 @@
               "node_id": "e5ff9360-a29c-437b-a9c1-05fc52df2834",
               "node_output_id": "d56d7c49-7b45-4933-9779-2bd7f82c2141"
             },
-            "schema": {"type": "string"}
+            "schema": {
+              "type": "string"
+            }
           }
         ]
       }

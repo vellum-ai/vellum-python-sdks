@@ -68,6 +68,10 @@ class InlineSubworkflowNode(
     subworkflow_inputs: ClassVar[EntityInputsInterface] = {}
     """
 
+    class Display(BaseNode.Display):
+        icon = "vellum:icon:diagram-sankey"
+        color = "grass"
+
     subworkflow: Type["BaseWorkflow[InputsType, InnerStateType]"]
     subworkflow_inputs: ClassVar[Union[EntityInputsInterface, BaseInputs, Type[undefined]]] = undefined
 

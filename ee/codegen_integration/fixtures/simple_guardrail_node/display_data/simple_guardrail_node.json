@@ -69,7 +69,9 @@
             "y": 180.75743992606283
           },
           "width": 464,
-          "height": 224
+          "height": 224,
+          "icon": "vellum:icon:shield-check",
+          "color": "rose"
         },
         "base": {
           "name": "GuardrailNode",
@@ -140,7 +142,9 @@
             "y": 210
           },
           "width": 458,
-          "height": 234
+          "height": 234,
+          "icon": "vellum:icon:circle-stop",
+          "color": "teal"
         },
         "base": {
           "name": "FinalOutputNode",
@@ -174,7 +178,16 @@
               "node_id": "c207b440-6aac-4047-a37c-e25fcb5b9cfb",
               "node_output_id": "0e455862-ccc4-47a4-a9a5-061fadc94fd6"
             },
-            "schema": {"anyOf": [{"type": "number"}, {"type": "integer"}]}
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            }
           }
         ],
         "trigger": {

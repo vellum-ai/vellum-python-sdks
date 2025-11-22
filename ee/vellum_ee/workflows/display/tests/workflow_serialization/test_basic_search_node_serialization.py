@@ -227,7 +227,11 @@ def test_serialize_workflow():
             "external_id_filters_node_input_id": "5c766934-13f7-4a0f-a751-21e25fd2ca30",
             "metadata_filters_node_input_id": "977d75bc-520f-447b-ad75-8b56c793f951",
         },
-        "display_data": {"position": {"x": 200.0, "y": -50.0}},
+        "display_data": {
+            "position": {"x": 200.0, "y": -50.0},
+            "icon": "vellum:icon:magnifying-glass-waveform",
+            "color": "purple",
+        },
         "base": {
             "name": "SearchNode",
             "module": ["vellum", "workflows", "nodes", "displayable", "search_node", "node"],

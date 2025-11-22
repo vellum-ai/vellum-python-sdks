@@ -49,6 +49,8 @@ def test_serialize_workflow():
                 "expanded": True,
                 "value": "\n    A tool calling node that calls the get_current_weather function.\n    ",
             },
+            "icon": "vellum:icon:wrench",
+            "color": "gold",
         },
         "base": {
             "name": "ToolCallingNode",

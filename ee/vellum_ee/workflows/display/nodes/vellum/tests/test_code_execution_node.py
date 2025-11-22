@@ -284,7 +284,11 @@ def test_serialize_node__with_non_exist_code_input_path_with_dry_run():
                         "output_id": "98cae9b9-45cc-4897-a0f5-df250b56c00d",
                         "log_output_id": "66c06c97-a9d1-4abf-840f-3f6c29709612",
                     },
-                    "display_data": {"position": {"x": 200.0, "y": -50.0}},
+                    "display_data": {
+                        "position": {"x": 200.0, "y": -50.0},
+                        "icon": "vellum:icon:rectangle-code",
+                        "color": "lime",
+                    },
                     "base": {
                         "name": "CodeExecutionNode",
                         "module": ["vellum", "workflows", "nodes", "displayable", "code_execution_node", "node"],

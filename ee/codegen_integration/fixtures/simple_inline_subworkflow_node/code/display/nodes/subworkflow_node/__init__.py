@@ -24,4 +24,8 @@ class SubworkflowNodeDisplay(BaseInlineSubworkflowNodeDisplay[SubworkflowNode]):
     port_displays = {
         SubworkflowNode.Ports.default: PortDisplayOverrides(id=UUID("fa5c22bc-2499-43fa-880f-75fb20d0587f"))
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=1991.684833859175, y=178.94753425793772))
+    display_data = NodeDisplayData(
+        position=NodeDisplayPosition(x=1991.684833859175, y=178.94753425793772),
+        icon="vellum:icon:diagram-sankey",
+        color="grass",
+    )

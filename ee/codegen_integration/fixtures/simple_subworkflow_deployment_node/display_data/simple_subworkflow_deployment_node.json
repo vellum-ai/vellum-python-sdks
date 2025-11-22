@@ -53,7 +53,9 @@
           "position": {
             "x": 1873.116343490305,
             "y": 239.74958448753466
-          }
+          },
+          "icon": "vellum:icon:diagram-sankey",
+          "color": "grass"
         },
         "base": {
           "name": "SubworkflowDeploymentNode",
@@ -123,7 +125,9 @@
             "y": 211.25540166204985
           },
           "width": 471,
-          "height": 234
+          "height": 234,
+          "icon": "vellum:icon:circle-stop",
+          "color": "teal"
         },
         "base": {
           "name": "FinalOutputNode",
@@ -161,7 +165,9 @@
               "type": "WORKFLOW_INPUT",
               "input_variable_id": "93b9d3fb-251c-4a53-a1d5-4bd8e61947c5"
             },
-            "schema": {"type": "string"}
+            "schema": {
+              "type": "string"
+            }
           }
         ]
       }

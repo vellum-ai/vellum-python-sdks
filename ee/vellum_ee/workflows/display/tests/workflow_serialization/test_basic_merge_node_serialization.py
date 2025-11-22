@@ -72,7 +72,7 @@ def test_serialize_workflow__await_all():
                 ],
                 "source_handle_id": "da1bdfe9-8e99-4d06-842f-a76af95a713a",
             },
-            "display_data": {"position": {"x": 400.0, "y": -50.0}},
+            "display_data": {"position": {"x": 400.0, "y": -50.0}, "icon": "vellum:icon:merge", "color": "tomato"},
             "base": {
                 "module": ["vellum", "workflows", "nodes", "displayable", "merge_node", "node"],
                 "name": "MergeNode",

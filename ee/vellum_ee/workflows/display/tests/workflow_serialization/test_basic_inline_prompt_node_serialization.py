@@ -147,7 +147,7 @@ def test_serialize_workflow():
                 },
                 "ml_model_name": "gpt-4o",
             },
-            "display_data": {"position": {"x": 200.0, "y": -50.0}},
+            "display_data": {"position": {"x": 200.0, "y": -50.0}, "icon": "vellum:icon:text-size", "color": "navy"},
             "base": {
                 "name": "InlinePromptNode",
                 "module": ["vellum", "workflows", "nodes", "displayable", "inline_prompt_node", "node"],

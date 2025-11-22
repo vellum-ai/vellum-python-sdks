@@ -217,6 +217,10 @@ class FunctionNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
 
     function_definition: Callable[..., Any]
 
+    class Display(BaseNode.Display):
+        icon = "vellum:icon:rectangle-code"
+        color = "purple"
+
     class Outputs(BaseNode.Outputs):
         result: Any
 

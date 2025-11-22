@@ -128,7 +128,11 @@ def test_serialize_workflow():
                     {"id": "fad5dd9f-3328-4e70-ad55-65a5325a4a82", "key": "reasoning", "type": "STRING"},
                 ],
             },
-            "display_data": {"position": {"x": 200.0, "y": -50.0}},
+            "display_data": {
+                "position": {"x": 200.0, "y": -50.0},
+                "icon": "vellum:icon:diagram-sankey",
+                "color": "grass",
+            },
             "base": {
                 "name": "InlineSubworkflowNode",
                 "module": ["vellum", "workflows", "nodes", "core", "inline_subworkflow_node", "node"],
