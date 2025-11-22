@@ -1,4 +1,5 @@
 import pytest
+import difflib
 import json
 import os
 from pathlib import Path
@@ -24,12 +25,13 @@ def _collect_file_map(root: Path) -> Dict[str, str]:
 def _compute_diff(
     original_root: Path,
     generated_root: Path,
-) -> Tuple[List[str], List[str], List[str]]:
+) -> Tuple[List[str], List[str], Dict[str, str]]:
     """
     Compare files between original and generated directories.
 
     Returns:
-        Tuple of (original_only, generated_only, modified) file lists
+        (original_only, generated_only, modified_diffs) where
+        modified_diffs maps relative file path -> unified diff string.
     """
     original_files = _collect_file_map(original_root)
     generated_files = _collect_file_map(generated_root)
@@ -40,9 +42,24 @@ def _compute_diff(
     original_only = sorted(orig_keys - gen_keys)
     generated_only = sorted(gen_keys - orig_keys)
 
-    modified = sorted(rel for rel in orig_keys & gen_keys if original_files[rel] != generated_files[rel])
+    modified_diffs: Dict[str, str] = {}
 
-    return original_only, generated_only, modified
+    for rel in sorted(orig_keys & gen_keys):
+        original_content = original_files[rel]
+        generated_content = generated_files[rel]
+        if original_content == generated_content:
+            continue
+
+        diff_lines = difflib.unified_diff(
+            original_content.splitlines(),
+            generated_content.splitlines(),
+            fromfile=f"original/{rel}",
+            tofile=f"generated/{rel}",
+            lineterm="",
+        )
+        modified_diffs[rel] = "\n".join(diff_lines)
+
+    return original_only, generated_only, modified_diffs
 
 
 @pytest.mark.xfail(reason="Zero-diff transforms not yet implemented")
@@ -107,15 +124,23 @@ def test_zero_diff_transforms(module_name: str):
         assert len(workflow_files) == 1, f"Expected exactly one workflow.py, found {workflow_files}"
         generated_root = workflow_files[0].parent
 
-        original_only, generated_only, modified = _compute_diff(
+        original_only, generated_only, modified_diffs = _compute_diff(
             original_root=original_root,
             generated_root=generated_root,
         )
 
+        modified_paths = sorted(modified_diffs.keys())
+
+        if modified_paths:
+            diff_text = "\n\n".join(f"Diff for {rel}:\n{modified_diffs[rel]}" for rel in modified_paths)
+        else:
+            diff_text = ""
+
     # THEN there should be no differences between original and generated files
-    assert not original_only and not generated_only and not modified, (
+    assert not original_only and not generated_only and not modified_paths, (
         "Expected zero diff between original and generated workflow files, but found:\n"
         f"original_only={original_only}\n"
         f"generated_only={generated_only}\n"
-        f"modified={modified}\n"
+        f"modified={modified_paths}\n"
+        f"{diff_text}\n"
     )
