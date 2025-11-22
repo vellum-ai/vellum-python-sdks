@@ -565,6 +565,8 @@ def test_serialize_tool_prompt_node():
     assert isinstance(display_data, dict)
     assert display_data["icon"] == "vellum:icon:text-size"
     assert display_data["color"] == "navy"
+
+
 def test_serialize_node__tool_calling_node__subworkflow_with_parent_input_reference():
     """
     Test that a tool calling node with a subworkflow that references parent inputs serializes correctly
