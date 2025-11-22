@@ -139,7 +139,7 @@ def test_serialize_workflow(vellum_client):
             "release_tag": "LATEST",
             "ml_model_fallbacks": ["gpt-4o", "gemini-1.5-pro"],
         },
-        "display_data": {"position": {"x": 200.0, "y": -50.0}},
+        "display_data": {"position": {"x": 200.0, "y": -50.0}, "icon": "vellum:icon:text-size", "color": "navy"},
         "base": {
             "name": "PromptDeploymentNode",
             "module": ["vellum", "workflows", "nodes", "displayable", "prompt_deployment_node", "node"],
@@ -299,7 +299,7 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
             "release_tag": "LATEST",
             "ml_model_fallbacks": None,
         },
-        "display_data": {"position": {"x": 200.0, "y": -50.0}},
+        "display_data": {"position": {"x": 200.0, "y": -50.0}, "icon": "vellum:icon:text-size", "color": "navy"},
         "base": {
             "name": "PromptDeploymentNode",
             "module": ["vellum", "workflows", "nodes", "displayable", "prompt_deployment_node", "node"],

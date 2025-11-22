@@ -400,7 +400,7 @@ def test_serialize_workflow():
                 ],
                 "version": "2",
             },
-            "display_data": {"position": {"x": 200.0, "y": -50.0}},
+            "display_data": {"position": {"x": 200.0, "y": -50.0}, "icon": "vellum:icon:split", "color": "corn"},
             "base": {
                 "name": "ConditionalNode",
                 "module": ["vellum", "workflows", "nodes", "displayable", "conditional_node", "node"],
@@ -640,7 +640,7 @@ def test_conditional_node_serialize_all_operators_with_lhs_and_rhs(descriptor, o
                 ],
                 "version": "2",
             },
-            "display_data": {"position": {"x": 200.0, "y": -50.0}},
+            "display_data": {"position": {"x": 200.0, "y": -50.0}, "icon": "vellum:icon:split", "color": "corn"},
             "base": {
                 "name": "ConditionalNode",
                 "module": ["vellum", "workflows", "nodes", "displayable", "conditional_node", "node"],
@@ -757,7 +757,7 @@ def test_conditional_node_serialize_all_operators_with_expression(descriptor, op
                 ],
                 "version": "2",
             },
-            "display_data": {"position": {"x": 200.0, "y": -50.0}},
+            "display_data": {"position": {"x": 200.0, "y": -50.0}, "icon": "vellum:icon:split", "color": "corn"},
             "base": {
                 "name": "ConditionalNode",
                 "module": ["vellum", "workflows", "nodes", "displayable", "conditional_node", "node"],
@@ -886,7 +886,7 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
                 ],
                 "version": "2",
             },
-            "display_data": {"position": {"x": 200.0, "y": -50.0}},
+            "display_data": {"position": {"x": 200.0, "y": -50.0}, "icon": "vellum:icon:split", "color": "corn"},
             "base": {
                 "name": "ConditionalNode",
                 "module": ["vellum", "workflows", "nodes", "displayable", "conditional_node", "node"],

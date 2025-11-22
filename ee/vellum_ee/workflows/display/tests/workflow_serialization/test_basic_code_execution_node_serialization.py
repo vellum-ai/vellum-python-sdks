@@ -84,7 +84,7 @@ def test_serialize_workflow_with_filepath():
             "output_id": "730c8f17-891c-40b4-b43d-26672bd38eef",
             "log_output_id": "8eea2893-1e79-4d1c-ba51-2e045968abfb",
         },
-        "display_data": {"position": {"x": 200.0, "y": -50.0}},
+        "display_data": {"position": {"x": 200.0, "y": -50.0}, "icon": "vellum:icon:rectangle-code", "color": "lime"},
         "base": {
             "module": [
                 "vellum",
@@ -196,7 +196,7 @@ def test_serialize_workflow_with_code():
             "output_id": "9b2b939b-c840-4e01-99c1-43a3418d7fb7",
             "log_output_id": "e3536bf9-cf37-4d16-b835-770a9ee6cc53",
         },
-        "display_data": {"position": {"x": 200.0, "y": -50.0}},
+        "display_data": {"position": {"x": 200.0, "y": -50.0}, "icon": "vellum:icon:rectangle-code", "color": "lime"},
         "base": {
             "name": "CodeExecutionNode",
             "module": ["vellum", "workflows", "nodes", "displayable", "code_execution_node", "node"],
@@ -296,7 +296,7 @@ def test_serialize_workflow__try_wrapped():
             "output_id": "a483823a-e856-4ad3-ab3b-cac3c2961536",
             "log_output_id": "0022691d-4707-476f-a9f5-4947b5e36f07",
         },
-        "display_data": {"position": {"x": 200.0, "y": -50.0}},
+        "display_data": {"position": {"x": 200.0, "y": -50.0}, "icon": "vellum:icon:rectangle-code", "color": "lime"},
         "base": {
             "module": [
                 "vellum",

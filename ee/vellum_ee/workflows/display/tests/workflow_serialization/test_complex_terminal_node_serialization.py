@@ -61,7 +61,11 @@ def test_serialize_workflow__missing_final_output_node():
                         },
                     }
                 ],
-                "display_data": {"position": {"x": 200.0, "y": 75.0}},
+                "display_data": {
+                    "position": {"x": 200.0, "y": 75.0},
+                    "icon": "vellum:icon:circle-stop",
+                    "color": "teal",
+                },
                 "base": {
                     "name": "FinalOutputNode",
                     "module": ["vellum", "workflows", "nodes", "displayable", "final_output_node", "node"],

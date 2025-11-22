@@ -142,7 +142,7 @@ def test_serialize_workflow(vellum_client):
             "workflow_deployment_id": deployment.id,
             "release_tag": "LATEST",
         },
-        "display_data": {"position": {"x": 200.0, "y": -50.0}},
+        "display_data": {"position": {"x": 200.0, "y": -50.0}, "icon": "vellum:icon:diagram-sankey", "color": "grass"},
         "base": {
             "module": ["vellum", "workflows", "nodes", "displayable", "subworkflow_deployment_node", "node"],
             "name": "SubworkflowDeploymentNode",
