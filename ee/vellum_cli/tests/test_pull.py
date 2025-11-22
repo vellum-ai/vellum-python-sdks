@@ -958,7 +958,7 @@ def test_pull__unexpected_error_path(vellum_client):
     "workflow_deployment",
     [
         "test-workflow-deployment-id",
-        str(uuid4()),
+        "377a59fb-1dd0-4760-9568-ae4bd6188da0",
     ],
 )
 def test_pull__workflow_deployment_adds_deployment_to_config(vellum_client, workflow_deployment):
