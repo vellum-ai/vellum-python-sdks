@@ -111,6 +111,7 @@ class MockNodeExecution(UniversalBaseModel):
         """Serialize the model and add node_id field computed from then_outputs."""
         serialized = handler(self)
         serialized["node_id"] = str(self.then_outputs.__class__.__parent_class__.__id__)
+        serialized["type"] = "NODE_EXECUTION"
         return serialized
 
     @field_serializer("then_outputs")
@@ -129,22 +130,47 @@ class MockNodeExecution(UniversalBaseModel):
     def validate_all(
         raw_mock_workflow_node_configs: Optional[List[Any]],
         workflow: Type["BaseWorkflow"],
+        descriptor_validator: Optional[Callable[[dict, Type["BaseWorkflow"]], BaseDescriptor]] = None,
     ) -> Optional[List["MockNodeExecution"]]:
         if not raw_mock_workflow_node_configs:
             return None
 
         ArrayVellumValue.model_rebuild()
-        try:
-            mock_workflow_node_configs = [
-                _RawMockWorkflowNodeConfig.model_validate(raw_mock_workflow_node_config)
-                for raw_mock_workflow_node_config in raw_mock_workflow_node_configs
-            ]
-        except ValidationError as e:
-            raise WorkflowInitializationException(
-                message="Failed to validate mock node executions",
-                code=WorkflowErrorCode.INVALID_INPUTS,
-                workflow_definition=workflow,
-            ) from e
+        mock_workflow_configs: list[Union[_RawMockWorkflowNodeConfig, MockNodeExecution]] = []
+        for raw_mock_workflow_node_config in raw_mock_workflow_node_configs:
+            if not isinstance(raw_mock_workflow_node_config, dict):
+                raise WorkflowInitializationException(
+                    message=f"Invalid mock node execution type: {type(raw_mock_workflow_node_config)}",
+                    code=WorkflowErrorCode.INVALID_INPUTS,
+                    workflow_definition=workflow,
+                )
+
+            try:
+                mock_workflow_configs.append(
+                    MockNodeExecution.model_validate(
+                        raw_mock_workflow_node_config,
+                        context={
+                            "workflow": workflow,
+                            "node_id": raw_mock_workflow_node_config.get("node_id"),
+                            "descriptor_validator": lambda value: (
+                                descriptor_validator(value, workflow) if descriptor_validator else None
+                            ),
+                        },
+                    )
+                )
+            except ValidationError:
+                # After the Vellum App is updated to the new mock resolution strategy,
+                # we can update this to raise an exception
+                try:
+                    mock_workflow_configs.append(
+                        _RawMockWorkflowNodeConfig.model_validate(raw_mock_workflow_node_config)
+                    )
+                except ValidationError as e:
+                    raise WorkflowInitializationException(
+                        message="Failed to validate mock node executions",
+                        code=WorkflowErrorCode.INVALID_INPUTS,
+                        workflow_definition=workflow,
+                    ) from e
 
         nodes = {node.__id__: node for node in workflow.get_nodes()}
         node_output_name_by_id = {
@@ -157,7 +183,7 @@ class MockNodeExecution(UniversalBaseModel):
         # 1. ✅ Release Mock support in SDK-Enabled Workflows
         # 2. ✅ Deprecate Mock support in non-SDK enabled Workflows, encouraging users to migrate to SDK Workflows
         # 3. ✅ Remove the old mock resolution strategy
-        # 4. Update this SDK to handle the new mock resolution strategy with WorkflowValueDescriptors
+        # 4. ✅ Update this SDK to handle the new mock resolution strategy with WorkflowValueDescriptors
         # 5. Cutover the Vellum App to the new mock resolution strategy
         # 6. Remove the old mock resolution strategy from this SDK
         def _translate_raw_logical_expression(
@@ -227,7 +253,11 @@ class MockNodeExecution(UniversalBaseModel):
                 )
 
         mock_node_executions = []
-        for mock_workflow_node_config in mock_workflow_node_configs:
+        for mock_workflow_node_config in mock_workflow_configs:
+            if isinstance(mock_workflow_node_config, MockNodeExecution):
+                mock_node_executions.append(mock_workflow_node_config)
+                continue
+
             for mock_execution in mock_workflow_node_config.mock_executions:
                 try:
                     when_condition = _translate_raw_logical_expression(

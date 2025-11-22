@@ -1,5 +1,8 @@
 from typing import TYPE_CHECKING, Any, Generic, Optional, Tuple, Type, TypeVar, Union, cast, overload
 
+from pydantic import GetCoreSchemaHandler, ValidationInfo
+from pydantic_core import core_schema
+
 if TYPE_CHECKING:
     from vellum.workflows.expressions.accessor import AccessorExpression
     from vellum.workflows.expressions.add import AddExpression
@@ -448,3 +451,33 @@ class BaseDescriptor(Generic[_T]):
         from vellum.workflows.expressions.minus import MinusExpression
 
         return MinusExpression(lhs=self, rhs=other)
+
+    @classmethod
+    def __get_pydantic_core_schema__(
+        cls, source_type: Type[Any], handler: GetCoreSchemaHandler
+    ) -> core_schema.CoreSchema:
+        def validate(value: Any, info: ValidationInfo) -> Any:
+            if isinstance(value, cls):
+                return value
+
+            if not isinstance(value, dict):
+                raise TypeError(f"Value must be an instance of {cls.__name__} or a dict")
+
+            context = info.context
+            if not isinstance(context, dict):
+                raise TypeError(f"Unexpected type for context: {type(context)}")
+
+            validator = context.get("descriptor_validator")
+            if validator and callable(validator):
+                return validator(value)
+
+            from vellum.workflows.references.constant import ConstantValueReference
+
+            return ConstantValueReference(value)
+
+        return core_schema.union_schema(
+            [
+                core_schema.is_instance_schema(cls),
+                core_schema.with_info_after_validator_function(validate, core_schema.dict_schema()),
+            ]
+        )

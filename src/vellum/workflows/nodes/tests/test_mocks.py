@@ -9,6 +9,7 @@ from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 
 
+# These tests represent the legacy shape of our mocks.
 def test_mocks__parse_from_app():
     # GIVEN a PromptNode
     class PromptNode(InlinePromptNode):

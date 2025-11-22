@@ -264,6 +264,7 @@ def test_serialize_module_with_node_output_mock_when_conditions():
     node_id = str(ProcessNode.__id__)
 
     assert first_mock == {
+        "type": "NODE_EXECUTION",
         "node_id": node_id,
         "when_condition": {
             "type": "BINARY_EXPRESSION",
@@ -286,6 +287,7 @@ def test_serialize_module_with_node_output_mock_when_conditions():
 
     second_mock = first_scenario["mocks"][1]
     assert second_mock == {
+        "type": "NODE_EXECUTION",
         "node_id": node_id,
         "when_condition": {
             "type": "BINARY_EXPRESSION",
@@ -316,6 +318,7 @@ def test_serialize_module_with_node_output_mock_when_conditions():
 
     third_mock = second_scenario["mocks"][0]
     assert third_mock == {
+        "type": "NODE_EXECUTION",
         "node_id": node_id,
         "when_condition": {
             "type": "BINARY_EXPRESSION",
