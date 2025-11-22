@@ -769,7 +769,6 @@ def test_function_node_execution_inputs_excludes_function_call_output(vellum_adh
 
     vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
 
-    # Set up UUID generator - generate UUIDs for both prompt executions
     uuid4_generator = mock_uuid4_generator("vellum.workflows.nodes.displayable.bases.inline_prompt_node.node.uuid4")
     uuid4_generator()
     uuid4_generator()
@@ -798,5 +797,92 @@ def test_function_node_execution_inputs_excludes_function_call_output(vellum_adh
         "arguments": {
             "location": "San Francisco",
             "unit": "celsius",
+        },
+    }
+
+
+def test_function_node_execution_inputs_uses_current_prompt_output_index(
+    vellum_adhoc_prompt_client, mock_uuid4_generator
+):
+    """
+    Test that FunctionNode execution events serialize arguments from the current function call
+    based on state.current_prompt_output_index, not always the first function call.
+    """
+
+    def generate_prompt_events(*_args, **_kwargs) -> Iterator[ExecutePromptEvent]:
+        execution_id = str(uuid4())
+        call_count = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count
+        expected_outputs: List[PromptOutput]
+        if call_count == 1:
+            expected_outputs = [
+                StringVellumValue(value="I'll help you with the weather."),
+                FunctionCallVellumValue(
+                    value=FunctionCall(
+                        arguments={"location": "San Francisco", "unit": "celsius"},
+                        id="call_first",
+                        name="get_current_weather",
+                        state="FULFILLED",
+                    ),
+                ),
+                FunctionCallVellumValue(
+                    value=FunctionCall(
+                        arguments={"location": "New York", "unit": "fahrenheit"},
+                        id="call_second",
+                        name="get_current_weather",
+                        state="FULFILLED",
+                    ),
+                ),
+            ]
+        else:
+            expected_outputs = [
+                StringVellumValue(value="The weather in San Francisco is 70°C and in New York is 75°F.")
+            ]
+
+        events: List[ExecutePromptEvent] = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            FulfilledExecutePromptEvent(
+                execution_id=execution_id,
+                outputs=expected_outputs,
+            ),
+        ]
+        yield from events
+
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
+
+    uuid4_generator = mock_uuid4_generator("vellum.workflows.nodes.displayable.bases.inline_prompt_node.node.uuid4")
+    uuid4_generator()
+    uuid4_generator()
+
+    # GIVEN a workflow with a function node
+    workflow = BasicToolCallingNodeWorkflow()
+
+    # WHEN the workflow is executed with a prompt that returns multiple function calls
+    events = list(workflow.stream(event_filter=all_workflow_event_filter, inputs=Inputs(query="What's the weather?")))
+
+    # THEN find all FunctionNode execution initiated events
+    function_node_events = [
+        e
+        for e in events
+        if isinstance(e, NodeExecutionInitiatedEvent)
+        and e.node_definition.__name__ == "FunctionNode_get_current_weather"
+    ]
+
+    assert len(function_node_events) == 2, "Expected two FunctionNode execution events"
+
+    # AND the first function node event should have the first function call's arguments
+    first_event_inputs = function_node_events[0].body.model_dump(mode="json")["inputs"]
+    assert first_event_inputs == {
+        "arguments": {
+            "location": "San Francisco",
+            "unit": "celsius",
+        },
+    }
+
+    # AND the second function node event should have the second function call's arguments
+    second_event_inputs = function_node_events[1].body.model_dump(mode="json")["inputs"]
+    assert second_event_inputs == {
+        "arguments": {
+            "location": "New York",
+            "unit": "fahrenheit",
         },
     }

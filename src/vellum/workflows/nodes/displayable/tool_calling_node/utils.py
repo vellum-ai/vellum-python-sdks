@@ -135,17 +135,26 @@ class FunctionCallArgumentsDescriptor(AccessorExpression):
         self._function_call_output_ref = function_call_output_ref
 
     def resolve(self, state: BaseState) -> Dict[str, Any]:
-        """Resolve the arguments by finding the first FUNCTION_CALL output in the results.
+        """Resolve the arguments by finding the FUNCTION_CALL output at the current index.
 
-        Overrides AccessorExpression.resolve() to implement custom logic that finds
-        the first FUNCTION_CALL output instead of assuming it's at index 0.
+        Overrides AccessorExpression.resolve() to use state.current_prompt_output_index
+        to select the correct function call being executed, ensuring NodeExecutionInitiatedEvent
+        inputs match the actual function call being run.
         """
         function_call_output = resolve_value(self._function_call_output_ref, state)
-        if function_call_output and len(function_call_output) > 0:
-            # Find the first FUNCTION_CALL output (not just assume it's at index 0)
-            for prompt_output in function_call_output:
-                if isinstance(prompt_output, FunctionCallVellumValue) and prompt_output.value is not None:
-                    return prompt_output.value.arguments or {}
+        if not function_call_output:
+            return {}
+
+        # Use current_prompt_output_index to get the correct function call
+        current_index = getattr(state, "current_prompt_output_index", 0)
+        if 0 <= current_index < len(function_call_output):
+            current = function_call_output[current_index]
+            if isinstance(current, FunctionCallVellumValue) and current.value is not None:
+                return current.value.arguments or {}
+
+        for prompt_output in function_call_output:
+            if isinstance(prompt_output, FunctionCallVellumValue) and prompt_output.value is not None:
+                return prompt_output.value.arguments or {}
         return {}
 
 
