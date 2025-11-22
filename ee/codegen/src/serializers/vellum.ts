@@ -980,6 +980,7 @@ export const NodeOutputSerializer: ObjectSchema<
   name: stringSchema(),
   type: VellumVariableTypeSerializer,
   value: WorkflowValueDescriptorSerializer.optional(),
+  schema: recordSchema(stringSchema(), unknownSchema()).optional(),
 });
 
 export declare namespace NodeOutputSerializer {
@@ -988,6 +989,7 @@ export declare namespace NodeOutputSerializer {
     name: string;
     type: VellumVariableTypeSerializer.Raw;
     value?: WorkflowValueDescriptorSerializer.Raw | null;
+    schema?: Record<string, unknown> | null;
   }
 }
 
@@ -998,6 +1000,7 @@ export const NodeAttributeSerializer: ObjectSchema<
   id: stringSchema(),
   name: stringSchema(),
   value: WorkflowValueDescriptorSerializer.optional().nullable(),
+  schema: recordSchema(stringSchema(), unknownSchema()).optional(),
 });
 
 export declare namespace NodeAttributeSerializer {
@@ -1005,6 +1008,7 @@ export declare namespace NodeAttributeSerializer {
     id: string;
     name: string;
     value?: WorkflowValueDescriptorSerializer.Raw | null;
+    schema?: Record<string, unknown> | null;
   }
 }
 

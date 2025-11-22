@@ -1002,6 +1002,7 @@ export interface NodeAttribute {
   id: string;
   name: string;
   value?: WorkflowValueDescriptor | null;
+  schema?: Record<string, unknown>;
 }
 
 export interface AdornmentNode {
