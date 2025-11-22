@@ -8,7 +8,6 @@ from typing import (
     Callable,
     ForwardRef,
     List,
-    Literal,
     Optional,
     Type,
     Union,
@@ -16,7 +15,7 @@ from typing import (
     get_origin,
 )
 
-from pydantic import BaseModel
+from pydantic import BaseModel, TypeAdapter
 from pydash import snake_case
 
 from vellum import Vellum
@@ -69,6 +68,7 @@ def _strip_titles(value: Any) -> Any:
 
 
 def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
+    # Handle special cases that TypeAdapter doesn't handle well
     if annotation is None:
         return {"type": "null"}
 
@@ -78,96 +78,29 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
     if annotation is datetime:
         return {"type": "string", "format": "date-time"}
 
-    if get_origin(annotation) is Union:
-        if is_json_type(get_args(annotation)):
-            return {"$ref": "#/$defs/vellum.workflows.types.core.Json"}
-
-        return {"anyOf": [compile_annotation(a, defs) for a in get_args(annotation)]}
-
-    if get_origin(annotation) is Literal:
-        values = list(get_args(annotation))
-        types = {type(value) for value in values}
-        if len(types) == 1:
-            value_type = types.pop()
-            if value_type in type_map:
-                return {"type": type_map[value_type], "enum": values}
-            else:
-                return {"enum": values}
-        else:
-            return {"enum": values}
-
-    if get_origin(annotation) is dict:
-        _, value_type = get_args(annotation)
-        return {"type": "object", "additionalProperties": compile_annotation(value_type, defs)}
-
-    if get_origin(annotation) is list:
-        item_type = get_args(annotation)[0]
-        return {"type": "array", "items": compile_annotation(item_type, defs)}
-
-    if get_origin(annotation) is tuple:
-        args = get_args(annotation)
-        if len(args) == 2 and args[1] is Ellipsis:
-            # Tuple[int, ...] with homogeneous items
-            return {"type": "array", "items": compile_annotation(args[0], defs)}
-        else:
-            # Tuple[int, str] with fixed length items
-            result = {
-                "type": "array",
-                "prefixItems": [compile_annotation(arg, defs) for arg in args],
-                "minItems": len(args),
-                "maxItems": len(args),
-            }
-            return result
-
-    if dataclasses.is_dataclass(annotation) and isinstance(annotation, type):
-        def_name = _get_def_name(annotation)
-        if def_name not in defs:
-            properties = {}
-            required = []
-            for field in dataclasses.fields(annotation):
-                properties[field.name] = compile_annotation(field.type, defs)
-                if field.default is dataclasses.MISSING:
-                    required.append(field.name)
-                else:
-                    properties[field.name]["default"] = _compile_default_value(field.default)
-            defs[def_name] = {"type": "object", "properties": properties, "required": required}
-        return {"$ref": f"#/$defs/{def_name}"}
-
-    if inspect.isclass(annotation) and issubclass(annotation, BaseModel):
-        def_name = _get_def_name(annotation)
-        if def_name not in defs:
-            schema = annotation.model_json_schema()
-            schema = _strip_titles(schema)
-
-            # If the schema has nested $defs, we need to merge them into the top-level defs
-            if "$defs" in schema:
-                nested_defs = schema.pop("$defs")
-                for nested_def_name, nested_def_schema in nested_defs.items():
-                    # Use the fully qualified name for nested models
-                    nested_annotation = annotation.model_fields.get(nested_def_name)
-                    if (
-                        nested_annotation
-                        and nested_annotation.annotation
-                        and hasattr(nested_annotation.annotation, "__module__")
-                    ):
-                        qualified_name = _get_def_name(nested_annotation.annotation)
-                        defs[qualified_name] = _strip_titles(nested_def_schema)
-                    else:
-                        # Fallback to the name provided by Pydantic
-                        defs[nested_def_name] = _strip_titles(nested_def_schema)
-
-            defs[def_name] = schema
-
-        return {"$ref": f"#/$defs/{def_name}"}
+    if get_origin(annotation) is Union and is_json_type(get_args(annotation)):
+        return {"$ref": "#/$defs/vellum.workflows.types.core.Json"}
 
     if type(annotation) is ForwardRef:
         # Ignore forward references for now
         return {}
 
-    if annotation not in type_map:
-        raise ValueError(f"Failed to compile type: {annotation}")
+    # Use Pydantic's TypeAdapter for everything else
+    try:
+        schema = TypeAdapter(annotation).json_schema()
+        schema = _strip_titles(schema)
 
-    return {"type": type_map[annotation]}
+        # Merge any nested $defs into the top-level defs dict
+        if "$defs" in schema:
+            nested_defs = schema.pop("$defs")
+            defs.update(nested_defs)
+
+        return schema
+    except Exception:
+        # Fallback for types that TypeAdapter can't handle
+        if annotation not in type_map:
+            raise ValueError(f"Failed to compile type: {annotation}")
+        return {"type": type_map[annotation]}
 
 
 def _compile_default_value(default: Any) -> Any:

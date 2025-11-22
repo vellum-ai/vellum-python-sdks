@@ -71,8 +71,8 @@ def test_compile_function_definition__all_args():
                 "b": {"type": "integer"},
                 "c": {"type": "number"},
                 "d": {"type": "boolean"},
-                "e": {"type": "array"},
-                "f": {"type": "object"},
+                "e": {"type": "array", "items": {}},
+                "f": {"type": "object", "additionalProperties": True},
             },
             "required": ["a", "b", "c", "d", "e", "f"],
         },
@@ -187,20 +187,19 @@ def test_compile_function_definition__dataclasses():
     compiled_function = compile_function_definition(my_function)
 
     # THEN it should return the compiled function definition
-    ref_name = f"{__name__}.test_compile_function_definition__dataclasses.<locals>.MyDataClass"
+    # Pydantic's TypeAdapter inlines the schema instead of using $refs
     assert compiled_function == FunctionDefinition(
         name="my_function",
         parameters={
             "type": "object",
-            "properties": {"c": {"$ref": f"#/$defs/{ref_name}"}},
-            "required": ["c"],
-            "$defs": {
-                ref_name: {
+            "properties": {
+                "c": {
                     "type": "object",
                     "properties": {"a": {"type": "integer"}, "b": {"type": "string"}},
                     "required": ["a", "b"],
                 }
             },
+            "required": ["c"],
         },
     )
 
@@ -218,15 +217,13 @@ def test_compile_function_definition__pydantic():
     compiled_function = compile_function_definition(my_function)
 
     # THEN it should return the compiled function definition
-    ref_name = f"{__name__}.test_compile_function_definition__pydantic.<locals>.MyPydanticModel"
+    # Pydantic's TypeAdapter inlines the schema instead of using $refs
     assert compiled_function == FunctionDefinition(
         name="my_function",
         parameters={
             "type": "object",
-            "properties": {"c": {"$ref": f"#/$defs/{ref_name}"}},
-            "required": ["c"],
-            "$defs": {
-                ref_name: {
+            "properties": {
+                "c": {
                     "type": "object",
                     "properties": {
                         "a": {"type": "integer", "description": "The first number"},
@@ -235,6 +232,7 @@ def test_compile_function_definition__pydantic():
                     "required": ["a", "b"],
                 }
             },
+            "required": ["c"],
         },
     )
 
@@ -253,20 +251,20 @@ def test_compile_function_definition__default_dataclass():
     compiled_function = compile_function_definition(my_function)
 
     # THEN it should return the compiled function definition
-    ref_name = f"{__name__}.test_compile_function_definition__default_dataclass.<locals>.MyDataClass"
+    # Pydantic's TypeAdapter inlines the schema instead of using $refs
     assert compiled_function == FunctionDefinition(
         name="my_function",
         parameters={
             "type": "object",
-            "properties": {"c": {"$ref": f"#/$defs/{ref_name}", "default": {"a": 1, "b": "hello"}}},
-            "required": [],
-            "$defs": {
-                ref_name: {
+            "properties": {
+                "c": {
                     "type": "object",
                     "properties": {"a": {"type": "integer"}, "b": {"type": "string"}},
                     "required": ["a", "b"],
+                    "default": {"a": 1, "b": "hello"},
                 }
             },
+            "required": [],
         },
     )
 
@@ -284,20 +282,20 @@ def test_compile_function_definition__default_pydantic():
     compiled_function = compile_function_definition(my_function)
 
     # THEN it should return the compiled function definition
-    ref_name = f"{__name__}.test_compile_function_definition__default_pydantic.<locals>.MyPydanticModel"
+    # Pydantic's TypeAdapter inlines the schema instead of using $refs
     assert compiled_function == FunctionDefinition(
         name="my_function",
         parameters={
             "type": "object",
-            "properties": {"c": {"$ref": f"#/$defs/{ref_name}", "default": {"a": 1, "b": "hello"}}},
-            "required": [],
-            "$defs": {
-                ref_name: {
+            "properties": {
+                "c": {
                     "type": "object",
                     "properties": {"a": {"type": "integer"}, "b": {"type": "string"}},
                     "required": ["a", "b"],
+                    "default": {"a": 1, "b": "hello"},
                 }
             },
+            "required": [],
         },
     )
 
@@ -369,8 +367,8 @@ def test_compile_inline_workflow_function_definition__all_args():
                 "b": {"type": "integer"},
                 "c": {"type": "number"},
                 "d": {"type": "boolean"},
-                "e": {"type": "array"},
-                "f": {"type": "object"},
+                "e": {"type": "array", "items": {}},
+                "f": {"type": "object", "additionalProperties": True},
             },
             "required": ["a", "b", "c", "d", "e", "f"],
         },
@@ -608,7 +606,8 @@ def test_compile_function_definition__literal_type_not_in_map():
 
     compiled_function = compile_function_definition(my_function)
     assert isinstance(compiled_function.parameters, dict)
-    assert compiled_function.parameters["properties"]["a"] == {"enum": [MyEnum.FOO, MyEnum.BAR]}
+    # Pydantic's TypeAdapter converts enum values to their actual values
+    assert compiled_function.parameters["properties"]["a"] == {"enum": ["foo", "bar"], "type": "string"}
 
 
 def test_compile_function_definition__annotated_descriptions():
@@ -756,8 +755,8 @@ def test_compile_function_definition__string_annotations_with_future_imports():
                 "b": {"type": "integer"},
                 "c": {"type": "number"},
                 "d": {"type": "boolean"},
-                "e": {"type": "array"},
-                "f": {"type": "object"},
+                "e": {"type": "array", "items": {}},
+                "f": {"type": "object", "additionalProperties": True},
                 "g": {"type": "null"},
             },
             "required": ["a", "b", "c", "d", "e", "f", "g"],
