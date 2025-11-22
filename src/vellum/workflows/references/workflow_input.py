@@ -1,9 +1,12 @@
+from functools import cached_property
+from uuid import UUID
 from typing import TYPE_CHECKING, Generic, Optional, Tuple, Type, TypeVar, cast
 
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.types.generics import import_workflow_class
+from vellum.workflows.utils.uuids import get_workflow_input_id
 
 if TYPE_CHECKING:
     from vellum.workflows.inputs.base import BaseInputs
@@ -28,6 +31,11 @@ class WorkflowInputReference(BaseDescriptor[_InputType], Generic[_InputType]):
     @property
     def inputs_class(self) -> Type["BaseInputs"]:
         return self._inputs_class
+
+    @cached_property
+    def id(self) -> UUID:
+        """Generate deterministic UUID from inputs class and input name."""
+        return get_workflow_input_id(self._inputs_class, self.name)
 
     def resolve(self, state: "BaseState") -> _InputType:
         if hasattr(state.meta.workflow_inputs, self._name) and (
