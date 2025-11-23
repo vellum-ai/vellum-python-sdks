@@ -671,14 +671,19 @@ describe("GenericNode", () => {
      * Tests that a generic node with no attributes, no ports, and no outputs generates correctly.
      */
     it("getNodeFile", async () => {
-      // GIVEN a generic node with no attributes, no ports, and no outputs
+      // GIVEN a generic node with no attributes, default trigger, and no outputs
       const nodeData = genericNodeFactory({
         nodeAttributes: [],
         nodeOutputs: [],
-        nodePorts: [],
         nodeTrigger: {
           id: uuidv4(),
           mergeBehavior: "AWAIT_ATTRIBUTES",
+        },
+        displayData: {
+          position: {
+            x: 200.0,
+            y: -50.0,
+          },
         },
       });
 
