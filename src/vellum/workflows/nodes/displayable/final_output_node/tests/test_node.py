@@ -1,5 +1,5 @@
 import pytest
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.core.templating_node import TemplatingNode
@@ -113,3 +113,29 @@ def test_final_output_node__any_output_type_should_accept_json():
         AnyOutputNode.__validate__()
     except ValueError as e:
         pytest.fail(f"Validation should not raise an exception when Any accepts Json: {e}")
+
+
+def test_final_output_node__list_str_output_type_should_pass_validation():
+    """
+    Tests that FinalOutputNode with list[str] output type accepts a descriptor with List[str] type.
+    """
+
+    # GIVEN a FinalOutputNode declared with list[str] output type
+    # AND the value descriptor has List[str] type
+    class ListStrOutputNode(FinalOutputNode[BaseState, list[str]]):
+        """Output with list[str] type."""
+
+        class Outputs(FinalOutputNode.Outputs):
+            value = OutputReference(
+                name="value",
+                types=(List[str],),
+                instance=None,
+                outputs_class=FinalOutputNode.Outputs,
+            )
+
+    # WHEN attempting to validate the node class
+    # THEN validation should pass without raising an exception
+    try:
+        ListStrOutputNode.__validate__()
+    except ValueError as e:
+        pytest.fail(f"Validation should not raise an exception for list[str]/List[str] compatibility: {e}")
