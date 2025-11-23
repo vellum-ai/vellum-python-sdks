@@ -7,6 +7,7 @@
  */
 
 export * from "./class";
+export * from "./comment";
 export * from "./field";
 export * from "./list";
 export * from "./optional";

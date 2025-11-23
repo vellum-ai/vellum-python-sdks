@@ -1,7 +1,6 @@
 import { mkdir, writeFile } from "fs/promises";
 import path, { join } from "path";
 
-import { Comment } from "@fern-api/python-ast/Comment";
 import { Reference } from "@fern-api/python-ast/Reference";
 import { StarImport } from "@fern-api/python-ast/StarImport";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
@@ -10,7 +9,7 @@ import { ModulePath } from "@fern-api/python-ast/core/types";
 import { INIT_FILE_NAME } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { FileFormattingError } from "src/generators/errors";
-import { PythonFile } from "src/generators/extensions";
+import { Comment, PythonFile } from "src/generators/extensions";
 import { Writer } from "src/generators/extensions/writer";
 
 export declare namespace BasePersistedFile {

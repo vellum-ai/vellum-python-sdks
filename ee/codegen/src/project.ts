@@ -4,7 +4,6 @@ import * as path from "path";
 import { join } from "path";
 
 import { python } from "@fern-api/python-ast";
-import { Comment } from "@fern-api/python-ast/Comment";
 import { StarImport } from "@fern-api/python-ast/StarImport";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { isNil } from "lodash";
@@ -12,6 +11,7 @@ import { VellumEnvironmentUrls } from "vellum-ai";
 
 import * as codegen from "./codegen";
 import { StateVariableContext } from "./context/state-variable-context";
+import { Comment } from "./generators/extensions/comment";
 import { getAllFilesInDir } from "./utils/files";
 
 import {
@@ -404,7 +404,7 @@ ${errors.slice(0, 3).map((err) => {
     const parentNode = this.workflowContext.parentNode;
     if (parentNode) {
       if (this.workflowContext.nestedWorkflowModuleName) {
-        comments.push(python.comment({ docs: "flake8: noqa: F401, F403" }));
+        comments.push(new Comment({ docs: "flake8: noqa: F401, F403" }));
         const parentDisplayModulePath = parentNode.getNodeDisplayModulePath();
         const displayIndex = parentDisplayModulePath.indexOf(
           GENERATED_DISPLAY_MODULE_NAME
@@ -420,7 +420,7 @@ ${errors.slice(0, 3).map((err) => {
         statements.push(parentNode.generateNodeClass());
       }
     } else {
-      comments.push(python.comment({ docs: "flake8: noqa: F401, F403" }));
+      comments.push(new Comment({ docs: "flake8: noqa: F401, F403" }));
       imports.push(
         python.starImport({
           modulePath: [...this.getModulePath(), GENERATED_DISPLAY_MODULE_NAME],
@@ -458,7 +458,7 @@ ${errors.slice(0, 3).map((err) => {
             modulePath: [".workflow"],
           })
         );
-        comments.push(python.comment({ docs: "flake8: noqa: F401, F403" }));
+        comments.push(new Comment({ docs: "flake8: noqa: F401, F403" }));
       } else {
         const parentModulePath = [...parentNode.getNodeDisplayModulePath()];
         imports.push(
@@ -472,10 +472,10 @@ ${errors.slice(0, 3).map((err) => {
           })
         );
         statements.push(...parentNode.generateNodeDisplayClasses());
-        comments.push(python.comment({ docs: "flake8: noqa: F401, F403" }));
+        comments.push(new Comment({ docs: "flake8: noqa: F401, F403" }));
       }
     } else {
-      comments.push(python.comment({ docs: "flake8: noqa: F401, F403" }));
+      comments.push(new Comment({ docs: "flake8: noqa: F401, F403" }));
       imports.push(
         python.starImport({
           modulePath: [
