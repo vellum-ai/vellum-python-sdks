@@ -1,8 +1,7 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
-
 import { nodeContextFactory } from "src/__test__/helpers";
 import * as codegen from "src/codegen";
 import { BaseNodeContext } from "src/context/node-context/base";
+import { Writer } from "src/generators/extensions/writer";
 import { NodeInput as NodeInputType, WorkflowDataNode } from "src/types/vellum";
 
 describe("NodeInput", () => {

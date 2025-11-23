@@ -13,3 +13,4 @@ export * from "./optional";
 export * from "./protected-python-file";
 export * from "./type";
 export * from "./union";
+export * from "./writer";

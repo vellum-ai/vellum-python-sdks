@@ -1,6 +1,5 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
-
 import * as codegen from "src/codegen";
+import { Writer } from "src/generators/extensions/writer";
 
 describe("VellumVariableField", () => {
   let writer: Writer;

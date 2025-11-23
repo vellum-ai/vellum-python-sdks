@@ -1,8 +1,7 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
-
 import { workflowContextFactory } from "./helpers";
 
 import { WorkflowContext } from "src/context/workflow-context";
+import { Writer } from "src/generators/extensions/writer";
 import { StatefulPromptBlock } from "src/generators/stateful-prompt-block";
 
 describe("StatefulPromptBlock", () => {

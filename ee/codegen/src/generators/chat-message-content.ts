@@ -1,7 +1,6 @@
 import { python } from "@fern-api/python-ast";
 import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { isNil } from "lodash";
 import {
   ChatMessageContentRequest as ChatMessageContentRequestType,
@@ -21,6 +20,7 @@ import {
 } from "vellum-ai/api";
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
+import { Writer } from "src/generators/extensions/writer";
 import { Json } from "src/generators/json";
 import { removeEscapeCharacters } from "src/utils/casing";
 import { assertUnreachable } from "src/utils/typing";

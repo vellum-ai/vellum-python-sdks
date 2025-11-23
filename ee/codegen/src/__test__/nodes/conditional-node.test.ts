@@ -1,4 +1,3 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { v4 as uuid4 } from "uuid";
 import { beforeEach, describe, expect, it } from "vitest";
 
@@ -15,6 +14,7 @@ import {
 import { createNodeContext, WorkflowContext } from "src/context";
 import { ConditionalNodeContext } from "src/context/node-context/conditional-node";
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
+import { Writer } from "src/generators/extensions/writer";
 import { ConditionalNode } from "src/generators/nodes/conditional-node";
 import {
   ConditionalNode as ConditionalNodeType,

@@ -1,8 +1,8 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { vi } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
 import { WorkflowContext } from "src/context";
+import { Writer } from "src/generators/extensions/writer";
 import { ArrayWorkflowReference } from "src/generators/workflow-value-descriptor-reference/array-workflow-reference";
 import { ArrayWorkflowReference as ArrayWorkflowReferenceType } from "src/types/vellum";
 

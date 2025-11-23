@@ -1,8 +1,9 @@
 import { python } from "@fern-api/python-ast";
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { AstNode } from "@fern-api/python-ast/python";
 
 import { PythonType } from "./type";
+
+import { Writer } from "src/generators/extensions/writer";
 
 export declare namespace Field {
   interface Args {

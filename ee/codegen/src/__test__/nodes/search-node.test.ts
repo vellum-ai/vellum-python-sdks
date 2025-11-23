@@ -1,4 +1,3 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { VellumError } from "vellum-ai";
 import { DocumentIndexRead } from "vellum-ai/api";
 import { DocumentIndexes as DocumentIndexesClient } from "vellum-ai/api/resources/documentIndexes/client/Client";
@@ -17,6 +16,7 @@ import {
   NodeAttributeGenerationError,
   ValueGenerationError,
 } from "src/generators/errors";
+import { Writer } from "src/generators/extensions/writer";
 import { SearchNode } from "src/generators/nodes/search-node";
 describe("TextSearchNode", () => {
   let workflowContext: WorkflowContext;

@@ -1,10 +1,10 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { beforeEach } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
 import { mergeNodeDataFactory } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { MergeNodeContext } from "src/context/node-context/merge-node";
+import { Writer } from "src/generators/extensions/writer";
 import { MergeNode } from "src/generators/nodes/merge-node";
 
 describe("MergeNode", () => {

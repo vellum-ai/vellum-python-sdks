@@ -1,5 +1,6 @@
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
-import { Writer } from "@fern-api/python-ast/core/Writer";
+
+import { Writer } from "src/generators/extensions/writer";
 
 export declare namespace PipeExpression {
   export interface Args {

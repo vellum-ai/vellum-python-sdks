@@ -1,4 +1,3 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { v4 as uuidv4 } from "uuid";
 
 import { workflowContextFactory } from "./helpers";
@@ -18,6 +17,7 @@ import {
 } from "./helpers/node-data-factories";
 
 import { createNodeContext } from "src/context";
+import { Writer } from "src/generators/extensions/writer";
 import { GraphAttribute } from "src/generators/graph-attribute";
 import { IntegrationProvider, WorkflowTriggerType } from "src/types/vellum";
 

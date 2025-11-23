@@ -1,5 +1,3 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
-
 import {
   nodeContextFactory,
   workflowContextFactory,
@@ -9,6 +7,7 @@ import { genericNodeFactory } from "src/__test__/helpers/node-data-factories";
 import { stateVariableContextFactory } from "src/__test__/helpers/state-variable-context-factory";
 import { WorkflowContext, createNodeContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
+import { Writer } from "src/generators/extensions/writer";
 import { NodeInputValuePointerRule } from "src/generators/node-inputs/node-input-value-pointer-rules/node-input-value-pointer-rule";
 import {
   NodeInputValuePointerRule as NodeInputValuePointerRuleType,

@@ -1,4 +1,3 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { v4 as uuidv4 } from "uuid";
 import { DocumentIndexRead } from "vellum-ai/api";
 import { DocumentIndexes as DocumentIndexesClient } from "vellum-ai/api/resources/documentIndexes/client/Client";
@@ -23,6 +22,7 @@ import { createNodeContext, WorkflowContext } from "src/context";
 import { OutputVariableContext } from "src/context/output-variable-context";
 import { WorkflowOutputContext } from "src/context/workflow-output-context";
 import { WorkflowGenerationError } from "src/generators/errors";
+import { Writer } from "src/generators/extensions/writer";
 import { GraphAttribute } from "src/generators/graph-attribute";
 import { WorkflowEdge } from "src/types/vellum";
 

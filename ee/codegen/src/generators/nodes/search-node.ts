@@ -1,7 +1,6 @@
 import { python } from "@fern-api/python-ast";
 import { ClassInstantiation } from "@fern-api/python-ast/ClassInstantiation";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
-import { Writer } from "@fern-api/python-ast/core/Writer";
 
 import {
   OUTPUTS_CLASS_NAME,
@@ -14,6 +13,7 @@ import {
   NodeAttributeGenerationError,
   ValueGenerationError,
 } from "src/generators/errors";
+import { Writer } from "src/generators/extensions/writer";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { VellumValueLogicalExpressionSerializer } from "src/serializers/vellum";
 import {
