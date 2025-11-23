@@ -300,6 +300,9 @@ describe("Workflow Sandbox", () => {
               },
               then_outputs: {
                 result: "mocked_result",
+                count: 42,
+                flag: true,
+                payload: { foo: "bar", nested: { value: 123 } },
               },
             },
           ],
