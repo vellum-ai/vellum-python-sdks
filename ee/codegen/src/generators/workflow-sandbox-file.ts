@@ -3,7 +3,9 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { isNil } from "lodash";
 
 import { vellumValue } from "src/codegen";
+import { VELLUM_WORKFLOW_ROOT_MODULE_PATH } from "src/constants";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
+import { NodeNotFoundError } from "src/generators/errors";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import {
   WorkflowSandboxDatasetRow,
@@ -172,17 +174,22 @@ if __name__ == "__main__":
     }
 
     if (!isNil(mocks) && mocks.length > 0) {
-      const mocksArray = python.TypeInstantiation.list(
-        mocks.map((mock) => this.getMockNodeExecution(mock)),
-        { endWithComma: true }
-      );
+      const mockNodes = mocks
+        .map((mock) => this.getMockNodeExecution(mock))
+        .filter((node): node is python.ClassInstantiation => !isNil(node));
 
-      arguments_.push(
-        python.methodArgument({
-          name: "mocks",
-          value: mocksArray,
-        })
-      );
+      if (mockNodes.length > 0) {
+        const mocksArray = python.TypeInstantiation.list(mockNodes, {
+          endWithComma: true,
+        });
+
+        arguments_.push(
+          python.methodArgument({
+            name: "mocks",
+            value: mocksArray,
+          })
+        );
+      }
     }
 
     return python.instantiateClass({
@@ -196,11 +203,17 @@ if __name__ == "__main__":
 
   private getMockNodeExecution(
     mock: WorkflowSandboxDatasetRowMock
-  ): python.ClassInstantiation {
+  ): python.ClassInstantiation | null {
     const nodeContext = this.workflowContext.findNodeContext(mock.node_id);
 
     if (!nodeContext) {
-      throw new Error(`Node context not found for node_id: ${mock.node_id}`);
+      this.workflowContext.addError(
+        new NodeNotFoundError(
+          `Failed to generate mock for node_id '${mock.node_id}' because node context was not found`,
+          "WARNING"
+        )
+      );
+      return null;
     }
 
     const arguments_: python.MethodArgument[] = [];
@@ -249,7 +262,7 @@ if __name__ == "__main__":
     return python.instantiateClass({
       classReference: python.reference({
         name: "MockNodeExecution",
-        modulePath: ["vellum", "workflows", "nodes", "mocks"],
+        modulePath: [...VELLUM_WORKFLOW_ROOT_MODULE_PATH, "nodes", "mocks"],
       }),
       arguments_,
     });

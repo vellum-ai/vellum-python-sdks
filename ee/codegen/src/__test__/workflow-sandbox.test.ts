@@ -262,6 +262,22 @@ describe("Workflow Sandbox", () => {
         })
       );
 
+      // Add a templating node to the workflow context so mocks can reference it
+      const { nodeContextFactory } = await import(
+        "./helpers/node-context-factory"
+      );
+      const { templatingNodeFactory } = await import(
+        "./helpers/node-data-factories"
+      );
+      const templatingNodeData = templatingNodeFactory().build();
+      // Override the ID to ensure uniqueness
+      templatingNodeData.id = "test-templating-node-for-mocks";
+      const templatingNodeContext = await nodeContextFactory({
+        workflowContext: uniqueWorkflowContext,
+        nodeData: templatingNodeData,
+      });
+      // Note: nodeContextFactory already adds the node to the workflow context
+
       const sandboxInputs: WorkflowSandboxDatasetRow[] = [
         {
           label: "Scenario with Mocks",
@@ -270,6 +286,18 @@ describe("Workflow Sandbox", () => {
               name: inputVariable.key,
               type: "STRING",
               value: "test-value",
+            },
+          ],
+          mocks: [
+            {
+              node_id: templatingNodeContext.nodeData.id,
+              when_condition: {
+                type: "CONSTANT_VALUE",
+                value: { type: "JSON", value: true },
+              },
+              then_outputs: {
+                result: "mocked_result",
+              },
             },
           ],
         },
@@ -294,7 +322,8 @@ describe("Workflow Sandbox", () => {
       const result = await writer.toStringFormatted();
 
       expect(result).toMatchSnapshot();
-      expect(result).not.toContain("mocks=");
+      expect(result).toContain("mocks=");
+      expect(result).toContain("MockNodeExecution");
       const lines = result.split("\n");
       const secondDatasetRowIndex = lines.findIndex((line) =>
         line.includes('label="Scenario without Mocks"')
