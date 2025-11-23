@@ -262,7 +262,7 @@ if __name__ == "__main__":
     return python.instantiateClass({
       classReference: python.reference({
         name: "MockNodeExecution",
-        modulePath: [...VELLUM_WORKFLOW_ROOT_MODULE_PATH, "nodes", "mocks"],
+        modulePath: VELLUM_WORKFLOW_ROOT_MODULE_PATH,
       }),
       arguments_,
     });

@@ -1,12 +1,12 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`Workflow Sandbox > write > should generate DatasetRow with mocks when mocks are provided 1`] = `
-"from vellum.workflows.inputs import DatasetRow
-from vellum.workflows.nodes.mocks import MockNodeExecution
+"from vellum.workflows import MockNodeExecution
+from vellum.workflows.inputs import DatasetRow
 from vellum.workflows.sandbox import WorkflowSandboxRunner
 
 from .inputs import Inputs
-from .nodes.templating_node import TemplatingNode
+from .nodes.my_custom_node import MyCustomNode
 from .workflow import TestWorkflow
 
 dataset = [
@@ -15,8 +15,8 @@ dataset = [
         inputs=Inputs(test_input="test-value"),
         mocks=[
             MockNodeExecution(
-                when_condition=True,
-                then_outputs=TemplatingNode.Outputs(result="mocked_result"),
+                when_condition=Inputs.test_input.equals("test-value"),
+                then_outputs=MyCustomNode.Outputs(result="mocked_result"),
             ),
         ],
     ),

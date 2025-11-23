@@ -4,6 +4,8 @@ import { StringInput } from "vellum-ai/api/types";
 
 import { workflowContextFactory } from "./helpers";
 import { inputVariableContextFactory } from "./helpers/input-variable-context-factory";
+import { nodeContextFactory } from "./helpers/node-context-factory";
+import { genericNodeFactory } from "./helpers/node-data-factories";
 
 import * as codegen from "src/codegen";
 import {
@@ -262,21 +264,11 @@ describe("Workflow Sandbox", () => {
         })
       );
 
-      // Add a templating node to the workflow context so mocks can reference it
-      const { nodeContextFactory } = await import(
-        "./helpers/node-context-factory"
-      );
-      const { templatingNodeFactory } = await import(
-        "./helpers/node-data-factories"
-      );
-      const templatingNodeData = templatingNodeFactory().build();
-      // Override the ID to ensure uniqueness
-      templatingNodeData.id = "test-templating-node-for-mocks";
-      const templatingNodeContext = await nodeContextFactory({
+      const genericNodeData = genericNodeFactory();
+      await nodeContextFactory({
         workflowContext: uniqueWorkflowContext,
-        nodeData: templatingNodeData,
+        nodeData: genericNodeData,
       });
-      // Note: nodeContextFactory already adds the node to the workflow context
 
       const sandboxInputs: WorkflowSandboxDatasetRow[] = [
         {
@@ -290,10 +282,21 @@ describe("Workflow Sandbox", () => {
           ],
           mocks: [
             {
-              node_id: templatingNodeContext.nodeData.id,
+              node_id: genericNodeData.id,
               when_condition: {
-                type: "CONSTANT_VALUE",
-                value: { type: "JSON", value: true },
+                type: "BINARY_EXPRESSION",
+                operator: "=",
+                lhs: {
+                  type: "WORKFLOW_INPUT",
+                  inputVariableId: "1",
+                },
+                rhs: {
+                  type: "CONSTANT_VALUE",
+                  value: {
+                    type: "STRING",
+                    value: "test-value",
+                  },
+                },
               },
               then_outputs: {
                 result: "mocked_result",
@@ -322,15 +325,6 @@ describe("Workflow Sandbox", () => {
       const result = await writer.toStringFormatted();
 
       expect(result).toMatchSnapshot();
-      expect(result).toContain("mocks=");
-      expect(result).toContain("MockNodeExecution");
-      const lines = result.split("\n");
-      const secondDatasetRowIndex = lines.findIndex((line) =>
-        line.includes('label="Scenario without Mocks"')
-      );
-      expect(secondDatasetRowIndex).toBeGreaterThan(-1);
-      const secondDatasetRowLine = lines[secondDatasetRowIndex];
-      expect(secondDatasetRowLine).not.toContain("mocks=");
     });
   });
 });
