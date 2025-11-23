@@ -28,8 +28,7 @@ export const VELLUM_WORKFLOW_ROOT_MODULE_PATH = [
   "workflows",
 ] as const;
 export const VELLUM_WORKFLOW_BASE_NODES_MODULE_PATH = [
-  "vellum",
-  "workflows",
+  ...VELLUM_WORKFLOWS_ROOT_MODULE_PATH,
   "nodes",
   "bases",
   "base",
