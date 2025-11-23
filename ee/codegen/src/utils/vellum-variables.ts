@@ -25,17 +25,26 @@ function parseRef(refPath: string): {
   // The last segment contains the full dotted path to the type
   const lastSegment = segments[segments.length - 1];
 
+  // Handle case where lastSegment might be undefined (empty ref path)
+  if (!lastSegment) {
+    return { name: "Any", modulePath: [...VELLUM_CLIENT_MODULE_PATH] };
+  }
+
   // Split the last segment by "." to separate module path from type name
   const parts = lastSegment.split(".");
 
   if (parts.length > 1) {
     // Extract type name (last part) and module path (everything before)
     const name = parts[parts.length - 1];
+    if (!name) {
+      // Edge case: ref ends with a dot
+      return { name: "Any", modulePath: [...VELLUM_CLIENT_MODULE_PATH] };
+    }
     const modulePath = parts.slice(0, -1);
     return { name, modulePath };
   } else {
     // No dots in the path, just a type name - use default module path
-    return { name: lastSegment, modulePath: VELLUM_CLIENT_MODULE_PATH };
+    return { name: lastSegment, modulePath: [...VELLUM_CLIENT_MODULE_PATH] };
   }
 }
 
