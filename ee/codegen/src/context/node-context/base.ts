@@ -1,6 +1,7 @@
 import { VellumVariableType } from "vellum-ai/api";
 
 import {
+  VELLUM_WORKFLOW_BASE_NODES_MODULE_PATH,
   VELLUM_WORKFLOWS_ROOT_MODULE_PATH,
   VELLUM_WORKFLOW_NODES_MODULE_PATH,
 } from "src/constants";
@@ -60,12 +61,13 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
       if (
         !doesModulePathStartWith(
           args.nodeData.base?.module,
-          VELLUM_WORKFLOWS_ROOT_MODULE_PATH
+          VELLUM_WORKFLOW_BASE_NODES_MODULE_PATH
         )
       ) {
         this.baseNodeClassModulePath = args.nodeData.base.module;
       } else {
-        this.baseNodeClassModulePath = VELLUM_WORKFLOW_NODES_MODULE_PATH;
+        // Use VELLUM_WORKFLOWS_ROOT_MODULE_PATH for BaseNode imports
+        this.baseNodeClassModulePath = VELLUM_WORKFLOWS_ROOT_MODULE_PATH;
       }
     } else if (
       !doesModulePathStartWith(

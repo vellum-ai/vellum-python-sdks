@@ -1,7 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`BaseNode > failures > should generate base nodes as much as possible for non strict workflow contexts 1`] = `
-"from vellum.workflows.nodes import BaseNode
+"from vellum.workflows import BaseNode
 
 
 class MyCustomNode(BaseNode):

@@ -29,7 +29,9 @@ class WebSearchNodeDisplay(BaseNodeDisplay[WebSearchNode]):
 `;
 
 exports[`WebSearchNode > basic > getNodeFile 1`] = `
-"from vellum.workflows.nodes import WebSearchNode as BaseWebSearchNode
+"from vellum.workflows.nodes.displayable.web_search_node import (
+    WebSearchNode as BaseWebSearchNode,
+)
 from vellum.workflows.references import EnvironmentVariableReference
 
 
@@ -42,7 +44,9 @@ class WebSearchNode(BaseWebSearchNode):
 `;
 
 exports[`WebSearchNode > edge cases > should handle minimal configuration with only required query 1`] = `
-"from vellum.workflows.nodes import WebSearchNode as BaseWebSearchNode
+"from vellum.workflows.nodes.displayable.web_search_node import (
+    WebSearchNode as BaseWebSearchNode,
+)
 
 
 class WebSearchNode(BaseWebSearchNode):
@@ -51,7 +55,9 @@ class WebSearchNode(BaseWebSearchNode):
 `;
 
 exports[`WebSearchNode > edge cases > should handle special characters in query 1`] = `
-"from vellum.workflows.nodes import WebSearchNode as BaseWebSearchNode
+"from vellum.workflows.nodes.displayable.web_search_node import (
+    WebSearchNode as BaseWebSearchNode,
+)
 
 
 class WebSearchNode(BaseWebSearchNode):
@@ -60,7 +66,9 @@ class WebSearchNode(BaseWebSearchNode):
 `;
 
 exports[`WebSearchNode > value type variations > should handle NODE_OUTPUT for query parameter 1`] = `
-"from vellum.workflows.nodes import WebSearchNode as BaseWebSearchNode
+"from vellum.workflows.nodes.displayable.web_search_node import (
+    WebSearchNode as BaseWebSearchNode,
+)
 
 
 class WebSearchNode(BaseWebSearchNode):
@@ -69,7 +77,9 @@ class WebSearchNode(BaseWebSearchNode):
 `;
 
 exports[`WebSearchNode > with custom attributes > should generate a web search node with workflow input 1`] = `
-"from vellum.workflows.nodes import WebSearchNode as BaseWebSearchNode
+"from vellum.workflows.nodes.displayable.web_search_node import (
+    WebSearchNode as BaseWebSearchNode,
+)
 
 from ..inputs import Inputs
 
