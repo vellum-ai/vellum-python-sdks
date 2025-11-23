@@ -447,7 +447,7 @@ exports[`WorkflowProjectGenerator > function > should generate <function_name>.p
 from .get_current_weather import get_current_weather
 
 from vellum import ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
-from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
+from vellum.workflows.nodes import ToolCallingNode
 
 
 class GetCurrentWeatherNode(ToolCallingNode):
@@ -541,7 +541,7 @@ def get_current_weather(location: str, unit: str) -> str:
 
 exports[`WorkflowProjectGenerator > function > should generate empty function array if no functions are defined > code/nodes/tool_call/__init__.py 1`] = `
 "from vellum import ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
-from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
+from vellum.workflows.nodes import ToolCallingNode
 
 
 class GetCurrentWeatherNode(ToolCallingNode):
@@ -763,7 +763,7 @@ exports[`WorkflowProjectGenerator > function > should generate inline workflow t
 "from .weather_function.workflow import WeatherFunction
 
 from vellum import ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
-from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
+from vellum.workflows.nodes import ToolCallingNode
 
 from ...inputs import Inputs
 
@@ -1135,7 +1135,7 @@ exports[`WorkflowProjectGenerator > function > should generate inline workflow t
 "from .weather_function.workflow import WeatherFunction
 
 from vellum import ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
-from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
+from vellum.workflows.nodes import ToolCallingNode
 
 from ...inputs import Inputs
 
@@ -1308,7 +1308,7 @@ class Workflow(BaseWorkflow[Inputs, BaseState]):
 `;
 
 exports[`WorkflowProjectGenerator > function > should generate workflow deployment tool > code/nodes/workflow/__init__.py 1`] = `
-"from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
+"from vellum.workflows.nodes import ToolCallingNode
 from vellum.workflows.types.definition import DeploymentDefinition
 
 

@@ -40,9 +40,7 @@ from vellum import (
     RichTextPromptBlock,
     VariablePromptBlock,
 )
-from vellum.workflows.nodes.displayable.tool_calling_node import (
-    ToolCallingNode as BaseToolCallingNode,
-)
+from vellum.workflows.nodes import ToolCallingNode as BaseToolCallingNode
 
 
 class ToolCallingNode(BaseToolCallingNode):
@@ -87,9 +85,7 @@ class ToolCallingNode(BaseToolCallingNode):
 `;
 
 exports[`ToolCallingNode > composio tool > should generate composio tool 'with integration_name and tool_slug' 1`] = `
-"from vellum.workflows.nodes.displayable.tool_calling_node import (
-    ToolCallingNode as BaseToolCallingNode,
-)
+"from vellum.workflows.nodes import ToolCallingNode as BaseToolCallingNode
 from vellum.workflows.types.definition import ComposioToolDefinition
 
 
@@ -105,9 +101,7 @@ class ToolCallingNode(BaseToolCallingNode):
 `;
 
 exports[`ToolCallingNode > composio tool > should generate composio tool 'with toolkit and action' 1`] = `
-"from vellum.workflows.nodes.displayable.tool_calling_node import (
-    ToolCallingNode as BaseToolCallingNode,
-)
+"from vellum.workflows.nodes import ToolCallingNode as BaseToolCallingNode
 from vellum.workflows.types.definition import ComposioToolDefinition
 
 
@@ -123,9 +117,7 @@ class ToolCallingNode(BaseToolCallingNode):
 `;
 
 exports[`ToolCallingNode > composio tool > should handle composio tool with integration_name & tool_slug fields 1`] = `
-"from vellum.workflows.nodes.displayable.tool_calling_node import (
-    ToolCallingNode as BaseToolCallingNode,
-)
+"from vellum.workflows.nodes import ToolCallingNode as BaseToolCallingNode
 from vellum.workflows.types.definition import ComposioToolDefinition
 
 
@@ -143,7 +135,7 @@ class ToolCallingNode(BaseToolCallingNode):
 exports[`ToolCallingNode > function name casing > preserves casing: 123invalid 1`] = `
 "from ._123invalid import _123invalid
 
-from vellum.workflows.nodes.displayable.tool_calling_node import ToolCallingNode
+from vellum.workflows.nodes import ToolCallingNode
 
 
 class CasingTestNode(ToolCallingNode):
@@ -154,7 +146,7 @@ class CasingTestNode(ToolCallingNode):
 exports[`ToolCallingNode > function name casing > preserves casing: parseJSON 1`] = `
 "from .parse_json import parseJSON
 
-from vellum.workflows.nodes.displayable.tool_calling_node import ToolCallingNode
+from vellum.workflows.nodes import ToolCallingNode
 
 
 class CasingTestNode(ToolCallingNode):
@@ -165,7 +157,7 @@ class CasingTestNode(ToolCallingNode):
 exports[`ToolCallingNode > function name casing > preserves casing: special-chars! 1`] = `
 "from .special_chars import special_chars
 
-from vellum.workflows.nodes.displayable.tool_calling_node import ToolCallingNode
+from vellum.workflows.nodes import ToolCallingNode
 
 
 class CasingTestNode(ToolCallingNode):
@@ -177,9 +169,7 @@ exports[`ToolCallingNode > function ordering > should preserve order: code-exec,
 "from .add_numbers import add_numbers
 from .subtract_workflow.workflow import SubtractWorkflow
 
-from vellum.workflows.nodes.displayable.tool_calling_node import (
-    ToolCallingNode as BaseToolCallingNode,
-)
+from vellum.workflows.nodes import ToolCallingNode as BaseToolCallingNode
 
 
 class ToolCallingNode(BaseToolCallingNode):
@@ -191,9 +181,7 @@ exports[`ToolCallingNode > function ordering > should preserve order: workflow, 
 "from .add_numbers import add_numbers
 from .subtract_workflow.workflow import SubtractWorkflow
 
-from vellum.workflows.nodes.displayable.tool_calling_node import (
-    ToolCallingNode as BaseToolCallingNode,
-)
+from vellum.workflows.nodes import ToolCallingNode as BaseToolCallingNode
 
 
 class ToolCallingNode(BaseToolCallingNode):
@@ -204,9 +192,7 @@ class ToolCallingNode(BaseToolCallingNode):
 exports[`ToolCallingNode > inline workflow > should generate inline workflow function name 1`] = `
 "from .subtract.workflow import Subtract
 
-from vellum.workflows.nodes.displayable.tool_calling_node import (
-    ToolCallingNode as BaseToolCallingNode,
-)
+from vellum.workflows.nodes import ToolCallingNode as BaseToolCallingNode
 
 
 class ToolCallingNode(BaseToolCallingNode):
@@ -221,9 +207,7 @@ exports[`ToolCallingNode > input variables > should generate input variables 1`]
     RichTextPromptBlock,
     VariablePromptBlock,
 )
-from vellum.workflows.nodes.displayable.tool_calling_node import (
-    ToolCallingNode as BaseToolCallingNode,
-)
+from vellum.workflows.nodes import ToolCallingNode as BaseToolCallingNode
 
 
 class ToolCallingNode(BaseToolCallingNode):
@@ -255,9 +239,7 @@ Summarize the following text:
 
 exports[`ToolCallingNode > mcp server > should generate mcp server 1`] = `
 "from vellum.workflows.constants import AuthorizationType
-from vellum.workflows.nodes.displayable.tool_calling_node import (
-    ToolCallingNode as BaseToolCallingNode,
-)
+from vellum.workflows.nodes import ToolCallingNode as BaseToolCallingNode
 from vellum.workflows.references import EnvironmentVariableReference
 from vellum.workflows.types.definition import MCPServer
 
@@ -277,9 +259,7 @@ class ToolCallingNode(BaseToolCallingNode):
 `;
 
 exports[`ToolCallingNode > mcp server > should generate mcp server with no authorization type 1`] = `
-"from vellum.workflows.nodes.displayable.tool_calling_node import (
-    ToolCallingNode as BaseToolCallingNode,
-)
+"from vellum.workflows.nodes import ToolCallingNode as BaseToolCallingNode
 from vellum.workflows.types.definition import MCPServer
 
 
@@ -289,9 +269,7 @@ class ToolCallingNode(BaseToolCallingNode):
 `;
 
 exports[`ToolCallingNode > mcp server > should generate mcp server with null authorization type 1`] = `
-"from vellum.workflows.nodes.displayable.tool_calling_node import (
-    ToolCallingNode as BaseToolCallingNode,
-)
+"from vellum.workflows.nodes import ToolCallingNode as BaseToolCallingNode
 from vellum.workflows.types.definition import MCPServer
 
 
@@ -302,9 +280,7 @@ class ToolCallingNode(BaseToolCallingNode):
 
 exports[`ToolCallingNode > no tools with jinja blocks > should be resilient to extra keys in jinja blocks 1`] = `
 "from vellum import JinjaPromptBlock
-from vellum.workflows.nodes.displayable.tool_calling_node import (
-    ToolCallingNode as BaseToolCallingNode,
-)
+from vellum.workflows.nodes import ToolCallingNode as BaseToolCallingNode
 
 
 class ToolCallingNode(BaseToolCallingNode):
@@ -316,9 +292,7 @@ class ToolCallingNode(BaseToolCallingNode):
 
 exports[`ToolCallingNode > no tools with jinja blocks > should handle invalid jinja blocks with missing template field 1`] = `
 "from vellum import JinjaPromptBlock
-from vellum.workflows.nodes.displayable.tool_calling_node import (
-    ToolCallingNode as BaseToolCallingNode,
-)
+from vellum.workflows.nodes import ToolCallingNode as BaseToolCallingNode
 
 
 class ToolCallingNode(BaseToolCallingNode):
@@ -329,9 +303,7 @@ class ToolCallingNode(BaseToolCallingNode):
 `;
 
 exports[`ToolCallingNode > workflow deployment > should generate latest release tag if release_tag is null 1`] = `
-"from vellum.workflows.nodes.displayable.tool_calling_node import (
-    ToolCallingNode as BaseToolCallingNode,
-)
+"from vellum.workflows.nodes import ToolCallingNode as BaseToolCallingNode
 from vellum.workflows.types.definition import DeploymentDefinition
 
 

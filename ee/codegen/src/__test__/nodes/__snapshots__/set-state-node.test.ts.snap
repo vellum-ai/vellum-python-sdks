@@ -32,9 +32,7 @@ class SetStateNodeDisplay(BaseNodeDisplay[SetStateNode]):
 `;
 
 exports[`SetStateNode > basic > getNodeFile 1`] = `
-"from vellum.workflows.nodes.displayable.set_state_node import (
-    SetStateNode as BaseSetStateNode,
-)
+"from vellum.workflows.nodes import SetStateNode as BaseSetStateNode
 
 from .my_custom_node import MyCustomNode
 from ..state import State
