@@ -26,6 +26,22 @@ export function jsonSchemaToType(
   } else if (schemaType === "array") {
     const items = schema.items as Record<string, unknown> | undefined;
     if (items) {
+      // Handle $ref in items
+      if (items.$ref && typeof items.$ref === "string") {
+        const refPath = items.$ref as string;
+        // Extract the type name from the $ref path
+        // e.g., "#/$defs/vellum.client.types.chat_message.ChatMessage" -> "ChatMessage"
+        const typeName = refPath.split(".").pop() || refPath.split("/").pop();
+        if (typeName) {
+          const itemType = python.Type.reference(
+            python.reference({
+              name: typeName,
+              modulePath: VELLUM_CLIENT_MODULE_PATH,
+            })
+          );
+          return new BuiltinListType(itemType);
+        }
+      }
       const itemType = jsonSchemaToType(items);
       return new BuiltinListType(itemType);
     }
