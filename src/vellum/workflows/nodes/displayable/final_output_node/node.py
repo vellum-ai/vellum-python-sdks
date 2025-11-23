@@ -84,13 +84,17 @@ class _FinalOutputNodeMeta(BaseNodeMeta):
                 ):
                     type_mismatch = False
                     break
-                # Check if both types have the same origin (e.g., list[str] and List[str])
+                # Check if both types have the same origin and args (e.g., list[str] and List[str])
                 descriptor_origin = get_origin(descriptor_type)
                 declared_origin = get_origin(declared_output_type)
                 if descriptor_origin is not None and declared_origin is not None:
                     if descriptor_origin == declared_origin:
-                        type_mismatch = False
-                        break
+                        # Also check that the generic arguments match
+                        descriptor_args = get_args(descriptor_type)
+                        declared_args = get_args(declared_output_type)
+                        if descriptor_args == declared_args:
+                            type_mismatch = False
+                            break
                 try:
                     if issubclass(descriptor_type, declared_output_type) or issubclass(
                         declared_output_type, descriptor_type

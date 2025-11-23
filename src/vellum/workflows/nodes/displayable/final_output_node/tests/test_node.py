@@ -139,3 +139,31 @@ def test_final_output_node__list_str_output_type_should_pass_validation():
         ListStrOutputNode.__validate__()
     except ValueError as e:
         pytest.fail(f"Validation should not raise an exception for list[str]/List[str] compatibility: {e}")
+
+
+def test_final_output_node__list_with_mismatched_args_should_raise_exception():
+    """
+    Tests that FinalOutputNode with list[int] output type rejects a descriptor with List[str] type.
+    """
+
+    # GIVEN a FinalOutputNode declared with list[int] output type
+    # AND the value descriptor has List[str] type (mismatched generic args)
+    class MismatchedListOutputNode(FinalOutputNode[BaseState, list[int]]):
+        """Output with list[int] type."""
+
+        class Outputs(FinalOutputNode.Outputs):
+            value = OutputReference(
+                name="value",
+                types=(List[str],),
+                instance=None,
+                outputs_class=FinalOutputNode.Outputs,
+            )
+
+    # WHEN attempting to validate the node class
+    # THEN a ValueError should be raised during validation
+    with pytest.raises(ValueError) as exc_info:
+        MismatchedListOutputNode.__validate__()
+
+    # AND the error message should indicate the type mismatch
+    assert "Output type mismatch" in str(exc_info.value)
+    assert "list" in str(exc_info.value)
