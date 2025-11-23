@@ -117,4 +117,13 @@ describe("jsonSchemaToType", () => {
     result.write(writer);
     expect(writer.toString()).toBe("list[ChatMessage]");
   });
+
+  it("should convert top-level $ref schema to referenced type", () => {
+    const schema = {
+      $ref: "#/$defs/vellum.client.types.chat_message.ChatMessage",
+    };
+    const result = jsonSchemaToType(schema);
+    result.write(writer);
+    expect(writer.toString()).toBe("ChatMessage");
+  });
 });

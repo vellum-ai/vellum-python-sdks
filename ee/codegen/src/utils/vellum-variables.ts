@@ -7,12 +7,56 @@ import { BuiltinListType } from "src/generators/extensions/list";
 import { assertUnreachable } from "src/utils/typing";
 
 /**
+ * Parses a $ref path and extracts the type name and module path.
+ * Examples:
+ * - "#/$defs/vellum.client.types.chat_message.ChatMessage" -> { name: "ChatMessage", modulePath: ["vellum", "client", "types", "chat_message"] }
+ * - "#/definitions/ChatMessage" -> { name: "ChatMessage", modulePath: ["vellum", "client"] }
+ */
+function parseRef(refPath: string): {
+  name: string;
+  modulePath: string[];
+} {
+  // Remove the leading "#/" or "#/$defs/" prefix
+  const withoutPrefix = refPath.replace(/^#\/(\$defs\/)?/, "");
+
+  // Split by "/" to get path segments
+  const segments = withoutPrefix.split("/");
+
+  // The last segment contains the full dotted path to the type
+  const lastSegment = segments[segments.length - 1];
+
+  // Split the last segment by "." to separate module path from type name
+  const parts = lastSegment.split(".");
+
+  if (parts.length > 1) {
+    // Extract type name (last part) and module path (everything before)
+    const name = parts[parts.length - 1];
+    const modulePath = parts.slice(0, -1);
+    return { name, modulePath };
+  } else {
+    // No dots in the path, just a type name - use default module path
+    return { name: lastSegment, modulePath: VELLUM_CLIENT_MODULE_PATH };
+  }
+}
+
+/**
  * Converts a JSON Schema to a Python type annotation.
- * Currently supports basic types: string, number, integer, boolean, array, object, null.
+ * Currently supports basic types: string, number, integer, boolean, array, object, null, and $ref.
  */
 export function jsonSchemaToType(
   schema: Record<string, unknown>
 ): python.Type | PythonType {
+  // Handle $ref at the top level
+  if (schema.$ref && typeof schema.$ref === "string") {
+    const { name, modulePath } = parseRef(schema.$ref);
+    return python.Type.reference(
+      python.reference({
+        name,
+        modulePath,
+      })
+    );
+  }
+
   const schemaType = schema.type;
 
   if (schemaType === "string") {
@@ -26,22 +70,7 @@ export function jsonSchemaToType(
   } else if (schemaType === "array") {
     const items = schema.items as Record<string, unknown> | undefined;
     if (items) {
-      // Handle $ref in items
-      if (items.$ref && typeof items.$ref === "string") {
-        const refPath = items.$ref as string;
-        // Extract the type name from the $ref path
-        // e.g., "#/$defs/vellum.client.types.chat_message.ChatMessage" -> "ChatMessage"
-        const typeName = refPath.split(".").pop() || refPath.split("/").pop();
-        if (typeName) {
-          const itemType = python.Type.reference(
-            python.reference({
-              name: typeName,
-              modulePath: VELLUM_CLIENT_MODULE_PATH,
-            })
-          );
-          return new BuiltinListType(itemType);
-        }
-      }
+      // Recursively handle items (including $ref via top-level handling)
       const itemType = jsonSchemaToType(items);
       return new BuiltinListType(itemType);
     }
