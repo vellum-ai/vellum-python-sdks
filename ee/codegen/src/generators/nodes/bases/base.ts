@@ -625,7 +625,7 @@ export abstract class BaseNode<
     return undefined;
   }
 
-  protected getNodeDisplay(): AstNode | undefined {
+  protected getNodeDisplay(): NodeDisplay | undefined {
     if (this.nodeData.displayData) {
       return new NodeDisplay({
         nodeDisplayData: this.nodeData.displayData,
@@ -669,7 +669,7 @@ export abstract class BaseNode<
 
       const nodeDisplay = this.getNodeDisplay();
 
-      if (nodeDisplay) {
+      if (nodeDisplay && !nodeDisplay.isEmpty()) {
         nodeClass.add(nodeDisplay);
       }
 

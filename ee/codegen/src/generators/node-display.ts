@@ -36,6 +36,10 @@ export class NodeDisplay extends AstNode {
     }
   }
 
+  public isEmpty(): boolean {
+    return this.astNode === undefined;
+  }
+
   private constructNodeDisplay(
     nodeDisplayData: NodeDisplayDataType | undefined,
     nodeContext: BaseNodeContext<WorkflowDataNode>

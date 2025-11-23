@@ -1495,6 +1495,7 @@ export function genericNodeFactory({
   adornments,
   base,
   definition,
+  displayData,
 }: {
   id?: string;
   label?: string;
@@ -1505,6 +1506,7 @@ export function genericNodeFactory({
   adornments?: AdornmentNode[];
   base?: CodeResourceDefinition;
   definition?: CodeResourceDefinition;
+  displayData?: NodeDisplayData;
 } = {}): GenericNode {
   const label = _label ?? "MyCustomNode";
   const nodeData: GenericNode = {
@@ -1560,6 +1562,7 @@ export function genericNodeFactory({
       },
     ],
     adornments: adornments,
+    displayData,
   };
   return nodeData;
 }

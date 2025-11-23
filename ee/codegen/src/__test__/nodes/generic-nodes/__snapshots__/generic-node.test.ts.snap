@@ -371,3 +371,12 @@ class MyCustomNode(BaseNode):
         merge_behavior = MergeBehavior.AWAIT_ALL
 "
 `;
+
+exports[`GenericNode > generic node with no attributes, no ports, no outputs > getNodeFile 1`] = `
+"from vellum.workflows.nodes import BaseNode
+
+
+class MyCustomNode(BaseNode):
+    pass
+"
+`;
