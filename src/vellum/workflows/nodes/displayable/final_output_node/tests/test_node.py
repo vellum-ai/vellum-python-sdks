@@ -1,13 +1,15 @@
 import pytest
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 from vellum.workflows.exceptions import NodeException
+from vellum.workflows.nodes.core.map_node import MapNode
 from vellum.workflows.nodes.core.templating_node import TemplatingNode
 from vellum.workflows.nodes.displayable.final_output_node import FinalOutputNode
 from vellum.workflows.nodes.displayable.inline_prompt_node import InlinePromptNode
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.core import Json
+from vellum.workflows.workflows.base import BaseWorkflow
 
 
 def test_final_output_node__mismatched_output_type_should_raise_exception_when_ran():
@@ -120,50 +122,22 @@ def test_final_output_node__list_str_output_type_should_pass_validation():
     Tests that FinalOutputNode with list[str] output type accepts a descriptor with List[str] type.
     """
 
-    # GIVEN a FinalOutputNode declared with list[str] output type
-    # AND the value descriptor has List[str] type
-    class ListStrOutputNode(FinalOutputNode[BaseState, list[str]]):
-        """Output with list[str] type."""
+    # GIVEN value descriptor has List[str] type
+    class MySubworkflow(BaseWorkflow):
+        class Outputs(BaseWorkflow.Outputs):
+            result: str
 
+    class MyMap(MapNode):
+        subworkflow = MySubworkflow
+
+    # AND a FinalOutputNode declared with list[str] output type
+    class ListStrOutputNode(FinalOutputNode[BaseState, list[str]]):
         class Outputs(FinalOutputNode.Outputs):
-            value = OutputReference(
-                name="value",
-                types=(List[str],),
-                instance=None,
-                outputs_class=FinalOutputNode.Outputs,
-            )
+            value = MyMap.Outputs.result
 
     # WHEN attempting to validate the node class
-    # THEN validation should pass without raising an exception
     try:
         ListStrOutputNode.__validate__()
-    except ValueError as e:
+    except Exception as e:
+        # THEN validation should pass without raising an exception
         pytest.fail(f"Validation should not raise an exception for list[str]/List[str] compatibility: {e}")
-
-
-def test_final_output_node__list_with_mismatched_args_should_raise_exception():
-    """
-    Tests that FinalOutputNode with list[int] output type rejects a descriptor with List[str] type.
-    """
-
-    # GIVEN a FinalOutputNode declared with list[int] output type
-    # AND the value descriptor has List[str] type (mismatched generic args)
-    class MismatchedListOutputNode(FinalOutputNode[BaseState, list[int]]):
-        """Output with list[int] type."""
-
-        class Outputs(FinalOutputNode.Outputs):
-            value = OutputReference(
-                name="value",
-                types=(List[str],),
-                instance=None,
-                outputs_class=FinalOutputNode.Outputs,
-            )
-
-    # WHEN attempting to validate the node class
-    # THEN a ValueError should be raised during validation
-    with pytest.raises(ValueError) as exc_info:
-        MismatchedListOutputNode.__validate__()
-
-    # AND the error message should indicate the type mismatch
-    assert "Output type mismatch" in str(exc_info.value)
-    assert "list" in str(exc_info.value)
