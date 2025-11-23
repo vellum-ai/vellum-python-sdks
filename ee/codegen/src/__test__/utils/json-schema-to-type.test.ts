@@ -105,4 +105,25 @@ describe("jsonSchemaToType", () => {
     result.write(writer);
     expect(writer.toString()).toBe("Union[str, int]");
   });
+
+  it("should convert array schema with $ref items to list[TypeName] type", () => {
+    const schema = {
+      type: "array",
+      items: {
+        $ref: "#/$defs/vellum.client.types.chat_message.ChatMessage",
+      },
+    };
+    const result = jsonSchemaToType(schema);
+    result.write(writer);
+    expect(writer.toString()).toBe("list[ChatMessage]");
+  });
+
+  it("should convert top-level $ref schema to referenced type", () => {
+    const schema = {
+      $ref: "#/$defs/vellum.client.types.chat_message.ChatMessage",
+    };
+    const result = jsonSchemaToType(schema);
+    result.write(writer);
+    expect(writer.toString()).toBe("ChatMessage");
+  });
 });
