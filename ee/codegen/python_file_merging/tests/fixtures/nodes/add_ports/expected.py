@@ -1,4 +1,4 @@
-from vellum.workflows.nodes import BaseNode
+from vellum.workflows import BaseNode
 from vellum.workflows.ports import Port
 
 from ..inputs import Inputs

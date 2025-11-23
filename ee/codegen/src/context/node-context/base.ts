@@ -66,7 +66,6 @@ export abstract class BaseNodeContext<T extends WorkflowDataNode> {
       ) {
         this.baseNodeClassModulePath = args.nodeData.base.module;
       } else {
-        // Use VELLUM_WORKFLOWS_ROOT_MODULE_PATH for BaseNode imports
         this.baseNodeClassModulePath = VELLUM_WORKFLOWS_ROOT_MODULE_PATH;
       }
     } else if (
