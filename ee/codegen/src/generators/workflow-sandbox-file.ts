@@ -6,6 +6,7 @@ import { vellumValue } from "src/codegen";
 import { VELLUM_WORKFLOW_ROOT_MODULE_PATH } from "src/constants";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
 import { NodeNotFoundError } from "src/generators/errors";
+import { Json } from "src/generators/json";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import {
   WorkflowSandboxDatasetRow,
@@ -239,7 +240,7 @@ if __name__ == "__main__":
     ).map(([key, value]) =>
       python.methodArgument({
         name: key,
-        value: python.TypeInstantiation.str(String(value)),
+        value: new Json(value),
       })
     );
 

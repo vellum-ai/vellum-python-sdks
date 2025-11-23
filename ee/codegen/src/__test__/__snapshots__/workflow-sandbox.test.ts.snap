@@ -16,7 +16,17 @@ dataset = [
         mocks=[
             MockNodeExecution(
                 when_condition=Inputs.test_input.equals("test-value"),
-                then_outputs=MyCustomNode.Outputs(result="mocked_result"),
+                then_outputs=MyCustomNode.Outputs(
+                    result="mocked_result",
+                    count=42,
+                    flag=True,
+                    payload={
+                        "foo": "bar",
+                        "nested": {
+                            "value": 123,
+                        },
+                    },
+                ),
             ),
         ],
     ),
