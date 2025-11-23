@@ -1,10 +1,10 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
 import { inputVariableContextFactory } from "src/__test__/helpers/input-variable-context-factory";
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
+import { Writer } from "src/generators/extensions/writer";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import {
   WorkflowDataNode,

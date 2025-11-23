@@ -1,5 +1,3 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
-
 import { workflowContextFactory } from "./helpers";
 import {
   EdgeFactoryNodePair,
@@ -14,6 +12,7 @@ import {
 
 import * as codegen from "src/codegen";
 import { createNodeContext } from "src/context";
+import { Writer } from "src/generators/extensions/writer";
 
 describe("Workflow", () => {
   const entrypointNode = entrypointNodeDataFactory();

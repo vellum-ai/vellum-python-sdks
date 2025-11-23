@@ -1,8 +1,8 @@
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
-import { Writer } from "@fern-api/python-ast/core/Writer";
 
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
+import { Writer } from "src/generators/extensions/writer";
 import {
   IterableConfig,
   NodeInputValuePointerRule as NodeInputValuePointerRuleType,

@@ -1,4 +1,3 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { MetricDefinitionHistoryItem } from "vellum-ai/api";
 import { MetricDefinitions as MetricDefinitionsClient } from "vellum-ai/api/resources/metricDefinitions/client/Client";
 import { VellumError } from "vellum-ai/errors";
@@ -9,6 +8,7 @@ import { inputVariableContextFactory } from "src/__test__/helpers/input-variable
 import { guardrailNodeDataFactory } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { GuardrailNodeContext } from "src/context/node-context/guardrail-node";
+import { Writer } from "src/generators/extensions/writer";
 import { GuardrailNode } from "src/generators/nodes/guardrail-node";
 
 describe("GuardrailNode", () => {

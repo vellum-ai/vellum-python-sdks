@@ -1,4 +1,3 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { DocumentIndexRead } from "vellum-ai/api";
 import { DocumentIndexes as DocumentIndexesClient } from "vellum-ai/api/resources/documentIndexes/client/Client";
 import { vi } from "vitest";
@@ -9,6 +8,7 @@ import {
 } from "src/__test__/helpers";
 import { mockDocumentIndexFactory } from "src/__test__/helpers/document-index-factory";
 import { searchNodeDataFactory } from "src/__test__/helpers/node-data-factories";
+import { Writer } from "src/generators/extensions/writer";
 import { ExecutionCounterPointerRule } from "src/generators/node-inputs/node-input-value-pointer-rules/execution-counter-pointer";
 
 describe("ExecutionCounterPointer", () => {

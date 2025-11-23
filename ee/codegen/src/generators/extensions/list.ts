@@ -1,7 +1,8 @@
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
-import { Writer } from "@fern-api/python-ast/core/Writer";
 
 import { PythonType } from "./type";
+
+import { Writer } from "src/generators/extensions/writer";
 
 /**
  * Creates a built-in list type annotation using lowercase `list[T]` instead of `List[T]` from typing.

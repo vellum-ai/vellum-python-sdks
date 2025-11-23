@@ -1,4 +1,3 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { VellumVariable } from "vellum-ai/api";
 import { StringInput } from "vellum-ai/api/types";
 
@@ -8,6 +7,7 @@ import { nodeContextFactory } from "./helpers/node-context-factory";
 import { genericNodeFactory } from "./helpers/node-data-factories";
 
 import * as codegen from "src/codegen";
+import { Writer } from "src/generators/extensions/writer";
 import {
   WorkflowSandboxDatasetRow,
   WorkflowTrigger,

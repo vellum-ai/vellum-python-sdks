@@ -1,7 +1,6 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
-
 import { workflowContextFactory } from "src/__test__/helpers";
 import { WorkflowContext } from "src/context";
+import { Writer } from "src/generators/extensions/writer";
 import { EnvironmentVariableWorkflowReference } from "src/generators/workflow-value-descriptor-reference/environment-variable-workflow-reference";
 import { WorkflowValueDescriptorReference } from "src/types/vellum";
 

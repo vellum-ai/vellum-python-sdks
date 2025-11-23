@@ -1,7 +1,6 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
-
 import { workflowContextFactory } from "src/__test__/helpers";
 import { WorkflowContext } from "src/context";
+import { Writer } from "src/generators/extensions/writer";
 import { TriggerAttributeWorkflowReference } from "src/generators/workflow-value-descriptor-reference/trigger-attribute-workflow-reference";
 import {
   IntegrationProvider,

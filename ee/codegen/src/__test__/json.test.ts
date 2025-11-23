@@ -1,5 +1,4 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
-
+import { Writer } from "src/generators/extensions/writer";
 import { Json } from "src/generators/json";
 
 describe("Json", () => {

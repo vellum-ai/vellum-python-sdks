@@ -1,4 +1,3 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
@@ -10,6 +9,7 @@ import {
 import { stateVariableContextFactory } from "src/__test__/helpers/state-variable-context-factory";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { GenericNodeContext } from "src/context/node-context/generic-node";
+import { Writer } from "src/generators/extensions/writer";
 import { GenericNode as GenericNodeClass } from "src/generators/nodes/generic-node";
 import { NodePort } from "src/types/vellum";
 

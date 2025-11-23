@@ -1,10 +1,10 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { vi } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
 import { inputVariableContextFactory } from "src/__test__/helpers/input-variable-context-factory";
 import { stateVariableContextFactory } from "src/__test__/helpers/state-variable-context-factory";
 import { WorkflowContext } from "src/context";
+import { Writer } from "src/generators/extensions/writer";
 import { DictionaryWorkflowReference } from "src/generators/workflow-value-descriptor-reference/dictionary-workflow-reference";
 import { DictionaryWorkflowReference as DictionaryWorkflowReferenceType } from "src/types/vellum";
 

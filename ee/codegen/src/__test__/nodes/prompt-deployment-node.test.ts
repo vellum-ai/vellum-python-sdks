@@ -1,4 +1,3 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { v4 as uuidv4 } from "uuid";
 import { Deployments as PromptDeploymentReleaseClient } from "vellum-ai/api/resources/deployments/client/Client";
 import { PromptDeploymentRelease } from "vellum-ai/api/types/PromptDeploymentRelease";
@@ -13,6 +12,7 @@ import {
 import { stateVariableContextFactory } from "src/__test__/helpers/state-variable-context-factory";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { PromptDeploymentNodeContext } from "src/context/node-context/prompt-deployment-node";
+import { Writer } from "src/generators/extensions/writer";
 import { PromptDeploymentNode } from "src/generators/nodes/prompt-deployment-node";
 import { NodeOutput as NodeOutputType } from "src/types/vellum";
 describe("PromptDeploymentNode", () => {

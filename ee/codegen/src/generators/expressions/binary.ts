@@ -1,8 +1,8 @@
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
-import { Writer } from "@fern-api/python-ast/core/Writer";
 
 import { WorkflowContext } from "src/context";
 import { NodeAttributeGenerationError } from "src/generators/errors";
+import { Writer } from "src/generators/extensions/writer";
 
 export declare namespace BinaryExpression {
   interface Args {

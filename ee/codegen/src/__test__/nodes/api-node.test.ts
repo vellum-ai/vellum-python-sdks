@@ -1,4 +1,3 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { v4 as uuidv4 } from "uuid";
 import { SecretTypeEnum, WorkspaceSecretRead } from "vellum-ai/api";
 import { WorkspaceSecrets } from "vellum-ai/api/resources/workspaceSecrets/client/Client";
@@ -15,6 +14,7 @@ import {
 import { createNodeContext, WorkflowContext } from "src/context";
 import { ApiNodeContext } from "src/context/node-context/api-node";
 import { EntityNotFoundError } from "src/generators/errors";
+import { Writer } from "src/generators/extensions/writer";
 import { ApiNode } from "src/generators/nodes/api-node";
 
 describe("ApiNode", () => {

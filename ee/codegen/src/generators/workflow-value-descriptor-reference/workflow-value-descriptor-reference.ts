@@ -1,5 +1,4 @@
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
-import { Writer } from "@fern-api/python-ast/core/Writer";
 
 import { ArrayWorkflowReference } from "./array-workflow-reference";
 import { DictionaryWorkflowReference } from "./dictionary-workflow-reference";
@@ -7,6 +6,7 @@ import { WorkflowStateReference } from "./workflow-state-reference";
 
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
+import { Writer } from "src/generators/extensions/writer";
 import { BaseNodeInputWorkflowReference } from "src/generators/workflow-value-descriptor-reference/BaseNodeInputWorkflowReference";
 import { ConstantValueReference } from "src/generators/workflow-value-descriptor-reference/constant-value-reference";
 import { EnvironmentVariableWorkflowReference } from "src/generators/workflow-value-descriptor-reference/environment-variable-workflow-reference";

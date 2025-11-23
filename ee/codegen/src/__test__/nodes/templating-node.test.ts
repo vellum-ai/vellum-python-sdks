@@ -1,4 +1,3 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { v4 as uuidv4 } from "uuid";
 import { VellumVariableType } from "vellum-ai/api/types";
 import { beforeEach } from "vitest";
@@ -12,6 +11,7 @@ import {
 import { createNodeContext, WorkflowContext } from "src/context";
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
 import { NodeNotFoundError } from "src/generators/errors";
+import { Writer } from "src/generators/extensions/writer";
 import { TemplatingNode } from "src/generators/nodes/templating-node";
 import {
   NodePort,

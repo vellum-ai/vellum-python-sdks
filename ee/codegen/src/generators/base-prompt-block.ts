@@ -2,7 +2,6 @@ import { python } from "@fern-api/python-ast";
 import { ClassInstantiation } from "@fern-api/python-ast/ClassInstantiation";
 import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { isNil } from "lodash";
 import {
   AudioPromptBlock,
@@ -18,6 +17,7 @@ import {
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { WorkflowContext } from "src/context/workflow-context";
+import { Writer } from "src/generators/extensions/writer";
 import {
   FunctionDefinitionPromptTemplateBlock,
   PlainTextPromptTemplateBlock,

@@ -1,7 +1,6 @@
 import { mkdir, readFile } from "fs/promises";
 import { join } from "path";
 
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { v4 as uuid } from "uuid";
 import { SecretTypeEnum, WorkspaceSecretRead } from "vellum-ai/api";
 import { WorkspaceSecrets } from "vellum-ai/api/resources/workspaceSecrets/client/Client";
@@ -18,6 +17,7 @@ import { makeTempDir } from "src/__test__/helpers/temp-dir";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { CodeExecutionContext } from "src/context/node-context/code-execution-node";
 import { NodeAttributeGenerationError } from "src/generators/errors";
+import { Writer } from "src/generators/extensions/writer";
 import { CodeExecutionNode } from "src/generators/nodes/code-execution-node";
 import {
   NodeInput,

@@ -1,6 +1,5 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
-
 import { ChatMessageContent } from "src/generators/chat-message-content";
+import { Writer } from "src/generators/extensions/writer";
 
 describe("ChatMessageContent", () => {
   let writer: Writer;

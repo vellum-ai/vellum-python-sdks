@@ -1,11 +1,11 @@
 import { python } from "@fern-api/python-ast";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
-import { Writer } from "@fern-api/python-ast/core/Writer";
 
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { Class } from "src/generators/extensions/class";
+import { Writer } from "src/generators/extensions/writer";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import {
   NodePort as NodePortType,

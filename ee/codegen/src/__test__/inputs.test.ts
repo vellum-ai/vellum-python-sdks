@@ -1,4 +1,3 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { Vellum } from "vellum-ai";
 import { VellumVariable } from "vellum-ai/api";
 import { VellumVariableType } from "vellum-ai/api/types";
@@ -8,6 +7,7 @@ import { inputVariableContextFactory } from "./helpers/input-variable-context-fa
 
 import * as codegen from "src/codegen";
 import { WorkflowContext } from "src/context";
+import { Writer } from "src/generators/extensions/writer";
 
 describe("Inputs", () => {
   let workflowContext: WorkflowContext;

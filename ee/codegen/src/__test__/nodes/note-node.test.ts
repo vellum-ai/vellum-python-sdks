@@ -1,10 +1,10 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { beforeEach } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
 import { noteNodeDataFactory } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { NoteNodeContext } from "src/context/node-context/note-node";
+import { Writer } from "src/generators/extensions/writer";
 import { NoteNode } from "src/generators/nodes/note-node";
 
 describe("NoteNode", () => {

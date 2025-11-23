@@ -1,7 +1,6 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
-
 import { nodeContextFactory } from "src/__test__/helpers";
 import { BaseNodeContext } from "src/context/node-context/base";
+import { Writer } from "src/generators/extensions/writer";
 import { WorkspaceSecretPointerRule } from "src/generators/node-inputs/node-input-value-pointer-rules/workspace-secret-pointer";
 import { WorkflowDataNode } from "src/types/vellum";
 

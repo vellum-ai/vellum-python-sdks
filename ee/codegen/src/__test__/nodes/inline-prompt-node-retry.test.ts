@@ -1,4 +1,3 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { v4 as uuidv4 } from "uuid";
 import { beforeEach, describe, expect, it } from "vitest";
 
@@ -7,6 +6,7 @@ import { inputVariableContextFactory } from "src/__test__/helpers/input-variable
 import { inlinePromptNodeDataInlineVariantFactory } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-node";
+import { Writer } from "src/generators/extensions/writer";
 import { InlinePromptNode } from "src/generators/nodes/inline-prompt-node";
 import { AdornmentNode } from "src/types/vellum";
 

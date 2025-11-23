@@ -1,4 +1,3 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { v4 as uuidv4 } from "uuid";
 import { PromptSettings } from "vellum-ai/api";
 import { beforeEach } from "vitest";
@@ -14,6 +13,7 @@ import {
 import { stateVariableContextFactory } from "src/__test__/helpers/state-variable-context-factory";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-node";
+import { Writer } from "src/generators/extensions/writer";
 import { InlinePromptNode } from "src/generators/nodes/inline-prompt-node";
 import {
   NodeAttribute as NodeAttributeType,

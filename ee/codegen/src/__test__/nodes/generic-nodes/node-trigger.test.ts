@@ -1,10 +1,10 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
 import { genericNodeFactory } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { GenericNodeContext } from "src/context/node-context/generic-node";
+import { Writer } from "src/generators/extensions/writer";
 import { NodeTrigger } from "src/generators/node-trigger";
 import { NodeTrigger as NodeTriggerType } from "src/types/vellum";
 

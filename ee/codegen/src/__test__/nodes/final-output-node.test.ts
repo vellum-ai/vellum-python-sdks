@@ -1,4 +1,3 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { beforeEach } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
@@ -6,6 +5,7 @@ import { finalOutputNodeFactory } from "src/__test__/helpers/node-data-factories
 import { createNodeContext, WorkflowContext } from "src/context";
 import { FinalOutputNodeContext } from "src/context/node-context/final-output-node";
 import { NodeAttributeGenerationError } from "src/generators/errors";
+import { Writer } from "src/generators/extensions/writer";
 import { FinalOutputNode } from "src/generators/nodes/final-output-node";
 
 describe("FinalOutputNode", () => {

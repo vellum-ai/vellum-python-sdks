@@ -1,4 +1,3 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { describe, it, expect, beforeEach } from "vitest";
 
 import {
@@ -8,6 +7,7 @@ import {
 import { genericNodeFactory } from "src/__test__/helpers/node-data-factories";
 import { WorkflowContext, createNodeContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
+import { Writer } from "src/generators/extensions/writer";
 import { NodeInputValuePointer } from "src/generators/node-inputs/node-input-value-pointer";
 import {
   NodeInputValuePointer as NodeInputValuePointerType,

@@ -1,4 +1,3 @@
-import { Writer } from "@fern-api/python-ast/core/Writer";
 import { WorkflowDeploymentRelease } from "vellum-ai/api";
 import { WorkflowDeployments as WorkflowReleaseClient } from "vellum-ai/api/resources/workflowDeployments/client/Client";
 import { VellumError } from "vellum-ai/errors";
@@ -9,6 +8,7 @@ import { subworkflowDeploymentNodeDataFactory } from "src/__test__/helpers/node-
 import { createNodeContext, WorkflowContext } from "src/context";
 import { SubworkflowDeploymentNodeContext } from "src/context/node-context/subworkflow-deployment-node";
 import { NodeDefinitionGenerationError } from "src/generators/errors";
+import { Writer } from "src/generators/extensions/writer";
 import { SubworkflowDeploymentNode } from "src/generators/nodes/subworkflow-deployment-node";
 
 describe("SubworkflowDeploymentNode", () => {
