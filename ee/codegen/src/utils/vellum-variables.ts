@@ -1,7 +1,11 @@
 import { python } from "@fern-api/python-ast";
 import * as Vellum from "vellum-ai/api";
 
-import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
+import {
+  TYPING_MODULE_PATH,
+  VELLUM_CLIENT_MODULE_PATH,
+  VELLUM_WORKFLOWS_ROOT_MODULE_PATH,
+} from "src/constants";
 import { PythonType, UnionType } from "src/generators/extensions";
 import { BuiltinListType } from "src/generators/extensions/list";
 import { assertUnreachable } from "src/utils/typing";
@@ -10,7 +14,7 @@ import { assertUnreachable } from "src/utils/typing";
  * Parses a $ref path and extracts the type name and module path.
  * Examples:
  * - "#/$defs/vellum.client.types.chat_message.ChatMessage" -> { name: "ChatMessage", modulePath: ["vellum", "client", "types", "chat_message"] }
- * - "#/definitions/ChatMessage" -> { name: "ChatMessage", modulePath: ["vellum", "client"] }
+ * - "#/definitions/ChatMessage" -> { name: "ChatMessage", modulePath: ["vellum", "workflows"] }
  */
 function parseRef(refPath: string): {
   name: string;
@@ -27,7 +31,7 @@ function parseRef(refPath: string): {
 
   // Handle case where lastSegment might be undefined (empty ref path)
   if (!lastSegment) {
-    return { name: "Any", modulePath: [...VELLUM_CLIENT_MODULE_PATH] };
+    return { name: "Any", modulePath: [...TYPING_MODULE_PATH] };
   }
 
   // Split the last segment by "." to separate module path from type name
@@ -38,13 +42,16 @@ function parseRef(refPath: string): {
     const name = parts[parts.length - 1];
     if (!name) {
       // Edge case: ref ends with a dot
-      return { name: "Any", modulePath: [...VELLUM_CLIENT_MODULE_PATH] };
+      return { name: "Any", modulePath: [...TYPING_MODULE_PATH] };
     }
     const modulePath = parts.slice(0, -1);
     return { name, modulePath };
   } else {
-    // No dots in the path, just a type name - use default module path
-    return { name: lastSegment, modulePath: [...VELLUM_CLIENT_MODULE_PATH] };
+    // No dots in the path, just a type name - use workflows root module path
+    return {
+      name: lastSegment,
+      modulePath: [...VELLUM_WORKFLOWS_ROOT_MODULE_PATH],
+    };
   }
 }
 
@@ -79,7 +86,6 @@ export function jsonSchemaToType(
   } else if (schemaType === "array") {
     const items = schema.items as Record<string, unknown> | undefined;
     if (items) {
-      // Recursively handle items (including $ref via top-level handling)
       const itemType = jsonSchemaToType(items);
       return new BuiltinListType(itemType);
     }

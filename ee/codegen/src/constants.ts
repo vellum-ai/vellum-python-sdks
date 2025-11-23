@@ -1,5 +1,10 @@
 /* Module paths */
 export const VELLUM_CLIENT_MODULE_PATH = ["vellum"] as const;
+export const VELLUM_WORKFLOWS_ROOT_MODULE_PATH = [
+  "vellum",
+  "workflows",
+] as const;
+export const TYPING_MODULE_PATH = ["typing"] as const;
 export const VELLUM_WORKFLOW_NODE_BASE_TYPES_PATH = [
   "vellum",
   "workflows",
