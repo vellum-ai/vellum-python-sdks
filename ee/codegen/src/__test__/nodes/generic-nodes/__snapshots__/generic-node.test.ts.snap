@@ -374,11 +374,9 @@ class MyCustomNode(BaseNode):
 
 exports[`GenericNode > generic node with no attributes, no ports, no outputs > getNodeFile 1`] = `
 "from vellum.workflows.nodes import BaseNode
-from vellum.workflows.types.core import MergeBehavior
 
 
 class MyCustomNode(BaseNode):
-    class Trigger(BaseNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ALL
+    pass
 "
 `;

@@ -676,6 +676,10 @@ describe("GenericNode", () => {
         nodeAttributes: [],
         nodeOutputs: [],
         nodePorts: [],
+        nodeTrigger: {
+          id: uuidv4(),
+          mergeBehavior: "AWAIT_ATTRIBUTES",
+        },
       });
 
       const nodeContext = (await createNodeContext({
