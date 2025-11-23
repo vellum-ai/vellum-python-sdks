@@ -4,6 +4,8 @@ import { StringInput } from "vellum-ai/api/types";
 
 import { workflowContextFactory } from "./helpers";
 import { inputVariableContextFactory } from "./helpers/input-variable-context-factory";
+import { nodeContextFactory } from "./helpers/node-context-factory";
+import { genericNodeFactory } from "./helpers/node-data-factories";
 
 import * as codegen from "src/codegen";
 import {
@@ -244,6 +246,85 @@ describe("Workflow Sandbox", () => {
       expect(secondDatasetRowIndex).toBeGreaterThan(-1);
       const secondDatasetRowLine = lines[secondDatasetRowIndex];
       expect(secondDatasetRowLine).not.toContain("trigger=");
+    });
+
+    it("should generate DatasetRow with mocks when mocks are provided", async () => {
+      const writer = new Writer();
+      const uniqueWorkflowContext = workflowContextFactory();
+      const inputVariable: VellumVariable = {
+        id: "1",
+        key: "test_input",
+        type: "STRING",
+      };
+
+      uniqueWorkflowContext.addInputVariableContext(
+        inputVariableContextFactory({
+          inputVariableData: inputVariable,
+          workflowContext: uniqueWorkflowContext,
+        })
+      );
+
+      const genericNodeData = genericNodeFactory();
+      await nodeContextFactory({
+        workflowContext: uniqueWorkflowContext,
+        nodeData: genericNodeData,
+      });
+
+      const sandboxInputs: WorkflowSandboxDatasetRow[] = [
+        {
+          label: "Scenario with Mocks",
+          inputs: [
+            {
+              name: inputVariable.key,
+              type: "STRING",
+              value: "test-value",
+            },
+          ],
+          mocks: [
+            {
+              node_id: genericNodeData.id,
+              when_condition: {
+                type: "BINARY_EXPRESSION",
+                operator: "=",
+                lhs: {
+                  type: "WORKFLOW_INPUT",
+                  inputVariableId: "1",
+                },
+                rhs: {
+                  type: "CONSTANT_VALUE",
+                  value: {
+                    type: "STRING",
+                    value: "test-value",
+                  },
+                },
+              },
+              then_outputs: {
+                result: "mocked_result",
+              },
+            },
+          ],
+        },
+        {
+          label: "Scenario without Mocks",
+          inputs: [
+            {
+              name: inputVariable.key,
+              type: "STRING",
+              value: "test-value-2",
+            },
+          ],
+        },
+      ];
+
+      const sandbox = codegen.workflowSandboxFile({
+        workflowContext: uniqueWorkflowContext,
+        sandboxInputs,
+      });
+
+      sandbox.write(writer);
+      const result = await writer.toStringFormatted();
+
+      expect(result).toMatchSnapshot();
     });
   });
 });

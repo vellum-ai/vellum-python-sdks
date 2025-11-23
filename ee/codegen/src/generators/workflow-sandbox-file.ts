@@ -3,10 +3,14 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { isNil } from "lodash";
 
 import { vellumValue } from "src/codegen";
+import { VELLUM_WORKFLOW_ROOT_MODULE_PATH } from "src/constants";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
+import { NodeNotFoundError } from "src/generators/errors";
+import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import {
-  WorkflowSandboxInputs,
   WorkflowSandboxDatasetRow,
+  WorkflowSandboxDatasetRowMock,
+  WorkflowSandboxInputs,
 } from "src/types/vellum";
 import { removeEscapeCharacters } from "src/utils/casing";
 import { getGeneratedInputsModulePath } from "src/utils/paths";
@@ -102,6 +106,11 @@ if __name__ == "__main__":
     const workflowTriggerId: string | undefined = Array.isArray(row)
       ? undefined
       : row.workflow_trigger_id;
+    const mocks = Array.isArray(row)
+      ? undefined
+      : "mocks" in row
+      ? row.mocks
+      : undefined;
 
     const hasInputs = inputs.length > 0;
     const arguments_: python.MethodArgument[] = [
@@ -164,10 +173,96 @@ if __name__ == "__main__":
       }
     }
 
+    if (!isNil(mocks) && mocks.length > 0) {
+      const mockNodes = mocks
+        .map((mock) => this.getMockNodeExecution(mock))
+        .filter((node): node is python.ClassInstantiation => !isNil(node));
+
+      if (mockNodes.length > 0) {
+        const mocksArray = python.TypeInstantiation.list(mockNodes, {
+          endWithComma: true,
+        });
+
+        arguments_.push(
+          python.methodArgument({
+            name: "mocks",
+            value: mocksArray,
+          })
+        );
+      }
+    }
+
     return python.instantiateClass({
       classReference: python.reference({
         name: "DatasetRow",
         modulePath: ["vellum", "workflows", "inputs"],
+      }),
+      arguments_,
+    });
+  }
+
+  private getMockNodeExecution(
+    mock: WorkflowSandboxDatasetRowMock
+  ): python.ClassInstantiation | null {
+    const nodeContext = this.workflowContext.findNodeContext(mock.node_id);
+
+    if (!nodeContext) {
+      this.workflowContext.addError(
+        new NodeNotFoundError(
+          `Failed to generate mock for node_id '${mock.node_id}' because node context was not found`,
+          "WARNING"
+        )
+      );
+      return null;
+    }
+
+    const arguments_: python.MethodArgument[] = [];
+
+    // Generate when_condition using WorkflowValueDescriptor
+    if (!isNil(mock.when_condition)) {
+      const whenConditionAst = new WorkflowValueDescriptor({
+        workflowValueDescriptor: mock.when_condition,
+        workflowContext: this.workflowContext,
+      });
+
+      arguments_.push(
+        python.methodArgument({
+          name: "when_condition",
+          value: whenConditionAst,
+        })
+      );
+    }
+
+    // Generate then_outputs by instantiating the node's Outputs class
+    const outputsArguments: python.MethodArgument[] = Object.entries(
+      mock.then_outputs
+    ).map(([key, value]) =>
+      python.methodArgument({
+        name: key,
+        value: python.TypeInstantiation.str(String(value)),
+      })
+    );
+
+    const thenOutputsInstance = python.instantiateClass({
+      classReference: python.reference({
+        name: nodeContext.nodeClassName,
+        modulePath: nodeContext.nodeModulePath,
+        attribute: ["Outputs"],
+      }),
+      arguments_: outputsArguments,
+    });
+
+    arguments_.push(
+      python.methodArgument({
+        name: "then_outputs",
+        value: thenOutputsInstance,
+      })
+    );
+
+    return python.instantiateClass({
+      classReference: python.reference({
+        name: "MockNodeExecution",
+        modulePath: VELLUM_WORKFLOW_ROOT_MODULE_PATH,
       }),
       arguments_,
     });
