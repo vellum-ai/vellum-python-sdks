@@ -665,4 +665,34 @@ describe("GenericNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+
+  describe("generic node with no attributes, no ports, no outputs", () => {
+    /**
+     * Tests that a generic node with no attributes, no ports, and no outputs generates correctly.
+     */
+    it("getNodeFile", async () => {
+      // GIVEN a generic node with no attributes, no ports, and no outputs
+      const nodeData = genericNodeFactory({
+        nodeAttributes: [],
+        nodeOutputs: [],
+        nodePorts: [],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      // WHEN we generate the node file
+      node.getNodeFile().write(writer);
+
+      // THEN the output should match the snapshot
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });
