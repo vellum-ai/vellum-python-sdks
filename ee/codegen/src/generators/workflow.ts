@@ -21,6 +21,7 @@ import {
   NodeNotFoundError,
   NodePortNotFoundError,
 } from "src/generators/errors";
+import { Class } from "src/generators/extensions/class";
 import { GraphAttribute } from "src/generators/graph-attribute";
 import { NodeDisplayData } from "src/generators/node-display-data";
 import { WorkflowOutput } from "src/generators/workflow-output";
@@ -115,8 +116,8 @@ export class Workflow {
     return baseWorkflowClassRef;
   }
 
-  private generateOutputsClass(parentWorkflowClass: Reference): python.Class {
-    const outputsClass = python.class_({
+  private generateOutputsClass(parentWorkflowClass: Reference): Class {
+    const outputsClass = new Class({
       name: OUTPUTS_CLASS_NAME,
       extends_: [
         python.reference({
@@ -141,12 +142,12 @@ export class Workflow {
     return outputsClass;
   }
 
-  public generateWorkflowClass(): python.Class {
+  public generateWorkflowClass(): Class {
     const workflowClassName = this.workflowContext.workflowClassName;
 
     const baseWorkflowClassRef = this.generateParentWorkflowClass();
 
-    const workflowClass = python.class_({
+    const workflowClass = new Class({
       name: workflowClassName,
       extends_: [baseWorkflowClassRef],
       docs: this.workflowContext.workflowClassDescription || undefined,
@@ -164,7 +165,7 @@ export class Workflow {
     return workflowClass;
   }
 
-  public generateWorkflowDisplayClass(): python.Class {
+  public generateWorkflowDisplayClass(): Class {
     const workflowDisplayClassName = `${this.workflowContext.workflowClassName}Display`;
 
     const workflowClassRef = python.reference({
@@ -172,7 +173,7 @@ export class Workflow {
       modulePath: this.getWorkflowFile().getModulePath(),
     });
 
-    const workflowDisplayClass = python.class_({
+    const workflowDisplayClass = new Class({
       name: workflowDisplayClassName,
       extends_: [
         python.reference({
@@ -653,7 +654,7 @@ export class Workflow {
     });
   }
 
-  private addGraph(workflowClass: python.Class): void {
+  private addGraph(workflowClass: Class): void {
     // Note: markUnusedNodesAndEdges() will handle determining which nodes are unused based on the generated graph
 
     try {
@@ -683,7 +684,7 @@ export class Workflow {
     }
   }
 
-  private addUnusedGraphs(workflowClass: python.Class): void {
+  private addUnusedGraphs(workflowClass: Class): void {
     // Filter out edges that reference non-existent nodes
     const remainingUnusedEdges = new Set<WorkflowEdge>(this.unusedEdges);
     const remainingUnusedNodes = new Set<WorkflowNode>(this.unusedNodes);

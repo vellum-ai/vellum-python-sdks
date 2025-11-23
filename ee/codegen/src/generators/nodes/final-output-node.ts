@@ -3,7 +3,7 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { FinalOutputNodeContext } from "src/context/node-context/final-output-node";
-import { PythonType } from "src/generators/extensions";
+import { Class, PythonType } from "src/generators/extensions";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { FinalOutputNode as FinalOutputNodeType } from "src/types/vellum";
@@ -40,9 +40,9 @@ export class FinalOutputNode extends BaseNode<
     return [this.generateOutputsClass()];
   }
 
-  private generateOutputsClass(): python.Class {
+  private generateOutputsClass(): Class {
     const nodeBaseClassRef = this.getNodeBaseClass();
-    const outputsClass = python.class_({
+    const outputsClass = new Class({
       name: OUTPUTS_CLASS_NAME,
       extends_: [
         python.reference({

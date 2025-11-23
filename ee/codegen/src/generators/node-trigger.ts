@@ -4,6 +4,7 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { BaseNodeContext } from "src/context/node-context/base";
+import { Class } from "src/generators/extensions/class";
 import {
   NodeTrigger as NodeTriggerType,
   WorkflowDataNode,
@@ -41,7 +42,7 @@ export class NodeTrigger extends AstNode {
       nodeContext.baseNodeClassName === nodeContext.nodeClassName
         ? `Base${nodeContext.baseNodeClassName}`
         : undefined;
-    const clazz = python.class_({
+    const clazz = new Class({
       name: "Trigger",
       extends_: [
         python.reference({

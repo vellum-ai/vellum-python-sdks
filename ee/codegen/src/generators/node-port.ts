@@ -5,6 +5,7 @@ import { Writer } from "@fern-api/python-ast/core/Writer";
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { NodeAttributeGenerationError } from "src/generators/errors";
+import { Class } from "src/generators/extensions/class";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import {
   NodePort as NodePortType,
@@ -63,7 +64,7 @@ export class NodePorts extends AstNode {
       return undefined;
     }
 
-    const clazz = python.class_({
+    const clazz = new Class({
       name: "Ports",
       extends_: [
         python.reference({

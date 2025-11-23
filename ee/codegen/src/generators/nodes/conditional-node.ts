@@ -6,6 +6,7 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { PORTS_CLASS_NAME } from "src/constants";
 import { ConditionalNodeContext } from "src/context/node-context/conditional-node";
 import { ConditionalNodePort } from "src/generators/conditional-node-port";
+import { Class } from "src/generators/extensions/class";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import {
   ConditionalNodeData,
@@ -42,7 +43,7 @@ export class ConditionalNode extends BaseNode<
 
       this.getNodeBaseClass().inheritReferences(ref);
 
-      const portsClass = python.class_({
+      const portsClass = new Class({
         name: "Ports",
         extends_: [ref],
       });

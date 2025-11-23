@@ -2,6 +2,7 @@ import { python } from "@fern-api/python-ast";
 import { isEqual } from "lodash";
 
 import { BasePersistedFile } from "./base-persisted-file";
+import { Class } from "./extensions/class";
 
 import * as codegen from "src/codegen";
 import { WorkflowContext } from "src/context";
@@ -16,7 +17,7 @@ export declare namespace Inputs {
 
 export class Inputs extends BasePersistedFile {
   public readonly baseInputsClassReference: python.Reference;
-  public readonly inputsClass: python.Class | undefined;
+  public readonly inputsClass: Class | undefined;
 
   constructor({ name, workflowContext }: Inputs.Args) {
     super({ workflowContext: workflowContext });
@@ -45,7 +46,7 @@ export class Inputs extends BasePersistedFile {
     name,
   }: {
     name: string | undefined;
-  }): python.Class | undefined {
+  }): Class | undefined {
     const inputVariableContextsById =
       this.workflowContext.inputVariableContextsById;
 
@@ -64,7 +65,7 @@ export class Inputs extends BasePersistedFile {
     }
 
     const inputsClassName = name ?? "Inputs";
-    const inputsClass = python.class_({
+    const inputsClass = new Class({
       name: inputsClassName,
       extends_: [this.baseInputsClassReference],
     });
