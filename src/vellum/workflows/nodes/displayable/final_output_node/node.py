@@ -1,4 +1,4 @@
-from typing import Any, Dict, Generic, Tuple, Type, TypeVar, get_args, get_origin
+from typing import Any, Dict, Generic, Tuple, Type, TypeVar, get_args
 
 from vellum.workflows.constants import undefined
 from vellum.workflows.nodes.bases import BaseNode
@@ -9,6 +9,7 @@ from vellum.workflows.references.output import OutputReference
 from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.generics import StateType
 from vellum.workflows.types.utils import get_original_base
+from vellum.workflows.utils.validate import validate_target_types
 
 _OutputType = TypeVar("_OutputType")
 
@@ -94,47 +95,7 @@ class FinalOutputNode(BaseNode[StateType], Generic[StateType, _OutputType], meta
         value_descriptor = cls.Outputs.value.instance
 
         if isinstance(value_descriptor, OutputReference):
-            descriptor_types = value_descriptor.types
-
-            type_mismatch = True
-            for descriptor_type in descriptor_types:
-                if descriptor_type == declared_output_type:
-                    type_mismatch = False
-                    break
-
-                try:
-                    if issubclass(descriptor_type, declared_output_type) or issubclass(
-                        declared_output_type, descriptor_type
-                    ):
-                        type_mismatch = False
-                        break
-                except TypeError:
-                    # Handle cases where types aren't classes (e.g., Union)
-                    if str(descriptor_type) == str(declared_output_type):
-                        type_mismatch = False
-                        break
-
-                descriptor_origin = get_origin(descriptor_type)
-                declared_origin = get_origin(declared_output_type)
-
-                if descriptor_origin is None and declared_origin is None:
-                    continue
-
-                if (
-                    descriptor_origin == declared_output_type
-                    or declared_origin == descriptor_type
-                    or descriptor_origin == declared_origin
-                ):
-                    type_mismatch = False
-                    break
-
-            if type_mismatch:
-                declared_type_name = getattr(declared_output_type, "__name__", str(declared_output_type))
-                descriptor_type_names = [getattr(t, "__name__", str(t)) for t in descriptor_types]
-
-                raise ValueError(
-                    f"Output type mismatch in {cls.__name__}: "
-                    f"FinalOutputNode is declared with output type '{declared_type_name}' "
-                    f"but the 'value' descriptor has type(s) {descriptor_type_names}. "
-                    f"The output descriptor type must match the declared FinalOutputNode output type."
-                )
+            try:
+                validate_target_types(declared_output_type, value_descriptor.types)
+            except ValueError as e:
+                raise ValueError(f"Failed to validate output type for node '{cls.__name__}': {e}")

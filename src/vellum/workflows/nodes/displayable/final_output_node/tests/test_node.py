@@ -43,9 +43,8 @@ def test_final_output_node__mismatched_output_type_should_raise_exception():
     # AND the error message should indicate the type mismatch
     assert (
         str(exc_info.value)
-        == "Output type mismatch in Output: FinalOutputNode is declared with output type 'list' but "
-        "the 'value' descriptor has type(s) ['str']. The output descriptor type must match the "
-        "declared FinalOutputNode output type."
+        == "Failed to validate output type for node 'Output': Output type mismatch: declared type 'list' but "
+        "the 'value' Output has type(s) ['str']. "
     )
 
 
