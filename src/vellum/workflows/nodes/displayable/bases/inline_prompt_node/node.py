@@ -112,7 +112,6 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                 Type["BaseWorkflow"],
                 VellumIntegrationToolDefinition,
                 MCPServer,
-                MCPToolDefinition,
             ]
         ]
     ] = None

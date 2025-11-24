@@ -36,7 +36,6 @@ from vellum.workflows.types.definition import (
     ComposioToolDefinition,
     DeploymentDefinition,
     MCPToolDefinition,
-    Tool,
     ToolBase,
     VellumIntegrationToolDefinition,
 )
@@ -331,7 +330,7 @@ class ElseNode(BaseNode[ToolCallingState]):
 def create_tool_prompt_node(
     ml_model: str,
     blocks: List[Union[PromptBlock, Dict[str, Any]]],
-    functions: List[Tool],
+    functions: List[Union[ToolBase, MCPToolDefinition]],
     prompt_inputs: Optional[EntityInputsInterface],
     parameters: PromptParameters,
     max_prompt_iterations: Optional[int] = None,
@@ -340,7 +339,7 @@ def create_tool_prompt_node(
     settings: Optional[Union[PromptSettings, Dict[str, Any]]] = None,
 ) -> Type[ToolPromptNode]:
     if functions and len(functions) > 0:
-        prompt_functions: List[Tool] = functions
+        prompt_functions: List[Union[ToolBase, MCPToolDefinition]] = functions
     else:
         prompt_functions = []
 
@@ -426,7 +425,7 @@ def _create_function_call_expressions(
 
 
 def create_router_node(
-    functions: List[Tool],
+    functions: List[Union[ToolBase, MCPToolDefinition]],
     tool_prompt_node: Type[InlinePromptNode[ToolCallingState]],
 ) -> Type[RouterNode]:
     """Create a RouterNode with dynamic ports that route based on tool_prompt_node outputs."""
