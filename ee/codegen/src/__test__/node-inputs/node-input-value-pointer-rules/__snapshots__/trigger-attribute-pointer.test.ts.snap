@@ -1,0 +1,16 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`TriggerAttributePointer > should generate correct Python code for trigger attribute reference 1`] = `
+"SlackNewMessageTrigger.channel_id
+"
+`;
+
+exports[`TriggerAttributePointer > should handle when attribute does not exist on trigger 1`] = `
+"None
+"
+`;
+
+exports[`TriggerAttributePointer > should handle when trigger does not exist 1`] = `
+"None
+"
+`;
