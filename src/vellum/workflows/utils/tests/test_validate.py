@@ -45,6 +45,7 @@ def test_validate__should_raise_exception(
         (dict, dict[str, str]),
         (str, Any),
         (Any, str),
+        (Union[str, int], str),
     ],
     ids=[
         "str",
@@ -52,6 +53,7 @@ def test_validate__should_raise_exception(
         "bare_dict_params_dict",
         "str_any",
         "any_str",
+        "union_str_int_str",
     ],
 )
 def test_validate__should_validate(

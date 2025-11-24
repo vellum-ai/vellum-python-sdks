@@ -20,6 +20,21 @@ def validate_target_type(declared_type: type, target_type: type) -> None:
     if declared_type is Any or target_type is Any:
         return
 
+    # If declared_type is a Union, target_type must be compatible with at least one union member
+    declared_origin = get_origin(declared_type)
+    if declared_origin is Union:
+        declared_union_args = get_args(declared_type)
+        for union_member in declared_union_args:
+            try:
+                validate_target_type(union_member, target_type)
+                # If any union member is compatible, validation passes
+                return
+            except TypeValidationError:
+                # This union member is incompatible, try the next one
+                continue
+        # None of the union members are compatible with target_type
+        raise TypeValidationError(declared_type, target_type)
+
     # If target_type is a Union, ALL union members must be compatible with declared_type
     target_origin = get_origin(target_type)
     if target_origin is Union:
