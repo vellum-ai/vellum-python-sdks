@@ -9,6 +9,7 @@ import { genericNodeFactory } from "./helpers/node-data-factories";
 import * as codegen from "src/codegen";
 import { Writer } from "src/generators/extensions/writer";
 import {
+  IntegrationProvider,
   WorkflowSandboxDatasetRow,
   WorkflowTrigger,
   WorkflowTriggerType,
@@ -246,6 +247,67 @@ describe("Workflow Sandbox", () => {
       expect(secondDatasetRowIndex).toBeGreaterThan(-1);
       const secondDatasetRowLine = lines[secondDatasetRowIndex];
       expect(secondDatasetRowLine).not.toContain("trigger=");
+    });
+
+    it("should generate DatasetRow with trigger instance including attributes", async () => {
+      const writer = new Writer();
+      const triggerId = "550e8400-e29b-41d4-a716-446655440001";
+      const triggers: WorkflowTrigger[] = [
+        {
+          id: triggerId,
+          type: WorkflowTriggerType.INTEGRATION,
+          attributes: [
+            { id: "attr1", key: "channel", type: "STRING" },
+            { id: "attr2", key: "user_id", type: "STRING" },
+          ],
+          execConfig: {
+            type: IntegrationProvider.COMPOSIO,
+            slug: "slack",
+            setupAttributes: [],
+            integrationName: "Slack",
+          },
+        },
+      ];
+      const uniqueWorkflowContext = workflowContextFactory({ triggers });
+      const inputVariable: VellumVariable = {
+        id: "1",
+        key: "test_input",
+        type: "STRING",
+      };
+
+      uniqueWorkflowContext.addInputVariableContext(
+        inputVariableContextFactory({
+          inputVariableData: inputVariable,
+          workflowContext: uniqueWorkflowContext,
+        })
+      );
+
+      const sandboxInputs: WorkflowSandboxDatasetRow[] = [
+        {
+          label: "Scenario with Trigger Attributes",
+          inputs: [
+            {
+              name: inputVariable.key,
+              type: "STRING",
+              value: "test-value",
+            },
+          ],
+          workflow_trigger_id: triggerId,
+        },
+      ];
+
+      const sandbox = codegen.workflowSandboxFile({
+        workflowContext: uniqueWorkflowContext,
+        sandboxInputs,
+      });
+
+      sandbox.write(writer);
+      const result = await writer.toStringFormatted();
+
+      expect(result).toMatchSnapshot();
+      expect(result).toContain("trigger=");
+      expect(result).toContain("channel=");
+      expect(result).toContain("user_id=");
     });
 
     it("should generate DatasetRow with mocks when mocks are provided", async () => {

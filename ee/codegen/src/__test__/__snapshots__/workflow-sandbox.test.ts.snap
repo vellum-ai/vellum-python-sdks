@@ -42,6 +42,29 @@ if __name__ == "__main__":
 "
 `;
 
+exports[`Workflow Sandbox > write > should generate DatasetRow with trigger instance including attributes 1`] = `
+"from vellum.workflows.inputs import DatasetRow
+from vellum.workflows.sandbox import WorkflowSandboxRunner
+
+from .inputs import Inputs
+from .triggers.slack import Slack
+from .workflow import TestWorkflow
+
+dataset = [
+    DatasetRow(
+        label="Scenario with Trigger Attributes",
+        inputs=Inputs(test_input="test-value"),
+        trigger=Slack(channel=None, user_id=None),
+    ),
+]
+
+runner = WorkflowSandboxRunner(workflow=TestWorkflow(), dataset=dataset)
+
+if __name__ == "__main__":
+    runner.run()
+"
+`;
+
 exports[`Workflow Sandbox > write > should generate DatasetRow with trigger when workflow_trigger_id is provided 1`] = `
 "from vellum.workflows.inputs import DatasetRow
 from vellum.workflows.sandbox import WorkflowSandboxRunner
@@ -54,7 +77,7 @@ dataset = [
     DatasetRow(
         label="Scenario with Trigger ID",
         inputs=Inputs(test_input="test-value"),
-        trigger=ScheduleTrigger,
+        trigger=ScheduleTrigger(),
     ),
     DatasetRow(
         label="Scenario without Trigger ID", inputs=Inputs(test_input="test-value-2")

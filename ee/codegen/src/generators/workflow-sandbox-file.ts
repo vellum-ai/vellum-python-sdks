@@ -162,13 +162,13 @@ if __name__ == "__main__":
     }
 
     if (!isNil(workflowTriggerId)) {
-      const triggerReference = this.getTriggerReference(workflowTriggerId);
+      const triggerInstance = this.getTriggerInstance(workflowTriggerId);
 
-      if (triggerReference) {
+      if (triggerInstance) {
         arguments_.push(
           python.methodArgument({
             name: "trigger",
-            value: triggerReference,
+            value: triggerInstance,
           })
         );
       }
@@ -264,6 +264,36 @@ if __name__ == "__main__":
       classReference: python.reference({
         name: "MockNodeExecution",
         modulePath: VELLUM_WORKFLOW_ROOT_MODULE_PATH,
+      }),
+      arguments_,
+    });
+  }
+
+  private getTriggerInstance(
+    workflowTriggerId: string
+  ): python.ClassInstantiation | undefined {
+    const triggers = this.workflowContext.triggers ?? [];
+    const trigger = triggers.find((t) => t.id === workflowTriggerId);
+
+    if (!trigger) {
+      return undefined;
+    }
+
+    const triggerClassInfo = getTriggerClassInfo(trigger, this.workflowContext);
+
+    // Generate arguments for the trigger instance based on its attributes
+    // For now, we set all attributes to None since we don't have values for them in the dataset row
+    const arguments_: python.MethodArgument[] = trigger.attributes.map((attr) =>
+      python.methodArgument({
+        name: attr.key,
+        value: python.TypeInstantiation.none(),
+      })
+    );
+
+    return python.instantiateClass({
+      classReference: python.reference({
+        name: triggerClassInfo.className,
+        modulePath: triggerClassInfo.modulePath,
       }),
       arguments_,
     });
