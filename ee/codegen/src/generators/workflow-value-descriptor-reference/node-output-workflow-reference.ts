@@ -1,7 +1,7 @@
 import { python } from "@fern-api/python-ast";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { OUTPUTS_CLASS_NAME } from "src/constants";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { BaseNodeInputWorkflowReference } from "src/generators/workflow-value-descriptor-reference/BaseNodeInputWorkflowReference";
 import { NodeOutputWorkflowReference as NodeOutputWorkflowReferenceType } from "src/types/vellum";
 

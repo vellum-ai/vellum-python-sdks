@@ -1,5 +1,4 @@
 import { python } from "@fern-api/python-ast";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { SubworkflowDeploymentNodeContext } from "src/context/node-context/subworkflow-deployment-node";
@@ -7,6 +6,7 @@ import {
   NodeAttributeGenerationError,
   NodeDefinitionGenerationError,
 } from "src/generators/errors";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { codegen } from "src/index";

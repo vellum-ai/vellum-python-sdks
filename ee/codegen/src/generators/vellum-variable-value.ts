@@ -1,5 +1,4 @@
 import { python } from "@fern-api/python-ast";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { isNil } from "lodash";
 import {
   ChatMessageRequest,
@@ -18,6 +17,7 @@ import { ChatMessageContent } from "./chat-message-content";
 import { ValueGenerationError } from "./errors";
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { Writer } from "src/generators/extensions/writer";
 import { Json } from "src/generators/json";
 import { AttributeConfig, IterableConfig } from "src/types/vellum";

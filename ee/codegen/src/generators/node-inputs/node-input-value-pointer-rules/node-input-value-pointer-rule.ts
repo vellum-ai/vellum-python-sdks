@@ -1,5 +1,3 @@
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
-
 import { BaseNodeInputValuePointerRule } from "./base";
 import { ConstantValuePointerRule } from "./constant-value-pointer";
 import { EnvironmentVariablePointerRule } from "./environment-variable-pointer";
@@ -11,6 +9,7 @@ import { WorkflowStatePointerRule } from "./workflow-state-pointer";
 import { WorkspaceSecretPointerRule } from "./workspace-secret-pointer";
 
 import { BaseNodeContext } from "src/context/node-context/base";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { Writer } from "src/generators/extensions/writer";
 import {
   IterableConfig,

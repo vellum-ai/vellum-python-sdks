@@ -1,7 +1,7 @@
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { isNil } from "lodash";
 
 import { ValueGenerationError } from "src/generators/errors";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { WorkflowDataNode } from "src/types/vellum";
 
 export function isDefined<TValue>(value: TValue | undefined): value is TValue {

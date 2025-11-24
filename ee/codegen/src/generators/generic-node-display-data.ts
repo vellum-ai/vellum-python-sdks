@@ -1,9 +1,9 @@
 import { python } from "@fern-api/python-ast";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { isNil } from "lodash";
 
 import { VELLUM_WORKFLOW_EDITOR_TYPES_PATH } from "src/constants";
 import { WorkflowContext } from "src/context";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { Writer } from "src/generators/extensions/writer";
 import { GenericNodeDisplayData as GenericNodeDisplayDataType } from "src/types/vellum";
 import { isNilOrEmpty } from "src/utils/typing";

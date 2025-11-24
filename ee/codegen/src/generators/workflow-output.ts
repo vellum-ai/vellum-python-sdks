@@ -1,11 +1,11 @@
 import { python } from "@fern-api/python-ast";
 import { Field } from "@fern-api/python-ast/Field";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { WorkflowValueDescriptor } from "./workflow-value-descriptor";
 
 import { WorkflowContext } from "src/context";
 import { WorkflowOutputContext } from "src/context/workflow-output-context";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { Writer } from "src/generators/extensions/writer";
 
 export declare namespace WorkflowOutput {

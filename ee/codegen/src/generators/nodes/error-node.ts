@@ -1,8 +1,8 @@
 import { python } from "@fern-api/python-ast";
 import { Field } from "@fern-api/python-ast/Field";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { ErrorNodeContext } from "src/context/node-context/error-node";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { ErrorNode as ErrorNodeType } from "src/types/vellum";
 

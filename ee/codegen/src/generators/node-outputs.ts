@@ -1,5 +1,4 @@
 import { python } from "@fern-api/python-ast";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { Field } from "./extensions";
 import { Class } from "./extensions/class";
@@ -7,6 +6,7 @@ import { Class } from "./extensions/class";
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { GenericNodeContext } from "src/context/node-context/generic-node";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { Writer } from "src/generators/extensions/writer";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { NodeOutput as NodeOutputType } from "src/types/vellum";

@@ -1,8 +1,8 @@
 import { python } from "@fern-api/python-ast";
 import { Field } from "@fern-api/python-ast/Field";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { NoteNodeContext } from "src/context/node-context/note-node";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { Json } from "src/generators/json";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { NoteNode as NoteNodeType } from "src/types/vellum";

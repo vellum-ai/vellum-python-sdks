@@ -1,8 +1,8 @@
 import { python } from "@fern-api/python-ast";
 import { Field } from "@fern-api/python-ast/Field";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { MergeNodeContext } from "src/context/node-context/merge-node";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { MergeNode as MergeNodeType } from "src/types/vellum";

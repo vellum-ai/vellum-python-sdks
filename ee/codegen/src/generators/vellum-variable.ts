@@ -1,11 +1,11 @@
 import { python } from "@fern-api/python-ast";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { isNil } from "lodash";
 import { VellumValue as VellumValueType } from "vellum-ai/api/types";
 
 import { Field } from "./extensions";
 import { OptionalType } from "./extensions/optional";
 
+import { AstNode } from "src/generators/extensions/ast-node";
 import { Writer } from "src/generators/extensions/writer";
 import { VellumValue } from "src/generators/vellum-variable-value";
 import { getVellumVariablePrimitiveType } from "src/utils/vellum-variables";

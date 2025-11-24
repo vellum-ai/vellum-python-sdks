@@ -1,7 +1,7 @@
 import { python } from "@fern-api/python-ast";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { validate as uuidValidate } from "uuid";
 
+import { AstNode } from "src/generators/extensions/ast-node";
 import { Writer } from "src/generators/extensions/writer";
 
 export class UuidOrString extends AstNode {

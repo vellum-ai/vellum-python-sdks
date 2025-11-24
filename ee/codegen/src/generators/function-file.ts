@@ -1,9 +1,9 @@
 import { python } from "@fern-api/python-ast";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { BasePersistedFile } from "./base-persisted-file";
 
 import { WorkflowContext } from "src/context";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { Writer } from "src/generators/extensions/writer";
 
 export declare namespace FunctionWithDecorator {

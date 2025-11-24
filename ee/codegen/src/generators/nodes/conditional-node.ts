@@ -1,11 +1,11 @@
 import { python } from "@fern-api/python-ast";
 import { Field } from "@fern-api/python-ast/Field";
 import { Reference } from "@fern-api/python-ast/Reference";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { PORTS_CLASS_NAME } from "src/constants";
 import { ConditionalNodeContext } from "src/context/node-context/conditional-node";
 import { ConditionalNodePort } from "src/generators/conditional-node-port";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import {

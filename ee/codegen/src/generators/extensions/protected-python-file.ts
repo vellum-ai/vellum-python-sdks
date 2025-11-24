@@ -7,13 +7,13 @@ import { Field } from "@fern-api/python-ast/Field";
 import { Method } from "@fern-api/python-ast/Method";
 import { Reference } from "@fern-api/python-ast/Reference";
 import { StarImport as PythonAstStarImport } from "@fern-api/python-ast/StarImport";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { ImportedName, ModulePath } from "@fern-api/python-ast/core/types";
 import { createPythonClassName } from "@fern-api/python-ast/core/utils";
 
 import { Comment } from "./comment";
 import { StarImport } from "./star-import";
 
+import { AstNode } from "src/generators/extensions/ast-node";
 import { Writer } from "src/generators/extensions/writer";
 
 interface UniqueReferenceValue {

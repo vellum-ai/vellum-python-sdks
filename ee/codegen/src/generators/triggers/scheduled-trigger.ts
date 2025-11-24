@@ -5,7 +5,7 @@ import { Class } from "src/generators/extensions/class";
 import { BaseTrigger } from "src/generators/triggers/base-trigger";
 import { createPythonClassName, toPythonSafeSnakeCase } from "src/utils/casing";
 
-import type { AstNode } from "@fern-api/python-ast/core/AstNode";
+import type { AstNode } from "src/generators/extensions/ast-node";
 import type { ScheduledTrigger as ScheduledTriggerType } from "src/types/vellum";
 
 export declare namespace ScheduledTrigger {

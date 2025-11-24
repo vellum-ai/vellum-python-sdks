@@ -2,7 +2,6 @@ import { python } from "@fern-api/python-ast";
 import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
 import { Reference } from "@fern-api/python-ast/Reference";
 import { Type } from "@fern-api/python-ast/Type";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { isNil } from "lodash";
 
 import {
@@ -21,6 +20,7 @@ import {
   NodeNotFoundError,
   NodePortNotFoundError,
 } from "src/generators/errors";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
 import { GraphAttribute } from "src/generators/graph-attribute";
 import { NodeDisplayData } from "src/generators/node-display-data";

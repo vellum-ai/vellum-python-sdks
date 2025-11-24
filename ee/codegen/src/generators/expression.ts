@@ -1,6 +1,5 @@
 import { python } from "@fern-api/python-ast";
 import { TypeInstantiation } from "@fern-api/python-ast/TypeInstantiation";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { NodeAttributeGenerationError } from "./errors";
 import { BinaryExpression } from "./expressions/binary";
@@ -8,6 +7,7 @@ import { TernaryExpression } from "./expressions/ternary";
 
 import { VELLUM_WORKFLOW_CONSTANTS_PATH } from "src/constants";
 import { WorkflowContext } from "src/context";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { Writer } from "src/generators/extensions/writer";
 import { WorkflowValueDescriptorReference } from "src/generators/workflow-value-descriptor-reference/workflow-value-descriptor-reference";
 

@@ -2,12 +2,12 @@ import { mkdir, writeFile } from "fs/promises";
 import * as path from "path";
 
 import { python } from "@fern-api/python-ast";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { CodeExecutionContext } from "src/context/node-context/code-execution-node";
 import { InitFile } from "src/generators";
 import { NodeAttributeGenerationError } from "src/generators/errors";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { CodeExecutionNode as CodeExecutionNodeType } from "src/types/vellum";
 import { getVellumVariablePrimitiveType } from "src/utils/vellum-variables";

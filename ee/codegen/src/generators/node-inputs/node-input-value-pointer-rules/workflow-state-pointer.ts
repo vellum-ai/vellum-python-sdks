@@ -1,10 +1,10 @@
 import { python } from "@fern-api/python-ast";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { BaseNodeInputValuePointerRule } from "./base";
 
 import { BaseNodeContext } from "src/context/node-context/base";
 import { NodeInputNotFoundError } from "src/generators/errors";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { WorkflowStatePointer, WorkflowDataNode } from "src/types/vellum";
 
 export declare namespace WorkflowStatePointerRule {

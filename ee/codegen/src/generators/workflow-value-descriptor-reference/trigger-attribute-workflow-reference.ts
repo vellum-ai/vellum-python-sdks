@@ -1,6 +1,6 @@
 import { python } from "@fern-api/python-ast";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
+import { AstNode } from "src/generators/extensions/ast-node";
 import { BaseNodeInputWorkflowReference } from "src/generators/workflow-value-descriptor-reference/BaseNodeInputWorkflowReference";
 import { TriggerAttributeWorkflowReference as TriggerAttributeWorkflowReferenceType } from "src/types/vellum";
 import { getTriggerClassInfo } from "src/utils/triggers";
