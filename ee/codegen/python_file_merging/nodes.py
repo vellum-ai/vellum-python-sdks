@@ -1,7 +1,7 @@
 import ast
 import logging
 import re
-from typing import Union
+from typing import Optional, Union
 from typing_extensions import TypeGuard
 
 import black
@@ -56,6 +56,13 @@ def merge_python_file(original_file_contents: str, generated_file_contents: str,
             # controlled by the generated class node
             merged_class_node.body = merged_class_node.body[1:]
 
+    original_annotations: dict[str, ast.expr] = {}
+    for node in merged_class_node.body:
+        if isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
+            orig_attr_name = node.target.id
+            if not orig_attr_name.startswith("_"):
+                original_annotations[orig_attr_name] = node.annotation
+
     # Delete the class attributes from the original class node that don't start with an underscore
     merged_class_node.body = [node for node in merged_class_node.body if not _is_public_assignment(node)]
 
@@ -64,7 +71,18 @@ def merge_python_file(original_file_contents: str, generated_file_contents: str,
 
     for prev_generated_node, generated_node in zip([None, *generated_class_node.body], generated_class_node.body):
         if isinstance(generated_node, ast.Assign):
-            stmts_to_insert.append(generated_node)
+            # Check if this attribute had an annotation in the original file
+            name = _get_assignment_target_name(generated_node)
+            if name is not None and name in original_annotations:
+                ann_assign = ast.AnnAssign(
+                    target=ast.Name(id=name, ctx=ast.Store()),
+                    annotation=original_annotations[name],
+                    value=generated_node.value,
+                    simple=1,
+                )
+                stmts_to_insert.append(ann_assign)
+            else:
+                stmts_to_insert.append(generated_node)
             continue
         if isinstance(generated_node, ast.AnnAssign):
             stmts_to_insert.append(generated_node)
@@ -135,6 +153,12 @@ def _is_public_assignment(stmt: ast.stmt) -> bool:
         return True
 
     return False
+
+
+def _get_assignment_target_name(stmt: ast.Assign) -> Optional[str]:
+    if len(stmt.targets) == 1 and isinstance(stmt.targets[0], ast.Name):
+        return stmt.targets[0].id
+    return None
 
 
 def _is_stmt_def(stmt: ast.stmt) -> TypeGuard[Union[ast.AsyncFunctionDef, ast.ClassDef, ast.FunctionDef]]:

@@ -1,0 +1,57 @@
+{
+  "input_variables": [
+    {
+      "id": "input-test",
+      "key": "test",
+      "type": "STRING",
+      "default": null,
+      "required": true,
+      "extensions": {
+        "color": null
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "id": "00000000-0000-0000-0000-000000000000",
+      "name": "result",
+      "type": "STRING",
+      "value": null
+    }
+  ],
+  "attributes": [
+    {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "name": "arg1",
+      "type": "STRING",
+      "value": {
+        "type": "WORKFLOW_INPUT",
+        "input_variable_id": "input-test"
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000002",
+      "name": "arg2",
+      "type": "STRING",
+      "value": {
+        "type": "CONSTANT_VALUE",
+        "value": {
+          "type": "NUMBER",
+          "value": 42
+        }
+      }
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000003",
+      "name": "arg3",
+      "type": "STRING",
+      "value": {
+        "type": "CONSTANT_VALUE",
+        "value": {
+          "type": "STRING",
+          "value": "no_annotation"
+        }
+      }
+    }
+  ]
+}

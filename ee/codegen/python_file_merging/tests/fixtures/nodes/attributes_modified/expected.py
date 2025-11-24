@@ -2,7 +2,7 @@ from vellum.workflows import BaseNode
 
 
 class MyCustomNode(BaseNode):
-    test = None
+    test: int = None
     new_attribute_1 = "hello"
     new_attribute_2 = "world"
     changed_attribute = "new_value"
