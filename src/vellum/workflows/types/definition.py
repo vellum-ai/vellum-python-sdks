@@ -222,7 +222,7 @@ class DeploymentDefinition(CompilableDefinition):
         return handler(self)
 
 
-class ComposioToolDefinition(UniversalBaseModel):
+class ComposioToolDefinition(CompilableDefinition):
     """Represents a specific Composio action that can be used in Tool Calling Node"""
 
     type: Literal["COMPOSIO"] = "COMPOSIO"
@@ -238,8 +238,37 @@ class ComposioToolDefinition(UniversalBaseModel):
         if self.name == "":
             self.name = self.action.lower()
 
+    def compile_function_definition(self, vellum_client: Optional[Vellum] = None) -> FunctionDefinition:
+        """Compile this Composio tool definition into a FunctionDefinition.
 
-class VellumIntegrationToolDefinition(UniversalBaseModel):
+        Args:
+            vellum_client: Optional Vellum client instance (not used for Composio)
+
+        Returns:
+            FunctionDefinition object representing this Composio tool
+        """
+        from vellum.workflows.integrations.composio_service import ComposioService
+
+        try:
+            composio_service = ComposioService()
+            tool_details = composio_service.get_tool_by_slug(self.action)
+
+            # Create a FunctionDefinition directly with proper field extraction
+            return FunctionDefinition(
+                name=self.name,
+                description=tool_details.get("description", self.description),
+                parameters=tool_details.get("input_parameters", {}),
+            )
+        except Exception:
+            # If hydration fails (including no API key), return basic function definition
+            return FunctionDefinition(
+                name=self.name,
+                description=self.description,
+                parameters={},
+            )
+
+
+class VellumIntegrationToolDefinition(CompilableDefinition):
     type: Literal["VELLUM_INTEGRATION"] = "VELLUM_INTEGRATION"
 
     # Core identification
@@ -249,6 +278,39 @@ class VellumIntegrationToolDefinition(UniversalBaseModel):
 
     # Required for tool base consistency
     description: str
+
+    def compile_function_definition(self, vellum_client: Optional[Vellum] = None) -> FunctionDefinition:
+        """Compile this Vellum integration tool definition into a FunctionDefinition.
+
+        Args:
+            vellum_client: Vellum client instance (required for API calls)
+
+        Returns:
+            FunctionDefinition object representing this Vellum integration tool
+        """
+        if vellum_client is None:
+            raise ValueError(
+                "Vellum client is required to compile a Vellum integration tool definition into a function definition."
+            )
+
+        from vellum.workflows.integrations.vellum_integration_service import VellumIntegrationService
+
+        try:
+            service = VellumIntegrationService(vellum_client)
+            tool_details = service.get_tool_definition(
+                integration=self.integration_name,
+                provider=self.provider.value,
+                tool_name=self.name,
+            )
+
+            return FunctionDefinition(
+                name=self.name,
+                description=tool_details.description,
+                parameters=tool_details.parameters or {},
+            )
+        except Exception:
+            # Fallback for service failures
+            return FunctionDefinition(name=self.name, description=self.description, parameters={})
 
 
 class VellumIntegrationToolDetails(VellumIntegrationToolDefinition):

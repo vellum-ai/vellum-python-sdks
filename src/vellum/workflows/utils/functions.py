@@ -8,9 +8,7 @@ from pydash import snake_case
 
 from vellum import Vellum
 from vellum.client.types.function_definition import FunctionDefinition
-from vellum.workflows.integrations.composio_service import ComposioService
 from vellum.workflows.integrations.mcp_service import MCPService
-from vellum.workflows.integrations.vellum_integration_service import VellumIntegrationService
 from vellum.workflows.types.definition import (
     ComposioToolDefinition,
     DeploymentDefinition,
@@ -303,24 +301,10 @@ def compile_composio_tool_definition(tool_def: ComposioToolDefinition) -> Functi
 
     Returns:
         FunctionDefinition with detailed parameters and description
-    """
-    try:
-        composio_service = ComposioService()
-        tool_details = composio_service.get_tool_by_slug(tool_def.action)
 
-        # Create a FunctionDefinition directly with proper field extraction
-        return FunctionDefinition(
-            name=tool_def.name,
-            description=tool_details.get("description", tool_def.description),
-            parameters=tool_details.get("input_parameters", {}),
-        )
-    except Exception:
-        # If hydration fails (including no API key), return basic function definition
-        return FunctionDefinition(
-            name=tool_def.name,
-            description=tool_def.description,
-            parameters={},
-        )
+    .. deprecated:: Use tool_def.compile_function_definition() instead
+    """
+    return tool_def.compile_function_definition()
 
 
 def compile_vellum_integration_tool_definition(
@@ -335,23 +319,10 @@ def compile_vellum_integration_tool_definition(
 
     Returns:
         FunctionDefinition with tool parameters and description
-    """
-    try:
-        service = VellumIntegrationService(vellum_client)
-        tool_details = service.get_tool_definition(
-            integration=tool_def.integration_name,
-            provider=tool_def.provider.value,
-            tool_name=tool_def.name,
-        )
 
-        return FunctionDefinition(
-            name=tool_def.name,
-            description=tool_details.description,
-            parameters=tool_details.parameters or {},
-        )
-    except Exception:
-        # Fallback for service failures
-        return FunctionDefinition(name=tool_def.name, description=tool_def.description, parameters={})
+    .. deprecated:: Use tool_def.compile_function_definition(vellum_client=vellum_client) instead
+    """
+    return tool_def.compile_function_definition(vellum_client=vellum_client)
 
 
 def use_tool_inputs(**inputs):

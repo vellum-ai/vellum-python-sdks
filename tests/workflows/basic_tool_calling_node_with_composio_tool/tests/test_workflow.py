@@ -54,7 +54,7 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
         "tags": ["github", "issues"],
     }
 
-    with mock.patch("vellum.workflows.utils.functions.ComposioService") as mock_service_class, mock.patch(
+    with mock.patch("vellum.workflows.integrations.composio_service.ComposioService") as mock_service_class, mock.patch(
         "vellum.workflows.nodes.displayable.tool_calling_node.utils.ComposioService"
     ) as mock_service_class_utils:
         mock_service_instance = mock.Mock()
@@ -229,7 +229,7 @@ def test_run_workflow__composio_api_key_precedence(vellum_adhoc_prompt_client, m
         "tags": [],
     }
 
-    with mock.patch("vellum.workflows.utils.functions.ComposioService") as mock_service_class, mock.patch(
+    with mock.patch("vellum.workflows.integrations.composio_service.ComposioService") as mock_service_class, mock.patch(
         "vellum.workflows.nodes.displayable.tool_calling_node.utils.ComposioService"
     ) as mock_service_class_utils:
         mock_service_instance = mock.Mock()
@@ -295,7 +295,7 @@ def test_run_workflow__composio_key_fallback(vellum_adhoc_prompt_client, monkeyp
         "tags": [],
     }
 
-    with mock.patch("vellum.workflows.utils.functions.ComposioService") as mock_service_class, mock.patch(
+    with mock.patch("vellum.workflows.integrations.composio_service.ComposioService") as mock_service_class, mock.patch(
         "vellum.workflows.nodes.displayable.tool_calling_node.utils.ComposioService"
     ) as mock_service_class_utils:
         mock_service_instance = mock.Mock()
@@ -358,7 +358,7 @@ def test_run_workflow__composio_tool_execution_error(vellum_adhoc_prompt_client,
         "tags": [],
     }
 
-    with mock.patch("vellum.workflows.utils.functions.ComposioService") as mock_service_class, mock.patch(
+    with mock.patch("vellum.workflows.integrations.composio_service.ComposioService") as mock_service_class, mock.patch(
         "vellum.workflows.nodes.displayable.tool_calling_node.utils.ComposioService"
     ) as mock_service_class_utils:
         mock_service_instance = mock.Mock()
@@ -437,7 +437,7 @@ def test_workflow_prompt_structure_includes_composio_tool_as_function(vellum_adh
         "tags": [],
     }
 
-    with mock.patch("vellum.workflows.utils.functions.ComposioService") as mock_service_class, mock.patch(
+    with mock.patch("vellum.workflows.integrations.composio_service.ComposioService") as mock_service_class, mock.patch(
         "vellum.workflows.nodes.displayable.tool_calling_node.utils.ComposioService"
     ) as mock_service_class_utils:
         mock_service_instance = mock.Mock()

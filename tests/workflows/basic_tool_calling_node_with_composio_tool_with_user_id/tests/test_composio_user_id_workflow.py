@@ -33,7 +33,7 @@ def test_run_workflow__with_user_id(vellum_adhoc_prompt_client, monkeypatch):
         "tags": [],
     }
 
-    with mock.patch("vellum.workflows.utils.functions.ComposioService") as mock_service_class, mock.patch(
+    with mock.patch("vellum.workflows.integrations.composio_service.ComposioService") as mock_service_class, mock.patch(
         "vellum.workflows.nodes.displayable.tool_calling_node.utils.ComposioService"
     ) as mock_service_class_utils:
         mock_service_instance = mock.Mock()

@@ -89,7 +89,9 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
         "provider": "COMPOSIO",
     }
 
-    with mock.patch("vellum.workflows.utils.functions.VellumIntegrationService") as mock_service_class, mock.patch(
+    with mock.patch(
+        "vellum.workflows.integrations.vellum_integration_service.VellumIntegrationService"
+    ) as mock_service_class, mock.patch(
         "vellum.workflows.nodes.displayable.tool_calling_node.utils.VellumIntegrationService"
     ) as mock_service_class_utils:
 
@@ -165,7 +167,9 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
 def test_run_workflow__error_handling_and_fallback(vellum_adhoc_prompt_client):
     """Test service errors use fallback and execution errors are properly raised."""
     # Test fallback when service unavailable
-    with mock.patch("vellum.workflows.utils.functions.VellumIntegrationService") as mock_service_class, mock.patch(
+    with mock.patch(
+        "vellum.workflows.integrations.vellum_integration_service.VellumIntegrationService"
+    ) as mock_service_class, mock.patch(
         "vellum.workflows.nodes.displayable.tool_calling_node.utils.VellumIntegrationService"
     ) as mock_service_class_utils:
 
@@ -200,7 +204,9 @@ def test_run_workflow__tool_execution_error(vellum_adhoc_prompt_client):
         "provider": "COMPOSIO",
     }
 
-    with mock.patch("vellum.workflows.utils.functions.VellumIntegrationService") as mock_service_class, mock.patch(
+    with mock.patch(
+        "vellum.workflows.integrations.vellum_integration_service.VellumIntegrationService"
+    ) as mock_service_class, mock.patch(
         "vellum.workflows.nodes.displayable.tool_calling_node.utils.VellumIntegrationService"
     ) as mock_service_class_utils:
 
@@ -243,9 +249,9 @@ def test_tool_definition_and_function_compilation(vellum_client):
     assert tool.name == "create_issue"
     assert tool.description == "Create a new issue in a GitHub repository"
 
-    from vellum.workflows.utils.functions import compile_vellum_integration_tool_definition
-
-    with mock.patch("vellum.workflows.utils.functions.VellumIntegrationService") as mock_service_class:
+    with mock.patch(
+        "vellum.workflows.integrations.vellum_integration_service.VellumIntegrationService"
+    ) as mock_service_class:
         mock_service_instance = mock.Mock()
         # Create a proper VellumIntegrationToolDetails object
         mock_tool_details_obj = VellumIntegrationToolDetails(
@@ -258,7 +264,7 @@ def test_tool_definition_and_function_compilation(vellum_client):
         mock_service_instance.get_tool_definition.return_value = mock_tool_details_obj
         mock_service_class.return_value = mock_service_instance
 
-        result = compile_vellum_integration_tool_definition(tool, vellum_client)
+        result = tool.compile_function_definition(vellum_client=vellum_client)
         assert result.name == "create_issue"
         assert result.description == "Enhanced description from service"
         assert result.parameters is not None and "properties" in result.parameters
@@ -268,12 +274,14 @@ def test_tool_definition_and_function_compilation(vellum_client):
         )
 
     # Test fallback on service failure
-    with mock.patch("vellum.workflows.utils.functions.VellumIntegrationService") as mock_service_class:
+    with mock.patch(
+        "vellum.workflows.integrations.vellum_integration_service.VellumIntegrationService"
+    ) as mock_service_class:
         mock_service_instance = mock.Mock()
         mock_service_instance.get_tool_definition.side_effect = Exception("Service down")
         mock_service_class.return_value = mock_service_instance
 
-        result = compile_vellum_integration_tool_definition(tool, vellum_client)
+        result = tool.compile_function_definition(vellum_client=vellum_client)
         assert result.name == "create_issue"
         assert result.description == "Create a new issue in a GitHub repository"
         assert result.parameters == {}
@@ -294,7 +302,9 @@ def test_workflow_prompt_structure_with_function_definition(vellum_adhoc_prompt_
         "provider": "COMPOSIO",
     }
 
-    with mock.patch("vellum.workflows.utils.functions.VellumIntegrationService") as mock_service_class, mock.patch(
+    with mock.patch(
+        "vellum.workflows.integrations.vellum_integration_service.VellumIntegrationService"
+    ) as mock_service_class, mock.patch(
         "vellum.workflows.nodes.displayable.tool_calling_node.utils.VellumIntegrationService"
     ) as mock_service_class_utils:
 
