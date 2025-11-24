@@ -5,12 +5,12 @@
 import { Class } from "@fern-api/python-ast/Class";
 import { Field } from "@fern-api/python-ast/Field";
 import { Method } from "@fern-api/python-ast/Method";
-import { Reference } from "@fern-api/python-ast/Reference";
 import { StarImport as PythonAstStarImport } from "@fern-api/python-ast/StarImport";
-import { ImportedName, ModulePath } from "@fern-api/python-ast/core/types";
+import { ImportedName } from "@fern-api/python-ast/core/types";
 import { createPythonClassName } from "@fern-api/python-ast/core/utils";
 
 import { Comment } from "./comment";
+import { ModulePath, Reference } from "./reference";
 import { StarImport } from "./star-import";
 
 import { AstNode } from "src/generators/extensions/ast-node";
