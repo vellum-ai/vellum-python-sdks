@@ -1,4 +1,16 @@
 {
+  "input_variables": [
+    {
+      "id": "input-test",
+      "key": "test",
+      "type": "STRING",
+      "default": null,
+      "required": true,
+      "extensions": {
+        "color": null
+      }
+    }
+  ],
   "outputs": [
     {
       "id": "00000000-0000-0000-0000-000000000000",
@@ -12,7 +24,10 @@
       "id": "00000000-0000-0000-0000-000000000001",
       "name": "arg1",
       "type": "STRING",
-      "value": null
+      "value": {
+        "type": "WORKFLOW_INPUT",
+        "input_variable_id": "input-test"
+      }
     },
     {
       "id": "00000000-0000-0000-0000-000000000002",

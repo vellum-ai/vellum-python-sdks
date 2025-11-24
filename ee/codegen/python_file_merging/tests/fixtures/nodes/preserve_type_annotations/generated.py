@@ -1,9 +1,10 @@
-from vellum.workflows.inputs import BaseInputs
-from vellum.workflows.nodes import BaseNode
+from vellum.workflows import BaseNode
+
+from ..inputs import Inputs
 
 
 class MyCustomNode(BaseNode):
-    arg1 = BaseInputs.test
+    arg1 = Inputs.test
     arg2 = 42
     arg3 = "no_annotation"
 
