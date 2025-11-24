@@ -4,7 +4,6 @@ import * as path from "path";
 import { join } from "path";
 
 import { python } from "@fern-api/python-ast";
-import { StarImport } from "@fern-api/python-ast/StarImport";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { isNil } from "lodash";
 import { VellumEnvironmentUrls } from "vellum-ai";
@@ -12,6 +11,7 @@ import { VellumEnvironmentUrls } from "vellum-ai";
 import * as codegen from "./codegen";
 import { StateVariableContext } from "./context/state-variable-context";
 import { Comment } from "./generators/extensions/comment";
+import { StarImport } from "./generators/extensions/star-import";
 import { getAllFilesInDir } from "./utils/files";
 
 import {
@@ -412,7 +412,7 @@ ${errors.slice(0, 3).map((err) => {
         const sliceEnd = displayIndex !== -1 ? displayIndex + 1 : 1;
 
         imports.push(
-          python.starImport({
+          new StarImport({
             modulePath: parentDisplayModulePath.slice(0, sliceEnd),
           })
         );
@@ -422,7 +422,7 @@ ${errors.slice(0, 3).map((err) => {
     } else {
       comments.push(new Comment({ docs: "flake8: noqa: F401, F403" }));
       imports.push(
-        python.starImport({
+        new StarImport({
           modulePath: [...this.getModulePath(), GENERATED_DISPLAY_MODULE_NAME],
         })
       );
@@ -448,13 +448,13 @@ ${errors.slice(0, 3).map((err) => {
     if (parentNode) {
       if (this.workflowContext.nestedWorkflowModuleName) {
         imports.push(
-          python.starImport({
+          new StarImport({
             modulePath: [".nodes"],
           })
         );
 
         imports.push(
-          python.starImport({
+          new StarImport({
             modulePath: [".workflow"],
           })
         );
@@ -462,12 +462,12 @@ ${errors.slice(0, 3).map((err) => {
       } else {
         const parentModulePath = [...parentNode.getNodeDisplayModulePath()];
         imports.push(
-          python.starImport({
+          new StarImport({
             modulePath: [...parentModulePath, "nodes"],
           })
         );
         imports.push(
-          python.starImport({
+          new StarImport({
             modulePath: [...parentModulePath, "workflow"],
           })
         );
@@ -477,7 +477,7 @@ ${errors.slice(0, 3).map((err) => {
     } else {
       comments.push(new Comment({ docs: "flake8: noqa: F401, F403" }));
       imports.push(
-        python.starImport({
+        new StarImport({
           modulePath: [
             ...this.getModulePath(),
             GENERATED_DISPLAY_MODULE_NAME,
@@ -486,7 +486,7 @@ ${errors.slice(0, 3).map((err) => {
         })
       );
       imports.push(
-        python.starImport({
+        new StarImport({
           modulePath: [
             ...this.getModulePath(),
             GENERATED_DISPLAY_MODULE_NAME,
