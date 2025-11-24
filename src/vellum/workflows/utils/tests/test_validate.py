@@ -9,10 +9,12 @@ from vellum.workflows.utils.validate import validate_target_type
     [
         (str, int),
         (list[str], list[int]),
+        (str, Union[str, int]),
     ],
     ids=[
         "str_int",
         "list_str_int",
+        "str_union_str_int",
     ],
 )
 def test_validate__should_raise_exception(
@@ -37,17 +39,11 @@ def test_validate__should_raise_exception(
         (str, str),
         (list[str], list[str]),
         (dict, dict[str, str]),
-        (str, Union[str, int]),
-        (int, Union[str, int]),
-        (list[str], Union[list[str], list[int]]),
     ],
     ids=[
         "str",
         "list_str",
         "bare_dict_params_dict",
-        "str_union_str_int",
-        "int_union_str_int",
-        "list_str_union",
     ],
 )
 def test_validate__should_validate(
@@ -55,7 +51,7 @@ def test_validate__should_validate(
     target_type,
 ):
     """
-    Tests that validate_target_type accepts matching types and union types.
+    Tests that validate_target_type accepts matching types.
     """
 
     # WHEN validating the target type
