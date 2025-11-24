@@ -4,6 +4,7 @@ import {
 } from "src/__test__/helpers";
 import { Writer } from "src/generators/extensions/writer";
 import { TriggerAttributePointerRule } from "src/generators/node-inputs";
+import { WorkflowTriggerType, IntegrationProvider } from "src/types/vellum";
 
 describe("TriggerAttributePointer", () => {
   let writer: Writer;
@@ -23,38 +24,39 @@ describe("TriggerAttributePointer", () => {
      */
 
     // GIVEN a workflow context with an integration trigger
-    const workflowContext = workflowContextFactory();
-    workflowContext.triggers = [
-      {
-        id: "slack-trigger-id",
-        type: "INTEGRATION",
-        execConfig: {
-          type: "COMPOSIO",
-          integrationName: "SLACK",
-          slug: "SLACK_NEW_MESSAGE_TRIGGER",
-          setupAttributes: [],
-        },
-        attributes: [
-          {
-            id: "channel-id-attribute",
-            key: "channel_id",
-            type: "STRING",
+    const workflowContext = workflowContextFactory({
+      triggers: [
+        {
+          id: "slack-trigger-id",
+          type: WorkflowTriggerType.INTEGRATION,
+          execConfig: {
+            type: IntegrationProvider.COMPOSIO,
+            integrationName: "SLACK",
+            slug: "SLACK_NEW_MESSAGE_TRIGGER",
+            setupAttributes: [],
           },
-          {
-            id: "message-attribute",
-            key: "message",
-            type: "STRING",
+          attributes: [
+            {
+              id: "channel-id-attribute",
+              key: "channel_id",
+              type: "STRING",
+            },
+            {
+              id: "message-attribute",
+              key: "message",
+              type: "STRING",
+            },
+          ],
+          displayData: {
+            label: "Slack New Message Trigger",
+            position: { x: 100, y: 200 },
+            z_index: 1,
+            icon: "slack",
+            color: "#4A154B",
           },
-        ],
-        displayData: {
-          label: "Slack New Message Trigger",
-          position: { x: 100, y: 200 },
-          zIndex: 1,
-          icon: "slack",
-          color: "#4A154B",
         },
-      },
-    ];
+      ],
+    });
 
     // AND a node context
     const nodeContext = await nodeContextFactory({ workflowContext });
@@ -114,33 +116,35 @@ describe("TriggerAttributePointer", () => {
      */
 
     // GIVEN a workflow context with a trigger that has specific attributes
-    const workflowContext = workflowContextFactory({ strict: false });
-    workflowContext.triggers = [
-      {
-        id: "linear-trigger-id",
-        type: "INTEGRATION",
-        execConfig: {
-          type: "COMPOSIO",
-          integrationName: "LINEAR",
-          slug: "LINEAR_COMMENT_EVENT_TRIGGER",
-          setupAttributes: [],
-        },
-        attributes: [
-          {
-            id: "action-attribute-id",
-            key: "action",
-            type: "STRING",
+    const workflowContext = workflowContextFactory({
+      strict: false,
+      triggers: [
+        {
+          id: "linear-trigger-id",
+          type: WorkflowTriggerType.INTEGRATION,
+          execConfig: {
+            type: IntegrationProvider.COMPOSIO,
+            integrationName: "LINEAR",
+            slug: "LINEAR_COMMENT_EVENT_TRIGGER",
+            setupAttributes: [],
           },
-        ],
-        displayData: {
-          label: "Linear Comment Event Trigger",
-          position: { x: 100, y: 200 },
-          zIndex: 1,
-          icon: "linear",
-          color: "#5E6AD2",
+          attributes: [
+            {
+              id: "action-attribute-id",
+              key: "action",
+              type: "STRING",
+            },
+          ],
+          displayData: {
+            label: "Linear Comment Event Trigger",
+            position: { x: 100, y: 200 },
+            z_index: 1,
+            icon: "linear",
+            color: "#5E6AD2",
+          },
         },
-      },
-    ];
+      ],
+    });
 
     // AND a node context
     const nodeContext = await nodeContextFactory({ workflowContext });
