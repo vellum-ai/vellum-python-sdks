@@ -128,16 +128,36 @@ def test_zero_diff_transforms(module_name: str):
 
         modified_paths = sorted(modified_diffs.keys())
 
+        # Collect file contents for showing full diffs of added/removed files
+        original_files = _collect_file_map(original_root)
+        generated_files = _collect_file_map(generated_root)
+
         # Build diff text with added/removed files shown in diff syntax
         diff_parts = []
 
-        # Show removed files (files in original but not in generated)
+        # Show removed files (files in original but not in generated) with full content
         for rel in original_only:
-            diff_parts.append(f"--- a/{rel}\n+++ /dev/null\n@@ File removed @@")
+            original_content = original_files[rel].splitlines()
+            diff_lines = difflib.unified_diff(
+                original_content,
+                [],
+                fromfile=f"a/{rel}",
+                tofile="/dev/null",
+                lineterm="",
+            )
+            diff_parts.append("\n".join(diff_lines))
 
-        # Show added files (files in generated but not in original)
+        # Show added files (files in generated but not in original) with full content
         for rel in generated_only:
-            diff_parts.append(f"--- /dev/null\n+++ b/{rel}\n@@ File added @@")
+            generated_content = generated_files[rel].splitlines()
+            diff_lines = difflib.unified_diff(
+                [],
+                generated_content,
+                fromfile="/dev/null",
+                tofile=f"b/{rel}",
+                lineterm="",
+            )
+            diff_parts.append("\n".join(diff_lines))
 
         # Show modified files
         for rel in modified_paths:
