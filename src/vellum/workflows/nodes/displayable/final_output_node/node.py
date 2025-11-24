@@ -1,11 +1,11 @@
 from typing import Any, Dict, Generic, Tuple, Type, TypeVar, get_args
 
 from vellum.workflows.constants import undefined
+from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.bases.base import BaseNodeMeta
 from vellum.workflows.nodes.utils import cast_to_output_type
 from vellum.workflows.ports import NodePorts
-from vellum.workflows.references.output import OutputReference
 from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.generics import StateType
 from vellum.workflows.types.utils import get_original_base
@@ -94,7 +94,7 @@ class FinalOutputNode(BaseNode[StateType], Generic[StateType, _OutputType], meta
 
         value_descriptor = cls.Outputs.value.instance
 
-        if isinstance(value_descriptor, OutputReference):
+        if isinstance(value_descriptor, BaseDescriptor):
             try:
                 validate_target_types(declared_output_type, value_descriptor.types)
             except ValueError as e:
