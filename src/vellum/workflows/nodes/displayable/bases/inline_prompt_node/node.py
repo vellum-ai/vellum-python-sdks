@@ -116,14 +116,20 @@ def _validate_json_schema_structure(schema: dict, path: str = "json_schema") -> 
         return
 
     # Validate array types
-    if _is_json_schema_type(schema, "array") and not schema.get("prefixItems"):
-        if not schema.get("items"):
+    if _is_json_schema_type(schema, "array"):
+        has_prefix_items = "prefixItems" in schema
+        has_items = "items" in schema
+
+        # Array schemas must have either 'items' or 'prefixItems' defined
+        if not has_prefix_items and not has_items:
             raise ValueError(
-                f"JSON Schema of type 'array' at '{path}' must have an 'items' field defined. "
-                f"Array schemas require an 'items' field to specify the type of elements in the array."
+                f"JSON Schema of type 'array' at '{path}' must define either an 'items' field "
+                f"or a 'prefixItems' field to specify the type of elements in the array."
             )
-        # Recursively validate the items schema
-        _validate_json_schema_structure(schema["items"], f"{path}.items")
+
+        # Recursively validate the items schema if present and is a dict
+        if has_items and isinstance(schema["items"], dict):
+            _validate_json_schema_structure(schema["items"], f"{path}.items")
 
     # Validate object types
     if _is_json_schema_type(schema, "object"):
