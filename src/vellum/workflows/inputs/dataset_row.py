@@ -40,9 +40,16 @@ class DatasetRow(UniversalBaseModel):
         if "mocks" in serialized and serialized.get("mocks") is None:
             serialized.pop("mocks")
 
-        # Convert workflow_trigger to workflow_trigger_id
+        # Handle workflow_trigger field and convert to workflow_trigger_id
+        # Check for both field name and alias since different call sites use different serialization modes
+        trigger_key = None
         if "workflow_trigger" in serialized:
-            value = serialized.pop("workflow_trigger")
+            trigger_key = "workflow_trigger"
+        elif "trigger" in serialized:
+            trigger_key = "trigger"
+
+        if trigger_key:
+            value = serialized.pop(trigger_key)
             if value is not None:
                 serialized["workflow_trigger_id"] = value
 
