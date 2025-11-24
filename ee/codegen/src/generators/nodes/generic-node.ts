@@ -17,6 +17,7 @@ import {
 import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { PromptBlock as PromptBlockType } from "src/generators/base-prompt-block";
 import { NodeDefinitionGenerationError } from "src/generators/errors";
+import { StarImport } from "src/generators/extensions/star-import";
 import { Writer } from "src/generators/extensions/writer";
 import { FunctionFile } from "src/generators/function-file";
 import { GenericNodeDisplayData } from "src/generators/generic-node-display-data";
@@ -811,11 +812,11 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
         statements: [this.generateNodeClass()],
       });
 
-      const nestedImports: python.StarImport[] = [];
+      const nestedImports: StarImport[] = [];
       this.inlineWorkflowsToGenerate.forEach((workflowFile) => {
         const workflowName = workflowFile.functionName;
         nestedImports.push(
-          python.starImport({
+          new StarImport({
             modulePath: [`.${workflowName}`, "nodes"],
           })
         );

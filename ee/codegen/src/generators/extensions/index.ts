@@ -12,6 +12,7 @@ export * from "./field";
 export * from "./list";
 export * from "./optional";
 export * from "./protected-python-file";
+export * from "./star-import";
 export * from "./type";
 export * from "./union";
 export * from "./writer";

@@ -1,8 +1,8 @@
-import { StarImport } from "@fern-api/python-ast/StarImport";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { BasePersistedFile } from "./base-persisted-file";
 import { Comment } from "./extensions/comment";
+import { StarImport } from "./extensions/star-import";
 
 export declare namespace InitFile {
   interface Args extends BasePersistedFile.Args {
