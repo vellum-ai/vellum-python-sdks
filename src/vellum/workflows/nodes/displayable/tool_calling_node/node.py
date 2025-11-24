@@ -6,9 +6,12 @@ from vellum.client.types.prompt_settings import PromptSettings
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
 from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
 from vellum.workflows.context import execution_context, get_parent_context
+from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.events.node import NodeExecutionStreamingEvent
 from vellum.workflows.events.workflow import is_workflow_event
 from vellum.workflows.exceptions import NodeException
+from vellum.workflows.expressions.coalesce_expression import CoalesceExpression
 from vellum.workflows.graph.graph import Graph
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
@@ -22,12 +25,23 @@ from vellum.workflows.nodes.displayable.tool_calling_node.utils import (
     get_function_name,
 )
 from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
+from vellum.workflows.references.output import OutputReference
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.core import EntityInputsInterface
 from vellum.workflows.types.definition import MCPServer, Tool
 from vellum.workflows.types.generics import StateType
 from vellum.workflows.utils.functions import compile_mcp_tool_definition, get_mcp_tool_name
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
+
+
+def _contains_reference_to_output(reference: BaseDescriptor, target_reference: OutputReference) -> bool:
+    if reference == target_reference:
+        return True
+    if isinstance(reference, CoalesceExpression):
+        return _contains_reference_to_output(reference.lhs, target_reference) or _contains_reference_to_output(
+            reference.rhs, target_reference
+        )
+    return False
 
 
 class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
@@ -115,6 +129,8 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
                 if event.output.name == "results":
                     if event.output.is_streaming:
                         if isinstance(event.output.delta, str):
+                            yield BaseOutput(name="text", delta=event.output.delta)
+
                             text_message = ChatMessage(
                                 text=event.output.delta,
                                 role="ASSISTANT",
@@ -223,3 +239,37 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
         graph._extend_edges(default_port_graph.edges)
 
         self._graph = graph
+
+    def __directly_emit_workflow_output__(
+        self,
+        event: NodeExecutionStreamingEvent,
+        workflow_output_descriptor: OutputReference,
+    ) -> bool:
+        """
+        Check if this ToolCallingNode should directly emit workflow output events.
+        Similar to BasePromptNode, this allows streaming text and chat_history outputs through FinalOutputNode.
+        """
+        # Only handle text and chat_history outputs
+        if event.output.name != "text":
+            return False
+
+        if not isinstance(event.output.delta, str) and not event.output.is_initiated:
+            return False
+
+        target_nodes = [e.to_node for port in self.Ports for e in port.edges if e.to_node.__simulates_workflow_output__]
+        target_node_output = next(
+            (
+                o
+                for target_node in target_nodes
+                for o in target_node.Outputs
+                if o == workflow_output_descriptor.instance
+            ),
+            None,
+        )
+        if not target_node_output:
+            return False
+
+        if not isinstance(target_node_output.instance, BaseDescriptor):
+            return False
+
+        return _contains_reference_to_output(target_node_output.instance, event.node_definition.Outputs.text)
