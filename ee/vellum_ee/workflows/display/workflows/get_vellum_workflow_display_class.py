@@ -1,3 +1,4 @@
+import importlib
 import types
 from typing import TYPE_CHECKING, Generic, Optional, Type, TypeVar
 
@@ -8,6 +9,24 @@ from vellum_ee.workflows.display.utils.registry import get_from_workflow_display
 
 if TYPE_CHECKING:
     from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
+
+
+def _ensure_display_module_imported(workflow_class: Type[WorkflowType]) -> None:
+    """
+    Best-effort import of the workflow's display module to ensure any custom
+    WorkflowDisplay subclass is registered before we look it up in the registry.
+
+    This allows workflows to work without a display/__init__.py file that
+    re-exports from .workflow and .nodes.
+    """
+    module_name = workflow_class.__module__
+    if module_name.endswith(".workflow"):
+        root = module_name[: -len(".workflow")]
+        display_workflow_module = f"{root}.display.workflow"
+        try:
+            importlib.import_module(display_workflow_module)
+        except ImportError:
+            pass
 
 
 def _get_workflow_display_class(*, workflow_class: Type[WorkflowType]) -> Type["BaseWorkflowDisplay"]:
@@ -42,6 +61,7 @@ def get_workflow_display(
     root_workflow_class: Optional[Type[WorkflowType]] = None,
     base_display_class: Optional[Type["BaseWorkflowDisplay"]] = None,
 ) -> "BaseWorkflowDisplay":
+    _ensure_display_module_imported(workflow_class)
     return _get_workflow_display_class(workflow_class=workflow_class)(
         parent_display_context=parent_display_context,
         client=client,
