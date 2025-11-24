@@ -28,7 +28,7 @@ from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.core import EntityInputsInterface
-from vellum.workflows.types.definition import MCPServer, MCPToolDefinition, Tool
+from vellum.workflows.types.definition import MCPServer, MCPToolDefinition, Tool, ToolBase
 from vellum.workflows.types.generics import StateType
 from vellum.workflows.utils.functions import compile_mcp_tool_definition, get_mcp_tool_name
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
@@ -187,11 +187,13 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
         process_blocks_method = getattr(self.__class__, "process_blocks", None)
 
         # Hydrate MCP servers upfront and replace them with tool definitions
-        hydrated_functions: List[Tool] = [
-            tool_def
-            for function in self.functions
-            for tool_def in (compile_mcp_tool_definition(function) if isinstance(function, MCPServer) else [function])
-        ]
+        hydrated_functions: List[Union[ToolBase, MCPToolDefinition]] = []
+        for function in self.functions:
+            if isinstance(function, MCPServer):
+                hydrated_functions.extend(compile_mcp_tool_definition(function))
+            else:
+                # After checking, function is HydratedTool (either ToolBase or MCPToolDefinition)
+                hydrated_functions.append(function)
 
         self.tool_prompt_node = create_tool_prompt_node(
             ml_model=self.ml_model,
