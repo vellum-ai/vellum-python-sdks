@@ -12,6 +12,7 @@ from vellum.workflows.utils.validate import validate_target_type
         (str, Union[str, int]),
         (int, Union[str, int]),
         (list[str], Union[list[str], list[int]]),
+        (Union[str, int], Union[bool, float]),
     ],
     ids=[
         "str_int",
@@ -19,6 +20,7 @@ from vellum.workflows.utils.validate import validate_target_type
         "str_union_str_int",
         "int_union_str_int",
         "list_str_union",
+        "union_str_int_union_bool_float",
     ],
 )
 def test_validate__should_raise_exception(
@@ -45,6 +47,11 @@ def test_validate__should_raise_exception(
         (dict, dict[str, str]),
         (str, Any),
         (Any, str),
+        (Union[str, int], str),
+        (Union[str, int], int),
+        (Union[str, int], Union[str, int]),
+        (Union[str, int], Union[int, str]),
+        (Union[str, int], Union[str, bool]),
     ],
     ids=[
         "str",
@@ -52,6 +59,11 @@ def test_validate__should_raise_exception(
         "bare_dict_params_dict",
         "str_any",
         "any_str",
+        "union_str_int_str",
+        "union_str_int_int",
+        "union_str_int_union_str_int",
+        "union_str_int_union_int_str",
+        "union_str_int_union_str_bool",
     ],
 )
 def test_validate__should_validate(
