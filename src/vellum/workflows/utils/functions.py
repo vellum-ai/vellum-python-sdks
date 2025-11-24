@@ -16,6 +16,7 @@ from typing import (
 )
 
 from pydantic import BaseModel, TypeAdapter
+from pydantic.json_schema import GenerateJsonSchema
 from pydash import snake_case
 
 from vellum import Vellum
@@ -51,6 +52,56 @@ def _strip_title_fields(schema: Any) -> Any:
         return schema
 
 
+class ModulePathJsonSchemaGenerator(GenerateJsonSchema):
+    """Custom JSON schema generator that includes full module paths in $ref references."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Map from original defs_ref to module path
+        self._defs_ref_to_module_path: dict[str, str] = {}
+
+    def get_cache_defs_ref_schema(self, core_ref: str) -> tuple[str, dict]:
+        """
+        Override to store mapping but keep Pydantic's internal key structure.
+
+        Args:
+            core_ref: The core reference string (e.g., "vellum.client.types.chat_message.ChatMessage:41224715280")
+
+        Returns:
+            Tuple of (defs_ref, json_schema)
+        """
+        # Get the default defs_ref and schema (Pydantic will use its sanitized key)
+        original_defs_ref, json_schema = super().get_cache_defs_ref_schema(core_ref)
+
+        # Extract the module path from core_ref and store the mapping
+        if ":" in core_ref:
+            model_path = core_ref.split(":")[0]
+            self._defs_ref_to_module_path[original_defs_ref] = model_path
+            # Update the json_schema ref to use the full module path with dots
+            if "$ref" in json_schema:
+                json_schema["$ref"] = f"#/$defs/{model_path}"
+                # Update the json_to_defs_refs mapping to point to the original defs_ref
+                # (which is the sanitized key in definitions)
+                self.json_to_defs_refs[f"#/$defs/{model_path}"] = original_defs_ref
+
+        return original_defs_ref, json_schema
+
+    def get_defs_ref(self, defs_ref: tuple[str, ...]) -> str:
+        """
+        Override to return the full module path instead of just the model name.
+
+        Args:
+            defs_ref: Tuple containing the core reference
+
+        Returns:
+            The full module-qualified model name
+        """
+        # Get the default defs_ref
+        original_defs_ref = super().get_defs_ref(defs_ref)
+        # Return the module path if we have a mapping, otherwise return the original
+        return self._defs_ref_to_module_path.get(original_defs_ref, original_defs_ref)
+
+
 def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
     if annotation is None:
         return {"type": "null"}
@@ -73,13 +124,15 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
 
     try:
         adapter = TypeAdapter(annotation)
-        schema = adapter.json_schema(mode="serialization", ref_template="#/$defs/{model}")
+        schema = adapter.json_schema(
+            mode="serialization", ref_template="#/$defs/{model}", schema_generator=ModulePathJsonSchemaGenerator
+        )
         schema_defs = schema.pop("$defs", {})
         schema_defs = {k: _strip_title_fields(v) for k, v in schema_defs.items()}
         defs.update(schema_defs)
         return _strip_title_fields(schema)
-    except Exception:
-        raise ValueError(f"Failed to compile type: {annotation}")
+    except Exception as e:
+        raise ValueError(f"Failed to compile type: {annotation}: {e}")
 
 
 def _compile_default_value(default: Any) -> Any:

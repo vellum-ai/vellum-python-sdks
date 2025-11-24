@@ -169,14 +169,19 @@
             "name": "text",
             "type": "STRING",
             "value": null,
-            "schema": {"type": "string"}
+            "schema": { "type": "string" }
           },
           {
             "id": "d278b1bc-dd58-4da0-bf58-84b03b1f5438",
             "name": "chat_history",
             "type": "CHAT_HISTORY",
             "value": null,
-            "schema": {"type": "array", "items": {"$ref": "#/$defs/ChatMessage"}}
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/vellum.client.types.chat_message.ChatMessage"
+              }
+            }
           }
         ]
       }
