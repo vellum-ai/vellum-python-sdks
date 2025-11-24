@@ -204,6 +204,85 @@ def test_inline_prompt_node_validation__valid_complex_schema__succeeds():
         pytest.fail("Validation should not raise an error for valid complex schema")
 
 
+def test_inline_prompt_node_validation__array_with_empty_items__succeeds():
+    """
+    Tests that array schemas with empty items object are valid (unconstrained elements).
+    """
+
+    # GIVEN an InlinePromptNode with an array schema where items is an empty object
+    class MyPromptNode(InlinePromptNode):
+        ml_model = "gpt-4"
+        blocks = []
+        parameters = PromptParameters(
+            custom_parameters={
+                "json_schema": {
+                    "type": "array",
+                    "items": {},  # Empty schema means unconstrained elements
+                }
+            }
+        )
+
+    # WHEN we call __validate__() on the node
+    # THEN it should not raise any errors
+    try:
+        MyPromptNode.__validate__()
+    except ValueError:
+        pytest.fail("Validation should not raise an error for array with empty items object")
+
+
+def test_inline_prompt_node_validation__array_with_empty_prefix_items__succeeds():
+    """
+    Tests that array schemas with empty prefixItems array are valid.
+    """
+
+    # GIVEN an InlinePromptNode with an array schema where prefixItems is an empty array
+    class MyPromptNode(InlinePromptNode):
+        ml_model = "gpt-4"
+        blocks = []
+        parameters = PromptParameters(
+            custom_parameters={
+                "json_schema": {
+                    "type": "array",
+                    "prefixItems": [],  # Empty array is valid
+                }
+            }
+        )
+
+    # WHEN we call __validate__() on the node
+    # THEN it should not raise any errors
+    try:
+        MyPromptNode.__validate__()
+    except ValueError:
+        pytest.fail("Validation should not raise an error for array with empty prefixItems array")
+
+
+def test_inline_prompt_node_validation__array_with_both_items_and_prefix_items__succeeds():
+    """
+    Tests that array schemas with both items and prefixItems are valid.
+    """
+
+    # GIVEN an InlinePromptNode with an array schema that has both items and prefixItems
+    class MyPromptNode(InlinePromptNode):
+        ml_model = "gpt-4"
+        blocks = []
+        parameters = PromptParameters(
+            custom_parameters={
+                "json_schema": {
+                    "type": "array",
+                    "prefixItems": [{"type": "string"}],
+                    "items": {"type": "number"},  # Additional items after prefix
+                }
+            }
+        )
+
+    # WHEN we call __validate__() on the node
+    # THEN it should not raise any errors
+    try:
+        MyPromptNode.__validate__()
+    except ValueError:
+        pytest.fail("Validation should not raise an error for array with both items and prefixItems")
+
+
 def test_inline_prompt_node_validation__no_json_schema__succeeds():
     """
     Tests that InlinePromptNode without json_schema passes validation.
