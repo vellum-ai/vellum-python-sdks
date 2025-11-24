@@ -1,8 +1,10 @@
 import importlib
+import re
 import types
 from typing import TYPE_CHECKING, Generic, Optional, Type, TypeVar
 
 from vellum.client import Vellum as VellumClient
+from vellum.workflows import BaseWorkflow
 from vellum.workflows.types.generics import WorkflowType
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
 from vellum_ee.workflows.display.utils.registry import get_from_workflow_display_registry
@@ -20,8 +22,12 @@ def _ensure_display_module_imported(workflow_class: Type[WorkflowType]) -> None:
     re-exports from .workflow and .nodes.
     """
     module_name = workflow_class.__module__
+
+    if module_name == BaseWorkflow.__module__:
+        return
+
     if module_name.endswith(".workflow"):
-        root = module_name[: -len(".workflow")]
+        root = re.sub(r"\.workflow$", "", module_name)
         display_workflow_module = f"{root}.display.workflow"
         try:
             importlib.import_module(display_workflow_module)
