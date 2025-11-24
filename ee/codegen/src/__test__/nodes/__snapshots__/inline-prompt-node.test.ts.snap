@@ -1543,3 +1543,32 @@ class PromptNode(InlinePromptNode):
     )
 "
 `;
+
+exports[`InlinePromptNode > with trigger attribute input > should generate prompt_inputs with trigger attribute reference 1`] = `
+"from vellum import JinjaPromptBlock, PromptParameters
+from vellum.workflows.nodes.displayable import InlinePromptNode
+
+from ..triggers.slack_new_message_trigger import SlackNewMessageTrigger
+
+
+class PromptNode(InlinePromptNode):
+    ml_model = "gpt-4o-mini"
+    blocks = [
+        JinjaPromptBlock(template="""Summarize what this means {{ INPUT_VARIABLE }}"""),
+    ]
+    prompt_inputs = {
+        "channel": SlackNewMessageTrigger.channel_id,
+    }
+    parameters = PromptParameters(
+        stop=[],
+        temperature=0,
+        max_tokens=1000,
+        top_p=1,
+        top_k=0,
+        frequency_penalty=0,
+        presence_penalty=0,
+        logit_bias={},
+        custom_parameters={},
+    )
+"
+`;
