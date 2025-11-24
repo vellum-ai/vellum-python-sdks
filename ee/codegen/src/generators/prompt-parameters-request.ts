@@ -1,10 +1,10 @@
 import { python } from "@fern-api/python-ast";
 import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { isNil } from "lodash";
 import { PromptParameters as PromptParametersType } from "vellum-ai/api";
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { Writer } from "src/generators/extensions/writer";
 import { Json } from "src/generators/json";
 

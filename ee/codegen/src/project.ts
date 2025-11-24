@@ -3,7 +3,6 @@ import { mkdir, writeFile } from "fs/promises";
 import * as path from "path";
 import { join } from "path";
 
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { isNil } from "lodash";
 import { VellumEnvironmentUrls } from "vellum-ai";
 
@@ -47,6 +46,7 @@ import {
   ProjectSerializationError,
   WorkflowGenerationError,
 } from "src/generators/errors";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { ApiNode } from "src/generators/nodes/api-node";
 import { BaseNode } from "src/generators/nodes/bases";
 import { CodeExecutionNode } from "src/generators/nodes/code-execution-node";

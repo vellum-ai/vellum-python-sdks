@@ -1,8 +1,8 @@
 import { python } from "@fern-api/python-ast";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { BaseNodeInputWorkflowReference } from "./BaseNodeInputWorkflowReference";
 
+import { AstNode } from "src/generators/extensions/ast-node";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { ArrayWorkflowReference as ArrayWorkflowReferenceType } from "src/types/vellum";
 

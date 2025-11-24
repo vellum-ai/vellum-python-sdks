@@ -1,11 +1,11 @@
 import { python } from "@fern-api/python-ast";
 import { OperatorType } from "@fern-api/python-ast/OperatorType";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import {
   PORTS_CLASS_NAME,
   VELLUM_WORKFLOW_GRAPH_MODULE_PATH,
 } from "src/constants";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { Writer } from "src/generators/extensions/writer";
 import {
   EntrypointNode,

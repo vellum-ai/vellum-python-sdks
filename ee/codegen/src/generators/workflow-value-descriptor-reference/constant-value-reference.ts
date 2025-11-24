@@ -1,8 +1,7 @@
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
-
 import * as codegen from "src/codegen";
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { BaseNodeInputWorkflowReference } from "src/generators/workflow-value-descriptor-reference/BaseNodeInputWorkflowReference";
 import {
   AttributeConfig,

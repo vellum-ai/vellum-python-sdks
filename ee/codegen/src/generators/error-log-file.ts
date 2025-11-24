@@ -1,8 +1,8 @@
 import { writeFile } from "fs/promises";
 
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
-
 import { BasePersistedFile } from "./base-persisted-file";
+
+import { AstNode } from "src/generators/extensions/ast-node";
 
 export class ErrorLogFile extends BasePersistedFile {
   protected getFileStatements(): AstNode[] {

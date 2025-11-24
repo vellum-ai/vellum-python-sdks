@@ -1,6 +1,5 @@
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
-
 import { WorkflowContext } from "src/context";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { Writer } from "src/generators/extensions/writer";
 
 export declare namespace TernaryExpression {

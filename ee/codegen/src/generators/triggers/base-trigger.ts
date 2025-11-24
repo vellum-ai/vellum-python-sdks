@@ -10,7 +10,7 @@ import { BasePersistedFile } from "src/generators/base-persisted-file";
 import { Class } from "src/generators/extensions/class";
 import { isNilOrEmpty } from "src/utils/typing";
 
-import type { AstNode } from "@fern-api/python-ast/core/AstNode";
+import type { AstNode } from "src/generators/extensions/ast-node";
 import type { WorkflowTrigger } from "src/types/vellum";
 
 export declare namespace BaseTrigger {

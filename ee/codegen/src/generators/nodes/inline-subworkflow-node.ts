@@ -1,8 +1,8 @@
 import { python } from "@fern-api/python-ast";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { InlineSubworkflowNodeContext } from "src/context/node-context/inline-subworkflow-node";
 import { NodeDefinitionGenerationError } from "src/generators/errors";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { BaseNestedWorkflowNode } from "src/generators/nodes/bases/nested-workflow-base";
 import { WorkflowProjectGenerator } from "src/project";
 import {

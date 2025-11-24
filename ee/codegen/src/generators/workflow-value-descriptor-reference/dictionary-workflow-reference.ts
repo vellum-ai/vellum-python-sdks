@@ -1,9 +1,9 @@
 import { python } from "@fern-api/python-ast";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { isNil } from "lodash";
 
 import { BaseNodeInputWorkflowReference } from "./BaseNodeInputWorkflowReference";
 
+import { AstNode } from "src/generators/extensions/ast-node";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { DictionaryWorkflowReference as DictionaryWorkflowReferenceType } from "src/types/vellum";
 

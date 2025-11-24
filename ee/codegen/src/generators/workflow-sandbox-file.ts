@@ -1,11 +1,11 @@
 import { python } from "@fern-api/python-ast";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { isNil } from "lodash";
 
 import { vellumValue } from "src/codegen";
 import { VELLUM_WORKFLOW_ROOT_MODULE_PATH } from "src/constants";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
 import { NodeNotFoundError } from "src/generators/errors";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { Json } from "src/generators/json";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import {

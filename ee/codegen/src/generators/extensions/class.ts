@@ -1,10 +1,10 @@
 import { python } from "@fern-api/python-ast";
 import { Decorator } from "@fern-api/python-ast/Decorator";
 import { Reference } from "@fern-api/python-ast/Reference";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { Field } from "./field";
 
+import { AstNode } from "src/generators/extensions/ast-node";
 import { Writer } from "src/generators/extensions/writer";
 
 export declare namespace Class {

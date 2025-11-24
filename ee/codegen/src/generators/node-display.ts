@@ -1,8 +1,8 @@
 import { python } from "@fern-api/python-ast";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { isNil } from "lodash";
 
 import { BaseNodeContext } from "src/context/node-context/base";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
 import { Writer } from "src/generators/extensions/writer";
 import {

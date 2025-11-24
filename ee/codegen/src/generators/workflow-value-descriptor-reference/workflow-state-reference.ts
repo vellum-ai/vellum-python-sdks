@@ -1,9 +1,9 @@
 import { python } from "@fern-api/python-ast";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { BaseNodeInputWorkflowReference } from "./BaseNodeInputWorkflowReference";
 
 import { NodeInputNotFoundError } from "src/generators/errors";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { WorkflowStateVariableWorkflowReference as WorkflowStateVariableWorkflowReferenceType } from "src/types/vellum";
 
 export class WorkflowStateReference extends BaseNodeInputWorkflowReference<WorkflowStateVariableWorkflowReferenceType> {

@@ -1,11 +1,11 @@
 import { python } from "@fern-api/python-ast";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { VellumVariableType } from "vellum-ai/api/types";
 
 import { OUTPUTS_CLASS_NAME, VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { PythonType } from "src/generators/extensions";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { TemplatingNode as TemplatingNodeType } from "src/types/vellum";
 import { getVellumVariablePrimitiveType } from "src/utils/vellum-variables";

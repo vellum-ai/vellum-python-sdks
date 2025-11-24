@@ -1,9 +1,9 @@
 import { python } from "@fern-api/python-ast";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { isNil } from "lodash";
 
 import { MapNodeContext } from "src/context/node-context/map-node";
 import { NodeDefinitionGenerationError } from "src/generators/errors";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { BaseNestedWorkflowNode } from "src/generators/nodes/bases/nested-workflow-base";
 import { WorkflowProjectGenerator } from "src/project";
 import { MapNode as MapNodeType, WorkflowRawData } from "src/types/vellum";

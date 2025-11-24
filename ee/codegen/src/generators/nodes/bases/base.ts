@@ -1,6 +1,5 @@
 import { python } from "@fern-api/python-ast";
 import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import * as codegen from "src/codegen";
 import {
@@ -17,6 +16,7 @@ import {
   BaseCodegenError,
   NodeAttributeGenerationError,
 } from "src/generators/errors";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
 import { NodeDisplay } from "src/generators/node-display";
 import { NodeDisplayData } from "src/generators/node-display-data";

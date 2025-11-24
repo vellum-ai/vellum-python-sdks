@@ -3,7 +3,6 @@ import { join } from "path";
 
 import { python } from "@fern-api/python-ast";
 import { Field } from "@fern-api/python-ast/Field";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import {
   PromptBlock as PromptBlockSerializer,
   PromptParameters as PromptParametersSerializer,
@@ -17,6 +16,7 @@ import {
 import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { PromptBlock as PromptBlockType } from "src/generators/base-prompt-block";
 import { NodeDefinitionGenerationError } from "src/generators/errors";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { StarImport } from "src/generators/extensions/star-import";
 import { Writer } from "src/generators/extensions/writer";
 import { FunctionFile } from "src/generators/function-file";

@@ -1,8 +1,7 @@
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
-
 import { NodeInputValuePointer } from "./node-input-value-pointer";
 
 import { BaseNodeContext } from "src/context/node-context/base";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { Writer } from "src/generators/extensions/writer";
 import { NodeInput as NodeInputType, WorkflowDataNode } from "src/types/vellum";
 

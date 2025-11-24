@@ -1,10 +1,10 @@
 import { python } from "@fern-api/python-ast";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { isNil } from "lodash";
 
 import { ApiNodeContext } from "src/context/node-context/api-node";
 import { NodeInput } from "src/generators";
 import { NodeAttributeGenerationError } from "src/generators/errors";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { ApiNode as ApiNodeType, ConstantValuePointer } from "src/types/vellum";

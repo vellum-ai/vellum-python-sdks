@@ -1,11 +1,11 @@
 import { python } from "@fern-api/python-ast";
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
 
 import { BaseNode } from "./bases/base";
 
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { GuardrailNodeContext } from "src/context/node-context/guardrail-node";
 import { NodeAttributeGenerationError } from "src/generators/errors";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { GuardrailNode as GuardrailNodeType } from "src/types/vellum";
 
 const INPUTS_PREFIX = "metric_inputs";
