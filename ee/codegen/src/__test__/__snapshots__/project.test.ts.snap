@@ -86,7 +86,7 @@ class APINode(BaseAPINode):
 `;
 
 exports[`WorkflowProjectGenerator > LazyReference > should not generate LazyReference when there is a simple loop > code/nodes/router_node.py 1`] = `
-"from vellum.workflows.nodes import BaseNode
+"from vellum.workflows import BaseNode
 from vellum.workflows.ports import Port
 
 from .start_node import StartNode
@@ -171,7 +171,7 @@ __all__ = [
 `;
 
 exports[`WorkflowProjectGenerator > Nodes present but not in graph > should still generate a file for the second node > code/nodes/second_node.py 1`] = `
-"from vellum.workflows.nodes import BaseNode
+"from vellum.workflows import BaseNode
 
 
 class SecondNode(BaseNode):
@@ -194,7 +194,7 @@ class Workflow(BaseWorkflow):
 `;
 
 exports[`WorkflowProjectGenerator > Nodes with forward references > should generate a proper Lazy Reference for the first node > code/nodes/first_node.py 1`] = `
-"from vellum.workflows.nodes import BaseNode
+"from vellum.workflows import BaseNode
 from vellum.workflows.references import LazyReference
 
 
@@ -866,7 +866,7 @@ class FinalOutput4(FinalOutputNode[BaseState, str]):
 exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 'no packages' > code/nodes/tool_call_get_current_weather_node/weather_function/nodes/tool_call_start_node.py 1`] = `
 "from typing import Union
 
-from vellum.workflows.nodes import BaseNode
+from vellum.workflows import BaseNode
 
 from ..inputs import Inputs
 
@@ -1238,7 +1238,7 @@ class FinalOutput4(FinalOutputNode[BaseState, str]):
 exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 'with packages' > code/nodes/tool_call_get_current_weather_node/weather_function/nodes/tool_call_start_node.py 1`] = `
 "from typing import Union
 
-from vellum.workflows.nodes import BaseNode
+from vellum.workflows import BaseNode
 
 from ..inputs import Inputs
 
@@ -1569,7 +1569,7 @@ class Workflow(BaseWorkflow[BaseInputs, State]):
 `;
 
 exports[`WorkflowProjectGenerator > subworkflow with inner and outer generic nodes > should generate workflow with subworkflow node containing inner generic node and outer generic node > code/nodes/outer.py 1`] = `
-"from vellum.workflows.nodes import BaseNode
+"from vellum.workflows import BaseNode
 
 
 class Outer(BaseNode):

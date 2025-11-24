@@ -28,7 +28,7 @@ repos:
     rev: 24.8.0
     hooks:
       - id: black
-        exclude: examples/workflows/.+/script\.py
+        exclude: (examples/workflows/.+/script\.py|ee/codegen/python_file_merging/tests/fixtures/)
 
   - repo: local
     hooks:

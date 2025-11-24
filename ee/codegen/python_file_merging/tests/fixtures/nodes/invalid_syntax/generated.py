@@ -1,4 +1,4 @@
-from vellum.workflows.nodes import BaseNode
+from vellum.workflows import BaseNode
 
 
 class MyCustomNode(BaseNode):
