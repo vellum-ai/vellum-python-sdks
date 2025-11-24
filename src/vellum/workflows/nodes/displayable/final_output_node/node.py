@@ -40,35 +40,58 @@ class _FinalOutputNodeMeta(BaseNodeMeta):
         else:
             return all_args[1]
 
-    def __validate__(cls) -> None:
-        cls._validate_output_type_consistency(cls)
+
+class FinalOutputNode(BaseNode[StateType], Generic[StateType, _OutputType], metaclass=_FinalOutputNodeMeta):
+    """
+    Used to directly reference the output of another node.
+    This provides backward compatibility with Vellum's Final Output Node.
+    """
+
+    class Display(BaseNode.Display):
+        icon = "vellum:icon:circle-stop"
+        color = "teal"
+
+    class Trigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ANY
+
+    class Ports(NodePorts):
+        pass
+
+    class Outputs(BaseNode.Outputs):
+        # We use our mypy plugin to override the _OutputType with the actual output type
+        # for downstream references to this output.
+        value: _OutputType = undefined  # type: ignore[valid-type]
+
+    def run(self) -> Outputs:
+        original_outputs = self.Outputs()
+
+        return self.Outputs(
+            value=cast_to_output_type(
+                original_outputs.value,
+                self.__class__.get_output_type(),
+            )
+        )
+
+    __simulates_workflow_output__ = True
 
     @classmethod
-    def _validate_output_type_consistency(mcs, cls: Type) -> None:
+    def __validate__(cls) -> None:
+        cls._validate_output_type_consistency()
+
+    @classmethod
+    def _validate_output_type_consistency(cls) -> None:
         """
         Validates that the declared output type of FinalOutputNode matches
         the type of the descriptor assigned to the 'value' attribute in its Outputs class.
 
         Raises ValueError if there's a type mismatch.
         """
-        if not hasattr(cls, "Outputs"):
-            return
-
-        outputs_class = cls.Outputs
-        if not hasattr(outputs_class, "value"):
-            return
-
         declared_output_type = cls.get_output_type()
 
         if declared_output_type is Any:
             return
 
-        value_descriptor = None
-
-        if "value" in outputs_class.__dict__:
-            value_descriptor = outputs_class.__dict__["value"]
-        else:
-            value_descriptor = getattr(outputs_class, "value")
+        value_descriptor = cls.Outputs.value.instance
 
         if isinstance(value_descriptor, OutputReference):
             descriptor_types = value_descriptor.types
@@ -115,37 +138,3 @@ class _FinalOutputNodeMeta(BaseNodeMeta):
                     f"but the 'value' descriptor has type(s) {descriptor_type_names}. "
                     f"The output descriptor type must match the declared FinalOutputNode output type."
                 )
-
-
-class FinalOutputNode(BaseNode[StateType], Generic[StateType, _OutputType], metaclass=_FinalOutputNodeMeta):
-    """
-    Used to directly reference the output of another node.
-    This provides backward compatibility with Vellum's Final Output Node.
-    """
-
-    class Display(BaseNode.Display):
-        icon = "vellum:icon:circle-stop"
-        color = "teal"
-
-    class Trigger(BaseNode.Trigger):
-        merge_behavior = MergeBehavior.AWAIT_ANY
-
-    class Ports(NodePorts):
-        pass
-
-    class Outputs(BaseNode.Outputs):
-        # We use our mypy plugin to override the _OutputType with the actual output type
-        # for downstream references to this output.
-        value: _OutputType = undefined  # type: ignore[valid-type]
-
-    def run(self) -> Outputs:
-        original_outputs = self.Outputs()
-
-        return self.Outputs(
-            value=cast_to_output_type(
-                original_outputs.value,
-                self.__class__.get_output_type(),
-            )
-        )
-
-    __simulates_workflow_output__ = True
