@@ -53,25 +53,40 @@
           "id": "fd55dc40-4e55-4327-8a89-d4123bb775df",
           "name": "json",
           "type": "JSON",
-          "value": null
+          "value": null,
+          "schema": {
+            "$ref": "#/$defs/vellum.workflows.types.core.Json"
+          }
         },
         {
           "id": "357a9805-da18-400c-9ce5-152be1dd2ff8",
           "name": "headers",
           "type": "JSON",
-          "value": null
+          "value": null,
+          "schema": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
         },
         {
           "id": "4e8c472c-5f32-4d41-9746-4085b3e8b6ef",
           "name": "status_code",
           "type": "NUMBER",
-          "value": null
+          "value": null,
+          "schema": {
+            "type": "integer"
+          }
         },
         {
           "id": "90d2ccc0-40da-40c5-895d-adf7d2de28d3",
           "name": "text",
           "type": "STRING",
-          "value": null
+          "value": null,
+          "schema": {
+            "type": "string"
+          }
         }
       ],
       "attributes": [
@@ -798,7 +813,11 @@
           "id": "57687d69-eb14-48fe-b919-abb044c85c35",
           "name": "results",
           "type": "JSON",
-          "value": null
+          "value": null,
+          "schema": {
+            "type": "object",
+            "additionalProperties": {}
+          }
         }
       ]
     },
@@ -990,13 +1009,22 @@
           "id": "bd83c7f1-fc8d-4441-abcf-95641aa03fcb",
           "name": "text",
           "type": "STRING",
-          "value": null
+          "value": null,
+          "schema": {
+            "type": "string"
+          }
         },
         {
           "id": "bb08b1a9-9745-475a-b030-6bb5b2146984",
           "name": "chat_history",
           "type": "CHAT_HISTORY",
-          "value": null
+          "value": null,
+          "schema": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/vellum.client.types.chat_message.ChatMessage"
+            }
+          }
         }
       ]
     },
@@ -1065,19 +1093,35 @@
           "id": "71bb6f36-d0cc-4c01-8dc2-1a0b98429c81",
           "name": "text",
           "type": "STRING",
-          "value": null
+          "value": null,
+          "schema": {
+            "type": "string"
+          }
         },
         {
           "id": "9df3ddf0-675f-48d5-b4b2-e3a805bbf450",
           "name": "urls",
-          "type": "JSON",
-          "value": null
+          "type": "ARRAY",
+          "value": null,
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
         },
         {
           "id": "87994bf1-d8d7-40d0-a715-90b1e399c5f2",
           "name": "results",
-          "type": "JSON",
-          "value": null
+          "type": "ARRAY",
+          "value": null,
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": {}
+            }
+          }
         }
       ]
     },
@@ -1126,7 +1170,10 @@
           "id": "c65369bf-7dbc-4f66-87c5-381c965ffb5d",
           "name": "value",
           "type": "STRING",
-          "value": null
+          "value": null,
+          "schema": {
+            "type": "string"
+          }
         }
       ]
     }
