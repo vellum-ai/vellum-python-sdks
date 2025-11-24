@@ -9,7 +9,7 @@ class TypeValidationError(ValueError):
         target_type_name = getattr(target_type, "__name__", str(target_type))
         super().__init__(
             f"Output type mismatch: declared type '{declared_type_name}' "
-            f"but the 'value' Output has type(s) {target_type_name}. "
+            f"but the 'value' Output has type(s) '{target_type_name}'. "
         )
         self.declared_type = declared_type
         self.target_type = target_type
