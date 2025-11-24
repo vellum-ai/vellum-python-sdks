@@ -19,6 +19,8 @@ import {
   NodeAttribute as NodeAttributeType,
   NodeOutput as NodeOutputType,
   PromptTemplateBlock,
+  WorkflowTriggerType,
+  IntegrationProvider,
 } from "src/types/vellum";
 
 describe("InlinePromptNode", () => {
@@ -595,9 +597,9 @@ describe("InlinePromptNode", () => {
         triggers: [
           {
             id: triggerId,
-            type: "INTEGRATION" as const,
+            type: WorkflowTriggerType.INTEGRATION,
             execConfig: {
-              type: "COMPOSIO" as const,
+              type: IntegrationProvider.COMPOSIO,
               integrationName: "SLACK",
               slug: "SLACK_NEW_MESSAGE_TRIGGER",
               setupAttributes: [],
