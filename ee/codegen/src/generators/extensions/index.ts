@@ -8,6 +8,7 @@
 
 export * from "./ast-node";
 export * from "./class";
+export * from "./class-instantiation";
 export * from "./comment";
 export * from "./dict";
 export * from "./field";
