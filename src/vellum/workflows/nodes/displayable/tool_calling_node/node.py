@@ -192,7 +192,6 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
             if isinstance(function, MCPServer):
                 hydrated_functions.extend(compile_mcp_tool_definition(function))
             else:
-                # After checking, function is HydratedTool (either ToolBase or MCPToolDefinition)
                 hydrated_functions.append(function)
 
         self.tool_prompt_node = create_tool_prompt_node(
