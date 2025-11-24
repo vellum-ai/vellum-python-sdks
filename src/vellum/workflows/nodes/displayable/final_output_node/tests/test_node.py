@@ -48,6 +48,29 @@ def test_final_output_node__mismatched_output_type_should_raise_exception():
     )
 
 
+def test_final_output_node__mismatched_output_type_in_state_should_raise_exception():
+    # GIVEN a state with a str type
+    class State(BaseState):
+        foo: str
+
+    # AND a FinalOutputNode declared with list output type
+    class Output(FinalOutputNode[BaseState, list]):
+        class Outputs(FinalOutputNode.Outputs):
+            value = State.foo
+
+    # WHEN attempting to validate the node class
+    # THEN a ValueError should be raised during validation
+    with pytest.raises(ValueError) as exc_info:
+        Output.__validate__()
+
+    # AND the error message should indicate the type mismatch
+    assert (
+        str(exc_info.value)
+        == "Failed to validate output type for node 'Output': Output type mismatch: declared type 'list' but "
+        "the 'value' Output has type(s) ['str']. "
+    )
+
+
 def test_final_output_node__matching_output_type_should_pass_validation():
     # GIVEN a FinalOutputNode declared with correct matching types
     class CorrectOutput(FinalOutputNode[BaseState, str]):
