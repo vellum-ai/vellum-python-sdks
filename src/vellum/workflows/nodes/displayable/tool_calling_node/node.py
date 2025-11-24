@@ -1,4 +1,4 @@
-from typing import Any, ClassVar, Dict, Generic, Iterator, List, Optional, Set, Union
+from typing import Any, ClassVar, Dict, Generic, Iterator, List, Optional, Set, Union, cast
 
 from vellum import ChatMessage, PromptBlock, PromptOutput
 from vellum.client.types.prompt_parameters import PromptParameters
@@ -192,7 +192,9 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
             if isinstance(function, MCPServer):
                 hydrated_functions.extend(compile_mcp_tool_definition(function))
             else:
-                hydrated_functions.append(function)
+                # After checking, function is ToolBase (not MCPServer)
+                # Mypy doesn't narrow Union[ToolBase, MCPServer] to ToolBase, so we cast
+                hydrated_functions.append(cast(ToolBase, function))
 
         self.tool_prompt_node = create_tool_prompt_node(
             ml_model=self.ml_model,
@@ -213,19 +215,21 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
         )
 
         self._function_nodes = {}
-        for function in hydrated_functions:
-            if isinstance(function, MCPToolDefinition):
-                function_name = get_mcp_tool_name(function)
+        for hydrated_function in hydrated_functions:
+            if isinstance(hydrated_function, MCPToolDefinition):
+                function_name = get_mcp_tool_name(hydrated_function)
 
                 self._function_nodes[function_name] = create_mcp_tool_node(
-                    tool_def=function,
+                    tool_def=hydrated_function,
                     tool_prompt_node=self.tool_prompt_node,
                 )
             else:
-                function_name = get_function_name(function)
+                # After checking, hydrated_function is ToolBase (not MCPToolDefinition)
+                # Mypy doesn't narrow Union[ToolBase, MCPToolDefinition] to ToolBase, so we cast
+                function_name = get_function_name(cast(ToolBase, hydrated_function))
 
                 self._function_nodes[function_name] = create_function_node(
-                    function=function,
+                    function=cast(ToolBase, hydrated_function),
                     tool_prompt_node=self.tool_prompt_node,
                 )
 
