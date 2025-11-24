@@ -84,6 +84,75 @@ if TYPE_CHECKING:
     from vellum.workflows.workflows.base import BaseWorkflow
 
 
+def _is_json_schema_type(schema: dict, schema_type: str) -> bool:
+    """
+    Check if a JSON schema has a specific type.
+    Handles both single type strings and arrays of types.
+    """
+    type_value = schema.get("type")
+    if isinstance(type_value, list):
+        return schema_type in type_value
+    return type_value == schema_type
+
+
+def _validate_json_schema_structure(schema: dict, path: str = "json_schema") -> None:
+    """
+    Validates the structure of a JSON schema to catch common errors early.
+
+    This validation focuses on structural requirements that would cause errors
+    during workflow execution. It checks:
+    - Array types have an 'items' field (unless using 'prefixItems')
+    - Object types have valid 'properties' structure
+    - Composition keywords (anyOf, oneOf, allOf) contain valid sub-schemas
+
+    Args:
+        schema: The JSON schema dictionary to validate
+        path: The current path in the schema (for error messages)
+
+    Raises:
+        ValueError: If the schema structure is invalid
+    """
+    if not isinstance(schema, dict):
+        return
+
+    # Validate array types
+    if _is_json_schema_type(schema, "array") and not schema.get("prefixItems"):
+        if not schema.get("items"):
+            raise ValueError(
+                f"JSON Schema of type 'array' at '{path}' must have an 'items' field defined. "
+                f"Array schemas require an 'items' field to specify the type of elements in the array."
+            )
+        # Recursively validate the items schema
+        _validate_json_schema_structure(schema["items"], f"{path}.items")
+
+    # Validate object types
+    if _is_json_schema_type(schema, "object"):
+        properties = schema.get("properties")
+        if properties is not None and not isinstance(properties, dict):
+            raise ValueError(
+                f"JSON Schema of type 'object' at '{path}' must have 'properties' defined as a dictionary, "
+                f"not {type(properties).__name__}"
+            )
+
+        # Recursively validate nested properties
+        if isinstance(properties, dict):
+            for key, value in properties.items():
+                _validate_json_schema_structure(value, f"{path}.properties.{key}")
+
+    # Validate composition keywords
+    for keyword in ["anyOf", "oneOf", "allOf"]:
+        if keyword in schema:
+            value = schema[keyword]
+            if not isinstance(value, list):
+                raise ValueError(
+                    f"JSON Schema's '{keyword}' field at '{path}' must be a list of schemas, "
+                    f"not {type(value).__name__}"
+                )
+            # Recursively validate each sub-schema
+            for i, sub_schema in enumerate(value):
+                _validate_json_schema_structure(sub_schema, f"{path}.{keyword}[{i}]")
+
+
 class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
     """
     Used to execute a Prompt defined inline.
@@ -492,3 +561,28 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
         Override this method to process the blocks before they are executed.
         """
         return blocks
+
+    @classmethod
+    def __validate__(cls) -> None:
+        """
+        Validates the node configuration, including JSON schema structure in parameters.
+
+        Raises:
+            ValueError: If the node configuration is invalid
+        """
+        super().__validate__()
+
+        # Validate JSON schema in custom parameters if present
+        if hasattr(cls, "parameters"):
+            # The parameters attribute is wrapped in a NodeReference, so we need to access the instance
+            parameters_ref = cls.parameters
+            if hasattr(parameters_ref, "instance"):
+                parameters_instance = parameters_ref.instance
+                if parameters_instance and hasattr(parameters_instance, "custom_parameters"):
+                    custom_params = parameters_instance.custom_parameters
+                    if custom_params and isinstance(custom_params, dict):
+                        json_schema = custom_params.get("json_schema")
+                        if json_schema and isinstance(json_schema, dict):
+                            _validate_json_schema_structure(
+                                json_schema, path="parameters.custom_parameters.json_schema"
+                            )
