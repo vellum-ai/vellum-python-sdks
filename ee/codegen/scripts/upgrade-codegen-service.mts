@@ -24,17 +24,18 @@ const main = async () => {
   }
 
   process.chdir(targetDir);
+  execSync(`npm install -g pnpm@10.23.0`, { stdio: "inherit" });
   execSync(`npm run gar-login`, { stdio: "inherit" });
-  execSync(`npm install @vellum-ai/vellum-codegen@${version} --save-exact`, {
+  execSync(`pnpm install @vellum-ai/vellum-codegen@${version} --save-exact`, {
     stdio: "inherit",
   });
   execSync(
-    `npm install @vellum-ai/vellum-codegen-${version}@npm:@vellum-ai/vellum-codegen@${version}  --save-exact`,
+    `pnpm install @vellum-ai/vellum-codegen-${version}@npm:@vellum-ai/vellum-codegen@${version}  --save-exact`,
     {
       stdio: "inherit",
     }
   );
-  execSync(`npm run postinstall`, { stdio: "inherit" });
+  execSync(`pnpm run postinstall`, { stdio: "inherit" });
 
   // Generate our codegen module lookup function. If we generate all if cases instead of
   // passing in a variable version to the async imports this will cause static type checking
@@ -70,8 +71,8 @@ ${packageVersionsLookups}
     path.join(targetDir, "src/utils/getCodegenModule.ts"),
     codeGeneratorFunction
   );
-  execSync(`npm run types`, { stdio: "inherit" });
-  execSync(`npm run lint:fix`, { stdio: "inherit" });
+  execSync(`pnpm run types`, { stdio: "inherit" });
+  execSync(`pnpm run lint:fix`, { stdio: "inherit" });
 
   execSync('git config user.name "vellum-automation[bot]"', {
     stdio: "inherit",
