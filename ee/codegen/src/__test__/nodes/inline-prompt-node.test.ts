@@ -19,6 +19,8 @@ import {
   NodeAttribute as NodeAttributeType,
   NodeOutput as NodeOutputType,
   PromptTemplateBlock,
+  WorkflowTriggerType,
+  IntegrationProvider,
 } from "src/types/vellum";
 
 describe("InlinePromptNode", () => {
@@ -581,6 +583,74 @@ describe("InlinePromptNode", () => {
         nodeContext,
       });
 
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("with trigger attribute input", () => {
+    it("should generate prompt_inputs with trigger attribute reference", async () => {
+      // GIVEN a workflow context with an integration trigger
+      const triggerId = "slack-trigger-id";
+      const triggerAttributeId = "channel-id-attribute";
+      const workflowContext = workflowContextFactory({
+        triggers: [
+          {
+            id: triggerId,
+            type: WorkflowTriggerType.INTEGRATION,
+            execConfig: {
+              type: IntegrationProvider.COMPOSIO,
+              integrationName: "SLACK",
+              slug: "SLACK_NEW_MESSAGE_TRIGGER",
+              setupAttributes: [],
+            },
+            attributes: [
+              {
+                id: triggerAttributeId,
+                key: "channel_id",
+                type: "STRING",
+              },
+            ],
+            displayData: {
+              label: "Slack New Message Trigger",
+              position: { x: 100, y: 200 },
+              z_index: 1,
+              icon: "slack",
+              color: "#4A154B",
+            },
+          },
+        ],
+      });
+
+      // AND a prompt node with a trigger attribute input
+      const nodeData = inlinePromptNodeDataInlineVariantFactory({
+        inputs: [
+          nodeInputFactory({
+            id: uuidv4(),
+            key: "channel",
+            value: {
+              type: "TRIGGER_ATTRIBUTE",
+              data: {
+                triggerId: triggerId,
+                attributeId: triggerAttributeId,
+              },
+            },
+          }),
+        ],
+      }).build();
+
+      // WHEN we generate the node
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as InlinePromptNodeContext;
+
+      const node = new InlinePromptNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      // THEN the generated code should reference the trigger attribute
       node.getNodeFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });

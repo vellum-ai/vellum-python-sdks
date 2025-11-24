@@ -3,14 +3,15 @@ import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { BaseNodeInputValuePointerRule } from "./base";
 import { ConstantValuePointerRule } from "./constant-value-pointer";
 import { EnvironmentVariablePointerRule } from "./environment-variable-pointer";
+import { ExecutionCounterPointerRule } from "./execution-counter-pointer";
 import { InputVariablePointerRule } from "./input-variable-pointer";
 import { NodeOutputPointerRule } from "./node-output-pointer";
+import { TriggerAttributePointerRule } from "./trigger-attribute-pointer";
 import { WorkflowStatePointerRule } from "./workflow-state-pointer";
+import { WorkspaceSecretPointerRule } from "./workspace-secret-pointer";
 
 import { BaseNodeContext } from "src/context/node-context/base";
 import { Writer } from "src/generators/extensions/writer";
-import { ExecutionCounterPointerRule } from "src/generators/node-inputs/node-input-value-pointer-rules/execution-counter-pointer";
-import { WorkspaceSecretPointerRule } from "src/generators/node-inputs/node-input-value-pointer-rules/workspace-secret-pointer";
 import {
   IterableConfig,
   NodeInputValuePointerRule as NodeInputValuePointerRuleType,
@@ -91,6 +92,11 @@ export class NodeInputValuePointerRule extends AstNode {
         });
       case "WORKFLOW_STATE":
         return new WorkflowStatePointerRule({
+          nodeContext: this.nodeContext,
+          nodeInputValuePointerRule: nodeInputValuePointerRuleData,
+        });
+      case "TRIGGER_ATTRIBUTE":
+        return new TriggerAttributePointerRule({
           nodeContext: this.nodeContext,
           nodeInputValuePointerRule: nodeInputValuePointerRuleData,
         });

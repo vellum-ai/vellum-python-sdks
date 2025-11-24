@@ -155,6 +155,14 @@ export interface WorkflowStatePointer {
   };
 }
 
+export interface TriggerAttributePointer {
+  type: "TRIGGER_ATTRIBUTE";
+  data: {
+    triggerId: string;
+    attributeId: string;
+  };
+}
+
 export type NodeInputValuePointerRule =
   | NodeOutputPointer
   | InputVariablePointer
@@ -162,7 +170,8 @@ export type NodeInputValuePointerRule =
   | WorkspaceSecretPointer
   | ExecutionCounterPointer
   | EnvironmentVariablePointer
-  | WorkflowStatePointer;
+  | WorkflowStatePointer
+  | TriggerAttributePointer;
 
 export interface NodeInputValuePointer {
   rules: NodeInputValuePointerRule[];
