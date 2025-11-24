@@ -92,7 +92,7 @@ export function jsonSchemaToType(
     }
     return new BuiltinListType(python.Type.any());
   } else if (schemaType === "object") {
-    // Handle additionalProperties for dict types
+    // Handle additionalProperties for typed dict types
     const additionalProperties = schema.additionalProperties as
       | Record<string, unknown>
       | undefined;
@@ -100,7 +100,8 @@ export function jsonSchemaToType(
       const valueType = jsonSchemaToType(additionalProperties);
       return new BuiltinDictType(python.Type.str(), valueType);
     }
-    return new BuiltinDictType(python.Type.str(), python.Type.any());
+    // Fallback to old behavior for plain objects
+    return python.Type.dict(python.Type.str(), python.Type.any());
   } else if (schemaType === "null") {
     return python.Type.none();
   } else if ("anyOf" in schema && Array.isArray(schema.anyOf)) {
