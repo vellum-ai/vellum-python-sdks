@@ -1,20 +1,22 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`GenericNode with two outputs > generic node with list of strings and dict of string to VellumDocument outputs > getNodeFile 1`] = `
-"from typing import Any
+exports[`GenericNode with two outputs > generic node with list of strings and dict of string to SearchResult outputs > getNodeFile 1`] = `
+"from typing import Dict
 
-from vellum import VellumValue
+from vellum.client.types.search_result import SearchResult
 from vellum.workflows import BaseNode
 from vellum.workflows.types.core import MergeBehavior
+
+from ..inputs import Inputs
 
 
 class TwoOutputsNode(BaseNode):
     default_attribute = "default-value"
-    default_attribute_2 = None
+    default_attribute_2 = Inputs.count
 
     class Outputs(BaseNode.Outputs):
-        string_list: list[VellumValue]
-        document_dict: Any
+        string_list: list[str]
+        document_dict: Dict[str, SearchResult]
 
     class Trigger(BaseNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ALL

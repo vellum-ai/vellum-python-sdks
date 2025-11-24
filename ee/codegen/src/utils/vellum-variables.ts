@@ -91,6 +91,14 @@ export function jsonSchemaToType(
     }
     return new BuiltinListType(python.Type.any());
   } else if (schemaType === "object") {
+    // Handle additionalProperties for dict types
+    const additionalProperties = schema.additionalProperties as
+      | Record<string, unknown>
+      | undefined;
+    if (additionalProperties) {
+      const valueType = jsonSchemaToType(additionalProperties);
+      return python.Type.dict(python.Type.str(), valueType);
+    }
     return python.Type.dict(python.Type.str(), python.Type.any());
   } else if (schemaType === "null") {
     return python.Type.none();
