@@ -1,8 +1,8 @@
 import { python } from "@fern-api/python-ast";
 import { Decorator } from "@fern-api/python-ast/Decorator";
-import { Reference } from "@fern-api/python-ast/Reference";
 
 import { Field } from "./field";
+import { Reference } from "./reference";
 
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Writer } from "src/generators/extensions/writer";

@@ -1,14 +1,12 @@
 import { mkdir, writeFile } from "fs/promises";
 import path, { join } from "path";
 
-import { Reference } from "@fern-api/python-ast/Reference";
-import { ModulePath } from "@fern-api/python-ast/core/types";
-
 import { INIT_FILE_NAME } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { FileFormattingError } from "src/generators/errors";
 import { Comment, PythonFile, StarImport } from "src/generators/extensions";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { ModulePath, Reference } from "src/generators/extensions/reference";
 import { Writer } from "src/generators/extensions/writer";
 
 export declare namespace BasePersistedFile {
