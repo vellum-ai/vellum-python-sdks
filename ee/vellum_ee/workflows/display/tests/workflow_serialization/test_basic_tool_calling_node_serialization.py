@@ -225,7 +225,7 @@ def test_serialize_workflow():
                 "name": "chat_history",
                 "type": "CHAT_HISTORY",
                 "value": None,
-                "schema": {"type": "array", "items": {"$ref": "#/$defs/vellum.client.types.chat_message.ChatMessage"}},
+                "schema": {"type": "array", "items": {"$ref": "#/$defs/ChatMessage"}},
             },
         ],
     }
