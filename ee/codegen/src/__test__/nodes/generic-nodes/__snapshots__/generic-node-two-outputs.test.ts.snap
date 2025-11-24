@@ -1,0 +1,22 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`GenericNode with two outputs > generic node with list of strings and dict of string to VellumDocument outputs > getNodeFile 1`] = `
+"from typing import Any
+
+from vellum import VellumValue
+from vellum.workflows import BaseNode
+from vellum.workflows.types.core import MergeBehavior
+
+
+class TwoOutputsNode(BaseNode):
+    default_attribute = "default-value"
+    default_attribute_2 = None
+
+    class Outputs(BaseNode.Outputs):
+        string_list: list[VellumValue]
+        document_dict: Any
+
+    class Trigger(BaseNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ALL
+"
+`;
