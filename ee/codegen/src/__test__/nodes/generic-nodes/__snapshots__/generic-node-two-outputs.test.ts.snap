@@ -1,9 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`GenericNode with two outputs > generic node with list of strings and dict of string to SearchResult outputs > getNodeFile 1`] = `
-"from typing import Dict
-
-from vellum.client.types.search_result import SearchResult
+"from vellum.client.types.search_result import SearchResult
 from vellum.workflows import BaseNode
 from vellum.workflows.types.core import MergeBehavior
 
@@ -16,7 +14,7 @@ class TwoOutputsNode(BaseNode):
 
     class Outputs(BaseNode.Outputs):
         string_list: list[str]
-        document_dict: Dict[str, SearchResult]
+        document_dict: dict[str, SearchResult]
 
     class Trigger(BaseNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ALL
