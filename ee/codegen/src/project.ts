@@ -14,10 +14,7 @@ import { Comment } from "./generators/extensions/comment";
 import { StarImport } from "./generators/extensions/star-import";
 import { getAllFilesInDir } from "./utils/files";
 
-import {
-  GENERATED_DISPLAY_MODULE_NAME,
-  GENERATED_NODES_MODULE_NAME,
-} from "src/constants";
+import { GENERATED_DISPLAY_MODULE_NAME } from "src/constants";
 import {
   createNodeContext,
   createTriggerContext,
@@ -903,103 +900,11 @@ ${errors.slice(0, 3).map((err) => {
   private generateNodeFiles(
     nodes: BaseNode<WorkflowDataNode, BaseNodeContext<WorkflowDataNode>>[]
   ): Promise<unknown>[] {
-    const rootNodesInitFileStatements: AstNode[] = [];
-    const rootDisplayNodesInitFileStatements: AstNode[] = [];
-    if (nodes.length) {
-      const nodeInitFileAllField = python.field({
-        name: "__all__",
-        initializer: python.TypeInstantiation.list(
-          [
-            ...this.sortAlphabetically(
-              nodes.map((node) => node.getNodeClassName())
-            ).map((name) => python.TypeInstantiation.str(name)),
-          ],
-          {
-            endWithComma: true,
-          }
-        ),
-      });
-      rootNodesInitFileStatements.push(nodeInitFileAllField);
-
-      const nodeDisplayInitFileAllField = python.field({
-        name: "__all__",
-        initializer: python.TypeInstantiation.list(
-          [
-            ...this.sortAlphabetically(
-              nodes.map((node) => node.getNodeDisplayClassName())
-            ).map((name) => python.TypeInstantiation.str(name)),
-          ],
-          {
-            endWithComma: true,
-          }
-        ),
-      });
-      rootDisplayNodesInitFileStatements.push(nodeDisplayInitFileAllField);
-    }
-
-    const rootNodesInitFile = codegen.initFile({
-      workflowContext: this.workflowContext,
-      modulePath: this.workflowContext.parentNode
-        ? this.workflowContext.nestedWorkflowModuleName
-          ? [
-              ...this.workflowContext.parentNode.nodeContext.nodeModulePath,
-              this.workflowContext.nestedWorkflowModuleName,
-              GENERATED_NODES_MODULE_NAME,
-            ]
-          : [
-              ...this.workflowContext.parentNode.nodeContext.nodeModulePath,
-              GENERATED_NODES_MODULE_NAME,
-            ]
-        : [...this.getModulePath(), GENERATED_NODES_MODULE_NAME],
-      statements: rootNodesInitFileStatements,
-    });
-
-    const rootDisplayNodesInitFile = codegen.initFile({
-      workflowContext: this.workflowContext,
-      modulePath: this.workflowContext.parentNode
-        ? this.workflowContext.nestedWorkflowModuleName
-          ? [
-              ...this.workflowContext.parentNode.getNodeDisplayModulePath(),
-              this.workflowContext.nestedWorkflowModuleName,
-              GENERATED_NODES_MODULE_NAME,
-            ]
-          : [
-              ...this.workflowContext.parentNode.getNodeDisplayModulePath(),
-              GENERATED_NODES_MODULE_NAME,
-            ]
-        : [
-            ...this.getModulePath(),
-            GENERATED_DISPLAY_MODULE_NAME,
-            GENERATED_NODES_MODULE_NAME,
-          ],
-      statements: rootDisplayNodesInitFileStatements,
-    });
-
-    nodes.forEach((node) => {
-      rootNodesInitFile.addReference(
-        python.reference({
-          name: node.getNodeClassName(),
-          modulePath: node.getNodeModulePath(),
-        })
-      );
-
-      rootDisplayNodesInitFile.addReference(
-        python.reference({
-          name: node.getNodeDisplayClassName(),
-          modulePath: node.getNodeDisplayModulePath(),
-        })
-      );
-    });
-
     const nodePromises = nodes.map(async (node) => {
       return await node.persist();
     });
 
     return [
-      // nodes/__init__.py
-      rootNodesInitFile.persist(),
-      // display/nodes/__init__.py
-      rootDisplayNodesInitFile.persist(),
       // nodes/* and display/nodes/*
       ...nodePromises,
     ];

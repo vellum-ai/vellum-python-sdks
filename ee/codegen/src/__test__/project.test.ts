@@ -2558,15 +2558,6 @@ baz = foo + bar
         "nodes",
         "second_node.py",
       ]);
-
-      // We should have included the second node in our init files
-      expectProjectFileToMatchSnapshot(["code", "nodes", "__init__.py"]);
-      expectProjectFileToMatchSnapshot([
-        "code",
-        "display",
-        "nodes",
-        "__init__.py",
-      ]);
     });
     it("should generate unused_graphs if final output is not used", async () => {
       // GIVEN a workflow where final output is not used
@@ -5000,7 +4991,6 @@ baz = foo + bar
       });
 
       await project.generateCode();
-      expectProjectFileToMatchSnapshot(["code", "nodes", "__init__.py"]);
       expectProjectFileToMatchSnapshot([
         "code",
         "nodes",
@@ -6408,7 +6398,6 @@ baz = foo + bar
       expect(project.workflowContext.getErrors()).toHaveLength(0);
       const expectedFiles = [
         ["code", "inputs.py"],
-        ["code", "nodes", "__init__.py"],
         ["code", "nodes", "final_output.py"],
         ["code", "nodes", "final_output_1.py"],
         ["code", "nodes", "final_output_2.py"],
@@ -6426,14 +6415,6 @@ baz = foo + bar
           "tool_call_get_current_weather_node",
           "weather_function",
           "inputs.py",
-        ],
-        [
-          "code",
-          "nodes",
-          "tool_call_get_current_weather_node",
-          "weather_function",
-          "nodes",
-          "__init__.py",
         ],
         [
           "code",
@@ -6472,15 +6453,6 @@ baz = foo + bar
           "display",
           "nodes",
           "tool_call_get_current_weather_node",
-          "__init__.py",
-        ],
-        [
-          "code",
-          "display",
-          "nodes",
-          "tool_call_get_current_weather_node",
-          "weather_function",
-          "nodes",
           "__init__.py",
         ],
         [
