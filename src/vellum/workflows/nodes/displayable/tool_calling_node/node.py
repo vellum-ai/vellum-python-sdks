@@ -28,7 +28,7 @@ from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.core import EntityInputsInterface
-from vellum.workflows.types.definition import MCPServer, Tool
+from vellum.workflows.types.definition import MCPServer, MCPToolDefinition, Tool
 from vellum.workflows.types.generics import StateType
 from vellum.workflows.utils.functions import compile_mcp_tool_definition, get_mcp_tool_name
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
@@ -186,10 +186,17 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
         process_parameters_method = getattr(self.__class__, "process_parameters", None)
         process_blocks_method = getattr(self.__class__, "process_blocks", None)
 
+        # Hydrate MCP servers upfront and replace them with tool definitions
+        hydrated_functions: List[Tool] = [
+            tool_def
+            for function in self.functions
+            for tool_def in (compile_mcp_tool_definition(function) if isinstance(function, MCPServer) else [function])
+        ]
+
         self.tool_prompt_node = create_tool_prompt_node(
             ml_model=self.ml_model,
             blocks=self.blocks,
-            functions=self.functions,
+            functions=hydrated_functions,
             prompt_inputs=self.prompt_inputs,
             parameters=self.parameters,
             max_prompt_iterations=self.max_prompt_iterations,
@@ -200,21 +207,19 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
 
         # Create the router node (handles routing logic only)
         self.router_node = create_router_node(
-            functions=self.functions,
+            functions=hydrated_functions,
             tool_prompt_node=self.tool_prompt_node,
         )
 
         self._function_nodes = {}
-        for function in self.functions:
-            if isinstance(function, MCPServer):
-                tool_definitions = compile_mcp_tool_definition(function)
-                for tool_definition in tool_definitions:
-                    function_name = get_mcp_tool_name(tool_definition)
+        for function in hydrated_functions:
+            if isinstance(function, MCPToolDefinition):
+                function_name = get_mcp_tool_name(function)
 
-                    self._function_nodes[function_name] = create_mcp_tool_node(
-                        tool_def=tool_definition,
-                        tool_prompt_node=self.tool_prompt_node,
-                    )
+                self._function_nodes[function_name] = create_mcp_tool_node(
+                    tool_def=function,
+                    tool_prompt_node=self.tool_prompt_node,
+                )
             else:
                 function_name = get_function_name(function)
 
