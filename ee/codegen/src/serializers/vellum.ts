@@ -103,6 +103,7 @@ import {
   SubworkflowNode,
   TemplatingNode,
   TernaryWorkflowExpression,
+  TriggerAttributePointer,
   TriggerAttributeWorkflowReference,
   UnaryWorkflowExpression,
   VariablePromptTemplateBlock,
@@ -510,6 +511,25 @@ export declare namespace WorkflowStatePointerSerializer {
   }
 }
 
+export const TriggerAttributePointerSerializer: ObjectSchema<
+  TriggerAttributePointerSerializer.Raw,
+  Omit<TriggerAttributePointer, "type">
+> = objectSchema({
+  data: objectSchema({
+    triggerId: propertySchema("trigger_id", stringSchema()),
+    attributeId: propertySchema("attribute_id", stringSchema()),
+  }),
+});
+
+export declare namespace TriggerAttributePointerSerializer {
+  interface Raw {
+    data: {
+      trigger_id: string;
+      attribute_id: string;
+    };
+  }
+}
+
 export const NodeInputValuePointerRuleSerializer: Schema<
   NodeInputValuePointerRuleSerializer.Raw,
   NodeInputValuePointerRule
@@ -521,6 +541,7 @@ export const NodeInputValuePointerRuleSerializer: Schema<
   EXECUTION_COUNTER: ExecutionCounterPointerSerializer,
   ENVIRONMENT_VARIABLE: EnvironmentVariablePointerSerializer,
   WORKFLOW_STATE: WorkflowStatePointerSerializer,
+  TRIGGER_ATTRIBUTE: TriggerAttributePointerSerializer,
 });
 
 export declare namespace NodeInputValuePointerRuleSerializer {
@@ -531,7 +552,8 @@ export declare namespace NodeInputValuePointerRuleSerializer {
     | WorkspaceSecretPointerSerializer.Raw
     | ExecutionCounterPointerSerializer.Raw
     | EnvironmentVariablePointerSerializer.Raw
-    | WorkflowStatePointerSerializer.Raw;
+    | WorkflowStatePointerSerializer.Raw
+    | TriggerAttributePointerSerializer.Raw;
 }
 
 export const NodeInputSerializer: ObjectSchema<
