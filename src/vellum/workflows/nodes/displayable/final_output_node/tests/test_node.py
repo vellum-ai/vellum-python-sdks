@@ -44,7 +44,7 @@ def test_final_output_node__mismatched_output_type_should_raise_exception():
     assert (
         str(exc_info.value)
         == "Failed to validate output type for node 'Output': Output type mismatch: declared type 'list' but "
-        "the 'value' Output has type(s) ['str']. "
+        "the 'value' Output has type(s) 'str'. "
     )
 
 
@@ -67,7 +67,7 @@ def test_final_output_node__mismatched_output_type_in_state_should_raise_excepti
     assert (
         str(exc_info.value)
         == "Failed to validate output type for node 'Output': Output type mismatch: declared type 'list' but "
-        "the 'value' Output has type(s) ['str']. "
+        "the 'value' Output has type(s) 'str'. "
     )
 
 
