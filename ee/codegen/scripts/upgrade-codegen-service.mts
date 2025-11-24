@@ -24,7 +24,7 @@ const main = async () => {
   }
 
   process.chdir(targetDir);
-  execSync(`npm install -g pnpm`, { stdio: "inherit" });
+  execSync(`npm install -g pnpm@10.23.0`, { stdio: "inherit" });
   execSync(`npm run gar-login`, { stdio: "inherit" });
   execSync(`pnpm install @vellum-ai/vellum-codegen@${version} --save-exact`, {
     stdio: "inherit",
