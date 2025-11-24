@@ -7,6 +7,7 @@ import {
   VELLUM_WORKFLOWS_ROOT_MODULE_PATH,
 } from "src/constants";
 import { PythonType, UnionType } from "src/generators/extensions";
+import { BuiltinDictType } from "src/generators/extensions/dict";
 import { BuiltinListType } from "src/generators/extensions/list";
 import { assertUnreachable } from "src/utils/typing";
 
@@ -91,6 +92,15 @@ export function jsonSchemaToType(
     }
     return new BuiltinListType(python.Type.any());
   } else if (schemaType === "object") {
+    // Handle additionalProperties for typed dict types
+    const additionalProperties = schema.additionalProperties as
+      | Record<string, unknown>
+      | undefined;
+    if (additionalProperties) {
+      const valueType = jsonSchemaToType(additionalProperties);
+      return new BuiltinDictType(python.Type.str(), valueType);
+    }
+    // Fallback to old behavior for plain objects
     return python.Type.dict(python.Type.str(), python.Type.any());
   } else if (schemaType === "null") {
     return python.Type.none();

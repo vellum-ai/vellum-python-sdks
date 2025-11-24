@@ -9,6 +9,7 @@
 export * from "./ast-node";
 export * from "./class";
 export * from "./comment";
+export * from "./dict";
 export * from "./field";
 export * from "./list";
 export * from "./optional";

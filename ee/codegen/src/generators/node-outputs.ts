@@ -11,7 +11,10 @@ import { Writer } from "src/generators/extensions/writer";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { NodeOutput as NodeOutputType } from "src/types/vellum";
 import { toValidPythonIdentifier } from "src/utils/casing";
-import { getVellumVariablePrimitiveType } from "src/utils/vellum-variables";
+import {
+  getVellumVariablePrimitiveType,
+  jsonSchemaToType,
+} from "src/utils/vellum-variables";
 
 export declare namespace NodeOutputs {
   export interface Args {
@@ -57,7 +60,10 @@ export class NodeOutputs extends AstNode {
     });
 
     nodeOutputs.forEach((output) => {
-      const type = getVellumVariablePrimitiveType(output.type);
+      // Use jsonSchemaToType if schema is present, otherwise fall back to getVellumVariablePrimitiveType
+      const type = output.schema
+        ? jsonSchemaToType(output.schema)
+        : getVellumVariablePrimitiveType(output.type);
       const sanitizedName = toValidPythonIdentifier(output.name, "output");
       const field = output.value
         ? python.field({
