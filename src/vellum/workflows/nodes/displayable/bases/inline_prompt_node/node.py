@@ -66,6 +66,7 @@ from vellum.workflows.types.definition import (
     ComposioToolDefinition,
     DeploymentDefinition,
     MCPServer,
+    MCPToolDefinition,
     VellumIntegrationToolDefinition,
 )
 from vellum.workflows.types.generics import StateType, is_workflow_class
@@ -73,7 +74,6 @@ from vellum.workflows.utils.functions import (
     compile_composio_tool_definition,
     compile_function_definition,
     compile_inline_workflow_function_definition,
-    compile_mcp_tool_definition,
     compile_vellum_integration_tool_definition,
     compile_workflow_deployment_function_definition,
     get_mcp_tool_name,
@@ -112,6 +112,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                 Type["BaseWorkflow"],
                 VellumIntegrationToolDefinition,
                 MCPServer,
+                MCPToolDefinition,
             ]
         ]
     ] = None
@@ -186,16 +187,14 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                     normalized_functions.append(
                         compile_vellum_integration_tool_definition(function, self._context.vellum_client)
                     )
-                elif isinstance(function, MCPServer):
-                    tool_definitions = compile_mcp_tool_definition(function)
-                    for tool_def in tool_definitions:
-                        normalized_functions.append(
-                            FunctionDefinition(
-                                name=get_mcp_tool_name(tool_def),
-                                description=tool_def.description,
-                                parameters=tool_def.parameters,
-                            )
+                elif isinstance(function, MCPToolDefinition):
+                    normalized_functions.append(
+                        FunctionDefinition(
+                            name=get_mcp_tool_name(function),
+                            description=function.description,
+                            parameters=function.parameters,
                         )
+                    )
                 else:
                     raise NodeException(
                         message=f"`{function}` is not a valid function definition",
