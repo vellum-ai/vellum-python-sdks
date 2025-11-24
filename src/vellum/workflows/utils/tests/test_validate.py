@@ -10,11 +10,15 @@ from vellum.workflows.utils.validate import validate_target_type
         (str, int),
         (list[str], list[int]),
         (str, Union[str, int]),
+        (int, Union[str, int]),
+        (list[str], Union[list[str], list[int]]),
     ],
     ids=[
         "str_int",
         "list_str_int",
         "str_union_str_int",
+        "int_union_str_int",
+        "list_str_union",
     ],
 )
 def test_validate__should_raise_exception(
