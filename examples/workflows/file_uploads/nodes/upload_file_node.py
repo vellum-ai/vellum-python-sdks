@@ -1,7 +1,6 @@
 from typing import List
 
 from vellum import VellumImage
-from vellum.utils.files import upload_vellum_file
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.state import BaseState
 
@@ -23,6 +22,7 @@ class UploadFileNode(BaseNode[BaseState]):
         color = "blue"
 
     class Outputs(BaseNode.Outputs):
+        chat: VellumImage
         receipt: VellumImage
         four_pillars: VellumImage
 
@@ -30,29 +30,33 @@ class UploadFileNode(BaseNode[BaseState]):
         # Get images from inputs
         images = self.images or []
 
-        if len(images) < 2:
-            raise ValueError("Expected at least 2 images")
+        if len(images) < 3:
+            raise ValueError("Expected at least 3 images")
 
         # Upload each file to Vellum if it's not already uploaded
         # This will:
         # 1. Return as-is if already a vellum:uploaded-file:* URI
         # 2. Upload from base64 data URL if that's the source
         # 3. Download from URL and upload if it's a public URL
-        uploaded_receipt = upload_vellum_file(
-            images[0],
+        uploaded_chat = images[0].upload(
+            filename="chat.png",
+            vellum_client=self._context.vellum_client,
+        )
+        uploaded_receipt = images[1].upload(
             filename="receipt.jpeg",
             vellum_client=self._context.vellum_client,
         )
-        uploaded_four_pillars = upload_vellum_file(
-            images[1],
+        uploaded_four_pillars = images[2].upload(
             filename="four_pillars.png",
             vellum_client=self._context.vellum_client,
         )
 
+        print(f"Uploaded chat: {uploaded_chat.src}")
         print(f"Uploaded receipt: {uploaded_receipt.src}")
         print(f"Uploaded four pillars: {uploaded_four_pillars.src}")
 
         return self.Outputs(
+            chat=uploaded_chat,
             receipt=uploaded_receipt,
             four_pillars=uploaded_four_pillars,
         )
