@@ -11,8 +11,10 @@ from ...core.http_response import AsyncHttpResponse, HttpResponse
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.pydantic_utilities import parse_obj_as
 from ...core.request_options import RequestOptions
+from ...core.serialization import convert_and_respect_annotation_metadata
 from ...errors.bad_request_error import BadRequestError
 from ...types.dataset_row_push_request import DatasetRowPushRequest
+from ...types.runner_config_request import RunnerConfigRequest
 from ...types.workflow_push_deployment_config_request import WorkflowPushDeploymentConfigRequest
 from ...types.workflow_push_exec_config import WorkflowPushExecConfig
 from ...types.workflow_push_response import WorkflowPushResponse
@@ -235,6 +237,7 @@ class RawWorkflowsClient:
         *,
         files: typing.Dict[str, typing.Optional[typing.Any]],
         module: typing.Optional[str] = OMIT,
+        runner_config: typing.Optional[RunnerConfigRequest] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[typing.Dict[str, typing.Optional[typing.Any]]]:
         """
@@ -245,6 +248,8 @@ class RawWorkflowsClient:
         files : typing.Dict[str, typing.Optional[typing.Any]]
 
         module : typing.Optional[str]
+
+        runner_config : typing.Optional[RunnerConfigRequest]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -261,6 +266,9 @@ class RawWorkflowsClient:
             json={
                 "files": files,
                 "module": module,
+                "runner_config": convert_and_respect_annotation_metadata(
+                    object_=runner_config, annotation=typing.Optional[RunnerConfigRequest], direction="write"
+                ),
             },
             headers={
                 "content-type": "application/json",
@@ -498,6 +506,7 @@ class AsyncRawWorkflowsClient:
         *,
         files: typing.Dict[str, typing.Optional[typing.Any]],
         module: typing.Optional[str] = OMIT,
+        runner_config: typing.Optional[RunnerConfigRequest] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[typing.Dict[str, typing.Optional[typing.Any]]]:
         """
@@ -508,6 +517,8 @@ class AsyncRawWorkflowsClient:
         files : typing.Dict[str, typing.Optional[typing.Any]]
 
         module : typing.Optional[str]
+
+        runner_config : typing.Optional[RunnerConfigRequest]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -524,6 +535,9 @@ class AsyncRawWorkflowsClient:
             json={
                 "files": files,
                 "module": module,
+                "runner_config": convert_and_respect_annotation_metadata(
+                    object_=runner_config, annotation=typing.Optional[RunnerConfigRequest], direction="write"
+                ),
             },
             headers={
                 "content-type": "application/json",

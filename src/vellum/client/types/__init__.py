@@ -427,6 +427,7 @@ from .release_tag_source import ReleaseTagSource
 from .replace_test_suite_test_case_request import ReplaceTestSuiteTestCaseRequest
 from .rich_text_child_block import RichTextChildBlock
 from .rich_text_prompt_block import RichTextPromptBlock
+from .runner_config_request import RunnerConfigRequest
 from .sandbox_scenario import SandboxScenario
 from .scenario_input import ScenarioInput
 from .scenario_input_audio_variable_value import ScenarioInputAudioVariableValue
@@ -1153,6 +1154,7 @@ __all__ = [
     "ReplaceTestSuiteTestCaseRequest",
     "RichTextChildBlock",
     "RichTextPromptBlock",
+    "RunnerConfigRequest",
     "SandboxScenario",
     "ScenarioInput",
     "ScenarioInputAudioVariableValue",
