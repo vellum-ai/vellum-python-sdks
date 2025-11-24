@@ -92,7 +92,7 @@ def upload_vellum_file(
         decoded = base64.b64decode(base64_content)
 
         # Ensure filename has appropriate extension
-        resolved_filename = ensure_filename_with_extension(filename, mime_type)
+        resolved_filename = ensure_filename_with_extension(filename, mime_type, decoded)
         file_content: File = (resolved_filename, BytesIO(decoded), mime_type)
 
         try:
@@ -130,7 +130,7 @@ def upload_vellum_file(
     content_type = response.headers.get("content-type", "application/octet-stream")
 
     # Ensure filename has appropriate extension
-    resolved_filename = ensure_filename_with_extension(filename, content_type)
+    resolved_filename = ensure_filename_with_extension(filename, content_type, content)
     file_content = (resolved_filename, BytesIO(content), content_type)
 
     try:
