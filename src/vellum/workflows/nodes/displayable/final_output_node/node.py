@@ -9,7 +9,7 @@ from vellum.workflows.ports import NodePorts
 from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.generics import StateType
 from vellum.workflows.types.utils import get_original_base
-from vellum.workflows.utils.validate import validate_target_types
+from vellum.workflows.utils.validate import validate_target_type
 
 _OutputType = TypeVar("_OutputType")
 
@@ -96,6 +96,6 @@ class FinalOutputNode(BaseNode[StateType], Generic[StateType, _OutputType], meta
 
         if isinstance(value_descriptor, BaseDescriptor):
             try:
-                validate_target_types(declared_output_type, value_descriptor.types)
+                validate_target_type(declared_output_type, value_descriptor.normalized_type)
             except ValueError as e:
                 raise ValueError(f"Failed to validate output type for node '{cls.__name__}': {e}")

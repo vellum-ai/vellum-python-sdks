@@ -1,13 +1,14 @@
 import pytest
+from typing import Union
 
-from vellum.workflows.utils.validate import validate_target_types
+from vellum.workflows.utils.validate import validate_target_type
 
 
 @pytest.mark.parametrize(
-    ["declared_type", "target_types"],
+    ["declared_type", "target_type"],
     [
-        (str, (int,)),
-        (list[str], (list[int],)),
+        (str, int),
+        (list[str], list[int]),
     ],
     ids=[
         "str_int",
@@ -16,33 +17,47 @@ from vellum.workflows.utils.validate import validate_target_types
 )
 def test_validate__should_raise_exception(
     declared_type,
-    target_types,
+    target_type,
 ):
-    # WHEN validating the target types
+    """
+    Tests that validate_target_type raises an exception for mismatched types.
+    """
+
+    # WHEN validating the target type
     with pytest.raises(ValueError) as exc_info:
-        validate_target_types(declared_type, target_types)
+        validate_target_type(declared_type, target_type)
 
     # THEN an exception should be raised
     assert "Output type mismatch" in str(exc_info.value)
 
 
 @pytest.mark.parametrize(
-    ["declared_type", "target_types"],
+    ["declared_type", "target_type"],
     [
-        (str, (str,)),
-        (list[str], (list[str],)),
-        (dict, (dict[str, str],)),
+        (str, str),
+        (list[str], list[str]),
+        (dict, dict[str, str]),
+        (str, Union[str, int]),
+        (int, Union[str, int]),
+        (list[str], Union[list[str], list[int]]),
     ],
     ids=[
         "str",
         "list_str",
         "bare_dict_params_dict",
+        "str_union_str_int",
+        "int_union_str_int",
+        "list_str_union",
     ],
 )
 def test_validate__should_validate(
     declared_type,
-    target_types,
+    target_type,
 ):
-    # WHEN validating the target types
+    """
+    Tests that validate_target_type accepts matching types and union types.
+    """
+
+    # WHEN validating the target type
     # THEN no exception should be raised
-    validate_target_types(declared_type, target_types)
+    validate_target_type(declared_type, target_type)
