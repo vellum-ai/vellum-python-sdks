@@ -78,12 +78,7 @@ class _FinalOutputNodeMeta(BaseNodeMeta):
                 if descriptor_type == declared_output_type:
                     type_mismatch = False
                     break
-                if (
-                    get_origin(descriptor_type) == declared_output_type
-                    or get_origin(declared_output_type) == descriptor_type
-                ):
-                    type_mismatch = False
-                    break
+
                 try:
                     if issubclass(descriptor_type, declared_output_type) or issubclass(
                         declared_output_type, descriptor_type
@@ -95,6 +90,20 @@ class _FinalOutputNodeMeta(BaseNodeMeta):
                     if str(descriptor_type) == str(declared_output_type):
                         type_mismatch = False
                         break
+
+                descriptor_origin = get_origin(descriptor_type)
+                declared_origin = get_origin(declared_output_type)
+
+                if descriptor_origin is None and declared_origin is None:
+                    continue
+
+                if (
+                    descriptor_origin == declared_output_type
+                    or declared_origin == descriptor_type
+                    or descriptor_origin == declared_origin
+                ):
+                    type_mismatch = False
+                    break
 
             if type_mismatch:
                 declared_type_name = getattr(declared_output_type, "__name__", str(declared_output_type))
