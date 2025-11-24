@@ -6,12 +6,13 @@ import { Class } from "@fern-api/python-ast/Class";
 import { Field } from "@fern-api/python-ast/Field";
 import { Method } from "@fern-api/python-ast/Method";
 import { Reference } from "@fern-api/python-ast/Reference";
-import { StarImport } from "@fern-api/python-ast/StarImport";
+import { StarImport as PythonAstStarImport } from "@fern-api/python-ast/StarImport";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { ImportedName, ModulePath } from "@fern-api/python-ast/core/types";
 import { createPythonClassName } from "@fern-api/python-ast/core/utils";
 
 import { Comment } from "./comment";
+import { StarImport } from "./star-import";
 
 import { Writer } from "src/generators/extensions/writer";
 
@@ -128,7 +129,10 @@ export class PythonFile extends AstNode {
     ).flatMap(({ references }) => references);
     importedReferences.forEach((reference) => {
       // Skip star imports since we should never override their import alias
-      if (reference instanceof StarImport) {
+      if (
+        reference instanceof StarImport ||
+        reference instanceof PythonAstStarImport
+      ) {
         return;
       }
 
