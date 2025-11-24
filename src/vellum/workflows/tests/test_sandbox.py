@@ -211,6 +211,39 @@ def test_sandbox_runner_with_trigger_instance(mock_logger):
     assert isinstance(dataset[0].workflow_trigger, MySchedule)
 
 
+def test_dataset_row_serialization_with_trigger_alias():
+    """
+    Test that DatasetRow serializes trigger field to workflow_trigger_id when using 'trigger' alias.
+    """
+
+    # GIVEN a trigger class
+    class MySchedule(ScheduleTrigger):
+        class Config(ScheduleTrigger.Config):
+            cron = "* * * * *"
+            timezone = "UTC"
+
+    # AND a trigger instance
+    trigger_instance = MySchedule(current_run_at=datetime.min, next_run_at=datetime.now())
+
+    # AND a DatasetRow constructed with 'trigger' alias
+    dataset_row = DatasetRow(
+        label="test_serialization",
+        inputs={"foo": "bar"},
+        trigger=trigger_instance,
+    )
+
+    # WHEN we serialize the DatasetRow
+    serialized = dataset_row.model_dump()
+
+    # THEN the serialized dict should contain workflow_trigger_id
+    assert "workflow_trigger_id" in serialized
+    assert serialized["workflow_trigger_id"] == str(MySchedule.__id__)
+
+    # AND should not contain 'trigger' or 'workflow_trigger' keys
+    assert "trigger" not in serialized
+    assert "workflow_trigger" not in serialized
+
+
 def test_sandbox_runner_with_node_output_mocks(mock_logger, mocker):
     """
     Tests that WorkflowSandboxRunner passes mocks from DatasetRow to workflow.stream().
