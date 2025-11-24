@@ -3,7 +3,6 @@
 // But the only difference is that all private methods are now protected
 
 import { Class } from "@fern-api/python-ast/Class";
-import { Comment } from "@fern-api/python-ast/Comment";
 import { Field } from "@fern-api/python-ast/Field";
 import { Method } from "@fern-api/python-ast/Method";
 import { Reference } from "@fern-api/python-ast/Reference";
@@ -11,6 +10,8 @@ import { StarImport } from "@fern-api/python-ast/StarImport";
 import { AstNode } from "@fern-api/python-ast/core/AstNode";
 import { ImportedName, ModulePath } from "@fern-api/python-ast/core/types";
 import { createPythonClassName } from "@fern-api/python-ast/core/utils";
+
+import { Comment } from "./comment";
 
 import { Writer } from "src/generators/extensions/writer";
 
