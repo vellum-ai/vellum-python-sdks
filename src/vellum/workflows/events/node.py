@@ -24,6 +24,10 @@ class _BaseNodeExecutionBody(UniversalBaseModel):
     def serialize_node_definition(self, node_definition: Type, _info: Any) -> Dict[str, Any]:
         return serialize_type_encoder_with_id(node_definition)
 
+    @property
+    def definition_name(self) -> str:
+        return self.node_definition.__name__
+
 
 class _BaseNodeEvent(BaseEvent):
     body: _BaseNodeExecutionBody
