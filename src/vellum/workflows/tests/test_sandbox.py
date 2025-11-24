@@ -155,6 +155,62 @@ def test_sandbox_runner_with_workflow_trigger(mock_logger):
     assert dataset[0].workflow_trigger == MySchedule
 
 
+def test_sandbox_runner_with_trigger_instance(mock_logger):
+    """
+    Test that WorkflowSandboxRunner can run with DatasetRow containing trigger instance using 'trigger' alias.
+    """
+
+    # GIVEN we capture the logs to stdout
+    logs = []
+    mock_logger.return_value.info.side_effect = lambda msg: logs.append(msg)
+
+    # AND a trigger class
+    class MySchedule(ScheduleTrigger):
+        class Config(ScheduleTrigger.Config):
+            cron = "* * * * *"
+            timezone = "UTC"
+
+    # AND a workflow that uses the trigger
+    class StartNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result = MySchedule.current_run_at
+
+    class Workflow(BaseWorkflow):
+        graph = MySchedule >> StartNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_output = StartNode.Outputs.result
+
+    # AND a trigger instance
+    trigger_instance = MySchedule(current_run_at=datetime.min, next_run_at=datetime.now())
+
+    # AND a dataset with trigger instance using 'trigger' alias
+    dataset = [
+        DatasetRow(
+            label="test_row_with_instance",
+            inputs={"current_run_at": datetime.min, "next_run_at": datetime.now()},
+            trigger=trigger_instance,
+        ),
+    ]
+
+    # WHEN we run the sandbox with the DatasetRow containing trigger instance
+    runner = WorkflowSandboxRunner(workflow=Workflow(), dataset=dataset)
+    runner.run()
+
+    # THEN the workflow should run successfully
+    assert logs == [
+        "Just started Node: StartNode",
+        "Just finished Node: StartNode",
+        "Workflow fulfilled!",
+        "----------------------------------",
+        "final_output: 0001-01-01 00:00:00",
+    ]
+
+    # AND the dataset row should have the trigger instance
+    assert dataset[0].workflow_trigger == trigger_instance
+    assert isinstance(dataset[0].workflow_trigger, MySchedule)
+
+
 def test_sandbox_runner_with_node_output_mocks(mock_logger, mocker):
     """
     Tests that WorkflowSandboxRunner passes mocks from DatasetRow to workflow.stream().
