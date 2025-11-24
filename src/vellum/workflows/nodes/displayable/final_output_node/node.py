@@ -88,10 +88,6 @@ class FinalOutputNode(BaseNode[StateType], Generic[StateType, _OutputType], meta
         Raises ValueError if there's a type mismatch.
         """
         declared_output_type = cls.get_output_type()
-
-        if declared_output_type is Any:
-            return
-
         value_descriptor = cls.Outputs.value.instance
 
         if isinstance(value_descriptor, BaseDescriptor):
