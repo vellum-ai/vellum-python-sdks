@@ -1,5 +1,5 @@
 import pytest
-from typing import Union
+from typing import Any, Union
 
 from vellum.workflows.utils.validate import validate_target_type
 
@@ -43,11 +43,15 @@ def test_validate__should_raise_exception(
         (str, str),
         (list[str], list[str]),
         (dict, dict[str, str]),
+        (str, Any),
+        (Any, str),
     ],
     ids=[
         "str",
         "list_str",
         "bare_dict_params_dict",
+        "str_any",
+        "any_str",
     ],
 )
 def test_validate__should_validate(

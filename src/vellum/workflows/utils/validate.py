@@ -1,4 +1,4 @@
-from typing import Union, get_args, get_origin
+from typing import Any, Union, get_args, get_origin
 
 
 class TypeValidationError(ValueError):
@@ -16,6 +16,10 @@ class TypeValidationError(ValueError):
 
 
 def validate_target_type(declared_type: type, target_type: type) -> None:
+    # If either type is Any, validation always passes
+    if declared_type is Any or target_type is Any:
+        return
+
     # If target_type is a Union, ALL union members must be compatible with declared_type
     target_origin = get_origin(target_type)
     if target_origin is Union:
