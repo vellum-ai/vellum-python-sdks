@@ -946,9 +946,6 @@ class StartNode(BaseNode):
     class Outputs(BaseNode.Outputs):
         result: str = "test output"
 """,
-        "display/nodes/__init__.py": """\
-from .start_node import StartNodeDisplay
-""",
         "display/nodes/start_node.py": """\
 from uuid import UUID
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay

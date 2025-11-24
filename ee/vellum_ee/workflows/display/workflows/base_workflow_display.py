@@ -6,6 +6,8 @@ import importlib
 import inspect
 import logging
 import os
+import pkgutil
+import re
 import traceback
 from uuid import UUID
 from typing import Any, Dict, ForwardRef, Generic, List, Optional, Set, Tuple, Type, TypeVar, Union, cast, get_args
@@ -98,7 +100,39 @@ class WorkflowSerializationResult(UniversalBaseModel):
     dataset: Optional[List[Dict[str, Any]]] = None
 
 
-class BaseWorkflowDisplay(Generic[WorkflowType]):
+BASE_MODULE_PATH = __name__
+
+
+class _BaseWorkflowDisplayMeta(type):
+    def __new__(mcs, name: str, bases: Tuple[Type[Any], ...], attrs: Dict[str, Any]) -> Type[Any]:
+        cls = super().__new__(mcs, name, bases, attrs)
+
+        # Automatically import all of the node displays now that we don't require the __init__.py file
+        # to do so for us.
+        module_path = cls.__module__
+        if module_path.startswith(BASE_MODULE_PATH):
+            return cls
+
+        nodes_module_path = re.sub(r"\.workflow$", ".nodes", module_path)
+        try:
+            nodes_module = importlib.import_module(nodes_module_path)
+        except Exception:
+            # likely because there are no `.nodes` module in the display workflow's module path
+            return cls
+
+        if not hasattr(nodes_module, "__path__") or not hasattr(nodes_module, "__name__"):
+            return cls
+
+        for info in pkgutil.iter_modules(nodes_module.__path__, nodes_module.__name__ + "."):
+            try:
+                importlib.import_module(info.name)
+            except Exception:
+                continue
+
+        return cls
+
+
+class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayMeta):
     # Used to specify the display data for a workflow.
     workflow_display: Optional[WorkflowMetaDisplay] = None
 
