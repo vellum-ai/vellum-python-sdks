@@ -40,7 +40,7 @@ describe("GenericNode with two outputs", () => {
             name: "document_dict",
             type: "JSON",
             value: undefined,
-            jsonSchema: {
+            schema: {
               type: "object",
               additionalProperties: {
                 $ref: "#/$defs/vellum.client.types.vellum_document.VellumDocument",
