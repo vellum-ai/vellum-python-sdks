@@ -1,4 +1,4 @@
-from typing import get_origin
+from typing import get_args, get_origin
 
 
 def validate_target_types(declared_type: type, target_types: tuple[type, ...]) -> None:
@@ -18,14 +18,31 @@ def validate_target_types(declared_type: type, target_types: tuple[type, ...]) -
                 type_mismatch = False
                 break
 
-        descriptor_origin = get_origin(target_type)
+        target_origin = get_origin(target_type)
         declared_origin = get_origin(declared_type)
 
-        if descriptor_origin is None and declared_origin is None:
+        if target_origin is None and declared_origin is None:
             continue
 
-        if descriptor_origin == declared_type or declared_origin == target_type or descriptor_origin == declared_origin:
-            type_mismatch = False
+        if target_origin == declared_type or declared_origin == target_type or target_origin == declared_origin:
+            target_args = get_args(target_type)
+            declared_args = get_args(declared_type)
+            if len(declared_args) == 0:
+                type_mismatch = False
+                break
+
+            if len(target_args) != len(declared_args):
+                continue
+
+            type_args_match = True
+            for target_arg, declared_arg in zip(target_args, declared_args):
+                try:
+                    validate_target_types(declared_arg, (target_arg,))
+                except ValueError:
+                    type_args_match = False
+                    break
+
+            type_mismatch = not type_args_match
             break
 
     if type_mismatch:
