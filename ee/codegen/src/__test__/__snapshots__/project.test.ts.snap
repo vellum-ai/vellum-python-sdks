@@ -128,17 +128,6 @@ class Workflow(BaseWorkflow):
 "
 `;
 
-exports[`WorkflowProjectGenerator > Nodes present but not in graph > should still generate a file for the second node > code/display/nodes/__init__.py 1`] = `
-"from .first_node import FirstNodeDisplay
-from .second_node import SecondNodeDisplay
-
-__all__ = [
-    "FirstNodeDisplay",
-    "SecondNodeDisplay",
-]
-"
-`;
-
 exports[`WorkflowProjectGenerator > Nodes present but not in graph > should still generate a file for the second node > code/display/nodes/second_node.py 1`] = `
 "from uuid import UUID
 
@@ -156,17 +145,6 @@ class SecondNodeDisplay(BaseNodeDisplay[SecondNode]):
         SecondNode.Outputs.output: NodeOutputDisplay(id=UUID("bd71c32b-0762-4556-a1bc-2c36b15f6428"), name="output")
     }
     display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
-"
-`;
-
-exports[`WorkflowProjectGenerator > Nodes present but not in graph > should still generate a file for the second node > code/nodes/__init__.py 1`] = `
-"from .first_node import FirstNode
-from .second_node import SecondNode
-
-__all__ = [
-    "FirstNode",
-    "SecondNode",
-]
 "
 `;
 
@@ -433,15 +411,6 @@ class GetCurrentWeatherNodeDisplay(BaseNodeDisplay[GetCurrentWeatherNode]):
 "
 `;
 
-exports[`WorkflowProjectGenerator > function > should generate <function_name>.py file > code/nodes/__init__.py 1`] = `
-"from .tool_call import GetCurrentWeatherNode
-
-__all__ = [
-    "GetCurrentWeatherNode",
-]
-"
-`;
-
 exports[`WorkflowProjectGenerator > function > should generate <function_name>.py file > code/nodes/tool_call/__init__.py 1`] = `
 "from .format_answer import format_answer
 from .get_current_weather import get_current_weather
@@ -618,21 +587,6 @@ from .workflow import *
 "
 `;
 
-exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 'no packages' > code/display/nodes/tool_call_get_current_weather_node/weather_function/nodes/__init__.py 1`] = `
-"from .code_execution_node import CodeExecutionNodeDisplay
-from .final_output import FinalOutput3Display
-from .final_output_1 import FinalOutput4Display
-from .tool_call_start_node import StartNodeDisplay
-
-__all__ = [
-    "CodeExecutionNodeDisplay",
-    "FinalOutput3Display",
-    "FinalOutput4Display",
-    "StartNodeDisplay",
-]
-"
-`;
-
 exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 'no packages' > code/display/nodes/tool_call_get_current_weather_node/weather_function/workflow.py 1`] = `
 "from uuid import UUID
 
@@ -701,21 +655,6 @@ class Inputs(BaseInputs):
     query: str
     city: str
     date: str
-"
-`;
-
-exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 'no packages' > code/nodes/__init__.py 1`] = `
-"from .final_output import FinalOutput
-from .final_output_1 import FinalOutput1
-from .final_output_2 import FinalOutput2
-from .tool_call_get_current_weather_node import GetCurrentWeatherNode
-
-__all__ = [
-    "FinalOutput",
-    "FinalOutput1",
-    "FinalOutput2",
-    "GetCurrentWeatherNode",
-]
 "
 `;
 
@@ -817,21 +756,6 @@ exports[`WorkflowProjectGenerator > function > should generate inline workflow t
 class Inputs(BaseInputs):
     city: str
     date: str
-"
-`;
-
-exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 'no packages' > code/nodes/tool_call_get_current_weather_node/weather_function/nodes/__init__.py 1`] = `
-"from .code_execution_node import CodeExecutionNode
-from .final_output import FinalOutput3
-from .final_output_1 import FinalOutput4
-from .tool_call_start_node import StartNode
-
-__all__ = [
-    "CodeExecutionNode",
-    "FinalOutput3",
-    "FinalOutput4",
-    "StartNode",
-]
 "
 `;
 
@@ -990,21 +914,6 @@ from .workflow import *
 "
 `;
 
-exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 'with packages' > code/display/nodes/tool_call_get_current_weather_node/weather_function/nodes/__init__.py 1`] = `
-"from .code_execution_node import CodeExecutionNodeDisplay
-from .final_output import FinalOutput3Display
-from .final_output_1 import FinalOutput4Display
-from .tool_call_start_node import StartNodeDisplay
-
-__all__ = [
-    "CodeExecutionNodeDisplay",
-    "FinalOutput3Display",
-    "FinalOutput4Display",
-    "StartNodeDisplay",
-]
-"
-`;
-
 exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 'with packages' > code/display/nodes/tool_call_get_current_weather_node/weather_function/workflow.py 1`] = `
 "from uuid import UUID
 
@@ -1073,21 +982,6 @@ class Inputs(BaseInputs):
     query: str
     city: str
     date: str
-"
-`;
-
-exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 'with packages' > code/nodes/__init__.py 1`] = `
-"from .final_output import FinalOutput
-from .final_output_1 import FinalOutput1
-from .final_output_2 import FinalOutput2
-from .tool_call_get_current_weather_node import GetCurrentWeatherNode
-
-__all__ = [
-    "FinalOutput",
-    "FinalOutput1",
-    "FinalOutput2",
-    "GetCurrentWeatherNode",
-]
 "
 `;
 
@@ -1189,21 +1083,6 @@ exports[`WorkflowProjectGenerator > function > should generate inline workflow t
 class Inputs(BaseInputs):
     city: str
     date: str
-"
-`;
-
-exports[`WorkflowProjectGenerator > function > should generate inline workflow tool 'with packages' > code/nodes/tool_call_get_current_weather_node/weather_function/nodes/__init__.py 1`] = `
-"from .code_execution_node import CodeExecutionNode
-from .final_output import FinalOutput3
-from .final_output_1 import FinalOutput4
-from .tool_call_start_node import StartNode
-
-__all__ = [
-    "CodeExecutionNode",
-    "FinalOutput3",
-    "FinalOutput4",
-    "StartNode",
-]
 "
 `;
 

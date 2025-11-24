@@ -128,10 +128,22 @@ def test_zero_diff_transforms(module_name: str):
 
         modified_paths = sorted(modified_diffs.keys())
 
-        if modified_paths:
-            diff_text = "\n\n".join(f"Diff for {rel}:\n{modified_diffs[rel]}" for rel in modified_paths)
-        else:
-            diff_text = ""
+        # Build diff text with added/removed files shown in diff syntax
+        diff_parts = []
+
+        # Show removed files (files in original but not in generated)
+        for rel in original_only:
+            diff_parts.append(f"--- a/{rel}\n+++ /dev/null\n@@ File removed @@")
+
+        # Show added files (files in generated but not in original)
+        for rel in generated_only:
+            diff_parts.append(f"--- /dev/null\n+++ b/{rel}\n@@ File added @@")
+
+        # Show modified files
+        for rel in modified_paths:
+            diff_parts.append(f"Diff for {rel}:\n{modified_diffs[rel]}")
+
+        diff_text = "\n\n".join(diff_parts) if diff_parts else ""
 
         if result.stdout:
             diff_text += f"\nCodegen output:\n{result.stdout}"
