@@ -283,7 +283,13 @@ def _validate_json_schema_structure(schema: dict, path: str = "json_schema") -> 
                 )
             # Recursively validate each sub-schema
             for i, sub_schema in enumerate(value):
-                _validate_json_schema_structure(sub_schema, f"{path}.{keyword}[{i}]")
+                if isinstance(sub_schema, dict):
+                    _validate_json_schema_structure(sub_schema, f"{path}.{keyword}[{i}]")
+                else:
+                    raise ValueError(
+                        f"JSON Schema '{keyword}[{i}]' at '{path}.{keyword}[{i}]' must be a schema object, "
+                        f"not {type(sub_schema).__name__}"
+                    )
 
 
 class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
