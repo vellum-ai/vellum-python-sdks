@@ -135,6 +135,21 @@
             "name": "default",
             "type": "DEFAULT"
           }
+        ],
+        "outputs": [{
+            "id": "9d1dae27-6e6a-40bf-a401-611c974d4143",
+            "name": "result",
+            "schema": {"type": "string"},
+            "type": "STRING",
+            "value": null
+          },
+          {
+            "id": "b57399ac-93ce-4225-8543-10bac4fe82f4",
+            "name": "log",
+            "schema": {"type": "string"},
+            "type": "STRING",
+            "value": null
+          }
         ]
       },
       {

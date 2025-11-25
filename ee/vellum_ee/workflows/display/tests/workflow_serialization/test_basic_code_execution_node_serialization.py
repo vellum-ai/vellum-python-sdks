@@ -105,6 +105,22 @@ def test_serialize_workflow_with_filepath():
             "merge_behavior": "AWAIT_ANY",
         },
         "ports": [{"id": "6aed9e19-9d26-457b-966d-0a9112f84070", "name": "default", "type": "DEFAULT"}],
+        "outputs": [
+            {
+                "id": "730c8f17-891c-40b4-b43d-26672bd38eef",
+                "name": "result",
+                "schema": {"type": "integer"},
+                "type": "NUMBER",
+                "value": None,
+            },
+            {
+                "id": "8eea2893-1e79-4d1c-ba51-2e045968abfb",
+                "name": "log",
+                "schema": {"type": "string"},
+                "type": "STRING",
+                "value": None,
+            },
+        ],
     }
 
     # AND the definition should be what we expect
@@ -210,6 +226,22 @@ def test_serialize_workflow_with_code():
             "merge_behavior": "AWAIT_ANY",
         },
         "ports": [{"id": "d2560e23-cbb6-4b73-b082-294982da72aa", "name": "default", "type": "DEFAULT"}],
+        "outputs": [
+            {
+                "id": "9b2b939b-c840-4e01-99c1-43a3418d7fb7",
+                "name": "result",
+                "schema": {"type": "integer"},
+                "type": "NUMBER",
+                "value": None,
+            },
+            {
+                "id": "e3536bf9-cf37-4d16-b835-770a9ee6cc53",
+                "name": "log",
+                "schema": {"type": "string"},
+                "type": "STRING",
+                "value": None,
+            },
+        ],
     }
 
     # AND the definition should be what we expect
@@ -338,6 +370,22 @@ def test_serialize_workflow__try_wrapped():
             "merge_behavior": "AWAIT_ANY",
         },
         "ports": [{"id": "dede45ee-e17a-447c-b1d3-ed0d29ff1057", "name": "default", "type": "DEFAULT"}],
+        "outputs": [
+            {
+                "id": "a483823a-e856-4ad3-ab3b-cac3c2961536",
+                "name": "result",
+                "schema": {"type": "integer"},
+                "type": "NUMBER",
+                "value": None,
+            },
+            {
+                "id": "0022691d-4707-476f-a9f5-4947b5e36f07",
+                "name": "log",
+                "schema": {"type": "string"},
+                "type": "STRING",
+                "value": None,
+            },
+        ],
     }
 
     # AND the definition should be what we expect
