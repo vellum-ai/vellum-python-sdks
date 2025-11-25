@@ -6,6 +6,7 @@ from vellum.client.core.api_error import ApiError
 from vellum.workflows.environment import EnvironmentVariables
 from vellum.workflows.nodes.displayable.code_execution_node.node import CodeExecutionNode
 from vellum.workflows.references.vellum_secret import VellumSecretReference
+from vellum.workflows.state.base import BaseState
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.nodes.vellum.code_execution_node import BaseCodeExecutionNodeDisplay
 from vellum_ee.workflows.display.utils.exceptions import NodeValidationError
@@ -303,6 +304,22 @@ def test_serialize_node__with_non_exist_code_input_path_with_dry_run():
                     },
                     "ports": [{"id": "dc9edb2e-4392-4a2c-ab92-cc1b9c0cbd53", "name": "default", "type": "DEFAULT"}],
                     "trigger": {"id": "66e7ef63-518b-40e7-911a-e38e8bcaec81", "merge_behavior": "AWAIT_ANY"},
+                    "outputs": [
+                        {
+                            "id": "98cae9b9-45cc-4897-a0f5-df250b56c00d",
+                            "name": "result",
+                            "schema": {"type": "string"},
+                            "type": "STRING",
+                            "value": None,
+                        },
+                        {
+                            "id": "66c06c97-a9d1-4abf-840f-3f6c29709612",
+                            "name": "log",
+                            "schema": {"type": "string"},
+                            "type": "STRING",
+                            "value": None,
+                        },
+                    ],
                 },
             ],
             "edges": [
@@ -326,3 +343,43 @@ def test_serialize_node__with_non_exist_code_input_path_with_dry_run():
         "state_variables": [],
         "output_variables": [],
     }
+
+
+def test_serialize_node__with_custom_output_type():
+    # GIVEN a code node with a custom output type
+    class MyNode(CodeExecutionNode[BaseState, dict[str, int]]):
+        code = """\
+return {
+    "hello": 1,
+}
+"""
+
+    # AND a workflow with the code node
+    class Workflow(BaseWorkflow):
+        graph = MyNode
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the node's outputs should serialize correctly
+    my_code_execution_node = next(
+        node for node in serialized_workflow["workflow_raw_data"]["nodes"] if node["type"] == "CODE_EXECUTION"
+    )
+    assert my_code_execution_node["outputs"] == [
+        {
+            "id": "01de8e8b-5e0e-4344-93b0-e002bbaed840",
+            "name": "result",
+            "value": None,
+            "type": "JSON",
+            "schema": {"type": "object", "additionalProperties": {"type": "integer"}},
+        },
+        {
+            "id": "64bf62e0-adc7-48cc-b689-8bf9b7e4eeef",
+            "name": "log",
+            "value": None,
+            "type": "STRING",
+            "schema": {"type": "string"},
+        },
+    ]
+    assert my_code_execution_node["data"]["output_type"] == "JSON"
