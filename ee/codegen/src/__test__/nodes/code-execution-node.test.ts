@@ -587,12 +587,12 @@ describe("CodeExecutionNode", () => {
       // GIVEN a code execution node with an output schema of {array: {string}}
       const outputId = "81b270c0-4deb-4db3-aae5-138f79531b2b";
       const nodeData = codeExecutionNodeFactory({
-        codeOutputValueType: "ARRAY",
+        codeOutputValueType: "JSON",
         outputs: [
           {
             id: outputId,
             name: "result",
-            type: "ARRAY",
+            type: "JSON",
             schema: {
               type: "array",
               items: {
