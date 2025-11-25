@@ -372,10 +372,24 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             )
 
         # Identify nodes that already have trigger edges so we can avoid duplicating entrypoint edges
-        nodes_with_trigger_edges: Set[Type[BaseNode]] = set()
+        nodes_with_manual_trigger_edges: Set[Type[BaseNode]] = set()
+        nodes_with_non_manual_trigger_edges: Set[Type[BaseNode]] = set()
         for trigger_edge in trigger_edges:
             try:
-                nodes_with_trigger_edges.add(get_unadorned_node(trigger_edge.to_node))
+                unadorned_target_node = get_unadorned_node(trigger_edge.to_node)
+            except Exception:
+                continue
+
+            if issubclass(trigger_edge.trigger_class, ManualTrigger):
+                nodes_with_manual_trigger_edges.add(unadorned_target_node)
+            else:
+                nodes_with_non_manual_trigger_edges.add(unadorned_target_node)
+
+        # Track nodes with explicit entrypoint overrides so we retain their edges even if they have triggers
+        entrypoint_override_nodes: Set[Type[BaseNode]] = set()
+        for entrypoint_node in self.entrypoint_displays.keys():
+            try:
+                entrypoint_override_nodes.add(get_unadorned_node(entrypoint_node))
             except Exception:
                 continue
 
@@ -396,12 +410,15 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         for target_node, entrypoint_display in self.display_context.entrypoint_displays.items():
             unadorned_target_node = get_unadorned_node(target_node)
 
-            # Skip the auto-generated entrypoint edge when a trigger already targets this node,
-            # unless the graph explicitly defines a non-trigger entrypoint for it.
+            # Skip the auto-generated entrypoint edge when a manual trigger already targets this node or when a
+            # non-manual trigger targets it without an explicit entrypoint override, unless the graph explicitly
+            # defines a non-trigger entrypoint for it.
+            has_manual_trigger = unadorned_target_node in nodes_with_manual_trigger_edges
+            has_non_manual_trigger = unadorned_target_node in nodes_with_non_manual_trigger_edges
+            has_override = unadorned_target_node in entrypoint_override_nodes
             if (
-                unadorned_target_node in nodes_with_trigger_edges
-                and unadorned_target_node not in non_trigger_entrypoint_nodes
-            ):
+                has_manual_trigger or (has_non_manual_trigger and not has_override)
+            ) and unadorned_target_node not in non_trigger_entrypoint_nodes:
                 continue
 
             # Skip edges to invalid nodes
@@ -432,7 +449,10 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         for trigger_edge in trigger_edges:
             target_node = trigger_edge.to_node
             unadorned_target_node = get_unadorned_node(target_node)
-            nodes_with_trigger_edges.add(unadorned_target_node)
+            if issubclass(trigger_edge.trigger_class, ManualTrigger):
+                nodes_with_manual_trigger_edges.add(unadorned_target_node)
+            else:
+                nodes_with_non_manual_trigger_edges.add(unadorned_target_node)
 
             # Skip edges to invalid nodes
             if self._is_node_invalid(unadorned_target_node):

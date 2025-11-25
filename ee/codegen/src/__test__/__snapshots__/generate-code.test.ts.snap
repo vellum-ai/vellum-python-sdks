@@ -332,10 +332,7 @@ from .triggers.linear_comment_event_trigger_1 import LinearIntegrationTrigger2
 
 class Workflow(BaseWorkflow):
     graph = {
-        {
-            MyFinalOutput,
-            LinearIntegrationTrigger >> MyFinalOutput,
-        },
+        LinearIntegrationTrigger >> MyFinalOutput,
         LinearIntegrationTrigger2 >> MyFinalOutput,
     }
 

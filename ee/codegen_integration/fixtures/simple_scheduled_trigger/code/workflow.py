@@ -5,10 +5,7 @@ from .triggers.scheduled import Scheduled
 
 
 class Workflow(BaseWorkflow):
-    graph = {
-        Output,
-        Scheduled >> Output,
-    }
+    graph = Scheduled >> Output
 
     class Outputs(BaseWorkflow.Outputs):
         output = Output.Outputs.value
