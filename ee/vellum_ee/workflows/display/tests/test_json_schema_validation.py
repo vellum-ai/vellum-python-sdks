@@ -283,6 +283,122 @@ def test_inline_prompt_node_validation__array_with_both_items_and_prefix_items__
         pytest.fail("Validation should not raise an error for array with both items and prefixItems")
 
 
+def test_inline_prompt_node_validation__nested_array_in_prefix_items__raises_error():
+    """
+    Tests that nested arrays in prefixItems without items/prefixItems are caught.
+    """
+
+    # GIVEN an InlinePromptNode with a nested array in prefixItems missing items
+    class MyPromptNode(InlinePromptNode):
+        ml_model = "gpt-4"
+        blocks = []
+        parameters = PromptParameters(
+            custom_parameters={
+                "json_schema": {
+                    "type": "array",
+                    "prefixItems": [{"type": "array"}],  # Missing items/prefixItems
+                }
+            }
+        )
+
+    # WHEN we call __validate__() on the node
+    # THEN it should raise a ValueError with a clear message
+    with pytest.raises(ValueError) as exc_info:
+        MyPromptNode.__validate__()
+
+    # AND the error message should indicate the nested path
+    error_message = str(exc_info.value)
+    assert "array" in error_message.lower()
+    assert "prefixItems[0]" in error_message
+
+
+def test_inline_prompt_node_validation__nested_array_in_list_items__raises_error():
+    """
+    Tests that nested arrays in list-valued items without items/prefixItems are caught.
+    """
+
+    # GIVEN an InlinePromptNode with a nested array in list-valued items
+    class MyPromptNode(InlinePromptNode):
+        ml_model = "gpt-4"
+        blocks = []
+        parameters = PromptParameters(
+            custom_parameters={
+                "json_schema": {
+                    "type": "array",
+                    "items": [
+                        {"type": "string"},
+                        {"type": "array"},  # Missing items/prefixItems
+                    ],
+                }
+            }
+        )
+
+    # WHEN we call __validate__() on the node
+    # THEN it should raise a ValueError with a clear message
+    with pytest.raises(ValueError) as exc_info:
+        MyPromptNode.__validate__()
+
+    # AND the error message should indicate the nested path
+    error_message = str(exc_info.value)
+    assert "array" in error_message.lower()
+    assert "items[1]" in error_message
+
+
+def test_inline_prompt_node_validation__valid_nested_array_in_prefix_items__succeeds():
+    """
+    Tests that valid nested arrays in prefixItems with proper items pass validation.
+    """
+
+    # GIVEN an InlinePromptNode with a valid nested array in prefixItems
+    class MyPromptNode(InlinePromptNode):
+        ml_model = "gpt-4"
+        blocks = []
+        parameters = PromptParameters(
+            custom_parameters={
+                "json_schema": {
+                    "type": "array",
+                    "prefixItems": [{"type": "array", "items": {"type": "string"}}],  # Valid nested array
+                }
+            }
+        )
+
+    # WHEN we call __validate__() on the node
+    # THEN it should not raise any errors
+    try:
+        MyPromptNode.__validate__()
+    except ValueError:
+        pytest.fail("Validation should not raise an error for valid nested array in prefixItems")
+
+
+def test_inline_prompt_node_validation__valid_nested_array_in_list_items__succeeds():
+    """
+    Tests that valid nested arrays in list-valued items with proper items pass validation.
+    """
+
+    # GIVEN an InlinePromptNode with a valid nested array in list-valued items
+    class MyPromptNode(InlinePromptNode):
+        ml_model = "gpt-4"
+        blocks = []
+        parameters = PromptParameters(
+            custom_parameters={
+                "json_schema": {
+                    "type": "array",
+                    "items": [
+                        {"type": "string"},
+                        {"type": "array", "items": {"type": "number"}},  # Valid nested array
+                    ],
+                }
+            }
+        )
+
+    # WHEN we call __validate__() on the node
+    # THEN it should not raise any errors
+    try:
+        MyPromptNode.__validate__()
+    except ValueError:
+        pytest.fail("Validation should not raise an error for valid nested array in list items")
+
+
 def test_inline_prompt_node_validation__no_json_schema__succeeds():
     """
     Tests that InlinePromptNode without json_schema passes validation.
