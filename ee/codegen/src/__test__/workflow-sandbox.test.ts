@@ -239,7 +239,7 @@ describe("Workflow Sandbox", () => {
       const result = await writer.toStringFormatted();
 
       expect(result).toMatchSnapshot();
-      expect(result).toContain("trigger=ScheduleTrigger");
+      expect(result).toContain("workflow_trigger=ScheduleTrigger");
       const lines = result.split("\n");
       const secondDatasetRowIndex = lines.findIndex((line) =>
         line.includes('label="Scenario without Trigger ID"')
