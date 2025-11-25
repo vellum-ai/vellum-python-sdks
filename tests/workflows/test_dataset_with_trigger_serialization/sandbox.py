@@ -13,7 +13,7 @@ dataset: List[DatasetRow] = [
     DatasetRow(
         label="Scenario 1",
         inputs={"current_run_at": datetime.min, "next_run_at": datetime.now()},
-        workflow_trigger=MySchedule(current_run_at=datetime.min, next_run_at=datetime.now()),
+        workflow_trigger=MySchedule,
     ),
 ]
 
