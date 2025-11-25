@@ -8,7 +8,6 @@ from .....nodes.map_node.nodes.search_node import SearchNode
 
 
 class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
-    label = "Search Node"
     node_id = UUID("4b0a7578-e5ec-4d72-b396-62abdecbd101")
     target_handle_id = UUID("df39e340-f66c-4f1c-b030-5437a2183414")
     node_input_ids_by_name = {

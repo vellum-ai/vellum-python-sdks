@@ -168,3 +168,37 @@ export function toValidPythonIdentifier(
 export function removeEscapeCharacters(str: string): string {
   return str.replace(/\\"/g, '"');
 }
+
+/**
+ * Converts a PascalCase string to Title Case with spaces.
+ * This mirrors the Python implementation in vellum.workflows.utils.names.pascal_to_title_case
+ *
+ * Examples:
+ * - "MyCustomNode" -> "My Custom Node"
+ * - "APINode" -> "API Node"
+ * - "SimpleAPINode" -> "Simple API Node"
+ *
+ * @param pascalStr the PascalCase string to convert
+ * @returns the Title Case string with spaces
+ */
+export function pascalToTitleCase(pascalStr: string): string {
+  // Insert spaces between:
+  // 1. A lowercase letter followed by an uppercase letter (e.g., "myNode" -> "my Node")
+  // 2. An uppercase letter followed by an uppercase letter and then a lowercase letter (e.g., "APINode" -> "API Node")
+  const titleCaseStr = pascalStr.replace(
+    /(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])/g,
+    " "
+  );
+
+  const words = titleCaseStr.split(/\s+/);
+  const resultWords = words.map((word) => {
+    // If the word is all uppercase, keep it as-is
+    if (word === word.toUpperCase()) {
+      return word;
+    }
+    // Otherwise, capitalize the first letter and lowercase the rest
+    return word.charAt(0).toUpperCase() + word.slice(1);
+  });
+
+  return resultWords.join(" ");
+}

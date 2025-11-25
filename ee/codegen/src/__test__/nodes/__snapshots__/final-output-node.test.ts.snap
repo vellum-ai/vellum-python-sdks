@@ -11,7 +11,6 @@ from ...nodes.final_output_node import FinalOutputNode
 
 
 class FinalOutputNodeDisplay(BaseFinalOutputNodeDisplay[FinalOutputNode]):
-    label = "Final Output Node"
     node_id = UUID("48e0d88b-a544-4a14-b49f-38aca82e0e13")
     target_handle_id = UUID("<target-handle-id>")
     output_name = "final-output"
@@ -53,7 +52,6 @@ from ...nodes.final_output_node import FinalOutputNode
 
 
 class FinalOutputNodeDisplay(BaseFinalOutputNodeDisplay[FinalOutputNode]):
-    label = "Final Output Node"
     node_id = UUID("48e0d88b-a544-4a14-b49f-38aca82e0e13")
     target_handle_id = UUID("<target-handle-id>")
     output_name = "final-output"
@@ -95,7 +93,6 @@ from ...nodes.final_output_node import FinalOutputNode
 
 
 class FinalOutputNodeDisplay(BaseFinalOutputNodeDisplay[FinalOutputNode]):
-    label = "Final Output Node"
     node_id = UUID("48e0d88b-a544-4a14-b49f-38aca82e0e13")
     target_handle_id = UUID("<target-handle-id>")
     output_name = "final-output"
@@ -134,7 +131,6 @@ from ...nodes.final_output import FinalOutput
 
 
 class FinalOutputDisplay(BaseFinalOutputNodeDisplay[FinalOutput]):
-    label = "Final Output"
     node_id = UUID("node-with-definition")
     target_handle_id = UUID("<target-handle-id>")
     output_name = "final_output"

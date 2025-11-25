@@ -57,7 +57,6 @@ from ...nodes.conditional_node import ConditionalNode
 
 
 class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
-    label = "Conditional Node"
     node_id = UUID("b81a4453-7b80-41ea-bd55-c62df8878fd3")
     target_handle_id = UUID("842b9dda-7977-47ad-a322-eb15b4c7069d")
     source_handle_ids = {
@@ -131,7 +130,6 @@ from ...nodes.templating_node import TemplatingNode
 
 
 class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
-    label = "Templating Node"
     node_id = UUID("46e221ab-a749-41a2-9242-b1f5bf31f3a5")
     target_handle_id = UUID("3960c8e1-9baa-4b9c-991d-e399d16a45aa")
     node_input_ids_by_name = {
@@ -209,7 +207,6 @@ from ...nodes.templating_node import TemplatingNode
 
 
 class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
-    label = "Templating Node"
     node_id = UUID("46e221ab-a749-41a2-9242-b1f5bf31f3a5")
     target_handle_id = UUID("3960c8e1-9baa-4b9c-991d-e399d16a45aa")
     node_input_ids_by_name = {
@@ -259,7 +256,6 @@ from ...nodes.conditional_node import ConditionalNode
 
 
 class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
-    label = "Conditional Node"
     node_id = UUID("b81a4453-7b80-41ea-bd55-c62df8878fd3")
     target_handle_id = UUID("842b9dda-7977-47ad-a322-eb15b4c7069d")
     source_handle_ids = {
@@ -319,7 +315,6 @@ from ...nodes.conditional_node import ConditionalNode
 
 
 class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
-    label = "Conditional Node"
     node_id = UUID("b81a4453-7b80-41ea-bd55-c62df8878fd3")
     target_handle_id = UUID("842b9dda-7977-47ad-a322-eb15b4c7069d")
     source_handle_ids = {
@@ -379,7 +374,6 @@ from ...nodes.conditional_node import ConditionalNode
 
 
 class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
-    label = "Conditional Node"
     node_id = UUID("b81a4453-7b80-41ea-bd55-c62df8878fd3")
     target_handle_id = UUID("842b9dda-7977-47ad-a322-eb15b4c7069d")
     source_handle_ids = {

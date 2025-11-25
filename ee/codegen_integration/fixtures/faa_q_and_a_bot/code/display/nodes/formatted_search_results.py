@@ -8,7 +8,6 @@ from ...nodes.formatted_search_results import FormattedSearchResults
 
 
 class FormattedSearchResultsDisplay(BaseTemplatingNodeDisplay[FormattedSearchResults]):
-    label = "Formatted Search Results"
     node_id = UUID("5e23510e-ef40-4ee1-99ed-0e03f1796cfa")
     target_handle_id = UUID("815664ad-b42f-40ea-9607-b23643a224a8")
     node_input_ids_by_name = {

@@ -8,7 +8,6 @@ from ...nodes.prompt_node import PromptNode
 
 
 class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
-    label = "Prompt Node"
     node_id = UUID("7e09927b-6d6f-4829-92c9-54e66bdcaf80")
     output_id = UUID("2d4f1826-de75-499a-8f84-0a690c8136ad")
     array_output_id = UUID("771c6fba-5b4a-4092-9d52-693242d7b92c")

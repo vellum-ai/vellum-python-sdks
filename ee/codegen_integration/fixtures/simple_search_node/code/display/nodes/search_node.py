@@ -8,7 +8,6 @@ from ...nodes.search_node import SearchNode
 
 
 class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
-    label = "Search Node"
     node_id = UUID("e5ff9360-a29c-437b-a9c1-05fc52df2834")
     target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
     metadata_filter_input_id_by_operand_id = {

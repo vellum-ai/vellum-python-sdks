@@ -14,7 +14,6 @@ from ...nodes.set_state_node import SetStateNode
 
 
 class SetStateNodeDisplay(BaseNodeDisplay[SetStateNode]):
-    label = "Set State Node"
     node_id = UUID("set-state-node-id")
     attribute_ids_by_name = {"operations": UUID("operations-attribute-id")}
     output_display = {

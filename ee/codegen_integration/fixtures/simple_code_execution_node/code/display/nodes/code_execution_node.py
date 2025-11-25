@@ -8,7 +8,6 @@ from ...nodes.code_execution_node import CodeExecutionNode
 
 
 class CodeExecutionNodeDisplay(BaseCodeExecutionNodeDisplay[CodeExecutionNode]):
-    label = "Code Execution Node"
     node_id = UUID("97240cb9-94a0-4a1a-b69e-3c2d96ebb1e2")
     target_handle_id = UUID("dba6c62b-8519-48ba-b888-ed2ca346fba8")
     output_id = UUID("9d1dae27-6e6a-40bf-a401-611c974d4143")

@@ -14,7 +14,6 @@ from ...nodes.code_execution_node import CodeExecutionNode
 
 
 class CodeExecutionNodeDisplay(BaseCodeExecutionNodeDisplay[CodeExecutionNode]):
-    label = "Code Execution Node"
     node_id = UUID("2cd960a3-cb8a-43ed-9e3f-f003fc480951")
     target_handle_id = UUID("06573a05-e6f0-48b9-bc6e-07e06d0bc1b1")
     output_id = UUID("81b270c0-4deb-4db3-aae5-138f79531b2b")
@@ -235,7 +234,6 @@ from ...nodes.code_execution_node import CodeExecutionNode
 
 
 class CodeExecutionNodeDisplay(BaseCodeExecutionNodeDisplay[CodeExecutionNode]):
-    label = "Code Execution Node"
     node_id = UUID("2cd960a3-cb8a-43ed-9e3f-f003fc480951")
     target_handle_id = UUID("06573a05-e6f0-48b9-bc6e-07e06d0bc1b1")
     output_id = UUID("81b270c0-4deb-4db3-aae5-138f79531b2b")

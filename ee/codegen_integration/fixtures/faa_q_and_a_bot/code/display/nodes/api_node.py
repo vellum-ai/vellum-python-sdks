@@ -8,7 +8,6 @@ from ...nodes.api_node import APINode
 
 
 class APINodeDisplay(BaseAPINodeDisplay[APINode]):
-    label = "API Node"
     node_id = UUID("81246ab6-153a-4c87-9f28-b6c28c915cf1")
     target_handle_id = UUID("8f6f1b95-dd80-46dd-b1f6-167196baf697")
     additional_header_key_input_ids = {}
