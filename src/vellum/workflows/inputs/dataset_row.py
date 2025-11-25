@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List, Optional, Sequence, Type, Union
+from typing import Any, Callable, Dict, List, Optional, Sequence, Union
 
 from pydantic import ConfigDict, Field, SerializationInfo, field_serializer, model_serializer
 
@@ -27,7 +27,7 @@ class DatasetRow(UniversalBaseModel):
     id: Optional[str] = None
     label: str
     inputs: Union[BaseInputs, Dict[str, Any]] = Field(default_factory=BaseInputs)
-    workflow_trigger: Optional[Union[BaseTrigger, Type[BaseTrigger]]] = Field(default=None, alias="trigger")
+    workflow_trigger: Optional[BaseTrigger] = Field(default=None, alias="trigger")
     mocks: Optional[Sequence[Union[BaseOutputs, MockNodeExecution]]] = None
 
     @model_serializer(mode="wrap")
@@ -59,14 +59,12 @@ class DatasetRow(UniversalBaseModel):
         return serialized
 
     @field_serializer("workflow_trigger")
-    def serialize_workflow_trigger(
-        self, workflow_trigger: Optional[Union[BaseTrigger, Type[BaseTrigger]]]
-    ) -> Optional[str]:
+    def serialize_workflow_trigger(self, workflow_trigger: Optional[BaseTrigger]) -> Optional[str]:
         """
         Custom serializer for workflow_trigger that converts it to a string ID.
 
         Args:
-            workflow_trigger: Optional workflow trigger instance or class
+            workflow_trigger: Optional workflow trigger instance
 
         Returns:
             String representation of the trigger ID, or None if no trigger
@@ -74,13 +72,8 @@ class DatasetRow(UniversalBaseModel):
         if workflow_trigger is None:
             return None
 
-        # Handle both instances and classes
-        if isinstance(workflow_trigger, type):
-            # It's a class
-            return str(workflow_trigger.__id__)
-        else:
-            # It's an instance - get __id__ from the class
-            return str(workflow_trigger.__class__.__id__)
+        # Get __id__ from the trigger instance's class
+        return str(workflow_trigger.__class__.__id__)
 
     @field_serializer("inputs")
     def serialize_inputs(self, inputs: Union[BaseInputs, Dict[str, Any]]) -> Dict[str, Any]:
