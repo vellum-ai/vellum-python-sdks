@@ -251,14 +251,32 @@ describe("Workflow Sandbox", () => {
 
     it("should generate DatasetRow with trigger instance including attributes", async () => {
       const writer = new Writer();
-      const triggerId = "550e8400-e29b-41d4-a716-446655440001";
+      const triggerId = "354ee648-3421-4432-a3bb-fe01b8d73fd6";
       const triggers: WorkflowTrigger[] = [
         {
           id: triggerId,
           type: WorkflowTriggerType.INTEGRATION,
           attributes: [
-            { id: "attr1", key: "channel", type: "STRING" },
-            { id: "attr2", key: "user_id", type: "STRING" },
+            {
+              id: "e0e8adcd-0c89-440a-8db1-fce97496bb81",
+              key: "created",
+              type: "NUMBER",
+            },
+            {
+              id: "f810dd5b-ae2d-469a-ba04-2d227f7a2482",
+              key: "creator",
+              type: "STRING",
+            },
+            {
+              id: "ac38c4c9-f98d-4453-b411-211362d36f0b",
+              key: "id",
+              type: "STRING",
+            },
+            {
+              id: "0429ff9f-5da5-4b2f-8671-7c46dad0b37d",
+              key: "name",
+              type: "STRING",
+            },
           ],
           execConfig: {
             type: IntegrationProvider.COMPOSIO,
@@ -269,27 +287,51 @@ describe("Workflow Sandbox", () => {
         },
       ];
       const uniqueWorkflowContext = workflowContextFactory({ triggers });
-      const inputVariable: VellumVariable = {
-        id: "1",
-        key: "test_input",
+      const inputVariableFoo: VellumVariable = {
+        id: "foo-id-1",
+        key: "test",
         type: "STRING",
       };
-
       uniqueWorkflowContext.addInputVariableContext(
         inputVariableContextFactory({
-          inputVariableData: inputVariable,
+          inputVariableData: inputVariableFoo,
           workflowContext: uniqueWorkflowContext,
         })
       );
 
       const sandboxInputs: WorkflowSandboxDatasetRow[] = [
         {
-          label: "Scenario with Trigger Attributes",
+          label: "Scenario 1",
           inputs: [
             {
-              name: inputVariable.key,
+              name: "test",
               type: "STRING",
-              value: "test-value",
+              value: "foo",
+            },
+          ],
+        },
+        {
+          label: "Scenario 2",
+          inputs: [
+            {
+              name: "creator",
+              type: "STRING",
+              value: "creator",
+            },
+            {
+              name: "id",
+              type: "STRING",
+              value: "some-id",
+            },
+            {
+              name: "name",
+              type: "STRING",
+              value: "my-name",
+            },
+            {
+              name: "created",
+              type: "NUMBER",
+              value: 0.0,
             },
           ],
           workflow_trigger_id: triggerId,
@@ -305,9 +347,6 @@ describe("Workflow Sandbox", () => {
       const result = await writer.toStringFormatted();
 
       expect(result).toMatchSnapshot();
-      expect(result).toContain("trigger=");
-      expect(result).toContain("channel=");
-      expect(result).toContain("user_id=");
     });
 
     it("should generate DatasetRow with mocks when mocks are provided", async () => {

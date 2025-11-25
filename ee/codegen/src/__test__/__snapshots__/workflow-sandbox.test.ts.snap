@@ -51,10 +51,12 @@ from .triggers.slack import Slack
 from .workflow import TestWorkflow
 
 dataset = [
+    DatasetRow(label="Scenario 1", inputs=Inputs(test="foo")),
     DatasetRow(
-        label="Scenario with Trigger Attributes",
-        inputs=Inputs(test_input="test-value"),
-        workflow_trigger=Slack(channel=None, user_id=None),
+        label="Scenario 2",
+        workflow_trigger=Slack(
+            created=0, creator="creator", id="some-id", name="my-name"
+        ),
     ),
 ]
 
