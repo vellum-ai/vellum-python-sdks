@@ -225,8 +225,10 @@ ${errors.slice(0, 3).map((err) => {
     await Promise.all([
       // __init__.py
       this.generateRootInitFile().persist(),
-      // display/__init__.py
-      this.generateDisplayRootInitFile().persist(),
+      // display/__init__.py (only for nested workflows)
+      ...(this.workflowContext.parentNode
+        ? [this.generateDisplayRootInitFile().persist()]
+        : []),
       // display/workflow.py
       workflow.getWorkflowDisplayFile().persist(),
       // inputs.py
@@ -470,26 +472,6 @@ ${errors.slice(0, 3).map((err) => {
         statements.push(...parentNode.generateNodeDisplayClasses());
         comments.push(new Comment({ docs: "flake8: noqa: F401, F403" }));
       }
-    } else {
-      comments.push(new Comment({ docs: "flake8: noqa: F401, F403" }));
-      imports.push(
-        new StarImport({
-          modulePath: [
-            ...this.getModulePath(),
-            GENERATED_DISPLAY_MODULE_NAME,
-            "nodes",
-          ],
-        })
-      );
-      imports.push(
-        new StarImport({
-          modulePath: [
-            ...this.getModulePath(),
-            GENERATED_DISPLAY_MODULE_NAME,
-            "workflow",
-          ],
-        })
-      );
     }
 
     const rootDisplayInitFile = codegen.initFile({
