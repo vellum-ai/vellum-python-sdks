@@ -1,3 +1,4 @@
+import ast
 from dataclasses import asdict, is_dataclass
 import inspect
 from uuid import UUID
@@ -262,6 +263,65 @@ def serialize_key(key: Any) -> str:
         return str(key)
 
 
+class _RemoveUseToolInputsTransformer(ast.NodeTransformer):
+    """Remove @use_tool_inputs decorators and imports from AST."""
+
+    def __init__(self, function_name: str):
+        self.function_name = function_name
+
+    def visit_FunctionDef(self, node: ast.FunctionDef) -> ast.FunctionDef:
+        """Remove @use_tool_inputs decorators from the target function."""
+        if node.name == self.function_name:
+            node.decorator_list = [
+                decorator
+                for decorator in node.decorator_list
+                if not (
+                    isinstance(decorator, ast.Call)
+                    and isinstance(decorator.func, ast.Name)
+                    and decorator.func.id == "use_tool_inputs"
+                )
+            ]
+        return self.generic_visit(node)
+
+    def visit_ImportFrom(self, node: ast.ImportFrom) -> Optional[ast.ImportFrom]:
+        """Remove use_tool_inputs from imports."""
+        if node.module == "vellum.workflows.utils.functions":
+            new_names = [alias for alias in node.names if alias.name != "use_tool_inputs"]
+            if new_names:
+                node.names = new_names
+                return node
+            return None  # Remove entire import if it's the only one
+        return node
+
+
+def _remove_use_tool_inputs_decorator(source_code: str, function_name: str) -> str:
+    """
+    Remove @use_tool_inputs decorator from a function's source code and its import.
+
+    The decorator will be regenerated during codegen from the function definition inputs,
+    so we don't need to serialize it.
+
+    Args:
+        source_code: The source code containing the function
+        function_name: The name of the function to remove decorators from
+
+    Returns:
+        The source code with @use_tool_inputs decorators and import removed
+    """
+    try:
+        tree = ast.parse(source_code)
+        transformer = _RemoveUseToolInputsTransformer(function_name)
+        new_tree = transformer.visit(tree)
+        result = ast.unparse(new_tree)
+        # Add trailing newline to match original format
+        if result and not result.endswith("\n"):
+            result += "\n"
+        return result
+    except Exception:
+        # If parsing/unparsing fails, return original source code
+        return source_code
+
+
 def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContext", value: Any) -> Optional[JsonObject]:
     """
     Serialize a value to a JSON object. Returns `None` if the value resolves to `undefined`.
@@ -504,6 +564,8 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
         if source_path is not None:
             with virtual_open(source_path) as f:
                 source_code = f.read()
+            # Remove @use_tool_inputs decorator since it will be regenerated during codegen
+            source_code = _remove_use_tool_inputs_decorator(source_code, name)
         else:
             source_code = f"Source code not available for {value.__name__}"
 
