@@ -127,9 +127,23 @@ def _validate_json_schema_structure(schema: dict, path: str = "json_schema") -> 
                 f"or a 'prefixItems' field to specify the type of elements in the array."
             )
 
-        # Recursively validate the items schema if present and is a dict
-        if has_items and isinstance(schema["items"], dict):
-            _validate_json_schema_structure(schema["items"], f"{path}.items")
+        # Recursively validate the items schema
+        if has_items:
+            items_schema = schema["items"]
+            # Single-schema items: recurse once
+            if isinstance(items_schema, dict):
+                _validate_json_schema_structure(items_schema, f"{path}.items")
+            # Tuple-style items: list of schemas
+            elif isinstance(items_schema, list):
+                for idx, sub_schema in enumerate(items_schema):
+                    if isinstance(sub_schema, dict):
+                        _validate_json_schema_structure(sub_schema, f"{path}.items[{idx}]")
+
+        # Recursively validate prefixItems schemas
+        if has_prefix_items and isinstance(schema["prefixItems"], list):
+            for idx, sub_schema in enumerate(schema["prefixItems"]):
+                if isinstance(sub_schema, dict):
+                    _validate_json_schema_structure(sub_schema, f"{path}.prefixItems[{idx}]")
 
     # Validate object types
     if _is_json_schema_type(schema, "object"):
