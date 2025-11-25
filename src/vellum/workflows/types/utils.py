@@ -121,7 +121,7 @@ def infer_types(object_: Type, attr_name: str, localns: Optional[Dict[str, Any]]
                 class_attribute = class_attributes[attr_name]
                 return resolve_types(class_attribute)
 
-        raise AttributeError(f"Failed to infer type from attribute {attr_name} on {object_.__name__}")
+        raise AttributeError(f"'{object_.__name__}' has no attribute '{attr_name}'")
     except TypeError:
         # Python 3.13+: object class doesn't have __annotations__ by default
         # Use getattr with default to safely access annotations
