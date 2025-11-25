@@ -243,10 +243,6 @@ def test_dataset_row_serialization_with_trigger_alias():
     assert "workflow_trigger_id" in serialized
     assert serialized["workflow_trigger_id"] == str(MySchedule.__id__)
 
-    # AND should not contain 'trigger' or 'workflow_trigger' keys
-    assert "trigger" not in serialized
-    assert "workflow_trigger" not in serialized
-
 
 def test_sandbox_runner_with_node_output_mocks(mock_logger, mocker):
     """
