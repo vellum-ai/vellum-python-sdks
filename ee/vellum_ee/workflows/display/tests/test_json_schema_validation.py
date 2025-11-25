@@ -504,3 +504,39 @@ def test_inline_prompt_node_validation__wrapper_with_valid_inner_schema__succeed
         MyPromptNode.__validate__()
     except ValueError as e:
         pytest.fail(f"Validation should not raise an error for valid wrapper schema: {e}")
+
+
+def test_inline_prompt_node_validation__real_schema_with_schema_field__validates_outer_schema():
+    """
+    Tests that a real JSON Schema with a 'schema' field for metadata is NOT treated as a wrapper.
+
+    This addresses the edge case where a user provides a real JSON Schema that happens to include
+    a top-level 'schema' field for metadata or extensions. The outer schema should be validated,
+    not skipped in favor of the inner 'schema' field.
+    """
+
+    # GIVEN an InlinePromptNode with a real JSON Schema that has a 'schema' field for metadata
+    # This is NOT a structured-output wrapper because it has 'type' at the top level
+    class MyPromptNode(InlinePromptNode):
+        ml_model = "gpt-4"
+        blocks = []
+        parameters = PromptParameters(
+            custom_parameters={
+                "json_schema": {
+                    "type": "array",
+                    "schema": {"type": "string"},  # Metadata field, not a wrapper
+                    # Missing 'items' field - this should trigger validation error on the OUTER schema
+                }
+            }
+        )
+
+    # WHEN we call __validate__() on the node
+    # THEN it should raise a ValueError for the outer array schema missing 'items'
+    with pytest.raises(ValueError) as exc_info:
+        MyPromptNode.__validate__()
+
+    # AND the error path should be for the outer json_schema, NOT .schema
+    assert str(exc_info.value) == (
+        "JSON Schema of type 'array' at 'parameters.custom_parameters.json_schema' must define either an 'items' "
+        "field or a 'prefixItems' field to specify the type of elements in the array."
+    )
