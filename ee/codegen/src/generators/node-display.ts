@@ -4,6 +4,7 @@ import { isNil } from "lodash";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 import {
   NodeDisplayData as NodeDisplayDataType,
@@ -64,7 +65,7 @@ export class NodeDisplay extends AstNode {
       fields.push(
         python.field({
           name: "icon",
-          initializer: python.TypeInstantiation.str(nodeDisplayData.icon),
+          initializer: new StrInstantiation(nodeDisplayData.icon),
         })
       );
     }
@@ -76,7 +77,7 @@ export class NodeDisplay extends AstNode {
       fields.push(
         python.field({
           name: "color",
-          initializer: python.TypeInstantiation.str(nodeDisplayData.color),
+          initializer: new StrInstantiation(nodeDisplayData.color),
         })
       );
     }

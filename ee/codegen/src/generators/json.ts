@@ -3,6 +3,7 @@ import { python } from "@fern-api/python-ast";
 import { ValueGenerationError } from "./errors";
 
 import { AstNode } from "src/generators/extensions/ast-node";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 
 export class Json extends AstNode {
@@ -28,7 +29,7 @@ export class Json extends AstNode {
     }
 
     if (typeof value === "string") {
-      return python.TypeInstantiation.str(value);
+      return new StrInstantiation(value);
     }
 
     if (typeof value === "number") {
@@ -61,7 +62,7 @@ export class Json extends AstNode {
         this.inheritReferences(jsonValue);
 
         return {
-          key: python.TypeInstantiation.str(key),
+          key: new StrInstantiation(key),
           value: jsonValue,
         };
       });

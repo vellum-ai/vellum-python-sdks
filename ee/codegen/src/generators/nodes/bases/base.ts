@@ -18,6 +18,7 @@ import {
 } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { NodeDisplay } from "src/generators/node-display";
 import { NodeDisplayData } from "src/generators/node-display-data";
 import { NodeInput } from "src/generators/node-inputs/node-input";
@@ -176,7 +177,7 @@ export abstract class BaseNode<
             }),
             python.methodArgument({
               name: "name",
-              value: python.TypeInstantiation.str(name),
+              value: new StrInstantiation(name),
             }),
           ],
         }),
@@ -768,7 +769,7 @@ export abstract class BaseNode<
       nodeClass.add(
         python.field({
           name: "label",
-          initializer: python.TypeInstantiation.str(nodeLabel),
+          initializer: new StrInstantiation(nodeLabel),
         })
       );
     }
@@ -796,7 +797,7 @@ export abstract class BaseNode<
               nodeInput.nodeInputData.id
             );
             return {
-              key: python.TypeInstantiation.str(nodeAttributeName ?? key),
+              key: new StrInstantiation(nodeAttributeName ?? key),
               value: new UuidOrString(nodeInput.nodeInputData.id),
             };
           })
@@ -812,7 +813,7 @@ export abstract class BaseNode<
           initializer: python.TypeInstantiation.dict(
             this.nodeData.attributes.map((attribute) => {
               return {
-                key: python.TypeInstantiation.str(
+                key: new StrInstantiation(
                   toValidPythonIdentifier(attribute.name, "attr")
                 ),
                 value: python.TypeInstantiation.uuid(attribute.id),

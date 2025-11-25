@@ -4,6 +4,7 @@ import { isNil } from "lodash";
 import { BaseNodeInputWorkflowReference } from "./BaseNodeInputWorkflowReference";
 
 import { AstNode } from "src/generators/extensions/ast-node";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { DictionaryWorkflowReference as DictionaryWorkflowReferenceType } from "src/types/vellum";
 
@@ -48,7 +49,7 @@ export class DictionaryWorkflowReference extends BaseNodeInputWorkflowReference<
 
     // Otherwise, generate dict as before
     const dictEntries = entries.map((entry) => {
-      const keyAstNode = python.TypeInstantiation.str(entry.key);
+      const keyAstNode = new StrInstantiation(entry.key);
 
       const valueNode = new WorkflowValueDescriptor({
         nodeContext: this.nodeContext,

@@ -6,6 +6,7 @@ import { TemplatingNodeContext } from "src/context/node-context/templating-node"
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { PythonType } from "src/generators/extensions";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { TemplatingNode as TemplatingNodeType } from "src/types/vellum";
 import { getVellumVariablePrimitiveType } from "src/utils/vellum-variables";
@@ -53,7 +54,7 @@ export class TemplatingNode extends BaseNode<
         name: INPUTS_PREFIX,
         initializer: python.TypeInstantiation.dict(
           otherInputs.map((codeInput) => ({
-            key: python.TypeInstantiation.str(codeInput.nodeInputData.key),
+            key: new StrInstantiation(codeInput.nodeInputData.key),
             value: codeInput,
           })),
           {
@@ -92,7 +93,7 @@ export class TemplatingNode extends BaseNode<
           "WARNING"
         )
       );
-      return python.TypeInstantiation.str("");
+      return new StrInstantiation("");
     }
 
     const templateRule = templatingInput.value.rules[0];
@@ -103,7 +104,7 @@ export class TemplatingNode extends BaseNode<
           "WARNING"
         )
       );
-      return python.TypeInstantiation.str("");
+      return new StrInstantiation("");
     }
 
     if (templateRule.type !== "CONSTANT_VALUE") {
@@ -113,7 +114,7 @@ export class TemplatingNode extends BaseNode<
           "WARNING"
         )
       );
-      return python.TypeInstantiation.str("");
+      return new StrInstantiation("");
     }
 
     if (templateRule.data.type !== "STRING") {
@@ -123,7 +124,7 @@ export class TemplatingNode extends BaseNode<
           "WARNING"
         )
       );
-      return python.TypeInstantiation.str("");
+      return new StrInstantiation("");
     }
 
     if (!templateRule.data.value) {
@@ -133,10 +134,10 @@ export class TemplatingNode extends BaseNode<
           "WARNING"
         )
       );
-      return python.TypeInstantiation.str("");
+      return new StrInstantiation("");
     }
 
-    return python.TypeInstantiation.str(templateRule.data.value, {
+    return new StrInstantiation(templateRule.data.value, {
       multiline: true,
       startOnNewLine: true,
       endWithNewLine: true,
@@ -169,7 +170,7 @@ export class TemplatingNode extends BaseNode<
               }),
               python.methodArgument({
                 name: "name",
-                value: python.TypeInstantiation.str("result"),
+                value: new StrInstantiation("result"),
               }),
             ],
           }),

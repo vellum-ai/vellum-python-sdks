@@ -8,6 +8,7 @@ import {
 } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { codegen } from "src/index";
 import { SubworkflowNode as SubworkflowNodeType } from "src/types/vellum";
@@ -43,7 +44,7 @@ export class SubworkflowDeploymentNode extends BaseNode<
       statements.push(
         python.field({
           name: "deployment",
-          initializer: python.TypeInstantiation.str(
+          initializer: new StrInstantiation(
             this.nodeContext.workflowDeploymentRelease.deployment.name
           ),
         })
@@ -53,9 +54,7 @@ export class SubworkflowDeploymentNode extends BaseNode<
     statements.push(
       python.field({
         name: "release_tag",
-        initializer: python.TypeInstantiation.str(
-          this.nodeData.data.releaseTag
-        ),
+        initializer: new StrInstantiation(this.nodeData.data.releaseTag),
       })
     );
 
@@ -64,7 +63,7 @@ export class SubworkflowDeploymentNode extends BaseNode<
         name: INPUTS_PREFIX,
         initializer: python.TypeInstantiation.dict(
           Array.from(this.nodeInputsByKey.entries()).map(([key, value]) => ({
-            key: python.TypeInstantiation.str(key),
+            key: new StrInstantiation(key),
             value: value,
           })),
           {
@@ -187,7 +186,7 @@ export class SubworkflowDeploymentNode extends BaseNode<
                 }),
                 python.methodArgument({
                   name: "name",
-                  value: python.TypeInstantiation.str(output.key),
+                  value: new StrInstantiation(output.key),
                 }),
               ],
             }),

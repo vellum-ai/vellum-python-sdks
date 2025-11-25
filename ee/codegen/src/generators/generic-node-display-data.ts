@@ -4,6 +4,7 @@ import { isNil } from "lodash";
 import { VELLUM_WORKFLOW_EDITOR_TYPES_PATH } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 import { GenericNodeDisplayData as GenericNodeDisplayDataType } from "src/types/vellum";
 import { isNilOrEmpty } from "src/utils/typing";
@@ -87,7 +88,7 @@ export class GenericNodeDisplayData extends AstNode {
       args.push(
         python.methodArgument({
           name: "icon",
-          value: python.TypeInstantiation.str(this.sourceNodeDisplayData.icon),
+          value: new StrInstantiation(this.sourceNodeDisplayData.icon),
         })
       );
     }
@@ -96,7 +97,7 @@ export class GenericNodeDisplayData extends AstNode {
       args.push(
         python.methodArgument({
           name: "color",
-          value: python.TypeInstantiation.str(this.sourceNodeDisplayData.color),
+          value: new StrInstantiation(this.sourceNodeDisplayData.color),
         })
       );
     }
@@ -138,7 +139,7 @@ export class GenericNodeDisplayData extends AstNode {
       commentArgs.push(
         python.methodArgument({
           name: "value",
-          value: python.TypeInstantiation.str(value),
+          value: new StrInstantiation(value),
         })
       );
     }

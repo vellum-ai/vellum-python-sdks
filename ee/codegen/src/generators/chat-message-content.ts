@@ -20,6 +20,7 @@ import {
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 import { Json } from "src/generators/json";
 import { removeEscapeCharacters } from "src/utils/casing";
@@ -42,7 +43,7 @@ class StringChatMessageContent extends AstNode {
       arguments_: [
         python.methodArgument({
           name: "value",
-          value: python.TypeInstantiation.str(removeEscapeCharacters(value)),
+          value: new StrInstantiation(removeEscapeCharacters(value)),
         }),
       ],
     });
@@ -80,7 +81,7 @@ class FunctionCallChatMessageContentValue extends AstNode {
       functionCallChatMessageContentValueArgs.push(
         new MethodArgument({
           name: "id",
-          value: python.TypeInstantiation.str(value.id),
+          value: new StrInstantiation(value.id),
         })
       );
     }
@@ -88,7 +89,7 @@ class FunctionCallChatMessageContentValue extends AstNode {
     functionCallChatMessageContentValueArgs.push(
       new MethodArgument({
         name: "name",
-        value: python.TypeInstantiation.str(value.name),
+        value: new StrInstantiation(value.name),
       })
     );
 
@@ -208,7 +209,7 @@ class AudioChatMessageContent extends AstNode {
     const audioArgs = [
       python.methodArgument({
         name: "src",
-        value: python.TypeInstantiation.str(value.src),
+        value: new StrInstantiation(value.src),
       }),
     ];
 
@@ -271,7 +272,7 @@ class VideoChatMessageContent extends AstNode {
     const videoArgs = [
       python.methodArgument({
         name: "src",
-        value: python.TypeInstantiation.str(value.src),
+        value: new StrInstantiation(value.src),
       }),
     ];
 
@@ -334,7 +335,7 @@ class ImageChatMessageContent extends AstNode {
     const imageArgs = [
       python.methodArgument({
         name: "src",
-        value: python.TypeInstantiation.str(value.src),
+        value: new StrInstantiation(value.src),
       }),
     ];
 
@@ -397,7 +398,7 @@ class DocumentChatMessageContent extends AstNode {
     const documentArgs = [
       python.methodArgument({
         name: "src",
-        value: python.TypeInstantiation.str(value.src),
+        value: new StrInstantiation(value.src),
       }),
     ];
 

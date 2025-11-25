@@ -8,6 +8,7 @@ import {
   PromptTemplateBlockExcludingFunctionDefinition,
 } from "src/generators/base-prompt-block";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Json } from "src/generators/json";
 import {
   AudioPromptTemplateBlock,
@@ -99,7 +100,7 @@ export class StatefulPromptBlock extends BasePromptBlock<PromptTemplateBlockExcl
       classArgs.push(
         new MethodArgument({
           name: "template",
-          value: python.TypeInstantiation.str(promptBlock.properties.template, {
+          value: new StrInstantiation(promptBlock.properties.template, {
             multiline: true,
             startOnNewLine: true,
             endWithNewLine: true,
@@ -110,7 +111,7 @@ export class StatefulPromptBlock extends BasePromptBlock<PromptTemplateBlockExcl
       classArgs.push(
         new MethodArgument({
           name: "template",
-          value: python.TypeInstantiation.str(""),
+          value: new StrInstantiation(""),
         })
       );
     }
@@ -135,7 +136,7 @@ export class StatefulPromptBlock extends BasePromptBlock<PromptTemplateBlockExcl
       classArgs.push(
         new MethodArgument({
           name: "chat_role",
-          value: python.TypeInstantiation.str(promptBlock.properties.chatRole),
+          value: new StrInstantiation(promptBlock.properties.chatRole),
         })
       );
     }
@@ -144,9 +145,7 @@ export class StatefulPromptBlock extends BasePromptBlock<PromptTemplateBlockExcl
       classArgs.push(
         new MethodArgument({
           name: "chat_source",
-          value: python.TypeInstantiation.str(
-            promptBlock.properties.chatSource
-          ),
+          value: new StrInstantiation(promptBlock.properties.chatSource),
         })
       );
     }
@@ -203,7 +202,7 @@ export class StatefulPromptBlock extends BasePromptBlock<PromptTemplateBlockExcl
     classArgs.push(
       new MethodArgument({
         name: "input_variable",
-        value: python.TypeInstantiation.str(inputVariableName),
+        value: new StrInstantiation(inputVariableName),
       })
     );
 
@@ -227,7 +226,7 @@ export class StatefulPromptBlock extends BasePromptBlock<PromptTemplateBlockExcl
     classArgs.push(
       new MethodArgument({
         name: "text",
-        value: python.TypeInstantiation.str(promptBlock.text, {
+        value: new StrInstantiation(promptBlock.text, {
           multiline: nonEmpty,
           startOnNewLine: nonEmpty,
           endWithNewLine: nonEmpty,
@@ -287,7 +286,7 @@ export class StatefulPromptBlock extends BasePromptBlock<PromptTemplateBlockExcl
     classArgs.push(
       new MethodArgument({
         name: "src",
-        value: python.TypeInstantiation.str(promptBlock.src),
+        value: new StrInstantiation(promptBlock.src),
       })
     );
 

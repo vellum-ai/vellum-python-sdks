@@ -18,6 +18,7 @@ import { ValueGenerationError } from "./errors";
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 import { Json } from "src/generators/json";
 import { AttributeConfig, IterableConfig } from "src/types/vellum";
@@ -33,7 +34,7 @@ class StringVellumValue extends AstNode {
   }
 
   private generateAstNode(value: string): AstNode {
-    return python.TypeInstantiation.str(removeEscapeCharacters(value));
+    return new StrInstantiation(removeEscapeCharacters(value));
   }
 
   public write(writer: Writer): void {
@@ -102,7 +103,7 @@ class ChatHistoryVellumValue extends AstNode {
       const arguments_ = [
         python.methodArgument({
           name: "role",
-          value: python.TypeInstantiation.str(chatMessage.role),
+          value: new StrInstantiation(chatMessage.role),
         }),
       ];
 
@@ -110,7 +111,7 @@ class ChatHistoryVellumValue extends AstNode {
         arguments_.push(
           python.methodArgument({
             name: "text",
-            value: python.TypeInstantiation.str(
+            value: new StrInstantiation(
               removeEscapeCharacters(chatMessage.text)
             ),
           })
@@ -121,7 +122,7 @@ class ChatHistoryVellumValue extends AstNode {
         arguments_.push(
           python.methodArgument({
             name: "source",
-            value: python.TypeInstantiation.str(chatMessage.source),
+            value: new StrInstantiation(chatMessage.source),
           })
         );
       }
@@ -180,11 +181,11 @@ class ErrorVellumValue extends AstNode {
       arguments_: [
         python.methodArgument({
           name: "message",
-          value: python.TypeInstantiation.str(message),
+          value: new StrInstantiation(message),
         }),
         python.methodArgument({
           name: "code",
-          value: python.TypeInstantiation.str(code),
+          value: new StrInstantiation(code),
         }),
       ],
     });
@@ -209,7 +210,7 @@ class AudioVellumValue extends AstNode {
     const arguments_ = [
       python.methodArgument({
         name: "src",
-        value: python.TypeInstantiation.str(value.src),
+        value: new StrInstantiation(value.src),
       }),
     ];
 
@@ -251,7 +252,7 @@ class VideoVellumValue extends AstNode {
     const arguments_ = [
       python.methodArgument({
         name: "src",
-        value: python.TypeInstantiation.str(value.src),
+        value: new StrInstantiation(value.src),
       }),
     ];
 
@@ -293,7 +294,7 @@ class ImageVellumValue extends AstNode {
     const arguments_ = [
       python.methodArgument({
         name: "src",
-        value: python.TypeInstantiation.str(value.src),
+        value: new StrInstantiation(value.src),
       }),
     ];
 
@@ -336,7 +337,7 @@ class DocumentVellumValue extends AstNode {
     const arguments_ = [
       python.methodArgument({
         name: "src",
-        value: python.TypeInstantiation.str(value.src),
+        value: new StrInstantiation(value.src),
       }),
     ];
 
@@ -414,7 +415,7 @@ class FunctionCallVellumValue extends AstNode {
       }),
       python.methodArgument({
         name: "name",
-        value: python.TypeInstantiation.str(value.name),
+        value: new StrInstantiation(value.name),
       }),
     ];
 
@@ -422,7 +423,7 @@ class FunctionCallVellumValue extends AstNode {
       arguments_.push(
         python.methodArgument({
           name: "id",
-          value: python.TypeInstantiation.str(value.id),
+          value: new StrInstantiation(value.id),
         })
       );
     }
@@ -457,7 +458,7 @@ class SearchResultsVellumValue extends AstNode {
       const arguments_ = [
         python.methodArgument({
           name: "text",
-          value: python.TypeInstantiation.str(result.text),
+          value: new StrInstantiation(result.text),
         }),
         python.methodArgument({
           name: "score",
@@ -466,7 +467,7 @@ class SearchResultsVellumValue extends AstNode {
         python.methodArgument({
           name: "keywords",
           value: python.TypeInstantiation.list(
-            result.keywords.map((k) => python.TypeInstantiation.str(k))
+            result.keywords.map((k) => new StrInstantiation(k))
           ),
         }),
         python.methodArgument({
@@ -480,13 +481,11 @@ class SearchResultsVellumValue extends AstNode {
               arguments_: [
                 python.methodArgument({
                   name: "id",
-                  value: python.TypeInstantiation.str(result.document.id ?? ""),
+                  value: new StrInstantiation(result.document.id ?? ""),
                 }),
                 python.methodArgument({
                   name: "label",
-                  value: python.TypeInstantiation.str(
-                    result.document.label ?? ""
-                  ),
+                  value: new StrInstantiation(result.document.label ?? ""),
                 }),
               ],
             });

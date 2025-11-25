@@ -4,6 +4,7 @@ import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { PromptDeploymentNodeContext } from "src/context/node-context/prompt-deployment-node";
 import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { DeploymentPromptNodeData, PromptNode } from "src/types/vellum";
@@ -37,8 +38,8 @@ export class PromptDeploymentNode extends BaseNode<
         python.field({
           name: "ml_model_fallbacks",
           initializer: python.TypeInstantiation.list(
-            this.nodeData.data.mlModelFallbacks.map((model) =>
-              python.TypeInstantiation.str(model)
+            this.nodeData.data.mlModelFallbacks.map(
+              (model) => new StrInstantiation(model)
             )
           ),
         })
@@ -49,7 +50,7 @@ export class PromptDeploymentNode extends BaseNode<
       statements.push(
         python.field({
           name: "deployment",
-          initializer: python.TypeInstantiation.str(
+          initializer: new StrInstantiation(
             this.nodeContext.promptDeploymentRelease.deployment.name
           ),
         })
@@ -68,7 +69,7 @@ export class PromptDeploymentNode extends BaseNode<
     statements.push(
       python.field({
         name: "release_tag",
-        initializer: python.TypeInstantiation.str(nodeData.releaseTag),
+        initializer: new StrInstantiation(nodeData.releaseTag),
       })
     );
 
@@ -92,7 +93,7 @@ export class PromptDeploymentNode extends BaseNode<
           name: INPUTS_PREFIX,
           initializer: python.TypeInstantiation.dict(
             Array.from(this.nodeInputsByKey.entries()).map(([key, value]) => ({
-              key: python.TypeInstantiation.str(key),
+              key: new StrInstantiation(key),
               value: value,
             })),
             {
@@ -147,7 +148,7 @@ export class PromptDeploymentNode extends BaseNode<
             }),
             python.methodArgument({
               name: "name",
-              value: python.TypeInstantiation.str("text"),
+              value: new StrInstantiation("text"),
             }),
           ],
         }),
@@ -174,7 +175,7 @@ export class PromptDeploymentNode extends BaseNode<
             }),
             python.methodArgument({
               name: "name",
-              value: python.TypeInstantiation.str("results"),
+              value: new StrInstantiation("results"),
             }),
           ],
         }),
@@ -202,7 +203,7 @@ export class PromptDeploymentNode extends BaseNode<
             }),
             python.methodArgument({
               name: "name",
-              value: python.TypeInstantiation.str("json"),
+              value: new StrInstantiation("json"),
             }),
           ],
         }),

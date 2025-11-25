@@ -18,6 +18,7 @@ import { PromptBlock as PromptBlockType } from "src/generators/base-prompt-block
 import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { StarImport } from "src/generators/extensions/star-import";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 import { FunctionFile } from "src/generators/function-file";
 import { GenericNodeDisplayData } from "src/generators/generic-node-display-data";
@@ -186,9 +187,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   const args = [
                     python.methodArgument({
                       name: "deployment",
-                      value: python.TypeInstantiation.str(
-                        workflowDeploymentName
-                      ),
+                      value: new StrInstantiation(workflowDeploymentName),
                     }),
                   ];
 
@@ -196,7 +195,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                     args.push(
                       python.methodArgument({
                         name: "release_tag",
-                        value: python.TypeInstantiation.str(f.release_tag),
+                        value: new StrInstantiation(f.release_tag),
                       })
                     );
                   }
@@ -233,15 +232,15 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   const args = [
                     python.methodArgument({
                       name: "toolkit",
-                      value: python.TypeInstantiation.str(toolkit),
+                      value: new StrInstantiation(toolkit),
                     }),
                     python.methodArgument({
                       name: "action",
-                      value: python.TypeInstantiation.str(action),
+                      value: new StrInstantiation(action),
                     }),
                     python.methodArgument({
                       name: "description",
-                      value: python.TypeInstantiation.str(description),
+                      value: new StrInstantiation(description),
                     }),
                   ];
 
@@ -249,9 +248,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                     args.push(
                       python.methodArgument({
                         name: "user_id",
-                        value: python.TypeInstantiation.str(
-                          composioTool.user_id
-                        ),
+                        value: new StrInstantiation(composioTool.user_id),
                       })
                     );
                   }
@@ -273,15 +270,11 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   const arguments_: python.MethodArgument[] = [
                     python.methodArgument({
                       name: "name",
-                      value: python.TypeInstantiation.str(
-                        mcpServerFunction.name
-                      ),
+                      value: new StrInstantiation(mcpServerFunction.name),
                     }),
                     python.methodArgument({
                       name: "url",
-                      value: python.TypeInstantiation.str(
-                        mcpServerFunction.url
-                      ),
+                      value: new StrInstantiation(mcpServerFunction.url),
                     }),
                   ];
 
@@ -329,7 +322,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                     arguments_.push(
                       python.methodArgument({
                         name: "api_key_header_key",
-                        value: python.TypeInstantiation.str(
+                        value: new StrInstantiation(
                           mcpServerFunction.api_key_header_key
                         ),
                       })
@@ -374,25 +367,25 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   const args = [
                     python.methodArgument({
                       name: "provider",
-                      value: python.TypeInstantiation.str(
+                      value: new StrInstantiation(
                         integrationTool.provider || "COMPOSIO"
                       ),
                     }),
                     python.methodArgument({
                       name: "integration_name",
-                      value: python.TypeInstantiation.str(
+                      value: new StrInstantiation(
                         integrationTool.integration_name || "UNKNOWN"
                       ),
                     }),
                     python.methodArgument({
                       name: "name",
-                      value: python.TypeInstantiation.str(
+                      value: new StrInstantiation(
                         integrationTool.name || "UNKNOWN"
                       ),
                     }),
                     python.methodArgument({
                       name: "description",
-                      value: python.TypeInstantiation.str(
+                      value: new StrInstantiation(
                         integrationTool.description || "UNKNOWN"
                       ),
                     }),
@@ -743,7 +736,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
           }),
           python.methodArgument({
             name: "name",
-            value: python.TypeInstantiation.str(output.name),
+            value: new StrInstantiation(output.name),
           }),
         ],
       }),

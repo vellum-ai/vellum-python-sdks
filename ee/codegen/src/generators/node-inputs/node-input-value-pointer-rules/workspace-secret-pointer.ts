@@ -3,6 +3,7 @@ import { isNil } from "lodash";
 
 import { BaseNodeInputValuePointerRule } from "./base";
 
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { WorkspaceSecretPointer as WorkspaceSecretPointerType } from "src/types/vellum";
 
 export class WorkspaceSecretPointerRule extends BaseNodeInputValuePointerRule<WorkspaceSecretPointerType> {
@@ -31,7 +32,7 @@ export class WorkspaceSecretPointerRule extends BaseNodeInputValuePointerRule<Wo
       }),
       arguments_: [
         python.methodArgument({
-          value: python.TypeInstantiation.str(workspaceSecretName),
+          value: new StrInstantiation(workspaceSecretName),
         }),
       ],
     });

@@ -17,6 +17,7 @@ export * from "./optional";
 export * from "./protected-python-file";
 export * from "./reference";
 export * from "./star-import";
+export * from "./str-instantiation";
 export * from "./type";
 export * from "./union";
 export * from "./writer";

@@ -6,6 +6,7 @@ import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { NodeAttributeGenerationError } from "src/generators/errors";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { WorkflowProjectGenerator } from "src/project";
 import { WorkflowDataNode, WorkflowRawData } from "src/types/vellum";
 import { createPythonClassName } from "src/utils/casing";
@@ -121,9 +122,7 @@ export abstract class BaseNestedWorkflowNode<
                 }),
                 python.methodArgument({
                   name: "name",
-                  value: python.TypeInstantiation.str(
-                    outputContext.getRawName()
-                  ),
+                  value: new StrInstantiation(outputContext.getRawName()),
                 }),
               ],
             }),

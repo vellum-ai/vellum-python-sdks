@@ -22,6 +22,7 @@ import {
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
 import { Reference } from "src/generators/extensions/reference";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { GraphAttribute } from "src/generators/graph-attribute";
 import { NodeDisplayData } from "src/generators/node-display-data";
 import { WorkflowOutput } from "src/generators/workflow-output";
@@ -287,7 +288,7 @@ export class Workflow {
                 overrideArgs.push(
                   python.methodArgument({
                     name: "name",
-                    value: python.TypeInstantiation.str(
+                    value: new StrInstantiation(
                       // Intentionally use the raw name from the input variable data
                       // rather than the sanitized name from the input variable context
                       inputVariableContext.getRawName()
@@ -301,7 +302,7 @@ export class Workflow {
                   overrideArgs.push(
                     python.methodArgument({
                       name: "color",
-                      value: python.TypeInstantiation.str(extensions),
+                      value: new StrInstantiation(extensions),
                     })
                   );
                 }
@@ -347,7 +348,7 @@ export class Workflow {
                 overrideArgs.push(
                   python.methodArgument({
                     name: "name",
-                    value: python.TypeInstantiation.str(
+                    value: new StrInstantiation(
                       // Intentionally use the raw name from the input variable data
                       // rather than the sanitized name from the input variable context
                       stateVariableContext.getRawName()
@@ -361,7 +362,7 @@ export class Workflow {
                   overrideArgs.push(
                     python.methodArgument({
                       name: "color",
-                      value: python.TypeInstantiation.str(extensions),
+                      value: new StrInstantiation(extensions),
                     })
                   );
                 }
@@ -576,7 +577,7 @@ export class Workflow {
                     }),
                     python.methodArgument({
                       name: "name",
-                      value: python.TypeInstantiation.str(
+                      value: new StrInstantiation(
                         // Intentionally use the raw name from the terminal node
                         // Rather than the sanitized name from the output context
                         outputVariable.getRawName()

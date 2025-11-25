@@ -13,6 +13,7 @@ import {
 } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { VellumValueLogicalExpressionSerializer } from "src/serializers/vellum";
@@ -50,7 +51,7 @@ export class SearchNode extends BaseNode<
       python.field({
         name: "document_index",
         initializer: documentName
-          ? python.TypeInstantiation.str(documentName)
+          ? new StrInstantiation(documentName)
           : documentIndex ?? python.TypeInstantiation.none(),
       })
     );
@@ -462,7 +463,7 @@ export class SearchNode extends BaseNode<
               }),
               python.methodArgument({
                 name: "name",
-                value: python.TypeInstantiation.str("results"),
+                value: new StrInstantiation("results"),
               }),
             ],
           }),
@@ -489,7 +490,7 @@ export class SearchNode extends BaseNode<
               }),
               python.methodArgument({
                 name: "name",
-                value: python.TypeInstantiation.str("text"),
+                value: new StrInstantiation("text"),
               }),
             ],
           }),
@@ -561,7 +562,7 @@ export class SearchNodeMetadataFilters extends AstNode {
       arguments_: [
         python.methodArgument({
           name: "combinator",
-          value: python.TypeInstantiation.str(data.combinator),
+          value: new StrInstantiation(data.combinator),
         }),
         python.methodArgument({
           name: "negated",
@@ -605,7 +606,7 @@ export class SearchNodeMetadataFilters extends AstNode {
       }),
       python.methodArgument({
         name: "operator",
-        value: python.TypeInstantiation.str(data.operator),
+        value: new StrInstantiation(data.operator),
       })
     );
 

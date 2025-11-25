@@ -19,6 +19,7 @@ import {
   PromptBlock as PromptBlockType,
 } from "src/generators/base-prompt-block";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Json } from "src/generators/json";
 
 export class PromptBlock extends BasePromptBlock<PromptBlockType> {
@@ -93,7 +94,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
       classArgs.push(
         new MethodArgument({
           name: "template",
-          value: python.TypeInstantiation.str(promptBlock.template, {
+          value: new StrInstantiation(promptBlock.template, {
             multiline: true,
             startOnNewLine: true,
             endWithNewLine: true,
@@ -104,7 +105,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
       classArgs.push(
         new MethodArgument({
           name: "template",
-          value: python.TypeInstantiation.str(""),
+          value: new StrInstantiation(""),
         })
       );
     }
@@ -129,7 +130,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
       classArgs.push(
         new MethodArgument({
           name: "chat_role",
-          value: python.TypeInstantiation.str(promptBlock.chatRole),
+          value: new StrInstantiation(promptBlock.chatRole),
         })
       );
     }
@@ -138,7 +139,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
       classArgs.push(
         new MethodArgument({
           name: "chat_source",
-          value: python.TypeInstantiation.str(promptBlock.chatSource),
+          value: new StrInstantiation(promptBlock.chatSource),
         })
       );
     }
@@ -190,7 +191,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
     classArgs.push(
       new MethodArgument({
         name: "input_variable",
-        value: python.TypeInstantiation.str(inputVariableName),
+        value: new StrInstantiation(inputVariableName),
       })
     );
 
@@ -214,7 +215,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
     classArgs.push(
       new MethodArgument({
         name: "text",
-        value: python.TypeInstantiation.str(promptBlock.text, {
+        value: new StrInstantiation(promptBlock.text, {
           multiline: nonEmpty,
           startOnNewLine: nonEmpty,
           endWithNewLine: nonEmpty,
@@ -274,7 +275,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
     classArgs.push(
       new MethodArgument({
         name: "src",
-        value: python.TypeInstantiation.str(promptBlock.src),
+        value: new StrInstantiation(promptBlock.src),
       })
     );
 
