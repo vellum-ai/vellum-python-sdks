@@ -125,6 +125,12 @@ from vellum.workflows.nodes.displayable.bases.inline_prompt_node import node as 
             "JSON Schema 'anyOf[0]' at 'parameters.custom_parameters.json_schema.anyOf[0]' must be a schema object, "
             "not str",
         ),
+        (
+            "wrapper with non-dict schema",
+            {"name": "my_schema", "schema": "string"},
+            "JSON Schema 'schema' field at 'parameters.custom_parameters.json_schema.schema' "
+            "must be a schema object, not str",
+        ),
     ],
     ids=lambda p: p if isinstance(p, str) else None,
 )
