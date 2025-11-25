@@ -176,6 +176,20 @@ def _get_json_schema_to_validate(parameters_ref: object) -> tuple:
     if not isinstance(json_schema, dict):
         return None, ""
 
+    # If this looks like a structured-output wrapper (has "schema" key but no JSON Schema keywords),
+    # validate that the inner schema is a dict. This catches invalid wrappers like
+    # {"name": "foo", "schema": "string"} early with a clear error message.
+    has_schema = "schema" in json_schema
+    has_schema_keywords = any(key in json_schema for key in _JSON_SCHEMA_KEYWORDS)
+
+    if has_schema and not has_schema_keywords:
+        inner_schema = json_schema["schema"]
+        if not isinstance(inner_schema, dict):
+            raise ValueError(
+                "JSON Schema 'schema' field at 'parameters.custom_parameters.json_schema.schema' "
+                f"must be a schema object, not {type(inner_schema).__name__}"
+            )
+
     # Check if json_schema is a structured-output wrapper (e.g., {"name": "...", "schema": {...}})
     # Only drill into the inner "schema" field if this is truly a wrapper, not a real JSON Schema
     # that happens to have a "schema" field for metadata/extensions
