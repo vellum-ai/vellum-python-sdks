@@ -84,6 +84,50 @@ if TYPE_CHECKING:
     from vellum.workflows.workflows.base import BaseWorkflow
 
 
+# JSON Schema keywords that indicate a dict is a real JSON Schema, not a structured-output wrapper
+_JSON_SCHEMA_KEYWORDS = frozenset(
+    {
+        "type",
+        "properties",
+        "items",
+        "prefixItems",
+        "anyOf",
+        "oneOf",
+        "allOf",
+        "not",
+        "$ref",
+        "$schema",
+        "$id",
+        "$defs",
+        "definitions",
+    }
+)
+
+
+def _is_structured_output_wrapper(json_schema: dict) -> bool:
+    """
+    Determines if a dict is a structured-output wrapper vs a real JSON Schema.
+
+    The structured-output wrapper format is: {"name": "...", "schema": {...}, "strict": ...}
+    It does NOT contain standard JSON Schema keywords at the top level.
+
+    A real JSON Schema would have keywords like "type", "properties", "items", etc. at the top level.
+
+    Args:
+        json_schema: The dict to check
+
+    Returns:
+        True if this appears to be a structured-output wrapper, False if it's a real JSON Schema
+    """
+    inner_schema = json_schema.get("schema")
+    if not isinstance(inner_schema, dict):
+        return False
+
+    # If the dict has any JSON Schema keywords at the top level, it's a real schema, not a wrapper
+    has_schema_keywords = any(key in json_schema for key in _JSON_SCHEMA_KEYWORDS)
+    return not has_schema_keywords
+
+
 def _is_json_schema_type(schema: dict, schema_type: str) -> bool:
     """
     Check if a JSON schema has a specific type.
@@ -122,12 +166,13 @@ def _get_json_schema_to_validate(parameters_ref: object) -> tuple:
     if not isinstance(json_schema, dict):
         return None, ""
 
-    # Check if json_schema is a wrapper with an inner "schema" field (standard structured-output format)
-    inner_schema = json_schema.get("schema")
-    if isinstance(inner_schema, dict):
-        return inner_schema, "parameters.custom_parameters.json_schema.schema"
+    # Check if json_schema is a structured-output wrapper (e.g., {"name": "...", "schema": {...}})
+    # Only drill into the inner "schema" field if this is truly a wrapper, not a real JSON Schema
+    # that happens to have a "schema" field for metadata/extensions
+    if _is_structured_output_wrapper(json_schema):
+        return json_schema["schema"], "parameters.custom_parameters.json_schema.schema"
 
-    # Fall back to json_schema itself (bare schema format)
+    # Fall back to json_schema itself (bare schema format or real JSON Schema with "schema" field)
     return json_schema, "parameters.custom_parameters.json_schema"
 
 
