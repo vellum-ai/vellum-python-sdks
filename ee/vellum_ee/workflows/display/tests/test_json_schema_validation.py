@@ -13,16 +13,15 @@ from vellum.workflows.nodes.displayable.bases.inline_prompt_node import node as 
 
 
 @pytest.mark.parametrize(
-    "description,json_schema,expected_message",
+    "json_schema,expected_message",
     [
-        (
-            "array without items or prefixItems",
+        pytest.param(
             {"type": "array"},
             "JSON Schema of type 'array' at 'parameters.custom_parameters.json_schema' must define either an 'items' "
             "field or a 'prefixItems' field to specify the type of elements in the array.",
+            id="array without items or prefixItems",
         ),
-        (
-            "nested array without items",
+        pytest.param(
             {
                 "type": "object",
                 "properties": {
@@ -31,30 +30,30 @@ from vellum.workflows.nodes.displayable.bases.inline_prompt_node import node as 
             },
             "JSON Schema of type 'array' at 'parameters.custom_parameters.json_schema.properties.items' must define "
             "either an 'items' field or a 'prefixItems' field to specify the type of elements in the array.",
+            id="nested array without items",
         ),
-        (
-            "object with non-dict properties",
+        pytest.param(
             {"type": "object", "properties": "invalid"},
             "JSON Schema of type 'object' at 'parameters.custom_parameters.json_schema' must have 'properties' "
             "defined as a dictionary, not str",
+            id="object with non-dict properties",
         ),
-        (
-            "anyOf not list",
+        pytest.param(
             {"anyOf": {"type": "string"}},
             "JSON Schema's 'anyOf' field at 'parameters.custom_parameters.json_schema' must be a list of schemas, "
             "not dict",
+            id="anyOf not list",
         ),
-        (
-            "nested array in prefixItems without items",
+        pytest.param(
             {
                 "type": "array",
                 "prefixItems": [{"type": "array"}],
             },
             "JSON Schema of type 'array' at 'parameters.custom_parameters.json_schema.prefixItems[0]' must define "
             "either an 'items' field or a 'prefixItems' field to specify the type of elements in the array.",
+            id="nested array in prefixItems without items",
         ),
-        (
-            "nested array in list-valued items without items",
+        pytest.param(
             {
                 "type": "array",
                 "items": [
@@ -64,69 +63,68 @@ from vellum.workflows.nodes.displayable.bases.inline_prompt_node import node as 
             },
             "JSON Schema of type 'array' at 'parameters.custom_parameters.json_schema.items[1]' must define "
             "either an 'items' field or a 'prefixItems' field to specify the type of elements in the array.",
+            id="nested array in list-valued items without items",
         ),
-        (
-            "schema with schema field validates outer schema",
+        pytest.param(
             {
                 "type": "array",
                 "schema": {"type": "string"},
             },
             "JSON Schema of type 'array' at 'parameters.custom_parameters.json_schema' must define either an 'items' "
             "field or a 'prefixItems' field to specify the type of elements in the array.",
+            id="schema with schema field validates outer schema",
         ),
-        (
-            "array with None items",
+        pytest.param(
             {"type": "array", "items": None},
             "JSON Schema 'items' field at 'parameters.custom_parameters.json_schema.items' must be a schema object "
             "or a list of schema objects, not NoneType",
+            id="array with None items",
         ),
-        (
-            "array with string items",
+        pytest.param(
             {"type": "array", "items": "string"},
             "JSON Schema 'items' field at 'parameters.custom_parameters.json_schema.items' must be a schema object "
             "or a list of schema objects, not str",
+            id="array with string items",
         ),
-        (
-            "array with non-list prefixItems",
+        pytest.param(
             {"type": "array", "prefixItems": {"type": "string"}},
             "JSON Schema 'prefixItems' field at 'parameters.custom_parameters.json_schema.prefixItems' must be a list "
             "of schema objects, not dict",
+            id="array with non-list prefixItems",
         ),
-        (
-            "prefixItems with non-dict element",
+        pytest.param(
             {"type": "array", "prefixItems": ["string"]},
             "JSON Schema 'prefixItems[0]' at 'parameters.custom_parameters.json_schema.prefixItems[0]' must be a "
             "schema object, not str",
+            id="prefixItems with non-dict element",
         ),
-        (
-            "list items with non-dict element",
+        pytest.param(
             {"type": "array", "items": ["string", {"type": "number"}]},
             "JSON Schema 'items[0]' at 'parameters.custom_parameters.json_schema.items[0]' must be a "
             "schema object, not str",
+            id="list items with non-dict element",
         ),
-        (
-            "anyOf with non-schema element",
+        pytest.param(
             {"anyOf": ["string"]},
             "JSON Schema 'anyOf[0]' at 'parameters.custom_parameters.json_schema.anyOf[0]' must be a schema object, "
             "not str",
+            id="anyOf with non-schema element",
         ),
-        (
-            "wrapper with invalid nested array schema",
+        pytest.param(
             {"name": "test", "schema": {"type": "array"}},
             "JSON Schema of type 'array' at 'parameters.custom_parameters.json_schema.schema' must define either an "
             "'items' field or a 'prefixItems' field to specify the type of elements in the array.",
+            id="wrapper with invalid nested array schema",
         ),
-        (
-            "wrapper with non-dict schema value",
+        pytest.param(
             {"name": "test", "schema": "string"},
             "JSON Schema 'schema' field at 'parameters.custom_parameters.json_schema.schema' must be a schema object, "
             "not str",
+            id="wrapper with non-dict schema value",
         ),
     ],
-    ids=lambda p: p if isinstance(p, str) else None,
 )
 def test_inline_prompt_node_validation__invalid_schemas_raise_error(
-    description: str,
     json_schema: dict,
     expected_message: str,
 ) -> None:
@@ -134,7 +132,7 @@ def test_inline_prompt_node_validation__invalid_schemas_raise_error(
     Tests that InlinePromptNode validation rejects structurally invalid JSON Schemas with clear error messages.
     """
 
-    # GIVEN an InlinePromptNode configured with a specific invalid JSON Schema scenario
+    # GIVEN an InlinePromptNode configured with an invalid JSON Schema
     class MyPromptNode(InlinePromptNode):
         ml_model = "gpt-4"
         blocks = []
@@ -149,44 +147,43 @@ def test_inline_prompt_node_validation__invalid_schemas_raise_error(
 
 
 @pytest.mark.parametrize(
-    "description,json_schema",
+    "json_schema",
     [
-        (
-            "array with prefixItems only",
+        pytest.param(
             {
                 "type": "array",
                 "prefixItems": [{"type": "string"}, {"type": "number"}],
             },
+            id="array with prefixItems only",
         ),
-        (
-            "valid array with items",
+        pytest.param(
             {"type": "array", "items": {"type": "string"}},
+            id="valid array with items",
         ),
-        (
-            "array with empty items object",
+        pytest.param(
             {"type": "array", "items": {}},
+            id="array with empty items object",
         ),
-        (
-            "array with empty prefixItems",
+        pytest.param(
             {"type": "array", "prefixItems": []},
+            id="array with empty prefixItems",
         ),
-        (
-            "array with both items and prefixItems",
+        pytest.param(
             {
                 "type": "array",
                 "prefixItems": [{"type": "string"}],
                 "items": {"type": "number"},
             },
+            id="array with both items and prefixItems",
         ),
-        (
-            "valid nested array in prefixItems",
+        pytest.param(
             {
                 "type": "array",
                 "prefixItems": [{"type": "array", "items": {"type": "string"}}],
             },
+            id="valid nested array in prefixItems",
         ),
-        (
-            "valid nested array in list-valued items",
+        pytest.param(
             {
                 "type": "array",
                 "items": [
@@ -194,9 +191,9 @@ def test_inline_prompt_node_validation__invalid_schemas_raise_error(
                     {"type": "array", "items": {"type": "number"}},
                 ],
             },
+            id="valid nested array in list-valued items",
         ),
-        (
-            "valid complex object schema with anyOf",
+        pytest.param(
             {
                 "type": "object",
                 "properties": {
@@ -213,9 +210,9 @@ def test_inline_prompt_node_validation__invalid_schemas_raise_error(
                 },
                 "anyOf": [{"required": ["name"]}, {"required": ["age"]}],
             },
+            id="valid complex object schema with anyOf",
         ),
-        (
-            "schema without type field passes validation",
+        pytest.param(
             {
                 "name": "match_scorer_schema",
                 "schema": {
@@ -240,30 +237,26 @@ def test_inline_prompt_node_validation__invalid_schemas_raise_error(
                     },
                 },
             },
+            id="wrapper with valid nested schema",
         ),
     ],
-    ids=lambda p: p if isinstance(p, str) else None,
 )
 def test_inline_prompt_node_validation__valid_schemas_succeed(
-    description: str,
     json_schema: dict,
 ) -> None:
     """
     Tests that InlinePromptNode validation accepts structurally valid JSON Schemas.
     """
 
-    # GIVEN an InlinePromptNode configured with a specific valid JSON Schema scenario
+    # GIVEN an InlinePromptNode configured with a valid JSON Schema
     class MyPromptNode(InlinePromptNode):
         ml_model = "gpt-4"
         blocks = []
         parameters = PromptParameters(custom_parameters={"json_schema": json_schema})
 
     # WHEN we call __validate__ on the node
-    try:
-        MyPromptNode.__validate__()
-    # THEN it should not raise an error for valid schemas
-    except ValueError as e:
-        pytest.fail(f"Validation should not raise an error for valid schema ({description}): {e}")
+    # THEN it should not raise an error
+    MyPromptNode.__validate__()
 
 
 def test_inline_prompt_node_validation__no_json_schema__succeeds():
@@ -277,11 +270,8 @@ def test_inline_prompt_node_validation__no_json_schema__succeeds():
         blocks = []
 
     # WHEN we call __validate__() on the node
-    try:
-        MyPromptNode.__validate__()
     # THEN it should not raise any errors
-    except ValueError as e:
-        pytest.fail(f"Validation should not raise an error when no json_schema is present: {e}")
+    MyPromptNode.__validate__()
 
 
 def test_inline_prompt_node_validation__pydantic_model_schema_is_validated():
