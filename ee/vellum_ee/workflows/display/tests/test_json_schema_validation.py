@@ -96,8 +96,8 @@ def test_inline_prompt_node_validation__array_with_prefix_items__succeeds():
     # THEN it should not raise any errors
     try:
         MyPromptNode.__validate__()
-    except ValueError:
-        pytest.fail("Validation should not raise an error for array with prefixItems")
+    except ValueError as e:
+        pytest.fail(f"Validation should not raise an error for array with prefixItems: {e}")
 
 
 def test_inline_prompt_node_validation__valid_array_with_items__succeeds():
@@ -115,8 +115,8 @@ def test_inline_prompt_node_validation__valid_array_with_items__succeeds():
     # THEN it should not raise any errors
     try:
         MyPromptNode.__validate__()
-    except ValueError:
-        pytest.fail("Validation should not raise an error for valid array schema")
+    except ValueError as e:
+        pytest.fail(f"Validation should not raise an error for valid array schema: {e}")
 
 
 def test_inline_prompt_node_validation__object_with_invalid_properties__raises_error():
@@ -202,8 +202,8 @@ def test_inline_prompt_node_validation__valid_complex_schema__succeeds():
     # THEN it should not raise any errors
     try:
         MyPromptNode.__validate__()
-    except ValueError:
-        pytest.fail("Validation should not raise an error for valid complex schema")
+    except ValueError as e:
+        pytest.fail(f"Validation should not raise an error for valid complex schema: {e}")
 
 
 def test_inline_prompt_node_validation__array_with_empty_items__succeeds():
@@ -228,8 +228,8 @@ def test_inline_prompt_node_validation__array_with_empty_items__succeeds():
     # THEN it should not raise any errors
     try:
         MyPromptNode.__validate__()
-    except ValueError:
-        pytest.fail("Validation should not raise an error for array with empty items object")
+    except ValueError as e:
+        pytest.fail(f"Validation should not raise an error for array with empty items object: {e}")
 
 
 def test_inline_prompt_node_validation__array_with_empty_prefix_items__succeeds():
@@ -254,8 +254,8 @@ def test_inline_prompt_node_validation__array_with_empty_prefix_items__succeeds(
     # THEN it should not raise any errors
     try:
         MyPromptNode.__validate__()
-    except ValueError:
-        pytest.fail("Validation should not raise an error for array with empty prefixItems array")
+    except ValueError as e:
+        pytest.fail(f"Validation should not raise an error for array with empty prefixItems array: {e}")
 
 
 def test_inline_prompt_node_validation__array_with_both_items_and_prefix_items__succeeds():
@@ -281,8 +281,8 @@ def test_inline_prompt_node_validation__array_with_both_items_and_prefix_items__
     # THEN it should not raise any errors
     try:
         MyPromptNode.__validate__()
-    except ValueError:
-        pytest.fail("Validation should not raise an error for array with both items and prefixItems")
+    except ValueError as e:
+        pytest.fail(f"Validation should not raise an error for array with both items and prefixItems: {e}")
 
 
 def test_inline_prompt_node_validation__nested_array_in_prefix_items__raises_error():
@@ -370,8 +370,8 @@ def test_inline_prompt_node_validation__valid_nested_array_in_prefix_items__succ
     # THEN it should not raise any errors
     try:
         MyPromptNode.__validate__()
-    except ValueError:
-        pytest.fail("Validation should not raise an error for valid nested array in prefixItems")
+    except ValueError as e:
+        pytest.fail(f"Validation should not raise an error for valid nested array in prefixItems: {e}")
 
 
 def test_inline_prompt_node_validation__valid_nested_array_in_list_items__succeeds():
@@ -399,8 +399,8 @@ def test_inline_prompt_node_validation__valid_nested_array_in_list_items__succee
     # THEN it should not raise any errors
     try:
         MyPromptNode.__validate__()
-    except ValueError:
-        pytest.fail("Validation should not raise an error for valid nested array in list items")
+    except ValueError as e:
+        pytest.fail(f"Validation should not raise an error for valid nested array in list items: {e}")
 
 
 def test_inline_prompt_node_validation__no_json_schema__succeeds():
@@ -418,8 +418,8 @@ def test_inline_prompt_node_validation__no_json_schema__succeeds():
     # THEN it should not raise any errors
     try:
         MyPromptNode.__validate__()
-    except ValueError:
-        pytest.fail("Validation should not raise an error when no json_schema is present")
+    except ValueError as e:
+        pytest.fail(f"Validation should not raise an error when no json_schema is present: {e}")
 
 
 def test_inline_prompt_node_validation__wrapper_with_invalid_inner_schema__raises_error():
@@ -502,5 +502,5 @@ def test_inline_prompt_node_validation__wrapper_with_valid_inner_schema__succeed
     # THEN it should not raise any errors
     try:
         MyPromptNode.__validate__()
-    except ValueError:
-        pytest.fail("Validation should not raise an error for valid wrapper schema")
+    except ValueError as e:
+        pytest.fail(f"Validation should not raise an error for valid wrapper schema: {e}")
