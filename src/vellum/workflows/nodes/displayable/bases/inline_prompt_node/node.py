@@ -219,10 +219,22 @@ def _validate_json_schema_structure(schema: dict, path: str = "json_schema") -> 
                 for idx, sub_schema in enumerate(items_schema):
                     if isinstance(sub_schema, dict):
                         _validate_json_schema_structure(sub_schema, f"{path}.items[{idx}]")
+            else:
+                # items must be a schema object or a list of schema objects
+                raise ValueError(
+                    f"JSON Schema 'items' field at '{path}.items' must be a schema object or a list of schema "
+                    f"objects, not {type(items_schema).__name__}"
+                )
 
         # Recursively validate prefixItems schemas
-        if has_prefix_items and isinstance(schema["prefixItems"], list):
-            for idx, sub_schema in enumerate(schema["prefixItems"]):
+        if has_prefix_items:
+            prefix_items = schema["prefixItems"]
+            if not isinstance(prefix_items, list):
+                raise ValueError(
+                    f"JSON Schema 'prefixItems' field at '{path}.prefixItems' must be a list of schema objects, "
+                    f"not {type(prefix_items).__name__}"
+                )
+            for idx, sub_schema in enumerate(prefix_items):
                 if isinstance(sub_schema, dict):
                     _validate_json_schema_structure(sub_schema, f"{path}.prefixItems[{idx}]")
 
