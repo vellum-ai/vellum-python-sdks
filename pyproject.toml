@@ -80,6 +80,7 @@ tomli_w = "1.1.0"
 types-PyYAML = "6.0.12.20240808"
 types-pytz = "2024.1.0.20240417"
 types-requests = "2.32.0.20240712"
+pytest-xdist = "^3.8.0"
 
 [tool.pytest.ini_options]
 testpaths = [ "tests" ]
