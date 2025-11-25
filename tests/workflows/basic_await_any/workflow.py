@@ -19,7 +19,7 @@ class BottomNode(BaseNode):
         total: int
 
     def run(self) -> Outputs:
-        time.sleep(0.01)
+        time.sleep(0.1)
         return self.Outputs(total=1)
 
 
