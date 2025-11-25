@@ -121,6 +121,23 @@ def test_serialize_node_label_with_pascal_case():
     assert data["label"] == "My Custom Node"
 
 
+def test_serialize_empty_start_node__label():
+    """
+    Tests that an empty StartNode serializes with the label 'Start Node'.
+    """
+
+    # GIVEN an empty StartNode
+    class StartNode(BaseNode):
+        pass
+
+    # WHEN we serialize the node
+    node_display_class = get_node_display_class(StartNode)
+    data = node_display_class().serialize(WorkflowDisplayContext())
+
+    # THEN the label should be 'Start Node'
+    assert data["label"] == "Start Node"
+
+
 def test_serialize_display_data_with_icon_and_color():
     """
     Tests that nodes with icon and color serialize display_data correctly.
