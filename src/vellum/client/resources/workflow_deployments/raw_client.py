@@ -9,9 +9,12 @@ from ...core.http_response import AsyncHttpResponse, HttpResponse
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.pydantic_utilities import parse_obj_as
 from ...core.request_options import RequestOptions
+from ...errors.misdirected_request_error import MisdirectedRequestError
+from ...errors.not_found_error import NotFoundError
 from ...types.paginated_slim_workflow_deployment_list import PaginatedSlimWorkflowDeploymentList
 from ...types.paginated_workflow_deployment_release_list import PaginatedWorkflowDeploymentReleaseList
 from ...types.paginated_workflow_release_tag_read_list import PaginatedWorkflowReleaseTagReadList
+from ...types.update_active_workspace_response import UpdateActiveWorkspaceResponse
 from ...types.workflow_deployment_event_executions_response import WorkflowDeploymentEventExecutionsResponse
 from ...types.workflow_deployment_history_item import WorkflowDeploymentHistoryItem
 from ...types.workflow_deployment_read import WorkflowDeploymentRead
@@ -224,6 +227,28 @@ class RawWorkflowDeploymentsClient:
                     ),
                 )
                 return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 421:
+                raise MisdirectedRequestError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        UpdateActiveWorkspaceResponse,
+                        parse_obj_as(
+                            type_=UpdateActiveWorkspaceResponse,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
@@ -741,6 +766,28 @@ class AsyncRawWorkflowDeploymentsClient:
                     ),
                 )
                 return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
+            if _response.status_code == 421:
+                raise MisdirectedRequestError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        UpdateActiveWorkspaceResponse,
+                        parse_obj_as(
+                            type_=UpdateActiveWorkspaceResponse,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
