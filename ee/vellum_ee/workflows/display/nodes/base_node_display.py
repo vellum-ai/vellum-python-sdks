@@ -1,5 +1,6 @@
 from functools import cached_property
 import inspect
+import sys
 from uuid import UUID
 from typing import (
     TYPE_CHECKING,
@@ -342,6 +343,16 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             raise ValueError(f"Node {node.__name__} must extend from exactly one parent node class.")
 
         base_node_class = base_node_classes[0]
+
+        base_module = sys.modules.get(base_node_class.__module__)
+        if base_module is not None:
+            class_from_module = getattr(base_module, base_node_class.__name__, None)
+            if class_from_module is not None and class_from_module is not base_node_class:
+                raise ValueError(
+                    f"Node '{node.__name__}' extends base class '{base_node_class.__name__}' which has been "
+                    f"shadowed by another class with the same name in module '{base_node_class.__module__}'. "
+                    f"Please rename either the base node class or the shadowing class to avoid this conflict."
+                )
 
         return CodeResourceDefinition(
             name=base_node_class.__name__,
