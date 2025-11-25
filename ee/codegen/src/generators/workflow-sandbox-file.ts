@@ -167,7 +167,7 @@ if __name__ == "__main__":
       if (triggerInstance) {
         arguments_.push(
           python.methodArgument({
-            name: "trigger",
+            name: "workflow_trigger",
             value: triggerInstance,
           })
         );

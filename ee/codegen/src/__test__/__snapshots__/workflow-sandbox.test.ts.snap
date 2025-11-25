@@ -54,7 +54,7 @@ dataset = [
     DatasetRow(
         label="Scenario with Trigger Attributes",
         inputs=Inputs(test_input="test-value"),
-        trigger=Slack(channel=None, user_id=None),
+        workflow_trigger=Slack(channel=None, user_id=None),
     ),
 ]
 
@@ -77,7 +77,7 @@ dataset = [
     DatasetRow(
         label="Scenario with Trigger ID",
         inputs=Inputs(test_input="test-value"),
-        trigger=ScheduleTrigger(),
+        workflow_trigger=ScheduleTrigger(),
     ),
     DatasetRow(
         label="Scenario without Trigger ID", inputs=Inputs(test_input="test-value-2")
