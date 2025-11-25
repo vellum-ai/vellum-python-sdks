@@ -62,11 +62,11 @@ describe("jsonSchemaToType", () => {
     expect(writer.toString()).toBe("list[Any]");
   });
 
-  it("should convert object schema to Dict[str, Any] type", () => {
+  it("should convert object schema to dict[str, Any] type", () => {
     const schema = { type: "object" };
     const result = jsonSchemaToType(schema);
     result.write(writer);
-    expect(writer.toString()).toBe("Dict[str, Any]");
+    expect(writer.toString()).toBe("dict[str, Any]");
   });
 
   it("should handle nested array schemas", () => {

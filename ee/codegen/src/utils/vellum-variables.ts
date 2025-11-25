@@ -101,7 +101,7 @@ export function jsonSchemaToType(
       return new BuiltinDictType(python.Type.str(), valueType);
     }
     // Fallback to old behavior for plain objects
-    return python.Type.dict(python.Type.str(), python.Type.any());
+    return new BuiltinDictType(python.Type.str(), python.Type.any());
   } else if (schemaType === "null") {
     return python.Type.none();
   } else if ("anyOf" in schema && Array.isArray(schema.anyOf)) {
