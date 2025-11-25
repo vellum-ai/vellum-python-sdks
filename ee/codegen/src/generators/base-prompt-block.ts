@@ -1,5 +1,4 @@
 import { python } from "@fern-api/python-ast";
-import { ClassInstantiation } from "@fern-api/python-ast/ClassInstantiation";
 import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
 import { isNil } from "lodash";
 import {
@@ -17,6 +16,7 @@ import {
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { WorkflowContext } from "src/context/workflow-context";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 import {
   FunctionDefinitionPromptTemplateBlock,
@@ -53,7 +53,7 @@ export abstract class BasePromptBlock<
   T extends PromptTemplateBlockExcludingFunctionDefinition | PromptBlock
 > extends AstNode {
   protected workflowContext: WorkflowContext;
-  private astNode: python.ClassInstantiation;
+  private astNode: ClassInstantiation;
   protected inputVariableNameById: Record<string, string> | undefined; // Stateful prompt blocks have an input variable name by id, prompt blocks do not
 
   public constructor({

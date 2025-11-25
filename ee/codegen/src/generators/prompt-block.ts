@@ -1,5 +1,4 @@
 import { python } from "@fern-api/python-ast";
-import { ClassInstantiation } from "@fern-api/python-ast/ClassInstantiation";
 import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
 import { isNil } from "lodash";
 import {
@@ -14,13 +13,13 @@ import {
   VideoPromptBlock,
 } from "vellum-ai/api";
 
-import { Json } from "./json";
-
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import {
   BasePromptBlock,
   PromptBlock as PromptBlockType,
 } from "src/generators/base-prompt-block";
+import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { Json } from "src/generators/json";
 
 export class PromptBlock extends BasePromptBlock<PromptBlockType> {
   protected generateAstNode(promptBlock: PromptBlockType): ClassInstantiation {
@@ -85,7 +84,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
 
   private generateJinjaPromptBlock(
     promptBlock: JinjaPromptBlock
-  ): python.ClassInstantiation {
+  ): ClassInstantiation {
     const classArgs: MethodArgument[] = [
       ...this.constructCommonClassArguments(promptBlock),
     ];
@@ -110,7 +109,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
       );
     }
 
-    const jinjaBlock = python.instantiateClass({
+    const jinjaBlock = new ClassInstantiation({
       classReference: this.getPromptBlockRef(promptBlock),
       arguments_: classArgs,
     });
@@ -121,7 +120,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
 
   private generateChatMessagePromptBlock(
     promptBlock: ChatMessagePromptBlock
-  ): python.ClassInstantiation {
+  ): ClassInstantiation {
     const classArgs: MethodArgument[] = [
       ...this.constructCommonClassArguments(promptBlock),
     ];
@@ -167,7 +166,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
       })
     );
 
-    const chatBlock = python.instantiateClass({
+    const chatBlock = new ClassInstantiation({
       classReference: this.getPromptBlockRef(promptBlock),
       arguments_: classArgs,
     });
@@ -178,7 +177,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
 
   private generateVariablePromptBlock(
     promptBlock: VariablePromptBlock
-  ): python.ClassInstantiation {
+  ): ClassInstantiation {
     const classArgs: MethodArgument[] = [
       ...this.constructCommonClassArguments(promptBlock),
     ];
@@ -195,7 +194,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
       })
     );
 
-    const variableBlock = python.instantiateClass({
+    const variableBlock = new ClassInstantiation({
       classReference: this.getPromptBlockRef(promptBlock),
       arguments_: classArgs,
     });
@@ -206,7 +205,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
 
   private generatePlainTextPromptBlock(
     promptBlock: PlainTextPromptBlock
-  ): python.ClassInstantiation {
+  ): ClassInstantiation {
     const classArgs: MethodArgument[] = [
       ...this.constructCommonClassArguments(promptBlock),
     ];
@@ -223,7 +222,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
       })
     );
 
-    const plainBlock = python.instantiateClass({
+    const plainBlock = new ClassInstantiation({
       classReference: this.getPromptBlockRef(promptBlock),
       arguments_: classArgs,
     });
@@ -234,7 +233,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
 
   private generateRichTextPromptBlock(
     promptBlock: RichTextPromptBlock
-  ): python.ClassInstantiation {
+  ): ClassInstantiation {
     const classArgs: MethodArgument[] = [
       ...this.constructCommonClassArguments(promptBlock),
     ];
@@ -254,7 +253,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
       })
     );
 
-    const richBlock = python.instantiateClass({
+    const richBlock = new ClassInstantiation({
       classReference: this.getPromptBlockRef(promptBlock),
       arguments_: classArgs,
     });
@@ -294,13 +293,13 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
 
   private generateAudioPromptBlock(
     promptBlock: AudioPromptBlock
-  ): python.ClassInstantiation {
+  ): ClassInstantiation {
     const classArgs: MethodArgument[] = [
       ...this.constructCommonClassArguments(promptBlock),
       ...this.generateCommonFileInputArguments(promptBlock),
     ];
 
-    const audioBlock = python.instantiateClass({
+    const audioBlock = new ClassInstantiation({
       classReference: this.getPromptBlockRef(promptBlock),
       arguments_: classArgs,
     });
@@ -311,13 +310,13 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
 
   private generateVideoPromptBlock(
     promptBlock: VideoPromptBlock
-  ): python.ClassInstantiation {
+  ): ClassInstantiation {
     const classArgs: MethodArgument[] = [
       ...this.constructCommonClassArguments(promptBlock),
       ...this.generateCommonFileInputArguments(promptBlock),
     ];
 
-    const videoBlock = python.instantiateClass({
+    const videoBlock = new ClassInstantiation({
       classReference: this.getPromptBlockRef(promptBlock),
       arguments_: classArgs,
     });
@@ -328,13 +327,13 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
 
   private generateImagePromptBlock(
     promptBlock: ImagePromptBlock
-  ): python.ClassInstantiation {
+  ): ClassInstantiation {
     const classArgs: MethodArgument[] = [
       ...this.constructCommonClassArguments(promptBlock),
       ...this.generateCommonFileInputArguments(promptBlock),
     ];
 
-    const imageBlock = python.instantiateClass({
+    const imageBlock = new ClassInstantiation({
       classReference: this.getPromptBlockRef(promptBlock),
       arguments_: classArgs,
     });
@@ -345,13 +344,13 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
 
   private generateDocumentPromptBlock(
     promptBlock: DocumentPromptBlock
-  ): python.ClassInstantiation {
+  ): ClassInstantiation {
     const classArgs: MethodArgument[] = [
       ...this.constructCommonClassArguments(promptBlock),
       ...this.generateCommonFileInputArguments(promptBlock),
     ];
 
-    const documentBlock = python.instantiateClass({
+    const documentBlock = new ClassInstantiation({
       classReference: this.getPromptBlockRef(promptBlock),
       arguments_: classArgs,
     });

@@ -1,5 +1,4 @@
 import { python } from "@fern-api/python-ast";
-import { ClassInstantiation } from "@fern-api/python-ast/ClassInstantiation";
 
 import {
   OUTPUTS_CLASS_NAME,
@@ -13,6 +12,7 @@ import {
   ValueGenerationError,
 } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { VellumValueLogicalExpressionSerializer } from "src/serializers/vellum";
@@ -217,7 +217,7 @@ export class SearchNode extends BaseNode<
           "WARNING"
         )
       );
-      return python.instantiateClass({
+      return new ClassInstantiation({
         classReference: python.reference({
           name: "SearchResultMergingRequest",
           modulePath: VELLUM_CLIENT_MODULE_PATH,
@@ -239,7 +239,7 @@ export class SearchNode extends BaseNode<
           "WARNING"
         )
       );
-      return python.instantiateClass({
+      return new ClassInstantiation({
         classReference: python.reference({
           name: "SearchResultMergingRequest",
           modulePath: VELLUM_CLIENT_MODULE_PATH,
@@ -253,7 +253,7 @@ export class SearchNode extends BaseNode<
       });
     }
 
-    return python.instantiateClass({
+    return new ClassInstantiation({
       classReference: python.reference({
         name: "SearchResultMergingRequest",
         modulePath: VELLUM_CLIENT_MODULE_PATH,
@@ -274,7 +274,7 @@ export class SearchNode extends BaseNode<
       rawMetadata = this.convertNodeInputToMetadata(metadataNodeInput);
     }
 
-    return python.instantiateClass({
+    return new ClassInstantiation({
       classReference: python.reference({
         name: "SearchFilters",
         modulePath: VELLUM_WORKFLOW_NODE_BASE_TYPES_PATH,
@@ -538,7 +538,7 @@ export class SearchNodeMetadataFilters extends AstNode {
 
   private generateLogicalConditionGroupArguments(
     data: VellumLogicalConditionGroupType
-  ): python.ClassInstantiation {
+  ): ClassInstantiation {
     const processCondition = (
       condition: VellumLogicalExpressionType
     ): AstNode => {
@@ -553,7 +553,7 @@ export class SearchNodeMetadataFilters extends AstNode {
       processCondition(condition)
     );
 
-    return python.instantiateClass({
+    return new ClassInstantiation({
       classReference: python.reference({
         name: "MetadataLogicalConditionGroup",
         modulePath: VELLUM_WORKFLOW_NODE_BASE_TYPES_PATH,
@@ -577,7 +577,7 @@ export class SearchNodeMetadataFilters extends AstNode {
 
   private generateLogicalConditionArguments(
     data: VellumLogicalConditionType
-  ): python.ClassInstantiation {
+  ): ClassInstantiation {
     const args: python.MethodArgument[] = [];
 
     const lhsId = data.lhsVariableId;
@@ -589,7 +589,7 @@ export class SearchNodeMetadataFilters extends AstNode {
           "WARNING"
         )
       );
-      return python.instantiateClass({
+      return new ClassInstantiation({
         classReference: python.reference({
           name: "MetadataLogicalCondition",
           modulePath: VELLUM_WORKFLOW_NODE_BASE_TYPES_PATH,
@@ -618,7 +618,7 @@ export class SearchNodeMetadataFilters extends AstNode {
           "WARNING"
         )
       );
-      return python.instantiateClass({
+      return new ClassInstantiation({
         classReference: python.reference({
           name: "MetadataLogicalCondition",
           modulePath: VELLUM_WORKFLOW_NODE_BASE_TYPES_PATH,
@@ -636,7 +636,7 @@ export class SearchNodeMetadataFilters extends AstNode {
       );
     }
 
-    return python.instantiateClass({
+    return new ClassInstantiation({
       classReference: python.reference({
         name: "MetadataLogicalCondition",
         modulePath: VELLUM_WORKFLOW_NODE_BASE_TYPES_PATH,
