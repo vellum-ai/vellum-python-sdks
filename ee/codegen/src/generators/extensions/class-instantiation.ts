@@ -2,18 +2,17 @@ import { python } from "@fern-api/python-ast";
 import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
 
 import { AstNode } from "./ast-node";
-import { Reference } from "./reference";
 import { Writer } from "./writer";
 
 export declare namespace ClassInstantiation {
   interface Args {
-    classReference: Reference;
+    classReference: python.Reference;
     arguments_: MethodArgument[];
   }
 }
 
 export class ClassInstantiation extends AstNode {
-  protected reference: Reference;
+  protected reference: python.Reference;
   private arguments: MethodArgument[];
 
   constructor({ classReference, arguments_ }: ClassInstantiation.Args) {
@@ -37,14 +36,4 @@ export class ClassInstantiation extends AstNode {
     });
     writer.write(")");
   }
-}
-
-export function instantiateClass(args: {
-  classReference: python.Reference | Reference;
-  arguments_: (python.MethodArgument | MethodArgument)[];
-}): ClassInstantiation {
-  return new ClassInstantiation({
-    classReference: args.classReference as Reference,
-    arguments_: args.arguments_ as MethodArgument[],
-  });
 }

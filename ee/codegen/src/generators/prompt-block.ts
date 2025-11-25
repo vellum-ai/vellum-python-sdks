@@ -18,10 +18,7 @@ import {
   BasePromptBlock,
   PromptBlock as PromptBlockType,
 } from "src/generators/base-prompt-block";
-import {
-  ClassInstantiation,
-  instantiateClass,
-} from "src/generators/extensions/class-instantiation";
+import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { Json } from "src/generators/json";
 
 export class PromptBlock extends BasePromptBlock<PromptBlockType> {
@@ -112,7 +109,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
       );
     }
 
-    const jinjaBlock = instantiateClass({
+    const jinjaBlock = new ClassInstantiation({
       classReference: this.getPromptBlockRef(promptBlock),
       arguments_: classArgs,
     });
@@ -169,7 +166,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
       })
     );
 
-    const chatBlock = instantiateClass({
+    const chatBlock = new ClassInstantiation({
       classReference: this.getPromptBlockRef(promptBlock),
       arguments_: classArgs,
     });
@@ -197,7 +194,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
       })
     );
 
-    const variableBlock = instantiateClass({
+    const variableBlock = new ClassInstantiation({
       classReference: this.getPromptBlockRef(promptBlock),
       arguments_: classArgs,
     });
@@ -225,7 +222,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
       })
     );
 
-    const plainBlock = instantiateClass({
+    const plainBlock = new ClassInstantiation({
       classReference: this.getPromptBlockRef(promptBlock),
       arguments_: classArgs,
     });
@@ -256,7 +253,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
       })
     );
 
-    const richBlock = instantiateClass({
+    const richBlock = new ClassInstantiation({
       classReference: this.getPromptBlockRef(promptBlock),
       arguments_: classArgs,
     });
@@ -302,7 +299,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
       ...this.generateCommonFileInputArguments(promptBlock),
     ];
 
-    const audioBlock = instantiateClass({
+    const audioBlock = new ClassInstantiation({
       classReference: this.getPromptBlockRef(promptBlock),
       arguments_: classArgs,
     });
@@ -319,7 +316,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
       ...this.generateCommonFileInputArguments(promptBlock),
     ];
 
-    const videoBlock = instantiateClass({
+    const videoBlock = new ClassInstantiation({
       classReference: this.getPromptBlockRef(promptBlock),
       arguments_: classArgs,
     });
@@ -336,7 +333,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
       ...this.generateCommonFileInputArguments(promptBlock),
     ];
 
-    const imageBlock = instantiateClass({
+    const imageBlock = new ClassInstantiation({
       classReference: this.getPromptBlockRef(promptBlock),
       arguments_: classArgs,
     });
@@ -353,7 +350,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
       ...this.generateCommonFileInputArguments(promptBlock),
     ];
 
-    const documentBlock = instantiateClass({
+    const documentBlock = new ClassInstantiation({
       classReference: this.getPromptBlockRef(promptBlock),
       arguments_: classArgs,
     });
