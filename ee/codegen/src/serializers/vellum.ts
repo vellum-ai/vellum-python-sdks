@@ -1721,6 +1721,7 @@ export const CodeExecutionNodeSerializer: ObjectSchema<
   base: CodeResourceDefinitionSerializer.optional(),
   definition: CodeResourceDefinitionSerializer.optional(),
   adornments: listSchema(AdornmentNodeSerializer).optional(),
+  outputs: listSchema(NodeOutputSerializer).optional(),
   ports: listSchema(NodePortSerializer).optional(),
   trigger: NodeTriggerSerializer.optional(),
 });
@@ -1728,6 +1729,7 @@ export const CodeExecutionNodeSerializer: ObjectSchema<
 export declare namespace CodeExecutionNodeSerializer {
   interface Raw extends BaseDisplayableWorkflowNodeSerializer.Raw {
     data: CodeExecutionNodeDataSerializer.Raw;
+    outputs?: NodeOutputSerializer.Raw[] | null;
   }
 }
 

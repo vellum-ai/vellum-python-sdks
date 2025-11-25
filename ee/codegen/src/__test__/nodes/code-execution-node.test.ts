@@ -577,4 +577,50 @@ describe("CodeExecutionNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+
+  describe("with output schema", () => {
+    it("should use schema field for type annotation when available", async () => {
+      /**
+       * Tests that code execution node uses jsonSchemaToType when outputs have a schema field.
+       */
+
+      // GIVEN a code execution node with an output schema of {array: {string}}
+      const outputId = "81b270c0-4deb-4db3-aae5-138f79531b2b";
+      const nodeData = codeExecutionNodeFactory({
+        codeOutputValueType: "ARRAY",
+        outputs: [
+          {
+            id: outputId,
+            name: "result",
+            type: "ARRAY",
+            schema: {
+              type: "array",
+              items: {
+                type: "object",
+                additionalProperties: {
+                  type: "string",
+                },
+              },
+            },
+          },
+        ],
+      }).build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as CodeExecutionContext;
+
+      node = new CodeExecutionNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      // WHEN we generate the node file
+      node.getNodeFile().write(writer);
+
+      // THEN the generated code should have list[dict[str, str]] as the parameterized type
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });

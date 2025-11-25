@@ -1324,6 +1324,7 @@ export function codeExecutionNodeFactory({
   generateLogOutputId = true,
   code,
   packages,
+  outputs,
 }: {
   id?: string;
   outputId?: string;
@@ -1334,6 +1335,7 @@ export function codeExecutionNodeFactory({
   generateLogOutputId?: boolean;
   code?: string;
   packages?: CodeExecutionPackage[];
+  outputs?: NodeOutput[];
 } = {}): NodeDataFactoryBuilder<CodeExecutionNode> {
   const runtime =
     runtimeInput ??
@@ -1399,6 +1401,7 @@ export function codeExecutionNodeFactory({
         y: 234.65663468515768,
       },
     },
+    outputs,
   };
 
   return new NodeDataFactoryBuilder<CodeExecutionNode>(nodeData);

@@ -10,7 +10,10 @@ import { NodeAttributeGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { CodeExecutionNode as CodeExecutionNodeType } from "src/types/vellum";
-import { getVellumVariablePrimitiveType } from "src/utils/vellum-variables";
+import {
+  getVellumVariablePrimitiveType,
+  jsonSchemaToType,
+} from "src/utils/vellum-variables";
 
 const CODE_INPUT_KEY = "code";
 const RUNTIME_INPUT_KEY = "runtime";
@@ -60,9 +63,16 @@ export class CodeExecutionNode extends BaseNode<
 
   protected getNodeBaseGenericTypes(): AstNode[] {
     const stateType = this.getStateTypeOrBaseState();
-    const primitiveOutputType = getVellumVariablePrimitiveType(
-      this.nodeData.data.outputType
+
+    // Use jsonSchemaToType if schema is present in outputs, otherwise fall back to getVellumVariablePrimitiveType
+    const resultOutput = this.nodeData.outputs?.find(
+      (output) => output.name === "result"
     );
+
+    const primitiveOutputType = resultOutput?.schema
+      ? jsonSchemaToType(resultOutput.schema)
+      : getVellumVariablePrimitiveType(this.nodeData.data.outputType);
+
     return [stateType, primitiveOutputType];
   }
 

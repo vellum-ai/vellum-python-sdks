@@ -313,6 +313,21 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
 "
 `;
 
+exports[`CodeExecutionNode > with output schema > should use schema field for type annotation when available 1`] = `
+"from vellum.workflows.nodes.displayable import (
+    CodeExecutionNode as BaseCodeExecutionNode,
+)
+from vellum.workflows.state import BaseState
+
+
+class CodeExecutionNode(BaseCodeExecutionNode[BaseState, list[dict[str, str]]]):
+    filepath = "./script.py"
+    code_inputs = {}
+    runtime = "PYTHON_3_11_6"
+    packages = None
+"
+`;
+
 exports[`CodeExecutionNode > with runtime set > should generate the correct standalone file PYTHON_3_11_6 1`] = `
 "from vellum.workflows.nodes.displayable import (
     CodeExecutionNode as BaseCodeExecutionNode,
