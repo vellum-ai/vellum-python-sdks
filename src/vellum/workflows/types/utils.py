@@ -91,7 +91,10 @@ def infer_types(object_: Type, attr_name: str, localns: Optional[Dict[str, Any]]
                 if len(types_list) == len(parts):
                     return tuple(types_list)
 
-        type_hints = get_type_hints(class_, localns=LOCAL_NS if localns is None else {**LOCAL_NS, **localns})
+        try:
+            type_hints = get_type_hints(class_, localns=LOCAL_NS if localns is None else {**LOCAL_NS, **localns})
+        except AttributeError:
+            type_hints = {}
         if attr_name in type_hints:
             type_hint = type_hints[attr_name]
             if get_origin(type_hint) is ClassVar:
@@ -121,12 +124,14 @@ def infer_types(object_: Type, attr_name: str, localns: Optional[Dict[str, Any]]
                 class_attribute = class_attributes[attr_name]
                 return resolve_types(class_attribute)
 
-        raise AttributeError(f"Failed to infer type from attribute {attr_name} on {object_.__name__}")
+        raise AttributeError(f"'{object_.__name__}' has no attribute '{attr_name}'")
     except TypeError:
         # Python 3.13+: object class doesn't have __annotations__ by default
         # Use getattr with default to safely access annotations
         annotations = getattr(object_, "__annotations__", {})
         annotation_value = annotations.get(attr_name, undefined)
+        if annotation_value is undefined:
+            raise AttributeError(f"'{object_.__name__}' has no attribute '{attr_name}'")
         raise AttributeError(
             f"Found 3.9+ typing syntax for field '{attr_name}' on class '{object_.__name__}' – {annotation_value}. Type annotations must be compatible with python version 3.8. "  # noqa: E501
         )
