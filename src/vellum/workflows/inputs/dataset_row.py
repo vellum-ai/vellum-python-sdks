@@ -1,6 +1,6 @@
-from typing import Any, Callable, Dict, List, Optional, Sequence, Type, Union
+from typing import Any, Callable, Dict, List, Optional, Sequence, Union
 
-from pydantic import Field, SerializationInfo, field_serializer, model_serializer
+from pydantic import ConfigDict, Field, SerializationInfo, field_serializer, model_serializer
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.inputs.base import BaseInputs
@@ -18,14 +18,16 @@ class DatasetRow(UniversalBaseModel):
         id: Optional unique identifier for the dataset row
         label: String label for the dataset row
         inputs: BaseInputs instance or dict containing the input data
-        workflow_trigger_id: Optional Trigger identifying the workflow trigger class for this scenario
+        workflow_trigger: Optional Trigger instance for this scenario
         mocks: Optional sequence of node output mocks for testing scenarios
     """
+
+    model_config = ConfigDict(populate_by_name=True, arbitrary_types_allowed=True)
 
     id: Optional[str] = None
     label: str
     inputs: Union[BaseInputs, Dict[str, Any]] = Field(default_factory=BaseInputs)
-    workflow_trigger: Optional[Type[BaseTrigger]] = None
+    workflow_trigger: Optional[BaseTrigger] = None
     mocks: Optional[Sequence[Union[BaseOutputs, MockNodeExecution]]] = None
 
     @model_serializer(mode="wrap")
@@ -39,10 +41,9 @@ class DatasetRow(UniversalBaseModel):
             serialized.pop("mocks")
 
         if "workflow_trigger" in serialized:
-            if serialized.get("workflow_trigger") is None:
-                serialized.pop("workflow_trigger")
-            else:
-                serialized["workflow_trigger_id"] = serialized.pop("workflow_trigger")
+            value = serialized.pop("workflow_trigger")
+            if value is not None:
+                serialized["workflow_trigger_id"] = value
 
         if "id" in serialized and serialized.get("id") is None:
             serialized.pop("id")
@@ -50,17 +51,20 @@ class DatasetRow(UniversalBaseModel):
         return serialized
 
     @field_serializer("workflow_trigger")
-    def serialize_workflow_trigger(self, workflow_trigger: Optional[Type[BaseTrigger]]) -> Optional[str]:
+    def serialize_workflow_trigger(self, workflow_trigger: Optional[BaseTrigger]) -> Optional[str]:
         """
         Custom serializer for workflow_trigger that converts it to a string ID.
 
         Args:
-            workflow_trigger: Optional workflow trigger class
+            workflow_trigger: Optional workflow trigger instance
 
         Returns:
             String representation of the trigger ID, or None if no trigger
         """
-        return str(workflow_trigger.__id__) if workflow_trigger is not None else None
+        if workflow_trigger is None:
+            return None
+
+        return str(workflow_trigger.__class__.__id__)
 
     @field_serializer("inputs")
     def serialize_inputs(self, inputs: Union[BaseInputs, Dict[str, Any]]) -> Dict[str, Any]:

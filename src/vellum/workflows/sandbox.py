@@ -1,4 +1,4 @@
-from typing import Any, Dict, Generic, Optional, Sequence, Type, Union
+from typing import Any, Dict, Generic, Optional, Sequence, Union
 
 import dotenv
 
@@ -53,11 +53,11 @@ class WorkflowSandboxRunner(Generic[WorkflowType]):
         selected_inputs = self._inputs[index]
 
         raw_inputs: Union[BaseInputs, Dict[str, Any]]
-        trigger_class: Optional[Type[BaseTrigger]] = None
+        trigger_value: Optional[BaseTrigger] = None
         node_output_mocks = None
         if isinstance(selected_inputs, DatasetRow):
             raw_inputs = selected_inputs.inputs
-            trigger_class = selected_inputs.workflow_trigger
+            trigger_value = selected_inputs.workflow_trigger
             node_output_mocks = selected_inputs.mocks
         else:
             raw_inputs = selected_inputs
@@ -69,10 +69,7 @@ class WorkflowSandboxRunner(Generic[WorkflowType]):
         else:
             inputs_for_stream = raw_inputs
 
-        trigger_instance: Optional[BaseTrigger] = None
-        if trigger_class is not None:
-            # Instantiate the trigger with the inputs
-            trigger_instance = trigger_class(**raw_inputs) if isinstance(raw_inputs, dict) else trigger_class()
+        trigger_instance: Optional[BaseTrigger] = trigger_value
 
         events = self._workflow.stream(
             inputs=inputs_for_stream,

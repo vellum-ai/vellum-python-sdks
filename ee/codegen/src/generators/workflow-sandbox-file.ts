@@ -121,13 +121,31 @@ if __name__ == "__main__":
       }),
     ];
 
-    if (hasInputs) {
+    // Determine which inputs belong to trigger attributes vs workflow inputs
+    const triggers = this.workflowContext.triggers ?? [];
+    const trigger = !isNil(workflowTriggerId)
+      ? triggers.find((t) => t.id === workflowTriggerId)
+      : undefined;
+    const triggerAttributeKeys = new Set(
+      trigger?.attributes.map((attr) => attr.key) ?? []
+    );
+
+    // Separate inputs into trigger attribute inputs and workflow inputs
+    const workflowInputs = hasInputs
+      ? inputs.filter(
+          (input) =>
+            !triggerAttributeKeys.has(removeEscapeCharacters(input.name))
+        )
+      : [];
+
+    // Add workflow inputs (excluding trigger attribute inputs)
+    if (workflowInputs.length > 0) {
       const inputsInstance = python.instantiateClass({
         classReference: python.reference({
           name: "Inputs",
           modulePath: getGeneratedInputsModulePath(this.workflowContext),
         }),
-        arguments_: inputs
+        arguments_: workflowInputs
           .map((input) => {
             if (isNil(input.value)) {
               return null;
@@ -162,13 +180,16 @@ if __name__ == "__main__":
     }
 
     if (!isNil(workflowTriggerId)) {
-      const triggerReference = this.getTriggerReference(workflowTriggerId);
+      const triggerInstance = this.getTriggerInstance(
+        workflowTriggerId,
+        inputs
+      );
 
-      if (triggerReference) {
+      if (triggerInstance) {
         arguments_.push(
           python.methodArgument({
-            name: "trigger",
-            value: triggerReference,
+            name: "workflow_trigger",
+            value: triggerInstance,
           })
         );
       }
@@ -264,6 +285,47 @@ if __name__ == "__main__":
       classReference: python.reference({
         name: "MockNodeExecution",
         modulePath: VELLUM_WORKFLOW_ROOT_MODULE_PATH,
+      }),
+      arguments_,
+    });
+  }
+
+  private getTriggerInstance(
+    workflowTriggerId: string,
+    inputs?: WorkflowSandboxInputs
+  ): python.ClassInstantiation | undefined {
+    const triggers = this.workflowContext.triggers ?? [];
+    const trigger = triggers.find((t) => t.id === workflowTriggerId);
+
+    if (!trigger) {
+      return undefined;
+    }
+
+    const triggerClassInfo = getTriggerClassInfo(trigger, this.workflowContext);
+
+    // Generate arguments for the trigger instance based on its attributes,
+    // using provided dataset inputs when available, else default to None.
+    const arguments_: python.MethodArgument[] = trigger.attributes.map(
+      (attr) => {
+        const matchingInput =
+          inputs?.find(
+            (i) =>
+              removeEscapeCharacters(i.name) === attr.key && !isNil(i.value)
+          ) ?? null;
+
+        return python.methodArgument({
+          name: attr.key,
+          value: matchingInput
+            ? vellumValue({ vellumValue: matchingInput })
+            : python.TypeInstantiation.none(),
+        });
+      }
+    );
+
+    return python.instantiateClass({
+      classReference: python.reference({
+        name: triggerClassInfo.className,
+        modulePath: triggerClassInfo.modulePath,
       }),
       arguments_,
     });
