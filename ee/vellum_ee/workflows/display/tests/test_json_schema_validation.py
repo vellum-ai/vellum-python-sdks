@@ -110,6 +110,18 @@ from vellum.workflows.nodes.displayable.bases.inline_prompt_node import node as 
             "JSON Schema 'anyOf[0]' at 'parameters.custom_parameters.json_schema.anyOf[0]' must be a schema object, "
             "not str",
         ),
+        (
+            "wrapper with invalid nested array schema",
+            {"name": "test", "schema": {"type": "array"}},
+            "JSON Schema of type 'array' at 'parameters.custom_parameters.json_schema.schema' must define either an "
+            "'items' field or a 'prefixItems' field to specify the type of elements in the array.",
+        ),
+        (
+            "wrapper with non-dict schema value",
+            {"name": "test", "schema": "string"},
+            "JSON Schema 'schema' field at 'parameters.custom_parameters.json_schema.schema' must be a schema object, "
+            "not str",
+        ),
     ],
     ids=lambda p: p if isinstance(p, str) else None,
 )
