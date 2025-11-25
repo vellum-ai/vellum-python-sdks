@@ -27,7 +27,7 @@ class DatasetRow(UniversalBaseModel):
     id: Optional[str] = None
     label: str
     inputs: Union[BaseInputs, Dict[str, Any]] = Field(default_factory=BaseInputs)
-    workflow_trigger: Optional[BaseTrigger] = Field(default=None)
+    workflow_trigger: Optional[BaseTrigger] = None
     mocks: Optional[Sequence[Union[BaseOutputs, MockNodeExecution]]] = None
 
     @model_serializer(mode="wrap")
