@@ -269,7 +269,7 @@ class _RemoveUseToolInputsTransformer(ast.NodeTransformer):
     def __init__(self, function_name: str):
         self.function_name = function_name
 
-    def visit_FunctionDef(self, node: ast.FunctionDef) -> ast.FunctionDef:
+    def visit_FunctionDef(self, node: ast.FunctionDef) -> ast.AST:
         """Remove @use_tool_inputs decorators from the target function."""
         if node.name == self.function_name:
             node.decorator_list = [
