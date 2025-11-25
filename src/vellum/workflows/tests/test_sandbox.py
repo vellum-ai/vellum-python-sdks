@@ -161,7 +161,7 @@ def test_sandbox_runner_with_workflow_trigger(mock_logger):
 
 def test_sandbox_runner_with_trigger_instance(mock_logger):
     """
-    Test that WorkflowSandboxRunner can run with DatasetRow containing trigger instance using 'trigger' alias.
+    Test that WorkflowSandboxRunner can run with DatasetRow containing trigger instance.
     """
 
     # GIVEN we capture the logs to stdout
@@ -188,12 +188,12 @@ def test_sandbox_runner_with_trigger_instance(mock_logger):
     # AND a trigger instance
     trigger_instance = MySchedule(current_run_at=datetime.min, next_run_at=datetime.now())
 
-    # AND a dataset with trigger instance using 'trigger' alias
+    # AND a dataset with trigger instance
     dataset = [
         DatasetRow(
             label="test_row_with_instance",
             inputs={"current_run_at": datetime.min, "next_run_at": datetime.now()},
-            trigger=trigger_instance,
+            workflow_trigger=trigger_instance,
         ),
     ]
 
@@ -215,9 +215,9 @@ def test_sandbox_runner_with_trigger_instance(mock_logger):
     assert isinstance(dataset[0].workflow_trigger, MySchedule)
 
 
-def test_dataset_row_serialization_with_trigger_alias():
+def test_dataset_row_serialization_with_workflow_trigger():
     """
-    Test that DatasetRow serializes trigger field to workflow_trigger_id when using 'trigger' alias.
+    Test that DatasetRow serializes workflow_trigger field to workflow_trigger_id.
     """
 
     # GIVEN a trigger class
@@ -229,15 +229,15 @@ def test_dataset_row_serialization_with_trigger_alias():
     # AND a trigger instance
     trigger_instance = MySchedule(current_run_at=datetime.min, next_run_at=datetime.now())
 
-    # AND a DatasetRow constructed with 'trigger' alias
+    # AND a DatasetRow constructed with workflow_trigger
     dataset_row = DatasetRow(
         label="test_serialization",
         inputs={"foo": "bar"},
-        trigger=trigger_instance,
+        workflow_trigger=trigger_instance,
     )
 
     # WHEN we serialize the DatasetRow
-    serialized = dataset_row.model_dump(by_alias=True)
+    serialized = dataset_row.model_dump()
 
     # THEN the serialized dict should contain workflow_trigger_id
     assert "workflow_trigger_id" in serialized

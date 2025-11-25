@@ -26,7 +26,7 @@ def test_dataset_row_serialization():
     )
     dataset_row = DatasetRow(label="test_label", inputs=test_inputs)
 
-    serialized_dict = dataset_row.model_dump(by_alias=True)
+    serialized_dict = dataset_row.model_dump()
 
     assert "label" in serialized_dict
     assert "inputs" in serialized_dict
@@ -55,7 +55,7 @@ def test_dataset_row_dict_serialization():
     simple_inputs = SimpleInputs(text="sample text")
     dataset_row = DatasetRow(label="simple_label", inputs=simple_inputs)
 
-    result_dict = dataset_row.model_dump(by_alias=True)
+    result_dict = dataset_row.model_dump()
 
     assert result_dict["label"] == "simple_label"
     assert result_dict["inputs"]["text"] == "sample text"
@@ -74,7 +74,7 @@ def test_dataset_row_with_multiple_fields():
     multi_inputs = MultiFieldInputs(text_field="test_text", number_field=456, optional_field="optional_value")
     dataset_row = DatasetRow(label="multi_field_test", inputs=multi_inputs)
 
-    result_dict = dataset_row.model_dump(by_alias=True)
+    result_dict = dataset_row.model_dump()
 
     assert result_dict["label"] == "multi_field_test"
     assert result_dict["inputs"]["text_field"] == "test_text"
@@ -94,7 +94,7 @@ def test_dataset_row_with_default_inputs():
     inputs_with_defaults = InputsWithDefaults(required_field="required_value")
     dataset_row = DatasetRow(label="defaults_test", inputs=inputs_with_defaults)
 
-    serialized_dict = dataset_row.model_dump(by_alias=True)
+    serialized_dict = dataset_row.model_dump()
 
     assert serialized_dict["label"] == "defaults_test"
     assert serialized_dict["inputs"]["required_field"] == "required_value"
@@ -108,7 +108,7 @@ def test_dataset_row_without_inputs():
 
     dataset_row = DatasetRow(label="test_label_only")
 
-    serialized_dict = dataset_row.model_dump(by_alias=True)
+    serialized_dict = dataset_row.model_dump()
 
     assert serialized_dict["label"] == "test_label_only"
     assert serialized_dict["inputs"] == {}
@@ -124,7 +124,7 @@ def test_dataset_row_with_empty_inputs():
     # GIVEN a DatasetRow with explicitly empty BaseInputs
     dataset_row = DatasetRow(label="test_label", inputs=BaseInputs())
 
-    serialized_dict = dataset_row.model_dump(by_alias=True)
+    serialized_dict = dataset_row.model_dump()
 
     assert serialized_dict["label"] == "test_label"
     assert serialized_dict["inputs"] == {}
@@ -144,7 +144,7 @@ def test_dataset_row_with_dict_inputs():
     assert isinstance(dataset_row.inputs, dict)
 
     # AND the serialized dict should contain the correct data
-    serialized_dict = dataset_row.model_dump(by_alias=True)
+    serialized_dict = dataset_row.model_dump()
     assert serialized_dict["label"] == "test_label"
     assert serialized_dict["inputs"]["message"] == "Hello World"
     assert serialized_dict["inputs"]["count"] == 42
@@ -170,7 +170,7 @@ def test_dataset_row_with_node_output_mocks():
 
     dataset_row = DatasetRow(label="test_with_mocks", inputs=test_inputs, mocks=[mock_output])
 
-    serialized_dict = dataset_row.model_dump(by_alias=True)
+    serialized_dict = dataset_row.model_dump()
 
     # THEN the serialized dict should contain the label and inputs
     assert serialized_dict["label"] == "test_with_mocks"
