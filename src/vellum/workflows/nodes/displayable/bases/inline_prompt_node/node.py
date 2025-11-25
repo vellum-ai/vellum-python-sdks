@@ -236,6 +236,18 @@ def _validate_json_schema_structure(schema: dict, path: str = "json_schema") -> 
                         f"not {type(sub_schema).__name__}"
                     )
 
+    # Handle structured-output wrappers: {"name": "...", "schema": {...}}
+    # Recursively validate the nested schema field if present
+    if "schema" in schema:
+        inner_schema = schema["schema"]
+        if isinstance(inner_schema, dict):
+            _validate_json_schema_structure(inner_schema, f"{path}.schema")
+        else:
+            raise ValueError(
+                f"JSON Schema 'schema' field at '{path}.schema' must be a schema object, "
+                f"not {type(inner_schema).__name__}"
+            )
+
 
 class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
     """
