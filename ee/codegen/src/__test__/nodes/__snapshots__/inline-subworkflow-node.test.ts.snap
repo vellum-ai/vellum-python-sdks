@@ -58,7 +58,6 @@ from .workflow import *
 
 
 class InlineSubworkflowNodeDisplay(BaseInlineSubworkflowNodeDisplay[InlineSubworkflowNode]):
-    label = "Inline Subworkflow Node"
     node_id = UUID("14fee4a0-ad25-402f-b942-104d3a5a0824")
     target_handle_id = UUID("3fe4b4a6-5ed2-4307-ac1c-02389337c4f2")
     workflow_input_ids_by_name = {}

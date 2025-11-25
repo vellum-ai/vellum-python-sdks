@@ -11,7 +11,6 @@ from ...nodes.web_search_node import WebSearchNode
 
 
 class WebSearchNodeDisplay(BaseNodeDisplay[WebSearchNode]):
-    label = "Web Search Node"
     node_id = UUID("web-search-node-id")
     attribute_ids_by_name = {
         "query": UUID("query-attribute-id"),

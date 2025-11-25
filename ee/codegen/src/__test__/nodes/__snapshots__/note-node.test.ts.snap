@@ -10,7 +10,6 @@ from ...nodes.note_node import NoteNode
 
 
 class NoteNodeDisplay(BaseNoteNodeDisplay[NoteNode]):
-    label = "Note Node"
     node_id = UUID("<note-node-id>")
     text = "This is a note"
     style = {

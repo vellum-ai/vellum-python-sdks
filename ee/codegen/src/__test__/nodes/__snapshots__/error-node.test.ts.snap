@@ -10,7 +10,6 @@ from ...nodes.error_node import ErrorNode
 
 
 class ErrorNodeDisplay(BaseErrorNodeDisplay[ErrorNode]):
-    label = "Error Node"
     node_id = UUID("2cd960a3-cb8a-43ed-9e3f-f003fc480951")
     target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
     node_input_ids_by_name = {
@@ -40,7 +39,6 @@ from ...nodes.error_node import ErrorNode
 
 
 class ErrorNodeDisplay(BaseErrorNodeDisplay[ErrorNode]):
-    label = "Error Node"
     node_id = UUID("2cd960a3-cb8a-43ed-9e3f-f003fc480951")
     target_handle_id = UUID("370d712d-3369-424e-bcf7-f4da1aef3928")
     display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))

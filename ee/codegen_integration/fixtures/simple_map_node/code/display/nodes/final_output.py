@@ -8,7 +8,6 @@ from ...nodes.final_output import FinalOutput
 
 
 class FinalOutputDisplay(BaseFinalOutputNodeDisplay[FinalOutput]):
-    label = "Final Output"
     node_id = UUID("fa0d5829-f259-4db8-a11a-b12fd7237ea5")
     target_handle_id = UUID("8e19172a-4f87-4c21-8c91-ccdfb3e74c16")
     output_name = "final-output"

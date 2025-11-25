@@ -8,7 +8,6 @@ from ...nodes.guardrail_node import GuardrailNode
 
 
 class GuardrailNodeDisplay(BaseGuardrailNodeDisplay[GuardrailNode]):
-    label = "Guardrail Node"
     node_id = UUID("c207b440-6aac-4047-a37c-e25fcb5b9cfb")
     target_handle_id = UUID("1817fbab-db21-4219-8b34-0e150ce78887")
     node_input_ids_by_name = {

@@ -139,7 +139,6 @@ from ...nodes.second_node import SecondNode
 
 
 class SecondNodeDisplay(BaseNodeDisplay[SecondNode]):
-    label = "Second Node"
     node_id = UUID("6bdede82-bcd6-42ab-8f6b-b3988fc6648f")
     output_display = {
         SecondNode.Outputs.output: NodeOutputDisplay(id=UUID("bd71c32b-0762-4556-a1bc-2c36b15f6428"), name="output")
@@ -386,6 +385,7 @@ from ....nodes.tool_call import GetCurrentWeatherNode
 
 
 class GetCurrentWeatherNodeDisplay(BaseNodeDisplay[GetCurrentWeatherNode]):
+    label = "GetCurrentWeatherNode"
     node_id = UUID("tool-calling-node")
     attribute_ids_by_name = {
         "ml_model": UUID("75bd1347-dca2-4cba-b0b0-a20a2923ebcc"),
@@ -542,6 +542,7 @@ from ....nodes.tool_call_get_current_weather_node import GetCurrentWeatherNode
 
 
 class GetCurrentWeatherNodeDisplay(BaseNodeDisplay[GetCurrentWeatherNode]):
+    label = "GetCurrentWeatherNode"
     node_id = UUID("21f29cac-da87-495f-bba1-093d423f4e46")
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=0, y=0),
@@ -868,6 +869,7 @@ from ....nodes.tool_call_get_current_weather_node import GetCurrentWeatherNode
 
 
 class GetCurrentWeatherNodeDisplay(BaseNodeDisplay[GetCurrentWeatherNode]):
+    label = "GetCurrentWeatherNode"
     node_id = UUID("21f29cac-da87-495f-bba1-093d423f4e46")
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=0, y=0),

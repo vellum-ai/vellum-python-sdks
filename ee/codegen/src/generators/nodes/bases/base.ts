@@ -37,7 +37,7 @@ import {
   WorkflowDataNode,
   WorkflowValueDescriptor as WorkflowValueDescriptorType,
 } from "src/types/vellum";
-import { toValidPythonIdentifier } from "src/utils/casing";
+import { pascalToTitleCase, toValidPythonIdentifier } from "src/utils/casing";
 import { findNodeDefinitionByBaseClassName } from "src/utils/node-definitions";
 import { doesModulePathStartWith } from "src/utils/paths";
 import { isNilOrEmpty } from "src/utils/typing";
@@ -764,7 +764,8 @@ export abstract class BaseNode<
     });
 
     const nodeLabel = this.nodeContext.getNodeLabel();
-    if (nodeLabel !== nodeContext.nodeClassName) {
+    const defaultLabel = pascalToTitleCase(nodeContext.nodeClassName);
+    if (nodeLabel !== defaultLabel) {
       nodeClass.add(
         python.field({
           name: "label",
