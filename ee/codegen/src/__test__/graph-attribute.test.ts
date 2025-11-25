@@ -1182,6 +1182,171 @@ describe("Workflow", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
+    it("should generate correct graph when an IntegrationTrigger targets a ported custom node", async () => {
+      const writer = new Writer();
+
+      const triggerId = "linear-trigger";
+      const entrypoint = entrypointNodeDataFactory("entrypoint-node");
+      const customNodeId = "custom-node";
+      const resultOutputId = "custom-node-result";
+
+      const customNode = genericNodeFactory({
+        id: customNodeId,
+        label: "Custom",
+        nodeTrigger: {
+          id: "custom-node-trigger",
+          mergeBehavior: "AWAIT_ATTRIBUTES",
+        },
+        nodePorts: nodePortsFactory([
+          {
+            id: "group_1_if_port",
+            name: "group_1_if_port",
+            type: "IF",
+            expression: {
+              type: "BINARY_EXPRESSION",
+              operator: "=",
+              lhs: {
+                type: "NODE_OUTPUT",
+                nodeId: customNodeId,
+                nodeOutputId: resultOutputId,
+              },
+              rhs: {
+                type: "CONSTANT_VALUE",
+                value: {
+                  type: "STRING",
+                  value: "fadsfs",
+                },
+              },
+            },
+          },
+          {
+            id: "group_1_else_port",
+            name: "group_1_else_port",
+            type: "ELSE",
+          },
+        ]),
+        nodeOutputs: [
+          {
+            id: resultOutputId,
+            name: "result",
+            type: "STRING",
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+      });
+
+      const firstOutputNode = finalOutputNodeFactory({
+        id: "output-node",
+        label: "Output",
+        name: "output",
+        targetHandleId: "bcdf898e-96d5-4c05-8e22-40b5c5ad05de",
+        outputId: "a360aeba-9caf-45fa-98f8-43324effe113",
+      }).build();
+
+      const secondOutputNode = finalOutputNodeFactory({
+        id: "output-2-node",
+        label: "Output 2",
+        name: "output-2",
+        targetHandleId: "73b60aac-3cd2-41eb-a65e-1e8c939ad34a",
+        outputId: "6a2dcc70-903a-4fcf-8342-7272e4de929b",
+      }).build();
+
+      const nodes = [entrypoint, customNode, firstOutputNode, secondOutputNode];
+
+      const edges = [
+        ...edgesFactory([
+          [entrypoint, customNode],
+          [[customNode, "group_1_if_port"], firstOutputNode],
+          [[customNode, "group_1_else_port"], secondOutputNode],
+        ]),
+        {
+          id: "integration-trigger-edge",
+          type: "DEFAULT" as const,
+          sourceNodeId: triggerId,
+          sourceHandleId: triggerId,
+          targetNodeId: customNode.id,
+          targetHandleId: customNode.trigger.id,
+        },
+      ];
+
+      const workflowContext = workflowContextFactory({
+        workflowRawData: {
+          nodes,
+          edges,
+        },
+        triggers: [
+          {
+            id: triggerId,
+            type: WorkflowTriggerType.INTEGRATION,
+            attributes: [
+              {
+                id: "attr-action",
+                key: "action",
+                type: "STRING",
+                required: true,
+              },
+              {
+                id: "attr-data",
+                key: "data",
+                type: "JSON",
+                required: true,
+              },
+              {
+                id: "attr-type",
+                key: "type",
+                type: "STRING",
+                required: true,
+              },
+              {
+                id: "attr-url",
+                key: "url",
+                type: "STRING",
+                required: true,
+              },
+            ],
+            execConfig: {
+              type: IntegrationProvider.COMPOSIO,
+              slug: "LINEAR_ISSUE_CREATED_TRIGGER",
+              setupAttributes: [
+                {
+                  id: "setup-team-id",
+                  key: "team_id",
+                  type: "STRING",
+                  required: true,
+                  default: {
+                    type: "STRING",
+                    value: "gfdgdf",
+                  },
+                },
+              ],
+              integrationName: "LINEAR",
+            },
+          },
+        ],
+      });
+
+      await Promise.all(
+        nodes
+          .filter((node) => node.type !== "ENTRYPOINT")
+          .map((node) =>
+            createNodeContext({
+              nodeData: node,
+              workflowContext,
+            })
+          )
+      );
+
+      const graphAttribute = new GraphAttribute({
+        workflowContext,
+      });
+
+      graphAttribute.write(writer);
+
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
     it("should handle a conditional node with default port pointing back to itself", async () => {
       const validateAPIResponseNode = genericNodeFactory({
         id: uuidv4(),

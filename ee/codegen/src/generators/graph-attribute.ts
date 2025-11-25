@@ -384,6 +384,12 @@ export class GraphAttribute extends AstNode {
           lhs: sourceTrigger,
           rhs: targetNode,
         };
+      } else if (this.startsWithTargetNode(targetNode, mutableAst)) {
+        return {
+          type: "right_shift",
+          lhs: sourceTrigger,
+          rhs: mutableAst,
+        };
       } else {
         return {
           type: "set",
