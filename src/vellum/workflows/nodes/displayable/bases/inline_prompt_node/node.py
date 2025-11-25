@@ -215,7 +215,13 @@ def _validate_json_schema_structure(schema: dict, path: str = "json_schema") -> 
         # Recursively validate nested properties
         if isinstance(properties, dict):
             for key, value in properties.items():
-                _validate_json_schema_structure(value, f"{path}.properties.{key}")
+                if isinstance(value, dict):
+                    _validate_json_schema_structure(value, f"{path}.properties.{key}")
+                else:
+                    raise ValueError(
+                        f"JSON Schema property '{key}' at '{path}.properties.{key}' must be a schema object, "
+                        f"not {type(value).__name__}"
+                    )
 
     # Validate composition keywords
     for keyword in ["anyOf", "oneOf", "allOf"]:

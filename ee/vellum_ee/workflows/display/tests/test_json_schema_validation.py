@@ -122,6 +122,12 @@ from vellum.workflows.nodes.displayable.bases.inline_prompt_node import node as 
             "not str",
             id="wrapper with non-dict schema value",
         ),
+        pytest.param(
+            {"type": "object", "properties": {"name": "string"}},
+            "JSON Schema property 'name' at 'parameters.custom_parameters.json_schema.properties.name' must be a "
+            "schema object, not str",
+            id="object with non-schema property value",
+        ),
     ],
 )
 def test_inline_prompt_node_validation__invalid_schemas_raise_error(
