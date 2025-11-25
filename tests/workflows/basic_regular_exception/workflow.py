@@ -1,3 +1,4 @@
+from vellum.client import ApiError
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.nodes.bases import BaseNode
 
@@ -7,7 +8,7 @@ class RegularExceptionNode(BaseNode):
         pass
 
     def run(self) -> Outputs:
-        raise Exception("Regular exception occurred")
+        raise ApiError(status_code=500, body="Regular exception occurred")
 
 
 class BasicRegularExceptionWorkflow(BaseWorkflow):
