@@ -633,3 +633,69 @@ def test_inline_prompt_node_validation__array_with_invalid_prefix_items_type__ra
         "JSON Schema 'prefixItems' field at 'parameters.custom_parameters.json_schema.prefixItems' must be a list "
         "of schema objects, not dict"
     )
+
+
+def test_inline_prompt_node_validation__prefix_items_with_non_dict_element__raises_error():
+    """
+    Tests that prefixItems arrays with non-dict elements are rejected early.
+
+    This addresses the edge case where prefixItems is a list but contains non-schema
+    elements like strings (e.g., {'type': 'array', 'prefixItems': ['string']}).
+    """
+
+    # GIVEN an InlinePromptNode with an array schema where prefixItems contains a string
+    class MyPromptNode(InlinePromptNode):
+        ml_model = "gpt-4"
+        blocks = []
+        parameters = PromptParameters(
+            custom_parameters={
+                "json_schema": {
+                    "type": "array",
+                    "prefixItems": ["string"],  # Invalid: should be a list of schema objects
+                }
+            }
+        )
+
+    # WHEN we call __validate__() on the node
+    # THEN it should raise a ValueError with a clear message
+    with pytest.raises(ValueError) as exc_info:
+        MyPromptNode.__validate__()
+
+    # AND the error message should describe the invalid element type
+    assert str(exc_info.value) == (
+        "JSON Schema 'prefixItems[0]' at 'parameters.custom_parameters.json_schema.prefixItems[0]' must be a "
+        "schema object, not str"
+    )
+
+
+def test_inline_prompt_node_validation__list_items_with_non_dict_element__raises_error():
+    """
+    Tests that list-valued items arrays with non-dict elements are rejected early.
+
+    This addresses the edge case where items is a list but contains non-schema
+    elements like strings (e.g., {'type': 'array', 'items': ['string']}).
+    """
+
+    # GIVEN an InlinePromptNode with an array schema where items is a list with a string
+    class MyPromptNode(InlinePromptNode):
+        ml_model = "gpt-4"
+        blocks = []
+        parameters = PromptParameters(
+            custom_parameters={
+                "json_schema": {
+                    "type": "array",
+                    "items": ["string", {"type": "number"}],  # Invalid: first element is not a schema
+                }
+            }
+        )
+
+    # WHEN we call __validate__() on the node
+    # THEN it should raise a ValueError with a clear message
+    with pytest.raises(ValueError) as exc_info:
+        MyPromptNode.__validate__()
+
+    # AND the error message should describe the invalid element type
+    assert str(exc_info.value) == (
+        "JSON Schema 'items[0]' at 'parameters.custom_parameters.json_schema.items[0]' must be a "
+        "schema object, not str"
+    )
