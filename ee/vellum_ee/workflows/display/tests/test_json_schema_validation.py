@@ -32,10 +32,10 @@ def test_inline_prompt_node_validation__array_without_items__raises_error():
         MyPromptNode.__validate__()
 
     # AND the error message should be clear and actionable
-    error_message = str(exc_info.value)
-    assert "array" in error_message.lower()
-    assert "items" in error_message.lower()
-    assert "parameters.custom_parameters.json_schema" in error_message
+    assert str(exc_info.value) == (
+        "JSON Schema of type 'array' at 'parameters.custom_parameters.json_schema' must define either an 'items' "
+        "field or a 'prefixItems' field to specify the type of elements in the array."
+    )
 
 
 def test_inline_prompt_node_validation__nested_array_without_items__raises_error():
@@ -67,10 +67,10 @@ def test_inline_prompt_node_validation__nested_array_without_items__raises_error
         MyPromptNode.__validate__()
 
     # AND the error message should indicate the nested path
-    error_message = str(exc_info.value)
-    assert "array" in error_message.lower()
-    assert "items" in error_message.lower()
-    assert "properties.items" in error_message
+    assert str(exc_info.value) == (
+        "JSON Schema of type 'array' at 'parameters.custom_parameters.json_schema.properties.items' must define "
+        "either an 'items' field or a 'prefixItems' field to specify the type of elements in the array."
+    )
 
 
 def test_inline_prompt_node_validation__array_with_prefix_items__succeeds():
@@ -140,9 +140,10 @@ def test_inline_prompt_node_validation__object_with_invalid_properties__raises_e
         MyPromptNode.__validate__()
 
     # AND the error message should mention properties
-    error_message = str(exc_info.value)
-    assert "object" in error_message.lower()
-    assert "properties" in error_message.lower()
+    assert str(exc_info.value) == (
+        "JSON Schema of type 'object' at 'parameters.custom_parameters.json_schema' must have 'properties' "
+        "defined as a dictionary, not str"
+    )
 
 
 def test_inline_prompt_node_validation__anyof_not_list__raises_error():
@@ -164,9 +165,10 @@ def test_inline_prompt_node_validation__anyof_not_list__raises_error():
         MyPromptNode.__validate__()
 
     # AND the error message should mention anyOf
-    error_message = str(exc_info.value)
-    assert "anyof" in error_message.lower()
-    assert "list" in error_message.lower()
+    assert str(exc_info.value) == (
+        "JSON Schema's 'anyOf' field at 'parameters.custom_parameters.json_schema' must be a list of schemas, "
+        "not dict"
+    )
 
 
 def test_inline_prompt_node_validation__valid_complex_schema__succeeds():
@@ -307,9 +309,10 @@ def test_inline_prompt_node_validation__nested_array_in_prefix_items__raises_err
         MyPromptNode.__validate__()
 
     # AND the error message should indicate the nested path
-    error_message = str(exc_info.value)
-    assert "array" in error_message.lower()
-    assert "prefixItems[0]" in error_message
+    assert str(exc_info.value) == (
+        "JSON Schema of type 'array' at 'parameters.custom_parameters.json_schema.prefixItems[0]' must define "
+        "either an 'items' field or a 'prefixItems' field to specify the type of elements in the array."
+    )
 
 
 def test_inline_prompt_node_validation__nested_array_in_list_items__raises_error():
@@ -339,9 +342,10 @@ def test_inline_prompt_node_validation__nested_array_in_list_items__raises_error
         MyPromptNode.__validate__()
 
     # AND the error message should indicate the nested path
-    error_message = str(exc_info.value)
-    assert "array" in error_message.lower()
-    assert "items[1]" in error_message
+    assert str(exc_info.value) == (
+        "JSON Schema of type 'array' at 'parameters.custom_parameters.json_schema.items[1]' must define "
+        "either an 'items' field or a 'prefixItems' field to specify the type of elements in the array."
+    )
 
 
 def test_inline_prompt_node_validation__valid_nested_array_in_prefix_items__succeeds():
@@ -450,10 +454,10 @@ def test_inline_prompt_node_validation__wrapper_with_invalid_inner_schema__raise
         MyPromptNode.__validate__()
 
     # AND the error message should indicate the nested path including .schema
-    error_message = str(exc_info.value)
-    assert "array" in error_message.lower()
-    assert "items" in error_message.lower()
-    assert "json_schema.schema" in error_message
+    assert str(exc_info.value) == (
+        "JSON Schema of type 'array' at 'parameters.custom_parameters.json_schema.schema.properties.items' "
+        "must define either an 'items' field or a 'prefixItems' field to specify the type of elements in the array."
+    )
 
 
 def test_inline_prompt_node_validation__wrapper_with_valid_inner_schema__succeeds():
