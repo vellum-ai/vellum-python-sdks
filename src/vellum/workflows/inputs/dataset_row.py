@@ -18,7 +18,7 @@ class DatasetRow(UniversalBaseModel):
         id: Optional unique identifier for the dataset row
         label: String label for the dataset row
         inputs: BaseInputs instance or dict containing the input data
-        workflow_trigger: Optional Trigger instance or class for this scenario (can be passed as 'trigger' kwarg)
+        workflow_trigger: Optional Trigger instance for this scenario (can be passed as 'trigger' kwarg)
         mocks: Optional sequence of node output mocks for testing scenarios
     """
 
@@ -40,16 +40,8 @@ class DatasetRow(UniversalBaseModel):
         if "mocks" in serialized and serialized.get("mocks") is None:
             serialized.pop("mocks")
 
-        # Handle workflow_trigger field and convert to workflow_trigger_id
-        # Check for both field name and alias since different call sites use different serialization modes
-        trigger_key = None
-        if "workflow_trigger" in serialized:
-            trigger_key = "workflow_trigger"
-        elif "trigger" in serialized:
-            trigger_key = "trigger"
-
-        if trigger_key:
-            value = serialized.pop(trigger_key)
+        if "trigger" in serialized:
+            value = serialized.pop("trigger")
             if value is not None:
                 serialized["workflow_trigger_id"] = value
 

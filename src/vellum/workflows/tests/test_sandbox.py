@@ -237,7 +237,7 @@ def test_dataset_row_serialization_with_trigger_alias():
     )
 
     # WHEN we serialize the DatasetRow
-    serialized = dataset_row.model_dump()
+    serialized = dataset_row.model_dump(by_alias=True)
 
     # THEN the serialized dict should contain workflow_trigger_id
     assert "workflow_trigger_id" in serialized
