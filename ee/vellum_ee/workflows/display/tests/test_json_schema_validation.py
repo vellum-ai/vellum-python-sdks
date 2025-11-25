@@ -66,22 +66,7 @@ from vellum.workflows.nodes.displayable.bases.inline_prompt_node import node as 
             "either an 'items' field or a 'prefixItems' field to specify the type of elements in the array.",
         ),
         (
-            "wrapper with invalid inner schema",
-            {
-                "name": "my_schema",
-                "schema": {
-                    "type": "object",
-                    "properties": {
-                        "items": {"type": "array"},
-                    },
-                },
-            },
-            "JSON Schema of type 'array' at 'parameters.custom_parameters.json_schema.schema.properties.items' "
-            "must define either an 'items' field or a 'prefixItems' field to specify the type of elements in the "
-            "array.",
-        ),
-        (
-            "real schema with schema field validates outer schema",
+            "schema with schema field validates outer schema",
             {
                 "type": "array",
                 "schema": {"type": "string"},
@@ -124,12 +109,6 @@ from vellum.workflows.nodes.displayable.bases.inline_prompt_node import node as 
             {"anyOf": ["string"]},
             "JSON Schema 'anyOf[0]' at 'parameters.custom_parameters.json_schema.anyOf[0]' must be a schema object, "
             "not str",
-        ),
-        (
-            "wrapper with non-dict schema",
-            {"name": "my_schema", "schema": "string"},
-            "JSON Schema 'schema' field at 'parameters.custom_parameters.json_schema.schema' "
-            "must be a schema object, not str",
         ),
     ],
     ids=lambda p: p if isinstance(p, str) else None,
@@ -224,7 +203,7 @@ def test_inline_prompt_node_validation__invalid_schemas_raise_error(
             },
         ),
         (
-            "wrapper with valid inner schema",
+            "schema without type field passes validation",
             {
                 "name": "match_scorer_schema",
                 "schema": {
@@ -302,16 +281,13 @@ def test_inline_prompt_node_validation__pydantic_model_schema_is_validated():
     class TestPydanticModel(BaseModel):
         result: str
 
-    # AND an InlinePromptNode with a Pydantic model as the schema
+    # AND an InlinePromptNode with a Pydantic model as the json_schema
     class MyPromptNode(InlinePromptNode):
         ml_model = "gpt-4"
         blocks = []
         parameters = PromptParameters(
             custom_parameters={
-                "json_schema": {
-                    "name": "get_result_pydantic",
-                    "schema": TestPydanticModel,
-                }
+                "json_schema": TestPydanticModel,
             }
         )
 
@@ -319,9 +295,6 @@ def test_inline_prompt_node_validation__pydantic_model_schema_is_validated():
     original_normalize_json = ipn.normalize_json
 
     def fake_normalize_json(value: object) -> object:
-        if isinstance(value, dict):
-            normalized = {k: fake_normalize_json(v) for k, v in value.items()}
-            return normalized
         if value is TestPydanticModel:
             return {"type": "array"}
         return original_normalize_json(value)
