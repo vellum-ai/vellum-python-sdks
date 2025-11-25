@@ -611,6 +611,7 @@ export interface CodeExecutionNodeData {
 export interface CodeExecutionNode extends BaseDisplayableWorkflowNode {
   type: "CODE_EXECUTION";
   data: CodeExecutionNodeData;
+  outputs?: NodeOutput[];
 }
 
 export interface TemplatingNodeData {
