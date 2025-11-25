@@ -147,6 +147,8 @@ def _get_json_schema_to_validate(parameters_ref: object) -> tuple:
     (e.g., {"name": "...", "schema": {...}}) by drilling into the inner "schema" field.
     Falls back to the json_schema itself if no inner schema is present.
 
+    Also normalizes Pydantic models to JSON schema dicts so they can be validated.
+
     Args:
         parameters_ref: The parameters reference (NodeReference wrapping PromptParameters)
 
@@ -163,6 +165,14 @@ def _get_json_schema_to_validate(parameters_ref: object) -> tuple:
         return None, ""
 
     json_schema = custom_params.get("json_schema")
+    if json_schema is None:
+        return None, ""
+
+    # Normalize Pydantic models to JSON schema dicts before validation
+    # This handles cases like {"name": "...", "schema": SomePydanticModel}
+    json_schema = normalize_json(json_schema)
+
+    # After normalization, we expect a dict; anything else we ignore
     if not isinstance(json_schema, dict):
         return None, ""
 

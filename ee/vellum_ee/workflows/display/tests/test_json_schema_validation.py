@@ -3,9 +3,13 @@ Tests for JSON schema validation in InlinePromptNode during serialization.
 """
 
 import pytest
+from unittest import mock
+
+from pydantic import BaseModel
 
 from vellum import PromptParameters
 from vellum.workflows.nodes import InlinePromptNode
+from vellum.workflows.nodes.displayable.bases.inline_prompt_node import node as ipn
 
 
 def test_inline_prompt_node_validation__array_without_items__raises_error():
@@ -699,3 +703,51 @@ def test_inline_prompt_node_validation__list_items_with_non_dict_element__raises
         "JSON Schema 'items[0]' at 'parameters.custom_parameters.json_schema.items[0]' must be a "
         "schema object, not str"
     )
+
+
+def test_inline_prompt_node_validation__pydantic_model_schema_is_validated():
+    """
+    Tests that Pydantic model-based json_schema values are normalized and validated.
+
+    This ensures that when json_schema is provided via a Pydantic model (inside the wrapper),
+    the validator actually runs on the normalized schema.
+    """
+
+    # GIVEN a Pydantic model for the schema
+    class TestPydanticModel(BaseModel):
+        result: str
+
+    # AND an InlinePromptNode with a Pydantic model as the schema
+    class MyPromptNode(InlinePromptNode):
+        ml_model = "gpt-4"
+        blocks = []
+        parameters = PromptParameters(
+            custom_parameters={
+                "json_schema": {
+                    "name": "get_result_pydantic",
+                    "schema": TestPydanticModel,
+                }
+            }
+        )
+
+    # AND we mock normalize_json to return an invalid array schema (missing items/prefixItems)
+    original_normalize_json = ipn.normalize_json
+
+    def fake_normalize_json(value: object) -> object:
+        # Normalize the wrapper dict first
+        if isinstance(value, dict):
+            normalized = {k: fake_normalize_json(v) for k, v in value.items()}
+            return normalized
+        # When we hit the Pydantic model, return an invalid array schema
+        if value is TestPydanticModel:
+            return {"type": "array"}  # Invalid: missing items/prefixItems
+        return original_normalize_json(value)
+
+    # WHEN we call __validate__() on the node with the mocked normalize_json
+    # THEN it should raise a ValueError because the normalized schema is invalid
+    with mock.patch.object(ipn, "normalize_json", side_effect=fake_normalize_json):
+        with pytest.raises(ValueError) as exc_info:
+            MyPromptNode.__validate__()
+
+    # AND the error message should indicate the array is missing items/prefixItems
+    assert "must define either an 'items' field or a 'prefixItems' field" in str(exc_info.value)
