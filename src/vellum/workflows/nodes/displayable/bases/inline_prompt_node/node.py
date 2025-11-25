@@ -95,6 +95,42 @@ def _is_json_schema_type(schema: dict, schema_type: str) -> bool:
     return type_value == schema_type
 
 
+def _get_json_schema_to_validate(parameters_ref: object) -> tuple:
+    """
+    Extracts the JSON schema to validate from a parameters reference.
+
+    This handles the common case where json_schema is a wrapper with metadata
+    (e.g., {"name": "...", "schema": {...}}) by drilling into the inner "schema" field.
+    Falls back to the json_schema itself if no inner schema is present.
+
+    Args:
+        parameters_ref: The parameters reference (NodeReference wrapping PromptParameters)
+
+    Returns:
+        A tuple of (schema_dict, path_string) where schema_dict is the schema to validate
+        and path_string is the path for error messages. Returns (None, "") if no schema found.
+    """
+    parameters_instance = getattr(parameters_ref, "instance", None)
+    if not parameters_instance:
+        return None, ""
+
+    custom_params = getattr(parameters_instance, "custom_parameters", None)
+    if not isinstance(custom_params, dict):
+        return None, ""
+
+    json_schema = custom_params.get("json_schema")
+    if not isinstance(json_schema, dict):
+        return None, ""
+
+    # Check if json_schema is a wrapper with an inner "schema" field (standard structured-output format)
+    inner_schema = json_schema.get("schema")
+    if isinstance(inner_schema, dict):
+        return inner_schema, "parameters.custom_parameters.json_schema.schema"
+
+    # Fall back to json_schema itself (bare schema format)
+    return json_schema, "parameters.custom_parameters.json_schema"
+
+
 def _validate_json_schema_structure(schema: dict, path: str = "json_schema") -> None:
     """
     Validates the structure of a JSON schema to catch common errors early.
@@ -592,17 +628,10 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
         """
         super().__validate__()
 
-        # Validate JSON schema in custom parameters if present
-        if hasattr(cls, "parameters"):
-            # The parameters attribute is wrapped in a NodeReference, so we need to access the instance
-            parameters_ref = cls.parameters
-            if hasattr(parameters_ref, "instance"):
-                parameters_instance = parameters_ref.instance
-                if parameters_instance and hasattr(parameters_instance, "custom_parameters"):
-                    custom_params = parameters_instance.custom_parameters
-                    if custom_params and isinstance(custom_params, dict):
-                        json_schema = custom_params.get("json_schema")
-                        if json_schema and isinstance(json_schema, dict):
-                            _validate_json_schema_structure(
-                                json_schema, path="parameters.custom_parameters.json_schema"
-                            )
+        parameters_ref = getattr(cls, "parameters", None)
+        if parameters_ref is None:
+            return
+
+        schema, path = _get_json_schema_to_validate(parameters_ref)
+        if schema is not None:
+            _validate_json_schema_structure(schema, path=path)

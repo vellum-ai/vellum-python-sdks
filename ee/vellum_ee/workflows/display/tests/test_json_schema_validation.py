@@ -416,3 +416,87 @@ def test_inline_prompt_node_validation__no_json_schema__succeeds():
         MyPromptNode.__validate__()
     except ValueError:
         pytest.fail("Validation should not raise an error when no json_schema is present")
+
+
+def test_inline_prompt_node_validation__wrapper_with_invalid_inner_schema__raises_error():
+    """
+    Tests that validation drills into the nested schema field for standard structured-output format.
+    """
+
+    # GIVEN an InlinePromptNode with a json_schema wrapper containing an invalid inner schema
+    class MyPromptNode(InlinePromptNode):
+        ml_model = "gpt-4"
+        blocks = []
+        parameters = PromptParameters(
+            custom_parameters={
+                "json_schema": {
+                    "name": "my_schema",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "items": {
+                                "type": "array",
+                                # Missing 'items' field - this should trigger validation error
+                            }
+                        },
+                    },
+                }
+            }
+        )
+
+    # WHEN we call __validate__() on the node
+    # THEN it should raise a ValueError with a clear message
+    with pytest.raises(ValueError) as exc_info:
+        MyPromptNode.__validate__()
+
+    # AND the error message should indicate the nested path including .schema
+    error_message = str(exc_info.value)
+    assert "array" in error_message.lower()
+    assert "items" in error_message.lower()
+    assert "json_schema.schema" in error_message
+
+
+def test_inline_prompt_node_validation__wrapper_with_valid_inner_schema__succeeds():
+    """
+    Tests that validation passes for valid schemas in the standard structured-output wrapper format.
+    """
+
+    # GIVEN an InlinePromptNode with a json_schema wrapper containing a valid inner schema
+    class MyPromptNode(InlinePromptNode):
+        ml_model = "gpt-4"
+        blocks = []
+        parameters = PromptParameters(
+            custom_parameters={
+                "json_schema": {
+                    "name": "match_scorer_schema",
+                    "schema": {
+                        "type": "object",
+                        "title": "MatchScorerSchema",
+                        "required": ["recommendation", "score", "remarks"],
+                        "properties": {
+                            "score": {
+                                "type": "integer",
+                                "title": "Match Score",
+                                "description": "Match score out of 10",
+                            },
+                            "remarks": {
+                                "type": "string",
+                                "title": "Remarks",
+                            },
+                            "recommendation": {
+                                "enum": ["Advance", "Defer", "Reject"],
+                                "type": "string",
+                                "title": "Status",
+                            },
+                        },
+                    },
+                }
+            }
+        )
+
+    # WHEN we call __validate__() on the node
+    # THEN it should not raise any errors
+    try:
+        MyPromptNode.__validate__()
+    except ValueError:
+        pytest.fail("Validation should not raise an error for valid wrapper schema")
