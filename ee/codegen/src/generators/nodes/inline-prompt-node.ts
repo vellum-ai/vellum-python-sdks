@@ -6,6 +6,7 @@ import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-
 import { PromptTemplateBlockExcludingFunctionDefinition } from "src/generators/base-prompt-block";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { FunctionDefinition } from "src/generators/function-definition";
 import { Json } from "src/generators/json";
 import { BaseNode } from "src/generators/nodes/bases/base";
@@ -84,7 +85,7 @@ export class InlinePromptNode extends BaseNode<
       statements.push(
         python.field({
           name: "ml_model",
-          initializer: python.TypeInstantiation.str(nodeData.mlModelName),
+          initializer: new StrInstantiation(nodeData.mlModelName),
         })
       );
     }
@@ -132,7 +133,7 @@ export class InlinePromptNode extends BaseNode<
           name: INPUTS_PREFIX,
           initializer: python.TypeInstantiation.dict(
             Array.from(this.nodeInputsByKey.entries()).map(([key, value]) => ({
-              key: python.TypeInstantiation.str(key),
+              key: new StrInstantiation(key),
               value: value,
             })),
             {
@@ -254,7 +255,7 @@ export class InlinePromptNode extends BaseNode<
             }),
             python.methodArgument({
               name: "name",
-              value: python.TypeInstantiation.str("text"),
+              value: new StrInstantiation("text"),
             }),
           ],
         }),
@@ -281,7 +282,7 @@ export class InlinePromptNode extends BaseNode<
             }),
             python.methodArgument({
               name: "name",
-              value: python.TypeInstantiation.str("results"),
+              value: new StrInstantiation("results"),
             }),
           ],
         }),
@@ -309,7 +310,7 @@ export class InlinePromptNode extends BaseNode<
             }),
             python.methodArgument({
               name: "name",
-              value: python.TypeInstantiation.str("json"),
+              value: new StrInstantiation("json"),
             }),
           ],
         }),
@@ -400,7 +401,7 @@ export class InlinePromptNode extends BaseNode<
                   classArgs.push(
                     python.methodArgument({
                       name: "name",
-                      value: python.TypeInstantiation.str(f.name),
+                      value: new StrInstantiation(f.name),
                     })
                   );
                 }
@@ -409,7 +410,7 @@ export class InlinePromptNode extends BaseNode<
                   classArgs.push(
                     python.methodArgument({
                       name: "description",
-                      value: python.TypeInstantiation.str(f.description),
+                      value: new StrInstantiation(f.description),
                     })
                   );
                 }

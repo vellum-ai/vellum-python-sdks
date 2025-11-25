@@ -2,6 +2,7 @@ import { python } from "@fern-api/python-ast";
 
 import { BaseNodeInputValuePointerRule } from "./base";
 
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { EnvironmentVariablePointer } from "src/types/vellum";
 
 export class EnvironmentVariablePointerRule extends BaseNodeInputValuePointerRule<EnvironmentVariablePointer> {
@@ -18,7 +19,7 @@ export class EnvironmentVariablePointerRule extends BaseNodeInputValuePointerRul
       arguments_: [
         python.methodArgument({
           name: "name",
-          value: python.TypeInstantiation.str(envVarName),
+          value: new StrInstantiation(envVarName),
         }),
       ],
     });

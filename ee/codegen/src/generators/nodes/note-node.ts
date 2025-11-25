@@ -3,6 +3,7 @@ import { Field } from "@fern-api/python-ast/Field";
 
 import { NoteNodeContext } from "src/context/node-context/note-node";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Json } from "src/generators/json";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { NoteNode as NoteNodeType } from "src/types/vellum";
@@ -19,9 +20,7 @@ export class NoteNode extends BaseNode<NoteNodeType, NoteNodeContext> {
     statements.push(
       python.field({
         name: "text",
-        initializer: python.TypeInstantiation.str(
-          this.nodeData.data.text ?? ""
-        ),
+        initializer: new StrInstantiation(this.nodeData.data.text ?? ""),
       })
     );
 

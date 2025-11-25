@@ -17,6 +17,7 @@ import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { WorkflowContext } from "src/context/workflow-context";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 import {
   FunctionDefinitionPromptTemplateBlock,
@@ -76,7 +77,7 @@ export abstract class BasePromptBlock<
       args.push(
         new MethodArgument({
           name: "state",
-          value: python.TypeInstantiation.str(promptBlock.state),
+          value: new StrInstantiation(promptBlock.state),
         })
       );
     }
@@ -103,9 +104,7 @@ export abstract class BasePromptBlock<
       return undefined;
     }
 
-    const cacheConfigType = python.TypeInstantiation.str(
-      promptBlock.cacheConfig.type
-    );
+    const cacheConfigType = new StrInstantiation(promptBlock.cacheConfig.type);
 
     return python.instantiateClass({
       classReference: python.reference({

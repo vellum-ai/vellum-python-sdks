@@ -6,6 +6,7 @@ import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { GuardrailNodeContext } from "src/context/node-context/guardrail-node";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { GuardrailNode as GuardrailNodeType } from "src/types/vellum";
 
 const INPUTS_PREFIX = "metric_inputs";
@@ -32,7 +33,7 @@ export class GuardrailNode extends BaseNode<
     statements.push(
       python.field({
         name: "metric_definition",
-        initializer: python.TypeInstantiation.str(
+        initializer: new StrInstantiation(
           this.nodeData.data.metricDefinitionId
         ),
       })
@@ -43,7 +44,7 @@ export class GuardrailNode extends BaseNode<
         name: INPUTS_PREFIX,
         initializer: python.TypeInstantiation.dict(
           Array.from(this.nodeInputsByKey.entries()).map(([key, value]) => ({
-            key: python.TypeInstantiation.str(key),
+            key: new StrInstantiation(key),
             value: value,
           })),
           {
@@ -60,9 +61,7 @@ export class GuardrailNode extends BaseNode<
     statements.push(
       python.field({
         name: "release_tag",
-        initializer: python.TypeInstantiation.str(
-          this.nodeData.data.releaseTag
-        ),
+        initializer: new StrInstantiation(this.nodeData.data.releaseTag),
       })
     );
 
@@ -124,7 +123,7 @@ export class GuardrailNode extends BaseNode<
                   }),
                   python.methodArgument({
                     name: "name",
-                    value: python.TypeInstantiation.str(output.key),
+                    value: new StrInstantiation(output.key),
                   }),
                 ],
               }),
@@ -143,7 +142,7 @@ export class GuardrailNode extends BaseNode<
                 }),
                 arguments_: [
                   python.methodArgument({
-                    value: python.TypeInstantiation.str(
+                    value: new StrInstantiation(
                       `${this.nodeContext.nodeClassName}.${OUTPUTS_CLASS_NAME}.${output.key}`
                     ),
                   }),
@@ -163,7 +162,7 @@ export class GuardrailNode extends BaseNode<
                   }),
                   python.methodArgument({
                     name: "name",
-                    value: python.TypeInstantiation.str(output.key),
+                    value: new StrInstantiation(output.key),
                   }),
                 ],
               }),

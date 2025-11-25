@@ -2,6 +2,7 @@ import { python } from "@fern-api/python-ast";
 
 import { VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH } from "src/constants";
 import { Class } from "src/generators/extensions/class";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseTrigger } from "src/generators/triggers/base-trigger";
 import { createPythonClassName, toPythonSafeSnakeCase } from "src/utils/casing";
 
@@ -43,14 +44,14 @@ export class IntegrationTrigger extends BaseTrigger<IntegrationTriggerType> {
     configFields.push(
       python.field({
         name: "provider",
-        initializer: python.TypeInstantiation.str(this.trigger.execConfig.type),
+        initializer: new StrInstantiation(this.trigger.execConfig.type),
       })
     );
 
     configFields.push(
       python.field({
         name: "integration_name",
-        initializer: python.TypeInstantiation.str(
+        initializer: new StrInstantiation(
           this.trigger.execConfig.integrationName
         ),
       })
@@ -59,7 +60,7 @@ export class IntegrationTrigger extends BaseTrigger<IntegrationTriggerType> {
     configFields.push(
       python.field({
         name: "slug",
-        initializer: python.TypeInstantiation.str(this.trigger.execConfig.slug),
+        initializer: new StrInstantiation(this.trigger.execConfig.slug),
       })
     );
 
@@ -69,10 +70,10 @@ export class IntegrationTrigger extends BaseTrigger<IntegrationTriggerType> {
           name: "setup_attributes",
           initializer: python.TypeInstantiation.dict(
             this.trigger.execConfig.setupAttributes.map((attr) => ({
-              key: python.TypeInstantiation.str(attr.key),
+              key: new StrInstantiation(attr.key),
               value:
                 typeof attr.default?.value === "string"
-                  ? python.TypeInstantiation.str(attr.default.value)
+                  ? new StrInstantiation(attr.default.value)
                   : python.TypeInstantiation.none(),
             }))
           ),

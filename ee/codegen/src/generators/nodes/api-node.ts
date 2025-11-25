@@ -5,6 +5,7 @@ import { ApiNodeContext } from "src/context/node-context/api-node";
 import { NodeInput } from "src/generators";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { ApiNode as ApiNodeType, ConstantValuePointer } from "src/types/vellum";
@@ -30,7 +31,7 @@ export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
     statements.push(
       python.field({
         name: "url",
-        initializer: urlInput || python.TypeInstantiation.str(""),
+        initializer: urlInput || new StrInstantiation(""),
       })
     );
 

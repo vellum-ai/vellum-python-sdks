@@ -6,6 +6,7 @@ import { VELLUM_WORKFLOW_ROOT_MODULE_PATH } from "src/constants";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
 import { NodeNotFoundError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Json } from "src/generators/json";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import {
@@ -117,7 +118,7 @@ if __name__ == "__main__":
     const arguments_: python.MethodArgument[] = [
       python.methodArgument({
         name: "label",
-        value: python.TypeInstantiation.str(label),
+        value: new StrInstantiation(label),
       }),
     ];
 

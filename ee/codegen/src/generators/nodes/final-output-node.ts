@@ -4,6 +4,7 @@ import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { FinalOutputNodeContext } from "src/context/node-context/final-output-node";
 import { Class, PythonType } from "src/generators/extensions";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { FinalOutputNode as FinalOutputNodeType } from "src/types/vellum";
@@ -101,7 +102,7 @@ export class FinalOutputNode extends BaseNode<
     statements.push(
       python.field({
         name: "output_name",
-        initializer: python.TypeInstantiation.str(this.nodeData.data.name),
+        initializer: new StrInstantiation(this.nodeData.data.name),
       })
     );
 
@@ -135,7 +136,7 @@ export class FinalOutputNode extends BaseNode<
                 }),
                 python.methodArgument({
                   name: "name",
-                  value: python.TypeInstantiation.str("value"),
+                  value: new StrInstantiation("value"),
                 }),
               ],
             }),

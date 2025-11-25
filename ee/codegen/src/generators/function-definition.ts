@@ -4,6 +4,7 @@ import { AstNode } from "@fern-api/python-ast/python";
 import { isNil } from "lodash";
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 import { Json } from "src/generators/json";
 import { FunctionDefinitionPromptTemplateBlock } from "src/types/vellum";
@@ -31,7 +32,7 @@ export class FunctionDefinition extends AstNode {
       classArgs.push(
         new MethodArgument({
           name: "name",
-          value: python.TypeInstantiation.str(
+          value: new StrInstantiation(
             functionDefinition.properties.functionName
           ),
         })
@@ -42,7 +43,7 @@ export class FunctionDefinition extends AstNode {
       classArgs.push(
         new MethodArgument({
           name: "description",
-          value: python.TypeInstantiation.str(
+          value: new StrInstantiation(
             functionDefinition.properties.functionDescription
           ),
         })

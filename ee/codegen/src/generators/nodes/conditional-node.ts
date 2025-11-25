@@ -7,6 +7,7 @@ import { ConditionalNodePort } from "src/generators/conditional-node-port";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
 import { Reference } from "src/generators/extensions/reference";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import {
   ConditionalNodeData,
@@ -160,12 +161,12 @@ export class ConditionalNode extends BaseNode<
           arguments_: [
             python.methodArgument({
               name: "id",
-              value: python.TypeInstantiation.str(condition.id),
+              value: new StrInstantiation(condition.id),
             }),
             python.methodArgument({
               name: "rule_group_id",
               value: condition.data
-                ? python.TypeInstantiation.str(condition.data.id)
+                ? new StrInstantiation(condition.data.id)
                 : python.TypeInstantiation.none(),
             }),
           ],
@@ -225,7 +226,7 @@ export class ConditionalNode extends BaseNode<
       arguments_: [
         python.methodArgument({
           name: "id",
-          value: python.TypeInstantiation.str(ruleData.id),
+          value: new StrInstantiation(ruleData.id),
         }),
         python.methodArgument({
           name: "lhs",
@@ -238,13 +239,13 @@ export class ConditionalNode extends BaseNode<
         python.methodArgument({
           name: "field_node_input_id",
           value: fieldId
-            ? python.TypeInstantiation.str(fieldId)
+            ? new StrInstantiation(fieldId)
             : python.TypeInstantiation.none(),
         }),
         python.methodArgument({
           name: "value_node_input_id",
           value: valueId
-            ? python.TypeInstantiation.str(valueId)
+            ? new StrInstantiation(valueId)
             : python.TypeInstantiation.none(),
         }),
       ],

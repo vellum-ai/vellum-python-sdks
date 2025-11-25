@@ -2,6 +2,7 @@ import { python } from "@fern-api/python-ast";
 
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseNodeInputWorkflowReference } from "src/generators/workflow-value-descriptor-reference/BaseNodeInputWorkflowReference";
 import { NodeOutputWorkflowReference as NodeOutputWorkflowReferenceType } from "src/types/vellum";
 
@@ -37,7 +38,7 @@ export class NodeOutputWorkflowReference extends BaseNodeInputWorkflowReference<
         }),
         arguments_: [
           python.methodArgument({
-            value: python.TypeInstantiation.str(
+            value: new StrInstantiation(
               `${nodeContext.nodeClassName}.${OUTPUTS_CLASS_NAME}.${nodeOutputName}`
             ),
           }),

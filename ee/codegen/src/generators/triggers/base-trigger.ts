@@ -8,6 +8,7 @@ import {
 import { WorkflowContext } from "src/context";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
 import { Class } from "src/generators/extensions/class";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { isNilOrEmpty } from "src/utils/typing";
 
 import type { AstNode } from "src/generators/extensions/ast-node";
@@ -71,7 +72,7 @@ export abstract class BaseTrigger<
     fields.push(
       python.field({
         name: "label",
-        initializer: python.TypeInstantiation.str(displayData.label),
+        initializer: new StrInstantiation(displayData.label),
       })
     );
 
@@ -103,7 +104,7 @@ export abstract class BaseTrigger<
       fields.push(
         python.field({
           name: "icon",
-          initializer: python.TypeInstantiation.str(displayData.icon),
+          initializer: new StrInstantiation(displayData.icon),
         })
       );
     }
@@ -112,7 +113,7 @@ export abstract class BaseTrigger<
       fields.push(
         python.field({
           name: "color",
-          initializer: python.TypeInstantiation.str(displayData.color),
+          initializer: new StrInstantiation(displayData.color),
         })
       );
     }
@@ -134,7 +135,7 @@ export abstract class BaseTrigger<
         commentArgs.push(
           python.methodArgument({
             name: "value",
-            value: python.TypeInstantiation.str(value),
+            value: new StrInstantiation(value),
           })
         );
       }

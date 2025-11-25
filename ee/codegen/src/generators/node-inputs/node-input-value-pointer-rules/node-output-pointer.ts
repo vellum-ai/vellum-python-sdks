@@ -3,6 +3,7 @@ import { python } from "@fern-api/python-ast";
 import { BaseNodeInputValuePointerRule } from "./base";
 
 import { OUTPUTS_CLASS_NAME } from "src/constants";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { NodeOutputPointer } from "src/types/vellum";
 
 export class NodeOutputPointerRule extends BaseNodeInputValuePointerRule<NodeOutputPointer> {
@@ -40,7 +41,7 @@ export class NodeOutputPointerRule extends BaseNodeInputValuePointerRule<NodeOut
           }),
           arguments_: [
             python.methodArgument({
-              value: python.TypeInstantiation.str(
+              value: new StrInstantiation(
                 `${nodeContext.nodeClassName}.${OUTPUTS_CLASS_NAME}.${nodeOutputName}`
               ),
             }),

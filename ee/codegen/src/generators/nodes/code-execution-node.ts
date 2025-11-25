@@ -8,6 +8,7 @@ import { CodeExecutionContext } from "src/context/node-context/code-execution-no
 import { InitFile } from "src/generators";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { CodeExecutionNode as CodeExecutionNodeType } from "src/types/vellum";
 import {
@@ -83,7 +84,7 @@ export class CodeExecutionNode extends BaseNode<
     statements.push(
       python.field({
         name: "filepath",
-        initializer: python.TypeInstantiation.str(this.nodeContext.filepath),
+        initializer: new StrInstantiation(this.nodeContext.filepath),
       })
     );
 
@@ -97,7 +98,7 @@ export class CodeExecutionNode extends BaseNode<
         name: INPUTS_PREFIX,
         initializer: python.TypeInstantiation.dict(
           codeInputs.map((codeInput) => ({
-            key: python.TypeInstantiation.str(codeInput.nodeInputData.key),
+            key: new StrInstantiation(codeInput.nodeInputData.key),
             value: codeInput,
           })),
           {
@@ -113,7 +114,7 @@ export class CodeExecutionNode extends BaseNode<
       statements.push(
         python.field({
           name: RUNTIME_INPUT_KEY,
-          initializer: python.TypeInstantiation.str(runtime),
+          initializer: new StrInstantiation(runtime),
         })
       );
     }
@@ -132,19 +133,17 @@ export class CodeExecutionNode extends BaseNode<
                   arguments_: [
                     python.methodArgument({
                       name: "name",
-                      value: python.TypeInstantiation.str(package_.name),
+                      value: new StrInstantiation(package_.name),
                     }),
                     python.methodArgument({
                       name: "version",
-                      value: python.TypeInstantiation.str(package_.version),
+                      value: new StrInstantiation(package_.version),
                     }),
                     ...(package_.repository
                       ? [
                           python.methodArgument({
                             name: "repository",
-                            value: python.TypeInstantiation.str(
-                              package_.repository
-                            ),
+                            value: new StrInstantiation(package_.repository),
                           }),
                         ]
                       : []),
@@ -285,7 +284,7 @@ export class CodeExecutionNode extends BaseNode<
             }),
             python.methodArgument({
               name: "name",
-              value: python.TypeInstantiation.str("result"),
+              value: new StrInstantiation("result"),
             }),
           ],
         }),
@@ -315,7 +314,7 @@ export class CodeExecutionNode extends BaseNode<
             }),
             python.methodArgument({
               name: "name",
-              value: python.TypeInstantiation.str("log"),
+              value: new StrInstantiation("log"),
             }),
           ],
         }),
