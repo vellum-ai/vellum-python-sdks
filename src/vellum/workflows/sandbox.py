@@ -53,11 +53,11 @@ class WorkflowSandboxRunner(Generic[WorkflowType]):
         selected_inputs = self._inputs[index]
 
         raw_inputs: Union[BaseInputs, Dict[str, Any]]
-        trigger_value: Optional[BaseTrigger] = None  # type: ignore[assignment]
+        trigger_value: Optional[BaseTrigger] = None
         node_output_mocks = None
         if isinstance(selected_inputs, DatasetRow):
             raw_inputs = selected_inputs.inputs
-            trigger_value = selected_inputs.workflow_trigger  # type: ignore[assignment]
+            trigger_value = selected_inputs.workflow_trigger
             node_output_mocks = selected_inputs.mocks
         else:
             raw_inputs = selected_inputs
@@ -69,14 +69,7 @@ class WorkflowSandboxRunner(Generic[WorkflowType]):
         else:
             inputs_for_stream = raw_inputs
 
-        trigger_instance: Optional[BaseTrigger] = None
-        if isinstance(trigger_value, BaseTrigger):
-            # New semantics: DatasetRow already holds the instantiated object
-            trigger_instance = trigger_value
-        elif trigger_value is not None:
-            # Old semantics: DatasetRow holds a trigger class that needs to be instantiated
-            trigger_class = trigger_value  # type: ignore[assignment]
-            trigger_instance = trigger_class(**raw_inputs) if isinstance(raw_inputs, dict) else trigger_class()
+        trigger_instance: Optional[BaseTrigger] = trigger_value
 
         events = self._workflow.stream(
             inputs=inputs_for_stream,

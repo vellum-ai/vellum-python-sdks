@@ -129,12 +129,15 @@ def test_sandbox_runner_with_workflow_trigger(mock_logger):
         class Outputs(BaseWorkflow.Outputs):
             final_output = StartNode.Outputs.result
 
-    # AND a dataset with workflow_trigger class (for backward compatibility)
+    # AND a trigger instance
+    trigger_instance = MySchedule(current_run_at=datetime.min, next_run_at=datetime.now())
+
+    # AND a dataset with workflow_trigger instance
     dataset = [
         DatasetRow(
             label="test_row",
             inputs={"current_run_at": datetime.min, "next_run_at": datetime.now()},
-            workflow_trigger=MySchedule,
+            workflow_trigger=trigger_instance,
         ),
     ]
 
@@ -151,8 +154,9 @@ def test_sandbox_runner_with_workflow_trigger(mock_logger):
         "final_output: 0001-01-01 00:00:00",
     ]
 
-    # AND the dataset row should still have the trigger class
-    assert dataset[0].workflow_trigger == MySchedule
+    # AND the dataset row should have the trigger instance
+    assert dataset[0].workflow_trigger == trigger_instance
+    assert isinstance(dataset[0].workflow_trigger, MySchedule)
 
 
 def test_sandbox_runner_with_trigger_instance(mock_logger):
