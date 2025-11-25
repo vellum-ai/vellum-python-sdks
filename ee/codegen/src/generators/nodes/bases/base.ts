@@ -763,14 +763,15 @@ export abstract class BaseNode<
       decorators: decorators.length > 0 ? decorators : undefined,
     });
 
-    nodeClass.add(
-      python.field({
-        name: "label",
-        initializer: python.TypeInstantiation.str(
-          this.nodeContext.getNodeLabel()
-        ),
-      })
-    );
+    const nodeLabel = this.nodeContext.getNodeLabel();
+    if (nodeLabel !== nodeContext.nodeClassName) {
+      nodeClass.add(
+        python.field({
+          name: "label",
+          initializer: python.TypeInstantiation.str(nodeLabel),
+        })
+      );
+    }
 
     nodeClass.add(
       python.field({

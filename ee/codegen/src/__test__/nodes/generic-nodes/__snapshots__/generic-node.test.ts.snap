@@ -14,7 +14,6 @@ from ...nodes.my_custom_node import MyCustomNode
 
 
 class MyCustomNodeDisplay(BaseNodeDisplay[MyCustomNode]):
-    label = "MyCustomNode"
     node_id = UUID("9dc95b5d-1467-4b17-abb0-449d1aac6aec")
     attribute_ids_by_name = {
         "default_attribute": UUID("990d55db-9d72-452a-b074-9bee1f89ecb9"),
@@ -87,7 +86,6 @@ from ...nodes.my_custom_node import MyCustomNode
 @BaseMapNodeDisplay.wrap(node_id=UUID("adornment-2"))
 @BaseRetryNodeDisplay.wrap(node_id=UUID("adornment-3"))
 class MyCustomNodeDisplay(BaseNodeDisplay[MyCustomNode]):
-    label = "MyCustomNode"
     node_id = UUID("75ce71d3-d50b-4c8f-9b38-eee8c8362a92")
     attribute_ids_by_name = {
         "default_attribute": UUID("990d55db-9d72-452a-b074-9bee1f89ecb9"),
@@ -282,7 +280,6 @@ from ...nodes.my_custom_node import MyCustomNode
 
 
 class MyCustomNodeDisplay(BaseNodeDisplay[MyCustomNode]):
-    label = "MyCustomNode"
     node_id = UUID("bed8d22e-4835-41d9-ad81-e78a4b0e7ae0")
     attribute_ids_by_name = {"default_attribute": UUID("attr-1-id")}
     output_display = {
