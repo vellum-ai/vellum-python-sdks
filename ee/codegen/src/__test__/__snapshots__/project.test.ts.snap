@@ -193,7 +193,6 @@ from ...nodes.prompt import Prompt
 
 @BaseRetryNodeDisplay.wrap(node_id=UUID("65483f3d-59a3-4a8d-a8ab-70e6797cc474"))
 class PromptDisplay(BaseInlinePromptNodeDisplay[Prompt]):
-    label = "Prompt"
     node_id = UUID("82d5c288-aab8-4d27-bceb-4ba7bc688c34")
     output_id = UUID("e054f21d-33e1-4c76-8b1d-b22c393f6c7d")
     array_output_id = UUID("191a66c6-3e38-45e0-b5dd-5e644fdec8b0")
@@ -387,7 +386,6 @@ from ....nodes.tool_call import GetCurrentWeatherNode
 
 
 class GetCurrentWeatherNodeDisplay(BaseNodeDisplay[GetCurrentWeatherNode]):
-    label = "GetCurrentWeatherNode"
     node_id = UUID("tool-calling-node")
     attribute_ids_by_name = {
         "ml_model": UUID("75bd1347-dca2-4cba-b0b0-a20a2923ebcc"),
@@ -544,7 +542,6 @@ from ....nodes.tool_call_get_current_weather_node import GetCurrentWeatherNode
 
 
 class GetCurrentWeatherNodeDisplay(BaseNodeDisplay[GetCurrentWeatherNode]):
-    label = "GetCurrentWeatherNode"
     node_id = UUID("21f29cac-da87-495f-bba1-093d423f4e46")
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=0, y=0),
@@ -871,7 +868,6 @@ from ....nodes.tool_call_get_current_weather_node import GetCurrentWeatherNode
 
 
 class GetCurrentWeatherNodeDisplay(BaseNodeDisplay[GetCurrentWeatherNode]):
-    label = "GetCurrentWeatherNode"
     node_id = UUID("21f29cac-da87-495f-bba1-093d423f4e46")
     display_data = NodeDisplayData(
         position=NodeDisplayPosition(x=0, y=0),
