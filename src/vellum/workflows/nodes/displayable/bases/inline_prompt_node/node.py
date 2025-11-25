@@ -219,6 +219,11 @@ def _validate_json_schema_structure(schema: dict, path: str = "json_schema") -> 
                 for idx, sub_schema in enumerate(items_schema):
                     if isinstance(sub_schema, dict):
                         _validate_json_schema_structure(sub_schema, f"{path}.items[{idx}]")
+                    else:
+                        raise ValueError(
+                            f"JSON Schema 'items[{idx}]' at '{path}.items[{idx}]' must be a schema object, "
+                            f"not {type(sub_schema).__name__}"
+                        )
             else:
                 # items must be a schema object or a list of schema objects
                 raise ValueError(
@@ -237,6 +242,11 @@ def _validate_json_schema_structure(schema: dict, path: str = "json_schema") -> 
             for idx, sub_schema in enumerate(prefix_items):
                 if isinstance(sub_schema, dict):
                     _validate_json_schema_structure(sub_schema, f"{path}.prefixItems[{idx}]")
+                else:
+                    raise ValueError(
+                        f"JSON Schema 'prefixItems[{idx}]' at '{path}.prefixItems[{idx}]' must be a schema object, "
+                        f"not {type(sub_schema).__name__}"
+                    )
 
     # Validate object types
     if _is_json_schema_type(schema, "object"):
