@@ -1,18 +1,18 @@
-import { python } from "@fern-api/python-ast";
 import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
 
 import { AstNode } from "./ast-node";
+import { Reference } from "./reference";
 import { Writer } from "./writer";
 
 export declare namespace ClassInstantiation {
   interface Args {
-    classReference: python.Reference;
+    classReference: Reference;
     arguments_: MethodArgument[];
   }
 }
 
 export class ClassInstantiation extends AstNode {
-  protected reference: python.Reference;
+  protected reference: Reference;
   private arguments: MethodArgument[];
 
   constructor({ classReference, arguments_ }: ClassInstantiation.Args) {

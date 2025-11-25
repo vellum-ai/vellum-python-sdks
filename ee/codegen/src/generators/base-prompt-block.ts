@@ -1,4 +1,3 @@
-import { python } from "@fern-api/python-ast";
 import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
 import { isNil } from "lodash";
 import {
@@ -17,6 +16,7 @@ import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { WorkflowContext } from "src/context/workflow-context";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 import {
@@ -95,7 +95,7 @@ export abstract class BasePromptBlock<
     return args;
   }
 
-  private generateCacheConfig(promptBlock: T): python.AstNode | undefined {
+  private generateCacheConfig(promptBlock: T): AstNode | undefined {
     if (isNil(promptBlock.cacheConfig)) {
       return undefined;
     }
@@ -106,8 +106,8 @@ export abstract class BasePromptBlock<
 
     const cacheConfigType = new StrInstantiation(promptBlock.cacheConfig.type);
 
-    return python.instantiateClass({
-      classReference: python.reference({
+    return new ClassInstantiation({
+      classReference: new Reference({
         name: "EphemeralPromptCacheConfig",
         modulePath: VELLUM_CLIENT_MODULE_PATH,
       }),
@@ -115,8 +115,6 @@ export abstract class BasePromptBlock<
         new MethodArgument({ name: "type", value: cacheConfigType }),
       ],
     });
-
-    return python.TypeInstantiation.none();
   }
 
   public write(writer: Writer): void {
