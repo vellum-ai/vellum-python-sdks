@@ -866,7 +866,9 @@ describe("ToolCallingNode", () => {
         "functions",
         {
           type: "ARRAY_REFERENCE",
-          items: [codeExecutionFunction] as unknown as WorkflowValueDescriptor[],
+          items: [
+            codeExecutionFunction,
+          ] as unknown as WorkflowValueDescriptor[],
         }
       );
 

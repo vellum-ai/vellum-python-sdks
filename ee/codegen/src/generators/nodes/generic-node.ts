@@ -123,7 +123,6 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
           }
 
           if (functions && functions.length > 0) {
-
             const codeExecutionFunctions: FunctionArgs[] = [];
             const inlineWorkflowFunctions: InlineWorkflowFunctionArgs[] = [];
             const deploymentWorkflowFunctions: WorkflowDeploymentFunctionArgs[] =
