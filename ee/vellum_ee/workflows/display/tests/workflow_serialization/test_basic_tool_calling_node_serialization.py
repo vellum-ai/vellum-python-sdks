@@ -129,38 +129,35 @@ def test_serialize_workflow():
                 "id": "1e3cd0b3-5657-42bd-8a71-48bdf9e9b835",
                 "name": "functions",
                 "value": {
-                    "type": "CONSTANT_VALUE",
-                    "value": {
-                        "type": "JSON",
-                        "value": [
-                            {
-                                "type": "CODE_EXECUTION",
+                    "type": "ARRAY_REFERENCE",
+                    "items": [
+                        {
+                            "type": "CODE_EXECUTION",
+                            "name": "get_current_weather",
+                            "description": "\n    Get the current weather in a given location.\n    ",
+                            "definition": {
+                                "state": None,
+                                "cache_config": None,
                                 "name": "get_current_weather",
                                 "description": "\n    Get the current weather in a given location.\n    ",
-                                "definition": {
-                                    "state": None,
-                                    "cache_config": None,
-                                    "name": "get_current_weather",
-                                    "description": "\n    Get the current weather in a given location.\n    ",
-                                    "parameters": {
-                                        "type": "object",
-                                        "properties": {
-                                            "location": {
-                                                "type": "string",
-                                                "description": "The location to get the weather for",
-                                            },
-                                            "unit": {"type": "string", "description": "The unit of temperature"},
+                                "parameters": {
+                                    "type": "object",
+                                    "properties": {
+                                        "location": {
+                                            "type": "string",
+                                            "description": "The location to get the weather for",
                                         },
-                                        "required": ["location", "unit"],
+                                        "unit": {"type": "string", "description": "The unit of temperature"},
                                     },
-                                    "inputs": None,
-                                    "forced": None,
-                                    "strict": None,
+                                    "required": ["location", "unit"],
                                 },
-                                "src": 'import math\nfrom typing import Annotated\n\n\ndef get_current_weather(\n    location: Annotated[str, "The location to get the weather for"], unit: Annotated[str, "The unit of temperature"]\n) -> str:\n    """\n    Get the current weather in a given location.\n    """\n    return f"The current weather in {location} is sunny with a temperature of {get_temperature(70.1)} degrees {unit}."\n\n\ndef get_temperature(temperature: float) -> int:\n    """\n    Get the temperature in a given location.\n    """\n    return math.floor(temperature)\n',  # noqa: E501
-                            }
-                        ],
-                    },
+                                "inputs": None,
+                                "forced": None,
+                                "strict": None,
+                            },
+                            "src": 'import math\nfrom typing import Annotated\n\n\ndef get_current_weather(\n    location: Annotated[str, "The location to get the weather for"], unit: Annotated[str, "The unit of temperature"]\n) -> str:\n    """\n    Get the current weather in a given location.\n    """\n    return f"The current weather in {location} is sunny with a temperature of {get_temperature(70.1)} degrees {unit}."\n\n\ndef get_temperature(temperature: float) -> int:\n    """\n    Get the temperature in a given location.\n    """\n    return math.floor(temperature)\n',  # noqa: E501
+                        }
+                    ],
                 },
             },
             {

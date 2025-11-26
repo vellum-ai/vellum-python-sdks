@@ -487,39 +487,18 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
 
         inputs = getattr(value, "__vellum_inputs__", {})
 
+        # Serialize inputs as WorkflowValueDescriptors
+        serialized_inputs: Optional[Dict[str, Any]] = None
         if inputs:
-            serialized_input_entries: List[Dict[str, Any]] = []
+            serialized_inputs = {}
             for param_name, input_ref in inputs.items():
                 serialized_input = serialize_value(executable_id, display_context, input_ref)
                 if serialized_input is not None:
-                    serialized_input_entries.append(
-                        {
-                            "id": str(uuid4_from_hash(f"{executable_id}|inputs|{param_name}")),
-                            "key": param_name,
-                            "value": serialized_input,
-                        }
-                    )
+                    serialized_inputs[param_name] = serialized_input
 
-            model_data = function_definition.model_dump()
-
-            # Check if all input entries have constant values (same pattern as dict serialization)
-            if all(entry["value"]["type"] == "CONSTANT_VALUE" for entry in serialized_input_entries):
-                # All inputs are constants, embed them directly in the definition
-                constant_inputs = {}
-                for entry in serialized_input_entries:
-                    entry_value = entry["value"]["value"]
-                    constant_inputs[entry["key"]] = entry_value["value"]
-                model_data["inputs"] = constant_inputs
-            else:
-                # Some inputs are references, use DICTIONARY_REFERENCE structure
-                model_data["inputs"] = {
-                    "type": "DICTIONARY_REFERENCE",
-                    "entries": cast(JsonArray, serialized_input_entries),
-                }
-
-            function_definition_data = model_data
-        else:
-            function_definition_data = function_definition.model_dump()
+        function_definition_data = function_definition.model_dump()
+        if serialized_inputs:
+            function_definition_data["inputs"] = serialized_inputs
 
         source_path = inspect.getsourcefile(value)
         if source_path is not None:
@@ -528,18 +507,13 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
         else:
             source_code = f"Source code not available for {value.__name__}"
 
+        # CODE_EXECUTION is now a first-class descriptor type at the top level
         return {
-            "type": "CONSTANT_VALUE",
-            "value": {
-                "type": "JSON",
-                "value": {
-                    "type": "CODE_EXECUTION",
-                    "name": name,
-                    "description": description,
-                    "definition": function_definition_data,
-                    "src": source_code,
-                },
-            },
+            "type": "CODE_EXECUTION",
+            "name": name,
+            "description": description,
+            "definition": function_definition_data,
+            "src": source_code,
         }
 
     if not isinstance(value, BaseDescriptor):

@@ -41,64 +41,48 @@ def test_serialize_workflow():
 
     attributes = tool_calling_node["attributes"]
     function_attributes = next(attribute for attribute in attributes if attribute["name"] == "functions")
+    # CODE_EXECUTION is now a first-class descriptor type at the top level
+    # The list of functions is wrapped in ARRAY_REFERENCE
     assert function_attributes == {
         "id": "e2695720-919b-497e-8d01-ae6aa705f7bb",
         "name": "functions",
         "value": {
-            "type": "CONSTANT_VALUE",
-            "value": {
-                "type": "JSON",
-                "value": [
-                    {
-                        "type": "CODE_EXECUTION",
+            "type": "ARRAY_REFERENCE",
+            "items": [
+                {
+                    "type": "CODE_EXECUTION",
+                    "name": "get_string",
+                    "description": "\n    Get a string with the parent input, dummy input, and the populated input.\n    ",  # noqa: E501
+                    "definition": {
+                        "state": None,
+                        "cache_config": None,
                         "name": "get_string",
                         "description": "\n    Get a string with the parent input, dummy input, and the populated input.\n    ",  # noqa: E501
-                        "definition": {
-                            "state": None,
-                            "cache_config": None,
-                            "name": "get_string",
-                            "description": "\n    Get a string with the parent input, dummy input, and the populated input.\n    ",  # noqa: E501
-                            "parameters": {
-                                "type": "object",
-                                "properties": {"populated_input": {"type": "string"}},
-                                "required": ["populated_input"],
-                            },
-                            "inputs": {
-                                "type": "DICTIONARY_REFERENCE",
-                                "entries": [
-                                    {
-                                        "id": "b5d789ae-f6b0-4d9d-9abb-b26d3187cac1",
-                                        "key": "parent_input",
-                                        "value": {
-                                            "type": "WORKFLOW_INPUT",
-                                            "input_variable_id": "4bf1f0e7-76c6-4204-9f8c-bd9c3b73a8db",
-                                        },
-                                    },
-                                    {
-                                        "id": "baca3d67-e383-4e6f-a33b-9e7818cb44a7",
-                                        "key": "dummy_input",
-                                        "value": {
-                                            "type": "NODE_OUTPUT",
-                                            "node_id": "72f78142-e0a2-40a9-ae70-0230ccf3b503",
-                                            "node_output_id": "6e639661-d0dc-4586-9393-e64e95e0d3ef",
-                                        },
-                                    },
-                                    {
-                                        "id": "aac6dcc9-b6c7-4cfd-aa56-25e8c4027bed",
-                                        "key": "constant_input",
-                                        "value": {
-                                            "type": "CONSTANT_VALUE",
-                                            "value": {"type": "STRING", "value": "constant_input"},
-                                        },
-                                    },
-                                ],
-                            },
-                            "forced": None,
-                            "strict": None,
+                        "parameters": {
+                            "type": "object",
+                            "properties": {"populated_input": {"type": "string"}},
+                            "required": ["populated_input"],
                         },
-                        "src": 'from vellum.workflows.utils.functions import use_tool_inputs\n\nfrom .inputs import ParentInputs\nfrom .nodes.dummy_node import DummyNode\n\n\n@use_tool_inputs(\n    parent_input=ParentInputs.parent_input,\n    dummy_input=DummyNode.Outputs.text,\n    constant_input="constant_input",\n)\ndef get_string(parent_input: str, dummy_input: str, constant_input: str, populated_input: str) -> str:\n    """\n    Get a string with the parent input, dummy input, and the populated input.\n    """\n    return f"parent input: {parent_input}, dummy input: {dummy_input}, constant input: {constant_input}, populated input: {populated_input}"  # noqa: E501\n',  # noqa: E501
-                    }
-                ],
-            },
+                        "inputs": {
+                            "parent_input": {
+                                "type": "WORKFLOW_INPUT",
+                                "input_variable_id": "4bf1f0e7-76c6-4204-9f8c-bd9c3b73a8db",
+                            },
+                            "dummy_input": {
+                                "type": "NODE_OUTPUT",
+                                "node_id": "72f78142-e0a2-40a9-ae70-0230ccf3b503",
+                                "node_output_id": "6e639661-d0dc-4586-9393-e64e95e0d3ef",
+                            },
+                            "constant_input": {
+                                "type": "CONSTANT_VALUE",
+                                "value": {"type": "STRING", "value": "constant_input"},
+                            },
+                        },
+                        "forced": None,
+                        "strict": None,
+                    },
+                    "src": 'from vellum.workflows.utils.functions import use_tool_inputs\n\nfrom .inputs import ParentInputs\nfrom .nodes.dummy_node import DummyNode\n\n\n@use_tool_inputs(\n    parent_input=ParentInputs.parent_input,\n    dummy_input=DummyNode.Outputs.text,\n    constant_input="constant_input",\n)\ndef get_string(parent_input: str, dummy_input: str, constant_input: str, populated_input: str) -> str:\n    """\n    Get a string with the parent input, dummy input, and the populated input.\n    """\n    return f"parent input: {parent_input}, dummy input: {dummy_input}, constant input: {constant_input}, populated input: {populated_input}"  # noqa: E501\n',  # noqa: E501
+                }
+            ],
         },
     }
