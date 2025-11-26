@@ -64,19 +64,34 @@ def test_serialize_workflow():
                                 "required": ["populated_input"],
                             },
                             "inputs": {
-                                "parent_input": {
-                                    "type": "WORKFLOW_INPUT",
-                                    "input_variable_id": "4bf1f0e7-76c6-4204-9f8c-bd9c3b73a8db",
-                                },
-                                "dummy_input": {
-                                    "type": "NODE_OUTPUT",
-                                    "node_id": "72f78142-e0a2-40a9-ae70-0230ccf3b503",
-                                    "node_output_id": "6e639661-d0dc-4586-9393-e64e95e0d3ef",
-                                },
-                                "constant_input": {
-                                    "type": "CONSTANT_VALUE",
-                                    "value": {"type": "STRING", "value": "constant_input"},
-                                },
+                                "type": "DICTIONARY_REFERENCE",
+                                "entries": [
+                                    {
+                                        "id": "b5d789ae-f6b0-4d9d-9abb-b26d3187cac1",
+                                        "key": "parent_input",
+                                        "value": {
+                                            "type": "WORKFLOW_INPUT",
+                                            "input_variable_id": "4bf1f0e7-76c6-4204-9f8c-bd9c3b73a8db",
+                                        },
+                                    },
+                                    {
+                                        "id": "baca3d67-e383-4e6f-a33b-9e7818cb44a7",
+                                        "key": "dummy_input",
+                                        "value": {
+                                            "type": "NODE_OUTPUT",
+                                            "node_id": "72f78142-e0a2-40a9-ae70-0230ccf3b503",
+                                            "node_output_id": "6e639661-d0dc-4586-9393-e64e95e0d3ef",
+                                        },
+                                    },
+                                    {
+                                        "id": "aac6dcc9-b6c7-4cfd-aa56-25e8c4027bed",
+                                        "key": "constant_input",
+                                        "value": {
+                                            "type": "CONSTANT_VALUE",
+                                            "value": {"type": "STRING", "value": "constant_input"},
+                                        },
+                                    },
+                                ],
                             },
                             "forced": None,
                             "strict": None,

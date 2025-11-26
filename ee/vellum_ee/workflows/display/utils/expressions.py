@@ -488,14 +488,35 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
         inputs = getattr(value, "__vellum_inputs__", {})
 
         if inputs:
-            serialized_inputs = {}
+            serialized_input_entries: List[Dict[str, Any]] = []
             for param_name, input_ref in inputs.items():
                 serialized_input = serialize_value(executable_id, display_context, input_ref)
                 if serialized_input is not None:
-                    serialized_inputs[param_name] = serialized_input
+                    serialized_input_entries.append(
+                        {
+                            "id": str(uuid4_from_hash(f"{executable_id}|inputs|{param_name}")),
+                            "key": param_name,
+                            "value": serialized_input,
+                        }
+                    )
 
             model_data = function_definition.model_dump()
-            model_data["inputs"] = serialized_inputs
+
+            # Check if all input entries have constant values (same pattern as dict serialization)
+            if all(entry["value"]["type"] == "CONSTANT_VALUE" for entry in serialized_input_entries):
+                # All inputs are constants, embed them directly in the definition
+                constant_inputs = {}
+                for entry in serialized_input_entries:
+                    entry_value = entry["value"]["value"]
+                    constant_inputs[entry["key"]] = entry_value["value"]
+                model_data["inputs"] = constant_inputs
+            else:
+                # Some inputs are references, use DICTIONARY_REFERENCE structure
+                model_data["inputs"] = {
+                    "type": "DICTIONARY_REFERENCE",
+                    "entries": cast(JsonArray, serialized_input_entries),
+                }
+
             function_definition_data = model_data
         else:
             function_definition_data = function_definition.model_dump()
