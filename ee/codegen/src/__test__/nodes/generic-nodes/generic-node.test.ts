@@ -704,4 +704,56 @@ describe("GenericNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+
+  describe("empty StartNode with label containing space", () => {
+    /**
+     * Tests that an empty StartNode with label "Start Node" generates the correct display file.
+     */
+    it("getNodeDisplayFile", async () => {
+      // GIVEN an empty StartNode with a label containing a space
+      const nodeData = genericNodeFactory({
+        id: "dcaa25fa-dabf-4bef-ad7f-2c9805ba3cdf",
+        label: "Start Node",
+        nodeAttributes: [],
+        nodeOutputs: [],
+        nodeTrigger: {
+          id: "d7ed7bf7-0eb8-4284-8864-de460071c6ed",
+          mergeBehavior: "AWAIT_ATTRIBUTES",
+        },
+        nodePorts: [
+          {
+            id: "b01956bf-e6b4-4535-9401-bee78c0157ab",
+            name: "default",
+            type: "DEFAULT",
+          },
+        ],
+        definition: {
+          name: "StartNode",
+          module: ["tests", "workflows", "trivial", "nodes", "start"],
+        },
+        displayData: {
+          position: {
+            x: 200.0,
+            y: -50.0,
+          },
+        },
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      // WHEN we generate the node display file
+      node.getNodeDisplayFile().write(writer);
+
+      // THEN the output should match the snapshot
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });
