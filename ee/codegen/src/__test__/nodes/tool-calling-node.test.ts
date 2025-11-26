@@ -694,6 +694,11 @@ describe("ToolCallingNode", () => {
        * Tests that MCPServer with EnvironmentVariableReference serialized as
        * ARRAY_REFERENCE+DICTIONARY_REFERENCE generates correct code.
        * This is the new serialization format used when MCPServer contains dynamic references.
+       *
+       * Note: The only difference between this and the legacy CONSTANT_VALUE format is that
+       * authorization_type is generated as a string (e.g., "API_KEY") instead of an enum
+       * (e.g., AuthorizationType.API_KEY). Both are functionally equivalent since Pydantic
+       * coerces the string to the enum at runtime.
        */
 
       // GIVEN the new ARRAY_REFERENCE+DICTIONARY_REFERENCE representation
