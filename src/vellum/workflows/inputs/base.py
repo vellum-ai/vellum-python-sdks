@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterator, Set, Tuple, Type, Union, get_args, get_origin
+from typing import Any, Callable, Dict, Iterator, Set, Tuple, Type, Union, cast, get_args, get_origin
 from typing_extensions import dataclass_transform
 
 from pydantic import GetCoreSchemaHandler
@@ -97,8 +97,7 @@ class BaseInputs(metaclass=_BaseInputsMeta):
                 # Check if default is a FieldInfo with default_factory
                 if isinstance(default_value, FieldInfo):
                     if default_value.default_factory is not None:
-                        # Call the factory function to create a new instance
-                        value = default_value.default_factory()  # type: ignore[call-arg]
+                        value = cast(Callable[[], Any], default_value.default_factory)()
                     elif hasattr(default_value, "default") and default_value.default is not ...:
                         # Use the default value directly
                         value = default_value.default
