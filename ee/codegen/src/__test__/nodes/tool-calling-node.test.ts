@@ -16,6 +16,7 @@ import {
   MCPServerFunctionArgs,
   NodePort,
   WorkflowDeploymentFunctionArgs,
+  WorkflowValueDescriptor,
 } from "src/types/vellum";
 
 describe("ToolCallingNode", () => {
@@ -858,20 +859,14 @@ describe("ToolCallingNode", () => {
       );
 
       // AND the new ARRAY_REFERENCE format (CODE_EXECUTION as first-class descriptor)
+      // Note: We cast to WorkflowValueDescriptor[] because the TypeScript types don't yet
+      // include CODE_EXECUTION as a first-class descriptor type - this is testing the new format
       const arrayFunctionsAttr = nodeAttributeFactory(
         "functions-array",
         "functions",
         {
           type: "ARRAY_REFERENCE",
-          items: [
-            {
-              type: "CODE_EXECUTION",
-              name: codeExecutionFunction.name,
-              description: codeExecutionFunction.description,
-              definition: codeExecutionFunction.definition,
-              src: codeExecutionFunction.src,
-            },
-          ],
+          items: [codeExecutionFunction] as unknown as WorkflowValueDescriptor[],
         }
       );
 
@@ -933,29 +928,31 @@ describe("ToolCallingNode", () => {
         }),
       ];
 
+      // Note: We cast to WorkflowValueDescriptor[] because the TypeScript types don't yet
+      // include CODE_EXECUTION as a first-class descriptor type - this is testing the new format
+      const codeExecutionFunc: FunctionArgs = {
+        type: "CODE_EXECUTION",
+        name: "get_weather",
+        description: "Get the current weather",
+        definition: {
+          name: "get_weather",
+          parameters: {
+            type: "object",
+            required: ["location"],
+            properties: {
+              location: { type: "string" },
+            },
+          },
+        },
+        src: 'def get_weather(location: str) -> str:\n    """Get the current weather"""\n    return f"Weather in {location}"\n',
+      };
+
       const functionsAttribute = nodeAttributeFactory(
         "functions-attr-id",
         "functions",
         {
           type: "ARRAY_REFERENCE",
-          items: [
-            {
-              type: "CODE_EXECUTION",
-              name: "get_weather",
-              description: "Get the current weather",
-              definition: {
-                name: "get_weather",
-                parameters: {
-                  type: "object",
-                  required: ["location"],
-                  properties: {
-                    location: { type: "string" },
-                  },
-                },
-              },
-              src: 'def get_weather(location: str) -> str:\n    """Get the current weather"""\n    return f"Weather in {location}"\n',
-            },
-          ],
+          items: [codeExecutionFunc] as unknown as WorkflowValueDescriptor[],
         }
       );
 
