@@ -158,6 +158,42 @@ class MyNode1Display(BaseTemplatingNodeDisplay[MyNode1]):
 "
 `;
 
+exports[`InlineSubworkflowNode > nested workflow class name collision > should generate unique nested workflow class name when internal node has same name 1`] = `
+"from vellum.workflows.nodes.displayable import InlineSubworkflowNode
+
+from .workflow import MyNodeWorkflow
+
+
+class MyNode(InlineSubworkflowNode):
+    subworkflow = MyNodeWorkflow
+"
+`;
+
+exports[`InlineSubworkflowNode > nested workflow class name collision > should generate unique nested workflow class name when internal node has same name 2`] = `
+"from vellum.workflows import BaseWorkflow
+
+from .nodes.my_node_workflow import MyNodeWorkflow1
+
+
+class MyNodeWorkflow(BaseWorkflow):
+    graph = MyNodeWorkflow1
+
+    class Outputs(BaseWorkflow.Outputs):
+        final_output = MyNodeWorkflow1.Outputs.result
+"
+`;
+
+exports[`InlineSubworkflowNode > nested workflow class name collision > should generate unique nested workflow class name when internal node has same name 3`] = `
+"from vellum.workflows.nodes.displayable import TemplatingNode
+from vellum.workflows.state import BaseState
+
+
+class MyNodeWorkflow1(TemplatingNode[BaseState, str]):
+    template = """Hello, World!"""
+    inputs = {}
+"
+`;
+
 exports[`InlineSubworkflowNode > with state > inline subworkflow node file with state should include all three generic type parameters 1`] = `
 "from vellum.workflows.nodes.displayable import InlineSubworkflowNode as BaseInlineSubworkflowNode
 from vellum.workflows.state import BaseState
