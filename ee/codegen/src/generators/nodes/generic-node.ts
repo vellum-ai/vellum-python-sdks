@@ -21,7 +21,6 @@ import { StarImport } from "src/generators/extensions/star-import";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 import { FunctionFile } from "src/generators/function-file";
-import { GenericNodeDisplayData } from "src/generators/generic-node-display-data";
 import { InitFile } from "src/generators/init-file";
 import { NodeOutputs } from "src/generators/node-outputs";
 import { BaseNode } from "src/generators/nodes/bases/base";
@@ -74,13 +73,6 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     super(args);
 
     this.nodeAttributes = this.generateNodeAttributes();
-  }
-
-  private generateGenericNodeDisplayData() {
-    return new GenericNodeDisplayData({
-      workflowContext: this.workflowContext,
-      nodeDisplayData: this.nodeData.displayData,
-    });
   }
 
   private generateNodeAttributes(): AstNode[] {
@@ -695,20 +687,8 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
   }
 
   getNodeDisplayClassBodyStatements(): AstNode[] {
-    const statements: AstNode[] = [];
-
-    // Add display data with our custom GenericNodeDisplayData generator only if it has content
-    const displayDataGenerator = this.generateGenericNodeDisplayData();
-    if (displayDataGenerator.hasContent()) {
-      statements.push(
-        python.field({
-          name: "display_data",
-          initializer: displayDataGenerator,
-        })
-      );
-    }
-
-    return statements;
+    // display_data is handled by the base class in generateNodeDisplayClasses()
+    return [];
   }
 
   protected getOutputDisplay(): Field | undefined {

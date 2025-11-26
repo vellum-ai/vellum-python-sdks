@@ -384,7 +384,6 @@ from ...nodes.start import StartNode
 
 class StartNodeDisplay(BaseNodeDisplay[StartNode]):
     node_id = UUID("dcaa25fa-dabf-4bef-ad7f-2c9805ba3cdf")
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=200, y=-50))
     port_displays = {
         StartNode.Ports.default: PortDisplayOverrides(
             id=UUID("b01956bf-e6b4-4535-9401-bee78c0157ab")
