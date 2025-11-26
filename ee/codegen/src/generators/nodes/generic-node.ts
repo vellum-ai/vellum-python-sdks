@@ -108,17 +108,35 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
             value?.type === "ARRAY_REFERENCE" &&
             Array.isArray(value.items)
           ) {
-            // Handle new ARRAY_REFERENCE format where CODE_EXECUTION is a first-class descriptor
+            // Handle new ARRAY_REFERENCE format where items are first-class descriptors
+            // (CODE_EXECUTION, INLINE_WORKFLOW, WORKFLOW_DEPLOYMENT, etc.)
+            // Also support CONSTANT_VALUE/JSON for backward compatibility
             functions = [];
             for (const item of value.items) {
               if (!item) continue;
-              // Each item is a WorkflowValueDescriptor - for CODE_EXECUTION, map to FunctionArgs
-              const itemWithType = item as { type?: string };
-              if (itemWithType.type === "CODE_EXECUTION") {
-                // The item has the same shape as FunctionArgs
-                functions.push(item as unknown as ToolArgs);
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const itemAny = item as any;
+              const itemType = itemAny.type as string | undefined;
+
+              // First-class descriptor types (new format)
+              if (
+                itemType === "CODE_EXECUTION" ||
+                itemType === "INLINE_WORKFLOW" ||
+                itemType === "WORKFLOW_DEPLOYMENT" ||
+                itemType === "COMPOSIO" ||
+                itemType === "MCP_SERVER"
+              ) {
+                functions.push(itemAny as ToolArgs);
+              } else if (
+                itemType === "CONSTANT_VALUE" &&
+                itemAny.value?.type === "JSON"
+              ) {
+                // Backward compatibility: unwrap CONSTANT_VALUE/JSON
+                const inner = itemAny.value.value;
+                if (inner) {
+                  functions.push(inner as ToolArgs);
+                }
               }
-              // Other function types (INLINE_WORKFLOW, etc.) are still in CONSTANT_VALUE format
             }
           }
 

@@ -43,9 +43,9 @@ def test_serialize_workflow():
     )
     assert function_attributes["id"] == "102d8447-5232-4e96-8192-9b1ca0f02650"
     assert function_attributes["name"] == "functions"
-    assert function_attributes["value"]["type"] == "CONSTANT_VALUE"
-    assert function_attributes["value"]["value"]["type"] == "JSON"
-    inline_workflow_tool = function_attributes["value"]["value"]["value"][0]
+    # INLINE_WORKFLOW is now a first-class descriptor type, so the list becomes ARRAY_REFERENCE
+    assert function_attributes["value"]["type"] == "ARRAY_REFERENCE"
+    inline_workflow_tool = function_attributes["value"]["items"][0]
     assert inline_workflow_tool["type"] == "INLINE_WORKFLOW"
     assert inline_workflow_tool["name"] == "BasicInlineSubworkflowWorkflow"
     assert (

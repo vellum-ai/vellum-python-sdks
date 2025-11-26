@@ -458,17 +458,12 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
         serialized_value: dict = workflow_display.serialize()
         name = serialized_value["workflow_raw_data"]["definition"]["name"]
         description = value.__doc__ or ""
+        # INLINE_WORKFLOW is now a first-class descriptor type at the top level
         return {
-            "type": "CONSTANT_VALUE",
-            "value": {
-                "type": "JSON",
-                "value": {
-                    "type": "INLINE_WORKFLOW",
-                    "name": name,
-                    "description": description,
-                    "exec_config": serialized_value,
-                },
-            },
+            "type": "INLINE_WORKFLOW",
+            "name": name,
+            "description": description,
+            "exec_config": serialized_value,
         }
 
     if isinstance(value, BaseModel):
