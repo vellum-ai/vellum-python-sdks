@@ -1,5 +1,4 @@
 import { python } from "@fern-api/python-ast";
-import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
 import { isNil } from "lodash";
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
@@ -8,6 +7,7 @@ import {
   PromptTemplateBlockExcludingFunctionDefinition,
 } from "src/generators/base-prompt-block";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { MethodArgument } from "src/generators/extensions/method-argument";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Json } from "src/generators/json";
 import {

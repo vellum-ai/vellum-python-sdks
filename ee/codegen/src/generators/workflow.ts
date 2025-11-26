@@ -1,5 +1,4 @@
 import { python } from "@fern-api/python-ast";
-import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
 import { Type } from "@fern-api/python-ast/Type";
 import { isNil } from "lodash";
 
@@ -21,6 +20,7 @@ import {
 } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
+import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { GraphAttribute } from "src/generators/graph-attribute";

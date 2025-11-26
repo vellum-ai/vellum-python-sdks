@@ -1,6 +1,5 @@
-import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
-
 import { AstNode } from "./ast-node";
+import { MethodArgument } from "./method-argument";
 import { Reference } from "./reference";
 import { Writer } from "./writer";
 
