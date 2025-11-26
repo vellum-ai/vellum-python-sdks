@@ -95,12 +95,34 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
           this.isNestedNode = true;
           const value = attribute.value;
 
+          // Extract functions from either CONSTANT_VALUE (legacy) or ARRAY_REFERENCE (new format)
+          let functions: ToolArgs[] | undefined;
+
           if (
             value?.type === "CONSTANT_VALUE" &&
             value.value?.type === "JSON" &&
             Array.isArray(value.value.value)
           ) {
-            const functions: ToolArgs[] = value.value.value;
+            functions = value.value.value as ToolArgs[];
+          } else if (
+            value?.type === "ARRAY_REFERENCE" &&
+            Array.isArray(value.items)
+          ) {
+            // Handle new ARRAY_REFERENCE format where CODE_EXECUTION is a first-class descriptor
+            functions = [];
+            for (const item of value.items) {
+              if (!item) continue;
+              // Each item is a WorkflowValueDescriptor - for CODE_EXECUTION, map to FunctionArgs
+              const itemWithType = item as { type?: string };
+              if (itemWithType.type === "CODE_EXECUTION") {
+                // The item has the same shape as FunctionArgs
+                functions.push(item as unknown as ToolArgs);
+              }
+              // Other function types (INLINE_WORKFLOW, etc.) are still in CONSTANT_VALUE format
+            }
+          }
+
+          if (functions && functions.length > 0) {
 
             const codeExecutionFunctions: FunctionArgs[] = [];
             const inlineWorkflowFunctions: InlineWorkflowFunctionArgs[] = [];

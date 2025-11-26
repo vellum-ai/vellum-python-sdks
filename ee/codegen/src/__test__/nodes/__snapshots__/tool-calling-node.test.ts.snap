@@ -1,5 +1,18 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`ToolCallingNode > ARRAY_REFERENCE format > generates code for ARRAY_REFERENCE with CODE_EXECUTION 1`] = `
+"from .get_weather import get_weather
+
+from vellum.workflows.nodes.displayable.tool_calling_node import (
+    ToolCallingNode as BaseToolCallingNode,
+)
+
+
+class ToolCallingNode(BaseToolCallingNode):
+    functions = [get_weather]
+"
+`;
+
 exports[`ToolCallingNode > basic > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 

@@ -820,4 +820,165 @@ describe("ToolCallingNode", () => {
       expect(output).toMatchSnapshot();
     });
   });
+
+  describe("ARRAY_REFERENCE format", () => {
+    it("generates same code for ARRAY_REFERENCE as CONSTANT_VALUE JSON", async () => {
+      /**
+       * Tests that the new ARRAY_REFERENCE format for functions produces
+       * the same codegen output as the legacy CONSTANT_VALUE JSON format.
+       */
+
+      // GIVEN a CODE_EXECUTION function definition
+      const codeExecutionFunction: FunctionArgs = {
+        type: "CODE_EXECUTION",
+        src: 'def add_numbers(a: int, b: int) -> int:\n    """\n    Add two numbers together.\n    """\n    return a + b\n',
+        name: "add_numbers",
+        description: "Add two numbers together.",
+        definition: {
+          name: "add_numbers",
+          parameters: {
+            type: "object",
+            required: ["a", "b"],
+            properties: {
+              a: { type: "integer" },
+              b: { type: "integer" },
+            },
+          },
+        },
+      };
+
+      // AND the legacy CONSTANT_VALUE JSON format
+      const constFunctionsAttr = nodeAttributeFactory(
+        "functions-const",
+        "functions",
+        {
+          type: "CONSTANT_VALUE",
+          value: { type: "JSON", value: [codeExecutionFunction] },
+        }
+      );
+
+      // AND the new ARRAY_REFERENCE format (CODE_EXECUTION as first-class descriptor)
+      const arrayFunctionsAttr = nodeAttributeFactory(
+        "functions-array",
+        "functions",
+        {
+          type: "ARRAY_REFERENCE",
+          items: [
+            {
+              type: "CODE_EXECUTION",
+              name: codeExecutionFunction.name,
+              description: codeExecutionFunction.description,
+              definition: codeExecutionFunction.definition,
+              src: codeExecutionFunction.src,
+            },
+          ],
+        }
+      );
+
+      const constNodeData = toolCallingNodeFactory({
+        nodePorts: [nodePortFactory({ id: "port-id-const" })],
+        nodeAttributes: [constFunctionsAttr],
+      });
+      const arrayNodeData = toolCallingNodeFactory({
+        nodePorts: [nodePortFactory({ id: "port-id-array" })],
+        nodeAttributes: [arrayFunctionsAttr],
+      });
+
+      // Use separate workflow contexts to avoid port ID conflicts
+      const constWorkflowContext = workflowContextFactory({ strict: false });
+      const arrayWorkflowContext = workflowContextFactory({ strict: false });
+
+      const constNodeContext = (await createNodeContext({
+        workflowContext: constWorkflowContext,
+        nodeData: constNodeData,
+      })) as GenericNodeContext;
+      const arrayNodeContext = (await createNodeContext({
+        workflowContext: arrayWorkflowContext,
+        nodeData: arrayNodeData,
+      })) as GenericNodeContext;
+
+      const constWriter = new Writer();
+      const arrayWriter = new Writer();
+
+      // WHEN we generate code for both formats
+      new GenericNode({
+        workflowContext: constWorkflowContext,
+        nodeContext: constNodeContext,
+      })
+        .getNodeFile()
+        .write(constWriter);
+      new GenericNode({
+        workflowContext: arrayWorkflowContext,
+        nodeContext: arrayNodeContext,
+      })
+        .getNodeFile()
+        .write(arrayWriter);
+
+      // THEN the generated code should be identical
+      expect(await constWriter.toStringFormatted()).toEqual(
+        await arrayWriter.toStringFormatted()
+      );
+    });
+
+    it("generates code for ARRAY_REFERENCE with CODE_EXECUTION", async () => {
+      /**
+       * Tests that the new ARRAY_REFERENCE format with CODE_EXECUTION
+       * generates valid Python code.
+       */
+
+      // GIVEN a CODE_EXECUTION function in ARRAY_REFERENCE format
+      const nodePortData: NodePort[] = [
+        nodePortFactory({
+          id: "port-id",
+        }),
+      ];
+
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        {
+          type: "ARRAY_REFERENCE",
+          items: [
+            {
+              type: "CODE_EXECUTION",
+              name: "get_weather",
+              description: "Get the current weather",
+              definition: {
+                name: "get_weather",
+                parameters: {
+                  type: "object",
+                  required: ["location"],
+                  properties: {
+                    location: { type: "string" },
+                  },
+                },
+              },
+              src: 'def get_weather(location: str) -> str:\n    """Get the current weather"""\n    return f"Weather in {location}"\n',
+            },
+          ],
+        }
+      );
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [functionsAttribute],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      // WHEN we generate code
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+
+      // THEN the generated code should match the snapshot
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });
