@@ -153,7 +153,9 @@ def test_serialize_node__prompt_inputs__mixed_values():
 
 
 def test_serialize_node__tool_calling_node__mcp_server_api_key():
-    # GIVEN a tool calling node with an mcp server
+    """Tests that MCPServer with EnvironmentVariableReference serializes as ARRAY_REFERENCE."""
+
+    # GIVEN a tool calling node with an mcp server using an environment variable for the API key
     class MyToolCallingNode(ToolCallingNode):
         functions = [
             MCPServer(
@@ -184,27 +186,26 @@ def test_serialize_node__tool_calling_node__mcp_server_api_key():
         attribute for attribute in my_tool_calling_node["attributes"] if attribute["name"] == "functions"
     )
 
-    assert functions_attribute == {
-        "id": "ff00c2d6-f99c-458b-9bcd-181f8e43b2d1",
-        "name": "functions",
-        "value": {
-            "type": "CONSTANT_VALUE",
-            "value": {
-                "type": "JSON",
-                "value": [
-                    {
-                        "type": "MCP_SERVER",
-                        "name": "my-mcp-server",
-                        "description": "",
-                        "url": "https://my-mcp-server.com",
-                        "authorization_type": "API_KEY",
-                        "bearer_token_value": None,
-                        "api_key_header_key": "my-api-key-header-key",
-                        "api_key_header_value": "my-api-key-header-value",
-                    }
-                ],
-            },
-        },
+    # AND the functions attribute should be an ARRAY_REFERENCE with a DICTIONARY_REFERENCE
+    # containing the MCP server fields, with api_key_header_value as ENVIRONMENT_VARIABLE
+    assert functions_attribute["id"] == "ff00c2d6-f99c-458b-9bcd-181f8e43b2d1"
+    assert functions_attribute["name"] == "functions"
+    assert functions_attribute["value"]["type"] == "ARRAY_REFERENCE"
+
+    items = functions_attribute["value"]["items"]
+    assert len(items) == 1
+
+    mcp_server_dict = items[0]
+    assert mcp_server_dict["type"] == "DICTIONARY_REFERENCE"
+    assert mcp_server_dict["definition"] == {
+        "name": "MCPServer",
+        "module": ["vellum", "workflows", "types", "definition"],
+    }
+
+    entries = {entry["key"]: entry["value"] for entry in mcp_server_dict["entries"]}
+    assert entries["api_key_header_value"] == {
+        "type": "ENVIRONMENT_VARIABLE",
+        "environment_variable": "my-api-key-header-value",
     }
 
 
