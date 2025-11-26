@@ -560,7 +560,7 @@ class BaseState(metaclass=_BaseStateMeta):
             if not name.startswith("_") and name != "meta":
                 if isinstance(value, FieldInfo):
                     if value.default_factory is not None:
-                        value = value.default_factory()  # type: ignore[call-arg]
+                        value = cast(Callable[[], Any], value.default_factory)()
                     elif hasattr(value, "default") and value.default is not ...:
                         value = value.default
                     else:
