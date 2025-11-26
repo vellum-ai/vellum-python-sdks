@@ -13,7 +13,7 @@ class EnvironmentVariableReference(BaseDescriptor[str]):
         self,
         *,
         name: str,
-        # DEPRECATED - to be removed in 0.15.0 release
+        # DEPRECATED - to be removed in 2.0 release
         default: Optional[str] = None,
     ):
         super().__init__(name=name, types=(str,), is_sensitive=True)
