@@ -137,6 +137,20 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                 initializer: new ListInstantiation(functionReferences),
               })
             );
+          } else if (value?.type === "ARRAY_REFERENCE") {
+            // Handle new ARRAY_REFERENCE format (e.g., MCPServer with EnvironmentVariableReference)
+            // This delegates to the generic WorkflowValueDescriptor machinery which handles
+            // ARRAY_REFERENCE -> ArrayWorkflowReference -> DictionaryWorkflowReference with definition
+            nodeAttributesStatements.push(
+              python.field({
+                name: toValidPythonIdentifier(attribute.name, "attr"),
+                initializer: new WorkflowValueDescriptor({
+                  nodeContext: this.nodeContext,
+                  workflowContext: this.workflowContext,
+                  workflowValueDescriptor: value,
+                }),
+              })
+            );
           }
           break;
         }

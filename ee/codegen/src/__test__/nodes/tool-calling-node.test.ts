@@ -688,6 +688,108 @@ describe("ToolCallingNode", () => {
       node.getNodeFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
+
+    it("should generate mcp server with ARRAY_REFERENCE format and EnvironmentVariableReference", async () => {
+      /**
+       * Tests that MCPServer with EnvironmentVariableReference serialized as
+       * ARRAY_REFERENCE+DICTIONARY_REFERENCE generates correct code.
+       * This is the new serialization format used when MCPServer contains dynamic references.
+       */
+
+      // GIVEN the new ARRAY_REFERENCE+DICTIONARY_REFERENCE representation
+      const arrayReferenceFunctionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        {
+          type: "ARRAY_REFERENCE",
+          items: [
+            {
+              type: "DICTIONARY_REFERENCE",
+              entries: [
+                {
+                  key: "name",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: { type: "STRING", value: "my-mcp-server" },
+                  },
+                },
+                {
+                  key: "url",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: {
+                      type: "STRING",
+                      value: "https://my-mcp-server.com",
+                    },
+                  },
+                },
+                {
+                  key: "authorization_type",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: { type: "STRING", value: "API_KEY" },
+                  },
+                },
+                {
+                  key: "api_key_header_key",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: { type: "STRING", value: "my-api-key-header-key" },
+                  },
+                },
+                {
+                  key: "api_key_header_value",
+                  value: {
+                    type: "ENVIRONMENT_VARIABLE",
+                    environmentVariable: "my-api-key-header-value",
+                  },
+                },
+              ],
+              definition: {
+                name: "MCPServer",
+                module: ["vellum", "workflows", "types", "definition"],
+              },
+            },
+          ],
+        }
+      );
+
+      const nodePortData: NodePort[] = [
+        nodePortFactory({
+          id: "port-id",
+        }),
+      ];
+
+      // WHEN we generate code for the new ARRAY_REFERENCE format
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [arrayReferenceFunctionsAttribute],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      const code = await writer.toStringFormatted();
+
+      // THEN the generated code should contain the MCPServer with EnvironmentVariableReference
+      expect(code).toContain("MCPServer(");
+      expect(code).toContain('name="my-mcp-server"');
+      expect(code).toContain('url="https://my-mcp-server.com"');
+      expect(code).toContain('api_key_header_key="my-api-key-header-key"');
+      expect(code).toContain("EnvironmentVariableReference(");
+      expect(code).toContain('name="my-api-key-header-value"');
+
+      // AND the full output should match the snapshot
+      expect(code).toMatchSnapshot();
+    });
   });
 
   describe("no tools with jinja blocks", () => {
