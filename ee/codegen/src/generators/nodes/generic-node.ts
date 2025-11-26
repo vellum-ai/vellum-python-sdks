@@ -109,35 +109,11 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
             Array.isArray(value.items)
           ) {
             // Handle new ARRAY_REFERENCE format where items are first-class descriptors
-            // (CODE_EXECUTION, INLINE_WORKFLOW, WORKFLOW_DEPLOYMENT, etc.)
-            // Also support CONSTANT_VALUE/JSON for backward compatibility
-            functions = [];
-            for (const item of value.items) {
-              if (!item) continue;
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const itemAny = item as any;
-              const itemType = itemAny.type as string | undefined;
-
-              // First-class descriptor types (new format)
-              if (
-                itemType === "CODE_EXECUTION" ||
-                itemType === "INLINE_WORKFLOW" ||
-                itemType === "WORKFLOW_DEPLOYMENT" ||
-                itemType === "COMPOSIO" ||
-                itemType === "MCP_SERVER"
-              ) {
-                functions.push(itemAny as ToolArgs);
-              } else if (
-                itemType === "CONSTANT_VALUE" &&
-                itemAny.value?.type === "JSON"
-              ) {
-                // Backward compatibility: unwrap CONSTANT_VALUE/JSON
-                const inner = itemAny.value.value;
-                if (inner) {
-                  functions.push(inner as ToolArgs);
-                }
-              }
-            }
+            // (CODE_EXECUTION, INLINE_WORKFLOW, etc.)
+            // Legacy CONSTANT_VALUE format is handled by the first branch above
+            functions = value.items
+              .filter((item): item is NonNullable<typeof item> => item != null)
+              .map((item) => item as unknown as ToolArgs);
           }
 
           if (functions && functions.length > 0) {

@@ -585,7 +585,9 @@ def test_serialize_node__tool_calling_node__subworkflow_with_parent_input_refere
         attribute for attribute in my_tool_calling_node["attributes"] if attribute["name"] == "functions"
     )
 
-    data = functions_attribute["value"]["value"]["value"][0]
+    # INLINE_WORKFLOW is now a first-class descriptor type, so the list becomes ARRAY_REFERENCE
+    assert functions_attribute["value"]["type"] == "ARRAY_REFERENCE"
+    data = functions_attribute["value"]["items"][0]
     nodes = data["exec_config"]["workflow_raw_data"]["nodes"]
     code_exec_node = next((node for node in nodes if node["type"] == "CODE_EXECUTION"), None)
 
