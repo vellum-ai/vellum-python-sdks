@@ -557,6 +557,11 @@ def create_function_node(
             wrapper.__name__ = func.__name__
             return wrapper
 
+        display_class = type(
+            f"FunctionNodeDisplay_{function.__name__}",
+            (FunctionNode.Display,),
+            {"icon": "vellum:icon:rectangle-code", "color": "purple"},
+        )
         node = type(
             f"FunctionNode_{function.__name__}",
             (FunctionNode,),
@@ -564,6 +569,7 @@ def create_function_node(
                 "function_definition": create_function_wrapper(function),
                 "arguments": arguments_expr,
                 "function_call_id": function_call_id_expr,
+                "Display": display_class,
                 "__module__": __name__,
             },
         )
