@@ -905,62 +905,68 @@ describe("ToolCallingNode", () => {
             id: "e2695720-919b-497e-8d01-ae6aa705f7bb",
             name: "functions",
             value: {
-              type: "ARRAY_REFERENCE",
-              items: [
-                {
-                  type: "CODE_EXECUTION",
-                  name: "get_string",
-                  description:
-                    "\n    Get a string with the parent input, dummy input, and the populated input.\n    ",
-                  definition: {
-                    state: null,
-                    cache_config: null,
+              type: "CONSTANT_VALUE",
+              value: {
+                type: "JSON",
+                value: [
+                  {
+                    type: "CODE_EXECUTION",
                     name: "get_string",
                     description:
                       "\n    Get a string with the parent input, dummy input, and the populated input.\n    ",
-                    parameters: {
-                      type: "object",
-                      properties: { populated_input: { type: "string" } },
-                      required: ["populated_input"],
+                    definition: {
+                      state: null,
+                      cache_config: null,
+                      name: "get_string",
+                      description:
+                        "\n    Get a string with the parent input, dummy input, and the populated input.\n    ",
+                      parameters: {
+                        type: "object",
+                        properties: { populated_input: { type: "string" } },
+                        required: ["populated_input"],
+                      },
+                      inputs: {
+                        type: "DICTIONARY_REFERENCE",
+                        entries: [
+                          {
+                            id: "11c6f6ee-6b1e-4070-90d6-05293d4da7fd",
+                            key: "parent_input",
+                            value: {
+                              type: "WORKFLOW_INPUT",
+                              input_variable_id:
+                                "4bf1f0e7-76c6-4204-9f8c-bd9c3b73a8db",
+                            },
+                          },
+                          {
+                            id: "0b86e78e-f3ec-44dd-9969-9a7c0bd634fc",
+                            key: "dummy_input",
+                            value: {
+                              type: "NODE_OUTPUT",
+                              node_id: "72f78142-e0a2-40a9-ae70-0230ccf3b503",
+                              node_output_id:
+                                "6e639661-d0dc-4586-9393-e64e95e0d3ef",
+                            },
+                          },
+                          {
+                            id: "31856421-ac85-47bc-bac8-923a3fba351e",
+                            key: "constant_input",
+                            value: {
+                              type: "CONSTANT_VALUE",
+                              value: {
+                                type: "STRING",
+                                value: "constant_input",
+                              },
+                            },
+                          },
+                        ],
+                      },
+                      forced: null,
+                      strict: null,
                     },
-                    inputs: {
-                      type: "DICTIONARY_REFERENCE",
-                      entries: [
-                        {
-                          id: "11c6f6ee-6b1e-4070-90d6-05293d4da7fd",
-                          key: "parent_input",
-                          value: {
-                            type: "WORKFLOW_INPUT",
-                            inputVariableId:
-                              "4bf1f0e7-76c6-4204-9f8c-bd9c3b73a8db",
-                          },
-                        },
-                        {
-                          id: "0b86e78e-f3ec-44dd-9969-9a7c0bd634fc",
-                          key: "dummy_input",
-                          value: {
-                            type: "NODE_OUTPUT",
-                            nodeId: "72f78142-e0a2-40a9-ae70-0230ccf3b503",
-                            nodeOutputId:
-                              "6e639661-d0dc-4586-9393-e64e95e0d3ef",
-                          },
-                        },
-                        {
-                          id: "31856421-ac85-47bc-bac8-923a3fba351e",
-                          key: "constant_input",
-                          value: {
-                            type: "CONSTANT_VALUE",
-                            value: { type: "STRING", value: "constant_input" },
-                          },
-                        },
-                      ],
-                    },
-                    forced: null,
-                    strict: null,
+                    src: 'from .inputs import ParentInputs\nfrom .nodes.dummy_node import DummyNode\n\ndef get_string(parent_input: str, dummy_input: str, constant_input: str, populated_input: str) -> str:\n    """\n    Get a string with the parent input, dummy input, and the populated input.\n    """\n    return f\'parent input: {parent_input}, dummy input: {dummy_input}, constant input: {constant_input}, populated input: {populated_input}\'\n',
                   },
-                  src: 'from .inputs import ParentInputs\nfrom .nodes.dummy_node import DummyNode\n\ndef get_string(parent_input: str, dummy_input: str, constant_input: str, populated_input: str) -> str:\n    """\n    Get a string with the parent input, dummy input, and the populated input.\n    """\n    return f\'parent input: {parent_input}, dummy input: {dummy_input}, constant input: {constant_input}, populated input: {populated_input}\'\n',
-                },
-              ],
+                ],
+              },
             },
           },
           {
