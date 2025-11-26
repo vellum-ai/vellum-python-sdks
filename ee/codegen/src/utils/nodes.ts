@@ -9,7 +9,7 @@ import {
 export function getNodeLabel(nodeData: WorkflowNode): string {
   switch (nodeData.type) {
     case "GENERIC":
-      return nodeData.definition?.name ?? nodeData.label ?? "Generic Node";
+      return nodeData.label ?? nodeData.definition?.name ?? "Generic Node";
     default:
       return nodeData.data.label;
   }

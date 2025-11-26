@@ -383,7 +383,6 @@ from ...nodes.start import StartNode
 
 
 class StartNodeDisplay(BaseNodeDisplay[StartNode]):
-    label = "StartNode"
     node_id = UUID("dcaa25fa-dabf-4bef-ad7f-2c9805ba3cdf")
     display_data = NodeDisplayData(position=NodeDisplayPosition(x=200, y=-50))
     port_displays = {
