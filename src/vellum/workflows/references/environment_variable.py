@@ -1,5 +1,5 @@
 import os
-from typing import TYPE_CHECKING, Any, Dict
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -14,7 +14,7 @@ class EnvironmentVariableReference(BaseDescriptor[str]):
         *,
         name: str,
         # DEPRECATED - to be removed in 0.15.0 release
-        # default: Optional[str] = None,
+        default: Optional[str] = None,
     ):
         super().__init__(name=name, types=(str,), is_sensitive=True)
 
