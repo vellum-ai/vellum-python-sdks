@@ -45,21 +45,60 @@ def test_serialize_workflow():
         "id": "80ed138a-1127-4c77-ba27-a66a37c92717",
         "name": "functions",
         "value": {
-            "type": "CONSTANT_VALUE",
-            "value": {
-                "type": "JSON",
-                "value": [
-                    {
-                        "type": "MCP_SERVER",
-                        "name": "github",
-                        "description": "",
-                        "url": "https://api.githubcopilot.com/mcp/",
-                        "authorization_type": "BEARER_TOKEN",
-                        "bearer_token_value": "GITHUB_PERSONAL_ACCESS_TOKEN",
-                        "api_key_header_key": None,
-                        "api_key_header_value": None,
-                    }
-                ],
-            },
+            "type": "ARRAY_REFERENCE",
+            "items": [
+                {
+                    "type": "DICTIONARY_REFERENCE",
+                    "entries": [
+                        {
+                            "id": "85eb3714-5810-4935-9abe-a6112d4c406c",
+                            "key": "type",
+                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "MCP_SERVER"}},
+                        },
+                        {
+                            "id": "c9cc0249-c8bd-4b67-9347-c0a210646bcc",
+                            "key": "name",
+                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "github"}},
+                        },
+                        {
+                            "id": "b8f99ea6-ae33-4e62-b958-351e7e975bdc",
+                            "key": "description",
+                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": ""}},
+                        },
+                        {
+                            "id": "07d62347-5a1b-4b91-90f7-1e313238f2b2",
+                            "key": "url",
+                            "value": {
+                                "type": "CONSTANT_VALUE",
+                                "value": {"type": "STRING", "value": "https://api.githubcopilot.com/mcp/"},
+                            },
+                        },
+                        {
+                            "id": "b9ef2156-dd84-4a84-91ce-ce590fe2087b",
+                            "key": "authorization_type",
+                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "BEARER_TOKEN"}},
+                        },
+                        {
+                            "id": "df799ea3-77bb-40a1-82a1-a5fe343ba68b",
+                            "key": "bearer_token_value",
+                            "value": {
+                                "type": "ENVIRONMENT_VARIABLE",
+                                "environment_variable": "GITHUB_PERSONAL_ACCESS_TOKEN",
+                            },
+                        },
+                        {
+                            "id": "6e940707-ffe9-4cfb-813e-ddc3a9204ba4",
+                            "key": "api_key_header_key",
+                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                        },
+                        {
+                            "id": "2e3db081-7596-4057-b977-be69971d7f87",
+                            "key": "api_key_header_value",
+                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                        },
+                    ],
+                    "definition": {"name": "MCPServer", "module": ["vellum", "workflows", "types", "definition"]},
+                }
+            ],
         },
     }
