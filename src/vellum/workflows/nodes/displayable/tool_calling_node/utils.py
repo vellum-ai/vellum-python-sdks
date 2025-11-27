@@ -563,7 +563,7 @@ def create_function_node(
             {"icon": "vellum:icon:rectangle-code", "color": "purple"},
         )
         node = type(
-            f"FunctionNode_{function.__name__}",
+            function.__name__,
             (FunctionNode,),
             {
                 "function_definition": create_function_wrapper(function),
