@@ -138,6 +138,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
           } else if (value?.type === "ARRAY_REFERENCE") {
             // Handle ARRAY_REFERENCE format (e.g., MCPServer with EnvironmentVariableReference)
             // Process each item using the same handler pattern as CONSTANT_VALUE
+            // Order is preserved by processing each item inline.
             const items = value.items || [];
             const functionReferences: python.AstNode[] = [];
             const functionHandlers: Record<
@@ -154,6 +155,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                 this.handleVellumIntegrationFunction(f),
             };
 
+            // Process each item in order to preserve function ordering
             items.forEach((item) => {
               if (
                 item.type === "CONSTANT_VALUE" &&
