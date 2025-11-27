@@ -138,17 +138,67 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
               })
             );
           } else if (value?.type === "ARRAY_REFERENCE") {
-            // Handle new ARRAY_REFERENCE format (e.g., MCPServer with EnvironmentVariableReference)
-            // This delegates to the generic WorkflowValueDescriptor machinery which handles
-            // ARRAY_REFERENCE -> ArrayWorkflowReference -> DictionaryWorkflowReference with definition
+            // Handle ARRAY_REFERENCE format (e.g., MCPServer with EnvironmentVariableReference)
+            // Process each item using the same handler pattern as CONSTANT_VALUE
+            const items = value.items || [];
+            const functionReferences: python.AstNode[] = [];
+            const functionHandlers: Record<
+              ToolArgs["type"],
+              (f: ToolArgs) => python.AstNode | null
+            > = {
+              CODE_EXECUTION: (f) => this.handleCodeExecutionFunction(f),
+              INLINE_WORKFLOW: (f) => this.handleInlineWorkflowFunction(f),
+              WORKFLOW_DEPLOYMENT: (f) =>
+                this.handleWorkflowDeploymentFunction(f),
+              COMPOSIO: (f) => this.handleComposioFunction(f),
+              MCP_SERVER: (f) => this.handleMCPServerFunction(f),
+              VELLUM_INTEGRATION: (f) =>
+                this.handleVellumIntegrationFunction(f),
+            };
+
+            items.forEach((item) => {
+              if (
+                item.type === "CONSTANT_VALUE" &&
+                item.value?.type === "JSON" &&
+                item.value.value &&
+                typeof item.value.value === "object" &&
+                "type" in item.value.value
+              ) {
+                // This is a ToolArgs object, use the handler pattern
+                const toolArg = item.value.value as ToolArgs;
+                const handler = functionHandlers[toolArg.type];
+                if (handler) {
+                  const functionReference = handler(toolArg);
+                  if (functionReference) {
+                    functionReferences.push(functionReference);
+                  }
+                } else {
+                  this.workflowContext.addError(
+                    new NodeDefinitionGenerationError(
+                      `Unsupported function type in ARRAY_REFERENCE: ${JSON.stringify(
+                        toolArg
+                      )}`,
+                      "WARNING"
+                    )
+                  );
+                }
+              } else {
+                // For other items (like DICTIONARY_REFERENCE for MCPServer),
+                // use WorkflowValueDescriptor directly
+                functionReferences.push(
+                  new WorkflowValueDescriptor({
+                    nodeContext: this.nodeContext,
+                    workflowContext: this.workflowContext,
+                    workflowValueDescriptor: item,
+                  })
+                );
+              }
+            });
+
             nodeAttributesStatements.push(
               python.field({
                 name: toValidPythonIdentifier(attribute.name, "attr"),
-                initializer: new WorkflowValueDescriptor({
-                  nodeContext: this.nodeContext,
-                  workflowContext: this.workflowContext,
-                  workflowValueDescriptor: value,
-                }),
+                initializer: python.TypeInstantiation.list(functionReferences),
               })
             );
           }

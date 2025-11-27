@@ -795,6 +795,513 @@ describe("ToolCallingNode", () => {
       // AND the full output should match the snapshot
       expect(code).toMatchSnapshot();
     });
+
+    it("should generate mixed functions with CODE_EXECUTION, MCP_SERVER with ENVIRONMENT_VARIABLE, and INLINE_WORKFLOW", async () => {
+      /**
+       * Tests that a ToolCallingNode with mixed function types in ARRAY_REFERENCE format
+       * generates correct code. This includes:
+       * - CODE_EXECUTION function (serialized as CONSTANT_VALUE)
+       * - MCP_SERVER with EnvironmentVariableReference (serialized as DICTIONARY_REFERENCE)
+       * - INLINE_WORKFLOW (serialized as CONSTANT_VALUE)
+       */
+
+      const arrayReferenceFunctionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        {
+          type: "ARRAY_REFERENCE",
+          items: [
+            {
+              type: "CONSTANT_VALUE",
+              value: {
+                type: "JSON",
+                value: {
+                  src: 'def add(a: int, b: int):\n    """Description of function_1"""\n    return a + b',
+                  name: "add",
+                  type: "CODE_EXECUTION",
+                  definition: {
+                    name: "add",
+                    state: null,
+                    forced: null,
+                    inputs: null,
+                    strict: null,
+                    parameters: {
+                      type: "object",
+                      required: ["a", "b"],
+                      properties: {
+                        a: { type: "integer" },
+                        b: { type: "integer" },
+                      },
+                    },
+                    description: "Description of function_1",
+                    cache_config: null,
+                  },
+                  description: "Description of function_1",
+                },
+              },
+            },
+            {
+              type: "DICTIONARY_REFERENCE",
+              entries: [
+                {
+                  id: "41a085ca-d80d-4f77-9d94-dd2045251c49",
+                  key: "type",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: { type: "STRING", value: "MCP_SERVER" },
+                  },
+                },
+                {
+                  id: "44a97bcf-5c73-4ee7-abc9-03f2704f4657",
+                  key: "name",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: { type: "STRING", value: "github" },
+                  },
+                },
+                {
+                  id: "f595fcea-5295-4822-881f-7054652b6ac2",
+                  key: "description",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: { type: "STRING", value: "" },
+                  },
+                },
+                {
+                  id: "147ae38b-56f7-452a-93d4-6291ce9fa26f",
+                  key: "url",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: {
+                      type: "STRING",
+                      value: "https://api.githubcopilot.com/mcp/",
+                    },
+                  },
+                },
+                {
+                  id: "297bd5da-9385-4058-be68-f7987c2f2ad0",
+                  key: "authorization_type",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: { type: "STRING", value: "API_KEY" },
+                  },
+                },
+                {
+                  id: "727f5be2-d55f-4039-a42f-f8c9783804bd",
+                  key: "bearer_token_value",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: { type: "JSON", value: null },
+                  },
+                },
+                {
+                  id: "1c5f7c73-e416-4256-be90-f216ff7ed8f4",
+                  key: "api_key_header_key",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: { type: "STRING", value: "aaa" },
+                  },
+                },
+                {
+                  id: "da14526d-a337-4ca3-82b0-b681cce999c6",
+                  key: "api_key_header_value",
+                  value: {
+                    type: "ENVIRONMENT_VARIABLE",
+                    environmentVariable: "FIRECRAWL",
+                  },
+                },
+              ],
+              definition: {
+                name: "MCPServer",
+                module: ["vellum", "workflows", "types", "definition"],
+              },
+            },
+            {
+              type: "CONSTANT_VALUE",
+              value: {
+                type: "JSON",
+                value: {
+                  name: "Subtract",
+                  type: "INLINE_WORKFLOW",
+                  description: "",
+                  exec_config: {
+                    input_variables: [
+                      {
+                        id: "578081cf-490e-47c8-9335-d3e88e7c8a9f",
+                        key: "var_1",
+                        type: "NUMBER",
+                        default: null,
+                        required: false,
+                        extensions: { color: "teal" },
+                      },
+                      {
+                        id: "1b13dc78-45d7-4bdc-8df5-64e4a7e63d0b",
+                        key: "var_2",
+                        type: "NUMBER",
+                        default: null,
+                        required: false,
+                        extensions: { color: "peach" },
+                      },
+                    ],
+                    state_variables: [],
+                    output_variables: [
+                      {
+                        id: "29b899b0-6e71-4e21-aaf2-5da484f9d088",
+                        key: "output",
+                        type: "NUMBER",
+                      },
+                    ],
+                    workflow_raw_data: {
+                      edges: [
+                        {
+                          id: "2cdc8ebb-a01e-4cf8-bf22-14b2e90ee42b",
+                          type: "DEFAULT",
+                          source_node_id:
+                            "45fae5fa-553e-432c-bf9e-d22b669dc5d5",
+                          target_node_id:
+                            "6aa59f91-6d5d-4f11-97cf-bdab0773972b",
+                          source_handle_id:
+                            "bb2cfe41-f0d1-4375-b4d8-e415df678808",
+                          target_handle_id:
+                            "1d5cea3d-9686-4903-a2b1-420e3c63934c",
+                        },
+                        {
+                          id: "de27a328-463e-4d84-bf13-eb267d1a339f",
+                          type: "DEFAULT",
+                          display_data: { z_index: 0 },
+                          source_node_id:
+                            "6aa59f91-6d5d-4f11-97cf-bdab0773972b",
+                          target_node_id:
+                            "d3d58aa4-ae05-4fc9-ba77-315cac5f4f06",
+                          source_handle_id:
+                            "ff54ed7c-06ec-46cc-8e51-71e92c06c408",
+                          target_handle_id:
+                            "24d76ce4-c2b4-4988-88f8-f59ab3f09a34",
+                        },
+                      ],
+                      nodes: [
+                        {
+                          id: "45fae5fa-553e-432c-bf9e-d22b669dc5d5",
+                          base: null,
+                          data: {
+                            label: "Entrypoint Node",
+                            source_handle_id:
+                              "bb2cfe41-f0d1-4375-b4d8-e415df678808",
+                          },
+                          type: "ENTRYPOINT",
+                          inputs: [],
+                          definition: null,
+                          display_data: {
+                            icon: "vellum:icon:play",
+                            color: "default",
+                            width: 306,
+                            height: 88,
+                            z_index: 2,
+                            position: { x: 1545.0, y: 330.0 },
+                          },
+                        },
+                        {
+                          id: "6aa59f91-6d5d-4f11-97cf-bdab0773972b",
+                          base: {
+                            name: "CodeExecutionNode",
+                            module: [
+                              "vellum",
+                              "workflows",
+                              "nodes",
+                              "displayable",
+                              "code_execution_node",
+                              "node",
+                            ],
+                          },
+                          data: {
+                            label: "Code Execution",
+                            packages: [],
+                            output_id: "32b2f0d3-fc4b-4e0c-997b-690de7de0912",
+                            output_type: "JSON",
+                            code_input_id:
+                              "446b935c-3840-472d-bab9-f232cb7f997f",
+                            log_output_id:
+                              "3f9245fe-7c3f-4c20-b737-472d857a2aaa",
+                            error_output_id: null,
+                            runtime_input_id:
+                              "05ae0ae1-0c18-42a3-9ce8-03c60dccfc91",
+                            source_handle_id:
+                              "ff54ed7c-06ec-46cc-8e51-71e92c06c408",
+                            target_handle_id:
+                              "1d5cea3d-9686-4903-a2b1-420e3c63934c",
+                          },
+                          type: "CODE_EXECUTION",
+                          ports: [
+                            {
+                              id: "ff54ed7c-06ec-46cc-8e51-71e92c06c408",
+                              name: "default",
+                              type: "DEFAULT",
+                            },
+                          ],
+                          inputs: [
+                            {
+                              id: "da5e7929-57f0-48af-96f3-d71ad6d71985",
+                              key: "var_1",
+                              value: {
+                                rules: [
+                                  {
+                                    data: {
+                                      input_variable_id:
+                                        "578081cf-490e-47c8-9335-d3e88e7c8a9f",
+                                    },
+                                    type: "INPUT_VARIABLE",
+                                  },
+                                ],
+                                combinator: "OR",
+                              },
+                            },
+                            {
+                              id: "ebc1e6aa-f856-4e00-8686-b302ce85edc4",
+                              key: "var_2",
+                              value: {
+                                rules: [
+                                  {
+                                    data: {
+                                      input_variable_id:
+                                        "1b13dc78-45d7-4bdc-8df5-64e4a7e63d0b",
+                                    },
+                                    type: "INPUT_VARIABLE",
+                                  },
+                                ],
+                                combinator: "OR",
+                              },
+                            },
+                            {
+                              id: "446b935c-3840-472d-bab9-f232cb7f997f",
+                              key: "code",
+                              value: {
+                                rules: [
+                                  {
+                                    data: {
+                                      type: "STRING",
+                                      value:
+                                        '"""\nYou must define a function called `main` whose arguments are named after the\nInput Variables.\n"""\n\ndef main(var_1: int, var_2: int) -> int:\n    return var_1 - var_2\n',
+                                    },
+                                    type: "CONSTANT_VALUE",
+                                  },
+                                ],
+                                combinator: "OR",
+                              },
+                            },
+                            {
+                              id: "05ae0ae1-0c18-42a3-9ce8-03c60dccfc91",
+                              key: "runtime",
+                              value: {
+                                rules: [
+                                  {
+                                    data: {
+                                      type: "STRING",
+                                      value: "PYTHON_3_11_6",
+                                    },
+                                    type: "CONSTANT_VALUE",
+                                  },
+                                ],
+                                combinator: "OR",
+                              },
+                            },
+                          ],
+                          outputs: [
+                            {
+                              id: "32b2f0d3-fc4b-4e0c-997b-690de7de0912",
+                              name: "result",
+                              type: "NUMBER",
+                              value: null,
+                              schema: {
+                                anyOf: [
+                                  { type: "number" },
+                                  { type: "integer" },
+                                ],
+                              },
+                            },
+                            {
+                              id: "3f9245fe-7c3f-4c20-b737-472d857a2aaa",
+                              name: "log",
+                              type: "STRING",
+                              value: null,
+                              schema: { type: "string" },
+                            },
+                          ],
+                          trigger: {
+                            id: "1d5cea3d-9686-4903-a2b1-420e3c63934c",
+                            merge_behavior: "AWAIT_ATTRIBUTES",
+                          },
+                          definition: {
+                            name: "CodeExecution",
+                            module: [
+                              "new_workflow",
+                              "nodes",
+                              "agent",
+                              "subtract",
+                              "nodes",
+                              "code_execution",
+                            ],
+                          },
+                          display_data: {
+                            width: 370,
+                            height: 92,
+                            z_index: 4,
+                            position: {
+                              x: 2045.8736080178173,
+                              y: 314.98374860801783,
+                            },
+                          },
+                        },
+                        {
+                          id: "d3d58aa4-ae05-4fc9-ba77-315cac5f4f06",
+                          base: {
+                            name: "FinalOutputNode",
+                            module: [
+                              "vellum",
+                              "workflows",
+                              "nodes",
+                              "displayable",
+                              "final_output_node",
+                              "node",
+                            ],
+                          },
+                          data: {
+                            name: "output",
+                            label: "Output",
+                            output_id: "29b899b0-6e71-4e21-aaf2-5da484f9d088",
+                            output_type: "NUMBER",
+                            node_input_id:
+                              "42549c0a-60cb-4a7a-a830-68f022c02e03",
+                            target_handle_id:
+                              "24d76ce4-c2b4-4988-88f8-f59ab3f09a34",
+                          },
+                          type: "TERMINAL",
+                          ports: [],
+                          inputs: [
+                            {
+                              id: "42549c0a-60cb-4a7a-a830-68f022c02e03",
+                              key: "node_input",
+                              value: {
+                                rules: [
+                                  {
+                                    data: {
+                                      node_id:
+                                        "6aa59f91-6d5d-4f11-97cf-bdab0773972b",
+                                      output_id:
+                                        "32b2f0d3-fc4b-4e0c-997b-690de7de0912",
+                                    },
+                                    type: "NODE_OUTPUT",
+                                  },
+                                ],
+                                combinator: "OR",
+                              },
+                            },
+                          ],
+                          outputs: [
+                            {
+                              id: "29b899b0-6e71-4e21-aaf2-5da484f9d088",
+                              name: "value",
+                              type: "NUMBER",
+                              value: {
+                                type: "NODE_OUTPUT",
+                                node_id: "6aa59f91-6d5d-4f11-97cf-bdab0773972b",
+                                node_output_id:
+                                  "32b2f0d3-fc4b-4e0c-997b-690de7de0912",
+                              },
+                              schema: {
+                                anyOf: [
+                                  { type: "number" },
+                                  { type: "integer" },
+                                ],
+                              },
+                            },
+                          ],
+                          trigger: {
+                            id: "24d76ce4-c2b4-4988-88f8-f59ab3f09a34",
+                            merge_behavior: "AWAIT_ATTRIBUTES",
+                          },
+                          definition: {
+                            name: "Output1",
+                            module: [
+                              "new_workflow",
+                              "nodes",
+                              "agent",
+                              "subtract",
+                              "nodes",
+                              "output",
+                            ],
+                          },
+                          display_data: {
+                            icon: "vellum:icon:circle-stop",
+                            color: "teal",
+                            width: 338,
+                            height: 88,
+                            z_index: 3,
+                            position: { x: 2750.0, y: 210.0 },
+                          },
+                        },
+                      ],
+                      definition: {
+                        name: "Subtract",
+                        module: [
+                          "new_workflow",
+                          "nodes",
+                          "agent",
+                          "subtract",
+                          "workflow",
+                        ],
+                      },
+                      display_data: {
+                        viewport: {
+                          x: -928.6639662994166,
+                          y: 96.75729099157488,
+                          zoom: 0.5819831497083603,
+                        },
+                      },
+                      output_values: [
+                        {
+                          value: {
+                            type: "NODE_OUTPUT",
+                            node_id: "d3d58aa4-ae05-4fc9-ba77-315cac5f4f06",
+                            node_output_id:
+                              "29b899b0-6e71-4e21-aaf2-5da484f9d088",
+                          },
+                          output_variable_id:
+                            "29b899b0-6e71-4e21-aaf2-5da484f9d088",
+                        },
+                      ],
+                    },
+                  },
+                },
+              },
+            },
+          ],
+        }
+      );
+
+      const nodePortData: NodePort[] = [
+        nodePortFactory({
+          id: "port-id",
+        }),
+      ];
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [arrayReferenceFunctionsAttribute],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
   });
 
   describe("no tools with jinja blocks", () => {
