@@ -157,7 +157,7 @@ def test_serialize_workflow():
                                     "forced": None,
                                     "strict": None,
                                 },
-                                "src": 'import math\nfrom typing import Annotated\n\n\ndef get_current_weather(\n    location: Annotated[str, "The location to get the weather for"], unit: Annotated[str, "The unit of temperature"]\n) -> str:\n    """\n    Get the current weather in a given location.\n    """\n    return f"The current weather in {location} is sunny with a temperature of {get_temperature(70.1)} degrees {unit}."\n\n\ndef get_temperature(temperature: float) -> int:\n    """\n    Get the temperature in a given location.\n    """\n    return math.floor(temperature)\n',  # noqa: E501
+                                "src": 'import math\nfrom typing import Annotated\n\ndef get_current_weather(location: Annotated[str, \'The location to get the weather for\'], unit: Annotated[str, \'The unit of temperature\']) -> str:\n    """\n    Get the current weather in a given location.\n    """\n    return f\'The current weather in {location} is sunny with a temperature of {get_temperature(70.1)} degrees {unit}.\'\n\ndef get_temperature(temperature: float) -> int:\n    """\n    Get the temperature in a given location.\n    """\n    return math.floor(temperature)\n',  # noqa: E501
                             }
                         ],
                     },
