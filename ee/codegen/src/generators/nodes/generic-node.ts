@@ -686,11 +686,6 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     return statements;
   }
 
-  getNodeDisplayClassBodyStatements(): AstNode[] {
-    // display_data is handled by the base class in generateNodeDisplayClasses()
-    return [];
-  }
-
   protected getOutputDisplay(): Field | undefined {
     if (!this.nodeData.outputs || this.nodeData.outputs.length === 0) {
       return undefined;
