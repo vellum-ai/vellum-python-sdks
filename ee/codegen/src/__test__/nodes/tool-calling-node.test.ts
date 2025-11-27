@@ -820,4 +820,167 @@ describe("ToolCallingNode", () => {
       expect(output).toMatchSnapshot();
     });
   });
+
+  describe("combined function types", () => {
+    it("should generate all function types: pure function, mcp server, inline subworkflow, and subworkflow deployment", async () => {
+      const codeExecutionFunction: FunctionArgs = {
+        type: "CODE_EXECUTION",
+        name: "add_numbers",
+        description: "Add two numbers together.",
+        src: 'def add_numbers(a: int, b: int) -> int:\n    """\n    Add two numbers together.\n    """\n    return a + b\n',
+        definition: {
+          name: "add_numbers",
+          parameters: {
+            type: "object",
+            required: ["a", "b"],
+            properties: {
+              a: { type: "integer" },
+              b: { type: "integer" },
+            },
+          },
+        },
+      };
+
+      const mcpServerFunction: MCPServerFunctionArgs = {
+        type: "MCP_SERVER",
+        name: "github",
+        url: "https://api.githubcopilot.com/mcp/",
+        authorization_type: "BEARER_TOKEN",
+        bearer_token_value: "GITHUB_PERSONAL_ACCESS_TOKEN",
+        api_key_header_key: null,
+        api_key_header_value: null,
+      };
+
+      const inlineWorkflowFunction = {
+        type: "INLINE_WORKFLOW",
+        name: "subtract_workflow",
+        description: "Subtract two numbers using a workflow",
+        exec_config: {
+          workflow_raw_data: {
+            nodes: [
+              {
+                id: "entrypoint",
+                type: "ENTRYPOINT",
+                data: {
+                  label: "Entrypoint Node",
+                  source_handle_id: "entry-source",
+                },
+                inputs: [],
+              },
+              {
+                id: "subtract-node",
+                type: "GENERIC",
+                label: "SubtractNode",
+                base: {
+                  name: "BaseNode",
+                  module: ["vellum", "workflows", "nodes", "bases", "base"],
+                },
+                attributes: [],
+                outputs: [
+                  {
+                    id: "subtract-output",
+                    name: "result",
+                    type: "NUMBER",
+                  },
+                ],
+                ports: [],
+                trigger: {
+                  id: "subtract-trigger",
+                  merge_behavior: "AWAIT_ATTRIBUTES",
+                },
+              },
+            ],
+            edges: [
+              {
+                id: "edge-1",
+                type: "DEFAULT",
+                source_node_id: "entrypoint",
+                source_handle_id: "entry-source",
+                target_node_id: "subtract-node",
+                target_handle_id: "subtract-trigger",
+              },
+            ],
+            definition: {
+              name: "SubtractWorkflow",
+              module: ["workflows", "subtract"],
+            },
+          },
+          input_variables: [
+            {
+              id: "input-a",
+              key: "a",
+              type: "NUMBER",
+              default: null,
+              required: true,
+              extensions: { color: null },
+            },
+            {
+              id: "input-b",
+              key: "b",
+              type: "NUMBER",
+              default: null,
+              required: true,
+              extensions: { color: null },
+            },
+          ],
+          output_variables: [
+            {
+              id: "output-result",
+              key: "result",
+              type: "NUMBER",
+            },
+          ],
+        },
+      };
+
+      const workflowDeploymentFunction: WorkflowDeploymentFunctionArgs = {
+        type: "WORKFLOW_DEPLOYMENT",
+        name: "deployed_workflow",
+        description: "A deployed workflow function",
+        deployment: "my-deployment",
+        release_tag: "production",
+      };
+
+      const nodePortData: NodePort[] = [
+        nodePortFactory({
+          id: "port-id",
+        }),
+      ];
+
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [
+              codeExecutionFunction,
+              mcpServerFunction,
+              inlineWorkflowFunction,
+              workflowDeploymentFunction,
+            ],
+          },
+        }
+      );
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [functionsAttribute],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });

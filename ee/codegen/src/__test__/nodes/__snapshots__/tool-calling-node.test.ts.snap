@@ -85,6 +85,35 @@ class ToolCallingNode(BaseToolCallingNode):
 "
 `;
 
+exports[`ToolCallingNode > combined function types > should generate all function types: pure function, mcp server, inline subworkflow, and subworkflow deployment 1`] = `
+"from .add_numbers import add_numbers
+from .subtract_workflow.workflow import SubtractWorkflow
+
+from vellum.workflows.constants import AuthorizationType
+from vellum.workflows.nodes.displayable.tool_calling_node import (
+    ToolCallingNode as BaseToolCallingNode,
+)
+from vellum.workflows.references import EnvironmentVariableReference
+from vellum.workflows.types.definition import DeploymentDefinition, MCPServer
+
+
+class ToolCallingNode(BaseToolCallingNode):
+    functions = [
+        add_numbers,
+        MCPServer(
+            name="github",
+            url="https://api.githubcopilot.com/mcp/",
+            authorization_type=AuthorizationType.BEARER_TOKEN,
+            bearer_token_value=EnvironmentVariableReference(
+                name="GITHUB_PERSONAL_ACCESS_TOKEN"
+            ),
+        ),
+        SubtractWorkflow,
+        DeploymentDefinition(deployment="my-deployment", release_tag="production"),
+    ]
+"
+`;
+
 exports[`ToolCallingNode > composio tool > should generate composio tool 'with integration_name and tool_slug' 1`] = `
 "from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,
