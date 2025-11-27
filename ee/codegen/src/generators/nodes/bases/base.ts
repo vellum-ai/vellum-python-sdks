@@ -110,7 +110,9 @@ export abstract class BaseNode<
 
   protected abstract getNodeClassBodyStatements(): AstNode[];
 
-  protected abstract getNodeDisplayClassBodyStatements(): AstNode[];
+  protected getNodeDisplayClassBodyStatements(): AstNode[] {
+    return [];
+  }
 
   // Override to specify a custom output display
   protected getOutputDisplay(): python.Field | undefined {
