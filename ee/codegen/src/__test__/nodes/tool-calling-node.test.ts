@@ -796,13 +796,16 @@ describe("ToolCallingNode", () => {
       expect(code).toMatchSnapshot();
     });
 
-    it("should generate mixed functions with CODE_EXECUTION, MCP_SERVER with ENVIRONMENT_VARIABLE, and INLINE_WORKFLOW", async () => {
+    it("should generate mixed functions with all supported function types in ARRAY_REFERENCE format", async () => {
       /**
-       * Tests that a ToolCallingNode with mixed function types in ARRAY_REFERENCE format
+       * Tests that a ToolCallingNode with all supported function types in ARRAY_REFERENCE format
        * generates correct code. This includes:
        * - CODE_EXECUTION function (serialized as CONSTANT_VALUE)
        * - MCP_SERVER with EnvironmentVariableReference (serialized as DICTIONARY_REFERENCE)
        * - INLINE_WORKFLOW (serialized as CONSTANT_VALUE)
+       * - COMPOSIO (serialized as CONSTANT_VALUE)
+       * - VELLUM_INTEGRATION (serialized as CONSTANT_VALUE)
+       * - WORKFLOW_DEPLOYMENT (serialized as CONSTANT_VALUE)
        */
 
       const arrayReferenceFunctionsAttribute = nodeAttributeFactory(
@@ -1274,6 +1277,48 @@ describe("ToolCallingNode", () => {
                 },
               },
             },
+            // COMPOSIO function
+            {
+              type: "CONSTANT_VALUE",
+              value: {
+                type: "JSON",
+                value: {
+                  type: "COMPOSIO",
+                  name: "github_create_issue",
+                  toolkit: "GITHUB",
+                  action: "GITHUB_CREATE_AN_ISSUE",
+                  description: "Create a new issue in a GitHub repository",
+                },
+              },
+            },
+            // VELLUM_INTEGRATION function
+            {
+              type: "CONSTANT_VALUE",
+              value: {
+                type: "JSON",
+                value: {
+                  type: "VELLUM_INTEGRATION",
+                  provider: "COMPOSIO",
+                  integration_name: "slack",
+                  name: "slack_send_message",
+                  description: "Send a message to a Slack channel",
+                },
+              },
+            },
+            // WORKFLOW_DEPLOYMENT function
+            {
+              type: "CONSTANT_VALUE",
+              value: {
+                type: "JSON",
+                value: {
+                  type: "WORKFLOW_DEPLOYMENT",
+                  name: "my_deployed_workflow",
+                  description: "A deployed workflow function",
+                  deployment: "my-workflow-deployment",
+                  release_tag: "production",
+                },
+              },
+            },
           ],
         }
       );
@@ -1284,6 +1329,7 @@ describe("ToolCallingNode", () => {
         }),
       ];
 
+      // WHEN we generate code for the ARRAY_REFERENCE format with all function types
       const nodeData = toolCallingNodeFactory({
         nodePorts: nodePortData,
         nodeAttributes: [arrayReferenceFunctionsAttribute],
@@ -1300,6 +1346,8 @@ describe("ToolCallingNode", () => {
       });
 
       node.getNodeFile().write(writer);
+
+      // THEN the generated code should match the snapshot
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
