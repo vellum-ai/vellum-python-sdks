@@ -164,9 +164,6 @@ def create_node_input_value_pointer_rule(
             data=ExecutionCounterData(node_id=str(node_class_display.node_id)),
         )
     if isinstance(value, EnvironmentVariableReference):
-        if value.serialize_as_constant:
-            vellum_value = primitive_to_vellum_value(value.name)
-            return ConstantValuePointer(type="CONSTANT_VALUE", data=vellum_value)
         return EnvironmentVariablePointer(
             data=EnvironmentVariableData(
                 environment_variable=value.name,
