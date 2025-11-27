@@ -335,6 +335,7 @@ from vellum.workflows.types.definition import MCPServer
 
 class ToolCallingNode(BaseToolCallingNode):
     functions = [
+        add,
         MCPServer(
             type="MCP_SERVER",
             name="github",
@@ -344,7 +345,6 @@ class ToolCallingNode(BaseToolCallingNode):
             api_key_header_key="aaa",
             api_key_header_value=EnvironmentVariableReference(name="FIRECRAWL"),
         ),
-        add,
         Subtract,
     ]
 "
