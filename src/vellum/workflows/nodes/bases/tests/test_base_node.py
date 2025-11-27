@@ -6,6 +6,7 @@ from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.string_vellum_value_request import StringVellumValueRequest
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.tests.test_utils import FixtureState
+from vellum.workflows.events.types import default_serializer
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes import FinalOutputNode
 from vellum.workflows.nodes.bases.base import BaseNode
@@ -15,6 +16,7 @@ from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.references.node import NodeReference
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.state.base import BaseState, StateMeta
+from vellum.workflows.workflows.base import BaseWorkflow
 
 
 def test_base_node__node_resolution__unset_pydantic_fields():
@@ -379,3 +381,37 @@ def test_base_node__ports_inheritance__cumulative_ports():
     # Potentially in the future, we support inheriting ports from multiple parents.
     # For now, we take only the declared ports, so that not all nodes have the default port.
     assert ports == ["bar"]
+
+
+def test_base_node__bytes_output_converts_to_string():
+    """Test that returning bytes in node outputs automatically converts to string."""
+
+    # GIVEN a node that returns bytes
+    class BytesOutputNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result: str
+
+        def run(self) -> "BytesOutputNode.Outputs":
+            b = b"hello"
+            return self.Outputs(result=b)  # type: ignore[arg-type]
+
+    class OutputNode(FinalOutputNode):
+        class Outputs(FinalOutputNode.Outputs):
+            result = BytesOutputNode.Outputs.result
+
+    class BytesWorkflow(BaseWorkflow):
+        graph = BytesOutputNode >> OutputNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            result = OutputNode.Outputs.result
+
+    workflow = BytesWorkflow()
+
+    # WHEN we run the workflow
+    result = workflow.run()
+
+    # THEN the execution is fulfilled successfully
+    assert result.name == "workflow.execution.fulfilled"
+
+    # AND the bytes are converted to a UTF-8 string when serialized
+    assert default_serializer(result.outputs.result) == "hello"
