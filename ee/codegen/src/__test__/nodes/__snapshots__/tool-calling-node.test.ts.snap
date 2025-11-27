@@ -293,7 +293,7 @@ class ToolCallingNode(BaseToolCallingNode):
             api_key_header_value=EnvironmentVariableReference(
                 name="my-api-key-header-value"
             ),
-        ),
+        )
     ]
 "
 `;
