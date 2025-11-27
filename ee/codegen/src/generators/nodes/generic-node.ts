@@ -167,6 +167,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                 "type" in item.value.value
               ) {
                 // This is a ToolArgs object, use the handler pattern
+                // which handles all function types (CODE_EXECUTION, INLINE_WORKFLOW, etc.)
                 const toolArg = item.value.value as ToolArgs;
                 const handler = functionHandlers[toolArg.type];
                 if (handler) {
