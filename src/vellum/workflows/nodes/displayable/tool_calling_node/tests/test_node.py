@@ -824,3 +824,29 @@ def test_vellum_integration_node_500_error_feeds_back_to_model(vellum_adhoc_prom
 
     # AND the third message should be the assistant's response to the error
     assert chat_history[2].role == "ASSISTANT"
+
+
+def test_function_node_name_uses_function_name():
+    """Test that create_function_node uses the function name directly without any prefix."""
+
+    # GIVEN a function named 'add'
+    def add(a: int, b: int) -> int:
+        return a + b
+
+    # AND a tool prompt node
+    tool_prompt_node = create_tool_prompt_node(
+        ml_model="test-model",
+        blocks=[],
+        functions=[add],
+        prompt_inputs=None,
+        parameters=DEFAULT_PROMPT_PARAMETERS,
+    )
+
+    # WHEN we create a function node for that function
+    function_node_class = create_function_node(
+        function=add,
+        tool_prompt_node=tool_prompt_node,
+    )
+
+    # THEN the node class name should be just the function name 'add'
+    assert function_node_class.__name__ == "add"
