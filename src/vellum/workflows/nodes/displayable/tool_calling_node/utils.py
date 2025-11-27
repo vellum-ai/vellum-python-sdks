@@ -560,7 +560,11 @@ def create_function_node(
         display_class = type(
             f"FunctionNodeDisplay_{function.__name__}",
             (FunctionNode.Display,),
-            {"icon": "vellum:icon:rectangle-code", "color": "purple"},
+            {
+                "icon": "vellum:icon:rectangle-code",
+                "color": "purple",
+                "label": function.__name__,
+            },
         )
         node = type(
             function.__name__,

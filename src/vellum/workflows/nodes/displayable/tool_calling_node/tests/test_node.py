@@ -850,3 +850,6 @@ def test_function_node_name_uses_function_name():
 
     # THEN the node class name should be just the function name 'add'
     assert function_node_class.__name__ == "add"
+
+    # AND the display label should also be 'add' (not 'Add')
+    assert function_node_class.Display.label == "add"
