@@ -322,7 +322,7 @@ class ToolCallingNode(BaseToolCallingNode):
 "
 `;
 
-exports[`ToolCallingNode > mcp server > should generate mixed functions with CODE_EXECUTION, MCP_SERVER with ENVIRONMENT_VARIABLE, and INLINE_WORKFLOW 1`] = `
+exports[`ToolCallingNode > mcp server > should generate mixed functions with all supported function types in ARRAY_REFERENCE format 1`] = `
 "from .add import add
 from .subtract.workflow import Subtract
 
@@ -330,7 +330,12 @@ from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,
 )
 from vellum.workflows.references import EnvironmentVariableReference
-from vellum.workflows.types.definition import MCPServer
+from vellum.workflows.types.definition import (
+    ComposioToolDefinition,
+    DeploymentDefinition,
+    MCPServer,
+    VellumIntegrationToolDefinition,
+)
 
 
 class ToolCallingNode(BaseToolCallingNode):
@@ -346,6 +351,20 @@ class ToolCallingNode(BaseToolCallingNode):
             api_key_header_value=EnvironmentVariableReference(name="FIRECRAWL"),
         ),
         Subtract,
+        ComposioToolDefinition(
+            toolkit="GITHUB",
+            action="GITHUB_CREATE_AN_ISSUE",
+            description="Create a new issue in a GitHub repository",
+        ),
+        VellumIntegrationToolDefinition(
+            provider="COMPOSIO",
+            integration_name="slack",
+            name="slack_send_message",
+            description="Send a message to a Slack channel",
+        ),
+        DeploymentDefinition(
+            deployment="my-workflow-deployment", release_tag="production"
+        ),
     ]
 "
 `;
