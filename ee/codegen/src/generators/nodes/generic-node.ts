@@ -23,8 +23,7 @@ import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StarImport } from "src/generators/extensions/star-import";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
-import { Writer } from "src/generators/extensions/writer";
-import { FunctionFile } from "src/generators/function-file";
+import { WrappedCall } from "src/generators/extensions/wrapped-call";
 import { InitFile } from "src/generators/init-file";
 import { NodeOutputs } from "src/generators/node-outputs";
 import { BaseNode } from "src/generators/nodes/bases/base";
@@ -264,10 +263,23 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     // Use toValidPythonIdentifier to ensure the name is safe for Python references
     // but preserve original casing when possible (see APO-1372)
     const safeName = toValidPythonIdentifier(functionToGenerate.name);
-    return python.reference({
+    const functionReference = python.reference({
       name: safeName, // Use safe Python identifier that preserves original casing
       modulePath: [`.${snakeName}`], // Import from snake_case module
     });
+
+    // Check if function has inputs that need to be wrapped with use_tool_inputs
+    const parsedInputs = this.parseToolInputs(codeExecutionFunction);
+    if (parsedInputs && Object.keys(parsedInputs).length > 0) {
+      // Wrap the function reference with use_tool_inputs(...)(func)
+      const wrapper = this.getUseToolInputsInvocation(parsedInputs);
+      return new WrappedCall({
+        wrapper,
+        inner: functionReference,
+      });
+    }
+
+    return functionReference;
   }
 
   private handleInlineWorkflowFunction(f: ToolArgs): python.AstNode | null {
@@ -787,10 +799,16 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     );
   }
 
-  private getFunction(f: FunctionArgs): FunctionArgs {
+  /**
+   * Parses the tool inputs from a function definition.
+   * Returns null if there are no inputs or if parsing fails.
+   */
+  private parseToolInputs(
+    f: FunctionArgs
+  ): Record<string, WorkflowValueDescriptorType> | null {
     const inputs = f.definition?.inputs;
     if (!f.definition || !inputs) {
-      return f;
+      return null;
     }
 
     const parsedInputs: Record<string, WorkflowValueDescriptorType> = {};
@@ -810,31 +828,18 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     });
 
     if (Object.keys(parsedInputs).length === 0) {
-      return f;
+      return null;
     }
 
-    const decorator = this.getInputsDecorator(parsedInputs);
-
-    const functionFile = new FunctionFile({
-      workflowContext: this.workflowContext,
-      functionSrc: f.src,
-      functionName: f.name,
-      decorator,
-      modulePath: [...this.nodeContext.nodeModulePath, f.name],
-    });
-
-    const writer = new Writer();
-    functionFile.write(writer);
-
-    return {
-      ...f,
-      src: writer.toString(),
-    };
+    return parsedInputs;
   }
 
-  private getInputsDecorator(
+  /**
+   * Creates a use_tool_inputs(...) method invocation for wrapping function references.
+   */
+  private getUseToolInputsInvocation(
     inputs: Record<string, WorkflowValueDescriptorType>
-  ): python.Decorator {
+  ): python.MethodInvocation {
     const inputMappings: MethodArgument[] = [];
     Object.entries(inputs).forEach(([inputName, inputDef]) => {
       // Use WorkflowValueDescriptor to handle all types of workflow value descriptors
@@ -852,14 +857,12 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
       );
     });
 
-    return python.decorator({
-      callable: python.invokeMethod({
-        methodReference: new Reference({
-          name: "use_tool_inputs",
-          modulePath: ["vellum", "workflows", "utils", "functions"],
-        }),
-        arguments_: inputMappings,
+    return python.invokeMethod({
+      methodReference: new Reference({
+        name: "use_tool_inputs",
+        modulePath: ["vellum", "workflows", "utils", "functions"],
       }),
+      arguments_: inputMappings,
     });
   }
 
