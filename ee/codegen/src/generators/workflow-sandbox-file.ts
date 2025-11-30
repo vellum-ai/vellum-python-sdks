@@ -6,6 +6,7 @@ import { VELLUM_WORKFLOW_ROOT_MODULE_PATH } from "src/constants";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
 import { NodeNotFoundError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Json } from "src/generators/json";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
@@ -334,7 +335,7 @@ if __name__ == "__main__":
 
   private getTriggerReference(
     workflowTriggerId: string
-  ): python.Reference | undefined {
+  ): Reference | undefined {
     const triggerContext =
       this.workflowContext.findTriggerContext(workflowTriggerId);
 

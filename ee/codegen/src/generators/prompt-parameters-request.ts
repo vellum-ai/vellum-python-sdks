@@ -5,6 +5,7 @@ import { PromptParameters as PromptParametersType } from "vellum-ai/api";
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { MethodArgument } from "src/generators/extensions/method-argument";
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 import { Json } from "src/generators/json";
@@ -26,7 +27,7 @@ export class PromptParameters extends AstNode {
     this.inheritReferences(this.astNode);
   }
 
-  private getPromptParametersRef(): python.Reference {
+  private getPromptParametersRef(): Reference {
     return python.reference({
       name: "PromptParameters",
       modulePath: VELLUM_CLIENT_MODULE_PATH,

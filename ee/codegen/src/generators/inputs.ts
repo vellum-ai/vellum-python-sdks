@@ -3,6 +3,7 @@ import { isEqual } from "lodash";
 
 import { BasePersistedFile } from "./base-persisted-file";
 import { Class } from "./extensions/class";
+import { Reference } from "./extensions/reference";
 
 import * as codegen from "src/codegen";
 import { WorkflowContext } from "src/context";
@@ -16,7 +17,7 @@ export declare namespace Inputs {
 }
 
 export class Inputs extends BasePersistedFile {
-  public readonly baseInputsClassReference: python.Reference;
+  public readonly baseInputsClassReference: Reference;
   public readonly inputsClass: Class | undefined;
 
   constructor({ name, workflowContext }: Inputs.Args) {

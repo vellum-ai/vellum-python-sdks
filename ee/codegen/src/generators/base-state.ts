@@ -1,6 +1,5 @@
-import { python } from "@fern-api/python-ast";
-
 import { WorkflowContext } from "src/context";
+import { Reference } from "src/generators/extensions/reference";
 
 export declare namespace BaseState {
   export interface Args {
@@ -8,7 +7,7 @@ export declare namespace BaseState {
   }
 }
 
-export class BaseState extends python.Reference {
+export class BaseState extends Reference {
   public constructor(args: BaseState.Args) {
     super({
       name: "BaseState",

@@ -18,6 +18,7 @@ import {
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
 import { MethodArgument } from "src/generators/extensions/method-argument";
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { NodeDisplay } from "src/generators/node-display";
 import { NodeDisplayData } from "src/generators/node-display-data";
@@ -242,7 +243,7 @@ export abstract class BaseNode<
     });
   }
 
-  protected getNodeBaseClass(): python.Reference {
+  protected getNodeBaseClass(): Reference {
     const isVellumNode = doesModulePathStartWith(
       this.nodeContext.baseNodeClassModulePath,
       VELLUM_WORKFLOW_NODES_MODULE_PATH
@@ -268,7 +269,7 @@ export abstract class BaseNode<
     });
   }
 
-  protected getNodeDisplayBaseClass(): python.Reference {
+  protected getNodeDisplayBaseClass(): Reference {
     return python.reference({
       name: this.nodeContext.baseNodeDisplayClassName,
       modulePath: this.nodeContext.baseNodeDisplayClassModulePath,
@@ -642,7 +643,7 @@ export abstract class BaseNode<
   public generateNodeClass(): Class {
     const nodeContext = this.nodeContext;
 
-    let nodeBaseClass: python.Reference = this.getNodeBaseClass();
+    let nodeBaseClass: Reference = this.getNodeBaseClass();
     if (nodeBaseClass.name === nodeContext.nodeClassName) {
       nodeBaseClass = python.reference({
         name: nodeBaseClass.name,

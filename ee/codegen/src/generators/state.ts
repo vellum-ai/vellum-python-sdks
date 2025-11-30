@@ -1,9 +1,9 @@
-import { python } from "@fern-api/python-ast";
 import { isEqual } from "lodash";
 
 import { BasePersistedFile } from "./base-persisted-file";
 import { BaseState } from "./base-state";
 import { Class } from "./extensions/class";
+import { Reference } from "./extensions/reference";
 
 import * as codegen from "src/codegen";
 import { WorkflowContext } from "src/context";
@@ -16,7 +16,7 @@ export declare namespace State {
 }
 
 export class State extends BasePersistedFile {
-  public readonly baseStateClassReference: python.Reference;
+  public readonly baseStateClassReference: Reference;
   public readonly stateClass: Class | undefined;
 
   constructor({ workflowContext }: State.Args) {

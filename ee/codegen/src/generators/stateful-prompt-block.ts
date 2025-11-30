@@ -8,6 +8,7 @@ import {
 } from "src/generators/base-prompt-block";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Json } from "src/generators/json";
 import {
@@ -52,7 +53,7 @@ export class StatefulPromptBlock extends BasePromptBlock<PromptTemplateBlockExcl
 
   private getPromptBlockRef(
     promptBlock: PromptTemplateBlockExcludingFunctionDefinition
-  ): python.Reference {
+  ): Reference {
     let pathName;
     switch (promptBlock.blockType) {
       case "JINJA":

@@ -56,7 +56,7 @@ export class Workflow {
     this.unusedEdges = new Set();
   }
 
-  private generateParentWorkflowClass(): python.Reference {
+  private generateParentWorkflowClass(): Reference {
     const parentGenerics: Type[] = [];
     let customGenericsUsed = false;
 
@@ -638,7 +638,7 @@ export class Workflow {
 
   private addRemainingUnusedNodes(
     remainingUnusedNodes: Set<WorkflowNode>,
-    unusedGraphs: (GraphAttribute | python.Reference)[]
+    unusedGraphs: (GraphAttribute | Reference)[]
   ): void {
     remainingUnusedNodes.forEach((node) => {
       const nodeContext = this.workflowContext.findNodeContext(node.id);
@@ -698,7 +698,7 @@ export class Workflow {
     }
 
     // Create a graph for each set of unused edges
-    const unusedGraphs: (GraphAttribute | python.Reference)[] = [];
+    const unusedGraphs: (GraphAttribute | Reference)[] = [];
     while (remainingUnusedEdges.size > 0) {
       const unusedGraph = new GraphAttribute({
         workflowContext: this.workflowContext,
