@@ -9,6 +9,7 @@ import {
 import { PythonType, UnionType } from "src/generators/extensions";
 import { BuiltinDictType } from "src/generators/extensions/dict";
 import { BuiltinListType } from "src/generators/extensions/list";
+import { Reference } from "src/generators/extensions/reference";
 import { assertUnreachable } from "src/utils/typing";
 
 /**
@@ -67,7 +68,7 @@ export function jsonSchemaToType(
   if (schema.$ref && typeof schema.$ref === "string") {
     const { name, modulePath } = parseRef(schema.$ref);
     return python.Type.reference(
-      python.reference({
+      new Reference({
         name,
         modulePath,
       })
@@ -124,7 +125,7 @@ export function getVellumVariablePrimitiveType(
     case "CHAT_HISTORY":
       return new BuiltinListType(
         python.Type.reference(
-          python.reference({
+          new Reference({
             name: "ChatMessage",
             modulePath: VELLUM_CLIENT_MODULE_PATH,
           })
@@ -133,7 +134,7 @@ export function getVellumVariablePrimitiveType(
     case "SEARCH_RESULTS":
       return new BuiltinListType(
         python.Type.reference(
-          python.reference({
+          new Reference({
             name: "SearchResult",
             modulePath: VELLUM_CLIENT_MODULE_PATH,
           })
@@ -141,7 +142,7 @@ export function getVellumVariablePrimitiveType(
       );
     case "ERROR":
       return python.Type.reference(
-        python.reference({
+        new Reference({
           name: "VellumError",
           modulePath: VELLUM_CLIENT_MODULE_PATH,
         })
@@ -149,7 +150,7 @@ export function getVellumVariablePrimitiveType(
     case "ARRAY":
       return new BuiltinListType(
         python.Type.reference(
-          python.reference({
+          new Reference({
             name: "VellumValue",
             modulePath: VELLUM_CLIENT_MODULE_PATH,
           })
@@ -157,42 +158,42 @@ export function getVellumVariablePrimitiveType(
       );
     case "FUNCTION_CALL":
       return python.Type.reference(
-        python.reference({
+        new Reference({
           name: "FunctionCall",
           modulePath: VELLUM_CLIENT_MODULE_PATH,
         })
       );
     case "AUDIO":
       return python.Type.reference(
-        python.reference({
+        new Reference({
           name: "VellumAudio",
           modulePath: VELLUM_CLIENT_MODULE_PATH,
         })
       );
     case "VIDEO":
       return python.Type.reference(
-        python.reference({
+        new Reference({
           name: "VellumVideo",
           modulePath: VELLUM_CLIENT_MODULE_PATH,
         })
       );
     case "IMAGE":
       return python.Type.reference(
-        python.reference({
+        new Reference({
           name: "VellumImage",
           modulePath: VELLUM_CLIENT_MODULE_PATH,
         })
       );
     case "DOCUMENT":
       return python.Type.reference(
-        python.reference({
+        new Reference({
           name: "VellumDocument",
           modulePath: VELLUM_CLIENT_MODULE_PATH,
         })
       );
     case "THINKING":
       return python.Type.reference(
-        python.reference({
+        new Reference({
           name: "StringVellumValue",
           modulePath: VELLUM_CLIENT_MODULE_PATH,
         })

@@ -161,13 +161,13 @@ export abstract class BaseNode<
 
     Object.entries(outputIdsByName).forEach(([name, id]) => {
       outputDisplayEntries.push({
-        key: python.reference({
+        key: new Reference({
           name: this.nodeContext.nodeClassName,
           modulePath: this.nodeContext.nodeModulePath,
           attribute: [OUTPUTS_CLASS_NAME, name],
         }),
         value: python.instantiateClass({
-          classReference: python.reference({
+          classReference: new Reference({
             name: "NodeOutputDisplay",
             modulePath:
               this.workflowContext.sdkModulePathNames
@@ -213,7 +213,7 @@ export abstract class BaseNode<
     if (firstStateVariableContext) {
       return [
         python.Type.reference(
-          python.reference({
+          new Reference({
             name: firstStateVariableContext.definition.name,
             modulePath: firstStateVariableContext.definition.module,
           })
@@ -231,7 +231,7 @@ export abstract class BaseNode<
 
     if (firstStateVariableContext) {
       return python.Type.reference(
-        python.reference({
+        new Reference({
           name: firstStateVariableContext.definition.name,
           modulePath: firstStateVariableContext.definition.module,
         })
@@ -261,7 +261,7 @@ export abstract class BaseNode<
 
     const baseNodeGenericTypes = this.getNodeBaseGenericTypes();
 
-    return python.reference({
+    return new Reference({
       name: baseNodeClassName,
       modulePath: this.nodeContext.baseNodeClassModulePath,
       genericTypes: baseNodeGenericTypes,
@@ -270,11 +270,11 @@ export abstract class BaseNode<
   }
 
   protected getNodeDisplayBaseClass(): Reference {
-    return python.reference({
+    return new Reference({
       name: this.nodeContext.baseNodeDisplayClassName,
       modulePath: this.nodeContext.baseNodeDisplayClassModulePath,
       genericTypes: [
-        python.reference({
+        new Reference({
           name: this.nodeContext.nodeClassName,
           modulePath: this.nodeContext.nodeModulePath,
         }),
@@ -406,7 +406,7 @@ export abstract class BaseNode<
           const isPortInCurrentNode = portIds.has(portId);
           if (isPortInCurrentNode) {
             const portDisplayOverrides = python.instantiateClass({
-              classReference: python.reference({
+              classReference: new Reference({
                 name: "PortDisplayOverrides",
                 modulePath:
                   this.workflowContext.sdkModulePathNames
@@ -434,7 +434,7 @@ export abstract class BaseNode<
           initializer: python.TypeInstantiation.dict(
             Array.from(portDisplayOverridesDict.entries()).map(
               ([key, value]) => ({
-                key: python.reference({
+                key: new Reference({
                   name: this.nodeContext.nodeClassName,
                   modulePath: this.nodeContext.nodeModulePath,
                   attribute: [PORTS_CLASS_NAME, key],
@@ -461,13 +461,13 @@ export abstract class BaseNode<
       name: "port_displays",
       initializer: python.TypeInstantiation.dict([
         {
-          key: python.reference({
+          key: new Reference({
             name: this.nodeContext.nodeClassName,
             modulePath: this.nodeContext.nodeModulePath,
             attribute: [PORTS_CLASS_NAME, "default"],
           }),
           value: python.instantiateClass({
-            classReference: python.reference({
+            classReference: new Reference({
               name: "PortDisplayOverrides",
               modulePath:
                 this.workflowContext.sdkModulePathNames
@@ -532,7 +532,7 @@ export abstract class BaseNode<
         decorators.push(
           python.decorator({
             callable: python.invokeMethod({
-              methodReference: python.reference({
+              methodReference: new Reference({
                 name: adornment.base.name,
                 attribute: ["wrap"],
                 modulePath: adornment.base.module,
@@ -544,7 +544,7 @@ export abstract class BaseNode<
                 const attributeConfig =
                   attrConfig?.type === AttributeType.WorkflowErrorCode
                     ? {
-                        lhs: python.reference({
+                        lhs: new Reference({
                           name: AttributeType.WorkflowErrorCode,
                           modulePath: [
                             ...VELLUM_CLIENT_MODULE_PATH,
@@ -577,7 +577,7 @@ export abstract class BaseNode<
       decorators.push(
         python.decorator({
           callable: python.invokeMethod({
-            methodReference: python.reference({
+            methodReference: new Reference({
               name: "TryNode",
               attribute: ["wrap"],
               modulePath:
@@ -645,7 +645,7 @@ export abstract class BaseNode<
 
     let nodeBaseClass: Reference = this.getNodeBaseClass();
     if (nodeBaseClass.name === nodeContext.nodeClassName) {
-      nodeBaseClass = python.reference({
+      nodeBaseClass = new Reference({
         name: nodeBaseClass.name,
         modulePath: nodeBaseClass.modulePath,
         genericTypes: nodeBaseClass.genericTypes,
@@ -711,7 +711,7 @@ export abstract class BaseNode<
         decorators.push(
           python.decorator({
             callable: python.invokeMethod({
-              methodReference: python.reference({
+              methodReference: new Reference({
                 name: `Base${adornment.base.name}Display`,
                 attribute: ["wrap"],
                 modulePath:
@@ -736,7 +736,7 @@ export abstract class BaseNode<
       decorators.push(
         python.decorator({
           callable: python.invokeMethod({
-            methodReference: python.reference({
+            methodReference: new Reference({
               name: "BaseTryNodeDisplay",
               attribute: ["wrap"],
               modulePath:

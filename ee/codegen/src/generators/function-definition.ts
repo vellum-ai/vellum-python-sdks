@@ -4,6 +4,7 @@ import { isNil } from "lodash";
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { MethodArgument } from "src/generators/extensions/method-argument";
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 import { Json } from "src/generators/json";
@@ -82,7 +83,7 @@ export class FunctionDefinition extends AstNode {
     }
 
     const functionDefinitionClass = python.instantiateClass({
-      classReference: python.reference({
+      classReference: new Reference({
         name: "FunctionDefinition",
         modulePath: VELLUM_CLIENT_MODULE_PATH,
       }),

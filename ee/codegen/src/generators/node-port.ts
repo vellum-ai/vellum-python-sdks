@@ -5,6 +5,7 @@ import { BaseNodeContext } from "src/context/node-context/base";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
+import { Reference } from "src/generators/extensions/reference";
 import { Writer } from "src/generators/extensions/writer";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import {
@@ -67,7 +68,7 @@ export class NodePorts extends AstNode {
     const clazz = new Class({
       name: "Ports",
       extends_: [
-        python.reference({
+        new Reference({
           name: this.nodeContext.baseNodeClassName,
           modulePath: this.nodeContext.baseNodeClassModulePath,
           alias: baseNodeClassNameAlias,
@@ -136,7 +137,7 @@ export class NodePorts extends AstNode {
       );
     }
     return python.invokeMethod({
-      methodReference: python.reference({
+      methodReference: new Reference({
         name: "Port",
         modulePath: this.workflowContext.sdkModulePathNames.PORTS_MODULE_PATH,
         attribute: [attribute],

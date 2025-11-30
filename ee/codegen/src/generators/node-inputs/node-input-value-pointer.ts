@@ -6,6 +6,7 @@ import { NodeInputValuePointerRule } from "./node-input-value-pointer-rules/node
 import { BaseNodeContext } from "src/context/node-context/base";
 import { BaseCodegenError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Reference } from "src/generators/extensions/reference";
 import { Writer } from "src/generators/extensions/writer";
 import {
   NodeInputValuePointer as NodeInputValuePointerType,
@@ -88,7 +89,7 @@ export class NodeInputValuePointer extends AstNode {
       expression = python.accessAttribute({
         lhs: expression,
         rhs: python.invokeMethod({
-          methodReference: python.reference({
+          methodReference: new Reference({
             name: "coalesce",
           }),
           arguments_: [python.methodArgument({ value: rule })],
@@ -99,7 +100,7 @@ export class NodeInputValuePointer extends AstNode {
     const hasReferenceToSelf = this.hasReferenceToSelf(rules);
     if (hasReferenceToSelf) {
       const lazyReference = python.instantiateClass({
-        classReference: python.reference({
+        classReference: new Reference({
           name: "LazyReference",
           modulePath: [
             ...this.nodeContext.workflowContext.sdkModulePathNames

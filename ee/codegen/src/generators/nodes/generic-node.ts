@@ -17,6 +17,7 @@ import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { PromptBlock as PromptBlockType } from "src/generators/base-prompt-block";
 import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Reference } from "src/generators/extensions/reference";
 import { StarImport } from "src/generators/extensions/star-import";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
@@ -110,7 +111,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   // but preserve original casing when possible (see APO-1372)
                   const safeName = toValidPythonIdentifier(f.name);
                   functionReferences.push(
-                    python.reference({
+                    new Reference({
                       name: safeName, // Use safe Python identifier that preserves original casing
                       modulePath: [`.${snakeName}`], // Import from snake_case module
                     })
@@ -154,7 +155,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                       const workflowClassName =
                         nestedProject.workflowContext.workflowClassName;
                       functionReferences.push(
-                        python.reference({
+                        new Reference({
                           name: workflowClassName,
                           modulePath: [
                             `.${workflowName}`,
@@ -194,7 +195,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
 
                   functionReferences.push(
                     python.instantiateClass({
-                      classReference: python.reference({
+                      classReference: new Reference({
                         name: "DeploymentDefinition",
                         modulePath: [
                           "vellum",
@@ -247,7 +248,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
 
                   functionReferences.push(
                     python.instantiateClass({
-                      classReference: python.reference({
+                      classReference: new Reference({
                         name: "ComposioToolDefinition",
                         modulePath: VELLUM_WORKFLOW_DEFINITION_PATH,
                       }),
@@ -274,7 +275,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                     arguments_.push(
                       python.methodArgument({
                         name: "authorization_type",
-                        value: python.reference({
+                        value: new Reference({
                           name: "AuthorizationType",
                           modulePath: [
                             ...this.workflowContext.sdkModulePathNames
@@ -343,7 +344,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
 
                   functionReferences.push(
                     python.instantiateClass({
-                      classReference: python.reference({
+                      classReference: new Reference({
                         name: "MCPServer",
                         modulePath: VELLUM_WORKFLOW_DEFINITION_PATH,
                       }),
@@ -385,7 +386,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
 
                   functionReferences.push(
                     python.instantiateClass({
-                      classReference: python.reference({
+                      classReference: new Reference({
                         name: "VellumIntegrationToolDefinition",
                         modulePath: VELLUM_WORKFLOW_DEFINITION_PATH,
                       }),
@@ -612,7 +613,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     return this.nodeData.adornments.map((adornment) =>
       python.decorator({
         callable: python.invokeMethod({
-          methodReference: python.reference({
+          methodReference: new Reference({
             name: adornment.base.name,
             attribute: ["wrap"],
             modulePath: adornment.base.module,
@@ -692,13 +693,13 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     }
 
     const outputDisplayEntries = this.nodeData.outputs.map((output) => ({
-      key: python.reference({
+      key: new Reference({
         name: this.nodeContext.nodeClassName,
         modulePath: this.nodeContext.nodeModulePath,
         attribute: [OUTPUTS_CLASS_NAME, output.name],
       }),
       value: python.instantiateClass({
-        classReference: python.reference({
+        classReference: new Reference({
           name: "NodeOutputDisplay",
           modulePath:
             this.workflowContext.sdkModulePathNames
@@ -892,7 +893,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
 
     return python.decorator({
       callable: python.invokeMethod({
-        methodReference: python.reference({
+        methodReference: new Reference({
           name: "use_tool_inputs",
           modulePath: ["vellum", "workflows", "utils", "functions"],
         }),

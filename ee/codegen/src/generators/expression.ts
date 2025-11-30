@@ -8,6 +8,7 @@ import { TernaryExpression } from "./expressions/ternary";
 import { VELLUM_WORKFLOW_CONSTANTS_PATH } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Reference } from "src/generators/extensions/reference";
 import { Writer } from "src/generators/extensions/writer";
 import { WorkflowValueDescriptorReference } from "src/generators/workflow-value-descriptor-reference/workflow-value-descriptor-reference";
 
@@ -111,7 +112,7 @@ export class Expression extends AstNode {
   // We are assuming that the expression contains "good data". If the expression contains data
   // where the generated expression is not correct, update the logic here with guardrails similar to the UI
   private generateConstantReference(ref: AstNode): AstNode {
-    const constantValueReference = python.reference({
+    const constantValueReference = new Reference({
       name: "ConstantValueReference",
       modulePath: VELLUM_WORKFLOW_CONSTANTS_PATH,
     });

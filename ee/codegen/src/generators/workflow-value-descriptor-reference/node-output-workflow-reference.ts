@@ -2,6 +2,7 @@ import { python } from "@fern-api/python-ast";
 
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseNodeInputWorkflowReference } from "src/generators/workflow-value-descriptor-reference/BaseNodeInputWorkflowReference";
 import { NodeOutputWorkflowReference as NodeOutputWorkflowReferenceType } from "src/types/vellum";
@@ -28,7 +29,7 @@ export class NodeOutputWorkflowReference extends BaseNodeInputWorkflowReference<
 
     if (this.nodeContext && this.nodeContext.isImportedBefore(nodeContext)) {
       return python.instantiateClass({
-        classReference: python.reference({
+        classReference: new Reference({
           name: "LazyReference",
           modulePath: [
             ...this.nodeContext.workflowContext.sdkModulePathNames
@@ -48,7 +49,7 @@ export class NodeOutputWorkflowReference extends BaseNodeInputWorkflowReference<
 
     if (this.nodeContext?.nodeClassName === nodeContext.nodeClassName) {
       return python.instantiateClass({
-        classReference: python.reference({
+        classReference: new Reference({
           name: "LazyReference",
           modulePath: [
             ...this.nodeContext.workflowContext.sdkModulePathNames
@@ -60,11 +61,11 @@ export class NodeOutputWorkflowReference extends BaseNodeInputWorkflowReference<
           python.methodArgument({
             value: python.lambda({
               body: python.accessAttribute({
-                lhs: python.reference({
+                lhs: new Reference({
                   name: nodeContext.nodeClassName,
                   modulePath: [],
                 }),
-                rhs: python.reference({
+                rhs: new Reference({
                   name: `${OUTPUTS_CLASS_NAME}.${nodeOutputName}`,
                   modulePath: [],
                 }),
@@ -75,7 +76,7 @@ export class NodeOutputWorkflowReference extends BaseNodeInputWorkflowReference<
       });
     }
 
-    const reference = python.reference({
+    const reference = new Reference({
       name: nodeContext.nodeClassName,
       modulePath: nodeContext.nodeModulePath,
       attribute: [OUTPUTS_CLASS_NAME, nodeOutputName],

@@ -4,6 +4,7 @@ import { isNil } from "lodash";
 import { VELLUM_WORKFLOW_EDITOR_TYPES_PATH } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 import { GenericNodeDisplayData as GenericNodeDisplayDataType } from "src/types/vellum";
@@ -45,7 +46,7 @@ export class GenericNodeDisplayData extends AstNode {
         python.methodArgument({
           name: "position",
           value: python.instantiateClass({
-            classReference: python.reference({
+            classReference: new Reference({
               name: "NodeDisplayPosition",
               modulePath: VELLUM_WORKFLOW_EDITOR_TYPES_PATH,
             }),
@@ -108,7 +109,7 @@ export class GenericNodeDisplayData extends AstNode {
     }
 
     const clazz = python.instantiateClass({
-      classReference: python.reference({
+      classReference: new Reference({
         name: "NodeDisplayData",
         modulePath: VELLUM_WORKFLOW_EDITOR_TYPES_PATH,
       }),
@@ -151,7 +152,7 @@ export class GenericNodeDisplayData extends AstNode {
     return python.methodArgument({
       name: "comment",
       value: python.instantiateClass({
-        classReference: python.reference({
+        classReference: new Reference({
           name: "NodeDisplayComment",
           modulePath: VELLUM_WORKFLOW_EDITOR_TYPES_PATH,
         }),

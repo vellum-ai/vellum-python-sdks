@@ -78,7 +78,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
         pathName = "DocumentPromptBlock";
         break;
     }
-    return python.reference({
+    return new Reference({
       name: pathName,
       modulePath: VELLUM_CLIENT_MODULE_PATH,
     });

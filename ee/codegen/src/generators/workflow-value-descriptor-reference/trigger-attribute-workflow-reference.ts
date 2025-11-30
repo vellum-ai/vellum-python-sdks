@@ -1,6 +1,5 @@
-import { python } from "@fern-api/python-ast";
-
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Reference } from "src/generators/extensions/reference";
 import { BaseNodeInputWorkflowReference } from "src/generators/workflow-value-descriptor-reference/BaseNodeInputWorkflowReference";
 import { TriggerAttributeWorkflowReference as TriggerAttributeWorkflowReferenceType } from "src/types/vellum";
 import { getTriggerClassInfo } from "src/utils/triggers";
@@ -34,7 +33,7 @@ export class TriggerAttributeWorkflowReference extends BaseNodeInputWorkflowRefe
     }
 
     // Generate: TriggerClassName.attributeName
-    return python.reference({
+    return new Reference({
       name: triggerClassInfo.className,
       modulePath: triggerClassInfo.modulePath,
       attribute: [attribute.key],

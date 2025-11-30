@@ -1,5 +1,4 @@
-import { python } from "@fern-api/python-ast";
-
+import { Reference } from "./reference";
 import { PythonType } from "./type";
 
 import { AstNode } from "src/generators/extensions/ast-node";
@@ -11,9 +10,7 @@ export class UnionType extends PythonType {
   constructor(itemTypes: AstNode[]) {
     super();
     this.itemTypes = itemTypes;
-    this.addReference(
-      python.reference({ name: "Union", modulePath: ["typing"] })
-    );
+    this.addReference(new Reference({ name: "Union", modulePath: ["typing"] }));
     itemTypes.forEach((itemType) => this.inheritReferences(itemType));
   }
 

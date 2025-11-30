@@ -7,6 +7,7 @@ import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Reference } from "src/generators/extensions/reference";
 import { Writer } from "src/generators/extensions/writer";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { NodeOutput as NodeOutputType } from "src/types/vellum";
@@ -50,7 +51,7 @@ export class NodeOutputs extends AstNode {
     const clazz = new Class({
       name: OUTPUTS_CLASS_NAME,
       extends_: [
-        python.reference({
+        new Reference({
           name: nodeContext.baseNodeClassName,
           modulePath: nodeContext.baseNodeClassModulePath,
           alias: baseNodeClassNameAlias,

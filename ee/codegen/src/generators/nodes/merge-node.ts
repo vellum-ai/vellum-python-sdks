@@ -4,6 +4,7 @@ import { Field } from "@fern-api/python-ast/Field";
 import { MergeNodeContext } from "src/context/node-context/merge-node";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
+import { Reference } from "src/generators/extensions/reference";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { MergeNode as MergeNodeType } from "src/types/vellum";
 
@@ -11,7 +12,7 @@ export class MergeNode extends BaseNode<MergeNodeType, MergeNodeContext> {
   getNodeClassBodyStatements(): AstNode[] {
     const statements: AstNode[] = [];
 
-    const mergeStrategyRef = python.reference({
+    const mergeStrategyRef = new Reference({
       name: "MergeBehavior",
       modulePath: [
         ...this.workflowContext.sdkModulePathNames.WORKFLOWS_MODULE_PATH,
@@ -25,7 +26,7 @@ export class MergeNode extends BaseNode<MergeNodeType, MergeNodeContext> {
     const triggerClass = new Class({
       name: "Trigger",
       extends_: [
-        python.reference({
+        new Reference({
           name: baseClass.name,
           modulePath: baseClass.modulePath,
           alias: baseClass.alias,

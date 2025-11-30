@@ -3,6 +3,7 @@ import { python } from "@fern-api/python-ast";
 import { InlineSubworkflowNodeContext } from "src/context/node-context/inline-subworkflow-node";
 import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Reference } from "src/generators/extensions/reference";
 import { BaseNestedWorkflowNode } from "src/generators/nodes/bases/nested-workflow-base";
 import { WorkflowProjectGenerator } from "src/project";
 import {
@@ -33,7 +34,7 @@ export class InlineSubworkflowNode extends BaseNestedWorkflowNode<
 
     // InputsType: Reference to the Inputs class from the nested workflow
     const inputsType = python.Type.reference(
-      python.reference({
+      new Reference({
         name: "Inputs",
         modulePath: [
           ...nestedWorkflowContext.modulePath.slice(0, -1),
@@ -49,13 +50,13 @@ export class InlineSubworkflowNode extends BaseNestedWorkflowNode<
 
     const innerStateType = nestedFirstStateVariableContext
       ? python.Type.reference(
-          python.reference({
+          new Reference({
             name: nestedFirstStateVariableContext.definition.name,
             modulePath: nestedFirstStateVariableContext.definition.module,
           })
         )
       : python.Type.reference(
-          python.reference({
+          new Reference({
             name: "BaseState",
             modulePath: ["vellum", "workflows", "state"],
           })
@@ -79,7 +80,7 @@ export class InlineSubworkflowNode extends BaseNestedWorkflowNode<
       BaseNestedWorkflowNode.subworkflowNestedProjectName
     );
 
-    const nestedWorkflowReference = python.reference({
+    const nestedWorkflowReference = new Reference({
       name: nestedWorkflowContext.workflowClassName,
       modulePath: nestedWorkflowContext.modulePath,
     });

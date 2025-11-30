@@ -6,6 +6,7 @@ import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-
 import { PromptTemplateBlockExcludingFunctionDefinition } from "src/generators/base-prompt-block";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { FunctionDefinition } from "src/generators/function-definition";
 import { Json } from "src/generators/json";
@@ -190,7 +191,7 @@ export class InlinePromptNode extends BaseNode<
           python.field({
             name: "settings",
             initializer: python.instantiateClass({
-              classReference: python.reference({
+              classReference: new Reference({
                 name: "PromptSettings",
                 modulePath: [...VELLUM_CLIENT_MODULE_PATH],
               }),
@@ -236,13 +237,13 @@ export class InlinePromptNode extends BaseNode<
 
     const outputDisplayEntries = [
       {
-        key: python.reference({
+        key: new Reference({
           name: this.nodeContext.nodeClassName,
           modulePath: this.nodeContext.nodeModulePath,
           attribute: [OUTPUTS_CLASS_NAME, "text"],
         }),
         value: python.instantiateClass({
-          classReference: python.reference({
+          classReference: new Reference({
             name: "NodeOutputDisplay",
             modulePath:
               this.workflowContext.sdkModulePathNames
@@ -261,13 +262,13 @@ export class InlinePromptNode extends BaseNode<
         }),
       },
       {
-        key: python.reference({
+        key: new Reference({
           name: this.nodeContext.nodeClassName,
           modulePath: this.nodeContext.nodeModulePath,
           attribute: [OUTPUTS_CLASS_NAME, "results"],
         }),
         value: python.instantiateClass({
-          classReference: python.reference({
+          classReference: new Reference({
             name: "NodeOutputDisplay",
             modulePath:
               this.workflowContext.sdkModulePathNames
@@ -291,13 +292,13 @@ export class InlinePromptNode extends BaseNode<
 
     if (jsonOutput) {
       outputDisplayEntries.push({
-        key: python.reference({
+        key: new Reference({
           name: this.nodeContext.nodeClassName,
           modulePath: this.nodeContext.nodeModulePath,
           attribute: [OUTPUTS_CLASS_NAME, "json"],
         }),
         value: python.instantiateClass({
-          classReference: python.reference({
+          classReference: new Reference({
             name: "NodeOutputDisplay",
             modulePath:
               this.workflowContext.sdkModulePathNames
@@ -443,7 +444,7 @@ export class InlinePromptNode extends BaseNode<
                 }
 
                 return python.instantiateClass({
-                  classReference: python.reference({
+                  classReference: new Reference({
                     name: "FunctionDefinition",
                     modulePath: [...VELLUM_CLIENT_MODULE_PATH],
                   }),

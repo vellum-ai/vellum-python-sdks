@@ -3,6 +3,7 @@ import { python } from "@fern-api/python-ast";
 import { BaseNodeInputValuePointerRule } from "./base";
 
 import { NodeInputNotFoundError } from "src/generators/errors";
+import { Reference } from "src/generators/extensions/reference";
 import { InputVariablePointer } from "src/types/vellum";
 
 export class InputVariablePointerRule extends BaseNodeInputValuePointerRule<InputVariablePointer> {
@@ -24,7 +25,7 @@ export class InputVariablePointerRule extends BaseNodeInputValuePointerRule<Inpu
       return python.TypeInstantiation.none();
     }
 
-    return python.reference({
+    return new Reference({
       name: inputVariableContext.definition.name,
       modulePath: inputVariableContext.definition.module,
       attribute: [inputVariableContext.name],

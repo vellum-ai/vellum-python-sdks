@@ -3,6 +3,7 @@ import { python } from "@fern-api/python-ast";
 import { BaseNodeInputValuePointerRule } from "./base";
 
 import { NodeInputNotFoundError } from "src/generators/errors";
+import { Reference } from "src/generators/extensions/reference";
 import { TriggerAttributePointer } from "src/types/vellum";
 import { getTriggerClassInfo } from "src/utils/triggers";
 
@@ -53,7 +54,7 @@ export class TriggerAttributePointerRule extends BaseNodeInputValuePointerRule<T
     }
 
     // Generate: TriggerClassName.attributeName
-    return python.reference({
+    return new Reference({
       name: triggerClassInfo.className,
       modulePath: triggerClassInfo.modulePath,
       attribute: [attribute.key],

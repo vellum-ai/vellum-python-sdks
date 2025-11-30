@@ -9,6 +9,7 @@ import { PortContext } from "src/context/port-context";
 import { Expression } from "src/generators/expression";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { MethodArgument } from "src/generators/extensions/method-argument";
+import { Reference } from "src/generators/extensions/reference";
 import { Writer } from "src/generators/extensions/writer";
 import { NodeInput } from "src/generators/node-inputs";
 import {
@@ -68,7 +69,7 @@ export class ConditionalNodePort extends AstNode {
 
   private constructPort(): AstNode {
     return python.invokeMethod({
-      methodReference: python.reference({
+      methodReference: new Reference({
         name: "Port",
         modulePath:
           this.portContext.workflowContext.sdkModulePathNames.PORTS_MODULE_PATH,

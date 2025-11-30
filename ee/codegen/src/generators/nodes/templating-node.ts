@@ -6,6 +6,7 @@ import { TemplatingNodeContext } from "src/context/node-context/templating-node"
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { PythonType } from "src/generators/extensions";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { TemplatingNode as TemplatingNodeType } from "src/types/vellum";
@@ -149,13 +150,13 @@ export class TemplatingNode extends BaseNode<
       name: "output_display",
       initializer: python.TypeInstantiation.dict([
         {
-          key: python.reference({
+          key: new Reference({
             name: this.nodeContext.nodeClassName,
             modulePath: this.nodeContext.nodeModulePath,
             attribute: [OUTPUTS_CLASS_NAME, "result"],
           }),
           value: python.instantiateClass({
-            classReference: python.reference({
+            classReference: new Reference({
               name: "NodeOutputDisplay",
               modulePath:
                 this.workflowContext.sdkModulePathNames
@@ -188,7 +189,7 @@ export class TemplatingNode extends BaseNode<
   ): python.Type | PythonType {
     return outputType === VellumVariableType.Json
       ? python.Type.reference(
-          python.reference({
+          new Reference({
             name: "Json",
             modulePath: [
               ...VELLUM_CLIENT_MODULE_PATH,

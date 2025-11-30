@@ -2,6 +2,7 @@ import { python } from "@fern-api/python-ast";
 import { isNil } from "lodash";
 
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseNodeInputWorkflowReference } from "src/generators/workflow-value-descriptor-reference/BaseNodeInputWorkflowReference";
 import { VellumSecretWorkflowReference as VellumSecretWorkflowReferenceType } from "src/types/vellum";
@@ -15,7 +16,7 @@ export class VellumSecretWorkflowReference extends BaseNodeInputWorkflowReferenc
       return python.TypeInstantiation.none();
     }
     return python.instantiateClass({
-      classReference: python.reference({
+      classReference: new Reference({
         name: "VellumSecretReference",
         modulePath: [
           ...this.workflowContext.sdkModulePathNames.WORKFLOWS_MODULE_PATH,

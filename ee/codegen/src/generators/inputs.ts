@@ -1,4 +1,3 @@
-import { python } from "@fern-api/python-ast";
 import { isEqual } from "lodash";
 
 import { BasePersistedFile } from "./base-persisted-file";
@@ -22,7 +21,7 @@ export class Inputs extends BasePersistedFile {
 
   constructor({ name, workflowContext }: Inputs.Args) {
     super({ workflowContext: workflowContext });
-    this.baseInputsClassReference = python.reference({
+    this.baseInputsClassReference = new Reference({
       name: "BaseInputs",
       modulePath: workflowContext.sdkModulePathNames.INPUTS_MODULE_PATH,
     });

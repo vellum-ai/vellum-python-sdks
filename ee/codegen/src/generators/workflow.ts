@@ -66,7 +66,7 @@ export class Workflow {
     if (firstInputVariableContext) {
       parentGenerics.push(
         python.Type.reference(
-          python.reference({
+          new Reference({
             name: firstInputVariableContext.definition.name,
             modulePath: firstInputVariableContext.definition.module,
           })
@@ -76,7 +76,7 @@ export class Workflow {
     } else {
       parentGenerics.push(
         python.Type.reference(
-          python.reference({
+          new Reference({
             name: "BaseInputs",
             modulePath:
               this.workflowContext.sdkModulePathNames.INPUTS_MODULE_PATH,
@@ -91,7 +91,7 @@ export class Workflow {
     if (firstStateVariableContext) {
       parentGenerics.push(
         python.Type.reference(
-          python.reference({
+          new Reference({
             name: firstStateVariableContext.definition.name,
             modulePath: firstStateVariableContext.definition.module,
           })
@@ -108,7 +108,7 @@ export class Workflow {
       );
     }
 
-    const baseWorkflowClassRef = python.reference({
+    const baseWorkflowClassRef = new Reference({
       name: "BaseWorkflow",
       modulePath: this.workflowContext.sdkModulePathNames.WORKFLOWS_MODULE_PATH,
       genericTypes: customGenericsUsed ? parentGenerics : undefined,
@@ -121,7 +121,7 @@ export class Workflow {
     const outputsClass = new Class({
       name: OUTPUTS_CLASS_NAME,
       extends_: [
-        python.reference({
+        new Reference({
           name: parentWorkflowClass.name,
           modulePath: parentWorkflowClass.modulePath,
           attribute: [OUTPUTS_CLASS_NAME],
@@ -169,7 +169,7 @@ export class Workflow {
   public generateWorkflowDisplayClass(): Class {
     const workflowDisplayClassName = `${this.workflowContext.workflowClassName}Display`;
 
-    const workflowClassRef = python.reference({
+    const workflowClassRef = new Reference({
       name: this.workflowContext.workflowClassName,
       modulePath: this.getWorkflowFile().getModulePath(),
     });
@@ -177,7 +177,7 @@ export class Workflow {
     const workflowDisplayClass = new Class({
       name: workflowDisplayClassName,
       extends_: [
-        python.reference({
+        new Reference({
           name: "BaseWorkflowDisplay",
           modulePath: VELLUM_WORKFLOWS_DISPLAY_MODULE_PATH,
           genericTypes: [workflowClassRef],
@@ -192,7 +192,7 @@ export class Workflow {
       python.field({
         name: "workflow_display",
         initializer: python.instantiateClass({
-          classReference: python.reference({
+          classReference: new Reference({
             name: "WorkflowMetaDisplay",
             modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
           }),
@@ -223,7 +223,7 @@ export class Workflow {
                   python.methodArgument({
                     name: "display_data",
                     value: python.instantiateClass({
-                      classReference: python.reference({
+                      classReference: new Reference({
                         name: "WorkflowDisplayData",
                         modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
                       }),
@@ -231,7 +231,7 @@ export class Workflow {
                         python.methodArgument({
                           name: "viewport",
                           value: python.instantiateClass({
-                            classReference: python.reference({
+                            classReference: new Reference({
                               name: "WorkflowDisplayDataViewport",
                               modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
                             }),
@@ -307,13 +307,13 @@ export class Workflow {
                   );
                 }
                 return {
-                  key: python.reference({
+                  key: new Reference({
                     name: inputVariableContext.definition.name,
                     modulePath: inputVariableContext.definition.module,
                     attribute: [inputVariableContext.name],
                   }),
                   value: python.instantiateClass({
-                    classReference: python.reference({
+                    classReference: new Reference({
                       name: "WorkflowInputsDisplay",
                       modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
                     }),
@@ -367,13 +367,13 @@ export class Workflow {
                   );
                 }
                 return {
-                  key: python.reference({
+                  key: new Reference({
                     name: stateVariableContext.definition.name,
                     modulePath: stateVariableContext.definition.module,
                     attribute: [stateVariableContext.name],
                   }),
                   value: python.instantiateClass({
-                    classReference: python.reference({
+                    classReference: new Reference({
                       name: "StateValueDisplay",
                       modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
                     }),
@@ -403,12 +403,12 @@ export class Workflow {
               }
 
               return {
-                key: python.reference({
+                key: new Reference({
                   name: defaultEntrypointNodeContext.nodeClassName,
                   modulePath: defaultEntrypointNodeContext.nodeModulePath,
                 }),
                 value: python.instantiateClass({
-                  classReference: python.reference({
+                  classReference: new Reference({
                     name: "EntrypointDisplay",
                     modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
                   }),
@@ -423,7 +423,7 @@ export class Workflow {
                     python.methodArgument({
                       name: "edge_display",
                       value: python.instantiateClass({
-                        classReference: python.reference({
+                        classReference: new Reference({
                           name: "EdgeDisplay",
                           modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
                         }),
@@ -500,18 +500,18 @@ export class Workflow {
             const zIndex = edge.display_data?.z_index;
             const edgeDisplayEntry = {
               key: python.TypeInstantiation.tuple([
-                python.reference({
+                new Reference({
                   name: sourcePortContext.nodeContext.nodeClassName,
                   modulePath: sourcePortContext.nodeContext.nodeModulePath,
                   attribute: [PORTS_CLASS_NAME, sourcePortContext.portName],
                 }),
-                python.reference({
+                new Reference({
                   name: targetNode.nodeClassName,
                   modulePath: targetNode.nodeModulePath,
                 }),
               ]),
               value: python.instantiateClass({
-                classReference: python.reference({
+                classReference: new Reference({
                   name: "EdgeDisplay",
                   modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
                 }),
@@ -558,13 +558,13 @@ export class Workflow {
               }
 
               return {
-                key: python.reference({
+                key: new Reference({
                   name: this.workflowContext.workflowClassName,
                   modulePath: this.workflowContext.modulePath,
                   attribute: [OUTPUTS_CLASS_NAME, outputVariable.name],
                 }),
                 value: python.instantiateClass({
-                  classReference: python.reference({
+                  classReference: new Reference({
                     name: "WorkflowOutputDisplay",
                     modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
                   }),
@@ -647,7 +647,7 @@ export class Workflow {
       }
 
       unusedGraphs.push(
-        python.reference({
+        new Reference({
           name: nodeContext.nodeClassName,
           modulePath: nodeContext.nodeModulePath,
         })

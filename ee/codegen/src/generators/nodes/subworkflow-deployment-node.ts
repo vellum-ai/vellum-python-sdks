@@ -8,6 +8,7 @@ import {
 } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { codegen } from "src/index";
@@ -96,7 +97,7 @@ export class SubworkflowDeploymentNode extends BaseNode<
     const outputsClass = new Class({
       name: OUTPUTS_CLASS_NAME,
       extends_: [
-        python.reference({
+        new Reference({
           name: nodeBaseClassRef.name,
           modulePath: nodeBaseClassRef.modulePath,
           alias: nodeBaseClassRef.alias,
@@ -167,13 +168,13 @@ export class SubworkflowDeploymentNode extends BaseNode<
             );
           }
           return {
-            key: python.reference({
+            key: new Reference({
               name: this.nodeContext.nodeClassName,
               modulePath: this.nodeContext.nodeModulePath,
               attribute: [OUTPUTS_CLASS_NAME, outputName],
             }),
             value: python.instantiateClass({
-              classReference: python.reference({
+              classReference: new Reference({
                 name: "NodeOutputDisplay",
                 modulePath:
                   this.workflowContext.sdkModulePathNames

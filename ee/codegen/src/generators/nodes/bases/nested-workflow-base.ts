@@ -6,6 +6,7 @@ import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { NodeAttributeGenerationError } from "src/generators/errors";
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { WorkflowProjectGenerator } from "src/project";
 import { WorkflowDataNode, WorkflowRawData } from "src/types/vellum";
@@ -101,13 +102,13 @@ export abstract class BaseNestedWorkflowNode<
       initializer: python.TypeInstantiation.dict(
         outputVariableContexts.map((outputContext) => {
           return {
-            key: python.reference({
+            key: new Reference({
               name: this.nodeContext.nodeClassName,
               modulePath: this.nodeContext.nodeModulePath,
               attribute: [OUTPUTS_CLASS_NAME, outputContext.name],
             }),
             value: python.instantiateClass({
-              classReference: python.reference({
+              classReference: new Reference({
                 name: "NodeOutputDisplay",
                 modulePath:
                   this.workflowContext.sdkModulePathNames

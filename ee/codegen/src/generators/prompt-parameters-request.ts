@@ -28,7 +28,7 @@ export class PromptParameters extends AstNode {
   }
 
   private getPromptParametersRef(): Reference {
-    return python.reference({
+    return new Reference({
       name: "PromptParameters",
       modulePath: VELLUM_CLIENT_MODULE_PATH,
     });
