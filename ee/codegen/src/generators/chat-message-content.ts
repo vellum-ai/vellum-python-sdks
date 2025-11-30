@@ -20,6 +20,7 @@ import {
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { MethodArgument } from "src/generators/extensions/method-argument";
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 import { Json } from "src/generators/json";
@@ -36,7 +37,7 @@ class StringChatMessageContent extends AstNode {
 
   private generateAstNode(value: string, isRequestType: boolean): AstNode {
     const astNode = python.instantiateClass({
-      classReference: python.reference({
+      classReference: new Reference({
         name: "StringChatMessageContent" + (isRequestType ? "Request" : ""),
         modulePath: VELLUM_CLIENT_MODULE_PATH,
       }),
@@ -102,7 +103,7 @@ class FunctionCallChatMessageContentValue extends AstNode {
       );
     }
 
-    const functionCallChatMessageContentValueRequestRef = python.reference({
+    const functionCallChatMessageContentValueRequestRef = new Reference({
       name:
         "FunctionCallChatMessageContentValue" +
         (isRequestType ? "Request" : ""),
@@ -117,7 +118,7 @@ class FunctionCallChatMessageContentValue extends AstNode {
     );
 
     const astNode = python.instantiateClass({
-      classReference: python.reference({
+      classReference: new Reference({
         name:
           "FunctionCallChatMessageContent" + (isRequestType ? "Request" : ""),
         modulePath: VELLUM_CLIENT_MODULE_PATH,
@@ -164,7 +165,7 @@ class ArrayChatMessageContent extends AstNode {
         })
     );
     const astNode = python.instantiateClass({
-      classReference: python.reference({
+      classReference: new Reference({
         name: "ArrayChatMessageContent" + (isRequestType ? "Request" : ""),
         modulePath: VELLUM_CLIENT_MODULE_PATH,
       }),
@@ -201,7 +202,7 @@ class AudioChatMessageContent extends AstNode {
     value: VellumAudioType | VellumAudioRequestType,
     isRequestType: boolean
   ): AstNode {
-    const audioChatMessageContentRequestRef = python.reference({
+    const audioChatMessageContentRequestRef = new Reference({
       name: "AudioChatMessageContent" + (isRequestType ? "Request" : ""),
       modulePath: VELLUM_CLIENT_MODULE_PATH,
     });
@@ -227,7 +228,7 @@ class AudioChatMessageContent extends AstNode {
       python.methodArgument({
         name: "value",
         value: python.instantiateClass({
-          classReference: python.reference({
+          classReference: new Reference({
             name: "VellumAudio" + (isRequestType ? "Request" : ""),
             modulePath: VELLUM_CLIENT_MODULE_PATH,
           }),
@@ -264,7 +265,7 @@ class VideoChatMessageContent extends AstNode {
     value: VellumVideoType | VellumVideoRequestType,
     isRequestType: boolean
   ): AstNode {
-    const videoChatMessageContentRequestRef = python.reference({
+    const videoChatMessageContentRequestRef = new Reference({
       name: "VideoChatMessageContent" + (isRequestType ? "Request" : ""),
       modulePath: VELLUM_CLIENT_MODULE_PATH,
     });
@@ -290,7 +291,7 @@ class VideoChatMessageContent extends AstNode {
       python.methodArgument({
         name: "value",
         value: python.instantiateClass({
-          classReference: python.reference({
+          classReference: new Reference({
             name: "VellumVideo" + (isRequestType ? "Request" : ""),
             modulePath: VELLUM_CLIENT_MODULE_PATH,
           }),
@@ -327,7 +328,7 @@ class ImageChatMessageContent extends AstNode {
     value: VellumImageType | VellumImageRequestType,
     isRequestType: boolean
   ): AstNode {
-    const imageChatMessageContentRequestRef = python.reference({
+    const imageChatMessageContentRequestRef = new Reference({
       name: "ImageChatMessageContent" + (isRequestType ? "Request" : ""),
       modulePath: VELLUM_CLIENT_MODULE_PATH,
     });
@@ -353,7 +354,7 @@ class ImageChatMessageContent extends AstNode {
       python.methodArgument({
         name: "value",
         value: python.instantiateClass({
-          classReference: python.reference({
+          classReference: new Reference({
             name: "VellumImage" + (isRequestType ? "Request" : ""),
             modulePath: VELLUM_CLIENT_MODULE_PATH,
           }),
@@ -390,7 +391,7 @@ class DocumentChatMessageContent extends AstNode {
     value: VellumDocumentType | VellumDocumentRequestType,
     isRequestType: boolean
   ): AstNode {
-    const documentChatMessageContentRequestRef = python.reference({
+    const documentChatMessageContentRequestRef = new Reference({
       name: "DocumentChatMessageContent" + (isRequestType ? "Request" : ""),
       modulePath: VELLUM_CLIENT_MODULE_PATH,
     });
@@ -416,7 +417,7 @@ class DocumentChatMessageContent extends AstNode {
       python.methodArgument({
         name: "value",
         value: python.instantiateClass({
-          classReference: python.reference({
+          classReference: new Reference({
             name: "VellumDocument" + (isRequestType ? "Request" : ""),
             modulePath: VELLUM_CLIENT_MODULE_PATH,
           }),

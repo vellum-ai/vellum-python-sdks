@@ -8,6 +8,7 @@ import { CodeExecutionContext } from "src/context/node-context/code-execution-no
 import { InitFile } from "src/generators";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { CodeExecutionNode as CodeExecutionNodeType } from "src/types/vellum";
@@ -126,7 +127,7 @@ export class CodeExecutionNode extends BaseNode<
           ? python.TypeInstantiation.list(
               nodeData.packages.map((package_) =>
                 python.instantiateClass({
-                  classReference: python.reference({
+                  classReference: new Reference({
                     name: "CodeExecutionPackage",
                     modulePath: ["vellum", "client", "types"],
                   }),
@@ -265,13 +266,13 @@ export class CodeExecutionNode extends BaseNode<
   protected getOutputDisplay(): python.Field {
     const outputDisplayEntries = [
       {
-        key: python.reference({
+        key: new Reference({
           name: this.nodeContext.nodeClassName,
           modulePath: this.nodeContext.nodeModulePath,
           attribute: [OUTPUTS_CLASS_NAME, "result"],
         }),
         value: python.instantiateClass({
-          classReference: python.reference({
+          classReference: new Reference({
             name: "NodeOutputDisplay",
             modulePath:
               this.workflowContext.sdkModulePathNames
@@ -293,13 +294,13 @@ export class CodeExecutionNode extends BaseNode<
 
     if (this.nodeData.data.logOutputId) {
       outputDisplayEntries.push({
-        key: python.reference({
+        key: new Reference({
           name: this.nodeContext.nodeClassName,
           modulePath: this.nodeContext.nodeModulePath,
           attribute: [OUTPUTS_CLASS_NAME, "log"],
         }),
         value: python.instantiateClass({
-          classReference: python.reference({
+          classReference: new Reference({
             name: "NodeOutputDisplay",
             modulePath:
               this.workflowContext.sdkModulePathNames

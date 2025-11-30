@@ -3,6 +3,7 @@ import { python } from "@fern-api/python-ast";
 import { BaseNodeInputValuePointerRule } from "./base";
 
 import { OUTPUTS_CLASS_NAME } from "src/constants";
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { NodeOutputPointer } from "src/types/vellum";
 
@@ -31,7 +32,7 @@ export class NodeOutputPointerRule extends BaseNodeInputValuePointerRule<NodeOut
     if (nodeOutputName) {
       if (this.nodeContext && this.nodeContext.isImportedBefore(nodeContext)) {
         return python.instantiateClass({
-          classReference: python.reference({
+          classReference: new Reference({
             name: "LazyReference",
             modulePath: [
               ...this.nodeContext.workflowContext.sdkModulePathNames
@@ -49,7 +50,7 @@ export class NodeOutputPointerRule extends BaseNodeInputValuePointerRule<NodeOut
         });
       }
 
-      return python.reference({
+      return new Reference({
         name: nodeContext.nodeClassName,
         modulePath: nodeContext.nodeModulePath,
         attribute: [OUTPUTS_CLASS_NAME, nodeOutputName],

@@ -18,6 +18,7 @@ import { ValueGenerationError } from "./errors";
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 import { Json } from "src/generators/json";
@@ -142,7 +143,7 @@ class ChatHistoryVellumValue extends AstNode {
       }
 
       return python.instantiateClass({
-        classReference: python.reference({
+        classReference: new Reference({
           name: "ChatMessage" + (isRequestType ? "Request" : ""),
           modulePath: VELLUM_CLIENT_MODULE_PATH,
         }),
@@ -174,7 +175,7 @@ class ErrorVellumValue extends AstNode {
 
   private generateAstNode({ message, code }: VellumError) {
     const astNode = python.instantiateClass({
-      classReference: python.reference({
+      classReference: new Reference({
         name: "VellumError",
         modulePath: VELLUM_CLIENT_MODULE_PATH,
       }),
@@ -224,7 +225,7 @@ class AudioVellumValue extends AstNode {
     }
 
     const astNode = python.instantiateClass({
-      classReference: python.reference({
+      classReference: new Reference({
         name: "VellumAudio",
         modulePath: VELLUM_CLIENT_MODULE_PATH,
       }),
@@ -266,7 +267,7 @@ class VideoVellumValue extends AstNode {
     }
 
     const astNode = python.instantiateClass({
-      classReference: python.reference({
+      classReference: new Reference({
         name: "VellumVideo",
         modulePath: VELLUM_CLIENT_MODULE_PATH,
       }),
@@ -308,7 +309,7 @@ class ImageVellumValue extends AstNode {
     }
 
     const astNode = python.instantiateClass({
-      classReference: python.reference({
+      classReference: new Reference({
         name: "VellumImage",
         modulePath: VELLUM_CLIENT_MODULE_PATH,
       }),
@@ -351,7 +352,7 @@ class DocumentVellumValue extends AstNode {
     }
 
     const astNode = python.instantiateClass({
-      classReference: python.reference({
+      classReference: new Reference({
         name: "VellumDocument",
         modulePath: VELLUM_CLIENT_MODULE_PATH,
       }),
@@ -429,7 +430,7 @@ class FunctionCallVellumValue extends AstNode {
     }
 
     const astNode = python.instantiateClass({
-      classReference: python.reference({
+      classReference: new Reference({
         name: "FunctionCall",
         modulePath: VELLUM_CLIENT_MODULE_PATH,
       }),
@@ -474,7 +475,7 @@ class SearchResultsVellumValue extends AstNode {
           name: "document",
           value: (() => {
             const document = python.instantiateClass({
-              classReference: python.reference({
+              classReference: new Reference({
                 name: "Document",
                 modulePath: VELLUM_CLIENT_MODULE_PATH,
               }),
@@ -505,7 +506,7 @@ class SearchResultsVellumValue extends AstNode {
       }
 
       return python.instantiateClass({
-        classReference: python.reference({
+        classReference: new Reference({
           name: "SearchResult",
           modulePath: VELLUM_CLIENT_MODULE_PATH,
         }),
@@ -544,7 +545,7 @@ class ThinkingVellumValue extends AstNode {
     ];
 
     const astNode = python.instantiateClass({
-      classReference: python.reference({
+      classReference: new Reference({
         name: "StringVellumValue",
         modulePath: VELLUM_CLIENT_MODULE_PATH,
       }),
@@ -590,7 +591,7 @@ export class VellumValue extends AstNode {
         if (attributeConfig) {
           this.astNode = python.accessAttribute({
             lhs: attributeConfig.lhs,
-            rhs: python.reference({
+            rhs: new Reference({
               name: vellumValue.value,
               modulePath: [],
             }),

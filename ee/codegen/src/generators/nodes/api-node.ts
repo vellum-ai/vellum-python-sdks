@@ -5,6 +5,7 @@ import { ApiNodeContext } from "src/context/node-context/api-node";
 import { NodeInput } from "src/generators";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
@@ -306,7 +307,7 @@ export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
     }
     const methodEnum = methodValue.data.value as string;
 
-    return python.reference({
+    return new Reference({
       name: "APIRequestMethod",
       modulePath: [
         ...this.workflowContext.sdkModulePathNames.WORKFLOWS_MODULE_PATH,
@@ -338,7 +339,7 @@ export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
     if (!authTypeEnum) {
       return undefined;
     } else {
-      return python.reference({
+      return new Reference({
         name: "AuthorizationType",
         modulePath: [
           ...this.workflowContext.sdkModulePathNames.WORKFLOWS_MODULE_PATH,

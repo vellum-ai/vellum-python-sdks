@@ -5,6 +5,7 @@ import { BaseNodeInputValuePointerRule } from "./base";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { NodeInputNotFoundError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Reference } from "src/generators/extensions/reference";
 import { WorkflowStatePointer, WorkflowDataNode } from "src/types/vellum";
 
 export declare namespace WorkflowStatePointerRule {
@@ -37,7 +38,7 @@ export class WorkflowStatePointerRule extends BaseNodeInputValuePointerRule<Work
       return python.TypeInstantiation.none();
     }
 
-    return python.reference({
+    return new Reference({
       name: stateVariableContext.definition.name,
       modulePath: stateVariableContext.definition.module,
       attribute: [stateVariableContext.name],

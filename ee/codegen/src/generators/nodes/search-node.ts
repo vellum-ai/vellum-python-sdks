@@ -13,6 +13,7 @@ import {
 } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 import { BaseNode } from "src/generators/nodes/bases/base";
@@ -189,7 +190,7 @@ export class SearchNode extends BaseNode<
     }
 
     const searchWeightsRequest = python.instantiateClass({
-      classReference: python.reference({
+      classReference: new Reference({
         name: "SearchWeightsRequest",
         modulePath: VELLUM_CLIENT_MODULE_PATH,
       }),
@@ -219,7 +220,7 @@ export class SearchNode extends BaseNode<
         )
       );
       return new ClassInstantiation({
-        classReference: python.reference({
+        classReference: new Reference({
           name: "SearchResultMergingRequest",
           modulePath: VELLUM_CLIENT_MODULE_PATH,
         }),
@@ -241,7 +242,7 @@ export class SearchNode extends BaseNode<
         )
       );
       return new ClassInstantiation({
-        classReference: python.reference({
+        classReference: new Reference({
           name: "SearchResultMergingRequest",
           modulePath: VELLUM_CLIENT_MODULE_PATH,
         }),
@@ -255,7 +256,7 @@ export class SearchNode extends BaseNode<
     }
 
     return new ClassInstantiation({
-      classReference: python.reference({
+      classReference: new Reference({
         name: "SearchResultMergingRequest",
         modulePath: VELLUM_CLIENT_MODULE_PATH,
       }),
@@ -276,7 +277,7 @@ export class SearchNode extends BaseNode<
     }
 
     return new ClassInstantiation({
-      classReference: python.reference({
+      classReference: new Reference({
         name: "SearchFilters",
         modulePath: VELLUM_WORKFLOW_NODE_BASE_TYPES_PATH,
       }),
@@ -442,13 +443,13 @@ export class SearchNode extends BaseNode<
       name: "output_display",
       initializer: python.TypeInstantiation.dict([
         {
-          key: python.reference({
+          key: new Reference({
             name: this.nodeContext.nodeClassName,
             modulePath: this.nodeContext.nodeModulePath,
             attribute: [OUTPUTS_CLASS_NAME, "results"],
           }),
           value: python.instantiateClass({
-            classReference: python.reference({
+            classReference: new Reference({
               name: "NodeOutputDisplay",
               modulePath:
                 this.workflowContext.sdkModulePathNames
@@ -469,13 +470,13 @@ export class SearchNode extends BaseNode<
           }),
         },
         {
-          key: python.reference({
+          key: new Reference({
             name: this.nodeContext.nodeClassName,
             modulePath: this.nodeContext.nodeModulePath,
             attribute: [OUTPUTS_CLASS_NAME, "text"],
           }),
           value: python.instantiateClass({
-            classReference: python.reference({
+            classReference: new Reference({
               name: "NodeOutputDisplay",
               modulePath:
                 this.workflowContext.sdkModulePathNames
@@ -555,7 +556,7 @@ export class SearchNodeMetadataFilters extends AstNode {
     );
 
     return new ClassInstantiation({
-      classReference: python.reference({
+      classReference: new Reference({
         name: "MetadataLogicalConditionGroup",
         modulePath: VELLUM_WORKFLOW_NODE_BASE_TYPES_PATH,
       }),
@@ -591,7 +592,7 @@ export class SearchNodeMetadataFilters extends AstNode {
         )
       );
       return new ClassInstantiation({
-        classReference: python.reference({
+        classReference: new Reference({
           name: "MetadataLogicalCondition",
           modulePath: VELLUM_WORKFLOW_NODE_BASE_TYPES_PATH,
         }),
@@ -620,7 +621,7 @@ export class SearchNodeMetadataFilters extends AstNode {
         )
       );
       return new ClassInstantiation({
-        classReference: python.reference({
+        classReference: new Reference({
           name: "MetadataLogicalCondition",
           modulePath: VELLUM_WORKFLOW_NODE_BASE_TYPES_PATH,
         }),
@@ -638,7 +639,7 @@ export class SearchNodeMetadataFilters extends AstNode {
     }
 
     return new ClassInstantiation({
-      classReference: python.reference({
+      classReference: new Reference({
         name: "MetadataLogicalCondition",
         modulePath: VELLUM_WORKFLOW_NODE_BASE_TYPES_PATH,
       }),

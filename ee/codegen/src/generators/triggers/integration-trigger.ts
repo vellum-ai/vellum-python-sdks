@@ -2,6 +2,7 @@ import { python } from "@fern-api/python-ast";
 
 import { VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH } from "src/constants";
 import { Class } from "src/generators/extensions/class";
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseTrigger } from "src/generators/triggers/base-trigger";
 import { createPythonClassName, toPythonSafeSnakeCase } from "src/utils/casing";
@@ -94,7 +95,7 @@ export class IntegrationTrigger extends BaseTrigger<IntegrationTriggerType> {
     const configClass = new Class({
       name: "Config",
       extends_: [
-        python.reference({
+        new Reference({
           name: "IntegrationTrigger",
           modulePath: VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH,
           attribute: ["Config"],

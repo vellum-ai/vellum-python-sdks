@@ -1,5 +1,4 @@
-import { python } from "@fern-api/python-ast";
-
+import { Reference } from "./reference";
 import { PythonType } from "./type";
 
 import { AstNode } from "src/generators/extensions/ast-node";
@@ -16,7 +15,7 @@ export class OptionalType extends PythonType {
     super();
     this.itemType = itemType;
     this.addReference(
-      python.reference({ name: "Optional", modulePath: ["typing"] })
+      new Reference({ name: "Optional", modulePath: ["typing"] })
     );
     this.inheritReferences(itemType);
   }

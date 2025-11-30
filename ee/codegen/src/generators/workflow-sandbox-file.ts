@@ -6,6 +6,7 @@ import { VELLUM_WORKFLOW_ROOT_MODULE_PATH } from "src/constants";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
 import { NodeNotFoundError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Json } from "src/generators/json";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
@@ -54,7 +55,7 @@ export class WorkflowSandboxFile extends BasePersistedFile {
     const sandboxRunnerField = python.field({
       name: "runner",
       initializer: python.instantiateClass({
-        classReference: python.reference({
+        classReference: new Reference({
           name: "WorkflowSandboxRunner",
           modulePath:
             this.workflowContext.sdkModulePathNames.SANDBOX_RUNNER_MODULE_PATH,
@@ -63,7 +64,7 @@ export class WorkflowSandboxFile extends BasePersistedFile {
           python.methodArgument({
             name: "workflow",
             value: python.instantiateClass({
-              classReference: python.reference({
+              classReference: new Reference({
                 name: this.workflowContext.workflowClassName,
                 modulePath: this.workflowContext.modulePath,
               }),
@@ -72,7 +73,7 @@ export class WorkflowSandboxFile extends BasePersistedFile {
           }),
           python.methodArgument({
             name: "dataset",
-            value: python.reference({
+            value: new Reference({
               name: "dataset",
             }),
           }),
@@ -142,7 +143,7 @@ if __name__ == "__main__":
     // Add workflow inputs (excluding trigger attribute inputs)
     if (workflowInputs.length > 0) {
       const inputsInstance = python.instantiateClass({
-        classReference: python.reference({
+        classReference: new Reference({
           name: "Inputs",
           modulePath: getGeneratedInputsModulePath(this.workflowContext),
         }),
@@ -216,7 +217,7 @@ if __name__ == "__main__":
     }
 
     return python.instantiateClass({
-      classReference: python.reference({
+      classReference: new Reference({
         name: "DatasetRow",
         modulePath: ["vellum", "workflows", "inputs"],
       }),
@@ -267,7 +268,7 @@ if __name__ == "__main__":
     );
 
     const thenOutputsInstance = python.instantiateClass({
-      classReference: python.reference({
+      classReference: new Reference({
         name: nodeContext.nodeClassName,
         modulePath: nodeContext.nodeModulePath,
         attribute: ["Outputs"],
@@ -283,7 +284,7 @@ if __name__ == "__main__":
     );
 
     return python.instantiateClass({
-      classReference: python.reference({
+      classReference: new Reference({
         name: "MockNodeExecution",
         modulePath: VELLUM_WORKFLOW_ROOT_MODULE_PATH,
       }),
@@ -324,7 +325,7 @@ if __name__ == "__main__":
     );
 
     return python.instantiateClass({
-      classReference: python.reference({
+      classReference: new Reference({
         name: triggerClassInfo.className,
         modulePath: triggerClassInfo.modulePath,
       }),
@@ -334,12 +335,12 @@ if __name__ == "__main__":
 
   private getTriggerReference(
     workflowTriggerId: string
-  ): python.Reference | undefined {
+  ): Reference | undefined {
     const triggerContext =
       this.workflowContext.findTriggerContext(workflowTriggerId);
 
     if (triggerContext) {
-      return python.reference({
+      return new Reference({
         name: triggerContext.triggerClassName,
         modulePath: triggerContext.triggerModulePath,
       });
@@ -354,7 +355,7 @@ if __name__ == "__main__":
 
     const triggerClassInfo = getTriggerClassInfo(trigger, this.workflowContext);
 
-    return python.reference({
+    return new Reference({
       name: triggerClassInfo.className,
       modulePath: triggerClassInfo.modulePath,
     });

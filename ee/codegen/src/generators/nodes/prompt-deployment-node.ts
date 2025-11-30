@@ -4,6 +4,7 @@ import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { PromptDeploymentNodeContext } from "src/context/node-context/prompt-deployment-node";
 import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
@@ -129,13 +130,13 @@ export class PromptDeploymentNode extends BaseNode<
 
     const outputDisplayEntries = [
       {
-        key: python.reference({
+        key: new Reference({
           name: this.nodeContext.nodeClassName,
           modulePath: this.nodeContext.nodeModulePath,
           attribute: [OUTPUTS_CLASS_NAME, "text"],
         }),
         value: python.instantiateClass({
-          classReference: python.reference({
+          classReference: new Reference({
             name: "NodeOutputDisplay",
             modulePath:
               this.workflowContext.sdkModulePathNames
@@ -154,13 +155,13 @@ export class PromptDeploymentNode extends BaseNode<
         }),
       },
       {
-        key: python.reference({
+        key: new Reference({
           name: this.nodeContext.nodeClassName,
           modulePath: this.nodeContext.nodeModulePath,
           attribute: [OUTPUTS_CLASS_NAME, "results"],
         }),
         value: python.instantiateClass({
-          classReference: python.reference({
+          classReference: new Reference({
             name: "NodeOutputDisplay",
             modulePath:
               this.workflowContext.sdkModulePathNames
@@ -184,13 +185,13 @@ export class PromptDeploymentNode extends BaseNode<
 
     if (jsonOutput) {
       outputDisplayEntries.push({
-        key: python.reference({
+        key: new Reference({
           name: this.nodeContext.nodeClassName,
           modulePath: this.nodeContext.nodeModulePath,
           attribute: [OUTPUTS_CLASS_NAME, "json"],
         }),
         value: python.instantiateClass({
-          classReference: python.reference({
+          classReference: new Reference({
             name: "NodeOutputDisplay",
             modulePath:
               this.workflowContext.sdkModulePathNames

@@ -6,6 +6,7 @@ import { Field } from "./extensions";
 import { OptionalType } from "./extensions/optional";
 
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Reference } from "src/generators/extensions/reference";
 import { Writer } from "src/generators/extensions/writer";
 import { VellumValue } from "src/generators/vellum-variable-value";
 import { getVellumVariablePrimitiveType } from "src/utils/vellum-variables";
@@ -101,7 +102,7 @@ export class VellumVariable extends AstNode {
     ) {
       // Use Field(default_factory=list) for empty lists
       // Use Field(default_factory=lambda: [...]) for non-empty lists
-      const fieldReference = python.reference({
+      const fieldReference = new Reference({
         name: "Field",
         modulePath: ["pydantic"],
       });
@@ -109,7 +110,7 @@ export class VellumVariable extends AstNode {
 
       const isEmpty = (variable.default.value as unknown[]).length === 0;
       const defaultFactoryValue = isEmpty
-        ? python.reference({
+        ? new Reference({
             name: "list",
           })
         : python.lambda({
@@ -137,7 +138,7 @@ export class VellumVariable extends AstNode {
     ) {
       // Use Field(default_factory=dict) for empty dicts
       // Use Field(default_factory=lambda: {...}) for non-empty dicts
-      const fieldReference = python.reference({
+      const fieldReference = new Reference({
         name: "Field",
         modulePath: ["pydantic"],
       });
@@ -146,7 +147,7 @@ export class VellumVariable extends AstNode {
       const isEmpty =
         Object.keys(variable.default.value as object).length === 0;
       const defaultFactoryValue = isEmpty
-        ? python.reference({
+        ? new Reference({
             name: "dict",
           })
         : python.lambda({

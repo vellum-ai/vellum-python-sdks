@@ -4,6 +4,7 @@ import { BaseNodeInputWorkflowReference } from "./BaseNodeInputWorkflowReference
 
 import { NodeInputNotFoundError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Reference } from "src/generators/extensions/reference";
 import { WorkflowStateVariableWorkflowReference as WorkflowStateVariableWorkflowReferenceType } from "src/types/vellum";
 
 export class WorkflowStateReference extends BaseNodeInputWorkflowReference<WorkflowStateVariableWorkflowReferenceType> {
@@ -24,7 +25,7 @@ export class WorkflowStateReference extends BaseNodeInputWorkflowReference<Workf
       );
       return python.TypeInstantiation.none();
     }
-    return python.reference({
+    return new Reference({
       name: stateVariableContext.definition.name,
       modulePath: stateVariableContext.definition.module,
       attribute: [stateVariableContext.name],

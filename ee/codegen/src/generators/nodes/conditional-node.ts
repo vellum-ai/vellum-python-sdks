@@ -35,7 +35,7 @@ export class ConditionalNode extends BaseNode<
 
       const baseNodeClassRef = this.getNodeBaseClass();
 
-      const ref = python.reference({
+      const ref = new Reference({
         name: baseNodeClassRef.name,
         modulePath: baseNodeClassRef.modulePath,
         alias: baseNodeClassRef.alias,
@@ -102,7 +102,7 @@ export class ConditionalNode extends BaseNode<
       })
     );
 
-    const ruleIdMapRef = python.reference({
+    const ruleIdMapRef = new Reference({
       name: "RuleIdMap",
       modulePath: [
         ...this.workflowContext.sdkModulePathNames.NODE_DISPLAY_MODULE_PATH,
@@ -122,7 +122,7 @@ export class ConditionalNode extends BaseNode<
       })
     );
 
-    const conditionIdRef = python.reference({
+    const conditionIdRef = new Reference({
       name: "ConditionId",
       modulePath: [
         ...this.workflowContext.sdkModulePathNames.NODE_DISPLAY_MODULE_PATH,
@@ -330,7 +330,7 @@ export class ConditionalNode extends BaseNode<
           }
 
           const portDisplayOverrides = python.instantiateClass({
-            classReference: python.reference({
+            classReference: new Reference({
               name: "PortDisplayOverrides",
               modulePath:
                 this.workflowContext.sdkModulePathNames
@@ -352,7 +352,7 @@ export class ConditionalNode extends BaseNode<
         initializer: python.TypeInstantiation.dict(
           Array.from(portDisplayOverridesDict.entries()).map(
             ([key, value]) => ({
-              key: python.reference({
+              key: new Reference({
                 name: this.nodeContext.nodeClassName,
                 modulePath: this.nodeContext.nodeModulePath,
                 attribute: [PORTS_CLASS_NAME, key],

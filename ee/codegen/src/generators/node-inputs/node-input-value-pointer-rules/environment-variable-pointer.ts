@@ -2,6 +2,7 @@ import { python } from "@fern-api/python-ast";
 
 import { BaseNodeInputValuePointerRule } from "./base";
 
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { EnvironmentVariablePointer } from "src/types/vellum";
 
@@ -9,7 +10,7 @@ export class EnvironmentVariablePointerRule extends BaseNodeInputValuePointerRul
   getAstNode(): python.AstNode {
     const envVarName = this.nodeInputValuePointerRule.data.environmentVariable;
     return python.instantiateClass({
-      classReference: python.reference({
+      classReference: new Reference({
         name: "EnvironmentVariableReference",
         modulePath: [
           ...this.workflowContext.sdkModulePathNames.WORKFLOWS_MODULE_PATH,

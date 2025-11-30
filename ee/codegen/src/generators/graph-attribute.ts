@@ -6,6 +6,7 @@ import {
   VELLUM_WORKFLOW_GRAPH_MODULE_PATH,
 } from "src/constants";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Reference } from "src/generators/extensions/reference";
 import { Writer } from "src/generators/extensions/writer";
 import {
   EntrypointNode,
@@ -1259,12 +1260,12 @@ export class GraphAttribute extends AstNode {
   ): AstNode {
     if (mutableAst.type === "empty") {
       return python.accessAttribute({
-        lhs: python.reference({
+        lhs: new Reference({
           name: "Graph",
           modulePath: VELLUM_WORKFLOW_GRAPH_MODULE_PATH,
         }),
         rhs: python.invokeMethod({
-          methodReference: python.reference({
+          methodReference: new Reference({
             name: "empty",
           }),
           arguments_: [],
@@ -1273,7 +1274,7 @@ export class GraphAttribute extends AstNode {
     }
 
     if (mutableAst.type === "node_reference") {
-      return python.reference({
+      return new Reference({
         name: mutableAst.reference.nodeClassName,
         modulePath: mutableAst.reference.nodeModulePath,
       });
@@ -1284,14 +1285,14 @@ export class GraphAttribute extends AstNode {
         mutableAst.reference,
         this.workflowContext
       );
-      return python.reference({
+      return new Reference({
         name: className,
         modulePath: modulePath,
       });
     }
 
     if (mutableAst.type === "port_reference") {
-      return python.reference({
+      return new Reference({
         name: mutableAst.reference.nodeContext.nodeClassName,
         modulePath: mutableAst.reference.nodeContext.nodeModulePath,
         attribute: mutableAst.reference.isDefault
@@ -1309,12 +1310,12 @@ export class GraphAttribute extends AstNode {
       );
       if (useWrap) {
         return python.accessAttribute({
-          lhs: python.reference({
+          lhs: new Reference({
             name: "Graph",
             modulePath: VELLUM_WORKFLOW_GRAPH_MODULE_PATH,
           }),
           rhs: python.invokeMethod({
-            methodReference: python.reference({
+            methodReference: new Reference({
               name: "from_set",
             }),
             arguments_: [python.methodArgument({ value: setAst })],

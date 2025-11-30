@@ -4,6 +4,7 @@ import { isNil } from "lodash";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 import {
@@ -89,7 +90,7 @@ export class NodeDisplay extends AstNode {
     const clazz = new Class({
       name: "Display",
       extends_: [
-        python.reference({
+        new Reference({
           name: nodeContext.baseNodeClassName,
           modulePath: nodeContext.baseNodeClassModulePath,
           alias: baseNodeClassNameAlias,

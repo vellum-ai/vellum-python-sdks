@@ -4,6 +4,7 @@ import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
+import { Reference } from "src/generators/extensions/reference";
 import { Writer } from "src/generators/extensions/writer";
 import {
   NodeTrigger as NodeTriggerType,
@@ -45,7 +46,7 @@ export class NodeTrigger extends AstNode {
     const clazz = new Class({
       name: "Trigger",
       extends_: [
-        python.reference({
+        new Reference({
           name: nodeContext.baseNodeClassName,
           modulePath: nodeContext.baseNodeClassModulePath,
           alias: baseNodeClassNameAlias,
@@ -58,7 +59,7 @@ export class NodeTrigger extends AstNode {
       python.field({
         name: "merge_behavior",
         initializer: python.accessAttribute({
-          lhs: python.reference({
+          lhs: new Reference({
             name: "MergeBehavior",
             modulePath: [
               ...VELLUM_CLIENT_MODULE_PATH,
@@ -67,7 +68,7 @@ export class NodeTrigger extends AstNode {
               "core",
             ],
           }),
-          rhs: python.reference({
+          rhs: new Reference({
             name: nodeTrigger.mergeBehavior,
             modulePath: [],
           }),

@@ -4,6 +4,7 @@ import { isNil } from "lodash";
 import { BaseNodeInputWorkflowReference } from "./BaseNodeInputWorkflowReference";
 
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { DictionaryWorkflowReference as DictionaryWorkflowReferenceType } from "src/types/vellum";
@@ -39,7 +40,7 @@ export class DictionaryWorkflowReference extends BaseNodeInputWorkflowReference<
         });
 
       return python.instantiateClass({
-        classReference: python.reference({
+        classReference: new Reference({
           name: definition.name,
           modulePath: definition.module,
         }),

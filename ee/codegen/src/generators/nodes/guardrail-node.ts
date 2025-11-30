@@ -6,6 +6,7 @@ import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { GuardrailNodeContext } from "src/context/node-context/guardrail-node";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { GuardrailNode as GuardrailNodeType } from "src/types/vellum";
 
@@ -104,13 +105,13 @@ export class GuardrailNode extends BaseNode<
           if (isStandardOutput) {
             // For standard outputs, use class reference
             return {
-              key: python.reference({
+              key: new Reference({
                 name: this.nodeContext.nodeClassName,
                 modulePath: this.nodeContext.nodeModulePath,
                 attribute: [OUTPUTS_CLASS_NAME, name],
               }),
               value: python.instantiateClass({
-                classReference: python.reference({
+                classReference: new Reference({
                   name: "NodeOutputDisplay",
                   modulePath:
                     this.workflowContext.sdkModulePathNames
@@ -132,7 +133,7 @@ export class GuardrailNode extends BaseNode<
             // For non standard outputs, use a LazyReference
             return {
               key: python.instantiateClass({
-                classReference: python.reference({
+                classReference: new Reference({
                   name: "LazyReference",
                   modulePath: [
                     ...this.workflowContext.sdkModulePathNames
@@ -149,7 +150,7 @@ export class GuardrailNode extends BaseNode<
                 ],
               }),
               value: python.instantiateClass({
-                classReference: python.reference({
+                classReference: new Reference({
                   name: "NodeOutputDisplay",
                   modulePath:
                     this.workflowContext.sdkModulePathNames

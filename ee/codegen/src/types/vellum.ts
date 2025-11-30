@@ -1,4 +1,3 @@
-import { python } from "@fern-api/python-ast";
 import {
   ChatMessage,
   ConditionCombinator,
@@ -24,6 +23,8 @@ import {
   VellumVariableType,
   VideoInputRequest,
 } from "vellum-ai/api/types";
+
+import { Reference } from "src/generators/extensions/reference";
 
 export enum WorkflowNodeType {
   PROMPT = "PROMPT",
@@ -1070,7 +1071,7 @@ export interface IterableConfig {
 }
 
 export interface AttributeConfig {
-  lhs: python.Reference;
+  lhs: Reference;
 }
 
 interface NameDescription {

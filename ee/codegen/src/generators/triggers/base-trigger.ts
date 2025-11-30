@@ -8,6 +8,7 @@ import {
 import { WorkflowContext } from "src/context";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
 import { Class } from "src/generators/extensions/class";
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { isNilOrEmpty } from "src/utils/typing";
 
@@ -148,7 +149,7 @@ export abstract class BaseTrigger<
         python.field({
           name: "comment",
           initializer: python.instantiateClass({
-            classReference: python.reference({
+            classReference: new Reference({
               name: "NodeDisplayComment",
               modulePath: VELLUM_WORKFLOW_EDITOR_TYPES_PATH,
             }),
@@ -165,7 +166,7 @@ export abstract class BaseTrigger<
     const displayClass = new Class({
       name: "Display",
       extends_: [
-        python.reference({
+        new Reference({
           name: this.getBaseTriggerClassName(),
           modulePath: VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH,
           attribute: ["Display"],
@@ -196,7 +197,7 @@ export abstract class BaseTrigger<
     const triggerClass = new Class({
       name: this.className,
       extends_: [
-        python.reference({
+        new Reference({
           name: this.getBaseTriggerClassName(),
           modulePath: VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH,
         }),

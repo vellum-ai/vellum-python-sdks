@@ -19,6 +19,7 @@ import {
 } from "src/generators/base-prompt-block";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Json } from "src/generators/json";
 
@@ -46,7 +47,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
     }
   }
 
-  private getPromptBlockRef(promptBlock: PromptBlockType): python.Reference {
+  private getPromptBlockRef(promptBlock: PromptBlockType): Reference {
     let pathName;
     switch (promptBlock.blockType) {
       case "JINJA":
@@ -77,7 +78,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
         pathName = "DocumentPromptBlock";
         break;
     }
-    return python.reference({
+    return new Reference({
       name: pathName,
       modulePath: VELLUM_CLIENT_MODULE_PATH,
     });

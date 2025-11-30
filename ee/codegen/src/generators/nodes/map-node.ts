@@ -4,6 +4,7 @@ import { isNil } from "lodash";
 import { MapNodeContext } from "src/context/node-context/map-node";
 import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Reference } from "src/generators/extensions/reference";
 import { BaseNestedWorkflowNode } from "src/generators/nodes/bases/nested-workflow-base";
 import { WorkflowProjectGenerator } from "src/project";
 import { MapNode as MapNodeType, WorkflowRawData } from "src/types/vellum";
@@ -28,7 +29,7 @@ export class MapNode extends BaseNestedWorkflowNode<
     // We use Any as the item type since extracting the exact type from List[ItemType]
     // would require complex type inference
     const itemType = python.Type.reference(
-      python.reference({
+      new Reference({
         name: "Any",
         modulePath: ["typing"],
       })
@@ -61,7 +62,7 @@ export class MapNode extends BaseNestedWorkflowNode<
       BaseNestedWorkflowNode.subworkflowNestedProjectName
     );
 
-    const nestedWorkflowReference = python.reference({
+    const nestedWorkflowReference = new Reference({
       name: nestedWorkflowContext.workflowClassName,
       modulePath: nestedWorkflowContext.modulePath,
     });

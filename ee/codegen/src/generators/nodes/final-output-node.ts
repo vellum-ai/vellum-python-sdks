@@ -4,6 +4,7 @@ import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { FinalOutputNodeContext } from "src/context/node-context/final-output-node";
 import { Class, PythonType } from "src/generators/extensions";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
@@ -46,7 +47,7 @@ export class FinalOutputNode extends BaseNode<
     const outputsClass = new Class({
       name: OUTPUTS_CLASS_NAME,
       extends_: [
-        python.reference({
+        new Reference({
           name: nodeBaseClassRef.name,
           modulePath: nodeBaseClassRef.modulePath,
           alias: nodeBaseClassRef.alias,
@@ -115,13 +116,13 @@ export class FinalOutputNode extends BaseNode<
       initializer: python.TypeInstantiation.dict(
         [
           {
-            key: python.reference({
+            key: new Reference({
               name: this.nodeContext.nodeClassName,
               modulePath: this.nodeContext.nodeModulePath,
               attribute: [OUTPUTS_CLASS_NAME, "value"],
             }),
             value: python.instantiateClass({
-              classReference: python.reference({
+              classReference: new Reference({
                 name: "NodeOutputDisplay",
                 modulePath:
                   this.workflowContext.sdkModulePathNames

@@ -3,6 +3,7 @@ import { isNil } from "lodash";
 
 import { BaseNodeInputValuePointerRule } from "./base";
 
+import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { WorkspaceSecretPointer as WorkspaceSecretPointerType } from "src/types/vellum";
 
@@ -23,7 +24,7 @@ export class WorkspaceSecretPointerRule extends BaseNodeInputValuePointerRule<Wo
     }
 
     return python.instantiateClass({
-      classReference: python.reference({
+      classReference: new Reference({
         name: "VellumSecretReference",
         modulePath: [
           ...this.workflowContext.sdkModulePathNames.WORKFLOWS_MODULE_PATH,
