@@ -15,7 +15,7 @@ class WorkflowResultEventOutputDataString(UniversalBaseModel):
     id: typing.Optional[str] = None
     name: str
     state: WorkflowNodeResultEventState
-    node_id: str
+    node_id: typing.Optional[str] = None
     delta: typing.Optional[str] = pydantic.Field(default=None)
     """
     The newly output string value, meant to be concatenated with all previous. Will be non-null for events of state STREAMING.
