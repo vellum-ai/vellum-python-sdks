@@ -1,5 +1,4 @@
 import { python } from "@fern-api/python-ast";
-import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
 import { isNil } from "lodash";
 import {
   ChatMessageContentRequest as ChatMessageContentRequestType,
@@ -20,6 +19,7 @@ import {
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { MethodArgument } from "src/generators/extensions/method-argument";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 import { Json } from "src/generators/json";

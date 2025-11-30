@@ -1,5 +1,4 @@
 import { python } from "@fern-api/python-ast";
-import { MethodArgument } from "@fern-api/python-ast/MethodArgument";
 import { isNil } from "lodash";
 import { VellumVariableType } from "vellum-ai/api";
 
@@ -9,6 +8,7 @@ import * as codegen from "src/codegen";
 import { PortContext } from "src/context/port-context";
 import { Expression } from "src/generators/expression";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Writer } from "src/generators/extensions/writer";
 import { NodeInput } from "src/generators/node-inputs";
 import {
