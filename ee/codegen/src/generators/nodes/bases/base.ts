@@ -17,6 +17,7 @@ import {
 } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
+import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -166,7 +167,7 @@ export abstract class BaseNode<
           modulePath: this.nodeContext.nodeModulePath,
           attribute: [OUTPUTS_CLASS_NAME, name],
         }),
-        value: python.instantiateClass({
+        value: new ClassInstantiation({
           classReference: new Reference({
             name: "NodeOutputDisplay",
             modulePath:
@@ -174,11 +175,11 @@ export abstract class BaseNode<
                 .NODE_DISPLAY_TYPES_MODULE_PATH,
           }),
           arguments_: [
-            python.methodArgument({
+            new MethodArgument({
               name: "id",
               value: python.TypeInstantiation.uuid(id),
             }),
-            python.methodArgument({
+            new MethodArgument({
               name: "name",
               value: new StrInstantiation(name),
             }),
@@ -405,7 +406,7 @@ export abstract class BaseNode<
         ([portId, context]) => {
           const isPortInCurrentNode = portIds.has(portId);
           if (isPortInCurrentNode) {
-            const portDisplayOverrides = python.instantiateClass({
+            const portDisplayOverrides = new ClassInstantiation({
               classReference: new Reference({
                 name: "PortDisplayOverrides",
                 modulePath:
@@ -413,7 +414,7 @@ export abstract class BaseNode<
                     .NODE_DISPLAY_TYPES_MODULE_PATH,
               }),
               arguments_: [
-                python.methodArgument({
+                new MethodArgument({
                   name: "id",
                   value: python.TypeInstantiation.uuid(portId),
                 }),
@@ -466,7 +467,7 @@ export abstract class BaseNode<
             modulePath: this.nodeContext.nodeModulePath,
             attribute: [PORTS_CLASS_NAME, "default"],
           }),
-          value: python.instantiateClass({
+          value: new ClassInstantiation({
             classReference: new Reference({
               name: "PortDisplayOverrides",
               modulePath:
@@ -474,7 +475,7 @@ export abstract class BaseNode<
                   .NODE_DISPLAY_TYPES_MODULE_PATH,
             }),
             arguments_: [
-              python.methodArgument({
+              new MethodArgument({
                 name: "id",
                 value: python.TypeInstantiation.uuid(
                   this.nodeData.data.sourceHandleId
@@ -556,7 +557,7 @@ export abstract class BaseNode<
                       }
                     : undefined;
 
-                return python.methodArgument({
+                return new MethodArgument({
                   name: attr.name,
                   value: new WorkflowValueDescriptor({
                     workflowValueDescriptor: attr.value,

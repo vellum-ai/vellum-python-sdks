@@ -6,6 +6,8 @@ import { ConditionalNodeContext } from "src/context/node-context/conditional-nod
 import { ConditionalNodePort } from "src/generators/conditional-node-port";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
+import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
@@ -156,14 +158,14 @@ export class ConditionalNode extends BaseNode<
     const conditionIdsList: AstNode[] = [];
     nodeData.conditions.forEach((condition) => {
       conditionIdsList.push(
-        python.instantiateClass({
+        new ClassInstantiation({
           classReference: conditionIdRef,
           arguments_: [
-            python.methodArgument({
+            new MethodArgument({
               name: "id",
               value: new StrInstantiation(condition.id),
             }),
-            python.methodArgument({
+            new MethodArgument({
               name: "rule_group_id",
               value: condition.data
                 ? new StrInstantiation(condition.data.id)
@@ -221,28 +223,28 @@ export class ConditionalNode extends BaseNode<
       rhs = this.createRuleIdMap(ruleData.rules[1], ruleIdMapRef);
     }
 
-    return python.instantiateClass({
+    return new ClassInstantiation({
       classReference: ruleIdMapRef,
       arguments_: [
-        python.methodArgument({
+        new MethodArgument({
           name: "id",
           value: new StrInstantiation(ruleData.id),
         }),
-        python.methodArgument({
+        new MethodArgument({
           name: "lhs",
           value: lhs ? lhs : python.TypeInstantiation.none(),
         }),
-        python.methodArgument({
+        new MethodArgument({
           name: "rhs",
           value: rhs ? rhs : python.TypeInstantiation.none(),
         }),
-        python.methodArgument({
+        new MethodArgument({
           name: "field_node_input_id",
           value: fieldId
             ? new StrInstantiation(fieldId)
             : python.TypeInstantiation.none(),
         }),
-        python.methodArgument({
+        new MethodArgument({
           name: "value_node_input_id",
           value: valueId
             ? new StrInstantiation(valueId)
@@ -329,7 +331,7 @@ export class ConditionalNode extends BaseNode<
             return;
           }
 
-          const portDisplayOverrides = python.instantiateClass({
+          const portDisplayOverrides = new ClassInstantiation({
             classReference: new Reference({
               name: "PortDisplayOverrides",
               modulePath:
@@ -337,7 +339,7 @@ export class ConditionalNode extends BaseNode<
                   .NODE_DISPLAY_TYPES_MODULE_PATH,
             }),
             arguments_: [
-              python.methodArgument({
+              new MethodArgument({
                 name: "id",
                 value: python.TypeInstantiation.uuid(edge.sourceHandleId),
               }),

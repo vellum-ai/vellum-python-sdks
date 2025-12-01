@@ -6,6 +6,8 @@ import { VELLUM_WORKFLOW_ROOT_MODULE_PATH } from "src/constants";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
 import { NodeNotFoundError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Json } from "src/generators/json";
@@ -54,16 +56,16 @@ export class WorkflowSandboxFile extends BasePersistedFile {
 
     const sandboxRunnerField = python.field({
       name: "runner",
-      initializer: python.instantiateClass({
+      initializer: new ClassInstantiation({
         classReference: new Reference({
           name: "WorkflowSandboxRunner",
           modulePath:
             this.workflowContext.sdkModulePathNames.SANDBOX_RUNNER_MODULE_PATH,
         }),
         arguments_: [
-          python.methodArgument({
+          new MethodArgument({
             name: "workflow",
-            value: python.instantiateClass({
+            value: new ClassInstantiation({
               classReference: new Reference({
                 name: this.workflowContext.workflowClassName,
                 modulePath: this.workflowContext.modulePath,
@@ -71,7 +73,7 @@ export class WorkflowSandboxFile extends BasePersistedFile {
               arguments_: [],
             }),
           }),
-          python.methodArgument({
+          new MethodArgument({
             name: "dataset",
             value: new Reference({
               name: "dataset",
@@ -97,7 +99,7 @@ if __name__ == "__main__":
   private getWorkflowInput(
     row: WorkflowSandboxDatasetRow,
     index: number
-  ): python.ClassInstantiation {
+  ): ClassInstantiation {
     const inputs: WorkflowSandboxInputs = Array.isArray(row)
       ? row
       : "inputs" in row
@@ -116,8 +118,8 @@ if __name__ == "__main__":
       : undefined;
 
     const hasInputs = inputs.length > 0;
-    const arguments_: python.MethodArgument[] = [
-      python.methodArgument({
+    const arguments_: MethodArgument[] = [
+      new MethodArgument({
         name: "label",
         value: new StrInstantiation(label),
       }),
@@ -142,7 +144,7 @@ if __name__ == "__main__":
 
     // Add workflow inputs (excluding trigger attribute inputs)
     if (workflowInputs.length > 0) {
-      const inputsInstance = python.instantiateClass({
+      const inputsInstance = new ClassInstantiation({
         classReference: new Reference({
           name: "Inputs",
           modulePath: getGeneratedInputsModulePath(this.workflowContext),
@@ -161,20 +163,18 @@ if __name__ == "__main__":
               return null;
             }
 
-            return python.methodArgument({
+            return new MethodArgument({
               name: inputVariableContext.name,
               value: vellumValue({
                 vellumValue: input,
               }),
             });
           })
-          .filter(
-            (argument): argument is python.MethodArgument => !isNil(argument)
-          ),
+          .filter((argument): argument is MethodArgument => !isNil(argument)),
       });
 
       arguments_.push(
-        python.methodArgument({
+        new MethodArgument({
           name: "inputs",
           value: inputsInstance,
         })
@@ -189,7 +189,7 @@ if __name__ == "__main__":
 
       if (triggerInstance) {
         arguments_.push(
-          python.methodArgument({
+          new MethodArgument({
             name: "workflow_trigger",
             value: triggerInstance,
           })
@@ -200,7 +200,7 @@ if __name__ == "__main__":
     if (!isNil(mocks) && mocks.length > 0) {
       const mockNodes = mocks
         .map((mock) => this.getMockNodeExecution(mock))
-        .filter((node): node is python.ClassInstantiation => !isNil(node));
+        .filter((node): node is ClassInstantiation => !isNil(node));
 
       if (mockNodes.length > 0) {
         const mocksArray = python.TypeInstantiation.list(mockNodes, {
@@ -208,7 +208,7 @@ if __name__ == "__main__":
         });
 
         arguments_.push(
-          python.methodArgument({
+          new MethodArgument({
             name: "mocks",
             value: mocksArray,
           })
@@ -216,7 +216,7 @@ if __name__ == "__main__":
       }
     }
 
-    return python.instantiateClass({
+    return new ClassInstantiation({
       classReference: new Reference({
         name: "DatasetRow",
         modulePath: ["vellum", "workflows", "inputs"],
@@ -227,7 +227,7 @@ if __name__ == "__main__":
 
   private getMockNodeExecution(
     mock: WorkflowSandboxDatasetRowMock
-  ): python.ClassInstantiation | null {
+  ): ClassInstantiation | null {
     const nodeContext = this.workflowContext.findNodeContext(mock.node_id);
 
     if (!nodeContext) {
@@ -240,7 +240,7 @@ if __name__ == "__main__":
       return null;
     }
 
-    const arguments_: python.MethodArgument[] = [];
+    const arguments_: MethodArgument[] = [];
 
     // Generate when_condition using WorkflowValueDescriptor
     if (!isNil(mock.when_condition)) {
@@ -250,7 +250,7 @@ if __name__ == "__main__":
       });
 
       arguments_.push(
-        python.methodArgument({
+        new MethodArgument({
           name: "when_condition",
           value: whenConditionAst,
         })
@@ -258,16 +258,17 @@ if __name__ == "__main__":
     }
 
     // Generate then_outputs by instantiating the node's Outputs class
-    const outputsArguments: python.MethodArgument[] = Object.entries(
+    const outputsArguments: MethodArgument[] = Object.entries(
       mock.then_outputs
-    ).map(([key, value]) =>
-      python.methodArgument({
-        name: key,
-        value: new Json(value),
-      })
+    ).map(
+      ([key, value]) =>
+        new MethodArgument({
+          name: key,
+          value: new Json(value),
+        })
     );
 
-    const thenOutputsInstance = python.instantiateClass({
+    const thenOutputsInstance = new ClassInstantiation({
       classReference: new Reference({
         name: nodeContext.nodeClassName,
         modulePath: nodeContext.nodeModulePath,
@@ -277,13 +278,13 @@ if __name__ == "__main__":
     });
 
     arguments_.push(
-      python.methodArgument({
+      new MethodArgument({
         name: "then_outputs",
         value: thenOutputsInstance,
       })
     );
 
-    return python.instantiateClass({
+    return new ClassInstantiation({
       classReference: new Reference({
         name: "MockNodeExecution",
         modulePath: VELLUM_WORKFLOW_ROOT_MODULE_PATH,
@@ -295,7 +296,7 @@ if __name__ == "__main__":
   private getTriggerInstance(
     workflowTriggerId: string,
     inputs?: WorkflowSandboxInputs
-  ): python.ClassInstantiation | undefined {
+  ): ClassInstantiation | undefined {
     const triggers = this.workflowContext.triggers ?? [];
     const trigger = triggers.find((t) => t.id === workflowTriggerId);
 
@@ -307,24 +308,21 @@ if __name__ == "__main__":
 
     // Generate arguments for the trigger instance based on its attributes,
     // using provided dataset inputs when available, else default to None.
-    const arguments_: python.MethodArgument[] = trigger.attributes.map(
-      (attr) => {
-        const matchingInput =
-          inputs?.find(
-            (i) =>
-              removeEscapeCharacters(i.name) === attr.key && !isNil(i.value)
-          ) ?? null;
+    const arguments_: MethodArgument[] = trigger.attributes.map((attr) => {
+      const matchingInput =
+        inputs?.find(
+          (i) => removeEscapeCharacters(i.name) === attr.key && !isNil(i.value)
+        ) ?? null;
 
-        return python.methodArgument({
-          name: attr.key,
-          value: matchingInput
-            ? vellumValue({ vellumValue: matchingInput })
-            : python.TypeInstantiation.none(),
-        });
-      }
-    );
+      return new MethodArgument({
+        name: attr.key,
+        value: matchingInput
+          ? vellumValue({ vellumValue: matchingInput })
+          : python.TypeInstantiation.none(),
+      });
+    });
 
-    return python.instantiateClass({
+    return new ClassInstantiation({
       classReference: new Reference({
         name: triggerClassInfo.className,
         modulePath: triggerClassInfo.modulePath,

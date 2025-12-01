@@ -8,6 +8,8 @@ import {
 } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
+import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
@@ -173,7 +175,7 @@ export class SubworkflowDeploymentNode extends BaseNode<
               modulePath: this.nodeContext.nodeModulePath,
               attribute: [OUTPUTS_CLASS_NAME, outputName],
             }),
-            value: python.instantiateClass({
+            value: new ClassInstantiation({
               classReference: new Reference({
                 name: "NodeOutputDisplay",
                 modulePath:
@@ -181,11 +183,11 @@ export class SubworkflowDeploymentNode extends BaseNode<
                     .NODE_DISPLAY_TYPES_MODULE_PATH,
               }),
               arguments_: [
-                python.methodArgument({
+                new MethodArgument({
                   name: "id",
                   value: python.TypeInstantiation.uuid(output.id),
                 }),
-                python.methodArgument({
+                new MethodArgument({
                   name: "name",
                   value: new StrInstantiation(output.key),
                 }),

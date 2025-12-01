@@ -4,6 +4,8 @@ import { isNil } from "lodash";
 import { VELLUM_WORKFLOW_EDITOR_TYPES_PATH } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
@@ -32,25 +34,25 @@ export class NodeDisplayData extends AstNode {
     this.nodeDisplayData = this.generateNodeDisplayData();
   }
 
-  private generateNodeDisplayData(): python.ClassInstantiation {
-    const args: python.MethodArgument[] = [];
+  private generateNodeDisplayData(): ClassInstantiation {
+    const args: MethodArgument[] = [];
 
     args.push(
-      python.methodArgument({
+      new MethodArgument({
         name: "position",
-        value: python.instantiateClass({
+        value: new ClassInstantiation({
           classReference: new Reference({
             name: "NodeDisplayPosition",
             modulePath: VELLUM_WORKFLOW_EDITOR_TYPES_PATH,
           }),
           arguments_: [
-            python.methodArgument({
+            new MethodArgument({
               name: "x",
               value: python.TypeInstantiation.float(
                 this.sourceNodeDisplayData?.position?.x ?? 0
               ),
             }),
-            python.methodArgument({
+            new MethodArgument({
               name: "y",
               value: python.TypeInstantiation.float(
                 this.sourceNodeDisplayData?.position?.y ?? 0
@@ -63,7 +65,7 @@ export class NodeDisplayData extends AstNode {
 
     if (!isNil(this.sourceNodeDisplayData?.z_index)) {
       args.push(
-        python.methodArgument({
+        new MethodArgument({
           name: "z_index",
           value: python.TypeInstantiation.int(
             this.sourceNodeDisplayData.z_index
@@ -74,7 +76,7 @@ export class NodeDisplayData extends AstNode {
 
     if (!isNil(this.sourceNodeDisplayData?.width)) {
       args.push(
-        python.methodArgument({
+        new MethodArgument({
           name: "width",
           value: python.TypeInstantiation.int(this.sourceNodeDisplayData.width),
         })
@@ -83,7 +85,7 @@ export class NodeDisplayData extends AstNode {
 
     if (!isNil(this.sourceNodeDisplayData?.height)) {
       args.push(
-        python.methodArgument({
+        new MethodArgument({
           name: "height",
           value: python.TypeInstantiation.int(
             this.sourceNodeDisplayData.height
@@ -94,7 +96,7 @@ export class NodeDisplayData extends AstNode {
 
     if (!isNil(this.sourceNodeDisplayData?.icon)) {
       args.push(
-        python.methodArgument({
+        new MethodArgument({
           name: "icon",
           value: new StrInstantiation(this.sourceNodeDisplayData.icon),
         })
@@ -103,7 +105,7 @@ export class NodeDisplayData extends AstNode {
 
     if (!isNil(this.sourceNodeDisplayData?.color)) {
       args.push(
-        python.methodArgument({
+        new MethodArgument({
           name: "color",
           value: new StrInstantiation(this.sourceNodeDisplayData.color),
         })
@@ -115,7 +117,7 @@ export class NodeDisplayData extends AstNode {
       args.push(commentArg);
     }
 
-    const clazz = python.instantiateClass({
+    const clazz = new ClassInstantiation({
       classReference: new Reference({
         name: "NodeDisplayData",
         modulePath: VELLUM_WORKFLOW_EDITOR_TYPES_PATH,
@@ -126,17 +128,17 @@ export class NodeDisplayData extends AstNode {
     return clazz;
   }
 
-  private generateCommentArg(): python.MethodArgument | undefined {
+  private generateCommentArg(): MethodArgument | undefined {
     if (!this.sourceNodeDisplayData?.comment) {
       return undefined;
     }
 
-    const commentArgs: python.MethodArgument[] = [];
+    const commentArgs: MethodArgument[] = [];
     const { expanded, value } = this.sourceNodeDisplayData.comment;
 
     if (expanded) {
       commentArgs.push(
-        python.methodArgument({
+        new MethodArgument({
           name: "expanded",
           value: python.TypeInstantiation.bool(expanded),
         })
@@ -145,7 +147,7 @@ export class NodeDisplayData extends AstNode {
 
     if (value) {
       commentArgs.push(
-        python.methodArgument({
+        new MethodArgument({
           name: "value",
           value: new StrInstantiation(value),
         })
@@ -156,9 +158,9 @@ export class NodeDisplayData extends AstNode {
       return undefined;
     }
 
-    return python.methodArgument({
+    return new MethodArgument({
       name: "comment",
-      value: python.instantiateClass({
+      value: new ClassInstantiation({
         classReference: new Reference({
           name: "NodeDisplayComment",
           modulePath: VELLUM_WORKFLOW_EDITOR_TYPES_PATH,

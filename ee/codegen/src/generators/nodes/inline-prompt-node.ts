@@ -6,6 +6,8 @@ import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-
 import { PromptTemplateBlockExcludingFunctionDefinition } from "src/generators/base-prompt-block";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { FunctionDefinition } from "src/generators/function-definition";
@@ -172,7 +174,7 @@ export class InlinePromptNode extends BaseNode<
       const args = [];
       if (!isNil(timeout)) {
         args.push(
-          python.methodArgument({
+          new MethodArgument({
             name: "timeout",
             value: python.TypeInstantiation.float(timeout),
           })
@@ -180,7 +182,7 @@ export class InlinePromptNode extends BaseNode<
       }
       if (!isNil(streamEnabled)) {
         args.push(
-          python.methodArgument({
+          new MethodArgument({
             name: "stream_enabled",
             value: python.TypeInstantiation.bool(streamEnabled),
           })
@@ -190,7 +192,7 @@ export class InlinePromptNode extends BaseNode<
         statements.push(
           python.field({
             name: "settings",
-            initializer: python.instantiateClass({
+            initializer: new ClassInstantiation({
               classReference: new Reference({
                 name: "PromptSettings",
                 modulePath: [...VELLUM_CLIENT_MODULE_PATH],
@@ -242,7 +244,7 @@ export class InlinePromptNode extends BaseNode<
           modulePath: this.nodeContext.nodeModulePath,
           attribute: [OUTPUTS_CLASS_NAME, "text"],
         }),
-        value: python.instantiateClass({
+        value: new ClassInstantiation({
           classReference: new Reference({
             name: "NodeOutputDisplay",
             modulePath:
@@ -250,11 +252,11 @@ export class InlinePromptNode extends BaseNode<
                 .NODE_DISPLAY_TYPES_MODULE_PATH,
           }),
           arguments_: [
-            python.methodArgument({
+            new MethodArgument({
               name: "id",
               value: python.TypeInstantiation.uuid(this.nodeData.data.outputId),
             }),
-            python.methodArgument({
+            new MethodArgument({
               name: "name",
               value: new StrInstantiation("text"),
             }),
@@ -267,7 +269,7 @@ export class InlinePromptNode extends BaseNode<
           modulePath: this.nodeContext.nodeModulePath,
           attribute: [OUTPUTS_CLASS_NAME, "results"],
         }),
-        value: python.instantiateClass({
+        value: new ClassInstantiation({
           classReference: new Reference({
             name: "NodeOutputDisplay",
             modulePath:
@@ -275,13 +277,13 @@ export class InlinePromptNode extends BaseNode<
                 .NODE_DISPLAY_TYPES_MODULE_PATH,
           }),
           arguments_: [
-            python.methodArgument({
+            new MethodArgument({
               name: "id",
               value: python.TypeInstantiation.uuid(
                 this.nodeData.data.arrayOutputId
               ),
             }),
-            python.methodArgument({
+            new MethodArgument({
               name: "name",
               value: new StrInstantiation("results"),
             }),
@@ -297,7 +299,7 @@ export class InlinePromptNode extends BaseNode<
           modulePath: this.nodeContext.nodeModulePath,
           attribute: [OUTPUTS_CLASS_NAME, "json"],
         }),
-        value: python.instantiateClass({
+        value: new ClassInstantiation({
           classReference: new Reference({
             name: "NodeOutputDisplay",
             modulePath:
@@ -305,11 +307,11 @@ export class InlinePromptNode extends BaseNode<
                 .NODE_DISPLAY_TYPES_MODULE_PATH,
           }),
           arguments_: [
-            python.methodArgument({
+            new MethodArgument({
               name: "id",
               value: python.TypeInstantiation.uuid(jsonOutput.id),
             }),
-            python.methodArgument({
+            new MethodArgument({
               name: "name",
               value: new StrInstantiation("json"),
             }),
@@ -400,7 +402,7 @@ export class InlinePromptNode extends BaseNode<
 
                 if (!isNil(f.name)) {
                   classArgs.push(
-                    python.methodArgument({
+                    new MethodArgument({
                       name: "name",
                       value: new StrInstantiation(f.name),
                     })
@@ -409,7 +411,7 @@ export class InlinePromptNode extends BaseNode<
 
                 if (!isNil(f.description)) {
                   classArgs.push(
-                    python.methodArgument({
+                    new MethodArgument({
                       name: "description",
                       value: new StrInstantiation(f.description),
                     })
@@ -418,7 +420,7 @@ export class InlinePromptNode extends BaseNode<
 
                 if (!isNil(f.parameters)) {
                   classArgs.push(
-                    python.methodArgument({
+                    new MethodArgument({
                       name: "parameters",
                       value: new Json(f.parameters),
                     })
@@ -427,7 +429,7 @@ export class InlinePromptNode extends BaseNode<
 
                 if (!isNil(f.forced)) {
                   classArgs.push(
-                    python.methodArgument({
+                    new MethodArgument({
                       name: "function_forced",
                       value: python.TypeInstantiation.bool(f.forced),
                     })
@@ -436,14 +438,14 @@ export class InlinePromptNode extends BaseNode<
 
                 if (!isNil(f.strict)) {
                   classArgs.push(
-                    python.methodArgument({
+                    new MethodArgument({
                       name: "function_strict",
                       value: python.TypeInstantiation.bool(f.strict),
                     })
                   );
                 }
 
-                return python.instantiateClass({
+                return new ClassInstantiation({
                   classReference: new Reference({
                     name: "FunctionDefinition",
                     modulePath: [...VELLUM_CLIENT_MODULE_PATH],

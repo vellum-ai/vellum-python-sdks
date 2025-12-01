@@ -2,6 +2,8 @@ import { python } from "@fern-api/python-ast";
 
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseNodeInputWorkflowReference } from "src/generators/workflow-value-descriptor-reference/BaseNodeInputWorkflowReference";
@@ -28,7 +30,7 @@ export class NodeOutputWorkflowReference extends BaseNodeInputWorkflowReference<
     }
 
     if (this.nodeContext && this.nodeContext.isImportedBefore(nodeContext)) {
-      return python.instantiateClass({
+      return new ClassInstantiation({
         classReference: new Reference({
           name: "LazyReference",
           modulePath: [
@@ -38,7 +40,7 @@ export class NodeOutputWorkflowReference extends BaseNodeInputWorkflowReference<
           ],
         }),
         arguments_: [
-          python.methodArgument({
+          new MethodArgument({
             value: new StrInstantiation(
               `${nodeContext.nodeClassName}.${OUTPUTS_CLASS_NAME}.${nodeOutputName}`
             ),
@@ -48,7 +50,7 @@ export class NodeOutputWorkflowReference extends BaseNodeInputWorkflowReference<
     }
 
     if (this.nodeContext?.nodeClassName === nodeContext.nodeClassName) {
-      return python.instantiateClass({
+      return new ClassInstantiation({
         classReference: new Reference({
           name: "LazyReference",
           modulePath: [
@@ -58,7 +60,7 @@ export class NodeOutputWorkflowReference extends BaseNodeInputWorkflowReference<
           ],
         }),
         arguments_: [
-          python.methodArgument({
+          new MethodArgument({
             value: python.lambda({
               body: python.accessAttribute({
                 lhs: new Reference({

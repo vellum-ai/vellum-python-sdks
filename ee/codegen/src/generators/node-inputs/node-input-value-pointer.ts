@@ -6,6 +6,8 @@ import { NodeInputValuePointerRule } from "./node-input-value-pointer-rules/node
 import { BaseNodeContext } from "src/context/node-context/base";
 import { BaseCodegenError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { Writer } from "src/generators/extensions/writer";
 import {
@@ -92,14 +94,14 @@ export class NodeInputValuePointer extends AstNode {
           methodReference: new Reference({
             name: "coalesce",
           }),
-          arguments_: [python.methodArgument({ value: rule })],
+          arguments_: [new MethodArgument({ value: rule })],
         }),
       });
     }
 
     const hasReferenceToSelf = this.hasReferenceToSelf(rules);
     if (hasReferenceToSelf) {
-      const lazyReference = python.instantiateClass({
+      const lazyReference = new ClassInstantiation({
         classReference: new Reference({
           name: "LazyReference",
           modulePath: [
@@ -109,7 +111,7 @@ export class NodeInputValuePointer extends AstNode {
           ],
         }),
         arguments_: [
-          python.methodArgument({
+          new MethodArgument({
             value: python.lambda({
               body: expression,
             }),

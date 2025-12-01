@@ -13,6 +13,7 @@ import {
 } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
@@ -189,17 +190,17 @@ export class SearchNode extends BaseNode<
       return python.TypeInstantiation.none();
     }
 
-    const searchWeightsRequest = python.instantiateClass({
+    const searchWeightsRequest = new ClassInstantiation({
       classReference: new Reference({
         name: "SearchWeightsRequest",
         modulePath: VELLUM_CLIENT_MODULE_PATH,
       }),
       arguments_: [
-        python.methodArgument({
+        new MethodArgument({
           name: "semantic_similarity",
           value: python.TypeInstantiation.float(semantic_similarity),
         }),
-        python.methodArgument({
+        new MethodArgument({
           name: "keywords",
           value: python.TypeInstantiation.float(keywords),
         }),
@@ -225,7 +226,7 @@ export class SearchNode extends BaseNode<
           modulePath: VELLUM_CLIENT_MODULE_PATH,
         }),
         arguments_: [
-          python.methodArgument({
+          new MethodArgument({
             name: "enabled",
             value: python.TypeInstantiation.bool(false),
           }),
@@ -247,7 +248,7 @@ export class SearchNode extends BaseNode<
           modulePath: VELLUM_CLIENT_MODULE_PATH,
         }),
         arguments_: [
-          python.methodArgument({
+          new MethodArgument({
             name: "enabled",
             value: python.TypeInstantiation.bool(false),
           }),
@@ -261,7 +262,7 @@ export class SearchNode extends BaseNode<
         modulePath: VELLUM_CLIENT_MODULE_PATH,
       }),
       arguments_: [
-        python.methodArgument({
+        new MethodArgument({
           name: "enabled",
           value: python.TypeInstantiation.bool(Boolean(resultMergingEnabled)),
         }),
@@ -282,13 +283,13 @@ export class SearchNode extends BaseNode<
         modulePath: VELLUM_WORKFLOW_NODE_BASE_TYPES_PATH,
       }),
       arguments_: [
-        python.methodArgument({
+        new MethodArgument({
           name: "external_ids",
           value:
             this.findNodeInputByName("external_id_filters") ??
             python.TypeInstantiation.none(),
         }),
-        python.methodArgument({
+        new MethodArgument({
           name: "metadata",
           value: rawMetadata
             ? new SearchNodeMetadataFilters({
@@ -448,7 +449,7 @@ export class SearchNode extends BaseNode<
             modulePath: this.nodeContext.nodeModulePath,
             attribute: [OUTPUTS_CLASS_NAME, "results"],
           }),
-          value: python.instantiateClass({
+          value: new ClassInstantiation({
             classReference: new Reference({
               name: "NodeOutputDisplay",
               modulePath:
@@ -456,13 +457,13 @@ export class SearchNode extends BaseNode<
                   .NODE_DISPLAY_TYPES_MODULE_PATH,
             }),
             arguments_: [
-              python.methodArgument({
+              new MethodArgument({
                 name: "id",
                 value: python.TypeInstantiation.uuid(
                   this.nodeData.data.resultsOutputId
                 ),
               }),
-              python.methodArgument({
+              new MethodArgument({
                 name: "name",
                 value: new StrInstantiation("results"),
               }),
@@ -475,7 +476,7 @@ export class SearchNode extends BaseNode<
             modulePath: this.nodeContext.nodeModulePath,
             attribute: [OUTPUTS_CLASS_NAME, "text"],
           }),
-          value: python.instantiateClass({
+          value: new ClassInstantiation({
             classReference: new Reference({
               name: "NodeOutputDisplay",
               modulePath:
@@ -483,13 +484,13 @@ export class SearchNode extends BaseNode<
                   .NODE_DISPLAY_TYPES_MODULE_PATH,
             }),
             arguments_: [
-              python.methodArgument({
+              new MethodArgument({
                 name: "id",
                 value: python.TypeInstantiation.uuid(
                   this.nodeData.data.textOutputId
                 ),
               }),
-              python.methodArgument({
+              new MethodArgument({
                 name: "name",
                 value: new StrInstantiation("text"),
               }),
@@ -561,15 +562,15 @@ export class SearchNodeMetadataFilters extends AstNode {
         modulePath: VELLUM_WORKFLOW_NODE_BASE_TYPES_PATH,
       }),
       arguments_: [
-        python.methodArgument({
+        new MethodArgument({
           name: "combinator",
           value: new StrInstantiation(data.combinator),
         }),
-        python.methodArgument({
+        new MethodArgument({
           name: "negated",
           value: python.TypeInstantiation.bool(data.negated),
         }),
-        python.methodArgument({
+        new MethodArgument({
           name: "conditions",
           value: python.TypeInstantiation.list(processedConditions),
         }),
@@ -580,7 +581,7 @@ export class SearchNodeMetadataFilters extends AstNode {
   private generateLogicalConditionArguments(
     data: VellumLogicalConditionType
   ): ClassInstantiation {
-    const args: python.MethodArgument[] = [];
+    const args: MethodArgument[] = [];
 
     const lhsId = data.lhsVariableId;
     const lhs = this.nodeInputsById.get(lhsId);
@@ -601,11 +602,11 @@ export class SearchNodeMetadataFilters extends AstNode {
     }
 
     args.push(
-      python.methodArgument({
+      new MethodArgument({
         name: "lhs_variable",
         value: lhs,
       }),
-      python.methodArgument({
+      new MethodArgument({
         name: "operator",
         value: new StrInstantiation(data.operator),
       })
@@ -631,7 +632,7 @@ export class SearchNodeMetadataFilters extends AstNode {
 
     if (rhs) {
       args.push(
-        python.methodArgument({
+        new MethodArgument({
           name: "rhs_variable",
           value: rhs,
         })

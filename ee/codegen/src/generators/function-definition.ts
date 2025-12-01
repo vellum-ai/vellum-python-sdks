@@ -3,6 +3,7 @@ import { isNil } from "lodash";
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -17,7 +18,7 @@ export declare namespace FunctionDefinition {
 }
 
 export class FunctionDefinition extends AstNode {
-  private astNode: python.ClassInstantiation;
+  private astNode: ClassInstantiation;
 
   public constructor({ functionDefinition }: FunctionDefinition.Args) {
     super();
@@ -26,7 +27,7 @@ export class FunctionDefinition extends AstNode {
 
   protected generateAstNode(
     functionDefinition: FunctionDefinitionPromptTemplateBlock
-  ): python.ClassInstantiation {
+  ): ClassInstantiation {
     const classArgs: MethodArgument[] = [];
 
     if (!isNil(functionDefinition.properties.functionName)) {
@@ -82,7 +83,7 @@ export class FunctionDefinition extends AstNode {
       );
     }
 
-    const functionDefinitionClass = python.instantiateClass({
+    const functionDefinitionClass = new ClassInstantiation({
       classReference: new Reference({
         name: "FunctionDefinition",
         modulePath: VELLUM_CLIENT_MODULE_PATH,

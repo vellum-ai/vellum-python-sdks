@@ -8,6 +8,8 @@ import { CodeExecutionContext } from "src/context/node-context/code-execution-no
 import { InitFile } from "src/generators";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
@@ -125,31 +127,32 @@ export class CodeExecutionNode extends BaseNode<
         name: "packages",
         initializer: nodeData.packages
           ? python.TypeInstantiation.list(
-              nodeData.packages.map((package_) =>
-                python.instantiateClass({
-                  classReference: new Reference({
-                    name: "CodeExecutionPackage",
-                    modulePath: ["vellum", "client", "types"],
-                  }),
-                  arguments_: [
-                    python.methodArgument({
-                      name: "name",
-                      value: new StrInstantiation(package_.name),
+              nodeData.packages.map(
+                (package_) =>
+                  new ClassInstantiation({
+                    classReference: new Reference({
+                      name: "CodeExecutionPackage",
+                      modulePath: ["vellum", "client", "types"],
                     }),
-                    python.methodArgument({
-                      name: "version",
-                      value: new StrInstantiation(package_.version),
-                    }),
-                    ...(package_.repository
-                      ? [
-                          python.methodArgument({
-                            name: "repository",
-                            value: new StrInstantiation(package_.repository),
-                          }),
-                        ]
-                      : []),
-                  ],
-                })
+                    arguments_: [
+                      new MethodArgument({
+                        name: "name",
+                        value: new StrInstantiation(package_.name),
+                      }),
+                      new MethodArgument({
+                        name: "version",
+                        value: new StrInstantiation(package_.version),
+                      }),
+                      ...(package_.repository
+                        ? [
+                            new MethodArgument({
+                              name: "repository",
+                              value: new StrInstantiation(package_.repository),
+                            }),
+                          ]
+                        : []),
+                    ],
+                  })
               ),
               {
                 endWithComma: true,
@@ -271,7 +274,7 @@ export class CodeExecutionNode extends BaseNode<
           modulePath: this.nodeContext.nodeModulePath,
           attribute: [OUTPUTS_CLASS_NAME, "result"],
         }),
-        value: python.instantiateClass({
+        value: new ClassInstantiation({
           classReference: new Reference({
             name: "NodeOutputDisplay",
             modulePath:
@@ -279,11 +282,11 @@ export class CodeExecutionNode extends BaseNode<
                 .NODE_DISPLAY_TYPES_MODULE_PATH,
           }),
           arguments_: [
-            python.methodArgument({
+            new MethodArgument({
               name: "id",
               value: python.TypeInstantiation.uuid(this.nodeData.data.outputId),
             }),
-            python.methodArgument({
+            new MethodArgument({
               name: "name",
               value: new StrInstantiation("result"),
             }),
@@ -299,7 +302,7 @@ export class CodeExecutionNode extends BaseNode<
           modulePath: this.nodeContext.nodeModulePath,
           attribute: [OUTPUTS_CLASS_NAME, "log"],
         }),
-        value: python.instantiateClass({
+        value: new ClassInstantiation({
           classReference: new Reference({
             name: "NodeOutputDisplay",
             modulePath:
@@ -307,13 +310,13 @@ export class CodeExecutionNode extends BaseNode<
                 .NODE_DISPLAY_TYPES_MODULE_PATH,
           }),
           arguments_: [
-            python.methodArgument({
+            new MethodArgument({
               name: "id",
               value: python.TypeInstantiation.uuid(
                 this.nodeData.data.logOutputId
               ),
             }),
-            python.methodArgument({
+            new MethodArgument({
               name: "name",
               value: new StrInstantiation("log"),
             }),

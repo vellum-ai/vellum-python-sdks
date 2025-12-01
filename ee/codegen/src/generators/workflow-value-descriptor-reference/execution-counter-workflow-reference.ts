@@ -1,6 +1,8 @@
 import { python } from "@fern-api/python-ast";
 
 import { AstNode } from "src/generators/extensions/ast-node";
+import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { BaseNodeInputWorkflowReference } from "src/generators/workflow-value-descriptor-reference/BaseNodeInputWorkflowReference";
 import { ExecutionCounterWorkflowReference as ExecutionCounterWorkflowReferenceType } from "src/types/vellum";
@@ -26,7 +28,7 @@ export class ExecutionCounterWorkflowReference extends BaseNodeInputWorkflowRefe
 
     const hasReferenceToSelf = this.hasReferenceToSelf(executionCounterNodeId);
     if (hasReferenceToSelf) {
-      return python.instantiateClass({
+      return new ClassInstantiation({
         classReference: new Reference({
           name: "LazyReference",
           modulePath: [
@@ -35,7 +37,7 @@ export class ExecutionCounterWorkflowReference extends BaseNodeInputWorkflowRefe
           ],
         }),
         arguments_: [
-          python.methodArgument({
+          new MethodArgument({
             value: python.lambda({
               body: reference,
             }),
