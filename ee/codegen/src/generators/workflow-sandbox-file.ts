@@ -132,16 +132,33 @@ if __name__ == "__main__":
     const trigger = !isNil(workflowTriggerId)
       ? triggers.find((t) => t.id === workflowTriggerId)
       : undefined;
-    const triggerAttributeKeys = new Set(
-      trigger?.attributes.map((attr) => attr.key) ?? []
+
+    // Build lookup maps for trigger attributes by both ID and key
+    const triggerAttributesById = new Map(
+      trigger?.attributes.map((attr) => [attr.id, attr]) ?? []
     );
+    const triggerAttributesByKey = new Map(
+      trigger?.attributes.map((attr) => [attr.key, attr]) ?? []
+    );
+
+    // Helper to check if an input is a trigger attribute input
+    const isTriggerAttributeInput = (
+      input: WorkflowSandboxInputs[number]
+    ): boolean => {
+      // Check by input_variable_id first (production format)
+      if ("input_variable_id" in input && input.input_variable_id) {
+        return triggerAttributesById.has(input.input_variable_id);
+      }
+      // Fallback to name matching (test format)
+      if ("name" in input && input.name) {
+        return triggerAttributesByKey.has(removeEscapeCharacters(input.name));
+      }
+      return false;
+    };
 
     // Separate inputs into trigger attribute inputs and workflow inputs
     const workflowInputs = hasInputs
-      ? inputs.filter(
-          (input) =>
-            !triggerAttributeKeys.has(removeEscapeCharacters(input.name))
-        )
+      ? inputs.filter((input) => !isTriggerAttributeInput(input))
       : [];
 
     // Add workflow inputs (excluding trigger attribute inputs)
@@ -187,13 +204,16 @@ if __name__ == "__main__":
       // Filter inputs to only those that match trigger attributes for this specific trigger
       const triggerInputs = hasInputs
         ? inputs.filter(
-            (input) =>
-              triggerAttributeKeys.has(removeEscapeCharacters(input.name)) &&
-              !isNil(input.value)
+            (input) => isTriggerAttributeInput(input) && !isNil(input.value)
           )
         : [];
 
-      const triggerInstance = this.getTriggerInstance(trigger, triggerInputs);
+      const triggerInstance = this.getTriggerInstance(
+        trigger,
+        triggerInputs,
+        triggerAttributesById,
+        triggerAttributesByKey
+      );
 
       if (triggerInstance) {
         arguments_.push(
@@ -303,17 +323,38 @@ if __name__ == "__main__":
 
   private getTriggerInstance(
     trigger: WorkflowTrigger,
-    triggerInputs: WorkflowSandboxInputs
+    triggerInputs: WorkflowSandboxInputs,
+    triggerAttributesById: Map<string, WorkflowTrigger["attributes"][number]>,
+    triggerAttributesByKey: Map<string, WorkflowTrigger["attributes"][number]>
   ): ClassInstantiation {
     const triggerClassInfo = getTriggerClassInfo(trigger, this.workflowContext);
 
     // Generate arguments for the trigger instance from the pre-filtered inputs
-    const arguments_: MethodArgument[] = triggerInputs.map((input) => {
-      return new MethodArgument({
-        name: removeEscapeCharacters(input.name),
-        value: vellumValue({ vellumValue: input }),
-      });
-    });
+    const arguments_: MethodArgument[] = triggerInputs
+      .map((input) => {
+        // Resolve the attribute to get the correct key name
+        let attr: WorkflowTrigger["attributes"][number] | undefined;
+
+        // Check by input_variable_id first (production format)
+        if ("input_variable_id" in input && input.input_variable_id) {
+          attr = triggerAttributesById.get(input.input_variable_id);
+        }
+
+        // Fallback to name matching (test format)
+        if (!attr && "name" in input && input.name) {
+          attr = triggerAttributesByKey.get(removeEscapeCharacters(input.name));
+        }
+
+        if (!attr) {
+          return null;
+        }
+
+        return new MethodArgument({
+          name: attr.key,
+          value: vellumValue({ vellumValue: input }),
+        });
+      })
+      .filter((arg): arg is MethodArgument => arg !== null);
 
     return new ClassInstantiation({
       classReference: new Reference({
