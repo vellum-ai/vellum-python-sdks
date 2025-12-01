@@ -18,7 +18,6 @@ from vellum import (
 from vellum.workflows.constants import LATEST_RELEASE_TAG, OMIT
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.events.types import NodeParentContext, VellumCodeResourceDefinition, WorkflowParentContext
-from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.state import BaseState
@@ -505,20 +504,15 @@ def test_stream_workflow__emits_workflow_initiated_and_rejected_events_on_invali
     deployment node has invalid inputs (interface mismatch).
     """
 
-    # GIVEN a simple workflow that will fail due to invalid inputs
+    # GIVEN a simple workflow that expects different inputs than what the parent provides
+    # The parent workflow passes `city` and `date`, but this workflow expects `city` and `day`
     class FailingWorkflowInputs(BaseInputs):
         city: str
-        date: str
+        day: str
 
     class FailingNode(BaseNode):
         class Outputs(BaseNode.Outputs):
             pass
-
-        def run(self) -> BaseNode.Outputs:
-            raise NodeException(
-                code=WorkflowErrorCode.INVALID_INPUTS,
-                message="Missing required input variable: 'foo'",
-            )
 
     class FailingWorkflow(BaseWorkflow[FailingWorkflowInputs, BaseState]):
         graph = FailingNode
