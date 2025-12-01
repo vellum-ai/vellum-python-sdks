@@ -5,6 +5,7 @@ import { PromptParameters as PromptParametersType } from "vellum-ai/api";
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -38,7 +39,7 @@ export class PromptParameters extends AstNode {
   private generatePromptParameters(): ClassInstantiation {
     const classArgs: MethodArgument[] = [];
 
-    const stopValue = python.TypeInstantiation.list(
+    const stopValue = new ListInstantiation(
       (this.promptParametersRequest.stop ?? []).map(
         (str) => new StrInstantiation(str)
       )

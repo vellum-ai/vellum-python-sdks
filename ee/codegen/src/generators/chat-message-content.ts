@@ -1,18 +1,17 @@
-import { python } from "@fern-api/python-ast";
 import { isNil } from "lodash";
 import {
-  ChatMessageContentRequest as ChatMessageContentRequestType,
-  ChatMessageContent as ChatMessageContentType,
-  FunctionCallChatMessageContentValueRequest as FunctionCallChatMessageContentValueRequestType,
-  FunctionCallChatMessageContentValue as FunctionCallChatMessageContentValueType,
-  ArrayChatMessageContentItemRequest as ArrayChatMessageContentItemRequestType,
   ArrayChatMessageContentItem as ArrayChatMessageContentItemType,
-  VellumImage as VellumImageType,
-  VellumImageRequest as VellumImageRequestType,
+  ArrayChatMessageContentItemRequest as ArrayChatMessageContentItemRequestType,
+  ChatMessageContent as ChatMessageContentType,
+  ChatMessageContentRequest as ChatMessageContentRequestType,
+  FunctionCallChatMessageContentValue as FunctionCallChatMessageContentValueType,
+  FunctionCallChatMessageContentValueRequest as FunctionCallChatMessageContentValueRequestType,
   VellumAudio as VellumAudioType,
   VellumAudioRequest as VellumAudioRequestType,
   VellumDocument as VellumDocumentType,
   VellumDocumentRequest as VellumDocumentRequestType,
+  VellumImage as VellumImageType,
+  VellumImageRequest as VellumImageRequestType,
   VellumVideo as VellumVideoType,
   VellumVideoRequest as VellumVideoRequestType,
 } from "vellum-ai/api";
@@ -20,6 +19,7 @@ import {
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -171,7 +171,7 @@ class ArrayChatMessageContent extends AstNode {
       arguments_: [
         new MethodArgument({
           name: "value",
-          value: python.TypeInstantiation.list(arrayElements, {
+          value: new ListInstantiation(arrayElements, {
             endWithComma: true,
           }),
         }),

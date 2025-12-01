@@ -1,8 +1,7 @@
-import { python } from "@fern-api/python-ast";
-
 import { BaseNodeInputWorkflowReference } from "./BaseNodeInputWorkflowReference";
 
 import { AstNode } from "src/generators/extensions/ast-node";
+import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { ArrayWorkflowReference as ArrayWorkflowReferenceType } from "src/types/vellum";
 
@@ -12,7 +11,7 @@ export class ArrayWorkflowReference extends BaseNodeInputWorkflowReference<Array
     const items = arrayReference.items;
 
     if (!items || items.length === 0) {
-      return python.TypeInstantiation.list([]);
+      return new ListInstantiation([]);
     }
 
     const listItems = items.map((item) => {
@@ -27,7 +26,7 @@ export class ArrayWorkflowReference extends BaseNodeInputWorkflowReference<Array
       return valueNode;
     });
 
-    return python.TypeInstantiation.list(listItems, {
+    return new ListInstantiation(listItems, {
       endWithComma: true,
     });
   }

@@ -19,6 +19,7 @@ import { ValueGenerationError } from "./errors";
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -153,7 +154,7 @@ class ChatHistoryVellumValue extends AstNode {
       });
     });
 
-    const astNode = python.TypeInstantiation.list(chatMessages, {
+    const astNode = new ListInstantiation(chatMessages, {
       endWithComma: true,
     });
     this.inheritReferences(astNode);
@@ -388,7 +389,7 @@ class ArrayVellumValue extends AstNode {
       );
     }
 
-    const astNode = python.TypeInstantiation.list(
+    const astNode = new ListInstantiation(
       value.map((item) => new VellumValue({ vellumValue: item })),
       iterableConfig ?? { endWithComma: true }
     );
@@ -469,7 +470,7 @@ class SearchResultsVellumValue extends AstNode {
         }),
         new MethodArgument({
           name: "keywords",
-          value: python.TypeInstantiation.list(
+          value: new ListInstantiation(
             result.keywords.map((k) => new StrInstantiation(k))
           ),
         }),
@@ -516,7 +517,7 @@ class SearchResultsVellumValue extends AstNode {
       });
     });
 
-    const searchResults = python.TypeInstantiation.list(searchResultItems, {
+    const searchResults = new ListInstantiation(searchResultItems, {
       endWithComma: true,
     });
 

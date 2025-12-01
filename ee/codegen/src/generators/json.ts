@@ -3,6 +3,7 @@ import { python } from "@fern-api/python-ast";
 import { ValueGenerationError } from "./errors";
 
 import { AstNode } from "src/generators/extensions/ast-node";
+import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 
@@ -44,7 +45,7 @@ export class Json extends AstNode {
     }
 
     if (Array.isArray(value)) {
-      return python.TypeInstantiation.list(
+      return new ListInstantiation(
         value.map((item) => {
           const jsonValue = new Json(item);
           this.inheritReferences(jsonValue);

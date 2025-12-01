@@ -7,6 +7,7 @@ import {
   PromptTemplateBlockExcludingFunctionDefinition,
 } from "src/generators/base-prompt-block";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -173,7 +174,7 @@ export class StatefulPromptBlock extends BasePromptBlock<PromptTemplateBlockExcl
     classArgs.push(
       new MethodArgument({
         name: "blocks",
-        value: python.TypeInstantiation.list(
+        value: new ListInstantiation(
           childBlocks.map((block) => {
             return this.generateAstNode(block);
           })
@@ -254,7 +255,7 @@ export class StatefulPromptBlock extends BasePromptBlock<PromptTemplateBlockExcl
     classArgs.push(
       new MethodArgument({
         name: "blocks",
-        value: python.TypeInstantiation.list(
+        value: new ListInstantiation(
           promptBlock.blocks.map((block) => {
             if (block.blockType === "VARIABLE") {
               return this.generateVariablePromptBlock(block);

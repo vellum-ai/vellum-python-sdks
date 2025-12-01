@@ -5,6 +5,7 @@ import { PromptDeploymentNodeContext } from "src/context/node-context/prompt-dep
 import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -40,7 +41,7 @@ export class PromptDeploymentNode extends BaseNode<
       statements.push(
         python.field({
           name: "ml_model_fallbacks",
-          initializer: python.TypeInstantiation.list(
+          initializer: new ListInstantiation(
             this.nodeData.data.mlModelFallbacks.map(
               (model) => new StrInstantiation(model)
             )

@@ -13,6 +13,7 @@ export * from "./comment";
 export * from "./dict";
 export * from "./field";
 export * from "./list";
+export * from "./list-instantiation";
 export * from "./method-argument";
 export * from "./none";
 export * from "./optional";
