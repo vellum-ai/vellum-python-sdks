@@ -55,7 +55,7 @@ dataset = [
     DatasetRow(
         label="Scenario 2",
         workflow_trigger=Slack(
-            created=0, creator="creator", id="some-id", name="my-name"
+            creator="creator", id="some-id", name="my-name", created=0
         ),
     ),
 ]

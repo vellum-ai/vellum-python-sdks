@@ -307,21 +307,24 @@ if __name__ == "__main__":
 
     const triggerClassInfo = getTriggerClassInfo(trigger, this.workflowContext);
 
-    // Generate arguments for the trigger instance based on its attributes,
-    // using provided dataset inputs when available, else default to None.
-    const arguments_: MethodArgument[] = trigger.attributes.map((attr) => {
-      const matchingInput =
-        inputs?.find(
-          (i) => removeEscapeCharacters(i.name) === attr.key && !isNil(i.value)
-        ) ?? null;
+    // Build a set of trigger attribute keys for quick lookup
+    const triggerAttributeKeys = new Set(
+      trigger.attributes.map((attr) => attr.key)
+    );
 
-      return new MethodArgument({
-        name: attr.key,
-        value: matchingInput
-          ? vellumValue({ vellumValue: matchingInput })
-          : python.TypeInstantiation.none(),
+    // Generate arguments for the trigger instance based on the provided inputs
+    // that match trigger attributes, rather than iterating over all attributes
+    const arguments_: MethodArgument[] = (inputs ?? [])
+      .filter((input) => {
+        const inputName = removeEscapeCharacters(input.name);
+        return triggerAttributeKeys.has(inputName) && !isNil(input.value);
+      })
+      .map((input) => {
+        return new MethodArgument({
+          name: removeEscapeCharacters(input.name),
+          value: vellumValue({ vellumValue: input }),
+        });
       });
-    });
 
     return new ClassInstantiation({
       classReference: new Reference({
