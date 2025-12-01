@@ -117,9 +117,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
               if (!handler) {
                 this.workflowContext.addError(
                   new NodeDefinitionGenerationError(
-                    `Unsupported function type: ${JSON.stringify(
-                      f
-                    )}. Only CODE_EXECUTION, INLINE_WORKFLOW, WORKFLOW_DEPLOYMENT, COMPOSIO, MCP_SERVER, and VELLUM_INTEGRATION are supported.`,
+                    `Unsupported function type: ${JSON.stringify(f)}.`,
                     "WARNING"
                   )
                 );
