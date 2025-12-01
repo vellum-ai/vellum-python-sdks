@@ -97,327 +97,41 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
             Array.isArray(value.value.value)
           ) {
             const functions: ToolArgs[] = value.value.value;
-
-            const codeExecutionFunctions: FunctionArgs[] = [];
-            const inlineWorkflowFunctions: InlineWorkflowFunctionArgs[] = [];
-            const deploymentWorkflowFunctions: WorkflowDeploymentFunctionArgs[] =
-              [];
             const functionReferences: python.AstNode[] = [];
+            const functionHandlers: Record<
+              ToolArgs["type"],
+              (f: ToolArgs) => python.AstNode | null
+            > = {
+              CODE_EXECUTION: (f) => this.handleCodeExecutionFunction(f),
+              INLINE_WORKFLOW: (f) => this.handleInlineWorkflowFunction(f),
+              WORKFLOW_DEPLOYMENT: (f) =>
+                this.handleWorkflowDeploymentFunction(f),
+              COMPOSIO: (f) => this.handleComposioFunction(f),
+              MCP_SERVER: (f) => this.handleMCPServerFunction(f),
+              VELLUM_INTEGRATION: (f) =>
+                this.handleVellumIntegrationFunction(f),
+            };
 
             functions.forEach((f) => {
-              switch (f.type) {
-                case "CODE_EXECUTION": {
-                  f = this.getFunction(f);
-                  codeExecutionFunctions.push(f);
-                  const snakeName = toPythonSafeSnakeCase(f.name);
-                  // Use toValidPythonIdentifier to ensure the name is safe for Python references
-                  // but preserve original casing when possible (see APO-1372)
-                  const safeName = toValidPythonIdentifier(f.name);
-                  functionReferences.push(
-                    new Reference({
-                      name: safeName, // Use safe Python identifier that preserves original casing
-                      modulePath: [`.${snakeName}`], // Import from snake_case module
-                    })
-                  );
-                  break;
-                }
-                case "INLINE_WORKFLOW": {
-                  const rawExecConfig =
-                    f.exec_config as unknown as WorkflowVersionExecConfigSerializer.Raw;
-                  const workflowVersionExecConfigResult =
-                    WorkflowVersionExecConfigSerializer.parse(rawExecConfig, {
-                      allowUnrecognizedUnionMembers: true,
-                      allowUnrecognizedEnumValues: true,
-                      unrecognizedObjectKeys: "strip",
-                    });
-                  if (!workflowVersionExecConfigResult.ok) {
-                    this.workflowContext.addError(
-                      new NodeDefinitionGenerationError(
-                        `Failed to parse WorkflowVersionExecConfig: ${JSON.stringify(
-                          workflowVersionExecConfigResult.errors
-                        )}`,
-                        "WARNING"
-                      )
-                    );
-                  } else {
-                    const workflowVersionExecConfig: WorkflowVersionExecConfig =
-                      workflowVersionExecConfigResult.value;
-                    const workflow: InlineWorkflowFunctionArgs = {
-                      type: "INLINE_WORKFLOW",
-                      name: f.name,
-                      description: f.description,
-                      exec_config: workflowVersionExecConfig,
-                    };
-                    inlineWorkflowFunctions.push(workflow);
+              const handler = functionHandlers[f.type];
+              if (!handler) {
+                this.workflowContext.addError(
+                  new NodeDefinitionGenerationError(
+                    `Unsupported function type: ${JSON.stringify(
+                      f
+                    )}. Only CODE_EXECUTION, INLINE_WORKFLOW, WORKFLOW_DEPLOYMENT, COMPOSIO, MCP_SERVER, and VELLUM_INTEGRATION are supported.`,
+                    "WARNING"
+                  )
+                );
+                return;
+              }
 
-                    const workflowName =
-                      this.getInlineWorkflowFunctionName(workflow);
-                    if (workflowName) {
-                      const nestedProject =
-                        this.getNestedWorkflowProject(workflow);
-                      const workflowClassName =
-                        nestedProject.workflowContext.workflowClassName;
-                      functionReferences.push(
-                        new Reference({
-                          name: workflowClassName,
-                          modulePath: [
-                            `.${workflowName}`,
-                            GENERATED_WORKFLOW_MODULE_NAME,
-                          ],
-                        })
-                      );
-                    }
-                  }
-                  break;
-                }
-                case "WORKFLOW_DEPLOYMENT": {
-                  const workflowDeployment: WorkflowDeploymentFunctionArgs = {
-                    type: "WORKFLOW_DEPLOYMENT",
-                    name: f.name,
-                    description: f.description,
-                    deployment: f.deployment,
-                    release_tag: f.release_tag,
-                  };
-                  deploymentWorkflowFunctions.push(workflowDeployment);
-                  const workflowDeploymentName = workflowDeployment.deployment;
-                  const args = [
-                    new MethodArgument({
-                      name: "deployment",
-                      value: new StrInstantiation(workflowDeploymentName),
-                    }),
-                  ];
+              const functionReference = handler(f);
 
-                  if (f.release_tag !== null) {
-                    args.push(
-                      new MethodArgument({
-                        name: "release_tag",
-                        value: new StrInstantiation(f.release_tag),
-                      })
-                    );
-                  }
-
-                  functionReferences.push(
-                    new ClassInstantiation({
-                      classReference: new Reference({
-                        name: "DeploymentDefinition",
-                        modulePath: [
-                          "vellum",
-                          "workflows",
-                          "types",
-                          "definition",
-                        ],
-                      }),
-                      arguments_: args,
-                    })
-                  );
-                  break;
-                }
-                case "COMPOSIO": {
-                  const composioTool = f as ComposioToolFunctionArgs;
-
-                  // Validate required fields and provide fallbacks for missing fields
-                  // Frontend sends integration_name and tool_slug, but backend sends toolkit and action
-                  const toolkit =
-                    composioTool.integration_name ||
-                    composioTool.toolkit ||
-                    "UNKNOWN";
-                  const action =
-                    composioTool.tool_slug || composioTool.action || "UNKNOWN";
-                  const description = composioTool.description || "UNKNOWN";
-
-                  const args = [
-                    new MethodArgument({
-                      name: "toolkit",
-                      value: new StrInstantiation(toolkit),
-                    }),
-                    new MethodArgument({
-                      name: "action",
-                      value: new StrInstantiation(action),
-                    }),
-                    new MethodArgument({
-                      name: "description",
-                      value: new StrInstantiation(description),
-                    }),
-                  ];
-
-                  if (composioTool.user_id != null) {
-                    args.push(
-                      new MethodArgument({
-                        name: "user_id",
-                        value: new StrInstantiation(composioTool.user_id),
-                      })
-                    );
-                  }
-
-                  functionReferences.push(
-                    new ClassInstantiation({
-                      classReference: new Reference({
-                        name: "ComposioToolDefinition",
-                        modulePath: VELLUM_WORKFLOW_DEFINITION_PATH,
-                      }),
-                      arguments_: args,
-                    })
-                  );
-                  break;
-                }
-                case "MCP_SERVER": {
-                  const mcpServerFunction = f as MCPServerFunctionArgs;
-
-                  const arguments_: MethodArgument[] = [
-                    new MethodArgument({
-                      name: "name",
-                      value: new StrInstantiation(mcpServerFunction.name),
-                    }),
-                    new MethodArgument({
-                      name: "url",
-                      value: new StrInstantiation(mcpServerFunction.url),
-                    }),
-                  ];
-
-                  if (mcpServerFunction.authorization_type) {
-                    arguments_.push(
-                      new MethodArgument({
-                        name: "authorization_type",
-                        value: new Reference({
-                          name: "AuthorizationType",
-                          modulePath: [
-                            ...this.workflowContext.sdkModulePathNames
-                              .WORKFLOWS_MODULE_PATH,
-                            "constants",
-                          ],
-                          attribute: [mcpServerFunction.authorization_type],
-                        }),
-                      })
-                    );
-                  }
-
-                  if (
-                    mcpServerFunction.authorization_type === "BEARER_TOKEN" &&
-                    mcpServerFunction.bearer_token_value
-                  ) {
-                    arguments_.push(
-                      new MethodArgument({
-                        name: "bearer_token_value",
-                        value: new WorkflowValueDescriptor({
-                          workflowValueDescriptor: {
-                            type: "ENVIRONMENT_VARIABLE",
-                            environmentVariable:
-                              mcpServerFunction.bearer_token_value,
-                          },
-                          nodeContext: this.nodeContext,
-                          workflowContext: this.workflowContext,
-                        }),
-                      })
-                    );
-                  }
-
-                  if (
-                    mcpServerFunction.authorization_type === "API_KEY" &&
-                    mcpServerFunction.api_key_header_key
-                  ) {
-                    arguments_.push(
-                      new MethodArgument({
-                        name: "api_key_header_key",
-                        value: new StrInstantiation(
-                          mcpServerFunction.api_key_header_key
-                        ),
-                      })
-                    );
-                  }
-
-                  if (
-                    mcpServerFunction.authorization_type === "API_KEY" &&
-                    mcpServerFunction.api_key_header_value
-                  ) {
-                    arguments_.push(
-                      new MethodArgument({
-                        name: "api_key_header_value",
-                        value: new WorkflowValueDescriptor({
-                          workflowValueDescriptor: {
-                            type: "ENVIRONMENT_VARIABLE",
-                            environmentVariable:
-                              mcpServerFunction.api_key_header_value,
-                          },
-                          nodeContext: this.nodeContext,
-                          workflowContext: this.workflowContext,
-                        }),
-                      })
-                    );
-                  }
-
-                  functionReferences.push(
-                    new ClassInstantiation({
-                      classReference: new Reference({
-                        name: "MCPServer",
-                        modulePath: VELLUM_WORKFLOW_DEFINITION_PATH,
-                      }),
-                      arguments_,
-                    })
-                  );
-                  break;
-                }
-                case "VELLUM_INTEGRATION": {
-                  const integrationTool =
-                    f as VellumIntegrationToolFunctionArgs;
-
-                  const args = [
-                    new MethodArgument({
-                      name: "provider",
-                      value: new StrInstantiation(
-                        integrationTool.provider || "COMPOSIO"
-                      ),
-                    }),
-                    new MethodArgument({
-                      name: "integration_name",
-                      value: new StrInstantiation(
-                        integrationTool.integration_name || "UNKNOWN"
-                      ),
-                    }),
-                    new MethodArgument({
-                      name: "name",
-                      value: new StrInstantiation(
-                        integrationTool.name || "UNKNOWN"
-                      ),
-                    }),
-                    new MethodArgument({
-                      name: "description",
-                      value: new StrInstantiation(
-                        integrationTool.description || "UNKNOWN"
-                      ),
-                    }),
-                  ];
-
-                  functionReferences.push(
-                    new ClassInstantiation({
-                      classReference: new Reference({
-                        name: "VellumIntegrationToolDefinition",
-                        modulePath: VELLUM_WORKFLOW_DEFINITION_PATH,
-                      }),
-                      arguments_: args,
-                    })
-                  );
-                  break;
-                }
-
-                default:
-                  this.workflowContext.addError(
-                    new NodeDefinitionGenerationError(
-                      `Unsupported function type: ${JSON.stringify(
-                        f
-                      )}. Only CODE_EXECUTION, INLINE_WORKFLOW, WORKFLOW_DEPLOYMENT, COMPOSIO, MCP_SERVER, and VELLUM_INTEGRATION are supported.`,
-                      "WARNING"
-                    )
-                  );
+              if (functionReference) {
+                functionReferences.push(functionReference);
               }
             });
-
-            if (codeExecutionFunctions.length > 0) {
-              this.generateFunctionFile(codeExecutionFunctions);
-            }
-
-            if (inlineWorkflowFunctions.length > 0) {
-              this.generateInlineWorkflowFiles(inlineWorkflowFunctions);
-            }
 
             nodeAttributesStatements.push(
               python.field({
@@ -544,6 +258,264 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     return nodeAttributesStatements;
   }
 
+  private handleCodeExecutionFunction(f: ToolArgs): python.AstNode {
+    const codeExecutionFunction = f as FunctionArgs;
+    const functionToGenerate = this.getFunction(codeExecutionFunction);
+    this.generateFunctionFile([functionToGenerate]);
+    const snakeName = toPythonSafeSnakeCase(functionToGenerate.name);
+    // Use toValidPythonIdentifier to ensure the name is safe for Python references
+    // but preserve original casing when possible (see APO-1372)
+    const safeName = toValidPythonIdentifier(functionToGenerate.name);
+    return python.reference({
+      name: safeName, // Use safe Python identifier that preserves original casing
+      modulePath: [`.${snakeName}`], // Import from snake_case module
+    });
+  }
+
+  private handleInlineWorkflowFunction(f: ToolArgs): python.AstNode | null {
+    const inlineWorkflow = f as InlineWorkflowFunctionArgs;
+    const rawExecConfig =
+      inlineWorkflow.exec_config as unknown as WorkflowVersionExecConfigSerializer.Raw;
+    const workflowVersionExecConfigResult =
+      WorkflowVersionExecConfigSerializer.parse(rawExecConfig, {
+        allowUnrecognizedUnionMembers: true,
+        allowUnrecognizedEnumValues: true,
+        unrecognizedObjectKeys: "strip",
+      });
+    if (!workflowVersionExecConfigResult.ok) {
+      this.workflowContext.addError(
+        new NodeDefinitionGenerationError(
+          `Failed to parse WorkflowVersionExecConfig: ${JSON.stringify(
+            workflowVersionExecConfigResult.errors
+          )}`,
+          "WARNING"
+        )
+      );
+      return null;
+    }
+
+    const workflowVersionExecConfig: WorkflowVersionExecConfig =
+      workflowVersionExecConfigResult.value;
+    const workflow: InlineWorkflowFunctionArgs = {
+      type: "INLINE_WORKFLOW",
+      name: inlineWorkflow.name,
+      description: inlineWorkflow.description,
+      exec_config: workflowVersionExecConfig,
+    };
+
+    // Generate inline workflow file directly
+    const nestedWorkflowProject = this.getNestedWorkflowProject(workflow);
+    const workflowName = this.getInlineWorkflowFunctionName(workflow);
+    if (workflowName) {
+      this.inlineWorkflowsToGenerate.push({
+        functionName: workflowName,
+        workflowProject: nestedWorkflowProject,
+      });
+
+      const workflowClassName =
+        nestedWorkflowProject.workflowContext.workflowClassName;
+      return python.reference({
+        name: workflowClassName,
+        modulePath: [`.${workflowName}`, GENERATED_WORKFLOW_MODULE_NAME],
+      });
+    }
+
+    return null;
+  }
+
+  private handleWorkflowDeploymentFunction(f: ToolArgs): python.AstNode {
+    const workflowDeployment = f as WorkflowDeploymentFunctionArgs;
+    const workflowDeploymentName = workflowDeployment.deployment;
+    const args = [
+      python.methodArgument({
+        name: "deployment",
+        value: new StrInstantiation(workflowDeploymentName),
+      }),
+    ];
+
+    if (workflowDeployment.release_tag !== null) {
+      args.push(
+        python.methodArgument({
+          name: "release_tag",
+          value: new StrInstantiation(workflowDeployment.release_tag),
+        })
+      );
+    }
+
+    return python.instantiateClass({
+      classReference: python.reference({
+        name: "DeploymentDefinition",
+        modulePath: ["vellum", "workflows", "types", "definition"],
+      }),
+      arguments_: args,
+    });
+  }
+
+  private handleComposioFunction(f: ToolArgs): python.AstNode {
+    const composioTool = f as ComposioToolFunctionArgs;
+
+    // Validate required fields and provide fallbacks for missing fields
+    // Frontend sends integration_name and tool_slug, but backend sends toolkit and action
+    const toolkit =
+      composioTool.integration_name || composioTool.toolkit || "UNKNOWN";
+    const action = composioTool.tool_slug || composioTool.action || "UNKNOWN";
+    const description = composioTool.description || "UNKNOWN";
+
+    const args = [
+      python.methodArgument({
+        name: "toolkit",
+        value: new StrInstantiation(toolkit),
+      }),
+      python.methodArgument({
+        name: "action",
+        value: new StrInstantiation(action),
+      }),
+      python.methodArgument({
+        name: "description",
+        value: new StrInstantiation(description),
+      }),
+    ];
+
+    if (composioTool.user_id != null) {
+      args.push(
+        python.methodArgument({
+          name: "user_id",
+          value: new StrInstantiation(composioTool.user_id),
+        })
+      );
+    }
+
+    return python.instantiateClass({
+      classReference: python.reference({
+        name: "ComposioToolDefinition",
+        modulePath: VELLUM_WORKFLOW_DEFINITION_PATH,
+      }),
+      arguments_: args,
+    });
+  }
+
+  private handleMCPServerFunction(f: ToolArgs): python.AstNode {
+    const mcpServerFunction = f as MCPServerFunctionArgs;
+
+    const arguments_: python.MethodArgument[] = [
+      python.methodArgument({
+        name: "name",
+        value: new StrInstantiation(mcpServerFunction.name),
+      }),
+      python.methodArgument({
+        name: "url",
+        value: new StrInstantiation(mcpServerFunction.url),
+      }),
+    ];
+
+    if (mcpServerFunction.authorization_type) {
+      arguments_.push(
+        python.methodArgument({
+          name: "authorization_type",
+          value: python.reference({
+            name: "AuthorizationType",
+            modulePath: [
+              ...this.workflowContext.sdkModulePathNames.WORKFLOWS_MODULE_PATH,
+              "constants",
+            ],
+            attribute: [mcpServerFunction.authorization_type],
+          }),
+        })
+      );
+    }
+
+    if (
+      mcpServerFunction.authorization_type === "BEARER_TOKEN" &&
+      mcpServerFunction.bearer_token_value
+    ) {
+      arguments_.push(
+        python.methodArgument({
+          name: "bearer_token_value",
+          value: new WorkflowValueDescriptor({
+            workflowValueDescriptor: {
+              type: "ENVIRONMENT_VARIABLE",
+              environmentVariable: mcpServerFunction.bearer_token_value,
+            },
+            nodeContext: this.nodeContext,
+            workflowContext: this.workflowContext,
+          }),
+        })
+      );
+    }
+
+    if (
+      mcpServerFunction.authorization_type === "API_KEY" &&
+      mcpServerFunction.api_key_header_key
+    ) {
+      arguments_.push(
+        python.methodArgument({
+          name: "api_key_header_key",
+          value: new StrInstantiation(mcpServerFunction.api_key_header_key),
+        })
+      );
+    }
+
+    if (
+      mcpServerFunction.authorization_type === "API_KEY" &&
+      mcpServerFunction.api_key_header_value
+    ) {
+      arguments_.push(
+        python.methodArgument({
+          name: "api_key_header_value",
+          value: new WorkflowValueDescriptor({
+            workflowValueDescriptor: {
+              type: "ENVIRONMENT_VARIABLE",
+              environmentVariable: mcpServerFunction.api_key_header_value,
+            },
+            nodeContext: this.nodeContext,
+            workflowContext: this.workflowContext,
+          }),
+        })
+      );
+    }
+
+    return python.instantiateClass({
+      classReference: python.reference({
+        name: "MCPServer",
+        modulePath: VELLUM_WORKFLOW_DEFINITION_PATH,
+      }),
+      arguments_,
+    });
+  }
+
+  private handleVellumIntegrationFunction(f: ToolArgs): python.AstNode {
+    const integrationTool = f as VellumIntegrationToolFunctionArgs;
+
+    const args = [
+      python.methodArgument({
+        name: "provider",
+        value: new StrInstantiation(integrationTool.provider || "COMPOSIO"),
+      }),
+      python.methodArgument({
+        name: "integration_name",
+        value: new StrInstantiation(
+          integrationTool.integration_name || "UNKNOWN"
+        ),
+      }),
+      python.methodArgument({
+        name: "name",
+        value: new StrInstantiation(integrationTool.name || "UNKNOWN"),
+      }),
+      python.methodArgument({
+        name: "description",
+        value: new StrInstantiation(integrationTool.description || "UNKNOWN"),
+      }),
+    ];
+
+    return python.instantiateClass({
+      classReference: python.reference({
+        name: "VellumIntegrationToolDefinition",
+        modulePath: VELLUM_WORKFLOW_DEFINITION_PATH,
+      }),
+      arguments_: args,
+    });
+  }
+
   getInnerWorkflowData(workflow: InlineWorkflowFunctionArgs): WorkflowRawData {
     return workflow.exec_config.workflowRawData;
   }
@@ -594,19 +566,6 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
       )
     );
     return "inline_workflow_function";
-  }
-
-  private generateInlineWorkflowFiles(
-    inlineWorkflows: InlineWorkflowFunctionArgs[]
-  ): void {
-    inlineWorkflows.forEach((workflow) => {
-      const nestedWorkflowProject = this.getNestedWorkflowProject(workflow);
-
-      this.inlineWorkflowsToGenerate.push({
-        functionName: this.getInlineWorkflowFunctionName(workflow),
-        workflowProject: nestedWorkflowProject,
-      });
-    });
   }
 
   getNodeDecorators(): python.Decorator[] | undefined {
