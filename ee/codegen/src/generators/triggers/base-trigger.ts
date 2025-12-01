@@ -8,6 +8,8 @@ import {
 import { WorkflowContext } from "src/context";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
 import { Class } from "src/generators/extensions/class";
+import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { isNilOrEmpty } from "src/utils/typing";
@@ -120,12 +122,12 @@ export abstract class BaseTrigger<
     }
 
     if (displayData.comment != null) {
-      const commentArgs: python.MethodArgument[] = [];
+      const commentArgs: MethodArgument[] = [];
       const { expanded, value } = displayData.comment;
 
       if (expanded) {
         commentArgs.push(
-          python.methodArgument({
+          new MethodArgument({
             name: "expanded",
             value: python.TypeInstantiation.bool(expanded),
           })
@@ -134,7 +136,7 @@ export abstract class BaseTrigger<
 
       if (value) {
         commentArgs.push(
-          python.methodArgument({
+          new MethodArgument({
             name: "value",
             value: new StrInstantiation(value),
           })
@@ -148,7 +150,7 @@ export abstract class BaseTrigger<
       fields.push(
         python.field({
           name: "comment",
-          initializer: python.instantiateClass({
+          initializer: new ClassInstantiation({
             classReference: new Reference({
               name: "NodeDisplayComment",
               modulePath: VELLUM_WORKFLOW_EDITOR_TYPES_PATH,

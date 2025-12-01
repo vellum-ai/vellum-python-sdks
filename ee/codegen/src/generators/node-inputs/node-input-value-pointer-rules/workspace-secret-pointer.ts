@@ -3,6 +3,8 @@ import { isNil } from "lodash";
 
 import { BaseNodeInputValuePointerRule } from "./base";
 
+import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { WorkspaceSecretPointer as WorkspaceSecretPointerType } from "src/types/vellum";
@@ -23,7 +25,7 @@ export class WorkspaceSecretPointerRule extends BaseNodeInputValuePointerRule<Wo
       return python.TypeInstantiation.none();
     }
 
-    return python.instantiateClass({
+    return new ClassInstantiation({
       classReference: new Reference({
         name: "VellumSecretReference",
         modulePath: [
@@ -32,7 +34,7 @@ export class WorkspaceSecretPointerRule extends BaseNodeInputValuePointerRule<Wo
         ],
       }),
       arguments_: [
-        python.methodArgument({
+        new MethodArgument({
           value: new StrInstantiation(workspaceSecretName),
         }),
       ],

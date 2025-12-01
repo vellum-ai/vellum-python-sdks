@@ -6,6 +6,8 @@ import { Field } from "./extensions";
 import { OptionalType } from "./extensions/optional";
 
 import { AstNode } from "src/generators/extensions/ast-node";
+import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { Writer } from "src/generators/extensions/writer";
 import { VellumValue } from "src/generators/vellum-variable-value";
@@ -119,10 +121,10 @@ export class VellumVariable extends AstNode {
             }),
           });
 
-      return python.instantiateClass({
+      return new ClassInstantiation({
         classReference: fieldReference,
         arguments_: [
-          python.methodArgument({
+          new MethodArgument({
             name: "default_factory",
             value: defaultFactoryValue,
           }),
@@ -156,10 +158,10 @@ export class VellumVariable extends AstNode {
             }),
           });
 
-      return python.instantiateClass({
+      return new ClassInstantiation({
         classReference: fieldReference,
         arguments_: [
-          python.methodArgument({
+          new MethodArgument({
             name: "default_factory",
             value: defaultFactoryValue,
           }),

@@ -18,6 +18,8 @@ import { ValueGenerationError } from "./errors";
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
@@ -102,7 +104,7 @@ class ChatHistoryVellumValue extends AstNode {
     }
     const chatMessages = value.map((chatMessage) => {
       const arguments_ = [
-        python.methodArgument({
+        new MethodArgument({
           name: "role",
           value: new StrInstantiation(chatMessage.role),
         }),
@@ -110,7 +112,7 @@ class ChatHistoryVellumValue extends AstNode {
 
       if (chatMessage.text !== undefined && chatMessage.text !== null) {
         arguments_.push(
-          python.methodArgument({
+          new MethodArgument({
             name: "text",
             value: new StrInstantiation(
               removeEscapeCharacters(chatMessage.text)
@@ -121,7 +123,7 @@ class ChatHistoryVellumValue extends AstNode {
 
       if (chatMessage.source !== undefined && chatMessage.source !== null) {
         arguments_.push(
-          python.methodArgument({
+          new MethodArgument({
             name: "source",
             value: new StrInstantiation(chatMessage.source),
           })
@@ -135,14 +137,14 @@ class ChatHistoryVellumValue extends AstNode {
         });
 
         arguments_.push(
-          python.methodArgument({
+          new MethodArgument({
             name: "content",
             value: content,
           })
         );
       }
 
-      return python.instantiateClass({
+      return new ClassInstantiation({
         classReference: new Reference({
           name: "ChatMessage" + (isRequestType ? "Request" : ""),
           modulePath: VELLUM_CLIENT_MODULE_PATH,
@@ -174,17 +176,17 @@ class ErrorVellumValue extends AstNode {
   }
 
   private generateAstNode({ message, code }: VellumError) {
-    const astNode = python.instantiateClass({
+    const astNode = new ClassInstantiation({
       classReference: new Reference({
         name: "VellumError",
         modulePath: VELLUM_CLIENT_MODULE_PATH,
       }),
       arguments_: [
-        python.methodArgument({
+        new MethodArgument({
           name: "message",
           value: new StrInstantiation(message),
         }),
-        python.methodArgument({
+        new MethodArgument({
           name: "code",
           value: new StrInstantiation(code),
         }),
@@ -209,7 +211,7 @@ class AudioVellumValue extends AstNode {
 
   private generateAstNode(value: VellumAudio): AstNode {
     const arguments_ = [
-      python.methodArgument({
+      new MethodArgument({
         name: "src",
         value: new StrInstantiation(value.src),
       }),
@@ -217,14 +219,14 @@ class AudioVellumValue extends AstNode {
 
     if (!isNil(value.metadata)) {
       arguments_.push(
-        python.methodArgument({
+        new MethodArgument({
           name: "metadata",
           value: new Json(value.metadata),
         })
       );
     }
 
-    const astNode = python.instantiateClass({
+    const astNode = new ClassInstantiation({
       classReference: new Reference({
         name: "VellumAudio",
         modulePath: VELLUM_CLIENT_MODULE_PATH,
@@ -242,7 +244,7 @@ class AudioVellumValue extends AstNode {
 }
 
 class VideoVellumValue extends AstNode {
-  private astNode: python.AstNode;
+  private astNode: AstNode;
 
   public constructor(value: VellumVideo) {
     super();
@@ -251,7 +253,7 @@ class VideoVellumValue extends AstNode {
 
   private generateAstNode(value: VellumVideo): AstNode {
     const arguments_ = [
-      python.methodArgument({
+      new MethodArgument({
         name: "src",
         value: new StrInstantiation(value.src),
       }),
@@ -259,14 +261,14 @@ class VideoVellumValue extends AstNode {
 
     if (!isNil(value.metadata)) {
       arguments_.push(
-        python.methodArgument({
+        new MethodArgument({
           name: "metadata",
           value: new Json(value.metadata),
         })
       );
     }
 
-    const astNode = python.instantiateClass({
+    const astNode = new ClassInstantiation({
       classReference: new Reference({
         name: "VellumVideo",
         modulePath: VELLUM_CLIENT_MODULE_PATH,
@@ -293,7 +295,7 @@ class ImageVellumValue extends AstNode {
 
   private generateAstNode(value: VellumImage): AstNode {
     const arguments_ = [
-      python.methodArgument({
+      new MethodArgument({
         name: "src",
         value: new StrInstantiation(value.src),
       }),
@@ -301,14 +303,14 @@ class ImageVellumValue extends AstNode {
 
     if (!isNil(value.metadata)) {
       arguments_.push(
-        python.methodArgument({
+        new MethodArgument({
           name: "metadata",
           value: new Json(value.metadata),
         })
       );
     }
 
-    const astNode = python.instantiateClass({
+    const astNode = new ClassInstantiation({
       classReference: new Reference({
         name: "VellumImage",
         modulePath: VELLUM_CLIENT_MODULE_PATH,
@@ -327,7 +329,7 @@ class ImageVellumValue extends AstNode {
 }
 
 class DocumentVellumValue extends AstNode {
-  private astNode: python.AstNode;
+  private astNode: AstNode;
 
   public constructor(value: VellumDocument) {
     super();
@@ -336,7 +338,7 @@ class DocumentVellumValue extends AstNode {
 
   private generateAstNode(value: VellumDocument): AstNode {
     const arguments_ = [
-      python.methodArgument({
+      new MethodArgument({
         name: "src",
         value: new StrInstantiation(value.src),
       }),
@@ -344,14 +346,14 @@ class DocumentVellumValue extends AstNode {
 
     if (!isNil(value.metadata)) {
       arguments_.push(
-        python.methodArgument({
+        new MethodArgument({
           name: "metadata",
           value: new Json(value.metadata),
         })
       );
     }
 
-    const astNode = python.instantiateClass({
+    const astNode = new ClassInstantiation({
       classReference: new Reference({
         name: "VellumDocument",
         modulePath: VELLUM_CLIENT_MODULE_PATH,
@@ -401,7 +403,7 @@ class ArrayVellumValue extends AstNode {
 }
 
 class FunctionCallVellumValue extends AstNode {
-  private astNode: python.AstNode;
+  private astNode: AstNode;
 
   public constructor(value: FunctionCall) {
     super();
@@ -410,11 +412,11 @@ class FunctionCallVellumValue extends AstNode {
 
   private generateAstNode(value: FunctionCall): AstNode {
     const arguments_ = [
-      python.methodArgument({
+      new MethodArgument({
         name: "arguments",
         value: new Json(value.arguments),
       }),
-      python.methodArgument({
+      new MethodArgument({
         name: "name",
         value: new StrInstantiation(value.name),
       }),
@@ -422,14 +424,14 @@ class FunctionCallVellumValue extends AstNode {
 
     if (!isNil(value.id)) {
       arguments_.push(
-        python.methodArgument({
+        new MethodArgument({
           name: "id",
           value: new StrInstantiation(value.id),
         })
       );
     }
 
-    const astNode = python.instantiateClass({
+    const astNode = new ClassInstantiation({
       classReference: new Reference({
         name: "FunctionCall",
         modulePath: VELLUM_CLIENT_MODULE_PATH,
@@ -457,34 +459,34 @@ class SearchResultsVellumValue extends AstNode {
   private generateAstNode(value: SearchResult[]): AstNode {
     const searchResultItems = value.map((result) => {
       const arguments_ = [
-        python.methodArgument({
+        new MethodArgument({
           name: "text",
           value: new StrInstantiation(result.text),
         }),
-        python.methodArgument({
+        new MethodArgument({
           name: "score",
           value: python.TypeInstantiation.float(result.score),
         }),
-        python.methodArgument({
+        new MethodArgument({
           name: "keywords",
           value: python.TypeInstantiation.list(
             result.keywords.map((k) => new StrInstantiation(k))
           ),
         }),
-        python.methodArgument({
+        new MethodArgument({
           name: "document",
           value: (() => {
-            const document = python.instantiateClass({
+            const document = new ClassInstantiation({
               classReference: new Reference({
                 name: "Document",
                 modulePath: VELLUM_CLIENT_MODULE_PATH,
               }),
               arguments_: [
-                python.methodArgument({
+                new MethodArgument({
                   name: "id",
                   value: new StrInstantiation(result.document.id ?? ""),
                 }),
-                python.methodArgument({
+                new MethodArgument({
                   name: "label",
                   value: new StrInstantiation(result.document.label ?? ""),
                 }),
@@ -498,14 +500,14 @@ class SearchResultsVellumValue extends AstNode {
 
       if (result.meta) {
         arguments_.push(
-          python.methodArgument({
+          new MethodArgument({
             name: "meta",
             value: new Json(result.meta),
           })
         );
       }
 
-      return python.instantiateClass({
+      return new ClassInstantiation({
         classReference: new Reference({
           name: "SearchResult",
           modulePath: VELLUM_CLIENT_MODULE_PATH,
@@ -538,13 +540,13 @@ class ThinkingVellumValue extends AstNode {
 
   private generateAstNode(value: StringVellumValueType): AstNode {
     const arguments_ = [
-      python.methodArgument({
+      new MethodArgument({
         name: "value",
         value: new StringVellumValue(value.value ?? ""),
       }),
     ];
 
-    const astNode = python.instantiateClass({
+    const astNode = new ClassInstantiation({
       classReference: new Reference({
         name: "StringVellumValue",
         modulePath: VELLUM_CLIENT_MODULE_PATH,

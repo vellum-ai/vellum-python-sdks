@@ -4,6 +4,8 @@ import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { PromptDeploymentNodeContext } from "src/context/node-context/prompt-deployment-node";
 import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
@@ -135,7 +137,7 @@ export class PromptDeploymentNode extends BaseNode<
           modulePath: this.nodeContext.nodeModulePath,
           attribute: [OUTPUTS_CLASS_NAME, "text"],
         }),
-        value: python.instantiateClass({
+        value: new ClassInstantiation({
           classReference: new Reference({
             name: "NodeOutputDisplay",
             modulePath:
@@ -143,11 +145,11 @@ export class PromptDeploymentNode extends BaseNode<
                 .NODE_DISPLAY_TYPES_MODULE_PATH,
           }),
           arguments_: [
-            python.methodArgument({
+            new MethodArgument({
               name: "id",
               value: python.TypeInstantiation.uuid(this.nodeData.data.outputId),
             }),
-            python.methodArgument({
+            new MethodArgument({
               name: "name",
               value: new StrInstantiation("text"),
             }),
@@ -160,7 +162,7 @@ export class PromptDeploymentNode extends BaseNode<
           modulePath: this.nodeContext.nodeModulePath,
           attribute: [OUTPUTS_CLASS_NAME, "results"],
         }),
-        value: python.instantiateClass({
+        value: new ClassInstantiation({
           classReference: new Reference({
             name: "NodeOutputDisplay",
             modulePath:
@@ -168,13 +170,13 @@ export class PromptDeploymentNode extends BaseNode<
                 .NODE_DISPLAY_TYPES_MODULE_PATH,
           }),
           arguments_: [
-            python.methodArgument({
+            new MethodArgument({
               name: "id",
               value: python.TypeInstantiation.uuid(
                 this.nodeData.data.arrayOutputId
               ),
             }),
-            python.methodArgument({
+            new MethodArgument({
               name: "name",
               value: new StrInstantiation("results"),
             }),
@@ -190,7 +192,7 @@ export class PromptDeploymentNode extends BaseNode<
           modulePath: this.nodeContext.nodeModulePath,
           attribute: [OUTPUTS_CLASS_NAME, "json"],
         }),
-        value: python.instantiateClass({
+        value: new ClassInstantiation({
           classReference: new Reference({
             name: "NodeOutputDisplay",
             modulePath:
@@ -198,11 +200,11 @@ export class PromptDeploymentNode extends BaseNode<
                 .NODE_DISPLAY_TYPES_MODULE_PATH,
           }),
           arguments_: [
-            python.methodArgument({
+            new MethodArgument({
               name: "id",
               value: python.TypeInstantiation.uuid(jsonOutput.id),
             }),
-            python.methodArgument({
+            new MethodArgument({
               name: "name",
               value: new StrInstantiation("json"),
             }),

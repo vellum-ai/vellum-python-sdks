@@ -6,6 +6,8 @@ import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { NodeAttributeGenerationError } from "src/generators/errors";
+import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { WorkflowProjectGenerator } from "src/project";
@@ -107,7 +109,7 @@ export abstract class BaseNestedWorkflowNode<
               modulePath: this.nodeContext.nodeModulePath,
               attribute: [OUTPUTS_CLASS_NAME, outputContext.name],
             }),
-            value: python.instantiateClass({
+            value: new ClassInstantiation({
               classReference: new Reference({
                 name: "NodeOutputDisplay",
                 modulePath:
@@ -115,13 +117,13 @@ export abstract class BaseNestedWorkflowNode<
                     .NODE_DISPLAY_TYPES_MODULE_PATH,
               }),
               arguments_: [
-                python.methodArgument({
+                new MethodArgument({
                   name: "id",
                   value: python.TypeInstantiation.uuid(
                     outputContext.getOutputVariableId()
                   ),
                 }),
-                python.methodArgument({
+                new MethodArgument({
                   name: "name",
                   value: new StrInstantiation(outputContext.getRawName()),
                 }),

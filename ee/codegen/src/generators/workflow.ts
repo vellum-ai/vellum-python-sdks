@@ -20,6 +20,7 @@ import {
 } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
+import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -191,7 +192,7 @@ export class Workflow {
     workflowDisplayClass.add(
       python.field({
         name: "workflow_display",
-        initializer: python.instantiateClass({
+        initializer: new ClassInstantiation({
           classReference: new Reference({
             name: "WorkflowMetaDisplay",
             modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
@@ -199,17 +200,17 @@ export class Workflow {
           arguments_: [
             ...(entrypointNode
               ? [
-                  python.methodArgument({
+                  new MethodArgument({
                     name: "entrypoint_node_id",
                     value: python.TypeInstantiation.uuid(entrypointNode.id),
                   }),
-                  python.methodArgument({
+                  new MethodArgument({
                     name: "entrypoint_node_source_handle_id",
                     value: python.TypeInstantiation.uuid(
                       entrypointNode.data.sourceHandleId
                     ),
                   }),
-                  python.methodArgument({
+                  new MethodArgument({
                     name: "entrypoint_node_display",
                     value: new NodeDisplayData({
                       workflowContext: this.workflowContext,
@@ -220,35 +221,35 @@ export class Workflow {
               : []),
             ...(this.displayData
               ? [
-                  python.methodArgument({
+                  new MethodArgument({
                     name: "display_data",
-                    value: python.instantiateClass({
+                    value: new ClassInstantiation({
                       classReference: new Reference({
                         name: "WorkflowDisplayData",
                         modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
                       }),
                       arguments_: [
-                        python.methodArgument({
+                        new MethodArgument({
                           name: "viewport",
-                          value: python.instantiateClass({
+                          value: new ClassInstantiation({
                             classReference: new Reference({
                               name: "WorkflowDisplayDataViewport",
                               modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
                             }),
                             arguments_: [
-                              python.methodArgument({
+                              new MethodArgument({
                                 name: "x",
                                 value: python.TypeInstantiation.float(
                                   this.displayData.viewport.x ?? 0
                                 ),
                               }),
-                              python.methodArgument({
+                              new MethodArgument({
                                 name: "y",
                                 value: python.TypeInstantiation.float(
                                   this.displayData.viewport.y ?? 0
                                 ),
                               }),
-                              python.methodArgument({
+                              new MethodArgument({
                                 name: "zoom",
                                 value: python.TypeInstantiation.float(
                                   this.displayData.viewport.zoom ?? 0
@@ -277,7 +278,7 @@ export class Workflow {
                 const overrideArgs: MethodArgument[] = [];
 
                 overrideArgs.push(
-                  python.methodArgument({
+                  new MethodArgument({
                     name: "id",
                     value: python.TypeInstantiation.uuid(
                       inputVariableContext.getInputVariableId()
@@ -286,7 +287,7 @@ export class Workflow {
                 );
 
                 overrideArgs.push(
-                  python.methodArgument({
+                  new MethodArgument({
                     name: "name",
                     value: new StrInstantiation(
                       // Intentionally use the raw name from the input variable data
@@ -300,7 +301,7 @@ export class Workflow {
                   inputVariableContext.getInputVariableData().extensions?.color;
                 if (!isNil(extensions)) {
                   overrideArgs.push(
-                    python.methodArgument({
+                    new MethodArgument({
                       name: "color",
                       value: new StrInstantiation(extensions),
                     })
@@ -312,7 +313,7 @@ export class Workflow {
                     modulePath: inputVariableContext.definition.module,
                     attribute: [inputVariableContext.name],
                   }),
-                  value: python.instantiateClass({
+                  value: new ClassInstantiation({
                     classReference: new Reference({
                       name: "WorkflowInputsDisplay",
                       modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
@@ -337,7 +338,7 @@ export class Workflow {
                 const overrideArgs: MethodArgument[] = [];
 
                 overrideArgs.push(
-                  python.methodArgument({
+                  new MethodArgument({
                     name: "id",
                     value: python.TypeInstantiation.uuid(
                       stateVariableContext.getStateVariableId()
@@ -346,7 +347,7 @@ export class Workflow {
                 );
 
                 overrideArgs.push(
-                  python.methodArgument({
+                  new MethodArgument({
                     name: "name",
                     value: new StrInstantiation(
                       // Intentionally use the raw name from the input variable data
@@ -360,7 +361,7 @@ export class Workflow {
                   stateVariableContext.getStateVariableData().extensions?.color;
                 if (!isNil(extensions)) {
                   overrideArgs.push(
-                    python.methodArgument({
+                    new MethodArgument({
                       name: "color",
                       value: new StrInstantiation(extensions),
                     })
@@ -372,7 +373,7 @@ export class Workflow {
                     modulePath: stateVariableContext.definition.module,
                     attribute: [stateVariableContext.name],
                   }),
-                  value: python.instantiateClass({
+                  value: new ClassInstantiation({
                     classReference: new Reference({
                       name: "StateValueDisplay",
                       modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
@@ -407,28 +408,28 @@ export class Workflow {
                   name: defaultEntrypointNodeContext.nodeClassName,
                   modulePath: defaultEntrypointNodeContext.nodeModulePath,
                 }),
-                value: python.instantiateClass({
+                value: new ClassInstantiation({
                   classReference: new Reference({
                     name: "EntrypointDisplay",
                     modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
                   }),
                   arguments_: [
-                    python.methodArgument({
+                    new MethodArgument({
                       name: "id",
                       value: python.TypeInstantiation.uuid(
                         // Use trigger ID when no entrypoint node exists (IntegrationTrigger workflows)
                         entrypointNode?.id ?? edge.sourceNodeId
                       ),
                     }),
-                    python.methodArgument({
+                    new MethodArgument({
                       name: "edge_display",
-                      value: python.instantiateClass({
+                      value: new ClassInstantiation({
                         classReference: new Reference({
                           name: "EdgeDisplay",
                           modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
                         }),
                         arguments_: [
-                          python.methodArgument({
+                          new MethodArgument({
                             name: "id",
                             value: python.TypeInstantiation.uuid(edge.id),
                           }),
@@ -510,17 +511,17 @@ export class Workflow {
                   modulePath: targetNode.nodeModulePath,
                 }),
               ]),
-              value: python.instantiateClass({
+              value: new ClassInstantiation({
                 classReference: new Reference({
                   name: "EdgeDisplay",
                   modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
                 }),
                 arguments_: [
-                  python.methodArgument({
+                  new MethodArgument({
                     name: "id",
                     value: python.TypeInstantiation.uuid(edge.id),
                   }),
-                  python.methodArgument({
+                  new MethodArgument({
                     name: "z_index",
                     value: !isNil(zIndex)
                       ? python.TypeInstantiation.int(zIndex)
@@ -563,19 +564,19 @@ export class Workflow {
                   modulePath: this.workflowContext.modulePath,
                   attribute: [OUTPUTS_CLASS_NAME, outputVariable.name],
                 }),
-                value: python.instantiateClass({
+                value: new ClassInstantiation({
                   classReference: new Reference({
                     name: "WorkflowOutputDisplay",
                     modulePath: VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
                   }),
                   arguments_: [
-                    python.methodArgument({
+                    new MethodArgument({
                       name: "id",
                       value: python.TypeInstantiation.uuid(
                         outputVariable.getOutputVariableId()
                       ),
                     }),
-                    python.methodArgument({
+                    new MethodArgument({
                       name: "name",
                       value: new StrInstantiation(
                         // Intentionally use the raw name from the terminal node

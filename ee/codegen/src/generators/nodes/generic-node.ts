@@ -17,6 +17,8 @@ import { GenericNodeContext } from "src/context/node-context/generic-node";
 import { PromptBlock as PromptBlockType } from "src/generators/base-prompt-block";
 import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StarImport } from "src/generators/extensions/star-import";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -178,7 +180,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   deploymentWorkflowFunctions.push(workflowDeployment);
                   const workflowDeploymentName = workflowDeployment.deployment;
                   const args = [
-                    python.methodArgument({
+                    new MethodArgument({
                       name: "deployment",
                       value: new StrInstantiation(workflowDeploymentName),
                     }),
@@ -186,7 +188,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
 
                   if (f.release_tag !== null) {
                     args.push(
-                      python.methodArgument({
+                      new MethodArgument({
                         name: "release_tag",
                         value: new StrInstantiation(f.release_tag),
                       })
@@ -194,7 +196,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   }
 
                   functionReferences.push(
-                    python.instantiateClass({
+                    new ClassInstantiation({
                       classReference: new Reference({
                         name: "DeploymentDefinition",
                         modulePath: [
@@ -223,15 +225,15 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   const description = composioTool.description || "UNKNOWN";
 
                   const args = [
-                    python.methodArgument({
+                    new MethodArgument({
                       name: "toolkit",
                       value: new StrInstantiation(toolkit),
                     }),
-                    python.methodArgument({
+                    new MethodArgument({
                       name: "action",
                       value: new StrInstantiation(action),
                     }),
-                    python.methodArgument({
+                    new MethodArgument({
                       name: "description",
                       value: new StrInstantiation(description),
                     }),
@@ -239,7 +241,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
 
                   if (composioTool.user_id != null) {
                     args.push(
-                      python.methodArgument({
+                      new MethodArgument({
                         name: "user_id",
                         value: new StrInstantiation(composioTool.user_id),
                       })
@@ -247,7 +249,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   }
 
                   functionReferences.push(
-                    python.instantiateClass({
+                    new ClassInstantiation({
                       classReference: new Reference({
                         name: "ComposioToolDefinition",
                         modulePath: VELLUM_WORKFLOW_DEFINITION_PATH,
@@ -260,12 +262,12 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                 case "MCP_SERVER": {
                   const mcpServerFunction = f as MCPServerFunctionArgs;
 
-                  const arguments_: python.MethodArgument[] = [
-                    python.methodArgument({
+                  const arguments_: MethodArgument[] = [
+                    new MethodArgument({
                       name: "name",
                       value: new StrInstantiation(mcpServerFunction.name),
                     }),
-                    python.methodArgument({
+                    new MethodArgument({
                       name: "url",
                       value: new StrInstantiation(mcpServerFunction.url),
                     }),
@@ -273,7 +275,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
 
                   if (mcpServerFunction.authorization_type) {
                     arguments_.push(
-                      python.methodArgument({
+                      new MethodArgument({
                         name: "authorization_type",
                         value: new Reference({
                           name: "AuthorizationType",
@@ -293,7 +295,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                     mcpServerFunction.bearer_token_value
                   ) {
                     arguments_.push(
-                      python.methodArgument({
+                      new MethodArgument({
                         name: "bearer_token_value",
                         value: new WorkflowValueDescriptor({
                           workflowValueDescriptor: {
@@ -313,7 +315,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                     mcpServerFunction.api_key_header_key
                   ) {
                     arguments_.push(
-                      python.methodArgument({
+                      new MethodArgument({
                         name: "api_key_header_key",
                         value: new StrInstantiation(
                           mcpServerFunction.api_key_header_key
@@ -327,7 +329,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                     mcpServerFunction.api_key_header_value
                   ) {
                     arguments_.push(
-                      python.methodArgument({
+                      new MethodArgument({
                         name: "api_key_header_value",
                         value: new WorkflowValueDescriptor({
                           workflowValueDescriptor: {
@@ -343,7 +345,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   }
 
                   functionReferences.push(
-                    python.instantiateClass({
+                    new ClassInstantiation({
                       classReference: new Reference({
                         name: "MCPServer",
                         modulePath: VELLUM_WORKFLOW_DEFINITION_PATH,
@@ -358,25 +360,25 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                     f as VellumIntegrationToolFunctionArgs;
 
                   const args = [
-                    python.methodArgument({
+                    new MethodArgument({
                       name: "provider",
                       value: new StrInstantiation(
                         integrationTool.provider || "COMPOSIO"
                       ),
                     }),
-                    python.methodArgument({
+                    new MethodArgument({
                       name: "integration_name",
                       value: new StrInstantiation(
                         integrationTool.integration_name || "UNKNOWN"
                       ),
                     }),
-                    python.methodArgument({
+                    new MethodArgument({
                       name: "name",
                       value: new StrInstantiation(
                         integrationTool.name || "UNKNOWN"
                       ),
                     }),
-                    python.methodArgument({
+                    new MethodArgument({
                       name: "description",
                       value: new StrInstantiation(
                         integrationTool.description || "UNKNOWN"
@@ -385,7 +387,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                   ];
 
                   functionReferences.push(
-                    python.instantiateClass({
+                    new ClassInstantiation({
                       classReference: new Reference({
                         name: "VellumIntegrationToolDefinition",
                         modulePath: VELLUM_WORKFLOW_DEFINITION_PATH,
@@ -618,16 +620,17 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
             attribute: ["wrap"],
             modulePath: adornment.base.module,
           }),
-          arguments_: adornment.attributes.map((attr) =>
-            python.methodArgument({
-              name: attr.name,
-              value: new WorkflowValueDescriptor({
-                workflowValueDescriptor: attr.value,
-                nodeContext: this.nodeContext,
-                workflowContext: this.workflowContext,
-                iterableConfig: { endWithComma: false },
-              }),
-            })
+          arguments_: adornment.attributes.map(
+            (attr) =>
+              new MethodArgument({
+                name: attr.name,
+                value: new WorkflowValueDescriptor({
+                  workflowValueDescriptor: attr.value,
+                  nodeContext: this.nodeContext,
+                  workflowContext: this.workflowContext,
+                  iterableConfig: { endWithComma: false },
+                }),
+              })
           ),
         }),
       })
@@ -698,7 +701,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
         modulePath: this.nodeContext.nodeModulePath,
         attribute: [OUTPUTS_CLASS_NAME, output.name],
       }),
-      value: python.instantiateClass({
+      value: new ClassInstantiation({
         classReference: new Reference({
           name: "NodeOutputDisplay",
           modulePath:
@@ -706,11 +709,11 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
               .NODE_DISPLAY_TYPES_MODULE_PATH,
         }),
         arguments_: [
-          python.methodArgument({
+          new MethodArgument({
             name: "id",
             value: python.TypeInstantiation.uuid(output.id),
           }),
-          python.methodArgument({
+          new MethodArgument({
             name: "name",
             value: new StrInstantiation(output.name),
           }),
@@ -874,7 +877,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
   private getInputsDecorator(
     inputs: Record<string, WorkflowValueDescriptorType>
   ): python.Decorator {
-    const inputMappings: python.MethodArgument[] = [];
+    const inputMappings: MethodArgument[] = [];
     Object.entries(inputs).forEach(([inputName, inputDef]) => {
       // Use WorkflowValueDescriptor to handle all types of workflow value descriptors
       const workflowValueDescriptor = new WorkflowValueDescriptor({
@@ -884,7 +887,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
       });
 
       inputMappings.push(
-        python.methodArgument({
+        new MethodArgument({
           name: inputName,
           value: workflowValueDescriptor,
         })

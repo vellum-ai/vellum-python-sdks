@@ -4,6 +4,8 @@ import { isNil } from "lodash";
 import { BaseNodeInputWorkflowReference } from "./BaseNodeInputWorkflowReference";
 
 import { AstNode } from "src/generators/extensions/ast-node";
+import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
@@ -33,13 +35,13 @@ export class DictionaryWorkflowReference extends BaseNodeInputWorkflowReference<
             attributeConfig: this.attributeConfig,
           });
 
-          return python.methodArgument({
+          return new MethodArgument({
             name: entry.key,
             value: valueNode,
           });
         });
 
-      return python.instantiateClass({
+      return new ClassInstantiation({
         classReference: new Reference({
           name: definition.name,
           modulePath: definition.module,

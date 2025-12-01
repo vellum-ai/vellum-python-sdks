@@ -5,6 +5,7 @@ import { BaseNodeContext } from "src/context/node-context/base";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
+import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { Writer } from "src/generators/extensions/writer";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
@@ -116,7 +117,7 @@ export class NodePorts extends AstNode {
     const args = [];
     if (descriptor) {
       args.push(
-        python.methodArgument({
+        new MethodArgument({
           value: descriptor,
         })
       );
@@ -131,7 +132,7 @@ export class NodePorts extends AstNode {
         )
       );
       args.push(
-        python.methodArgument({
+        new MethodArgument({
           value: python.TypeInstantiation.none(),
         })
       );

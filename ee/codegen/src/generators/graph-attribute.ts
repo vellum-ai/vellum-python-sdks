@@ -6,6 +6,7 @@ import {
   VELLUM_WORKFLOW_GRAPH_MODULE_PATH,
 } from "src/constants";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { Writer } from "src/generators/extensions/writer";
 import {
@@ -1318,7 +1319,7 @@ export class GraphAttribute extends AstNode {
             methodReference: new Reference({
               name: "from_set",
             }),
-            arguments_: [python.methodArgument({ value: setAst })],
+            arguments_: [new MethodArgument({ value: setAst })],
           }),
         });
       }

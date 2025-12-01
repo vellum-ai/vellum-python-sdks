@@ -2,6 +2,8 @@ import { python } from "@fern-api/python-ast";
 
 import { BaseNodeInputValuePointerRule } from "./base";
 
+import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { EnvironmentVariablePointer } from "src/types/vellum";
@@ -9,7 +11,7 @@ import { EnvironmentVariablePointer } from "src/types/vellum";
 export class EnvironmentVariablePointerRule extends BaseNodeInputValuePointerRule<EnvironmentVariablePointer> {
   getAstNode(): python.AstNode {
     const envVarName = this.nodeInputValuePointerRule.data.environmentVariable;
-    return python.instantiateClass({
+    return new ClassInstantiation({
       classReference: new Reference({
         name: "EnvironmentVariableReference",
         modulePath: [
@@ -18,7 +20,7 @@ export class EnvironmentVariablePointerRule extends BaseNodeInputValuePointerRul
         ],
       }),
       arguments_: [
-        python.methodArgument({
+        new MethodArgument({
           name: "name",
           value: new StrInstantiation(envVarName),
         }),

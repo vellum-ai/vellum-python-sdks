@@ -4,6 +4,8 @@ import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { FinalOutputNodeContext } from "src/context/node-context/final-output-node";
 import { Class, PythonType } from "src/generators/extensions";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
@@ -121,7 +123,7 @@ export class FinalOutputNode extends BaseNode<
               modulePath: this.nodeContext.nodeModulePath,
               attribute: [OUTPUTS_CLASS_NAME, "value"],
             }),
-            value: python.instantiateClass({
+            value: new ClassInstantiation({
               classReference: new Reference({
                 name: "NodeOutputDisplay",
                 modulePath:
@@ -129,13 +131,13 @@ export class FinalOutputNode extends BaseNode<
                     .NODE_DISPLAY_TYPES_MODULE_PATH,
               }),
               arguments_: [
-                python.methodArgument({
+                new MethodArgument({
                   name: "id",
                   value: python.TypeInstantiation.uuid(
                     this.nodeData.data.outputId
                   ),
                 }),
-                python.methodArgument({
+                new MethodArgument({
                   name: "name",
                   value: new StrInstantiation("value"),
                 }),

@@ -6,6 +6,8 @@ import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { GuardrailNodeContext } from "src/context/node-context/guardrail-node";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { GuardrailNode as GuardrailNodeType } from "src/types/vellum";
@@ -110,7 +112,7 @@ export class GuardrailNode extends BaseNode<
                 modulePath: this.nodeContext.nodeModulePath,
                 attribute: [OUTPUTS_CLASS_NAME, name],
               }),
-              value: python.instantiateClass({
+              value: new ClassInstantiation({
                 classReference: new Reference({
                   name: "NodeOutputDisplay",
                   modulePath:
@@ -118,11 +120,11 @@ export class GuardrailNode extends BaseNode<
                       .NODE_DISPLAY_TYPES_MODULE_PATH,
                 }),
                 arguments_: [
-                  python.methodArgument({
+                  new MethodArgument({
                     name: "id",
                     value: python.TypeInstantiation.uuid(output.id),
                   }),
-                  python.methodArgument({
+                  new MethodArgument({
                     name: "name",
                     value: new StrInstantiation(output.key),
                   }),
@@ -132,7 +134,7 @@ export class GuardrailNode extends BaseNode<
           } else {
             // For non standard outputs, use a LazyReference
             return {
-              key: python.instantiateClass({
+              key: new ClassInstantiation({
                 classReference: new Reference({
                   name: "LazyReference",
                   modulePath: [
@@ -142,14 +144,14 @@ export class GuardrailNode extends BaseNode<
                   ],
                 }),
                 arguments_: [
-                  python.methodArgument({
+                  new MethodArgument({
                     value: new StrInstantiation(
                       `${this.nodeContext.nodeClassName}.${OUTPUTS_CLASS_NAME}.${output.key}`
                     ),
                   }),
                 ],
               }),
-              value: python.instantiateClass({
+              value: new ClassInstantiation({
                 classReference: new Reference({
                   name: "NodeOutputDisplay",
                   modulePath:
@@ -157,11 +159,11 @@ export class GuardrailNode extends BaseNode<
                       .NODE_DISPLAY_TYPES_MODULE_PATH,
                 }),
                 arguments_: [
-                  python.methodArgument({
+                  new MethodArgument({
                     name: "id",
                     value: python.TypeInstantiation.uuid(output.id),
                   }),
-                  python.methodArgument({
+                  new MethodArgument({
                     name: "name",
                     value: new StrInstantiation(output.key),
                   }),

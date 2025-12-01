@@ -8,6 +8,8 @@ import { TernaryExpression } from "./expressions/ternary";
 import { VELLUM_WORKFLOW_CONSTANTS_PATH } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { Writer } from "src/generators/extensions/writer";
 import { WorkflowValueDescriptorReference } from "src/generators/workflow-value-descriptor-reference/workflow-value-descriptor-reference";
@@ -116,10 +118,10 @@ export class Expression extends AstNode {
       name: "ConstantValueReference",
       modulePath: VELLUM_WORKFLOW_CONSTANTS_PATH,
     });
-    return python.instantiateClass({
+    return new ClassInstantiation({
       classReference: constantValueReference,
       arguments_: [
-        python.methodArgument({
+        new MethodArgument({
           value: ref,
         }),
       ],
