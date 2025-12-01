@@ -390,7 +390,10 @@ export class GraphAttribute extends AstNode {
         // Check if mutableAst is a bare node_reference (entrypoint only) or a more complex structure
         // If it's a bare node_reference and the target node has no outgoing port edges,
         // we should create a set to preserve the entrypoint edge
-        if (mutableAst.type === "node_reference" && mutableAst.reference === targetNode.reference) {
+        if (
+          mutableAst.type === "node_reference" &&
+          mutableAst.reference === targetNode.reference
+        ) {
           // Check if the target node has any outgoing port edges
           const edgesByPortId = this.workflowContext.getEdgesByPortId();
           let hasOutgoingEdges = false;
