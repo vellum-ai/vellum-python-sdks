@@ -780,11 +780,14 @@ export abstract class BaseNode<
     }
 
     // Only add node_id if it differs from the hash-generated UUID
-    const expectedNodeId = getNodeIdFromModuleAndName(
-      nodeContext.nodeModulePath,
-      nodeContext.nodeClassName
-    );
-    if (this.nodeData.id !== expectedNodeId) {
+    // Use the node's definition module path (matching Python SDK's node_class.__module__)
+    const definitionModule = this.nodeData.definition?.module;
+    const definitionName = this.nodeData.definition?.name;
+    const expectedNodeId =
+      definitionModule && definitionName
+        ? getNodeIdFromModuleAndName(definitionModule, definitionName)
+        : undefined;
+    if (expectedNodeId === undefined || this.nodeData.id !== expectedNodeId) {
       nodeClass.add(
         python.field({
           name: "node_id",
