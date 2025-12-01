@@ -888,7 +888,8 @@ export interface WorkflowVersionExecConfig {
   triggers?: WorkflowTrigger[];
 }
 
-type WorkflowSandboxInput =
+// Base input types from SDK use `name` field
+type NameBasedWorkflowSandboxInput =
   | StringInput
   | JsonInput
   | ChatHistoryInput
@@ -897,6 +898,17 @@ type WorkflowSandboxInput =
   | VideoInputRequest
   | ImageInputRequest
   | DocumentInputRequest;
+
+// Production format uses `input_variable_id` to reference trigger attributes by ID
+interface IdBasedWorkflowSandboxInput {
+  input_variable_id: string;
+  type: VellumVariableType;
+  value?: unknown;
+}
+
+type WorkflowSandboxInput =
+  | NameBasedWorkflowSandboxInput
+  | IdBasedWorkflowSandboxInput;
 export type WorkflowSandboxInputs = WorkflowSandboxInput[];
 export interface WorkflowSandboxDatasetRowMock {
   node_id: string;
