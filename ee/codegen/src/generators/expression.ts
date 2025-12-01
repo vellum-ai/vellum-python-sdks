@@ -149,6 +149,10 @@ export class Expression extends AstNode {
   }
 
   private isTypeInstantiation(lhs: AstNode): boolean {
+    // Check for both the fern TypeInstantiation and our custom NoneInstantiation
+    if (lhs instanceof NoneInstantiation) {
+      return true;
+    }
     return lhs instanceof TypeInstantiation;
   }
 
