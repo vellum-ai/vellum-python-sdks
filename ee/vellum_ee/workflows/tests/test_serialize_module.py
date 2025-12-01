@@ -340,6 +340,46 @@ def test_serialize_module_with_node_output_mock_when_conditions():
     }
 
 
+def test_serialize_module_with_dataset_trigger_not_in_graph(metadata_trigger_factory):
+    """
+    Tests that serialize_module correctly includes triggers in exec_config when
+    the trigger is only referenced in a DatasetRow but NOT in the workflow graph.
+
+    This is a regression test for APO-2252 where saving a change in sandbox.py
+    would cause workflow_trigger data to be wiped out because the trigger wasn't
+    included in exec_config["triggers"].
+    """
+    module_path = "tests.workflows.test_dataset_trigger_not_in_graph"
+
+    metadata_trigger_id = uuid.uuid4()
+    metadata_trigger_factory(metadata_trigger_id)
+
+    result = BaseWorkflowDisplay.serialize_module(module_path)
+
+    # THEN the dataset should be serialized correctly
+    assert hasattr(result, "dataset")
+    assert result.dataset is not None
+    assert isinstance(result.dataset, list)
+    assert len(result.dataset) == 2
+
+    # AND the first scenario should not have a workflow_trigger_id
+    assert result.dataset[0]["label"] == "Scenario 1"
+    assert "workflow_trigger_id" not in result.dataset[0]
+
+    # AND the second scenario should have the workflow_trigger_id
+    assert result.dataset[1]["label"] == "Scenario 2"
+    assert result.dataset[1]["workflow_trigger_id"] == str(metadata_trigger_id)
+
+    # AND the trigger should be included in exec_config["triggers"]
+    # This is the key assertion - triggers referenced only in DatasetRow should still be serialized
+    assert "triggers" in result.exec_config
+    triggers = result.exec_config["triggers"]
+    assert isinstance(triggers, list)
+    assert len(triggers) == 1
+    assert triggers[0]["id"] == str(metadata_trigger_id)
+    assert triggers[0]["type"] == "SCHEDULED"
+
+
 def test_serialize_module__with_invalid_nested_set_graph(temp_module_path):
     """
     Tests that serialize_module raises a clear user-facing exception for workflows with nested sets in graph attribute.

@@ -29,6 +29,7 @@ from vellum.workflows.nodes.displayable.final_output_node.node import FinalOutpu
 from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port, get_wrapped_node
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, StateValueReference, WorkflowInputReference
+from vellum.workflows.triggers.base import BaseTrigger
 from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.triggers.manual import ManualTrigger
 from vellum.workflows.triggers.schedule import ScheduleTrigger
@@ -593,122 +594,139 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
 
         unique_trigger_classes = list(dict.fromkeys(edge.trigger_class for edge in trigger_edges))
 
-        trigger_type_mapping = get_trigger_type_mapping()
         serialized_triggers: List[JsonObject] = []
 
         for trigger_class in unique_trigger_classes:
-            # Get the trigger type from the mapping, or check if it's a subclass
-            trigger_type = trigger_type_mapping.get(trigger_class)
-            if trigger_type is None:
-                # Check if it's a subclass of a known trigger type
-                if issubclass(trigger_class, ManualTrigger):
-                    trigger_type = WorkflowTriggerType.MANUAL
-                elif issubclass(trigger_class, IntegrationTrigger):
-                    trigger_type = WorkflowTriggerType.INTEGRATION
-                elif issubclass(trigger_class, ScheduleTrigger):
-                    trigger_type = WorkflowTriggerType.SCHEDULED
-                else:
-                    raise ValueError(
-                        f"Unknown trigger type: {trigger_class.__name__}. "
-                        f"Please add it to the trigger type mapping in get_trigger_type_mapping()."
-                    )
+            trigger_data = self._serialize_single_trigger(trigger_class)
+            if trigger_data:
+                serialized_triggers.append(trigger_data)
 
-            trigger_id = trigger_class.__id__
+        return cast(JsonArray, serialized_triggers) if serialized_triggers else None
 
-            # Serialize trigger attributes like node outputs
-            trigger_data: JsonObject
-            if trigger_type == WorkflowTriggerType.SCHEDULED:
-                # For scheduled triggers, attributes should be empty
-                # and cron/timezone should be top level
+    def _serialize_single_trigger(self, trigger_class: Type[BaseTrigger]) -> Optional[JsonObject]:
+        """
+        Serialize a single trigger class to JSON.
 
-                config_class = trigger_class.Config
-                cron_value = getattr(config_class, "cron", None)
-                timezone_value = getattr(config_class, "timezone", None)
+        Args:
+            trigger_class: The trigger class to serialize
 
-                trigger_data = {
-                    "id": str(trigger_id),
-                    "type": trigger_type.value,
-                    "cron": cron_value,
-                    "timezone": timezone_value,
-                    "attributes": [],
-                }
+        Returns:
+            JsonObject with trigger data, or None if serialization fails
+        """
+        if not issubclass(trigger_class, BaseTrigger):
+            return None
+
+        trigger_type_mapping = get_trigger_type_mapping()
+        # Get the trigger type from the mapping, or check if it's a subclass
+        trigger_type = trigger_type_mapping.get(trigger_class)
+        if trigger_type is None:
+            # Check if it's a subclass of a known trigger type
+            if issubclass(trigger_class, ManualTrigger):
+                trigger_type = WorkflowTriggerType.MANUAL
+            elif issubclass(trigger_class, IntegrationTrigger):
+                trigger_type = WorkflowTriggerType.INTEGRATION
+            elif issubclass(trigger_class, ScheduleTrigger):
+                trigger_type = WorkflowTriggerType.SCHEDULED
             else:
-                # For other triggers, serialize attributes from attribute_references as VellumVariables
-                attribute_references = trigger_class.attribute_references().values()
-                trigger_attributes: JsonArray = cast(
-                    JsonArray,
-                    [
-                        cast(
-                            JsonObject,
-                            {
-                                "id": str(reference.id),
-                                "key": reference.name,
-                                "type": primitive_type_to_vellum_variable_type(reference),
-                                "required": True,
-                                "default": None,
-                                "extensions": None,
-                            },
-                        )
-                        for reference in sorted(attribute_references, key=lambda ref: ref.name)
-                    ],
+                raise ValueError(
+                    f"Unknown trigger type: {trigger_class.__name__}. "
+                    f"Please add it to the trigger type mapping in get_trigger_type_mapping()."
                 )
 
-                trigger_data = {
-                    "id": str(trigger_id),
-                    "type": trigger_type.value,
-                    "attributes": trigger_attributes,
-                }
+        trigger_id = trigger_class.__id__
 
-                if trigger_type == WorkflowTriggerType.INTEGRATION and issubclass(trigger_class, IntegrationTrigger):
-                    exec_config = self._serialize_integration_trigger_exec_config(trigger_class)
-                    trigger_data["exec_config"] = exec_config
+        # Serialize trigger attributes like node outputs
+        trigger_data: JsonObject
+        if trigger_type == WorkflowTriggerType.SCHEDULED:
+            # For scheduled triggers, attributes should be empty
+            # and cron/timezone should be top level
 
-            # Serialize display_data from trigger's Display class
-            display_class = trigger_class.Display
-            display_data: JsonObject = {}
+            config_class = trigger_class.Config
+            cron_value = getattr(config_class, "cron", None)
+            timezone_value = getattr(config_class, "timezone", None)
 
-            # Add label if present
-            if hasattr(display_class, "label") and display_class.label is not None:
-                display_data["label"] = display_class.label
+            trigger_data = {
+                "id": str(trigger_id),
+                "type": trigger_type.value,
+                "cron": cron_value,
+                "timezone": timezone_value,
+                "attributes": [],
+            }
+        else:
+            # For other triggers, serialize attributes from attribute_references as VellumVariables
+            attribute_references = trigger_class.attribute_references().values()
+            trigger_attributes: JsonArray = cast(
+                JsonArray,
+                [
+                    cast(
+                        JsonObject,
+                        {
+                            "id": str(reference.id),
+                            "key": reference.name,
+                            "type": primitive_type_to_vellum_variable_type(reference),
+                            "required": True,
+                            "default": None,
+                            "extensions": None,
+                        },
+                    )
+                    for reference in sorted(attribute_references, key=lambda ref: ref.name)
+                ],
+            )
 
-            # Add x and y coordinates if present
-            if (
-                hasattr(display_class, "x")
-                and display_class.x is not None
-                and hasattr(display_class, "y")
-                and display_class.y is not None
-            ):
-                display_data["position"] = {
-                    "x": display_class.x,
-                    "y": display_class.y,
-                }
+            trigger_data = {
+                "id": str(trigger_id),
+                "type": trigger_type.value,
+                "attributes": trigger_attributes,
+            }
 
-            # Add z index if present
-            if hasattr(display_class, "z_index") and display_class.z_index is not None:
-                display_data["z_index"] = display_class.z_index
+            if trigger_type == WorkflowTriggerType.INTEGRATION and issubclass(trigger_class, IntegrationTrigger):
+                exec_config = self._serialize_integration_trigger_exec_config(trigger_class)
+                trigger_data["exec_config"] = exec_config
 
-            # Add icon if present
-            if hasattr(display_class, "icon") and display_class.icon is not None:
-                display_data["icon"] = display_class.icon
+        # Serialize display_data from trigger's Display class
+        display_class = trigger_class.Display
+        display_data: JsonObject = {}
 
-            # Add color if present
-            if hasattr(display_class, "color") and display_class.color is not None:
-                display_data["color"] = display_class.color
+        # Add label if present
+        if hasattr(display_class, "label") and display_class.label is not None:
+            display_data["label"] = display_class.label
 
-            # Add comment if present
-            if hasattr(display_class, "comment") and display_class.comment is not None:
-                display_data["comment"] = {
-                    "value": display_class.comment.value,
-                    "expanded": display_class.comment.expanded,
-                }
+        # Add x and y coordinates if present
+        if (
+            hasattr(display_class, "x")
+            and display_class.x is not None
+            and hasattr(display_class, "y")
+            and display_class.y is not None
+        ):
+            display_data["position"] = {
+                "x": display_class.x,
+                "y": display_class.y,
+            }
 
-            # Don't include display_data for manual triggers
-            if display_data and trigger_type != WorkflowTriggerType.MANUAL:
-                trigger_data["display_data"] = display_data
+        # Add z index if present
+        if hasattr(display_class, "z_index") and display_class.z_index is not None:
+            display_data["z_index"] = display_class.z_index
 
-            serialized_triggers.append(trigger_data)
+        # Add icon if present
+        if hasattr(display_class, "icon") and display_class.icon is not None:
+            display_data["icon"] = display_class.icon
 
-        return cast(JsonArray, serialized_triggers)
+        # Add color if present
+        if hasattr(display_class, "color") and display_class.color is not None:
+            display_data["color"] = display_class.color
+
+        # Add comment if present
+        if hasattr(display_class, "comment") and display_class.comment is not None:
+            display_data["comment"] = {
+                "value": display_class.comment.value,
+                "expanded": display_class.comment.expanded,
+            }
+
+        # Don't include display_data for manual triggers
+        if display_data and trigger_type != WorkflowTriggerType.MANUAL:
+            trigger_data["display_data"] = display_data
+
+        return trigger_data
 
     def _serialize_edge_display_data(self, edge_display: EdgeDisplay) -> Optional[JsonObject]:
         """Serialize edge display data, returning None if no display data is present."""
@@ -1267,6 +1285,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             exec_config["module_data"] = {"additional_files": cast(JsonObject, additional_files)}
 
         dataset = None
+        dataset_triggers: List[Type["BaseTrigger"]] = []
         try:
             sandbox_module_path = f"{module}.sandbox"
             sandbox_module = importlib.import_module(sandbox_module_path)
@@ -1281,6 +1300,13 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                             if isinstance(inputs_obj, BaseInputs)
                             else inputs_obj
                         )
+
+                        # Collect triggers from DatasetRows for later serialization
+                        if isinstance(normalized_row, DatasetRow) and normalized_row.workflow_trigger is not None:
+                            trigger_class = type(normalized_row.workflow_trigger)
+                            if trigger_class not in dataset_triggers:
+                                dataset_triggers.append(trigger_class)
+
                         row_data = normalized_row.model_dump(
                             mode="json",
                             by_alias=True,
@@ -1302,6 +1328,23 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                         dataset.append(row_data)
         except (ImportError, AttributeError):
             pass
+
+        # Add triggers from DatasetRows to exec_config if they're not already there
+        if dataset_triggers:
+            existing_trigger_ids = set()
+            if "triggers" in exec_config and isinstance(exec_config["triggers"], list):
+                for trigger in exec_config["triggers"]:
+                    if isinstance(trigger, dict) and "id" in trigger:
+                        existing_trigger_ids.add(trigger["id"])
+            else:
+                exec_config["triggers"] = []
+
+            for trigger_class in dataset_triggers:
+                trigger_id = str(trigger_class.__id__)
+                if trigger_id not in existing_trigger_ids:
+                    serialized_trigger = workflow_display._serialize_single_trigger(trigger_class)
+                    if serialized_trigger:
+                        cast(List[JsonObject], exec_config["triggers"]).append(serialized_trigger)
 
         return WorkflowSerializationResult(
             exec_config=exec_config,
