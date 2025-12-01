@@ -994,6 +994,7 @@ ${errors.slice(0, 3).map((err) => {
 
     const metadata = {
       trigger_path_to_id_mapping: this.getTriggerPathToIdMapping(),
+      trigger_attribute_id_mapping: this.getTriggerAttributeIdMapping(),
       node_id_to_file_mapping: this.getNodeIdToFileMapping(),
       entrypoint: this.getEntrypointId(),
       edges_to_id_mapping: this.getEdgesToIdMapping(),
@@ -1066,7 +1067,60 @@ ${errors.slice(0, 3).map((err) => {
     );
   }
 
-  public getEntrypointId(): string | undefined {
+  /**
+   * Build mapping for trigger attribute IDs.
+   *
+   * Key:   "<trigger_path>|<attribute_key>"
+   *        where trigger_path is the same format as trigger_path_to_id_mapping
+   * Value: "<attribute_id>"
+   *
+   * This ensures trigger attribute IDs remain stable across serialization round-trips.
+   */
+  public getTriggerAttributeIdMapping(): Record<string, string> {
+    const workflowRootModulePath = this.workflowContext.modulePath.slice(0, -1);
+    const result: Record<string, string> = {};
+
+    Array.from(
+      this.workflowContext.globalTriggerContextsByTriggerId.entries()
+    ).forEach(([, triggerContext]) => {
+      const modulePathParts = triggerContext.triggerModulePath;
+
+      let relativeModuleParts: string[];
+      const prefixMatches = workflowRootModulePath.every(
+        (part, index) => modulePathParts[index] === part
+      );
+
+      if (
+        prefixMatches &&
+        modulePathParts.length >= workflowRootModulePath.length
+      ) {
+        relativeModuleParts = modulePathParts.slice(
+          workflowRootModulePath.length
+        );
+      } else {
+        relativeModuleParts = [...modulePathParts];
+      }
+
+      const modulePath = relativeModuleParts.join(".");
+      const triggerPath =
+        relativeModuleParts.length > 0
+          ? `.${modulePath}.${triggerContext.triggerClassName}`
+          : `${modulePath}.${triggerContext.triggerClassName}`;
+
+      // Add each attribute from the trigger
+      const triggerData = triggerContext.triggerData;
+      if (triggerData.attributes) {
+        triggerData.attributes.forEach((attr) => {
+          const key = `${triggerPath}|${attr.key}`;
+          result[key] = attr.id;
+        });
+      }
+    });
+
+    return result;
+  }
+
+  public getEntrypointId():string | undefined {
     const entrypointNode = this.workflowContext.tryGetEntrypointNode();
     if (isNil(entrypointNode)) {
       this.workflowContext.addError(
