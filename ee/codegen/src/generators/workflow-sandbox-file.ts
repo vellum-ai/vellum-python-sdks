@@ -331,32 +331,4 @@ if __name__ == "__main__":
       arguments_,
     });
   }
-
-  private getTriggerReference(
-    workflowTriggerId: string
-  ): Reference | undefined {
-    const triggerContext =
-      this.workflowContext.findTriggerContext(workflowTriggerId);
-
-    if (triggerContext) {
-      return new Reference({
-        name: triggerContext.triggerClassName,
-        modulePath: triggerContext.triggerModulePath,
-      });
-    }
-
-    const triggers = this.workflowContext.triggers ?? [];
-    const trigger = triggers.find((t) => t.id === workflowTriggerId);
-
-    if (!trigger) {
-      return undefined;
-    }
-
-    const triggerClassInfo = getTriggerClassInfo(trigger, this.workflowContext);
-
-    return new Reference({
-      name: triggerClassInfo.className,
-      modulePath: triggerClassInfo.modulePath,
-    });
-  }
 }
