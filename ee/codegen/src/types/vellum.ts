@@ -900,11 +900,10 @@ type NameBasedWorkflowSandboxInput =
   | DocumentInputRequest;
 
 // Production format uses `input_variable_id` to reference trigger attributes by ID
-interface IdBasedWorkflowSandboxInput {
+// This extends VellumValue with an additional input_variable_id field
+type IdBasedWorkflowSandboxInput = VellumValue & {
   input_variable_id: string;
-  type: VellumVariableType;
-  value?: unknown;
-}
+};
 
 type WorkflowSandboxInput =
   | NameBasedWorkflowSandboxInput

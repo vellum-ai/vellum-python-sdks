@@ -162,13 +162,19 @@ if __name__ == "__main__":
       : [];
 
     // Add workflow inputs (excluding trigger attribute inputs)
-    if (workflowInputs.length > 0) {
+    // Only name-based inputs can be workflow inputs
+    const nameBasedWorkflowInputs = workflowInputs.filter(
+      (input): input is WorkflowSandboxInputs[number] & { name: string } =>
+        "name" in input && typeof input.name === "string"
+    );
+
+    if (nameBasedWorkflowInputs.length > 0) {
       const inputsInstance = new ClassInstantiation({
         classReference: new Reference({
           name: "Inputs",
           modulePath: getGeneratedInputsModulePath(this.workflowContext),
         }),
-        arguments_: workflowInputs
+        arguments_: nameBasedWorkflowInputs
           .map((input) => {
             if (isNil(input.value)) {
               return null;
