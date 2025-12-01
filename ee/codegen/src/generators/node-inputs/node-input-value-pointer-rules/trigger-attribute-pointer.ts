@@ -1,13 +1,14 @@
 import { BaseNodeInputValuePointerRule } from "./base";
 
 import { NodeInputNotFoundError } from "src/generators/errors";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { TriggerAttributePointer } from "src/types/vellum";
 import { getTriggerClassInfo } from "src/utils/triggers";
 
 export class TriggerAttributePointerRule extends BaseNodeInputValuePointerRule<TriggerAttributePointer> {
-  getAstNode(): python.AstNode {
+  getAstNode(): AstNode {
     const triggerAttributePointerRuleData = this.nodeInputValuePointerRule.data;
 
     // Find the trigger in the workflow context
