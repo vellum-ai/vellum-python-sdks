@@ -1,12 +1,11 @@
-import { python } from "@fern-api/python-ast";
-
 import { BaseNodeInputValuePointerRule } from "./base";
 
 import { BaseNodeContext } from "src/context/node-context/base";
 import { NodeInputNotFoundError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
-import { WorkflowStatePointer, WorkflowDataNode } from "src/types/vellum";
+import { WorkflowDataNode, WorkflowStatePointer } from "src/types/vellum";
 
 export declare namespace WorkflowStatePointerRule {
   interface Args {
@@ -35,7 +34,7 @@ export class WorkflowStatePointerRule extends BaseNodeInputValuePointerRule<Work
           "WARNING"
         )
       );
-      return python.TypeInstantiation.none();
+      return new NoneInstantiation();
     }
 
     return new Reference({

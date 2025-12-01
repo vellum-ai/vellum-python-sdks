@@ -21,6 +21,7 @@ import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
+import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
@@ -649,7 +650,7 @@ export class VellumValue extends AstNode {
 
   public write(writer: Writer): void {
     if (this.astNode === null) {
-      python.TypeInstantiation.none().write(writer);
+      new NoneInstantiation().write(writer);
       return;
     }
     this.astNode.write(writer);

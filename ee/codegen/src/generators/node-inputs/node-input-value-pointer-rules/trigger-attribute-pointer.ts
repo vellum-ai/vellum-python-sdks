@@ -1,8 +1,7 @@
-import { python } from "@fern-api/python-ast";
-
 import { BaseNodeInputValuePointerRule } from "./base";
 
 import { NodeInputNotFoundError } from "src/generators/errors";
+import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { TriggerAttributePointer } from "src/types/vellum";
 import { getTriggerClassInfo } from "src/utils/triggers";
@@ -23,7 +22,7 @@ export class TriggerAttributePointerRule extends BaseNodeInputValuePointerRule<T
           "WARNING"
         )
       );
-      return python.TypeInstantiation.none();
+      return new NoneInstantiation();
     }
 
     // Find the attribute name from the trigger's attributes
@@ -38,7 +37,7 @@ export class TriggerAttributePointerRule extends BaseNodeInputValuePointerRule<T
           "WARNING"
         )
       );
-      return python.TypeInstantiation.none();
+      return new NoneInstantiation();
     }
 
     // Get the trigger class information based on trigger
@@ -50,7 +49,7 @@ export class TriggerAttributePointerRule extends BaseNodeInputValuePointerRule<T
           "WARNING"
         )
       );
-      return python.TypeInstantiation.none();
+      return new NoneInstantiation();
     }
 
     // Generate: TriggerClassName.attributeName

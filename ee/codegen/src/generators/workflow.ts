@@ -22,6 +22,7 @@ import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
+import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { GraphAttribute } from "src/generators/graph-attribute";
@@ -525,7 +526,7 @@ export class Workflow {
                     name: "z_index",
                     value: !isNil(zIndex)
                       ? python.TypeInstantiation.int(zIndex)
-                      : python.TypeInstantiation.none(),
+                      : new NoneInstantiation(),
                   }),
                 ],
               }),

@@ -15,6 +15,7 @@ import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
+import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
@@ -55,7 +56,7 @@ export class SearchNode extends BaseNode<
         name: "document_index",
         initializer: documentName
           ? new StrInstantiation(documentName)
-          : documentIndex ?? python.TypeInstantiation.none(),
+          : documentIndex ?? new NoneInstantiation(),
       })
     );
 
@@ -141,7 +142,7 @@ export class SearchNode extends BaseNode<
       this.workflowContext.addError(
         new NodeAttributeGenerationError("weights input is required", "WARNING")
       );
-      return python.TypeInstantiation.none();
+      return new NoneInstantiation();
     }
 
     // Accept null/empty JSON values and add a warning instead of throwing
@@ -155,7 +156,7 @@ export class SearchNode extends BaseNode<
           "WARNING"
         )
       );
-      return python.TypeInstantiation.none();
+      return new NoneInstantiation();
     }
 
     if (typeof rawValueUnknown !== "object" || Array.isArray(rawValueUnknown)) {
@@ -165,7 +166,7 @@ export class SearchNode extends BaseNode<
           "WARNING"
         )
       );
-      return python.TypeInstantiation.none();
+      return new NoneInstantiation();
     }
 
     const weightsObject = rawValueUnknown as Record<string, unknown>;
@@ -178,7 +179,7 @@ export class SearchNode extends BaseNode<
           "WARNING"
         )
       );
-      return python.TypeInstantiation.none();
+      return new NoneInstantiation();
     }
 
     if (typeof keywords !== "number") {
@@ -188,7 +189,7 @@ export class SearchNode extends BaseNode<
           "WARNING"
         )
       );
-      return python.TypeInstantiation.none();
+      return new NoneInstantiation();
     }
 
     const searchWeightsRequest = new ClassInstantiation({
@@ -288,7 +289,7 @@ export class SearchNode extends BaseNode<
           name: "external_ids",
           value:
             this.findNodeInputByName("external_id_filters") ??
-            python.TypeInstantiation.none(),
+            new NoneInstantiation(),
         }),
         new MethodArgument({
           name: "metadata",
@@ -298,7 +299,7 @@ export class SearchNode extends BaseNode<
                 nodeInputsById: this.nodeInputsById,
                 nodeContext: this.nodeContext,
               })
-            : python.TypeInstantiation.none(),
+            : new NoneInstantiation(),
         }),
       ],
     });

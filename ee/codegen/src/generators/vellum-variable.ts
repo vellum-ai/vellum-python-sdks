@@ -8,6 +8,7 @@ import { OptionalType } from "./extensions/optional";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
+import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { Writer } from "src/generators/extensions/writer";
 import { VellumValue } from "src/generators/vellum-variable-value";
@@ -59,7 +60,7 @@ export class VellumVariable extends AstNode {
         type: new OptionalType(baseType),
         initializer: variable.default
           ? this.generateInitializerIfDefault(variable)
-          : python.TypeInstantiation.none(),
+          : new NoneInstantiation(),
       });
     } else {
       this.field = new Field({
@@ -78,9 +79,7 @@ export class VellumVariable extends AstNode {
     variable: VellumVariableWithName
   ): AstNode | undefined {
     if (!variable.default) {
-      return variable.default == null
-        ? python.TypeInstantiation.none()
-        : undefined;
+      return variable.default == null ? new NoneInstantiation() : undefined;
     }
 
     // Check if the default type is ARRAY, JSON, or CHAT_HISTORY
@@ -177,7 +176,7 @@ export class VellumVariable extends AstNode {
         variable.required === false ||
         (variable.required === undefined && this.defaultRequired === false);
       if (isOptional) {
-        return python.TypeInstantiation.none();
+        return new NoneInstantiation();
       }
       // For required fields with null default, don't set an initializer
       return undefined;

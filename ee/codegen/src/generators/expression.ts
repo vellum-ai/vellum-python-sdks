@@ -1,4 +1,3 @@
-import { python } from "@fern-api/python-ast";
 import { TypeInstantiation } from "@fern-api/python-ast/TypeInstantiation";
 
 import { NodeAttributeGenerationError } from "./errors";
@@ -10,6 +9,7 @@ import { WorkflowContext } from "src/context";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
+import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { Writer } from "src/generators/extensions/writer";
 import { WorkflowValueDescriptorReference } from "src/generators/workflow-value-descriptor-reference/workflow-value-descriptor-reference";
@@ -76,7 +76,7 @@ export class Expression extends AstNode {
             "rhs must be defined for ternary expressions"
           )
         );
-        rawRhs = python.TypeInstantiation.none();
+        rawRhs = new NoneInstantiation();
       }
 
       this.inheritReferences(rawRhs);
