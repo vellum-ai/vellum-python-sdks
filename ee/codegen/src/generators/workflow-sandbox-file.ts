@@ -17,6 +17,7 @@ import {
   WorkflowSandboxDatasetRow,
   WorkflowSandboxDatasetRowMock,
   WorkflowSandboxInputs,
+  WorkflowTrigger,
 } from "src/types/vellum";
 import { removeEscapeCharacters } from "src/utils/casing";
 import { getGeneratedInputsModulePath } from "src/utils/paths";
@@ -182,11 +183,17 @@ if __name__ == "__main__":
       );
     }
 
-    if (!isNil(workflowTriggerId)) {
-      const triggerInstance = this.getTriggerInstance(
-        workflowTriggerId,
-        inputs
-      );
+    if (!isNil(workflowTriggerId) && trigger) {
+      // Filter inputs to only those that match trigger attributes for this specific trigger
+      const triggerInputs = hasInputs
+        ? inputs.filter(
+            (input) =>
+              triggerAttributeKeys.has(removeEscapeCharacters(input.name)) &&
+              !isNil(input.value)
+          )
+        : [];
+
+      const triggerInstance = this.getTriggerInstance(trigger, triggerInputs);
 
       if (triggerInstance) {
         arguments_.push(
@@ -295,36 +302,18 @@ if __name__ == "__main__":
   }
 
   private getTriggerInstance(
-    workflowTriggerId: string,
-    inputs?: WorkflowSandboxInputs
-  ): ClassInstantiation | undefined {
-    const triggers = this.workflowContext.triggers ?? [];
-    const trigger = triggers.find((t) => t.id === workflowTriggerId);
-
-    if (!trigger) {
-      return undefined;
-    }
-
+    trigger: WorkflowTrigger,
+    triggerInputs: WorkflowSandboxInputs
+  ): ClassInstantiation {
     const triggerClassInfo = getTriggerClassInfo(trigger, this.workflowContext);
 
-    // Build a set of trigger attribute keys for quick lookup
-    const triggerAttributeKeys = new Set(
-      trigger.attributes.map((attr) => attr.key)
-    );
-
-    // Generate arguments for the trigger instance based on the provided inputs
-    // that match trigger attributes, rather than iterating over all attributes
-    const arguments_: MethodArgument[] = (inputs ?? [])
-      .filter((input) => {
-        const inputName = removeEscapeCharacters(input.name);
-        return triggerAttributeKeys.has(inputName) && !isNil(input.value);
-      })
-      .map((input) => {
-        return new MethodArgument({
-          name: removeEscapeCharacters(input.name),
-          value: vellumValue({ vellumValue: input }),
-        });
+    // Generate arguments for the trigger instance from the pre-filtered inputs
+    const arguments_: MethodArgument[] = triggerInputs.map((input) => {
+      return new MethodArgument({
+        name: removeEscapeCharacters(input.name),
+        value: vellumValue({ vellumValue: input }),
       });
+    });
 
     return new ClassInstantiation({
       classReference: new Reference({
