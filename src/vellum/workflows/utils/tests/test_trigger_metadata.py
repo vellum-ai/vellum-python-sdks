@@ -73,6 +73,9 @@ def test_trigger_attribute_reference_id__different_attributes_get_different_ids(
     value_ref = TestTrigger.value
     other_ref = TestTrigger.other
 
+    assert isinstance(value_ref, TriggerAttributeReference)
+    assert isinstance(other_ref, TriggerAttributeReference)
+
     # WHEN we get their IDs (without metadata)
     with patch(
         "vellum.workflows.references.trigger.get_trigger_attribute_id_from_metadata",
