@@ -7,6 +7,7 @@ import { ConditionalNodePort } from "src/generators/conditional-node-port";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -118,7 +119,7 @@ export class ConditionalNode extends BaseNode<
     statements.push(
       python.field({
         name: "rule_ids",
-        initializer: python.TypeInstantiation.list(
+        initializer: new ListInstantiation(
           this.createRuleIdMapList(this.nodeData.data, ruleIdMapRef)
         ),
       })
@@ -138,7 +139,7 @@ export class ConditionalNode extends BaseNode<
     statements.push(
       python.field({
         name: "condition_ids",
-        initializer: python.TypeInstantiation.list(
+        initializer: new ListInstantiation(
           this.createConditionIdList(this.nodeData.data, conditionIdRef)
         ),
       })

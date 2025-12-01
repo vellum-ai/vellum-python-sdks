@@ -18,6 +18,7 @@ import { PromptBlock as PromptBlockType } from "src/generators/base-prompt-block
 import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StarImport } from "src/generators/extensions/star-import";
@@ -421,7 +422,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
             nodeAttributesStatements.push(
               python.field({
                 name: toValidPythonIdentifier(attribute.name, "attr"),
-                initializer: python.TypeInstantiation.list(functionReferences),
+                initializer: new ListInstantiation(functionReferences),
               })
             );
           }
@@ -477,7 +478,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
             nodeAttributesStatements.push(
               python.field({
                 name: attribute.name,
-                initializer: python.TypeInstantiation.list(
+                initializer: new ListInstantiation(
                   deserializedBlocks.map((block) => {
                     return new PromptBlock({
                       workflowContext: this.workflowContext,

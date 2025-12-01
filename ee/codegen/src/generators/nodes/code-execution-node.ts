@@ -9,6 +9,7 @@ import { InitFile } from "src/generators";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -126,7 +127,7 @@ export class CodeExecutionNode extends BaseNode<
       python.field({
         name: "packages",
         initializer: nodeData.packages
-          ? python.TypeInstantiation.list(
+          ? new ListInstantiation(
               nodeData.packages.map(
                 (package_) =>
                   new ClassInstantiation({

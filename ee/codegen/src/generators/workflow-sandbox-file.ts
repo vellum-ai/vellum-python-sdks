@@ -7,6 +7,7 @@ import { BasePersistedFile } from "src/generators/base-persisted-file";
 import { NodeNotFoundError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -45,7 +46,7 @@ export class WorkflowSandboxFile extends BasePersistedFile {
   protected getFileStatements(): AstNode[] {
     const datasetField = python.field({
       name: "dataset",
-      initializer: python.TypeInstantiation.list(
+      initializer: new ListInstantiation(
         this.sandboxInputs.map((input, index) =>
           this.getWorkflowInput(input, index)
         ),
@@ -203,7 +204,7 @@ if __name__ == "__main__":
         .filter((node): node is ClassInstantiation => !isNil(node));
 
       if (mockNodes.length > 0) {
-        const mocksArray = python.TypeInstantiation.list(mockNodes, {
+        const mocksArray = new ListInstantiation(mockNodes, {
           endWithComma: true,
         });
 

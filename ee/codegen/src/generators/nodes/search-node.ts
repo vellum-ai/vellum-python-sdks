@@ -13,6 +13,7 @@ import {
 } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -572,7 +573,7 @@ export class SearchNodeMetadataFilters extends AstNode {
         }),
         new MethodArgument({
           name: "conditions",
-          value: python.TypeInstantiation.list(processedConditions),
+          value: new ListInstantiation(processedConditions),
         }),
       ],
     });

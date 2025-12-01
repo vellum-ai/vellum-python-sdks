@@ -7,6 +7,7 @@ import { PromptTemplateBlockExcludingFunctionDefinition } from "src/generators/b
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -96,7 +97,7 @@ export class InlinePromptNode extends BaseNode<
     statements.push(
       python.field({
         name: "blocks",
-        initializer: python.TypeInstantiation.list(
+        initializer: new ListInstantiation(
           blocksExcludingFunctionDefinition.map((block) => {
             return new StatefulPromptBlock({
               workflowContext: this.workflowContext,
@@ -374,7 +375,7 @@ export class InlinePromptNode extends BaseNode<
         statements.push(
           python.field({
             name: "functions",
-            initializer: python.TypeInstantiation.list(
+            initializer: new ListInstantiation(
               codeExecutionFunctions.map((f) => {
                 const funcName = this.getFunctionName(f.name);
                 return python.codeBlock(toPythonSafeSnakeCase(funcName));
@@ -396,7 +397,7 @@ export class InlinePromptNode extends BaseNode<
         statements.push(
           python.field({
             name: "functions",
-            initializer: python.TypeInstantiation.list(
+            initializer: new ListInstantiation(
               nonCodeExecutionFunctions.map((f) => {
                 const classArgs = [];
 
@@ -483,7 +484,7 @@ export class InlinePromptNode extends BaseNode<
       statements.push(
         python.field({
           name: "functions",
-          initializer: python.TypeInstantiation.list(
+          initializer: new ListInstantiation(
             functionDefinitions.map(
               (functionDefinition) =>
                 new FunctionDefinition({ functionDefinition })
