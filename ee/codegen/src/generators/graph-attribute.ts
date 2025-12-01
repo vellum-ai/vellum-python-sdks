@@ -14,6 +14,7 @@ import {
   WorkflowDataNode,
   WorkflowEdge,
   WorkflowTrigger,
+  WorkflowTriggerType,
 } from "src/types/vellum";
 import { getTriggerClassInfo } from "src/utils/triggers";
 
@@ -389,8 +390,12 @@ export class GraphAttribute extends AstNode {
       } else if (this.startsWithTargetNode(targetNode, mutableAst)) {
         // Check if mutableAst is a bare node_reference (entrypoint only) or a more complex structure
         // If it's a bare node_reference and the target node has no outgoing port edges,
-        // we should create a set to preserve the entrypoint edge
+        // we should create a set to preserve the entrypoint edge.
+        // This only applies to integration triggers - scheduled triggers should just wrap the AST.
+        const isIntegrationTrigger =
+          sourceTrigger.reference.type === WorkflowTriggerType.INTEGRATION;
         if (
+          isIntegrationTrigger &&
           mutableAst.type === "node_reference" &&
           mutableAst.reference === targetNode.reference
         ) {
@@ -406,7 +411,7 @@ export class GraphAttribute extends AstNode {
 
           // If the target node has no outgoing edges, create a set to preserve the entrypoint
           if (!hasOutgoingEdges) {
-            return {
+            return this.flattenSet({
               type: "set",
               values: [
                 mutableAst,
@@ -416,7 +421,7 @@ export class GraphAttribute extends AstNode {
                   rhs: targetNode,
                 },
               ],
-            };
+            });
           }
         }
 
