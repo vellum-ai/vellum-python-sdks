@@ -11,7 +11,7 @@ from uuid import uuid4
 from typing import List, Optional, Set, Tuple
 
 from vellum import DeploymentRead, WorkspaceSecretRead
-from vellum.workflows.triggers.base import _get_trigger_path_to_id_mapping
+from vellum.workflows.triggers.base import _get_trigger_attribute_id_mapping, _get_trigger_path_to_id_mapping
 
 current_file_path = os.path.abspath(__file__)
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -89,6 +89,7 @@ def mock_trigger_metadata():
     """Mock virtual_open to return metadata.json with trigger path to ID mapping."""
 
     _get_trigger_path_to_id_mapping.cache_clear()
+    _get_trigger_attribute_id_mapping.cache_clear()
 
     metadata_content = {
         "trigger_path_to_id_mapping": {".triggers.scheduled.Scheduled": "c484ce55-a392-4a1b-8c10-1233b81c4539"},
@@ -126,3 +127,4 @@ def mock_trigger_metadata():
 
     # Clear cache after test
     _get_trigger_path_to_id_mapping.cache_clear()
+    _get_trigger_attribute_id_mapping.cache_clear()
