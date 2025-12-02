@@ -11,8 +11,7 @@ from uuid import uuid4
 from typing import List, Optional, Set, Tuple
 
 from vellum import DeploymentRead, WorkspaceSecretRead
-from vellum.workflows.triggers.base import _get_trigger_path_to_id_mapping
-from vellum.workflows.utils.trigger_metadata import _get_trigger_attribute_id_mapping
+from vellum.workflows.triggers.base import _get_trigger_attribute_id_mapping, _get_trigger_path_to_id_mapping
 
 current_file_path = os.path.abspath(__file__)
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -115,9 +114,7 @@ def mock_trigger_metadata():
     # Patch virtual_open
     with patch("vellum.workflows.utils.files.virtual_open", side_effect=mock_virtual_open), patch(
         "vellum.workflows.triggers.base.virtual_open", side_effect=mock_virtual_open
-    ), patch("vellum.workflows.utils.trigger_metadata.virtual_open", side_effect=mock_virtual_open), patch(
-        "vellum_ee.workflows.display.utils.metadata.virtual_open", side_effect=mock_virtual_open
-    ), patch(
+    ), patch("vellum_ee.workflows.display.utils.metadata.virtual_open", side_effect=mock_virtual_open), patch(
         "vellum_ee.workflows.display.utils.expressions.virtual_open", side_effect=mock_virtual_open
     ):
 

@@ -11,8 +11,6 @@ from pydantic_core import core_schema
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
-from vellum.workflows.utils.trigger_metadata import get_trigger_attribute_id_from_metadata
-from vellum.workflows.utils.uuids import get_trigger_attribute_id
 
 if TYPE_CHECKING:
     from vellum.workflows.state.base import BaseState
@@ -42,19 +40,13 @@ class TriggerAttributeReference(BaseDescriptor[_T], Generic[_T]):
     @property
     def id(self) -> UUID:
         """
-        Get the trigger attribute ID, first checking metadata.json for a stable ID,
-        then falling back to a deterministic hash-based ID.
+        Get the trigger attribute ID via the trigger class, which knows how to read
+        metadata.json and fall back to hash-based IDs.
 
         This ensures trigger attribute IDs remain stable across serialization round-trips
         when metadata.json is present.
         """
-        # First try to get the ID from metadata.json
-        metadata_id = get_trigger_attribute_id_from_metadata(self._trigger_class, self.name)
-        if metadata_id is not None:
-            return metadata_id
-
-        # Fall back to deterministic hash-based ID
-        return get_trigger_attribute_id(self._trigger_class, self.name)
+        return self._trigger_class.get_attribute_id(self.name)
 
     def resolve(self, state: BaseState) -> _T:
         trigger_attributes = getattr(state.meta, "trigger_attributes", {})
