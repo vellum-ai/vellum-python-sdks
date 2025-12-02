@@ -1,4 +1,4 @@
-"""Utility functions for reading trigger metadata from metadata.json."""
+"""Utility functions for reading trigger attribute metadata from metadata.json."""
 
 from functools import lru_cache
 import json
@@ -10,58 +10,6 @@ from vellum.workflows.utils.files import virtual_open
 
 if TYPE_CHECKING:
     from vellum.workflows.triggers.base import BaseTrigger
-
-
-def _convert_to_relative_module_path(absolute_module_path: str, workflow_root: str) -> str:
-    """
-    Convert an absolute module path to a relative path from the workflow root.
-
-    Args:
-        absolute_module_path: The full module path (e.g., "workflow_id.triggers.scheduled")
-        workflow_root: The workflow root module (e.g., "workflow_id")
-
-    Returns:
-        Relative module path with leading dot (e.g., ".triggers.scheduled")
-    """
-    if not absolute_module_path.startswith(workflow_root):
-        return ""
-
-    remaining_path = absolute_module_path[len(workflow_root) :]
-    if remaining_path.startswith("."):
-        return remaining_path
-    else:
-        return "." + remaining_path
-
-
-def _find_workflow_root_with_metadata(trigger_module: str) -> Optional[str]:
-    """
-    Find the workflow root module by searching for metadata.json up the module hierarchy.
-
-    Args:
-        trigger_module: The trigger's module path (e.g., "workflows.my_workflow.triggers.my_trigger")
-
-    Returns:
-        The workflow root module path if found, None otherwise
-    """
-    module_parts = trigger_module.split(".")
-
-    # Try searching up the module hierarchy for metadata.json
-    for i in range(len(module_parts), 0, -1):
-        potential_root = ".".join(module_parts[:i])
-        module_dir = potential_root.replace(".", os.path.sep)
-        metadata_path = os.path.join(module_dir, "metadata.json")
-
-        # Try to open the file using virtual_open to support both regular and virtual filesystems
-        # virtual_open checks BaseWorkflowFinder instances before falling back to regular open()
-        try:
-            file_handle = virtual_open(metadata_path)
-            if file_handle is not None:
-                file_handle.close()
-                return potential_root
-        except (FileNotFoundError, OSError):
-            pass
-
-    return None
 
 
 @lru_cache(maxsize=128)
@@ -78,9 +26,13 @@ def _get_trigger_attribute_id_mapping(module_path: str) -> Dict[str, UUID]:
     Returns:
         Dictionary mapping "<trigger_path>|<attribute_key>" to their UUIDs
     """
+    # Local import to avoid circular dependency: triggers.base imports references.trigger,
+    # which in turn imports this module.
+    from vellum.workflows.triggers import base as triggers_base
+
     try:
         # Find the workflow root that contains metadata.json
-        workflow_root = _find_workflow_root_with_metadata(module_path)
+        workflow_root = triggers_base._find_workflow_root_with_metadata(module_path)
         if not workflow_root:
             return {}
 
@@ -120,7 +72,11 @@ def get_trigger_attribute_id_from_metadata(trigger_class: "Type[BaseTrigger]", a
     Returns:
         The UUID from metadata.json, or None if not found
     """
-    workflow_root = _find_workflow_root_with_metadata(trigger_class.__module__)
+    # Local import to avoid circular dependency: triggers.base imports references.trigger,
+    # which in turn imports this module.
+    from vellum.workflows.triggers import base as triggers_base
+
+    workflow_root = triggers_base._find_workflow_root_with_metadata(trigger_class.__module__)
     if not workflow_root:
         return None
 
@@ -130,7 +86,7 @@ def get_trigger_attribute_id_from_metadata(trigger_class: "Type[BaseTrigger]", a
 
     # Convert module path to relative path and append class name
     # e.g., "root_module.triggers.scheduled" + "ScheduleTrigger" -> ".triggers.scheduled.ScheduleTrigger"
-    relative_module_path = _convert_to_relative_module_path(trigger_class.__module__, workflow_root)
+    relative_module_path = triggers_base._convert_to_relative_module_path(trigger_class.__module__, workflow_root)
     if not relative_module_path:
         return None
 
