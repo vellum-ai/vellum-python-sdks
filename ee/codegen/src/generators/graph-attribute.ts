@@ -14,6 +14,7 @@ import {
   WorkflowDataNode,
   WorkflowEdge,
   WorkflowTrigger,
+  WorkflowTriggerType,
 } from "src/types/vellum";
 import { getTriggerClassInfo } from "src/utils/triggers";
 
@@ -387,13 +388,51 @@ export class GraphAttribute extends AstNode {
           rhs: targetNode,
         };
       } else if (this.startsWithTargetNode(targetNode, mutableAst)) {
+        // Check if mutableAst is a bare node_reference (entrypoint only) or a more complex structure
+        // If it's a bare node_reference and the target node has no outgoing port edges,
+        // we should create a set to preserve the entrypoint edge.
+        // This only applies to integration triggers - scheduled triggers should just wrap the AST.
+        const isIntegrationTrigger =
+          sourceTrigger.reference.type === WorkflowTriggerType.INTEGRATION;
+        if (
+          isIntegrationTrigger &&
+          mutableAst.type === "node_reference" &&
+          mutableAst.reference === targetNode.reference
+        ) {
+          // Check if the target node has any outgoing port edges
+          const edgesByPortId = this.workflowContext.getEdgesByPortId();
+          let hasOutgoingEdges = false;
+          targetNode.reference.portContextsById.forEach((portContext) => {
+            const edges = edgesByPortId.get(portContext.portId);
+            if (edges && edges.length > 0) {
+              hasOutgoingEdges = true;
+            }
+          });
+
+          // If the target node has no outgoing edges, create a set to preserve the entrypoint
+          if (!hasOutgoingEdges) {
+            return this.flattenSet({
+              type: "set",
+              values: [
+                mutableAst,
+                {
+                  type: "right_shift",
+                  lhs: sourceTrigger,
+                  rhs: targetNode,
+                },
+              ],
+            });
+          }
+        }
+
+        // Otherwise, wrap the existing AST with the trigger
         return {
           type: "right_shift",
           lhs: sourceTrigger,
           rhs: mutableAst,
         };
       } else {
-        return {
+        return this.flattenSet({
           type: "set",
           values: [
             mutableAst,
@@ -403,7 +442,7 @@ export class GraphAttribute extends AstNode {
               rhs: targetNode,
             },
           ],
-        };
+        });
       }
     }
 
