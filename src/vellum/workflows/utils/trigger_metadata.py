@@ -91,12 +91,20 @@ def _get_trigger_attribute_id_mapping(module_path: str) -> Dict[str, UUID]:
         # Use virtual_open to support both regular and virtual environments
         with virtual_open(metadata_path) as f:
             metadata_json = json.load(f)
-            attribute_mapping = metadata_json.get("trigger_attribute_id_mapping", {})
+            raw_mapping = metadata_json.get("trigger_attribute_id_mapping", {}) or {}
 
-            # Convert string IDs to UUIDs
-            return {key: UUID(id_str) for key, id_str in attribute_mapping.items()}
+        # Convert string IDs to UUIDs, skipping invalid entries
+        result: Dict[str, UUID] = {}
+        for key, id_str in raw_mapping.items():
+            try:
+                result[key] = UUID(id_str)
+            except ValueError:
+                # Skip invalid UUID entries; they will fall back to hash-based IDs
+                continue
 
-    except (FileNotFoundError, json.JSONDecodeError, ValueError, KeyError):
+        return result
+
+    except (FileNotFoundError, json.JSONDecodeError, KeyError):
         # If there's any error reading or parsing the file, return empty dict
         return {}
 
