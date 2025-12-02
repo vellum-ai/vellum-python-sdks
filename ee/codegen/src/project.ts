@@ -1120,7 +1120,7 @@ ${errors.slice(0, 3).map((err) => {
     return result;
   }
 
-  public getEntrypointId():string | undefined {
+  public getEntrypointId(): string | undefined {
     const entrypointNode = this.workflowContext.tryGetEntrypointNode();
     if (isNil(entrypointNode)) {
       this.workflowContext.addError(
