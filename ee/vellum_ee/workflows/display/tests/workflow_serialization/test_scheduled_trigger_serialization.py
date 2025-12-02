@@ -244,24 +244,33 @@ def test_scheduled_trigger_serialization_full():
     # THEN we get the expected trigger
     assert len(result["triggers"]) == 1
     trigger = result["triggers"][0]
+
+    # AND the trigger has the expected structure with attributes
+    assert trigger["id"] == "f3e5eddb-75da-42e6-9abf-d616f30c145c"
+    assert trigger["type"] == "SCHEDULED"
+    assert trigger["cron"] == "0 9 * * *"
+    assert trigger["timezone"] == "UTC"
+
+    # AND attributes are serialized (current_run_at and next_run_at from ScheduleTrigger)
+    assert "attributes" in trigger
+    attributes = trigger["attributes"]
+    assert isinstance(attributes, list)
+    assert len(attributes) == 2
+    attribute_keys = {attr["key"] for attr in attributes}
+    assert attribute_keys == {"current_run_at", "next_run_at"}
+
+    # AND display_data is serialized correctly
     assert not DeepDiff(
-        trigger,
+        trigger["display_data"],
         {
-            "id": "f3e5eddb-75da-42e6-9abf-d616f30c145c",
-            "type": "SCHEDULED",
-            "cron": "0 9 * * *",
-            "timezone": "UTC",
-            "attributes": [],
-            "display_data": {
-                "label": "Daily Schedule",
-                "position": {"x": 100.5, "y": 200.75},
-                "z_index": 3,
-                "icon": "vellum:icon:calendar",
-                "color": "#4A90E2",
-                "comment": {
-                    "value": "This is scheduled trigger",
-                    "expanded": True,
-                },
+            "label": "Daily Schedule",
+            "position": {"x": 100.5, "y": 200.75},
+            "z_index": 3,
+            "icon": "vellum:icon:calendar",
+            "color": "#4A90E2",
+            "comment": {
+                "value": "This is scheduled trigger",
+                "expanded": True,
             },
         },
     )
