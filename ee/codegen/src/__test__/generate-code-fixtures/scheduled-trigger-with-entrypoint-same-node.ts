@@ -96,5 +96,5 @@ export default {
       },
     },
   ],
-  assertions: ["workflow.py", "triggers/daily_schedule.py"],
+  assertions: ["workflow.py", "triggers/scheduled.py"],
 };
