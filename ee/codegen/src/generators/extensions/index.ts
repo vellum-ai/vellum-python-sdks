@@ -23,5 +23,6 @@ export * from "./reference";
 export * from "./star-import";
 export * from "./str-instantiation";
 export * from "./type";
+export * from "./type-instantiation";
 export * from "./union";
 export * from "./writer";

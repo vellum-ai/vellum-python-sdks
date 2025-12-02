@@ -1,4 +1,4 @@
-import { TypeInstantiation } from "@fern-api/python-ast/TypeInstantiation";
+import { TypeInstantiation as FernTypeInstantiation } from "@fern-api/python-ast/TypeInstantiation";
 
 import { NodeAttributeGenerationError } from "./errors";
 import { BinaryExpression } from "./expressions/binary";
@@ -11,6 +11,7 @@ import { ClassInstantiation } from "src/generators/extensions/class-instantiatio
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
+import { TypeInstantiation } from "src/generators/extensions/type-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 import { WorkflowValueDescriptorReference } from "src/generators/workflow-value-descriptor-reference/workflow-value-descriptor-reference";
 
@@ -149,11 +150,11 @@ export class Expression extends AstNode {
   }
 
   private isTypeInstantiation(lhs: AstNode): boolean {
-    // Check for both the fern TypeInstantiation and our custom NoneInstantiation
-    if (lhs instanceof NoneInstantiation) {
-      return true;
-    }
-    return lhs instanceof TypeInstantiation;
+    // Check for both our local TypeInstantiation (which NoneInstantiation, StrInstantiation, etc. extend)
+    // and the fern TypeInstantiation for backwards compatibility
+    return (
+      lhs instanceof TypeInstantiation || lhs instanceof FernTypeInstantiation
+    );
   }
 
   public write(writer: Writer) {
