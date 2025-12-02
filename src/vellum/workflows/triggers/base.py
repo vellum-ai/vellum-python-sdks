@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Dict, Iterator, Optional, Tuple
 from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.types.utils import get_class_attr_names, infer_types
 from vellum.workflows.utils.files import virtual_open
+from vellum.workflows.utils.trigger_metadata import _convert_to_relative_module_path, _find_workflow_root_with_metadata
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.editor import NodeDisplayComment
 
@@ -30,27 +31,6 @@ def _is_annotated(cls: Type, name: str) -> bool:
             return True
 
     return False
-
-
-def _convert_to_relative_module_path(absolute_module_path: str, workflow_root: str) -> str:
-    """
-    Convert an absolute module path to a relative path from the workflow root.
-
-    Args:
-        absolute_module_path: The full module path (e.g., "workflow_id.triggers.scheduled")
-        workflow_root: The workflow root module (e.g., "workflow_id")
-
-    Returns:
-        Relative module path with leading dot (e.g., ".triggers.scheduled")
-    """
-    if not absolute_module_path.startswith(workflow_root):
-        return ""
-
-    remaining_path = absolute_module_path[len(workflow_root) :]
-    if remaining_path.startswith("."):
-        return remaining_path
-    else:
-        return "." + remaining_path
 
 
 def _get_trigger_id_from_metadata(trigger_class: Type["BaseTrigger"]) -> Optional[UUID]:
@@ -80,37 +60,6 @@ def _get_trigger_id_from_metadata(trigger_class: Type["BaseTrigger"]) -> Optiona
     # Append class name to get full trigger path
     relative_trigger_path = f"{relative_module_path}.{trigger_class.__qualname__}"
     return trigger_path_to_id_mapping.get(relative_trigger_path)
-
-
-def _find_workflow_root_with_metadata(trigger_module: str) -> Optional[str]:
-    """
-    Find the workflow root module by searching for metadata.json up the module hierarchy.
-
-    Args:
-        trigger_module: The trigger's module path (e.g., "workflows.my_workflow.triggers.my_trigger")
-
-    Returns:
-        The workflow root module path if found, None otherwise
-    """
-    module_parts = trigger_module.split(".")
-
-    # Try searching up the module hierarchy for metadata.json
-    for i in range(len(module_parts), 0, -1):
-        potential_root = ".".join(module_parts[:i])
-        module_dir = potential_root.replace(".", os.path.sep)
-        metadata_path = os.path.join(module_dir, "metadata.json")
-
-        # Try to open the file using virtual_open to support both regular and virtual filesystems
-        # virtual_open checks BaseWorkflowFinder instances before falling back to regular open()
-        try:
-            file_handle = virtual_open(metadata_path)
-            if file_handle is not None:
-                file_handle.close()
-                return potential_root
-        except (FileNotFoundError, OSError):
-            pass
-
-    return None
 
 
 @lru_cache(maxsize=128)
