@@ -615,12 +615,33 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
 
             trigger_id = trigger_class.__id__
 
-            # Serialize trigger attributes like node outputs
+            # Serialize trigger attributes from attribute_references as VellumVariables
+            attribute_references = trigger_class.attribute_references().values()
+            trigger_attributes: JsonArray = cast(
+                JsonArray,
+                [
+                    cast(
+                        JsonObject,
+                        {
+                            "id": str(reference.id),
+                            "key": reference.name,
+                            "type": primitive_type_to_vellum_variable_type(reference),
+                            "required": False,
+                            "default": {
+                                "type": primitive_type_to_vellum_variable_type(reference),
+                                "value": None,
+                            },
+                            "extensions": None,
+                            "schema": None,
+                        },
+                    )
+                    for reference in sorted(attribute_references, key=lambda ref: ref.name)
+                ],
+            )
+
             trigger_data: JsonObject
             if trigger_type == WorkflowTriggerType.SCHEDULED:
-                # For scheduled triggers, attributes should be empty
-                # and cron/timezone should be top level
-
+                # For scheduled triggers, include cron/timezone at top level
                 config_class = trigger_class.Config
                 cron_value = getattr(config_class, "cron", None)
                 timezone_value = getattr(config_class, "timezone", None)
@@ -630,29 +651,10 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                     "type": trigger_type.value,
                     "cron": cron_value,
                     "timezone": timezone_value,
-                    "attributes": [],
+                    "attributes": trigger_attributes,
                 }
             else:
-                # For other triggers, serialize attributes from attribute_references as VellumVariables
-                attribute_references = trigger_class.attribute_references().values()
-                trigger_attributes: JsonArray = cast(
-                    JsonArray,
-                    [
-                        cast(
-                            JsonObject,
-                            {
-                                "id": str(reference.id),
-                                "key": reference.name,
-                                "type": primitive_type_to_vellum_variable_type(reference),
-                                "required": True,
-                                "default": None,
-                                "extensions": None,
-                            },
-                        )
-                        for reference in sorted(attribute_references, key=lambda ref: ref.name)
-                    ],
-                )
-
+                # For other triggers (integration, etc.)
                 trigger_data = {
                     "id": str(trigger_id),
                     "type": trigger_type.value,
