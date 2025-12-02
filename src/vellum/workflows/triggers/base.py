@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Dict, Iterator, Optional, Tuple
 from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.types.utils import get_class_attr_names, infer_types
 from vellum.workflows.utils.files import virtual_open
-from vellum.workflows.utils.uuids import uuid4_from_hash
+from vellum.workflows.utils.uuids import get_trigger_attribute_id, uuid4_from_hash
 from vellum_ee.workflows.display.editor import NodeDisplayComment
 
 if TYPE_CHECKING:
@@ -481,8 +481,6 @@ class BaseTrigger(ABC, metaclass=BaseTriggerMeta):
         Returns:
             The UUID for the attribute
         """
-        from vellum.workflows.utils.uuids import get_trigger_attribute_id
-
         # First try to get the ID from metadata.json
         metadata_id = _get_trigger_attribute_id_from_metadata(cls, attribute_name)
         if metadata_id is not None:
