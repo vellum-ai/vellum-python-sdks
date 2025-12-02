@@ -626,7 +626,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                             "id": str(reference.id),
                             "key": reference.name,
                             "type": primitive_type_to_vellum_variable_type(reference),
-                            "required": self._is_reference_required(reference),
+                            "required": type(None) not in reference.types,
                             "default": {
                                 "type": primitive_type_to_vellum_variable_type(reference),
                                 "value": None,
