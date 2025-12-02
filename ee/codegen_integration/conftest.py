@@ -12,6 +12,7 @@ from typing import List, Optional, Set, Tuple
 
 from vellum import DeploymentRead, WorkspaceSecretRead
 from vellum.workflows.triggers.base import _get_trigger_path_to_id_mapping
+from vellum.workflows.utils.trigger_metadata import _get_trigger_attribute_id_mapping
 
 current_file_path = os.path.abspath(__file__)
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -89,6 +90,7 @@ def mock_trigger_metadata():
     """Mock virtual_open to return metadata.json with trigger path to ID mapping."""
 
     _get_trigger_path_to_id_mapping.cache_clear()
+    _get_trigger_attribute_id_mapping.cache_clear()
 
     metadata_content = {
         "trigger_path_to_id_mapping": {".triggers.scheduled.Scheduled": "c484ce55-a392-4a1b-8c10-1233b81c4539"},
@@ -113,7 +115,9 @@ def mock_trigger_metadata():
     # Patch virtual_open
     with patch("vellum.workflows.utils.files.virtual_open", side_effect=mock_virtual_open), patch(
         "vellum.workflows.triggers.base.virtual_open", side_effect=mock_virtual_open
-    ), patch("vellum_ee.workflows.display.utils.metadata.virtual_open", side_effect=mock_virtual_open), patch(
+    ), patch("vellum.workflows.utils.trigger_metadata.virtual_open", side_effect=mock_virtual_open), patch(
+        "vellum_ee.workflows.display.utils.metadata.virtual_open", side_effect=mock_virtual_open
+    ), patch(
         "vellum_ee.workflows.display.utils.expressions.virtual_open", side_effect=mock_virtual_open
     ):
 
@@ -126,3 +130,4 @@ def mock_trigger_metadata():
 
     # Clear cache after test
     _get_trigger_path_to_id_mapping.cache_clear()
+    _get_trigger_attribute_id_mapping.cache_clear()
