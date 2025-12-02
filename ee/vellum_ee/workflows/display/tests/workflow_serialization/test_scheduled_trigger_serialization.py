@@ -212,6 +212,8 @@ def test_scheduled_trigger_serialization_display_data():
 
 
 def test_scheduled_trigger_serialization_full():
+    """ScheduleTrigger serializes with attributes and display data."""
+
     # GIVEN a scheduled trigger with comprehensive Display attributes
     class DailyTriggerWithDisplay(ScheduleTrigger):
         class Config(ScheduleTrigger.Config):
@@ -244,24 +246,40 @@ def test_scheduled_trigger_serialization_full():
     # THEN we get the expected trigger
     assert len(result["triggers"]) == 1
     trigger = result["triggers"][0]
+
+    # AND the trigger has the expected structure
+    assert trigger["id"] == "f3e5eddb-75da-42e6-9abf-d616f30c145c"
+    assert trigger["type"] == "SCHEDULED"
+    assert trigger["cron"] == "0 9 * * *"
+    assert trigger["timezone"] == "UTC"
+
+    # AND the trigger has attributes for current_run_at and next_run_at
+    assert "attributes" in trigger
+    attributes = trigger["attributes"]
+    assert len(attributes) == 2
+    attribute_keys = {attr["key"] for attr in attributes}
+    assert attribute_keys == {"current_run_at", "next_run_at"}
+
+    # AND each attribute has the expected structure
+    for attr in attributes:
+        assert "id" in attr
+        assert attr["type"] == "JSON"
+        assert attr["required"] is True
+        assert attr["default"] is None
+        assert attr["extensions"] is None
+
+    # AND display_data is serialized correctly
     assert not DeepDiff(
-        trigger,
+        trigger["display_data"],
         {
-            "id": "f3e5eddb-75da-42e6-9abf-d616f30c145c",
-            "type": "SCHEDULED",
-            "cron": "0 9 * * *",
-            "timezone": "UTC",
-            "attributes": [],
-            "display_data": {
-                "label": "Daily Schedule",
-                "position": {"x": 100.5, "y": 200.75},
-                "z_index": 3,
-                "icon": "vellum:icon:calendar",
-                "color": "#4A90E2",
-                "comment": {
-                    "value": "This is scheduled trigger",
-                    "expanded": True,
-                },
+            "label": "Daily Schedule",
+            "position": {"x": 100.5, "y": 200.75},
+            "z_index": 3,
+            "icon": "vellum:icon:calendar",
+            "color": "#4A90E2",
+            "comment": {
+                "value": "This is scheduled trigger",
+                "expanded": True,
             },
         },
     )
