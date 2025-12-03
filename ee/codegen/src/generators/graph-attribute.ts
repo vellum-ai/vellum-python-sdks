@@ -683,6 +683,13 @@ export class GraphAttribute extends AstNode {
       });
       if (newSet.every(({ edgeAddedPriority }) => edgeAddedPriority === 0)) {
         if (sourceNode == graphSourceNode) {
+          // Check if the target node is already in the set to avoid duplicates.
+          // This can happen when both an entrypoint and a trigger point to the same node,
+          // and the entrypoint edge is processed after the trigger edge has already
+          // added the target node to the set.
+          if (this.isNodeInBranch(targetNode, setAst)) {
+            return setAst;
+          }
           return {
             type: "set",
             values: [...setAst.values, targetNode],

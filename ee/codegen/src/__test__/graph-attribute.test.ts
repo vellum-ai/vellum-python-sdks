@@ -1347,6 +1347,83 @@ describe("Workflow", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
+    it("should not duplicate output node when both entrypoint and scheduled trigger point to same node", async () => {
+      /**
+       * Tests that when both an entrypoint and a scheduled trigger point to the same output node,
+       * the output node is not duplicated in the generated graph.
+       */
+      const writer = new Writer();
+
+      // GIVEN an entrypoint node
+      const entrypoint = entrypointNodeDataFactory("entrypoint-node");
+
+      // AND a scheduled trigger
+      const triggerId = "scheduled-trigger";
+
+      // AND an output node that both the entrypoint and trigger point to
+      const outputNode = finalOutputNodeFactory({
+        id: "output-node",
+        label: "Output",
+        name: "output",
+        targetHandleId: "output-target-handle",
+        outputId: "output-id",
+      }).build();
+
+      const nodes = [entrypoint, outputNode];
+
+      // AND edges from both entrypoint and trigger to the same output node
+      const edges = [
+        {
+          id: "trigger-edge",
+          type: "DEFAULT" as const,
+          sourceNodeId: triggerId,
+          sourceHandleId: triggerId,
+          targetNodeId: outputNode.id,
+          targetHandleId: outputNode.data.targetHandleId,
+        },
+        {
+          id: "entrypoint-edge",
+          type: "DEFAULT" as const,
+          sourceNodeId: entrypoint.id,
+          sourceHandleId: entrypoint.data.sourceHandleId,
+          targetNodeId: outputNode.id,
+          targetHandleId: outputNode.data.targetHandleId,
+        },
+      ];
+
+      const workflowContext = workflowContextFactory({
+        workflowRawData: {
+          nodes,
+          edges,
+        },
+        triggers: [
+          {
+            id: triggerId,
+            type: WorkflowTriggerType.SCHEDULED,
+            attributes: [],
+            execConfig: {
+              schedule: "0 0 * * *",
+            },
+          },
+        ],
+      });
+
+      await createNodeContext({
+        nodeData: outputNode,
+        workflowContext,
+      });
+
+      // WHEN we generate the graph attribute
+      const graphAttribute = new GraphAttribute({
+        workflowContext,
+      });
+
+      graphAttribute.write(writer);
+
+      // THEN the output should not contain duplicate Output nodes
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
     it("should handle a conditional node with default port pointing back to itself", async () => {
       const validateAPIResponseNode = genericNodeFactory({
         id: uuidv4(),

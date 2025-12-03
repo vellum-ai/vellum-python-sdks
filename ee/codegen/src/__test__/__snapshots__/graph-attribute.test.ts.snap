@@ -323,6 +323,14 @@ exports[`Workflow > graph > should handle a simple edge of generic nodes 1`] = `
 "
 `;
 
+exports[`Workflow > graph > should not duplicate output node when both entrypoint and scheduled trigger point to same node 1`] = `
+"{
+    Output,
+    ScheduleTrigger >> Output,
+}
+"
+`;
+
 exports[`Workflow > graph > should properly format UUID-like port names in graph references 1`] = `
 "{
     GenericNode.Ports.port_7d813792_04c2_4d26_a126_16de4c4cebaf >> FirstNode,
