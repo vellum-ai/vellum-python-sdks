@@ -134,16 +134,21 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
 
     def _handle_api_error(self, e: ApiError) -> None:
         body = e.body if isinstance(e.body, dict) else {}
-        detail = body.get("detail", "")
+        detail = body.get("detail") or body.get("message") or ""
         error_code = body.get("code")
 
         if e.status_code and e.status_code == 403:
             # Only classify as PROVIDER_CREDENTIALS_UNAVAILABLE if the backend explicitly indicates so
-            if error_code == "PROVIDER_CREDENTIALS_UNAVAILABLE" or (
-                isinstance(detail, str) and "provider credentials" in detail.lower()
-            ):
+            if error_code == "PROVIDER_CREDENTIALS_UNAVAILABLE":
                 raise NodeException(
                     message=detail or "Provider credentials is missing or unavailable",
+                    code=WorkflowErrorCode.PROVIDER_CREDENTIALS_UNAVAILABLE,
+                ) from e
+
+            # Backwards-compat for older responses that only set detail
+            if detail == "Provider credentials is missing or unavailable":
+                raise NodeException(
+                    message=detail,
                     code=WorkflowErrorCode.PROVIDER_CREDENTIALS_UNAVAILABLE,
                 ) from e
 
@@ -155,7 +160,7 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
 
         if e.status_code and e.status_code >= 400 and e.status_code < 500:
             raise NodeException(
-                message=body.get("message", detail) or "Failed to execute code",
+                message=detail or "Failed to execute code",
                 code=WorkflowErrorCode.INVALID_INPUTS,
             ) from e
 

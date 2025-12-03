@@ -820,6 +820,63 @@ def test_run_node__execute_code_api_fails_403__provider_credentials_unavailable(
     assert "Provider credentials is missing or unavailable" in exc_info.value.message
 
 
+def test_run_node__execute_code_api_fails_403_with_code_field__provider_credentials_unavailable(vellum_client):
+    """
+    Tests that a 403 error with explicit code field is handled with PROVIDER_CREDENTIALS_UNAVAILABLE.
+    """
+
+    # GIVEN a code execution node
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, str]):
+        code = "def main(): return 'test'"
+        runtime = "PYTHON_3_11_6"
+        packages = [CodeExecutionPackage(name="requests", version="2.28.0")]
+
+    # AND the API returns a 403 error with explicit code field
+    vellum_client.execute_code.side_effect = ForbiddenError(
+        body={
+            "code": "PROVIDER_CREDENTIALS_UNAVAILABLE",
+            "detail": "Custom error message about credentials",
+        }
+    )
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode()
+    with pytest.raises(NodeException) as exc_info:
+        node.run()
+
+    # THEN it should raise PROVIDER_CREDENTIALS_UNAVAILABLE
+    assert exc_info.value.code == WorkflowErrorCode.PROVIDER_CREDENTIALS_UNAVAILABLE
+    assert exc_info.value.message == "Custom error message about credentials"
+
+
+def test_run_node__execute_code_api_fails_403_generic__node_execution(vellum_client):
+    """
+    Tests that a generic 403 error without provider credentials indicator uses NODE_EXECUTION.
+    """
+
+    # GIVEN a code execution node
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, str]):
+        code = "def main(): return 'test'"
+        runtime = "PYTHON_3_11_6"
+        packages = [CodeExecutionPackage(name="requests", version="2.28.0")]
+
+    # AND the API returns a generic 403 error (not related to provider credentials)
+    vellum_client.execute_code.side_effect = ForbiddenError(
+        body={
+            "detail": "Access denied to this resource",
+        }
+    )
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode()
+    with pytest.raises(NodeException) as exc_info:
+        node.run()
+
+    # THEN it should raise NODE_EXECUTION (not PROVIDER_CREDENTIALS_UNAVAILABLE)
+    assert exc_info.value.code == WorkflowErrorCode.NODE_EXECUTION
+    assert exc_info.value.message == "Access denied to this resource"
+
+
 def test_run_node__execute_code_api_fails_404__invalid_inputs(vellum_client):
     """
     Tests that a 404 error from the API is handled with INVALID_INPUTS error code.
