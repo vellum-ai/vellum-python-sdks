@@ -387,37 +387,51 @@ export class GraphAttribute extends AstNode {
           rhs: targetNode,
         };
       } else if (this.startsWithTargetNode(targetNode, mutableAst)) {
-        // Check if mutableAst is a bare node_reference (entrypoint only) or a more complex structure
-        // If it's a bare node_reference and the target node has no outgoing port edges,
-        // we should create a set to preserve the entrypoint edge.
+        // When both entrypoint and trigger point to the same node, create a set to preserve
+        // both edges. This handles cases like:
+        // - Bare node: {Custom, Trigger >> Custom}
+        // - Node with outgoing edges: {Custom, Trigger >> Custom} >> Output
         if (
           mutableAst.type === "node_reference" &&
           mutableAst.reference === targetNode.reference
         ) {
-          // Check if the target node has any outgoing port edges
-          const edgesByPortId = this.workflowContext.getEdgesByPortId();
-          let hasOutgoingEdges = false;
-          targetNode.reference.portContextsById.forEach((portContext) => {
-            const edges = edgesByPortId.get(portContext.portId);
-            if (edges && edges.length > 0) {
-              hasOutgoingEdges = true;
-            }
+          // Create a set to preserve both the entrypoint edge and the trigger edge
+          return this.flattenSet({
+            type: "set",
+            values: [
+              mutableAst,
+              {
+                type: "right_shift",
+                lhs: sourceTrigger,
+                rhs: targetNode,
+              },
+            ],
           });
+        }
 
-          // If the target node has no outgoing edges, create a set to preserve the entrypoint
-          if (!hasOutgoingEdges) {
-            return this.flattenSet({
+        // Handle the case where mutableAst is a right_shift starting with the target node
+        // (e.g., Custom >> Output). We need to preserve the entrypoint edge by creating
+        // a set: {Custom, Trigger >> Custom} >> Output
+        if (
+          mutableAst.type === "right_shift" &&
+          mutableAst.lhs.type === "node_reference" &&
+          mutableAst.lhs.reference === targetNode.reference
+        ) {
+          return {
+            type: "right_shift",
+            lhs: this.flattenSet({
               type: "set",
               values: [
-                mutableAst,
+                mutableAst.lhs,
                 {
                   type: "right_shift",
                   lhs: sourceTrigger,
                   rhs: targetNode,
                 },
               ],
-            });
-          }
+            }),
+            rhs: mutableAst.rhs,
+          };
         }
 
         // Otherwise, wrap the existing AST with the trigger
