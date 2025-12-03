@@ -1032,35 +1032,15 @@ ${errors.slice(0, 3).map((err) => {
   }
 
   public getTriggerPathToIdMapping(): Record<string, string> {
-    const workflowRootModulePath = this.workflowContext.modulePath.slice(0, -1);
-
     return Object.fromEntries(
       Array.from(
         this.workflowContext.globalTriggerContextsByTriggerId.entries()
       ).map(([triggerId, triggerContext]) => {
-        const modulePathParts = triggerContext.triggerModulePath;
-
-        let relativeModuleParts: string[];
-        const prefixMatches = workflowRootModulePath.every(
-          (part, index) => modulePathParts[index] === part
-        );
-
-        if (
-          prefixMatches &&
-          modulePathParts.length >= workflowRootModulePath.length
-        ) {
-          relativeModuleParts = modulePathParts.slice(
-            workflowRootModulePath.length
-          );
-        } else {
-          relativeModuleParts = [...modulePathParts];
-        }
-
-        const modulePath = relativeModuleParts.join(".");
-        const triggerPath =
-          relativeModuleParts.length > 0
-            ? `.${modulePath}.${triggerContext.triggerClassName}`
-            : `${modulePath}.${triggerContext.triggerClassName}`;
+        // Use full module path for consistency with Python lookups
+        const triggerPath = [
+          ...triggerContext.triggerModulePath,
+          triggerContext.triggerClassName,
+        ].join(".");
 
         return [triggerPath, triggerId];
       })
@@ -1077,35 +1057,16 @@ ${errors.slice(0, 3).map((err) => {
    * This ensures trigger attribute IDs remain stable across serialization round-trips.
    */
   public getTriggerAttributeIdMapping(): Record<string, string> {
-    const workflowRootModulePath = this.workflowContext.modulePath.slice(0, -1);
     const result: Record<string, string> = {};
 
     Array.from(
       this.workflowContext.globalTriggerContextsByTriggerId.entries()
     ).forEach(([, triggerContext]) => {
-      const modulePathParts = triggerContext.triggerModulePath;
-
-      let relativeModuleParts: string[];
-      const prefixMatches = workflowRootModulePath.every(
-        (part, index) => modulePathParts[index] === part
-      );
-
-      if (
-        prefixMatches &&
-        modulePathParts.length >= workflowRootModulePath.length
-      ) {
-        relativeModuleParts = modulePathParts.slice(
-          workflowRootModulePath.length
-        );
-      } else {
-        relativeModuleParts = [...modulePathParts];
-      }
-
-      const modulePath = relativeModuleParts.join(".");
-      const triggerPath =
-        relativeModuleParts.length > 0
-          ? `.${modulePath}.${triggerContext.triggerClassName}`
-          : `${modulePath}.${triggerContext.triggerClassName}`;
+      // Use full module path for consistency with Python lookups
+      const triggerPath = [
+        ...triggerContext.triggerModulePath,
+        triggerContext.triggerClassName,
+      ].join(".");
 
       // Add each attribute from the trigger
       const triggerData = triggerContext.triggerData;

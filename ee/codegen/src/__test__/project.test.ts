@@ -704,7 +704,7 @@ describe("WorkflowProjectGenerator", () => {
 
       const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
       expect(metadata.trigger_path_to_id_mapping).toEqual({
-        ".triggers.scheduled.ScheduleTrigger": "trigger-1",
+        "code.triggers.scheduled.ScheduleTrigger": "trigger-1",
       });
     });
 
@@ -818,9 +818,9 @@ describe("WorkflowProjectGenerator", () => {
 
       const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
       expect(metadata.trigger_attribute_id_mapping).toEqual({
-        ".triggers.scheduled.ScheduleTrigger|first_attribute":
+        "code.triggers.scheduled.ScheduleTrigger|first_attribute":
           "748d9061-5f79-407c-a44e-a1538440eed9",
-        ".triggers.scheduled.ScheduleTrigger|second_attribute":
+        "code.triggers.scheduled.ScheduleTrigger|second_attribute":
           "9b0cc233-9c11-435e-8d37-33dd3461689c",
       });
     });

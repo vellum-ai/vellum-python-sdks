@@ -36,19 +36,16 @@ def mock_metadata_json(trigger_class_name: str, trigger_id: UUID) -> Iterator[Tu
         # Create metadata.json with trigger mapping
         metadata_path = os.path.join(tmpdir, "metadata.json")
 
-        test_module_parts = __name__.split(".")
-        workflow_root_module = ".".join(test_module_parts[:-1])  # Remove last part
-
-        relative_module_path = "." + test_module_parts[-1]
-        # Include the full trigger path with class name to match TypeScript codegen
-        relative_trigger_path = f"{relative_module_path}.{trigger_class_name}"
+        # Use full module path for consistency with codegen
+        # e.g., "ee.vellum_ee...test_scheduled_trigger_serialization.DailyScheduleTrigger"
+        full_trigger_path = f"{__name__}.{trigger_class_name}"
 
         with open(metadata_path, "w") as f:
             json.dump(
                 {
                     "trigger_path_to_id_mapping": {
                         # Use full trigger path including class name
-                        relative_trigger_path: str(trigger_id),
+                        full_trigger_path: str(trigger_id),
                     }
                 },
                 f,
@@ -60,14 +57,11 @@ def mock_metadata_json(trigger_class_name: str, trigger_id: UUID) -> Iterator[Tu
             return open(metadata_path)
 
         # Mock the workflow root finder to return the parent module path
-        with patch(
-            "vellum.workflows.triggers.base._find_workflow_root_with_metadata", return_value=workflow_root_module
-        ):
-            with patch("vellum.workflows.triggers.base.virtual_open", side_effect=mock_virtual_open):
-                # Clear the LRU cache to ensure fresh read
-                _get_trigger_path_to_id_mapping.cache_clear()
+        with patch("vellum.workflows.triggers.base.virtual_open", side_effect=mock_virtual_open):
+            # Clear the LRU cache to ensure fresh read
+            _get_trigger_path_to_id_mapping.cache_clear()
 
-                yield __name__, trigger_id
+            yield __name__, trigger_id
 
 
 def test_scheduled_trigger_serialization_with_metadata_json():

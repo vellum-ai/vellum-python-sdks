@@ -32,27 +32,6 @@ def _is_annotated(cls: Type, name: str) -> bool:
     return False
 
 
-def _convert_to_relative_module_path(absolute_module_path: str, workflow_root: str) -> str:
-    """
-    Convert an absolute module path to a relative path from the workflow root.
-
-    Args:
-        absolute_module_path: The full module path (e.g., "workflow_id.triggers.scheduled")
-        workflow_root: The workflow root module (e.g., "workflow_id")
-
-    Returns:
-        Relative module path with leading dot (e.g., ".triggers.scheduled")
-    """
-    if not absolute_module_path.startswith(workflow_root):
-        return ""
-
-    remaining_path = absolute_module_path[len(workflow_root) :]
-    if remaining_path.startswith("."):
-        return remaining_path
-    else:
-        return "." + remaining_path
-
-
 def _find_workflow_root_with_metadata(trigger_module: str) -> Optional[str]:
     """
     Find the workflow root module by searching for metadata.json up the module hierarchy.
@@ -94,23 +73,14 @@ def _get_trigger_id_from_metadata(trigger_class: Type["BaseTrigger"]) -> Optiona
     Returns:
         The UUID from metadata.json, or None if not found
     """
-    workflow_root = _find_workflow_root_with_metadata(trigger_class.__module__)
-    if not workflow_root:
-        return None
-
     trigger_path_to_id_mapping = _get_trigger_path_to_id_mapping(trigger_class.__module__)
     if not trigger_path_to_id_mapping:
         return None
 
-    # Convert module path to relative path and append class name
-    # e.g., "root_module.triggers.scheduled" + "ScheduleTrigger" -> ".triggers.scheduled.ScheduleTrigger"
-    relative_module_path = _convert_to_relative_module_path(trigger_class.__module__, workflow_root)
-    if not relative_module_path:
-        return None
-
-    # Append class name to get full trigger path
-    relative_trigger_path = f"{relative_module_path}.{trigger_class.__qualname__}"
-    return trigger_path_to_id_mapping.get(relative_trigger_path)
+    # Use full module path for consistency with codegen
+    # e.g., "workflow_id.triggers.scheduled.ScheduleTrigger"
+    trigger_path = f"{trigger_class.__module__}.{trigger_class.__qualname__}"
+    return trigger_path_to_id_mapping.get(trigger_path)
 
 
 @lru_cache(maxsize=128)
@@ -206,23 +176,15 @@ def _get_trigger_attribute_id_from_metadata(trigger_class: Type["BaseTrigger"], 
     Returns:
         The UUID from metadata.json, or None if not found
     """
-    workflow_root = _find_workflow_root_with_metadata(trigger_class.__module__)
-    if not workflow_root:
-        return None
-
     attribute_mapping = _get_trigger_attribute_id_mapping(trigger_class.__module__)
     if not attribute_mapping:
         return None
 
-    # Convert module path to relative path and append class name
-    # e.g., "root_module.triggers.scheduled" + "ScheduleTrigger" -> ".triggers.scheduled.ScheduleTrigger"
-    relative_module_path = _convert_to_relative_module_path(trigger_class.__module__, workflow_root)
-    if not relative_module_path:
-        return None
-
+    # Use full module path for consistency with codegen
     # Build the key: "<trigger_path>|<attribute_key>"
-    relative_trigger_path = f"{relative_module_path}.{trigger_class.__qualname__}"
-    key = f"{relative_trigger_path}|{attribute_name}"
+    # e.g., "workflow_id.triggers.scheduled.ScheduleTrigger|attribute_name"
+    trigger_path = f"{trigger_class.__module__}.{trigger_class.__qualname__}"
+    key = f"{trigger_path}|{attribute_name}"
     return attribute_mapping.get(key)
 
 

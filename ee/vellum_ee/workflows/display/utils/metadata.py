@@ -33,33 +33,12 @@ def find_workflow_root_with_metadata(module_path: str) -> Optional[str]:
     return None
 
 
-def _normalize_edge_path(path: str, root: str) -> str:
-    """
-    Normalize an edge path from metadata.json to a fully-qualified Python module path.
-
-    Codegen writes relative paths starting with "." (e.g., ".nodes.custom.Custom.Trigger"),
-    but Python lookups use full module paths (e.g., "my_workflow.nodes.custom.Custom.Trigger").
-    This function expands relative paths to full paths.
-
-    Args:
-        path: The path from metadata.json (may be relative starting with "." or absolute)
-        root: The workflow root module path (e.g., "my_workflow")
-
-    Returns:
-        The fully-qualified module path
-    """
-    if path.startswith("."):
-        return f"{root}{path}"
-    return path
-
-
 def load_edges_to_id_mapping(module_path: str) -> Dict[str, str]:
     """
     Load edge path to ID mapping from metadata.json for a given module.
 
     This function searches up the module hierarchy for metadata.json and extracts
-    the edges_to_id_mapping. Keys are normalized from relative paths (starting with ".")
-    to fully-qualified Python module paths for consistent lookups.
+    the edges_to_id_mapping.
 
     Args:
         module_path: The module path to search from (e.g., "workflows.my_workflow")
@@ -75,23 +54,7 @@ def load_edges_to_id_mapping(module_path: str) -> Dict[str, str]:
         with virtual_open(file_path) as f:
             data = json.load(f)
             edges_map = data.get("edges_to_id_mapping")
-            if not isinstance(edges_map, dict):
-                return {}
-
-            # Normalize keys from relative paths to fully-qualified module paths
-            normalized_map: Dict[str, str] = {}
-            for key, value in edges_map.items():
-                parts = key.split("|")
-                if len(parts) == 2:
-                    source_path, target_path = parts
-                    normalized_source = _normalize_edge_path(source_path, root)
-                    normalized_target = _normalize_edge_path(target_path, root)
-                    normalized_key = f"{normalized_source}|{normalized_target}"
-                    normalized_map[normalized_key] = value
-                else:
-                    # Keep malformed keys as-is
-                    normalized_map[key] = value
-            return normalized_map
+            return edges_map if isinstance(edges_map, dict) else {}
     except Exception:
         return {}
 
