@@ -133,15 +133,29 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
             return self.Outputs(result=code_execution_result.output.value, log=code_execution_result.log)
 
     def _handle_api_error(self, e: ApiError) -> None:
-        if e.status_code and e.status_code == 403 and isinstance(e.body, dict):
+        body = e.body if isinstance(e.body, dict) else {}
+        detail = body.get("detail", "")
+        error_code = body.get("code")
+
+        if e.status_code and e.status_code == 403:
+            # Only classify as PROVIDER_CREDENTIALS_UNAVAILABLE if the backend explicitly indicates so
+            if error_code == "PROVIDER_CREDENTIALS_UNAVAILABLE" or (
+                isinstance(detail, str) and "provider credentials" in detail.lower()
+            ):
+                raise NodeException(
+                    message=detail or "Provider credentials is missing or unavailable",
+                    code=WorkflowErrorCode.PROVIDER_CREDENTIALS_UNAVAILABLE,
+                ) from e
+
+            # For other 403 errors, use NODE_EXECUTION to avoid misclassification
             raise NodeException(
-                message=e.body.get("detail", "Provider credentials is missing or unavailable"),
-                code=WorkflowErrorCode.PROVIDER_CREDENTIALS_UNAVAILABLE,
+                message=detail or "Code execution forbidden",
+                code=WorkflowErrorCode.NODE_EXECUTION,
             ) from e
 
-        if e.status_code and e.status_code >= 400 and e.status_code < 500 and isinstance(e.body, dict):
+        if e.status_code and e.status_code >= 400 and e.status_code < 500:
             raise NodeException(
-                message=e.body.get("message", e.body.get("detail", "Failed to execute code")),
+                message=body.get("message", detail) or "Failed to execute code",
                 code=WorkflowErrorCode.INVALID_INPUTS,
             ) from e
 
