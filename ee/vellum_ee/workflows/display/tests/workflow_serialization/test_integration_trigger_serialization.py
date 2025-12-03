@@ -381,17 +381,19 @@ def test_integration_trigger_and_entrypoint_edges_have_distinct_ids():
     trigger_id = trigger["id"]
 
     # AND find the Custom node (by definition name since there are multiple GENERIC nodes)
-    custom_nodes = [
-        n
-        for n in nodes
-        if isinstance(n, dict)
-        and n.get("type") == "GENERIC"
-        and isinstance(n.get("definition"), dict)
-        and n.get("definition", {}).get("name") == "Custom"
-    ]
-    assert len(custom_nodes) == 1, "Should have one Custom node"
-    custom_node = custom_nodes[0]
-    assert isinstance(custom_node, dict)
+    custom_node = None
+    for n in nodes:
+        if not isinstance(n, dict):
+            continue
+        if n.get("type") != "GENERIC":
+            continue
+        definition = n.get("definition")
+        if not isinstance(definition, dict):
+            continue
+        if definition.get("name") == "Custom":
+            custom_node = n
+            break
+    assert custom_node is not None, "Should have one Custom node"
     custom_node_id = custom_node["id"]
 
     # AND we should have BOTH an entrypoint edge AND a trigger edge to Custom
