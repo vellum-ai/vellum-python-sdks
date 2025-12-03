@@ -381,43 +381,122 @@ export class GraphAttribute extends AstNode {
       // TODO: Lots of other cases to handle here
       const sourceTrigger = sourceNodeOrTrigger;
       if (mutableAst.type === "empty") {
+        // Check if the target node also has an entrypoint edge.
+        // If so, we need to create a set to preserve both edges:
+        // {targetNode, Trigger >> targetNode}
+        // This handles the case where the trigger edge is processed before the entrypoint edge.
+        const hasEntrypointEdge =
+          this.entrypointNode &&
+          this.workflowContext.workflowRawData.edges.some(
+            (e) =>
+              e.sourceNodeId === this.entrypointNode?.id &&
+              e.targetNodeId === targetNode.reference.nodeData.id
+          );
+
+        if (hasEntrypointEdge) {
+          return this.flattenSet({
+            type: "set",
+            values: [
+              targetNode,
+              {
+                type: "right_shift",
+                lhs: sourceTrigger,
+                rhs: targetNode,
+              },
+            ],
+          });
+        }
+
         return {
           type: "right_shift",
           lhs: sourceTrigger,
           rhs: targetNode,
         };
       } else if (this.startsWithTargetNode(targetNode, mutableAst)) {
-        // Check if mutableAst is a bare node_reference (entrypoint only) or a more complex structure
-        // If it's a bare node_reference and the target node has no outgoing port edges,
-        // we should create a set to preserve the entrypoint edge.
+        // When both entrypoint and trigger point to the same node, create a set to preserve
+        // both edges. This handles cases like:
+        // - Bare node: {Custom, Trigger >> Custom}
+        // - Node with outgoing edges: {Custom, Trigger >> Custom} >> Output
         if (
           mutableAst.type === "node_reference" &&
           mutableAst.reference === targetNode.reference
         ) {
-          // Check if the target node has any outgoing port edges
-          const edgesByPortId = this.workflowContext.getEdgesByPortId();
-          let hasOutgoingEdges = false;
-          targetNode.reference.portContextsById.forEach((portContext) => {
-            const edges = edgesByPortId.get(portContext.portId);
-            if (edges && edges.length > 0) {
-              hasOutgoingEdges = true;
-            }
+          // Create a set to preserve both the entrypoint edge and the trigger edge
+          return this.flattenSet({
+            type: "set",
+            values: [
+              mutableAst,
+              {
+                type: "right_shift",
+                lhs: sourceTrigger,
+                rhs: targetNode,
+              },
+            ],
           });
+        }
 
-          // If the target node has no outgoing edges, create a set to preserve the entrypoint
-          if (!hasOutgoingEdges) {
-            return this.flattenSet({
+        // Handle the case where mutableAst is a right_shift starting with the target node
+        // (e.g., Custom >> Output). We need to preserve the entrypoint edge by creating
+        // a set: {Custom, Trigger >> Custom} >> Output
+        if (
+          mutableAst.type === "right_shift" &&
+          mutableAst.lhs.type === "node_reference" &&
+          mutableAst.lhs.reference === targetNode.reference
+        ) {
+          return {
+            type: "right_shift",
+            lhs: this.flattenSet({
               type: "set",
               values: [
-                mutableAst,
+                mutableAst.lhs,
                 {
                   type: "right_shift",
                   lhs: sourceTrigger,
                   rhs: targetNode,
                 },
               ],
-            });
-          }
+            }),
+            rhs: mutableAst.rhs,
+          };
+        }
+
+        // Handle the case where mutableAst is a right_shift starting with a port of the target node
+        // (e.g., Custom.Ports.if >> Output). We need to preserve the entrypoint edge by creating
+        // a set: {Custom.Ports.if >> Output, Trigger >> Custom}
+        if (
+          mutableAst.type === "right_shift" &&
+          mutableAst.lhs.type === "port_reference" &&
+          mutableAst.lhs.reference.nodeContext === targetNode.reference
+        ) {
+          return this.flattenSet({
+            type: "set",
+            values: [
+              mutableAst,
+              {
+                type: "right_shift",
+                lhs: sourceTrigger,
+                rhs: targetNode,
+              },
+            ],
+          });
+        }
+
+        // Handle the case where mutableAst is a set of branches starting from the target node's ports
+        // (e.g., {Custom.Ports.if >> Output, Custom.Ports.else >> Output2}). We need to add the
+        // trigger as a new entry to preserve both the entrypoint paths and the trigger path:
+        // {Custom.Ports.if >> Output, Custom.Ports.else >> Output2, Trigger >> Custom}
+        if (mutableAst.type === "set") {
+          return this.flattenSet({
+            type: "set",
+            values: [
+              ...mutableAst.values,
+              {
+                type: "right_shift",
+                lhs: sourceTrigger,
+                rhs: targetNode,
+              },
+            ],
+          });
         }
 
         // Otherwise, wrap the existing AST with the trigger
@@ -549,8 +628,25 @@ export class GraphAttribute extends AstNode {
         }
       }
 
+      // Check if this set has a non-trigger entry branch for the source node.
+      // If so, we should skip trigger-led branches when adding non-trigger edges,
+      // so that port edges only get added to the entrypoint branch, not the trigger branch.
+      const hasEntryBranchForSource =
+        !!sourceNode &&
+        setAst.values.some(
+          (value) =>
+            this.isNodeInBranch(sourceNode, value) &&
+            !this.startsWithTrigger(value)
+        );
+
       const newSet = setAst.values.map((subAst) => {
-        const canBeAdded = this.isNodeInBranch(sourceNode, subAst);
+        // Skip this branch if:
+        // 1. The source node is not in this branch, OR
+        // 2. There's an entrypoint branch for the source node AND this branch starts with a trigger
+        const canBeAdded =
+          !!sourceNode &&
+          this.isNodeInBranch(sourceNode, subAst) &&
+          (!hasEntryBranchForSource || !this.startsWithTrigger(subAst));
         if (!canBeAdded) {
           return { edgeAddedPriority: 0, original: subAst, value: subAst };
         }
@@ -1282,6 +1378,22 @@ export class GraphAttribute extends AstNode {
       );
     } else if (mutableAst.type === "right_shift") {
       return this.startsWithTargetNode(targetNode, mutableAst.lhs);
+    }
+    return false;
+  };
+
+  /**
+   * Checks if a branch in the AST starts with a trigger reference.
+   * Used to distinguish trigger-led branches from entrypoint-led branches
+   * when processing non-trigger edges in sets.
+   */
+  private startsWithTrigger = (mutableAst: GraphMutableAst): boolean => {
+    if (mutableAst.type === "trigger_reference") {
+      return true;
+    } else if (mutableAst.type === "right_shift") {
+      return this.startsWithTrigger(mutableAst.lhs);
+    } else if (mutableAst.type === "set") {
+      return mutableAst.values.every((value) => this.startsWithTrigger(value));
     }
     return false;
   };
