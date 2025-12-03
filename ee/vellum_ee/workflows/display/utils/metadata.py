@@ -38,7 +38,9 @@ def load_edges_to_id_mapping(module_path: str) -> Dict[str, str]:
     Load edge path to ID mapping from metadata.json for a given module.
 
     This function searches up the module hierarchy for metadata.json and extracts
-    the edges_to_id_mapping.
+    the edges_to_id_mapping. It normalizes relative paths (starting with ".") to
+    absolute paths using the workflow root module, ensuring compatibility with both
+    legacy metadata (relative paths) and new metadata (absolute paths).
 
     Args:
         module_path: The module path to search from (e.g., "workflows.my_workflow")
@@ -54,7 +56,24 @@ def load_edges_to_id_mapping(module_path: str) -> Dict[str, str]:
         with virtual_open(file_path) as f:
             data = json.load(f)
             edges_map = data.get("edges_to_id_mapping")
-            return edges_map if isinstance(edges_map, dict) else {}
+            if not isinstance(edges_map, dict):
+                return {}
+
+            def normalize_path(path: str) -> str:
+                if path.startswith(".") and root:
+                    return f"{root}{path}"
+                return path
+
+            normalized: Dict[str, str] = {}
+            for key, value in edges_map.items():
+                source, sep, target = key.partition("|")
+                if not sep:
+                    normalized[key] = value
+                    continue
+                normalized_key = f"{normalize_path(source)}|{normalize_path(target)}"
+                normalized[normalized_key] = value
+
+            return normalized
     except Exception:
         return {}
 
