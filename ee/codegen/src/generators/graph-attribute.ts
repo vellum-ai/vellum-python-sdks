@@ -7,6 +7,7 @@ import {
 } from "src/constants";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { MethodArgument } from "src/generators/extensions/method-argument";
+import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { Writer } from "src/generators/extensions/writer";
 import {
@@ -1479,7 +1480,7 @@ export class GraphAttribute extends AstNode {
         mutableAst.lhs.type === "set"
       );
       if (!lhs || !rhs) {
-        return python.TypeInstantiation.none();
+        return new NoneInstantiation();
       }
       return python.operator({
         operator: OperatorType.RightShift,
@@ -1488,7 +1489,7 @@ export class GraphAttribute extends AstNode {
       });
     }
 
-    return python.TypeInstantiation.none();
+    return new NoneInstantiation();
   }
 
   private generateGraphAttribute(): AstNode {

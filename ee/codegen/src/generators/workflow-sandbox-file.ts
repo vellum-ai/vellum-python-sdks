@@ -9,6 +9,7 @@ import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
+import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Json } from "src/generators/json";
@@ -319,7 +320,7 @@ if __name__ == "__main__":
         name: attr.key,
         value: matchingInput
           ? vellumValue({ vellumValue: matchingInput })
-          : python.TypeInstantiation.none(),
+          : new NoneInstantiation(),
       });
     });
 

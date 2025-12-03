@@ -2,6 +2,7 @@ import { python } from "@fern-api/python-ast";
 
 import { VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH } from "src/constants";
 import { Class } from "src/generators/extensions/class";
+import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseTrigger } from "src/generators/triggers/base-trigger";
@@ -75,7 +76,7 @@ export class IntegrationTrigger extends BaseTrigger<IntegrationTriggerType> {
               value:
                 typeof attr.default?.value === "string"
                   ? new StrInstantiation(attr.default.value)
-                  : python.TypeInstantiation.none(),
+                  : new NoneInstantiation(),
             }))
           ),
         })

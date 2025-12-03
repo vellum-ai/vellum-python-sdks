@@ -9,6 +9,7 @@ import { PortContext } from "src/context/port-context";
 import { Expression } from "src/generators/expression";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { MethodArgument } from "src/generators/extensions/method-argument";
+import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { Writer } from "src/generators/extensions/writer";
 import { NodeInput } from "src/generators/node-inputs";
@@ -102,7 +103,7 @@ export class ConditionalNodePort extends AstNode {
     ruleIdx: number = -1
   ): AstNode {
     if (!conditionData) {
-      return python.TypeInstantiation.none();
+      return new NoneInstantiation();
     }
 
     if (conditionData && conditionData.fieldNodeInputId) {
@@ -143,7 +144,7 @@ export class ConditionalNodePort extends AstNode {
 
     return otherConditions.length > 0
       ? otherConditions.reduce((prev, curr) => combine(prev, curr))
-      : python.TypeInstantiation.none();
+      : new NoneInstantiation();
   }
 
   private convertConditionTypeToPortAttribute(conditionType: string): string {
@@ -171,7 +172,7 @@ export class ConditionalNodePort extends AstNode {
           "WARNING"
         )
       );
-      return python.TypeInstantiation.none();
+      return new NoneInstantiation();
     }
     const lhs = this.nodeInputsByKey.get(lhsKey);
     if (isNil(lhs)) {
@@ -181,7 +182,7 @@ export class ConditionalNodePort extends AstNode {
           "WARNING"
         )
       );
-      return python.TypeInstantiation.none();
+      return new NoneInstantiation();
     }
 
     const operator = conditionData.operator

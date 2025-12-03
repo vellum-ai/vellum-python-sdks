@@ -7,6 +7,7 @@ import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
+import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
@@ -52,7 +53,7 @@ export class PromptParameters extends AstNode {
     );
 
     const temperatureValue = isNil(this.promptParametersRequest.temperature)
-      ? python.TypeInstantiation.none()
+      ? new NoneInstantiation()
       : python.TypeInstantiation.float(
           this.promptParametersRequest.temperature
         );
@@ -64,7 +65,7 @@ export class PromptParameters extends AstNode {
     );
 
     const maxTokensValue = isNil(this.promptParametersRequest.maxTokens)
-      ? python.TypeInstantiation.none()
+      ? new NoneInstantiation()
       : python.TypeInstantiation.float(this.promptParametersRequest.maxTokens);
     classArgs.push(
       new MethodArgument({
@@ -74,7 +75,7 @@ export class PromptParameters extends AstNode {
     );
 
     const topPValue = isNil(this.promptParametersRequest.topP)
-      ? python.TypeInstantiation.none()
+      ? new NoneInstantiation()
       : python.TypeInstantiation.float(this.promptParametersRequest.topP);
     classArgs.push(
       new MethodArgument({
@@ -84,7 +85,7 @@ export class PromptParameters extends AstNode {
     );
 
     const topKValue = isNil(this.promptParametersRequest.topK)
-      ? python.TypeInstantiation.none()
+      ? new NoneInstantiation()
       : python.TypeInstantiation.float(this.promptParametersRequest.topK);
     classArgs.push(
       new MethodArgument({
@@ -96,7 +97,7 @@ export class PromptParameters extends AstNode {
     const frequencyPenaltyValue = isNil(
       this.promptParametersRequest.frequencyPenalty
     )
-      ? python.TypeInstantiation.none()
+      ? new NoneInstantiation()
       : python.TypeInstantiation.float(
           this.promptParametersRequest.frequencyPenalty
         );
@@ -110,7 +111,7 @@ export class PromptParameters extends AstNode {
     const presencePenaltyValue = isNil(
       this.promptParametersRequest.presencePenalty
     )
-      ? python.TypeInstantiation.none()
+      ? new NoneInstantiation()
       : python.TypeInstantiation.float(
           this.promptParametersRequest.presencePenalty
         );
