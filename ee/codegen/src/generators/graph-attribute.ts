@@ -434,6 +434,45 @@ export class GraphAttribute extends AstNode {
           };
         }
 
+        // Handle the case where mutableAst is a right_shift starting with a port of the target node
+        // (e.g., Custom.Ports.if >> Output). We need to preserve the entrypoint edge by creating
+        // a set: {Custom.Ports.if >> Output, Trigger >> Custom}
+        if (
+          mutableAst.type === "right_shift" &&
+          mutableAst.lhs.type === "port_reference" &&
+          mutableAst.lhs.reference.nodeContext === targetNode.reference
+        ) {
+          return this.flattenSet({
+            type: "set",
+            values: [
+              mutableAst,
+              {
+                type: "right_shift",
+                lhs: sourceTrigger,
+                rhs: targetNode,
+              },
+            ],
+          });
+        }
+
+        // Handle the case where mutableAst is a set of branches starting from the target node's ports
+        // (e.g., {Custom.Ports.if >> Output, Custom.Ports.else >> Output2}). We need to add the
+        // trigger as a new entry to preserve both the entrypoint paths and the trigger path:
+        // {Custom.Ports.if >> Output, Custom.Ports.else >> Output2, Trigger >> Custom}
+        if (mutableAst.type === "set") {
+          return this.flattenSet({
+            type: "set",
+            values: [
+              ...mutableAst.values,
+              {
+                type: "right_shift",
+                lhs: sourceTrigger,
+                rhs: targetNode,
+              },
+            ],
+          });
+        }
+
         // Otherwise, wrap the existing AST with the trigger
         return {
           type: "right_shift",
@@ -563,8 +602,25 @@ export class GraphAttribute extends AstNode {
         }
       }
 
+      // Check if this set has a non-trigger entry branch for the source node.
+      // If so, we should skip trigger-led branches when adding non-trigger edges,
+      // so that port edges only get added to the entrypoint branch, not the trigger branch.
+      const hasEntryBranchForSource =
+        !!sourceNode &&
+        setAst.values.some(
+          (value) =>
+            this.isNodeInBranch(sourceNode, value) &&
+            !this.startsWithTrigger(value)
+        );
+
       const newSet = setAst.values.map((subAst) => {
-        const canBeAdded = this.isNodeInBranch(sourceNode, subAst);
+        // Skip this branch if:
+        // 1. The source node is not in this branch, OR
+        // 2. There's an entrypoint branch for the source node AND this branch starts with a trigger
+        const canBeAdded =
+          !!sourceNode &&
+          this.isNodeInBranch(sourceNode, subAst) &&
+          (!hasEntryBranchForSource || !this.startsWithTrigger(subAst));
         if (!canBeAdded) {
           return { edgeAddedPriority: 0, original: subAst, value: subAst };
         }
@@ -1296,6 +1352,22 @@ export class GraphAttribute extends AstNode {
       );
     } else if (mutableAst.type === "right_shift") {
       return this.startsWithTargetNode(targetNode, mutableAst.lhs);
+    }
+    return false;
+  };
+
+  /**
+   * Checks if a branch in the AST starts with a trigger reference.
+   * Used to distinguish trigger-led branches from entrypoint-led branches
+   * when processing non-trigger edges in sets.
+   */
+  private startsWithTrigger = (mutableAst: GraphMutableAst): boolean => {
+    if (mutableAst.type === "trigger_reference") {
+      return true;
+    } else if (mutableAst.type === "right_shift") {
+      return this.startsWithTrigger(mutableAst.lhs);
+    } else if (mutableAst.type === "set") {
+      return mutableAst.values.every((value) => this.startsWithTrigger(value));
     }
     return false;
   };

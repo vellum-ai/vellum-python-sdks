@@ -287,9 +287,10 @@ exports[`Workflow > graph > should generate correct graph for expression referen
 `;
 
 exports[`Workflow > graph > should generate correct graph when an IntegrationTrigger targets a ported custom node 1`] = `
-"LinearIssueCreatedTrigger >> {
+"{
     Custom.Ports.group_1_if_port >> Output,
     Custom.Ports.group_1_else_port >> Output2,
+    LinearIssueCreatedTrigger >> Custom,
 }
 "
 `;
