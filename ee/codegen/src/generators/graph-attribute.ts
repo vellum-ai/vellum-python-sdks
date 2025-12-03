@@ -381,6 +381,32 @@ export class GraphAttribute extends AstNode {
       // TODO: Lots of other cases to handle here
       const sourceTrigger = sourceNodeOrTrigger;
       if (mutableAst.type === "empty") {
+        // Check if the target node also has an entrypoint edge.
+        // If so, we need to create a set to preserve both edges:
+        // {targetNode, Trigger >> targetNode}
+        // This handles the case where the trigger edge is processed before the entrypoint edge.
+        const hasEntrypointEdge =
+          this.entrypointNode &&
+          this.workflowContext.workflowRawData.edges.some(
+            (e) =>
+              e.sourceNodeId === this.entrypointNode?.id &&
+              e.targetNodeId === targetNode.reference.nodeData.id
+          );
+
+        if (hasEntrypointEdge) {
+          return this.flattenSet({
+            type: "set",
+            values: [
+              targetNode,
+              {
+                type: "right_shift",
+                lhs: sourceTrigger,
+                rhs: targetNode,
+              },
+            ],
+          });
+        }
+
         return {
           type: "right_shift",
           lhs: sourceTrigger,
