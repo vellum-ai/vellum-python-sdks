@@ -1401,9 +1401,8 @@ describe("Workflow", () => {
             id: triggerId,
             type: WorkflowTriggerType.SCHEDULED,
             attributes: [],
-            execConfig: {
-              schedule: "0 0 * * *",
-            },
+            cron: "0 0 * * *",
+            timezone: "UTC",
           },
         ],
       });
