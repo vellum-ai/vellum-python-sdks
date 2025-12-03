@@ -3,6 +3,8 @@
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
+from vellum.workflows.ports import Port
+from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
@@ -304,3 +306,119 @@ def test_integration_trigger_serialization_display_data():
     assert isinstance(display_data, dict)
     assert display_data["icon"] == "vellum:icon:integrations/COMPOSIO/SLACK"
     assert display_data["color"] == "#4A154B"
+
+
+def test_integration_trigger_and_entrypoint_edges_have_distinct_ids():
+    """
+    Tests that when a node is both the target of an IntegrationTrigger AND has outgoing edges
+    (which creates an implicit entrypoint edge), both edges have distinct IDs.
+
+    This is a regression test for a bug where both edges were assigned the same ID,
+    causing the UI to deduplicate them and only show one edge.
+    """
+
+    # GIVEN an integration trigger
+    class LinearTrigger(IntegrationTrigger):
+        issue_id: str
+
+        class Config:
+            provider = "COMPOSIO"
+            integration_name = "LINEAR"
+            slug = "linear_issue_created"
+
+    # AND a custom node with conditional ports
+    class Custom(BaseNode):
+        class Ports(BaseNode.Ports):
+            group_1_if_port = Port.on_if(ConstantValueReference("hi").equals("hi"))
+            group_1_else_port = Port.on_else()
+
+    # AND output nodes
+    class Output(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            value = LinearTrigger.issue_id
+
+    class Output2(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            value = LinearTrigger.issue_id
+
+    # AND a workflow where Custom is both:
+    # 1. The target of an IntegrationTrigger (LinearTrigger >> Custom)
+    # 2. The source of regular edges (Custom.Ports >> Output/Output2)
+    # This creates both an entrypoint edge and a trigger edge to Custom
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = {
+            Custom.Ports.group_1_if_port >> Output,
+            Custom.Ports.group_1_else_port >> Output2,
+            LinearTrigger >> Custom,
+        }
+
+        class Outputs(BaseWorkflow.Outputs):
+            output = Output.Outputs.value
+            output_2 = Output2.Outputs.value
+
+    # WHEN we serialize the workflow
+    result = get_workflow_display(workflow_class=TestWorkflow).serialize()
+
+    # THEN we should have both an ENTRYPOINT node and a trigger
+    workflow_raw_data = result["workflow_raw_data"]
+    assert isinstance(workflow_raw_data, dict)
+    nodes = workflow_raw_data["nodes"]
+    assert isinstance(nodes, list)
+    edges = workflow_raw_data["edges"]
+    assert isinstance(edges, list)
+
+    entrypoint_nodes = [n for n in nodes if isinstance(n, dict) and n.get("type") == "ENTRYPOINT"]
+    assert len(entrypoint_nodes) == 1, "Should have an ENTRYPOINT node"
+    entrypoint_node = entrypoint_nodes[0]
+    assert isinstance(entrypoint_node, dict)
+    entrypoint_node_id = entrypoint_node["id"]
+
+    triggers = result.get("triggers", [])
+    assert isinstance(triggers, list)
+    assert len(triggers) == 1, "Should have one trigger"
+    trigger = triggers[0]
+    assert isinstance(trigger, dict)
+    trigger_id = trigger["id"]
+
+    # AND find the Custom node (by definition name since there are multiple GENERIC nodes)
+    custom_nodes = [
+        n
+        for n in nodes
+        if isinstance(n, dict)
+        and n.get("type") == "GENERIC"
+        and isinstance(n.get("definition"), dict)
+        and n.get("definition", {}).get("name") == "Custom"
+    ]
+    assert len(custom_nodes) == 1, "Should have one Custom node"
+    custom_node = custom_nodes[0]
+    assert isinstance(custom_node, dict)
+    custom_node_id = custom_node["id"]
+
+    # AND we should have BOTH an entrypoint edge AND a trigger edge to Custom
+    entrypoint_to_custom_edges = [
+        e
+        for e in edges
+        if isinstance(e, dict)
+        and e.get("source_node_id") == entrypoint_node_id
+        and e.get("target_node_id") == custom_node_id
+    ]
+    trigger_to_custom_edges = [
+        e
+        for e in edges
+        if isinstance(e, dict) and e.get("source_node_id") == trigger_id and e.get("target_node_id") == custom_node_id
+    ]
+
+    assert len(entrypoint_to_custom_edges) == 1, "Should have an entrypoint edge to Custom"
+    assert len(trigger_to_custom_edges) == 1, "Should have a trigger edge to Custom"
+
+    # AND the two edges should have DISTINCT IDs (this is the key assertion)
+    entrypoint_edge = entrypoint_to_custom_edges[0]
+    trigger_edge = trigger_to_custom_edges[0]
+    assert isinstance(entrypoint_edge, dict)
+    assert isinstance(trigger_edge, dict)
+    entrypoint_edge_id = entrypoint_edge["id"]
+    trigger_edge_id = trigger_edge["id"]
+
+    assert entrypoint_edge_id != trigger_edge_id, (
+        f"Entrypoint edge and trigger edge should have distinct IDs, " f"but both have ID: {entrypoint_edge_id}"
+    )
