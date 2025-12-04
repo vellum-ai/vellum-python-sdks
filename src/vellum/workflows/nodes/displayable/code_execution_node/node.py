@@ -136,22 +136,15 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
         body = e.body if isinstance(e.body, dict) else {}
         detail = body.get("detail") or body.get("message") or ""
 
-        if e.status_code == 403:
-            # 403s are platform-level errors (auth, permissions, throttling), not user code errors
-            raise NodeException(
-                message=detail or "Failed to execute code",
-                code=WorkflowErrorCode.NODE_EXECUTION,
-            ) from e
-
-        if e.status_code and 400 <= e.status_code < 500:
+        if e.status_code == 400:
             raise NodeException(
                 message=detail or "Failed to execute code",
                 code=WorkflowErrorCode.INVALID_INPUTS,
             ) from e
 
         raise NodeException(
-            message="Failed to execute code",
-            code=WorkflowErrorCode.INTERNAL_ERROR,
+            message=detail or "Failed to execute code",
+            code=WorkflowErrorCode.NODE_EXECUTION,
         ) from e
 
     def _has_secrets_in_code_inputs(self) -> bool:
