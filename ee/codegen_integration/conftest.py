@@ -94,8 +94,8 @@ def mock_trigger_metadata():
     metadata_content = {
         "trigger_path_to_id_mapping": {".triggers.scheduled.Scheduled": "c484ce55-a392-4a1b-8c10-1233b81c4539"},
         "edges_to_id_mapping": {
-            "vellum.workflows.triggers.manual.Manual|codegen_integration.fixtures.simple_scheduled_trigger.code.nodes.output.Output.Trigger": "42a1cc56-f544-4864-afa5-33d399d4e7eb",  # noqa: E501
-            "codegen_integration.fixtures.simple_scheduled_trigger.code.triggers.scheduled.Scheduled|codegen_integration.fixtures.simple_scheduled_trigger.code.nodes.output.Output.Trigger": "43083a12-5c4a-4839-ad92-8221f54ddfd3",  # noqa: E501
+            "vellum.workflows.triggers.manual.Manual|.nodes.output.Output.Trigger": "42a1cc56-f544-4864-afa5-33d399d4e7eb",  # noqa: E501
+            ".triggers.scheduled.Scheduled|.nodes.output.Output.Trigger": "43083a12-5c4a-4839-ad92-8221f54ddfd3",  # noqa: E501
         },
     }
 

@@ -1032,36 +1032,14 @@ ${errors.slice(0, 3).map((err) => {
   }
 
   public getTriggerPathToIdMapping(): Record<string, string> {
-    const workflowRootModulePath = this.workflowContext.modulePath.slice(0, -1);
-
     return Object.fromEntries(
       Array.from(
         this.workflowContext.globalTriggerContextsByTriggerId.entries()
       ).map(([triggerId, triggerContext]) => {
-        const modulePathParts = triggerContext.triggerModulePath;
-
-        let relativeModuleParts: string[];
-        const prefixMatches = workflowRootModulePath.every(
-          (part, index) => modulePathParts[index] === part
+        const triggerPath = this.formatMetadataClassPath(
+          triggerContext.triggerModulePath,
+          triggerContext.triggerClassName
         );
-
-        if (
-          prefixMatches &&
-          modulePathParts.length >= workflowRootModulePath.length
-        ) {
-          relativeModuleParts = modulePathParts.slice(
-            workflowRootModulePath.length
-          );
-        } else {
-          relativeModuleParts = [...modulePathParts];
-        }
-
-        const modulePath = relativeModuleParts.join(".");
-        const triggerPath =
-          relativeModuleParts.length > 0
-            ? `.${modulePath}.${triggerContext.triggerClassName}`
-            : `${modulePath}.${triggerContext.triggerClassName}`;
-
         return [triggerPath, triggerId];
       })
     );
@@ -1077,35 +1055,15 @@ ${errors.slice(0, 3).map((err) => {
    * This ensures trigger attribute IDs remain stable across serialization round-trips.
    */
   public getTriggerAttributeIdMapping(): Record<string, string> {
-    const workflowRootModulePath = this.workflowContext.modulePath.slice(0, -1);
     const result: Record<string, string> = {};
 
     Array.from(
       this.workflowContext.globalTriggerContextsByTriggerId.entries()
     ).forEach(([, triggerContext]) => {
-      const modulePathParts = triggerContext.triggerModulePath;
-
-      let relativeModuleParts: string[];
-      const prefixMatches = workflowRootModulePath.every(
-        (part, index) => modulePathParts[index] === part
+      const triggerPath = this.formatMetadataClassPath(
+        triggerContext.triggerModulePath,
+        triggerContext.triggerClassName
       );
-
-      if (
-        prefixMatches &&
-        modulePathParts.length >= workflowRootModulePath.length
-      ) {
-        relativeModuleParts = modulePathParts.slice(
-          workflowRootModulePath.length
-        );
-      } else {
-        relativeModuleParts = [...modulePathParts];
-      }
-
-      const modulePath = relativeModuleParts.join(".");
-      const triggerPath =
-        relativeModuleParts.length > 0
-          ? `.${modulePath}.${triggerContext.triggerClassName}`
-          : `${modulePath}.${triggerContext.triggerClassName}`;
 
       // Add each attribute from the trigger
       const triggerData = triggerContext.triggerData;
@@ -1164,10 +1122,10 @@ ${errors.slice(0, 3).map((err) => {
           edge.sourceNodeId
         );
         if (triggerContext) {
-          sourcePath = [
-            ...triggerContext.triggerModulePath,
-            triggerContext.triggerClassName,
-          ].join(".");
+          sourcePath = this.formatMetadataClassPath(
+            triggerContext.triggerModulePath,
+            triggerContext.triggerClassName
+          );
         } else {
           const sourceNodeContext = this.workflowContext.findNodeContext(
             edge.sourceNodeId
@@ -1175,10 +1133,10 @@ ${errors.slice(0, 3).map((err) => {
           if (sourceNodeContext) {
             // Incorporate the source handle to disambiguate multiple edges from the same source node
             // Use the handle id as the per-edge discriminator to avoid collisions.
-            const sourceNodeBasePath = [
-              ...sourceNodeContext.nodeModulePath,
-              sourceNodeContext.nodeClassName,
-            ].join(".");
+            const sourceNodeBasePath = this.formatMetadataClassPath(
+              sourceNodeContext.nodeModulePath,
+              sourceNodeContext.nodeClassName
+            );
             sourcePath = `${sourceNodeBasePath}.Ports.${edge.sourceHandleId}`;
           }
         }
@@ -1190,10 +1148,10 @@ ${errors.slice(0, 3).map((err) => {
       }
 
       // Targets of data edges and trigger edges connect to the node's trigger input
-      const targetNodeBasePath = [
-        ...target.nodeModulePath,
-        target.nodeClassName,
-      ].join(".");
+      const targetNodeBasePath = this.formatMetadataClassPath(
+        target.nodeModulePath,
+        target.nodeClassName
+      );
       const targetPath = `${targetNodeBasePath}.Trigger`;
       const key = `${sourcePath}|${targetPath}`;
       result[key] = edge.id;
@@ -1216,5 +1174,34 @@ ${errors.slice(0, 3).map((err) => {
     });
 
     return result;
+  }
+
+  private formatMetadataClassPath(
+    modulePathParts: string[],
+    className: string
+  ): string {
+    const workflowRootModulePath = this.workflowContext.modulePath.slice(0, -1);
+    const prefixMatches = workflowRootModulePath.every(
+      (part, index) => modulePathParts[index] === part
+    );
+
+    if (
+      prefixMatches &&
+      modulePathParts.length >= workflowRootModulePath.length
+    ) {
+      const relativeParts = modulePathParts.slice(
+        workflowRootModulePath.length
+      );
+      if (relativeParts.length === 0) {
+        return `.${className}`;
+      }
+      return `.${relativeParts.join(".")}.${className}`;
+    }
+
+    if (modulePathParts.length === 0) {
+      return className;
+    }
+
+    return `${modulePathParts.join(".")}.${className}`;
   }
 }
