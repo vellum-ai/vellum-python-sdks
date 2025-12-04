@@ -220,6 +220,8 @@ def push_command(
 
     provided_id = workflow_config.workflow_sandbox_id or workflow_sandbox_id
 
+    dataset_serialized = json.dumps(serialization_result.dataset) if serialization_result.dataset else OMIT
+
     try:
         response = client.workflows.push(
             exec_config=json.dumps(exec_config),
@@ -228,6 +230,7 @@ def push_command(
             # We should check with fern if we could auto-serialize typed object fields for us
             # https://app.shortcut.com/vellum/story/5568
             deployment_config=deployment_config_serialized,  # type: ignore[arg-type]
+            dataset=dataset_serialized,  # type: ignore[arg-type]
             dry_run=dry_run,
             strict=strict,
         )
