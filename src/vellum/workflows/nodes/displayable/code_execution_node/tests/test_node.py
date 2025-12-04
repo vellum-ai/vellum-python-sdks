@@ -6,7 +6,6 @@ from typing import Any, List, Union
 from pydantic import BaseModel
 
 from vellum import ArrayInput, CodeExecutorResponse, NumberVellumValue, StringInput, StringVellumValue
-from vellum.client.core.api_error import ApiError
 from vellum.client.errors.bad_request_error import BadRequestError
 from vellum.client.errors.forbidden_error import ForbiddenError
 from vellum.client.errors.internal_server_error import InternalServerError
@@ -796,34 +795,34 @@ Node.js v21.7.3
     assert exc_info.value.message == message
 
 
-def test_run_node__execute_code_api_fails_403__provider_credentials_unavailable(vellum_client):
-    """
-    Tests that a 403 error from the API is handled with PROVIDER_CREDENTIALS_UNAVAILABLE error code.
-    """
+def test_run_node__execute_code_api_fails_403__node_execution(vellum_client):
+    """Tests that a 403 error from the code execution API is handled with NODE_EXECUTION error code."""
 
+    # GIVEN a code execution node
     class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, str]):
         code = "def main(): return 'test'"
         runtime = "PYTHON_3_11_6"
         packages = [CodeExecutionPackage(name="requests", version="2.28.0")]
 
+    # AND the API returns a 403 error
     vellum_client.execute_code.side_effect = ForbiddenError(
         body={
-            "detail": "Provider credentials is missing or unavailable",
+            "detail": "Access denied to this resource",
         }
     )
 
+    # WHEN we run the node
     node = ExampleCodeExecutionNode()
     with pytest.raises(NodeException) as exc_info:
         node.run()
 
-    assert exc_info.value.code == WorkflowErrorCode.PROVIDER_CREDENTIALS_UNAVAILABLE
-    assert "Provider credentials is missing or unavailable" in exc_info.value.message
+    # THEN it should raise NODE_EXECUTION (not PROVIDER_CREDENTIALS_UNAVAILABLE)
+    assert exc_info.value.code == WorkflowErrorCode.NODE_EXECUTION
+    assert exc_info.value.message == "Access denied to this resource"
 
 
-def test_run_node__execute_code_api_fails_404__invalid_inputs(vellum_client):
-    """
-    Tests that a 404 error from the API is handled with INVALID_INPUTS error code.
-    """
+def test_run_node__execute_code_api_fails_404__node_execution(vellum_client):
+    """Tests that a 404 error from the API is handled with NODE_EXECUTION error code."""
 
     class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, str]):
         code = "def main(): return 'test'"
@@ -840,14 +839,12 @@ def test_run_node__execute_code_api_fails_404__invalid_inputs(vellum_client):
     with pytest.raises(NodeException) as exc_info:
         node.run()
 
-    assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
+    assert exc_info.value.code == WorkflowErrorCode.NODE_EXECUTION
     assert "Resource not found" in exc_info.value.message
 
 
 def test_run_node__execute_code_api_fails_500__internal_error(vellum_client):
-    """
-    Tests that a 500 error from the API is handled with INTERNAL_ERROR error code.
-    """
+    """Tests that a 500 error from the API is handled with INTERNAL_ERROR error code."""
 
     class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, str]):
         code = "def main(): return 'test'"
@@ -865,21 +862,18 @@ def test_run_node__execute_code_api_fails_500__internal_error(vellum_client):
         node.run()
 
     assert exc_info.value.code == WorkflowErrorCode.INTERNAL_ERROR
-    assert exc_info.value.message == "Failed to execute code"
+    assert exc_info.value.message == "Internal server error occurred"
 
 
-def test_run_node__execute_code_api_fails_4xx_no_message__uses_detail(vellum_client):
-    """
-    Tests that a 4xx error without a 'message' field falls back to 'detail' field.
-    """
+def test_run_node__execute_code_api_fails_400__invalid_inputs(vellum_client):
+    """Tests that a 400 error from the API is handled with INVALID_INPUTS error code."""
 
     class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, str]):
         code = "def main(): return 'test'"
         runtime = "PYTHON_3_11_6"
         packages = [CodeExecutionPackage(name="requests", version="2.28.0")]
 
-    vellum_client.execute_code.side_effect = ApiError(
-        status_code=422,
+    vellum_client.execute_code.side_effect = BadRequestError(
         body={
             "detail": "Invalid request parameters",
         },

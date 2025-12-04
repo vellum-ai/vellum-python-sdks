@@ -133,22 +133,16 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
             return self.Outputs(result=code_execution_result.output.value, log=code_execution_result.log)
 
     def _handle_api_error(self, e: ApiError) -> None:
-        if e.status_code and e.status_code == 403 and isinstance(e.body, dict):
-            raise NodeException(
-                message=e.body.get("detail", "Provider credentials is missing or unavailable"),
-                code=WorkflowErrorCode.PROVIDER_CREDENTIALS_UNAVAILABLE,
-            ) from e
+        body = e.body if isinstance(e.body, dict) else {}
+        message = body.get("detail") or body.get("message") or "Failed to execute code"
 
-        if e.status_code and e.status_code >= 400 and e.status_code < 500 and isinstance(e.body, dict):
-            raise NodeException(
-                message=e.body.get("message", e.body.get("detail", "Failed to execute code")),
-                code=WorkflowErrorCode.INVALID_INPUTS,
-            ) from e
+        if e.status_code == 400:
+            raise NodeException(message=message, code=WorkflowErrorCode.INVALID_INPUTS) from e
 
-        raise NodeException(
-            message="Failed to execute code",
-            code=WorkflowErrorCode.INTERNAL_ERROR,
-        ) from e
+        if e.status_code and e.status_code >= 500:
+            raise NodeException(message=message, code=WorkflowErrorCode.INTERNAL_ERROR) from e
+
+        raise NodeException(message=message, code=WorkflowErrorCode.NODE_EXECUTION) from e
 
     def _has_secrets_in_code_inputs(self) -> bool:
         """Check if any code_inputs contain VellumSecret instances that require API execution."""
