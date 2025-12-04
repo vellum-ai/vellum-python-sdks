@@ -15,6 +15,7 @@ from vellum.client.types.workflow_push_response import WorkflowPushResponse
 from vellum.utils.uuid import is_valid_uuid
 from vellum_cli import main as cli_main
 from vellum_ee.workflows.display.nodes.utils import to_kebab_case
+from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay, WorkflowSerializationResult
 
 
 def _extract_tar_gz(tar_gz_bytes: bytes) -> dict[str, str]:
@@ -172,6 +173,61 @@ def test_push__happy_path(mock_module, vellum_client, base_command):
 
     extracted_files = _extract_tar_gz(call_args["artifact"].read())
     assert extracted_files["workflow.py"] == workflow_py_file_content
+
+
+def test_push__forwards_dataset_to_client(mock_module, vellum_client, mocker):
+    """
+    Tests that the push command forwards the serialized dataset (scenarios)
+    to the API client when present.
+    """
+
+    # GIVEN a single workflow configured
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+
+    # AND a workflow exists in the module successfully
+    _ensure_workflow_py(temp_dir, module)
+
+    # AND serialize_module returns an exec_config and a dataset with a workflow_trigger_id
+    fake_exec_config = {
+        "workflow_raw_data": {
+            "definition": {"name": "ExampleWorkflow"},
+        }
+    }
+    fake_dataset = [
+        {
+            "label": "Scenario 1",
+            "inputs": {},
+            "workflow_trigger_id": "trigger-123",
+        }
+    ]
+    mocker.patch.object(
+        BaseWorkflowDisplay,
+        "serialize_module",
+        return_value=WorkflowSerializationResult(
+            exec_config=fake_exec_config,
+            errors=[],
+            dataset=fake_dataset,
+        ),
+    )
+
+    # AND the push API call returns successfully
+    vellum_client.workflows.push.return_value = WorkflowPushResponse(
+        workflow_sandbox_id=str(uuid4()),
+    )
+
+    # WHEN calling `vellum workflows push`
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["workflows", "push", module])
+
+    # THEN it should succeed
+    assert result.exit_code == 0
+
+    # AND we should have called the push API with the dataset argument
+    vellum_client.workflows.push.assert_called_once()
+    call_args = vellum_client.workflows.push.call_args.kwargs
+    assert "dataset" in call_args
+    assert json.loads(call_args["dataset"]) == fake_dataset
 
 
 @pytest.mark.usefixtures("info_log_level")
