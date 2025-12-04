@@ -134,18 +134,15 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
 
     def _handle_api_error(self, e: ApiError) -> None:
         body = e.body if isinstance(e.body, dict) else {}
-        detail = body.get("detail") or body.get("message") or ""
+        message = body.get("detail") or body.get("message") or "Failed to execute code"
 
         if e.status_code == 400:
-            raise NodeException(
-                message=detail or "Failed to execute code",
-                code=WorkflowErrorCode.INVALID_INPUTS,
-            ) from e
+            raise NodeException(message=message, code=WorkflowErrorCode.INVALID_INPUTS) from e
 
-        raise NodeException(
-            message=detail or "Failed to execute code",
-            code=WorkflowErrorCode.NODE_EXECUTION,
-        ) from e
+        if e.status_code and e.status_code >= 500:
+            raise NodeException(message=message, code=WorkflowErrorCode.INTERNAL_ERROR) from e
+
+        raise NodeException(message=message, code=WorkflowErrorCode.NODE_EXECUTION) from e
 
     def _has_secrets_in_code_inputs(self) -> bool:
         """Check if any code_inputs contain VellumSecret instances that require API execution."""
