@@ -257,12 +257,11 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
 
   private handleCodeExecutionFunction(f: ToolArgs): python.AstNode {
     const codeExecutionFunction = f as FunctionArgs;
-    const functionToGenerate = this.getFunction(codeExecutionFunction);
-    this.generateFunctionFile([functionToGenerate]);
-    const snakeName = toPythonSafeSnakeCase(functionToGenerate.name);
+    this.generateFunctionFile([codeExecutionFunction]);
+    const snakeName = toPythonSafeSnakeCase(codeExecutionFunction.name);
     // Use toValidPythonIdentifier to ensure the name is safe for Python references
     // but preserve original casing when possible (see APO-1372)
-    const safeName = toValidPythonIdentifier(functionToGenerate.name);
+    const safeName = toValidPythonIdentifier(codeExecutionFunction.name);
     const functionReference = python.reference({
       name: safeName, // Use safe Python identifier that preserves original casing
       modulePath: [`.${snakeName}`], // Import from snake_case module
