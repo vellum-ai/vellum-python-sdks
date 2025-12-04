@@ -141,7 +141,7 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
             # those are only produced by prompt execution services. All 403s from execute_code
             # should be treated as generic node execution errors.
             raise NodeException(
-                message=detail or "Code execution forbidden",
+                message=detail or "Failed to execute code",
                 code=WorkflowErrorCode.NODE_EXECUTION,
             ) from e
 
