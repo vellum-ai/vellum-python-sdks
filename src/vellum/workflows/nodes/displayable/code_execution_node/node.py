@@ -137,9 +137,7 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
         detail = body.get("detail") or body.get("message") or ""
 
         if e.status_code == 403:
-            # The code execution service doesn't return PROVIDER_CREDENTIALS_UNAVAILABLE errors;
-            # those are only produced by prompt execution services. All 403s from execute_code
-            # should be treated as generic node execution errors.
+            # 403s are platform-level errors (auth, permissions, throttling), not user code errors
             raise NodeException(
                 message=detail or "Failed to execute code",
                 code=WorkflowErrorCode.NODE_EXECUTION,

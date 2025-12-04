@@ -797,13 +797,7 @@ Node.js v21.7.3
 
 
 def test_run_node__execute_code_api_fails_403__node_execution(vellum_client):
-    """
-    Tests that a 403 error from the code execution API is handled with NODE_EXECUTION error code.
-
-    The code execution service doesn't return PROVIDER_CREDENTIALS_UNAVAILABLE errors;
-    those are only produced by prompt execution services. All 403s from execute_code
-    should be treated as generic node execution errors.
-    """
+    """Tests that a 403 error from the code execution API is handled with NODE_EXECUTION error code."""
 
     # GIVEN a code execution node
     class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, str]):
