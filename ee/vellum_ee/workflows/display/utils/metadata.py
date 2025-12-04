@@ -3,7 +3,7 @@
 import json
 import os
 from uuid import UUID
-from typing import Dict, Optional, Type
+from typing import Dict, Optional, Tuple, Type
 
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.utils.files import virtual_open
@@ -33,7 +33,7 @@ def find_workflow_root_with_metadata(module_path: str) -> Optional[str]:
     return None
 
 
-def load_edges_to_id_mapping(module_path: str) -> Dict[str, str]:
+def _load_edges_mapping(module_path: str) -> Tuple[Optional[str], Dict[str, str]]:
     """
     Load edge path to ID mapping from metadata.json for a given module.
 
@@ -47,16 +47,37 @@ def load_edges_to_id_mapping(module_path: str) -> Dict[str, str]:
         Dictionary mapping edge keys to their UUID strings
     """
     try:
-        root = find_workflow_root_with_metadata(module_path)
-        if not root:
-            return {}
-        file_path = os.path.join(root.replace(".", os.path.sep), "metadata.json")
+        workflow_root = find_workflow_root_with_metadata(module_path)
+        if not workflow_root:
+            return None, {}
+        file_path = os.path.join(workflow_root.replace(".", os.path.sep), "metadata.json")
         with virtual_open(file_path) as f:
             data = json.load(f)
             edges_map = data.get("edges_to_id_mapping")
-            return edges_map if isinstance(edges_map, dict) else {}
+            if isinstance(edges_map, dict):
+                return workflow_root, edges_map
+            return workflow_root, {}
     except Exception:
-        return {}
+        return None, {}
+
+
+def load_edges_to_id_mapping(module_path: str) -> Dict[str, str]:
+    _, mapping = _load_edges_mapping(module_path)
+    return mapping
+
+
+def _build_metadata_class_path(module: str, class_name: str, workflow_root: Optional[str]) -> str:
+    """
+    Format a class path so that it matches the metadata.json key structure.
+    """
+    if workflow_root:
+        if module == workflow_root:
+            return f".{class_name}"
+        prefix = f"{workflow_root}."
+        if module.startswith(prefix):
+            relative = module[len(prefix) :]
+            return f".{relative}.{class_name}" if relative else f".{class_name}"
+    return f"{module}.{class_name}"
 
 
 def get_trigger_edge_id(trigger_cls: Type, target_node: Type[BaseNode], module_path: str) -> Optional[str]:
@@ -71,9 +92,12 @@ def get_trigger_edge_id(trigger_cls: Type, target_node: Type[BaseNode], module_p
     Returns:
         The stable edge ID if found in metadata.json, None otherwise
     """
-    edges_mapping = load_edges_to_id_mapping(module_path)
-    trigger_path = f"{trigger_cls.__module__}.{trigger_cls.__name__}"
-    target_path = f"{target_node.__module__}.{target_node.__name__}.Trigger"
+    workflow_root, edges_mapping = _load_edges_mapping(module_path)
+    if not edges_mapping:
+        return None
+    trigger_path = _build_metadata_class_path(trigger_cls.__module__, trigger_cls.__name__, workflow_root)
+    target_base = _build_metadata_class_path(target_node.__module__, target_node.__name__, workflow_root)
+    target_path = f"{target_base}.Trigger"
     edge_key = f"{trigger_path}|{target_path}"
     return edges_mapping.get(edge_key)
 
@@ -89,9 +113,12 @@ def get_entrypoint_edge_id(target_node: Type[BaseNode], module_path: str) -> Opt
     Returns:
         The stable edge ID if found in metadata.json, None otherwise
     """
-    edges_mapping = load_edges_to_id_mapping(module_path)
+    workflow_root, edges_mapping = _load_edges_mapping(module_path)
+    if not edges_mapping:
+        return None
     manual_path = "vellum.workflows.triggers.manual.Manual"
-    target_path = f"{target_node.__module__}.{target_node.__name__}.Trigger"
+    target_base = _build_metadata_class_path(target_node.__module__, target_node.__name__, workflow_root)
+    target_path = f"{target_base}.Trigger"
     edge_key = f"{manual_path}|{target_path}"
     return edges_mapping.get(edge_key)
 
@@ -111,9 +138,13 @@ def get_regular_edge_id(
     Returns:
         The stable edge ID if found in metadata.json, None otherwise
     """
-    edges_mapping = load_edges_to_id_mapping(module_path)
-    source_path = f"{source_node_cls.__module__}.{source_node_cls.__name__}.Ports.{str(source_handle_id)}"
-    target_path = f"{target_node.__module__}.{target_node.__name__}.Trigger"
+    workflow_root, edges_mapping = _load_edges_mapping(module_path)
+    if not edges_mapping:
+        return None
+    source_base = _build_metadata_class_path(source_node_cls.__module__, source_node_cls.__name__, workflow_root)
+    source_path = f"{source_base}.Ports.{str(source_handle_id)}"
+    target_base = _build_metadata_class_path(target_node.__module__, target_node.__name__, workflow_root)
+    target_path = f"{target_base}.Trigger"
     edge_key = f"{source_path}|{target_path}"
     return edges_mapping.get(edge_key)
 
