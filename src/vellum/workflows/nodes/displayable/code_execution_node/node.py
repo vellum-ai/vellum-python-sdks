@@ -135,30 +135,17 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
     def _handle_api_error(self, e: ApiError) -> None:
         body = e.body if isinstance(e.body, dict) else {}
         detail = body.get("detail") or body.get("message") or ""
-        error_code = body.get("code")
 
-        if e.status_code and e.status_code == 403:
-            # Only classify as PROVIDER_CREDENTIALS_UNAVAILABLE if the backend explicitly indicates so
-            if error_code == "PROVIDER_CREDENTIALS_UNAVAILABLE":
-                raise NodeException(
-                    message=detail or "Provider credentials is missing or unavailable",
-                    code=WorkflowErrorCode.PROVIDER_CREDENTIALS_UNAVAILABLE,
-                ) from e
-
-            # Backwards-compat for older responses that only set detail
-            if detail == "Provider credentials is missing or unavailable":
-                raise NodeException(
-                    message=detail,
-                    code=WorkflowErrorCode.PROVIDER_CREDENTIALS_UNAVAILABLE,
-                ) from e
-
-            # For other 403 errors, use NODE_EXECUTION to avoid misclassification
+        if e.status_code == 403:
+            # The code execution service doesn't return PROVIDER_CREDENTIALS_UNAVAILABLE errors;
+            # those are only produced by prompt execution services. All 403s from execute_code
+            # should be treated as generic node execution errors.
             raise NodeException(
                 message=detail or "Code execution forbidden",
                 code=WorkflowErrorCode.NODE_EXECUTION,
             ) from e
 
-        if e.status_code and e.status_code >= 400 and e.status_code < 500:
+        if e.status_code and 400 <= e.status_code < 500:
             raise NodeException(
                 message=detail or "Failed to execute code",
                 code=WorkflowErrorCode.INVALID_INPUTS,
