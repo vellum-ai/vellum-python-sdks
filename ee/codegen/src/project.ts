@@ -1147,18 +1147,6 @@ ${errors.slice(0, 3).map((err) => {
    */
   public getEdgesToIdMapping(): Record<string, string> {
     const result: Record<string, string> = {};
-    const workflowRootModuleName =
-      this.workflowContext.moduleName?.replace(/\.$/, "") ?? "";
-
-    const normalizeEdgePath = (path?: string): string | undefined => {
-      if (!path) {
-        return path;
-      }
-      if (!path.startsWith(".") || !workflowRootModuleName) {
-        return path;
-      }
-      return `${workflowRootModuleName}${path}`;
-    };
 
     const entrypointNode = this.workflowContext.tryGetEntrypointNode();
 
@@ -1207,12 +1195,7 @@ ${errors.slice(0, 3).map((err) => {
         target.nodeClassName,
       ].join(".");
       const targetPath = `${targetNodeBasePath}.Trigger`;
-      const normalizedSourcePath = normalizeEdgePath(sourcePath);
-      const normalizedTargetPath = normalizeEdgePath(targetPath);
-      if (!normalizedSourcePath || !normalizedTargetPath) {
-        return;
-      }
-      const key = `${normalizedSourcePath}|${normalizedTargetPath}`;
+      const key = `${sourcePath}|${targetPath}`;
       result[key] = edge.id;
     });
 
