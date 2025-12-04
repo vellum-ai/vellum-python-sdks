@@ -1122,10 +1122,10 @@ ${errors.slice(0, 3).map((err) => {
           edge.sourceNodeId
         );
         if (triggerContext) {
-        sourcePath = this.formatMetadataClassPath(
-          triggerContext.triggerModulePath,
-          triggerContext.triggerClassName
-        );
+          sourcePath = this.formatMetadataClassPath(
+            triggerContext.triggerModulePath,
+            triggerContext.triggerClassName
+          );
         } else {
           const sourceNodeContext = this.workflowContext.findNodeContext(
             edge.sourceNodeId
@@ -1189,7 +1189,9 @@ ${errors.slice(0, 3).map((err) => {
       prefixMatches &&
       modulePathParts.length >= workflowRootModulePath.length
     ) {
-      const relativeParts = modulePathParts.slice(workflowRootModulePath.length);
+      const relativeParts = modulePathParts.slice(
+        workflowRootModulePath.length
+      );
       if (relativeParts.length === 0) {
         return `.${className}`;
       }
