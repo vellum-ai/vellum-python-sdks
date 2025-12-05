@@ -1,3 +1,4 @@
+from datetime import datetime
 import typing
 from typing import Any, List, Tuple, Type, Union, get_args, get_origin
 
@@ -60,7 +61,7 @@ def primitive_type_to_vellum_variable_type(type_: Union[Type, BaseDescriptor]) -
 
         type_ = type_.types[0]
 
-    if _is_type_optionally_equal(type_, str):
+    if _is_type_optionally_in(type_, (str, datetime)):
         return "STRING"
     elif _is_type_optionally_in(type_, (int, float)):
         return "NUMBER"
