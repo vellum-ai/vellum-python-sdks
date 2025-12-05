@@ -1,4 +1,5 @@
 import pytest
+from datetime import datetime
 from typing import List, Optional
 
 from vellum import ChatMessage, SearchResult, VellumAudio, VellumDocument, VellumImage, VellumValue
@@ -14,6 +15,8 @@ from vellum.workflows.utils.vellum_variables import (
     [
         (str, "STRING"),
         (Optional[str], "STRING"),
+        (datetime, "STRING"),
+        (Optional[datetime], "STRING"),
         (int, "NUMBER"),
         (Optional[int], "NUMBER"),
         (float, "NUMBER"),

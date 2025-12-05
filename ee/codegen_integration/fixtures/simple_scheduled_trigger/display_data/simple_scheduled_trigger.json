@@ -172,10 +172,10 @@
         {
           "id": "3882abb3-efd6-492a-a700-bd2a7e71d4bb",
           "key": "current_run_at",
-          "type": "JSON",
+          "type": "STRING",
           "required": true,
           "default": {
-            "type": "JSON",
+            "type": "STRING",
             "value": null
           },
           "extensions": null,
@@ -184,10 +184,10 @@
         {
           "id": "051faa28-5589-42b8-ad09-0dede7196bd8",
           "key": "next_run_at",
-          "type": "JSON",
+          "type": "STRING",
           "required": true,
           "default": {
-            "type": "JSON",
+            "type": "STRING",
             "value": null
           },
           "extensions": null,
