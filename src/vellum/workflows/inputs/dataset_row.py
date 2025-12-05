@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any, Callable, Dict, List, Optional, Sequence, Union
 
 from pydantic import ConfigDict, Field, SerializationInfo, field_serializer, model_serializer
@@ -44,6 +45,15 @@ class DatasetRow(UniversalBaseModel):
             value = serialized.pop("workflow_trigger")
             if value is not None:
                 serialized["workflow_trigger_id"] = value
+
+        # Merge trigger attribute values into inputs if workflow_trigger is present
+        if self.workflow_trigger is not None:
+            trigger_attrs = self.workflow_trigger.to_trigger_attribute_values()
+            for ref, attr_value in trigger_attrs.items():
+                # Convert datetime objects to ISO format strings for JSON serialization
+                if isinstance(attr_value, datetime):
+                    attr_value = attr_value.isoformat()
+                serialized["inputs"][ref.name] = attr_value
 
         if "id" in serialized and serialized.get("id") is None:
             serialized.pop("id")
