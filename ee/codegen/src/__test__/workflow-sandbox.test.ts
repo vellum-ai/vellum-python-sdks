@@ -430,5 +430,110 @@ describe("Workflow Sandbox", () => {
 
       expect(result).toMatchSnapshot();
     });
+
+    it("should generate DatasetRow with mocks using array format for then_outputs", async () => {
+      const writer = new Writer();
+      const uniqueWorkflowContext = workflowContextFactory();
+      const inputVariable: VellumVariable = {
+        id: "1",
+        key: "test_input",
+        type: "STRING",
+      };
+
+      uniqueWorkflowContext.addInputVariableContext(
+        inputVariableContextFactory({
+          inputVariableData: inputVariable,
+          workflowContext: uniqueWorkflowContext,
+        })
+      );
+
+      // Create a generic node with a known output id
+      const genericNodeData = genericNodeFactory({
+        nodeOutputs: [
+          {
+            id: "test-output-id-1",
+            name: "text_output",
+            type: "STRING",
+          },
+          {
+            id: "test-output-id-2",
+            name: "json_output",
+            type: "JSON",
+          },
+        ],
+      });
+      await nodeContextFactory({
+        workflowContext: uniqueWorkflowContext,
+        nodeData: genericNodeData,
+      });
+
+      const sandboxInputs: WorkflowSandboxDatasetRow[] = [
+        {
+          label: "Scenario with Array Mocks",
+          inputs: [
+            {
+              name: inputVariable.key,
+              type: "STRING",
+              value: "test-value",
+            },
+          ],
+          mocks: [
+            {
+              node_id: genericNodeData.id,
+              when_condition: {
+                type: "BINARY_EXPRESSION",
+                operator: ">=",
+                lhs: {
+                  type: "EXECUTION_COUNTER",
+                  nodeId: genericNodeData.id,
+                },
+                rhs: {
+                  type: "CONSTANT_VALUE",
+                  value: {
+                    type: "NUMBER",
+                    value: 0,
+                  },
+                },
+              },
+              then_outputs: [
+                {
+                  output_id: "test-output-id-1",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: {
+                      type: "STRING",
+                      value: "This is a mocked text output",
+                    },
+                  },
+                },
+                {
+                  output_id: "test-output-id-2",
+                  value: {
+                    type: "CONSTANT_VALUE",
+                    value: {
+                      type: "JSON",
+                      value: { key: "mocked_value", nested: { data: 123 } },
+                    },
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      ];
+
+      const sandbox = codegen.workflowSandboxFile({
+        workflowContext: uniqueWorkflowContext,
+        sandboxInputs,
+      });
+
+      sandbox.write(writer);
+      const result = await writer.toStringFormatted();
+
+      expect(result).toMatchSnapshot();
+      expect(result).toContain("text_output=");
+      expect(result).toContain("json_output=");
+      expect(result).toContain("This is a mocked text output");
+    });
   });
 });
