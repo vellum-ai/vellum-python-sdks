@@ -1,11 +1,16 @@
-from vellum.workflows.nodes.displayable.bases.api_node import BaseAPINode
+from vellum._lazy import make_lazy_loader
 
-from .error_node import ErrorNode
-from .inline_subworkflow_node import InlineSubworkflowNode
-from .map_node import MapNode
-from .retry_node import RetryNode
-from .templating_node import TemplatingNode
-from .try_node import TryNode
+_LAZY_IMPORTS = {
+    "BaseAPINode": ("vellum.workflows.nodes.displayable.bases.api_node", "BaseAPINode"),
+    "ErrorNode": (".error_node", "ErrorNode"),
+    "InlineSubworkflowNode": (".inline_subworkflow_node", "InlineSubworkflowNode"),
+    "MapNode": (".map_node", "MapNode"),
+    "RetryNode": (".retry_node", "RetryNode"),
+    "TemplatingNode": (".templating_node", "TemplatingNode"),
+    "TryNode": (".try_node", "TryNode"),
+}
+
+__getattr__, __dir__ = make_lazy_loader(__name__, _LAZY_IMPORTS)
 
 __all__ = [
     "BaseAPINode",

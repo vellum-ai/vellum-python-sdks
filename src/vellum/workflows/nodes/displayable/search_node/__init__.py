@@ -1,4 +1,10 @@
-from .node import SearchNode
+from vellum._lazy import make_lazy_loader
+
+_LAZY_IMPORTS = {
+    "SearchNode": (".node", "SearchNode"),
+}
+
+__getattr__, __dir__ = make_lazy_loader(__name__, _LAZY_IMPORTS)
 
 __all__ = [
     "SearchNode",

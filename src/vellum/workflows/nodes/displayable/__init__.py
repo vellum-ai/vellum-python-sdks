@@ -1,21 +1,27 @@
-from ..core.error_node import ErrorNode
-from ..core.inline_subworkflow_node import InlineSubworkflowNode
-from ..core.map_node import MapNode
-from ..core.templating_node import TemplatingNode
-from .api_node import APINode
-from .code_execution_node import CodeExecutionNode
-from .conditional_node import ConditionalNode
-from .final_output_node import FinalOutputNode
-from .guardrail_node import GuardrailNode
-from .inline_prompt_node import InlinePromptNode
-from .merge_node import MergeNode
-from .note_node import NoteNode
-from .prompt_deployment_node import PromptDeploymentNode
-from .search_node import SearchNode
-from .set_state_node import SetStateNode
-from .subworkflow_deployment_node import SubworkflowDeploymentNode
-from .tool_calling_node import ToolCallingNode
-from .web_search_node import WebSearchNode
+from vellum._lazy import make_lazy_loader
+
+_LAZY_IMPORTS = {
+    "ErrorNode": ("..core.error_node", "ErrorNode"),
+    "InlineSubworkflowNode": ("..core.inline_subworkflow_node", "InlineSubworkflowNode"),
+    "MapNode": ("..core.map_node", "MapNode"),
+    "TemplatingNode": ("..core.templating_node", "TemplatingNode"),
+    "APINode": (".api_node", "APINode"),
+    "CodeExecutionNode": (".code_execution_node", "CodeExecutionNode"),
+    "ConditionalNode": (".conditional_node", "ConditionalNode"),
+    "FinalOutputNode": (".final_output_node", "FinalOutputNode"),
+    "GuardrailNode": (".guardrail_node", "GuardrailNode"),
+    "InlinePromptNode": (".inline_prompt_node", "InlinePromptNode"),
+    "MergeNode": (".merge_node", "MergeNode"),
+    "NoteNode": (".note_node", "NoteNode"),
+    "PromptDeploymentNode": (".prompt_deployment_node", "PromptDeploymentNode"),
+    "SearchNode": (".search_node", "SearchNode"),
+    "SetStateNode": (".set_state_node", "SetStateNode"),
+    "SubworkflowDeploymentNode": (".subworkflow_deployment_node", "SubworkflowDeploymentNode"),
+    "ToolCallingNode": (".tool_calling_node", "ToolCallingNode"),
+    "WebSearchNode": (".web_search_node", "WebSearchNode"),
+}
+
+__getattr__, __dir__ = make_lazy_loader(__name__, _LAZY_IMPORTS)
 
 __all__ = [
     "APINode",

@@ -1,4 +1,10 @@
-from .node import SubworkflowDeploymentNode
+from vellum._lazy import make_lazy_loader
+
+_LAZY_IMPORTS = {
+    "SubworkflowDeploymentNode": (".node", "SubworkflowDeploymentNode"),
+}
+
+__getattr__, __dir__ = make_lazy_loader(__name__, _LAZY_IMPORTS)
 
 __all__ = [
     "SubworkflowDeploymentNode",

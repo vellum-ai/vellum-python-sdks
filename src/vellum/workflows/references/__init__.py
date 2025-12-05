@@ -1,12 +1,18 @@
-from .environment_variable import EnvironmentVariableReference
-from .external_input import ExternalInputReference
-from .lazy import LazyReference
-from .node import NodeReference
-from .output import OutputReference
-from .state_value import StateValueReference
-from .trigger import TriggerAttributeReference
-from .vellum_secret import VellumSecretReference
-from .workflow_input import WorkflowInputReference
+from vellum._lazy import make_lazy_loader
+
+_LAZY_IMPORTS = {
+    "EnvironmentVariableReference": (".environment_variable", "EnvironmentVariableReference"),
+    "ExternalInputReference": (".external_input", "ExternalInputReference"),
+    "LazyReference": (".lazy", "LazyReference"),
+    "NodeReference": (".node", "NodeReference"),
+    "OutputReference": (".output", "OutputReference"),
+    "StateValueReference": (".state_value", "StateValueReference"),
+    "TriggerAttributeReference": (".trigger", "TriggerAttributeReference"),
+    "VellumSecretReference": (".vellum_secret", "VellumSecretReference"),
+    "WorkflowInputReference": (".workflow_input", "WorkflowInputReference"),
+}
+
+__getattr__, __dir__ = make_lazy_loader(__name__, _LAZY_IMPORTS)
 
 __all__ = [
     "EnvironmentVariableReference",

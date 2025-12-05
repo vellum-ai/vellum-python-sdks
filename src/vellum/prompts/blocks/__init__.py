@@ -1,3 +1,10 @@
-from .helpers import TextSystemMessage, TextUserMessage
+from vellum._lazy import make_lazy_loader
+
+_LAZY_IMPORTS = {
+    "TextSystemMessage": (".helpers", "TextSystemMessage"),
+    "TextUserMessage": (".helpers", "TextUserMessage"),
+}
+
+__getattr__, __dir__ = make_lazy_loader(__name__, _LAZY_IMPORTS)
 
 __all__ = ["TextSystemMessage", "TextUserMessage"]

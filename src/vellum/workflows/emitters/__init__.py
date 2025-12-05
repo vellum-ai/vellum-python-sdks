@@ -1,5 +1,11 @@
-from .base import BaseWorkflowEmitter
-from .vellum_emitter import VellumEmitter
+from vellum._lazy import make_lazy_loader
+
+_LAZY_IMPORTS = {
+    "BaseWorkflowEmitter": (".base", "BaseWorkflowEmitter"),
+    "VellumEmitter": (".vellum_emitter", "VellumEmitter"),
+}
+
+__getattr__, __dir__ = make_lazy_loader(__name__, _LAZY_IMPORTS)
 
 __all__ = [
     "BaseWorkflowEmitter",

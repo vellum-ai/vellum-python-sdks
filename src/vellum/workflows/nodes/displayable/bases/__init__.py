@@ -1,7 +1,13 @@
-from .api_node import BaseAPINode
-from .inline_prompt_node import BaseInlinePromptNode
-from .prompt_deployment_node import BasePromptDeploymentNode
-from .search_node import BaseSearchNode
+from vellum._lazy import make_lazy_loader
+
+_LAZY_IMPORTS = {
+    "BaseAPINode": (".api_node", "BaseAPINode"),
+    "BaseInlinePromptNode": (".inline_prompt_node", "BaseInlinePromptNode"),
+    "BasePromptDeploymentNode": (".prompt_deployment_node", "BasePromptDeploymentNode"),
+    "BaseSearchNode": (".search_node", "BaseSearchNode"),
+}
+
+__getattr__, __dir__ = make_lazy_loader(__name__, _LAZY_IMPORTS)
 
 __all__ = [
     "BaseAPINode",
