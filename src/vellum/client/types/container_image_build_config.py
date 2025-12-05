@@ -10,6 +10,7 @@ from .code_execution_package import CodeExecutionPackage
 class ContainerImageBuildConfig(UniversalBaseModel):
     packages: typing.List[CodeExecutionPackage]
     user_script: typing.Optional[str] = None
+    hotswappable_version: typing.Optional[str] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

@@ -24,6 +24,7 @@ IntegrationName = typing.Union[
         "MEM0",
         "MONDAY",
         "NEON",
+        "OUTLOOK",
         "GITHUB",
         "GOOGLE_SHEETS",
         "GOOGLE_CALENDAR",
