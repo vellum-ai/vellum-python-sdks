@@ -45,6 +45,12 @@ class DatasetRow(UniversalBaseModel):
             if value is not None:
                 serialized["workflow_trigger_id"] = value
 
+        # Merge trigger attribute values into inputs if workflow_trigger is present
+        if self.workflow_trigger is not None:
+            trigger_attrs = self.workflow_trigger.to_trigger_attribute_values()
+            for ref, attr_value in trigger_attrs.items():
+                serialized["inputs"][ref.name] = attr_value
+
         if "id" in serialized and serialized.get("id") is None:
             serialized.pop("id")
 

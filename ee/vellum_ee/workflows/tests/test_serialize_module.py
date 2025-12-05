@@ -68,7 +68,7 @@ def test_serialize_module_with_actual_dataset():
     assert result.dataset[1]["inputs"]["message"] == "DatasetRow Test"
 
 
-def test_serialize_module_with_actual_dataset_with_trigger(metadata_trigger_factory):
+def test_serialize_module_with_actual_dataset_with_scheduled_trigger(metadata_trigger_factory):
     """Test that serialize_module correctly serializes dataset with trigger"""
     module_path = "tests.workflows.test_dataset_with_trigger_serialization"
 
@@ -85,6 +85,12 @@ def test_serialize_module_with_actual_dataset_with_trigger(metadata_trigger_fact
 
     assert result.dataset[0]["label"] == "Scenario 1"
     assert result.dataset[0]["workflow_trigger_id"] == str(metadata_trigger_id)
+
+    inputs = result.dataset[0]["inputs"]
+    assert len(inputs) == 2
+
+    assert "current_run_at" in inputs
+    assert "next_run_at" in inputs
 
 
 def test_serialize_module_happy_path():
