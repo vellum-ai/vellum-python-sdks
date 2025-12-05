@@ -259,15 +259,47 @@ if __name__ == "__main__":
     }
 
     // Generate then_outputs by instantiating the node's Outputs class
-    const outputsArguments: MethodArgument[] = Object.entries(
-      mock.then_outputs
-    ).map(
-      ([key, value]) =>
-        new MethodArgument({
-          name: key,
-          value: new Json(value),
+    // Handle both array format (with output_id) and object format (with keys)
+    let outputsArguments: MethodArgument[];
+
+    if (Array.isArray(mock.then_outputs)) {
+      // Array format: each element has output_id and value
+      outputsArguments = mock.then_outputs
+        .map((output) => {
+          const outputName = nodeContext.getNodeOutputNameById(
+            output.output_id
+          );
+          if (isNil(outputName)) {
+            this.workflowContext.addError(
+              new NodeNotFoundError(
+                `Failed to find output name for output_id '${output.output_id}' in node '${mock.node_id}'`,
+                "WARNING"
+              )
+            );
+            return null;
+          }
+          return new MethodArgument({
+            name: outputName,
+            value: new WorkflowValueDescriptor({
+              workflowValueDescriptor: output.value,
+              workflowContext: this.workflowContext,
+            }),
+          });
         })
-    );
+        .filter((arg): arg is MethodArgument => !isNil(arg));
+    } else if (!isNil(mock.then_outputs)) {
+      // Object format: keys are output names, values are the output values
+      outputsArguments = Object.entries(mock.then_outputs).map(
+        ([key, value]) =>
+          new MethodArgument({
+            name: key,
+            value: new Json(value),
+          })
+      );
+    } else {
+      // No then_outputs provided
+      outputsArguments = [];
+    }
 
     const thenOutputsInstance = new ClassInstantiation({
       classReference: new Reference({

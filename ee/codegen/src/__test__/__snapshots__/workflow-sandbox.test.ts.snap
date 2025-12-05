@@ -1,5 +1,42 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Workflow Sandbox > write > should generate DatasetRow with mocks using array format for then_outputs 1`] = `
+"from vellum.workflows import MockNodeExecution
+from vellum.workflows.inputs import DatasetRow
+from vellum.workflows.sandbox import WorkflowSandboxRunner
+
+from .inputs import Inputs
+from .nodes.my_custom_node import MyCustomNode
+from .workflow import TestWorkflow
+
+dataset = [
+    DatasetRow(
+        label="Scenario with Array Mocks",
+        inputs=Inputs(test_input="test-value"),
+        mocks=[
+            MockNodeExecution(
+                when_condition=MyCustomNode.Execution.count.greater_than_or_equal_to(0),
+                then_outputs=MyCustomNode.Outputs(
+                    text_output="This is a mocked text output",
+                    json_output={
+                        "key": "mocked_value",
+                        "nested": {
+                            "data": 123,
+                        },
+                    },
+                ),
+            ),
+        ],
+    ),
+]
+
+runner = WorkflowSandboxRunner(workflow=TestWorkflow(), dataset=dataset)
+
+if __name__ == "__main__":
+    runner.run()
+"
+`;
+
 exports[`Workflow Sandbox > write > should generate DatasetRow with mocks when mocks are provided 1`] = `
 "from vellum.workflows import MockNodeExecution
 from vellum.workflows.inputs import DatasetRow

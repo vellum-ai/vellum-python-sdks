@@ -898,10 +898,15 @@ type WorkflowSandboxInput =
   | ImageInputRequest
   | DocumentInputRequest;
 export type WorkflowSandboxInputs = WorkflowSandboxInput[];
+export interface WorkflowSandboxDatasetRowMockOutput {
+  output_id: string;
+  value: WorkflowValueDescriptor;
+}
+
 export interface WorkflowSandboxDatasetRowMock {
   node_id: string;
   when_condition?: WorkflowValueDescriptor;
-  then_outputs: Record<string, unknown>;
+  then_outputs: Record<string, unknown> | WorkflowSandboxDatasetRowMockOutput[];
 }
 
 export type WorkflowSandboxDatasetRow =
