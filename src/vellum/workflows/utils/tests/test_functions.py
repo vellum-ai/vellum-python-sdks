@@ -18,6 +18,7 @@ from vellum.workflows.utils.functions import (
     compile_function_definition,
     compile_inline_workflow_function_definition,
     compile_workflow_deployment_function_definition,
+    use_tool_inputs,
 )
 
 
@@ -777,3 +778,31 @@ def test_compile_function_definition__string_annotations_with_future_imports():
             "required": ["a", "b", "c", "d", "e", "f", "g"],
         },
     )
+
+
+def test_use_tool_inputs__inline_vs_decorator():
+    """
+    Tests that inline use_tool_inputs(...)(func) behaves the same as @use_tool_inputs(...) decorator.
+    """
+
+    # GIVEN a function with some parameters
+    def my_function(a: str, b: int, c: float) -> str:
+        """A test function."""
+        return f"{a}-{b}-{c}"
+
+    # WHEN using use_tool_inputs as a decorator
+    @use_tool_inputs(a="fixed_a", b=42)
+    def decorated_function(a: str, b: int, c: float) -> str:
+        """A test function."""
+        return f"{a}-{b}-{c}"
+
+    # AND using use_tool_inputs inline
+    inline_function = use_tool_inputs(a="fixed_a", b=42)(my_function)
+
+    # THEN both should have the same __vellum_inputs__ attribute
+    assert hasattr(decorated_function, "__vellum_inputs__")
+    assert hasattr(inline_function, "__vellum_inputs__")
+
+    # AND the inputs should be identical
+    assert decorated_function.__vellum_inputs__ == inline_function.__vellum_inputs__
+    assert decorated_function.__vellum_inputs__ == {"a": "fixed_a", "b": 42}

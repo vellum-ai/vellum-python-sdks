@@ -23,4 +23,5 @@ export * from "./star-import";
 export * from "./str-instantiation";
 export * from "./type";
 export * from "./union";
+export * from "./wrapped-call";
 export * from "./writer";
