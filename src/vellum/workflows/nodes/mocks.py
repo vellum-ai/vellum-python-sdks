@@ -10,7 +10,7 @@ from vellum.client.types.vellum_value import VellumValue
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.events.types import default_serializer
-from vellum.workflows.exceptions import WorkflowInitializationException
+from vellum.workflows.exceptions import NodeException, WorkflowInitializationException
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.references.constant import ConstantValueReference
 
@@ -158,7 +158,7 @@ class MockNodeExecution(UniversalBaseModel):
                         },
                     )
                 )
-            except ValidationError:
+            except (ValidationError, NodeException):
                 # After the Vellum App is updated to the new mock resolution strategy,
                 # we can update this to raise an exception
                 try:
