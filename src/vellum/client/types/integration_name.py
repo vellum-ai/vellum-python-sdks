@@ -94,6 +94,10 @@ IntegrationName = typing.Union[
         "DISCORD",
         "DOCUSIGN",
         "TRELLO",
+        "HEYREACH",
+        "ACTIVE_CAMPAIGN",
+        "CUSTOMER_IO",
+        "SEGMENT",
     ],
     typing.Any,
 ]
