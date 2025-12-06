@@ -185,6 +185,56 @@ if __name__ == "__main__":
 "
 `;
 
+exports[`Workflow Sandbox > write > should handle mocks with empty then_outputs object 1`] = `
+"from vellum.workflows import MockNodeExecution
+from vellum.workflows.inputs import DatasetRow
+from vellum.workflows.sandbox import WorkflowSandboxRunner
+
+from .inputs import Inputs
+from .workflow import TestWorkflow
+
+dataset = [
+    DatasetRow(
+        label="Scenario with Mock with empty then_outputs",
+        inputs=Inputs(test_input="test-value"),
+        mocks=[
+            MockNodeExecution(when_condition=Inputs.test_input.equals("test-value")),
+        ],
+    ),
+]
+
+runner = WorkflowSandboxRunner(workflow=TestWorkflow(), dataset=dataset)
+
+if __name__ == "__main__":
+    runner.run()
+"
+`;
+
+exports[`Workflow Sandbox > write > should handle mocks with undefined then_outputs without throwing TypeError 1`] = `
+"from vellum.workflows import MockNodeExecution
+from vellum.workflows.inputs import DatasetRow
+from vellum.workflows.sandbox import WorkflowSandboxRunner
+
+from .inputs import Inputs
+from .workflow import TestWorkflow
+
+dataset = [
+    DatasetRow(
+        label="Scenario with Mock without then_outputs",
+        inputs=Inputs(test_input="test-value"),
+        mocks=[
+            MockNodeExecution(when_condition=Inputs.test_input.equals("test-value")),
+        ],
+    ),
+]
+
+runner = WorkflowSandboxRunner(workflow=TestWorkflow(), dataset=dataset)
+
+if __name__ == "__main__":
+    runner.run()
+"
+`;
+
 exports[`Workflow Sandbox > write > should properly handle special characters with escaped quotes 1`] = `
 "from vellum.workflows.inputs import DatasetRow
 from vellum.workflows.sandbox import WorkflowSandboxRunner
