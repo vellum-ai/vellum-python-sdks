@@ -430,5 +430,155 @@ describe("Workflow Sandbox", () => {
 
       expect(result).toMatchSnapshot();
     });
+
+    it("should handle mocks with undefined then_outputs without throwing TypeError", async () => {
+      /**
+       * Tests that mocks with undefined then_outputs don't throw TypeError when
+       * Object.entries is called on them.
+       */
+
+      const writer = new Writer();
+      const uniqueWorkflowContext = workflowContextFactory();
+      const inputVariable: VellumVariable = {
+        id: "1",
+        key: "test_input",
+        type: "STRING",
+      };
+
+      uniqueWorkflowContext.addInputVariableContext(
+        inputVariableContextFactory({
+          inputVariableData: inputVariable,
+          workflowContext: uniqueWorkflowContext,
+        })
+      );
+
+      const genericNodeData = genericNodeFactory();
+      await nodeContextFactory({
+        workflowContext: uniqueWorkflowContext,
+        nodeData: genericNodeData,
+      });
+
+      // GIVEN a mock with undefined then_outputs
+      const sandboxInputs: WorkflowSandboxDatasetRow[] = [
+        {
+          label: "Scenario with Mock without then_outputs",
+          inputs: [
+            {
+              name: inputVariable.key,
+              type: "STRING",
+              value: "test-value",
+            },
+          ],
+          mocks: [
+            {
+              node_id: genericNodeData.id,
+              when_condition: {
+                type: "BINARY_EXPRESSION",
+                operator: "=",
+                lhs: {
+                  type: "WORKFLOW_INPUT",
+                  inputVariableId: "1",
+                },
+                rhs: {
+                  type: "CONSTANT_VALUE",
+                  value: {
+                    type: "STRING",
+                    value: "test-value",
+                  },
+                },
+              },
+              // then_outputs is intentionally undefined to test the fix
+            },
+          ],
+        },
+      ];
+
+      // WHEN we generate the sandbox file
+      const sandbox = codegen.workflowSandboxFile({
+        workflowContext: uniqueWorkflowContext,
+        sandboxInputs,
+      });
+
+      sandbox.write(writer);
+      const result = await writer.toStringFormatted();
+
+      // THEN it should not throw and should not generate MockNodeExecution
+      expect(result).toMatchSnapshot();
+    });
+
+    it("should handle mocks with empty then_outputs object", async () => {
+      /**
+       * Tests that mocks with empty then_outputs object generate
+       * MockNodeExecution with empty Outputs().
+       */
+
+      const writer = new Writer();
+      const uniqueWorkflowContext = workflowContextFactory();
+      const inputVariable: VellumVariable = {
+        id: "1",
+        key: "test_input",
+        type: "STRING",
+      };
+
+      uniqueWorkflowContext.addInputVariableContext(
+        inputVariableContextFactory({
+          inputVariableData: inputVariable,
+          workflowContext: uniqueWorkflowContext,
+        })
+      );
+
+      const genericNodeData = genericNodeFactory();
+      await nodeContextFactory({
+        workflowContext: uniqueWorkflowContext,
+        nodeData: genericNodeData,
+      });
+
+      // GIVEN a mock with empty then_outputs object
+      const sandboxInputs: WorkflowSandboxDatasetRow[] = [
+        {
+          label: "Scenario with Mock with empty then_outputs",
+          inputs: [
+            {
+              name: inputVariable.key,
+              type: "STRING",
+              value: "test-value",
+            },
+          ],
+          mocks: [
+            {
+              node_id: genericNodeData.id,
+              when_condition: {
+                type: "BINARY_EXPRESSION",
+                operator: "=",
+                lhs: {
+                  type: "WORKFLOW_INPUT",
+                  inputVariableId: "1",
+                },
+                rhs: {
+                  type: "CONSTANT_VALUE",
+                  value: {
+                    type: "STRING",
+                    value: "test-value",
+                  },
+                },
+              },
+              then_outputs: {},
+            },
+          ],
+        },
+      ];
+
+      // WHEN we generate the sandbox file
+      const sandbox = codegen.workflowSandboxFile({
+        workflowContext: uniqueWorkflowContext,
+        sandboxInputs,
+      });
+
+      sandbox.write(writer);
+      const result = await writer.toStringFormatted();
+
+      // THEN it should generate MockNodeExecution with empty Outputs()
+      expect(result).toMatchSnapshot();
+    });
   });
 });
