@@ -1,10 +1,13 @@
+import pytest
 import uuid
 
 from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.workflows import BaseWorkflow
+from vellum.workflows.exceptions import WorkflowInitializationException
 from vellum.workflows.nodes import InlinePromptNode
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.mocks import MockNodeExecution
+from vellum.workflows.references.constant import ConstantValueReference
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 
@@ -206,3 +209,71 @@ def test_mocks__use_id_from_display():
             foo="Hello",
         ),
     )
+
+
+def test_mocks__invalid_then_outputs_key_falls_back_to_legacy():
+    """
+    Tests that when then_outputs contains an invalid key that triggers a NodeException,
+    the validation falls back to the legacy _RawMockWorkflowNodeConfig resolution strategy.
+    """
+
+    # GIVEN a Base Node with a single output
+    class StartNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            foo: str
+
+    # AND a workflow class with that Node
+    class MyWorkflow(BaseWorkflow):
+        graph = StartNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_value = StartNode.Outputs.foo
+
+    # AND a mock with an invalid output key that will trigger NodeException
+    # but is in the legacy format so the fallback will succeed
+    raw_mock_with_invalid_key = [
+        {
+            "type": "WORKFLOW_NODE_OUTPUT",
+            "node_id": str(StartNode.__id__),
+            "mock_executions": [
+                {
+                    "when_condition": {
+                        "expression": {
+                            "type": "LOGICAL_CONDITION_GROUP",
+                            "combinator": "AND",
+                            "negated": False,
+                            "conditions": [],
+                        },
+                        "variables": [],
+                    },
+                    "then_outputs": [
+                        {
+                            "output_id": str(uuid.uuid4()),
+                            "value": {
+                                "id": str(uuid.uuid4()),
+                                "type": "CONSTANT_VALUE",
+                                "variable_value": {"type": "STRING", "value": "Hello"},
+                            },
+                        },
+                    ],
+                }
+            ],
+        },
+        {
+            "type": "NODE_EXECUTION",
+            "node_id": str(StartNode.__id__),
+            "when_condition": ConstantValueReference(True),
+            "then_outputs": {
+                "invalid_key": "some_value",
+            },
+        },
+    ]
+
+    # WHEN we parse the mock workflow node execution
+    # THEN it should raise WorkflowInitializationException because the second mock
+    # triggers NodeException and the fallback also fails
+    with pytest.raises(WorkflowInitializationException, match="Failed to validate mock node executions"):
+        MockNodeExecution.validate_all(
+            raw_mock_with_invalid_key,
+            MyWorkflow,
+        )
