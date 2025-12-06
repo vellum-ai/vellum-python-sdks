@@ -275,6 +275,29 @@ class ToolCallingNode(BaseToolCallingNode):
 "
 `;
 
+exports[`ToolCallingNode > mcp server > should generate mcp server with ARRAY_REFERENCE format and EnvironmentVariableReference 1`] = `
+"from vellum.workflows.nodes.displayable.tool_calling_node import (
+    ToolCallingNode as BaseToolCallingNode,
+)
+from vellum.workflows.references import EnvironmentVariableReference
+from vellum.workflows.types.definition import MCPServer
+
+
+class ToolCallingNode(BaseToolCallingNode):
+    functions = [
+        MCPServer(
+            name="my-mcp-server",
+            url="https://my-mcp-server.com",
+            authorization_type="API_KEY",
+            api_key_header_key="my-api-key-header-key",
+            api_key_header_value=EnvironmentVariableReference(
+                name="my-api-key-header-value"
+            ),
+        )
+    ]
+"
+`;
+
 exports[`ToolCallingNode > mcp server > should generate mcp server with no authorization type 1`] = `
 "from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,
@@ -296,6 +319,53 @@ from vellum.workflows.types.definition import MCPServer
 
 class ToolCallingNode(BaseToolCallingNode):
     functions = [MCPServer(name="github", url="https://api.githubcopilot.com/mcp/")]
+"
+`;
+
+exports[`ToolCallingNode > mcp server > should generate mixed functions with all supported function types in ARRAY_REFERENCE format 1`] = `
+"from .add import add
+from .subtract.workflow import Subtract
+
+from vellum.workflows.nodes.displayable.tool_calling_node import (
+    ToolCallingNode as BaseToolCallingNode,
+)
+from vellum.workflows.references import EnvironmentVariableReference
+from vellum.workflows.types.definition import (
+    ComposioToolDefinition,
+    DeploymentDefinition,
+    MCPServer,
+    VellumIntegrationToolDefinition,
+)
+
+
+class ToolCallingNode(BaseToolCallingNode):
+    functions = [
+        add,
+        MCPServer(
+            type="MCP_SERVER",
+            name="github",
+            description="",
+            url="https://api.githubcopilot.com/mcp/",
+            authorization_type="API_KEY",
+            api_key_header_key="aaa",
+            api_key_header_value=EnvironmentVariableReference(name="FIRECRAWL"),
+        ),
+        Subtract,
+        ComposioToolDefinition(
+            toolkit="GITHUB",
+            action="GITHUB_CREATE_AN_ISSUE",
+            description="Create a new issue in a GitHub repository",
+        ),
+        VellumIntegrationToolDefinition(
+            provider="COMPOSIO",
+            integration_name="slack",
+            name="slack_send_message",
+            description="Send a message to a Slack channel",
+        ),
+        DeploymentDefinition(
+            deployment="my-workflow-deployment", release_tag="production"
+        ),
+    ]
 "
 `;
 

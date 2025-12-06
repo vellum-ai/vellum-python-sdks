@@ -153,7 +153,9 @@ def test_serialize_node__prompt_inputs__mixed_values():
 
 
 def test_serialize_node__tool_calling_node__mcp_server_api_key():
-    # GIVEN a tool calling node with an mcp server
+    """Tests that MCPServer with EnvironmentVariableReference serializes as ARRAY_REFERENCE."""
+
+    # GIVEN a tool calling node with an mcp server using an environment variable for the API key
     class MyToolCallingNode(ToolCallingNode):
         functions = [
             MCPServer(
@@ -184,26 +186,70 @@ def test_serialize_node__tool_calling_node__mcp_server_api_key():
         attribute for attribute in my_tool_calling_node["attributes"] if attribute["name"] == "functions"
     )
 
+    # AND the functions attribute should be an ARRAY_REFERENCE with a DICTIONARY_REFERENCE
+    # containing the MCP server fields, with api_key_header_value as ENVIRONMENT_VARIABLE
     assert functions_attribute == {
         "id": "ff00c2d6-f99c-458b-9bcd-181f8e43b2d1",
         "name": "functions",
         "value": {
-            "type": "CONSTANT_VALUE",
-            "value": {
-                "type": "JSON",
-                "value": [
-                    {
-                        "type": "MCP_SERVER",
-                        "name": "my-mcp-server",
-                        "description": "",
-                        "url": "https://my-mcp-server.com",
-                        "authorization_type": "API_KEY",
-                        "bearer_token_value": None,
-                        "api_key_header_key": "my-api-key-header-key",
-                        "api_key_header_value": "my-api-key-header-value",
-                    }
-                ],
-            },
+            "type": "ARRAY_REFERENCE",
+            "items": [
+                {
+                    "type": "DICTIONARY_REFERENCE",
+                    "entries": [
+                        {
+                            "id": "8cff4f0a-86d9-43fd-8d0b-542c845db53e",
+                            "key": "type",
+                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "MCP_SERVER"}},
+                        },
+                        {
+                            "id": "29203be4-407c-4056-aaa3-6e6d1249113e",
+                            "key": "name",
+                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "my-mcp-server"}},
+                        },
+                        {
+                            "id": "69813bb2-12c1-432b-9ef3-a0071bd29149",
+                            "key": "description",
+                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": ""}},
+                        },
+                        {
+                            "id": "83cd2f84-bf35-4996-9840-3754a79e1091",
+                            "key": "url",
+                            "value": {
+                                "type": "CONSTANT_VALUE",
+                                "value": {"type": "STRING", "value": "https://my-mcp-server.com"},
+                            },
+                        },
+                        {
+                            "id": "5ad23cee-497e-4ca3-ba51-d13f56985c75",
+                            "key": "authorization_type",
+                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "API_KEY"}},
+                        },
+                        {
+                            "id": "45964d28-1a9b-40a1-b544-62da92d2f62a",
+                            "key": "bearer_token_value",
+                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                        },
+                        {
+                            "id": "c4952fa6-1ffb-4e88-863f-3d0867b19b7a",
+                            "key": "api_key_header_key",
+                            "value": {
+                                "type": "CONSTANT_VALUE",
+                                "value": {"type": "STRING", "value": "my-api-key-header-key"},
+                            },
+                        },
+                        {
+                            "id": "7dc9cdb0-d139-4a1d-8c6f-9941c6b82b62",
+                            "key": "api_key_header_value",
+                            "value": {
+                                "type": "ENVIRONMENT_VARIABLE",
+                                "environment_variable": "my-api-key-header-value",
+                            },
+                        },
+                    ],
+                    "definition": {"name": "MCPServer", "module": ["vellum", "workflows", "types", "definition"]},
+                }
+            ],
         },
     }
 

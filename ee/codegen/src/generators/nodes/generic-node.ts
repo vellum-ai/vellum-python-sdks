@@ -137,6 +137,73 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                 initializer: new ListInstantiation(functionReferences),
               })
             );
+          } else if (value?.type === "ARRAY_REFERENCE") {
+            // Handle ARRAY_REFERENCE format (e.g., MCPServer with EnvironmentVariableReference)
+            // Process each item using the same handler pattern as CONSTANT_VALUE
+            // Order is preserved by processing each item inline.
+            const items = value.items || [];
+            const functionReferences: python.AstNode[] = [];
+            const functionHandlers: Record<
+              ToolArgs["type"],
+              (f: ToolArgs) => python.AstNode | null
+            > = {
+              CODE_EXECUTION: (f) => this.handleCodeExecutionFunction(f),
+              INLINE_WORKFLOW: (f) => this.handleInlineWorkflowFunction(f),
+              WORKFLOW_DEPLOYMENT: (f) =>
+                this.handleWorkflowDeploymentFunction(f),
+              COMPOSIO: (f) => this.handleComposioFunction(f),
+              MCP_SERVER: (f) => this.handleMCPServerFunction(f),
+              VELLUM_INTEGRATION: (f) =>
+                this.handleVellumIntegrationFunction(f),
+            };
+
+            // Process each item in order to preserve function ordering
+            items.forEach((item) => {
+              if (
+                item.type === "CONSTANT_VALUE" &&
+                item.value?.type === "JSON" &&
+                item.value.value &&
+                typeof item.value.value === "object" &&
+                "type" in item.value.value
+              ) {
+                // This is a ToolArgs object, use the handler pattern
+                // which handles all function types (CODE_EXECUTION, INLINE_WORKFLOW, etc.)
+                const toolArg = item.value.value as ToolArgs;
+                const handler = functionHandlers[toolArg.type];
+                if (handler) {
+                  const functionReference = handler(toolArg);
+                  if (functionReference) {
+                    functionReferences.push(functionReference);
+                  }
+                } else {
+                  this.workflowContext.addError(
+                    new NodeDefinitionGenerationError(
+                      `Unsupported function type in ARRAY_REFERENCE: ${JSON.stringify(
+                        toolArg
+                      )}`,
+                      "WARNING"
+                    )
+                  );
+                }
+              } else {
+                // For other items (like DICTIONARY_REFERENCE for MCPServer),
+                // use WorkflowValueDescriptor directly
+                functionReferences.push(
+                  new WorkflowValueDescriptor({
+                    nodeContext: this.nodeContext,
+                    workflowContext: this.workflowContext,
+                    workflowValueDescriptor: item,
+                  })
+                );
+              }
+            });
+
+            nodeAttributesStatements.push(
+              python.field({
+                name: toValidPythonIdentifier(attribute.name, "attr"),
+                initializer: python.TypeInstantiation.list(functionReferences),
+              })
+            );
           }
           break;
         }
