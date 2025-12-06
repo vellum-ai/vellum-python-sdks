@@ -259,31 +259,36 @@ if __name__ == "__main__":
     }
 
     // Generate then_outputs by instantiating the node's Outputs class
-    const outputsArguments: MethodArgument[] = Object.entries(
-      mock.then_outputs
-    ).map(
-      ([key, value]) =>
-        new MethodArgument({
-          name: key,
-          value: new Json(value),
-        })
-    );
+    // Only include then_outputs if it's defined and has values
+    if (!isNil(mock.then_outputs)) {
+      const outputsArguments: MethodArgument[] = Object.entries(
+        mock.then_outputs
+      ).map(
+        ([key, value]) =>
+          new MethodArgument({
+            name: key,
+            value: new Json(value),
+          })
+      );
 
-    const thenOutputsInstance = new ClassInstantiation({
-      classReference: new Reference({
-        name: nodeContext.nodeClassName,
-        modulePath: nodeContext.nodeModulePath,
-        attribute: ["Outputs"],
-      }),
-      arguments_: outputsArguments,
-    });
+      if (outputsArguments.length > 0) {
+        const thenOutputsInstance = new ClassInstantiation({
+          classReference: new Reference({
+            name: nodeContext.nodeClassName,
+            modulePath: nodeContext.nodeModulePath,
+            attribute: ["Outputs"],
+          }),
+          arguments_: outputsArguments,
+        });
 
-    arguments_.push(
-      new MethodArgument({
-        name: "then_outputs",
-        value: thenOutputsInstance,
-      })
-    );
+        arguments_.push(
+          new MethodArgument({
+            name: "then_outputs",
+            value: thenOutputsInstance,
+          })
+        );
+      }
+    }
 
     return new ClassInstantiation({
       classReference: new Reference({
