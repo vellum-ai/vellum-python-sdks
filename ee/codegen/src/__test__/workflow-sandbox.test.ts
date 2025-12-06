@@ -502,19 +502,14 @@ describe("Workflow Sandbox", () => {
       sandbox.write(writer);
       const result = await writer.toStringFormatted();
 
-      // THEN it should not throw and should generate valid code
+      // THEN it should not throw and should not generate MockNodeExecution
       expect(result).toMatchSnapshot();
-      expect(result).toContain("MockNodeExecution");
-      // Verify that MockNodeExecution doesn't have then_outputs parameter
-      expect(result).toContain(
-        "MockNodeExecution(when_condition=Inputs.test_input.equals"
-      );
     });
 
     it("should handle mocks with empty then_outputs object", async () => {
       /**
-       * Tests that mocks with empty then_outputs object don't generate
-       * then_outputs parameter.
+       * Tests that mocks with empty then_outputs object generate
+       * MockNodeExecution with empty Outputs().
        */
 
       const writer = new Writer();
@@ -582,13 +577,8 @@ describe("Workflow Sandbox", () => {
       sandbox.write(writer);
       const result = await writer.toStringFormatted();
 
-      // THEN it should not throw and should generate valid code without then_outputs
+      // THEN it should generate MockNodeExecution with empty Outputs()
       expect(result).toMatchSnapshot();
-      expect(result).toContain("MockNodeExecution");
-      // Verify that MockNodeExecution doesn't have then_outputs parameter
-      expect(result).toContain(
-        "MockNodeExecution(when_condition=Inputs.test_input.equals"
-      );
     });
   });
 });

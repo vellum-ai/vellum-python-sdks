@@ -191,6 +191,7 @@ from vellum.workflows.inputs import DatasetRow
 from vellum.workflows.sandbox import WorkflowSandboxRunner
 
 from .inputs import Inputs
+from .nodes.my_custom_node import MyCustomNode
 from .workflow import TestWorkflow
 
 dataset = [
@@ -198,7 +199,10 @@ dataset = [
         label="Scenario with Mock with empty then_outputs",
         inputs=Inputs(test_input="test-value"),
         mocks=[
-            MockNodeExecution(when_condition=Inputs.test_input.equals("test-value")),
+            MockNodeExecution(
+                when_condition=Inputs.test_input.equals("test-value"),
+                then_outputs=MyCustomNode.Outputs(),
+            ),
         ],
     ),
 ]
@@ -211,8 +215,7 @@ if __name__ == "__main__":
 `;
 
 exports[`Workflow Sandbox > write > should handle mocks with undefined then_outputs without throwing TypeError 1`] = `
-"from vellum.workflows import MockNodeExecution
-from vellum.workflows.inputs import DatasetRow
+"from vellum.workflows.inputs import DatasetRow
 from vellum.workflows.sandbox import WorkflowSandboxRunner
 
 from .inputs import Inputs
@@ -222,9 +225,6 @@ dataset = [
     DatasetRow(
         label="Scenario with Mock without then_outputs",
         inputs=Inputs(test_input="test-value"),
-        mocks=[
-            MockNodeExecution(when_condition=Inputs.test_input.equals("test-value")),
-        ],
     ),
 ]
 
