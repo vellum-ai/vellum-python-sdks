@@ -112,12 +112,18 @@ export class WorkflowValueDescriptorReference extends AstNode {
           workflowContext: this.workflowContext,
           nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
         });
-      case "EXECUTION_COUNTER":
-        return new ExecutionCounterWorkflowReference({
+      case "EXECUTION_COUNTER": {
+        const reference = new ExecutionCounterWorkflowReference({
           nodeContext: this.nodeContext,
           workflowContext: this.workflowContext,
           nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
         });
+        if (reference.getAstNode()) {
+          return reference;
+        } else {
+          return undefined;
+        }
+      }
       case "TRIGGER_ATTRIBUTE": {
         const reference = new TriggerAttributeWorkflowReference({
           nodeContext: this.nodeContext,
