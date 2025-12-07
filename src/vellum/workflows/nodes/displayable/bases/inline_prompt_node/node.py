@@ -553,8 +553,6 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
         Raises:
             jsonschema.exceptions.SchemaError: If the JSON schema structure is invalid
         """
-        super().__validate__()
-
         parameters_ref = getattr(cls, "parameters", None)
         if parameters_ref is None:
             return
