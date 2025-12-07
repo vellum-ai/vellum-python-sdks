@@ -91,6 +91,19 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
           this.isNestedNode = true;
           const value = attribute.value;
 
+          const functionHandlers: Record<
+            ToolArgs["type"],
+            (f: ToolArgs) => python.AstNode | null
+          > = {
+            CODE_EXECUTION: (f) => this.handleCodeExecutionFunction(f),
+            INLINE_WORKFLOW: (f) => this.handleInlineWorkflowFunction(f),
+            WORKFLOW_DEPLOYMENT: (f) =>
+              this.handleWorkflowDeploymentFunction(f),
+            COMPOSIO: (f) => this.handleComposioFunction(f),
+            MCP_SERVER: (f) => this.handleMCPServerFunction(f),
+            VELLUM_INTEGRATION: (f) => this.handleVellumIntegrationFunction(f),
+          };
+
           if (
             value?.type === "CONSTANT_VALUE" &&
             value.value?.type === "JSON" &&
@@ -98,19 +111,6 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
           ) {
             const functions: ToolArgs[] = value.value.value;
             const functionReferences: python.AstNode[] = [];
-            const functionHandlers: Record<
-              ToolArgs["type"],
-              (f: ToolArgs) => python.AstNode | null
-            > = {
-              CODE_EXECUTION: (f) => this.handleCodeExecutionFunction(f),
-              INLINE_WORKFLOW: (f) => this.handleInlineWorkflowFunction(f),
-              WORKFLOW_DEPLOYMENT: (f) =>
-                this.handleWorkflowDeploymentFunction(f),
-              COMPOSIO: (f) => this.handleComposioFunction(f),
-              MCP_SERVER: (f) => this.handleMCPServerFunction(f),
-              VELLUM_INTEGRATION: (f) =>
-                this.handleVellumIntegrationFunction(f),
-            };
 
             functions.forEach((f) => {
               const handler = functionHandlers[f.type];
@@ -143,19 +143,6 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
             // Order is preserved by processing each item inline.
             const items = value.items || [];
             const functionReferences: python.AstNode[] = [];
-            const functionHandlers: Record<
-              ToolArgs["type"],
-              (f: ToolArgs) => python.AstNode | null
-            > = {
-              CODE_EXECUTION: (f) => this.handleCodeExecutionFunction(f),
-              INLINE_WORKFLOW: (f) => this.handleInlineWorkflowFunction(f),
-              WORKFLOW_DEPLOYMENT: (f) =>
-                this.handleWorkflowDeploymentFunction(f),
-              COMPOSIO: (f) => this.handleComposioFunction(f),
-              MCP_SERVER: (f) => this.handleMCPServerFunction(f),
-              VELLUM_INTEGRATION: (f) =>
-                this.handleVellumIntegrationFunction(f),
-            };
 
             // Process each item in order to preserve function ordering
             items.forEach((item) => {
