@@ -23,6 +23,7 @@ from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.errors.types import workflow_event_error_to_workflow_error
 from vellum.workflows.events.types import WorkflowDeploymentParentContext, default_serializer
 from vellum.workflows.events.workflow import (
+    WorkflowEvent,
     WorkflowExecutionInitiatedBody,
     WorkflowExecutionInitiatedEvent,
     WorkflowExecutionRejectedBody,
@@ -220,7 +221,7 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
                 # Note: We pass inputs=None because the inputs were invalid and we can't
                 # construct a valid inputs object. Calling get_default_inputs() would raise
                 # another WorkflowInitializationException for required fields without defaults.
-                initiated_event = WorkflowExecutionInitiatedEvent(
+                initiated_event: WorkflowEvent = WorkflowExecutionInitiatedEvent(
                     trace_id=current_execution_context.trace_id,
                     span_id=subworkflow_span_id,
                     body=WorkflowExecutionInitiatedBody(
