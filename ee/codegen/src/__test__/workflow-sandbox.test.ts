@@ -580,5 +580,84 @@ describe("Workflow Sandbox", () => {
       // THEN it should generate MockNodeExecution with empty Outputs()
       expect(result).toMatchSnapshot();
     });
+
+    it("should handle mocks with when_condition referencing non-existent node ID", async () => {
+      /**
+       * Tests that mocks with when_condition containing NODE_OUTPUT reference
+       * to a non-existent node ID are handled gracefully by generating None
+       * for the unresolved reference.
+       */
+
+      const writer = new Writer();
+      const uniqueWorkflowContext = workflowContextFactory({ strict: false });
+      const inputVariable: VellumVariable = {
+        id: "1",
+        key: "test_input",
+        type: "STRING",
+      };
+
+      uniqueWorkflowContext.addInputVariableContext(
+        inputVariableContextFactory({
+          inputVariableData: inputVariable,
+          workflowContext: uniqueWorkflowContext,
+        })
+      );
+
+      const genericNodeData = genericNodeFactory();
+      await nodeContextFactory({
+        workflowContext: uniqueWorkflowContext,
+        nodeData: genericNodeData,
+      });
+
+      // GIVEN a mock with when_condition referencing a non-existent node ID
+      const sandboxInputs: WorkflowSandboxDatasetRow[] = [
+        {
+          label: "Scenario with non-existent node in when_condition",
+          inputs: [
+            {
+              name: inputVariable.key,
+              type: "STRING",
+              value: "test-value",
+            },
+          ],
+          mocks: [
+            {
+              node_id: genericNodeData.id,
+              when_condition: {
+                type: "BINARY_EXPRESSION",
+                operator: "=",
+                lhs: {
+                  type: "NODE_OUTPUT",
+                  nodeId: "non-existent-node-id",
+                  nodeOutputId: "some-output-id",
+                },
+                rhs: {
+                  type: "CONSTANT_VALUE",
+                  value: {
+                    type: "STRING",
+                    value: "test-value",
+                  },
+                },
+              },
+              then_outputs: {
+                result: "mocked_result",
+              },
+            },
+          ],
+        },
+      ];
+
+      // WHEN we generate the sandbox file
+      const sandbox = codegen.workflowSandboxFile({
+        workflowContext: uniqueWorkflowContext,
+        sandboxInputs,
+      });
+
+      sandbox.write(writer);
+      const result = await writer.toStringFormatted();
+
+      // THEN it should generate MockNodeExecution with None for the unresolved reference
+      expect(result).toMatchSnapshot();
+    });
   });
 });

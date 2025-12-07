@@ -235,6 +235,36 @@ if __name__ == "__main__":
 "
 `;
 
+exports[`Workflow Sandbox > write > should handle mocks with when_condition referencing non-existent node ID 1`] = `
+"from vellum.workflows import MockNodeExecution
+from vellum.workflows.inputs import DatasetRow
+from vellum.workflows.references.constant import ConstantValueReference
+from vellum.workflows.sandbox import WorkflowSandboxRunner
+
+from .inputs import Inputs
+from .nodes.my_custom_node import MyCustomNode
+from .workflow import TestWorkflow
+
+dataset = [
+    DatasetRow(
+        label="Scenario with non-existent node in when_condition",
+        inputs=Inputs(test_input="test-value"),
+        mocks=[
+            MockNodeExecution(
+                when_condition=ConstantValueReference(None).equals("test-value"),
+                then_outputs=MyCustomNode.Outputs(result="mocked_result"),
+            ),
+        ],
+    ),
+]
+
+runner = WorkflowSandboxRunner(workflow=TestWorkflow(), dataset=dataset)
+
+if __name__ == "__main__":
+    runner.run()
+"
+`;
+
 exports[`Workflow Sandbox > write > should properly handle special characters with escaped quotes 1`] = `
 "from vellum.workflows.inputs import DatasetRow
 from vellum.workflows.sandbox import WorkflowSandboxRunner
