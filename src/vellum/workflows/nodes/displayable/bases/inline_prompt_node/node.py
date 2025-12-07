@@ -85,7 +85,7 @@ if TYPE_CHECKING:
     from vellum.workflows.workflows.base import BaseWorkflow
 
 
-def _get_json_schema_to_validate(parameters_ref: object) -> tuple:
+def _get_json_schema_to_validate(parameters_ref: object) -> Optional[dict]:
     """
     Extracts the JSON schema to validate from a parameters reference.
 
@@ -95,20 +95,19 @@ def _get_json_schema_to_validate(parameters_ref: object) -> tuple:
         parameters_ref: The parameters reference (NodeReference wrapping PromptParameters)
 
     Returns:
-        A tuple of (schema_dict, path_string) where schema_dict is the schema to validate
-        and path_string is the path for error messages. Returns (None, "") if no schema found.
+        The JSON schema dict to validate, or None if no schema found.
     """
     parameters_instance = getattr(parameters_ref, "instance", None)
     if not parameters_instance:
-        return None, ""
+        return None
 
     custom_params = getattr(parameters_instance, "custom_parameters", None)
     if not isinstance(custom_params, dict):
-        return None, ""
+        return None
 
     json_schema = custom_params.get("json_schema")
     if json_schema is None:
-        return None, ""
+        return None
 
     # Normalize Pydantic models to JSON schema dicts before validation
     # This handles cases like {"name": "...", "schema": SomePydanticModel}
@@ -116,9 +115,9 @@ def _get_json_schema_to_validate(parameters_ref: object) -> tuple:
 
     # After normalization, we expect a dict; anything else we ignore
     if not isinstance(json_schema, dict):
-        return None, ""
+        return None
 
-    return json_schema, "parameters.custom_parameters.json_schema"
+    return json_schema
 
 
 def _validate_json_schema_structure(schema: dict) -> None:
@@ -560,6 +559,6 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
         if parameters_ref is None:
             return
 
-        schema, _ = _get_json_schema_to_validate(parameters_ref)
+        schema = _get_json_schema_to_validate(parameters_ref)
         if schema is not None:
             _validate_json_schema_structure(schema)
