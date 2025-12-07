@@ -21,6 +21,7 @@ from vellum.workflows.constants import LATEST_RELEASE_TAG, OMIT, undefined
 from vellum.workflows.context import execution_context, get_execution_context, get_parent_context
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.errors.types import workflow_event_error_to_workflow_error
+from vellum.workflows.events.exception_handling import stream_initialization_exception
 from vellum.workflows.events.types import WorkflowDeploymentParentContext, default_serializer
 from vellum.workflows.events.workflow import is_workflow_event
 from vellum.workflows.exceptions import NodeException, WorkflowInitializationException
@@ -191,16 +192,25 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
             resolved_workflow = workflow_class(
                 context=WorkflowContext.create_from(self._context), parent_state=self.state
             )
-            subworkflow_stream = resolved_workflow.stream(
-                inputs=self._compile_subworkflow_inputs_for_direct_invocation(resolved_workflow),
-                event_filter=all_workflow_event_filter,
-                node_output_mocks=self._context._get_all_node_output_mocks(),
-            )
 
             try:
+                # The stream creation and first event retrieval are wrapped in try/except because
+                # WorkflowInitializationException can be raised during stream creation (e.g., when
+                # inputs are invalid) or when getting the first event
+                subworkflow_inputs = self._compile_subworkflow_inputs_for_direct_invocation(resolved_workflow)
+                subworkflow_stream = resolved_workflow.stream(
+                    inputs=subworkflow_inputs,
+                    event_filter=all_workflow_event_filter,
+                    node_output_mocks=self._context._get_all_node_output_mocks(),
+                )
                 first_event = next(subworkflow_stream)
                 self._context._emit_subworkflow_event(first_event)
             except WorkflowInitializationException as e:
+                # Emit initiated and rejected events for the subworkflow so that
+                # the parent workflow can see the subworkflow's lifecycle events
+                for init_failure_event in stream_initialization_exception(e):
+                    self._context._emit_subworkflow_event(init_failure_event)
+
                 hashed_module = e.definition.__module__
                 raise NodeException(
                     message=e.message,

@@ -54,7 +54,7 @@ def test_base_inputs_explicit_none_should_raise_on_fields_without_defaults(field
         TestInputs()  # type: ignore[call-arg]
 
     assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
-    assert "Required input variables required_string should have defined value" == str(exc_info.value)
+    assert "Required input variables 'required_string' should have defined value" == str(exc_info.value)
 
 
 def test_base_inputs_explicit_none_should_raise_on_required_fields_with_none():
@@ -69,7 +69,7 @@ def test_base_inputs_explicit_none_should_raise_on_required_fields_with_none():
         TestInputs(required_string=None)  # type: ignore[arg-type]
 
     assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
-    assert "Required input variables required_string should have defined value" == str(exc_info.value)
+    assert "Required input variables 'required_string' should have defined value" == str(exc_info.value)
 
 
 def test_base_inputs_empty_value():
@@ -84,7 +84,7 @@ def test_base_inputs_empty_value():
 
     # THEN it should raise a NodeException with the correct error message and code
     assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
-    assert "Required input variables required_string should have defined value" == str(exc_info.value)
+    assert "Required input variables 'required_string' should have defined value" == str(exc_info.value)
 
 
 def test_base_inputs_with_default():

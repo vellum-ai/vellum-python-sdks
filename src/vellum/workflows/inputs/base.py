@@ -113,7 +113,7 @@ class BaseInputs(metaclass=_BaseInputsMeta):
             if value is undefined and not has_default:
                 # All fields without defaults must be provided, even if Optional
                 raise WorkflowInitializationException(
-                    message=f"Required input variables {name} should have defined value",
+                    message=f"Required input variables '{name}' should have defined value",
                     code=WorkflowErrorCode.INVALID_INPUTS,
                     workflow_definition=self.__class__.__parent_class__,
                 )
@@ -121,7 +121,7 @@ class BaseInputs(metaclass=_BaseInputsMeta):
             # Validate that None is not provided for non-Optional fields
             if value is None and not is_optional:
                 raise WorkflowInitializationException(
-                    message=f"Required input variables {name} should have defined value",
+                    message=f"Required input variables '{name}' should have defined value",
                     code=WorkflowErrorCode.INVALID_INPUTS,
                     workflow_definition=self.__class__.__parent_class__,
                 )

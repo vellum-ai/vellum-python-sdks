@@ -16,6 +16,7 @@ from vellum import (
     WorkflowStreamEvent,
 )
 from vellum.workflows.constants import LATEST_RELEASE_TAG, OMIT
+from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.events.types import NodeParentContext, VellumCodeResourceDefinition, WorkflowParentContext
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes import BaseNode
@@ -495,3 +496,81 @@ def test_stream_workflow__emits_workflow_initiated_and_fulfilled_events(mocker):
             workflow_definition=workflow.__class__, span_id=uuid4()
         ).workflow_definition.model_dump()
     )
+
+
+def test_stream_workflow__emits_workflow_initiated_and_rejected_events_on_invalid_inputs(mocker):
+    """
+    Tests that workflow initiated and rejected events are emitted when a subworkflow
+    deployment node has invalid inputs (interface mismatch).
+    """
+
+    # GIVEN a simple workflow that expects different inputs than what the parent provides
+    # The parent workflow passes `city` and `date`, but this workflow expects `city` and `day`
+    class FailingWorkflowInputs(BaseInputs):
+        city: str
+        day: str
+
+    class FailingNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            pass
+
+    class FailingWorkflow(BaseWorkflow[FailingWorkflowInputs, BaseState]):
+        graph = FailingNode
+
+    # AND a workflow with a Subworkflow Deployment Node
+    workflow = BasicSubworkflowDeploymentWorkflow()
+
+    # AND we mock resolve_workflow_deployment to return the failing workflow class with metadata
+    def mock_resolve(deployment_name: str, release_tag: str, state: Any):
+        metadata = WorkflowDeploymentMetadata(
+            deployment_id=uuid4(),
+            deployment_name=deployment_name,
+            deployment_history_item_id=uuid4(),
+            release_tag_id=uuid4(),
+            release_tag_name=release_tag,
+            workflow_version_id=uuid4(),
+        )
+        return (FailingWorkflow, metadata)
+
+    mocker.patch.object(workflow._context, "resolve_workflow_deployment", side_effect=mock_resolve)
+
+    # WHEN we stream the workflow with all_workflow_event_filter to capture subworkflow events
+    result = list(
+        workflow.stream(
+            inputs=Inputs(
+                city="San Francisco",
+                date="2024-01-01",
+            ),
+            event_filter=all_workflow_event_filter,
+        )
+    )
+
+    all_workflow_events = list(event for event in result if event.name.startswith("workflow."))
+
+    # THEN we should have workflow initiated and rejected events
+    initiated_events = [e for e in all_workflow_events if e.name == "workflow.execution.initiated"]
+    rejected_events = [e for e in all_workflow_events if e.name == "workflow.execution.rejected"]
+
+    # AND we should have two initiated events (parent workflow and subworkflow)
+    assert len(initiated_events) == 2
+
+    # AND we should have two rejected events (subworkflow rejected, then parent workflow rejected)
+    assert len(rejected_events) == 2
+
+    # AND the first initiated event should be from the parent workflow
+    assert initiated_events[0].workflow_definition == BasicSubworkflowDeploymentWorkflow
+    assert initiated_events[0].parent is not None
+    assert initiated_events[0].parent.type == "EXTERNAL"
+
+    # AND the second initiated event should be from the subworkflow with proper parent context
+    assert initiated_events[1].workflow_definition == FailingWorkflow
+    assert initiated_events[1].parent is not None
+    assert initiated_events[1].parent.type == "WORKFLOW_RELEASE_TAG"
+
+    # AND the first rejected event should be from the subworkflow with the invalid inputs error
+    assert rejected_events[0].workflow_definition == FailingWorkflow
+    assert rejected_events[0].error.code == WorkflowErrorCode.INVALID_INPUTS
+    assert "Required input variables 'day' should have defined value" in rejected_events[0].error.message
+
+    # AND the second rejected event should be from the parent workflow
+    assert rejected_events[1].workflow_definition == BasicSubworkflowDeploymentWorkflow
