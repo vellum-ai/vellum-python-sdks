@@ -116,7 +116,7 @@ def test_inline_subworkflow_node__base_inputs_validation():
 
     # AND the error message should indicate the missing required input
     assert e.value.code == WorkflowErrorCode.INVALID_INPUTS
-    assert "Required input variables required_input should have defined value" == str(e.value)
+    assert "Required input variables 'required_input' should have defined value" == str(e.value)
 
 
 def test_inline_subworkflow_node__with_adornment():

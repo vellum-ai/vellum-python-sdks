@@ -570,7 +570,7 @@ def test_stream_workflow__emits_workflow_initiated_and_rejected_events_on_invali
     # AND the first rejected event should be from the subworkflow with the invalid inputs error
     assert rejected_events[0].workflow_definition == FailingWorkflow
     assert rejected_events[0].error.code == WorkflowErrorCode.INVALID_INPUTS
-    assert "Missing required input variable" in rejected_events[0].error.message
+    assert "Required input variables 'day' should have defined value" in rejected_events[0].error.message
 
     # AND the second rejected event should be from the parent workflow
     assert rejected_events[1].workflow_definition == BasicSubworkflowDeploymentWorkflow
