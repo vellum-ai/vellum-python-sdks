@@ -581,9 +581,9 @@ describe("Workflow Sandbox", () => {
       expect(result).toMatchSnapshot();
     });
 
-    it("should handle mocks with when_condition referencing non-existent node ID", async () => {
+    it("should handle mocks with when_condition referencing non-existent node ID via execution counter", async () => {
       /**
-       * Tests that mocks with when_condition containing NODE_OUTPUT reference
+       * Tests that mocks with when_condition containing EXECUTION_COUNTER reference
        * to a non-existent node ID are handled gracefully by generating None
        * for the unresolved reference.
        */
@@ -609,7 +609,7 @@ describe("Workflow Sandbox", () => {
         nodeData: genericNodeData,
       });
 
-      // GIVEN a mock with when_condition referencing a non-existent node ID
+      // GIVEN a mock with when_condition referencing a non-existent node ID via execution counter
       const sandboxInputs: WorkflowSandboxDatasetRow[] = [
         {
           label: "Scenario with non-existent node in when_condition",
@@ -627,9 +627,8 @@ describe("Workflow Sandbox", () => {
                 type: "BINARY_EXPRESSION",
                 operator: "=",
                 lhs: {
-                  type: "NODE_OUTPUT",
+                  type: "EXECUTION_COUNTER",
                   nodeId: "non-existent-node-id",
-                  nodeOutputId: "some-output-id",
                 },
                 rhs: {
                   type: "CONSTANT_VALUE",
