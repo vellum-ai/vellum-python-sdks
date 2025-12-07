@@ -17,6 +17,7 @@ from typing import (
 )
 
 import httpx
+import jsonschema
 
 from vellum import (
     AdHocExecutePromptEvent,
@@ -84,17 +85,6 @@ if TYPE_CHECKING:
     from vellum.workflows.workflows.base import BaseWorkflow
 
 
-def _is_json_schema_type(schema: dict, schema_type: str) -> bool:
-    """
-    Check if a JSON schema has a specific type.
-    Handles both single type strings and arrays of types.
-    """
-    type_value = schema.get("type")
-    if isinstance(type_value, list):
-        return schema_type in type_value
-    return type_value == schema_type
-
-
 def _get_json_schema_to_validate(parameters_ref: object) -> tuple:
     """
     Extracts the JSON schema to validate from a parameters reference.
@@ -131,128 +121,20 @@ def _get_json_schema_to_validate(parameters_ref: object) -> tuple:
     return json_schema, "parameters.custom_parameters.json_schema"
 
 
-def _validate_json_schema_structure(schema: dict, path: str = "json_schema") -> None:
+def _validate_json_schema_structure(schema: dict) -> None:
     """
-    Validates the structure of a JSON schema to catch common errors early.
+    Validates the structure of a JSON schema using the jsonschema library.
 
-    This validation focuses on structural requirements that would cause errors
-    during workflow execution. It checks:
-    - Array types have an 'items' field (unless using 'prefixItems')
-    - Object types have valid 'properties' structure
-    - Composition keywords (anyOf, oneOf, allOf) contain valid sub-schemas
+    This uses the JSON Schema meta-schema to validate that the provided schema
+    is a valid JSON Schema according to the specification.
 
     Args:
         schema: The JSON schema dictionary to validate
-        path: The current path in the schema (for error messages)
 
     Raises:
-        ValueError: If the schema structure is invalid
+        jsonschema.exceptions.SchemaError: If the schema structure is invalid
     """
-    if not isinstance(schema, dict):
-        return
-
-    # Validate array types
-    if _is_json_schema_type(schema, "array"):
-        has_prefix_items = "prefixItems" in schema
-        has_items = "items" in schema
-
-        # Array schemas must have either 'items' or 'prefixItems' defined
-        if not has_prefix_items and not has_items:
-            raise ValueError(
-                f"JSON Schema of type 'array' at '{path}' must define either an 'items' field "
-                f"or a 'prefixItems' field to specify the type of elements in the array."
-            )
-
-        # Recursively validate the items schema
-        if has_items:
-            items_schema = schema["items"]
-            # Single-schema items: recurse once
-            if isinstance(items_schema, dict):
-                _validate_json_schema_structure(items_schema, f"{path}.items")
-            # Tuple-style items: list of schemas
-            elif isinstance(items_schema, list):
-                for idx, sub_schema in enumerate(items_schema):
-                    if isinstance(sub_schema, dict):
-                        _validate_json_schema_structure(sub_schema, f"{path}.items[{idx}]")
-                    else:
-                        raise ValueError(
-                            f"JSON Schema 'items[{idx}]' at '{path}.items[{idx}]' must be a schema object, "
-                            f"not {type(sub_schema).__name__}"
-                        )
-            else:
-                # items must be a schema object or a list of schema objects
-                raise ValueError(
-                    f"JSON Schema 'items' field at '{path}.items' must be a schema object or a list of schema "
-                    f"objects, not {type(items_schema).__name__}"
-                )
-
-        # Recursively validate prefixItems schemas
-        if has_prefix_items:
-            prefix_items = schema["prefixItems"]
-            if not isinstance(prefix_items, list):
-                raise ValueError(
-                    f"JSON Schema 'prefixItems' field at '{path}.prefixItems' must be a list of schema objects, "
-                    f"not {type(prefix_items).__name__}"
-                )
-            for idx, sub_schema in enumerate(prefix_items):
-                if isinstance(sub_schema, dict):
-                    _validate_json_schema_structure(sub_schema, f"{path}.prefixItems[{idx}]")
-                else:
-                    raise ValueError(
-                        f"JSON Schema 'prefixItems[{idx}]' at '{path}.prefixItems[{idx}]' must be a schema object, "
-                        f"not {type(sub_schema).__name__}"
-                    )
-
-    # Validate object types
-    if _is_json_schema_type(schema, "object"):
-        properties = schema.get("properties")
-        if properties is not None and not isinstance(properties, dict):
-            raise ValueError(
-                f"JSON Schema of type 'object' at '{path}' must have 'properties' defined as a dictionary, "
-                f"not {type(properties).__name__}"
-            )
-
-        # Recursively validate nested properties
-        if isinstance(properties, dict):
-            for key, value in properties.items():
-                if isinstance(value, dict):
-                    _validate_json_schema_structure(value, f"{path}.properties.{key}")
-                else:
-                    raise ValueError(
-                        f"JSON Schema property '{key}' at '{path}.properties.{key}' must be a schema object, "
-                        f"not {type(value).__name__}"
-                    )
-
-    # Validate composition keywords
-    for keyword in ["anyOf", "oneOf", "allOf"]:
-        if keyword in schema:
-            value = schema[keyword]
-            if not isinstance(value, list):
-                raise ValueError(
-                    f"JSON Schema's '{keyword}' field at '{path}' must be a list of schemas, "
-                    f"not {type(value).__name__}"
-                )
-            # Recursively validate each sub-schema
-            for i, sub_schema in enumerate(value):
-                if isinstance(sub_schema, dict):
-                    _validate_json_schema_structure(sub_schema, f"{path}.{keyword}[{i}]")
-                else:
-                    raise ValueError(
-                        f"JSON Schema '{keyword}[{i}]' at '{path}.{keyword}[{i}]' must be a schema object, "
-                        f"not {type(sub_schema).__name__}"
-                    )
-
-    # Handle structured-output wrappers: {"name": "...", "schema": {...}}
-    # Recursively validate the nested schema field if present
-    if "schema" in schema:
-        inner_schema = schema["schema"]
-        if isinstance(inner_schema, dict):
-            _validate_json_schema_structure(inner_schema, f"{path}.schema")
-        else:
-            raise ValueError(
-                f"JSON Schema 'schema' field at '{path}.schema' must be a schema object, "
-                f"not {type(inner_schema).__name__}"
-            )
+    jsonschema.Draft7Validator.check_schema(schema)
 
 
 class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
@@ -670,7 +552,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
         Validates the node configuration, including JSON schema structure in parameters.
 
         Raises:
-            ValueError: If the node configuration is invalid
+            jsonschema.exceptions.SchemaError: If the JSON schema structure is invalid
         """
         super().__validate__()
 
@@ -678,6 +560,6 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
         if parameters_ref is None:
             return
 
-        schema, path = _get_json_schema_to_validate(parameters_ref)
+        schema, _ = _get_json_schema_to_validate(parameters_ref)
         if schema is not None:
-            _validate_json_schema_structure(schema, path=path)
+            _validate_json_schema_structure(schema)

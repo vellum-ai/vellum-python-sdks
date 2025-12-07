@@ -40,6 +40,7 @@ Jinja2 = ">=3.1.0,<4.0.0"
 click = ">=8.1.7,<9.0.0"
 docker = ">=7.1.0,<8.0.0"
 httpx = ">=0.21.2"
+jsonschema = ">=4.0.0"
 orderly-set = "^5.2.2"
 publication = "0.0.3"
 pydantic = ">= 1.9.2"
@@ -99,6 +100,7 @@ exclude = ["venv", "examples/workflows", "ee/codegen/python_file_merging/tests/f
 overrides = [
     { module = "deepdiff.*", ignore_missing_imports = true },
     { module = "docker.*", ignore_missing_imports = true },
+    { module = "jsonschema.*", ignore_missing_imports = true },
     { module = "setuptools.*", ignore_missing_imports = true },
 ]
 [tool.ruff]
