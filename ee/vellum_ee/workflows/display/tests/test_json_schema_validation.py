@@ -8,6 +8,8 @@ The validation is spec-compliant, meaning some schemas that might seem incomplet
 
 import pytest
 
+import jsonschema
+
 from vellum import PromptParameters
 from vellum.workflows.nodes import InlinePromptNode
 
@@ -43,8 +45,8 @@ def test_inline_prompt_node_validation__invalid_schemas_raise_error(
         parameters = PromptParameters(custom_parameters={"json_schema": json_schema})
 
     # WHEN we call __validate__ on the node
-    # THEN it should raise a ValueError
-    with pytest.raises(ValueError):
+    # THEN it should raise a SchemaError
+    with pytest.raises(jsonschema.exceptions.SchemaError):
         MyPromptNode.__validate__()
 
 
