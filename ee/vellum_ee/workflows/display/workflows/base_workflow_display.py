@@ -12,6 +12,8 @@ import traceback
 from uuid import UUID
 from typing import Any, Dict, ForwardRef, Generic, List, Optional, Set, Tuple, Type, TypeVar, Union, cast, get_args
 
+import jsonschema
+
 from vellum.client import Vellum as VellumClient
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows import BaseWorkflow
@@ -295,7 +297,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             try:
                 try:
                     node.__validate__()
-                except ValueError as validation_error:
+                except (ValueError, jsonschema.exceptions.SchemaError) as validation_error:
                     # Only collect node validation errors directly to errors list, don't raise them
                     self.display_context.add_validation_error(validation_error)
 

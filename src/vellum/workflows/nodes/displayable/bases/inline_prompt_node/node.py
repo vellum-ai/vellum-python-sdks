@@ -17,6 +17,7 @@ from typing import (
 )
 
 import httpx
+import jsonschema
 
 from vellum import (
     AdHocExecutePromptEvent,
@@ -82,6 +83,57 @@ from vellum.workflows.utils.pydantic_schema import normalize_json
 
 if TYPE_CHECKING:
     from vellum.workflows.workflows.base import BaseWorkflow
+
+
+def _get_json_schema_to_validate(parameters_ref: object) -> Optional[dict]:
+    """
+    Extracts the JSON schema to validate from a parameters reference.
+
+    Also normalizes Pydantic models to JSON schema dicts so they can be validated.
+
+    Args:
+        parameters_ref: The parameters reference (NodeReference wrapping PromptParameters)
+
+    Returns:
+        The JSON schema dict to validate, or None if no schema found.
+    """
+    parameters_instance = getattr(parameters_ref, "instance", None)
+    if not parameters_instance:
+        return None
+
+    custom_params = getattr(parameters_instance, "custom_parameters", None)
+    if not isinstance(custom_params, dict):
+        return None
+
+    json_schema = custom_params.get("json_schema")
+    if json_schema is None:
+        return None
+
+    # Normalize Pydantic models to JSON schema dicts before validation
+    # This handles cases like {"name": "...", "schema": SomePydanticModel}
+    json_schema = normalize_json(json_schema)
+
+    # After normalization, we expect a dict; anything else we ignore
+    if not isinstance(json_schema, dict):
+        return None
+
+    return json_schema
+
+
+def _validate_json_schema_structure(schema: dict) -> None:
+    """
+    Validates the structure of a JSON schema using the jsonschema library.
+
+    This uses the JSON Schema meta-schema to validate that the provided schema
+    is a valid JSON Schema according to the specification.
+
+    Args:
+        schema: The JSON schema dictionary to validate
+
+    Raises:
+        jsonschema.exceptions.SchemaError: If the schema structure is invalid
+    """
+    jsonschema.Draft7Validator.check_schema(schema)
 
 
 class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
@@ -492,3 +544,19 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
         Override this method to process the blocks before they are executed.
         """
         return blocks
+
+    @classmethod
+    def __validate__(cls) -> None:
+        """
+        Validates the node configuration, including JSON schema structure in parameters.
+
+        Raises:
+            jsonschema.exceptions.SchemaError: If the JSON schema structure is invalid
+        """
+        parameters_ref = getattr(cls, "parameters", None)
+        if parameters_ref is None:
+            return
+
+        schema = _get_json_schema_to_validate(parameters_ref)
+        if schema is not None:
+            _validate_json_schema_structure(schema)
