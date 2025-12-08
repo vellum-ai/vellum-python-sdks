@@ -551,7 +551,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
         Validates the node configuration, including JSON schema structure in parameters.
 
         Raises:
-            jsonschema.exceptions.SchemaError: If the JSON schema structure is invalid
+            ValueError: If the JSON schema structure is invalid
         """
         parameters_ref = getattr(cls, "parameters", None)
         if parameters_ref is None:
@@ -559,4 +559,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
 
         schema = _get_json_schema_to_validate(parameters_ref)
         if schema is not None:
-            _validate_json_schema_structure(schema)
+            try:
+                _validate_json_schema_structure(schema)
+            except jsonschema.exceptions.SchemaError as e:
+                raise ValueError(f"Invalid JSON schema: {e.message}") from e
