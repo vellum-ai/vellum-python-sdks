@@ -290,7 +290,7 @@ ${errors.slice(0, 3).map((err) => {
         });
 
         proc.on("error", (err) => {
-          reject(`Process failed to start: ${err}`);
+          reject(new Error(`Process failed to start`, { cause: err }));
         });
 
         proc.stderr.on("data", (data) => {
@@ -303,13 +303,16 @@ ${errors.slice(0, 3).map((err) => {
 
             if (code !== 0) {
               reject(
-                `Error merging code, exit code ${code} output:\n ${errorOutput} ${output}`
+                new Error(
+                  `Error merging code, exit code ${code} output:\n ${errorOutput} ${output}`
+                )
               );
             } else {
               resolve(JSON.parse(output));
             }
           } catch (e) {
-            reject(e);
+            // gotta catch here or screws with event handling and kills app
+            reject(new Error(`Error merging code`, { cause: e }));
           }
         });
 
@@ -320,7 +323,7 @@ ${errors.slice(0, 3).map((err) => {
           proc.stdin.end();
         }
       } catch (e) {
-        reject(e);
+        reject(new Error(`Error running code merge process`, { cause: e }));
       }
     });
   };
