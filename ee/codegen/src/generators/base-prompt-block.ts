@@ -134,7 +134,7 @@ export abstract class BasePromptBlock<
       ...this.generateCommonFileInputArguments(promptBlock),
     ];
 
-    const audioBlock = python.instantiateClass({
+    const audioBlock = new ClassInstantiation({
       classReference: this.getPromptBlockRef(promptBlock),
       arguments_: classArgs,
     });
@@ -151,7 +151,7 @@ export abstract class BasePromptBlock<
       ...this.generateCommonFileInputArguments(promptBlock),
     ];
 
-    const videoBlock = python.instantiateClass({
+    const videoBlock = new ClassInstantiation({
       classReference: this.getPromptBlockRef(promptBlock),
       arguments_: classArgs,
     });
@@ -168,7 +168,7 @@ export abstract class BasePromptBlock<
       ...this.generateCommonFileInputArguments(promptBlock),
     ];
 
-    const imageBlock = python.instantiateClass({
+    const imageBlock = new ClassInstantiation({
       classReference: this.getPromptBlockRef(promptBlock),
       arguments_: classArgs,
     });
@@ -185,7 +185,7 @@ export abstract class BasePromptBlock<
       ...this.generateCommonFileInputArguments(promptBlock),
     ];
 
-    const documentBlock = python.instantiateClass({
+    const documentBlock = new ClassInstantiation({
       classReference: this.getPromptBlockRef(promptBlock),
       arguments_: classArgs,
     });
@@ -194,7 +194,7 @@ export abstract class BasePromptBlock<
     return documentBlock;
   }
 
-  protected getPromptBlockRef(promptBlock: T): python.Reference {
+  protected getPromptBlockRef(promptBlock: T): Reference {
     let pathName;
     switch (promptBlock.blockType) {
       case "JINJA":
@@ -225,7 +225,7 @@ export abstract class BasePromptBlock<
         pathName = "DocumentPromptBlock";
         break;
     }
-    return python.reference({
+    return new Reference({
       name: pathName,
       modulePath: VELLUM_CLIENT_MODULE_PATH,
     });
@@ -243,7 +243,7 @@ export abstract class BasePromptBlock<
     classArgs.push(
       new MethodArgument({
         name: "src",
-        value: python.TypeInstantiation.str(promptBlock.src),
+        value: new StrInstantiation(promptBlock.src),
       })
     );
 
