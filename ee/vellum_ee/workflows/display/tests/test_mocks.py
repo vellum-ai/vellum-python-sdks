@@ -1,4 +1,5 @@
 from vellum.workflows import BaseInputs, BaseNode, BaseState, BaseWorkflow, MockNodeExecution
+from vellum.workflows.references.constant import ConstantValueReference
 from vellum_ee.workflows.display.utils.expressions import base_descriptor_validator
 
 
@@ -118,3 +119,61 @@ def test_mocks__parse_from_app__descriptors():
             foo="Hello baz",
         ),
     )
+
+
+def test_mocks__parse_from_app__when_condition_defaults_to_false_without_descriptor_validator():
+    """
+    Tests that when_condition defaults to ConstantValueReference(False) when
+    descriptor_validator is not provided. This ensures that mocks without a
+    descriptor_validator have a valid when_condition that evaluates to False.
+    """
+
+    # GIVEN a Base Node
+    class StartNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            foo: str
+
+    # AND a workflow class with that Node
+    class MyWorkflow(BaseWorkflow):
+        graph = StartNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_value = StartNode.Outputs.foo
+
+    # AND a mock workflow node execution with a valid when_condition JSON structure
+    raw_mock_workflow_node_executions = [
+        {
+            "node_id": str(StartNode.__id__),
+            "when_condition": {
+                "type": "BINARY_EXPRESSION",
+                "operator": ">=",
+                "lhs": {
+                    "type": "EXECUTION_COUNTER",
+                    "node_id": str(StartNode.__id__),
+                },
+                "rhs": {
+                    "type": "CONSTANT_VALUE",
+                    "value": {
+                        "type": "NUMBER",
+                        "value": 1,
+                    },
+                },
+            },
+            "then_outputs": {
+                "foo": "Hello foo",
+            },
+        },
+    ]
+
+    # WHEN we parse the raw data on `MockNodeExecution` without a descriptor_validator
+    node_output_mocks = MockNodeExecution.validate_all(
+        raw_mock_workflow_node_executions,
+        MyWorkflow,
+    )
+
+    # THEN we get a list of MockNodeExecution objects
+    assert node_output_mocks is not None
+    assert len(node_output_mocks) == 1
+
+    # AND the when_condition defaults to ConstantValueReference(False)
+    assert node_output_mocks[0].when_condition == ConstantValueReference(False)
