@@ -1,4 +1,5 @@
 from vellum.workflows import BaseInputs, BaseNode, BaseState, BaseWorkflow, MockNodeExecution
+from vellum.workflows.references.constant import ConstantValueReference
 from vellum_ee.workflows.display.utils.expressions import base_descriptor_validator
 
 
@@ -120,11 +121,11 @@ def test_mocks__parse_from_app__descriptors():
     )
 
 
-def test_mocks__parse_from_app__when_condition_none_without_descriptor_validator():
+def test_mocks__parse_from_app__when_condition_defaults_to_false_without_descriptor_validator():
     """
-    Tests that when_condition is None when descriptor_validator is not provided.
-    This reproduces a bug where JSON data sent without a descriptor_validator
-    causes when_condition to be None, leading to downstream failures.
+    Tests that when_condition defaults to ConstantValueReference(False) when
+    descriptor_validator is not provided. This ensures that mocks without a
+    descriptor_validator have a valid when_condition that evaluates to False.
     """
 
     # GIVEN a Base Node
@@ -174,6 +175,5 @@ def test_mocks__parse_from_app__when_condition_none_without_descriptor_validator
     assert node_output_mocks is not None
     assert len(node_output_mocks) == 1
 
-    # AND the when_condition is None because no descriptor_validator was provided
-    # This is the bug we're reproducing - when_condition should not be None
-    assert node_output_mocks[0].when_condition is None
+    # AND the when_condition defaults to ConstantValueReference(False)
+    assert node_output_mocks[0].when_condition == ConstantValueReference(False)

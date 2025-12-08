@@ -153,7 +153,9 @@ class MockNodeExecution(UniversalBaseModel):
                             "workflow": workflow,
                             "node_id": raw_mock_workflow_node_config.get("node_id"),
                             "descriptor_validator": lambda value: (
-                                descriptor_validator(value, workflow) if descriptor_validator else None
+                                descriptor_validator(value, workflow)
+                                if descriptor_validator
+                                else ConstantValueReference(False)
                             ),
                         },
                     )
