@@ -5,11 +5,11 @@ import { Writer } from "./writer";
 
 /**
  * Represents a wrapped function call pattern: wrapper(...)(inner)
- * This is used for patterns like use_tool_inputs(...)(func)
+ * This is used for patterns like tool(...)(func)
  */
 export declare namespace WrappedCall {
   interface Args {
-    /** The wrapper function invocation (e.g., use_tool_inputs(...)) */
+    /** The wrapper function invocation (e.g., tool(...)) */
     wrapper: python.MethodInvocation;
     /** The inner value to pass to the wrapper result (e.g., the function reference) */
     inner: AstNode;

@@ -391,10 +391,39 @@ def compile_vellum_integration_tool_definition(
         return FunctionDefinition(name=tool_def.name, description=tool_def.description, parameters={})
 
 
-def use_tool_inputs(**inputs):
+def tool(*, inputs: Optional[dict[str, Any]] = None) -> Callable[[Callable], Callable]:
+    """
+    Decorator to configure a tool function.
+
+    Currently supports specifying which parameters should come from parent workflow inputs
+    via the `inputs` mapping. Additional options may be added in the future.
+
+    Args:
+        inputs: Mapping of parameter names to parent input references
+
+    Example:
+        @tool(inputs={
+            "parent_input": ParentInputs.parent_input,
+        })
+        def get_string(parent_input: str, user_query: str) -> str:
+            return f"Parent: {parent_input}, Query: {user_query}"
+    """
+
+    def decorator(func: Callable) -> Callable:
+        # Store the inputs mapping on the function for later use
+        if inputs is not None:
+            setattr(func, "__vellum_inputs__", inputs)
+        return func
+
+    return decorator
+
+
+def use_tool_inputs(**inputs: Any) -> Callable[[Callable], Callable]:
     """
     Decorator to specify which parameters of a tool function should be provided
     from the parent workflow inputs rather than from the LLM.
+
+    This is a backward-compatible helper equivalent to @tool(inputs={...}).
 
     Args:
         **inputs: Mapping of parameter names to parent input references
@@ -406,10 +435,4 @@ def use_tool_inputs(**inputs):
         def get_string(parent_input: str, user_query: str) -> str:
             return f"Parent: {parent_input}, Query: {user_query}"
     """
-
-    def decorator(func: Callable) -> Callable:
-        # Store the inputs mapping on the function for later use
-        setattr(func, "__vellum_inputs__", inputs)
-        return func
-
-    return decorator
+    return tool(inputs=inputs)
