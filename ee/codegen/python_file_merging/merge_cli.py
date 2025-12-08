@@ -7,10 +7,16 @@ from python_file_merging.nodes import merge_python_files
 
 STOP_SIGNAL = "--vellum-input-stop--"
 
-input_raw = ""
-while STOP_SIGNAL not in input_raw:
-    # os/read they come in chunks of idk length, not as lines
-    input_raw += os.read(0, 100_000_000).decode("utf-8")
+input_raw_bytes = b""
+while STOP_SIGNAL.encode("utf-8") not in input_raw_bytes:
+    # Read in binary mode to avoid UTF-8 decode errors on partial reads
+    chunk = os.read(0, 100_000_000)
+    if not chunk:  # EOF
+        break
+    input_raw_bytes += chunk
+
+# Decode only after we have all the data
+input_raw = input_raw_bytes.decode("utf-8")
 
 split_input = input_raw.split(f"\n{STOP_SIGNAL}\n")
 input_json = split_input[0]
