@@ -342,7 +342,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                     serialized_terminal_node["data"]["name"] = workflow_output_display.name
 
             try:
-                output_value = serialize_value(self.workflow_id, self.display_context, workflow_output.instance)
+                output_value = self.serialize_value(workflow_output.instance)
             except UserFacingException as e:
                 self.display_context.add_error(
                     UserFacingException(f"Failed to serialize output '{workflow_output.name}': {e}")
@@ -1287,13 +1287,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                             mode="json",
                             by_alias=True,
                             exclude_none=True,
-                            context={
-                                "serializer": lambda value: serialize_value(
-                                    workflow_display.workflow_id,
-                                    workflow_display.display_context,
-                                    value,
-                                )
-                            },
+                            context={"serializer": workflow_display.serialize_value},
                         )
 
                         if i in dataset_row_index_to_id:
@@ -1316,6 +1310,9 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             ],
             dataset=dataset,
         )
+
+    def serialize_value(self, value: Any) -> Any:
+        return serialize_value(self.workflow_id, self.display_context, value)
 
     def _gather_additional_module_files(self, module_path: str) -> Dict[str, str]:
         workflow_module_path = f"{module_path}.workflow"
