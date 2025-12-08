@@ -118,3 +118,62 @@ def test_mocks__parse_from_app__descriptors():
             foo="Hello baz",
         ),
     )
+
+
+def test_mocks__parse_from_app__when_condition_none_without_descriptor_validator():
+    """
+    Tests that when_condition is None when descriptor_validator is not provided.
+    This reproduces a bug where JSON data sent without a descriptor_validator
+    causes when_condition to be None, leading to downstream failures.
+    """
+
+    # GIVEN a Base Node
+    class StartNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            foo: str
+
+    # AND a workflow class with that Node
+    class MyWorkflow(BaseWorkflow):
+        graph = StartNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_value = StartNode.Outputs.foo
+
+    # AND a mock workflow node execution with a valid when_condition JSON structure
+    raw_mock_workflow_node_executions = [
+        {
+            "node_id": str(StartNode.__id__),
+            "when_condition": {
+                "type": "BINARY_EXPRESSION",
+                "operator": ">=",
+                "lhs": {
+                    "type": "EXECUTION_COUNTER",
+                    "node_id": str(StartNode.__id__),
+                },
+                "rhs": {
+                    "type": "CONSTANT_VALUE",
+                    "value": {
+                        "type": "NUMBER",
+                        "value": 1,
+                    },
+                },
+            },
+            "then_outputs": {
+                "foo": "Hello foo",
+            },
+        },
+    ]
+
+    # WHEN we parse the raw data on `MockNodeExecution` without a descriptor_validator
+    node_output_mocks = MockNodeExecution.validate_all(
+        raw_mock_workflow_node_executions,
+        MyWorkflow,
+    )
+
+    # THEN we get a list of MockNodeExecution objects
+    assert node_output_mocks is not None
+    assert len(node_output_mocks) == 1
+
+    # AND the when_condition is None because no descriptor_validator was provided
+    # This is the bug we're reproducing - when_condition should not be None
+    assert node_output_mocks[0].when_condition is None
