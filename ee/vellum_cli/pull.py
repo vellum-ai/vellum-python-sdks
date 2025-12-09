@@ -145,6 +145,7 @@ def pull_command(
     include_sandbox: Optional[bool] = None,
     target_directory: Optional[str] = None,
     workspace: Optional[str] = None,
+    release_tag: Optional[str] = None,
 ) -> None:
     load_dotenv(dotenv_path=os.path.join(os.getcwd(), ".env"))
     logger = load_cli_logger()
@@ -198,6 +199,7 @@ def pull_command(
 
     response = client.workflows.pull(
         pk,
+        release_tag=release_tag,
         request_options={"additional_query_parameters": query_parameters},
     )
 

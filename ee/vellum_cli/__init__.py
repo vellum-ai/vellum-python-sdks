@@ -208,6 +208,11 @@ Helpful for running and debugging workflows locally.""",
     help="""Directory to pull the workflow into. If not specified, \
 the workflow will be pulled into the current working directory.""",
 )
+@click.option(
+    "--release-tag",
+    type=str,
+    help="""Release tag to use when pulling from a deployment.""",
+)
 def pull(
     ctx: click.Context,
     include_json: Optional[bool],
@@ -215,6 +220,7 @@ def pull(
     strict: Optional[bool],
     include_sandbox: Optional[bool],
     target_directory: Optional[str],
+    release_tag: Optional[str],
 ) -> None:
     """Pull Resources from Vellum"""
 
@@ -225,6 +231,7 @@ def pull(
             strict=strict,
             include_sandbox=include_sandbox,
             target_directory=target_directory,
+            release_tag=release_tag,
         )
 
 
@@ -271,6 +278,11 @@ the workflow will be pulled into the current working directory.""",
     type=str,
     help="The specific Workspace config to use when pulling",
 )
+@click.option(
+    "--release-tag",
+    type=str,
+    help="""Release tag to use when pulling from a deployment.""",
+)
 def workflows_pull(
     module: Optional[str],
     include_json: Optional[bool],
@@ -281,6 +293,7 @@ def workflows_pull(
     include_sandbox: Optional[bool],
     target_directory: Optional[str],
     workspace: Optional[str],
+    release_tag: Optional[str],
 ) -> None:
     """
     Pull Workflows from Vellum. If a module is provided, only the Workflow for that module will be pulled.
@@ -297,6 +310,7 @@ def workflows_pull(
         include_sandbox=include_sandbox,
         target_directory=target_directory,
         workspace=workspace,
+        release_tag=release_tag,
     )
 
 
@@ -332,6 +346,11 @@ Helpful for running and debugging resources locally.""",
     help="""Directory to pull the workflow into. If not specified, \
 the workflow will be pulled into the current working directory.""",
 )
+@click.option(
+    "--release-tag",
+    type=str,
+    help="""Release tag to use when pulling from a deployment.""",
+)
 def pull_module(
     ctx: click.Context,
     include_json: Optional[bool],
@@ -339,6 +358,7 @@ def pull_module(
     strict: Optional[bool],
     include_sandbox: Optional[bool],
     target_directory: Optional[str],
+    release_tag: Optional[str],
 ) -> None:
     """Pull a specific module from Vellum"""
 
@@ -350,6 +370,7 @@ def pull_module(
             strict=strict,
             include_sandbox=include_sandbox,
             target_directory=target_directory,
+            release_tag=release_tag,
         )
 
 

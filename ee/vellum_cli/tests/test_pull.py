@@ -1337,3 +1337,33 @@ MY_OTHER_VELLUM_API_KEY=aaabbbcccddd
     assert os.path.exists(workflow_py)
     with open(workflow_py) as f:
         assert f.read() == "print('hello')"
+
+
+@pytest.mark.parametrize(
+    "base_command",
+    [
+        ["pull"],
+        ["workflows", "pull"],
+    ],
+    ids=["pull", "workflows_pull"],
+)
+def test_pull__release_tag(vellum_client, mock_module, base_command):
+    """Tests that the --release-tag option is passed to the API."""
+
+    # GIVEN a module on the user's filesystem
+    module = mock_module.module
+
+    # AND the workflow pull API call returns a zip file
+    vellum_client.workflows.pull.return_value = iter([zip_file_map({"workflow.py": "print('hello')"})])
+
+    # WHEN the user runs the pull command with --release-tag
+    runner = CliRunner()
+    result = runner.invoke(cli_main, base_command + [module, "--release-tag", "my-release-tag"])
+
+    # THEN the command returns successfully
+    assert result.exit_code == 0
+
+    # AND the pull api is called with release_tag="my-release-tag"
+    vellum_client.workflows.pull.assert_called_once()
+    call_args = vellum_client.workflows.pull.call_args.kwargs
+    assert call_args["release_tag"] == "my-release-tag"
