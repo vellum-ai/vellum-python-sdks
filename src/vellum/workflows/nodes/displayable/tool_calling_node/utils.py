@@ -102,7 +102,14 @@ class ToolPromptNode(InlinePromptNode[ToolCallingState]):
     def run(self) -> Iterator[BaseOutput]:
         if self.max_prompt_iterations is not None and self.state.prompt_iterations >= self.max_prompt_iterations:
             max_iterations_message = f"Maximum number of prompt iterations `{self.max_prompt_iterations}` reached."
-            raise NodeException(message=max_iterations_message, code=WorkflowErrorCode.NODE_EXECUTION)
+            raise NodeException(
+                message=max_iterations_message,
+                code=WorkflowErrorCode.NODE_EXECUTION,
+                raw_data={
+                    "node_id": str(self.__class__.__id__),
+                    "node_label": self.__class__.__name__,
+                },
+            )
 
         generator = super().run()
         with self.state.__quiet__():
