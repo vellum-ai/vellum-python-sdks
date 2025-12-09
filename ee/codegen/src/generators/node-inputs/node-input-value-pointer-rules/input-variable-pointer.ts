@@ -1,13 +1,13 @@
-import { python } from "@fern-api/python-ast";
-
 import { BaseNodeInputValuePointerRule } from "./base";
 
 import { NodeInputNotFoundError } from "src/generators/errors";
+import { AstNode } from "src/generators/extensions/ast-node";
+import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { InputVariablePointer } from "src/types/vellum";
 
 export class InputVariablePointerRule extends BaseNodeInputValuePointerRule<InputVariablePointer> {
-  getAstNode(): python.AstNode {
+  getAstNode(): AstNode {
     const inputVariablePointerRuleData = this.nodeInputValuePointerRule.data;
 
     const inputVariableContext =
@@ -22,7 +22,7 @@ export class InputVariablePointerRule extends BaseNodeInputValuePointerRule<Inpu
           "WARNING"
         )
       );
-      return python.TypeInstantiation.none();
+      return new NoneInstantiation();
     }
 
     return new Reference({

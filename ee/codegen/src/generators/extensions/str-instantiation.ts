@@ -1,5 +1,5 @@
-import { AstNode } from "./ast-node";
-import { Writer } from "./writer";
+import { TypeInstantiation } from "src/generators/extensions/type-instantiation";
+import { Writer } from "src/generators/extensions/writer";
 
 export declare namespace StrInstantiation {
   interface Config {
@@ -9,7 +9,7 @@ export declare namespace StrInstantiation {
   }
 }
 
-export class StrInstantiation extends AstNode {
+export class StrInstantiation extends TypeInstantiation {
   private readonly value: string;
   private readonly config: StrInstantiation.Config;
 

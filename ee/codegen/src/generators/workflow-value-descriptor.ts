@@ -1,10 +1,10 @@
-import { python } from "@fern-api/python-ast";
 import { isNil } from "lodash";
 
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { Expression } from "src/generators/expression";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 import { WorkflowValueDescriptorReference } from "src/generators/workflow-value-descriptor-reference/workflow-value-descriptor-reference";
 import {
@@ -53,7 +53,7 @@ export class WorkflowValueDescriptor extends AstNode {
     workflowValueDescriptor: WorkflowValueDescriptorType | null | undefined
   ): AstNode {
     if (isNil(workflowValueDescriptor)) {
-      return python.TypeInstantiation.none();
+      return new NoneInstantiation();
     }
     return this.buildExpression(workflowValueDescriptor);
   }
@@ -62,7 +62,7 @@ export class WorkflowValueDescriptor extends AstNode {
     workflowValueDescriptor: WorkflowValueDescriptorType | undefined
   ): AstNode {
     if (!workflowValueDescriptor) {
-      return python.TypeInstantiation.none();
+      return new NoneInstantiation();
     }
 
     // Base case
@@ -76,7 +76,7 @@ export class WorkflowValueDescriptor extends AstNode {
       });
 
       if (!reference.astNode) {
-        return python.TypeInstantiation.none();
+        return new NoneInstantiation();
       }
 
       return reference;

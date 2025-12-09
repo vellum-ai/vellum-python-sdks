@@ -1,7 +1,6 @@
-import { python } from "@fern-api/python-ast";
-
 import { NodeInputNotFoundError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { BaseNodeInputWorkflowReference } from "src/generators/workflow-value-descriptor-reference/BaseNodeInputWorkflowReference";
 import { WorkflowInputWorkflowReference as WorkflowInputWorkflowReferenceType } from "src/types/vellum";
@@ -26,7 +25,7 @@ export class WorkflowInputReference extends BaseNodeInputWorkflowReference<Workf
           "WARNING"
         )
       );
-      return python.TypeInstantiation.none();
+      return new NoneInstantiation();
     }
     return new Reference({
       name: inputVariableContext.definition.name,

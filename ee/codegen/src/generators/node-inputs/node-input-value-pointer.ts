@@ -8,6 +8,7 @@ import { BaseCodegenError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
+import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { Writer } from "src/generators/extensions/writer";
 import {
@@ -72,7 +73,7 @@ export class NodeInputValuePointer extends AstNode {
 
     const firstRule = rules[0];
     if (!firstRule) {
-      return python.TypeInstantiation.none();
+      return new NoneInstantiation();
     }
 
     let expression: AstNode = firstRule;
