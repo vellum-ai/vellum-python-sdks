@@ -2601,6 +2601,7 @@ export declare namespace WorkflowSandboxDatasetRowMockSerializer {
     node_id: string;
     when_condition?: WorkflowValueDescriptorSerializer.Raw | null;
     then_outputs?: Record<string, unknown> | null;
+    disabled?: boolean | null;
   }
 }
 
@@ -2611,6 +2612,7 @@ export const WorkflowSandboxDatasetRowMockSerializer: ObjectSchema<
   node_id: stringSchema(),
   when_condition: WorkflowValueDescriptorSerializer.optional(),
   then_outputs: recordSchema(stringSchema(), unknownSchema()).optional(),
+  disabled: booleanSchema().optional(),
 });
 
 const WorkflowSandboxDatasetRowSerializer = undiscriminatedUnionSchema([

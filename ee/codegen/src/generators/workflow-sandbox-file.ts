@@ -290,6 +290,16 @@ if __name__ == "__main__":
       })
     );
 
+    // Generate disabled parameter if it's true
+    if (mock.disabled === true) {
+      arguments_.push(
+        new MethodArgument({
+          name: "disabled",
+          value: python.TypeInstantiation.bool(true),
+        })
+      );
+    }
+
     return new ClassInstantiation({
       classReference: new Reference({
         name: "MockNodeExecution",

@@ -103,6 +103,7 @@ class _RawMockWorkflowNodeConfig(UniversalBaseModel):
 class MockNodeExecution(UniversalBaseModel):
     when_condition: BaseDescriptor
     then_outputs: BaseOutputs
+    disabled: bool = False
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -112,6 +113,8 @@ class MockNodeExecution(UniversalBaseModel):
         serialized = handler(self)
         serialized["node_id"] = str(self.then_outputs.__class__.__parent_class__.__id__)
         serialized["type"] = "NODE_EXECUTION"
+        if not self.disabled:
+            del serialized["disabled"]
         return serialized
 
     @field_serializer("then_outputs")
