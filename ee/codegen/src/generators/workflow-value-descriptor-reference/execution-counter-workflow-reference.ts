@@ -10,7 +10,7 @@ import { ExecutionCounterWorkflowReference as ExecutionCounterWorkflowReferenceT
 export class ExecutionCounterWorkflowReference extends BaseNodeInputWorkflowReference<ExecutionCounterWorkflowReferenceType> {
   getAstNode(): AstNode | undefined {
     const executionCounterNodeId =
-      this.nodeInputWorkflowReferencePointer.node_id;
+      this.nodeInputWorkflowReferencePointer.nodeId;
 
     const nodeContext = this.workflowContext.findNodeContext(
       executionCounterNodeId

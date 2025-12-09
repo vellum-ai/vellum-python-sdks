@@ -25,6 +25,7 @@ import {
   VellumValue as VellumValueSerializer,
   VellumVariable as VellumVariableSerializer,
   VellumVariableType as VellumVariableTypeSerializer,
+  WorkflowInput as WorkflowInputSerializer,
 } from "vellum-ai/serialization";
 import { ConditionCombinator as ConditionCombinatorSerializer } from "vellum-ai/serialization/types/ConditionCombinator";
 
@@ -119,6 +120,7 @@ import {
   WorkflowNode,
   WorkflowOutputValue,
   WorkflowRawData,
+  WorkflowSandboxDatasetRowMock,
   WorkflowSandboxRoutingConfig,
   WorkflowStatePointer,
   WorkflowStateVariableWorkflowReference,
@@ -889,7 +891,7 @@ export const ExecutionCounterWorkflowReferenceSerializer: ObjectSchema<
   ExecutionCounterWorkflowReferenceSerializer.Raw,
   Omit<ExecutionCounterWorkflowReference, "type">
 > = objectSchema({
-  node_id: propertySchema("node_id", stringSchema()),
+  nodeId: propertySchema("node_id", stringSchema()),
 });
 
 export declare namespace ExecutionCounterWorkflowReferenceSerializer {
@@ -2589,3 +2591,39 @@ export declare namespace WorkflowDisplayDataSerializer {
     viewport: WorkflowDisplayDataViewportSerializer.Raw;
   }
 }
+
+export const WorkflowSandboxInputsSerializer = listSchema(
+  WorkflowInputSerializer
+);
+
+export declare namespace WorkflowSandboxDatasetRowMockSerializer {
+  interface Raw {
+    node_id: string;
+    when_condition?: WorkflowValueDescriptorSerializer.Raw | null;
+    then_outputs?: Record<string, unknown> | null;
+  }
+}
+
+export const WorkflowSandboxDatasetRowMockSerializer: ObjectSchema<
+  WorkflowSandboxDatasetRowMockSerializer.Raw,
+  WorkflowSandboxDatasetRowMock
+> = objectSchema({
+  node_id: stringSchema(),
+  when_condition: WorkflowValueDescriptorSerializer.optional(),
+  then_outputs: recordSchema(stringSchema(), unknownSchema()).optional(),
+});
+
+const WorkflowSandboxDatasetRowSerializer = undiscriminatedUnionSchema([
+  WorkflowSandboxInputsSerializer,
+  objectSchema({
+    id: stringSchema().optional(),
+    label: stringSchema(),
+    inputs: WorkflowSandboxInputsSerializer.optional(),
+    workflow_trigger_id: stringSchema().optional(),
+    mocks: listSchema(WorkflowSandboxDatasetRowMockSerializer).optional(),
+  }),
+]);
+
+export const WorkflowSandboxDatasetRowsSerializer = listSchema(
+  WorkflowSandboxDatasetRowSerializer
+);

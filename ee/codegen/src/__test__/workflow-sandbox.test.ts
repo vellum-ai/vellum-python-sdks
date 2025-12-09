@@ -628,7 +628,7 @@ describe("Workflow Sandbox", () => {
                 operator: "=",
                 lhs: {
                   type: "EXECUTION_COUNTER",
-                  node_id: "non-existent-node-id",
+                  nodeId: "non-existent-node-id",
                 },
                 rhs: {
                   type: "CONSTANT_VALUE",
@@ -705,7 +705,7 @@ describe("Workflow Sandbox", () => {
                 operator: "=",
                 lhs: {
                   type: "EXECUTION_COUNTER",
-                  node_id: genericNodeData.id,
+                  nodeId: genericNodeData.id,
                 },
                 rhs: {
                   type: "CONSTANT_VALUE",

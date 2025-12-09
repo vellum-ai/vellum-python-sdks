@@ -94,7 +94,7 @@ describe("WorkflowValueDescriptorReferencePointer", () => {
     await nodeContextFactory({ workflowContext, nodeData: node });
     const counterReference: WorkflowValueDescriptorReferenceType = {
       type: "EXECUTION_COUNTER",
-      node_id: node.id,
+      nodeId: node.id,
     };
 
     const reference = new WorkflowValueDescriptorReference({

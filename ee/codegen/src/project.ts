@@ -67,7 +67,10 @@ import { TemplatingNode } from "src/generators/nodes/templating-node";
 import { IntegrationTrigger } from "src/generators/triggers/integration-trigger";
 import { ScheduledTrigger } from "src/generators/triggers/scheduled-trigger";
 import { WorkflowSandboxFile } from "src/generators/workflow-sandbox-file";
-import { WorkflowVersionExecConfigSerializer } from "src/serializers/vellum";
+import {
+  WorkflowSandboxDatasetRowsSerializer,
+  WorkflowVersionExecConfigSerializer,
+} from "src/serializers/vellum";
 import {
   CodeResourceDefinition,
   FinalOutputNode as FinalOutputNodeType,
@@ -100,7 +103,7 @@ export declare namespace WorkflowProjectGenerator {
     workflowVersionExecConfigData: unknown;
     vellumApiKey?: string;
     vellumApiEnvironment?: VellumEnvironmentUrls;
-    sandboxInputs?: WorkflowSandboxDatasetRow[];
+    sandboxInputs?: unknown;
     options?: WorkflowProjectGeneratorOptions;
   }
 
@@ -173,7 +176,18 @@ ${errors.slice(0, 3).map((err) => {
         pythonCodeMergeableNodeFiles: new Set<string>(),
         triggers: this.workflowVersionExecConfig.triggers,
       });
-      this.sandboxInputs = rest.sandboxInputs;
+
+      const sandboxInputsResult = WorkflowSandboxDatasetRowsSerializer.parse(
+        rest.sandboxInputs,
+        {
+          allowUnrecognizedUnionMembers: true,
+          allowUnrecognizedEnumValues: true,
+          unrecognizedObjectKeys: "strip",
+        }
+      );
+      this.sandboxInputs = sandboxInputsResult.ok
+        ? sandboxInputsResult.value
+        : undefined;
     }
   }
 

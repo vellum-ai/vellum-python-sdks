@@ -4,24 +4,17 @@ import {
   LogicalOperator,
 } from "vellum-ai/api";
 import {
-  AudioInputRequest,
-  ChatHistoryInput,
   ChatMessageRequest,
   ChatMessageRole,
-  DocumentInputRequest,
   FunctionDefinition,
-  ImageInputRequest,
-  JsonInput,
-  NumberInput,
   PromptBlockState,
   PromptParameters,
   SearchResult,
   SearchResultRequest,
-  StringInput,
   VellumValue,
   VellumVariable,
   VellumVariableType,
-  VideoInputRequest,
+  WorkflowInput,
 } from "vellum-ai/api/types";
 
 import { Reference } from "src/generators/extensions/reference";
@@ -888,16 +881,7 @@ export interface WorkflowVersionExecConfig {
   triggers?: WorkflowTrigger[];
 }
 
-type WorkflowSandboxInput =
-  | StringInput
-  | JsonInput
-  | ChatHistoryInput
-  | NumberInput
-  | AudioInputRequest
-  | VideoInputRequest
-  | ImageInputRequest
-  | DocumentInputRequest;
-export type WorkflowSandboxInputs = WorkflowSandboxInput[];
+export type WorkflowSandboxInputs = WorkflowInput[];
 export interface WorkflowSandboxDatasetRowMock {
   node_id: string;
   when_condition?: WorkflowValueDescriptor;
@@ -974,7 +958,7 @@ export interface EnvironmentVariableWorkflowReference {
 
 export interface ExecutionCounterWorkflowReference {
   type: "EXECUTION_COUNTER";
-  node_id: string;
+  nodeId: string;
 }
 
 export interface TriggerAttributeWorkflowReference {
