@@ -225,7 +225,7 @@ class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
         # Add result to chat history
         self._add_function_result_to_chat_history(result, self.state)
 
-        yield BaseOutput(name="result", value=result)
+        yield from []
 
 
 class MCPNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
