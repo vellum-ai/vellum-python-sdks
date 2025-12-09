@@ -889,7 +889,7 @@ export const ExecutionCounterWorkflowReferenceSerializer: ObjectSchema<
   ExecutionCounterWorkflowReferenceSerializer.Raw,
   Omit<ExecutionCounterWorkflowReference, "type">
 > = objectSchema({
-  nodeId: propertySchema("node_id", stringSchema()),
+  node_id: propertySchema("node_id", stringSchema()),
 });
 
 export declare namespace ExecutionCounterWorkflowReferenceSerializer {
