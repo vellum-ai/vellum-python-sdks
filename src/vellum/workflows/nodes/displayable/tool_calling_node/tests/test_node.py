@@ -768,10 +768,12 @@ def test_vellum_integration_node_error_outputs_result(vellum_client):
     assert result_output.is_fulfilled is True
 
     # AND the result should contain the error payload
-    assert "code" in result_output.value
-    assert "message" in result_output.value
-    assert result_output.value["code"] == "PROVIDER_ERROR"
-    assert "Internal server error occurred while executing the tool" in result_output.value["message"]
+    error_result = result_output.value
+    assert isinstance(error_result, dict)
+    assert "code" in error_result
+    assert "message" in error_result
+    assert error_result["code"] == "PROVIDER_ERROR"
+    assert "Internal server error occurred while executing the tool" in error_result["message"]
 
     # AND the error should also be in chat history
     assert len(state.chat_history) == 1
