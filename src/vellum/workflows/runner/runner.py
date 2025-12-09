@@ -510,6 +510,8 @@ class WorkflowRunner(Generic[StateType]):
             was_mocked: Optional[bool] = None
             mock_candidates = node_output_mocks_map.get(node.Outputs) or []
             for mock_candidate in mock_candidates:
+                if mock_candidate.disabled:
+                    continue
                 if mock_candidate.when_condition.resolve(node.state):
                     node_run_response = mock_candidate.then_outputs
                     was_mocked = True

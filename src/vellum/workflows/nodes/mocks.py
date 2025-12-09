@@ -103,6 +103,7 @@ class _RawMockWorkflowNodeConfig(UniversalBaseModel):
 class MockNodeExecution(UniversalBaseModel):
     when_condition: BaseDescriptor
     then_outputs: BaseOutputs
+    disabled: bool = False
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
