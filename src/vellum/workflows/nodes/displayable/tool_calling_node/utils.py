@@ -225,7 +225,7 @@ class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
         # Add result to chat history
         self._add_function_result_to_chat_history(result, self.state)
 
-        yield from []
+        yield BaseOutput(name="result", value=result)
 
 
 class MCPNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
@@ -279,7 +279,7 @@ class VellumIntegrationNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
                 error_payload["error"]["raw_data"] = e.raw_data
 
             self._add_function_result_to_chat_history(error_payload, self.state)
-            yield from []
+            yield BaseOutput(name="result", value=error_payload["error"])
             return
         except Exception as e:
             self._handle_tool_exception(e, "Vellum Integration tool", self.vellum_integration_tool.name)

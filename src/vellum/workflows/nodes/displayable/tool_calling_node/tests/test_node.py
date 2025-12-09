@@ -701,6 +701,88 @@ def test_vellum_integration_node_outputs_result(vellum_client):
     assert result_output.value == {"id": 123, "url": "https://github.com/test-owner/test-repo/issues/123"}
 
 
+def test_vellum_integration_node_error_outputs_result(vellum_client):
+    """Test that VellumIntegrationNode yields error payload as result output when NodeException occurs."""
+
+    # GIVEN a VellumIntegrationToolDefinition
+    github_tool = VellumIntegrationToolDefinition(
+        provider=VellumIntegrationProviderType.COMPOSIO,
+        integration_name="GITHUB",
+        name="create_issue",
+        description="Create a new issue in a GitHub repository",
+    )
+
+    # AND a tool prompt node
+    tool_prompt_node = create_tool_prompt_node(
+        ml_model="test-model",
+        blocks=[],
+        functions=[github_tool],
+        prompt_inputs=None,
+        parameters=DEFAULT_PROMPT_PARAMETERS,
+    )
+
+    function_node_class = create_function_node(
+        function=github_tool,
+        tool_prompt_node=tool_prompt_node,
+    )
+
+    # AND a state with a function call
+    state = ToolCallingState(
+        meta=StateMeta(
+            node_outputs={
+                tool_prompt_node.Outputs.results: [
+                    FunctionCallVellumValue(
+                        value=FunctionCall(
+                            arguments={"owner": "test-owner", "repo": "test-repo", "title": "Test Issue"},
+                            id="call_vellum_error_test",
+                            name="create_issue",
+                            state="FULFILLED",
+                        ),
+                    )
+                ],
+            },
+        )
+    )
+
+    # AND mock the vellum client's integration service to raise a 500 error
+    vellum_client.integrations.execute_integration_tool.side_effect = ApiError(
+        status_code=500,
+        body={"detail": "Internal server error occurred while executing the tool."},
+    )
+
+    # AND create a context with the vellum client
+    context = WorkflowContext()
+    context.vellum_client = vellum_client
+
+    function_node = function_node_class(state=state)
+    function_node._context = context
+
+    # WHEN the VellumIntegration node runs
+    outputs = list(function_node.run())
+
+    # THEN there should be exactly one output with name "result"
+    assert len(outputs) == 1
+    result_output = outputs[0]
+    assert isinstance(result_output, BaseOutput)
+    assert result_output.name == "result"
+    assert result_output.is_fulfilled is True
+
+    # AND the result should contain the error payload
+    assert "code" in result_output.value
+    assert "message" in result_output.value
+    assert result_output.value["code"] == "PROVIDER_ERROR"
+    assert "Internal server error occurred while executing the tool" in result_output.value["message"]
+
+    # AND the error should also be in chat history
+    assert len(state.chat_history) == 1
+    function_message = state.chat_history[0]
+    assert function_message.role == "FUNCTION"
+    assert isinstance(function_message.content, StringChatMessageContent)
+    error_data = json.loads(function_message.content.value)
+    assert "error" in error_data
+    assert error_data["error"]["code"] == "PROVIDER_ERROR"
+
+
 def test_tool_calling_node_400_error_returns_internal_error(vellum_adhoc_prompt_client):
     """
     Test that ToolCallingNode returns INTERNAL_ERROR when the underlying prompt node returns a 400 error.
