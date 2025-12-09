@@ -35,7 +35,7 @@ describe("generateCode", () => {
 
   it.each(fixtures)(`should generate code for %1`, async (fixture) => {
     const fixtureModule = await import(path.join(fixturesDir, fixture));
-    const { assertions, ...workflowVersionExecConfigData } =
+    const { assertions, dataset, ...workflowVersionExecConfigData } =
       fixtureModule.default;
 
     const fixtureDir = path.join(tempDir, fixture.replace(/\.ts$/, ""));
@@ -62,6 +62,7 @@ describe("generateCode", () => {
       workflowVersionExecConfigData,
       moduleName,
       vellumApiKey,
+      sandboxInputs: dataset,
     });
     await project.generateCode();
 

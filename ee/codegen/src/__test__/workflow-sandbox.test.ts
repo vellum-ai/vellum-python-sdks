@@ -658,5 +658,82 @@ describe("Workflow Sandbox", () => {
       // THEN it should generate MockNodeExecution with None for the unresolved reference
       expect(result).toMatchSnapshot();
     });
+
+    it("should handle mocks with when_condition referencing existing node ID via execution counter", async () => {
+      /**
+       * Tests that mocks with when_condition containing EXECUTION_COUNTER reference
+       * to an existing node ID generate the correct node execution counter reference.
+       */
+
+      const writer = new Writer();
+      const uniqueWorkflowContext = workflowContextFactory();
+      const inputVariable: VellumVariable = {
+        id: "1",
+        key: "test_input",
+        type: "STRING",
+      };
+
+      uniqueWorkflowContext.addInputVariableContext(
+        inputVariableContextFactory({
+          inputVariableData: inputVariable,
+          workflowContext: uniqueWorkflowContext,
+        })
+      );
+
+      const genericNodeData = genericNodeFactory();
+      await nodeContextFactory({
+        workflowContext: uniqueWorkflowContext,
+        nodeData: genericNodeData,
+      });
+
+      // GIVEN a mock with when_condition referencing an existing node ID via execution counter
+      const sandboxInputs: WorkflowSandboxDatasetRow[] = [
+        {
+          label: "Scenario with existing node in when_condition",
+          inputs: [
+            {
+              name: inputVariable.key,
+              type: "STRING",
+              value: "test-value",
+            },
+          ],
+          mocks: [
+            {
+              node_id: genericNodeData.id,
+              when_condition: {
+                type: "BINARY_EXPRESSION",
+                operator: "=",
+                lhs: {
+                  type: "EXECUTION_COUNTER",
+                  nodeId: genericNodeData.id,
+                },
+                rhs: {
+                  type: "CONSTANT_VALUE",
+                  value: {
+                    type: "NUMBER",
+                    value: 1,
+                  },
+                },
+              },
+              then_outputs: {
+                result: "mocked_result",
+              },
+            },
+          ],
+        },
+      ];
+
+      // WHEN we generate the sandbox file
+      const sandbox = codegen.workflowSandboxFile({
+        workflowContext: uniqueWorkflowContext,
+        sandboxInputs,
+      });
+
+      sandbox.write(writer);
+      const result = await writer.toStringFormatted();
+
+      // THEN it should generate MockNodeExecution with the node's Execution.count reference
+      expect(result).toMatchSnapshot();
+    });
   });
 });
