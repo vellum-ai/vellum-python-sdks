@@ -32,7 +32,7 @@ describe("ExecutionCounterWorkflowReferencePointer", () => {
   it("should generate correct AST for execution counter reference", async () => {
     const counterReference: WorkflowValueDescriptorReference = {
       type: "EXECUTION_COUNTER",
-      nodeId: node.id,
+      node_id: node.id,
     };
 
     const pointer = new ExecutionCounterWorkflowReference({
@@ -48,7 +48,7 @@ describe("ExecutionCounterWorkflowReferencePointer", () => {
   it("should generate Lazy Reference for self-referencing nodes", async () => {
     const counterReference: WorkflowValueDescriptorReference = {
       type: "EXECUTION_COUNTER",
-      nodeId: node.id,
+      node_id: node.id,
     };
 
     const pointer = new ExecutionCounterWorkflowReference({

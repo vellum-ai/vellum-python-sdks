@@ -974,7 +974,7 @@ export interface EnvironmentVariableWorkflowReference {
 
 export interface ExecutionCounterWorkflowReference {
   type: "EXECUTION_COUNTER";
-  nodeId: string;
+  node_id: string;
 }
 
 export interface TriggerAttributeWorkflowReference {
