@@ -250,7 +250,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         has_manual_trigger = len(manual_trigger_edges) > 0
 
         # Determine which nodes have explicit non-trigger entrypoints in the graph
-        # We need this early to decide whether to create an ENTRYPOINT node
+        # This is used later to decide whether to skip entrypoint edges for nodes with triggers
         non_trigger_entrypoint_nodes: Set[Type[BaseNode]] = set()
         for subgraph in self._workflow.get_subgraphs():
             if any(True for _ in subgraph.trigger_edges):
@@ -260,18 +260,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                     non_trigger_entrypoint_nodes.add(get_unadorned_node(entrypoint))
                 except Exception:
                     continue
-
-        # Check if workflow has only non-manual triggers (IntegrationTrigger/ScheduleTrigger)
-        has_only_non_manual_triggers = len(trigger_edges) > 0 and not has_manual_trigger
-
-        # We need an ENTRYPOINT node if:
-        # 1. There's a ManualTrigger, OR
-        # 2. There are no triggers at all (backward compatibility), OR
-        # 3. There are non-trigger entrypoints (nodes that need ENTRYPOINT edges alongside triggers)
-        # We skip ENTRYPOINT node only when there are ONLY non-manual triggers with no regular entrypoints
-        needs_entrypoint_node = (
-            has_manual_trigger or not has_only_non_manual_triggers or len(non_trigger_entrypoint_nodes) > 0
-        )
 
         entrypoint_node_id: Optional[UUID] = None
         entrypoint_node_source_handle_id: Optional[UUID] = None
@@ -296,8 +284,9 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                 "base": None,
                 "definition": None,
             }
-        elif needs_entrypoint_node:
-            # Non-trigger entrypoints exist: use workflow_display ENTRYPOINT node
+        else:
+            # Non-manual trigger or no triggers: use workflow_display ENTRYPOINT node if IDs are present
+            # This allows the ENTRYPOINT node to be optional - if IDs are None, no ENTRYPOINT node is created
             entrypoint_node_id = self.display_context.workflow_display.entrypoint_node_id
             entrypoint_node_source_handle_id = self.display_context.workflow_display.entrypoint_node_source_handle_id
 
@@ -315,7 +304,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                     "base": None,
                     "definition": None,
                 }
-        # else: only non-manual triggers with no regular entrypoints - no ENTRYPOINT node needed
 
         # Add all the nodes in the workflows
         for node in self._workflow.get_all_nodes():
