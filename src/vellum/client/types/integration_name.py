@@ -55,6 +55,7 @@ IntegrationName = typing.Union[
         "EXA",
         "GAMMA",
         "GITLAB",
+        "GONG",
         "FIRECRAWL",
         "FIGMA",
         "FIREFLIES",
