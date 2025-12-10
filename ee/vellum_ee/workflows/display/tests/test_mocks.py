@@ -1,4 +1,3 @@
-import importlib
 import sys
 from uuid import uuid4
 
@@ -246,9 +245,6 @@ class StartNodeDisplay(BaseNodeDisplay[StartNode]):
 
     # AND the workflow is loaded from the module
     Workflow = BaseWorkflow.load_from_module(namespace)
-
-    # AND the display module is imported to trigger the node ID annotation
-    importlib.import_module(f"{namespace}.display")
     StartNode = list(Workflow.get_nodes())[0]
 
     # AND a mock workflow node execution using the display-annotated node ID
