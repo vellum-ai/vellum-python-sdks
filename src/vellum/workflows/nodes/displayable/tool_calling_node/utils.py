@@ -106,8 +106,8 @@ class ToolPromptNode(InlinePromptNode[ToolCallingState]):
                 message=max_iterations_message,
                 code=WorkflowErrorCode.NODE_EXECUTION,
                 raw_data={
-                    "node_id": str(self.__class__.__id__),
-                    "node_label": self.__class__.__name__,
+                    "max_iterations": self.max_prompt_iterations,
+                    "iterations_reached": self.state.prompt_iterations,
                 },
             )
 
