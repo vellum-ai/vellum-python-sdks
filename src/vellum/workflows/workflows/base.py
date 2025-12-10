@@ -880,6 +880,19 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             raise WorkflowInitializationException(message=f"Invalid variable reference: {e}") from e
         except Exception as e:
             raise WorkflowInitializationException(message=f"Unexpected failure while loading module: {e}") from e
+
+        # Attempt to load optional display sidecar module to trigger node ID annotations
+        display_path = f"{module_path}.display"
+        try:
+            importlib.import_module(display_path)
+        except ModuleNotFoundError:
+            # No display package for this workflow; that's fine.
+            pass
+        except Exception as e:
+            raise WorkflowInitializationException(
+                message=f"Unexpected failure while loading display module '{display_path}': {e}"
+            ) from e
+
         workflows: List[Type[BaseWorkflow]] = []
         for name in dir(module):
             if name.startswith("__"):
