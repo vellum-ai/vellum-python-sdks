@@ -1182,6 +1182,59 @@ describe("Workflow", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
+    it("should generate correct graph when workflow relies solely on a scheduled trigger", async () => {
+      const writer = new Writer();
+      const triggerId = "scheduled-trigger";
+
+      const outputNode = finalOutputNodeFactory({
+        id: "output-node",
+        label: "Output",
+        name: "output",
+        targetHandleId: "output-target-handle",
+        outputId: "output-id",
+      }).build();
+
+      const edges = [
+        {
+          id: "trigger-edge",
+          type: "DEFAULT" as const,
+          sourceNodeId: triggerId,
+          sourceHandleId: triggerId,
+          targetNodeId: outputNode.id,
+          targetHandleId: outputNode.data.targetHandleId,
+        },
+      ];
+
+      const workflowContext = workflowContextFactory({
+        workflowRawData: {
+          nodes: [outputNode],
+          edges,
+        },
+        triggers: [
+          {
+            id: triggerId,
+            type: WorkflowTriggerType.SCHEDULED,
+            attributes: [],
+            cron: "* * * * *",
+            timezone: "UTC",
+          },
+        ],
+      });
+
+      await createNodeContext({
+        nodeData: outputNode,
+        workflowContext,
+      });
+
+      const graphAttribute = new GraphAttribute({
+        workflowContext,
+      });
+
+      graphAttribute.write(writer);
+
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
     it("should generate correct graph when an IntegrationTrigger targets a ported custom node", async () => {
       const writer = new Writer();
 

@@ -305,6 +305,11 @@ exports[`Workflow > graph > should generate correct graph when workflow has an I
 "
 `;
 
+exports[`Workflow > graph > should generate correct graph when workflow relies solely on a scheduled trigger 1`] = `
+"ScheduleTrigger >> Output
+"
+`;
+
 exports[`Workflow > graph > should handle a conditional node with default port pointing back to itself 1`] = `
 "{
     ValidateAPIResponse.Ports.success >> APISuccessOutput,

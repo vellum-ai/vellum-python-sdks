@@ -3,13 +3,10 @@ import { mkdir, writeFile } from "fs/promises";
 import * as path from "path";
 import { join } from "path";
 
-import { isNil } from "lodash";
 import { VellumEnvironmentUrls } from "vellum-ai";
 
 import * as codegen from "./codegen";
 import { StateVariableContext } from "./context/state-variable-context";
-import { Comment } from "./generators/extensions/comment";
-import { StarImport } from "./generators/extensions/star-import";
 import { getAllFilesInDir } from "./utils/files";
 
 import { GENERATED_DISPLAY_MODULE_NAME } from "src/constants";
@@ -41,11 +38,11 @@ import { WorkflowOutputContext } from "src/context/workflow-output-context";
 import { ErrorLogFile, InitFile, Inputs, Workflow } from "src/generators";
 import {
   BaseCodegenError,
-  MissingEntrypointIdError,
   NodeDefinitionGenerationError,
   ProjectSerializationError,
   WorkflowGenerationError,
 } from "src/generators/errors";
+import { StarImport, Comment } from "src/generators/extensions";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ApiNode } from "src/generators/nodes/api-node";
 import { BaseNode } from "src/generators/nodes/bases";
@@ -1097,17 +1094,7 @@ ${errors.slice(0, 3).map((err) => {
 
   public getEntrypointId(): string | undefined {
     const entrypointNode = this.workflowContext.tryGetEntrypointNode();
-    if (isNil(entrypointNode)) {
-      this.workflowContext.addError(
-        new MissingEntrypointIdError(
-          "Cannot determine entrypoint id for the given workflow",
-          "WARNING"
-        )
-      );
-      return undefined;
-    } else {
-      return entrypointNode.id;
-    }
+    return entrypointNode?.id;
   }
 
   /**
