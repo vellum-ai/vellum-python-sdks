@@ -1097,17 +1097,7 @@ ${errors.slice(0, 3).map((err) => {
 
   public getEntrypointId(): string | undefined {
     const entrypointNode = this.workflowContext.tryGetEntrypointNode();
-    if (isNil(entrypointNode)) {
-      this.workflowContext.addError(
-        new MissingEntrypointIdError(
-          "Cannot determine entrypoint id for the given workflow",
-          "WARNING"
-        )
-      );
-      return undefined;
-    } else {
-      return entrypointNode.id;
-    }
+    return entrypointNode?.id;
   }
 
   /**
