@@ -1,6 +1,11 @@
+import importlib
+import sys
+from uuid import uuid4
+
 from vellum.workflows import BaseInputs, BaseNode, BaseState, BaseWorkflow, MockNodeExecution
 from vellum.workflows.references.constant import ConstantValueReference
 from vellum_ee.workflows.display.utils.expressions import base_descriptor_validator
+from vellum_ee.workflows.server.virtual_file_loader import VirtualFileFinder
 
 
 def test_mocks__parse_from_app__descriptors():
@@ -177,3 +182,113 @@ def test_mocks__parse_from_app__when_condition_defaults_to_false_without_descrip
 
     # AND the when_condition defaults to ConstantValueReference(False)
     assert node_output_mocks[0].when_condition == ConstantValueReference(False)
+
+
+def test_mocks__use_node_id_from_display():
+    """
+    Tests that validate_all correctly resolves mocks when the node ID is annotated by the display class.
+    """
+
+    # GIVEN a workflow module with a display class that sets a custom node_id
+    display_node_id = uuid4()
+    files = {
+        "__init__.py": "",
+        "workflow.py": """\
+from vellum.workflows import BaseWorkflow
+from vellum.workflows.nodes import BaseNode
+
+
+class StartNode(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        foo: str
+
+
+class Workflow(BaseWorkflow):
+    graph = StartNode
+
+    class Outputs(BaseWorkflow.Outputs):
+        final_value = StartNode.Outputs.foo
+""",
+        "display/__init__.py": """\
+# flake8: noqa: F401, F403
+
+from .workflow import *
+from .nodes import *
+""",
+        "display/workflow.py": """\
+from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
+from ..workflow import Workflow
+
+
+class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
+    pass
+""",
+        "display/nodes/__init__.py": """\
+# flake8: noqa: F401, F403
+
+from .start_node import *
+""",
+        "display/nodes/start_node.py": f"""\
+from uuid import UUID
+from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
+from ...workflow import StartNode
+
+
+class StartNodeDisplay(BaseNodeDisplay[StartNode]):
+    node_id = UUID("{display_node_id}")
+""",
+    }
+
+    namespace = str(uuid4())
+
+    # AND the virtual file loader is registered
+    sys.meta_path.append(VirtualFileFinder(files, namespace))
+
+    # AND the workflow is loaded from the module
+    Workflow = BaseWorkflow.load_from_module(namespace)
+
+    # AND the display module is imported to trigger the node ID annotation
+    importlib.import_module(f"{namespace}.display")
+    StartNode = list(Workflow.get_nodes())[0]
+
+    # AND a mock workflow node execution using the display-annotated node ID
+    raw_mock_workflow_node_executions = [
+        {
+            "node_id": str(display_node_id),
+            "when_condition": {
+                "type": "BINARY_EXPRESSION",
+                "operator": ">=",
+                "lhs": {
+                    "type": "EXECUTION_COUNTER",
+                    "node_id": str(display_node_id),
+                },
+                "rhs": {
+                    "type": "CONSTANT_VALUE",
+                    "value": {
+                        "type": "NUMBER",
+                        "value": 0,
+                    },
+                },
+            },
+            "then_outputs": {
+                "foo": "Hello",
+            },
+        },
+    ]
+
+    # WHEN we parse the mock workflow node execution
+    node_output_mocks = MockNodeExecution.validate_all(
+        raw_mock_workflow_node_executions,
+        Workflow,
+        descriptor_validator=base_descriptor_validator,
+    )
+
+    # THEN we get the expected list of MockNodeExecution objects
+    assert node_output_mocks
+    assert len(node_output_mocks) == 1
+    assert node_output_mocks[0] == MockNodeExecution(
+        when_condition=StartNode.Execution.count.greater_than_or_equal_to(0),
+        then_outputs=StartNode.Outputs(  # type: ignore[call-arg]
+            foo="Hello",
+        ),
+    )
