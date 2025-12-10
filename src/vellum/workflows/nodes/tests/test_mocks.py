@@ -211,6 +211,96 @@ def test_mocks__use_id_from_display():
     )
 
 
+def test_mocks__use_node_id_from_display():
+    """
+    Tests that validate_all correctly resolves mocks when the node ID is annotated by the display class.
+    """
+
+    # GIVEN a Base Node
+    class StartNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            foo: str
+
+    # AND a display class that sets a custom node_id
+    display_node_id = uuid.uuid4()
+
+    class StartNodeDisplay(BaseNodeDisplay[StartNode]):
+        node_id = display_node_id
+
+    # AND a workflow class with that Node
+    class MyWorkflow(BaseWorkflow):
+        graph = StartNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_value = StartNode.Outputs.foo
+
+    # AND a mock workflow node execution using the display-annotated node ID in legacy format
+    node_output_id = StartNode.__output_ids__["foo"]
+    raw_mock_workflow_node_execution = [
+        {
+            "type": "WORKFLOW_NODE_OUTPUT",
+            "node_id": str(display_node_id),
+            "mock_executions": [
+                {
+                    "when_condition": {
+                        "expression": {
+                            "type": "LOGICAL_CONDITION_GROUP",
+                            "combinator": "AND",
+                            "negated": False,
+                            "conditions": [
+                                {
+                                    "type": "LOGICAL_CONDITION",
+                                    "lhs_variable_id": "e60902d5-6892-4916-80c1-f0130af52322",
+                                    "operator": ">=",
+                                    "rhs_variable_id": "5c1bbb24-c288-49cb-a9b7-0c6f38a86037",
+                                }
+                            ],
+                        },
+                        "variables": [
+                            {
+                                "type": "EXECUTION_COUNTER",
+                                "node_id": str(display_node_id),
+                                "id": "e60902d5-6892-4916-80c1-f0130af52322",
+                            },
+                            {
+                                "type": "CONSTANT_VALUE",
+                                "variable_value": {"type": "NUMBER", "value": 0},
+                                "id": "5c1bbb24-c288-49cb-a9b7-0c6f38a86037",
+                            },
+                        ],
+                    },
+                    "then_outputs": [
+                        {
+                            "output_id": str(node_output_id),
+                            "value": {
+                                "id": "27006b2a-fa81-430c-a0b2-c66a9351fc68",
+                                "type": "CONSTANT_VALUE",
+                                "variable_value": {"type": "STRING", "value": "Hello"},
+                            },
+                        },
+                    ],
+                }
+            ],
+        }
+    ]
+
+    # WHEN we parse the mock workflow node execution
+    node_output_mocks = MockNodeExecution.validate_all(
+        raw_mock_workflow_node_execution,
+        MyWorkflow,
+    )
+
+    # THEN we get the expected list of MockNodeExecution objects
+    assert node_output_mocks
+    assert len(node_output_mocks) == 1
+    assert node_output_mocks[0] == MockNodeExecution(
+        when_condition=StartNode.Execution.count.greater_than_or_equal_to(0.0),
+        then_outputs=StartNode.Outputs(
+            foo="Hello",
+        ),
+    )
+
+
 def test_mocks__invalid_then_outputs_key_falls_back_to_legacy():
     """
     Tests that when then_outputs contains an invalid key that triggers a NodeException,
