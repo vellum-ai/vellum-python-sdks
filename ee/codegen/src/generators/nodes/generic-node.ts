@@ -26,6 +26,7 @@ import { StarImport } from "src/generators/extensions/star-import";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { WrappedCall } from "src/generators/extensions/wrapped-call";
 import { InitFile } from "src/generators/init-file";
+import { Json } from "src/generators/json";
 import { NodeOutputs } from "src/generators/node-outputs";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { AttributeType, NODE_ATTRIBUTES } from "src/generators/nodes/constants";
@@ -322,11 +323,15 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
       modulePath: [`.${snakeName}`], // Import from snake_case module
     });
 
-    // Check if function has inputs that need to be wrapped with tool()
+    // Check if function has inputs or input_examples that need to be wrapped with tool()
     const parsedInputs = this.parseToolInputs(codeExecutionFunction);
-    if (parsedInputs && Object.keys(parsedInputs).length > 0) {
+    const inputExamples = codeExecutionFunction.input_examples ?? null;
+    const hasInputs = parsedInputs && Object.keys(parsedInputs).length > 0;
+    const hasInputExamples = inputExamples && inputExamples.length > 0;
+
+    if (hasInputs || hasInputExamples) {
       // Wrap the function reference with tool(...)(func)
-      const wrapper = this.getToolInvocation(parsedInputs);
+      const wrapper = this.getToolInvocation(parsedInputs, inputExamples);
       return new WrappedCall({
         wrapper,
         inner: functionReference,
@@ -889,41 +894,71 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
   }
 
   /**
-   * Creates a tool(inputs={...}) method invocation for wrapping function references.
+   * Creates a tool(inputs={...}, input_examples=[...]) method invocation for wrapping function references.
    */
   private getToolInvocation(
-    inputs: Record<string, WorkflowValueDescriptorType>
+    inputs: Record<string, WorkflowValueDescriptorType> | null,
+    inputExamples: Array<Record<string, unknown>> | null
   ): MethodInvocation {
-    // Build dict entries for the inputs parameter
-    const dictEntries = Object.entries(inputs).map(([inputName, inputDef]) => {
-      const workflowValueDescriptor = new WorkflowValueDescriptor({
-        workflowValueDescriptor: inputDef,
-        nodeContext: this.nodeContext,
-        workflowContext: this.workflowContext,
+    const arguments_: python.MethodArgument[] = [];
+
+    // Build dict entries for the inputs parameter if provided
+    if (inputs && Object.keys(inputs).length > 0) {
+      const dictEntries = Object.entries(inputs).map(
+        ([inputName, inputDef]) => {
+          const workflowValueDescriptor = new WorkflowValueDescriptor({
+            workflowValueDescriptor: inputDef,
+            nodeContext: this.nodeContext,
+            workflowContext: this.workflowContext,
+          });
+
+          return {
+            key: new StrInstantiation(inputName),
+            value: workflowValueDescriptor,
+          };
+        }
+      );
+
+      const inputsDict = python.TypeInstantiation.dict(dictEntries, {
+        endWithComma: true,
       });
 
-      return {
-        key: new StrInstantiation(inputName),
-        value: workflowValueDescriptor,
-      };
-    });
+      arguments_.push(
+        new MethodArgument({
+          name: "inputs",
+          value: inputsDict,
+        })
+      );
+    }
 
-    // Create the dict literal for inputs
-    const inputsDict = python.TypeInstantiation.dict(dictEntries, {
-      endWithComma: true,
-    });
+    // Build list entries for the input_examples parameter if provided
+    if (inputExamples && inputExamples.length > 0) {
+      const exampleDicts = inputExamples.map((example) => {
+        const dictEntries = Object.entries(example).map(([key, value]) => ({
+          key: new StrInstantiation(key),
+          value: new Json(value),
+        }));
+        return python.TypeInstantiation.dict(dictEntries, {
+          endWithComma: true,
+        });
+      });
+
+      arguments_.push(
+        new MethodArgument({
+          name: "input_examples",
+          value: python.TypeInstantiation.list(exampleDicts, {
+            endWithComma: true,
+          }),
+        })
+      );
+    }
 
     return new MethodInvocation({
       methodReference: new Reference({
         name: "tool",
         modulePath: ["vellum", "workflows", "utils", "functions"],
       }),
-      arguments_: [
-        new MethodArgument({
-          name: "inputs",
-          value: inputsDict,
-        }),
-      ],
+      arguments_,
     });
   }
 

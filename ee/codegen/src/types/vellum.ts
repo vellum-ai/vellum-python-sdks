@@ -1068,6 +1068,7 @@ export type FunctionArgs = {
   type: "CODE_EXECUTION";
   src: string;
   definition?: FunctionDefinition; // `legacy frontend` does not send definition field
+  input_examples?: Array<Record<string, unknown>>;
 } & NameDescription;
 
 export type InlineWorkflowFunctionArgs = {
