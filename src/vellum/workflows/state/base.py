@@ -310,7 +310,7 @@ class StateMeta(UniversalBaseModel):
     id: UUID = field(default_factory=uuid4_default_factory)
     span_id: UUID = field(default_factory=uuid4_default_factory)
     updated_ts: datetime = field(default_factory=default_datetime_factory)
-    workflow_inputs: BaseInputs = field(default_factory=BaseInputs)
+    workflow_inputs: Optional[BaseInputs] = field(default=None)
     external_inputs: Dict[ExternalInputReference, Any] = field(default_factory=dict)
     node_outputs: Dict[OutputReference, Any] = field(default_factory=dict)
     trigger_attributes: Dict[TriggerAttributeReference, Any] = field(default_factory=dict)
@@ -456,9 +456,13 @@ class StateMeta(UniversalBaseModel):
     @classmethod
     def deserialize_workflow_inputs(cls, workflow_inputs: Any, info: ValidationInfo):
         workflow_definition = cls._get_workflow(info)
+        context = info.context or {}
+        skip_default_inputs = bool(context.get("skip_workflow_inputs_default"))
 
         if workflow_definition:
             if workflow_inputs is None:
+                if skip_default_inputs:
+                    return None
                 return workflow_definition.get_inputs_class()()
             if isinstance(workflow_inputs, dict):
                 return workflow_definition.get_inputs_class()(**workflow_inputs)

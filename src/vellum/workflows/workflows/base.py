@@ -735,13 +735,24 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         return self.get_inputs_class()()
 
     def get_default_state(
-        self, workflow_inputs: Optional[InputsType] = None, execution_id: Optional[UUID] = None
+        self,
+        workflow_inputs: Optional[InputsType] = None,
+        execution_id: Optional[UUID] = None,
+        *,
+        fallback_to_default_inputs: bool = True,
     ) -> StateType:
-        meta = StateMeta(
-            parent=self._parent_state,
-            workflow_inputs=workflow_inputs or self.get_default_inputs(),
-            workflow_definition=self.__class__,
-        )
+        resolved_inputs: Optional[InputsType] = workflow_inputs
+        meta_kwargs = {
+            "parent": self._parent_state,
+            "workflow_inputs": resolved_inputs,
+            "workflow_definition": self.__class__,
+        }
+        if resolved_inputs is None and not fallback_to_default_inputs:
+            meta = StateMeta.model_validate(meta_kwargs, context={"skip_workflow_inputs_default": True})
+        else:
+            if resolved_inputs is None:
+                meta_kwargs["workflow_inputs"] = self.get_default_inputs()
+            meta = StateMeta(**meta_kwargs)
 
         # Makes the uuid factory mocker work this way instead of setting in cosntructor
         if execution_id:
