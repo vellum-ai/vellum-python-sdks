@@ -140,7 +140,7 @@ class ToolCallingNode(BaseToolCallingNode):
 `;
 
 exports[`ToolCallingNode > examples > should generate tool decorator with both inputs and examples 1`] = `
-"from .search import search
+"from .get_current_weather import get_current_weather
 
 from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,
@@ -154,33 +154,8 @@ class ToolCallingNode(BaseToolCallingNode):
     functions = [
         tool(
             inputs={
-                "parent_context": Inputs.location,
+                "date_input": Inputs.location,
             },
-            examples=[
-                {
-                    "query": "weather in SF",
-                },
-                {
-                    "query": "stock prices",
-                },
-            ],
-        )(search)
-    ]
-"
-`;
-
-exports[`ToolCallingNode > examples > should generate tool decorator with examples 1`] = `
-"from .get_weather import get_weather
-
-from vellum.workflows.nodes.displayable.tool_calling_node import (
-    ToolCallingNode as BaseToolCallingNode,
-)
-from vellum.workflows.utils.functions import tool
-
-
-class ToolCallingNode(BaseToolCallingNode):
-    functions = [
-        tool(
             examples=[
                 {
                     "location": "San Francisco",
@@ -189,8 +164,8 @@ class ToolCallingNode(BaseToolCallingNode):
                     "location": "New York",
                     "units": "celsius",
                 },
-            ]
-        )(get_weather)
+            ],
+        )(get_current_weather)
     ]
 "
 `;
