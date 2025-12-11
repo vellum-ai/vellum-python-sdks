@@ -163,6 +163,17 @@ class MockNodeExecution(UniversalBaseModel):
                         },
                     )
                 )
+            except WorkflowInitializationException as e:
+                # If the node is not found in the workflow, skip it with a warning
+                if "not found in workflow" in str(e):
+                    node_id = raw_mock_workflow_node_config.get("node_id")
+                    logger.warning(
+                        "Skipping mock for node %s: node not found in workflow %s",
+                        node_id,
+                        workflow.__name__,
+                    )
+                    continue
+                raise
             except (ValidationError, NodeException):
                 # After the Vellum App is updated to the new mock resolution strategy,
                 # we can update this to raise an exception
