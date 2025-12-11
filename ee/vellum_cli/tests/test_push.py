@@ -1514,3 +1514,9 @@ def test_push__includes_metadata_json_in_artifact(mock_module, vellum_client):
     extracted_files = _extract_tar_gz(call_args["artifact"].read())
     assert extracted_files["workflow.py"] == workflow_py_file_content
     assert extracted_files["metadata.json"] == metadata_json_content
+
+    # AND metadata.json should NOT be in the exec_config's module_data additional_files
+    exec_config = json.loads(call_args["exec_config"])
+    module_data = exec_config.get("module_data") or {}
+    additional_files = module_data.get("additional_files") or {}
+    assert "metadata.json" not in additional_files

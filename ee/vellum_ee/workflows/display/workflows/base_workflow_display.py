@@ -87,6 +87,7 @@ IGNORE_PATTERNS = [
     ".*",
     "node_modules/*",
     "*.log",
+    "metadata.json",
 ]
 
 
