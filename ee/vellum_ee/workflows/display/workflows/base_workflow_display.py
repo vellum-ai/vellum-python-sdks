@@ -1317,14 +1317,17 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         return serialize_value(self.workflow_id, self.display_context, value)
 
     _INCLUDED_FILE_EXTENSIONS = [".py"]
+    _INCLUDED_FILENAMES = ["metadata.json"]
 
     @staticmethod
     def should_include_file(filename: str) -> bool:
-        """Check if a file should be included based on its extension.
+        """Check if a file should be included based on its extension or filename.
 
         This is used by both the serialization logic and the push API to ensure
         consistency in which files are included in workflow artifacts.
         """
+        if filename in BaseWorkflowDisplay._INCLUDED_FILENAMES:
+            return True
         return any(filename.endswith(ext) for ext in BaseWorkflowDisplay._INCLUDED_FILE_EXTENSIONS)
 
     def _gather_additional_module_files(self, module_path: str) -> Dict[str, str]:
