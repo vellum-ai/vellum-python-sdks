@@ -876,8 +876,11 @@ def test_tool_input_examples_included_in_schema():
 
     compiled = compile_function_definition(get_current_weather)
     assert isinstance(compiled.parameters, dict)
-    assert compiled.parameters.get("examples") == [
-        {"location": "San Francisco"},
-        {"location": "New York", "units": "celsius"},
-    ]
-    assert compiled.parameters["properties"]["units"]["default"] == "fahrenheit"
+    assert compiled.parameters == {
+        "type": "object",
+        "properties": {
+            "location": {"type": "string", "examples": ["San Francisco", "New York"]},
+            "units": {"type": "string", "default": "fahrenheit", "examples": ["celsius"]},
+        },
+        "required": ["location"],
+    }
