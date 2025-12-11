@@ -1484,76 +1484,6 @@ describe("ToolCallingNode", () => {
   });
 
   describe("examples", () => {
-    it("should generate tool decorator with examples", async () => {
-      /**
-       * Tests that a CODE_EXECUTION function with examples in definition.parameters
-       * generates a tool decorator with the examples parameter.
-       */
-
-      // GIVEN a code execution function with examples in definition.parameters
-      const codeExecutionFunctionWithExamples: FunctionArgs = {
-        type: "CODE_EXECUTION",
-        src: 'def get_weather(location: str, units: str = "fahrenheit") -> str:\n    """Get the current weather for a location."""\n    return "sunny"\n',
-        name: "get_weather",
-        description: "Get the current weather for a location.",
-        definition: {
-          name: "get_weather",
-          parameters: {
-            type: "object",
-            required: ["location"],
-            properties: {
-              location: { type: "string" },
-              units: { type: "string", default: "fahrenheit" },
-            },
-            examples: [
-              { location: "San Francisco" },
-              { location: "New York", units: "celsius" },
-            ],
-          },
-        },
-      };
-
-      const nodePortData: NodePort[] = [
-        nodePortFactory({
-          id: "port-id",
-        }),
-      ];
-
-      const functionsAttribute = nodeAttributeFactory(
-        "functions-attr-id",
-        "functions",
-        {
-          type: "CONSTANT_VALUE",
-          value: {
-            type: "JSON",
-            value: [codeExecutionFunctionWithExamples],
-          },
-        }
-      );
-
-      const nodeData = toolCallingNodeFactory({
-        nodePorts: nodePortData,
-        nodeAttributes: [functionsAttribute],
-      });
-
-      // WHEN we create the node and generate the node file
-      const nodeContext = (await createNodeContext({
-        workflowContext,
-        nodeData,
-      })) as GenericNodeContext;
-
-      const node = new GenericNode({
-        workflowContext,
-        nodeContext,
-      });
-
-      node.getNodeFile().write(writer);
-      const output = await writer.toStringFormatted();
-
-      // THEN the generated code should include the tool decorator with examples
-      expect(output).toMatchSnapshot();
-    });
-
     it("should generate tool decorator with both inputs and examples", async () => {
       /**
        * Tests that a CODE_EXECUTION function with both inputs and examples
@@ -1561,24 +1491,34 @@ describe("ToolCallingNode", () => {
        */
 
       // GIVEN a code execution function with both inputs and examples
-      const codeExecutionFunctionWithBoth: FunctionArgs = {
+      const codeExecutionFunction: FunctionArgs = {
         type: "CODE_EXECUTION",
-        src: 'def search(query: str, parent_context: str) -> str:\n    """Search for information."""\n    return "results"\n',
-        name: "search",
-        description: "Search for information.",
+        name: "get_current_weather",
+        description: "",
+        src: 'from typing import Annotated\n\n\ndef get_current_weather(\n    date_input: str,\n    location: Annotated[str, "The location to get the weather for"],\n    units: Annotated[str, "The unit of temperature"] = "fahrenheit",\n) -> str:\n    return f"The current weather on {date_input} in {location} is sunny with a temperature of 70 degrees {units}."\n',
         definition: {
-          name: "search",
+          name: "get_current_weather",
           parameters: {
             type: "object",
-            required: ["query"],
             properties: {
-              query: { type: "string" },
-              parent_context: { type: "string" },
+              location: {
+                type: "string",
+                description: "The location to get the weather for",
+              },
+              units: {
+                type: "string",
+                description: "The unit of temperature",
+                default: "fahrenheit",
+              },
             },
-            examples: [{ query: "weather in SF" }, { query: "stock prices" }],
+            required: ["location"],
+            examples: [
+              { location: "San Francisco" },
+              { location: "New York", units: "celsius" },
+            ],
           },
           inputs: {
-            parent_context: {
+            date_input: {
               type: "WORKFLOW_INPUT",
               input_variable_id: "input-1",
             },
@@ -1599,7 +1539,7 @@ describe("ToolCallingNode", () => {
           type: "CONSTANT_VALUE",
           value: {
             type: "JSON",
-            value: [codeExecutionFunctionWithBoth],
+            value: [codeExecutionFunction],
           },
         }
       );
