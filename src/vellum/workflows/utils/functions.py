@@ -231,10 +231,7 @@ def compile_function_definition(function: Callable) -> FunctionDefinition:
     if defs:
         parameters["$defs"] = defs
     if input_examples is not None:
-        for prop_name in list(properties.keys()):
-            values = [ex[prop_name] for ex in input_examples if isinstance(ex, dict) and prop_name in ex]
-            if values:
-                properties[prop_name]["examples"] = values
+        parameters["examples"] = input_examples
 
     return FunctionDefinition(
         name=function.__name__,

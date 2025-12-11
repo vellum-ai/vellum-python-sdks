@@ -879,8 +879,12 @@ def test_tool_input_examples_included_in_schema():
     assert compiled.parameters == {
         "type": "object",
         "properties": {
-            "location": {"type": "string", "examples": ["San Francisco", "New York"]},
-            "units": {"type": "string", "default": "fahrenheit", "examples": ["celsius"]},
+            "location": {"type": "string"},
+            "units": {"type": "string", "default": "fahrenheit"},
         },
         "required": ["location"],
+        "examples": [
+            {"location": "San Francisco"},
+            {"location": "New York", "units": "celsius"},
+        ],
     }
