@@ -36,6 +36,7 @@ from .state.base import BaseState
 from .triggers import IntegrationTrigger, ScheduleTrigger
 from .types.core import Json, MergeBehavior
 from .types.definition import DeploymentDefinition, MCPServer, VellumIntegrationToolDefinition
+from .utils.functions import tool, use_tool_inputs
 from .workflows import BaseWorkflow
 
 __all__ = [
@@ -75,8 +76,10 @@ __all__ = [
     "SearchNode",
     "SubworkflowDeploymentNode",
     "TemplatingNode",
+    "tool",
     "ToolCallingNode",
     "TryNode",
+    "use_tool_inputs",
     "VellumIntegrationToolDefinition",
     "WebSearchNode",
     "WorkflowErrorCode",

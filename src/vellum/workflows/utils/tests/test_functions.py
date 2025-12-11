@@ -18,6 +18,7 @@ from vellum.workflows.utils.functions import (
     compile_function_definition,
     compile_inline_workflow_function_definition,
     compile_workflow_deployment_function_definition,
+    tool,
     use_tool_inputs,
 )
 
@@ -806,3 +807,58 @@ def test_use_tool_inputs__inline_vs_decorator():
     # AND the inputs should be identical
     assert decorated_function.__vellum_inputs__ == inline_function.__vellum_inputs__
     assert decorated_function.__vellum_inputs__ == {"a": "fixed_a", "b": 42}
+
+
+def test_tool__inline_vs_decorator():
+    """
+    Tests that inline tool(inputs={...})(func) behaves the same as @tool(inputs={...}) decorator.
+    """
+
+    # GIVEN a function with some parameters
+    def my_function(a: str, b: int, c: float) -> str:
+        """A test function."""
+        return f"{a}-{b}-{c}"
+
+    # WHEN using tool as a decorator
+    @tool(inputs={"a": "fixed_a", "b": 42})
+    def decorated_function(a: str, b: int, c: float) -> str:
+        """A test function."""
+        return f"{a}-{b}-{c}"
+
+    # AND using tool inline
+    inline_function = tool(inputs={"a": "fixed_a", "b": 42})(my_function)
+
+    # THEN both should have the same __vellum_inputs__ attribute
+    assert hasattr(decorated_function, "__vellum_inputs__")
+    assert hasattr(inline_function, "__vellum_inputs__")
+
+    # AND the inputs should be identical
+    assert decorated_function.__vellum_inputs__ == inline_function.__vellum_inputs__
+    assert decorated_function.__vellum_inputs__ == {"a": "fixed_a", "b": 42}
+
+
+def test_tool__backward_compatibility_with_use_tool_inputs():
+    """
+    Tests that tool(inputs={...}) and use_tool_inputs(**inputs) produce the same __vellum_inputs__ attribute.
+    """
+
+    # GIVEN a function with some parameters
+    def my_function(a: str, b: int) -> str:
+        """A test function."""
+        return f"{a}-{b}"
+
+    # WHEN using tool as a decorator with inputs dict
+    @tool(inputs={"a": "value_a"})
+    def tool_decorated(a: str, b: int) -> str:
+        """A test function."""
+        return f"{a}-{b}"
+
+    # AND using use_tool_inputs as a decorator with kwargs
+    @use_tool_inputs(a="value_a")
+    def use_tool_inputs_decorated(a: str, b: int) -> str:
+        """A test function."""
+        return f"{a}-{b}"
+
+    # THEN both should have identical __vellum_inputs__ attributes
+    assert getattr(tool_decorated, "__vellum_inputs__") == getattr(use_tool_inputs_decorated, "__vellum_inputs__")
+    assert getattr(tool_decorated, "__vellum_inputs__") == {"a": "value_a"}

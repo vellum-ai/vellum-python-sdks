@@ -415,7 +415,7 @@ from .get_current_weather import get_current_weather
 
 from vellum import ChatMessagePromptBlock, PlainTextPromptBlock, RichTextPromptBlock, VariablePromptBlock
 from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
-from vellum.workflows.utils.functions import use_tool_inputs
+from vellum.workflows.utils.functions import tool
 
 from ...inputs import Inputs
 
@@ -432,7 +432,14 @@ class GetCurrentWeatherNode(ToolCallingNode):
             chat_role="USER", blocks=[RichTextPromptBlock(blocks=[VariablePromptBlock(input_variable="question")])]
         ),
     ]
-    functions = [use_tool_inputs(location=Inputs.location)(get_current_weather), format_answer]
+    functions = [
+        tool(
+            inputs={
+                "location": Inputs.location,
+            }
+        )(get_current_weather),
+        format_answer,
+    ]
     prompt_inputs = {
         "question": "What's the weather like in San Francisco?",
     }

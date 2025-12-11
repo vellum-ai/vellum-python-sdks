@@ -321,11 +321,11 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
       modulePath: [`.${snakeName}`], // Import from snake_case module
     });
 
-    // Check if function has inputs that need to be wrapped with use_tool_inputs
+    // Check if function has inputs that need to be wrapped with tool()
     const parsedInputs = this.parseToolInputs(codeExecutionFunction);
     if (parsedInputs && Object.keys(parsedInputs).length > 0) {
-      // Wrap the function reference with use_tool_inputs(...)(func)
-      const wrapper = this.getUseToolInputsInvocation(parsedInputs);
+      // Wrap the function reference with tool(...)(func)
+      const wrapper = this.getToolInvocation(parsedInputs);
       return new WrappedCall({
         wrapper,
         inner: functionReference,
@@ -888,34 +888,41 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
   }
 
   /**
-   * Creates a use_tool_inputs(...) method invocation for wrapping function references.
+   * Creates a tool(inputs={...}) method invocation for wrapping function references.
    */
-  private getUseToolInputsInvocation(
+  private getToolInvocation(
     inputs: Record<string, WorkflowValueDescriptorType>
   ): python.MethodInvocation {
-    const inputMappings: MethodArgument[] = [];
-    Object.entries(inputs).forEach(([inputName, inputDef]) => {
-      // Use WorkflowValueDescriptor to handle all types of workflow value descriptors
+    // Build dict entries for the inputs parameter
+    const dictEntries = Object.entries(inputs).map(([inputName, inputDef]) => {
       const workflowValueDescriptor = new WorkflowValueDescriptor({
         workflowValueDescriptor: inputDef,
         nodeContext: this.nodeContext,
         workflowContext: this.workflowContext,
       });
 
-      inputMappings.push(
-        new MethodArgument({
-          name: inputName,
-          value: workflowValueDescriptor,
-        })
-      );
+      return {
+        key: new StrInstantiation(inputName),
+        value: workflowValueDescriptor,
+      };
+    });
+
+    // Create the dict literal for inputs
+    const inputsDict = python.TypeInstantiation.dict(dictEntries, {
+      endWithComma: true,
     });
 
     return python.invokeMethod({
       methodReference: new Reference({
-        name: "use_tool_inputs",
+        name: "tool",
         modulePath: ["vellum", "workflows", "utils", "functions"],
       }),
-      arguments_: inputMappings,
+      arguments_: [
+        new MethodArgument({
+          name: "inputs",
+          value: inputsDict,
+        }),
+      ],
     });
   }
 
