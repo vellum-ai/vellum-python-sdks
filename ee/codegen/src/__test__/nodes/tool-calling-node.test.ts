@@ -1482,4 +1482,149 @@ describe("ToolCallingNode", () => {
       expect(output).toMatchSnapshot();
     });
   });
+
+  describe("input_examples", () => {
+    it("should generate tool decorator with input_examples", async () => {
+      /**
+       * Tests that a CODE_EXECUTION function with input_examples generates
+       * a tool decorator with the input_examples parameter.
+       */
+
+      // GIVEN a code execution function with input_examples
+      const codeExecutionFunctionWithExamples: FunctionArgs = {
+        type: "CODE_EXECUTION",
+        src: 'def get_weather(location: str, units: str = "fahrenheit") -> str:\n    """Get the current weather for a location."""\n    return "sunny"\n',
+        name: "get_weather",
+        description: "Get the current weather for a location.",
+        definition: {
+          name: "get_weather",
+          parameters: {
+            type: "object",
+            required: ["location"],
+            properties: {
+              location: { type: "string" },
+              units: { type: "string", default: "fahrenheit" },
+            },
+          },
+        },
+        input_examples: [
+          { location: "San Francisco" },
+          { location: "New York", units: "celsius" },
+        ],
+      };
+
+      const nodePortData: NodePort[] = [
+        nodePortFactory({
+          id: "port-id",
+        }),
+      ];
+
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [codeExecutionFunctionWithExamples],
+          },
+        }
+      );
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [functionsAttribute],
+      });
+
+      // WHEN we create the node and generate the node file
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      const output = await writer.toStringFormatted();
+
+      // THEN the generated code should include the tool decorator with input_examples
+      expect(output).toMatchSnapshot();
+    });
+
+    it("should generate tool decorator with both inputs and input_examples", async () => {
+      /**
+       * Tests that a CODE_EXECUTION function with both inputs and input_examples
+       * generates a tool decorator with both parameters.
+       */
+
+      // GIVEN a code execution function with both inputs and input_examples
+      const codeExecutionFunctionWithBoth: FunctionArgs = {
+        type: "CODE_EXECUTION",
+        src: 'def search(query: str, parent_context: str) -> str:\n    """Search for information."""\n    return "results"\n',
+        name: "search",
+        description: "Search for information.",
+        definition: {
+          name: "search",
+          parameters: {
+            type: "object",
+            required: ["query"],
+            properties: {
+              query: { type: "string" },
+              parent_context: { type: "string" },
+            },
+          },
+          inputs: {
+            parent_context: {
+              type: "WORKFLOW_INPUT",
+              input_variable_id: "input-1",
+            },
+          },
+        },
+        input_examples: [{ query: "weather in SF" }, { query: "stock prices" }],
+      };
+
+      const nodePortData: NodePort[] = [
+        nodePortFactory({
+          id: "port-id",
+        }),
+      ];
+
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [codeExecutionFunctionWithBoth],
+          },
+        }
+      );
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [functionsAttribute],
+      });
+
+      // WHEN we create the node and generate the node file
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      const output = await writer.toStringFormatted();
+
+      // THEN the generated code should include the tool decorator with both inputs and input_examples
+      expect(output).toMatchSnapshot();
+    });
+  });
 });

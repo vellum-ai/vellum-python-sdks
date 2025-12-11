@@ -252,6 +252,62 @@ Summarize the following text:
 "
 `;
 
+exports[`ToolCallingNode > input_examples > should generate tool decorator with both inputs and input_examples 1`] = `
+"from .search import search
+
+from vellum.workflows.nodes.displayable.tool_calling_node import (
+    ToolCallingNode as BaseToolCallingNode,
+)
+from vellum.workflows.utils.functions import tool
+
+from ..inputs import Inputs
+
+
+class ToolCallingNode(BaseToolCallingNode):
+    functions = [
+        tool(
+            inputs={
+                "parent_context": Inputs.location,
+            },
+            input_examples=[
+                {
+                    "query": "weather in SF",
+                },
+                {
+                    "query": "stock prices",
+                },
+            ],
+        )(search)
+    ]
+"
+`;
+
+exports[`ToolCallingNode > input_examples > should generate tool decorator with input_examples 1`] = `
+"from .get_weather import get_weather
+
+from vellum.workflows.nodes.displayable.tool_calling_node import (
+    ToolCallingNode as BaseToolCallingNode,
+)
+from vellum.workflows.utils.functions import tool
+
+
+class ToolCallingNode(BaseToolCallingNode):
+    functions = [
+        tool(
+            input_examples=[
+                {
+                    "location": "San Francisco",
+                },
+                {
+                    "location": "New York",
+                    "units": "celsius",
+                },
+            ]
+        )(get_weather)
+    ]
+"
+`;
+
 exports[`ToolCallingNode > mcp server > should generate mcp server 1`] = `
 "from vellum.workflows.constants import AuthorizationType
 from vellum.workflows.nodes.displayable.tool_calling_node import (
