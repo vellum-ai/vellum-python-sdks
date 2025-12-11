@@ -198,6 +198,7 @@ def compile_function_definition(function: Callable) -> FunctionDefinition:
 
     # Get inputs from the decorator if present
     inputs = getattr(function, "__vellum_inputs__", {})
+    examples = getattr(function, "__vellum_examples__", None)
     exclude_params = set(inputs.keys())
 
     properties = {}
@@ -229,6 +230,8 @@ def compile_function_definition(function: Callable) -> FunctionDefinition:
     parameters = {"type": "object", "properties": properties, "required": required}
     if defs:
         parameters["$defs"] = defs
+    if examples is not None:
+        parameters["examples"] = examples
 
     return FunctionDefinition(
         name=function.__name__,
@@ -391,20 +394,26 @@ def compile_vellum_integration_tool_definition(
         return FunctionDefinition(name=tool_def.name, description=tool_def.description, parameters={})
 
 
-def tool(*, inputs: Optional[dict[str, Any]] = None) -> Callable[[Callable], Callable]:
+def tool(
+    *,
+    inputs: Optional[dict[str, Any]] = None,
+    examples: Optional[List[dict[str, Any]]] = None,
+) -> Callable[[Callable], Callable]:
     """
     Decorator to configure a tool function.
 
     Currently supports specifying which parameters should come from parent workflow inputs
-    via the `inputs` mapping. Additional options may be added in the future.
+    via the `inputs` mapping. Also supports providing `examples` which will be hoisted
+    into the JSON Schema `examples` keyword for this tool's parameters.
 
     Args:
         inputs: Mapping of parameter names to parent input references
+        examples: List of example argument objects for the tool
 
     Example:
         @tool(inputs={
             "parent_input": ParentInputs.parent_input,
-        })
+        }, examples=[{"location": "San Francisco"}])
         def get_string(parent_input: str, user_query: str) -> str:
             return f"Parent: {parent_input}, Query: {user_query}"
     """
@@ -413,6 +422,9 @@ def tool(*, inputs: Optional[dict[str, Any]] = None) -> Callable[[Callable], Cal
         # Store the inputs mapping on the function for later use
         if inputs is not None:
             setattr(func, "__vellum_inputs__", inputs)
+        # Store the examples on the function for later use
+        if examples is not None:
+            setattr(func, "__vellum_examples__", examples)
         return func
 
     return decorator

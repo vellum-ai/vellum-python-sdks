@@ -862,3 +862,29 @@ def test_tool__backward_compatibility_with_use_tool_inputs():
     # THEN both should have identical __vellum_inputs__ attributes
     assert getattr(tool_decorated, "__vellum_inputs__") == getattr(use_tool_inputs_decorated, "__vellum_inputs__")
     assert getattr(tool_decorated, "__vellum_inputs__") == {"a": "value_a"}
+
+
+def test_tool_examples_included_in_schema():
+    @tool(
+        examples=[
+            {"location": "San Francisco"},
+            {"location": "New York", "units": "celsius"},
+        ]
+    )
+    def get_current_weather(location: str, units: str = "fahrenheit") -> str:
+        return "sunny"
+
+    compiled = compile_function_definition(get_current_weather)
+    assert isinstance(compiled.parameters, dict)
+    assert compiled.parameters == {
+        "type": "object",
+        "properties": {
+            "location": {"type": "string"},
+            "units": {"type": "string", "default": "fahrenheit"},
+        },
+        "required": ["location"],
+        "examples": [
+            {"location": "San Francisco"},
+            {"location": "New York", "units": "celsius"},
+        ],
+    }
