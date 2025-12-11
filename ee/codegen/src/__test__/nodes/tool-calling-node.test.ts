@@ -1483,14 +1483,14 @@ describe("ToolCallingNode", () => {
     });
   });
 
-  describe("input_examples", () => {
-    it("should generate tool decorator with input_examples", async () => {
+  describe("examples", () => {
+    it("should generate tool decorator with examples", async () => {
       /**
-       * Tests that a CODE_EXECUTION function with input_examples generates
-       * a tool decorator with the input_examples parameter.
+       * Tests that a CODE_EXECUTION function with examples in definition.parameters
+       * generates a tool decorator with the examples parameter.
        */
 
-      // GIVEN a code execution function with input_examples
+      // GIVEN a code execution function with examples in definition.parameters
       const codeExecutionFunctionWithExamples: FunctionArgs = {
         type: "CODE_EXECUTION",
         src: 'def get_weather(location: str, units: str = "fahrenheit") -> str:\n    """Get the current weather for a location."""\n    return "sunny"\n',
@@ -1505,12 +1505,12 @@ describe("ToolCallingNode", () => {
               location: { type: "string" },
               units: { type: "string", default: "fahrenheit" },
             },
+            examples: [
+              { location: "San Francisco" },
+              { location: "New York", units: "celsius" },
+            ],
           },
         },
-        input_examples: [
-          { location: "San Francisco" },
-          { location: "New York", units: "celsius" },
-        ],
       };
 
       const nodePortData: NodePort[] = [
@@ -1550,17 +1550,17 @@ describe("ToolCallingNode", () => {
       node.getNodeFile().write(writer);
       const output = await writer.toStringFormatted();
 
-      // THEN the generated code should include the tool decorator with input_examples
+      // THEN the generated code should include the tool decorator with examples
       expect(output).toMatchSnapshot();
     });
 
-    it("should generate tool decorator with both inputs and input_examples", async () => {
+    it("should generate tool decorator with both inputs and examples", async () => {
       /**
-       * Tests that a CODE_EXECUTION function with both inputs and input_examples
+       * Tests that a CODE_EXECUTION function with both inputs and examples
        * generates a tool decorator with both parameters.
        */
 
-      // GIVEN a code execution function with both inputs and input_examples
+      // GIVEN a code execution function with both inputs and examples
       const codeExecutionFunctionWithBoth: FunctionArgs = {
         type: "CODE_EXECUTION",
         src: 'def search(query: str, parent_context: str) -> str:\n    """Search for information."""\n    return "results"\n',
@@ -1575,6 +1575,7 @@ describe("ToolCallingNode", () => {
               query: { type: "string" },
               parent_context: { type: "string" },
             },
+            examples: [{ query: "weather in SF" }, { query: "stock prices" }],
           },
           inputs: {
             parent_context: {
@@ -1583,7 +1584,6 @@ describe("ToolCallingNode", () => {
             },
           },
         },
-        input_examples: [{ query: "weather in SF" }, { query: "stock prices" }],
       };
 
       const nodePortData: NodePort[] = [
@@ -1623,7 +1623,7 @@ describe("ToolCallingNode", () => {
       node.getNodeFile().write(writer);
       const output = await writer.toStringFormatted();
 
-      // THEN the generated code should include the tool decorator with both inputs and input_examples
+      // THEN the generated code should include the tool decorator with both inputs and examples
       expect(output).toMatchSnapshot();
     });
   });

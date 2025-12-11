@@ -323,15 +323,20 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
       modulePath: [`.${snakeName}`], // Import from snake_case module
     });
 
-    // Check if function has inputs or input_examples that need to be wrapped with tool()
+    // Check if function has inputs or examples that need to be wrapped with tool()
     const parsedInputs = this.parseToolInputs(codeExecutionFunction);
-    const inputExamples = codeExecutionFunction.input_examples ?? null;
+    // Read examples from definition.parameters.examples (JSON Schema examples keyword)
+    const parameters = codeExecutionFunction.definition?.parameters as
+      | Record<string, unknown>
+      | undefined;
+    const examples =
+      (parameters?.examples as Array<Record<string, unknown>>) ?? null;
     const hasInputs = parsedInputs && Object.keys(parsedInputs).length > 0;
-    const hasInputExamples = inputExamples && inputExamples.length > 0;
+    const hasExamples = Array.isArray(examples) && examples.length > 0;
 
-    if (hasInputs || hasInputExamples) {
+    if (hasInputs || hasExamples) {
       // Wrap the function reference with tool(...)(func)
-      const wrapper = this.getToolInvocation(parsedInputs, inputExamples);
+      const wrapper = this.getToolInvocation(parsedInputs, examples);
       return new WrappedCall({
         wrapper,
         inner: functionReference,
@@ -894,11 +899,11 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
   }
 
   /**
-   * Creates a tool(inputs={...}, input_examples=[...]) method invocation for wrapping function references.
+   * Creates a tool(inputs={...}, examples=[...]) method invocation for wrapping function references.
    */
   private getToolInvocation(
     inputs: Record<string, WorkflowValueDescriptorType> | null,
-    inputExamples: Array<Record<string, unknown>> | null
+    examples: Array<Record<string, unknown>> | null
   ): MethodInvocation {
     const arguments_: python.MethodArgument[] = [];
 
@@ -931,9 +936,9 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
       );
     }
 
-    // Build list entries for the input_examples parameter if provided
-    if (inputExamples && inputExamples.length > 0) {
-      const exampleDicts = inputExamples.map((example) => {
+    // Build list entries for the examples parameter if provided
+    if (examples && examples.length > 0) {
+      const exampleDicts = examples.map((example) => {
         const dictEntries = Object.entries(example).map(([key, value]) => ({
           key: new StrInstantiation(key),
           value: new Json(value),
@@ -945,7 +950,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
 
       arguments_.push(
         new MethodArgument({
-          name: "input_examples",
+          name: "examples",
           value: python.TypeInstantiation.list(exampleDicts, {
             endWithComma: true,
           }),
