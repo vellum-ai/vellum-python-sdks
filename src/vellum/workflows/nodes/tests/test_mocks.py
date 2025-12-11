@@ -277,3 +277,61 @@ def test_mocks__invalid_then_outputs_key_falls_back_to_legacy():
             raw_mock_with_invalid_key,
             MyWorkflow,
         )
+
+
+def test_mocks__node_not_found_in_workflow_skips_with_warning(caplog):
+    """
+    Tests that when a mock references a node_id that doesn't exist in the workflow,
+    the mock is skipped with a warning instead of raising an error.
+    """
+
+    # GIVEN a Base Node
+    class StartNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            foo: str
+
+    # AND a workflow class with that Node
+    class MyWorkflow(BaseWorkflow):
+        graph = StartNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_value = StartNode.Outputs.foo
+
+    # AND a mock workflow node execution referencing a non-existent node_id
+    non_existent_node_id = uuid.uuid4()
+    raw_mock_with_missing_node = [
+        {
+            "type": "WORKFLOW_NODE_OUTPUT",
+            "node_id": str(non_existent_node_id),
+            "mock_executions": [
+                {
+                    "when_condition": {
+                        "expression": {
+                            "type": "LOGICAL_CONDITION_GROUP",
+                            "combinator": "AND",
+                            "negated": False,
+                            "conditions": [],
+                        },
+                        "variables": [],
+                    },
+                    "then_outputs": [],
+                }
+            ],
+        }
+    ]
+
+    # WHEN we parse the mock workflow node execution
+    node_output_mocks = MockNodeExecution.validate_all(
+        raw_mock_with_missing_node,
+        MyWorkflow,
+    )
+
+    # THEN we get an empty list (the mock was skipped)
+    assert node_output_mocks == []
+
+    # AND a warning was logged
+    assert any(
+        f"Skipping mock for node {non_existent_node_id}" in record.message
+        and "node not found in workflow MyWorkflow" in record.message
+        for record in caplog.records
+    )
