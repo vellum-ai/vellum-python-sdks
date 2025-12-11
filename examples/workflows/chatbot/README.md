@@ -12,13 +12,13 @@ This example is a small variant of the chatbot workflow that explicitly uses `Se
 ## Running locally (sandbox)
 
 ```bash
-poetry run python -m examples.workflows.chatbot_set_state.sandbox
+poetry run python -m examples.workflows.chatbot.sandbox
 ```
 
 ## Running interactively with state persistence
 
 ```bash
-poetry run python -m examples.workflows.chatbot_set_state.chat
+poetry run python -m examples.workflows.chatbot.chat
 ```
 
 After the first run, copy the printed `previous_execution_id` to resume the conversation and see the accumulated `chat_history` emitted from `FinalOutput`.
