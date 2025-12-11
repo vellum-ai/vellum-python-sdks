@@ -201,7 +201,7 @@ def push_command(
         module_dir = workflow_config.module.replace(".", os.path.sep)
         for root, _, files in os.walk(module_dir):
             for filename in files:
-                if not filename.endswith(".py"):
+                if not BaseWorkflowDisplay.should_include_file(filename):
                     continue
 
                 file_path = os.path.join(root, filename)
