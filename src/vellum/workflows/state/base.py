@@ -311,6 +311,7 @@ class StateMeta(UniversalBaseModel):
     span_id: UUID = field(default_factory=uuid4_default_factory)
     updated_ts: datetime = field(default_factory=default_datetime_factory)
     workflow_inputs: Optional[BaseInputs] = field(default=None)
+    workflow_inputs_skipped: bool = field(default=False)
     external_inputs: Dict[ExternalInputReference, Any] = field(default_factory=dict)
     node_outputs: Dict[OutputReference, Any] = field(default_factory=dict)
     trigger_attributes: Dict[TriggerAttributeReference, Any] = field(default_factory=dict)
@@ -320,6 +321,21 @@ class StateMeta(UniversalBaseModel):
 
     def model_post_init(self, context: Any) -> None:
         self.__snapshot_callback__ = None
+
+        if context and isinstance(context, dict):
+            if "workflow_definition" not in context:
+                context["workflow_definition"] = self.workflow_definition
+            context.setdefault("workflow_inputs_skipped", self.workflow_inputs_skipped)
+
+        if self.workflow_inputs is None and not self.workflow_inputs_skipped:
+            workflow_definition = (
+                self.workflow_definition if is_workflow_class(self.workflow_definition) else import_workflow_class()
+            )
+            try:
+                inputs_class = workflow_definition.get_inputs_class()
+                self.workflow_inputs = inputs_class()
+            except Exception:
+                self.workflow_inputs = BaseInputs()
 
     def add_snapshot_callback(self, callback: Callable[[Optional[StateDelta]], None]) -> None:
         self.node_outputs = _make_snapshottable("meta.node_outputs", self.node_outputs, callback)
@@ -455,13 +471,13 @@ class StateMeta(UniversalBaseModel):
     @field_validator("workflow_inputs", mode="before")
     @classmethod
     def deserialize_workflow_inputs(cls, workflow_inputs: Any, info: ValidationInfo):
-        workflow_definition = cls._get_workflow(info)
-        context = info.context or {}
-        skip_default_inputs = bool(context.get("skip_workflow_inputs_default"))
+        context = info.context if isinstance(info.context, dict) else {}
+        workflow_definition = context.get("workflow_definition") or cls._get_workflow(info)
+        skip_defaults = bool(context.get("workflow_inputs_skipped"))
 
         if workflow_definition:
             if workflow_inputs is None:
-                if skip_default_inputs:
+                if skip_defaults:
                     return None
                 return workflow_definition.get_inputs_class()()
             if isinstance(workflow_inputs, dict):
@@ -540,6 +556,12 @@ class StateMeta(UniversalBaseModel):
             return None
 
         return workflow_definition
+
+    def model_dump(self, *args: Any, **kwargs: Any) -> Dict[str, Any]:
+        data = super().model_dump(*args, **kwargs)
+        if not data.get("workflow_inputs_skipped"):
+            data.pop("workflow_inputs_skipped", None)
+        return data
 
 
 class BaseState(metaclass=_BaseStateMeta):

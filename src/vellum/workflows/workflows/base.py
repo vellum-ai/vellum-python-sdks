@@ -742,17 +742,19 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         fallback_to_default_inputs: bool = True,
     ) -> StateType:
         resolved_inputs: Optional[InputsType] = workflow_inputs
-        meta_kwargs = {
-            "parent": self._parent_state,
-            "workflow_inputs": resolved_inputs,
-            "workflow_definition": self.__class__,
-        }
-        if resolved_inputs is None and not fallback_to_default_inputs:
-            meta = StateMeta.model_validate(meta_kwargs, context={"skip_workflow_inputs_default": True})
-        else:
-            if resolved_inputs is None:
-                meta_kwargs["workflow_inputs"] = self.get_default_inputs()
-            meta = StateMeta(**meta_kwargs)
+        workflow_inputs_skipped = resolved_inputs is None and not fallback_to_default_inputs
+        meta = StateMeta.model_validate(
+            {
+                "parent": self._parent_state,
+                "workflow_definition": self.__class__,
+                "workflow_inputs": None if workflow_inputs_skipped else resolved_inputs,
+                "workflow_inputs_skipped": workflow_inputs_skipped,
+            },
+            context={
+                "workflow_definition": self.__class__,
+                "workflow_inputs_skipped": workflow_inputs_skipped,
+            },
+        )
 
         # Makes the uuid factory mocker work this way instead of setting in cosntructor
         if execution_id:
@@ -810,13 +812,19 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
 
         state_class = cls.get_state_class()
         if "meta" in state:
+            meta_payload = dict(state["meta"])
+            if workflow_inputs is not None:
+                meta_payload["workflow_inputs"] = workflow_inputs
+                meta_payload["workflow_inputs_skipped"] = False
+            else:
+                meta_payload.setdefault("workflow_inputs_skipped", False)
+            meta_payload.setdefault("workflow_definition", cls)
+
             state["meta"] = StateMeta.model_validate(
-                {
-                    **state["meta"],
-                    "workflow_inputs": workflow_inputs,
-                },
+                meta_payload,
                 context={
                     "workflow_definition": cls,
+                    "workflow_inputs_skipped": meta_payload.get("workflow_inputs_skipped", False),
                 },
             )
 
