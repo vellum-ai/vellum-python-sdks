@@ -109,33 +109,45 @@ def test_serialize_module_happy_path():
 
 
 def test_serialize_module_includes_additional_files():
-    """Test that serialize_module includes additional files from the module directory."""
+    """
+    Tests that serialize_module includes only Python files from the module directory.
+
+    Non-Python files (like .txt) should be excluded from additional_files.
+    """
+    # GIVEN a module path with additional files including both .py and non-.py files
     module_path = "tests.workflows.module_with_additional_files"
 
+    # WHEN we serialize the module
     result = BaseWorkflowDisplay.serialize_module(module_path)
 
+    # THEN the result should have the expected structure
     assert hasattr(result, "exec_config")
     assert hasattr(result, "errors")
     assert isinstance(result.exec_config, dict)
     assert isinstance(result.errors, list)
 
+    # AND module_data should contain additional_files
     assert "module_data" in result.exec_config
     assert "additional_files" in result.exec_config["module_data"]
 
     additional_files = result.exec_config["module_data"]["additional_files"]
     assert isinstance(additional_files, dict)
 
+    # AND Python helper files should be included
     assert "helper.py" in additional_files
-    assert "data.txt" in additional_files
     assert "utils/constants.py" in additional_files
+    assert "utils/__init__.py" in additional_files
 
+    # AND non-Python files should NOT be included
+    assert "data.txt" not in additional_files
+
+    # AND serialized workflow files should NOT be included
     assert "workflow.py" not in additional_files
     assert "__init__.py" not in additional_files
-    assert "utils/__init__.py" in additional_files
     assert "nodes/test_node.py" not in additional_files
 
+    # AND the Python file contents should be correct
     assert "def helper_function():" in additional_files["helper.py"]
-    assert "sample data file" in additional_files["data.txt"]
     assert "CONSTANT_VALUE" in additional_files["utils/constants.py"]
 
 

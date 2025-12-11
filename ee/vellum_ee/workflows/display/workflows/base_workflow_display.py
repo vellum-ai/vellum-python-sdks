@@ -90,6 +90,17 @@ IGNORE_PATTERNS = [
     "metadata.json",
 ]
 
+INCLUDED_FILE_EXTENSIONS = [".py"]
+
+
+def should_include_file(filename: str) -> bool:
+    """Check if a file should be included based on its extension.
+
+    This is used by both the serialization logic and the push API to ensure
+    only Python files are included in workflow artifacts.
+    """
+    return any(filename.endswith(ext) for ext in INCLUDED_FILE_EXTENSIONS)
+
 
 class WorkflowSerializationError(UniversalBaseModel):
     message: str
@@ -1329,6 +1340,9 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
 
         for root, _, filenames in os.walk(module_dir):
             for filename in filenames:
+                if not should_include_file(filename):
+                    continue
+
                 file_path = os.path.join(root, filename)
                 relative_path = os.path.relpath(file_path, start=module_dir)
 
