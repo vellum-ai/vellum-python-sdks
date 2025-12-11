@@ -1,8 +1,11 @@
-from typing import Any, Optional, Union
+from typing import Optional, Union
 
+from pydantic import Field
+
+from vellum import ChatMessage
 from vellum.workflows.state import BaseState
 
 
 class State(BaseState):
-    conversation_history: list[str] = []
-    message_count: int = 0
+    message_count: Optional[Union[float, int]] = 0
+    chat_history: Optional[list[ChatMessage]] = Field(default_factory=list)

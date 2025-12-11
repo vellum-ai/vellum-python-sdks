@@ -10,12 +10,10 @@ from .workflow import Workflow
 def main():
     load_dotenv()
     previous_execution_id = None
-
     iterations = 1
 
     while True:
         print("--- New Message ---")
-
         user_message = input(f"Your message ({iterations}): ").strip()
 
         if user_message.lower() in ["quit", "exit"]:
@@ -27,13 +25,15 @@ def main():
             continue
 
         workflow = Workflow(
-            emitters=[VellumEmitter()], resolvers=[VellumResolver()]  # needed for sdk first  # needed for sdk first
+            emitters=[VellumEmitter()],
+            resolvers=[VellumResolver()],  # needed for sdk first
         )
 
         if previous_execution_id:
             print(f"Resuming from previous execution ID: {previous_execution_id}")
             terminal_event = workflow.run(
-                inputs=Inputs(user_message=user_message), previous_execution_id=previous_execution_id
+                inputs=Inputs(user_message=user_message),
+                previous_execution_id=previous_execution_id,
             )
         else:
             print("Starting new conversation")
