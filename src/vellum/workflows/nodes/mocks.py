@@ -103,7 +103,7 @@ class _RawMockWorkflowNodeConfig(UniversalBaseModel):
 class MockNodeExecution(UniversalBaseModel):
     when_condition: BaseDescriptor
     then_outputs: BaseOutputs
-    disabled: bool = False
+    disabled: Optional[bool] = None
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -113,7 +113,7 @@ class MockNodeExecution(UniversalBaseModel):
         serialized = handler(self)
         serialized["node_id"] = str(self.then_outputs.__class__.__parent_class__.__id__)
         serialized["type"] = "NODE_EXECUTION"
-        if not self.disabled:
+        if self.disabled is None:
             del serialized["disabled"]
         return serialized
 
@@ -263,6 +263,15 @@ class MockNodeExecution(UniversalBaseModel):
                 mock_node_executions.append(mock_workflow_node_config)
                 continue
 
+            node_id = mock_workflow_node_config.node_id
+            if node_id not in nodes:
+                logger.warning(
+                    "Skipping mock for node %s: node not found in workflow %s",
+                    node_id,
+                    workflow.__name__,
+                )
+                continue
+
             for mock_execution in mock_workflow_node_config.mock_executions:
                 try:
                     when_condition = _translate_raw_logical_expression(
@@ -270,7 +279,7 @@ class MockNodeExecution(UniversalBaseModel):
                         mock_execution.when_condition.variables,
                     )
 
-                    then_outputs = nodes[mock_workflow_node_config.node_id].Outputs()
+                    then_outputs = nodes[node_id].Outputs()
                     for then_output in mock_execution.then_outputs:
                         node_output_name = node_output_name_by_id.get(then_output.output_id)
                         if node_output_name is None:
