@@ -250,7 +250,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         has_manual_trigger = len(manual_trigger_edges) > 0
 
         # Determine which nodes have explicit non-trigger entrypoints in the graph
-        # This is used later to decide whether to skip entrypoint edges for nodes with triggers
+        # This is used to decide whether to create an ENTRYPOINT node and skip entrypoint edges
         non_trigger_entrypoint_nodes: Set[Type[BaseNode]] = set()
         for subgraph in self._workflow.get_subgraphs():
             if any(True for _ in subgraph.trigger_edges):
@@ -260,6 +260,14 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                     non_trigger_entrypoint_nodes.add(get_unadorned_node(entrypoint))
                 except Exception:
                     continue
+
+        # Determine if we need an ENTRYPOINT node:
+        # - ManualTrigger: always need ENTRYPOINT (backward compatibility)
+        # - No triggers: always need ENTRYPOINT (traditional workflows)
+        # - Non-trigger entrypoints exist: need ENTRYPOINT for those branches
+        # - Only non-manual triggers with no regular entrypoints: skip ENTRYPOINT
+        has_triggers = len(trigger_edges) > 0
+        needs_entrypoint_node = has_manual_trigger or not has_triggers or len(non_trigger_entrypoint_nodes) > 0
 
         entrypoint_node_id: Optional[UUID] = None
         entrypoint_node_source_handle_id: Optional[UUID] = None
@@ -284,9 +292,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                 "base": None,
                 "definition": None,
             }
-        else:
-            # Non-manual trigger or no triggers: use workflow_display ENTRYPOINT node if IDs are present
-            # This allows the ENTRYPOINT node to be optional - if IDs are None, no ENTRYPOINT node is created
+        elif needs_entrypoint_node:
+            # No triggers or non-trigger entrypoints exist: use workflow_display ENTRYPOINT node
             entrypoint_node_id = self.display_context.workflow_display.entrypoint_node_id
             entrypoint_node_source_handle_id = self.display_context.workflow_display.entrypoint_node_source_handle_id
 
@@ -304,6 +311,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                     "base": None,
                     "definition": None,
                 }
+        # else: only non-manual triggers with no regular entrypoints - skip ENTRYPOINT node
 
         # Add all the nodes in the workflows
         for node in self._workflow.get_all_nodes():
@@ -994,16 +1002,33 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         )
 
     def _generate_workflow_meta_display(self) -> WorkflowMetaDisplay:
+        defaults = WorkflowMetaDisplay.get_default(self._workflow)
         overrides = self.workflow_display
-        if overrides:
-            return WorkflowMetaDisplay(
-                entrypoint_node_id=overrides.entrypoint_node_id,
-                entrypoint_node_source_handle_id=overrides.entrypoint_node_source_handle_id,
-                entrypoint_node_display=overrides.entrypoint_node_display,
-                display_data=overrides.display_data,
-            )
 
-        return WorkflowMetaDisplay.get_default(self._workflow)
+        if not overrides:
+            return defaults
+
+        # Merge overrides with defaults - if override provides None, fall back to default
+        entrypoint_node_id = (
+            overrides.entrypoint_node_id if overrides.entrypoint_node_id is not None else defaults.entrypoint_node_id
+        )
+        entrypoint_node_source_handle_id = (
+            overrides.entrypoint_node_source_handle_id
+            if overrides.entrypoint_node_source_handle_id is not None
+            else defaults.entrypoint_node_source_handle_id
+        )
+        entrypoint_node_display = (
+            overrides.entrypoint_node_display
+            if overrides.entrypoint_node_display is not None
+            else defaults.entrypoint_node_display
+        )
+
+        return WorkflowMetaDisplay(
+            entrypoint_node_id=entrypoint_node_id,
+            entrypoint_node_source_handle_id=entrypoint_node_source_handle_id,
+            entrypoint_node_display=entrypoint_node_display,
+            display_data=overrides.display_data,
+        )
 
     def _generate_workflow_input_display(
         self, workflow_input: WorkflowInputReference, overrides: Optional[WorkflowInputsDisplay] = None
