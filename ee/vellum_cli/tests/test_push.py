@@ -1477,3 +1477,40 @@ def test_push__validation_error_during_serialization(mock_module, mocker):
 
     # AND the error message should contain the validation error details
     assert "Field required" in result.output
+
+
+def test_push__includes_metadata_json_in_artifact(mock_module, vellum_client):
+    """
+    Tests that the push command includes metadata.json in the artifact.
+    """
+
+    # GIVEN a single workflow configured
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+
+    # AND a workflow exists in the module successfully
+    workflow_py_file_content = _ensure_workflow_py(temp_dir, module)
+
+    # AND a metadata.json file exists in the module
+    metadata_json_content = _ensure_file(temp_dir, module, "metadata.json", '{"key": "value"}')
+
+    # AND the push API call returns successfully
+    vellum_client.workflows.push.return_value = WorkflowPushResponse(
+        workflow_sandbox_id=str(uuid4()),
+    )
+
+    # WHEN calling `vellum workflows push`
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["workflows", "push", module])
+
+    # THEN it should succeed
+    assert result.exit_code == 0
+
+    # AND we should have called the push API with the correct args
+    vellum_client.workflows.push.assert_called_once()
+    call_args = vellum_client.workflows.push.call_args.kwargs
+
+    # AND the artifact should contain both workflow.py and metadata.json
+    extracted_files = _extract_tar_gz(call_args["artifact"].read())
+    assert extracted_files["workflow.py"] == workflow_py_file_content
+    assert extracted_files["metadata.json"] == metadata_json_content
