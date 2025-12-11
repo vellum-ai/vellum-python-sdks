@@ -457,9 +457,9 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                 "target_handle_id": str(target_node_display.get_trigger_id()),
                 "type": "DEFAULT",
             }
-            display_data = self._serialize_edge_display_data(entrypoint_display.edge_display)
-            if display_data is not None:
-                entrypoint_edge_dict["display_data"] = display_data
+            edge_display_data = self._serialize_edge_display_data(entrypoint_display.edge_display)
+            if edge_display_data is not None:
+                entrypoint_edge_dict["display_data"] = edge_display_data
             edges.append(entrypoint_edge_dict)
 
         # Then add trigger edges
@@ -504,9 +504,9 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                 "target_handle_id": str(target_node_display.get_trigger_id()),
                 "type": "DEFAULT",
             }
-            display_data = self._serialize_edge_display_data(target_entrypoint_display.edge_display)
-            if display_data is not None:
-                trigger_edge_dict["display_data"] = display_data
+            trigger_edge_display_data = self._serialize_edge_display_data(target_entrypoint_display.edge_display)
+            if trigger_edge_display_data is not None:
+                trigger_edge_dict["display_data"] = trigger_edge_display_data
             edges.append(trigger_edge_dict)
 
         for (source_node_port, target_node), edge_display in self.display_context.edge_displays.items():
@@ -539,9 +539,9 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                 ),
                 "type": "DEFAULT",
             }
-            display_data = self._serialize_edge_display_data(edge_display)
-            if display_data is not None:
-                regular_edge_dict["display_data"] = display_data
+            regular_edge_display_data = self._serialize_edge_display_data(edge_display)
+            if regular_edge_display_data is not None:
+                regular_edge_dict["display_data"] = regular_edge_display_data
             edges.append(regular_edge_dict)
 
         nodes_list = list(serialized_nodes.values())
