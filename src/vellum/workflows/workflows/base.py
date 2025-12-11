@@ -647,7 +647,10 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             for node in candidate_nodes:
                 if node.__id__ == node_uuid:
                     return node
-            raise WorkflowInitializationException(message=f"Node '{node_uuid}' not found in workflow")
+            raise WorkflowInitializationException(
+                message=f"Node '{node_uuid}' not found in workflow",
+                raw_data={"node_ref": str(node_uuid)},
+            )
 
         if isinstance(node_ref, str):
             try:
@@ -656,14 +659,23 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
                 node_class = getattr(module, class_name)
                 if inspect.isclass(node_class) and issubclass(node_class, BaseNode):
                     return node_class
-                raise WorkflowInitializationException(message=f"Node '{node_ref}' not found in workflow")
+                raise WorkflowInitializationException(
+                    message=f"Node '{node_ref}' not found in workflow",
+                    raw_data={"node_ref": node_ref},
+                )
             except (ValueError, ModuleNotFoundError, AttributeError):
                 for node in candidate_nodes:
                     if f"{node.__module__}.{node.__name__}" == node_ref:
                         return node
-                raise WorkflowInitializationException(message=f"Node '{node_ref}' not found in workflow")
+                raise WorkflowInitializationException(
+                    message=f"Node '{node_ref}' not found in workflow",
+                    raw_data={"node_ref": node_ref},
+                )
 
-        raise WorkflowInitializationException(message=f"Node '{node_ref}' not found in workflow")
+        raise WorkflowInitializationException(
+            message=f"Node '{node_ref}' not found in workflow",
+            raw_data={"node_ref": str(node_ref)},
+        )
 
     def run_node(
         self, node: Union[Type[BaseNode], UUID, str], *, inputs: Optional[Dict[str, Any]] = None

@@ -165,8 +165,9 @@ class MockNodeExecution(UniversalBaseModel):
                 )
             except WorkflowInitializationException as e:
                 # If the node is not found in the workflow, skip it with a warning
-                if "not found in workflow" in str(e):
-                    node_id = raw_mock_workflow_node_config.get("node_id")
+                node_id = raw_mock_workflow_node_config.get("node_id")
+                raw_data = e.raw_data or {}
+                if raw_data.get("node_ref") == node_id:
                     logger.warning(
                         "Skipping mock for node %s: node not found in workflow %s",
                         node_id,
