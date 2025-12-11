@@ -322,7 +322,7 @@ def push_command(
         has_errors = len(error_list) > 0
         has_diffs = response.proposed_diffs is not None and response.proposed_diffs
 
-        if has_errors or has_diffs:
+        if has_errors or (strict and has_diffs):
             exit(1)
     else:
         default_api_url = client._client_wrapper._environment.default

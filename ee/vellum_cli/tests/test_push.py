@@ -585,6 +585,84 @@ def test_push__dry_run_option_no_errors_returns_success(mock_module, vellum_clie
 
 
 @pytest.mark.usefixtures("info_log_level")
+def test_push__dry_run_with_diffs_but_no_strict_returns_success(mock_module, vellum_client):
+    """Test that dry-run returns exit code 0 when there are diffs but strict flag is not passed"""
+    # GIVEN a workflow module with a valid workflow
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+    _ensure_workflow_py(temp_dir, module)
+
+    # AND the push API call returns successfully with diffs but no errors
+    vellum_client.workflows.push.return_value = WorkflowPushResponse(
+        workflow_sandbox_id=str(uuid4()),
+        proposed_diffs={
+            "iterable_item_added": {
+                "root['raw_data']['nodes'][0]": {
+                    "id": str(uuid4()),
+                    "type": "GENERIC",
+                },
+            },
+        },
+    )
+
+    # WHEN calling `vellum push` with dry-run but without strict
+    runner = CliRunner(mix_stderr=True)
+    result = runner.invoke(cli_main, ["push", module, "--dry-run"])
+
+    # THEN it should succeed with exit code 0 (diffs are only enforced with --strict)
+    assert result.exit_code == 0
+
+    # AND we should have called the push API with the dry-run option but not strict
+    vellum_client.workflows.push.assert_called_once()
+    call_args = vellum_client.workflows.push.call_args.kwargs
+    assert call_args["dry_run"] is True
+    assert call_args["strict"] is None or call_args["strict"] is False
+
+    # AND the report should show the diffs
+    assert "## Proposed Diffs" in result.output
+    assert "iterable_item_added" in result.output
+
+
+@pytest.mark.usefixtures("info_log_level")
+def test_push__dry_run_with_diffs_and_strict_returns_failure(mock_module, vellum_client):
+    """Test that dry-run returns exit code 1 when there are diffs and strict flag is passed"""
+    # GIVEN a workflow module with a valid workflow
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+    _ensure_workflow_py(temp_dir, module)
+
+    # AND the push API call returns successfully with diffs but no errors
+    vellum_client.workflows.push.return_value = WorkflowPushResponse(
+        workflow_sandbox_id=str(uuid4()),
+        proposed_diffs={
+            "iterable_item_added": {
+                "root['raw_data']['nodes'][0]": {
+                    "id": str(uuid4()),
+                    "type": "GENERIC",
+                },
+            },
+        },
+    )
+
+    # WHEN calling `vellum push` with dry-run and strict
+    runner = CliRunner(mix_stderr=True)
+    result = runner.invoke(cli_main, ["push", module, "--dry-run", "--strict"])
+
+    # THEN it should fail with exit code 1 due to diffs
+    assert result.exit_code == 1
+
+    # AND we should have called the push API with both dry-run and strict options
+    vellum_client.workflows.push.assert_called_once()
+    call_args = vellum_client.workflows.push.call_args.kwargs
+    assert call_args["dry_run"] is True
+    assert call_args["strict"] is True
+
+    # AND the report should show the diffs
+    assert "## Proposed Diffs" in result.output
+    assert "iterable_item_added" in result.output
+
+
+@pytest.mark.usefixtures("info_log_level")
 def test_push__strict_option_returns_diffs(mock_module, vellum_client):
     # GIVEN a single workflow configured
     temp_dir = mock_module.temp_dir
