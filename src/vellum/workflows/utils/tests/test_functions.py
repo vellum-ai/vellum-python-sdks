@@ -864,9 +864,9 @@ def test_tool__backward_compatibility_with_use_tool_inputs():
     assert getattr(tool_decorated, "__vellum_inputs__") == {"a": "value_a"}
 
 
-def test_tool_input_examples_included_in_schema():
+def test_tool_examples_included_in_schema():
     @tool(
-        input_examples=[
+        examples=[
             {"location": "San Francisco"},
             {"location": "New York", "units": "celsius"},
         ]

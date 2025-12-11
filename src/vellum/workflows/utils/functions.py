@@ -198,7 +198,7 @@ def compile_function_definition(function: Callable) -> FunctionDefinition:
 
     # Get inputs from the decorator if present
     inputs = getattr(function, "__vellum_inputs__", {})
-    input_examples = getattr(function, "__vellum_input_examples__", None)
+    examples = getattr(function, "__vellum_examples__", None)
     exclude_params = set(inputs.keys())
 
     properties = {}
@@ -230,8 +230,8 @@ def compile_function_definition(function: Callable) -> FunctionDefinition:
     parameters = {"type": "object", "properties": properties, "required": required}
     if defs:
         parameters["$defs"] = defs
-    if input_examples is not None:
-        parameters["examples"] = input_examples
+    if examples is not None:
+        parameters["examples"] = examples
 
     return FunctionDefinition(
         name=function.__name__,
@@ -397,23 +397,23 @@ def compile_vellum_integration_tool_definition(
 def tool(
     *,
     inputs: Optional[dict[str, Any]] = None,
-    input_examples: Optional[List[dict[str, Any]]] = None,
+    examples: Optional[List[dict[str, Any]]] = None,
 ) -> Callable[[Callable], Callable]:
     """
     Decorator to configure a tool function.
 
     Currently supports specifying which parameters should come from parent workflow inputs
-    via the `inputs` mapping. Also supports providing `input_examples` which will be hoisted
+    via the `inputs` mapping. Also supports providing `examples` which will be hoisted
     into the JSON Schema `examples` keyword for this tool's parameters.
 
     Args:
         inputs: Mapping of parameter names to parent input references
-        input_examples: List of example argument objects for the tool
+        examples: List of example argument objects for the tool
 
     Example:
         @tool(inputs={
             "parent_input": ParentInputs.parent_input,
-        }, input_examples=[{"location": "San Francisco"}])
+        }, examples=[{"location": "San Francisco"}])
         def get_string(parent_input: str, user_query: str) -> str:
             return f"Parent: {parent_input}, Query: {user_query}"
     """
@@ -422,9 +422,9 @@ def tool(
         # Store the inputs mapping on the function for later use
         if inputs is not None:
             setattr(func, "__vellum_inputs__", inputs)
-        # Store the input examples on the function for later use
-        if input_examples is not None:
-            setattr(func, "__vellum_input_examples__", input_examples)
+        # Store the examples on the function for later use
+        if examples is not None:
+            setattr(func, "__vellum_examples__", examples)
         return func
 
     return decorator
