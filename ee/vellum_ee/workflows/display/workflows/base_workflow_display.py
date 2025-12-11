@@ -90,17 +90,6 @@ IGNORE_PATTERNS = [
     "metadata.json",
 ]
 
-INCLUDED_FILE_EXTENSIONS = [".py"]
-
-
-def should_include_file(filename: str) -> bool:
-    """Check if a file should be included based on its extension.
-
-    This is used by both the serialization logic and the push API to ensure
-    only Python files are included in workflow artifacts.
-    """
-    return any(filename.endswith(ext) for ext in INCLUDED_FILE_EXTENSIONS)
-
 
 class WorkflowSerializationError(UniversalBaseModel):
     message: str
@@ -1327,6 +1316,17 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
     def serialize_value(self, value: Any) -> Any:
         return serialize_value(self.workflow_id, self.display_context, value)
 
+    _INCLUDED_FILE_EXTENSIONS = [".py"]
+
+    @staticmethod
+    def should_include_file(filename: str) -> bool:
+        """Check if a file should be included based on its extension.
+
+        This is used by both the serialization logic and the push API to ensure
+        consistency in which files are included in workflow artifacts.
+        """
+        return any(filename.endswith(ext) for ext in BaseWorkflowDisplay._INCLUDED_FILE_EXTENSIONS)
+
     def _gather_additional_module_files(self, module_path: str) -> Dict[str, str]:
         workflow_module_path = f"{module_path}.workflow"
         workflow_module = importlib.import_module(workflow_module_path)
@@ -1340,7 +1340,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
 
         for root, _, filenames in os.walk(module_dir):
             for filename in filenames:
-                if not should_include_file(filename):
+                if not self.should_include_file(filename):
                     continue
 
                 file_path = os.path.join(root, filename)

@@ -17,7 +17,7 @@ from vellum.workflows.vellum_client import create_vellum_client
 from vellum_cli.config import DEFAULT_WORKSPACE_CONFIG, WorkflowConfig, WorkflowDeploymentConfig, load_vellum_cli_config
 from vellum_cli.logger import handle_cli_error, load_cli_logger
 from vellum_ee.workflows.display.nodes.utils import to_kebab_case
-from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay, should_include_file
+from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 
 
 def push_command(
@@ -201,7 +201,7 @@ def push_command(
         module_dir = workflow_config.module.replace(".", os.path.sep)
         for root, _, files in os.walk(module_dir):
             for filename in files:
-                if not should_include_file(filename):
+                if not BaseWorkflowDisplay.should_include_file(filename):
                     continue
 
                 file_path = os.path.join(root, filename)
