@@ -433,7 +433,6 @@ def tool(
     return decorator
 
 
-# Deprecated: use_tool_inputs will be removed in version 2.0.0.
 def use_tool_inputs(**inputs: Any) -> Callable[[Callable], Callable]:
     """
     Decorator to specify which parameters of a tool function should be provided
