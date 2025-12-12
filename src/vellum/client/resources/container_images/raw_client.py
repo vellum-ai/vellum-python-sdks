@@ -9,6 +9,8 @@ from ...core.http_response import AsyncHttpResponse, HttpResponse
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.pydantic_utilities import parse_obj_as
 from ...core.request_options import RequestOptions
+from ...core.serialization import convert_and_respect_annotation_metadata
+from ...types.code_execution_package_request import CodeExecutionPackageRequest
 from ...types.container_image_read import ContainerImageRead
 from ...types.docker_service_token import DockerServiceToken
 from ...types.paginated_container_image_read_list import PaginatedContainerImageReadList
@@ -77,6 +79,77 @@ class RawContainerImagesClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
+    def create_container_image(
+        self,
+        *,
+        name: str,
+        packages: typing.Sequence[CodeExecutionPackageRequest],
+        tag: str,
+        user_script: typing.Optional[str] = OMIT,
+        is_hotswappable: typing.Optional[bool] = OMIT,
+        server_version: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> HttpResponse[ContainerImageRead]:
+        """
+        Create a new Container Image.
+
+        Parameters
+        ----------
+        name : str
+
+        packages : typing.Sequence[CodeExecutionPackageRequest]
+
+        tag : str
+
+        user_script : typing.Optional[str]
+
+        is_hotswappable : typing.Optional[bool]
+
+        server_version : typing.Optional[str]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[ContainerImageRead]
+
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "v1/container-images",
+            base_url=self._client_wrapper.get_environment().default,
+            method="POST",
+            json={
+                "name": name,
+                "packages": convert_and_respect_annotation_metadata(
+                    object_=packages, annotation=typing.Sequence[CodeExecutionPackageRequest], direction="write"
+                ),
+                "tag": tag,
+                "user_script": user_script,
+                "is_hotswappable": is_hotswappable,
+                "server_version": server_version,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    ContainerImageRead,
+                    parse_obj_as(
+                        type_=ContainerImageRead,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
     def retrieve(
         self, id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> HttpResponse[ContainerImageRead]:
@@ -101,6 +174,77 @@ class RawContainerImagesClient:
             base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    ContainerImageRead,
+                    parse_obj_as(
+                        type_=ContainerImageRead,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
+    def update_container_image(
+        self,
+        id: str,
+        *,
+        packages: typing.Sequence[CodeExecutionPackageRequest],
+        tag: str,
+        user_script: typing.Optional[str] = OMIT,
+        is_hotswappable: typing.Optional[bool] = OMIT,
+        server_version: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> HttpResponse[ContainerImageRead]:
+        """
+        Update an existing Container Image.
+
+        Parameters
+        ----------
+        id : str
+            A UUID string identifying this container image.
+
+        packages : typing.Sequence[CodeExecutionPackageRequest]
+
+        tag : str
+
+        user_script : typing.Optional[str]
+
+        is_hotswappable : typing.Optional[bool]
+
+        server_version : typing.Optional[str]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[ContainerImageRead]
+
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"v1/container-images/{jsonable_encoder(id)}",
+            base_url=self._client_wrapper.get_environment().default,
+            method="PUT",
+            json={
+                "packages": convert_and_respect_annotation_metadata(
+                    object_=packages, annotation=typing.Sequence[CodeExecutionPackageRequest], direction="write"
+                ),
+                "tag": tag,
+                "user_script": user_script,
+                "is_hotswappable": is_hotswappable,
+                "server_version": server_version,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
         )
         try:
             if 200 <= _response.status_code < 300:
@@ -272,6 +416,77 @@ class AsyncRawContainerImagesClient:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
+    async def create_container_image(
+        self,
+        *,
+        name: str,
+        packages: typing.Sequence[CodeExecutionPackageRequest],
+        tag: str,
+        user_script: typing.Optional[str] = OMIT,
+        is_hotswappable: typing.Optional[bool] = OMIT,
+        server_version: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AsyncHttpResponse[ContainerImageRead]:
+        """
+        Create a new Container Image.
+
+        Parameters
+        ----------
+        name : str
+
+        packages : typing.Sequence[CodeExecutionPackageRequest]
+
+        tag : str
+
+        user_script : typing.Optional[str]
+
+        is_hotswappable : typing.Optional[bool]
+
+        server_version : typing.Optional[str]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[ContainerImageRead]
+
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "v1/container-images",
+            base_url=self._client_wrapper.get_environment().default,
+            method="POST",
+            json={
+                "name": name,
+                "packages": convert_and_respect_annotation_metadata(
+                    object_=packages, annotation=typing.Sequence[CodeExecutionPackageRequest], direction="write"
+                ),
+                "tag": tag,
+                "user_script": user_script,
+                "is_hotswappable": is_hotswappable,
+                "server_version": server_version,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    ContainerImageRead,
+                    parse_obj_as(
+                        type_=ContainerImageRead,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
     async def retrieve(
         self, id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> AsyncHttpResponse[ContainerImageRead]:
@@ -296,6 +511,77 @@ class AsyncRawContainerImagesClient:
             base_url=self._client_wrapper.get_environment().default,
             method="GET",
             request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    ContainerImageRead,
+                    parse_obj_as(
+                        type_=ContainerImageRead,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
+        raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
+
+    async def update_container_image(
+        self,
+        id: str,
+        *,
+        packages: typing.Sequence[CodeExecutionPackageRequest],
+        tag: str,
+        user_script: typing.Optional[str] = OMIT,
+        is_hotswappable: typing.Optional[bool] = OMIT,
+        server_version: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AsyncHttpResponse[ContainerImageRead]:
+        """
+        Update an existing Container Image.
+
+        Parameters
+        ----------
+        id : str
+            A UUID string identifying this container image.
+
+        packages : typing.Sequence[CodeExecutionPackageRequest]
+
+        tag : str
+
+        user_script : typing.Optional[str]
+
+        is_hotswappable : typing.Optional[bool]
+
+        server_version : typing.Optional[str]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[ContainerImageRead]
+
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"v1/container-images/{jsonable_encoder(id)}",
+            base_url=self._client_wrapper.get_environment().default,
+            method="PUT",
+            json={
+                "packages": convert_and_respect_annotation_metadata(
+                    object_=packages, annotation=typing.Sequence[CodeExecutionPackageRequest], direction="write"
+                ),
+                "tag": tag,
+                "user_script": user_script,
+                "is_hotswappable": is_hotswappable,
+                "server_version": server_version,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
         )
         try:
             if 200 <= _response.status_code < 300:

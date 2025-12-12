@@ -67,6 +67,7 @@ from .code_execution_node_result_output import CodeExecutionNodeResultOutput
 from .code_execution_node_search_results_result import CodeExecutionNodeSearchResultsResult
 from .code_execution_node_string_result import CodeExecutionNodeStringResult
 from .code_execution_package import CodeExecutionPackage
+from .code_execution_package_request import CodeExecutionPackageRequest
 from .code_execution_runtime import CodeExecutionRuntime
 from .code_executor_input import CodeExecutorInput
 from .code_executor_response import CodeExecutorResponse
@@ -798,6 +799,7 @@ __all__ = [
     "CodeExecutionNodeSearchResultsResult",
     "CodeExecutionNodeStringResult",
     "CodeExecutionPackage",
+    "CodeExecutionPackageRequest",
     "CodeExecutionRuntime",
     "CodeExecutorInput",
     "CodeExecutorResponse",

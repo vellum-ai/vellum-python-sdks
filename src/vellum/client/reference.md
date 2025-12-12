@@ -2234,6 +2234,128 @@ client.container_images.list()
 </dl>
 </details>
 
+<details><summary><code>client.container_images.<a href="src/vellum/resources/container_images/client.py">create_container_image</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Create a new Container Image.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import CodeExecutionPackageRequest, Vellum
+
+client = Vellum(
+    api_version="YOUR_API_VERSION",
+    api_key="YOUR_API_KEY",
+)
+client.container_images.create_container_image(
+    name="x",
+    packages=[
+        CodeExecutionPackageRequest(
+            version="x",
+            name="x",
+        ),
+        CodeExecutionPackageRequest(
+            version="x",
+            name="x",
+        ),
+    ],
+    tag="x",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**name:** `str` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**packages:** `typing.Sequence[CodeExecutionPackageRequest]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**tag:** `str` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**user_script:** `typing.Optional[str]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**is_hotswappable:** `typing.Optional[bool]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**server_version:** `typing.Optional[str]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.container_images.<a href="src/vellum/resources/container_images/client.py">retrieve</a>(...)</code></summary>
 <dl>
 <dd>
@@ -2286,6 +2408,128 @@ client.container_images.retrieve(
 <dd>
 
 **id:** `str` — Either the Container Image's ID or its unique name
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.container_images.<a href="src/vellum/resources/container_images/client.py">update_container_image</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Update an existing Container Image.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import CodeExecutionPackageRequest, Vellum
+
+client = Vellum(
+    api_version="YOUR_API_VERSION",
+    api_key="YOUR_API_KEY",
+)
+client.container_images.update_container_image(
+    id="id",
+    packages=[
+        CodeExecutionPackageRequest(
+            version="x",
+            name="x",
+        ),
+        CodeExecutionPackageRequest(
+            version="x",
+            name="x",
+        ),
+    ],
+    tag="x",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — A UUID string identifying this container image.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**packages:** `typing.Sequence[CodeExecutionPackageRequest]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**tag:** `str` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**user_script:** `typing.Optional[str]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**is_hotswappable:** `typing.Optional[bool]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**server_version:** `typing.Optional[str]` 
     
 </dd>
 </dl>

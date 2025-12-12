@@ -4,6 +4,7 @@ import typing
 
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.request_options import RequestOptions
+from ...types.code_execution_package_request import CodeExecutionPackageRequest
 from ...types.container_image_read import ContainerImageRead
 from ...types.docker_service_token import DockerServiceToken
 from ...types.paginated_container_image_read_list import PaginatedContainerImageReadList
@@ -77,6 +78,76 @@ class ContainerImagesClient:
         )
         return _response.data
 
+    def create_container_image(
+        self,
+        *,
+        name: str,
+        packages: typing.Sequence[CodeExecutionPackageRequest],
+        tag: str,
+        user_script: typing.Optional[str] = OMIT,
+        is_hotswappable: typing.Optional[bool] = OMIT,
+        server_version: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> ContainerImageRead:
+        """
+        Create a new Container Image.
+
+        Parameters
+        ----------
+        name : str
+
+        packages : typing.Sequence[CodeExecutionPackageRequest]
+
+        tag : str
+
+        user_script : typing.Optional[str]
+
+        is_hotswappable : typing.Optional[bool]
+
+        server_version : typing.Optional[str]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        ContainerImageRead
+
+
+        Examples
+        --------
+        from vellum import CodeExecutionPackageRequest, Vellum
+
+        client = Vellum(
+            api_version="YOUR_API_VERSION",
+            api_key="YOUR_API_KEY",
+        )
+        client.container_images.create_container_image(
+            name="x",
+            packages=[
+                CodeExecutionPackageRequest(
+                    version="x",
+                    name="x",
+                ),
+                CodeExecutionPackageRequest(
+                    version="x",
+                    name="x",
+                ),
+            ],
+            tag="x",
+        )
+        """
+        _response = self._raw_client.create_container_image(
+            name=name,
+            packages=packages,
+            tag=tag,
+            user_script=user_script,
+            is_hotswappable=is_hotswappable,
+            server_version=server_version,
+            request_options=request_options,
+        )
+        return _response.data
+
     def retrieve(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> ContainerImageRead:
         """
         Retrieve a Container Image by its ID or name.
@@ -107,6 +178,77 @@ class ContainerImagesClient:
         )
         """
         _response = self._raw_client.retrieve(id, request_options=request_options)
+        return _response.data
+
+    def update_container_image(
+        self,
+        id: str,
+        *,
+        packages: typing.Sequence[CodeExecutionPackageRequest],
+        tag: str,
+        user_script: typing.Optional[str] = OMIT,
+        is_hotswappable: typing.Optional[bool] = OMIT,
+        server_version: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> ContainerImageRead:
+        """
+        Update an existing Container Image.
+
+        Parameters
+        ----------
+        id : str
+            A UUID string identifying this container image.
+
+        packages : typing.Sequence[CodeExecutionPackageRequest]
+
+        tag : str
+
+        user_script : typing.Optional[str]
+
+        is_hotswappable : typing.Optional[bool]
+
+        server_version : typing.Optional[str]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        ContainerImageRead
+
+
+        Examples
+        --------
+        from vellum import CodeExecutionPackageRequest, Vellum
+
+        client = Vellum(
+            api_version="YOUR_API_VERSION",
+            api_key="YOUR_API_KEY",
+        )
+        client.container_images.update_container_image(
+            id="id",
+            packages=[
+                CodeExecutionPackageRequest(
+                    version="x",
+                    name="x",
+                ),
+                CodeExecutionPackageRequest(
+                    version="x",
+                    name="x",
+                ),
+            ],
+            tag="x",
+        )
+        """
+        _response = self._raw_client.update_container_image(
+            id,
+            packages=packages,
+            tag=tag,
+            user_script=user_script,
+            is_hotswappable=is_hotswappable,
+            server_version=server_version,
+            request_options=request_options,
+        )
         return _response.data
 
     def docker_service_token(self, *, request_options: typing.Optional[RequestOptions] = None) -> DockerServiceToken:
@@ -250,6 +392,84 @@ class AsyncContainerImagesClient:
         )
         return _response.data
 
+    async def create_container_image(
+        self,
+        *,
+        name: str,
+        packages: typing.Sequence[CodeExecutionPackageRequest],
+        tag: str,
+        user_script: typing.Optional[str] = OMIT,
+        is_hotswappable: typing.Optional[bool] = OMIT,
+        server_version: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> ContainerImageRead:
+        """
+        Create a new Container Image.
+
+        Parameters
+        ----------
+        name : str
+
+        packages : typing.Sequence[CodeExecutionPackageRequest]
+
+        tag : str
+
+        user_script : typing.Optional[str]
+
+        is_hotswappable : typing.Optional[bool]
+
+        server_version : typing.Optional[str]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        ContainerImageRead
+
+
+        Examples
+        --------
+        import asyncio
+
+        from vellum import AsyncVellum, CodeExecutionPackageRequest
+
+        client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.container_images.create_container_image(
+                name="x",
+                packages=[
+                    CodeExecutionPackageRequest(
+                        version="x",
+                        name="x",
+                    ),
+                    CodeExecutionPackageRequest(
+                        version="x",
+                        name="x",
+                    ),
+                ],
+                tag="x",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.create_container_image(
+            name=name,
+            packages=packages,
+            tag=tag,
+            user_script=user_script,
+            is_hotswappable=is_hotswappable,
+            server_version=server_version,
+            request_options=request_options,
+        )
+        return _response.data
+
     async def retrieve(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> ContainerImageRead:
         """
         Retrieve a Container Image by its ID or name.
@@ -288,6 +508,85 @@ class AsyncContainerImagesClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.retrieve(id, request_options=request_options)
+        return _response.data
+
+    async def update_container_image(
+        self,
+        id: str,
+        *,
+        packages: typing.Sequence[CodeExecutionPackageRequest],
+        tag: str,
+        user_script: typing.Optional[str] = OMIT,
+        is_hotswappable: typing.Optional[bool] = OMIT,
+        server_version: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> ContainerImageRead:
+        """
+        Update an existing Container Image.
+
+        Parameters
+        ----------
+        id : str
+            A UUID string identifying this container image.
+
+        packages : typing.Sequence[CodeExecutionPackageRequest]
+
+        tag : str
+
+        user_script : typing.Optional[str]
+
+        is_hotswappable : typing.Optional[bool]
+
+        server_version : typing.Optional[str]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        ContainerImageRead
+
+
+        Examples
+        --------
+        import asyncio
+
+        from vellum import AsyncVellum, CodeExecutionPackageRequest
+
+        client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.container_images.update_container_image(
+                id="id",
+                packages=[
+                    CodeExecutionPackageRequest(
+                        version="x",
+                        name="x",
+                    ),
+                    CodeExecutionPackageRequest(
+                        version="x",
+                        name="x",
+                    ),
+                ],
+                tag="x",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.update_container_image(
+            id,
+            packages=packages,
+            tag=tag,
+            user_script=user_script,
+            is_hotswappable=is_hotswappable,
+            server_version=server_version,
+            request_options=request_options,
+        )
         return _response.data
 
     async def docker_service_token(

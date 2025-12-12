@@ -161,7 +161,7 @@ class RawWorkflowsClient:
     def push(
         self,
         *,
-        exec_config: WorkflowPushExecConfig,
+        exec_config: typing.Optional[WorkflowPushExecConfig] = OMIT,
         workflow_sandbox_id: typing.Optional[str] = OMIT,
         deployment_config: typing.Optional[WorkflowPushDeploymentConfigRequest] = OMIT,
         artifact: typing.Optional[core.File] = OMIT,
@@ -173,8 +173,8 @@ class RawWorkflowsClient:
         """
         Parameters
         ----------
-        exec_config : WorkflowPushExecConfig
-            The execution configuration of the workflow.
+        exec_config : typing.Optional[WorkflowPushExecConfig]
+            The execution configuration of the workflow. If not provided, it will be derived from the artifact.
 
         workflow_sandbox_id : typing.Optional[str]
 
@@ -430,7 +430,7 @@ class AsyncRawWorkflowsClient:
     async def push(
         self,
         *,
-        exec_config: WorkflowPushExecConfig,
+        exec_config: typing.Optional[WorkflowPushExecConfig] = OMIT,
         workflow_sandbox_id: typing.Optional[str] = OMIT,
         deployment_config: typing.Optional[WorkflowPushDeploymentConfigRequest] = OMIT,
         artifact: typing.Optional[core.File] = OMIT,
@@ -442,8 +442,8 @@ class AsyncRawWorkflowsClient:
         """
         Parameters
         ----------
-        exec_config : WorkflowPushExecConfig
-            The execution configuration of the workflow.
+        exec_config : typing.Optional[WorkflowPushExecConfig]
+            The execution configuration of the workflow. If not provided, it will be derived from the artifact.
 
         workflow_sandbox_id : typing.Optional[str]
 
