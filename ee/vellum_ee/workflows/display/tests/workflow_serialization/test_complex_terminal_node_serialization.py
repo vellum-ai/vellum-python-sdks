@@ -2,6 +2,7 @@ import pytest
 
 from deepdiff import DeepDiff
 
+from vellum_ee.workflows.display.utils.exceptions import WorkflowValidationError
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 from tests.workflows.complex_final_output_node.missing_final_output_node import MissingFinalOutputNodeWorkflow
@@ -97,8 +98,11 @@ def test_serialize_workflow__missing_workflow_output():
     # GIVEN a Workflow that contains a terminal node that is unreferenced by the Workflow's Outputs
     workflow_display = get_workflow_display(workflow_class=MissingWorkflowOutputWorkflow)
 
-    # WHEN we serialize it, it should throw an error
-    with pytest.raises(ValueError) as exc_info:
+    # WHEN we serialize it, it should throw a WorkflowValidationError
+    with pytest.raises(WorkflowValidationError) as exc_info:
         workflow_display.serialize()
 
-    assert exc_info.value.args[0] == "Unable to serialize terminal nodes that are not referenced by workflow outputs."
+    # THEN the error message should indicate the terminal node is not referenced
+    error_message = str(exc_info.value)
+    assert "MissingWorkflowOutputWorkflow" in error_message
+    assert "terminal nodes that are not referenced by workflow outputs" in error_message
