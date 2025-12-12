@@ -193,9 +193,10 @@ def create_node_input_value_pointer_rule(
             ),
         )
     if isinstance(value, StateValueReference):
+        state_value_display = display_context.global_state_value_displays[value]
         return WorkflowStatePointer(
             data=WorkflowStateData(
-                state_variable_id=str(value.id),
+                state_variable_id=str(state_value_display.id),
             ),
         )
     if isinstance(value, TriggerAttributeReference):
