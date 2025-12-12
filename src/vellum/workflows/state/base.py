@@ -310,11 +310,10 @@ class StateMeta(UniversalBaseModel):
     id: UUID = field(default_factory=uuid4_default_factory)
     span_id: UUID = field(default_factory=uuid4_default_factory)
     updated_ts: datetime = field(default_factory=default_datetime_factory)
+    trigger_attributes: Optional[Dict[TriggerAttributeReference, Any]] = field(default=None)
     workflow_inputs: Optional[BaseInputs] = field(default=None)
-    workflow_inputs_skipped: bool = field(default=False)
     external_inputs: Dict[ExternalInputReference, Any] = field(default_factory=dict)
     node_outputs: Dict[OutputReference, Any] = field(default_factory=dict)
-    trigger_attributes: Dict[TriggerAttributeReference, Any] = field(default_factory=dict)
     node_execution_cache: NodeExecutionCache = field(default_factory=NodeExecutionCache)
     parent: Optional["BaseState"] = None
     __snapshot_callback__: Optional[Callable[[Optional[StateDelta]], None]] = field(init=False, default=None)
@@ -322,12 +321,9 @@ class StateMeta(UniversalBaseModel):
     def model_post_init(self, context: Any) -> None:
         self.__snapshot_callback__ = None
 
-        if context and isinstance(context, dict):
-            if "workflow_definition" not in context:
-                context["workflow_definition"] = self.workflow_definition
-            context.setdefault("workflow_inputs_skipped", self.workflow_inputs_skipped)
-
-        if self.workflow_inputs is None and not self.workflow_inputs_skipped:
+        # Auto-populate workflow_inputs with defaults only if trigger_attributes is None
+        # (trigger_attributes being set indicates a trigger-based workflow where we don't want default inputs)
+        if self.workflow_inputs is None and self.trigger_attributes is None:
             workflow_definition = (
                 self.workflow_definition if is_workflow_class(self.workflow_definition) else import_workflow_class()
             )
@@ -340,7 +336,8 @@ class StateMeta(UniversalBaseModel):
     def add_snapshot_callback(self, callback: Callable[[Optional[StateDelta]], None]) -> None:
         self.node_outputs = _make_snapshottable("meta.node_outputs", self.node_outputs, callback)
         self.external_inputs = _make_snapshottable("meta.external_inputs", self.external_inputs, callback)
-        self.trigger_attributes = _make_snapshottable("meta.trigger_attributes", self.trigger_attributes, callback)
+        if self.trigger_attributes is not None:
+            self.trigger_attributes = _make_snapshottable("meta.trigger_attributes", self.trigger_attributes, callback)
         self.__snapshot_callback__ = callback
 
     def __setattr__(self, name: str, value: Any) -> None:
@@ -377,8 +374,10 @@ class StateMeta(UniversalBaseModel):
 
     @field_serializer("trigger_attributes")
     def serialize_trigger_attributes(
-        self, trigger_attributes: Dict[TriggerAttributeReference, Any], _info: Any
+        self, trigger_attributes: Optional[Dict[TriggerAttributeReference, Any]], _info: Any
     ) -> Dict[str, Any]:
+        if trigger_attributes is None:
+            return {}
         return {str(descriptor.id): value for descriptor, value in trigger_attributes.items()}
 
     @field_validator("node_outputs", mode="before")
@@ -473,13 +472,8 @@ class StateMeta(UniversalBaseModel):
     def deserialize_workflow_inputs(cls, workflow_inputs: Any, info: ValidationInfo):
         context = info.context if isinstance(info.context, dict) else {}
         workflow_definition = context.get("workflow_definition") or cls._get_workflow(info)
-        skip_defaults = bool(context.get("workflow_inputs_skipped"))
 
         if workflow_definition:
-            if workflow_inputs is None:
-                if skip_defaults:
-                    return None
-                return workflow_definition.get_inputs_class()()
             if isinstance(workflow_inputs, dict):
                 return workflow_definition.get_inputs_class()(**workflow_inputs)
 
@@ -556,12 +550,6 @@ class StateMeta(UniversalBaseModel):
             return None
 
         return workflow_definition
-
-    def model_dump(self, *args: Any, **kwargs: Any) -> Dict[str, Any]:
-        data = super().model_dump(*args, **kwargs)
-        if not data.get("workflow_inputs_skipped"):
-            data.pop("workflow_inputs_skipped", None)
-        return data
 
 
 class BaseState(metaclass=_BaseStateMeta):

@@ -742,17 +742,21 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         fallback_to_default_inputs: bool = True,
     ) -> StateType:
         resolved_inputs: Optional[InputsType] = workflow_inputs
-        workflow_inputs_skipped = resolved_inputs is None and not fallback_to_default_inputs
+
+        meta_payload: Dict[str, Any] = {
+            "parent": self._parent_state,
+            "workflow_definition": self.__class__,
+            "workflow_inputs": resolved_inputs,
+        }
+        # When fallback_to_default_inputs=False, set trigger_attributes to empty dict to signal
+        # that inputs should not be auto-populated (trigger-based workflows)
+        if not fallback_to_default_inputs:
+            meta_payload["trigger_attributes"] = {}
+
         meta = StateMeta.model_validate(
-            {
-                "parent": self._parent_state,
-                "workflow_definition": self.__class__,
-                "workflow_inputs": None if workflow_inputs_skipped else resolved_inputs,
-                "workflow_inputs_skipped": workflow_inputs_skipped,
-            },
+            meta_payload,
             context={
                 "workflow_definition": self.__class__,
-                "workflow_inputs_skipped": workflow_inputs_skipped,
             },
         )
 
@@ -815,16 +819,12 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             meta_payload = dict(state["meta"])
             if workflow_inputs is not None:
                 meta_payload["workflow_inputs"] = workflow_inputs
-                meta_payload["workflow_inputs_skipped"] = False
-            else:
-                meta_payload.setdefault("workflow_inputs_skipped", False)
             meta_payload.setdefault("workflow_definition", cls)
 
             state["meta"] = StateMeta.model_validate(
                 meta_payload,
                 context={
                     "workflow_definition": cls,
-                    "workflow_inputs_skipped": meta_payload.get("workflow_inputs_skipped", False),
                 },
             )
 

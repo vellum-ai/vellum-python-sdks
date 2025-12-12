@@ -93,7 +93,6 @@ class MockFileResolver(BaseWorkflowResolver):
                     meta_payload,
                     context={
                         "workflow_definition": RunFromExternalWorkflow,
-                        "workflow_inputs_skipped": meta_payload.get("workflow_inputs_skipped", False),
                     },
                 )
                 snapshot = BaseState(

@@ -214,7 +214,6 @@ class WorkflowRunner(Generic[StateType]):
             if state:
                 self._initial_state = deepcopy(state)
                 self._initial_state.meta.workflow_inputs = default_inputs
-                self._initial_state.meta.workflow_inputs_skipped = default_inputs is None
                 self._initial_state.meta.span_id = execution_id or uuid4()
                 self._initial_state.meta.workflow_definition = self.workflow.__class__
             else:

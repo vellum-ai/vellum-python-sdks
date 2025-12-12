@@ -464,6 +464,8 @@ class BaseTrigger(ABC, metaclass=BaseTriggerMeta):
     def bind_to_state(self, state: "BaseState") -> None:
         """Persist this trigger's attribute values onto the provided state."""
 
+        if state.meta.trigger_attributes is None:
+            state.meta.trigger_attributes = {}
         state.meta.trigger_attributes.update(self.to_trigger_attribute_values())
 
     @classmethod
