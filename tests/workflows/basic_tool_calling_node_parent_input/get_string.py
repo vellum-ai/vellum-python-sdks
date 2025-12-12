@@ -8,6 +8,7 @@ from .nodes.dummy_node import DummyNode
     parent_input=ParentInputs.parent_input,
     dummy_input=DummyNode.Outputs.text,
     constant_input="constant_input",
+    unused_input="unused_input",  # this should not be passed to the function
 )
 def get_string(parent_input: str, dummy_input: str, constant_input: str, populated_input: str) -> str:
     """
