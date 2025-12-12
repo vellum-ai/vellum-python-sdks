@@ -14,6 +14,7 @@ from vellum.workflows.references.environment_variable import EnvironmentVariable
 from vellum.workflows.references.execution_count import ExecutionCountReference
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.references.node import NodeReference
+from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
 from vellum_ee.workflows.display.utils.exceptions import InvalidInputReferenceError, UnsupportedSerializationException
@@ -78,6 +79,16 @@ class EnvironmentVariablePointer(UniversalBaseModel):
     data: EnvironmentVariableData
 
 
+class TriggerAttributeData(UniversalBaseModel):
+    trigger_id: str
+    attribute_id: str
+
+
+class TriggerAttributePointer(UniversalBaseModel):
+    type: Literal["TRIGGER_ATTRIBUTE"] = "TRIGGER_ATTRIBUTE"
+    data: TriggerAttributeData
+
+
 NodeInputValuePointerRule = Union[
     NodeOutputPointer,
     InputVariablePointer,
@@ -85,6 +96,7 @@ NodeInputValuePointerRule = Union[
     WorkspaceSecretPointer,
     ExecutionCounterPointer,
     EnvironmentVariablePointer,
+    TriggerAttributePointer,
 ]
 
 
@@ -167,6 +179,13 @@ def create_node_input_value_pointer_rule(
         return EnvironmentVariablePointer(
             data=EnvironmentVariableData(
                 environment_variable=value.name,
+            ),
+        )
+    if isinstance(value, TriggerAttributeReference):
+        return TriggerAttributePointer(
+            data=TriggerAttributeData(
+                trigger_id=str(value.trigger_class.__id__),
+                attribute_id=str(value.id),
             ),
         )
 
