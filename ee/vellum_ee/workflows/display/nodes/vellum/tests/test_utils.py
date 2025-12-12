@@ -8,6 +8,8 @@ from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.references import LazyReference
+from vellum.workflows.references.state_value import StateValueReference
+from vellum.workflows.state import BaseState
 from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.triggers.base import BaseTrigger
 from vellum_ee.workflows.display.base import WorkflowInputsDisplay, WorkflowMetaDisplay
@@ -23,6 +25,9 @@ from vellum_ee.workflows.display.utils.vellum import (
     NodeInputValuePointerRule,
     NodeOutputData,
     NodeOutputPointer,
+    WorkflowStateData,
+    WorkflowStatePointer,
+    create_node_input_value_pointer_rule,
     TriggerAttributeData,
     TriggerAttributePointer,
     create_node_input_value_pointer_rule,
@@ -136,6 +141,31 @@ def test_create_node_input_value_pointer_rules(
         ),
     )
     assert rules == expected_rules
+
+
+class MyState(BaseState):
+    my_attribute: str
+
+
+def test_create_node_input_value_pointer_rule__state_value_reference() -> None:
+    """
+    Tests that StateValueReference is serialized to WorkflowStatePointer.
+    """
+
+    # GIVEN a StateValueReference
+    state_value_reference: StateValueReference[str] = MyState.my_attribute  # type: ignore[assignment]
+
+    # AND a display context
+    display_context = WorkflowDisplayContext()
+
+    # WHEN we create a node input value pointer rule
+    result = create_node_input_value_pointer_rule(state_value_reference, display_context)
+
+    # THEN we should get a WorkflowStatePointer with the correct data
+    assert isinstance(result, WorkflowStatePointer)
+    assert result.type == "WORKFLOW_STATE"
+    assert isinstance(result.data, WorkflowStateData)
+    assert result.data.state_variable_id == str(state_value_reference.id)
 
 
 class MyTrigger(BaseTrigger):
