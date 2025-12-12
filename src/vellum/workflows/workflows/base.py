@@ -75,6 +75,7 @@ from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.mocks import MockNodeExecutionArg
 from vellum.workflows.nodes.utils import get_unadorned_node
 from vellum.workflows.outputs import BaseOutputs
+from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.resolvers.base import BaseWorkflowResolver
 from vellum.workflows.runner import WorkflowRunner
 from vellum.workflows.runner.runner import ExternalInputsArg, RunFromNodeArg
@@ -739,7 +740,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         workflow_inputs: Optional[InputsType] = None,
         execution_id: Optional[UUID] = None,
         *,
-        fallback_to_default_inputs: bool = True,
+        trigger_attributes: Optional[Dict[TriggerAttributeReference, Any]] = None,
     ) -> StateType:
         resolved_inputs: Optional[InputsType] = workflow_inputs
 
@@ -748,10 +749,8 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             "workflow_definition": self.__class__,
             "workflow_inputs": resolved_inputs,
         }
-        # When fallback_to_default_inputs=False, set trigger_attributes to empty dict to signal
-        # that inputs should not be auto-populated (trigger-based workflows)
-        if not fallback_to_default_inputs:
-            meta_payload["trigger_attributes"] = {}
+        if trigger_attributes is not None:
+            meta_payload["trigger_attributes"] = trigger_attributes
 
         meta = StateMeta.model_validate(
             meta_payload,

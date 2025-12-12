@@ -220,7 +220,7 @@ class WorkflowRunner(Generic[StateType]):
                 self._initial_state = self.workflow.get_default_state(
                     default_inputs,
                     execution_id,
-                    fallback_to_default_inputs=False,
+                    trigger_attributes={},
                 )
                 self._should_emit_initial_state = False
 
