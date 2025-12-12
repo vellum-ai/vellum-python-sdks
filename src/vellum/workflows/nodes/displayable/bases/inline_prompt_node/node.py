@@ -67,6 +67,7 @@ from vellum.workflows.types.definition import (
     ComposioToolDefinition,
     DeploymentDefinition,
     MCPServer,
+    MCPToolDefinition,
     VellumIntegrationToolDefinition,
 )
 from vellum.workflows.types.generics import StateType, is_workflow_class
@@ -164,6 +165,7 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                 Type["BaseWorkflow"],
                 VellumIntegrationToolDefinition,
                 MCPServer,
+                MCPToolDefinition,
             ]
         ]
     ] = None
@@ -237,6 +239,14 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                 elif isinstance(function, VellumIntegrationToolDefinition):
                     normalized_functions.append(
                         compile_vellum_integration_tool_definition(function, self._context.vellum_client)
+                    )
+                elif isinstance(function, MCPToolDefinition):
+                    normalized_functions.append(
+                        FunctionDefinition(
+                            name=get_mcp_tool_name(function),
+                            description=function.description,
+                            parameters=function.parameters,
+                        )
                     )
                 elif isinstance(function, MCPServer):
                     tool_definitions = compile_mcp_tool_definition(function)

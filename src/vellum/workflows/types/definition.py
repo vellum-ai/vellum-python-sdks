@@ -224,4 +224,4 @@ ToolBase = Union[
     ComposioToolDefinition,
     VellumIntegrationToolDefinition,
 ]
-Tool = Union[ToolBase, MCPServer]
+Tool = Union[ToolBase, MCPServer, MCPToolDefinition]
