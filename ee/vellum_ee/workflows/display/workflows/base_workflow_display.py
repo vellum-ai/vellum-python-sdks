@@ -370,7 +370,10 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         # raise a serialization error
         if len(unreferenced_final_output_node_outputs) > 0:
             self.display_context.add_error(
-                ValueError("Unable to serialize terminal nodes that are not referenced by workflow outputs.")
+                WorkflowValidationError(
+                    message="Unable to serialize terminal nodes that are not referenced by workflow outputs.",
+                    workflow_class_name=self._workflow.__name__,
+                )
             )
 
         # Identify nodes that already have trigger edges so we can avoid duplicating entrypoint edges
