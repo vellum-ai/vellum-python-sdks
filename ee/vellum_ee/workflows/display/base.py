@@ -49,9 +49,9 @@ class WorkflowDisplayData(UniversalBaseModel):
 
 @dataclass
 class WorkflowMetaDisplay:
-    entrypoint_node_id: UUID
-    entrypoint_node_source_handle_id: UUID
-    entrypoint_node_display: NodeDisplayData = Field(default_factory=NodeDisplayData)
+    entrypoint_node_id: Optional[UUID] = None
+    entrypoint_node_source_handle_id: Optional[UUID] = None
+    entrypoint_node_display: Optional[NodeDisplayData] = None
     display_data: WorkflowDisplayData = field(default_factory=WorkflowDisplayData)
 
     @classmethod

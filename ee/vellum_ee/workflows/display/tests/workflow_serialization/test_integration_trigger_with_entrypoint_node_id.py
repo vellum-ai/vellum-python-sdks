@@ -16,9 +16,13 @@ from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class imp
 def test_integration_trigger_with_explicit_entrypoint_node_id():
     """
     Tests that a workflow with an IntegrationTrigger and explicit entrypoint_node_id
-    creates an ENTRYPOINT node using the explicit ID (not the trigger's ID).
+    does NOT create an ENTRYPOINT node when all branches are trigger-sourced.
+
+    Even with explicit IDs provided, if all graph branches originate from triggers,
+    the ENTRYPOINT node should be skipped.
     """
 
+    # GIVEN an IntegrationTrigger workflow with explicit entrypoint_node_id
     class SlackMessageTrigger(IntegrationTrigger):
         message: str
 
@@ -53,8 +57,10 @@ def test_integration_trigger_with_explicit_entrypoint_node_id():
             )
         }
 
+    # WHEN we serialize the workflow
     result: dict = get_workflow_display(workflow_class=TestWorkflow).serialize()
 
+    # THEN the trigger should be serialized
     assert "workflow_raw_data" in result
     workflow_raw_data = result["workflow_raw_data"]
     assert isinstance(workflow_raw_data, dict)
@@ -67,22 +73,19 @@ def test_integration_trigger_with_explicit_entrypoint_node_id():
     assert isinstance(trigger, dict)
     trigger_id = trigger["id"]
 
+    # AND there should be NO ENTRYPOINT node (all branches are trigger-sourced)
     nodes = workflow_raw_data["nodes"]
     assert isinstance(nodes, list)
 
     entrypoint_nodes = [n for n in nodes if isinstance(n, dict) and n.get("type") == "ENTRYPOINT"]
 
-    assert (
-        len(entrypoint_nodes) == 1
-    ), "IntegrationTrigger workflows with explicit entrypoint_node_id should create an ENTRYPOINT node"
-
-    entrypoint_node = entrypoint_nodes[0]
-    assert isinstance(entrypoint_node, dict)
-    entrypoint_node_id = entrypoint_node["id"]
-
-    assert entrypoint_node_id == str(explicit_entrypoint_node_id), (
-        f"Entrypoint node ID should be {explicit_entrypoint_node_id} from workflow_display, "
-        f"not {trigger_id} from trigger"
+    assert len(entrypoint_nodes) == 0, (
+        "IntegrationTrigger-only workflows should NOT create an ENTRYPOINT node "
+        "even with explicit entrypoint_node_id, since all branches are trigger-sourced"
     )
 
-    assert entrypoint_node_id != trigger_id, "Entrypoint node should not use the trigger's ID"
+    # AND edges should use trigger ID as source_node_id
+    edges = workflow_raw_data["edges"]
+    assert isinstance(edges, list)
+    trigger_edges = [e for e in edges if isinstance(e, dict) and e.get("source_node_id") == trigger_id]
+    assert len(trigger_edges) > 0, "Should have edges from trigger ID"
