@@ -8,9 +8,11 @@ from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.references import LazyReference
+from vellum.workflows.references.state_value import StateValueReference
 from vellum.workflows.references.trigger import TriggerAttributeReference
+from vellum.workflows.state import BaseState
 from vellum.workflows.triggers.base import BaseTrigger
-from vellum_ee.workflows.display.base import WorkflowInputsDisplay, WorkflowMetaDisplay
+from vellum_ee.workflows.display.base import StateValueDisplay, WorkflowInputsDisplay, WorkflowMetaDisplay
 from vellum_ee.workflows.display.editor.types import NodeDisplayData
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
@@ -25,6 +27,8 @@ from vellum_ee.workflows.display.utils.vellum import (
     NodeOutputPointer,
     TriggerAttributeData,
     TriggerAttributePointer,
+    WorkflowStateData,
+    WorkflowStatePointer,
     create_node_input_value_pointer_rule,
 )
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
@@ -136,6 +140,36 @@ def test_create_node_input_value_pointer_rules(
         ),
     )
     assert rules == expected_rules
+
+
+class MyState(BaseState):
+    my_attribute: str
+
+
+def test_create_node_input_value_pointer_rule__state_value_reference() -> None:
+    """
+    Tests that StateValueReference is serialized to WorkflowStatePointer using the display override ID.
+    """
+
+    # GIVEN a StateValueReference
+    state_value_reference: StateValueReference[str] = MyState.my_attribute  # type: ignore[assignment]
+
+    # AND a display context with a state value display override
+    override_id = uuid4()
+    display_context = WorkflowDisplayContext(
+        global_state_value_displays={
+            state_value_reference: StateValueDisplay(id=override_id),
+        },
+    )
+
+    # WHEN we create a node input value pointer rule
+    result = create_node_input_value_pointer_rule(state_value_reference, display_context)
+
+    # THEN we should get a WorkflowStatePointer with the overridden display ID
+    assert isinstance(result, WorkflowStatePointer)
+    assert result.type == "WORKFLOW_STATE"
+    assert isinstance(result.data, WorkflowStateData)
+    assert result.data.state_variable_id == str(override_id)
 
 
 class MyTrigger(BaseTrigger):

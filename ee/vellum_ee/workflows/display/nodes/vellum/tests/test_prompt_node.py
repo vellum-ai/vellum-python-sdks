@@ -154,17 +154,17 @@ def test_serialize_node__prompt_inputs__state_reference():
     workflow_display = get_workflow_display(workflow_class=Workflow)
     serialized_workflow: dict = workflow_display.serialize()
 
-    # THEN the node should skip the state reference input rule
     my_prompt_node = next(
         node for node in serialized_workflow["workflow_raw_data"]["nodes"] if node["id"] == str(MyPromptNode.__id__)
     )
-
     assert my_prompt_node["inputs"] == [
         {
             "id": "7c5d23b3-c5ed-4ed6-a685-43fbe9a9baf8",
             "key": "foo",
             "value": {
-                "rules": [],
+                "rules": [
+                    {"type": "WORKFLOW_STATE", "data": {"state_variable_id": "dd3391bf-c818-4eba-aac5-912618ba412f"}}
+                ],
                 "combinator": "OR",
             },
         },
@@ -172,15 +172,7 @@ def test_serialize_node__prompt_inputs__state_reference():
             "id": "e138f06e-d705-46bc-8ac4-c844b0e9131a",
             "key": "bar",
             "value": {
-                "rules": [
-                    {
-                        "type": "CONSTANT_VALUE",
-                        "data": {
-                            "type": "STRING",
-                            "value": "baz",
-                        },
-                    }
-                ],
+                "rules": [{"type": "CONSTANT_VALUE", "data": {"type": "STRING", "value": "baz"}}],
                 "combinator": "OR",
             },
         },

@@ -14,6 +14,7 @@ from vellum.workflows.references.environment_variable import EnvironmentVariable
 from vellum.workflows.references.execution_count import ExecutionCountReference
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.references.node import NodeReference
+from vellum.workflows.references.state_value import StateValueReference
 from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
@@ -79,6 +80,15 @@ class EnvironmentVariablePointer(UniversalBaseModel):
     data: EnvironmentVariableData
 
 
+class WorkflowStateData(UniversalBaseModel):
+    state_variable_id: str
+
+
+class WorkflowStatePointer(UniversalBaseModel):
+    type: Literal["WORKFLOW_STATE"] = "WORKFLOW_STATE"
+    data: WorkflowStateData
+
+
 class TriggerAttributeData(UniversalBaseModel):
     trigger_id: str
     attribute_id: str
@@ -96,6 +106,7 @@ NodeInputValuePointerRule = Union[
     WorkspaceSecretPointer,
     ExecutionCounterPointer,
     EnvironmentVariablePointer,
+    WorkflowStatePointer,
     TriggerAttributePointer,
 ]
 
@@ -179,6 +190,13 @@ def create_node_input_value_pointer_rule(
         return EnvironmentVariablePointer(
             data=EnvironmentVariableData(
                 environment_variable=value.name,
+            ),
+        )
+    if isinstance(value, StateValueReference):
+        state_value_display = display_context.global_state_value_displays[value]
+        return WorkflowStatePointer(
+            data=WorkflowStateData(
+                state_variable_id=str(state_value_display.id),
             ),
         )
     if isinstance(value, TriggerAttributeReference):
