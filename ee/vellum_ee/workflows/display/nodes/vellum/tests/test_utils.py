@@ -9,8 +9,8 @@ from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.references import LazyReference
 from vellum.workflows.references.state_value import StateValueReference
-from vellum.workflows.state import BaseState
 from vellum.workflows.references.trigger import TriggerAttributeReference
+from vellum.workflows.state import BaseState
 from vellum.workflows.triggers.base import BaseTrigger
 from vellum_ee.workflows.display.base import WorkflowInputsDisplay, WorkflowMetaDisplay
 from vellum_ee.workflows.display.editor.types import NodeDisplayData
@@ -25,11 +25,10 @@ from vellum_ee.workflows.display.utils.vellum import (
     NodeInputValuePointerRule,
     NodeOutputData,
     NodeOutputPointer,
-    WorkflowStateData,
-    WorkflowStatePointer,
-    create_node_input_value_pointer_rule,
     TriggerAttributeData,
     TriggerAttributePointer,
+    WorkflowStateData,
+    WorkflowStatePointer,
     create_node_input_value_pointer_rule,
 )
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
