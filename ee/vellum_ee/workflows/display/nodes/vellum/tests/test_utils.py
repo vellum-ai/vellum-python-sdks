@@ -8,6 +8,8 @@ from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.references import LazyReference
+from vellum.workflows.references.trigger import TriggerAttributeReference
+from vellum.workflows.triggers.base import BaseTrigger
 from vellum_ee.workflows.display.base import WorkflowInputsDisplay, WorkflowMetaDisplay
 from vellum_ee.workflows.display.editor.types import NodeDisplayData
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
@@ -21,6 +23,9 @@ from vellum_ee.workflows.display.utils.vellum import (
     NodeInputValuePointerRule,
     NodeOutputData,
     NodeOutputPointer,
+    TriggerAttributeData,
+    TriggerAttributePointer,
+    create_node_input_value_pointer_rule,
 )
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 
@@ -131,3 +136,29 @@ def test_create_node_input_value_pointer_rules(
         ),
     )
     assert rules == expected_rules
+
+
+class MyTrigger(BaseTrigger):
+    my_attribute: str
+
+
+def test_create_node_input_value_pointer_rule__trigger_attribute_reference() -> None:
+    """
+    Tests that TriggerAttributeReference is serialized to TriggerAttributePointer.
+    """
+
+    # GIVEN a TriggerAttributeReference
+    trigger_attribute_reference: TriggerAttributeReference[str] = MyTrigger.my_attribute  # type: ignore[assignment]
+
+    # AND a display context
+    display_context = WorkflowDisplayContext()
+
+    # WHEN we create a node input value pointer rule
+    result = create_node_input_value_pointer_rule(trigger_attribute_reference, display_context)
+
+    # THEN we should get a TriggerAttributePointer with the correct data
+    assert isinstance(result, TriggerAttributePointer)
+    assert result.type == "TRIGGER_ATTRIBUTE"
+    assert isinstance(result.data, TriggerAttributeData)
+    assert result.data.trigger_id == str(MyTrigger.__id__)
+    assert result.data.attribute_id == str(trigger_attribute_reference.id)
