@@ -75,6 +75,7 @@ from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.mocks import MockNodeExecutionArg
 from vellum.workflows.nodes.utils import get_unadorned_node
 from vellum.workflows.outputs import BaseOutputs
+from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.resolvers.base import BaseWorkflowResolver
 from vellum.workflows.runner import WorkflowRunner
 from vellum.workflows.runner.runner import ExternalInputsArg, RunFromNodeArg
@@ -735,12 +736,27 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         return self.get_inputs_class()()
 
     def get_default_state(
-        self, workflow_inputs: Optional[InputsType] = None, execution_id: Optional[UUID] = None
+        self,
+        workflow_inputs: Optional[InputsType] = None,
+        execution_id: Optional[UUID] = None,
+        *,
+        trigger_attributes: Optional[Dict[TriggerAttributeReference, Any]] = None,
     ) -> StateType:
-        meta = StateMeta(
-            parent=self._parent_state,
-            workflow_inputs=workflow_inputs or self.get_default_inputs(),
-            workflow_definition=self.__class__,
+        resolved_inputs: Optional[InputsType] = workflow_inputs
+
+        meta_payload: Dict[str, Any] = {
+            "parent": self._parent_state,
+            "workflow_definition": self.__class__,
+            "workflow_inputs": resolved_inputs,
+        }
+        if trigger_attributes is not None:
+            meta_payload["trigger_attributes"] = trigger_attributes
+
+        meta = StateMeta.model_validate(
+            meta_payload,
+            context={
+                "workflow_definition": self.__class__,
+            },
         )
 
         # Makes the uuid factory mocker work this way instead of setting in cosntructor
@@ -799,11 +815,13 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
 
         state_class = cls.get_state_class()
         if "meta" in state:
+            meta_payload = dict(state["meta"])
+            if workflow_inputs is not None:
+                meta_payload["workflow_inputs"] = workflow_inputs
+            meta_payload.setdefault("workflow_definition", cls)
+
             state["meta"] = StateMeta.model_validate(
-                {
-                    **state["meta"],
-                    "workflow_inputs": workflow_inputs,
-                },
+                meta_payload,
                 context={
                     "workflow_definition": cls,
                 },

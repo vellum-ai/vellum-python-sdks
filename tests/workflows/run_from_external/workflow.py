@@ -88,7 +88,13 @@ class MockFileResolver(BaseWorkflowResolver):
                 data = json.loads(content)
 
             for serialized_state in data["snapshots"]:
-                meta = StateMeta.model_validate(serialized_state.pop("meta"))
+                meta_payload = serialized_state.pop("meta")
+                meta = StateMeta.model_validate(
+                    meta_payload,
+                    context={
+                        "workflow_definition": RunFromExternalWorkflow,
+                    },
+                )
                 snapshot = BaseState(
                     **serialized_state,
                     meta=meta,

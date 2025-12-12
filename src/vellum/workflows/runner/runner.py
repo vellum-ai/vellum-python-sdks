@@ -64,6 +64,7 @@ from vellum.workflows.events.workflow import (
     WorkflowExecutionStreamingBody,
 )
 from vellum.workflows.exceptions import NodeException, WorkflowInitializationException
+from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.bases.base import NodeRunResponse
 from vellum.workflows.nodes.mocks import MockNodeExecutionArg
@@ -209,14 +210,18 @@ class WorkflowRunner(Generic[StateType]):
             self._entrypoints = self.workflow.get_entrypoints()
         elif trigger:
             # When trigger is provided, set up default state and filter entrypoints by trigger type
-            normalized_inputs = deepcopy(inputs) if inputs else self.workflow.get_default_inputs()
+            default_inputs = deepcopy(inputs) if inputs else None
             if state:
                 self._initial_state = deepcopy(state)
-                self._initial_state.meta.workflow_inputs = normalized_inputs
+                self._initial_state.meta.workflow_inputs = default_inputs
                 self._initial_state.meta.span_id = execution_id or uuid4()
                 self._initial_state.meta.workflow_definition = self.workflow.__class__
             else:
-                self._initial_state = self.workflow.get_default_state(normalized_inputs, execution_id)
+                self._initial_state = self.workflow.get_default_state(
+                    default_inputs,
+                    execution_id,
+                    trigger_attributes={},
+                )
                 self._should_emit_initial_state = False
 
             # Validate and bind trigger, then filter entrypoints
@@ -938,7 +943,7 @@ class WorkflowRunner(Generic[StateType]):
             span_id=self._initial_state.meta.span_id,
             body=WorkflowExecutionInitiatedBody(
                 workflow_definition=self.workflow.__class__,
-                inputs=self._initial_state.meta.workflow_inputs,
+                inputs=self._initial_state.meta.workflow_inputs or BaseInputs(),
                 initial_state=deepcopy(self._initial_state) if self._should_emit_initial_state else None,
                 trigger=self._trigger.__class__ if self._trigger else None,
             ),

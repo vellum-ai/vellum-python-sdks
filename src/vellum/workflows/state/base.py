@@ -310,10 +310,10 @@ class StateMeta(UniversalBaseModel):
     id: UUID = field(default_factory=uuid4_default_factory)
     span_id: UUID = field(default_factory=uuid4_default_factory)
     updated_ts: datetime = field(default_factory=default_datetime_factory)
-    workflow_inputs: BaseInputs = field(default_factory=BaseInputs)
+    trigger_attributes: Optional[Dict[TriggerAttributeReference, Any]] = field(default=None)
+    workflow_inputs: Optional[BaseInputs] = field(default=None)
     external_inputs: Dict[ExternalInputReference, Any] = field(default_factory=dict)
     node_outputs: Dict[OutputReference, Any] = field(default_factory=dict)
-    trigger_attributes: Dict[TriggerAttributeReference, Any] = field(default_factory=dict)
     node_execution_cache: NodeExecutionCache = field(default_factory=NodeExecutionCache)
     parent: Optional["BaseState"] = None
     __snapshot_callback__: Optional[Callable[[Optional[StateDelta]], None]] = field(init=False, default=None)
@@ -321,10 +321,23 @@ class StateMeta(UniversalBaseModel):
     def model_post_init(self, context: Any) -> None:
         self.__snapshot_callback__ = None
 
+        # Auto-populate workflow_inputs with defaults only if trigger_attributes is None
+        # (trigger_attributes being set indicates a trigger-based workflow where we don't want default inputs)
+        if self.workflow_inputs is None and self.trigger_attributes is None:
+            workflow_definition = (
+                self.workflow_definition if is_workflow_class(self.workflow_definition) else import_workflow_class()
+            )
+            try:
+                inputs_class = workflow_definition.get_inputs_class()
+                self.workflow_inputs = inputs_class()
+            except Exception:
+                self.workflow_inputs = BaseInputs()
+
     def add_snapshot_callback(self, callback: Callable[[Optional[StateDelta]], None]) -> None:
         self.node_outputs = _make_snapshottable("meta.node_outputs", self.node_outputs, callback)
         self.external_inputs = _make_snapshottable("meta.external_inputs", self.external_inputs, callback)
-        self.trigger_attributes = _make_snapshottable("meta.trigger_attributes", self.trigger_attributes, callback)
+        if self.trigger_attributes is not None:
+            self.trigger_attributes = _make_snapshottable("meta.trigger_attributes", self.trigger_attributes, callback)
         self.__snapshot_callback__ = callback
 
     def __setattr__(self, name: str, value: Any) -> None:
@@ -361,8 +374,10 @@ class StateMeta(UniversalBaseModel):
 
     @field_serializer("trigger_attributes")
     def serialize_trigger_attributes(
-        self, trigger_attributes: Dict[TriggerAttributeReference, Any], _info: Any
+        self, trigger_attributes: Optional[Dict[TriggerAttributeReference, Any]], _info: Any
     ) -> Dict[str, Any]:
+        if trigger_attributes is None:
+            return {}
         return {str(descriptor.id): value for descriptor, value in trigger_attributes.items()}
 
     @field_validator("node_outputs", mode="before")
@@ -455,11 +470,10 @@ class StateMeta(UniversalBaseModel):
     @field_validator("workflow_inputs", mode="before")
     @classmethod
     def deserialize_workflow_inputs(cls, workflow_inputs: Any, info: ValidationInfo):
-        workflow_definition = cls._get_workflow(info)
+        context = info.context if isinstance(info.context, dict) else {}
+        workflow_definition = context.get("workflow_definition") or cls._get_workflow(info)
 
         if workflow_definition:
-            if workflow_inputs is None:
-                return workflow_definition.get_inputs_class()()
             if isinstance(workflow_inputs, dict):
                 return workflow_definition.get_inputs_class()(**workflow_inputs)
 
