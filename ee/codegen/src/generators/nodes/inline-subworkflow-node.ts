@@ -35,11 +35,8 @@ export class InlineSubworkflowNode extends BaseNestedWorkflowNode<
     // InputsType: Reference to the Inputs class from the nested workflow
     const inputsType = python.Type.reference(
       new Reference({
-        name: "Inputs",
-        modulePath: [
-          ...nestedWorkflowContext.modulePath.slice(0, -1),
-          "inputs",
-        ],
+        name: "BaseInputs",
+        modulePath: nestedWorkflowContext.sdkModulePathNames.INPUTS_MODULE_PATH,
       })
     );
 
