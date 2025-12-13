@@ -36,7 +36,7 @@ export class InlineSubworkflowNode extends BaseNestedWorkflowNode<
     const inputsType = python.Type.reference(
       new Reference({
         name: "BaseInputs",
-        modulePath: ["vellum", "workflows", "inputs"],
+        modulePath: nestedWorkflowContext.sdkModulePathNames.INPUTS_MODULE_PATH,
       })
     );
 
