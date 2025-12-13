@@ -269,3 +269,41 @@ def test_api_node_passes_timeout_to_vellum_client(vellum_client):
     # AND the call should include RequestOptions with the correct timeout
     assert request_options is not None
     assert request_options["timeout_in_seconds"] == 25
+
+
+def test_api_node_supports_state_type_parameter(vellum_client):
+    """Test that APINode supports StateType generic parameter."""
+
+    # GIVEN a state class
+    from vellum.workflows.state.base import BaseState
+
+    class TestState(BaseState):
+        counter: int = 0
+
+    # AND an API node that uses the StateType parameter
+    class TestAPINode(APINode[TestState]):
+        method = APIRequestMethod.GET
+        authorization_type = AuthorizationType.BEARER_TOKEN
+        url = "https://example.com"
+        bearer_token_value = VellumSecret(name="secret")
+
+    # AND a mock response from the API
+    vellum_client.execute_api.return_value = ExecuteApiResponse(
+        status_code=200,
+        text='{"result": "success"}',
+        json_={"result": "success"},
+        headers={"content-type": "application/json"},
+    )
+
+    # WHEN we create and run the node with a state instance
+    state = TestState()
+    node = TestAPINode(state=state)
+    outputs = node.run()
+
+    # THEN the node should run successfully
+    assert vellum_client.execute_api.call_count == 1
+    assert outputs.status_code == 200
+    assert outputs.json == {"result": "success"}
+
+    # AND the state should be accessible (though not modified by the API node)
+    assert state.counter == 0
