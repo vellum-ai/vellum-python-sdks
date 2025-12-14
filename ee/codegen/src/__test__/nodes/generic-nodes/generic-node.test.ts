@@ -756,4 +756,70 @@ describe("GenericNode", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
+
+  // TODO: Unskip this test once vembda-side issues are resolved
+  describe.skip("node_id skipping when it matches hash-generated UUID", () => {
+    /**
+     * Tests that node_id is omitted from the display class when it matches
+     * the deterministically generated UUID from the node's module path and class name.
+     */
+    it("getNodeDisplayFile should skip node_id when it matches hash", async () => {
+      // GIVEN a generic node with an ID that matches the hash-generated UUID
+      // The hash of "my_nodes.my_custom_node.MyCustomNode" is "1be19097-e8d7-4acc-8bb5-2a99dc12dece"
+      const nodeData = genericNodeFactory({
+        id: "1be19097-e8d7-4acc-8bb5-2a99dc12dece",
+        label: "MyCustomNode",
+        nodePorts: [
+          nodePortFactory({
+            id: "2544f9e4-d6e6-4475-b6a9-13393115d77c",
+          }),
+        ],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      // WHEN we generate the node display file
+      node.getNodeDisplayFile().write(writer);
+
+      // THEN the output should match the snapshot (without node_id attribute)
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("getNodeDisplayFile should include node_id when it does not match hash", async () => {
+      // GIVEN a generic node with an ID that does NOT match the hash-generated UUID
+      const nodeData = genericNodeFactory({
+        id: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+        label: "MyCustomNode",
+        nodePorts: [
+          nodePortFactory({
+            id: "2544f9e4-d6e6-4475-b6a9-13393115d77c",
+          }),
+        ],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      // WHEN we generate the node display file
+      node.getNodeDisplayFile().write(writer);
+
+      // THEN the output should match the snapshot (with node_id attribute)
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });

@@ -44,6 +44,8 @@ import { pascalToTitleCase, toValidPythonIdentifier } from "src/utils/casing";
 import { findNodeDefinitionByBaseClassName } from "src/utils/node-definitions";
 import { doesModulePathStartWith } from "src/utils/paths";
 import { isNilOrEmpty } from "src/utils/typing";
+// TODO: Uncomment when vembda-side issues are resolved
+// import { getNodeIdFromDefinition } from "src/utils/uuids";
 
 export declare namespace BaseNode {
   interface Args<T extends WorkflowDataNode, V extends BaseNodeContext<T>> {
@@ -779,12 +781,17 @@ export abstract class BaseNode<
       );
     }
 
+    // TODO: Uncomment this check once vembda-side issues are resolved
+    // Only add node_id if it differs from the hash-generated UUID
+    // const expectedNodeId = getNodeIdFromDefinition(this.nodeData.definition);
+    // if (expectedNodeId === undefined || this.nodeData.id !== expectedNodeId) {
     nodeClass.add(
       python.field({
         name: "node_id",
         initializer: python.TypeInstantiation.uuid(this.nodeData.id),
       })
     );
+    // }
 
     this.getNodeDisplayClassBodyStatements().forEach((statement) =>
       nodeClass.add(statement)
