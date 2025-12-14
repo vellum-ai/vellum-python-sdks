@@ -35,6 +35,9 @@ jobs:
         run: poetry run flake8
       - name: Compile
         run: poetry run mypy .
+      - name: Type Check (ty)
+        run: poetry run ty check
+        continue-on-error: true
   test:
     runs-on: ubuntu-latest
     steps:
