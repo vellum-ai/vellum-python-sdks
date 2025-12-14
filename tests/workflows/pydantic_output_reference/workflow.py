@@ -30,15 +30,15 @@ class FirstNode(BaseNode):
 
 
 class SecondNode(BaseNode):
-    """A node that references a field from the Pydantic model output."""
+    """A node that references a Pydantic model output and operates on its field."""
 
-    user_name = FirstNode.Outputs.profile["name"]
+    profile = FirstNode.Outputs.profile
 
     class Outputs(BaseOutputs):
         greeting: str
 
     def run(self) -> BaseOutputs:
-        return self.Outputs(greeting=f"Hello, {self.user_name}!")
+        return self.Outputs(greeting=f"Hello, {self.profile.name}!")
 
 
 class PydanticOutputReferenceWorkflow(BaseWorkflow):
