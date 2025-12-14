@@ -34,18 +34,24 @@ export function uuid4FromHash(inputStr: string): string {
 }
 
 /**
- * Generate a deterministic node ID from a module path and class name.
+ * Generate a deterministic node ID from a code resource definition.
  * This matches the Python SDK's node ID generation pattern:
  * uuid4_from_hash(f"{node_class.__module__}.{node_class.__qualname__}")
  *
- * @param modulePath - The module path as an array of strings
- * @param className - The class name
- * @returns A UUID v4 string
+ * @param definition - The code resource definition containing module path and name
+ * @returns A UUID v4 string, or undefined if definition is not provided
  */
-export function getNodeIdFromModuleAndName(
-  modulePath: readonly string[],
-  className: string
-): string {
-  const moduleStr = modulePath.join(".");
-  return uuid4FromHash(`${moduleStr}.${className}`);
+export function getNodeIdFromDefinition(
+  definition:
+    | {
+        module: readonly string[];
+        name: string;
+      }
+    | undefined
+): string | undefined {
+  if (!definition) {
+    return undefined;
+  }
+  const moduleStr = definition.module.join(".");
+  return uuid4FromHash(`${moduleStr}.${definition.name}`);
 }

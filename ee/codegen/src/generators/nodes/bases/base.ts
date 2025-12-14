@@ -43,7 +43,8 @@ import { pascalToTitleCase, toValidPythonIdentifier } from "src/utils/casing";
 import { findNodeDefinitionByBaseClassName } from "src/utils/node-definitions";
 import { doesModulePathStartWith } from "src/utils/paths";
 import { isNilOrEmpty } from "src/utils/typing";
-import { getNodeIdFromModuleAndName } from "src/utils/uuids";
+// TODO: Uncomment when vembda-side issues are resolved
+// import { getNodeIdFromDefinition } from "src/utils/uuids";
 
 export declare namespace BaseNode {
   interface Args<T extends WorkflowDataNode, V extends BaseNodeContext<T>> {
@@ -779,22 +780,17 @@ export abstract class BaseNode<
       );
     }
 
+    // TODO: Uncomment this check once vembda-side issues are resolved
     // Only add node_id if it differs from the hash-generated UUID
-    // Use the node's definition module path (matching Python SDK's node_class.__module__)
-    const definitionModule = this.nodeData.definition?.module;
-    const definitionName = this.nodeData.definition?.name;
-    const expectedNodeId =
-      definitionModule && definitionName
-        ? getNodeIdFromModuleAndName(definitionModule, definitionName)
-        : undefined;
-    if (expectedNodeId === undefined || this.nodeData.id !== expectedNodeId) {
-      nodeClass.add(
-        python.field({
-          name: "node_id",
-          initializer: python.TypeInstantiation.uuid(this.nodeData.id),
-        })
-      );
-    }
+    // const expectedNodeId = getNodeIdFromDefinition(this.nodeData.definition);
+    // if (expectedNodeId === undefined || this.nodeData.id !== expectedNodeId) {
+    nodeClass.add(
+      python.field({
+        name: "node_id",
+        initializer: python.TypeInstantiation.uuid(this.nodeData.id),
+      })
+    );
+    // }
 
     this.getNodeDisplayClassBodyStatements().forEach((statement) =>
       nodeClass.add(statement)
