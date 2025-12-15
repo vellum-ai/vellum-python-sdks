@@ -1,4 +1,4 @@
-from typing import Generic
+from typing import Any, Dict, Generic, Optional
 
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.types import MergeBehavior
@@ -9,6 +9,9 @@ class NoteNode(BaseNode[StateType], Generic[StateType]):
     """
     A no-op Node purely used to display a note in the Vellum UI.
     """
+
+    text: str = ""
+    style: Optional[Dict[str, Any]] = None
 
     class Display(BaseNode.Display):
         icon = "vellum:icon:note"
