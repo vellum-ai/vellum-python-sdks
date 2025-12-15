@@ -1,5 +1,6 @@
-import { AstNode } from "./ast-node";
-import { Writer } from "./writer";
+import { AstNode } from "src/generators/extensions/ast-node";
+import { TypeInstantiation } from "src/generators/extensions/type-instantiation";
+import { Writer } from "src/generators/extensions/writer";
 
 export declare namespace ListInstantiation {
   interface Config {
@@ -7,7 +8,7 @@ export declare namespace ListInstantiation {
   }
 }
 
-export class ListInstantiation extends AstNode {
+export class ListInstantiation extends TypeInstantiation {
   private readonly values: AstNode[];
   private readonly config: ListInstantiation.Config;
 

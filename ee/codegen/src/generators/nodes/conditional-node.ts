@@ -9,6 +9,7 @@ import { Class } from "src/generators/extensions/class";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
+import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
@@ -170,7 +171,7 @@ export class ConditionalNode extends BaseNode<
               name: "rule_group_id",
               value: condition.data
                 ? new StrInstantiation(condition.data.id)
-                : python.TypeInstantiation.none(),
+                : new NoneInstantiation(),
             }),
           ],
         })
@@ -233,23 +234,23 @@ export class ConditionalNode extends BaseNode<
         }),
         new MethodArgument({
           name: "lhs",
-          value: lhs ? lhs : python.TypeInstantiation.none(),
+          value: lhs ? lhs : new NoneInstantiation(),
         }),
         new MethodArgument({
           name: "rhs",
-          value: rhs ? rhs : python.TypeInstantiation.none(),
+          value: rhs ? rhs : new NoneInstantiation(),
         }),
         new MethodArgument({
           name: "field_node_input_id",
           value: fieldId
             ? new StrInstantiation(fieldId)
-            : python.TypeInstantiation.none(),
+            : new NoneInstantiation(),
         }),
         new MethodArgument({
           name: "value_node_input_id",
           value: valueId
             ? new StrInstantiation(valueId)
-            : python.TypeInstantiation.none(),
+            : new NoneInstantiation(),
         }),
       ],
     });

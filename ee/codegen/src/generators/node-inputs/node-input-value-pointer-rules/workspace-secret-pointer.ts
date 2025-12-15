@@ -1,20 +1,21 @@
-import { python } from "@fern-api/python-ast";
 import { isNil } from "lodash";
 
 import { BaseNodeInputValuePointerRule } from "./base";
 
+import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
+import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { WorkspaceSecretPointer as WorkspaceSecretPointerType } from "src/types/vellum";
 
 export class WorkspaceSecretPointerRule extends BaseNodeInputValuePointerRule<WorkspaceSecretPointerType> {
-  getAstNode(): python.AstNode {
+  getAstNode(): AstNode {
     const workspaceSecretPointerData = this.nodeInputValuePointerRule.data;
 
     if (!workspaceSecretPointerData.workspaceSecretId) {
-      return python.TypeInstantiation.none();
+      return new NoneInstantiation();
     }
 
     const workspaceSecretName = this.workflowContext.getWorkspaceSecretName(
@@ -22,7 +23,7 @@ export class WorkspaceSecretPointerRule extends BaseNodeInputValuePointerRule<Wo
     );
 
     if (isNil(workspaceSecretName)) {
-      return python.TypeInstantiation.none();
+      return new NoneInstantiation();
     }
 
     return new ClassInstantiation({

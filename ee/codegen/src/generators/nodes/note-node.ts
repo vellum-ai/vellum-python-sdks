@@ -3,6 +3,7 @@ import { Field } from "@fern-api/python-ast/Field";
 
 import { NoteNodeContext } from "src/context/node-context/note-node";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Json } from "src/generators/json";
 import { BaseNode } from "src/generators/nodes/bases/base";
@@ -26,7 +27,7 @@ export class NoteNode extends BaseNode<NoteNodeType, NoteNodeContext> {
 
     const styleValue = this.nodeData.data.style
       ? new Json(this.nodeData.data.style)
-      : python.TypeInstantiation.none();
+      : new NoneInstantiation();
 
     statements.push(
       python.field({

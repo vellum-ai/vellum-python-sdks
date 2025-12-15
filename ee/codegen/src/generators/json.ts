@@ -4,6 +4,7 @@ import { ValueGenerationError } from "./errors";
 
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
+import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 
@@ -26,7 +27,7 @@ export class Json extends AstNode {
 
   private generateAstNode(value: unknown): python.AstNode {
     if (value === null || value === undefined) {
-      return python.TypeInstantiation.none();
+      return new NoneInstantiation();
     }
 
     if (typeof value === "string") {
