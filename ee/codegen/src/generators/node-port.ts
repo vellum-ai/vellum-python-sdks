@@ -6,6 +6,7 @@ import { NodeAttributeGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
 import { MethodArgument } from "src/generators/extensions/method-argument";
+import { MethodInvocation } from "src/generators/extensions/method-invocation";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { Writer } from "src/generators/extensions/writer";
@@ -138,7 +139,7 @@ export class NodePorts extends AstNode {
         })
       );
     }
-    return python.invokeMethod({
+    return new MethodInvocation({
       methodReference: new Reference({
         name: "Port",
         modulePath: this.workflowContext.sdkModulePathNames.PORTS_MODULE_PATH,

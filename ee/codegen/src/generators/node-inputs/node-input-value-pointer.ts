@@ -8,6 +8,7 @@ import { BaseCodegenError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
+import { MethodInvocation } from "src/generators/extensions/method-invocation";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { Writer } from "src/generators/extensions/writer";
@@ -91,7 +92,7 @@ export class NodeInputValuePointer extends AstNode {
 
       expression = python.accessAttribute({
         lhs: expression,
-        rhs: python.invokeMethod({
+        rhs: new MethodInvocation({
           methodReference: new Reference({
             name: "coalesce",
           }),

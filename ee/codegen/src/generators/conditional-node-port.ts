@@ -1,4 +1,3 @@
-import { python } from "@fern-api/python-ast";
 import { isNil } from "lodash";
 import { VellumVariableType } from "vellum-ai/api";
 
@@ -9,6 +8,7 @@ import { PortContext } from "src/context/port-context";
 import { Expression } from "src/generators/expression";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { MethodArgument } from "src/generators/extensions/method-argument";
+import { MethodInvocation } from "src/generators/extensions/method-invocation";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { Writer } from "src/generators/extensions/writer";
@@ -69,7 +69,7 @@ export class ConditionalNodePort extends AstNode {
   }
 
   private constructPort(): AstNode {
-    return python.invokeMethod({
+    return new MethodInvocation({
       methodReference: new Reference({
         name: "Port",
         modulePath:

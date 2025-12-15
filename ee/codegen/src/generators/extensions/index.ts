@@ -15,6 +15,7 @@ export * from "./field";
 export * from "./list";
 export * from "./list-instantiation";
 export * from "./method-argument";
+export * from "./method-invocation";
 export * from "./none";
 export * from "./none-instantiation";
 export * from "./optional";

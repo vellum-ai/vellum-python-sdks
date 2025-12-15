@@ -1,6 +1,5 @@
-import { python } from "@fern-api/python-ast";
-
 import { AstNode } from "./ast-node";
+import { MethodInvocation } from "./method-invocation";
 import { Writer } from "./writer";
 
 /**
@@ -10,14 +9,14 @@ import { Writer } from "./writer";
 export declare namespace WrappedCall {
   interface Args {
     /** The wrapper function invocation (e.g., tool(...)) */
-    wrapper: python.MethodInvocation;
+    wrapper: MethodInvocation;
     /** The inner value to pass to the wrapper result (e.g., the function reference) */
     inner: AstNode;
   }
 }
 
 export class WrappedCall extends AstNode {
-  private readonly wrapper: python.MethodInvocation;
+  private readonly wrapper: MethodInvocation;
   private readonly inner: AstNode;
 
   constructor({ wrapper, inner }: WrappedCall.Args) {
