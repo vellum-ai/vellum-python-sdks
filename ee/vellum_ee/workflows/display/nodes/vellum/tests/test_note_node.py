@@ -57,9 +57,9 @@ def test_serialize_workflow__graph_with_only_note_nodes():
         text = "Second note"
         style = {"fontSize": 20}
 
-    # AND a workflow with only note nodes in the graph
+    # AND a workflow with only note nodes in unused_graphs
     class Workflow(BaseWorkflow):
-        graph = {FirstNoteNode, SecondNoteNode}  # type: ignore[assignment]
+        unused_graphs = {FirstNoteNode, SecondNoteNode}  # type: ignore[assignment]
 
     # WHEN the workflow is serialized
     workflow_display = get_workflow_display(workflow_class=Workflow)
