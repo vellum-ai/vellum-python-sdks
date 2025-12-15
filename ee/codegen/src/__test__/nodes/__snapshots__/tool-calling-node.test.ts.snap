@@ -139,6 +139,37 @@ class ToolCallingNode(BaseToolCallingNode):
 "
 `;
 
+exports[`ToolCallingNode > examples > should generate tool decorator with both inputs and examples 1`] = `
+"from .get_current_weather import get_current_weather
+
+from vellum.workflows.nodes.displayable.tool_calling_node import (
+    ToolCallingNode as BaseToolCallingNode,
+)
+from vellum.workflows.utils.functions import tool
+
+from ..inputs import Inputs
+
+
+class ToolCallingNode(BaseToolCallingNode):
+    functions = [
+        tool(
+            inputs={
+                "date_input": Inputs.location,
+            },
+            examples=[
+                {
+                    "location": "San Francisco",
+                },
+                {
+                    "location": "New York",
+                    "units": "celsius",
+                },
+            ],
+        )(get_current_weather)
+    ]
+"
+`;
+
 exports[`ToolCallingNode > function name casing > preserves casing: 123invalid 1`] = `
 "from ._123invalid import _123invalid
 
