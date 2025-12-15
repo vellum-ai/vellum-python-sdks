@@ -6,6 +6,7 @@ import { InlinePromptNodeContext } from "src/context/node-context/inline-prompt-
 import { PromptTemplateBlockExcludingFunctionDefinition } from "src/generators/base-prompt-block";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { BoolInstantiation } from "src/generators/extensions/bool-instantiation";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
@@ -185,7 +186,7 @@ export class InlinePromptNode extends BaseNode<
         args.push(
           new MethodArgument({
             name: "stream_enabled",
-            value: python.TypeInstantiation.bool(streamEnabled),
+            value: new BoolInstantiation(streamEnabled),
           })
         );
       }
@@ -432,7 +433,7 @@ export class InlinePromptNode extends BaseNode<
                   classArgs.push(
                     new MethodArgument({
                       name: "function_forced",
-                      value: python.TypeInstantiation.bool(f.forced),
+                      value: new BoolInstantiation(f.forced),
                     })
                   );
                 }
@@ -441,7 +442,7 @@ export class InlinePromptNode extends BaseNode<
                   classArgs.push(
                     new MethodArgument({
                       name: "function_strict",
-                      value: python.TypeInstantiation.bool(f.strict),
+                      value: new BoolInstantiation(f.strict),
                     })
                   );
                 }

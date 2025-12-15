@@ -7,6 +7,7 @@
  */
 
 export * from "./ast-node";
+export * from "./bool-instantiation";
 export * from "./class";
 export * from "./class-instantiation";
 export * from "./comment";

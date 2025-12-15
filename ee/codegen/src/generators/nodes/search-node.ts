@@ -12,6 +12,7 @@ import {
   ValueGenerationError,
 } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { BoolInstantiation } from "src/generators/extensions/bool-instantiation";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
@@ -230,7 +231,7 @@ export class SearchNode extends BaseNode<
         arguments_: [
           new MethodArgument({
             name: "enabled",
-            value: python.TypeInstantiation.bool(false),
+            value: new BoolInstantiation(false),
           }),
         ],
       });
@@ -252,7 +253,7 @@ export class SearchNode extends BaseNode<
         arguments_: [
           new MethodArgument({
             name: "enabled",
-            value: python.TypeInstantiation.bool(false),
+            value: new BoolInstantiation(false),
           }),
         ],
       });
@@ -266,7 +267,7 @@ export class SearchNode extends BaseNode<
       arguments_: [
         new MethodArgument({
           name: "enabled",
-          value: python.TypeInstantiation.bool(Boolean(resultMergingEnabled)),
+          value: new BoolInstantiation(Boolean(resultMergingEnabled)),
         }),
       ],
     });
@@ -570,7 +571,7 @@ export class SearchNodeMetadataFilters extends AstNode {
         }),
         new MethodArgument({
           name: "negated",
-          value: python.TypeInstantiation.bool(data.negated),
+          value: new BoolInstantiation(data.negated),
         }),
         new MethodArgument({
           name: "conditions",
