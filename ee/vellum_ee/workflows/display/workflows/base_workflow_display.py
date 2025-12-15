@@ -496,8 +496,14 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             # Prefer stable id from metadata mapping if present
             stable_edge_id = get_trigger_edge_id(trigger_class, unadorned_target_node, self._workflow.__module__)
 
+            # Generate a unique fallback edge ID using trigger_id and target_node_id
+            # This ensures multiple triggers targeting the same node get unique edge IDs
+            fallback_edge_id = uuid4_from_hash(
+                f"{self.workflow_id}|trigger_edge|{trigger_id}|{target_node_display.node_id}"
+            )
+
             trigger_edge_dict: Dict[str, Json] = {
-                "id": str(stable_edge_id) if stable_edge_id else str(target_entrypoint_display.edge_display.id),
+                "id": str(stable_edge_id) if stable_edge_id else str(fallback_edge_id),
                 "source_node_id": str(source_node_id),
                 "source_handle_id": str(source_handle_id),
                 "target_node_id": str(target_node_display.node_id),
