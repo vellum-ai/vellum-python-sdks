@@ -452,6 +452,37 @@ def test_compile_inline_workflow_function_definition__optionals():
     )
 
 
+def test_compile_inline_workflow_function_definition__examples():
+    class MyNode(BaseNode):
+        pass
+
+    @tool(
+        examples=[
+            {"location": "San Francisco", "query": "restaurants"},
+            {"location": "New York", "query": "hotels"},
+        ]
+    )
+    class MyWorkflow(BaseWorkflow):
+        graph = MyNode
+
+    # WHEN compiling the workflow
+    compiled_function = compile_inline_workflow_function_definition(MyWorkflow)
+
+    # THEN it should return the compiled function definition with examples
+    assert compiled_function == FunctionDefinition(
+        name="my_workflow",
+        parameters={
+            "type": "object",
+            "properties": {},
+            "required": [],
+            "examples": [
+                {"location": "San Francisco", "query": "restaurants"},
+                {"location": "New York", "query": "hotels"},
+            ],
+        },
+    )
+
+
 def test_compile_workflow_deployment_function_definition__just_name():
     # GIVEN a mock Vellum client and deployment
     mock_client = Mock()
