@@ -20,6 +20,7 @@ import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
+import { MethodInvocation } from "src/generators/extensions/method-invocation";
 import { Reference } from "src/generators/extensions/reference";
 import { StarImport } from "src/generators/extensions/star-import";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -637,7 +638,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     }
     return this.nodeData.adornments.map((adornment) =>
       python.decorator({
-        callable: python.invokeMethod({
+        callable: new MethodInvocation({
           methodReference: new Reference({
             name: adornment.base.name,
             attribute: ["wrap"],
@@ -892,7 +893,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
    */
   private getToolInvocation(
     inputs: Record<string, WorkflowValueDescriptorType>
-  ): python.MethodInvocation {
+  ): MethodInvocation {
     // Build dict entries for the inputs parameter
     const dictEntries = Object.entries(inputs).map(([inputName, inputDef]) => {
       const workflowValueDescriptor = new WorkflowValueDescriptor({
@@ -912,7 +913,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
       endWithComma: true,
     });
 
-    return python.invokeMethod({
+    return new MethodInvocation({
       methodReference: new Reference({
         name: "tool",
         modulePath: ["vellum", "workflows", "utils", "functions"],

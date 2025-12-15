@@ -7,6 +7,7 @@ import {
 } from "src/constants";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { MethodArgument } from "src/generators/extensions/method-argument";
+import { MethodInvocation } from "src/generators/extensions/method-invocation";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { Writer } from "src/generators/extensions/writer";
@@ -1419,7 +1420,7 @@ export class GraphAttribute extends AstNode {
           name: "Graph",
           modulePath: VELLUM_WORKFLOW_GRAPH_MODULE_PATH,
         }),
-        rhs: python.invokeMethod({
+        rhs: new MethodInvocation({
           methodReference: new Reference({
             name: "empty",
           }),
@@ -1469,7 +1470,7 @@ export class GraphAttribute extends AstNode {
             name: "Graph",
             modulePath: VELLUM_WORKFLOW_GRAPH_MODULE_PATH,
           }),
-          rhs: python.invokeMethod({
+          rhs: new MethodInvocation({
             methodReference: new Reference({
               name: "from_set",
             }),

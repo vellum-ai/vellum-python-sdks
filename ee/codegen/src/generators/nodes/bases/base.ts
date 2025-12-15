@@ -19,6 +19,7 @@ import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
+import { MethodInvocation } from "src/generators/extensions/method-invocation";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { NodeDisplay } from "src/generators/node-display";
@@ -534,7 +535,7 @@ export abstract class BaseNode<
       if (adornment.base) {
         decorators.push(
           python.decorator({
-            callable: python.invokeMethod({
+            callable: new MethodInvocation({
               methodReference: new Reference({
                 name: adornment.base.name,
                 attribute: ["wrap"],
@@ -579,7 +580,7 @@ export abstract class BaseNode<
     if (errorOutputId && !tryAdornmentExists) {
       decorators.push(
         python.decorator({
-          callable: python.invokeMethod({
+          callable: new MethodInvocation({
             methodReference: new Reference({
               name: "TryNode",
               attribute: ["wrap"],
@@ -713,7 +714,7 @@ export abstract class BaseNode<
       if (adornment.base) {
         decorators.push(
           python.decorator({
-            callable: python.invokeMethod({
+            callable: new MethodInvocation({
               methodReference: new Reference({
                 name: `Base${adornment.base.name}Display`,
                 attribute: ["wrap"],
@@ -738,7 +739,7 @@ export abstract class BaseNode<
     if (errorOutputId && !tryAdornmentExists) {
       decorators.push(
         python.decorator({
-          callable: python.invokeMethod({
+          callable: new MethodInvocation({
             methodReference: new Reference({
               name: "BaseTryNodeDisplay",
               attribute: ["wrap"],
