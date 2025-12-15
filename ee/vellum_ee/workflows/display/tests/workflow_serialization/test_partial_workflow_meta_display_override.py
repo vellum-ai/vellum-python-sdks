@@ -43,7 +43,9 @@ def test_triggerless_workflow_with_partial_display_override_creates_entrypoint()
     entrypoint_node = entrypoint_nodes[0]
     assert isinstance(entrypoint_node, dict)
     assert entrypoint_node["id"] is not None, "ENTRYPOINT node should have a non-None id"
-    source_handle_id = entrypoint_node["data"]["source_handle_id"]
+    entrypoint_data = entrypoint_node["data"]
+    assert isinstance(entrypoint_data, dict)
+    source_handle_id = entrypoint_data["source_handle_id"]
     assert source_handle_id is not None, "ENTRYPOINT node should have a non-None source_handle_id"
 
     # AND there should be an edge from ENTRYPOINT to the process node
