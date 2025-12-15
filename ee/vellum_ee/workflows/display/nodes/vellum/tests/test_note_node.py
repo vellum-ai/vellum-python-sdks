@@ -1,6 +1,5 @@
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.nodes.displayable.note_node.node import NoteNode
-from vellum_ee.workflows.display.nodes.vellum.note_node import BaseNoteNodeDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 
@@ -9,18 +8,14 @@ def test_serialize_node__note_node():
     Tests that a single note node is properly serialized in a workflow.
     """
 
-    # GIVEN a note node
+    # GIVEN a note node with text and style defined on the node class
     class MyNoteNode(NoteNode):
-        pass
-
-    # AND a display class for the note node
-    class MyNoteNodeDisplay(BaseNoteNodeDisplay[MyNoteNode]):
         text = "This makes sense"
         style = {
             "fontSize": 24,
         }
 
-    # AND a workflow with the code node
+    # AND a workflow with the note node
     class Workflow(BaseWorkflow):
         graph = MyNoteNode
 
@@ -41,19 +36,12 @@ def test_serialize_workflow__graph_with_only_note_nodes():
     Tests that a workflow with only note nodes properly serializes all note nodes in the final payload.
     """
 
-    # GIVEN multiple note nodes
+    # GIVEN multiple note nodes with text and style defined on the node classes
     class FirstNoteNode(NoteNode):
-        pass
-
-    class SecondNoteNode(NoteNode):
-        pass
-
-    # AND display classes for the note nodes
-    class FirstNoteNodeDisplay(BaseNoteNodeDisplay[FirstNoteNode]):
         text = "First note"
         style = {"fontSize": 16}
 
-    class SecondNoteNodeDisplay(BaseNoteNodeDisplay[SecondNoteNode]):
+    class SecondNoteNode(NoteNode):
         text = "Second note"
         style = {"fontSize": 20}
 
