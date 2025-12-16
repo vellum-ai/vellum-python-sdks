@@ -33,7 +33,7 @@ def test_serialize_workflow(vellum_client):
             input_variables=[],
             output_variables=[],
         ),
-        deployment=WorkflowDeploymentReleaseWorkflowDeployment(name="test-name"),
+        deployment=WorkflowDeploymentReleaseWorkflowDeployment(id="test-deployment-id", name="test-name"),
         description="test-description",  # main mock
         release_tags=[
             ReleaseReleaseTag(

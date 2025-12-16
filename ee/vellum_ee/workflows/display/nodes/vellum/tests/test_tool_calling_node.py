@@ -744,7 +744,7 @@ def test_serialize_tool_prompt_node_with_workflow_deployment(vellum_client):
             input_variables=[],
             output_variables=[],
         ),
-        deployment=WorkflowDeploymentReleaseWorkflowDeployment(name="test-name"),
+        deployment=WorkflowDeploymentReleaseWorkflowDeployment(id="test-deployment-id", name="test-name"),
         description="test-description",
         release_tags=[
             ReleaseReleaseTag(
