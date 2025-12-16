@@ -6,7 +6,6 @@ from deepdiff import DeepDiff
 from vellum import (
     ReleaseEnvironment,
     VellumVariable,
-    WorkflowDeploymentRead,
     WorkflowDeploymentRelease,
     WorkflowDeploymentReleaseWorkflowDeployment,
     WorkflowDeploymentReleaseWorkflowVersion,
@@ -23,18 +22,6 @@ from tests.workflows.basic_subworkflow_deployment.workflow import BasicSubworkfl
 
 def test_serialize_workflow(vellum_client):
     # GIVEN a Workflow with stubbed out API calls
-    deployment = WorkflowDeploymentRead(
-        id="4fec7b3d-4aad-4088-8c7c-a0435ac0b324",
-        created=datetime.now(),
-        label="Example Subworkflow Deployment",
-        name="example_subworkflow_deployment",
-        input_variables=[],
-        output_variables=[],
-        last_deployed_on=datetime.now(),
-        last_deployed_history_item_id=str(uuid4()),
-    )
-    vellum_client.workflow_deployments.retrieve.return_value = deployment
-
     deployment_release = WorkflowDeploymentRelease(
         id=str(uuid4()),
         created=datetime.now(),
@@ -44,7 +31,10 @@ def test_serialize_workflow(vellum_client):
             input_variables=[],
             output_variables=[],
         ),
-        deployment=WorkflowDeploymentReleaseWorkflowDeployment(name="example_subworkflow_deployment"),
+        deployment=WorkflowDeploymentReleaseWorkflowDeployment(
+            id="4fec7b3d-4aad-4088-8c7c-a0435ac0b324",
+            name="example_subworkflow_deployment",
+        ),
         release_tags=[],
         reviews=[],
     )
@@ -229,19 +219,6 @@ def test_serialize_workflow__subworkflow_deployment_node_outputs_from_release(ve
             foo = SubworkflowDeploymentNodeWithOutputs.Outputs.foo
             bar = SubworkflowDeploymentNodeWithOutputs.Outputs.bar
 
-    # AND a deployment with the expected ID
-    deployment = WorkflowDeploymentRead(
-        id=str(uuid4()),
-        created=datetime.now(),
-        label="Test Subworkflow Deployment",
-        name="test_subworkflow_deployment",
-        input_variables=[],
-        output_variables=[],
-        last_deployed_on=datetime.now(),
-        last_deployed_history_item_id=str(uuid4()),
-    )
-    vellum_client.workflow_deployments.retrieve.return_value = deployment
-
     # AND a deployment release with output variables for foo and bar
     foo_output_id = "11111111-1111-1111-1111-111111111111"
     bar_output_id = "22222222-2222-2222-2222-222222222222"
@@ -257,7 +234,10 @@ def test_serialize_workflow__subworkflow_deployment_node_outputs_from_release(ve
                 VellumVariable(id=bar_output_id, key="bar", type="NUMBER"),
             ],
         ),
-        deployment=WorkflowDeploymentReleaseWorkflowDeployment(name="test_subworkflow_deployment"),
+        deployment=WorkflowDeploymentReleaseWorkflowDeployment(
+            id=str(uuid4()),
+            name="test_subworkflow_deployment",
+        ),
         release_tags=[],
         reviews=[],
     )
