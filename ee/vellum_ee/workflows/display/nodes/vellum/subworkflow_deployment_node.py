@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import Generic, Optional, TypeVar
+from typing import Generic, List, Optional, TypeVar
 
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes import SubworkflowDeploymentNode
@@ -46,11 +46,27 @@ class BaseSubworkflowDeploymentNodeDisplay(
         ]
 
         deployment_descriptor_id = str(raise_if_descriptor(node.deployment))
+        release_tag = raise_if_descriptor(node.release_tag)
+        outputs: List[JsonObject] = []
         try:
-            deployment = display_context.client.workflow_deployments.retrieve(
+            deployment_release = display_context.client.workflow_deployments.retrieve_workflow_deployment_release(
                 id=deployment_descriptor_id,
+                release_id_or_release_tag=release_tag,
             )
-            deployment_id = str(deployment.id)
+            deployment_id = str(uuid4_from_hash(deployment_descriptor_id))
+
+            output_variables_by_key = {var.key: var for var in deployment_release.workflow_version.output_variables}
+            for output in node.Outputs:
+                output_variable = output_variables_by_key.get(output.name)
+                if output_variable:
+                    outputs.append(
+                        {
+                            "id": output_variable.id,
+                            "name": output.name,
+                            "type": output_variable.type,
+                            "value": None,
+                        }
+                    )
         except Exception as e:
             display_context.add_error(e)
             deployment_id = str(uuid4_from_hash(deployment_descriptor_id))
@@ -66,7 +82,8 @@ class BaseSubworkflowDeploymentNodeDisplay(
                 "target_handle_id": str(self.get_target_handle_id()),
                 "variant": "DEPLOYMENT",
                 "workflow_deployment_id": deployment_id,
-                "release_tag": raise_if_descriptor(node.release_tag),
+                "release_tag": release_tag,
             },
             **self.serialize_generic_fields(display_context, exclude=["outputs"]),
+            "outputs": outputs,
         }
