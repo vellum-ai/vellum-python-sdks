@@ -1,10 +1,10 @@
-import { python } from "@fern-api/python-ast";
 import { isNil } from "lodash";
 import { PromptParameters as PromptParametersType } from "vellum-ai/api";
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { FloatInstantiation } from "src/generators/extensions/float-instantiation";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
@@ -54,9 +54,7 @@ export class PromptParameters extends AstNode {
 
     const temperatureValue = isNil(this.promptParametersRequest.temperature)
       ? new NoneInstantiation()
-      : python.TypeInstantiation.float(
-          this.promptParametersRequest.temperature
-        );
+      : new FloatInstantiation(this.promptParametersRequest.temperature);
     classArgs.push(
       new MethodArgument({
         name: "temperature",
@@ -66,7 +64,7 @@ export class PromptParameters extends AstNode {
 
     const maxTokensValue = isNil(this.promptParametersRequest.maxTokens)
       ? new NoneInstantiation()
-      : python.TypeInstantiation.float(this.promptParametersRequest.maxTokens);
+      : new FloatInstantiation(this.promptParametersRequest.maxTokens);
     classArgs.push(
       new MethodArgument({
         name: "max_tokens",
@@ -76,7 +74,7 @@ export class PromptParameters extends AstNode {
 
     const topPValue = isNil(this.promptParametersRequest.topP)
       ? new NoneInstantiation()
-      : python.TypeInstantiation.float(this.promptParametersRequest.topP);
+      : new FloatInstantiation(this.promptParametersRequest.topP);
     classArgs.push(
       new MethodArgument({
         name: "top_p",
@@ -86,7 +84,7 @@ export class PromptParameters extends AstNode {
 
     const topKValue = isNil(this.promptParametersRequest.topK)
       ? new NoneInstantiation()
-      : python.TypeInstantiation.float(this.promptParametersRequest.topK);
+      : new FloatInstantiation(this.promptParametersRequest.topK);
     classArgs.push(
       new MethodArgument({
         name: "top_k",
@@ -98,9 +96,7 @@ export class PromptParameters extends AstNode {
       this.promptParametersRequest.frequencyPenalty
     )
       ? new NoneInstantiation()
-      : python.TypeInstantiation.float(
-          this.promptParametersRequest.frequencyPenalty
-        );
+      : new FloatInstantiation(this.promptParametersRequest.frequencyPenalty);
     classArgs.push(
       new MethodArgument({
         name: "frequency_penalty",
@@ -112,9 +108,7 @@ export class PromptParameters extends AstNode {
       this.promptParametersRequest.presencePenalty
     )
       ? new NoneInstantiation()
-      : python.TypeInstantiation.float(
-          this.promptParametersRequest.presencePenalty
-        );
+      : new FloatInstantiation(this.promptParametersRequest.presencePenalty);
     classArgs.push(
       new MethodArgument({
         name: "presence_penalty",

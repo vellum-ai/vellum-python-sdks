@@ -4,6 +4,8 @@ import { ValueGenerationError } from "./errors";
 
 import { AstNode } from "src/generators/extensions/ast-node";
 import { BoolInstantiation } from "src/generators/extensions/bool-instantiation";
+import { FloatInstantiation } from "src/generators/extensions/float-instantiation";
+import { IntInstantiation } from "src/generators/extensions/int-instantiation";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -37,9 +39,9 @@ export class Json extends AstNode {
 
     if (typeof value === "number") {
       if (Number.isInteger(value)) {
-        return python.TypeInstantiation.int(value);
+        return new IntInstantiation(value);
       }
-      return python.TypeInstantiation.float(value);
+      return new FloatInstantiation(value);
     }
 
     if (typeof value === "boolean") {

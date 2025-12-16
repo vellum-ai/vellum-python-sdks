@@ -21,6 +21,8 @@ import {
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { FloatInstantiation } from "src/generators/extensions/float-instantiation";
+import { IntInstantiation } from "src/generators/extensions/int-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
@@ -240,19 +242,19 @@ export class Workflow {
                             arguments_: [
                               new MethodArgument({
                                 name: "x",
-                                value: python.TypeInstantiation.float(
+                                value: new FloatInstantiation(
                                   this.displayData.viewport.x ?? 0
                                 ),
                               }),
                               new MethodArgument({
                                 name: "y",
-                                value: python.TypeInstantiation.float(
+                                value: new FloatInstantiation(
                                   this.displayData.viewport.y ?? 0
                                 ),
                               }),
                               new MethodArgument({
                                 name: "zoom",
-                                value: python.TypeInstantiation.float(
+                                value: new FloatInstantiation(
                                   this.displayData.viewport.zoom ?? 0
                                 ),
                               }),
@@ -525,7 +527,7 @@ export class Workflow {
                   new MethodArgument({
                     name: "z_index",
                     value: !isNil(zIndex)
-                      ? python.TypeInstantiation.int(zIndex)
+                      ? new IntInstantiation(zIndex)
                       : new NoneInstantiation(),
                   }),
                 ],

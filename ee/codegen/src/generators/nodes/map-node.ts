@@ -4,6 +4,7 @@ import { isNil } from "lodash";
 import { MapNodeContext } from "src/context/node-context/map-node";
 import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { IntInstantiation } from "src/generators/extensions/int-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { BaseNestedWorkflowNode } from "src/generators/nodes/bases/nested-workflow-base";
 import { WorkflowProjectGenerator } from "src/project";
@@ -76,9 +77,7 @@ export class MapNode extends BaseNestedWorkflowNode<
     if (!isNil(this.nodeData.data.concurrency)) {
       const concurrencyField = python.field({
         name: "max_concurrency",
-        initializer: python.TypeInstantiation.int(
-          this.nodeData.data.concurrency
-        ),
+        initializer: new IntInstantiation(this.nodeData.data.concurrency),
       });
       statements.push(concurrencyField);
     }

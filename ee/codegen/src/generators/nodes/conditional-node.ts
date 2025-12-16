@@ -7,6 +7,7 @@ import { ConditionalNodePort } from "src/generators/conditional-node-port";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { IntInstantiation } from "src/generators/extensions/int-instantiation";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
@@ -99,7 +100,7 @@ export class ConditionalNode extends BaseNode<
         name: "source_handle_ids",
         initializer: python.TypeInstantiation.dict(
           this.nodeData.data.conditions.map((condition, idx) => ({
-            key: python.TypeInstantiation.int(idx),
+            key: new IntInstantiation(idx),
             value: python.TypeInstantiation.uuid(condition.sourceHandleId),
           }))
         ),

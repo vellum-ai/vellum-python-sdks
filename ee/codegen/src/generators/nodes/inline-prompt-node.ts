@@ -8,6 +8,7 @@ import { NodeAttributeGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { BoolInstantiation } from "src/generators/extensions/bool-instantiation";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { FloatInstantiation } from "src/generators/extensions/float-instantiation";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
@@ -178,7 +179,7 @@ export class InlinePromptNode extends BaseNode<
         args.push(
           new MethodArgument({
             name: "timeout",
-            value: python.TypeInstantiation.float(timeout),
+            value: new FloatInstantiation(timeout),
           })
         );
       }

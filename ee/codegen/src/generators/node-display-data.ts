@@ -1,4 +1,3 @@
-import { python } from "@fern-api/python-ast";
 import { isNil } from "lodash";
 
 import { VELLUM_WORKFLOW_EDITOR_TYPES_PATH } from "src/constants";
@@ -6,6 +5,8 @@ import { WorkflowContext } from "src/context";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { BoolInstantiation } from "src/generators/extensions/bool-instantiation";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { FloatInstantiation } from "src/generators/extensions/float-instantiation";
+import { IntInstantiation } from "src/generators/extensions/int-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -49,13 +50,13 @@ export class NodeDisplayData extends AstNode {
           arguments_: [
             new MethodArgument({
               name: "x",
-              value: python.TypeInstantiation.float(
+              value: new FloatInstantiation(
                 this.sourceNodeDisplayData?.position?.x ?? 0
               ),
             }),
             new MethodArgument({
               name: "y",
-              value: python.TypeInstantiation.float(
+              value: new FloatInstantiation(
                 this.sourceNodeDisplayData?.position?.y ?? 0
               ),
             }),
@@ -68,9 +69,7 @@ export class NodeDisplayData extends AstNode {
       args.push(
         new MethodArgument({
           name: "z_index",
-          value: python.TypeInstantiation.int(
-            this.sourceNodeDisplayData.z_index
-          ),
+          value: new IntInstantiation(this.sourceNodeDisplayData.z_index),
         })
       );
     }
@@ -79,7 +78,7 @@ export class NodeDisplayData extends AstNode {
       args.push(
         new MethodArgument({
           name: "width",
-          value: python.TypeInstantiation.int(this.sourceNodeDisplayData.width),
+          value: new IntInstantiation(this.sourceNodeDisplayData.width),
         })
       );
     }
@@ -88,9 +87,7 @@ export class NodeDisplayData extends AstNode {
       args.push(
         new MethodArgument({
           name: "height",
-          value: python.TypeInstantiation.int(
-            this.sourceNodeDisplayData.height
-          ),
+          value: new IntInstantiation(this.sourceNodeDisplayData.height),
         })
       );
     }
