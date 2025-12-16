@@ -1509,16 +1509,6 @@ describe("Workflow", () => {
     });
 
     it("should correctly handle cycle edges with port references", async () => {
-      // This test reproduces the graph structure from APO-2373 where a cycle edge
-      // from a non-default port was not correctly generating a port reference.
-      // Graph structure:
-      // - Entrypoint -> NodeA (with IF/ELSE ports)
-      // - NodeA.if_port -> ErrorNode
-      // - NodeA.else_port -> NodeB (with IF/ELSE ports)
-      // - NodeB.if_port -> NodeA (cycle back - this is the bug case)
-      // - NodeB.else_port -> NodeC
-      // - NodeC -> FinalOutput
-
       const nodeA = genericNodeFactory({
         id: uuidv4(),
         label: "NodeA",
