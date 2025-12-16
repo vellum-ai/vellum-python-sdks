@@ -3,7 +3,7 @@ from uuid import UUID
 from typing import TYPE_CHECKING, Any, Dict, Generic, Iterable, Literal, Optional, Type, Union, cast
 from typing_extensions import TypeGuard
 
-from pydantic import SerializationInfo, field_serializer, field_validator
+from pydantic import Field, SerializationInfo, field_serializer, field_validator
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.errors import WorkflowError
@@ -111,9 +111,17 @@ class WorkflowExecutionInitiatedBody(_BaseWorkflowExecutionBody, Generic[InputsT
 
     trigger: Optional[Type[BaseTrigger]] = None
 
+    # Raw inputs from trigger event data, used to include trigger attributes in serialized inputs.
+    # This field is excluded from serialization and only used to merge into the inputs field.
+    raw_inputs: Optional[Dict[str, Any]] = Field(default=None, exclude=True)
+
     @field_serializer("inputs")
     def serialize_inputs(self, inputs: InputsType, _info: Any) -> Dict[str, Any]:
-        return default_serializer(inputs)
+        serialized = default_serializer(inputs)
+        # Merge raw_inputs (trigger event data) with serialized inputs
+        if self.raw_inputs:
+            return {**self.raw_inputs, **serialized}
+        return serialized
 
     @field_serializer("initial_state")
     def serialize_initial_state(self, initial_state: Optional[StateType], _info: Any) -> Optional[Dict[str, Any]]:
