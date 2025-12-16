@@ -11,6 +11,7 @@ import { MethodArgument } from "src/generators/extensions/method-argument";
 import { MethodInvocation } from "src/generators/extensions/method-invocation";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
+import { SetInstantiation } from "src/generators/extensions/set-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 import {
   EntrypointNode,
@@ -1459,7 +1460,7 @@ export class GraphAttribute extends AstNode {
     }
 
     if (mutableAst.type === "set") {
-      const setAst = python.TypeInstantiation.set(
+      const setAst = new SetInstantiation(
         mutableAst.values.map((ast) => this.getGraphAttributeAstNode(ast)),
         {
           endWithComma: true,
