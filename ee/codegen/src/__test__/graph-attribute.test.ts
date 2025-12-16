@@ -1507,5 +1507,60 @@ describe("Workflow", () => {
         [[validateAPIResponseNode, "default"], validateAPIResponseNode],
       ]);
     });
+
+    it("should correctly handle cycle edges with port references", async () => {
+      // This test reproduces the graph structure from APO-2373 where a cycle edge
+      // from a non-default port was not correctly generating a port reference.
+      // Graph structure:
+      // - Entrypoint -> NodeA (with IF/ELSE ports)
+      // - NodeA.if_port -> ErrorNode
+      // - NodeA.else_port -> NodeB (with IF/ELSE ports)
+      // - NodeB.if_port -> NodeA (cycle back - this is the bug case)
+      // - NodeB.else_port -> NodeC
+      // - NodeC -> FinalOutput
+
+      const nodeA = genericNodeFactory({
+        id: uuidv4(),
+        label: "NodeA",
+        nodePorts: [
+          nodePortFactory({ name: "if_port", type: "IF" }),
+          nodePortFactory({ name: "else_port", type: "ELSE" }),
+        ],
+      });
+
+      const nodeB = genericNodeFactory({
+        id: uuidv4(),
+        label: "NodeB",
+        nodePorts: [
+          nodePortFactory({ name: "if_port", type: "IF" }),
+          nodePortFactory({ name: "else_port", type: "ELSE" }),
+        ],
+      });
+
+      const nodeC = genericNodeFactory({
+        id: uuidv4(),
+        label: "NodeC",
+      });
+
+      const errorNode = genericNodeFactory({
+        id: uuidv4(),
+        label: "ErrorNode",
+      });
+
+      const finalOutputNode = finalOutputNodeFactory({
+        id: uuidv4(),
+        label: "FinalOutput",
+        name: "final_output",
+      }).build();
+
+      await runGraphTest([
+        [entrypointNode, nodeA],
+        [[nodeA, "if_port"], errorNode],
+        [[nodeA, "else_port"], nodeB],
+        [[nodeB, "if_port"], nodeA],
+        [[nodeB, "else_port"], nodeC],
+        [nodeC, finalOutputNode],
+      ]);
+    });
   });
 });
