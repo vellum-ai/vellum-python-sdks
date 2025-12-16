@@ -19,6 +19,7 @@ import { ValueGenerationError } from "./errors";
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { FloatInstantiation } from "src/generators/extensions/float-instantiation";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
@@ -56,7 +57,7 @@ class NumberVellumValue extends AstNode {
   }
 
   private generateAstNode(value: number): AstNode {
-    return python.TypeInstantiation.float(value);
+    return new FloatInstantiation(value);
   }
 
   public write(writer: Writer): void {
@@ -467,7 +468,7 @@ class SearchResultsVellumValue extends AstNode {
         }),
         new MethodArgument({
           name: "score",
-          value: python.TypeInstantiation.float(result.score),
+          value: new FloatInstantiation(result.score),
         }),
         new MethodArgument({
           name: "keywords",

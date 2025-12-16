@@ -14,6 +14,8 @@ export * from "./comment";
 export * from "./decorator";
 export * from "./dict";
 export * from "./field";
+export * from "./float-instantiation";
+export * from "./int-instantiation";
 export * from "./list";
 export * from "./list-instantiation";
 export * from "./method-argument";

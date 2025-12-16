@@ -14,6 +14,8 @@ import {
 import { AstNode } from "src/generators/extensions/ast-node";
 import { BoolInstantiation } from "src/generators/extensions/bool-instantiation";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { FloatInstantiation } from "src/generators/extensions/float-instantiation";
+import { IntInstantiation } from "src/generators/extensions/int-instantiation";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
@@ -78,7 +80,7 @@ export class SearchNode extends BaseNode<
           bodyStatements.push(
             python.field({
               name: "limit",
-              initializer: python.TypeInstantiation.int(parsedInt),
+              initializer: new IntInstantiation(parsedInt),
             })
           );
         }
@@ -201,11 +203,11 @@ export class SearchNode extends BaseNode<
       arguments_: [
         new MethodArgument({
           name: "semantic_similarity",
-          value: python.TypeInstantiation.float(semantic_similarity),
+          value: new FloatInstantiation(semantic_similarity),
         }),
         new MethodArgument({
           name: "keywords",
-          value: python.TypeInstantiation.float(keywords),
+          value: new FloatInstantiation(keywords),
         }),
       ],
     });

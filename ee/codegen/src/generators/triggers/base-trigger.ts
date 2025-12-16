@@ -10,6 +10,8 @@ import { BasePersistedFile } from "src/generators/base-persisted-file";
 import { BoolInstantiation } from "src/generators/extensions/bool-instantiation";
 import { Class } from "src/generators/extensions/class";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { FloatInstantiation } from "src/generators/extensions/float-instantiation";
+import { IntInstantiation } from "src/generators/extensions/int-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -84,13 +86,13 @@ export abstract class BaseTrigger<
       fields.push(
         python.field({
           name: "x",
-          initializer: python.TypeInstantiation.float(displayData.position.x),
+          initializer: new FloatInstantiation(displayData.position.x),
         })
       );
       fields.push(
         python.field({
           name: "y",
-          initializer: python.TypeInstantiation.float(displayData.position.y),
+          initializer: new FloatInstantiation(displayData.position.y),
         })
       );
     }
@@ -99,7 +101,7 @@ export abstract class BaseTrigger<
       fields.push(
         python.field({
           name: "z_index",
-          initializer: python.TypeInstantiation.int(displayData.z_index),
+          initializer: new IntInstantiation(displayData.z_index),
         })
       );
     }
