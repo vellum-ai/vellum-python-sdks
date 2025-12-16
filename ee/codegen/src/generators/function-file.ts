@@ -1,23 +1,22 @@
-import { python } from "@fern-api/python-ast";
-
 import { BasePersistedFile } from "./base-persisted-file";
 
 import { WorkflowContext } from "src/context";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Decorator } from "src/generators/extensions/decorator";
 import { Writer } from "src/generators/extensions/writer";
 
 export declare namespace FunctionWithDecorator {
   export interface Args {
     functionSrc: string;
     functionName: string;
-    decorator?: python.Decorator;
+    decorator?: Decorator;
   }
 }
 
 export class FunctionWithDecorator extends AstNode {
   private functionSrc: string;
   private functionName: string;
-  private decorator?: python.Decorator;
+  private decorator?: Decorator;
 
   constructor(args: FunctionWithDecorator.Args) {
     super();
@@ -74,7 +73,7 @@ export declare namespace FunctionFile {
     workflowContext: WorkflowContext;
     functionSrc: string;
     functionName: string;
-    decorator?: python.Decorator;
+    decorator?: Decorator;
     modulePath: string[];
   }
 }
@@ -82,7 +81,7 @@ export declare namespace FunctionFile {
 export class FunctionFile extends BasePersistedFile {
   private readonly functionSrc: string;
   private readonly functionName: string;
-  private readonly decorator?: python.Decorator;
+  private readonly decorator?: Decorator;
   private readonly modulePath: string[];
 
   constructor({

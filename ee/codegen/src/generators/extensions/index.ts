@@ -11,6 +11,7 @@ export * from "./bool-instantiation";
 export * from "./class";
 export * from "./class-instantiation";
 export * from "./comment";
+export * from "./decorator";
 export * from "./dict";
 export * from "./field";
 export * from "./list";

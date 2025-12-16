@@ -18,6 +18,7 @@ import { PromptBlock as PromptBlockType } from "src/generators/base-prompt-block
 import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { Decorator } from "src/generators/extensions/decorator";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { MethodInvocation } from "src/generators/extensions/method-invocation";
@@ -642,32 +643,33 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     return "inline_workflow_function";
   }
 
-  getNodeDecorators(): python.Decorator[] | undefined {
+  getNodeDecorators(): Decorator[] | undefined {
     if (!this.nodeData.adornments) {
       return [];
     }
-    return this.nodeData.adornments.map((adornment) =>
-      python.decorator({
-        callable: new MethodInvocation({
-          methodReference: new Reference({
-            name: adornment.base.name,
-            attribute: ["wrap"],
-            modulePath: adornment.base.module,
+    return this.nodeData.adornments.map(
+      (adornment) =>
+        new Decorator({
+          callable: new MethodInvocation({
+            methodReference: new Reference({
+              name: adornment.base.name,
+              attribute: ["wrap"],
+              modulePath: adornment.base.module,
+            }),
+            arguments_: adornment.attributes.map(
+              (attr) =>
+                new MethodArgument({
+                  name: attr.name,
+                  value: new WorkflowValueDescriptor({
+                    workflowValueDescriptor: attr.value,
+                    nodeContext: this.nodeContext,
+                    workflowContext: this.workflowContext,
+                    iterableConfig: { endWithComma: false },
+                  }),
+                })
+            ),
           }),
-          arguments_: adornment.attributes.map(
-            (attr) =>
-              new MethodArgument({
-                name: attr.name,
-                value: new WorkflowValueDescriptor({
-                  workflowValueDescriptor: attr.value,
-                  nodeContext: this.nodeContext,
-                  workflowContext: this.workflowContext,
-                  iterableConfig: { endWithComma: false },
-                }),
-              })
-          ),
-        }),
-      })
+        })
     );
   }
 

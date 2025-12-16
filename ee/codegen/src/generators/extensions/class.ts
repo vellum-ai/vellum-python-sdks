@@ -1,6 +1,6 @@
 import { python } from "@fern-api/python-ast";
-import { Decorator } from "@fern-api/python-ast/Decorator";
 
+import { Decorator } from "./decorator";
 import { Field } from "./field";
 import { Reference } from "./reference";
 
