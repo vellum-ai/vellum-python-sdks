@@ -104,7 +104,7 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
         output_type = self.__class__.get_output_type()
         code, filepath = self._resolve_code()
         if not self.packages and self.runtime == "PYTHON_3_11_6" and not self._has_secrets_in_code_inputs():
-            logs, result = run_code_inline(code, self.code_inputs, output_type, filepath)
+            logs, result = run_code_inline(code, self.code_inputs, output_type, filepath, self._context.vellum_client)
             return self.Outputs(result=result, log=logs)
 
         else:

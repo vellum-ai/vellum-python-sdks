@@ -1,11 +1,12 @@
 import pytest
+from datetime import datetime
 import os
 import re
 from typing import Any, List, Union
 
 from pydantic import BaseModel
 
-from vellum import ArrayInput, CodeExecutorResponse, NumberVellumValue, StringInput, StringVellumValue
+from vellum import ArrayInput, CodeExecutorResponse, MlModelRead, NumberVellumValue, StringInput, StringVellumValue
 from vellum.client.errors.bad_request_error import BadRequestError
 from vellum.client.errors.forbidden_error import ForbiddenError
 from vellum.client.errors.internal_server_error import InternalServerError
@@ -23,6 +24,7 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.displayable.code_execution_node import CodeExecutionNode
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.state.base import BaseState, StateMeta
+from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.core import Json
 
 
@@ -548,6 +550,51 @@ def main(word: str) -> dict:
         },
         "log": "",
     }
+
+
+def test_run_node__run_inline__vellum_client(vellum_client):
+    """Confirm that CodeExecutionNodes can convert a dict to a Pydantic model during inline execution."""
+
+    # GIVEN a node that subclasses CodeExecutionNode that returns a dict matching Any
+    vellum_client.ml_models.retrieve.return_value = MlModelRead(
+        id="test-ml-model-id",
+        name="Test ML Model",
+        description="Test ML Model Description",
+        introduced_on=datetime(2025, 1, 2),
+    )
+
+    class ExampleCodeExecutionNode(CodeExecutionNode[BaseState, Any]):
+        code = """\
+def main(model_id: str) -> dict:
+    ml_model = vellum_client.ml_models.retrieve(model_id)
+    return {
+        "model_name": ml_model.name,
+        "model_id": ml_model.id,
+    }
+    """
+        runtime = "PYTHON_3_11_6"
+
+        code_inputs = {
+            "model_id": "test-ml-model-id",
+        }
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode(context=WorkflowContext(vellum_client=vellum_client))
+    outputs = node.run()
+
+    # THEN the node should have produced the outputs we expect
+    assert outputs == {
+        "result": {
+            "model_name": "Test ML Model",
+            "model_id": "test-ml-model-id",
+        },
+        "log": "",
+    }
+
+    # AND
+    vellum_client.ml_models.retrieve.assert_called_once_with(
+        "test-ml-model-id",
+    )
 
 
 def test_run_node__array_input_with_vellum_values(vellum_client):
