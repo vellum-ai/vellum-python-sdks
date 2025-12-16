@@ -3,6 +3,7 @@ import { python } from "@fern-api/python-ast";
 import { ValueGenerationError } from "./errors";
 
 import { AstNode } from "src/generators/extensions/ast-node";
+import { BoolInstantiation } from "src/generators/extensions/bool-instantiation";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -42,7 +43,7 @@ export class Json extends AstNode {
     }
 
     if (typeof value === "boolean") {
-      return python.TypeInstantiation.bool(value);
+      return new BoolInstantiation(value);
     }
 
     if (Array.isArray(value)) {

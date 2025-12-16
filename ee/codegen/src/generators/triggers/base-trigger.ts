@@ -7,6 +7,7 @@ import {
 } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
+import { BoolInstantiation } from "src/generators/extensions/bool-instantiation";
 import { Class } from "src/generators/extensions/class";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
@@ -129,7 +130,7 @@ export abstract class BaseTrigger<
         commentArgs.push(
           new MethodArgument({
             name: "expanded",
-            value: python.TypeInstantiation.bool(expanded),
+            value: new BoolInstantiation(expanded),
           })
         );
       }

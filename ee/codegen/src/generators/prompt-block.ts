@@ -1,4 +1,3 @@
-import { python } from "@fern-api/python-ast";
 import { isNil } from "lodash";
 import {
   ChatMessagePromptBlock,
@@ -12,6 +11,7 @@ import {
   BasePromptBlock,
   PromptBlock as PromptBlockType,
 } from "src/generators/base-prompt-block";
+import { BoolInstantiation } from "src/generators/extensions/bool-instantiation";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
@@ -83,9 +83,7 @@ export class PromptBlock extends BasePromptBlock<PromptBlockType> {
       classArgs.push(
         new MethodArgument({
           name: "chat_message_unterminated",
-          value: python.TypeInstantiation.bool(
-            promptBlock.chatMessageUnterminated
-          ),
+          value: new BoolInstantiation(promptBlock.chatMessageUnterminated),
         })
       );
     }

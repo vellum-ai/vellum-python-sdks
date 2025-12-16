@@ -4,6 +4,7 @@ import { isNil } from "lodash";
 import { VELLUM_WORKFLOW_EDITOR_TYPES_PATH } from "src/constants";
 import { WorkflowContext } from "src/context";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { BoolInstantiation } from "src/generators/extensions/bool-instantiation";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
@@ -133,7 +134,7 @@ export class GenericNodeDisplayData extends AstNode {
       commentArgs.push(
         new MethodArgument({
           name: "expanded",
-          value: python.TypeInstantiation.bool(expanded),
+          value: new BoolInstantiation(expanded),
         })
       );
     }

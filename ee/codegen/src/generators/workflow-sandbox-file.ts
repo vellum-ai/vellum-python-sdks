@@ -6,6 +6,7 @@ import { VELLUM_WORKFLOW_ROOT_MODULE_PATH } from "src/constants";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
 import { NodeNotFoundError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { BoolInstantiation } from "src/generators/extensions/bool-instantiation";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
@@ -296,7 +297,7 @@ if __name__ == "__main__":
       arguments_.push(
         new MethodArgument({
           name: "disabled",
-          value: python.TypeInstantiation.bool(true),
+          value: new BoolInstantiation(true),
         })
       );
     }
