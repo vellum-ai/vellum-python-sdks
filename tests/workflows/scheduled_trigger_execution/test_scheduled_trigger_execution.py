@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 from tests.workflows.scheduled_trigger_execution.workflows.multi_port_workflow import (
+    Inputs as MultiPortInputs,
     MultiPortScheduledWorkflow,
     MySchedule as MultiPortSchedule,
 )
@@ -38,9 +39,10 @@ def test_multi_port_node_executes_once_with_trigger():
     # GIVEN a workflow with a trigger pointing to a node with multiple ports
     workflow = MultiPortScheduledWorkflow()
     trigger = MultiPortSchedule(current_run_at=datetime.now(), next_run_at=datetime.now() + timedelta(minutes=1))
+    inputs = MultiPortInputs(value="test")
 
     # WHEN streaming events
-    events = list(workflow.stream(trigger=trigger, event_filter=all_workflow_event_filter))
+    events = list(workflow.stream(inputs=inputs, trigger=trigger, event_filter=all_workflow_event_filter))
 
     # THEN the MultiPortNode should only have one initiated event
     node_initiated_events = [e for e in events if e.name == "node.execution.initiated"]
