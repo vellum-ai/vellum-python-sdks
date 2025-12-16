@@ -1,4 +1,4 @@
-import time
+import threading
 from typing import Iterator, List, Set
 
 from vellum.workflows.inputs import BaseInputs
@@ -8,6 +8,8 @@ from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.ports.port import Port
 from vellum.workflows.state import BaseState
 from vellum.workflows.workflows import BaseWorkflow
+
+consumption_event = threading.Event()
 
 
 class Inputs(BaseInputs):
@@ -39,9 +41,14 @@ class FirstNode(BaseNode[State]):
             return set()
 
     def run(self) -> Iterator[BaseOutput]:
+        consumption_event.set()
+
         reversed_fruits = []
-        for index, fruit in enumerate(self.fruits):
-            time.sleep(0.01 * (index + 1))
+        for fruit in self.fruits:
+            # Block until SecondNode to consumes the output
+            consumption_event.wait()
+            consumption_event.clear()
+
             reversed = fruit[::-1]
             self.state.outputs.append(reversed)
             reversed_fruits.append(reversed)
@@ -58,12 +65,14 @@ class SecondNode(BaseNode[State]):
 
     def run(self) -> Iterator[BaseOutput]:
         doubled_fruits = []
-        for index, item in enumerate(self.items):
-            time.sleep(0.01 * (index + 1))
+        for item in self.items:
             doubled = item + " " + item
             self.state.outputs.append(doubled)
             doubled_fruits.append(doubled)
             yield BaseOutput(delta=doubled, name="doubled")
+
+            # Signal that SecondNode has consumed the output and can proceed
+            consumption_event.set()
 
         yield BaseOutput(value=doubled_fruits, name="doubled")
 
