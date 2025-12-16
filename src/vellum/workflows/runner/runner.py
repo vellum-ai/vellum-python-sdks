@@ -938,6 +938,10 @@ class WorkflowRunner(Generic[StateType]):
                 ),
             ]
 
+        # Get raw inputs from trigger event data if available
+        # This ensures trigger attributes are included in the serialized inputs
+        raw_inputs = self._trigger._event_data if self._trigger else None
+
         return WorkflowExecutionInitiatedEvent(
             trace_id=self._execution_context.trace_id,
             span_id=self._initial_state.meta.span_id,
@@ -946,6 +950,7 @@ class WorkflowRunner(Generic[StateType]):
                 inputs=self._initial_state.meta.workflow_inputs or BaseInputs(),
                 initial_state=deepcopy(self._initial_state) if self._should_emit_initial_state else None,
                 trigger=self._trigger.__class__ if self._trigger else None,
+                raw_inputs=raw_inputs,
             ),
             parent=self._execution_context.parent_context,
             links=links,

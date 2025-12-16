@@ -186,3 +186,33 @@ def test_workflow_initiated_event_has_trigger():
     trigger_definition = initiated.body.trigger
     assert trigger_definition is not None
     assert trigger_definition.__name__ == "SlackMessageTrigger"
+
+
+def test_workflow_initiated_event_serialized_inputs_include_trigger_attributes():
+    """Test that serialized initiated event inputs include trigger attribute values."""
+    # GIVEN a workflow with an IntegrationTrigger (Slack)
+    workflow = SimpleSlackWorkflow()
+
+    # AND a trigger instance with specific attribute values
+    trigger = SlackMessageTrigger(
+        message="test_message",
+        channel="C123",
+        user="U456",
+    )
+
+    # WHEN streaming events
+    events = list(workflow.stream(trigger=trigger))
+
+    # THEN the first event is workflow.execution.initiated
+    assert len(events) >= 1
+    initiated = events[0]
+    assert initiated.name == "workflow.execution.initiated"
+
+    # AND when we serialize the event, the inputs include trigger attribute values
+    serialized = initiated.model_dump(mode="json")
+    serialized_inputs = serialized["body"]["inputs"]
+
+    # THEN the serialized inputs should include the trigger attribute values
+    assert serialized_inputs["message"] == "test_message"
+    assert serialized_inputs["channel"] == "C123"
+    assert serialized_inputs["user"] == "U456"
