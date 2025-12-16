@@ -4,6 +4,7 @@ import sys
 import traceback
 from typing import Any, Optional, Tuple, Union
 
+from vellum import Vellum
 from vellum.workflows.constants import undefined
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
@@ -41,6 +42,7 @@ def run_code_inline(
     inputs: EntityInputsInterface,
     output_type: Any,
     filepath: str,
+    vellum_client: Vellum,
 ) -> Tuple[str, Any]:
     log_buffer = io.StringIO()
 
@@ -54,6 +56,7 @@ def run_code_inline(
         "__arg__inputs": wrapped_inputs,
         "__arg__out": None,
         "print": _inline_print,
+        "vellum_client": vellum_client,
     }
     run_args = [f"{name}=__arg__inputs['{name}']" for name, value in inputs.items() if value is not undefined]
     execution_code = f"""\
