@@ -18,6 +18,7 @@ import {
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { Decorator } from "src/generators/extensions/decorator";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { MethodInvocation } from "src/generators/extensions/method-invocation";
 import { Reference } from "src/generators/extensions/reference";
@@ -514,8 +515,8 @@ export abstract class BaseNode<
     return [];
   }
 
-  protected getNodeDecorators(): python.Decorator[] | undefined {
-    const decorators: python.Decorator[] = [];
+  protected getNodeDecorators(): Decorator[] | undefined {
+    const decorators: Decorator[] = [];
     const errorOutputId = this.getErrorOutputId();
     let tryAdornmentExists = false;
 
@@ -534,7 +535,7 @@ export abstract class BaseNode<
 
       if (adornment.base) {
         decorators.push(
-          python.decorator({
+          new Decorator({
             callable: new MethodInvocation({
               methodReference: new Reference({
                 name: adornment.base.name,
@@ -579,7 +580,7 @@ export abstract class BaseNode<
 
     if (errorOutputId && !tryAdornmentExists) {
       decorators.push(
-        python.decorator({
+        new Decorator({
           callable: new MethodInvocation({
             methodReference: new Reference({
               name: "TryNode",
@@ -699,7 +700,7 @@ export abstract class BaseNode<
 
   public generateNodeDisplayClasses(): Class[] {
     const nodeContext = this.nodeContext;
-    const decorators: python.Decorator[] = [];
+    const decorators: Decorator[] = [];
     const errorOutputId = this.getErrorOutputId();
     let tryAdornmentExists = false;
 
@@ -713,7 +714,7 @@ export abstract class BaseNode<
 
       if (adornment.base) {
         decorators.push(
-          python.decorator({
+          new Decorator({
             callable: new MethodInvocation({
               methodReference: new Reference({
                 name: `Base${adornment.base.name}Display`,
@@ -738,7 +739,7 @@ export abstract class BaseNode<
 
     if (errorOutputId && !tryAdornmentExists) {
       decorators.push(
-        python.decorator({
+        new Decorator({
           callable: new MethodInvocation({
             methodReference: new Reference({
               name: "BaseTryNodeDisplay",
