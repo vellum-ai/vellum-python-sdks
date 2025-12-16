@@ -1,6 +1,11 @@
+import pytest
+
 from tests.workflows.streaming_node_pipeline.workflow import Inputs, StreamingNodePipelineWorkflow
 
 
+# We're using a threading Event to coordinate work between nodes.
+# Add a timeout to guard against deadlocks.
+@pytest.mark.timeout(5)
 def test_workflow__happy_path():
     """
     Ensure that we can successfully pipeline the outputs from one streaming node to the next.
