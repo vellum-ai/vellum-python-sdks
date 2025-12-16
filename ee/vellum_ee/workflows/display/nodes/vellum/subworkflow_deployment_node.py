@@ -1,9 +1,9 @@
 from uuid import UUID
-from typing import Generic, List, Optional, TypeVar
+from typing import Generic, Optional, TypeVar
 
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes import SubworkflowDeploymentNode
-from vellum.workflows.types.core import JsonObject
+from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
@@ -47,7 +47,7 @@ class BaseSubworkflowDeploymentNodeDisplay(
 
         deployment_descriptor_id = str(raise_if_descriptor(node.deployment))
         release_tag = raise_if_descriptor(node.release_tag)
-        outputs: List[JsonObject] = []
+        outputs: JsonArray = []
         try:
             deployment_release = display_context.client.workflow_deployments.retrieve_workflow_deployment_release(
                 id=deployment_descriptor_id,
