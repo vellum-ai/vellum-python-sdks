@@ -3,7 +3,12 @@ from uuid import uuid4
 
 from deepdiff import DeepDiff
 
-from vellum import WorkflowDeploymentRead
+from vellum import VellumVariable, WorkflowDeploymentRead
+from vellum.workflows import BaseWorkflow
+from vellum.workflows.inputs import BaseInputs
+from vellum.workflows.nodes import SubworkflowDeploymentNode
+from vellum.workflows.outputs import BaseOutputs
+from vellum.workflows.state import BaseState
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 from tests.workflows.basic_subworkflow_deployment.workflow import BasicSubworkflowDeploymentWorkflow
@@ -179,3 +184,65 @@ def test_serialize_workflow(vellum_client):
             "workflow",
         ],
     }
+
+
+def test_serialize_workflow__subworkflow_deployment_node_outputs_from_release(vellum_client):
+    """
+    Tests that subworkflow deployment node outputs are populated from the deployment's output variables.
+    """
+
+    # GIVEN a subworkflow deployment node with foo and bar outputs
+    class SubworkflowDeploymentNodeWithOutputs(SubworkflowDeploymentNode):
+        deployment = "test_subworkflow_deployment"
+
+        class Outputs(BaseOutputs):
+            foo: str
+            bar: int
+
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = SubworkflowDeploymentNodeWithOutputs
+
+        class Outputs(BaseOutputs):
+            foo = SubworkflowDeploymentNodeWithOutputs.Outputs.foo
+            bar = SubworkflowDeploymentNodeWithOutputs.Outputs.bar
+
+    # AND a deployment with output variables for foo and bar
+    foo_output_id = "11111111-1111-1111-1111-111111111111"
+    bar_output_id = "22222222-2222-2222-2222-222222222222"
+    deployment = WorkflowDeploymentRead(
+        id=str(uuid4()),
+        created=datetime.now(),
+        label="Test Subworkflow Deployment",
+        name="test_subworkflow_deployment",
+        input_variables=[],
+        output_variables=[
+            VellumVariable(id=foo_output_id, key="foo", type="STRING"),
+            VellumVariable(id=bar_output_id, key="bar", type="NUMBER"),
+        ],
+        last_deployed_on=datetime.now(),
+        last_deployed_history_item_id=str(uuid4()),
+    )
+    vellum_client.workflow_deployments.retrieve.return_value = deployment
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the subworkflow deployment node should have outputs populated from the deployment's output variables
+    workflow_raw_data = serialized_workflow["workflow_raw_data"]
+    subworkflow_node = next(node for node in workflow_raw_data["nodes"] if node["type"] == "SUBWORKFLOW")
+
+    # AND the outputs should contain foo and bar with the correct IDs from the deployment
+    assert subworkflow_node.get("outputs") is not None, "outputs field should not be None"
+    outputs = subworkflow_node["outputs"]
+    assert len(outputs) == 2
+
+    foo_output = next((o for o in outputs if o["name"] == "foo"), None)
+    bar_output = next((o for o in outputs if o["name"] == "bar"), None)
+
+    assert foo_output is not None, "foo output should exist"
+    assert bar_output is not None, "bar output should exist"
+    assert foo_output["id"] == foo_output_id, "foo output ID should match deployment's output variable ID"
+    assert bar_output["id"] == bar_output_id, "bar output ID should match deployment's output variable ID"
+    assert foo_output["type"] == "STRING"
+    assert bar_output["type"] == "NUMBER"
