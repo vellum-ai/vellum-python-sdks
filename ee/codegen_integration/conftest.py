@@ -10,7 +10,13 @@ from unittest.mock import patch
 from uuid import uuid4
 from typing import List, Optional, Set, Tuple
 
-from vellum import DeploymentRead, WorkspaceSecretRead
+from vellum import (
+    ReleaseEnvironment,
+    WorkflowDeploymentRelease,
+    WorkflowDeploymentReleaseWorkflowDeployment,
+    WorkflowDeploymentReleaseWorkflowVersion,
+    WorkspaceSecretRead,
+)
 from vellum.workflows.triggers.base import _get_trigger_attribute_id_mapping, _get_trigger_path_to_id_mapping
 
 current_file_path = os.path.abspath(__file__)
@@ -71,17 +77,23 @@ def workspace_secret_client(vellum_client):
 
 @pytest.fixture
 def deployment_client(vellum_client):
-    deployment = DeploymentRead(
-        id="e68d6033-f3e6-4681-a7b9-6bfd2828a237",
+    deployment_release = WorkflowDeploymentRelease(
+        id=str(uuid4()),
         created=datetime.now(),
-        label="Example Deployment",
-        name="example deployment",
-        last_deployed_on=datetime.now(),
-        input_variables=[],
-        active_model_version_ids=[],
-        last_deployed_history_item_id=str(uuid4()),
+        environment=ReleaseEnvironment(id=str(uuid4()), name="DEVELOPMENT", label="Development"),
+        workflow_version=WorkflowDeploymentReleaseWorkflowVersion(
+            id=str(uuid4()),
+            input_variables=[],
+            output_variables=[],
+        ),
+        deployment=WorkflowDeploymentReleaseWorkflowDeployment(
+            id="e68d6033-f3e6-4681-a7b9-6bfd2828a237",
+            name="example deployment",
+        ),
+        release_tags=[],
+        reviews=[],
     )
-    vellum_client.workflow_deployments.retrieve.return_value = deployment
+    vellum_client.workflow_deployments.retrieve_workflow_deployment_release.return_value = deployment_release
 
 
 @pytest.fixture(autouse=True)

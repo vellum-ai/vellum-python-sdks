@@ -6,6 +6,7 @@ from uuid import UUID
 class NodeOutputDisplay:
     id: UUID
     name: str
+    _is_implicit: bool = False
 
 
 @dataclass

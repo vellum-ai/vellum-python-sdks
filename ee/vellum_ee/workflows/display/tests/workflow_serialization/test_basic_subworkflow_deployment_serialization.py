@@ -3,7 +3,18 @@ from uuid import uuid4
 
 from deepdiff import DeepDiff
 
-from vellum import WorkflowDeploymentRead
+from vellum import (
+    ReleaseEnvironment,
+    VellumVariable,
+    WorkflowDeploymentRelease,
+    WorkflowDeploymentReleaseWorkflowDeployment,
+    WorkflowDeploymentReleaseWorkflowVersion,
+)
+from vellum.workflows import BaseWorkflow
+from vellum.workflows.inputs import BaseInputs
+from vellum.workflows.nodes import SubworkflowDeploymentNode, TemplatingNode
+from vellum.workflows.outputs import BaseOutputs
+from vellum.workflows.state import BaseState
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 from tests.workflows.basic_subworkflow_deployment.workflow import BasicSubworkflowDeploymentWorkflow
@@ -11,17 +22,24 @@ from tests.workflows.basic_subworkflow_deployment.workflow import BasicSubworkfl
 
 def test_serialize_workflow(vellum_client):
     # GIVEN a Workflow with stubbed out API calls
-    deployment = WorkflowDeploymentRead(
+    deployment_id = str(uuid4())
+    deployment_release = WorkflowDeploymentRelease(
         id=str(uuid4()),
         created=datetime.now(),
-        label="Example Subworkflow Deployment",
-        name="example_subworkflow_deployment",
-        input_variables=[],
-        output_variables=[],
-        last_deployed_on=datetime.now(),
-        last_deployed_history_item_id=str(uuid4()),
+        environment=ReleaseEnvironment(id=str(uuid4()), name="DEVELOPMENT", label="Development"),
+        workflow_version=WorkflowDeploymentReleaseWorkflowVersion(
+            id=str(uuid4()),
+            input_variables=[],
+            output_variables=[],
+        ),
+        deployment=WorkflowDeploymentReleaseWorkflowDeployment(
+            id=deployment_id,
+            name="example_subworkflow_deployment",
+        ),
+        release_tags=[],
+        reviews=[],
     )
-    vellum_client.workflow_deployments.retrieve.return_value = deployment
+    vellum_client.workflow_deployments.retrieve_workflow_deployment_release.return_value = deployment_release
 
     # WHEN we serialize it
     workflow_display = get_workflow_display(workflow_class=BasicSubworkflowDeploymentWorkflow)
@@ -139,7 +157,7 @@ def test_serialize_workflow(vellum_client):
             "source_handle_id": "ff99bf0c-c239-4b8b-8ac1-483b134f94f4",
             "target_handle_id": "d6194ccf-d31b-4846-8e24-3e189d84351a",
             "variant": "DEPLOYMENT",
-            "workflow_deployment_id": deployment.id,
+            "workflow_deployment_id": deployment_id,
             "release_tag": "LATEST",
         },
         "display_data": {"position": {"x": 200.0, "y": -50.0}},
@@ -156,6 +174,22 @@ def test_serialize_workflow(vellum_client):
             "merge_behavior": "AWAIT_ANY",
         },
         "ports": [{"id": "ff99bf0c-c239-4b8b-8ac1-483b134f94f4", "name": "default", "type": "DEFAULT"}],
+        "outputs": [
+            {
+                "id": "d901cbed-9905-488c-be62-e2668f85438f",
+                "name": "temperature",
+                "schema": {"type": "number"},
+                "type": "NUMBER",
+                "value": None,
+            },
+            {
+                "id": "68de689c-fe8a-4189-b7d0-82c620ac30f9",
+                "name": "reasoning",
+                "schema": {"type": "string"},
+                "type": "STRING",
+                "value": None,
+            },
+        ],
     }
 
     # AND the display data should be what we expect
@@ -179,3 +213,103 @@ def test_serialize_workflow(vellum_client):
             "workflow",
         ],
     }
+
+
+def test_serialize_workflow__subworkflow_deployment_node_outputs_from_release(vellum_client):
+    """
+    Tests that subworkflow deployment node outputs are populated from the deployment's output variables,
+    and that downstream nodes referencing those outputs correctly reference the subworkflow node.
+    """
+
+    # GIVEN a subworkflow deployment node with foo and bar outputs
+    class SubworkflowDeploymentNodeWithOutputs(SubworkflowDeploymentNode):
+        deployment = "test_subworkflow_deployment"
+
+        class Outputs(BaseOutputs):
+            foo: str
+            bar: int
+
+    # AND a templating node that references both outputs
+    class ConsumingNode(TemplatingNode):
+        template = "foo: {{ foo }}, bar: {{ bar }}"
+        inputs = {
+            "foo": SubworkflowDeploymentNodeWithOutputs.Outputs.foo,
+            "bar": SubworkflowDeploymentNodeWithOutputs.Outputs.bar,
+        }
+
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = SubworkflowDeploymentNodeWithOutputs >> ConsumingNode
+
+        class Outputs(BaseOutputs):
+            result = ConsumingNode.Outputs.result
+
+    # AND a deployment release with output variables for foo and bar
+    foo_output_id = "11111111-1111-1111-1111-111111111111"
+    bar_output_id = "22222222-2222-2222-2222-222222222222"
+    deployment_release = WorkflowDeploymentRelease(
+        id=str(uuid4()),
+        created=datetime.now(),
+        environment=ReleaseEnvironment(id=str(uuid4()), name="DEVELOPMENT", label="Development"),
+        workflow_version=WorkflowDeploymentReleaseWorkflowVersion(
+            id=str(uuid4()),
+            input_variables=[],
+            output_variables=[
+                VellumVariable(id=foo_output_id, key="foo", type="STRING"),
+                VellumVariable(id=bar_output_id, key="bar", type="NUMBER"),
+            ],
+        ),
+        deployment=WorkflowDeploymentReleaseWorkflowDeployment(
+            id=str(uuid4()),
+            name="test_subworkflow_deployment",
+        ),
+        release_tags=[],
+        reviews=[],
+    )
+    vellum_client.workflow_deployments.retrieve_workflow_deployment_release.return_value = deployment_release
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the subworkflow deployment node should have outputs populated from the deployment's output variables
+    workflow_raw_data = serialized_workflow["workflow_raw_data"]
+    subworkflow_node = next(node for node in workflow_raw_data["nodes"] if node["type"] == "SUBWORKFLOW")
+
+    # AND the outputs should contain foo and bar with the correct IDs from the deployment
+    assert subworkflow_node.get("outputs") is not None, "outputs field should not be None"
+    outputs = subworkflow_node["outputs"]
+    assert len(outputs) == 2
+
+    foo_output = next((o for o in outputs if o["name"] == "foo"), None)
+    bar_output = next((o for o in outputs if o["name"] == "bar"), None)
+
+    assert foo_output is not None, "foo output should exist"
+    assert bar_output is not None, "bar output should exist"
+    assert foo_output["id"] == foo_output_id, "foo output ID should match deployment's output variable ID"
+    assert bar_output["id"] == bar_output_id, "bar output ID should match deployment's output variable ID"
+    assert foo_output["type"] == "STRING"
+    assert bar_output["type"] == "NUMBER"
+
+    # AND the consuming node should reference the subworkflow node's outputs
+    consuming_node = next(node for node in workflow_raw_data["nodes"] if node["type"] == "TEMPLATING")
+    consuming_node_inputs = consuming_node["inputs"]
+
+    foo_input = next((inp for inp in consuming_node_inputs if inp["key"] == "foo"), None)
+    bar_input = next((inp for inp in consuming_node_inputs if inp["key"] == "bar"), None)
+
+    assert foo_input is not None, "foo input should exist on consuming node"
+    assert bar_input is not None, "bar input should exist on consuming node"
+
+    # AND the foo input should reference the subworkflow node
+    foo_rule = foo_input["value"]["rules"][0]
+    assert foo_rule["type"] == "NODE_OUTPUT"
+    assert foo_rule["data"]["node_id"] == subworkflow_node["id"]
+    # The output_id should match the foo output from the subworkflow node's outputs list
+    assert foo_rule["data"]["output_id"] == foo_output["id"]
+
+    # AND the bar input should reference the subworkflow node
+    bar_rule = bar_input["value"]["rules"][0]
+    assert bar_rule["type"] == "NODE_OUTPUT"
+    assert bar_rule["data"]["node_id"] == subworkflow_node["id"]
+    # The output_id should match the bar output from the subworkflow node's outputs list
+    assert bar_rule["data"]["output_id"] == bar_output["id"]
