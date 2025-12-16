@@ -6,6 +6,7 @@
  * https://github.com/fern-api/fern/tree/main/generators/python-v2/ast
  */
 
+export * from "./access-attribute";
 export * from "./ast-node";
 export * from "./bool-instantiation";
 export * from "./class";

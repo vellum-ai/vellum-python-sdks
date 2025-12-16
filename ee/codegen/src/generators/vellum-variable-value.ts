@@ -1,4 +1,3 @@
-import { python } from "@fern-api/python-ast";
 import { isNil } from "lodash";
 import {
   ChatMessageRequest,
@@ -17,6 +16,7 @@ import { ChatMessageContent } from "./chat-message-content";
 import { ValueGenerationError } from "./errors";
 
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
+import { AccessAttribute } from "src/generators/extensions/access-attribute";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { FloatInstantiation } from "src/generators/extensions/float-instantiation";
@@ -205,7 +205,7 @@ class ErrorVellumValue extends AstNode {
 }
 
 class AudioVellumValue extends AstNode {
-  private astNode: python.AstNode;
+  private astNode: AstNode;
 
   public constructor(value: VellumAudio) {
     super();
@@ -374,7 +374,7 @@ class DocumentVellumValue extends AstNode {
 }
 
 class ArrayVellumValue extends AstNode {
-  private astNode: python.AstNode;
+  private astNode: AstNode;
 
   public constructor(value: unknown, iterableConfig?: IterableConfig) {
     super();
@@ -594,7 +594,7 @@ export class VellumValue extends AstNode {
       case "STRING":
         this.astNode = new StringVellumValue(vellumValue.value);
         if (attributeConfig) {
-          this.astNode = python.accessAttribute({
+          this.astNode = new AccessAttribute({
             lhs: attributeConfig.lhs,
             rhs: new Reference({
               name: vellumValue.value,
