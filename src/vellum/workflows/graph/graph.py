@@ -81,12 +81,16 @@ class Graph:
         entrypoints = set()
         edges = OrderedSet[Edge]()
         terminals = set()
+        trigger_edges: List[TriggerEdge] = []
 
         for target in targets:
             if isinstance(target, Graph):
                 entrypoints.update(target._entrypoints)
                 edges.update(target._edges)
                 terminals.update(target._terminals)
+                for trigger_edge in target._trigger_edges:
+                    if trigger_edge not in trigger_edges:
+                        trigger_edges.append(trigger_edge)
             elif hasattr(target, "Ports"):
                 entrypoints.update({port for port in target.Ports})
                 terminals.update({port for port in target.Ports})
@@ -95,7 +99,7 @@ class Graph:
                 entrypoints.update({target})
                 terminals.update({target})
 
-        return Graph(entrypoints=entrypoints, edges=list(edges), terminals=terminals)
+        return Graph(entrypoints=entrypoints, edges=list(edges), terminals=terminals, trigger_edges=trigger_edges)
 
     @staticmethod
     def from_edge(edge: Edge) -> "Graph":
@@ -197,6 +201,7 @@ class Graph:
                         midgraph = final_output_node >> set(elem.entrypoints)
                         self._extend_edges(midgraph.edges)
                         self._extend_edges(elem.edges)
+                        self._extend_trigger_edges(elem._trigger_edges)
                         for other_terminal in elem._terminals:
                             new_terminals.add(other_terminal)
                     elif hasattr(elem, "Ports"):
@@ -219,6 +224,7 @@ class Graph:
                 midgraph = final_output_node >> set(other.entrypoints)
                 self._extend_edges(midgraph.edges)
                 self._extend_edges(other.edges)
+            self._extend_trigger_edges(other._trigger_edges)
             self._terminals = other._terminals
             return self
 
@@ -297,6 +303,11 @@ class Graph:
         for edge in edges:
             if edge not in self._edges:
                 self._edges.append(edge)
+
+    def _extend_trigger_edges(self, trigger_edges: List[TriggerEdge]) -> None:
+        for trigger_edge in trigger_edges:
+            if trigger_edge not in self._trigger_edges:
+                self._trigger_edges.append(trigger_edge)
 
     def __str__(self) -> str:
         """

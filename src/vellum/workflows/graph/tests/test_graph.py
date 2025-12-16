@@ -5,6 +5,7 @@ from vellum.workflows.graph.graph import Graph
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.ports.port import Port
 from vellum.workflows.triggers import ManualTrigger
+from vellum.workflows.triggers.schedule import ScheduleTrigger
 
 
 def test_graph__empty():
@@ -784,3 +785,140 @@ def test_graph__trigger_then_graph_then_node():
     # AND the graph has both nodes
     nodes = list(graph.nodes)
     assert len(nodes) == 2
+
+
+def test_graph__set_of_trigger_graphs_preserves_trigger_edges():
+    """Test that combining graphs with triggers via a set preserves trigger edges.
+
+    This tests the fix for Graph.from_set() not propagating _trigger_edges.
+    """
+
+    # GIVEN a custom scheduled trigger
+    class MyScheduledTrigger(ScheduleTrigger):
+        class Config:
+            cron = "0 9 * * *"
+
+    # AND two trigger-initiated graphs
+    class MyFirstNode(BaseNode):
+        pass
+
+    class MySecondNode(BaseNode):
+        pass
+
+    trigger_graph_a = MyScheduledTrigger >> MyFirstNode
+    trigger_graph_b = MyScheduledTrigger >> MySecondNode
+
+    # WHEN we combine them in a set
+    combined_graph = Graph.from_set({trigger_graph_a, trigger_graph_b})
+
+    # THEN the combined graph has both trigger edges
+    trigger_edges = list(combined_graph.trigger_edges)
+    assert len(trigger_edges) == 2
+
+    # AND both edges point to the correct nodes
+    target_nodes = {edge.to_node for edge in trigger_edges}
+    assert target_nodes == {MyFirstNode, MySecondNode}
+
+    # AND the graph exposes the trigger
+    triggers = list(combined_graph.triggers)
+    assert len(triggers) == 1
+    assert triggers[0] == MyScheduledTrigger
+
+
+def test_graph__set_of_trigger_graphs_to_node_preserves_trigger_edges():
+    # GIVEN a custom scheduled trigger
+    class MyScheduledTrigger(ScheduleTrigger):
+        class Config:
+            cron = "0 9 * * *"
+
+    # AND two trigger-initiated graphs
+    class MyFirstNode(BaseNode):
+        pass
+
+    class MySecondNode(BaseNode):
+        pass
+
+    class MyThirdNode(BaseNode):
+        pass
+
+    trigger_graph_a = MyScheduledTrigger >> MyFirstNode
+    trigger_graph_b = MyScheduledTrigger >> MySecondNode
+
+    # WHEN we combine them in a set and connect to another node
+    combined_graph = {trigger_graph_a, trigger_graph_b} >> MyThirdNode
+
+    # THEN the combined graph has both trigger edges
+    trigger_edges = list(combined_graph.trigger_edges)
+    assert len(trigger_edges) == 2
+
+    # AND both trigger edges point to the correct initial nodes
+    trigger_target_nodes = {edge.to_node for edge in trigger_edges}
+    assert trigger_target_nodes == {MyFirstNode, MySecondNode}
+
+    # AND the graph has regular edges to the third node
+    regular_edges = list(combined_graph.edges)
+    assert len(regular_edges) == 2
+    assert all(edge.to_node == MyThirdNode for edge in regular_edges)
+
+    # AND the graph has all three nodes
+    nodes = list(combined_graph.nodes)
+    assert len(nodes) == 3
+    assert set(nodes) == {MyFirstNode, MySecondNode, MyThirdNode}
+
+
+def test_graph__graph_rshift_graph_preserves_trigger_edges():
+    """Test that Graph >> Graph preserves trigger edges from the right-hand graph."""
+
+    # GIVEN a regular graph and a trigger-initiated graph
+    class StartNode(BaseNode):
+        pass
+
+    class TriggerNode(BaseNode):
+        pass
+
+    class EndNode(BaseNode):
+        pass
+
+    regular_graph = StartNode >> TriggerNode
+    trigger_graph = ManualTrigger >> EndNode
+
+    # WHEN we combine them with >>
+    combined = regular_graph >> trigger_graph
+
+    # THEN the combined graph has the trigger edge
+    trigger_edges = list(combined.trigger_edges)
+    assert len(trigger_edges) == 1
+    assert trigger_edges[0].to_node == EndNode
+
+    # AND the graph exposes the trigger
+    triggers = list(combined.triggers)
+    assert len(triggers) == 1
+
+
+def test_graph__graph_rshift_set_of_trigger_graphs_preserves_trigger_edges():
+    """Test that Graph >> {TriggerGraph1, TriggerGraph2} preserves trigger edges."""
+
+    # GIVEN a regular graph and two trigger-initiated graphs
+    class StartNode(BaseNode):
+        pass
+
+    class TriggerNodeA(BaseNode):
+        pass
+
+    class TriggerNodeB(BaseNode):
+        pass
+
+    regular_graph = Graph.from_node(StartNode)
+    trigger_graph_a = ManualTrigger >> TriggerNodeA
+    trigger_graph_b = ManualTrigger >> TriggerNodeB
+
+    # WHEN we combine them with >> and a set
+    combined = regular_graph >> {trigger_graph_a, trigger_graph_b}
+
+    # THEN the combined graph has both trigger edges
+    trigger_edges = list(combined.trigger_edges)
+    assert len(trigger_edges) == 2
+
+    # AND both trigger edges point to the correct nodes
+    trigger_target_nodes = {edge.to_node for edge in trigger_edges}
+    assert trigger_target_nodes == {TriggerNodeA, TriggerNodeB}
