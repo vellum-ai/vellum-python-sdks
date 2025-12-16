@@ -12,7 +12,7 @@ from vellum import (
 )
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
-from vellum.workflows.nodes import SubworkflowDeploymentNode
+from vellum.workflows.nodes import SubworkflowDeploymentNode, TemplatingNode
 from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.state import BaseState
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
@@ -201,7 +201,8 @@ def test_serialize_workflow(vellum_client):
 
 def test_serialize_workflow__subworkflow_deployment_node_outputs_from_release(vellum_client):
     """
-    Tests that subworkflow deployment node outputs are populated from the deployment's output variables.
+    Tests that subworkflow deployment node outputs are populated from the deployment's output variables,
+    and that downstream nodes referencing those outputs correctly reference the subworkflow node.
     """
 
     # GIVEN a subworkflow deployment node with foo and bar outputs
@@ -212,12 +213,19 @@ def test_serialize_workflow__subworkflow_deployment_node_outputs_from_release(ve
             foo: str
             bar: int
 
+    # AND a templating node that references both outputs
+    class ConsumingNode(TemplatingNode):
+        template = "foo: {{ foo }}, bar: {{ bar }}"
+        inputs = {
+            "foo": SubworkflowDeploymentNodeWithOutputs.Outputs.foo,
+            "bar": SubworkflowDeploymentNodeWithOutputs.Outputs.bar,
+        }
+
     class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
-        graph = SubworkflowDeploymentNodeWithOutputs
+        graph = SubworkflowDeploymentNodeWithOutputs >> ConsumingNode
 
         class Outputs(BaseOutputs):
-            foo = SubworkflowDeploymentNodeWithOutputs.Outputs.foo
-            bar = SubworkflowDeploymentNodeWithOutputs.Outputs.bar
+            result = ConsumingNode.Outputs.result
 
     # AND a deployment release with output variables for foo and bar
     foo_output_id = "11111111-1111-1111-1111-111111111111"
@@ -265,3 +273,27 @@ def test_serialize_workflow__subworkflow_deployment_node_outputs_from_release(ve
     assert bar_output["id"] == bar_output_id, "bar output ID should match deployment's output variable ID"
     assert foo_output["type"] == "STRING"
     assert bar_output["type"] == "NUMBER"
+
+    # AND the consuming node should reference the subworkflow node's outputs
+    consuming_node = next(node for node in workflow_raw_data["nodes"] if node["type"] == "TEMPLATING")
+    consuming_node_inputs = consuming_node["inputs"]
+
+    foo_input = next((inp for inp in consuming_node_inputs if inp["key"] == "foo"), None)
+    bar_input = next((inp for inp in consuming_node_inputs if inp["key"] == "bar"), None)
+
+    assert foo_input is not None, "foo input should exist on consuming node"
+    assert bar_input is not None, "bar input should exist on consuming node"
+
+    # AND the foo input should reference the subworkflow node
+    foo_rule = foo_input["value"]["rules"][0]
+    assert foo_rule["type"] == "NODE_OUTPUT"
+    assert foo_rule["data"]["node_id"] == subworkflow_node["id"]
+    # The output_id should match the foo output from the subworkflow node's outputs list
+    assert foo_rule["data"]["output_id"] == foo_output["id"]
+
+    # AND the bar input should reference the subworkflow node
+    bar_rule = bar_input["value"]["rules"][0]
+    assert bar_rule["type"] == "NODE_OUTPUT"
+    assert bar_rule["data"]["node_id"] == subworkflow_node["id"]
+    # The output_id should match the bar output from the subworkflow node's outputs list
+    assert bar_rule["data"]["output_id"] == bar_output["id"]
