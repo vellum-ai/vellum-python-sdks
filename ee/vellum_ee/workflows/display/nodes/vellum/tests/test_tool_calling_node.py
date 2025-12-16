@@ -246,6 +246,16 @@ def test_serialize_node__tool_calling_node__mcp_server_api_key():
                                 "environment_variable": "my-api-key-header-value",
                             },
                         },
+                        {
+                            "id": "0ce4327e-72ab-4fb3-83ab-9cce5d398388",
+                            "key": "include_tools",
+                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                        },
+                        {
+                            "id": "9ee4fd57-b73a-4b97-991e-14cad22645fa",
+                            "key": "exclude_tools",
+                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                        },
                     ],
                     "definition": {"name": "MCPServer", "module": ["vellum", "workflows", "types", "definition"]},
                 }
@@ -300,6 +310,8 @@ def test_serialize_node__tool_calling_node__mcp_server_no_authorization():
                         "bearer_token_value": None,
                         "api_key_header_key": None,
                         "api_key_header_value": None,
+                        "include_tools": None,
+                        "exclude_tools": None,
                     }
                 ],
             },
