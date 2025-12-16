@@ -5,6 +5,7 @@ import {
   PORTS_CLASS_NAME,
   VELLUM_WORKFLOW_GRAPH_MODULE_PATH,
 } from "src/constants";
+import { AccessAttribute } from "src/generators/extensions/access-attribute";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { MethodInvocation } from "src/generators/extensions/method-invocation";
@@ -1415,7 +1416,7 @@ export class GraphAttribute extends AstNode {
     useWrap: boolean = false
   ): AstNode {
     if (mutableAst.type === "empty") {
-      return python.accessAttribute({
+      return new AccessAttribute({
         lhs: new Reference({
           name: "Graph",
           modulePath: VELLUM_WORKFLOW_GRAPH_MODULE_PATH,
@@ -1465,7 +1466,7 @@ export class GraphAttribute extends AstNode {
         }
       );
       if (useWrap) {
-        return python.accessAttribute({
+        return new AccessAttribute({
           lhs: new Reference({
             name: "Graph",
             modulePath: VELLUM_WORKFLOW_GRAPH_MODULE_PATH,

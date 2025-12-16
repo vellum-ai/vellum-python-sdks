@@ -5,6 +5,7 @@ import { NodeInputValuePointerRule } from "./node-input-value-pointer-rules/node
 
 import { BaseNodeContext } from "src/context/node-context/base";
 import { BaseCodegenError } from "src/generators/errors";
+import { AccessAttribute } from "src/generators/extensions/access-attribute";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
@@ -90,7 +91,7 @@ export class NodeInputValuePointer extends AstNode {
         break;
       }
 
-      expression = python.accessAttribute({
+      expression = new AccessAttribute({
         lhs: expression,
         rhs: new MethodInvocation({
           methodReference: new Reference({
