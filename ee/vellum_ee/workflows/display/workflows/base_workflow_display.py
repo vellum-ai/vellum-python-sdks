@@ -860,13 +860,14 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         node: Type[BaseNode],
         node_display: BaseNodeDisplay,
         node_output_displays: Dict[OutputReference, NodeOutputDisplay],
+        errors: List[Exception],
     ):
         """This method recursively adds nodes wrapped in decorators to the node_output_displays dictionary."""
 
         inner_node = get_wrapped_node(node)
         if inner_node:
-            inner_node_display = self._get_node_display(inner_node)
-            self._enrich_global_node_output_displays(inner_node, inner_node_display, node_output_displays)
+            inner_node_display = self._get_node_display(inner_node, errors)
+            self._enrich_global_node_output_displays(inner_node, inner_node_display, node_output_displays, errors)
 
         for node_output in node.Outputs:
             if node_output in node_output_displays:
@@ -879,13 +880,14 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         node: Type[BaseNode],
         node_display: BaseNodeDisplay,
         port_displays: Dict[Port, PortDisplay],
+        errors: List[Exception],
     ):
         """This method recursively adds nodes wrapped in decorators to the port_displays dictionary."""
 
         inner_node = get_wrapped_node(node)
         if inner_node:
-            inner_node_display = self._get_node_display(inner_node)
-            self._enrich_node_port_displays(inner_node, inner_node_display, port_displays)
+            inner_node_display = self._get_node_display(inner_node, errors)
+            self._enrich_node_port_displays(inner_node, inner_node_display, port_displays, errors)
 
         for port in node.Ports:
             if port in port_displays:
@@ -893,12 +895,18 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
 
             port_displays[port] = node_display.get_node_port_display(port)
 
-    def _get_node_display(self, node: Type[BaseNode]) -> BaseNodeDisplay:
+    def _get_node_display(self, node: Type[BaseNode], errors: List[Exception]) -> BaseNodeDisplay:
         node_display_class = get_node_display_class(node)
-        return node_display_class()
+        node_display = node_display_class()
+        try:
+            node_display.build(client=self._client)
+        except Exception as e:
+            errors.append(e)
+        return node_display
 
     @cached_property
     def display_context(self) -> WorkflowDisplayContext:
+        errors: List[Exception] = []
         workflow_meta_display = self._generate_workflow_meta_display()
 
         global_node_output_displays: NodeOutputDisplays = (
@@ -920,6 +928,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                 global_node_displays=global_node_displays,
                 global_node_output_displays=global_node_output_displays,
                 port_displays=port_displays,
+                errors=errors,
             )
 
         workflow_input_displays: WorkflowInputsDisplays = {}
@@ -1005,6 +1014,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             port_displays=port_displays,
             workflow_display_class=self.__class__,
             dry_run=self._dry_run,
+            _errors=errors,
         )
 
     def _generate_workflow_meta_display(self) -> WorkflowMetaDisplay:
@@ -1211,8 +1221,9 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         global_node_displays: NodeDisplays,
         global_node_output_displays: NodeOutputDisplays,
         port_displays: PortDisplays,
+        errors: List[Exception],
     ) -> None:
-        extracted_node_displays = self._extract_node_displays(node)
+        extracted_node_displays = self._extract_node_displays(node, errors)
 
         for extracted_node, extracted_node_display in extracted_node_displays.items():
             if extracted_node not in node_displays:
@@ -1221,11 +1232,15 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             if extracted_node not in global_node_displays:
                 global_node_displays[extracted_node] = extracted_node_display
 
-        self._enrich_global_node_output_displays(node, extracted_node_displays[node], global_node_output_displays)
-        self._enrich_node_port_displays(node, extracted_node_displays[node], port_displays)
+        self._enrich_global_node_output_displays(
+            node, extracted_node_displays[node], global_node_output_displays, errors
+        )
+        self._enrich_node_port_displays(node, extracted_node_displays[node], port_displays, errors)
 
-    def _extract_node_displays(self, node: Type[BaseNode]) -> Dict[Type[BaseNode], BaseNodeDisplay]:
-        node_display = self._get_node_display(node)
+    def _extract_node_displays(
+        self, node: Type[BaseNode], errors: List[Exception]
+    ) -> Dict[Type[BaseNode], BaseNodeDisplay]:
+        node_display = self._get_node_display(node, errors)
         additional_node_displays: Dict[Type[BaseNode], BaseNodeDisplay] = {
             node: node_display,
         }
@@ -1233,7 +1248,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         # Nodes wrapped in a decorator need to be in our node display dictionary for later retrieval
         inner_node = get_wrapped_node(node)
         if inner_node:
-            inner_node_displays = self._extract_node_displays(inner_node)
+            inner_node_displays = self._extract_node_displays(inner_node, errors)
 
             for node, display in inner_node_displays.items():
                 if node not in additional_node_displays:

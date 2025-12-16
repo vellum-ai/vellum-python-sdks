@@ -22,6 +22,7 @@ from tests.workflows.basic_subworkflow_deployment.workflow import BasicSubworkfl
 
 def test_serialize_workflow(vellum_client):
     # GIVEN a Workflow with stubbed out API calls
+    deployment_id = str(uuid4())
     deployment_release = WorkflowDeploymentRelease(
         id=str(uuid4()),
         created=datetime.now(),
@@ -32,7 +33,7 @@ def test_serialize_workflow(vellum_client):
             output_variables=[],
         ),
         deployment=WorkflowDeploymentReleaseWorkflowDeployment(
-            id="4fec7b3d-4aad-4088-8c7c-a0435ac0b324",
+            id=deployment_id,
             name="example_subworkflow_deployment",
         ),
         release_tags=[],
@@ -156,7 +157,7 @@ def test_serialize_workflow(vellum_client):
             "source_handle_id": "ff99bf0c-c239-4b8b-8ac1-483b134f94f4",
             "target_handle_id": "d6194ccf-d31b-4846-8e24-3e189d84351a",
             "variant": "DEPLOYMENT",
-            "workflow_deployment_id": "4fec7b3d-4aad-4088-8c7c-a0435ac0b324",
+            "workflow_deployment_id": deployment_id,
             "release_tag": "LATEST",
         },
         "display_data": {"position": {"x": 200.0, "y": -50.0}},
@@ -173,7 +174,22 @@ def test_serialize_workflow(vellum_client):
             "merge_behavior": "AWAIT_ANY",
         },
         "ports": [{"id": "ff99bf0c-c239-4b8b-8ac1-483b134f94f4", "name": "default", "type": "DEFAULT"}],
-        "outputs": [],
+        "outputs": [
+            {
+                "id": "d901cbed-9905-488c-be62-e2668f85438f",
+                "name": "temperature",
+                "schema": {"type": "number"},
+                "type": "NUMBER",
+                "value": None,
+            },
+            {
+                "id": "68de689c-fe8a-4189-b7d0-82c620ac30f9",
+                "name": "reasoning",
+                "schema": {"type": "string"},
+                "type": "STRING",
+                "value": None,
+            },
+        ],
     }
 
     # AND the display data should be what we expect

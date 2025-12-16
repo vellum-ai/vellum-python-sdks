@@ -1,11 +1,11 @@
 from uuid import UUID
-from typing import Dict, Generic, Optional, TypeVar
+from typing import Generic, Optional, TypeVar
 
+from vellum.client import Vellum as VellumClient
+from vellum.utils.uuid import is_valid_uuid
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes import SubworkflowDeploymentNode
-from vellum.workflows.references import OutputReference
-from vellum.workflows.types.core import JsonArray, JsonObject
-from vellum.workflows.utils.uuids import uuid4_from_hash
+from vellum.workflows.types.core import JsonObject
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
@@ -20,19 +20,36 @@ class BaseSubworkflowDeploymentNodeDisplay(
 ):
     __serializable_inputs__ = {SubworkflowDeploymentNode.subworkflow_inputs}
 
-    # Cache for output IDs fetched from the deployment release
-    _output_ids_by_name: Optional[Dict[str, str]] = None
+    _deployment_id: Optional[str] = None
+    _release_tag: Optional[str] = None
 
-    def get_node_output_display(self, output: OutputReference) -> NodeOutputDisplay:
-        # Check if we have a cached output ID from the deployment release
-        if self._output_ids_by_name is not None and output.name in self._output_ids_by_name:
-            return NodeOutputDisplay(
-                id=UUID(self._output_ids_by_name[output.name]),
+    def build(self, client: VellumClient) -> None:
+        node = self._node
+        deployment_descriptor_id = str(raise_if_descriptor(node.deployment))
+        self._release_tag = raise_if_descriptor(node.release_tag)
+
+        deployment_release = client.workflow_deployments.retrieve_workflow_deployment_release(
+            id=deployment_descriptor_id,
+            release_id_or_release_tag=self._release_tag,
+        )
+        self._deployment_id = str(deployment_release.deployment.id)
+        output_variables_by_key = {var.key: var for var in deployment_release.workflow_version.output_variables}
+
+        for output in node.Outputs:
+            original_output_display = self.output_display.get(output)
+            if original_output_display and not original_output_display._is_implicit:
+                continue
+
+            output_variable = output_variables_by_key.get(output.name)
+            if not output_variable or not is_valid_uuid(output_variable.id):
+                continue
+
+            output_id = UUID(output_variable.id)
+            self.output_display[output] = NodeOutputDisplay(
+                id=output_id,
                 name=output.name,
             )
-
-        # Fall back to the default behavior
-        return super().get_node_output_display(output)
+            self._node.__output_ids__[output.name] = output_id
 
     def serialize(
         self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **_kwargs
@@ -61,39 +78,6 @@ class BaseSubworkflowDeploymentNodeDisplay(
             for variable_name, variable_value in input_items
         ]
 
-        deployment_descriptor_id = str(raise_if_descriptor(node.deployment))
-        release_tag = raise_if_descriptor(node.release_tag)
-        outputs: JsonArray = []
-        try:
-            deployment_release = display_context.client.workflow_deployments.retrieve_workflow_deployment_release(
-                id=deployment_descriptor_id,
-                release_id_or_release_tag=release_tag,
-            )
-            deployment_id = str(deployment_release.deployment.id)
-
-            output_variables_by_key = {var.key: var for var in deployment_release.workflow_version.output_variables}
-            for output in node.Outputs:
-                output_variable = output_variables_by_key.get(output.name)
-                if output_variable:
-                    output_id = UUID(output_variable.id)
-                    outputs.append(
-                        {
-                            "id": output_variable.id,
-                            "name": output.name,
-                            "type": output_variable.type,
-                            "value": None,
-                        }
-                    )
-                    # Update the global_node_output_displays with the correct output ID from the deployment release
-                    # This ensures that downstream nodes referencing this output use the correct ID
-                    display_context.global_node_output_displays[output] = NodeOutputDisplay(
-                        id=output_id,
-                        name=output.name,
-                    )
-        except Exception as e:
-            display_context.add_error(e)
-            deployment_id = str(uuid4_from_hash(deployment_descriptor_id))
-
         return {
             "id": str(node_id),
             "type": "SUBWORKFLOW",
@@ -104,9 +88,8 @@ class BaseSubworkflowDeploymentNodeDisplay(
                 "source_handle_id": str(self.get_source_handle_id(display_context.port_displays)),
                 "target_handle_id": str(self.get_target_handle_id()),
                 "variant": "DEPLOYMENT",
-                "workflow_deployment_id": deployment_id,
-                "release_tag": release_tag,
+                "workflow_deployment_id": self._deployment_id,
+                "release_tag": self._release_tag,
             },
-            **self.serialize_generic_fields(display_context, exclude=["outputs"]),
-            "outputs": outputs,
+            **self.serialize_generic_fields(display_context),
         }

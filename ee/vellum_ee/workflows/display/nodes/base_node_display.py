@@ -19,6 +19,7 @@ from typing import (
     get_origin,
 )
 
+from vellum.client import Vellum as VellumClient
 from vellum.client.types.code_resource_definition import CodeResourceDefinition
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.constants import undefined
@@ -62,10 +63,9 @@ class BaseNodeDisplayMeta(type):
         cls = cast(Type["BaseNodeDisplay"], super().__new__(mcs, name, bases, dct))
         # This cast shouldn't be necessary, but it's a workaround for a mypy bug
         node_class = cast(Type[BaseNode], cls.infer_node_class() if name != "BaseNodeDisplay" else BaseNode)
-
         if not dct.get("output_display"):
             cls.output_display = {
-                ref: NodeOutputDisplay(id=node_class.__output_ids__[ref.name], name=ref.name)
+                ref: NodeOutputDisplay(id=node_class.__output_ids__[ref.name], name=ref.name, _is_implicit=True)
                 for ref in node_class.Outputs
                 if ref.name in node_class.__output_ids__
             }
@@ -141,6 +141,11 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
     # don't want to commit to that decision just yet
     __unserializable_attributes__: Set[NodeReference] = set()
     # END: Attributes for backwards compatible serialization
+
+    def build(self, client: VellumClient) -> None:
+        # Individual display classes can override this method to perform any async logic
+        # needed to perform serialization across all nodes.
+        pass
 
     def serialize(self, display_context: "WorkflowDisplayContext", **kwargs: Any) -> JsonObject:
         node = self._node
