@@ -48,12 +48,23 @@ class BaseSubworkflowDeploymentNodeDisplay(
         deployment_descriptor_id = str(raise_if_descriptor(node.deployment))
         release_tag = raise_if_descriptor(node.release_tag)
         outputs: JsonArray = []
+
+        # First, retrieve the deployment to get the deployment_id
+        try:
+            deployment = display_context.client.workflow_deployments.retrieve(
+                id=deployment_descriptor_id,
+            )
+            deployment_id = str(deployment.id)
+        except Exception as e:
+            display_context.add_error(e)
+            deployment_id = str(uuid4_from_hash(deployment_descriptor_id))
+
+        # Then, retrieve the deployment release to get output variables
         try:
             deployment_release = display_context.client.workflow_deployments.retrieve_workflow_deployment_release(
                 id=deployment_descriptor_id,
                 release_id_or_release_tag=release_tag,
             )
-            deployment_id = str(uuid4_from_hash(deployment_descriptor_id))
 
             output_variables_by_key = {var.key: var for var in deployment_release.workflow_version.output_variables}
             for output in node.Outputs:
@@ -69,7 +80,6 @@ class BaseSubworkflowDeploymentNodeDisplay(
                     )
         except Exception as e:
             display_context.add_error(e)
-            deployment_id = str(uuid4_from_hash(deployment_descriptor_id))
 
         return {
             "id": str(node_id),
