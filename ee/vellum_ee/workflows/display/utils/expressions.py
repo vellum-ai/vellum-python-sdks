@@ -449,16 +449,29 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
         serialized_value: dict = workflow_display.serialize()
         name = serialized_value["workflow_raw_data"]["definition"]["name"]
         description = value.__doc__ or ""
+
+        workflow_data: Dict[str, Any] = {
+            "type": "INLINE_WORKFLOW",
+            "name": name,
+            "description": description,
+            "exec_config": serialized_value,
+        }
+
+        # Handle __vellum_inputs__ for inline workflows (similar to function tools)
+        inputs = getattr(value, "__vellum_inputs__", {})
+        if inputs:
+            serialized_inputs = {}
+            for param_name, input_ref in inputs.items():
+                serialized_input = serialize_value(executable_id, display_context, input_ref)
+                if serialized_input is not None:
+                    serialized_inputs[param_name] = serialized_input
+            workflow_data["inputs"] = serialized_inputs
+
         return {
             "type": "CONSTANT_VALUE",
             "value": {
                 "type": "JSON",
-                "value": {
-                    "type": "INLINE_WORKFLOW",
-                    "name": name,
-                    "description": description,
-                    "exec_config": serialized_value,
-                },
+                "value": workflow_data,
             },
         }
 
