@@ -56,9 +56,14 @@ from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.references.workflow_input import WorkflowInputReference
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.core import JsonArray, JsonObject
+from vellum.workflows.types.definition import DeploymentDefinition
 from vellum.workflows.types.generics import is_workflow_class
 from vellum.workflows.utils.files import virtual_open
-from vellum.workflows.utils.functions import compile_function_definition, compile_inline_workflow_function_definition
+from vellum.workflows.utils.functions import (
+    compile_function_definition,
+    compile_inline_workflow_function_definition,
+    compile_workflow_deployment_function_definition,
+)
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.utils.exceptions import (
@@ -484,6 +489,35 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
                 "value": workflow_data,
             },
         }
+
+    if isinstance(value, DeploymentDefinition):
+        # Handle DeploymentDefinition with tool wrapper support (similar to inline workflows)
+        context = {"executable_id": executable_id, "client": display_context.client}
+        dict_value = value.model_dump(context=context)
+
+        # Compile the function definition (which now handles __vellum_inputs__ and __vellum_examples__)
+        if display_context.client is not None:
+            function_definition = compile_workflow_deployment_function_definition(value, display_context.client)
+
+            # Handle __vellum_inputs__ for workflow deployments (similar to function tools)
+            inputs = getattr(value, "__vellum_inputs__", {})
+            if inputs:
+                serialized_inputs = {}
+                for param_name, input_ref in inputs.items():
+                    serialized_input = serialize_value(executable_id, display_context, input_ref)
+                    if serialized_input is not None:
+                        serialized_inputs[param_name] = serialized_input
+
+                model_data = function_definition.model_dump()
+                model_data["inputs"] = serialized_inputs
+                function_definition_data = model_data
+            else:
+                function_definition_data = function_definition.model_dump()
+
+            dict_value["definition"] = function_definition_data
+
+        dict_ref = serialize_value(executable_id, display_context, dict_value)
+        return dict_ref
 
     if isinstance(value, BaseModel):
         context = {"executable_id": executable_id, "client": display_context.client}

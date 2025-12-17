@@ -153,10 +153,24 @@ class RouterNode(BaseNode[ToolCallingState]):
 class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode[ToolCallingState], FunctionCallNodeMixin):
     """Node that executes a deployment definition with function call output."""
 
+    deployment_definition: Optional[DeploymentDefinition] = None
+
     def run(self) -> Iterator[BaseOutput]:
+        # Merge arguments with resolved inputs from __vellum_inputs__
+        merged_inputs = self.arguments.copy()
+        if self.deployment_definition is not None:
+            vellum_inputs = getattr(self.deployment_definition, "__vellum_inputs__", {})
+            if vellum_inputs:
+                for param_name, param_ref in vellum_inputs.items():
+                    if isinstance(param_ref, BaseDescriptor):
+                        resolved_value = param_ref.resolve(self.state)
+                    else:
+                        resolved_value = param_ref
+                    merged_inputs[param_name] = resolved_value
+
         # Mypy doesn't like instance assignments of class attributes. It's safe in our case tho bc it's what
         # we do in the `__init__` method.
-        self.subworkflow_inputs = self.arguments  # type:ignore[misc]
+        self.subworkflow_inputs = merged_inputs  # type:ignore[misc]
 
         # Call the parent run method to execute the subworkflow
         outputs = {}
@@ -507,6 +521,7 @@ def create_function_node(
             {
                 "deployment": deployment,
                 "release_tag": release_tag,
+                "deployment_definition": function,
                 "arguments": arguments_expr,
                 "function_call_id": function_call_id_expr,
                 "__module__": __name__,
