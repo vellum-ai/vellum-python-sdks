@@ -142,7 +142,10 @@ export function toPythonSafeSnakeCase(
     safetyPrefix === "_"
       ? "_"
       : `${safetyPrefix}${safetyPrefix.endsWith("_") ? "" : "_"}`;
-  return startsWithUnsafe ? cleanedSafetyPrefix + snakeCase : snakeCase;
+  const result = startsWithUnsafe ? cleanedSafetyPrefix + snakeCase : snakeCase;
+
+  // Escape Python keywords
+  return escapePythonKeyword(result);
 }
 
 export function toValidPythonIdentifier(
