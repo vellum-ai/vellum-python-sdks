@@ -1,8 +1,28 @@
-export { OperatorType } from "@fern-api/python-ast/OperatorType";
-import { OperatorType } from "@fern-api/python-ast/OperatorType";
-
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Writer } from "src/generators/extensions/writer";
+
+export type OperatorType =
+  | "or"
+  | "and"
+  | "add"
+  | "subtract"
+  | "multiple"
+  | "divide"
+  | "modulo"
+  | "leftShift"
+  | "rightShift";
+
+export const OperatorType = {
+  Or: "or",
+  And: "and",
+  Add: "add",
+  Subtract: "subtract",
+  Multiply: "multiple",
+  Divide: "divide",
+  Modulo: "modulo",
+  LeftShift: "leftShift",
+  RightShift: "rightShift",
+} as const;
 
 export declare namespace Operator {
   interface Args {
