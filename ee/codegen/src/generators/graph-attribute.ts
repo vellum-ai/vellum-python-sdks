@@ -1170,9 +1170,9 @@ export class GraphAttribute extends AstNode {
       };
     }
 
-    // If it's a right_shift, check if the RHS contains/starts with the source node
+    // If it's a right_shift, check if the LHS or RHS contains the source node
     if (mutableAst.type === "right_shift") {
-      // Check if the RHS starts with or contains the source node
+      // Check if the RHS contains the source node - process RHS
       if (this.isNodeInBranch(sourceNode, mutableAst.rhs)) {
         return {
           type: "right_shift",
@@ -1182,6 +1182,19 @@ export class GraphAttribute extends AstNode {
             cycleEdge,
             mutableAst.rhs
           ),
+        };
+      }
+      // Check if the LHS contains the source node - process LHS
+      // This handles cases like {NodeB, NodeX} >> MergeNode where the source is in the left set
+      if (this.isNodeInBranch(sourceNode, mutableAst.lhs)) {
+        return {
+          type: "right_shift",
+          lhs: this.insertCycleEdgeIntoBranch(
+            sourceNode,
+            cycleEdge,
+            mutableAst.lhs
+          ),
+          rhs: mutableAst.rhs,
         };
       }
     }
