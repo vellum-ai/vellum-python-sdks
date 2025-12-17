@@ -1,6 +1,3 @@
-import { python } from "@fern-api/python-ast";
-import { OperatorType } from "@fern-api/python-ast/OperatorType";
-
 import {
   PORTS_CLASS_NAME,
   VELLUM_WORKFLOW_GRAPH_MODULE_PATH,
@@ -10,6 +7,7 @@ import { AstNode } from "src/generators/extensions/ast-node";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { MethodInvocation } from "src/generators/extensions/method-invocation";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
+import { Operator, OperatorType } from "src/generators/extensions/operator";
 import { Reference } from "src/generators/extensions/reference";
 import { SetInstantiation } from "src/generators/extensions/set-instantiation";
 import { Writer } from "src/generators/extensions/writer";
@@ -64,7 +62,7 @@ export declare namespace GraphAttribute {
 export class GraphAttribute extends AstNode {
   private readonly workflowContext: WorkflowContext;
   private readonly entrypointNode: EntrypointNode | null;
-  private readonly astNode: python.AstNode;
+  private readonly astNode: AstNode;
   private readonly unusedEdges: Set<WorkflowEdge>;
   private readonly usedEdges = new Set<WorkflowEdge>();
   private readonly usedNodes = new Set<string>();
@@ -181,7 +179,7 @@ export class GraphAttribute extends AstNode {
    * Returns an array of Python AST nodes. If the GraphAttribute represents a set,
    * returns the individual elements. Otherwise, returns an array with a single element.
    */
-  public getAstNodesForUnusedGraphs(): python.AstNode[] {
+  public getAstNodesForUnusedGraphs(): AstNode[] {
     if (this.mutableAst.type === "set") {
       // Convert each set member to a Python AST node
       return this.mutableAst.values.map((value) => {
@@ -1492,7 +1490,7 @@ export class GraphAttribute extends AstNode {
       if (!lhs || !rhs) {
         return new NoneInstantiation();
       }
-      return python.operator({
+      return new Operator({
         operator: OperatorType.RightShift,
         lhs,
         rhs,
