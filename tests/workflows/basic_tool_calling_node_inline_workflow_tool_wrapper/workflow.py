@@ -50,11 +50,6 @@ class WorkflowInputs(BaseInputs):
     context: str
 
 
-InlineWorkflowWithToolWrapper = tool(
-    inputs={"context": WorkflowInputs.context},
-)(BasicInlineSubworkflowWorkflow)
-
-
 class GetCurrentWeatherNode(ToolCallingNode):
     """
     A tool calling node that calls the get_current_weather function with tool wrapper.
@@ -87,7 +82,7 @@ class GetCurrentWeatherNode(ToolCallingNode):
             ],
         ),
     ]
-    functions = [InlineWorkflowWithToolWrapper]
+    functions = [tool(inputs={"context": WorkflowInputs.context})(BasicInlineSubworkflowWorkflow)]
     prompt_inputs = {
         "question": WorkflowInputs.query,
     }
