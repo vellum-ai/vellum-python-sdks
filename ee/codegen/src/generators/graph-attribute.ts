@@ -610,20 +610,35 @@ export class GraphAttribute extends AstNode {
         if (doesReverseEdgeExist) {
           const sourceNodePortContext =
             sourceNode.reference.portContextsById.get(edge.sourceHandleId);
+
+          // When we have a cycle edge from a non-default port, we need to insert it
+          // into the branch that contains the source node, not as a top-level set member.
+          // This ensures the source node is not incorrectly treated as an entrypoint.
           if (sourceNodePortContext && !sourceNodePortContext.isDefault) {
+            const cycleEdge: GraphRightShift = {
+              type: "right_shift",
+              lhs: {
+                type: "port_reference",
+                reference: sourceNodePortContext,
+              },
+              rhs: targetNode,
+            };
+
+            // Find and modify the branch that contains the source node
+            const newValues = setAst.values.map((value) => {
+              if (this.isNodeInBranch(sourceNode, value)) {
+                return this.insertCycleEdgeIntoBranch(
+                  sourceNode,
+                  cycleEdge,
+                  value
+                );
+              }
+              return value;
+            });
+
             return {
-              type: "set",
-              values: [
-                ...setAst.values,
-                {
-                  type: "right_shift",
-                  lhs: {
-                    type: "port_reference",
-                    reference: sourceNodePortContext,
-                  },
-                  rhs: targetNode,
-                },
-              ],
+              type: "set" as const,
+              values: newValues,
             };
           }
 
@@ -1129,6 +1144,63 @@ export class GraphAttribute extends AstNode {
       return mutableAst.reference.nodeContext === targetNode.reference;
     }
     return false;
+  }
+
+  /**
+   * Inserts a cycle edge into a branch at the location where the source node is referenced.
+   *
+   * This transforms:
+   *   A >> B.Ports.else >> C >> D
+   * Into:
+   *   A >> { B.Ports.if >> A, B.Ports.else >> C >> D }
+   *
+   * Where the cycleEdge is `B.Ports.if >> A` and sourceNode is B.
+   */
+  private insertCycleEdgeIntoBranch(
+    sourceNode: GraphNodeReference,
+    cycleEdge: GraphRightShift,
+    mutableAst: GraphMutableAst
+  ): GraphMutableAst {
+    // If this AST starts with the source node, create a set with both the cycle edge
+    // and the original AST
+    if (this.startsWithTargetNode(sourceNode, mutableAst)) {
+      return {
+        type: "set",
+        values: [cycleEdge, mutableAst],
+      };
+    }
+
+    // If it's a right_shift, check if the RHS contains/starts with the source node
+    if (mutableAst.type === "right_shift") {
+      // Check if the RHS starts with or contains the source node
+      if (this.isNodeInBranch(sourceNode, mutableAst.rhs)) {
+        return {
+          type: "right_shift",
+          lhs: mutableAst.lhs,
+          rhs: this.insertCycleEdgeIntoBranch(
+            sourceNode,
+            cycleEdge,
+            mutableAst.rhs
+          ),
+        };
+      }
+    }
+
+    // If it's a set, recursively process each branch that contains the source node
+    if (mutableAst.type === "set") {
+      return {
+        type: "set",
+        values: mutableAst.values.map((value) => {
+          if (this.isNodeInBranch(sourceNode, value)) {
+            return this.insertCycleEdgeIntoBranch(sourceNode, cycleEdge, value);
+          }
+          return value;
+        }),
+      };
+    }
+
+    // Fallback: return the original AST unchanged
+    return mutableAst;
   }
 
   /**
