@@ -1,4 +1,4 @@
-from typing import Any, ClassVar, Dict, Generic, Iterator, List, Optional, Set, Union
+from typing import Any, ClassVar, Dict, Generic, Iterator, List, Optional, Set, Union, cast
 
 from vellum import ChatMessage, PromptBlock, PromptOutput
 from vellum.client.types.prompt_parameters import PromptParameters
@@ -28,7 +28,7 @@ from vellum.workflows.outputs.base import BaseOutput, BaseOutputs
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.core import EntityInputsInterface
-from vellum.workflows.types.definition import MCPServer, Tool
+from vellum.workflows.types.definition import MCPServer, MCPToolDefinition, Tool, ToolBase
 from vellum.workflows.types.generics import StateType
 from vellum.workflows.utils.functions import compile_mcp_tool_definition, get_mcp_tool_name
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
@@ -186,10 +186,20 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
         process_parameters_method = getattr(self.__class__, "process_parameters", None)
         process_blocks_method = getattr(self.__class__, "process_blocks", None)
 
+        # Hydrate MCP servers upfront and replace them with tool definitions
+        hydrated_functions: List[Union[ToolBase, MCPToolDefinition]] = []
+        for function in self.functions:
+            if isinstance(function, MCPServer):
+                hydrated_functions.extend(compile_mcp_tool_definition(function))
+            else:
+                # After checking, function is ToolBase (not MCPServer)
+                # Mypy doesn't narrow Union[ToolBase, MCPServer] to ToolBase, so we cast
+                hydrated_functions.append(cast(ToolBase, function))
+
         self.tool_prompt_node = create_tool_prompt_node(
             ml_model=self.ml_model,
             blocks=self.blocks,
-            functions=self.functions,
+            functions=hydrated_functions,
             prompt_inputs=self.prompt_inputs,
             parameters=self.parameters,
             max_prompt_iterations=self.max_prompt_iterations,
@@ -200,26 +210,26 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
 
         # Create the router node (handles routing logic only)
         self.router_node = create_router_node(
-            functions=self.functions,
+            functions=hydrated_functions,
             tool_prompt_node=self.tool_prompt_node,
         )
 
         self._function_nodes = {}
-        for function in self.functions:
-            if isinstance(function, MCPServer):
-                tool_definitions = compile_mcp_tool_definition(function)
-                for tool_definition in tool_definitions:
-                    function_name = get_mcp_tool_name(tool_definition)
+        for hydrated_function in hydrated_functions:
+            if isinstance(hydrated_function, MCPToolDefinition):
+                function_name = get_mcp_tool_name(hydrated_function)
 
-                    self._function_nodes[function_name] = create_mcp_tool_node(
-                        tool_def=tool_definition,
-                        tool_prompt_node=self.tool_prompt_node,
-                    )
+                self._function_nodes[function_name] = create_mcp_tool_node(
+                    tool_def=hydrated_function,
+                    tool_prompt_node=self.tool_prompt_node,
+                )
             else:
-                function_name = get_function_name(function)
+                # After checking, hydrated_function is ToolBase (not MCPToolDefinition)
+                # Mypy doesn't narrow Union[ToolBase, MCPToolDefinition] to ToolBase, so we cast
+                function_name = get_function_name(cast(ToolBase, hydrated_function))
 
                 self._function_nodes[function_name] = create_function_node(
-                    function=function,
+                    function=cast(ToolBase, hydrated_function),
                     tool_prompt_node=self.tool_prompt_node,
                 )
 

@@ -582,11 +582,10 @@ def test_mcp_node_outputs_result():
         parameters={},
     )
 
-    # AND a tool prompt node
     tool_prompt_node = create_tool_prompt_node(
         ml_model="test-model",
         blocks=[],
-        functions=[mcp_server],
+        functions=[mcp_tool],
         prompt_inputs=None,
         parameters=DEFAULT_PROMPT_PARAMETERS,
     )

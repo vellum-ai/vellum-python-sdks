@@ -6,7 +6,7 @@ from vellum.workflows import MCPServer
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.nodes import InlinePromptNode
 from vellum.workflows.types.core import JsonObject
-from vellum.workflows.types.definition import DeploymentDefinition, VellumIntegrationToolDefinition
+from vellum.workflows.types.definition import DeploymentDefinition, MCPToolDefinition, VellumIntegrationToolDefinition
 from vellum.workflows.types.generics import is_workflow_class
 from vellum.workflows.utils.functions import (
     compile_function_definition,
@@ -83,7 +83,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
             [
                 self._generate_function_tools(function, i, display_context)
                 for i, function in enumerate(function_definitions)
-                if not isinstance(function, MCPServer)  # we don't need to serialize MCP servers
+                if not isinstance(function, (MCPServer, MCPToolDefinition))  # we don't need to serialize MCP types
             ]
             if isinstance(function_definitions, list)
             else []
