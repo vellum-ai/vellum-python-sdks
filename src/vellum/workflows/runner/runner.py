@@ -299,13 +299,17 @@ class WorkflowRunner(Generic[StateType]):
         Allows subclasses: if trigger_class is a subclass of any declared trigger,
         returns those entrypoints.
         """
+        seen: Set[Type[BaseNode]] = set()
         entrypoints: List[Type[BaseNode]] = []
         for subgraph in self.workflow.get_subgraphs():
             for trigger in subgraph.triggers:
                 # Check if the provided trigger_class is a subclass of the declared trigger
                 # This allows runtime instances to be subclasses of what's declared in the workflow
                 if issubclass(trigger_class, trigger):
-                    entrypoints.extend(subgraph.entrypoints)
+                    for entrypoint in subgraph.entrypoints:
+                        if entrypoint not in seen:
+                            seen.add(entrypoint)
+                            entrypoints.append(entrypoint)
         return entrypoints
 
     def _validate_and_bind_trigger(self, trigger: BaseTrigger) -> None:
