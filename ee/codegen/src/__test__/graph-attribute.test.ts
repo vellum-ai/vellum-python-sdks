@@ -1507,5 +1507,50 @@ describe("Workflow", () => {
         [[validateAPIResponseNode, "default"], validateAPIResponseNode],
       ]);
     });
+
+    it("should correctly handle cycle edges with port references", async () => {
+      const nodeA = genericNodeFactory({
+        id: uuidv4(),
+        label: "NodeA",
+        nodePorts: [
+          nodePortFactory({ name: "if_port", type: "IF" }),
+          nodePortFactory({ name: "else_port", type: "ELSE" }),
+        ],
+      });
+
+      const nodeB = genericNodeFactory({
+        id: uuidv4(),
+        label: "NodeB",
+        nodePorts: [
+          nodePortFactory({ name: "if_port", type: "IF" }),
+          nodePortFactory({ name: "else_port", type: "ELSE" }),
+        ],
+      });
+
+      const nodeC = genericNodeFactory({
+        id: uuidv4(),
+        label: "NodeC",
+      });
+
+      const errorNode = genericNodeFactory({
+        id: uuidv4(),
+        label: "ErrorNode",
+      });
+
+      const finalOutputNode = finalOutputNodeFactory({
+        id: uuidv4(),
+        label: "FinalOutput",
+        name: "final_output",
+      }).build();
+
+      await runGraphTest([
+        [entrypointNode, nodeA],
+        [[nodeA, "if_port"], errorNode],
+        [[nodeA, "else_port"], nodeB],
+        [[nodeB, "if_port"], nodeA],
+        [[nodeB, "else_port"], nodeC],
+        [nodeC, finalOutputNode],
+      ]);
+    });
   });
 });

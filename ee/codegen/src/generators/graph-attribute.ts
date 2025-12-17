@@ -608,6 +608,25 @@ export class GraphAttribute extends AstNode {
               e.targetNodeId === sourceNodeId
           );
         if (doesReverseEdgeExist) {
+          const sourceNodePortContext =
+            sourceNode.reference.portContextsById.get(edge.sourceHandleId);
+          if (sourceNodePortContext && !sourceNodePortContext.isDefault) {
+            return {
+              type: "set",
+              values: [
+                ...setAst.values,
+                {
+                  type: "right_shift",
+                  lhs: {
+                    type: "port_reference",
+                    reference: sourceNodePortContext,
+                  },
+                  rhs: targetNode,
+                },
+              ],
+            };
+          }
+
           // Create a new set with the same values, but modify the branch that contains the source node
           const newValues = setAst.values.map((value) => {
             // Check if this branch contains the source node
