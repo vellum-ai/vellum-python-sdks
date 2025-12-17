@@ -1070,9 +1070,21 @@ export type FunctionArgs = {
   definition?: FunctionDefinition; // `legacy frontend` does not send definition field
 } & NameDescription;
 
+export interface InlineWorkflowFunctionDefinition {
+  name: string;
+  description?: string;
+  parameters?: Record<string, unknown>;
+  inputs?: Record<string, unknown>;
+  state?: unknown;
+  cache_config?: unknown;
+  forced?: boolean | null;
+  strict?: boolean | null;
+}
+
 export type InlineWorkflowFunctionArgs = {
   type: "INLINE_WORKFLOW";
   exec_config: WorkflowVersionExecConfig;
+  definition?: InlineWorkflowFunctionDefinition;
 } & NameDescription;
 
 export type WorkflowDeploymentFunctionArgs = {

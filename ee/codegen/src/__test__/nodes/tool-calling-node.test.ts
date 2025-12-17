@@ -500,6 +500,247 @@ describe("ToolCallingNode", () => {
       node.getNodeFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
+
+    it("should generate inline workflow with tool wrapper when definition has inputs and examples", async () => {
+      const nodePortData: NodePort[] = [
+        nodePortFactory({
+          id: "port-id",
+        }),
+      ];
+
+      const inlineWorkflowWithToolWrapper = {
+        name: "GetWeather",
+        type: "INLINE_WORKFLOW",
+        description: "Get weather for a city",
+        definition: {
+          name: "get_weather",
+          description: "Get weather for a city",
+          parameters: {
+            type: "object",
+            properties: {
+              city: { type: "string" },
+              date: { type: "string" },
+            },
+            required: ["city", "date"],
+            examples: [{ city: "San Francisco", date: "2025-01-01" }],
+          },
+          inputs: {
+            context: {
+              type: "WORKFLOW_INPUT",
+              input_variable_id: "input-1",
+            },
+          },
+          state: null,
+          cache_config: null,
+          forced: null,
+          strict: null,
+        },
+        exec_config: {
+          runner_config: {},
+          input_variables: [
+            { id: "city-input", key: "city", type: "STRING" },
+            { id: "date-input", key: "date", type: "STRING" },
+            { id: "context-input", key: "context", type: "STRING" },
+          ],
+          state_variables: [],
+          output_variables: [
+            { id: "output-1", key: "temperature", type: "NUMBER" },
+          ],
+          workflow_raw_data: {
+            edges: [],
+            nodes: [],
+            definition: null,
+            output_values: [],
+          },
+        },
+      };
+
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [inlineWorkflowWithToolWrapper],
+          },
+        }
+      );
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [functionsAttribute],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("should generate inline workflow with tool wrapper when definition has only examples", async () => {
+      const nodePortData: NodePort[] = [
+        nodePortFactory({
+          id: "port-id",
+        }),
+      ];
+
+      const inlineWorkflowWithExamplesOnly = {
+        name: "GetWeather",
+        type: "INLINE_WORKFLOW",
+        description: "Get weather for a city",
+        definition: {
+          name: "get_weather",
+          description: "Get weather for a city",
+          parameters: {
+            type: "object",
+            properties: {
+              city: { type: "string" },
+            },
+            required: ["city"],
+            examples: [{ city: "New York" }],
+          },
+          state: null,
+          cache_config: null,
+          forced: null,
+          strict: null,
+        },
+        exec_config: {
+          runner_config: {},
+          input_variables: [{ id: "city-input", key: "city", type: "STRING" }],
+          state_variables: [],
+          output_variables: [
+            { id: "output-1", key: "temperature", type: "NUMBER" },
+          ],
+          workflow_raw_data: {
+            edges: [],
+            nodes: [],
+            definition: null,
+            output_values: [],
+          },
+        },
+      };
+
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [inlineWorkflowWithExamplesOnly],
+          },
+        }
+      );
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [functionsAttribute],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("should generate inline workflow with tool wrapper when definition has only inputs", async () => {
+      const nodePortData: NodePort[] = [
+        nodePortFactory({
+          id: "port-id",
+        }),
+      ];
+
+      const inlineWorkflowWithInputsOnly = {
+        name: "GetWeather",
+        type: "INLINE_WORKFLOW",
+        description: "Get weather for a city",
+        definition: {
+          name: "get_weather",
+          description: "Get weather for a city",
+          parameters: {
+            type: "object",
+            properties: {
+              city: { type: "string" },
+            },
+            required: ["city"],
+          },
+          inputs: {
+            context: {
+              type: "WORKFLOW_INPUT",
+              input_variable_id: "input-1",
+            },
+          },
+          state: null,
+          cache_config: null,
+          forced: null,
+          strict: null,
+        },
+        exec_config: {
+          runner_config: {},
+          input_variables: [
+            { id: "city-input", key: "city", type: "STRING" },
+            { id: "context-input", key: "context", type: "STRING" },
+          ],
+          state_variables: [],
+          output_variables: [
+            { id: "output-1", key: "temperature", type: "NUMBER" },
+          ],
+          workflow_raw_data: {
+            edges: [],
+            nodes: [],
+            definition: null,
+            output_values: [],
+          },
+        },
+      };
+
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [inlineWorkflowWithInputsOnly],
+          },
+        }
+      );
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [functionsAttribute],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
   });
 
   describe("workflow deployment", () => {

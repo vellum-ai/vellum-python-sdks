@@ -390,10 +390,30 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
 
       const workflowClassName =
         nestedWorkflowProject.workflowContext.workflowClassName;
-      return python.reference({
+      const workflowReference = python.reference({
         name: workflowClassName,
         modulePath: [`.${workflowName}`, GENERATED_WORKFLOW_MODULE_NAME],
       });
+
+      // Check if inline workflow has inputs or examples that need to be wrapped with tool()
+      const parsedInputs = this.parseInlineWorkflowToolInputs(inlineWorkflow);
+      const parameters = inlineWorkflow.definition?.parameters as
+        | Record<string, unknown>
+        | undefined;
+      const examples =
+        (parameters?.examples as Array<Record<string, unknown>>) ?? null;
+      const hasInputs = parsedInputs && Object.keys(parsedInputs).length > 0;
+      const hasExamples = Array.isArray(examples) && examples.length > 0;
+
+      if (hasInputs || hasExamples) {
+        const wrapper = this.getToolInvocation(parsedInputs, examples);
+        return new WrappedCall({
+          wrapper,
+          inner: workflowReference,
+        });
+      }
+
+      return workflowReference;
     }
 
     return null;
@@ -887,6 +907,41 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
         this.workflowContext.addError(
           new NodeDefinitionGenerationError(
             `Failed to parse input '${inputName}': ${JSON.stringify(
+              inputResult.errors
+            )}`
+          )
+        );
+      }
+    });
+
+    if (Object.keys(parsedInputs).length === 0) {
+      return null;
+    }
+
+    return parsedInputs;
+  }
+
+  /**
+   * Parses the tool inputs from an inline workflow function definition.
+   * Returns null if there are no inputs or if parsing fails.
+   */
+  private parseInlineWorkflowToolInputs(
+    f: InlineWorkflowFunctionArgs
+  ): Record<string, WorkflowValueDescriptorType> | null {
+    const inputs = f.definition?.inputs;
+    if (!f.definition || !inputs) {
+      return null;
+    }
+
+    const parsedInputs: Record<string, WorkflowValueDescriptorType> = {};
+    Object.entries(inputs).forEach(([inputName, inputDef]) => {
+      const inputResult = WorkflowValueDescriptorSerializer.parse(inputDef);
+      if (inputResult.ok) {
+        parsedInputs[inputName] = inputResult.value;
+      } else {
+        this.workflowContext.addError(
+          new NodeDefinitionGenerationError(
+            `Failed to parse inline workflow input '${inputName}': ${JSON.stringify(
               inputResult.errors
             )}`
           )
