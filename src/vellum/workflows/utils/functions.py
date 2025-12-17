@@ -248,12 +248,21 @@ def compile_inline_workflow_function_definition(workflow_class: Type["BaseWorkfl
     inputs_class = workflow_class.get_inputs_class()
     vars_inputs_class = vars(inputs_class)
 
+    # Get inputs from the decorator if present (to exclude from schema)
+    inputs = getattr(workflow_class, "__vellum_inputs__", {})
+    examples = getattr(workflow_class, "__vellum_examples__", None)
+    exclude_params = set(inputs.keys())
+
     properties = {}
     required = []
     defs: dict[str, Any] = {}
 
     for name, field_type in inputs_class.__annotations__.items():
         if name.startswith("__"):
+            continue
+
+        # Skip parameters that are in the exclude_params set
+        if exclude_params and name in exclude_params:
             continue
 
         properties[name] = compile_annotation(field_type, defs)
@@ -268,6 +277,8 @@ def compile_inline_workflow_function_definition(workflow_class: Type["BaseWorkfl
     parameters = {"type": "object", "properties": properties, "required": required}
     if defs:
         parameters["$defs"] = defs
+    if examples is not None:
+        parameters["examples"] = examples
 
     return FunctionDefinition(
         name=snake_case(workflow_class.__name__),

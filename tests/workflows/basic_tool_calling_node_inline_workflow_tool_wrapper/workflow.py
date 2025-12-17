@@ -82,7 +82,12 @@ class GetCurrentWeatherNode(ToolCallingNode):
             ],
         ),
     ]
-    functions = [tool(inputs={"context": WorkflowInputs.context})(BasicInlineSubworkflowWorkflow)]
+    functions = [
+        tool(
+            inputs={"context": WorkflowInputs.context},
+            examples=[{"city": "San Francisco", "date": "2025-01-01"}],
+        )(BasicInlineSubworkflowWorkflow)
+    ]
     prompt_inputs = {
         "question": WorkflowInputs.query,
     }
