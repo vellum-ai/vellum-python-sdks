@@ -1,10 +1,10 @@
-import { python } from "@fern-api/python-ast";
 import { isNil } from "lodash";
 
 import { BaseNodeInputWorkflowReference } from "./BaseNodeInputWorkflowReference";
 
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -18,7 +18,7 @@ export class DictionaryWorkflowReference extends BaseNodeInputWorkflowReference<
     const definition = dictionaryReference.definition;
 
     if (!entries || entries.length === 0) {
-      return python.TypeInstantiation.dict([]);
+      return new DictInstantiation([]);
     }
 
     // If definition exists, generate class instantiation instead of dict
@@ -68,7 +68,7 @@ export class DictionaryWorkflowReference extends BaseNodeInputWorkflowReference<
       };
     });
 
-    return python.TypeInstantiation.dict(dictEntries, {
+    return new DictInstantiation(dictEntries, {
       endWithComma: true,
     });
   }

@@ -9,6 +9,7 @@ import { InitFile } from "src/generators";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
@@ -101,7 +102,7 @@ export class CodeExecutionNode extends BaseNode<
     statements.push(
       python.field({
         name: INPUTS_PREFIX,
-        initializer: python.TypeInstantiation.dict(
+        initializer: new DictInstantiation(
           codeInputs.map((codeInput) => ({
             key: new StrInstantiation(codeInput.nodeInputData.key),
             value: codeInput,
@@ -329,7 +330,7 @@ export class CodeExecutionNode extends BaseNode<
 
     return python.field({
       name: "output_display",
-      initializer: python.TypeInstantiation.dict(outputDisplayEntries),
+      initializer: new DictInstantiation(outputDisplayEntries),
     });
   }
 }

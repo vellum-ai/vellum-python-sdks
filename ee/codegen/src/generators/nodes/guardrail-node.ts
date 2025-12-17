@@ -7,6 +7,7 @@ import { GuardrailNodeContext } from "src/context/node-context/guardrail-node";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -45,7 +46,7 @@ export class GuardrailNode extends BaseNode<
     statements.push(
       python.field({
         name: INPUTS_PREFIX,
-        initializer: python.TypeInstantiation.dict(
+        initializer: new DictInstantiation(
           Array.from(this.nodeInputsByKey.entries()).map(([key, value]) => ({
             key: new StrInstantiation(key),
             value: value,
@@ -89,7 +90,7 @@ export class GuardrailNode extends BaseNode<
   protected getOutputDisplay(): python.Field {
     return python.field({
       name: "output_display",
-      initializer: python.TypeInstantiation.dict(
+      initializer: new DictInstantiation(
         (
           this.nodeContext.metricDefinitionsHistoryItem?.outputVariables ?? []
         ).map((output) => {

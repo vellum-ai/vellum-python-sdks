@@ -4,6 +4,7 @@ import { ValueGenerationError } from "./errors";
 
 import { AstNode } from "src/generators/extensions/ast-node";
 import { BoolInstantiation } from "src/generators/extensions/bool-instantiation";
+import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
 import { FloatInstantiation } from "src/generators/extensions/float-instantiation";
 import { IntInstantiation } from "src/generators/extensions/int-instantiation";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
@@ -71,7 +72,7 @@ export class Json extends AstNode {
           value: jsonValue,
         };
       });
-      return python.TypeInstantiation.dict(entries, {
+      return new DictInstantiation(entries, {
         endWithComma: true,
       });
     }

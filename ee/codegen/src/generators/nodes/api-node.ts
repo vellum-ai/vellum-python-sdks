@@ -5,6 +5,7 @@ import { ApiNodeContext } from "src/context/node-context/api-node";
 import { NodeInput } from "src/generators";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
@@ -60,7 +61,7 @@ export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
       statements.push(
         python.field({
           name: "headers",
-          initializer: python.TypeInstantiation.dict(
+          initializer: new DictInstantiation(
             additionalHeaders.map((header) => {
               const keyInput = this.nodeData.inputs.find(
                 (input) => input.id === header.headerKeyInputId
@@ -230,7 +231,7 @@ export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
       statements.push(
         python.field({
           name: "additional_header_key_input_ids",
-          initializer: python.TypeInstantiation.dict(
+          initializer: new DictInstantiation(
             this.nodeData.data.additionalHeaders.map((header) => {
               const nodeInput = this.nodeData.inputs.find(
                 (nodeInput) => nodeInput.id === header.headerKeyInputId
@@ -260,7 +261,7 @@ export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
       statements.push(
         python.field({
           name: "additional_header_value_input_ids",
-          initializer: python.TypeInstantiation.dict(
+          initializer: new DictInstantiation(
             this.nodeData.data.additionalHeaders.map((header) => {
               const nodeInput = this.nodeData.inputs.find(
                 (nodeInput) => nodeInput.id === header.headerKeyInputId

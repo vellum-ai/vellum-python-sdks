@@ -7,6 +7,7 @@ import { ConditionalNodePort } from "src/generators/conditional-node-port";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
 import { IntInstantiation } from "src/generators/extensions/int-instantiation";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
@@ -98,7 +99,7 @@ export class ConditionalNode extends BaseNode<
     statements.push(
       python.field({
         name: "source_handle_ids",
-        initializer: python.TypeInstantiation.dict(
+        initializer: new DictInstantiation(
           this.nodeData.data.conditions.map((condition, idx) => ({
             key: new IntInstantiation(idx),
             value: python.TypeInstantiation.uuid(condition.sourceHandleId),
@@ -354,7 +355,7 @@ export class ConditionalNode extends BaseNode<
       );
       return python.field({
         name: "port_displays",
-        initializer: python.TypeInstantiation.dict(
+        initializer: new DictInstantiation(
           Array.from(portDisplayOverridesDict.entries()).map(
             ([key, value]) => ({
               key: new Reference({

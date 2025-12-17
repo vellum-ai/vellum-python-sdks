@@ -3,6 +3,7 @@ import { python } from "@fern-api/python-ast";
 import { InlineSubworkflowNodeContext } from "src/context/node-context/inline-subworkflow-node";
 import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { BaseNestedWorkflowNode } from "src/generators/nodes/bases/nested-workflow-base";
 import { WorkflowProjectGenerator } from "src/project";
@@ -105,7 +106,7 @@ export class InlineSubworkflowNode extends BaseNestedWorkflowNode<
     statements.push(
       python.field({
         name: "workflow_input_ids_by_name",
-        initializer: python.TypeInstantiation.dict([]),
+        initializer: new DictInstantiation([]),
       })
     );
 

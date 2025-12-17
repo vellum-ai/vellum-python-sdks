@@ -19,6 +19,7 @@ import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { Decorator } from "src/generators/extensions/decorator";
+import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { MethodInvocation } from "src/generators/extensions/method-invocation";
@@ -759,7 +760,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
 
     return python.field({
       name: "output_display",
-      initializer: python.TypeInstantiation.dict(outputDisplayEntries),
+      initializer: new DictInstantiation(outputDisplayEntries),
     });
   }
 
@@ -926,7 +927,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
         }
       );
 
-      const inputsDict = python.TypeInstantiation.dict(dictEntries, {
+      const inputsDict = new DictInstantiation(dictEntries, {
         endWithComma: true,
       });
 
@@ -945,7 +946,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
           key: new StrInstantiation(key),
           value: new Json(value),
         }));
-        return python.TypeInstantiation.dict(dictEntries, {
+        return new DictInstantiation(dictEntries, {
           endWithComma: true,
         });
       });
