@@ -19,7 +19,6 @@ from vellum.workflows.nodes.displayable.tool_calling_node.state import ToolCalli
 from vellum.workflows.nodes.displayable.tool_calling_node.utils import (
     create_else_node,
     create_function_node,
-    create_mcp_tool_node,
     create_router_node,
     create_tool_prompt_node,
     get_function_name,
@@ -30,7 +29,7 @@ from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.core import EntityInputsInterface
 from vellum.workflows.types.definition import MCPServer, MCPToolDefinition, Tool, ToolBase
 from vellum.workflows.types.generics import StateType
-from vellum.workflows.utils.functions import compile_mcp_tool_definition, get_mcp_tool_name
+from vellum.workflows.utils.functions import compile_mcp_tool_definition
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 
@@ -216,22 +215,11 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
 
         self._function_nodes = {}
         for hydrated_function in hydrated_functions:
-            if isinstance(hydrated_function, MCPToolDefinition):
-                function_name = get_mcp_tool_name(hydrated_function)
-
-                self._function_nodes[function_name] = create_mcp_tool_node(
-                    tool_def=hydrated_function,
-                    tool_prompt_node=self.tool_prompt_node,
-                )
-            else:
-                # After checking, hydrated_function is ToolBase (not MCPToolDefinition)
-                # Mypy doesn't narrow Union[ToolBase, MCPToolDefinition] to ToolBase, so we cast
-                function_name = get_function_name(cast(ToolBase, hydrated_function))
-
-                self._function_nodes[function_name] = create_function_node(
-                    function=cast(ToolBase, hydrated_function),
-                    tool_prompt_node=self.tool_prompt_node,
-                )
+            function_name = get_function_name(hydrated_function)
+            self._function_nodes[function_name] = create_function_node(
+                function=hydrated_function,
+                tool_prompt_node=self.tool_prompt_node,
+            )
 
         graph: Graph = self.tool_prompt_node >> self.router_node
 
