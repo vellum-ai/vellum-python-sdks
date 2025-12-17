@@ -26,6 +26,7 @@ export * from "./none-instantiation";
 export * from "./optional";
 export * from "./protected-python-file";
 export * from "./reference";
+export * from "./set-instantiation";
 export * from "./star-import";
 export * from "./str-instantiation";
 export * from "./type";

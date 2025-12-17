@@ -26,6 +26,7 @@ import { IntInstantiation } from "src/generators/extensions/int-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
+import { SetInstantiation } from "src/generators/extensions/set-instantiation";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { GraphAttribute } from "src/generators/graph-attribute";
 import { NodeDisplayData } from "src/generators/node-display-data";
@@ -741,7 +742,7 @@ export class Workflow {
 
       const unusedGraphsField = python.field({
         name: "unused_graphs",
-        initializer: python.TypeInstantiation.set(flattenedUnusedGraphs),
+        initializer: new SetInstantiation(flattenedUnusedGraphs),
       });
 
       workflowClass.add(unusedGraphsField);
