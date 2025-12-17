@@ -7,8 +7,10 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 
 
 class DatasetRowPushRequest(UniversalBaseModel):
+    id: typing.Optional[str] = None
     label: str
     inputs: typing.Dict[str, typing.Optional[typing.Any]]
+    mocks: typing.Optional[typing.List[typing.Dict[str, typing.Optional[typing.Any]]]] = None
     workflow_trigger_id: typing.Optional[str] = None
 
     if IS_PYDANTIC_V2:
