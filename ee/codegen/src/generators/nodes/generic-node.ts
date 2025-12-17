@@ -3,6 +3,7 @@ import { join } from "path";
 
 import { python } from "@fern-api/python-ast";
 import { Field } from "@fern-api/python-ast/Field";
+import { FunctionDefinition } from "vellum-ai/api/types";
 import {
   PromptBlock as PromptBlockSerializer,
   PromptParameters as PromptParametersSerializer,
@@ -326,7 +327,9 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     });
 
     // Check if function has inputs or examples that need to be wrapped with tool()
-    const parsedInputs = this.parseToolInputs(codeExecutionFunction);
+    const parsedInputs = this.parseToolInputsFromDefinition(
+      codeExecutionFunction.definition
+    );
     // Read examples from definition.parameters.examples (JSON Schema examples keyword)
     const parameters = codeExecutionFunction.definition?.parameters as
       | Record<string, unknown>
@@ -396,7 +399,9 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
       });
 
       // Check if inline workflow has inputs or examples that need to be wrapped with tool()
-      const parsedInputs = this.parseInlineWorkflowToolInputs(inlineWorkflow);
+      const parsedInputs = this.parseToolInputsFromDefinition(
+        inlineWorkflow.definition
+      );
       const parameters = inlineWorkflow.definition?.parameters as
         | Record<string, unknown>
         | undefined;
@@ -890,11 +895,11 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
    * Parses the tool inputs from a function definition.
    * Returns null if there are no inputs or if parsing fails.
    */
-  private parseToolInputs(
-    f: FunctionArgs
+  private parseToolInputsFromDefinition(
+    definition: FunctionDefinition | undefined
   ): Record<string, WorkflowValueDescriptorType> | null {
-    const inputs = f.definition?.inputs;
-    if (!f.definition || !inputs) {
+    const inputs = definition?.inputs;
+    if (!definition || !inputs) {
       return null;
     }
 
@@ -907,41 +912,6 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
         this.workflowContext.addError(
           new NodeDefinitionGenerationError(
             `Failed to parse input '${inputName}': ${JSON.stringify(
-              inputResult.errors
-            )}`
-          )
-        );
-      }
-    });
-
-    if (Object.keys(parsedInputs).length === 0) {
-      return null;
-    }
-
-    return parsedInputs;
-  }
-
-  /**
-   * Parses the tool inputs from an inline workflow function definition.
-   * Returns null if there are no inputs or if parsing fails.
-   */
-  private parseInlineWorkflowToolInputs(
-    f: InlineWorkflowFunctionArgs
-  ): Record<string, WorkflowValueDescriptorType> | null {
-    const inputs = f.definition?.inputs;
-    if (!f.definition || !inputs) {
-      return null;
-    }
-
-    const parsedInputs: Record<string, WorkflowValueDescriptorType> = {};
-    Object.entries(inputs).forEach(([inputName, inputDef]) => {
-      const inputResult = WorkflowValueDescriptorSerializer.parse(inputDef);
-      if (inputResult.ok) {
-        parsedInputs[inputName] = inputResult.value;
-      } else {
-        this.workflowContext.addError(
-          new NodeDefinitionGenerationError(
-            `Failed to parse inline workflow input '${inputName}': ${JSON.stringify(
               inputResult.errors
             )}`
           )
