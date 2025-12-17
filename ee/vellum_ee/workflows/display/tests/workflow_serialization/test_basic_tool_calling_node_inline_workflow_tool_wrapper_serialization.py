@@ -55,27 +55,30 @@ def test_serialize_workflow__inline_workflow_with_tool_wrapper():
     assert "definition" in inline_workflow_tool
     definition = inline_workflow_tool["definition"]
 
-    # AND the definition should have the function name and parameters
-    assert definition["name"] == "basic_inline_subworkflow_workflow"
-    assert "parameters" in definition
+    # AND the definition should match the expected structure with inputs and examples
+    context_var = next(var for var in input_variables if var["key"] == "context")
+    context_input_variable_id = context_var["id"]
 
-    # AND the parameters should exclude the context input (provided via tool wrapper)
-    parameters = definition["parameters"]
-    assert parameters["type"] == "object"
-    assert "context" not in parameters["properties"]
-    assert "city" in parameters["properties"]
-    assert "date" in parameters["properties"]
-
-    # AND the parameters should include examples from the tool wrapper
-    assert "examples" in parameters
-    assert parameters["examples"] == [{"city": "San Francisco", "date": "2025-01-01"}]
-
-    # AND the definition should have the inputs attribute from the tool wrapper
-    assert "inputs" in definition
-    inputs = definition["inputs"]
-    assert "context" in inputs
-
-    # AND the context input should reference the parent workflow input
-    context_input = inputs["context"]
-    assert context_input["type"] == "WORKFLOW_INPUT"
-    assert "input_variable_id" in context_input
+    assert definition == {
+        "state": None,
+        "cache_config": None,
+        "name": "basic_inline_subworkflow_workflow",
+        "description": "\n    A workflow that gets the weather for a given city and date with context.\n    ",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "city": {"type": "string"},
+                "date": {"type": "string"},
+            },
+            "required": ["city", "date"],
+            "examples": [{"city": "San Francisco", "date": "2025-01-01"}],
+        },
+        "inputs": {
+            "context": {
+                "type": "WORKFLOW_INPUT",
+                "input_variable_id": context_input_variable_id,
+            }
+        },
+        "forced": None,
+        "strict": None,
+    }
