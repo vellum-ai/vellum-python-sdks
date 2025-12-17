@@ -5,6 +5,7 @@ import { PromptDeploymentNodeContext } from "src/context/node-context/prompt-dep
 import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
@@ -95,7 +96,7 @@ export class PromptDeploymentNode extends BaseNode<
       statements.push(
         python.field({
           name: INPUTS_PREFIX,
-          initializer: python.TypeInstantiation.dict(
+          initializer: new DictInstantiation(
             Array.from(this.nodeInputsByKey.entries()).map(([key, value]) => ({
               key: new StrInstantiation(key),
               value: value,
@@ -216,7 +217,7 @@ export class PromptDeploymentNode extends BaseNode<
 
     return python.field({
       name: "output_display",
-      initializer: python.TypeInstantiation.dict(outputDisplayEntries),
+      initializer: new DictInstantiation(outputDisplayEntries),
     });
   }
 

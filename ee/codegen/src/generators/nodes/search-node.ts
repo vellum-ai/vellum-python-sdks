@@ -14,6 +14,7 @@ import {
 import { AstNode } from "src/generators/extensions/ast-node";
 import { BoolInstantiation } from "src/generators/extensions/bool-instantiation";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
 import { FloatInstantiation } from "src/generators/extensions/float-instantiation";
 import { IntInstantiation } from "src/generators/extensions/int-instantiation";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
@@ -368,7 +369,7 @@ export class SearchNode extends BaseNode<
         statements.push(
           python.field({
             name: "metadata_filter_input_id_by_operand_id",
-            initializer: python.TypeInstantiation.dict(
+            initializer: new DictInstantiation(
               Array.from(metadataFilterInputIdByOperandId.entries()).map(
                 ([metadataFilterOperandId, metadataFilterNodeInputId]) => {
                   return {
@@ -447,7 +448,7 @@ export class SearchNode extends BaseNode<
   protected getOutputDisplay(): python.Field {
     return python.field({
       name: "output_display",
-      initializer: python.TypeInstantiation.dict([
+      initializer: new DictInstantiation([
         {
           key: new Reference({
             name: this.nodeContext.nodeClassName,

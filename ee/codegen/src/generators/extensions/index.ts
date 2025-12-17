@@ -14,6 +14,7 @@ export * from "./class-instantiation";
 export * from "./comment";
 export * from "./decorator";
 export * from "./dict";
+export * from "./dict-instantiation";
 export * from "./field";
 export * from "./float-instantiation";
 export * from "./int-instantiation";

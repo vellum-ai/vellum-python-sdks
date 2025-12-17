@@ -7,6 +7,7 @@ import { NodeAttributeGenerationError } from "src/generators/errors";
 import { PythonType } from "src/generators/extensions";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -55,7 +56,7 @@ export class TemplatingNode extends BaseNode<
     statements.push(
       python.field({
         name: INPUTS_PREFIX,
-        initializer: python.TypeInstantiation.dict(
+        initializer: new DictInstantiation(
           otherInputs.map((codeInput) => ({
             key: new StrInstantiation(codeInput.nodeInputData.key),
             value: codeInput,
@@ -150,7 +151,7 @@ export class TemplatingNode extends BaseNode<
   protected getOutputDisplay(): python.Field {
     return python.field({
       name: "output_display",
-      initializer: python.TypeInstantiation.dict([
+      initializer: new DictInstantiation([
         {
           key: new Reference({
             name: this.nodeContext.nodeClassName,

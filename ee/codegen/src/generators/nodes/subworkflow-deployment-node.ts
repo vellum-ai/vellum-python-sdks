@@ -9,6 +9,7 @@ import {
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -64,7 +65,7 @@ export class SubworkflowDeploymentNode extends BaseNode<
     statements.push(
       python.field({
         name: INPUTS_PREFIX,
-        initializer: python.TypeInstantiation.dict(
+        initializer: new DictInstantiation(
           Array.from(this.nodeInputsByKey.entries()).map(([key, value]) => ({
             key: new StrInstantiation(key),
             value: value,
@@ -161,7 +162,7 @@ export class SubworkflowDeploymentNode extends BaseNode<
 
     return python.field({
       name: "output_display",
-      initializer: python.TypeInstantiation.dict(
+      initializer: new DictInstantiation(
         outputVariables.map((output) => {
           const outputName = this.nodeContext.getNodeOutputNameById(output.id);
           if (!outputName) {

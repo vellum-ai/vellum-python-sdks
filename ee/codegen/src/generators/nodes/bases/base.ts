@@ -19,6 +19,7 @@ import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { Decorator } from "src/generators/extensions/decorator";
+import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { MethodInvocation } from "src/generators/extensions/method-invocation";
 import { Reference } from "src/generators/extensions/reference";
@@ -194,7 +195,7 @@ export abstract class BaseNode<
 
     return python.field({
       name: "output_display",
-      initializer: python.TypeInstantiation.dict(outputDisplayEntries),
+      initializer: new DictInstantiation(outputDisplayEntries),
     });
   }
 
@@ -436,7 +437,7 @@ export abstract class BaseNode<
       if (portDisplayOverridesDict.size > 0) {
         return python.field({
           name: "port_displays",
-          initializer: python.TypeInstantiation.dict(
+          initializer: new DictInstantiation(
             Array.from(portDisplayOverridesDict.entries()).map(
               ([key, value]) => ({
                 key: new Reference({
@@ -464,7 +465,7 @@ export abstract class BaseNode<
 
     return python.field({
       name: "port_displays",
-      initializer: python.TypeInstantiation.dict([
+      initializer: new DictInstantiation([
         {
           key: new Reference({
             name: this.nodeContext.nodeClassName,
@@ -802,7 +803,7 @@ export abstract class BaseNode<
     if (this.nodeInputsByKey.size > 0) {
       const nodeInputIdsByNameField = python.field({
         name: "node_input_ids_by_name",
-        initializer: python.TypeInstantiation.dict(
+        initializer: new DictInstantiation(
           Array.from(this.nodeInputsByKey).map<{
             key: AstNode;
             value: AstNode;
@@ -824,7 +825,7 @@ export abstract class BaseNode<
       nodeClass.add(
         python.field({
           name: "attribute_ids_by_name",
-          initializer: python.TypeInstantiation.dict(
+          initializer: new DictInstantiation(
             this.nodeData.attributes.map((attribute) => {
               return {
                 key: new StrInstantiation(

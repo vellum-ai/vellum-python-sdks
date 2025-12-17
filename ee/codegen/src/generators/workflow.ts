@@ -21,6 +21,7 @@ import {
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
 import { FloatInstantiation } from "src/generators/extensions/float-instantiation";
 import { IntInstantiation } from "src/generators/extensions/int-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
@@ -276,7 +277,7 @@ export class Workflow {
       workflowDisplayClass.add(
         python.field({
           name: "inputs_display",
-          initializer: python.TypeInstantiation.dict(
+          initializer: new DictInstantiation(
             Array.from(this.workflowContext.inputVariableContextsById)
               .map(([_, inputVariableContext]) => {
                 const overrideArgs: MethodArgument[] = [];
@@ -336,7 +337,7 @@ export class Workflow {
       workflowDisplayClass.add(
         python.field({
           name: "state_value_displays",
-          initializer: python.TypeInstantiation.dict(
+          initializer: new DictInstantiation(
             Array.from(this.workflowContext.stateVariableContextsById)
               .map(([_, stateVariableContext]) => {
                 const overrideArgs: MethodArgument[] = [];
@@ -396,7 +397,7 @@ export class Workflow {
     workflowDisplayClass.add(
       python.field({
         name: "entrypoint_displays",
-        initializer: python.TypeInstantiation.dict(
+        initializer: new DictInstantiation(
           this.workflowContext
             .getTriggerEdges()
             .map((edge): DictEntry | null => {
@@ -546,7 +547,7 @@ export class Workflow {
       workflowDisplayClass.add(
         python.field({
           name: "edge_displays",
-          initializer: python.TypeInstantiation.dict(edgeDisplayEntries),
+          initializer: new DictInstantiation(edgeDisplayEntries),
         })
       );
     }
@@ -554,7 +555,7 @@ export class Workflow {
     workflowDisplayClass.add(
       python.field({
         name: "output_displays",
-        initializer: python.TypeInstantiation.dict(
+        initializer: new DictInstantiation(
           this.workflowContext.workflowOutputContexts
             .map((workflowOutputContext) => {
               const outputVariable = workflowOutputContext.getOutputVariable();

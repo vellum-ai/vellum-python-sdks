@@ -7,6 +7,7 @@ import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -101,7 +102,7 @@ export abstract class BaseNestedWorkflowNode<
 
     return python.field({
       name: "output_display",
-      initializer: python.TypeInstantiation.dict(
+      initializer: new DictInstantiation(
         outputVariableContexts.map((outputContext) => {
           return {
             key: new Reference({
