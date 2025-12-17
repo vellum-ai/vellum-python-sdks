@@ -1,8 +1,7 @@
-import { python } from "@fern-api/python-ast";
-
 import { BaseNodeInputValuePointerRule } from "./base";
 
 import { OUTPUTS_CLASS_NAME } from "src/constants";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
@@ -18,7 +17,7 @@ export class NodeOutputPointerRule extends BaseNodeInputValuePointerRule<NodeOut
     );
   }
 
-  getAstNode(): python.AstNode | undefined {
+  getAstNode(): AstNode | undefined {
     const nodeOutputPointerRuleData = this.nodeInputValuePointerRule.data;
 
     const nodeContext = this.getReferencedNodeContext();

@@ -1,5 +1,3 @@
-import { python } from "@fern-api/python-ast";
-
 import { ValueGenerationError } from "./errors";
 
 import { AstNode } from "src/generators/extensions/ast-node";
@@ -13,7 +11,7 @@ import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 
 export class Json extends AstNode {
-  private readonly astNode: python.AstNode;
+  private readonly astNode: AstNode;
 
   constructor(value: unknown) {
     super();
@@ -29,7 +27,7 @@ export class Json extends AstNode {
     this.inheritReferences(this.astNode);
   }
 
-  private generateAstNode(value: unknown): python.AstNode {
+  private generateAstNode(value: unknown): AstNode {
     if (value === null || value === undefined) {
       return new NoneInstantiation();
     }

@@ -731,7 +731,7 @@ export class Workflow {
 
     if (unusedGraphs.length > 0) {
       // Flatten any GraphAttributes that contain sets into their individual elements
-      const flattenedUnusedGraphs: python.AstNode[] = [];
+      const flattenedUnusedGraphs: AstNode[] = [];
       for (const graph of unusedGraphs) {
         if (graph instanceof GraphAttribute) {
           const astNodes = graph.getAstNodesForUnusedGraphs();
