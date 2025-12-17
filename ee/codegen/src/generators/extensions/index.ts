@@ -23,6 +23,7 @@ export * from "./method-argument";
 export * from "./method-invocation";
 export * from "./none";
 export * from "./none-instantiation";
+export * from "./operator";
 export * from "./optional";
 export * from "./protected-python-file";
 export * from "./reference";
