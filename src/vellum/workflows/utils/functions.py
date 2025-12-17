@@ -248,12 +248,21 @@ def compile_inline_workflow_function_definition(workflow_class: Type["BaseWorkfl
     inputs_class = workflow_class.get_inputs_class()
     vars_inputs_class = vars(inputs_class)
 
+    # Get inputs from the decorator if present (to exclude from schema)
+    inputs = getattr(workflow_class, "__vellum_inputs__", {})
+    examples = getattr(workflow_class, "__vellum_examples__", None)
+    exclude_params = set(inputs.keys())
+
     properties = {}
     required = []
     defs: dict[str, Any] = {}
 
     for name, field_type in inputs_class.__annotations__.items():
         if name.startswith("__"):
+            continue
+
+        # Skip parameters that are in the exclude_params set
+        if exclude_params and name in exclude_params:
             continue
 
         properties[name] = compile_annotation(field_type, defs)
@@ -268,6 +277,8 @@ def compile_inline_workflow_function_definition(workflow_class: Type["BaseWorkfl
     parameters = {"type": "object", "properties": properties, "required": required}
     if defs:
         parameters["$defs"] = defs
+    if examples is not None:
+        parameters["examples"] = examples
 
     return FunctionDefinition(
         name=snake_case(workflow_class.__name__),
@@ -394,13 +405,16 @@ def compile_vellum_integration_tool_definition(
         return FunctionDefinition(name=tool_def.name, description=tool_def.description, parameters={})
 
 
+ToolType = Union[Callable[..., Any], Type["BaseWorkflow"]]
+
+
 def tool(
     *,
     inputs: Optional[dict[str, Any]] = None,
     examples: Optional[List[dict[str, Any]]] = None,
-) -> Callable[[Callable], Callable]:
+) -> Callable[[ToolType], ToolType]:
     """
-    Decorator to configure a tool function.
+    Decorator to configure a tool function or inline workflow.
 
     Currently supports specifying which parameters should come from parent workflow inputs
     via the `inputs` mapping. Also supports providing `examples` which will be hoisted
@@ -410,19 +424,29 @@ def tool(
         inputs: Mapping of parameter names to parent input references
         examples: List of example argument objects for the tool
 
-    Example:
+    Example with function:
         @tool(inputs={
             "parent_input": ParentInputs.parent_input,
         }, examples=[{"location": "San Francisco"}])
         def get_string(parent_input: str, user_query: str) -> str:
             return f"Parent: {parent_input}, Query: {user_query}"
+
+    Example with inline workflow:
+        @tool(inputs={
+            "context": ParentInputs.context,
+        })
+        class MyInlineWorkflow(BaseWorkflow):
+            graph = MyNode
+
+            class Outputs(BaseWorkflow.Outputs):
+                result = MyNode.Outputs.result
     """
 
-    def decorator(func: Callable) -> Callable:
-        # Store the inputs mapping on the function for later use
+    def decorator(func: ToolType) -> ToolType:
+        # Store the inputs mapping on the function/workflow for later use
         if inputs is not None:
             setattr(func, "__vellum_inputs__", inputs)
-        # Store the examples on the function for later use
+        # Store the examples on the function/workflow for later use
         if examples is not None:
             setattr(func, "__vellum_examples__", examples)
         return func

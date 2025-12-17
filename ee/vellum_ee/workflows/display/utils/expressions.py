@@ -58,7 +58,7 @@ from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.types.generics import is_workflow_class
 from vellum.workflows.utils.files import virtual_open
-from vellum.workflows.utils.functions import compile_function_definition
+from vellum.workflows.utils.functions import compile_function_definition, compile_inline_workflow_function_definition
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.utils.exceptions import (
@@ -439,6 +439,7 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
             }
 
     if is_workflow_class(value):
+        # Import here to avoid circular imports
         from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
         # Pass the parent display context so the subworkflow can resolve parent workflow inputs
@@ -449,16 +450,38 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
         serialized_value: dict = workflow_display.serialize()
         name = serialized_value["workflow_raw_data"]["definition"]["name"]
         description = value.__doc__ or ""
+
+        # Compile the function definition (which now handles __vellum_inputs__ and __vellum_examples__)
+        function_definition = compile_inline_workflow_function_definition(value)
+
+        # Handle __vellum_inputs__ for inline workflows (similar to function tools)
+        inputs = getattr(value, "__vellum_inputs__", {})
+        if inputs:
+            serialized_inputs = {}
+            for param_name, input_ref in inputs.items():
+                serialized_input = serialize_value(executable_id, display_context, input_ref)
+                if serialized_input is not None:
+                    serialized_inputs[param_name] = serialized_input
+
+            model_data = function_definition.model_dump()
+            model_data["inputs"] = serialized_inputs
+            function_definition_data = model_data
+        else:
+            function_definition_data = function_definition.model_dump()
+
+        workflow_data: Dict[str, Any] = {
+            "type": "INLINE_WORKFLOW",
+            "name": name,
+            "description": description,
+            "definition": function_definition_data,
+            "exec_config": serialized_value,
+        }
+
         return {
             "type": "CONSTANT_VALUE",
             "value": {
                 "type": "JSON",
-                "value": {
-                    "type": "INLINE_WORKFLOW",
-                    "name": name,
-                    "description": description,
-                    "exec_config": serialized_value,
-                },
+                "value": workflow_data,
             },
         }
 

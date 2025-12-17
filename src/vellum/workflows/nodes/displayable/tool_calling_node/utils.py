@@ -175,7 +175,18 @@ class DynamicInlineSubworkflowNode(
     """Node that executes an inline subworkflow with function call output."""
 
     def run(self) -> Iterator[BaseOutput]:
-        self.subworkflow_inputs = self.arguments  # type: ignore[misc]
+        # Merge arguments with resolved inputs from __vellum_inputs__
+        merged_inputs = self.arguments.copy()
+        vellum_inputs = getattr(self.subworkflow, "__vellum_inputs__", {})
+        if vellum_inputs:
+            for param_name, param_ref in vellum_inputs.items():
+                if isinstance(param_ref, BaseDescriptor):
+                    resolved_value = param_ref.resolve(self.state)
+                else:
+                    resolved_value = param_ref
+                merged_inputs[param_name] = resolved_value
+
+        self.subworkflow_inputs = merged_inputs  # type: ignore[misc]
 
         # Call the parent run method to execute the subworkflow with proper streaming
         outputs = {}
