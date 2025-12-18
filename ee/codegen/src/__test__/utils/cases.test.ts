@@ -114,6 +114,59 @@ describe("Casing utility functions", () => {
         safetyPrefix: "attr_",
         expected: "attr_1hello_world",
       },
+      // Python keyword escaping tests
+      {
+        input: "if",
+        safetyPrefix: undefined,
+        expected: "if_",
+      },
+      {
+        input: "class",
+        safetyPrefix: undefined,
+        expected: "class_",
+      },
+      {
+        input: "import",
+        safetyPrefix: undefined,
+        expected: "import_",
+      },
+      {
+        input: "for",
+        safetyPrefix: undefined,
+        expected: "for_",
+      },
+      {
+        input: "while",
+        safetyPrefix: undefined,
+        expected: "while_",
+      },
+      // Proper case keywords become lowercase and don't need escaping
+      {
+        input: "True",
+        safetyPrefix: undefined,
+        expected: "true",
+      },
+      {
+        input: "False",
+        safetyPrefix: undefined,
+        expected: "false",
+      },
+      {
+        input: "None",
+        safetyPrefix: undefined,
+        expected: "none",
+      },
+      // Keywords with numbers/prefixes
+      {
+        input: "1if",
+        safetyPrefix: undefined,
+        expected: "_1if",
+      },
+      {
+        input: "class",
+        safetyPrefix: "module",
+        expected: "class_",
+      },
     ];
 
     it.each(testCases)(
