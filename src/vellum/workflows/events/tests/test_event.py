@@ -573,3 +573,89 @@ def test_node_execution_initiated_event_includes_exclude_from_monitoring():
     serialized = else_node_event.model_dump(mode="json")
     assert "exclude_from_monitoring" in serialized["body"]["node_definition"]
     assert serialized["body"]["node_definition"]["exclude_from_monitoring"] is True
+
+
+def test_event_max__body_redacted_when_exceeds_limit():
+    """
+    Tests that event body is redacted when serialized size exceeds event_max.
+    """
+
+    # GIVEN an event with a large body
+    event = WorkflowExecutionFulfilledEvent(
+        id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+        timestamp=datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
+        trace_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+        span_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+        body=WorkflowExecutionFulfilledBody(
+            workflow_definition=MockWorkflow,
+            outputs=MockNode.Outputs(
+                example="foo",
+            ),
+        ),
+    )
+
+    # AND a very small event_max that will be exceeded
+    event.event_max = 10
+
+    # WHEN the event is serialized
+    serialized = event.model_dump(mode="json")
+
+    # THEN the body should be redacted
+    assert serialized["body"] == {"redacted": True}
+
+
+def test_event_max__body_not_redacted_when_under_limit():
+    """
+    Tests that event body is not redacted when serialized size is under event_max.
+    """
+
+    # GIVEN an event with a small body
+    event = WorkflowExecutionFulfilledEvent(
+        id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+        timestamp=datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
+        trace_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+        span_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+        body=WorkflowExecutionFulfilledBody(
+            workflow_definition=MockWorkflow,
+            outputs=MockNode.Outputs(
+                example="foo",
+            ),
+        ),
+    )
+
+    # AND a large event_max that will not be exceeded
+    event.event_max = 100000
+
+    # WHEN the event is serialized
+    serialized = event.model_dump(mode="json")
+
+    # THEN the body should not be redacted
+    assert "redacted" not in serialized["body"]
+    assert serialized["body"]["outputs"] == {"example": "foo"}
+
+
+def test_event_max__none_does_not_redact():
+    """
+    Tests that event body is not redacted when event_max is None.
+    """
+
+    # GIVEN an event without event_max set
+    event = WorkflowExecutionFulfilledEvent(
+        id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+        timestamp=datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
+        trace_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+        span_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+        body=WorkflowExecutionFulfilledBody(
+            workflow_definition=MockWorkflow,
+            outputs=MockNode.Outputs(
+                example="foo",
+            ),
+        ),
+    )
+
+    # WHEN the event is serialized (event_max is None by default)
+    serialized = event.model_dump(mode="json")
+
+    # THEN the body should not be redacted
+    assert "redacted" not in serialized["body"]
+    assert serialized["body"]["outputs"] == {"example": "foo"}
