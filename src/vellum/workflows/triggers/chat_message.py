@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Optional, Union
 from vellum.client.types import ChatMessage, ChatMessageContent
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.utils import resolve_value
+from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.triggers.base import BaseTrigger
 
@@ -21,7 +22,8 @@ class ChatMessageTrigger(BaseTrigger):
     Attributes:
         message: The incoming chat message (text string or multi-modal content).
         output: Class-level reference to a workflow output to append as assistant
-            response. Set via subclassing: `output = MyWorkflow.Outputs.response`
+            response. Use LazyReference for forward references:
+            `output = LazyReference(lambda: MyWorkflow.Outputs.response)`
     """
 
     message: Union[str, ChatMessageContent]
@@ -55,8 +57,12 @@ class ChatMessageTrigger(BaseTrigger):
         outputs: "BaseOutputs",
     ) -> Union[str, ChatMessageContent]:
         """Resolves output reference from workflow outputs or state."""
-        if isinstance(output, OutputReference) and hasattr(outputs, output.name):
-            return getattr(outputs, output.name)
+        descriptor = output
+        if isinstance(output, LazyReference) and callable(output._get):
+            descriptor = output._get()
+
+        if isinstance(descriptor, OutputReference) and hasattr(outputs, descriptor.name):
+            return getattr(outputs, descriptor.name)
         return resolve_value(output, state)
 
     class Display(BaseTrigger.Display):

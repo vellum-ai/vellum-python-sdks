@@ -6,6 +6,7 @@ from vellum.client.types import ChatMessage
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
+from vellum.workflows.references import LazyReference
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.triggers.chat_message import ChatMessageTrigger
 
@@ -24,7 +25,7 @@ class ResponseNode(BaseNode):
 class SimpleChatTrigger(ChatMessageTrigger):
     """Chat trigger that appends workflow output as assistant message."""
 
-    pass  # output is assigned after workflow is defined to avoid circular reference
+    output = LazyReference(lambda: SimpleChatWorkflow.Outputs.response)  # type: ignore[has-type]
 
 
 class SimpleChatWorkflow(BaseWorkflow[BaseInputs, ChatState]):
@@ -34,7 +35,3 @@ class SimpleChatWorkflow(BaseWorkflow[BaseInputs, ChatState]):
 
     class Outputs(BaseWorkflow.Outputs):
         response = ResponseNode.Outputs.response
-
-
-# Post-definition assignment to avoid circular reference
-SimpleChatTrigger.output = SimpleChatWorkflow.Outputs.response
