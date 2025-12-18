@@ -1,4 +1,5 @@
 import pytest
+from unittest.mock import patch
 from uuid import UUID, uuid4
 from typing import List
 
@@ -16,7 +17,7 @@ from vellum_ee.workflows.display.base import StateValueDisplay, WorkflowInputsDi
 from vellum_ee.workflows.display.editor.types import NodeDisplayData
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
-from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input_value_pointer_rules
+from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input, create_node_input_value_pointer_rules
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
 from vellum_ee.workflows.display.utils.vellum import (
     ConstantValuePointer,
@@ -197,3 +198,41 @@ def test_create_node_input_value_pointer_rule__trigger_attribute_reference() -> 
     assert isinstance(result.data, TriggerAttributeData)
     assert result.data.trigger_id == str(MyTrigger.__id__)
     assert result.data.attribute_id == str(trigger_attribute_reference.id)
+
+
+def test_create_node_input__unexpected_error_returns_node_input_with_empty_rules() -> None:
+    """
+    Tests that when create_node_input_value_pointer_rules raises an unexpected error,
+    create_node_input still returns a NodeInput with empty rules and adds the error to display context.
+    """
+
+    # GIVEN a display context
+    display_context = WorkflowDisplayContext()
+
+    # AND a node_id and input_name
+    node_id = uuid4()
+    input_name = "test_input"
+
+    # AND create_node_input_value_pointer_rules will raise an unexpected error
+    unexpected_error = RuntimeError("Unexpected error during serialization")
+    with patch(
+        "vellum_ee.workflows.display.nodes.vellum.utils.create_node_input_value_pointer_rules",
+        side_effect=unexpected_error,
+    ):
+        # WHEN we call create_node_input
+        result = create_node_input(
+            node_id=node_id,
+            input_name=input_name,
+            value="test_value",
+            display_context=display_context,
+        )
+
+    # THEN we should still get a NodeInput with empty rules
+    assert result.key == input_name
+    assert result.value.rules == []
+    assert result.value.combinator == "OR"
+
+    # AND the error should be added to the display context
+    errors = list(display_context.errors)
+    assert len(errors) == 1
+    assert errors[0] is unexpected_error
