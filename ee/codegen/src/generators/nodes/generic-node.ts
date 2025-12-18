@@ -96,7 +96,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
 
           const functionHandlers: Record<
             ToolArgs["type"],
-            (f: ToolArgs) => python.AstNode | null
+            (f: ToolArgs) => AstNode | null
           > = {
             CODE_EXECUTION: (f) => this.handleCodeExecutionFunction(f),
             INLINE_WORKFLOW: (f) => this.handleInlineWorkflowFunction(f),
@@ -113,7 +113,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
             Array.isArray(value.value.value)
           ) {
             const functions: ToolArgs[] = value.value.value;
-            const functionReferences: python.AstNode[] = [];
+            const functionReferences: AstNode[] = [];
 
             functions.forEach((f) => {
               const handler = functionHandlers[f.type];
@@ -145,7 +145,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
             // Process each item using the same handler pattern as CONSTANT_VALUE
             // Order is preserved by processing each item inline.
             const items = value.items || [];
-            const functionReferences: python.AstNode[] = [];
+            const functionReferences: AstNode[] = [];
 
             // Process each item in order to preserve function ordering
             items.forEach((item) => {
@@ -313,7 +313,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     return nodeAttributesStatements;
   }
 
-  private handleCodeExecutionFunction(f: ToolArgs): python.AstNode {
+  private handleCodeExecutionFunction(f: ToolArgs): AstNode {
     const codeExecutionFunction = f as FunctionArgs;
     this.generateFunctionFile([codeExecutionFunction]);
     const snakeName = toPythonSafeSnakeCase(codeExecutionFunction.name);
@@ -348,7 +348,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     return functionReference;
   }
 
-  private handleInlineWorkflowFunction(f: ToolArgs): python.AstNode | null {
+  private handleInlineWorkflowFunction(f: ToolArgs): AstNode | null {
     const inlineWorkflow = f as InlineWorkflowFunctionArgs;
     const rawExecConfig =
       inlineWorkflow.exec_config as unknown as WorkflowVersionExecConfigSerializer.Raw;
@@ -399,7 +399,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     return null;
   }
 
-  private handleWorkflowDeploymentFunction(f: ToolArgs): python.AstNode {
+  private handleWorkflowDeploymentFunction(f: ToolArgs): AstNode {
     const workflowDeployment = f as WorkflowDeploymentFunctionArgs;
     const workflowDeploymentName = workflowDeployment.deployment;
     const args = [
@@ -427,7 +427,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     });
   }
 
-  private handleComposioFunction(f: ToolArgs): python.AstNode {
+  private handleComposioFunction(f: ToolArgs): AstNode {
     const composioTool = f as ComposioToolFunctionArgs;
 
     // Validate required fields and provide fallbacks for missing fields
@@ -470,7 +470,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     });
   }
 
-  private handleMCPServerFunction(f: ToolArgs): python.AstNode {
+  private handleMCPServerFunction(f: ToolArgs): AstNode {
     const mcpServerFunction = f as MCPServerFunctionArgs;
 
     const arguments_: python.MethodArgument[] = [
@@ -559,7 +559,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     });
   }
 
-  private handleVellumIntegrationFunction(f: ToolArgs): python.AstNode {
+  private handleVellumIntegrationFunction(f: ToolArgs): AstNode {
     const integrationTool = f as VellumIntegrationToolFunctionArgs;
 
     const args = [

@@ -161,8 +161,8 @@ export abstract class BaseNode<
     }
 
     const outputDisplayEntries: Array<{
-      key: python.AstNode;
-      value: python.AstNode;
+      key: AstNode;
+      value: AstNode;
     }> = [];
 
     Object.entries(outputIdsByName).forEach(([name, id]) => {
