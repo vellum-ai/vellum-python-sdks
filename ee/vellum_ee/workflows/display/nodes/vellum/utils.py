@@ -34,7 +34,7 @@ def create_node_input(
     pointer_type: Optional[Type[NodeInputValuePointerRule]] = ConstantValuePointer,
 ) -> NodeInput:
     input_id = str(input_id) if input_id else str(uuid4_from_hash(f"{node_id}|{input_name}"))
-    rules = create_node_input_value_pointer_rules(value, display_context, pointer_type=pointer_type)
+    rules = create_node_input_value_pointer_rules(value, display_context, pointer_type=pointer_type, node_id=node_id)
     return NodeInput(
         id=input_id,
         key=input_name,
@@ -61,7 +61,7 @@ def create_node_input_value_pointer_rules(
     display_context: WorkflowDisplayContext,
     existing_rules: Optional[List[NodeInputValuePointerRule]] = None,
     pointer_type: Optional[Type[NodeInputValuePointerRule]] = None,
-    node_id: Optional[UUID] = None,
+    node_id: UUID = None,  # type: ignore[assignment]
 ) -> List[NodeInputValuePointerRule]:
     node_input_value_pointer_rules: List[NodeInputValuePointerRule] = existing_rules or []
 
@@ -78,20 +78,17 @@ def create_node_input_value_pointer_rules(
             )
 
         if isinstance(value, CoalesceExpression):
-            # Recursively handle the left-hand side
             lhs_rules = create_node_input_value_pointer_rules(
                 value.lhs, display_context, [], pointer_type=pointer_type, node_id=node_id
             )
             node_input_value_pointer_rules.extend(lhs_rules)
 
-            # Handle the right-hand side
             if not isinstance(value.rhs, CoalesceExpression):
                 rhs_rules = create_node_input_value_pointer_rules(
                     value.rhs, display_context, [], pointer_type=pointer_type, node_id=node_id
                 )
                 node_input_value_pointer_rules.extend(rhs_rules)
         else:
-            # Non-CoalesceExpression case
             try:
                 rule = create_node_input_value_pointer_rule(value, display_context)
             except UnsupportedSerializationException:
@@ -99,14 +96,17 @@ def create_node_input_value_pointer_rules(
 
             node_input_value_pointer_rules.append(rule)
     elif isinstance(value, (dict, list)) and _contains_descriptor(value):
-        executable_id = node_id or uuid4_from_hash("default")
-        serialized = serialize_value(executable_id, display_context, value)
-        if serialized is not None:
-            serialized_pointer = ConstantValuePointer(
-                type="CONSTANT_VALUE",
-                data=JsonVellumValue(type="JSON", value=serialized),
+        display_context.add_validation_error(
+            UnsupportedSerializationException(
+                "The Vellum UI does not support nested references for this Node attribute. "
+                "Consider flattening the references."
             )
-            node_input_value_pointer_rules.append(serialized_pointer)
+        )
+        serialized = serialize_value(node_id, display_context, value)
+        serialized_pointer = ConstantValuePointer(
+            data=JsonVellumValue(value=serialized),
+        )
+        node_input_value_pointer_rules.append(serialized_pointer)
     else:
         constant_pointer = create_pointer(value, pointer_type)
         node_input_value_pointer_rules.append(constant_pointer)
