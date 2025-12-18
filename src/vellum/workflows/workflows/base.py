@@ -598,6 +598,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             init_execution_context=self._execution_context,
             trigger=trigger,
             execution_id=execution_id,
+            event_max=event_max,
         )
         self._current_runner = runner
         runner_stream = runner.stream()
@@ -607,7 +608,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
                 if should_yield(self.__class__, event):
                     yield event
 
-        return WorkflowEventGenerator(_generate_filtered_events(), runner_stream.span_id, event_max=event_max)
+        return WorkflowEventGenerator(_generate_filtered_events(), runner_stream.span_id)
 
     @classmethod
     def validate(cls) -> None:

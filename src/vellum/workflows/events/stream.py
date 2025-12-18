@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import Generator, Generic, Iterator, Optional, TypeVar
+from typing import Generator, Generic, Iterator, TypeVar
 
 EventType = TypeVar("EventType")
 
@@ -10,15 +10,9 @@ class WorkflowEventGenerator(Generic[EventType]):
     while maintaining iterator compatibility.
     """
 
-    def __init__(
-        self,
-        event_generator: Generator[EventType, None, None],
-        span_id: UUID,
-        event_max: Optional[int] = None,
-    ):
+    def __init__(self, event_generator: Generator[EventType, None, None], span_id: UUID):
         self._event_generator = event_generator
         self._span_id = span_id
-        self._event_max = event_max
 
     @property
     def span_id(self) -> UUID:
@@ -31,7 +25,4 @@ class WorkflowEventGenerator(Generic[EventType]):
 
     def __next__(self) -> EventType:
         """Get the next event from the underlying generator."""
-        event = next(self._event_generator)
-        if self._event_max is not None and hasattr(event, "event_max"):
-            event.event_max = self._event_max
-        return event
+        return next(self._event_generator)

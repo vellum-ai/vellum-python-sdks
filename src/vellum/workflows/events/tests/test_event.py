@@ -37,6 +37,7 @@ from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.core import VellumSecret
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.workflows.base import BaseWorkflow
+from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 
 class MockInputs(BaseInputs):
@@ -580,26 +581,26 @@ def test_event_max__body_redacted_when_exceeds_limit():
     Tests that event body is redacted when serialized size exceeds event_max.
     """
 
-    # GIVEN an event with a large body and a very small event_max that will be exceeded
-    event: WorkflowExecutionFulfilledEvent = WorkflowExecutionFulfilledEvent(
-        id=UUID("123e4567-e89b-12d3-a456-426614174000"),
-        timestamp=datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
-        trace_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
-        span_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
-        body=WorkflowExecutionFulfilledBody(
-            workflow_definition=MockWorkflow,
-            outputs=MockNode.Outputs(
-                example="foo",
-            ),
-        ),
-        event_max=10,
-    )
+    # GIVEN a workflow with a node
+    workflow = MockWorkflow()
 
-    # WHEN the event is serialized
-    serialized = event.model_dump(mode="json")
+    # WHEN the workflow is streamed with a very small event_max
+    events = list(workflow.stream(inputs=MockInputs(foo="bar"), event_filter=all_workflow_event_filter, event_max=10))
 
-    # THEN the body should be redacted
-    assert serialized["body"] == {"redacted": True}
+    # THEN both node and workflow fulfilled events should have redacted bodies
+    node_fulfilled_events = [e for e in events if e.name == "node.execution.fulfilled"]
+    workflow_fulfilled_events = [e for e in events if e.name == "workflow.execution.fulfilled"]
+
+    assert len(node_fulfilled_events) > 0, "Expected at least one node fulfilled event"
+    assert len(workflow_fulfilled_events) == 1, "Expected exactly one workflow fulfilled event"
+
+    # AND the node fulfilled event body should be redacted
+    node_serialized = node_fulfilled_events[0].model_dump(mode="json")
+    assert node_serialized["body"] == {"redacted": True}
+
+    # AND the workflow fulfilled event body should be redacted
+    workflow_serialized = workflow_fulfilled_events[0].model_dump(mode="json")
+    assert workflow_serialized["body"] == {"redacted": True}
 
 
 def test_event_max__body_not_redacted_when_under_limit():
@@ -607,52 +608,25 @@ def test_event_max__body_not_redacted_when_under_limit():
     Tests that event body is not redacted when serialized size is under event_max.
     """
 
-    # GIVEN an event with a small body and a large event_max that will not be exceeded
-    event: WorkflowExecutionFulfilledEvent = WorkflowExecutionFulfilledEvent(
-        id=UUID("123e4567-e89b-12d3-a456-426614174000"),
-        timestamp=datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
-        trace_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
-        span_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
-        body=WorkflowExecutionFulfilledBody(
-            workflow_definition=MockWorkflow,
-            outputs=MockNode.Outputs(
-                example="foo",
-            ),
-        ),
-        event_max=100000,
+    # GIVEN a workflow with a node
+    workflow = MockWorkflow()
+
+    # WHEN the workflow is streamed with a large event_max
+    events = list(
+        workflow.stream(inputs=MockInputs(foo="bar"), event_filter=all_workflow_event_filter, event_max=100000)
     )
 
-    # WHEN the event is serialized
-    serialized = event.model_dump(mode="json")
+    # THEN both node and workflow fulfilled events should not have redacted bodies
+    node_fulfilled_events = [e for e in events if e.name == "node.execution.fulfilled"]
+    workflow_fulfilled_events = [e for e in events if e.name == "workflow.execution.fulfilled"]
 
-    # THEN the body should not be redacted
-    assert "redacted" not in serialized["body"]
-    # AND the outputs should be preserved
-    assert serialized["body"]["outputs"] == {"example": "foo"}
+    assert len(node_fulfilled_events) > 0, "Expected at least one node fulfilled event"
+    assert len(workflow_fulfilled_events) == 1, "Expected exactly one workflow fulfilled event"
 
+    # AND the node fulfilled event body should not be redacted
+    node_serialized = node_fulfilled_events[0].model_dump(mode="json")
+    assert "redacted" not in node_serialized["body"]
 
-def test_event_max__none_does_not_redact():
-    """
-    Tests that event body is not redacted when event_max is None.
-    """
-
-    # GIVEN an event without event_max set
-    event: WorkflowExecutionFulfilledEvent = WorkflowExecutionFulfilledEvent(
-        id=UUID("123e4567-e89b-12d3-a456-426614174000"),
-        timestamp=datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
-        trace_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
-        span_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
-        body=WorkflowExecutionFulfilledBody(
-            workflow_definition=MockWorkflow,
-            outputs=MockNode.Outputs(
-                example="foo",
-            ),
-        ),
-    )
-
-    # WHEN the event is serialized (event_max is None by default)
-    serialized = event.model_dump(mode="json")
-
-    # THEN the body should not be redacted
-    assert "redacted" not in serialized["body"]
-    assert serialized["body"]["outputs"] == {"example": "foo"}
+    # AND the workflow fulfilled event body should not be redacted
+    workflow_serialized = workflow_fulfilled_events[0].model_dump(mode="json")
+    assert "redacted" not in workflow_serialized["body"]
