@@ -103,7 +103,10 @@ class Graph:
 
     @staticmethod
     def from_edge(edge: Edge) -> "Graph":
-        return Graph(entrypoints={edge.from_port}, edges=[edge], terminals={port for port in edge.to_node.Ports})
+        terminals: Set[Union["Port", "NoPortsNode"]] = {port for port in edge.to_node.Ports}
+        if not terminals:
+            terminals = {NoPortsNode(edge.to_node)}
+        return Graph(entrypoints={edge.from_port}, edges=[edge], terminals=terminals)
 
     @staticmethod
     def from_trigger_edge(edge: TriggerEdge) -> "Graph":

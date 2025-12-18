@@ -785,7 +785,6 @@ def test_base_workflow__run_node_with_inputs():
     assert fulfilled_event.body.outputs.result == "overridden_overridden_value_default_value2_not_overridden"
 
 
-@pytest.mark.xfail(reason="We should error when drawing an outgoing edge from a node with no ports.", strict=True)
 def test_base_workflow__invalid_graph__outgoing_edge_with_no_ports():
     """Test that graph construction fails if we attempt to create an outgoing edge from a node with no ports."""
 

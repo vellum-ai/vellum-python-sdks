@@ -936,7 +936,6 @@ class TestFinalOutputNoPortsNode:
         assert isinstance(node, NoPortsNode)
         assert node.node_class == final_output_node
 
-    @pytest.mark.xfail(reason="We should preserve final output nodes as NoPortsNode.", strict=True)
     def test_from_edge(self):
         # GIVEN
         class StartNode(BaseNode[BaseState]):
