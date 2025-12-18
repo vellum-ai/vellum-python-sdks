@@ -5,6 +5,10 @@ from uuid import UUID
 from deepdiff import DeepDiff
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
+from vellum.client.types import (
+    NodeExecutionFulfilledEvent as ClientNodeExecutionFulfilledEvent,
+    WorkflowExecutionFulfilledEvent as ClientWorkflowExecutionFulfilledEvent,
+)
 from vellum.workflows.constants import undefined
 from vellum.workflows.errors.types import WorkflowError, WorkflowErrorCode
 from vellum.workflows.events.exception_handling import stream_initialization_exception
@@ -576,57 +580,81 @@ def test_node_execution_initiated_event_includes_exclude_from_monitoring():
     assert serialized["body"]["node_definition"]["exclude_from_monitoring"] is True
 
 
-def test_event_max__body_redacted_when_exceeds_limit():
+def test_event_max_size__outputs_redacted_when_exceeds_limit():
     """
-    Tests that event body is redacted when serialized size exceeds event_max.
-    """
-
-    # GIVEN a workflow with a node
-    workflow = MockWorkflow()
-
-    # WHEN the workflow is streamed with a very small event_max
-    events = list(workflow.stream(inputs=MockInputs(foo="bar"), event_filter=all_workflow_event_filter, event_max=10))
-
-    # THEN both node and workflow fulfilled events should have redacted bodies
-    node_fulfilled_events = [e for e in events if e.name == "node.execution.fulfilled"]
-    workflow_fulfilled_events = [e for e in events if e.name == "workflow.execution.fulfilled"]
-
-    assert len(node_fulfilled_events) > 0, "Expected at least one node fulfilled event"
-    assert len(workflow_fulfilled_events) == 1, "Expected exactly one workflow fulfilled event"
-
-    # AND the node fulfilled event body should be redacted
-    node_serialized = node_fulfilled_events[0].model_dump(mode="json")
-    assert node_serialized["body"] == {"redacted": True}
-
-    # AND the workflow fulfilled event body should be redacted
-    workflow_serialized = workflow_fulfilled_events[0].model_dump(mode="json")
-    assert workflow_serialized["body"] == {"redacted": True}
-
-
-def test_event_max__body_not_redacted_when_under_limit():
-    """
-    Tests that event body is not redacted when serialized size is under event_max.
+    Tests that event outputs are redacted when serialized size exceeds event_max_size.
     """
 
     # GIVEN a workflow with a node
     workflow = MockWorkflow()
 
-    # WHEN the workflow is streamed with a large event_max
+    # WHEN the workflow is streamed with a very small event_max_size
     events = list(
-        workflow.stream(inputs=MockInputs(foo="bar"), event_filter=all_workflow_event_filter, event_max=100000)
+        workflow.stream(inputs=MockInputs(foo="bar"), event_filter=all_workflow_event_filter, event_max_size=10)
     )
 
-    # THEN both node and workflow fulfilled events should not have redacted bodies
+    # THEN both node and workflow fulfilled events should have redacted outputs
     node_fulfilled_events = [e for e in events if e.name == "node.execution.fulfilled"]
     workflow_fulfilled_events = [e for e in events if e.name == "workflow.execution.fulfilled"]
 
     assert len(node_fulfilled_events) > 0, "Expected at least one node fulfilled event"
     assert len(workflow_fulfilled_events) == 1, "Expected exactly one workflow fulfilled event"
 
-    # AND the node fulfilled event body should not be redacted
+    # AND the node fulfilled event outputs should be empty
     node_serialized = node_fulfilled_events[0].model_dump(mode="json")
-    assert "redacted" not in node_serialized["body"]
+    assert node_serialized["body"]["outputs"] == {}
 
-    # AND the workflow fulfilled event body should not be redacted
+    # AND the serialized node event should be parseable by the client library
+    ClientNodeExecutionFulfilledEvent.model_validate(node_serialized)
+
+    # AND the workflow fulfilled event outputs should be empty
     workflow_serialized = workflow_fulfilled_events[0].model_dump(mode="json")
-    assert "redacted" not in workflow_serialized["body"]
+    assert workflow_serialized["body"]["outputs"] == {}
+
+    # AND the serialized workflow event should be parseable by the client library
+    ClientWorkflowExecutionFulfilledEvent.model_validate(workflow_serialized)
+
+
+def test_event_max_size__outputs_preserved_when_under_limit():
+    """
+    Tests that event outputs are preserved when serialized size is under event_max_size.
+    """
+
+    # GIVEN a workflow with a node that produces outputs
+    class OutputNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result: str = "hello world"
+
+    class OutputWorkflow(BaseWorkflow[MockInputs, BaseState]):
+        graph = OutputNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final = OutputNode.Outputs.result
+
+    workflow = OutputWorkflow()
+
+    # WHEN the workflow is streamed with a large event_max_size
+    events = list(
+        workflow.stream(inputs=MockInputs(foo="bar"), event_filter=all_workflow_event_filter, event_max_size=100000)
+    )
+
+    # THEN both node and workflow fulfilled events should have their outputs preserved
+    node_fulfilled_events = [e for e in events if e.name == "node.execution.fulfilled"]
+    workflow_fulfilled_events = [e for e in events if e.name == "workflow.execution.fulfilled"]
+
+    assert len(node_fulfilled_events) > 0, "Expected at least one node fulfilled event"
+    assert len(workflow_fulfilled_events) == 1, "Expected exactly one workflow fulfilled event"
+
+    # AND the node fulfilled event outputs should contain the result
+    node_serialized = node_fulfilled_events[0].model_dump(mode="json")
+    assert node_serialized["body"]["outputs"]["result"] == "hello world"
+
+    # AND the serialized node event should be parseable by the client library
+    ClientNodeExecutionFulfilledEvent.model_validate(node_serialized)
+
+    # AND the workflow fulfilled event outputs should contain the final output
+    workflow_serialized = workflow_fulfilled_events[0].model_dump(mode="json")
+    assert workflow_serialized["body"]["outputs"]["final"] == "hello world"
+
+    # AND the serialized workflow event should be parseable by the client library
+    ClientWorkflowExecutionFulfilledEvent.model_validate(workflow_serialized)

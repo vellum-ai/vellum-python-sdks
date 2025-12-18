@@ -1,11 +1,13 @@
+import json
 import logging
 from uuid import UUID
 from typing import TYPE_CHECKING, Any, Dict, Generic, Iterable, Literal, Optional, Type, Union, cast
 from typing_extensions import TypeGuard
 
-from pydantic import Field, SerializationInfo, field_serializer, field_validator
+from pydantic import Field, SerializationInfo, field_serializer, field_validator, model_serializer
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
+from vellum.utils.json_encoder import VellumJsonEncoder
 from vellum.workflows.errors import WorkflowError
 from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.references import ExternalInputReference
@@ -203,13 +205,23 @@ class WorkflowExecutionFulfilledEvent(_BaseWorkflowEvent, Generic[OutputsType, S
     def final_state(self) -> Optional[StateType]:
         return self.body.final_state
 
-    @field_serializer("body")
-    def serialize_body(
-        self, body: WorkflowExecutionFulfilledBody[OutputsType, StateType], info: SerializationInfo
-    ) -> WorkflowExecutionFulfilledBody[OutputsType, StateType]:
-        return cast(
-            WorkflowExecutionFulfilledBody[OutputsType, StateType], _serialize_body_with_enricher(self, body, info)
-        )
+    @model_serializer(mode="plain", when_used="json")
+    def serialize_model(self, info: SerializationInfo) -> Dict[str, Any]:
+        enriched_body = _serialize_body_with_enricher(self, self.body, info)
+        original_body = self.body
+        self.body = cast(WorkflowExecutionFulfilledBody[OutputsType, StateType], enriched_body)
+        serialized = super().serialize_model(info)
+        self.body = original_body
+
+        if (
+            self._event_max_size is not None
+            and len(json.dumps(serialized, cls=VellumJsonEncoder)) > self._event_max_size
+            and "body" in serialized
+            and isinstance(serialized["body"], dict)
+        ):
+            serialized["body"]["outputs"] = {}
+
+        return serialized
 
 
 class WorkflowExecutionRejectedBody(_BaseWorkflowExecutionBody):

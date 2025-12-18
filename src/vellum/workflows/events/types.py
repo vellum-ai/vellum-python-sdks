@@ -1,9 +1,9 @@
 from datetime import datetime
 import json
 from uuid import UUID, uuid4
-from typing import Annotated, Any, Dict, List, Literal, Optional, Union, get_args
+from typing import Annotated, Any, List, Literal, Optional, Union, get_args
 
-from pydantic import Field, GetCoreSchemaHandler, PrivateAttr, SerializationInfo, Tag, ValidationInfo, model_serializer
+from pydantic import Field, GetCoreSchemaHandler, PrivateAttr, Tag, ValidationInfo
 from pydantic_core import CoreSchema, core_schema
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
@@ -186,13 +186,4 @@ class BaseEvent(UniversalBaseModel):
     span_id: UUID
     parent: Optional[ParentContext] = None
     links: Optional[List[SpanLink]] = None
-    _event_max: Optional[int] = PrivateAttr(default=None)
-
-    @model_serializer(mode="plain", when_used="json")
-    def serialize_model(self, info: SerializationInfo) -> Dict[str, Any]:
-        serialized = super().serialize_model(info)
-
-        if self._event_max is not None and len(json.dumps(serialized, cls=VellumJsonEncoder)) > self._event_max:
-            serialized["body"] = {"redacted": True}
-
-        return serialized
+    _event_max_size: Optional[int] = PrivateAttr(default=None)
