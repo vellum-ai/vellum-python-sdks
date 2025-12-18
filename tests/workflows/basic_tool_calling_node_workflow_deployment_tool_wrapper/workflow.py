@@ -1,6 +1,3 @@
-from typing import List
-
-from vellum import ChatMessage
 from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
 from vellum.client.types.plain_text_prompt_block import PlainTextPromptBlock
 from vellum.client.types.rich_text_prompt_block import RichTextPromptBlock
@@ -75,5 +72,5 @@ class BasicToolCallingNodeWorkflowDeploymentToolWrapperWorkflow(BaseWorkflow[Wor
     graph = GetCurrentWeatherNode
 
     class Outputs(BaseWorkflow.Outputs):
-        text: str = GetCurrentWeatherNode.Outputs.text
-        chat_history: List[ChatMessage] = GetCurrentWeatherNode.Outputs.chat_history
+        text = GetCurrentWeatherNode.Outputs.text
+        chat_history = GetCurrentWeatherNode.Outputs.chat_history

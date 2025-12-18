@@ -1,27 +1,21 @@
-from unittest.mock import MagicMock
 from uuid import uuid4
 from typing import Iterator, List
 
 from vellum.client.types.chat_message import ChatMessage
 from vellum.client.types.execute_prompt_event import ExecutePromptEvent
-from vellum.client.types.execute_workflow_stream_event import ExecuteWorkflowStreamEvent
 from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
-from vellum.client.types.fulfilled_execute_workflow_workflow_result_event import (
-    FulfilledExecuteWorkflowWorkflowResultEvent,
-)
 from vellum.client.types.function_call import FunctionCall
 from vellum.client.types.function_call_chat_message_content import FunctionCallChatMessageContent
 from vellum.client.types.function_call_chat_message_content_value import FunctionCallChatMessageContentValue
 from vellum.client.types.function_call_vellum_value import FunctionCallVellumValue
 from vellum.client.types.initiated_execute_prompt_event import InitiatedExecutePromptEvent
-from vellum.client.types.initiated_execute_workflow_workflow_result_event import (
-    InitiatedExecuteWorkflowWorkflowResultEvent,
-)
-from vellum.client.types.json_vellum_value import JsonVellumValue
 from vellum.client.types.prompt_output import PromptOutput
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
 from vellum.client.types.string_vellum_value import StringVellumValue
-from vellum.client.types.workflow_output import WorkflowOutput
+from vellum.client.types.workflow_deployment_release import WorkflowDeploymentRelease
+from vellum.client.types.workflow_execution_workflow_result_event import WorkflowExecutionWorkflowResultEvent
+from vellum.client.types.workflow_output_string import WorkflowOutputString
+from vellum.client.types.workflow_result_event import WorkflowResultEvent
 from vellum.workflows.events.workflow import WorkflowExecutionFulfilledEvent
 
 from tests.workflows.basic_tool_calling_node_workflow_deployment_tool_wrapper.workflow import (
@@ -36,7 +30,7 @@ def test_workflow_deployment_tool_wrapper__merges_inputs_from_parent(vellum_adho
     """
 
     # GIVEN a mock that returns function call events followed by a final response
-    def generate_prompt_events(*args, **kwargs) -> Iterator[ExecutePromptEvent]:
+    def generate_prompt_events(*args, **kwargs) -> Iterator[ExecutePromptEvent]:  # noqa: U100
         execution_id = str(uuid4())
 
         call_count = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count
@@ -70,38 +64,66 @@ def test_workflow_deployment_tool_wrapper__merges_inputs_from_parent(vellum_adho
 
     vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
 
-    # AND a mock for the workflow deployment execution that includes the context
-    def generate_workflow_events(*args, **kwargs) -> Iterator[ExecuteWorkflowStreamEvent]:
-        execution_id = str(uuid4())
+    # AND a mock for the workflow deployment release info
+    mock_workflow_deployment_release = WorkflowDeploymentRelease(
+        id="mock-deployment-id",
+        created="2024-01-01T00:00:00Z",
+        environment={"id": "mock-env-id", "name": "mock-env-name", "label": "mock-env-label"},
+        created_by={"id": "mock-user-id", "email": "mock@example.com"},
+        workflow_version={
+            "id": "mock-version-id",
+            "input_variables": [
+                {"id": "city-input-id", "key": "city", "type": "STRING", "required": True, "default": None},
+                {"id": "date-input-id", "key": "date", "type": "STRING", "required": True, "default": None},
+                {"id": "context-input-id", "key": "context", "type": "STRING", "required": False, "default": None},
+            ],
+            "output_variables": [],
+        },
+        deployment={"id": "mock-deployment-id", "name": "weather-workflow-deployment"},
+        description="A workflow that gets the weather for a given city and date.",
+        release_tags=[],
+        reviews=[],
+    )
+    vellum_client.workflow_deployments.retrieve_workflow_deployment_release.return_value = (
+        mock_workflow_deployment_release
+    )
 
+    # AND a mock for the workflow deployment execution that includes the context
+    def mock_workflow_execution(*args, **kwargs):  # noqa: U100
         # Check that the context was passed to the workflow deployment
         inputs = kwargs.get("inputs", [])
         context_input = next((i for i in inputs if i.name == "context"), None)
         context_value = context_input.value if context_input else ""
 
-        events: List[ExecuteWorkflowStreamEvent] = [
-            InitiatedExecuteWorkflowWorkflowResultEvent(execution_id=execution_id),
-            FulfilledExecuteWorkflowWorkflowResultEvent(
-                execution_id=execution_id,
+        yield WorkflowExecutionWorkflowResultEvent(
+            execution_id="mock-execution-id",
+            type="WORKFLOW",
+            data=WorkflowResultEvent(id="mock-event-id", state="INITIATED", ts="2024-01-01T00:00:00Z"),
+        )
+        yield WorkflowExecutionWorkflowResultEvent(
+            execution_id="mock-execution-id",
+            type="WORKFLOW",
+            data=WorkflowResultEvent(id="mock-event-id", state="STREAMING", ts="2024-01-01T00:00:00Z"),
+        )
+        yield WorkflowExecutionWorkflowResultEvent(
+            execution_id="mock-execution-id",
+            type="WORKFLOW",
+            data=WorkflowResultEvent(
+                id="mock-event-id",
+                state="FULFILLED",
+                ts="2024-01-01T00:00:00Z",
                 outputs=[
-                    WorkflowOutput(
-                        id=str(uuid4()),
-                        name="temperature",
-                        value=JsonVellumValue(value=70),
-                    ),
-                    WorkflowOutput(
-                        id=str(uuid4()),
-                        name="reasoning",
-                        value=StringVellumValue(
-                            value=f"The weather in San Francisco on 2025-01-01 was hot. Context: {context_value}"
-                        ),
-                    ),
+                    WorkflowOutputString(
+                        id="mock-output-id",
+                        name="result",
+                        type="STRING",
+                        value=f"The weather in San Francisco on 2025-01-01 was hot. Context: {context_value}",
+                    )
                 ],
             ),
-        ]
-        yield from events
+        )
 
-    vellum_client.execute_workflow_stream = MagicMock(side_effect=generate_workflow_events)
+    vellum_client.execute_workflow_stream.side_effect = mock_workflow_execution
 
     # AND a workflow that uses a workflow deployment with tool wrapper
     workflow = BasicToolCallingNodeWorkflowDeploymentToolWrapperWorkflow()
@@ -153,7 +175,7 @@ def test_workflow_deployment_tool_wrapper__merges_inputs_from_parent(vellum_adho
             role="FUNCTION",
             content=StringChatMessageContent(
                 type="STRING",
-                value='{"temperature": 70, "reasoning": "The weather in San Francisco on 2025-01-01 was hot. Context: This is additional context from parent workflow"}',  # noqa: E501
+                value='{"result": "The weather in San Francisco on 2025-01-01 was hot. Context: This is additional context from parent workflow"}',  # noqa: E501
             ),
             source="call_workflow_deployment",
         ),

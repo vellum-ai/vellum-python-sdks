@@ -1,6 +1,5 @@
 from unittest.mock import MagicMock
 
-from vellum.client.types.string_vellum_variable_value import StringVellumVariableValue
 from vellum.client.types.vellum_variable import VellumVariable
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
@@ -41,7 +40,7 @@ def test_serialize_workflow__workflow_deployment_with_tool_wrapper(vellum_client
             key="context",
             type="STRING",
             required=False,
-            default=StringVellumVariableValue(value="default context"),
+            default=None,
         ),
     ]
     vellum_client.workflow_deployments.retrieve_workflow_deployment_release.return_value = mock_release

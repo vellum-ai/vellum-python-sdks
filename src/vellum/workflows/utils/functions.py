@@ -11,6 +11,7 @@ from typing import (
     Literal,
     Optional,
     Type,
+    TypeVar,
     Union,
     get_args,
     get_origin,
@@ -416,14 +417,19 @@ def compile_vellum_integration_tool_definition(
         return FunctionDefinition(name=tool_def.name, description=tool_def.description, parameters={})
 
 
-ToolType = Union[Callable[..., Any], Type["BaseWorkflow"], DeploymentDefinition]
+ToolT = TypeVar(
+    "ToolT",
+    Callable[..., Any],
+    Type["BaseWorkflow[Any, Any]"],
+    DeploymentDefinition,
+)
 
 
 def tool(
     *,
     inputs: Optional[dict[str, Any]] = None,
     examples: Optional[List[dict[str, Any]]] = None,
-) -> Callable[[ToolType], ToolType]:
+) -> Callable[[ToolT], ToolT]:
     """
     Decorator to configure a tool function, inline workflow, or workflow deployment.
 
@@ -458,7 +464,7 @@ def tool(
         })(DeploymentDefinition(deployment="my-workflow-deployment"))
     """
 
-    def decorator(func: ToolType) -> ToolType:
+    def decorator(func: ToolT) -> ToolT:
         # Store the inputs mapping on the function/workflow/deployment for later use
         if inputs is not None:
             setattr(func, "__vellum_inputs__", inputs)
@@ -470,7 +476,7 @@ def tool(
     return decorator
 
 
-def use_tool_inputs(**inputs: Any) -> Callable[[ToolType], ToolType]:
+def use_tool_inputs(**inputs: Any) -> Callable[[ToolT], ToolT]:
     """
     Decorator to specify which parameters of a tool function should be provided
     from the parent workflow inputs rather than from the LLM.
