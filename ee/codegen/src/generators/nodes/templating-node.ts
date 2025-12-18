@@ -8,6 +8,7 @@ import { PythonType } from "src/generators/extensions";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
+import { Field } from "src/generators/extensions/field";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -47,14 +48,14 @@ export class TemplatingNode extends BaseNode<
     );
 
     statements.push(
-      python.field({
+      new Field({
         name: TEMPLATING_INPUT_KEY,
         initializer: this.getTemplatingInput(),
       })
     );
 
     statements.push(
-      python.field({
+      new Field({
         name: INPUTS_PREFIX,
         initializer: new DictInstantiation(
           otherInputs.map((codeInput) => ({
@@ -75,7 +76,7 @@ export class TemplatingNode extends BaseNode<
     const statements: AstNode[] = [];
 
     statements.push(
-      python.field({
+      new Field({
         name: "target_handle_id",
         initializer: python.TypeInstantiation.uuid(
           this.nodeData.data.targetHandleId
@@ -148,8 +149,8 @@ export class TemplatingNode extends BaseNode<
     });
   }
 
-  protected getOutputDisplay(): python.Field {
-    return python.field({
+  protected getOutputDisplay(): Field {
+    return new Field({
       name: "output_display",
       initializer: new DictInstantiation([
         {

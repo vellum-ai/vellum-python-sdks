@@ -20,6 +20,7 @@ import { Class } from "src/generators/extensions/class";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { Decorator } from "src/generators/extensions/decorator";
 import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
+import { Field } from "src/generators/extensions/field";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { MethodInvocation } from "src/generators/extensions/method-invocation";
 import { Reference } from "src/generators/extensions/reference";
@@ -122,7 +123,7 @@ export abstract class BaseNode<
   }
 
   // Override to specify a custom output display
-  protected getOutputDisplay(): python.Field | undefined {
+  protected getOutputDisplay(): Field | undefined {
     const outputIdsByName: Record<string, string> = {};
 
     // We use this mapping for backwards compatibility support with legacy `node.data`
@@ -193,7 +194,7 @@ export abstract class BaseNode<
       });
     });
 
-    return python.field({
+    return new Field({
       name: "output_display",
       initializer: new DictInstantiation(outputDisplayEntries),
     });
@@ -393,7 +394,7 @@ export abstract class BaseNode<
     return [nodeInputsByKey, nodeInputsById, nodeAttributeNameByNodeInputId];
   }
 
-  protected getPortDisplay(): python.Field | undefined {
+  protected getPortDisplay(): Field | undefined {
     if (this.nodeData.ports) {
       return this.getPortDisplayFromAttribute();
     } else {
@@ -401,7 +402,7 @@ export abstract class BaseNode<
     }
   }
 
-  protected getPortDisplayFromAttribute(): python.Field | undefined {
+  protected getPortDisplayFromAttribute(): Field | undefined {
     if (!this.nodeData.ports) {
       return;
     } else {
@@ -435,7 +436,7 @@ export abstract class BaseNode<
       );
 
       if (portDisplayOverridesDict.size > 0) {
-        return python.field({
+        return new Field({
           name: "port_displays",
           initializer: new DictInstantiation(
             Array.from(portDisplayOverridesDict.entries()).map(
@@ -455,7 +456,7 @@ export abstract class BaseNode<
     return;
   }
 
-  protected getPortDisplayFromSourceHandle(): python.Field | undefined {
+  protected getPortDisplayFromSourceHandle(): Field | undefined {
     if (
       !("data" in this.nodeData) ||
       !("sourceHandleId" in this.nodeData.data)
@@ -463,7 +464,7 @@ export abstract class BaseNode<
       return;
     }
 
-    return python.field({
+    return new Field({
       name: "port_displays",
       initializer: new DictInstantiation([
         {
@@ -500,8 +501,8 @@ export abstract class BaseNode<
     });
   }
 
-  private getDisplayData(): python.Field {
-    return python.field({
+  private getDisplayData(): Field {
+    return new Field({
       name: "display_data",
       initializer: this.generateNodeDisplayDataWithoutComment(),
     });
@@ -777,7 +778,7 @@ export abstract class BaseNode<
     const defaultLabel = pascalToTitleCase(nodeContext.nodeClassName);
     if (nodeLabel !== defaultLabel) {
       nodeClass.add(
-        python.field({
+        new Field({
           name: "label",
           initializer: new StrInstantiation(nodeLabel),
         })
@@ -789,7 +790,7 @@ export abstract class BaseNode<
     // const expectedNodeId = getNodeIdFromDefinition(this.nodeData.definition);
     // if (expectedNodeId === undefined || this.nodeData.id !== expectedNodeId) {
     nodeClass.add(
-      python.field({
+      new Field({
         name: "node_id",
         initializer: python.TypeInstantiation.uuid(this.nodeData.id),
       })
@@ -801,7 +802,7 @@ export abstract class BaseNode<
     );
 
     if (this.nodeInputsByKey.size > 0) {
-      const nodeInputIdsByNameField = python.field({
+      const nodeInputIdsByNameField = new Field({
         name: "node_input_ids_by_name",
         initializer: new DictInstantiation(
           Array.from(this.nodeInputsByKey).map<{
@@ -823,7 +824,7 @@ export abstract class BaseNode<
 
     if (this.nodeData.attributes && this.nodeData.attributes.length > 0) {
       nodeClass.add(
-        python.field({
+        new Field({
           name: "attribute_ids_by_name",
           initializer: new DictInstantiation(
             this.nodeData.attributes.map((attribute) => {

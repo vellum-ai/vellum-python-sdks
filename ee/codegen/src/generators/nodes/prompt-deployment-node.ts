@@ -6,6 +6,7 @@ import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
+import { Field } from "src/generators/extensions/field";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
@@ -40,7 +41,7 @@ export class PromptDeploymentNode extends BaseNode<
       this.nodeData.data.mlModelFallbacks.length > 0
     ) {
       statements.push(
-        python.field({
+        new Field({
           name: "ml_model_fallbacks",
           initializer: new ListInstantiation(
             this.nodeData.data.mlModelFallbacks.map(
@@ -53,7 +54,7 @@ export class PromptDeploymentNode extends BaseNode<
 
     if (this.nodeContext.promptDeploymentRelease) {
       statements.push(
-        python.field({
+        new Field({
           name: "deployment",
           initializer: new StrInstantiation(
             this.nodeContext.promptDeploymentRelease.deployment.name
@@ -62,7 +63,7 @@ export class PromptDeploymentNode extends BaseNode<
       );
     } else {
       statements.push(
-        python.field({
+        new Field({
           name: "deployment",
           initializer: python.TypeInstantiation.uuid(
             this.nodeData.data.promptDeploymentId
@@ -72,7 +73,7 @@ export class PromptDeploymentNode extends BaseNode<
     }
 
     statements.push(
-      python.field({
+      new Field({
         name: "release_tag",
         initializer: new StrInstantiation(nodeData.releaseTag),
       })
@@ -83,7 +84,7 @@ export class PromptDeploymentNode extends BaseNode<
     );
     if (promptInputsAttribute) {
       statements.push(
-        python.field({
+        new Field({
           name: INPUTS_PREFIX,
           initializer: new WorkflowValueDescriptor({
             nodeContext: this.nodeContext,
@@ -94,7 +95,7 @@ export class PromptDeploymentNode extends BaseNode<
       );
     } else if (this.nodeInputsByKey.size > 0) {
       statements.push(
-        python.field({
+        new Field({
           name: INPUTS_PREFIX,
           initializer: new DictInstantiation(
             Array.from(this.nodeInputsByKey.entries()).map(([key, value]) => ({
@@ -116,7 +117,7 @@ export class PromptDeploymentNode extends BaseNode<
     const statements: AstNode[] = [];
 
     statements.push(
-      python.field({
+      new Field({
         name: "target_handle_id",
         initializer: python.TypeInstantiation.uuid(
           this.nodeData.data.targetHandleId
@@ -127,7 +128,7 @@ export class PromptDeploymentNode extends BaseNode<
     return statements;
   }
 
-  protected getOutputDisplay(): python.Field {
+  protected getOutputDisplay(): Field {
     const jsonOutput = this.nodeData.outputs?.find(
       (output) => output.type === "JSON"
     );
@@ -215,7 +216,7 @@ export class PromptDeploymentNode extends BaseNode<
       });
     }
 
-    return python.field({
+    return new Field({
       name: "output_display",
       initializer: new DictInstantiation(outputDisplayEntries),
     });

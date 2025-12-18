@@ -8,6 +8,7 @@ import { NodeNotFoundError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { BoolInstantiation } from "src/generators/extensions/bool-instantiation";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { Field } from "src/generators/extensions/field";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
@@ -47,7 +48,7 @@ export class WorkflowSandboxFile extends BasePersistedFile {
   }
 
   protected getFileStatements(): AstNode[] {
-    const datasetField = python.field({
+    const datasetField = new Field({
       name: "dataset",
       initializer: new ListInstantiation(
         this.sandboxInputs.map((input, index) =>
@@ -58,7 +59,7 @@ export class WorkflowSandboxFile extends BasePersistedFile {
     });
     this.inheritReferences(datasetField);
 
-    const sandboxRunnerField = python.field({
+    const sandboxRunnerField = new Field({
       name: "runner",
       initializer: new ClassInstantiation({
         classReference: new Reference({

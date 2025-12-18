@@ -6,6 +6,7 @@ import { Class, PythonType } from "src/generators/extensions";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
+import { Field } from "src/generators/extensions/field";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -70,7 +71,7 @@ export class FinalOutputNode extends BaseNode<
             workflowContext: this.workflowContext,
           });
 
-          const outputField = python.field({
+          const outputField = new Field({
             name: "value",
             initializer: workflowValueDescriptor,
           });
@@ -81,7 +82,7 @@ export class FinalOutputNode extends BaseNode<
       const nodeInput = this.getNodeInputByName("node_input");
 
       if (nodeInput) {
-        const outputField = python.field({
+        const outputField = new Field({
           name: "value",
           initializer: nodeInput,
         });
@@ -95,7 +96,7 @@ export class FinalOutputNode extends BaseNode<
     const statements: AstNode[] = [];
 
     statements.push(
-      python.field({
+      new Field({
         name: "target_handle_id",
         initializer: python.TypeInstantiation.uuid(
           this.nodeData.data.targetHandleId
@@ -104,7 +105,7 @@ export class FinalOutputNode extends BaseNode<
     );
 
     statements.push(
-      python.field({
+      new Field({
         name: "output_name",
         initializer: new StrInstantiation(this.nodeData.data.name),
       })
@@ -113,8 +114,8 @@ export class FinalOutputNode extends BaseNode<
     return statements;
   }
 
-  protected getOutputDisplay(): python.Field {
-    return python.field({
+  protected getOutputDisplay(): Field {
+    return new Field({
       name: "output_display",
       initializer: new DictInstantiation(
         [

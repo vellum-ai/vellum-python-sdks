@@ -1,7 +1,6 @@
-import { python } from "@fern-api/python-ast";
-
 import { VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH } from "src/constants";
 import { Class } from "src/generators/extensions/class";
+import { Field } from "src/generators/extensions/field";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -56,14 +55,14 @@ export class ScheduledTrigger extends BaseTrigger<ScheduledTriggerType> {
     });
 
     configClass.add(
-      python.field({
+      new Field({
         name: "cron",
         initializer: new StrInstantiation(this.trigger.cron),
       })
     );
 
     configClass.add(
-      python.field({
+      new Field({
         name: "timezone",
         initializer: this.trigger.timezone
           ? new StrInstantiation(this.trigger.timezone)

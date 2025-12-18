@@ -1,5 +1,3 @@
-import { python } from "@fern-api/python-ast";
-
 import {
   GENERATED_TRIGGERS_MODULE_NAME,
   VELLUM_WORKFLOW_EDITOR_TYPES_PATH,
@@ -10,6 +8,7 @@ import { BasePersistedFile } from "src/generators/base-persisted-file";
 import { BoolInstantiation } from "src/generators/extensions/bool-instantiation";
 import { Class } from "src/generators/extensions/class";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { Field } from "src/generators/extensions/field";
 import { FloatInstantiation } from "src/generators/extensions/float-instantiation";
 import { IntInstantiation } from "src/generators/extensions/int-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
@@ -76,7 +75,7 @@ export abstract class BaseTrigger<
     const fields: AstNode[] = [];
 
     fields.push(
-      python.field({
+      new Field({
         name: "label",
         initializer: new StrInstantiation(displayData.label),
       })
@@ -84,13 +83,13 @@ export abstract class BaseTrigger<
 
     if (displayData.position != null) {
       fields.push(
-        python.field({
+        new Field({
           name: "x",
           initializer: new FloatInstantiation(displayData.position.x),
         })
       );
       fields.push(
-        python.field({
+        new Field({
           name: "y",
           initializer: new FloatInstantiation(displayData.position.y),
         })
@@ -99,7 +98,7 @@ export abstract class BaseTrigger<
 
     if (displayData.z_index != null) {
       fields.push(
-        python.field({
+        new Field({
           name: "z_index",
           initializer: new IntInstantiation(displayData.z_index),
         })
@@ -108,7 +107,7 @@ export abstract class BaseTrigger<
 
     if (displayData.icon != null) {
       fields.push(
-        python.field({
+        new Field({
           name: "icon",
           initializer: new StrInstantiation(displayData.icon),
         })
@@ -117,7 +116,7 @@ export abstract class BaseTrigger<
 
     if (displayData.color != null) {
       fields.push(
-        python.field({
+        new Field({
           name: "color",
           initializer: new StrInstantiation(displayData.color),
         })
@@ -151,7 +150,7 @@ export abstract class BaseTrigger<
       }
 
       fields.push(
-        python.field({
+        new Field({
           name: "comment",
           initializer: new ClassInstantiation({
             classReference: new Reference({
@@ -227,11 +226,13 @@ export abstract class BaseTrigger<
    * All triggers have attributes, so this is a common helper.
    */
   protected createAttributeFields(): AstNode[] {
-    return this.trigger.attributes.map((attr) =>
-      python.field({
-        name: attr.key,
-        type: python.Type.str(),
-      })
+    return this.trigger.attributes.map(
+      (attr) =>
+        new Field({
+          name: attr.key,
+          type: undefined,
+          initializer: undefined,
+        })
     );
   }
 }

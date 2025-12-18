@@ -1,11 +1,9 @@
-import { python } from "@fern-api/python-ast";
-import { Field } from "@fern-api/python-ast/Field";
-
 import { WorkflowValueDescriptor } from "./workflow-value-descriptor";
 
 import { WorkflowContext } from "src/context";
 import { WorkflowOutputContext } from "src/context/workflow-output-context";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Field } from "src/generators/extensions/field";
 import { Writer } from "src/generators/extensions/writer";
 
 export declare namespace WorkflowOutput {
@@ -35,7 +33,7 @@ export class WorkflowOutput extends AstNode {
       return undefined;
     }
 
-    const workflowOutput = python.field({
+    const workflowOutput = new Field({
       name: outputVariable.name,
       initializer: new WorkflowValueDescriptor({
         workflowContext: this.workflowContext,

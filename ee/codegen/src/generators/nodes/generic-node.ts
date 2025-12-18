@@ -2,7 +2,6 @@ import { mkdir, writeFile } from "fs/promises";
 import { join } from "path";
 
 import { python } from "@fern-api/python-ast";
-import { Field } from "@fern-api/python-ast/Field";
 import {
   PromptBlock as PromptBlockSerializer,
   PromptParameters as PromptParametersSerializer,
@@ -20,6 +19,7 @@ import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { Decorator } from "src/generators/extensions/decorator";
 import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
+import { Field } from "src/generators/extensions/field";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { MethodInvocation } from "src/generators/extensions/method-invocation";
@@ -135,7 +135,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
             });
 
             nodeAttributesStatements.push(
-              python.field({
+              new Field({
                 name: toValidPythonIdentifier(attribute.name, "attr"),
                 initializer: new ListInstantiation(functionReferences),
               })
@@ -189,7 +189,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
             });
 
             nodeAttributesStatements.push(
-              python.field({
+              new Field({
                 name: toValidPythonIdentifier(attribute.name, "attr"),
                 initializer: python.TypeInstantiation.list(functionReferences),
               })
@@ -245,7 +245,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
             }
 
             nodeAttributesStatements.push(
-              python.field({
+              new Field({
                 name: attribute.name,
                 initializer: new ListInstantiation(
                   deserializedBlocks.map((block) => {
@@ -286,7 +286,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
             }
             const promptParameters = parseResult.value;
             nodeAttributesStatements.push(
-              python.field({
+              new Field({
                 name: "parameters",
                 initializer: new PromptParameters({
                   promptParametersRequest: promptParameters,
@@ -298,7 +298,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
         }
         default:
           nodeAttributesStatements.push(
-            python.field({
+            new Field({
               name: toPythonSafeSnakeCase(attribute.name),
               initializer: new WorkflowValueDescriptor({
                 nodeContext: this.nodeContext,
@@ -758,7 +758,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
       }),
     }));
 
-    return python.field({
+    return new Field({
       name: "output_display",
       initializer: new DictInstantiation(outputDisplayEntries),
     });

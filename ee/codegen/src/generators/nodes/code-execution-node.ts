@@ -10,6 +10,7 @@ import { NodeAttributeGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
+import { Field } from "src/generators/extensions/field";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
@@ -88,7 +89,7 @@ export class CodeExecutionNode extends BaseNode<
     const statements: AstNode[] = [];
 
     statements.push(
-      python.field({
+      new Field({
         name: "filepath",
         initializer: new StrInstantiation(this.nodeContext.filepath),
       })
@@ -100,7 +101,7 @@ export class CodeExecutionNode extends BaseNode<
     );
 
     statements.push(
-      python.field({
+      new Field({
         name: INPUTS_PREFIX,
         initializer: new DictInstantiation(
           codeInputs.map((codeInput) => ({
@@ -118,7 +119,7 @@ export class CodeExecutionNode extends BaseNode<
 
     if (runtime) {
       statements.push(
-        python.field({
+        new Field({
           name: RUNTIME_INPUT_KEY,
           initializer: new StrInstantiation(runtime),
         })
@@ -126,7 +127,7 @@ export class CodeExecutionNode extends BaseNode<
     }
 
     statements.push(
-      python.field({
+      new Field({
         name: "packages",
         initializer: nodeData.packages
           ? new ListInstantiation(
@@ -173,7 +174,7 @@ export class CodeExecutionNode extends BaseNode<
     const statements: AstNode[] = [];
 
     statements.push(
-      python.field({
+      new Field({
         name: "target_handle_id",
         initializer: python.TypeInstantiation.uuid(
           this.nodeData.data.targetHandleId
@@ -182,7 +183,7 @@ export class CodeExecutionNode extends BaseNode<
     );
 
     statements.push(
-      python.field({
+      new Field({
         name: "output_id",
         initializer: python.TypeInstantiation.uuid(nodeData.outputId),
       })
@@ -190,7 +191,7 @@ export class CodeExecutionNode extends BaseNode<
 
     if (nodeData.logOutputId) {
       statements.push(
-        python.field({
+        new Field({
           name: "log_output_id",
           initializer: nodeData.logOutputId
             ? python.TypeInstantiation.uuid(nodeData.logOutputId)
@@ -269,7 +270,7 @@ export class CodeExecutionNode extends BaseNode<
     return;
   }
 
-  protected getOutputDisplay(): python.Field {
+  protected getOutputDisplay(): Field {
     const outputDisplayEntries = [
       {
         key: new Reference({
@@ -328,7 +329,7 @@ export class CodeExecutionNode extends BaseNode<
       });
     }
 
-    return python.field({
+    return new Field({
       name: "output_display",
       initializer: new DictInstantiation(outputDisplayEntries),
     });

@@ -1,8 +1,8 @@
 import { python } from "@fern-api/python-ast";
-import { Field } from "@fern-api/python-ast/Field";
 
 import { ErrorNodeContext } from "src/context/node-context/error-node";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Field } from "src/generators/extensions/field";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { ErrorNode as ErrorNodeType } from "src/types/vellum";
 
@@ -13,7 +13,7 @@ export class ErrorNode extends BaseNode<ErrorNodeType, ErrorNodeContext> {
 
     if (errorSourceInputId) {
       bodyStatements.push(
-        python.field({
+        new Field({
           name: "error",
           initializer: errorSourceInputId,
         })
@@ -27,7 +27,7 @@ export class ErrorNode extends BaseNode<ErrorNodeType, ErrorNodeContext> {
     const statements: AstNode[] = [];
 
     statements.push(
-      python.field({
+      new Field({
         name: "target_handle_id",
         initializer: python.TypeInstantiation.uuid(
           this.nodeData.data.targetHandleId

@@ -1,9 +1,9 @@
 import { python } from "@fern-api/python-ast";
-import { Field } from "@fern-api/python-ast/Field";
 
 import { MergeNodeContext } from "src/context/node-context/merge-node";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
+import { Field } from "src/generators/extensions/field";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { BaseNode } from "src/generators/nodes/bases/base";
@@ -36,7 +36,7 @@ export class MergeNode extends BaseNode<MergeNodeType, MergeNodeContext> {
       ],
     });
     triggerClass.add(
-      python.field({
+      new Field({
         name: "merge_behavior",
         initializer: mergeStrategyRef,
       })
@@ -56,7 +56,7 @@ export class MergeNode extends BaseNode<MergeNodeType, MergeNodeContext> {
       )
     );
     statements.push(
-      python.field({ name: "target_handle_ids", initializer: targetHandleIds })
+      new Field({ name: "target_handle_ids", initializer: targetHandleIds })
     );
 
     return statements;

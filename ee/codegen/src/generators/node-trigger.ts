@@ -1,10 +1,9 @@
-import { python } from "@fern-api/python-ast";
-
 import { VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { AccessAttribute } from "src/generators/extensions/access-attribute";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
+import { Field } from "src/generators/extensions/field";
 import { Reference } from "src/generators/extensions/reference";
 import { Writer } from "src/generators/extensions/writer";
 import {
@@ -57,7 +56,7 @@ export class NodeTrigger extends AstNode {
     });
 
     clazz.add(
-      python.field({
+      new Field({
         name: "merge_behavior",
         initializer: new AccessAttribute({
           lhs: new Reference({

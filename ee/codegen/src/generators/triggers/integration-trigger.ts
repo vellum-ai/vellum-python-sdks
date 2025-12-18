@@ -1,8 +1,7 @@
-import { python } from "@fern-api/python-ast";
-
 import { VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH } from "src/constants";
 import { Class } from "src/generators/extensions/class";
 import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
+import { Field } from "src/generators/extensions/field";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -45,14 +44,14 @@ export class IntegrationTrigger extends BaseTrigger<IntegrationTriggerType> {
     const configFields: AstNode[] = [];
 
     configFields.push(
-      python.field({
+      new Field({
         name: "provider",
         initializer: new StrInstantiation(this.trigger.execConfig.type),
       })
     );
 
     configFields.push(
-      python.field({
+      new Field({
         name: "integration_name",
         initializer: new StrInstantiation(
           this.trigger.execConfig.integrationName
@@ -61,7 +60,7 @@ export class IntegrationTrigger extends BaseTrigger<IntegrationTriggerType> {
     );
 
     configFields.push(
-      python.field({
+      new Field({
         name: "slug",
         initializer: new StrInstantiation(this.trigger.execConfig.slug),
       })
@@ -69,7 +68,7 @@ export class IntegrationTrigger extends BaseTrigger<IntegrationTriggerType> {
 
     if (this.trigger.execConfig.setupAttributes.length > 0) {
       configFields.push(
-        python.field({
+        new Field({
           name: "setup_attributes",
           initializer: new DictInstantiation(
             this.trigger.execConfig.setupAttributes.map((attr) => ({

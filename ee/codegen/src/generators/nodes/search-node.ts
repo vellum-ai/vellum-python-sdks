@@ -15,6 +15,7 @@ import { AstNode } from "src/generators/extensions/ast-node";
 import { BoolInstantiation } from "src/generators/extensions/bool-instantiation";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
+import { Field } from "src/generators/extensions/field";
 import { FloatInstantiation } from "src/generators/extensions/float-instantiation";
 import { IntInstantiation } from "src/generators/extensions/int-instantiation";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
@@ -46,7 +47,7 @@ export class SearchNode extends BaseNode<
     const query = this.getNodeInputByName("query");
     if (query) {
       bodyStatements.push(
-        python.field({
+        new Field({
           name: "query",
           initializer: query,
         })
@@ -56,7 +57,7 @@ export class SearchNode extends BaseNode<
     const documentName = this.nodeContext.documentIndex?.name;
     const documentIndex = this.getNodeInputByName("document_index_id");
     bodyStatements.push(
-      python.field({
+      new Field({
         name: "document_index",
         initializer: documentName
           ? new StrInstantiation(documentName)
@@ -79,7 +80,7 @@ export class SearchNode extends BaseNode<
             );
           }
           bodyStatements.push(
-            python.field({
+            new Field({
               name: "limit",
               initializer: new IntInstantiation(parsedInt),
             })
@@ -97,7 +98,7 @@ export class SearchNode extends BaseNode<
         );
       } else {
         bodyStatements.push(
-          python.field({
+          new Field({
             name: "limit",
             initializer: limitInput,
           })
@@ -106,21 +107,21 @@ export class SearchNode extends BaseNode<
     }
 
     bodyStatements.push(
-      python.field({
+      new Field({
         name: "weights",
         initializer: this.getSearchWeightsRequest(),
       })
     );
 
     bodyStatements.push(
-      python.field({
+      new Field({
         name: "result_merging",
         initializer: this.getResultMerging(),
       })
     );
 
     bodyStatements.push(
-      python.field({
+      new Field({
         name: "filters",
         initializer: this.searchFiltersConfig(),
       })
@@ -130,7 +131,7 @@ export class SearchNode extends BaseNode<
 
     if (separator) {
       bodyStatements.push(
-        python.field({
+        new Field({
           name: "chunk_separator",
           initializer: separator,
         })
@@ -350,7 +351,7 @@ export class SearchNode extends BaseNode<
     const statements: AstNode[] = [];
 
     statements.push(
-      python.field({
+      new Field({
         name: "target_handle_id",
         initializer: python.TypeInstantiation.uuid(
           this.nodeData.data.targetHandleId
@@ -367,7 +368,7 @@ export class SearchNode extends BaseNode<
           this.generateMetadataFilterInputIdByOperandIdMap(rawMetadata);
 
         statements.push(
-          python.field({
+          new Field({
             name: "metadata_filter_input_id_by_operand_id",
             initializer: new DictInstantiation(
               Array.from(metadataFilterInputIdByOperandId.entries()).map(
@@ -445,8 +446,8 @@ export class SearchNode extends BaseNode<
     return result;
   }
 
-  protected getOutputDisplay(): python.Field {
-    return python.field({
+  protected getOutputDisplay(): Field {
+    return new Field({
       name: "output_display",
       initializer: new DictInstantiation([
         {
