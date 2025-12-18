@@ -528,6 +528,11 @@ def create_function_node(
         )
         return node
     elif isinstance(function, VellumIntegrationToolDefinition):
+        display_class = type(
+            f"VellumIntegrationNodeDisplay_{function.name}",
+            (VellumIntegrationNode.Display,),
+            {"icon": "vellum:icon:plug", "color": "navy"},
+        )
         node = type(
             f"VellumIntegrationNode_{function.name}",
             (VellumIntegrationNode,),
@@ -535,6 +540,7 @@ def create_function_node(
                 "vellum_integration_tool": function,
                 "arguments": arguments_expr,
                 "function_call_id": function_call_id_expr,
+                "Display": display_class,
                 "__module__": __name__,
             },
         )
