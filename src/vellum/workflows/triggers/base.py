@@ -14,6 +14,7 @@ from vellum_ee.workflows.display.editor import NodeDisplayComment
 
 if TYPE_CHECKING:
     from vellum.workflows.graph.graph import Graph, GraphTarget
+    from vellum.workflows.outputs import BaseOutputs
     from vellum.workflows.state.base import BaseState
 
 
@@ -490,3 +491,18 @@ class BaseTrigger(ABC, metaclass=BaseTriggerMeta):
 
         # Fall back to deterministic hash-based ID
         return get_trigger_attribute_id(cls, attribute_name)
+
+    def __on_workflow_fulfilled__(self, state: "BaseState", outputs: "BaseOutputs") -> None:
+        """
+        Lifecycle hook called by WorkflowRunner after workflow execution completes.
+
+        Subclasses can override this method to perform automatic state updates
+        based on workflow outputs (e.g., appending messages to chat history).
+
+        Default implementation does nothing.
+
+        Args:
+            state: The final workflow state
+            outputs: The workflow outputs from the final node
+        """
+        pass

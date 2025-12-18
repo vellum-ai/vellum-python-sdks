@@ -1138,6 +1138,9 @@ class WorkflowRunner(Generic[StateType]):
                     descriptor.instance.resolve(final_state),
                 )
 
+        if self._trigger is not None:
+            self._trigger.__on_workflow_fulfilled__(final_state, fulfilled_outputs)
+
         self._workflow_event_outer_queue.put(self._fulfill_workflow_event(fulfilled_outputs, final_state))
 
     def _run_background_thread(self) -> None:
