@@ -1173,6 +1173,13 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             input.name: display_context.workflow_input_displays[input].id
             for input in display_context.workflow_input_displays
         }
+
+        # Include trigger attributes in workflow_inputs so they appear in the executions list UI
+        for subgraph in self._workflow.get_subgraphs():
+            for trigger_class in subgraph.triggers:
+                for trigger_attr_ref in trigger_class:
+                    if trigger_attr_ref.name not in workflow_inputs:
+                        workflow_inputs[trigger_attr_ref.name] = trigger_attr_ref.id
         node_displays = {
             node.__id__: (node, display_context.node_displays[node]) for node in display_context.node_displays
         }

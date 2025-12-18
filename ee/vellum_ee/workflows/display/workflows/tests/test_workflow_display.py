@@ -11,6 +11,7 @@ from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.nodes.displayable.final_output_node.node import FinalOutputNode
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.state.base import BaseState
+from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.editor.types import NodeDisplayData, NodeDisplayPosition
@@ -287,6 +288,38 @@ def test_get_event_display_context__workflow_output_display_with_none():
 
     # THEN the workflow output display should be included
     assert display_context.workflow_outputs.keys() == {"foo", "bar"}
+
+
+def test_get_event_display_context__trigger_attributes_included():
+    """Trigger attributes should be included in workflow_inputs for display in executions list."""
+
+    # GIVEN a workflow with an integration trigger that has attributes
+    class SlackTrigger(IntegrationTrigger):
+        message: str
+        channel: str
+
+        class Config:
+            provider = "COMPOSIO"
+            integration_name = "SLACK"
+            slug = "slack_new_message"
+
+    class ProcessNode(BaseNode):
+        pass
+
+    class MyWorkflow(BaseWorkflow):
+        graph = SlackTrigger >> ProcessNode
+
+    # WHEN we gather the event display context
+    display_context = get_workflow_display(workflow_class=MyWorkflow).get_event_display_context()
+
+    # THEN the trigger attributes should be included in workflow_inputs
+    assert "message" in display_context.workflow_inputs
+    assert "channel" in display_context.workflow_inputs
+
+    # AND the IDs should match the trigger attribute IDs
+    trigger_attr_refs = SlackTrigger.attribute_references()
+    assert display_context.workflow_inputs["message"] == trigger_attr_refs["message"].id
+    assert display_context.workflow_inputs["channel"] == trigger_attr_refs["channel"].id
 
 
 def test_serialize_workflow__inherited_node_display_class_not_registered():
