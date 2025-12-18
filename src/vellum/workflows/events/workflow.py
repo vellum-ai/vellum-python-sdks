@@ -205,13 +205,17 @@ class WorkflowExecutionFulfilledEvent(_BaseWorkflowEvent, Generic[OutputsType, S
     def final_state(self) -> Optional[StateType]:
         return self.body.final_state
 
+    @field_serializer("body")
+    def serialize_body(
+        self, body: WorkflowExecutionFulfilledBody[OutputsType, StateType], info: SerializationInfo
+    ) -> WorkflowExecutionFulfilledBody[OutputsType, StateType]:
+        return cast(
+            WorkflowExecutionFulfilledBody[OutputsType, StateType], _serialize_body_with_enricher(self, body, info)
+        )
+
     @model_serializer(mode="plain", when_used="json")
     def serialize_model(self, info: SerializationInfo) -> Dict[str, Any]:
-        enriched_body = _serialize_body_with_enricher(self, self.body, info)
-        original_body = self.body
-        self.body = cast(WorkflowExecutionFulfilledBody[OutputsType, StateType], enriched_body)
         serialized = super().serialize_model(info)
-        self.body = original_body
 
         if (
             self._event_max_size is not None
