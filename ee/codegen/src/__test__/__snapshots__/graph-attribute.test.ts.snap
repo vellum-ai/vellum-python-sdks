@@ -264,8 +264,11 @@ exports[`Workflow > graph > should be pointing to the correct terminal nodes fro
 exports[`Workflow > graph > should correctly handle cycle edges with port references 1`] = `
 "{
     NodeA.Ports.if_port >> ErrorNode,
-    NodeA.Ports.else_port >> NodeB.Ports.else_port >> NodeC >> FinalOutput,
-    NodeB.Ports.if_port >> NodeA,
+    NodeA.Ports.else_port
+    >> {
+        NodeB.Ports.if_port >> NodeA,
+        NodeB.Ports.else_port >> NodeC >> FinalOutput,
+    },
 }
 "
 `;
