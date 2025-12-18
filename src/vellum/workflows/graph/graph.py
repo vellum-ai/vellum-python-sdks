@@ -173,6 +173,7 @@ class Graph:
 
     def __rshift__(self, other: GraphTarget) -> "Graph":
         # Check for trigger target (class-level only)
+        from vellum.workflows.nodes.bases.base import BaseNode
         from vellum.workflows.triggers.base import BaseTrigger
 
         if isinstance(other, type) and issubclass(other, BaseTrigger):
@@ -210,8 +211,10 @@ class Graph:
                     elif hasattr(elem, "Ports"):
                         midgraph = final_output_node >> elem
                         self._extend_edges(midgraph.edges)
-                        for other_terminal in elem.Ports:
-                            new_terminals.add(other_terminal)
+                        other_ports = {port for port in elem.Ports}
+                        if isinstance(elem, type) and issubclass(elem, BaseNode) and not other_ports:
+                            other_ports = {NoPortsNode(elem)}
+                        new_terminals.update(other_ports)
                     else:
                         # elem is a Port
                         midgraph = final_output_node >> elem
@@ -232,9 +235,6 @@ class Graph:
             return self
 
         if hasattr(other, "Ports"):
-            # This is a workaround for circular imports
-            from vellum.workflows.nodes.bases.base import BaseNode
-
             for final_output_node in self._terminals:
                 if isinstance(final_output_node, NoPortsNode):
                     continue
