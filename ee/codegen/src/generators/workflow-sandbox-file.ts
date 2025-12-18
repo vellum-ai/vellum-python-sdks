@@ -16,6 +16,7 @@ import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Json } from "src/generators/json";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import {
+  ConstantValueWorkflowReference,
   WorkflowSandboxDatasetRow,
   WorkflowSandboxDatasetRowMock,
   WorkflowSandboxInputs,
@@ -228,6 +229,22 @@ if __name__ == "__main__":
     });
   }
 
+  private isConstantTrueCondition(
+    whenCondition: WorkflowSandboxDatasetRowMock["when_condition"]
+  ): boolean {
+    if (isNil(whenCondition)) {
+      return false;
+    }
+
+    const constantValueCondition =
+      whenCondition as ConstantValueWorkflowReference;
+    if (constantValueCondition.type !== "CONSTANT_VALUE") {
+      return false;
+    }
+
+    return constantValueCondition.value?.value === true;
+  }
+
   private getMockNodeExecution(
     mock: WorkflowSandboxDatasetRowMock
   ): ClassInstantiation | null {
@@ -246,23 +263,6 @@ if __name__ == "__main__":
         )
       );
       return null;
-    }
-
-    const arguments_: MethodArgument[] = [];
-
-    // Generate when_condition using WorkflowValueDescriptor
-    if (!isNil(mock.when_condition)) {
-      const whenConditionAst = new WorkflowValueDescriptor({
-        workflowValueDescriptor: mock.when_condition,
-        workflowContext: this.workflowContext,
-      });
-
-      arguments_.push(
-        new MethodArgument({
-          name: "when_condition",
-          value: whenConditionAst,
-        })
-      );
     }
 
     // Generate then_outputs by instantiating the node's Outputs class
@@ -284,6 +284,28 @@ if __name__ == "__main__":
       }),
       arguments_: outputsArguments,
     });
+
+    // If when_condition is a constant true value, return the Node's Outputs directly
+    if (this.isConstantTrueCondition(mock.when_condition)) {
+      return thenOutputsInstance;
+    }
+
+    const arguments_: MethodArgument[] = [];
+
+    // Generate when_condition using WorkflowValueDescriptor
+    if (!isNil(mock.when_condition)) {
+      const whenConditionAst = new WorkflowValueDescriptor({
+        workflowValueDescriptor: mock.when_condition,
+        workflowContext: this.workflowContext,
+      });
+
+      arguments_.push(
+        new MethodArgument({
+          name: "when_condition",
+          value: whenConditionAst,
+        })
+      );
+    }
 
     arguments_.push(
       new MethodArgument({

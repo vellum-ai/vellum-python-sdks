@@ -735,5 +735,74 @@ describe("Workflow Sandbox", () => {
       // THEN it should generate MockNodeExecution with the node's Execution.count reference
       expect(result).toMatchSnapshot();
     });
+
+    it("should generate Node outputs directly when when_condition is constant true", async () => {
+      /**
+       * Tests that mocks with when_condition as a constant true value generate
+       * the Node's outputs directly without wrapping in MockNodeExecution.
+       */
+
+      const writer = new Writer();
+      const uniqueWorkflowContext = workflowContextFactory();
+      const inputVariable: VellumVariable = {
+        id: "1",
+        key: "test_input",
+        type: "STRING",
+      };
+
+      uniqueWorkflowContext.addInputVariableContext(
+        inputVariableContextFactory({
+          inputVariableData: inputVariable,
+          workflowContext: uniqueWorkflowContext,
+        })
+      );
+
+      const genericNodeData = genericNodeFactory();
+      await nodeContextFactory({
+        workflowContext: uniqueWorkflowContext,
+        nodeData: genericNodeData,
+      });
+
+      // GIVEN a mock with when_condition as a constant true value
+      const sandboxInputs: WorkflowSandboxDatasetRow[] = [
+        {
+          label: "Scenario with constant true when_condition",
+          inputs: [
+            {
+              name: inputVariable.key,
+              type: "STRING",
+              value: "test-value",
+            },
+          ],
+          mocks: [
+            {
+              node_id: genericNodeData.id,
+              when_condition: {
+                type: "CONSTANT_VALUE",
+                value: {
+                  type: "JSON",
+                  value: true,
+                },
+              },
+              then_outputs: {
+                result: "mocked_result",
+              },
+            },
+          ],
+        },
+      ];
+
+      // WHEN we generate the sandbox file
+      const sandbox = codegen.workflowSandboxFile({
+        workflowContext: uniqueWorkflowContext,
+        sandboxInputs,
+      });
+
+      sandbox.write(writer);
+      const result = await writer.toStringFormatted();
+
+      // THEN it should generate the Node's outputs directly without MockNodeExecution
+      expect(result).toMatchSnapshot();
+    });
   });
 });
