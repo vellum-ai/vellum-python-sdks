@@ -39,3 +39,12 @@ class WorkflowValidationError(UserFacingException):
         self.message = message
         self.workflow_class_name = workflow_class_name
         super().__init__(f"Workflow validation error in {workflow_class_name}: {message}")
+
+
+class TriggerValidationError(UserFacingException):
+    """Exception raised when a trigger fails validation during serialization."""
+
+    def __init__(self, message: str, trigger_class_name: str):
+        self.message = message
+        self.trigger_class_name = trigger_class_name
+        super().__init__(f"Trigger validation error in {trigger_class_name}: {message}")

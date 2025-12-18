@@ -67,7 +67,11 @@ from vellum_ee.workflows.display.types import (
     WorkflowOutputDisplays,
 )
 from vellum_ee.workflows.display.utils.auto_layout import auto_layout_nodes
-from vellum_ee.workflows.display.utils.exceptions import UserFacingException, WorkflowValidationError
+from vellum_ee.workflows.display.utils.exceptions import (
+    TriggerValidationError,
+    UserFacingException,
+    WorkflowValidationError,
+)
 from vellum_ee.workflows.display.utils.expressions import serialize_value
 from vellum_ee.workflows.display.utils.metadata import (
     get_entrypoint_edge_id,
@@ -688,6 +692,9 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                     exec_config = self._serialize_integration_trigger_exec_config(trigger_class)
                     trigger_data["exec_config"] = exec_config
 
+                    # Validate trigger attributes against the expected types from the API
+                    self._validate_integration_trigger_attributes(trigger_class, trigger_attributes)
+
             # Serialize display_data from trigger's Display class
             display_class = trigger_class.Display
             display_data: JsonObject = {}
@@ -793,6 +800,98 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                 "setup_attributes": setup_attributes,
             },
         )
+
+    def _fetch_integration_trigger_definition(
+        self, provider: str, integration_name: str, trigger_slug: str
+    ) -> Optional[JsonObject]:
+        """
+        Fetch the trigger definition from the API to get the expected event attribute types.
+
+        Uses the client's integration_providers resource to make the API call.
+
+        Returns the trigger definition if found, None otherwise.
+        """
+        try:
+            # Use the client's raw response pattern to access the triggers endpoint
+            # The triggers endpoint is not exposed in the auto-generated client,
+            # so we use the underlying httpx client through the integration_providers resource
+            response = self._client.integration_providers._client_wrapper.httpx_client.request(
+                f"v1/integration-providers/{provider}/triggers",
+                base_url=self._client.integration_providers._client_wrapper.get_environment().default,
+                method="GET",
+                params={"integration_name": integration_name},
+            )
+            if response.status_code != 200:
+                logger.warning(
+                    f"Failed to fetch trigger definitions for {provider}/{integration_name}: {response.status_code}"
+                )
+                return None
+
+            data = response.json()
+            results = data.get("results", [])
+            for trigger_def in results:
+                if trigger_def.get("name") == trigger_slug:
+                    return cast(JsonObject, trigger_def)
+
+            logger.warning(f"Trigger {trigger_slug} not found in {provider}/{integration_name}")
+            return None
+        except Exception as e:
+            logger.warning(f"Error fetching trigger definition: {e}")
+            return None
+
+    def _validate_integration_trigger_attributes(
+        self,
+        trigger_class: Type[IntegrationTrigger],
+        trigger_attributes: JsonArray,
+    ) -> None:
+        """
+        Validate that the trigger attributes match the expected types from the API.
+
+        Raises TriggerValidationError if there's a type mismatch.
+        """
+        config_class = trigger_class.Config
+        provider = getattr(config_class, "provider", None)
+        if isinstance(provider, Enum):
+            provider = provider.value
+        elif provider is not None:
+            provider = str(provider)
+
+        slug = getattr(config_class, "slug", None)
+        integration_name = getattr(config_class, "integration_name", None)
+
+        if not provider or not slug or not integration_name:
+            return
+
+        trigger_def = self._fetch_integration_trigger_definition(provider, integration_name, slug)
+        if not trigger_def:
+            return
+
+        expected_event_attributes = trigger_def.get("event_attributes", [])
+        if not expected_event_attributes or not isinstance(expected_event_attributes, list):
+            return
+
+        expected_types_by_key: Dict[str, str] = {}
+        for attr in expected_event_attributes:
+            if not isinstance(attr, dict):
+                continue
+            key = attr.get("key")
+            attr_type = attr.get("type")
+            if isinstance(key, str) and isinstance(attr_type, str):
+                expected_types_by_key[key] = attr_type
+
+        for attr in trigger_attributes:
+            if not isinstance(attr, dict):
+                continue
+            key = attr.get("key")
+            actual_type = attr.get("type")
+            if isinstance(key, str) and key in expected_types_by_key:
+                expected_type = expected_types_by_key[key]
+                if actual_type != expected_type:
+                    raise TriggerValidationError(
+                        message=f"Attribute '{key}' has type '{actual_type}' but expected type '{expected_type}'. "
+                        "The trigger configuration is invalid or contains unsupported values.",
+                        trigger_class_name=trigger_class.__name__,
+                    )
 
     @staticmethod
     def _model_dump(value: Any) -> Any:
