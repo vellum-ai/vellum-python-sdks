@@ -951,7 +951,6 @@ class TestFinalOutputNoPortsNode:
         # THEN
         self.validate_graph(graph, MyFinalOutput)
 
-    @pytest.mark.xfail(reason="We should preserve final output nodes as NoPortsNode.", strict=True)
     def test_rshift__node(self):
         # GIVEN
         class StartNode(BaseNode[BaseState]):

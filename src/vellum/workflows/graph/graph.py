@@ -232,12 +232,19 @@ class Graph:
             return self
 
         if hasattr(other, "Ports"):
+            # This is a workaround for circular imports
+            from vellum.workflows.nodes.bases.base import BaseNode
+
             for final_output_node in self._terminals:
                 if isinstance(final_output_node, NoPortsNode):
                     continue
                 subgraph = final_output_node >> other
                 self._extend_edges(subgraph.edges)
-            self._terminals = {port for port in other.Ports}
+
+            other_ports = {port for port in other.Ports}
+            if isinstance(other, type) and issubclass(other, BaseNode) and not other_ports:
+                other_ports = {NoPortsNode(other)}
+            self._terminals = other_ports
             return self
 
         # other is a Port
