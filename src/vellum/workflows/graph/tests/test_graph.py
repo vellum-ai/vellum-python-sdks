@@ -1,9 +1,12 @@
 import pytest
+from typing import Type
 
 from vellum.workflows.edges.edge import Edge
-from vellum.workflows.graph.graph import Graph
+from vellum.workflows.graph.graph import Graph, NoPortsNode
 from vellum.workflows.nodes.bases.base import BaseNode
+from vellum.workflows.nodes.displayable.final_output_node import FinalOutputNode
 from vellum.workflows.ports.port import Port
+from vellum.workflows.state.base import BaseState
 from vellum.workflows.triggers import ManualTrigger
 from vellum.workflows.triggers.schedule import ScheduleTrigger
 
@@ -922,3 +925,92 @@ def test_graph__graph_rshift_set_of_trigger_graphs_preserves_trigger_edges():
     # AND both trigger edges point to the correct nodes
     trigger_target_nodes = {edge.to_node for edge in trigger_edges}
     assert trigger_target_nodes == {TriggerNodeA, TriggerNodeB}
+
+
+class TestFinalOutputNoPortsNode:
+    """Test that we preserve final output nodes as NoPortsNode when constructing a Graph."""
+
+    def validate_graph(self, graph: Graph, final_output_node: Type[FinalOutputNode]):
+        assert len(list(graph._terminals)) == 1
+        node = list(graph._terminals)[0]
+        assert isinstance(node, NoPortsNode)
+        assert node.node_class == final_output_node
+
+    @pytest.mark.xfail(reason="We should preserve final output nodes as NoPortsNode.", strict=True)
+    def test_from_edge(self):
+        # GIVEN
+        class StartNode(BaseNode[BaseState]):
+            pass
+
+        class MyFinalOutput(FinalOutputNode[BaseState, str]):
+            pass
+
+        # WHEN
+        edge = Edge(from_port=StartNode.Ports.default, to_node=MyFinalOutput)
+        graph = Graph.from_edge(edge)
+
+        # THEN
+        self.validate_graph(graph, MyFinalOutput)
+
+    @pytest.mark.xfail(reason="We should preserve final output nodes as NoPortsNode.", strict=True)
+    def test_rshift__node(self):
+        # GIVEN
+        class StartNode(BaseNode[BaseState]):
+            pass
+
+        class MyFinalOutput(FinalOutputNode[BaseState, str]):
+            pass
+
+        # WHEN
+        initial_graph = Graph.from_node(StartNode)
+        graph = initial_graph >> MyFinalOutput
+
+        # THEN
+        self.validate_graph(graph, MyFinalOutput)
+
+    def test_rshift__graph(self):
+        # GIVEN
+        class StartNode(BaseNode[BaseState]):
+            pass
+
+        class MyFinalOutput(FinalOutputNode[BaseState, str]):
+            pass
+
+        # WHEN
+        subgraph = Graph.from_node(MyFinalOutput)
+        graph = Graph.from_node(StartNode) >> subgraph
+
+        # THEN
+        self.validate_graph(subgraph, MyFinalOutput)
+        self.validate_graph(graph, MyFinalOutput)
+
+    @pytest.mark.xfail(reason="We should preserve final output nodes as NoPortsNode.", strict=True)
+    def test_rshift__set_with_node(self):
+        # GIVEN
+        class StartNode(BaseNode[BaseState]):
+            pass
+
+        class MyFinalOutput(FinalOutputNode[BaseState, str]):
+            pass
+
+        # WHEN
+        graph = Graph.from_node(StartNode) >> {MyFinalOutput}
+
+        # THEN
+        self.validate_graph(graph, MyFinalOutput)
+
+    def test_rshift__set_with_graph(self):
+        # GIVEN
+        class StartNode(BaseNode[BaseState]):
+            pass
+
+        class MyFinalOutput(FinalOutputNode[BaseState, str]):
+            pass
+
+        # WHEN
+        subgraph = Graph.from_node(MyFinalOutput)
+        graph = Graph.from_node(StartNode) >> {subgraph}
+
+        # THEN
+        self.validate_graph(subgraph, MyFinalOutput)
+        self.validate_graph(graph, MyFinalOutput)
