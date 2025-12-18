@@ -1,10 +1,12 @@
 """Tests for ChatMessageTrigger."""
 
-from typing import List
+import pytest
+from typing import List, Union
 
 from vellum.client.types import (
     ArrayChatMessageContent,
     ChatMessage,
+    ChatMessageContent,
     ImageChatMessageContent,
     StringChatMessageContent,
     VellumImage,
@@ -19,11 +21,27 @@ class ChatState(BaseState):
     chat_history: List[ChatMessage] = []
 
 
-def test_chat_message_trigger__text_message():
+@pytest.mark.parametrize(
+    ["message", "expected_text", "expected_content"],
+    [
+        pytest.param("Hello, world!", "Hello, world!", None, id="pure_string"),
+        pytest.param(
+            StringChatMessageContent(value="Hello, world!"),
+            None,
+            StringChatMessageContent(value="Hello, world!"),
+            id="string_content",
+        ),
+    ],
+)
+def test_chat_message_trigger__text_message(
+    message: Union[str, ChatMessageContent],
+    expected_text: str,
+    expected_content: ChatMessageContent,
+):
     """Tests that ChatMessageTrigger handles text messages correctly."""
 
     # GIVEN a ChatMessageTrigger with a text message
-    trigger = ChatMessageTrigger(message="Hello, world!")
+    trigger = ChatMessageTrigger(message=message)
 
     # AND a state with chat_history
     state = ChatState()
@@ -37,8 +55,8 @@ def test_chat_message_trigger__text_message():
     # THEN the user message is appended to chat_history
     assert len(state.chat_history) == 1
     assert state.chat_history[0].role == "USER"
-    assert state.chat_history[0].text == "Hello, world!"
-    assert state.chat_history[0].content is None
+    assert state.chat_history[0].text == expected_text
+    assert state.chat_history[0].content == expected_content
 
 
 def test_chat_message_trigger__multimodal_message():
