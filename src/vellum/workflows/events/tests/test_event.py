@@ -580,8 +580,8 @@ def test_event_max__body_redacted_when_exceeds_limit():
     Tests that event body is redacted when serialized size exceeds event_max.
     """
 
-    # GIVEN an event with a large body
-    event = WorkflowExecutionFulfilledEvent(
+    # GIVEN an event with a large body and a very small event_max that will be exceeded
+    event: WorkflowExecutionFulfilledEvent = WorkflowExecutionFulfilledEvent(
         id=UUID("123e4567-e89b-12d3-a456-426614174000"),
         timestamp=datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
         trace_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
@@ -592,10 +592,8 @@ def test_event_max__body_redacted_when_exceeds_limit():
                 example="foo",
             ),
         ),
+        event_max=10,
     )
-
-    # AND a very small event_max that will be exceeded
-    event.event_max = 10
 
     # WHEN the event is serialized
     serialized = event.model_dump(mode="json")
@@ -609,8 +607,8 @@ def test_event_max__body_not_redacted_when_under_limit():
     Tests that event body is not redacted when serialized size is under event_max.
     """
 
-    # GIVEN an event with a small body
-    event = WorkflowExecutionFulfilledEvent(
+    # GIVEN an event with a small body and a large event_max that will not be exceeded
+    event: WorkflowExecutionFulfilledEvent = WorkflowExecutionFulfilledEvent(
         id=UUID("123e4567-e89b-12d3-a456-426614174000"),
         timestamp=datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
         trace_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
@@ -621,16 +619,15 @@ def test_event_max__body_not_redacted_when_under_limit():
                 example="foo",
             ),
         ),
+        event_max=100000,
     )
-
-    # AND a large event_max that will not be exceeded
-    event.event_max = 100000
 
     # WHEN the event is serialized
     serialized = event.model_dump(mode="json")
 
     # THEN the body should not be redacted
     assert "redacted" not in serialized["body"]
+    # AND the outputs should be preserved
     assert serialized["body"]["outputs"] == {"example": "foo"}
 
 
@@ -640,7 +637,7 @@ def test_event_max__none_does_not_redact():
     """
 
     # GIVEN an event without event_max set
-    event = WorkflowExecutionFulfilledEvent(
+    event: WorkflowExecutionFulfilledEvent = WorkflowExecutionFulfilledEvent(
         id=UUID("123e4567-e89b-12d3-a456-426614174000"),
         timestamp=datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
         trace_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
