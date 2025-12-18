@@ -138,6 +138,7 @@ def test_create_node_input_value_pointer_rules(
                 MyNodeA: MyNodeADisplay(),
             },
         ),
+        uuid4(),
     )
     assert rules == expected_rules
 

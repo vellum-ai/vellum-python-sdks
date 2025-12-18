@@ -198,6 +198,17 @@ def test_final_output_node_display__serialize_with_nested_node_output_reference(
     entry_keys = {entry["key"] for entry in serialized_value["entries"]}
     assert entry_keys == {"download_url", "row_count", "message"}
 
+    # AND the outputs should contain the DICTIONARY_REFERENCE value
+    assert len(terminal_node["outputs"]) == 1
+    output = terminal_node["outputs"][0]
+    assert output["name"] == "value"
+    assert output["type"] == "JSON"
+    assert output["value"]["type"] == "DICTIONARY_REFERENCE"
+    assert len(output["value"]["entries"]) == 3
+
+    # AND the attributes should be empty for this node
+    assert terminal_node.get("attributes", []) == []
+
     # AND a validation error should be recorded for the nested references
     errors = list(workflow_display.display_context.errors)
     assert len(errors) == 1

@@ -34,7 +34,7 @@ def create_node_input(
     pointer_type: Optional[Type[NodeInputValuePointerRule]] = ConstantValuePointer,
 ) -> NodeInput:
     input_id = str(input_id) if input_id else str(uuid4_from_hash(f"{node_id}|{input_name}"))
-    rules = create_node_input_value_pointer_rules(value, display_context, pointer_type=pointer_type, node_id=node_id)
+    rules = create_node_input_value_pointer_rules(value, display_context, node_id, pointer_type=pointer_type)
     return NodeInput(
         id=input_id,
         key=input_name,
@@ -59,9 +59,9 @@ def _contains_descriptor(value: Any) -> bool:
 def create_node_input_value_pointer_rules(
     value: Any,
     display_context: WorkflowDisplayContext,
+    node_id: UUID,
     existing_rules: Optional[List[NodeInputValuePointerRule]] = None,
     pointer_type: Optional[Type[NodeInputValuePointerRule]] = None,
-    node_id: UUID = None,  # type: ignore[assignment]
 ) -> List[NodeInputValuePointerRule]:
     node_input_value_pointer_rules: List[NodeInputValuePointerRule] = existing_rules or []
 
@@ -74,18 +74,18 @@ def create_node_input_value_pointer_rules(
         if isinstance(value, LazyReference):
             child_descriptor = get_child_descriptor(value, display_context)
             return create_node_input_value_pointer_rules(
-                child_descriptor, display_context, [], pointer_type=pointer_type, node_id=node_id
+                child_descriptor, display_context, node_id, existing_rules=[], pointer_type=pointer_type
             )
 
         if isinstance(value, CoalesceExpression):
             lhs_rules = create_node_input_value_pointer_rules(
-                value.lhs, display_context, [], pointer_type=pointer_type, node_id=node_id
+                value.lhs, display_context, node_id, existing_rules=[], pointer_type=pointer_type
             )
             node_input_value_pointer_rules.extend(lhs_rules)
 
             if not isinstance(value.rhs, CoalesceExpression):
                 rhs_rules = create_node_input_value_pointer_rules(
-                    value.rhs, display_context, [], pointer_type=pointer_type, node_id=node_id
+                    value.rhs, display_context, node_id, existing_rules=[], pointer_type=pointer_type
                 )
                 node_input_value_pointer_rules.extend(rhs_rules)
         else:
