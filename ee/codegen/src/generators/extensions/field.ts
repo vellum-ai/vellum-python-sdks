@@ -8,8 +8,8 @@ import { Writer } from "src/generators/extensions/writer";
 export declare namespace Field {
   interface Args {
     name: string;
-    type: python.Type | PythonType | undefined;
-    initializer: AstNode | undefined;
+    type?: python.Type | PythonType | undefined;
+    initializer?: AstNode | undefined;
     docs?: string;
   }
 }
