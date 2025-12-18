@@ -9,7 +9,7 @@ from vellum.workflows.references import NodeReference
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
-from vellum_ee.workflows.display.utils.exceptions import UnsupportedSerializationException
+from vellum_ee.workflows.display.utils.exceptions import UnsupportedSerializationException, UserFacingException
 from vellum_ee.workflows.display.utils.expressions import get_child_descriptor, serialize_value
 from vellum_ee.workflows.display.utils.vellum import (
     ConstantValuePointer,
@@ -34,7 +34,13 @@ def create_node_input(
     pointer_type: Optional[Type[NodeInputValuePointerRule]] = ConstantValuePointer,
 ) -> NodeInput:
     input_id = str(input_id) if input_id else str(uuid4_from_hash(f"{node_id}|{input_name}"))
-    rules = create_node_input_value_pointer_rules(value, display_context, node_id, pointer_type=pointer_type)
+    try:
+        rules = create_node_input_value_pointer_rules(value, display_context, node_id, pointer_type=pointer_type)
+    except UserFacingException:
+        raise
+    except Exception as e:
+        display_context.add_validation_error(e)
+        rules = []
     return NodeInput(
         id=input_id,
         key=input_name,
