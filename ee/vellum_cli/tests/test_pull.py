@@ -840,10 +840,12 @@ def test_pull__module_name_from_deployment_name(vellum_client):
         ]
     )
 
-    # AND we are currently in a new directory
+    # AND we are currently in a new directory with a .env file
     current_dir = os.getcwd()
     temp_dir = tempfile.mkdtemp()
     os.chdir(temp_dir)
+    with open(os.path.join(temp_dir, ".env"), "w") as f:
+        f.write("VELLUM_API_KEY=test-api-key")
 
     # WHEN the user runs the pull command with the workflow deployment
     runner = CliRunner()
