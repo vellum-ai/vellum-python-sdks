@@ -1,6 +1,7 @@
 from uuid import UUID
 from typing import Any, List, Optional, Type, Union, cast
 
+from vellum.client.types.json_vellum_value import JsonVellumValue
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.expressions.coalesce_expression import CoalesceExpression
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
@@ -9,7 +10,7 @@ from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
 from vellum_ee.workflows.display.utils.exceptions import UnsupportedSerializationException
-from vellum_ee.workflows.display.utils.expressions import get_child_descriptor
+from vellum_ee.workflows.display.utils.expressions import get_child_descriptor, serialize_value
 from vellum_ee.workflows.display.utils.vellum import (
     ConstantValuePointer,
     ExecutionCounterData,
@@ -44,11 +45,23 @@ def create_node_input(
     )
 
 
+def _contains_descriptor(value: Any) -> bool:
+    """Check if a value contains any BaseDescriptor objects."""
+    if isinstance(value, BaseDescriptor):
+        return True
+    if isinstance(value, dict):
+        return any(_contains_descriptor(v) for v in value.values())
+    if isinstance(value, list):
+        return any(_contains_descriptor(item) for item in value)
+    return False
+
+
 def create_node_input_value_pointer_rules(
     value: Any,
     display_context: WorkflowDisplayContext,
     existing_rules: Optional[List[NodeInputValuePointerRule]] = None,
     pointer_type: Optional[Type[NodeInputValuePointerRule]] = None,
+    node_id: Optional[UUID] = None,
 ) -> List[NodeInputValuePointerRule]:
     node_input_value_pointer_rules: List[NodeInputValuePointerRule] = existing_rules or []
 
@@ -61,18 +74,20 @@ def create_node_input_value_pointer_rules(
         if isinstance(value, LazyReference):
             child_descriptor = get_child_descriptor(value, display_context)
             return create_node_input_value_pointer_rules(
-                child_descriptor, display_context, [], pointer_type=pointer_type
+                child_descriptor, display_context, [], pointer_type=pointer_type, node_id=node_id
             )
 
         if isinstance(value, CoalesceExpression):
             # Recursively handle the left-hand side
-            lhs_rules = create_node_input_value_pointer_rules(value.lhs, display_context, [], pointer_type=pointer_type)
+            lhs_rules = create_node_input_value_pointer_rules(
+                value.lhs, display_context, [], pointer_type=pointer_type, node_id=node_id
+            )
             node_input_value_pointer_rules.extend(lhs_rules)
 
             # Handle the right-hand side
             if not isinstance(value.rhs, CoalesceExpression):
                 rhs_rules = create_node_input_value_pointer_rules(
-                    value.rhs, display_context, [], pointer_type=pointer_type
+                    value.rhs, display_context, [], pointer_type=pointer_type, node_id=node_id
                 )
                 node_input_value_pointer_rules.extend(rhs_rules)
         else:
@@ -83,9 +98,18 @@ def create_node_input_value_pointer_rules(
                 return node_input_value_pointer_rules
 
             node_input_value_pointer_rules.append(rule)
+    elif isinstance(value, (dict, list)) and _contains_descriptor(value):
+        executable_id = node_id or uuid4_from_hash("default")
+        serialized = serialize_value(executable_id, display_context, value)
+        if serialized is not None:
+            serialized_pointer = ConstantValuePointer(
+                type="CONSTANT_VALUE",
+                data=JsonVellumValue(type="JSON", value=serialized),
+            )
+            node_input_value_pointer_rules.append(serialized_pointer)
     else:
-        pointer = create_pointer(value, pointer_type)
-        node_input_value_pointer_rules.append(pointer)
+        constant_pointer = create_pointer(value, pointer_type)
+        node_input_value_pointer_rules.append(constant_pointer)
 
     return node_input_value_pointer_rules
 

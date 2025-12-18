@@ -218,10 +218,13 @@ def test_serialize_node__with_environment_variable_references():
     assert other_config_input["value"]["combinator"] == "OR"
     assert len(other_config_input["value"]["rules"]) == 1
     assert other_config_input["value"]["rules"][0]["type"] == "CONSTANT_VALUE"
-    # The nested dict should contain the environment variable reference
     nested_data = other_config_input["value"]["rules"][0]["data"]
     assert nested_data["type"] == "JSON"
-    assert "nested_key" in nested_data["value"]
+    assert nested_data["value"]["type"] == "DICTIONARY_REFERENCE"
+    assert len(nested_data["value"]["entries"]) == 1
+    assert nested_data["value"]["entries"][0]["key"] == "nested_key"
+    assert nested_data["value"]["entries"][0]["value"]["type"] == "ENVIRONMENT_VARIABLE"
+    assert nested_data["value"]["entries"][0]["value"]["environment_variable"] == "NESTED_KEY"
 
 
 def test_serialize_node__with_non_exist_code_input_path_with_dry_run():
