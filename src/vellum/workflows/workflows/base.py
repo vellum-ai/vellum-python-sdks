@@ -526,6 +526,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         max_concurrency: Optional[int] = None,
         timeout: Optional[float] = None,
         trigger: Optional[BaseTrigger] = None,
+        event_max_size: Optional[int] = None,
     ) -> WorkflowEventStream:
         """
         Invoke a Workflow, yielding events as they are emitted.
@@ -576,6 +577,10 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             The trigger instance is bound to the workflow state, making its attributes accessible to downstream nodes.
             Required for workflows that only have IntegrationTrigger; optional for workflows with both ManualTrigger
             and IntegrationTrigger.
+
+        event_max_size: Optional[int] = None
+            The maximum size in bytes for serialized events. If an event's serialized size exceeds this value,
+            the outputs will be set to an empty dict.
         """
 
         should_yield = event_filter or workflow_event_filter
@@ -593,6 +598,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             init_execution_context=self._execution_context,
             trigger=trigger,
             execution_id=execution_id,
+            event_max_size=event_max_size,
         )
         self._current_runner = runner
         runner_stream = runner.stream()

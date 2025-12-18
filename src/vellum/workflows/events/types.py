@@ -3,7 +3,7 @@ import json
 from uuid import UUID, uuid4
 from typing import Annotated, Any, List, Literal, Optional, Union, get_args
 
-from pydantic import Field, GetCoreSchemaHandler, Tag, ValidationInfo
+from pydantic import Field, GetCoreSchemaHandler, PrivateAttr, Tag, ValidationInfo
 from pydantic_core import CoreSchema, core_schema
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
@@ -186,3 +186,4 @@ class BaseEvent(UniversalBaseModel):
     span_id: UUID
     parent: Optional[ParentContext] = None
     links: Optional[List[SpanLink]] = None
+    _event_max_size: Optional[int] = PrivateAttr(default=None)

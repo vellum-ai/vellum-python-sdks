@@ -115,6 +115,7 @@ class WorkflowRunner(Generic[StateType]):
         init_execution_context: Optional[ExecutionContext] = None,
         trigger: Optional[BaseTrigger] = None,
         execution_id: Optional[UUID] = None,
+        event_max_size: Optional[int] = None,
     ):
         if state and external_inputs:
             raise ValueError("Can only run a Workflow providing one of state or external inputs, not both")
@@ -268,6 +269,7 @@ class WorkflowRunner(Generic[StateType]):
         self._timeout = timeout
         self._execution_context = init_execution_context or get_execution_context()
         self._trigger = trigger
+        self._event_max_size = event_max_size
 
         setattr(
             self._initial_state,
@@ -470,6 +472,8 @@ class WorkflowRunner(Generic[StateType]):
         return state
 
     def _emit_event(self, event: WorkflowEvent) -> WorkflowEvent:
+        if self._event_max_size is not None:
+            event._event_max_size = self._event_max_size
         self.workflow._store.append_event(event)
         self._background_thread_queue.put(event)
         return event
