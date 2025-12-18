@@ -317,8 +317,9 @@ def test_get_event_display_context__trigger_attributes_included():
     assert "channel" in display_context.workflow_inputs
 
     # AND the IDs should match the trigger attribute IDs
-    assert display_context.workflow_inputs["message"] == SlackTrigger.message.id
-    assert display_context.workflow_inputs["channel"] == SlackTrigger.channel.id
+    trigger_attr_refs = SlackTrigger.attribute_references()
+    assert display_context.workflow_inputs["message"] == trigger_attr_refs["message"].id
+    assert display_context.workflow_inputs["channel"] == trigger_attr_refs["channel"].id
 
 
 def test_serialize_workflow__inherited_node_display_class_not_registered():
