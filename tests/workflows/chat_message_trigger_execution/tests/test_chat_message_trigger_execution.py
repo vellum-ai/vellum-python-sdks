@@ -3,15 +3,15 @@
 from tests.workflows.chat_message_trigger_execution.workflows.simple_chat_workflow import (
     ChatState,
     SimpleChatTrigger,
-    SimpleChatWorkflow,
+    SimpleChatWorkflowWithTrigger,
 )
 
 
-def test_chat_message_trigger__workflow_integration():
-    """Tests that ChatMessageTrigger integrates with workflow execution."""
+def test_chat_message_trigger__workflow_output_reference():
+    """Tests that ChatMessageTrigger resolves workflow output references."""
 
-    # GIVEN a workflow using SimpleChatTrigger (subclass with output reference)
-    workflow = SimpleChatWorkflow()
+    # GIVEN a workflow using SimpleChatTrigger (subclass with workflow output reference)
+    workflow = SimpleChatWorkflowWithTrigger()
 
     # AND a trigger with message
     trigger = SimpleChatTrigger(message="Hello")
@@ -23,7 +23,7 @@ def test_chat_message_trigger__workflow_integration():
     assert terminal_event.name == "workflow.execution.fulfilled"
     assert terminal_event.outputs == {"response": "Hello from assistant!"}
 
-    # AND the chat history is updated with user message and resolved assistant response
+    # AND the chat history is updated with user message and resolved workflow output
     final_state = terminal_event.body.final_state
     assert final_state is not None
     assert isinstance(final_state, ChatState)

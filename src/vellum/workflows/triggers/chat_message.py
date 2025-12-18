@@ -1,8 +1,9 @@
-from typing import TYPE_CHECKING, ClassVar, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Optional, Union
 
 from vellum.client.types import ChatMessage, ChatMessageContent
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.utils import resolve_value
+from vellum.workflows.references.output import OutputReference
 from vellum.workflows.triggers.base import BaseTrigger
 
 if TYPE_CHECKING:
@@ -19,12 +20,12 @@ class ChatMessageTrigger(BaseTrigger):
 
     Attributes:
         message: The incoming chat message (text string or multi-modal content).
-        output: Class-level reference to a node/workflow output to append as assistant
-            response. Set via subclassing: `output = MyNode.Outputs.text`
+        output: Class-level reference to a workflow output to append as assistant
+            response. Set via subclassing: `output = MyWorkflow.Outputs.response`
     """
 
     message: Union[str, ChatMessageContent]
-    output: ClassVar[Optional[BaseDescriptor[Union[str, ChatMessageContent]]]] = None
+    output: ClassVar[Optional[BaseDescriptor[Any]]] = None
 
     def __on_workflow_fulfilled__(self, state: "BaseState", outputs: "BaseOutputs") -> None:
         """Appends user message and assistant response to state.chat_history."""
@@ -39,13 +40,24 @@ class ChatMessageTrigger(BaseTrigger):
         state.chat_history.append(user_message)
 
         if self.output is not None:
-            resolved_output = resolve_value(self.output, state)
+            resolved_output = self._resolve_output(self.output, state, outputs)
             assistant_message = ChatMessage(
                 role="ASSISTANT",
                 content=resolved_output if not isinstance(resolved_output, str) else None,
                 text=resolved_output if isinstance(resolved_output, str) else None,
             )
             state.chat_history.append(assistant_message)
+
+    def _resolve_output(
+        self,
+        output: BaseDescriptor[Any],
+        state: "BaseState",
+        outputs: "BaseOutputs",
+    ) -> Union[str, ChatMessageContent]:
+        """Resolves output reference from workflow outputs or state."""
+        if isinstance(output, OutputReference) and hasattr(outputs, output.name):
+            return getattr(outputs, output.name)
+        return resolve_value(output, state)
 
     class Display(BaseTrigger.Display):
         label: str = "Chat Message"

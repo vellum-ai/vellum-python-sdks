@@ -21,14 +21,23 @@ class ResponseNode(BaseNode):
         response: str = "Hello from assistant!"
 
 
-class SimpleChatTrigger(ChatMessageTrigger):
-    """Chat trigger that appends ResponseNode output as assistant message."""
-
-    output = ResponseNode.Outputs.response
-
-
 class SimpleChatWorkflow(BaseWorkflow[BaseInputs, ChatState]):
     """Workflow triggered by chat messages."""
+
+    graph = ChatMessageTrigger >> ResponseNode
+
+    class Outputs(BaseWorkflow.Outputs):
+        response = ResponseNode.Outputs.response
+
+
+class SimpleChatTrigger(ChatMessageTrigger):
+    """Chat trigger that appends workflow output as assistant message."""
+
+    output = SimpleChatWorkflow.Outputs.response
+
+
+class SimpleChatWorkflowWithTrigger(BaseWorkflow[BaseInputs, ChatState]):
+    """Workflow using SimpleChatTrigger with workflow output reference."""
 
     graph = SimpleChatTrigger >> ResponseNode
 
