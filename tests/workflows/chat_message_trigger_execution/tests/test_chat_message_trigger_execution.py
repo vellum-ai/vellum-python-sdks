@@ -3,7 +3,7 @@
 from tests.workflows.chat_message_trigger_execution.workflows.simple_chat_workflow import (
     ChatState,
     SimpleChatTrigger,
-    SimpleChatWorkflowWithTrigger,
+    SimpleChatWorkflow,
 )
 
 
@@ -11,7 +11,7 @@ def test_chat_message_trigger__workflow_output_reference():
     """Tests that ChatMessageTrigger resolves workflow output references."""
 
     # GIVEN a workflow using SimpleChatTrigger (subclass with workflow output reference)
-    workflow = SimpleChatWorkflowWithTrigger()
+    workflow = SimpleChatWorkflow()
 
     # AND a trigger with message
     trigger = SimpleChatTrigger(message="Hello")

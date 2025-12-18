@@ -21,25 +21,20 @@ class ResponseNode(BaseNode):
         response: str = "Hello from assistant!"
 
 
-class SimpleChatWorkflow(BaseWorkflow[BaseInputs, ChatState]):
-    """Workflow triggered by chat messages."""
-
-    graph = ChatMessageTrigger >> ResponseNode
-
-    class Outputs(BaseWorkflow.Outputs):
-        response = ResponseNode.Outputs.response
-
-
 class SimpleChatTrigger(ChatMessageTrigger):
     """Chat trigger that appends workflow output as assistant message."""
 
-    output = SimpleChatWorkflow.Outputs.response
+    pass  # output is assigned after workflow is defined to avoid circular reference
 
 
-class SimpleChatWorkflowWithTrigger(BaseWorkflow[BaseInputs, ChatState]):
+class SimpleChatWorkflow(BaseWorkflow[BaseInputs, ChatState]):
     """Workflow using SimpleChatTrigger with workflow output reference."""
 
     graph = SimpleChatTrigger >> ResponseNode
 
     class Outputs(BaseWorkflow.Outputs):
         response = ResponseNode.Outputs.response
+
+
+# Post-definition assignment to avoid circular reference
+SimpleChatTrigger.output = SimpleChatWorkflow.Outputs.response
