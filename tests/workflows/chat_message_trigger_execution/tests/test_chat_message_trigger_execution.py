@@ -1,5 +1,6 @@
 """Tests for ChatMessageTrigger workflow execution."""
 
+from vellum.client.types import ChatMessage
 from vellum.workflows.events.workflow import WorkflowExecutionSnapshottedEvent
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
@@ -69,11 +70,9 @@ def test_chat_message_trigger__emits_snapshot_events_for_trigger_state_mutations
 
     # AND the last snapshot event should contain the full chat history with both messages
     last_snapshot = snapshot_events[-1]
-    assert hasattr(last_snapshot.state, "chat_history")
-    chat_history = last_snapshot.state.chat_history
-    assert [(m.role, m.text) for m in chat_history] == [
-        ("USER", "Hello"),
-        ("ASSISTANT", "Hello from assistant!"),
+    assert last_snapshot.state.chat_history == [
+        ChatMessage(role="USER", text="Hello", content=None, source=None),
+        ChatMessage(role="ASSISTANT", text="Hello from assistant!", content=None, source=None),
     ]
 
     # AND the snapshot events should appear before the fulfilled event
