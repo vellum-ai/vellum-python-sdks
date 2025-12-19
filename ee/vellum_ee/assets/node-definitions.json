@@ -148,26 +148,6 @@
           "name": "default",
           "type": "DEFAULT"
         }
-      ],
-      "outputs": [
-        {
-          "id": "cd6cf124-b178-4852-b5d5-251f5835fc8f",
-          "name": "result",
-          "type": "STRING",
-          "value": null,
-          "schema": {
-            "type": "string"
-          }
-        },
-        {
-          "id": "c86c2620-9192-412c-9423-4f594411fd47",
-          "name": "log",
-          "type": "STRING",
-          "value": null,
-          "schema": {
-            "type": "string"
-          }
-        }
       ]
     },
     {
@@ -652,8 +632,7 @@
           "name": "default",
           "type": "DEFAULT"
         }
-      ],
-      "outputs": []
+      ]
     },
     {
       "id": "e1c8d236-6131-4218-aed8-45f986723227",
