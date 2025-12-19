@@ -3,6 +3,7 @@ import sys
 from uuid import uuid4
 
 from vellum.workflows import BaseInputs, BaseNode, BaseState, BaseWorkflow, MockNodeExecution
+from vellum.workflows.exceptions import NodeException
 from vellum.workflows.expressions.accessor import AccessorExpression
 from vellum.workflows.expressions.add import AddExpression
 from vellum.workflows.expressions.and_ import AndExpression
@@ -27,6 +28,7 @@ from vellum.workflows.expressions.not_between import NotBetweenExpression
 from vellum.workflows.expressions.not_in import NotInExpression
 from vellum.workflows.expressions.or_ import OrExpression
 from vellum.workflows.expressions.parse_json import ParseJsonExpression
+from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubworkflowNode
 from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.references.environment_variable import EnvironmentVariableReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
@@ -651,3 +653,88 @@ def test_base_descriptor_validator__accessor_expression():
 
     # THEN we get an AccessorExpression
     assert isinstance(result, AccessorExpression)
+
+
+def test_mocks__validate_all__node_nested_in_subworkflow():
+    """
+    Tests that MockNodeExecution.validate_all correctly handles mocks for nodes
+    nested within a subworkflow node by validating against the inner subworkflow.
+    """
+
+    # GIVEN a node that will be nested inside a subworkflow
+    class NestedNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result: str
+
+        def run(self) -> Outputs:
+            raise NodeException("This node should be mocked")
+
+    # AND a subworkflow containing that nested node
+    class InnerSubworkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = NestedNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            inner_result = NestedNode.Outputs.result
+
+    # AND a subworkflow node that uses the inner subworkflow
+    class SubworkflowNode(InlineSubworkflowNode):
+        subworkflow = InnerSubworkflow
+
+    # AND an outer workflow containing the subworkflow node
+    class OuterWorkflow(BaseWorkflow):
+        graph = SubworkflowNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_result = SubworkflowNode.Outputs.inner_result
+
+    # AND raw mock data for the nested node using the modern data model format
+    raw_mock_workflow_node_executions = [
+        {
+            "node_id": str(NestedNode.__id__),
+            "when_condition": {
+                "type": "BINARY_EXPRESSION",
+                "operator": ">=",
+                "lhs": {
+                    "type": "EXECUTION_COUNTER",
+                    "node_id": str(NestedNode.__id__),
+                },
+                "rhs": {
+                    "type": "CONSTANT_VALUE",
+                    "value": {
+                        "type": "NUMBER",
+                        "value": 0,
+                    },
+                },
+            },
+            "then_outputs": {
+                "result": "mocked_result",
+            },
+        }
+    ]
+
+    # WHEN we call validate_all on the outer workflow
+    node_output_mocks = MockNodeExecution.validate_all(
+        raw_mock_workflow_node_executions,
+        OuterWorkflow,
+        descriptor_validator=base_descriptor_validator,
+    )
+
+    # THEN we get a list of MockNodeExecution objects
+    assert node_output_mocks is not None
+    assert len(node_output_mocks) == 1
+
+    # AND the mock is correctly parsed with the nested node's outputs
+    assert node_output_mocks[0] == MockNodeExecution(
+        when_condition=NestedNode.Execution.count.greater_than_or_equal_to(0),
+        then_outputs=NestedNode.Outputs(result="mocked_result"),
+    )
+
+    # AND when we run the outer workflow with the mocks
+    workflow = OuterWorkflow()
+    terminal_event = workflow.run(node_output_mocks=node_output_mocks)
+
+    # THEN the workflow completes successfully
+    assert terminal_event.name == "workflow.execution.fulfilled", terminal_event
+
+    # AND the output reflects the mocked value from the nested node
+    assert terminal_event.outputs.final_result == "mocked_result"

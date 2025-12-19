@@ -189,9 +189,10 @@ class MockNodeExecution(UniversalBaseModel):
                         workflow_definition=workflow,
                     ) from e
 
-        nodes = {node.__id__: node for node in workflow.get_nodes()}
+        all_nodes = list(workflow.get_all_nodes_recursive())
+        nodes = {node.__id__: node for node in all_nodes}
         node_output_name_by_id = {
-            node.__output_ids__[output.name]: output.name for node in workflow.get_nodes() for output in node.Outputs
+            node.__output_ids__[output.name]: output.name for node in all_nodes for output in node.Outputs
         }
 
         # We need to support the old way that the Vellum App's WorkflowRunner used to define Node Mocks in order to
