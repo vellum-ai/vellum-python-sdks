@@ -29,7 +29,9 @@ from vellum.workflows.expressions.not_in import NotInExpression
 from vellum.workflows.expressions.or_ import OrExpression
 from vellum.workflows.expressions.parse_json import ParseJsonExpression
 from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubworkflowNode
+from vellum.workflows.references.array import ArrayReference
 from vellum.workflows.references.constant import ConstantValueReference
+from vellum.workflows.references.dictionary import DictionaryReference
 from vellum.workflows.references.environment_variable import EnvironmentVariableReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum_ee.workflows.display.utils.expressions import base_descriptor_validator
@@ -460,10 +462,10 @@ def test_base_descriptor_validator__array_reference():
     # WHEN we validate the descriptor
     result = base_descriptor_validator(raw_descriptor, MyWorkflow)
 
-    # THEN we get a ConstantValueReference containing a list
-    assert isinstance(result, ConstantValueReference)
-    assert isinstance(result._value, list)
-    assert len(result._value) == 2
+    # THEN we get an ArrayReference containing a list of descriptors
+    assert isinstance(result, ArrayReference)
+    assert isinstance(result._items, list)
+    assert len(result._items) == 2
 
 
 def test_base_descriptor_validator__dictionary_reference():
@@ -499,11 +501,11 @@ def test_base_descriptor_validator__dictionary_reference():
     # WHEN we validate the descriptor
     result = base_descriptor_validator(raw_descriptor, MyWorkflow)
 
-    # THEN we get a ConstantValueReference containing a dict
-    assert isinstance(result, ConstantValueReference)
-    assert isinstance(result._value, dict)
-    assert "key1" in result._value
-    assert "key2" in result._value
+    # THEN we get a DictionaryReference containing a dict of descriptors
+    assert isinstance(result, DictionaryReference)
+    assert isinstance(result._entries, dict)
+    assert "key1" in result._entries
+    assert "key2" in result._entries
 
 
 @pytest.mark.parametrize(
