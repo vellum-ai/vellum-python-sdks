@@ -379,7 +379,6 @@ def test_mocks__node_not_found_in_workflow_skips_with_warning(caplog):
         and "node not found in workflow MyWorkflow" in record.message
         for record in caplog.records
     )
-<<<<<<< HEAD
 
 
 def test_base_descriptor_validator__vellum_secret():
