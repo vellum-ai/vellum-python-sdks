@@ -8,12 +8,22 @@ from tests.workflows.chat_message_trigger_execution.workflows.simple_chat_workfl
 def test_simple_chat_workflow_serialization():
     """SimpleChatWorkflow from tests/workflows serializes correctly with ChatMessageTrigger."""
 
-    # WHEN we serialize the SimpleChatWorkflow
+    # GIVEN a Workflow that uses a ChatMessageTrigger
+    # WHEN we serialize it
     workflow_display = get_workflow_display(workflow_class=SimpleChatWorkflow)
-    result: dict = workflow_display.serialize()
+    serialized_workflow: dict = workflow_display.serialize()
 
-    # THEN the triggers should be serialized correctly
-    assert result["triggers"] == [
+    # THEN we should get a serialized representation of the Workflow
+    assert serialized_workflow.keys() == {
+        "workflow_raw_data",
+        "input_variables",
+        "state_variables",
+        "output_variables",
+        "triggers",
+    }
+
+    # AND the triggers should be serialized correctly
+    assert serialized_workflow["triggers"] == [
         {
             "id": "9e14c49b-c6d9-4fe5-9ff2-835fd695fe5f",
             "type": "CHAT_MESSAGE",
