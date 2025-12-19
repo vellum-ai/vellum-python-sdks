@@ -103,7 +103,10 @@ class Graph:
 
     @staticmethod
     def from_edge(edge: Edge) -> "Graph":
-        return Graph(entrypoints={edge.from_port}, edges=[edge], terminals={port for port in edge.to_node.Ports})
+        terminals: Set[Union["Port", "NoPortsNode"]] = {port for port in edge.to_node.Ports}
+        if not terminals:
+            terminals = {NoPortsNode(edge.to_node)}
+        return Graph(entrypoints={edge.from_port}, edges=[edge], terminals=terminals)
 
     @staticmethod
     def from_trigger_edge(edge: TriggerEdge) -> "Graph":
@@ -170,6 +173,7 @@ class Graph:
 
     def __rshift__(self, other: GraphTarget) -> "Graph":
         # Check for trigger target (class-level only)
+        from vellum.workflows.nodes.bases.base import BaseNode
         from vellum.workflows.triggers.base import BaseTrigger
 
         if isinstance(other, type) and issubclass(other, BaseTrigger):
@@ -207,8 +211,10 @@ class Graph:
                     elif hasattr(elem, "Ports"):
                         midgraph = final_output_node >> elem
                         self._extend_edges(midgraph.edges)
-                        for other_terminal in elem.Ports:
-                            new_terminals.add(other_terminal)
+                        other_ports = {port for port in elem.Ports}
+                        if isinstance(elem, type) and issubclass(elem, BaseNode) and not other_ports:
+                            other_ports = {NoPortsNode(elem)}
+                        new_terminals.update(other_ports)
                     else:
                         # elem is a Port
                         midgraph = final_output_node >> elem
@@ -234,7 +240,11 @@ class Graph:
                     continue
                 subgraph = final_output_node >> other
                 self._extend_edges(subgraph.edges)
-            self._terminals = {port for port in other.Ports}
+
+            other_ports = {port for port in other.Ports}
+            if isinstance(other, type) and issubclass(other, BaseNode) and not other_ports:
+                other_ports = {NoPortsNode(other)}
+            self._terminals = other_ports
             return self
 
         # other is a Port

@@ -783,3 +783,28 @@ def test_base_workflow__run_node_with_inputs():
     # AND the execution result should use the overridden and non-overridden attributes
     fulfilled_event = events[1]
     assert fulfilled_event.body.outputs.result == "overridden_overridden_value_default_value2_not_overridden"
+
+
+def test_base_workflow__invalid_graph__outgoing_edge_with_no_ports():
+    """Test that graph construction fails if we attempt to create an outgoing edge from a node with no ports."""
+
+    # GIVEN
+    class StartNode(BaseNode[BaseState]):
+        pass
+
+    class MyFinalOutput(BaseNode[BaseState]):
+        class Ports(BaseNode.Ports):
+            pass
+
+    class EndNode(BaseNode[BaseState]):
+        pass
+
+    # THEN
+    with pytest.raises(
+        ValueError,
+        match="Cannot create edges from graph because all terminal nodes have no ports defined: MyFinalOutput. "
+        + "Nodes with empty Ports classes cannot be connected to other nodes.",
+    ):
+
+        class InvalidWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+            graph = StartNode >> MyFinalOutput >> EndNode
