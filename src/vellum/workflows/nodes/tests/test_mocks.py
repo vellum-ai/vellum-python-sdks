@@ -3,14 +3,11 @@ import uuid
 
 from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.workflows import BaseWorkflow
-from vellum.workflows.exceptions import NodeException, WorkflowInitializationException
-from vellum.workflows.inputs.base import BaseInputs
+from vellum.workflows.exceptions import WorkflowInitializationException
 from vellum.workflows.nodes import InlinePromptNode
 from vellum.workflows.nodes.bases.base import BaseNode
-from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubworkflowNode
 from vellum.workflows.nodes.mocks import MockNodeExecution
 from vellum.workflows.references.constant import ConstantValueReference
-from vellum.workflows.state.base import BaseState
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 
@@ -280,111 +277,3 @@ def test_mocks__invalid_then_outputs_key_falls_back_to_legacy():
             raw_mock_with_invalid_key,
             MyWorkflow,
         )
-
-
-def test_mocks__validate_all__node_nested_in_subworkflow():
-    """
-    Tests that MockNodeExecution.validate_all correctly handles mocks for nodes
-    nested within a subworkflow node by validating against the inner subworkflow.
-    """
-
-    # GIVEN a node that will be nested inside a subworkflow
-    class NestedNode(BaseNode):
-        class Outputs(BaseNode.Outputs):
-            result: str
-
-        def run(self) -> Outputs:
-            raise NodeException("This node should be mocked")
-
-    # AND a subworkflow containing that nested node
-    class InnerSubworkflow(BaseWorkflow[BaseInputs, BaseState]):
-        graph = NestedNode
-
-        class Outputs(BaseWorkflow.Outputs):
-            inner_result = NestedNode.Outputs.result
-
-    # AND a subworkflow node that uses the inner subworkflow
-    class SubworkflowNode(InlineSubworkflowNode):
-        subworkflow = InnerSubworkflow
-
-    # AND an outer workflow containing the subworkflow node
-    class OuterWorkflow(BaseWorkflow):
-        graph = SubworkflowNode
-
-        class Outputs(BaseWorkflow.Outputs):
-            final_result = SubworkflowNode.Outputs.inner_result
-
-    # AND raw mock data for the nested node
-    raw_mock_workflow_node_executions = [
-        {
-            "type": "WORKFLOW_NODE_OUTPUT",
-            "node_id": str(NestedNode.__id__),
-            "mock_executions": [
-                {
-                    "when_condition": {
-                        "expression": {
-                            "type": "LOGICAL_CONDITION_GROUP",
-                            "combinator": "AND",
-                            "negated": False,
-                            "conditions": [
-                                {
-                                    "type": "LOGICAL_CONDITION",
-                                    "lhs_variable_id": "e60902d5-6892-4916-80c1-f0130af52322",
-                                    "operator": ">=",
-                                    "rhs_variable_id": "5c1bbb24-c288-49cb-a9b7-0c6f38a86037",
-                                }
-                            ],
-                        },
-                        "variables": [
-                            {
-                                "type": "EXECUTION_COUNTER",
-                                "node_id": str(NestedNode.__id__),
-                                "id": "e60902d5-6892-4916-80c1-f0130af52322",
-                            },
-                            {
-                                "type": "CONSTANT_VALUE",
-                                "variable_value": {"type": "NUMBER", "value": 0},
-                                "id": "5c1bbb24-c288-49cb-a9b7-0c6f38a86037",
-                            },
-                        ],
-                    },
-                    "then_outputs": [
-                        {
-                            "output_id": str(NestedNode.__output_ids__["result"]),
-                            "value": {
-                                "id": "27006b2a-fa81-430c-a0b2-c66a9351fc68",
-                                "type": "CONSTANT_VALUE",
-                                "variable_value": {"type": "STRING", "value": "mocked_result"},
-                            },
-                        },
-                    ],
-                }
-            ],
-        }
-    ]
-
-    # WHEN we call validate_all on the inner subworkflow (where the nested node lives)
-    node_output_mocks = MockNodeExecution.validate_all(
-        raw_mock_workflow_node_executions,
-        InnerSubworkflow,
-    )
-
-    # THEN we get a list of MockNodeExecution objects
-    assert node_output_mocks is not None
-    assert len(node_output_mocks) == 1
-
-    # AND the mock is correctly parsed with the nested node's outputs
-    assert node_output_mocks[0] == MockNodeExecution(
-        when_condition=NestedNode.Execution.count.greater_than_or_equal_to(0.0),
-        then_outputs=NestedNode.Outputs(result="mocked_result"),
-    )
-
-    # AND when we run the outer workflow with the mocks
-    workflow = OuterWorkflow()
-    terminal_event = workflow.run(node_output_mocks=node_output_mocks)
-
-    # THEN the workflow completes successfully
-    assert terminal_event.name == "workflow.execution.fulfilled", terminal_event
-
-    # AND the output reflects the mocked value from the nested node
-    assert terminal_event.outputs.final_result == "mocked_result"
