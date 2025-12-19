@@ -70,7 +70,11 @@ def test_chat_message_trigger__emits_snapshot_events_for_trigger_state_mutations
     # AND the last snapshot event should contain the full chat history with both messages
     last_snapshot = snapshot_events[-1]
     assert hasattr(last_snapshot.state, "chat_history")
-    assert len(last_snapshot.state.chat_history) == 2
+    chat_history = last_snapshot.state.chat_history
+    assert [(m.role, m.text) for m in chat_history] == [
+        ("USER", "Hello"),
+        ("ASSISTANT", "Hello from assistant!"),
+    ]
 
     # AND the snapshot events should appear before the fulfilled event
     event_names = [e.name for e in events]

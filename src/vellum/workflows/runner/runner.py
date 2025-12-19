@@ -1044,14 +1044,6 @@ class WorkflowRunner(Generic[StateType]):
         if self._trigger is not None:
             self._trigger.__on_workflow_initiated__(self._initial_state)
 
-            # Drain any events produced by the trigger hook (e.g., snapshot events from state mutations)
-            # and forward them to the outer queue so stream consumers can observe them
-            try:
-                while event := self._workflow_event_inner_queue.get_nowait():
-                    self._workflow_event_outer_queue.put(event)
-            except Empty:
-                pass
-
         current_parent = WorkflowParentContext(
             span_id=self._initial_state.meta.span_id,
             workflow_definition=self.workflow.__class__,
