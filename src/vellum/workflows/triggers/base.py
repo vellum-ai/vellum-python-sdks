@@ -490,3 +490,32 @@ class BaseTrigger(ABC, metaclass=BaseTriggerMeta):
 
         # Fall back to deterministic hash-based ID
         return get_trigger_attribute_id(cls, attribute_name)
+
+    class Config:
+        """Configuration for trigger behavior. Subclasses can override."""
+
+        pass
+
+    def __on_workflow_initiated__(self, state: "BaseState") -> None:
+        """
+        Lifecycle hook called by WorkflowRunner when workflow execution starts.
+
+        Subclasses can override to perform state initialization (e.g., appending
+        user messages to chat history so nodes can reference them).
+
+        Args:
+            state: The initial workflow state
+        """
+        pass
+
+    def __on_workflow_fulfilled__(self, state: "BaseState") -> None:
+        """
+        Lifecycle hook called by WorkflowRunner before workflow outputs are resolved.
+
+        Subclasses can override to perform state updates that should be reflected
+        in workflow outputs (e.g., appending assistant messages to chat history).
+
+        Args:
+            state: The final workflow state
+        """
+        pass
