@@ -26,8 +26,10 @@ from vellum.workflows.expressions.equals import EqualsExpression
 from vellum.workflows.expressions.greater_than import GreaterThanExpression
 from vellum.workflows.expressions.greater_than_or_equal_to import GreaterThanOrEqualToExpression
 from vellum.workflows.expressions.in_ import InExpression
+from vellum.workflows.expressions.is_blank import IsBlankExpression
 from vellum.workflows.expressions.is_error import IsErrorExpression
 from vellum.workflows.expressions.is_nil import IsNilExpression
+from vellum.workflows.expressions.is_not_blank import IsNotBlankExpression
 from vellum.workflows.expressions.is_not_nil import IsNotNilExpression
 from vellum.workflows.expressions.is_not_null import IsNotNullExpression
 from vellum.workflows.expressions.is_not_undefined import IsNotUndefinedExpression
@@ -102,6 +104,10 @@ def convert_descriptor_to_operator(descriptor: BaseDescriptor) -> LogicalOperato
         return "null"
     elif isinstance(descriptor, (IsNotNullExpression, IsNotNilExpression, IsNotUndefinedExpression)):
         return "notNull"
+    elif isinstance(descriptor, IsBlankExpression):
+        return "blank"
+    elif isinstance(descriptor, IsNotBlankExpression):
+        return "notBlank"
     elif isinstance(descriptor, InExpression):
         return "in"
     elif isinstance(descriptor, NotInExpression):
@@ -199,7 +205,9 @@ def _serialize_condition(
     if isinstance(
         condition,
         (
+            IsBlankExpression,
             IsErrorExpression,
+            IsNotBlankExpression,
             IsNullExpression,
             IsNotNullExpression,
             IsNilExpression,

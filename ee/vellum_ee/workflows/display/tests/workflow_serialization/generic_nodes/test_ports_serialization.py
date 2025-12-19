@@ -1001,6 +1001,133 @@ def test_serialize_node__or_then_and(serialize_node):
     )
 
 
+def test_serialize_node__blank(serialize_node):
+    """
+    Tests that a node with an is_blank() port condition serializes correctly.
+    """
+
+    # GIVEN a node with an is_blank() port condition
+    class BlankGenericNode(BaseNode):
+
+        class Ports(BaseNode.Ports):
+            if_branch = Port.on_if(Inputs.input.is_blank())
+
+    input_id = uuid4()
+
+    # WHEN we serialize the node
+    serialized_node = serialize_node(
+        node_class=BlankGenericNode, global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=input_id)}
+    )
+
+    # THEN the serialized node should have the correct structure with a UNARY_EXPRESSION and "blank" operator
+    assert not DeepDiff(
+        {
+            "id": "a9067b0e-6c3b-4ed0-8b0a-a4eb861f75a8",
+            "label": "Blank Generic Node",
+            "type": "GENERIC",
+            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
+            "definition": {
+                "name": "BlankGenericNode",
+                "module": [
+                    "vellum_ee",
+                    "workflows",
+                    "display",
+                    "tests",
+                    "workflow_serialization",
+                    "generic_nodes",
+                    "test_ports_serialization",
+                ],
+            },
+            "trigger": {"id": "f4cc239d-9feb-4eeb-84d9-62633a7883e7", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [
+                {
+                    "id": "3ac47591-d4dc-470b-be44-74e1445518e2",
+                    "type": "IF",
+                    "name": "if_branch",
+                    "expression": {
+                        "type": "UNARY_EXPRESSION",
+                        "lhs": {
+                            "type": "WORKFLOW_INPUT",
+                            "input_variable_id": str(input_id),
+                        },
+                        "operator": "blank",
+                    },
+                }
+            ],
+            "adornments": None,
+            "attributes": [],
+            "outputs": [],
+        },
+        serialized_node,
+        ignore_order=True,
+    )
+
+
+def test_serialize_node__not_blank(serialize_node):
+    """
+    Tests that a node with an is_not_blank() port condition serializes correctly.
+    """
+
+    # GIVEN a node with an is_not_blank() port condition
+    class NotBlankGenericNode(BaseNode):
+
+        class Ports(BaseNode.Ports):
+            if_branch = Port.on_if(Inputs.input.is_not_blank())
+
+    input_id = uuid4()
+
+    # WHEN we serialize the node
+    serialized_node = serialize_node(
+        node_class=NotBlankGenericNode,
+        global_workflow_input_displays={Inputs.input: WorkflowInputsDisplay(id=input_id)},
+    )
+
+    # THEN the serialized node should have the correct structure with a UNARY_EXPRESSION and "notBlank" operator
+    assert not DeepDiff(
+        {
+            "id": "a9349004-bd02-458e-af66-7b515cdd4d3a",
+            "label": "Not Blank Generic Node",
+            "type": "GENERIC",
+            "display_data": {"position": {"x": 0.0, "y": 0.0}},
+            "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
+            "definition": {
+                "name": "NotBlankGenericNode",
+                "module": [
+                    "vellum_ee",
+                    "workflows",
+                    "display",
+                    "tests",
+                    "workflow_serialization",
+                    "generic_nodes",
+                    "test_ports_serialization",
+                ],
+            },
+            "trigger": {"id": "60521d64-adc6-4f49-8605-0bf617a23a2d", "merge_behavior": "AWAIT_ATTRIBUTES"},
+            "ports": [
+                {
+                    "id": "4824d11b-9d44-4183-8e7f-c4eb21262cc8",
+                    "type": "IF",
+                    "name": "if_branch",
+                    "expression": {
+                        "type": "UNARY_EXPRESSION",
+                        "lhs": {
+                            "type": "WORKFLOW_INPUT",
+                            "input_variable_id": str(input_id),
+                        },
+                        "operator": "notBlank",
+                    },
+                }
+            ],
+            "adornments": None,
+            "attributes": [],
+            "outputs": [],
+        },
+        serialized_node,
+        ignore_order=True,
+    )
+
+
 def test_serialize_node__parse_json(serialize_node):
 
     class ParseJsonGenericNode(BaseNode):
