@@ -38,3 +38,7 @@ def test_chat_message_trigger__workflow_output_reference():
     assert final_state is not None
     assert isinstance(final_state, ChatState)
     assert len(final_state.chat_history) == 2
+    assert final_state.chat_history[0].role == "USER"
+    assert final_state.chat_history[0].text == "Hello"
+    assert final_state.chat_history[1].role == "ASSISTANT"
+    assert final_state.chat_history[1].text == "Hello from assistant!"
