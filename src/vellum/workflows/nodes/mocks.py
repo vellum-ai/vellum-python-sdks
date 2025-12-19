@@ -8,7 +8,7 @@ from vellum.client.types.array_vellum_value import ArrayVellumValue
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.events.types import default_serializer
-from vellum.workflows.exceptions import WorkflowInitializationException
+from vellum.workflows.exceptions import NodeException, WorkflowInitializationException
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.references.constant import ConstantValueReference
 
@@ -93,7 +93,7 @@ class MockNodeExecution(UniversalBaseModel):
                     )
                     continue
                 raise
-            except ValidationError as e:
+            except (ValidationError, NodeException) as e:
                 raise WorkflowInitializationException(
                     message="Failed to validate mock node executions",
                     code=WorkflowErrorCode.INVALID_INPUTS,
