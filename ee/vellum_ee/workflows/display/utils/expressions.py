@@ -133,7 +133,7 @@ def convert_descriptor_to_operator(descriptor: BaseDescriptor) -> LogicalOperato
     elif isinstance(descriptor, ConcatExpression):
         return "concat"
     else:
-        raise ValueError(f"Unsupported descriptor type: {descriptor}")
+        raise UnsupportedSerializationException(f"Unsupported descriptor type: {descriptor}")
 
 
 def get_child_descriptor(value: LazyReference, display_context: "WorkflowDisplayContext") -> BaseDescriptor:
