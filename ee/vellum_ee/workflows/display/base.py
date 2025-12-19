@@ -18,6 +18,7 @@ class WorkflowTriggerType(Enum):
     MANUAL = "MANUAL"
     INTEGRATION = "INTEGRATION"
     SCHEDULED = "SCHEDULED"
+    CHAT_MESSAGE = "CHAT_MESSAGE"
 
 
 def get_trigger_type_mapping() -> Dict[Type["BaseTrigger"], WorkflowTriggerType]:
