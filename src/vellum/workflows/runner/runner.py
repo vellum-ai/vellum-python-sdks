@@ -278,6 +278,7 @@ class WorkflowRunner(Generic[StateType]):
         )
         self.workflow.context._register_event_queue(self._workflow_event_inner_queue)
         self.workflow.context._register_node_output_mocks(node_output_mocks or [])
+        self.workflow.context._register_event_max_size(event_max_size)
 
         self._outputs_listening_to_state = [
             descriptor for descriptor in self.workflow.Outputs if isinstance(descriptor.instance, StateValueReference)

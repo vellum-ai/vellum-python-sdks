@@ -202,6 +202,7 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
                     inputs=subworkflow_inputs,
                     event_filter=all_workflow_event_filter,
                     node_output_mocks=self._context._get_all_node_output_mocks(),
+                    event_max_size=self._context.event_max_size,
                 )
                 first_event = next(subworkflow_stream)
                 self._context._emit_subworkflow_event(first_event)

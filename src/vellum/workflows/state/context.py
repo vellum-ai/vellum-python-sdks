@@ -43,6 +43,7 @@ class WorkflowContext:
         generated_files: Optional[dict[str, str]] = None,
         namespace: Optional[str] = None,
         store_class: Optional[Type[Store]] = None,
+        event_max_size: Optional[int] = None,
     ):
         self._vellum_client = vellum_client
         self._event_queue: Optional[Queue["WorkflowEvent"]] = None
@@ -50,6 +51,7 @@ class WorkflowContext:
         self._execution_context = get_execution_context()
         self._namespace = namespace
         self._store_class = store_class if store_class is not None else Store
+        self._event_max_size = event_max_size
 
         if execution_context is not None:
             self._execution_context.trace_id = execution_context.trace_id
@@ -92,6 +94,10 @@ class WorkflowContext:
     @property
     def store_class(self) -> Type[Store]:
         return self._store_class
+
+    @property
+    def event_max_size(self) -> Optional[int]:
+        return self._event_max_size
 
     @property
     def monitoring_url(self) -> Optional[str]:
@@ -146,6 +152,9 @@ class WorkflowContext:
 
     def _register_event_queue(self, event_queue: Queue["WorkflowEvent"]) -> None:
         self._event_queue = event_queue
+
+    def _register_event_max_size(self, event_max_size: Optional[int]) -> None:
+        self._event_max_size = event_max_size
 
     def _register_node_output_mocks(self, node_output_mocks: MockNodeExecutionArg) -> None:
         for mock in node_output_mocks:
@@ -290,10 +299,11 @@ class WorkflowContext:
         return None
 
     @classmethod
-    def create_from(cls, context):
+    def create_from(cls, context: "WorkflowContext") -> "WorkflowContext":
         return cls(
             vellum_client=context.vellum_client,
             generated_files=context.generated_files,
             namespace=context.namespace,
             store_class=context.store_class,
+            event_max_size=context.event_max_size,
         )
