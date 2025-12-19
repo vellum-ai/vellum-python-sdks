@@ -1,5 +1,8 @@
 """Tests for ChatMessageTrigger workflow execution."""
 
+from vellum.workflows.events.workflow import WorkflowExecutionSnapshottedEvent
+from vellum.workflows.workflows.event_filters import all_workflow_event_filter
+
 from tests.workflows.chat_message_trigger_execution.workflows.simple_chat_workflow import (
     ChatState,
     SimpleChatTrigger,
@@ -42,3 +45,35 @@ def test_chat_message_trigger__workflow_output_reference():
     assert final_state.chat_history[0].text == "Hello"
     assert final_state.chat_history[1].role == "ASSISTANT"
     assert final_state.chat_history[1].text == "Hello from assistant!"
+
+
+def test_chat_message_trigger__emits_snapshot_events_for_trigger_state_mutations():
+    """Tests that snapshot events are emitted when trigger mutates state in lifecycle hooks."""
+
+    # GIVEN a workflow using SimpleChatTrigger
+    workflow = SimpleChatWorkflow()
+
+    # AND a trigger with message
+    trigger = SimpleChatTrigger(message="Hello")
+
+    # WHEN we stream the workflow events with all_workflow_event_filter to include snapshot events
+    events = list(workflow.stream(trigger=trigger, event_filter=all_workflow_event_filter))
+
+    # THEN we should have snapshot events for the trigger's state mutations
+    snapshot_events = [e for e in events if isinstance(e, WorkflowExecutionSnapshottedEvent)]
+
+    # AND there should be at least 2 snapshot events (one for user message, one for assistant message)
+    # These are emitted when ChatMessageTrigger appends to chat_history in __on_workflow_initiated__
+    # and __on_workflow_fulfilled__
+    assert len(snapshot_events) >= 2, f"Expected at least 2 snapshot events, got {len(snapshot_events)}"
+
+    # AND the last snapshot event should contain the full chat history with both messages
+    last_snapshot = snapshot_events[-1]
+    assert hasattr(last_snapshot.state, "chat_history")
+    assert len(last_snapshot.state.chat_history) == 2
+
+    # AND the snapshot events should appear before the fulfilled event
+    event_names = [e.name for e in events]
+    last_snapshot_idx = max(i for i, e in enumerate(events) if isinstance(e, WorkflowExecutionSnapshottedEvent))
+    fulfilled_idx = next(i for i, name in enumerate(event_names) if name == "workflow.execution.fulfilled")
+    assert last_snapshot_idx < fulfilled_idx, "Snapshot events should appear before fulfilled event"
