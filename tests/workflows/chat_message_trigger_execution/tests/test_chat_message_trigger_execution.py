@@ -68,7 +68,22 @@ def test_chat_message_trigger__emits_snapshot_events_for_trigger_state_mutations
     # and __on_workflow_fulfilled__
     assert len(snapshot_events) >= 2, f"Expected at least 2 snapshot events, got {len(snapshot_events)}"
 
+    # AND there should be a snapshot event with just the user message (from __on_workflow_initiated__)
+    user_message_snapshot = next(
+        (
+            e
+            for e in snapshot_events
+            if e.state.chat_history
+            == [
+                ChatMessage(role="USER", text="Hello", content=None, source=None),
+            ]
+        ),
+        None,
+    )
+    assert user_message_snapshot is not None, "Expected a snapshot event with just the user message"
+
     # AND the last snapshot event should contain the full chat history with both messages
+    # (from __on_workflow_fulfilled__)
     last_snapshot = snapshot_events[-1]
     assert last_snapshot.state.chat_history == [
         ChatMessage(role="USER", text="Hello", content=None, source=None),
