@@ -318,37 +318,16 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     const codeExecutionFunction = f as FunctionArgs;
     this.generateFunctionFile([codeExecutionFunction]);
     const snakeName = toPythonSafeSnakeCase(codeExecutionFunction.name);
-    // Use toValidPythonIdentifier to ensure the name is safe for Python references
-    // but preserve original casing when possible (see APO-1372)
     const safeName = toValidPythonIdentifier(codeExecutionFunction.name);
     const functionReference = python.reference({
-      name: safeName, // Use safe Python identifier that preserves original casing
-      modulePath: [`.${snakeName}`], // Import from snake_case module
+      name: safeName,
+      modulePath: [`.${snakeName}`],
     });
 
-    // Check if function has inputs or examples that need to be wrapped with tool()
-    const parsedInputs = this.parseToolInputsFromDefinition(
+    return this.wrapWithToolIfNeeded(
+      functionReference,
       codeExecutionFunction.definition
     );
-    // Read examples from definition.parameters.examples (JSON Schema examples keyword)
-    const parameters = codeExecutionFunction.definition?.parameters as
-      | Record<string, unknown>
-      | undefined;
-    const examples =
-      (parameters?.examples as Array<Record<string, unknown>>) ?? null;
-    const hasInputs = parsedInputs && Object.keys(parsedInputs).length > 0;
-    const hasExamples = Array.isArray(examples) && examples.length > 0;
-
-    if (hasInputs || hasExamples) {
-      // Wrap the function reference with tool(...)(func)
-      const wrapper = this.getToolInvocation(parsedInputs, examples);
-      return new WrappedCall({
-        wrapper,
-        inner: functionReference,
-      });
-    }
-
-    return functionReference;
   }
 
   private handleInlineWorkflowFunction(f: ToolArgs): AstNode | null {
@@ -398,27 +377,10 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
         modulePath: [`.${workflowName}`, GENERATED_WORKFLOW_MODULE_NAME],
       });
 
-      // Check if inline workflow has inputs or examples that need to be wrapped with tool()
-      const parsedInputs = this.parseToolInputsFromDefinition(
+      return this.wrapWithToolIfNeeded(
+        workflowReference,
         inlineWorkflow.definition
       );
-      const parameters = inlineWorkflow.definition?.parameters as
-        | Record<string, unknown>
-        | undefined;
-      const examples =
-        (parameters?.examples as Array<Record<string, unknown>>) ?? null;
-      const hasInputs = parsedInputs && Object.keys(parsedInputs).length > 0;
-      const hasExamples = Array.isArray(examples) && examples.length > 0;
-
-      if (hasInputs || hasExamples) {
-        const wrapper = this.getToolInvocation(parsedInputs, examples);
-        return new WrappedCall({
-          wrapper,
-          inner: workflowReference,
-        });
-      }
-
-      return workflowReference;
     }
 
     return null;
@@ -926,9 +888,45 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     return parsedInputs;
   }
 
-  /**
-   * Creates a tool(inputs={...}, examples=[...]) method invocation for wrapping function references.
-   */
+  private parseToolExamplesFromDefinition(
+    definition: FunctionDefinition | undefined
+  ): Array<Record<string, unknown>> | null {
+    const parameters = definition?.parameters as
+      | Record<string, unknown>
+      | undefined
+      | null;
+    if (!parameters) {
+      return null;
+    }
+
+    const examples = parameters.examples as
+      | Array<Record<string, unknown>>
+      | undefined;
+    if (!Array.isArray(examples) || examples.length === 0) {
+      return null;
+    }
+
+    return examples;
+  }
+
+  private wrapWithToolIfNeeded(
+    inner: python.AstNode,
+    definition: FunctionDefinition | undefined
+  ): python.AstNode {
+    const parsedInputs = this.parseToolInputsFromDefinition(definition);
+    const examples = this.parseToolExamplesFromDefinition(definition);
+
+    if (parsedInputs || examples) {
+      const wrapper = this.getToolInvocation(parsedInputs, examples);
+      return new WrappedCall({
+        wrapper,
+        inner,
+      });
+    }
+
+    return inner;
+  }
+
   private getToolInvocation(
     inputs: Record<string, WorkflowValueDescriptorType> | null,
     examples: Array<Record<string, unknown>> | null
