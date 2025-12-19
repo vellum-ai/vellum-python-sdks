@@ -176,6 +176,7 @@ def _get_pydantic_model_definition(model_class: type) -> Optional[JsonObject]:
 
 
 BinaryExpression = Union[
+    AccessorExpression,
     AddExpression,
     AndExpression,
     BeginsWithExpression,
@@ -555,8 +556,6 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
     return _serialize_condition(executable_id, display_context, value)
 
 
-# This method is not yet exhaustive of all possible descriptor types. We started with the most
-# common ones needed to support node mocking.
 def base_descriptor_validator(value: dict, workflow: Type[BaseWorkflow]) -> BaseDescriptor:
     descriptor_type = value.get("type")
 
@@ -575,8 +574,26 @@ def base_descriptor_validator(value: dict, workflow: Type[BaseWorkflow]) -> Base
     if descriptor_type == "EXECUTION_COUNTER":
         return _execution_counter_reference_validator(value.get("node_id"), workflow)
 
+    if descriptor_type == "VELLUM_SECRET":
+        return _vellum_secret_reference_validator(value.get("vellum_secret_name"))
+
+    if descriptor_type == "ENVIRONMENT_VARIABLE":
+        return _environment_variable_reference_validator(value.get("environment_variable"))
+
+    if descriptor_type == "ARRAY_REFERENCE":
+        return _array_reference_validator(value.get("items"), workflow)
+
+    if descriptor_type == "DICTIONARY_REFERENCE":
+        return _dictionary_reference_validator(value.get("entries"), workflow)
+
     if descriptor_type == "BINARY_EXPRESSION":
         return _binary_expression_validator(value, workflow)
+
+    if descriptor_type == "UNARY_EXPRESSION":
+        return _unary_expression_validator(value, workflow)
+
+    if descriptor_type == "TERNARY_EXPRESSION":
+        return _ternary_expression_validator(value, workflow)
 
     raise ValueError(f"Unsupported descriptor type: {descriptor_type}")
 
@@ -644,6 +661,124 @@ def _execution_counter_reference_validator(node_id: Any, workflow: Type[BaseWork
     return ExecutionCountReference(node_class)
 
 
+def _vellum_secret_reference_validator(secret_name: Any) -> VellumSecretReference:
+    if not isinstance(secret_name, str):
+        raise ValueError(f"Unexpected type for vellum secret name: {type(secret_name)}")
+    return VellumSecretReference(secret_name)
+
+
+def _environment_variable_reference_validator(env_var_name: Any) -> EnvironmentVariableReference:
+    if not isinstance(env_var_name, str):
+        raise ValueError(f"Unexpected type for environment variable name: {type(env_var_name)}")
+    return EnvironmentVariableReference(name=env_var_name)
+
+
+def _array_reference_validator(items: Any, workflow: Type[BaseWorkflow]) -> ConstantValueReference:
+    if not isinstance(items, list):
+        raise ValueError(f"Unexpected type for array items: {type(items)}")
+
+    validated_items = []
+    for item in items:
+        if isinstance(item, dict):
+            validated_items.append(base_descriptor_validator(item, workflow))
+        else:
+            validated_items.append(item)
+
+    return ConstantValueReference(validated_items)
+
+
+def _dictionary_reference_validator(entries: Any, workflow: Type[BaseWorkflow]) -> ConstantValueReference:
+    if not isinstance(entries, list):
+        raise ValueError(f"Unexpected type for dictionary entries: {type(entries)}")
+
+    validated_dict: Dict[str, Any] = {}
+    for entry in entries:
+        if not isinstance(entry, dict):
+            raise ValueError(f"Unexpected type for dictionary entry: {type(entry)}")
+
+        key = entry.get("key")
+        if not isinstance(key, str):
+            raise ValueError(f"Unexpected type for dictionary key: {type(key)}")
+
+        raw_value = entry.get("value")
+        if isinstance(raw_value, dict):
+            validated_dict[key] = base_descriptor_validator(raw_value, workflow)
+        else:
+            validated_dict[key] = raw_value
+
+    return ConstantValueReference(validated_dict)
+
+
+UnaryExpression = Union[
+    IsBlankExpression,
+    IsErrorExpression,
+    IsNilExpression,
+    IsNotBlankExpression,
+    IsNotNilExpression,
+    IsNotNullExpression,
+    IsNotUndefinedExpression,
+    IsNullExpression,
+    IsUndefinedExpression,
+    LengthExpression,
+    ParseJsonExpression,
+]
+
+
+def _unary_expression_validator(unary_expression: dict, workflow: Type[BaseWorkflow]) -> UnaryExpression:
+    operator = unary_expression.get("operator")
+    raw_lhs = unary_expression.get("lhs")
+    if not isinstance(raw_lhs, dict):
+        raise ValueError(f"Unexpected type for lhs: {type(raw_lhs)}")
+
+    expression = base_descriptor_validator(raw_lhs, workflow)
+
+    if operator == "blank":
+        return IsBlankExpression(expression=expression)
+    elif operator == "notBlank":
+        return IsNotBlankExpression(expression=expression)
+    elif operator == "null":
+        return IsNullExpression(expression=expression)
+    elif operator == "notNull":
+        return IsNotNullExpression(expression=expression)
+    elif operator == "isError":
+        return IsErrorExpression(expression=expression)
+    elif operator == "length":
+        return LengthExpression(expression=expression)
+    elif operator == "parseJson":
+        return ParseJsonExpression(expression=expression)
+
+    raise ValueError(f"Unsupported unary expression operator: {operator}")
+
+
+TernaryExpression = Union[BetweenExpression, NotBetweenExpression]
+
+
+def _ternary_expression_validator(ternary_expression: dict, workflow: Type[BaseWorkflow]) -> TernaryExpression:
+    operator = ternary_expression.get("operator")
+    raw_base = ternary_expression.get("base")
+    if not isinstance(raw_base, dict):
+        raise ValueError(f"Unexpected type for base: {type(raw_base)}")
+
+    raw_lhs = ternary_expression.get("lhs")
+    if not isinstance(raw_lhs, dict):
+        raise ValueError(f"Unexpected type for lhs: {type(raw_lhs)}")
+
+    raw_rhs = ternary_expression.get("rhs")
+    if not isinstance(raw_rhs, dict):
+        raise ValueError(f"Unexpected type for rhs: {type(raw_rhs)}")
+
+    base = base_descriptor_validator(raw_base, workflow)
+    start = base_descriptor_validator(raw_lhs, workflow)
+    end = base_descriptor_validator(raw_rhs, workflow)
+
+    if operator == "between":
+        return BetweenExpression(value=base, start=start, end=end)
+    elif operator == "notBetween":
+        return NotBetweenExpression(value=base, start=start, end=end)
+
+    raise ValueError(f"Unsupported ternary expression operator: {operator}")
+
+
 def _binary_expression_validator(binary_expression: dict, workflow: Type[BaseWorkflow]) -> BinaryExpression:
     operator = binary_expression.get("operator")
     raw_lhs = binary_expression.get("lhs")
@@ -657,7 +792,7 @@ def _binary_expression_validator(binary_expression: dict, workflow: Type[BaseWor
     lhs = base_descriptor_validator(raw_lhs, workflow)
     rhs = base_descriptor_validator(raw_rhs, workflow)
 
-    if operator == "==":
+    if operator in ("=", "=="):
         return EqualsExpression(lhs=lhs, rhs=rhs)
     elif operator == "!=":
         return DoesNotEqualExpression(lhs=lhs, rhs=rhs)
@@ -675,5 +810,29 @@ def _binary_expression_validator(binary_expression: dict, workflow: Type[BaseWor
         return BeginsWithExpression(lhs=lhs, rhs=rhs)
     elif operator == "endsWith":
         return EndsWithExpression(lhs=lhs, rhs=rhs)
+    elif operator == "doesNotContain":
+        return DoesNotContainExpression(lhs=lhs, rhs=rhs)
+    elif operator == "doesNotBeginWith":
+        return DoesNotBeginWithExpression(lhs=lhs, rhs=rhs)
+    elif operator == "doesNotEndWith":
+        return DoesNotEndWithExpression(lhs=lhs, rhs=rhs)
+    elif operator == "in":
+        return InExpression(lhs=lhs, rhs=rhs)
+    elif operator == "notIn":
+        return NotInExpression(lhs=lhs, rhs=rhs)
+    elif operator == "and":
+        return AndExpression(lhs=lhs, rhs=rhs)
+    elif operator == "or":
+        return OrExpression(lhs=lhs, rhs=rhs)
+    elif operator == "coalesce":
+        return CoalesceExpression(lhs=lhs, rhs=rhs)
+    elif operator == "+":
+        return AddExpression(lhs=lhs, rhs=rhs)
+    elif operator == "-":
+        return MinusExpression(lhs=lhs, rhs=rhs)
+    elif operator == "concat":
+        return ConcatExpression(lhs=lhs, rhs=rhs)
+    elif operator == "accessField":
+        return AccessorExpression(base=lhs, field=rhs)
 
     raise ValueError(f"Unsupported binary expression operator: {operator}")

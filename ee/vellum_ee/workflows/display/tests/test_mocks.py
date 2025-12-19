@@ -1,8 +1,35 @@
+import pytest
 import sys
 from uuid import uuid4
 
 from vellum.workflows import BaseInputs, BaseNode, BaseState, BaseWorkflow, MockNodeExecution
+from vellum.workflows.expressions.accessor import AccessorExpression
+from vellum.workflows.expressions.add import AddExpression
+from vellum.workflows.expressions.and_ import AndExpression
+from vellum.workflows.expressions.begins_with import BeginsWithExpression
+from vellum.workflows.expressions.between import BetweenExpression
+from vellum.workflows.expressions.coalesce_expression import CoalesceExpression
+from vellum.workflows.expressions.concat import ConcatExpression
+from vellum.workflows.expressions.contains import ContainsExpression
+from vellum.workflows.expressions.does_not_begin_with import DoesNotBeginWithExpression
+from vellum.workflows.expressions.does_not_contain import DoesNotContainExpression
+from vellum.workflows.expressions.does_not_end_with import DoesNotEndWithExpression
+from vellum.workflows.expressions.ends_with import EndsWithExpression
+from vellum.workflows.expressions.in_ import InExpression
+from vellum.workflows.expressions.is_blank import IsBlankExpression
+from vellum.workflows.expressions.is_error import IsErrorExpression
+from vellum.workflows.expressions.is_not_blank import IsNotBlankExpression
+from vellum.workflows.expressions.is_not_null import IsNotNullExpression
+from vellum.workflows.expressions.is_null import IsNullExpression
+from vellum.workflows.expressions.length import LengthExpression
+from vellum.workflows.expressions.minus import MinusExpression
+from vellum.workflows.expressions.not_between import NotBetweenExpression
+from vellum.workflows.expressions.not_in import NotInExpression
+from vellum.workflows.expressions.or_ import OrExpression
+from vellum.workflows.expressions.parse_json import ParseJsonExpression
 from vellum.workflows.references.constant import ConstantValueReference
+from vellum.workflows.references.environment_variable import EnvironmentVariableReference
+from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum_ee.workflows.display.utils.expressions import base_descriptor_validator
 from vellum_ee.workflows.server.virtual_file_loader import VirtualFileFinder
 
@@ -350,3 +377,277 @@ def test_mocks__node_not_found_in_workflow_skips_with_warning(caplog):
         and "node not found in workflow MyWorkflow" in record.message
         for record in caplog.records
     )
+
+
+def test_base_descriptor_validator__vellum_secret():
+    """
+    Tests that VELLUM_SECRET descriptor type is correctly validated.
+    """
+
+    # GIVEN a simple workflow
+    class StartNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            foo: str
+
+    class MyWorkflow(BaseWorkflow):
+        graph = StartNode
+
+    # AND a VELLUM_SECRET descriptor
+    raw_descriptor = {
+        "type": "VELLUM_SECRET",
+        "vellum_secret_name": "my_secret",
+    }
+
+    # WHEN we validate the descriptor
+    result = base_descriptor_validator(raw_descriptor, MyWorkflow)
+
+    # THEN we get a VellumSecretReference
+    assert isinstance(result, VellumSecretReference)
+    assert result.name == "my_secret"
+
+
+def test_base_descriptor_validator__environment_variable():
+    """
+    Tests that ENVIRONMENT_VARIABLE descriptor type is correctly validated.
+    """
+
+    # GIVEN a simple workflow
+    class StartNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            foo: str
+
+    class MyWorkflow(BaseWorkflow):
+        graph = StartNode
+
+    # AND an ENVIRONMENT_VARIABLE descriptor
+    raw_descriptor = {
+        "type": "ENVIRONMENT_VARIABLE",
+        "environment_variable": "MY_ENV_VAR",
+    }
+
+    # WHEN we validate the descriptor
+    result = base_descriptor_validator(raw_descriptor, MyWorkflow)
+
+    # THEN we get an EnvironmentVariableReference
+    assert isinstance(result, EnvironmentVariableReference)
+    assert result.name == "MY_ENV_VAR"
+
+
+def test_base_descriptor_validator__array_reference():
+    """
+    Tests that ARRAY_REFERENCE descriptor type is correctly validated.
+    """
+
+    # GIVEN a simple workflow
+    class StartNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            foo: str
+
+    class MyWorkflow(BaseWorkflow):
+        graph = StartNode
+
+    # AND an ARRAY_REFERENCE descriptor with constant values
+    raw_descriptor = {
+        "type": "ARRAY_REFERENCE",
+        "items": [
+            {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "item1"}},
+            {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "item2"}},
+        ],
+    }
+
+    # WHEN we validate the descriptor
+    result = base_descriptor_validator(raw_descriptor, MyWorkflow)
+
+    # THEN we get a ConstantValueReference containing a list
+    assert isinstance(result, ConstantValueReference)
+    assert isinstance(result._value, list)
+    assert len(result._value) == 2
+
+
+def test_base_descriptor_validator__dictionary_reference():
+    """
+    Tests that DICTIONARY_REFERENCE descriptor type is correctly validated.
+    """
+
+    # GIVEN a simple workflow
+    class StartNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            foo: str
+
+    class MyWorkflow(BaseWorkflow):
+        graph = StartNode
+
+    # AND a DICTIONARY_REFERENCE descriptor
+    raw_descriptor = {
+        "type": "DICTIONARY_REFERENCE",
+        "entries": [
+            {
+                "id": "entry1",
+                "key": "key1",
+                "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "value1"}},
+            },
+            {
+                "id": "entry2",
+                "key": "key2",
+                "value": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 42}},
+            },
+        ],
+    }
+
+    # WHEN we validate the descriptor
+    result = base_descriptor_validator(raw_descriptor, MyWorkflow)
+
+    # THEN we get a ConstantValueReference containing a dict
+    assert isinstance(result, ConstantValueReference)
+    assert isinstance(result._value, dict)
+    assert "key1" in result._value
+    assert "key2" in result._value
+
+
+@pytest.mark.parametrize(
+    "operator,expected_type",
+    [
+        ("blank", IsBlankExpression),
+        ("notBlank", IsNotBlankExpression),
+        ("null", IsNullExpression),
+        ("notNull", IsNotNullExpression),
+        ("isError", IsErrorExpression),
+        ("length", LengthExpression),
+        ("parseJson", ParseJsonExpression),
+    ],
+)
+def test_base_descriptor_validator__unary_expression(operator, expected_type):
+    """
+    Tests that UNARY_EXPRESSION descriptor types are correctly validated.
+    """
+
+    # GIVEN a simple workflow
+    class StartNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            foo: str
+
+    class MyWorkflow(BaseWorkflow):
+        graph = StartNode
+
+    # AND a UNARY_EXPRESSION descriptor
+    raw_descriptor = {
+        "type": "UNARY_EXPRESSION",
+        "operator": operator,
+        "lhs": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "test"}},
+    }
+
+    # WHEN we validate the descriptor
+    result = base_descriptor_validator(raw_descriptor, MyWorkflow)
+
+    # THEN we get the expected expression type
+    assert isinstance(result, expected_type)
+
+
+@pytest.mark.parametrize(
+    "operator,expected_type",
+    [
+        ("between", BetweenExpression),
+        ("notBetween", NotBetweenExpression),
+    ],
+)
+def test_base_descriptor_validator__ternary_expression(operator, expected_type):
+    """
+    Tests that TERNARY_EXPRESSION descriptor types are correctly validated.
+    """
+
+    # GIVEN a simple workflow
+    class StartNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            foo: str
+
+    class MyWorkflow(BaseWorkflow):
+        graph = StartNode
+
+    # AND a TERNARY_EXPRESSION descriptor
+    raw_descriptor = {
+        "type": "TERNARY_EXPRESSION",
+        "operator": operator,
+        "base": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 5}},
+        "lhs": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 1}},
+        "rhs": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 10}},
+    }
+
+    # WHEN we validate the descriptor
+    result = base_descriptor_validator(raw_descriptor, MyWorkflow)
+
+    # THEN we get the expected expression type
+    assert isinstance(result, expected_type)
+
+
+@pytest.mark.parametrize(
+    "operator,expected_type",
+    [
+        ("=", BeginsWithExpression.__bases__[0].__bases__[0]),
+        ("==", BeginsWithExpression.__bases__[0].__bases__[0]),
+        ("doesNotContain", DoesNotContainExpression),
+        ("doesNotBeginWith", DoesNotBeginWithExpression),
+        ("doesNotEndWith", DoesNotEndWithExpression),
+        ("in", InExpression),
+        ("notIn", NotInExpression),
+        ("and", AndExpression),
+        ("or", OrExpression),
+        ("coalesce", CoalesceExpression),
+        ("+", AddExpression),
+        ("-", MinusExpression),
+        ("concat", ConcatExpression),
+    ],
+)
+def test_base_descriptor_validator__binary_expression_additional_operators(operator, expected_type):
+    """
+    Tests that additional BINARY_EXPRESSION operators are correctly validated.
+    """
+
+    # GIVEN a simple workflow
+    class StartNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            foo: str
+
+    class MyWorkflow(BaseWorkflow):
+        graph = StartNode
+
+    # AND a BINARY_EXPRESSION descriptor with the given operator
+    raw_descriptor = {
+        "type": "BINARY_EXPRESSION",
+        "operator": operator,
+        "lhs": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "left"}},
+        "rhs": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "right"}},
+    }
+
+    # WHEN we validate the descriptor
+    result = base_descriptor_validator(raw_descriptor, MyWorkflow)
+
+    # THEN we get the expected expression type
+    assert isinstance(result, expected_type)
+
+
+def test_base_descriptor_validator__accessor_expression():
+    """
+    Tests that accessField operator in BINARY_EXPRESSION is correctly validated.
+    """
+
+    # GIVEN a simple workflow
+    class StartNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            foo: str
+
+    class MyWorkflow(BaseWorkflow):
+        graph = StartNode
+
+    # AND a BINARY_EXPRESSION descriptor with accessField operator
+    raw_descriptor = {
+        "type": "BINARY_EXPRESSION",
+        "operator": "accessField",
+        "lhs": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": {"field": "value"}}},
+        "rhs": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "field"}},
+    }
+
+    # WHEN we validate the descriptor
+    result = base_descriptor_validator(raw_descriptor, MyWorkflow)
+
+    # THEN we get an AccessorExpression
+    assert isinstance(result, AccessorExpression)
