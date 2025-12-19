@@ -1,3 +1,5 @@
+import { python } from "@fern-api/python-ast";
+
 import {
   GENERATED_TRIGGERS_MODULE_NAME,
   VELLUM_WORKFLOW_EDITOR_TYPES_PATH,
@@ -230,8 +232,7 @@ export abstract class BaseTrigger<
       (attr) =>
         new Field({
           name: attr.key,
-          type: undefined,
-          initializer: undefined,
+          type: python.Type.str(),
         })
     );
   }
