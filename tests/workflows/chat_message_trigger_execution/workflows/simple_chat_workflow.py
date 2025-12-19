@@ -12,7 +12,12 @@ from vellum.workflows.triggers.chat_message import ChatMessageTrigger
 
 
 class ChatState(BaseState):
-    chat_history: List[ChatMessage] = []
+    chat_history: List[ChatMessage]
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if "chat_history" not in kwargs:
+            self.chat_history = []
 
 
 class ResponseNode(BaseNode):
@@ -25,7 +30,8 @@ class ResponseNode(BaseNode):
 class SimpleChatTrigger(ChatMessageTrigger):
     """Chat trigger that appends workflow output as assistant message."""
 
-    output = LazyReference(lambda: SimpleChatWorkflow.Outputs.response)  # type: ignore[has-type]
+    class Config(ChatMessageTrigger.Config):
+        output = LazyReference(lambda: SimpleChatWorkflow.Outputs.response)  # type: ignore[has-type]
 
 
 class SimpleChatWorkflow(BaseWorkflow[BaseInputs, ChatState]):
@@ -35,3 +41,4 @@ class SimpleChatWorkflow(BaseWorkflow[BaseInputs, ChatState]):
 
     class Outputs(BaseWorkflow.Outputs):
         response = ResponseNode.Outputs.response
+        chat_history = ChatState.chat_history

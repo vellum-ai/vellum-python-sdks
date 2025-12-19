@@ -33,7 +33,7 @@ from .references.lazy import LazyReference
 from .runner import WorkflowRunner
 from .sandbox import WorkflowSandboxRunner
 from .state.base import BaseState
-from .triggers import IntegrationTrigger, ScheduleTrigger
+from .triggers import ChatMessageTrigger, IntegrationTrigger, ScheduleTrigger
 from .types.core import Json, MergeBehavior
 from .types.definition import DeploymentDefinition, MCPServer, VellumIntegrationToolDefinition
 from .utils.functions import tool, use_tool_inputs
@@ -50,6 +50,7 @@ __all__ = [
     "BaseSearchNode",
     "BaseState",
     "BaseWorkflow",
+    "ChatMessageTrigger",
     "CodeExecutionNode",
     "ConditionalNode",
     "DatasetRow",

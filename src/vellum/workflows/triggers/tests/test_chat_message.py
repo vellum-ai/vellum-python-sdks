@@ -12,13 +12,17 @@ from vellum.client.types import (
     VellumImage,
 )
 from vellum.workflows.nodes.bases.base import BaseNode
-from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.triggers.chat_message import ChatMessageTrigger
 
 
 class ChatState(BaseState):
-    chat_history: List[ChatMessage] = []
+    chat_history: List[ChatMessage]
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if "chat_history" not in kwargs:
+            self.chat_history = []
 
 
 @pytest.mark.parametrize(
@@ -33,12 +37,12 @@ class ChatState(BaseState):
         ),
     ],
 )
-def test_chat_message_trigger__text_message(
+def test_chat_message_trigger__initiated_text_message(
     message: Union[str, ChatMessageContent],
     expected_text: str,
     expected_content: ChatMessageContent,
 ):
-    """Tests that ChatMessageTrigger handles text messages correctly."""
+    """Tests that ChatMessageTrigger appends user message on workflow initiation."""
 
     # GIVEN a ChatMessageTrigger with a text message
     trigger = ChatMessageTrigger(message=message)
@@ -46,11 +50,8 @@ def test_chat_message_trigger__text_message(
     # AND a state with chat_history
     state = ChatState()
 
-    # AND empty outputs
-    outputs = BaseOutputs()
-
-    # WHEN the lifecycle hook is called
-    trigger.__on_workflow_fulfilled__(state, outputs)
+    # WHEN the initiated lifecycle hook is called
+    trigger.__on_workflow_initiated__(state)
 
     # THEN the user message is appended to chat_history
     assert len(state.chat_history) == 1
@@ -59,7 +60,7 @@ def test_chat_message_trigger__text_message(
     assert state.chat_history[0].content == expected_content
 
 
-def test_chat_message_trigger__multimodal_message():
+def test_chat_message_trigger__initiated_multimodal_message():
     """Tests that ChatMessageTrigger handles multi-modal messages correctly."""
 
     # GIVEN a ChatMessageTrigger with an image message
@@ -69,11 +70,8 @@ def test_chat_message_trigger__multimodal_message():
     # AND a state with chat_history
     state = ChatState()
 
-    # AND empty outputs
-    outputs = BaseOutputs()
-
-    # WHEN the lifecycle hook is called
-    trigger.__on_workflow_fulfilled__(state, outputs)
+    # WHEN the initiated lifecycle hook is called
+    trigger.__on_workflow_initiated__(state)
 
     # THEN the user message is appended with content
     assert len(state.chat_history) == 1
@@ -82,7 +80,7 @@ def test_chat_message_trigger__multimodal_message():
     assert state.chat_history[0].content == image_content
 
 
-def test_chat_message_trigger__array_content_message():
+def test_chat_message_trigger__initiated_array_content_message():
     """Tests that ChatMessageTrigger handles array content with multiple types."""
 
     # GIVEN a ChatMessageTrigger with an array message containing text and image
@@ -97,11 +95,8 @@ def test_chat_message_trigger__array_content_message():
     # AND a state with chat_history
     state = ChatState()
 
-    # AND empty outputs
-    outputs = BaseOutputs()
-
-    # WHEN the lifecycle hook is called
-    trigger.__on_workflow_fulfilled__(state, outputs)
+    # WHEN the initiated lifecycle hook is called
+    trigger.__on_workflow_initiated__(state)
 
     # THEN the user message is appended with array content
     assert len(state.chat_history) == 1
@@ -119,11 +114,8 @@ def test_chat_message_trigger__state_without_chat_history():
     # AND a state without chat_history attribute
     state = BaseState()
 
-    # AND empty outputs
-    outputs = BaseOutputs()
-
-    # WHEN the lifecycle hook is called
-    trigger.__on_workflow_fulfilled__(state, outputs)
+    # WHEN the initiated lifecycle hook is called
+    trigger.__on_workflow_initiated__(state)
 
     # THEN no error is raised and state is unchanged
     assert not hasattr(state, "chat_history")

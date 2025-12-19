@@ -14,7 +14,6 @@ from vellum_ee.workflows.display.editor import NodeDisplayComment
 
 if TYPE_CHECKING:
     from vellum.workflows.graph.graph import Graph, GraphTarget
-    from vellum.workflows.outputs import BaseOutputs
     from vellum.workflows.state.base import BaseState
 
 
@@ -492,17 +491,31 @@ class BaseTrigger(ABC, metaclass=BaseTriggerMeta):
         # Fall back to deterministic hash-based ID
         return get_trigger_attribute_id(cls, attribute_name)
 
-    def __on_workflow_fulfilled__(self, state: "BaseState", outputs: "BaseOutputs") -> None:
+    class Config:
+        """Configuration for trigger behavior. Subclasses can override."""
+
+        pass
+
+    def __on_workflow_initiated__(self, state: "BaseState") -> None:
         """
-        Lifecycle hook called by WorkflowRunner after workflow execution completes.
+        Lifecycle hook called by WorkflowRunner when workflow execution starts.
 
-        Subclasses can override this method to perform automatic state updates
-        based on workflow outputs (e.g., appending messages to chat history).
+        Subclasses can override to perform state initialization (e.g., appending
+        user messages to chat history so nodes can reference them).
 
-        Default implementation does nothing.
+        Args:
+            state: The initial workflow state
+        """
+        pass
+
+    def __on_workflow_fulfilled__(self, state: "BaseState") -> None:
+        """
+        Lifecycle hook called by WorkflowRunner before workflow outputs are resolved.
+
+        Subclasses can override to perform state updates that should be reflected
+        in workflow outputs (e.g., appending assistant messages to chat history).
 
         Args:
             state: The final workflow state
-            outputs: The workflow outputs from the final node
         """
         pass

@@ -1040,6 +1040,10 @@ class WorkflowRunner(Generic[StateType]):
         for edge in self.workflow.get_edges():
             self._dependencies[edge.to_node].add(edge.from_port.node_class)
 
+        # Call trigger initiated hook so nodes can reference trigger state
+        if self._trigger is not None:
+            self._trigger.__on_workflow_initiated__(self._initial_state)
+
         current_parent = WorkflowParentContext(
             span_id=self._initial_state.meta.span_id,
             workflow_definition=self.workflow.__class__,
@@ -1127,6 +1131,10 @@ class WorkflowRunner(Generic[StateType]):
             )
             return
 
+        # Call trigger fulfilled hook before output resolution so state changes are reflected in outputs
+        if self._trigger is not None:
+            self._trigger.__on_workflow_fulfilled__(final_state)
+
         fulfilled_outputs = self.workflow.Outputs()
         for descriptor, value in fulfilled_outputs:
             if isinstance(value, BaseDescriptor):
@@ -1137,9 +1145,6 @@ class WorkflowRunner(Generic[StateType]):
                     descriptor.name,
                     descriptor.instance.resolve(final_state),
                 )
-
-        if self._trigger is not None:
-            self._trigger.__on_workflow_fulfilled__(final_state, fulfilled_outputs)
 
         self._workflow_event_outer_queue.put(self._fulfill_workflow_event(fulfilled_outputs, final_state))
 
