@@ -189,7 +189,7 @@ class MockNodeExecution(UniversalBaseModel):
                         workflow_definition=workflow,
                     ) from e
 
-        all_nodes = list(workflow._get_all_nodes_recursive())
+        all_nodes = list(workflow.get_all_nodes_recursive())
         nodes = {node.__id__: node for node in all_nodes}
         node_output_name_by_id = {
             node.__output_ids__[output.name]: output.name for node in all_nodes for output in node.Outputs
