@@ -38,7 +38,7 @@ from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_var
 from vellum_ee.workflows.display.editor.types import NodeDisplayComment, NodeDisplayData
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
-from vellum_ee.workflows.display.utils.exceptions import NodeValidationError
+from vellum_ee.workflows.display.utils.exceptions import NodeValidationError, UnsupportedSerializationException
 from vellum_ee.workflows.display.utils.expressions import serialize_value
 from vellum_ee.workflows.display.utils.registry import register_node_display_class
 
@@ -209,14 +209,18 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
         for port in node.Ports:
             id = str(self.get_node_port_display(port).id)
             if port._condition_type:
+                expression = None
+                if port._condition:
+                    try:
+                        expression = serialize_value(node_id, display_context, port._condition)
+                    except UnsupportedSerializationException as e:
+                        display_context.add_error(e)
                 ports.append(
                     {
                         "id": id,
                         "name": port.name,
                         "type": port._condition_type.value,
-                        "expression": (
-                            serialize_value(node_id, display_context, port._condition) if port._condition else None
-                        ),
+                        "expression": expression,
                     }
                 )
             else:

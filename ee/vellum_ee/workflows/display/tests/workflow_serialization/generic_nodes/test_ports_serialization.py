@@ -1,14 +1,22 @@
 from uuid import uuid4
+from typing import cast
 
 from deepdiff import DeepDiff
 
+from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.ports.port import Port
 from vellum.workflows.references.vellum_secret import VellumSecretReference
-from vellum_ee.workflows.display.base import WorkflowInputsDisplay
+from vellum.workflows.types.core import JsonArray, JsonObject
+from vellum_ee.workflows.display.base import WorkflowInputsDisplay, WorkflowMetaDisplay
+from vellum_ee.workflows.display.editor.types import NodeDisplayData
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
+from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
+from vellum_ee.workflows.display.types import WorkflowDisplayContext
+from vellum_ee.workflows.display.utils.exceptions import UnsupportedSerializationException
+from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 
 
 class Inputs(BaseInputs):
@@ -1194,3 +1202,54 @@ def test_serialize_node__parse_json(serialize_node):
         serialized_node,
         ignore_order=True,
     )
+
+
+def test_serialize_node__unsupported_descriptor_type():
+    """
+    Tests that serializing a generic node with an unsupported descriptor type
+    returns the node with an empty expression and adds the error to the display context.
+    """
+
+    # GIVEN a custom descriptor that is not a supported expression type
+    class UnsupportedDescriptor(BaseDescriptor[bool]):
+        def __init__(self) -> None:
+            super().__init__(name="unsupported", types=(bool,), instance=None)
+
+    # AND a generic node that uses this unsupported descriptor in a port condition
+    class UnsupportedDescriptorNode(BaseNode):
+        class Ports(BaseNode.Ports):
+            if_branch = Port.on_if(UnsupportedDescriptor())
+
+    # AND a display context with dry_run=True to capture errors
+    node_display_class = get_node_display_class(UnsupportedDescriptorNode)
+    node_display = node_display_class()
+
+    context = WorkflowDisplayContext(
+        workflow_display_class=BaseWorkflowDisplay,
+        workflow_display=WorkflowMetaDisplay(
+            entrypoint_node_id=uuid4(),
+            entrypoint_node_source_handle_id=uuid4(),
+            entrypoint_node_display=NodeDisplayData(),
+        ),
+        node_displays={UnsupportedDescriptorNode: node_display},
+        dry_run=True,
+    )
+
+    # WHEN we serialize the node
+    serialized_node = node_display.serialize(context)
+
+    # THEN the node should still be returned
+    assert serialized_node["type"] == "GENERIC"
+
+    # AND the port should have a None expression
+    ports = cast(JsonArray, serialized_node["ports"])
+    assert len(ports) == 1
+    port = cast(JsonObject, ports[0])
+    assert port["type"] == "IF"
+    assert port["expression"] is None
+
+    # AND the error should be added to the display context
+    errors = list(context.errors)
+    assert len(errors) == 1
+    assert isinstance(errors[0], UnsupportedSerializationException)
+    assert "Unsupported condition type" in str(errors[0])
