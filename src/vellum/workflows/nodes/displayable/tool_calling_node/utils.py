@@ -433,12 +433,7 @@ def create_router_node(
         Ports = type("Ports", (), {})
 
         # Collect all tool names
-        tool_names: List[str] = []
-        for function in functions:
-            if isinstance(function, MCPToolDefinition):
-                tool_names.append(get_mcp_tool_name(function))
-            else:
-                tool_names.append(get_function_name(function))
+        tool_names: List[str] = [get_function_name(function) for function in functions]
 
         # Build conditions for each tool name
         conditions = [
@@ -482,7 +477,7 @@ def create_router_node(
 
 
 def create_function_node(
-    function: ToolBase,
+    function: Union[ToolBase, MCPToolDefinition],
     tool_prompt_node: Type[ToolPromptNode],
 ) -> Type[BaseNode]:
     """
@@ -490,11 +485,15 @@ def create_function_node(
 
     For workflow functions: BaseNode
     For regular functions: BaseNode with direct function call
+    For MCP tools: MCPNode
 
     Args:
         function: The function to create a node for
         tool_prompt_node: The tool prompt node class
     """
+    if isinstance(function, MCPToolDefinition):
+        return create_mcp_tool_node(function, tool_prompt_node)
+
     arguments_expr, function_call_id_expr = _create_function_call_expressions(tool_prompt_node)
 
     if isinstance(function, DeploymentDefinition):
@@ -639,8 +638,10 @@ def create_else_node(
     return node
 
 
-def get_function_name(function: ToolBase) -> str:
-    if isinstance(function, DeploymentDefinition):
+def get_function_name(function: Union[ToolBase, MCPToolDefinition]) -> str:
+    if isinstance(function, MCPToolDefinition):
+        return get_mcp_tool_name(function)
+    elif isinstance(function, DeploymentDefinition):
         name = str(function.deployment_id or function.deployment_name)
         return name.replace("-", "")
     elif isinstance(function, ComposioToolDefinition):
