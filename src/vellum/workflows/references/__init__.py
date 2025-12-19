@@ -1,3 +1,5 @@
+from .array import ArrayReference
+from .dictionary import DictionaryReference
 from .environment_variable import EnvironmentVariableReference
 from .external_input import ExternalInputReference
 from .lazy import LazyReference
@@ -9,6 +11,8 @@ from .vellum_secret import VellumSecretReference
 from .workflow_input import WorkflowInputReference
 
 __all__ = [
+    "ArrayReference",
+    "DictionaryReference",
     "EnvironmentVariableReference",
     "ExternalInputReference",
     "LazyReference",

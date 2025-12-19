@@ -47,7 +47,9 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.nodes.utils import get_unadorned_node
+from vellum.workflows.references.array import ArrayReference
 from vellum.workflows.references.constant import ConstantValueReference
+from vellum.workflows.references.dictionary import DictionaryReference
 from vellum.workflows.references.environment_variable import EnvironmentVariableReference
 from vellum.workflows.references.execution_count import ExecutionCountReference
 from vellum.workflows.references.lazy import LazyReference
@@ -672,25 +674,34 @@ def _environment_variable_reference_validator(env_var_name: Any) -> EnvironmentV
     return EnvironmentVariableReference(name=env_var_name)
 
 
-def _array_reference_validator(items: Any, workflow: Type[BaseWorkflow]) -> ConstantValueReference:
+def _array_reference_validator(
+    items: Any, workflow: Type[BaseWorkflow]
+) -> Union[ArrayReference, ConstantValueReference]:
     if not isinstance(items, list):
         raise ValueError(f"Unexpected type for array items: {type(items)}")
 
     validated_items = []
+    has_descriptors = False
     for item in items:
         if isinstance(item, dict):
             validated_items.append(base_descriptor_validator(item, workflow))
+            has_descriptors = True
         else:
             validated_items.append(item)
 
+    if has_descriptors:
+        return ArrayReference(validated_items)
     return ConstantValueReference(validated_items)
 
 
-def _dictionary_reference_validator(entries: Any, workflow: Type[BaseWorkflow]) -> ConstantValueReference:
+def _dictionary_reference_validator(
+    entries: Any, workflow: Type[BaseWorkflow]
+) -> Union[DictionaryReference, ConstantValueReference]:
     if not isinstance(entries, list):
         raise ValueError(f"Unexpected type for dictionary entries: {type(entries)}")
 
     validated_dict: Dict[str, Any] = {}
+    has_descriptors = False
     for entry in entries:
         if not isinstance(entry, dict):
             raise ValueError(f"Unexpected type for dictionary entry: {type(entry)}")
@@ -702,9 +713,12 @@ def _dictionary_reference_validator(entries: Any, workflow: Type[BaseWorkflow]) 
         raw_value = entry.get("value")
         if isinstance(raw_value, dict):
             validated_dict[key] = base_descriptor_validator(raw_value, workflow)
+            has_descriptors = True
         else:
             validated_dict[key] = raw_value
 
+    if has_descriptors:
+        return DictionaryReference(validated_dict)
     return ConstantValueReference(validated_dict)
 
 
