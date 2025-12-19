@@ -625,7 +625,8 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         """
         for node in cls.get_all_nodes():
             yield node
-            for attr_value in node.__dict__.values():
+            for node_ref in node:
+                attr_value = node_ref.instance
                 if inspect.isclass(attr_value) and issubclass(attr_value, BaseWorkflow):
                     yield from attr_value.get_all_nodes_recursive()
 
