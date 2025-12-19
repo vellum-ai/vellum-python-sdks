@@ -805,26 +805,27 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         self, provider: str, integration_name: str, trigger_slug: str
     ) -> Optional[JsonObject]:
         """
-        Fetch the trigger definition from the API to get the expected event attribute types.
+        Fetch the trigger/tool definition from the API to get the expected attribute types.
 
-        Uses the client's integration_providers.list_integration_tools method and filters by slug.
+        Uses the client's integrations.retrieve_integration_tool_definition method.
 
-        Returns the trigger definition with event_attributes if found, None otherwise.
+        Returns the tool definition with input_parameters if found, None otherwise.
         """
         try:
-            tools_response = self._client.integration_providers.list_integration_tools(
-                integration_provider=provider,
+            tool_definition = self._client.integrations.retrieve_integration_tool_definition(
                 integration_name=integration_name,
+                integration_provider=provider,
+                tool_name=trigger_slug,
             )
-            for tool in tools_response.results:
-                tool_dict = self._model_dump(tool)
-                if isinstance(tool_dict, dict) and tool_dict.get("name") == trigger_slug:
-                    return cast(JsonObject, tool_dict)
-
-            logger.warning(f"Trigger {trigger_slug} not found in {provider}/{integration_name}")
-            return None
+            return cast(
+                JsonObject,
+                {
+                    "name": tool_definition.name,
+                    "input_parameters": tool_definition.input_parameters,
+                },
+            )
         except Exception as e:
-            logger.warning(f"Error fetching trigger definition for {trigger_slug}: {e}")
+            logger.warning(f"Error fetching tool definition for {trigger_slug}: {e}")
             return None
 
     def _validate_integration_trigger_attributes(
@@ -854,18 +855,17 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         if not trigger_def:
             return
 
-        event_attributes = trigger_def.get("event_attributes", [])
-        if not event_attributes or not isinstance(event_attributes, list):
+        input_parameters = trigger_def.get("input_parameters", {})
+        if not input_parameters or not isinstance(input_parameters, dict):
             return
 
         expected_types_by_key: Dict[str, str] = {}
-        for attr in event_attributes:
-            if not isinstance(attr, dict):
+        for key, param_info in input_parameters.items():
+            if not isinstance(param_info, dict):
                 continue
-            key = attr.get("key")
-            attr_type = attr.get("type")
-            if isinstance(key, str) and isinstance(attr_type, str):
-                expected_types_by_key[key] = attr_type
+            param_type = param_info.get("type")
+            if isinstance(param_type, str):
+                expected_types_by_key[key] = param_type.upper()
 
         for attr in trigger_attributes:
             if not isinstance(attr, dict):
