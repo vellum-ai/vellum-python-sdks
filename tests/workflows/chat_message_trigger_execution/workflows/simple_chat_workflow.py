@@ -2,6 +2,8 @@
 
 from typing import List
 
+from pydantic import Field
+
 from vellum.client.types import ChatMessage
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
@@ -12,12 +14,7 @@ from vellum.workflows.triggers.chat_message import ChatMessageTrigger
 
 
 class ChatState(BaseState):
-    chat_history: List[ChatMessage]
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        if "chat_history" not in kwargs:
-            self.chat_history = []
+    chat_history: List[ChatMessage] = Field(default_factory=list)
 
 
 class ResponseNode(BaseNode):
