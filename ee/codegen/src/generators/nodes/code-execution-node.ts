@@ -1,8 +1,6 @@
 import { mkdir, writeFile } from "fs/promises";
 import * as path from "path";
 
-import { python } from "@fern-api/python-ast";
-
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { CodeExecutionContext } from "src/context/node-context/code-execution-node";
 import { InitFile } from "src/generators";
@@ -16,6 +14,7 @@ import { MethodArgument } from "src/generators/extensions/method-argument";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
+import { UuidInstantiation } from "src/generators/extensions/uuid-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { CodeExecutionNode as CodeExecutionNodeType } from "src/types/vellum";
 import {
@@ -176,16 +175,14 @@ export class CodeExecutionNode extends BaseNode<
     statements.push(
       new Field({
         name: "target_handle_id",
-        initializer: python.TypeInstantiation.uuid(
-          this.nodeData.data.targetHandleId
-        ),
+        initializer: new UuidInstantiation(this.nodeData.data.targetHandleId),
       })
     );
 
     statements.push(
       new Field({
         name: "output_id",
-        initializer: python.TypeInstantiation.uuid(nodeData.outputId),
+        initializer: new UuidInstantiation(nodeData.outputId),
       })
     );
 
@@ -194,7 +191,7 @@ export class CodeExecutionNode extends BaseNode<
         new Field({
           name: "log_output_id",
           initializer: nodeData.logOutputId
-            ? python.TypeInstantiation.uuid(nodeData.logOutputId)
+            ? new UuidInstantiation(nodeData.logOutputId)
             : new NoneInstantiation(),
         })
       );
@@ -288,7 +285,7 @@ export class CodeExecutionNode extends BaseNode<
           arguments_: [
             new MethodArgument({
               name: "id",
-              value: python.TypeInstantiation.uuid(this.nodeData.data.outputId),
+              value: new UuidInstantiation(this.nodeData.data.outputId),
             }),
             new MethodArgument({
               name: "name",
@@ -316,9 +313,7 @@ export class CodeExecutionNode extends BaseNode<
           arguments_: [
             new MethodArgument({
               name: "id",
-              value: python.TypeInstantiation.uuid(
-                this.nodeData.data.logOutputId
-              ),
+              value: new UuidInstantiation(this.nodeData.data.logOutputId),
             }),
             new MethodArgument({
               name: "name",

@@ -1,5 +1,3 @@
-import { python } from "@fern-api/python-ast";
-
 import { BaseNode } from "./base";
 
 import { OUTPUTS_CLASS_NAME } from "src/constants";
@@ -12,6 +10,7 @@ import { Field } from "src/generators/extensions/field";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
+import { UuidInstantiation } from "src/generators/extensions/uuid-instantiation";
 import { WorkflowProjectGenerator } from "src/project";
 import { WorkflowDataNode, WorkflowRawData } from "src/types/vellum";
 import { createPythonClassName } from "src/utils/casing";
@@ -121,7 +120,7 @@ export abstract class BaseNestedWorkflowNode<
               arguments_: [
                 new MethodArgument({
                   name: "id",
-                  value: python.TypeInstantiation.uuid(
+                  value: new UuidInstantiation(
                     outputContext.getOutputVariableId()
                   ),
                 }),

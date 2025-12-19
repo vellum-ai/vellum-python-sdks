@@ -1,5 +1,3 @@
-import { python } from "@fern-api/python-ast";
-
 import { PORTS_CLASS_NAME } from "src/constants";
 import { ConditionalNodeContext } from "src/context/node-context/conditional-node";
 import { ConditionalNodePort } from "src/generators/conditional-node-port";
@@ -14,6 +12,7 @@ import { MethodArgument } from "src/generators/extensions/method-argument";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
+import { UuidInstantiation } from "src/generators/extensions/uuid-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import {
   ConditionalNodeData,
@@ -90,9 +89,7 @@ export class ConditionalNode extends BaseNode<
     statements.push(
       new Field({
         name: "target_handle_id",
-        initializer: python.TypeInstantiation.uuid(
-          this.nodeData.data.targetHandleId
-        ),
+        initializer: new UuidInstantiation(this.nodeData.data.targetHandleId),
       })
     );
 
@@ -102,7 +99,7 @@ export class ConditionalNode extends BaseNode<
         initializer: new DictInstantiation(
           this.nodeData.data.conditions.map((condition, idx) => ({
             key: new IntInstantiation(idx),
-            value: python.TypeInstantiation.uuid(condition.sourceHandleId),
+            value: new UuidInstantiation(condition.sourceHandleId),
           }))
         ),
       })
@@ -345,7 +342,7 @@ export class ConditionalNode extends BaseNode<
             arguments_: [
               new MethodArgument({
                 name: "id",
-                value: python.TypeInstantiation.uuid(edge.sourceHandleId),
+                value: new UuidInstantiation(edge.sourceHandleId),
               }),
             ],
           });

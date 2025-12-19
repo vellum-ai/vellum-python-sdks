@@ -15,6 +15,7 @@ import { ListInstantiation } from "src/generators/extensions/list-instantiation"
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
+import { UuidInstantiation } from "src/generators/extensions/uuid-instantiation";
 import { FunctionDefinition } from "src/generators/function-definition";
 import { Json } from "src/generators/json";
 import { BaseNode } from "src/generators/nodes/bases/base";
@@ -218,19 +219,15 @@ export class InlinePromptNode extends BaseNode<
     statements.push(
       new Field({
         name: "output_id",
-        initializer: python.TypeInstantiation.uuid(this.nodeData.data.outputId),
+        initializer: new UuidInstantiation(this.nodeData.data.outputId),
       }),
       new Field({
         name: "array_output_id",
-        initializer: python.TypeInstantiation.uuid(
-          this.nodeData.data.arrayOutputId
-        ),
+        initializer: new UuidInstantiation(this.nodeData.data.arrayOutputId),
       }),
       new Field({
         name: "target_handle_id",
-        initializer: python.TypeInstantiation.uuid(
-          this.nodeData.data.targetHandleId
-        ),
+        initializer: new UuidInstantiation(this.nodeData.data.targetHandleId),
       })
     );
 
@@ -259,7 +256,7 @@ export class InlinePromptNode extends BaseNode<
           arguments_: [
             new MethodArgument({
               name: "id",
-              value: python.TypeInstantiation.uuid(this.nodeData.data.outputId),
+              value: new UuidInstantiation(this.nodeData.data.outputId),
             }),
             new MethodArgument({
               name: "name",
@@ -284,9 +281,7 @@ export class InlinePromptNode extends BaseNode<
           arguments_: [
             new MethodArgument({
               name: "id",
-              value: python.TypeInstantiation.uuid(
-                this.nodeData.data.arrayOutputId
-              ),
+              value: new UuidInstantiation(this.nodeData.data.arrayOutputId),
             }),
             new MethodArgument({
               name: "name",
@@ -314,7 +309,7 @@ export class InlinePromptNode extends BaseNode<
           arguments_: [
             new MethodArgument({
               name: "id",
-              value: python.TypeInstantiation.uuid(jsonOutput.id),
+              value: new UuidInstantiation(jsonOutput.id),
             }),
             new MethodArgument({
               name: "name",

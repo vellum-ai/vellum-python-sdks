@@ -1,5 +1,3 @@
-import { python } from "@fern-api/python-ast";
-
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { SubworkflowDeploymentNodeContext } from "src/context/node-context/subworkflow-deployment-node";
 import {
@@ -14,6 +12,7 @@ import { Field } from "src/generators/extensions/field";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
+import { UuidInstantiation } from "src/generators/extensions/uuid-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { codegen } from "src/index";
 import { SubworkflowNode as SubworkflowNodeType } from "src/types/vellum";
@@ -138,9 +137,7 @@ export class SubworkflowDeploymentNode extends BaseNode<
     statements.push(
       new Field({
         name: "target_handle_id",
-        initializer: python.TypeInstantiation.uuid(
-          this.nodeData.data.targetHandleId
-        ),
+        initializer: new UuidInstantiation(this.nodeData.data.targetHandleId),
       })
     );
 
@@ -187,7 +184,7 @@ export class SubworkflowDeploymentNode extends BaseNode<
               arguments_: [
                 new MethodArgument({
                   name: "id",
-                  value: python.TypeInstantiation.uuid(output.id),
+                  value: new UuidInstantiation(output.id),
                 }),
                 new MethodArgument({
                   name: "name",

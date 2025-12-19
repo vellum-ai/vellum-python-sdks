@@ -26,6 +26,7 @@ import { MethodInvocation } from "src/generators/extensions/method-invocation";
 import { Reference } from "src/generators/extensions/reference";
 import { StarImport } from "src/generators/extensions/star-import";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
+import { UuidInstantiation } from "src/generators/extensions/uuid-instantiation";
 import { WrappedCall } from "src/generators/extensions/wrapped-call";
 import { InitFile } from "src/generators/init-file";
 import { Json } from "src/generators/json";
@@ -748,7 +749,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
         arguments_: [
           new MethodArgument({
             name: "id",
-            value: python.TypeInstantiation.uuid(output.id),
+            value: new UuidInstantiation(output.id),
           }),
           new MethodArgument({
             name: "name",
