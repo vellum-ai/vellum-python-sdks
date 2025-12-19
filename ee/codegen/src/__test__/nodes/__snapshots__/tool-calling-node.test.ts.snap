@@ -244,6 +244,34 @@ class ToolCallingNode(BaseToolCallingNode):
 "
 `;
 
+exports[`ToolCallingNode > inline workflow > should generate inline workflow with tool wrapper when definition has inputs and examples 1`] = `
+"from .get_weather.workflow import GetWeather
+
+from vellum.workflows.nodes.displayable.tool_calling_node import (
+    ToolCallingNode as BaseToolCallingNode,
+)
+from vellum.workflows.utils.functions import tool
+
+from ..inputs import Inputs
+
+
+class ToolCallingNode(BaseToolCallingNode):
+    functions = [
+        tool(
+            inputs={
+                "context": Inputs.location,
+            },
+            examples=[
+                {
+                    "city": "San Francisco",
+                    "date": "2025-01-01",
+                },
+            ],
+        )(GetWeather)
+    ]
+"
+`;
+
 exports[`ToolCallingNode > input variables > should generate input variables 1`] = `
 "from vellum import (
     ChatMessagePromptBlock,
