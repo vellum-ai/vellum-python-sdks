@@ -1,8 +1,10 @@
 """Tests for IntegrationTrigger attribute type validation during serialization."""
 
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
+from vellum.client.types.composio_tool_definition import ComposioToolDefinition
+from vellum.client.types.integration import Integration
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
@@ -41,44 +43,43 @@ class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
     graph = LinearIssueTrigger >> ProcessNode
 
 
-def _create_mock_response(status_code: int, json_data: dict) -> MagicMock:
-    """Helper to create a mock HTTP response."""
-    mock_response = MagicMock()
-    mock_response.status_code = status_code
-    mock_response.json.return_value = json_data
-    return mock_response
+def _create_mock_tool_definition(output_parameters: dict) -> ComposioToolDefinition:
+    """Helper to create a mock tool definition."""
+    return ComposioToolDefinition(
+        provider="COMPOSIO",
+        integration=Integration(id="test-id", provider="COMPOSIO", name="LINEAR"),
+        name="LINEAR_ISSUE_CREATED_TRIGGER",
+        label="Issue Created Trigger",
+        description="Triggered when a new issue is created.",
+        input_parameters={},
+        output_parameters=output_parameters,
+    )
 
 
 def test_integration_trigger_validation__matching_types():
     """
     Tests that serialization succeeds when trigger attribute types match the API definition.
     """
-    # GIVEN a trigger definition from the API with matching types
-    api_response = {
-        "count": 1,
-        "results": [
-            {
-                "provider": "COMPOSIO",
-                "name": "LINEAR_ISSUE_CREATED_TRIGGER",
-                "event_attributes": [
-                    {"key": "action", "type": "STRING"},
-                    {"key": "data", "type": "JSON"},
-                    {"key": "type", "type": "STRING"},
-                    {"key": "url", "type": "STRING"},
-                ],
-            }
-        ],
-    }
-    mock_response = _create_mock_response(200, api_response)
+    # GIVEN a tool definition from the API with matching types
+    mock_tool_def = _create_mock_tool_definition(
+        {
+            "action": {"type": "string"},
+            "data": {"type": "json"},
+            "type": {"type": "string"},
+            "url": {"type": "string"},
+        }
+    )
 
     # WHEN we serialize the workflow with mocked API
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+
     with patch.object(
-        get_workflow_display(workflow_class=TestWorkflow)._client.integration_providers._client_wrapper.httpx_client,
-        "request",
-        return_value=mock_response,
+        workflow_display._client.integration_providers,
+        "retrieve_integration_provider_tool_definition",
+        return_value=mock_tool_def,
     ):
         # THEN serialization should succeed without raising an error
-        result = get_workflow_display(workflow_class=TestWorkflow).serialize()
+        result = workflow_display.serialize()
 
     # AND the trigger should be serialized correctly
     assert "triggers" in result
@@ -91,32 +92,24 @@ def test_integration_trigger_validation__type_mismatch():
     """
     Tests that serialization raises TriggerValidationError when attribute types don't match.
     """
-    # GIVEN a trigger definition from the API with mismatched types
+    # GIVEN a tool definition from the API with mismatched types
     # The API says 'action' should be JSON, but our trigger defines it as STRING
-    api_response = {
-        "count": 1,
-        "results": [
-            {
-                "provider": "COMPOSIO",
-                "name": "LINEAR_ISSUE_CREATED_TRIGGER",
-                "event_attributes": [
-                    {"key": "action", "type": "JSON"},  # Mismatch: trigger has STRING
-                    {"key": "data", "type": "JSON"},
-                    {"key": "type", "type": "STRING"},
-                    {"key": "url", "type": "STRING"},
-                ],
-            }
-        ],
-    }
-    mock_response = _create_mock_response(200, api_response)
+    mock_tool_def = _create_mock_tool_definition(
+        {
+            "action": {"type": "json"},
+            "data": {"type": "json"},
+            "type": {"type": "string"},
+            "url": {"type": "string"},
+        }
+    )
 
     # WHEN we serialize the workflow with mocked API
     workflow_display = get_workflow_display(workflow_class=TestWorkflow)
 
     with patch.object(
-        workflow_display._client.integration_providers._client_wrapper.httpx_client,
-        "request",
-        return_value=mock_response,
+        workflow_display._client.integration_providers,
+        "retrieve_integration_provider_tool_definition",
+        return_value=mock_tool_def,
     ):
         # THEN serialization should raise TriggerValidationError
         with pytest.raises(TriggerValidationError) as exc_info:
@@ -133,17 +126,16 @@ def test_integration_trigger_validation__api_error():
     """
     Tests that serialization continues gracefully when the API returns an error.
     """
-    # GIVEN an API that returns an error
-    mock_response = _create_mock_response(500, {})
+    # GIVEN an API that raises an exception
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
 
-    # WHEN we serialize the workflow with mocked API
     with patch.object(
-        get_workflow_display(workflow_class=TestWorkflow)._client.integration_providers._client_wrapper.httpx_client,
-        "request",
-        return_value=mock_response,
+        workflow_display._client.integration_providers,
+        "retrieve_integration_provider_tool_definition",
+        side_effect=Exception("API Error"),
     ):
         # THEN serialization should succeed (validation is skipped on API error)
-        result = get_workflow_display(workflow_class=TestWorkflow).serialize()
+        result = workflow_display.serialize()
 
     # AND the trigger should still be serialized
     assert "triggers" in result
@@ -152,66 +144,23 @@ def test_integration_trigger_validation__api_error():
     assert len(triggers) == 1
 
 
-def test_integration_trigger_validation__trigger_not_found():
+def test_integration_trigger_validation__no_output_parameters():
     """
-    Tests that serialization continues gracefully when the trigger is not found in the API response.
+    Tests that serialization continues gracefully when the API response has no output_parameters.
     """
-    # GIVEN an API response that doesn't contain the trigger
-    api_response = {
-        "count": 1,
-        "results": [
-            {
-                "provider": "COMPOSIO",
-                "name": "DIFFERENT_TRIGGER",  # Different trigger name
-                "event_attributes": [
-                    {"key": "action", "type": "STRING"},
-                ],
-            }
-        ],
-    }
-    mock_response = _create_mock_response(200, api_response)
+    # GIVEN a tool definition with empty output_parameters
+    mock_tool_def = _create_mock_tool_definition({})
 
     # WHEN we serialize the workflow with mocked API
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+
     with patch.object(
-        get_workflow_display(workflow_class=TestWorkflow)._client.integration_providers._client_wrapper.httpx_client,
-        "request",
-        return_value=mock_response,
+        workflow_display._client.integration_providers,
+        "retrieve_integration_provider_tool_definition",
+        return_value=mock_tool_def,
     ):
-        # THEN serialization should succeed (validation is skipped when trigger not found)
-        result = get_workflow_display(workflow_class=TestWorkflow).serialize()
-
-    # AND the trigger should still be serialized
-    assert "triggers" in result
-    triggers = result["triggers"]
-    assert isinstance(triggers, list)
-    assert len(triggers) == 1
-
-
-def test_integration_trigger_validation__no_event_attributes():
-    """
-    Tests that serialization continues gracefully when the API response has no event_attributes.
-    """
-    # GIVEN an API response with no event_attributes
-    api_response = {
-        "count": 1,
-        "results": [
-            {
-                "provider": "COMPOSIO",
-                "name": "LINEAR_ISSUE_CREATED_TRIGGER",
-                "event_attributes": [],  # Empty event_attributes
-            }
-        ],
-    }
-    mock_response = _create_mock_response(200, api_response)
-
-    # WHEN we serialize the workflow with mocked API
-    with patch.object(
-        get_workflow_display(workflow_class=TestWorkflow)._client.integration_providers._client_wrapper.httpx_client,
-        "request",
-        return_value=mock_response,
-    ):
-        # THEN serialization should succeed (validation is skipped when no event_attributes)
-        result = get_workflow_display(workflow_class=TestWorkflow).serialize()
+        # THEN serialization should succeed (validation is skipped when no output_parameters)
+        result = workflow_display.serialize()
 
     # AND the trigger should still be serialized
     assert "triggers" in result

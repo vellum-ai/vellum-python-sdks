@@ -805,38 +805,27 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         self, provider: str, integration_name: str, trigger_slug: str
     ) -> Optional[JsonObject]:
         """
-        Fetch the trigger definition from the API to get the expected event attribute types.
+        Fetch the trigger/tool definition from the API to get the expected attribute types.
 
-        Uses the client's integration_providers resource to make the API call.
+        Uses the client's integration_providers.retrieve_integration_provider_tool_definition method.
 
-        Returns the trigger definition if found, None otherwise.
+        Returns the tool definition with output_parameters if found, None otherwise.
         """
         try:
-            # Use the client's raw response pattern to access the triggers endpoint
-            # The triggers endpoint is not exposed in the auto-generated client,
-            # so we use the underlying httpx client through the integration_providers resource
-            response = self._client.integration_providers._client_wrapper.httpx_client.request(
-                f"v1/integration-providers/{provider}/triggers",
-                base_url=self._client.integration_providers._client_wrapper.get_environment().default,
-                method="GET",
-                params={"integration_name": integration_name},
+            tool_definition = self._client.integration_providers.retrieve_integration_provider_tool_definition(
+                integration_provider=provider,
+                integration_name=integration_name,
+                tool_name=trigger_slug,
             )
-            if response.status_code != 200:
-                logger.warning(
-                    f"Failed to fetch trigger definitions for {provider}/{integration_name}: {response.status_code}"
-                )
-                return None
-
-            data = response.json()
-            results = data.get("results", [])
-            for trigger_def in results:
-                if trigger_def.get("name") == trigger_slug:
-                    return cast(JsonObject, trigger_def)
-
-            logger.warning(f"Trigger {trigger_slug} not found in {provider}/{integration_name}")
-            return None
+            return cast(
+                JsonObject,
+                {
+                    "name": tool_definition.name,
+                    "output_parameters": tool_definition.output_parameters,
+                },
+            )
         except Exception as e:
-            logger.warning(f"Error fetching trigger definition: {e}")
+            logger.warning(f"Error fetching tool definition for {trigger_slug}: {e}")
             return None
 
     def _validate_integration_trigger_attributes(
@@ -866,29 +855,28 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         if not trigger_def:
             return
 
-        expected_event_attributes = trigger_def.get("event_attributes", [])
-        if not expected_event_attributes or not isinstance(expected_event_attributes, list):
+        output_parameters = trigger_def.get("output_parameters", {})
+        if not output_parameters or not isinstance(output_parameters, dict):
             return
 
         expected_types_by_key: Dict[str, str] = {}
-        for attr in expected_event_attributes:
-            if not isinstance(attr, dict):
+        for key, param_info in output_parameters.items():
+            if not isinstance(param_info, dict):
                 continue
-            key = attr.get("key")
-            attr_type = attr.get("type")
-            if isinstance(key, str) and isinstance(attr_type, str):
-                expected_types_by_key[key] = attr_type
+            param_type = param_info.get("type")
+            if isinstance(param_type, str):
+                expected_types_by_key[key] = param_type.upper()
 
         for attr in trigger_attributes:
             if not isinstance(attr, dict):
                 continue
-            key = attr.get("key")
+            attr_key = attr.get("key")
             actual_type = attr.get("type")
-            if isinstance(key, str) and isinstance(actual_type, str) and key in expected_types_by_key:
-                expected_type = expected_types_by_key[key]
+            if isinstance(attr_key, str) and isinstance(actual_type, str) and attr_key in expected_types_by_key:
+                expected_type = expected_types_by_key[attr_key]
                 if actual_type != expected_type:
                     raise TriggerValidationError(
-                        message=f"Attribute '{key}' has type '{actual_type}' but expected type '{expected_type}'. "
+                        message=f"Attribute '{attr_key}' has type '{actual_type}' but expected type '{expected_type}'. "
                         "The trigger configuration is invalid or contains unsupported values.",
                         trigger_class_name=trigger_class.__name__,
                     )
