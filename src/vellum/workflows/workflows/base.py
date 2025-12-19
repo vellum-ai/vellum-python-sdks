@@ -619,6 +619,17 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         cls._validate_no_self_edges()
 
     @classmethod
+    def _get_all_nodes_recursive(cls) -> Iterator[Type[BaseNode]]:
+        """
+        Returns an iterator over all nodes in the Workflow, including nodes nested in subworkflows.
+        """
+        for node in cls.get_all_nodes():
+            yield node
+            subworkflow = node.__dict__.get("subworkflow")
+            if subworkflow is not None and hasattr(subworkflow, "_get_all_nodes_recursive"):
+                yield from subworkflow._get_all_nodes_recursive()
+
+    @classmethod
     def resolve_node_ref(cls, node_ref: Union[Type[BaseNode], UUID, str]) -> Type[BaseNode]:
         """
         Resolve a node reference (class, UUID, or string) to a node class.
@@ -637,7 +648,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             return node_ref
 
         candidate_nodes: List[Type[BaseNode]] = []
-        for node in cls.get_all_nodes():
+        for node in cls._get_all_nodes_recursive():
             candidate_nodes.append(node)
             wrapped_node = get_unadorned_node(node)
             if wrapped_node != node:

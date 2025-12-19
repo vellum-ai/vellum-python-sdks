@@ -712,10 +712,10 @@ def test_mocks__validate_all__node_nested_in_subworkflow():
         }
     ]
 
-    # WHEN we call validate_all on the inner subworkflow (where the nested node lives)
+    # WHEN we call validate_all on the outer workflow
     node_output_mocks = MockNodeExecution.validate_all(
         raw_mock_workflow_node_executions,
-        InnerSubworkflow,
+        OuterWorkflow,
         descriptor_validator=base_descriptor_validator,
     )
 
