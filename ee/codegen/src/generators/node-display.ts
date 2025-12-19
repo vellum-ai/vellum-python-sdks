@@ -1,9 +1,9 @@
-import { python } from "@fern-api/python-ast";
 import { isNil } from "lodash";
 
 import { BaseNodeContext } from "src/context/node-context/base";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
+import { Field } from "src/generators/extensions/field";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
@@ -64,7 +64,7 @@ export class NodeDisplay extends AstNode {
       nodeDisplayData.icon !== baseDisplayDefaults?.icon
     ) {
       fields.push(
-        python.field({
+        new Field({
           name: "icon",
           initializer: new StrInstantiation(nodeDisplayData.icon),
         })
@@ -76,7 +76,7 @@ export class NodeDisplay extends AstNode {
       nodeDisplayData.color !== baseDisplayDefaults?.color
     ) {
       fields.push(
-        python.field({
+        new Field({
           name: "color",
           initializer: new StrInstantiation(nodeDisplayData.color),
         })

@@ -1,5 +1,3 @@
-import { python } from "@fern-api/python-ast";
-
 import { Field } from "./extensions";
 import { Class } from "./extensions/class";
 
@@ -67,7 +65,7 @@ export class NodeOutputs extends AstNode {
         : getVellumVariablePrimitiveType(output.type);
       const sanitizedName = toValidPythonIdentifier(output.name, "output");
       const field = output.value
-        ? python.field({
+        ? new Field({
             name: sanitizedName,
             initializer: new WorkflowValueDescriptor({
               workflowValueDescriptor: output.value,

@@ -1,8 +1,6 @@
-import { python } from "@fern-api/python-ast";
-import { Field } from "@fern-api/python-ast/Field";
-
 import { NoteNodeContext } from "src/context/node-context/note-node";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Field } from "src/generators/extensions/field";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Json } from "src/generators/json";
@@ -14,7 +12,7 @@ export class NoteNode extends BaseNode<NoteNodeType, NoteNodeContext> {
     const statements: AstNode[] = [];
 
     statements.push(
-      python.field({
+      new Field({
         name: "text",
         initializer: new StrInstantiation(this.nodeData.data.text ?? ""),
       })
@@ -25,7 +23,7 @@ export class NoteNode extends BaseNode<NoteNodeType, NoteNodeContext> {
       : new NoneInstantiation();
 
     statements.push(
-      python.field({
+      new Field({
         name: "style",
         initializer: styleValue,
       })

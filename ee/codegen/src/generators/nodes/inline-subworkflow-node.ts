@@ -4,6 +4,7 @@ import { InlineSubworkflowNodeContext } from "src/context/node-context/inline-su
 import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
+import { Field } from "src/generators/extensions/field";
 import { Reference } from "src/generators/extensions/reference";
 import { BaseNestedWorkflowNode } from "src/generators/nodes/bases/nested-workflow-base";
 import { WorkflowProjectGenerator } from "src/project";
@@ -83,7 +84,7 @@ export class InlineSubworkflowNode extends BaseNestedWorkflowNode<
       modulePath: nestedWorkflowContext.modulePath,
     });
 
-    const subworkflowField = python.field({
+    const subworkflowField = new Field({
       name: "subworkflow",
       initializer: nestedWorkflowReference,
     });
@@ -95,7 +96,7 @@ export class InlineSubworkflowNode extends BaseNestedWorkflowNode<
     const statements: AstNode[] = [];
 
     statements.push(
-      python.field({
+      new Field({
         name: "target_handle_id",
         initializer: python.TypeInstantiation.uuid(
           this.nodeData.data.targetHandleId
@@ -104,7 +105,7 @@ export class InlineSubworkflowNode extends BaseNestedWorkflowNode<
     );
 
     statements.push(
-      python.field({
+      new Field({
         name: "workflow_input_ids_by_name",
         initializer: new DictInstantiation([]),
       })

@@ -6,6 +6,7 @@ import { NodeInput } from "src/generators";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
+import { Field } from "src/generators/extensions/field";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
@@ -31,7 +32,7 @@ export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
 
     const urlInput = this.nodeInputsByKey.get("url");
     statements.push(
-      python.field({
+      new Field({
         name: "url",
         initializer: urlInput || new StrInstantiation(""),
       })
@@ -40,7 +41,7 @@ export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
     const methodValue = this.convertMethodValueToEnum();
     if (methodValue.toString() !== "APIRequestMethod.GET") {
       statements.push(
-        python.field({
+        new Field({
           name: "method",
           initializer: methodValue,
         })
@@ -49,7 +50,7 @@ export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
     const body = this.nodeInputsByKey.get("body");
     if (body && body.toString() !== "{}" && body.toString() !== "None") {
       statements.push(
-        python.field({
+        new Field({
           name: "json",
           initializer: body,
         })
@@ -59,7 +60,7 @@ export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
     const additionalHeaders = this.nodeData.data.additionalHeaders;
     if (additionalHeaders && additionalHeaders.length > 0) {
       statements.push(
-        python.field({
+        new Field({
           name: "headers",
           initializer: new DictInstantiation(
             additionalHeaders.map((header) => {
@@ -114,7 +115,7 @@ export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
         );
       }
       statements.push(
-        python.field({
+        new Field({
           name: "api_key_header_key",
           initializer: key,
         })
@@ -124,7 +125,7 @@ export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
     const authTypeEnum = this.convertAuthTypeValueToEnum();
     if (authTypeEnum) {
       statements.push(
-        python.field({
+        new Field({
           name: "authorization_type",
           initializer: authTypeEnum,
         })
@@ -151,7 +152,7 @@ export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
             );
           } else {
             statements.push(
-              python.field({
+              new Field({
                 name: "api_key_header_value",
                 initializer: value,
               })
@@ -182,7 +183,7 @@ export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
             );
           } else {
             statements.push(
-              python.field({
+              new Field({
                 name: "bearer_token_value",
                 initializer: value,
               })
@@ -201,7 +202,7 @@ export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
       !this.isAttributeDefault(timeoutAttribute.value, { defaultValue: null })
     ) {
       statements.push(
-        python.field({
+        new Field({
           name: "timeout",
           initializer: new WorkflowValueDescriptor({
             nodeContext: this.nodeContext,
@@ -219,7 +220,7 @@ export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
     const statements: AstNode[] = [];
 
     statements.push(
-      python.field({
+      new Field({
         name: "target_handle_id",
         initializer: python.TypeInstantiation.uuid(
           this.nodeData.data.targetHandleId
@@ -229,7 +230,7 @@ export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
 
     if (!isNil(this.nodeData.data.additionalHeaders)) {
       statements.push(
-        python.field({
+        new Field({
           name: "additional_header_key_input_ids",
           initializer: new DictInstantiation(
             this.nodeData.data.additionalHeaders.map((header) => {
@@ -259,7 +260,7 @@ export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
 
     if (!isNil(this.nodeData.data.additionalHeaders)) {
       statements.push(
-        python.field({
+        new Field({
           name: "additional_header_value_input_ids",
           initializer: new DictInstantiation(
             this.nodeData.data.additionalHeaders.map((header) => {

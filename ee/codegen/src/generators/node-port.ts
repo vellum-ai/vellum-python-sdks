@@ -1,10 +1,9 @@
-import { python } from "@fern-api/python-ast";
-
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
+import { Field } from "src/generators/extensions/field";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { MethodInvocation } from "src/generators/extensions/method-invocation";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
@@ -56,7 +55,7 @@ export class NodePorts extends AstNode {
       const portExpression = this.generateNodePortExpression(port);
       if (portExpression) {
         fields.push(
-          python.field({
+          new Field({
             name: this.getSanitizedPortName(port),
             initializer: portExpression,
           })

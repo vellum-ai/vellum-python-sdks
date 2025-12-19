@@ -8,6 +8,7 @@ import { BaseNodeContext } from "src/context/node-context/base";
 import { NodeAttributeGenerationError } from "src/generators/errors";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
+import { Field } from "src/generators/extensions/field";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -92,7 +93,7 @@ export abstract class BaseNestedWorkflowNode<
     ]);
   }
 
-  protected getOutputDisplay(): python.Field {
+  protected getOutputDisplay(): Field {
     const nestedWorkflowContext = this.getNestedWorkflowContextByName(
       BaseNestedWorkflowNode.subworkflowNestedProjectName
     );
@@ -100,7 +101,7 @@ export abstract class BaseNestedWorkflowNode<
       nestedWorkflowContext.outputVariableContextsById.values()
     );
 
-    return python.field({
+    return new Field({
       name: "output_display",
       initializer: new DictInstantiation(
         outputVariableContexts.map((outputContext) => {

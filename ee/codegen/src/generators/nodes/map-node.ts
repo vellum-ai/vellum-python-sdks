@@ -4,6 +4,7 @@ import { isNil } from "lodash";
 import { MapNodeContext } from "src/context/node-context/map-node";
 import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
+import { Field } from "src/generators/extensions/field";
 import { IntInstantiation } from "src/generators/extensions/int-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { BaseNestedWorkflowNode } from "src/generators/nodes/bases/nested-workflow-base";
@@ -52,7 +53,7 @@ export class MapNode extends BaseNestedWorkflowNode<
 
     const items = this.getNodeInputByName("items");
     if (items) {
-      const itemsField = python.field({
+      const itemsField = new Field({
         name: "items",
         initializer: items,
       });
@@ -68,14 +69,14 @@ export class MapNode extends BaseNestedWorkflowNode<
       modulePath: nestedWorkflowContext.modulePath,
     });
 
-    const subworkflowField = python.field({
+    const subworkflowField = new Field({
       name: "subworkflow",
       initializer: nestedWorkflowReference,
     });
     statements.push(subworkflowField);
 
     if (!isNil(this.nodeData.data.concurrency)) {
-      const concurrencyField = python.field({
+      const concurrencyField = new Field({
         name: "max_concurrency",
         initializer: new IntInstantiation(this.nodeData.data.concurrency),
       });
@@ -89,7 +90,7 @@ export class MapNode extends BaseNestedWorkflowNode<
     const statements: AstNode[] = [];
 
     statements.push(
-      python.field({
+      new Field({
         name: "target_handle_id",
         initializer: python.TypeInstantiation.uuid(
           this.nodeData.data.targetHandleId

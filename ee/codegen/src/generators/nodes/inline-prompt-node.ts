@@ -9,6 +9,7 @@ import { AstNode } from "src/generators/extensions/ast-node";
 import { BoolInstantiation } from "src/generators/extensions/bool-instantiation";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
+import { Field } from "src/generators/extensions/field";
 import { FloatInstantiation } from "src/generators/extensions/float-instantiation";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
@@ -79,7 +80,7 @@ export class InlinePromptNode extends BaseNode<
     // of using ml model name
     if (mlModelAttr) {
       statements.push(
-        python.field({
+        new Field({
           name: "ml_model",
           initializer: new WorkflowValueDescriptor({
             nodeContext: this.nodeContext,
@@ -90,7 +91,7 @@ export class InlinePromptNode extends BaseNode<
       );
     } else {
       statements.push(
-        python.field({
+        new Field({
           name: "ml_model",
           initializer: new StrInstantiation(nodeData.mlModelName),
         })
@@ -98,7 +99,7 @@ export class InlinePromptNode extends BaseNode<
     }
 
     statements.push(
-      python.field({
+      new Field({
         name: "blocks",
         initializer: new ListInstantiation(
           blocksExcludingFunctionDefinition.map((block) => {
@@ -125,7 +126,7 @@ export class InlinePromptNode extends BaseNode<
 
     if (promptInputsAttribute) {
       statements.push(
-        python.field({
+        new Field({
           name: INPUTS_PREFIX,
           initializer: new WorkflowValueDescriptor({
             nodeContext: this.nodeContext,
@@ -136,7 +137,7 @@ export class InlinePromptNode extends BaseNode<
       );
     } else if (this.nodeInputsByKey.size > 0) {
       statements.push(
-        python.field({
+        new Field({
           name: INPUTS_PREFIX,
           initializer: new DictInstantiation(
             Array.from(this.nodeInputsByKey.entries()).map(([key, value]) => ({
@@ -163,7 +164,7 @@ export class InlinePromptNode extends BaseNode<
     );
 
     statements.push(
-      python.field({
+      new Field({
         name: "parameters",
         initializer: new PromptParameters({
           promptParametersRequest: this.nodeData.data.execConfig.parameters,
@@ -194,7 +195,7 @@ export class InlinePromptNode extends BaseNode<
       }
       if (!isNilOrEmpty(args)) {
         statements.push(
-          python.field({
+          new Field({
             name: "settings",
             initializer: new ClassInstantiation({
               classReference: new Reference({
@@ -215,17 +216,17 @@ export class InlinePromptNode extends BaseNode<
     const statements: AstNode[] = [];
 
     statements.push(
-      python.field({
+      new Field({
         name: "output_id",
         initializer: python.TypeInstantiation.uuid(this.nodeData.data.outputId),
       }),
-      python.field({
+      new Field({
         name: "array_output_id",
         initializer: python.TypeInstantiation.uuid(
           this.nodeData.data.arrayOutputId
         ),
       }),
-      python.field({
+      new Field({
         name: "target_handle_id",
         initializer: python.TypeInstantiation.uuid(
           this.nodeData.data.targetHandleId
@@ -236,7 +237,7 @@ export class InlinePromptNode extends BaseNode<
     return statements;
   }
 
-  protected getOutputDisplay(): python.Field {
+  protected getOutputDisplay(): Field {
     const jsonOutput = this.nodeData.outputs?.find(
       (output) => output.type === "JSON"
     );
@@ -324,7 +325,7 @@ export class InlinePromptNode extends BaseNode<
       });
     }
 
-    return python.field({
+    return new Field({
       name: "output_display",
       initializer: new DictInstantiation(outputDisplayEntries),
     });
@@ -376,7 +377,7 @@ export class InlinePromptNode extends BaseNode<
         this.workflowContext.addPythonCodeMergeableNodeFile(relativePath);
 
         statements.push(
-          python.field({
+          new Field({
             name: "functions",
             initializer: new ListInstantiation(
               codeExecutionFunctions.map((f) => {
@@ -398,7 +399,7 @@ export class InlinePromptNode extends BaseNode<
 
       if (nonCodeExecutionFunctions.length > 0) {
         statements.push(
-          python.field({
+          new Field({
             name: "functions",
             initializer: new ListInstantiation(
               nonCodeExecutionFunctions.map((f) => {
@@ -474,7 +475,7 @@ export class InlinePromptNode extends BaseNode<
       !this.isAttributeDefault(functionsAttribute.value, { defaultValue: null })
     ) {
       statements.push(
-        python.field({
+        new Field({
           name: "functions",
           initializer: new WorkflowValueDescriptor({
             nodeContext: this.nodeContext,
@@ -485,7 +486,7 @@ export class InlinePromptNode extends BaseNode<
       );
     } else if (functionDefinitions.length > 0) {
       statements.push(
-        python.field({
+        new Field({
           name: "functions",
           initializer: new ListInstantiation(
             functionDefinitions.map(

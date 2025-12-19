@@ -1,5 +1,4 @@
 import { python } from "@fern-api/python-ast";
-import { Field } from "@fern-api/python-ast/Field";
 
 import { PORTS_CLASS_NAME } from "src/constants";
 import { ConditionalNodeContext } from "src/context/node-context/conditional-node";
@@ -8,6 +7,7 @@ import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
+import { Field } from "src/generators/extensions/field";
 import { IntInstantiation } from "src/generators/extensions/int-instantiation";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
@@ -65,7 +65,7 @@ export class ConditionalNode extends BaseNode<
           }
 
           portsClass.addField(
-            python.field({
+            new Field({
               name: context.portName,
               initializer: new ConditionalNodePort({
                 portContext: context,
@@ -88,7 +88,7 @@ export class ConditionalNode extends BaseNode<
     const statements: AstNode[] = [];
 
     statements.push(
-      python.field({
+      new Field({
         name: "target_handle_id",
         initializer: python.TypeInstantiation.uuid(
           this.nodeData.data.targetHandleId
@@ -97,7 +97,7 @@ export class ConditionalNode extends BaseNode<
     );
 
     statements.push(
-      python.field({
+      new Field({
         name: "source_handle_ids",
         initializer: new DictInstantiation(
           this.nodeData.data.conditions.map((condition, idx) => ({
@@ -120,7 +120,7 @@ export class ConditionalNode extends BaseNode<
     this.getNodeDisplayBaseClass().inheritReferences(ruleIdMapRef);
 
     statements.push(
-      python.field({
+      new Field({
         name: "rule_ids",
         initializer: new ListInstantiation(
           this.createRuleIdMapList(this.nodeData.data, ruleIdMapRef)
@@ -140,7 +140,7 @@ export class ConditionalNode extends BaseNode<
     this.getNodeDisplayBaseClass().inheritReferences(conditionIdRef);
 
     statements.push(
-      python.field({
+      new Field({
         name: "condition_ids",
         initializer: new ListInstantiation(
           this.createConditionIdList(this.nodeData.data, conditionIdRef)
@@ -311,7 +311,7 @@ export class ConditionalNode extends BaseNode<
     return undefined;
   }
 
-  protected getPortDisplay(): python.Field | undefined {
+  protected getPortDisplay(): Field | undefined {
     if (this.nodeData.ports) {
       return super.getPortDisplay();
     } else {
@@ -353,7 +353,7 @@ export class ConditionalNode extends BaseNode<
           portDisplayOverridesDict.set(context.portName, portDisplayOverrides);
         }
       );
-      return python.field({
+      return new Field({
         name: "port_displays",
         initializer: new DictInstantiation(
           Array.from(portDisplayOverridesDict.entries()).map(

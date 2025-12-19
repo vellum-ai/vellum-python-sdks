@@ -22,6 +22,7 @@ import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
+import { Field } from "src/generators/extensions/field";
 import { FloatInstantiation } from "src/generators/extensions/float-instantiation";
 import { IntInstantiation } from "src/generators/extensions/int-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
@@ -195,7 +196,7 @@ export class Workflow {
     const entrypointNode = this.workflowContext.tryGetEntrypointNode();
 
     workflowDisplayClass.add(
-      python.field({
+      new Field({
         name: "workflow_display",
         initializer: new ClassInstantiation({
           classReference: new Reference({
@@ -275,7 +276,7 @@ export class Workflow {
 
     if (this.workflowContext.inputVariableContextsById.size > 0) {
       workflowDisplayClass.add(
-        python.field({
+        new Field({
           name: "inputs_display",
           initializer: new DictInstantiation(
             Array.from(this.workflowContext.inputVariableContextsById)
@@ -335,7 +336,7 @@ export class Workflow {
 
     if (this.workflowContext.stateVariableContextsById.size > 0) {
       workflowDisplayClass.add(
-        python.field({
+        new Field({
           name: "state_value_displays",
           initializer: new DictInstantiation(
             Array.from(this.workflowContext.stateVariableContextsById)
@@ -395,7 +396,7 @@ export class Workflow {
     }
 
     workflowDisplayClass.add(
-      python.field({
+      new Field({
         name: "entrypoint_displays",
         initializer: new DictInstantiation(
           this.workflowContext
@@ -545,7 +546,7 @@ export class Workflow {
       );
     if (edgeDisplayEntries.length) {
       workflowDisplayClass.add(
-        python.field({
+        new Field({
           name: "edge_displays",
           initializer: new DictInstantiation(edgeDisplayEntries),
         })
@@ -553,7 +554,7 @@ export class Workflow {
     }
 
     workflowDisplayClass.add(
-      python.field({
+      new Field({
         name: "output_displays",
         initializer: new DictInstantiation(
           this.workflowContext.workflowOutputContexts
@@ -672,7 +673,7 @@ export class Workflow {
       // Only add graph attribute if it's not empty
       const graphMutableAst = graph.generateGraphMutableAst();
       if (graphMutableAst.type !== "empty") {
-        const graphField = python.field({
+        const graphField = new Field({
           name: "graph",
           initializer: graph,
         });
@@ -741,7 +742,7 @@ export class Workflow {
         }
       }
 
-      const unusedGraphsField = python.field({
+      const unusedGraphsField = new Field({
         name: "unused_graphs",
         initializer: new SetInstantiation(flattenedUnusedGraphs),
       });

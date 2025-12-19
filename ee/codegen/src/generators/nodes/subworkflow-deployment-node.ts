@@ -10,6 +10,7 @@ import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
+import { Field } from "src/generators/extensions/field";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -46,7 +47,7 @@ export class SubworkflowDeploymentNode extends BaseNode<
       );
     } else {
       statements.push(
-        python.field({
+        new Field({
           name: "deployment",
           initializer: new StrInstantiation(
             this.nodeContext.workflowDeploymentRelease.deployment.name
@@ -56,14 +57,14 @@ export class SubworkflowDeploymentNode extends BaseNode<
     }
 
     statements.push(
-      python.field({
+      new Field({
         name: "release_tag",
         initializer: new StrInstantiation(this.nodeData.data.releaseTag),
       })
     );
 
     statements.push(
-      python.field({
+      new Field({
         name: INPUTS_PREFIX,
         initializer: new DictInstantiation(
           Array.from(this.nodeInputsByKey.entries()).map(([key, value]) => ({
@@ -135,7 +136,7 @@ export class SubworkflowDeploymentNode extends BaseNode<
     const statements: AstNode[] = [];
 
     statements.push(
-      python.field({
+      new Field({
         name: "target_handle_id",
         initializer: python.TypeInstantiation.uuid(
           this.nodeData.data.targetHandleId
@@ -146,7 +147,7 @@ export class SubworkflowDeploymentNode extends BaseNode<
     return statements;
   }
 
-  protected getOutputDisplay(): python.Field | undefined {
+  protected getOutputDisplay(): Field | undefined {
     if (!this.nodeContext.workflowDeploymentRelease) {
       this.workflowContext.addError(
         new NodeDefinitionGenerationError(
@@ -160,7 +161,7 @@ export class SubworkflowDeploymentNode extends BaseNode<
       this.nodeContext.workflowDeploymentRelease?.workflowVersion
         .outputVariables ?? [];
 
-    return python.field({
+    return new Field({
       name: "output_display",
       initializer: new DictInstantiation(
         outputVariables.map((output) => {
