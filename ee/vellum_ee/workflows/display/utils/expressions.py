@@ -176,7 +176,6 @@ def _get_pydantic_model_definition(model_class: type) -> Optional[JsonObject]:
 
 
 BinaryExpression = Union[
-    AccessorExpression,
     AddExpression,
     AndExpression,
     BeginsWithExpression,
@@ -779,7 +778,9 @@ def _ternary_expression_validator(ternary_expression: dict, workflow: Type[BaseW
     raise ValueError(f"Unsupported ternary expression operator: {operator}")
 
 
-def _binary_expression_validator(binary_expression: dict, workflow: Type[BaseWorkflow]) -> BinaryExpression:
+def _binary_expression_validator(
+    binary_expression: dict, workflow: Type[BaseWorkflow]
+) -> Union[BinaryExpression, AccessorExpression]:
     operator = binary_expression.get("operator")
     raw_lhs = binary_expression.get("lhs")
     if not isinstance(raw_lhs, dict):
