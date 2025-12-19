@@ -1,4 +1,3 @@
-import { python } from "@fern-api/python-ast";
 import { isNil } from "lodash";
 
 import { ApiNodeContext } from "src/context/node-context/api-node";
@@ -9,6 +8,7 @@ import { DictInstantiation } from "src/generators/extensions/dict-instantiation"
 import { Field } from "src/generators/extensions/field";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
+import { UuidInstantiation } from "src/generators/extensions/uuid-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { ApiNode as ApiNodeType, ConstantValuePointer } from "src/types/vellum";
@@ -222,9 +222,7 @@ export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
     statements.push(
       new Field({
         name: "target_handle_id",
-        initializer: python.TypeInstantiation.uuid(
-          this.nodeData.data.targetHandleId
-        ),
+        initializer: new UuidInstantiation(this.nodeData.data.targetHandleId),
       })
     );
 
@@ -250,7 +248,7 @@ export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
 
               return {
                 key,
-                value: python.TypeInstantiation.uuid(nodeInput.id),
+                value: new UuidInstantiation(nodeInput.id),
               };
             })
           ),
@@ -280,7 +278,7 @@ export class ApiNode extends BaseNode<ApiNodeType, ApiNodeContext> {
 
               return {
                 key,
-                value: python.TypeInstantiation.uuid(header.headerValueInputId),
+                value: new UuidInstantiation(header.headerValueInputId),
               };
             })
           ),

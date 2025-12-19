@@ -25,6 +25,7 @@ import { MethodArgument } from "src/generators/extensions/method-argument";
 import { MethodInvocation } from "src/generators/extensions/method-invocation";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
+import { UuidInstantiation } from "src/generators/extensions/uuid-instantiation";
 import { NodeDisplay } from "src/generators/node-display";
 import { NodeDisplayData } from "src/generators/node-display-data";
 import { NodeInput } from "src/generators/node-inputs/node-input";
@@ -183,7 +184,7 @@ export abstract class BaseNode<
           arguments_: [
             new MethodArgument({
               name: "id",
-              value: python.TypeInstantiation.uuid(id),
+              value: new UuidInstantiation(id),
             }),
             new MethodArgument({
               name: "name",
@@ -422,7 +423,7 @@ export abstract class BaseNode<
               arguments_: [
                 new MethodArgument({
                   name: "id",
-                  value: python.TypeInstantiation.uuid(portId),
+                  value: new UuidInstantiation(portId),
                 }),
               ],
             });
@@ -483,9 +484,7 @@ export abstract class BaseNode<
             arguments_: [
               new MethodArgument({
                 name: "id",
-                value: python.TypeInstantiation.uuid(
-                  this.nodeData.data.sourceHandleId
-                ),
+                value: new UuidInstantiation(this.nodeData.data.sourceHandleId),
               }),
             ],
           }),
@@ -730,7 +729,7 @@ export abstract class BaseNode<
               arguments_: [
                 new MethodArgument({
                   name: "node_id",
-                  value: python.TypeInstantiation.uuid(adornment.id),
+                  value: new UuidInstantiation(adornment.id),
                 }),
               ],
             }),
@@ -756,11 +755,11 @@ export abstract class BaseNode<
               // https://linear.app/vellum/issue/APO-213/define-output-transformations-for-node-adornments
               new MethodArgument({
                 name: "node_id",
-                value: python.TypeInstantiation.uuid(errorOutputId),
+                value: new UuidInstantiation(errorOutputId),
               }),
               new MethodArgument({
                 name: "error_output_id",
-                value: python.TypeInstantiation.uuid(errorOutputId),
+                value: new UuidInstantiation(errorOutputId),
               }),
             ],
           }),
@@ -792,7 +791,7 @@ export abstract class BaseNode<
     nodeClass.add(
       new Field({
         name: "node_id",
-        initializer: python.TypeInstantiation.uuid(this.nodeData.id),
+        initializer: new UuidInstantiation(this.nodeData.id),
       })
     );
     // }
@@ -832,7 +831,7 @@ export abstract class BaseNode<
                 key: new StrInstantiation(
                   toValidPythonIdentifier(attribute.name, "attr")
                 ),
-                value: python.TypeInstantiation.uuid(attribute.id),
+                value: new UuidInstantiation(attribute.id),
               };
             })
           ),

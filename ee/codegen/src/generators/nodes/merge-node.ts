@@ -1,11 +1,10 @@
-import { python } from "@fern-api/python-ast";
-
 import { MergeNodeContext } from "src/context/node-context/merge-node";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
 import { Field } from "src/generators/extensions/field";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { Reference } from "src/generators/extensions/reference";
+import { UuidInstantiation } from "src/generators/extensions/uuid-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { MergeNode as MergeNodeType } from "src/types/vellum";
 
@@ -51,8 +50,8 @@ export class MergeNode extends BaseNode<MergeNodeType, MergeNodeContext> {
     const statements: AstNode[] = [];
 
     const targetHandleIds = new ListInstantiation(
-      this.nodeData.data.targetHandles.map((targetHandle) =>
-        python.TypeInstantiation.uuid(targetHandle.id)
+      this.nodeData.data.targetHandles.map(
+        (targetHandle) => new UuidInstantiation(targetHandle.id)
       )
     );
     statements.push(

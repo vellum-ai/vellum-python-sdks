@@ -7,6 +7,7 @@ import { AstNode } from "src/generators/extensions/ast-node";
 import { Field } from "src/generators/extensions/field";
 import { IntInstantiation } from "src/generators/extensions/int-instantiation";
 import { Reference } from "src/generators/extensions/reference";
+import { UuidInstantiation } from "src/generators/extensions/uuid-instantiation";
 import { BaseNestedWorkflowNode } from "src/generators/nodes/bases/nested-workflow-base";
 import { WorkflowProjectGenerator } from "src/project";
 import { MapNode as MapNodeType, WorkflowRawData } from "src/types/vellum";
@@ -92,9 +93,7 @@ export class MapNode extends BaseNestedWorkflowNode<
     statements.push(
       new Field({
         name: "target_handle_id",
-        initializer: python.TypeInstantiation.uuid(
-          this.nodeData.data.targetHandleId
-        ),
+        initializer: new UuidInstantiation(this.nodeData.data.targetHandleId),
       })
     );
 

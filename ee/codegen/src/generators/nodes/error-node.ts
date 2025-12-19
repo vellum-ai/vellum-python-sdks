@@ -1,8 +1,7 @@
-import { python } from "@fern-api/python-ast";
-
 import { ErrorNodeContext } from "src/context/node-context/error-node";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Field } from "src/generators/extensions/field";
+import { UuidInstantiation } from "src/generators/extensions/uuid-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { ErrorNode as ErrorNodeType } from "src/types/vellum";
 
@@ -29,9 +28,7 @@ export class ErrorNode extends BaseNode<ErrorNodeType, ErrorNodeContext> {
     statements.push(
       new Field({
         name: "target_handle_id",
-        initializer: python.TypeInstantiation.uuid(
-          this.nodeData.data.targetHandleId
-        ),
+        initializer: new UuidInstantiation(this.nodeData.data.targetHandleId),
       })
     );
 

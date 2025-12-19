@@ -1,5 +1,3 @@
-import { python } from "@fern-api/python-ast";
-
 import { BaseNode } from "./bases/base";
 
 import { OUTPUTS_CLASS_NAME } from "src/constants";
@@ -12,6 +10,7 @@ import { Field } from "src/generators/extensions/field";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
+import { UuidInstantiation } from "src/generators/extensions/uuid-instantiation";
 import { GuardrailNode as GuardrailNodeType } from "src/types/vellum";
 
 const INPUTS_PREFIX = "metric_inputs";
@@ -79,9 +78,7 @@ export class GuardrailNode extends BaseNode<
     statements.push(
       new Field({
         name: "target_handle_id",
-        initializer: python.TypeInstantiation.uuid(
-          this.nodeData.data.targetHandleId
-        ),
+        initializer: new UuidInstantiation(this.nodeData.data.targetHandleId),
       })
     );
 
@@ -124,7 +121,7 @@ export class GuardrailNode extends BaseNode<
                 arguments_: [
                   new MethodArgument({
                     name: "id",
-                    value: python.TypeInstantiation.uuid(output.id),
+                    value: new UuidInstantiation(output.id),
                   }),
                   new MethodArgument({
                     name: "name",
@@ -163,7 +160,7 @@ export class GuardrailNode extends BaseNode<
                 arguments_: [
                   new MethodArgument({
                     name: "id",
-                    value: python.TypeInstantiation.uuid(output.id),
+                    value: new UuidInstantiation(output.id),
                   }),
                   new MethodArgument({
                     name: "name",

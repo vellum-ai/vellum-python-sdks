@@ -1,8 +1,8 @@
-import { python } from "@fern-api/python-ast";
 import { validate as uuidValidate } from "uuid";
 
 import { AstNode } from "src/generators/extensions/ast-node";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
+import { UuidInstantiation } from "src/generators/extensions/uuid-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 
 export class UuidOrString extends AstNode {
@@ -15,7 +15,7 @@ export class UuidOrString extends AstNode {
 
   generateId(id: string): AstNode {
     return uuidValidate(id)
-      ? python.TypeInstantiation.uuid(id)
+      ? new UuidInstantiation(id)
       : new StrInstantiation(id);
   }
 

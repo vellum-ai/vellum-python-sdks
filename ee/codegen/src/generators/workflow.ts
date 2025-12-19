@@ -30,6 +30,7 @@ import { NoneInstantiation } from "src/generators/extensions/none-instantiation"
 import { Reference } from "src/generators/extensions/reference";
 import { SetInstantiation } from "src/generators/extensions/set-instantiation";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
+import { UuidInstantiation } from "src/generators/extensions/uuid-instantiation";
 import { GraphAttribute } from "src/generators/graph-attribute";
 import { NodeDisplayData } from "src/generators/node-display-data";
 import { WorkflowOutput } from "src/generators/workflow-output";
@@ -208,11 +209,11 @@ export class Workflow {
               ? [
                   new MethodArgument({
                     name: "entrypoint_node_id",
-                    value: python.TypeInstantiation.uuid(entrypointNode.id),
+                    value: new UuidInstantiation(entrypointNode.id),
                   }),
                   new MethodArgument({
                     name: "entrypoint_node_source_handle_id",
-                    value: python.TypeInstantiation.uuid(
+                    value: new UuidInstantiation(
                       entrypointNode.data.sourceHandleId
                     ),
                   }),
@@ -286,7 +287,7 @@ export class Workflow {
                 overrideArgs.push(
                   new MethodArgument({
                     name: "id",
-                    value: python.TypeInstantiation.uuid(
+                    value: new UuidInstantiation(
                       inputVariableContext.getInputVariableId()
                     ),
                   })
@@ -346,7 +347,7 @@ export class Workflow {
                 overrideArgs.push(
                   new MethodArgument({
                     name: "id",
-                    value: python.TypeInstantiation.uuid(
+                    value: new UuidInstantiation(
                       stateVariableContext.getStateVariableId()
                     ),
                   })
@@ -422,7 +423,7 @@ export class Workflow {
                   arguments_: [
                     new MethodArgument({
                       name: "id",
-                      value: python.TypeInstantiation.uuid(
+                      value: new UuidInstantiation(
                         // Use trigger ID when no entrypoint node exists (IntegrationTrigger workflows)
                         entrypointNode?.id ?? edge.sourceNodeId
                       ),
@@ -437,7 +438,7 @@ export class Workflow {
                         arguments_: [
                           new MethodArgument({
                             name: "id",
-                            value: python.TypeInstantiation.uuid(edge.id),
+                            value: new UuidInstantiation(edge.id),
                           }),
                         ],
                       }),
@@ -525,7 +526,7 @@ export class Workflow {
                 arguments_: [
                   new MethodArgument({
                     name: "id",
-                    value: python.TypeInstantiation.uuid(edge.id),
+                    value: new UuidInstantiation(edge.id),
                   }),
                   new MethodArgument({
                     name: "z_index",
@@ -578,7 +579,7 @@ export class Workflow {
                   arguments_: [
                     new MethodArgument({
                       name: "id",
-                      value: python.TypeInstantiation.uuid(
+                      value: new UuidInstantiation(
                         outputVariable.getOutputVariableId()
                       ),
                     }),
