@@ -884,7 +884,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                 continue
             key = attr.get("key")
             actual_type = attr.get("type")
-            if isinstance(key, str) and key in expected_types_by_key:
+            if isinstance(key, str) and isinstance(actual_type, str) and key in expected_types_by_key:
                 expected_type = expected_types_by_key[key]
                 if actual_type != expected_type:
                     raise TriggerValidationError(
