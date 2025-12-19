@@ -36,6 +36,7 @@ class TryNode(BaseAdornmentNode[StateType], Generic[StateType]):
             subworkflow_stream = subworkflow.stream(
                 event_filter=all_workflow_event_filter,
                 node_output_mocks=self._context._get_all_node_output_mocks(),
+                event_max_size=self._context.event_max_size,
             )
 
         outputs: Optional[BaseOutputs] = None
