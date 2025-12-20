@@ -42,11 +42,16 @@ class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
     graph = LinearIssueTrigger >> ProcessNode
 
 
-def _create_mock_tool_definition(input_parameters: Dict[str, dict]) -> MagicMock:
-    """Helper to create a mock tool definition with input_parameters."""
+def _create_mock_tool_definition(properties: Dict[str, dict]) -> MagicMock:
+    """Helper to create a mock tool definition with input_parameters as JSON Schema."""
     mock_tool_def = MagicMock()
     mock_tool_def.name = "LINEAR_ISSUE_CREATED_TRIGGER"
-    mock_tool_def.input_parameters = input_parameters
+    # input_parameters is a JSON Schema object
+    mock_tool_def.input_parameters = {
+        "type": "object",
+        "properties": properties,
+        "required": list(properties.keys()),
+    }
     return mock_tool_def
 
 
@@ -54,11 +59,11 @@ def test_integration_trigger_validation__matching_types():
     """
     Tests that serialization succeeds when trigger attribute types match the API definition.
     """
-    # GIVEN a tool definition from the API with matching types
+    # GIVEN a tool definition from the API with matching types (JSON Schema format)
     mock_tool_def = _create_mock_tool_definition(
         {
             "action": {"type": "string"},
-            "data": {"type": "json"},
+            "data": {"type": "object"},
             "type": {"type": "string"},
             "url": {"type": "string"},
         }
@@ -86,12 +91,12 @@ def test_integration_trigger_validation__type_mismatch():
     """
     Tests that serialization raises TriggerValidationError when attribute types don't match.
     """
-    # GIVEN a tool definition from the API with mismatched types
-    # The API says 'action' should be JSON, but our trigger defines it as STRING
+    # GIVEN a tool definition from the API with mismatched types (JSON Schema format)
+    # The API says 'action' should be object (JSON), but our trigger defines it as STRING
     mock_tool_def = _create_mock_tool_definition(
         {
-            "action": {"type": "json"},
-            "data": {"type": "json"},
+            "action": {"type": "object"},
+            "data": {"type": "object"},
             "type": {"type": "string"},
             "url": {"type": "string"},
         }
@@ -139,11 +144,11 @@ def test_integration_trigger_validation__api_error():
     assert len(triggers) == 1
 
 
-def test_integration_trigger_validation__no_input_parameters():
+def test_integration_trigger_validation__no_properties():
     """
-    Tests that serialization continues gracefully when the API response has no input_parameters.
+    Tests that serialization continues gracefully when the API response has no properties.
     """
-    # GIVEN a tool definition with empty input_parameters
+    # GIVEN a tool definition with empty properties in JSON Schema
     mock_tool_def = _create_mock_tool_definition({})
 
     # WHEN we serialize the workflow with mocked API

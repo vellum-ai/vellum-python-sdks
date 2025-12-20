@@ -859,13 +859,31 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         if not input_parameters or not isinstance(input_parameters, dict):
             return
 
+        # input_parameters is a JSON Schema object with structure:
+        # {"type": "object", "properties": {"key": {"type": "string"}, ...}, "required": [...]}
+        properties = input_parameters.get("properties", {})
+        if not properties or not isinstance(properties, dict):
+            return
+
+        # Map JSON Schema types to Vellum attribute types
+        json_schema_to_vellum_type: Dict[str, str] = {
+            "string": "STRING",
+            "number": "NUMBER",
+            "integer": "NUMBER",
+            "boolean": "BOOLEAN",
+            "object": "JSON",
+            "array": "JSON",
+        }
+
         expected_types_by_key: Dict[str, str] = {}
-        for key, param_info in input_parameters.items():
+        for key, param_info in properties.items():
             if not isinstance(param_info, dict):
                 continue
             param_type = param_info.get("type")
             if isinstance(param_type, str):
-                expected_types_by_key[key] = param_type.upper()
+                vellum_type = json_schema_to_vellum_type.get(param_type)
+                if vellum_type:
+                    expected_types_by_key[key] = vellum_type
 
         for attr in trigger_attributes:
             if not isinstance(attr, dict):
