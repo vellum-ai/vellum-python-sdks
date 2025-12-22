@@ -372,8 +372,11 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
                 all_deps_invoked = all(dep in node_classes_invoked for dep in dependencies)
                 return all_deps_invoked
 
+            if cls.merge_behavior == MergeBehavior.CUSTOM:
+                return False
+
             raise NodeException(
-                message="Invalid Trigger Node Specification",
+                message=f"Invalid Trigger Node Specification: {cls.merge_behavior}",
                 code=WorkflowErrorCode.INVALID_INPUTS,
             )
 

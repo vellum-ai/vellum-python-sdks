@@ -1,11 +1,13 @@
 import pytest
-from uuid import UUID
+from uuid import UUID, uuid4
 from typing import Optional, Set
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.string_vellum_value_request import StringVellumValueRequest
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.tests.test_utils import FixtureState
+from vellum.workflows.errors.types import WorkflowErrorCode
+from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes import FinalOutputNode
 from vellum.workflows.nodes.bases.base import BaseNode
@@ -379,3 +381,32 @@ def test_base_node__ports_inheritance__cumulative_ports():
     # Potentially in the future, we support inheriting ports from multiple parents.
     # For now, we take only the declared ports, so that not all nodes have the default port.
     assert ports == ["bar"]
+
+
+def test_base_node__trigger_should_initiate__invalid_merge_behavior():
+    """
+    Tests that an invalid merge behavior raises a NodeException with the invalid value in the error message.
+    """
+
+    # GIVEN a node with an invalid merge behavior
+    class InvalidMergeBehaviorNode(BaseNode):
+        class Trigger(BaseNode.Trigger):
+            merge_behavior = "INVALID_MERGE_BEHAVIOR"  # type: ignore[assignment]
+
+    # AND a state
+    state = BaseState()
+
+    # WHEN we call should_initiate
+    # THEN it should raise a NodeException with the invalid merge behavior in the error message
+    with pytest.raises(NodeException) as exc_info:
+        InvalidMergeBehaviorNode.Trigger.should_initiate(
+            state=state,
+            dependencies=set(),
+            node_span_id=uuid4(),
+        )
+
+    # AND the error should have the correct code
+    assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
+
+    # AND the error message should contain the invalid merge behavior
+    assert "INVALID_MERGE_BEHAVIOR" in str(exc_info.value.message)
