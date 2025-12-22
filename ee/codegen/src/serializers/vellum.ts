@@ -2435,6 +2435,16 @@ export declare namespace IntegrationTriggerSerializer {
   }
 }
 
+const ChatMessageTriggerExecConfigSerializer = objectSchema({
+  output: WorkflowValueDescriptorSerializer.optional(),
+});
+
+export declare namespace ChatMessageTriggerExecConfigSerializer {
+  interface Raw {
+    output?: WorkflowValueDescriptorSerializer.Raw | null;
+  }
+}
+
 const ChatMessageTriggerSerializer = objectSchema({
   id: stringSchema(),
   attributes: listSchema(VellumVariableSerializer),
@@ -2442,6 +2452,10 @@ const ChatMessageTriggerSerializer = objectSchema({
   displayData: propertySchema(
     "display_data",
     WorkflowTriggerDisplayDataSerializer.nullable().optional()
+  ),
+  execConfig: propertySchema(
+    "exec_config",
+    ChatMessageTriggerExecConfigSerializer.optional()
   ),
 });
 
@@ -2452,6 +2466,7 @@ export declare namespace ChatMessageTriggerSerializer {
     attributes: VellumVariableSerializer.Raw[];
     definition?: CodeResourceDefinitionSerializer.Raw | null;
     display_data?: WorkflowTriggerDisplayDataSerializer.Raw | null;
+    exec_config?: ChatMessageTriggerExecConfigSerializer.Raw | null;
   }
 }
 

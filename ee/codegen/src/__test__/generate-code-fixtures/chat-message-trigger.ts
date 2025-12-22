@@ -61,7 +61,13 @@ export default {
             type: "DEFAULT",
           },
         ],
-        outputs: [],
+        outputs: [
+          {
+            id: "bottom-output-id",
+            name: "result",
+            type: "STRING",
+          },
+        ],
         attributes: [],
       },
     ],
@@ -98,6 +104,13 @@ export default {
           type: "JSON",
         },
       ],
+      exec_config: {
+        output: {
+          type: "NODE_OUTPUT",
+          node_id: "bottom-node",
+          node_output_id: "bottom-output-id",
+        },
+      },
       display_data: {
         label: "Chat Message",
         position: {
@@ -110,5 +123,5 @@ export default {
       },
     },
   ],
-  assertions: ["workflow.py"],
+  assertions: ["workflow.py", "triggers/chat_message.py"],
 };

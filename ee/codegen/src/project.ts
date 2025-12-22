@@ -61,6 +61,7 @@ import { PromptDeploymentNode } from "src/generators/nodes/prompt-deployment-nod
 import { SearchNode } from "src/generators/nodes/search-node";
 import { SubworkflowDeploymentNode } from "src/generators/nodes/subworkflow-deployment-node";
 import { TemplatingNode } from "src/generators/nodes/templating-node";
+import { ChatMessageTrigger } from "src/generators/triggers/chat-message-trigger";
 import { IntegrationTrigger } from "src/generators/triggers/integration-trigger";
 import { ScheduledTrigger } from "src/generators/triggers/scheduled-trigger";
 import { WorkflowSandboxFile } from "src/generators/workflow-sandbox-file";
@@ -926,6 +927,12 @@ ${errors.slice(0, 3).map((err) => {
           trigger,
         });
         triggerPromises.push(scheduledTrigger.persist());
+      } else if (trigger.type === "CHAT_MESSAGE" && trigger.execConfig) {
+        const chatMessageTrigger = new ChatMessageTrigger({
+          workflowContext: this.workflowContext,
+          trigger,
+        });
+        triggerPromises.push(chatMessageTrigger.persist());
       }
     });
 
