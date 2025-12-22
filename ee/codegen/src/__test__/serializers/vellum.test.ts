@@ -1,6 +1,35 @@
-import { WorkflowNodeSerializer } from "src/serializers/vellum";
+import {
+  WorkflowNodeSerializer,
+  WorkflowTriggerSerializer,
+} from "src/serializers/vellum";
 
 describe("vellum", () => {
+  describe("WorkflowTriggerSerializer", () => {
+    it("should parse CHAT_MESSAGE trigger", () => {
+      /**
+       * Tests that CHAT_MESSAGE triggers are properly deserialized.
+       * This test will fail if ChatMessageTriggerSerializer is not registered
+       * in the WorkflowTriggerSerializer union.
+       */
+
+      // GIVEN a raw CHAT_MESSAGE trigger from the API
+      const data = {
+        id: "chat-message-trigger-id",
+        type: "CHAT_MESSAGE",
+        attributes: [{ id: "attr-1", key: "message", type: "JSON" }],
+      };
+
+      // WHEN we parse it
+      const result = WorkflowTriggerSerializer.parse(data);
+
+      // THEN it should succeed and have the correct type
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        expect(result.value.type).toBe("CHAT_MESSAGE");
+      }
+    });
+  });
+
   describe("PromptNodeSerializer", () => {
     it("should serialize legacy prompt nodes", () => {
       const data = {
