@@ -327,6 +327,12 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
 
     if isinstance(value, OutputReference):
         if value not in display_context.global_node_output_displays:
+            if value in display_context.workflow_output_displays:
+                workflow_output_display = display_context.workflow_output_displays[value]
+                return {
+                    "type": "WORKFLOW_OUTPUT",
+                    "output_variable_id": str(workflow_output_display.id),
+                }
             if issubclass(value.outputs_class, BaseNode.Outputs):
                 raise InvalidOutputReferenceError(
                     f"Reference to node '{value.outputs_class.__parent_class__.__name__}' not found in graph."
