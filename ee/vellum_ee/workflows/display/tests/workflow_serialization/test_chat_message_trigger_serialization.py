@@ -41,6 +41,13 @@ def test_simple_chat_workflow_serialization():
                     "schema": None,
                 }
             ],
+            "exec_config": {
+                "output": {
+                    "type": "NODE_OUTPUT",
+                    "node_id": "6c43f557-304c-4f08-a8fd-13d1fb02d96a",
+                    "node_output_id": "14f1265b-d5fb-4b60-b06b-9012029f6c6c",
+                },
+            },
             "display_data": {
                 "label": "Chat Message",
                 "position": {

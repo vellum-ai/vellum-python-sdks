@@ -705,6 +705,11 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                     # Validate trigger attributes against the expected types from the API
                     self._validate_integration_trigger_attributes(trigger_class, trigger_attributes)
 
+                if trigger_type == WorkflowTriggerType.CHAT_MESSAGE and issubclass(trigger_class, ChatMessageTrigger):
+                    chat_exec_config = self._serialize_chat_message_trigger_exec_config(trigger_class)
+                    if chat_exec_config:
+                        trigger_data["exec_config"] = chat_exec_config
+
             # Serialize display_data from trigger's Display class
             display_class = trigger_class.Display
             display_data: JsonObject = {}
@@ -912,6 +917,28 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                         "The trigger configuration is invalid or contains unsupported values.",
                         trigger_class_name=trigger_class.__name__,
                     )
+
+    def _serialize_chat_message_trigger_exec_config(
+        self, trigger_class: Type[ChatMessageTrigger]
+    ) -> Optional[JsonObject]:
+        config_class = trigger_class.Config
+        output = getattr(config_class, "output", None)
+
+        if output is None:
+            return None
+
+        serialized_output = serialize_value(
+            executable_id=trigger_class.__id__,
+            display_context=self.display_context,
+            value=output,
+        )
+
+        return cast(
+            JsonObject,
+            {
+                "output": serialized_output,
+            },
+        )
 
     @staticmethod
     def _model_dump(value: Any) -> Any:
