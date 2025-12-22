@@ -17,6 +17,8 @@ from vellum.workflows.events.node import (
     NodeExecutionFulfilledEvent,
     NodeExecutionInitiatedBody,
     NodeExecutionInitiatedEvent,
+    NodeExecutionLogBody,
+    NodeExecutionLogEvent,
     NodeExecutionStreamingBody,
     NodeExecutionStreamingEvent,
 )
@@ -476,6 +478,41 @@ mock_node_uuid = str(MockNode.__id__)
                 "links": None,
             },
         ),
+        (
+            NodeExecutionLogEvent(
+                id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+                timestamp=datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
+                trace_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+                span_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+                body=NodeExecutionLogBody(
+                    node_definition=MockNode,
+                    attributes={"foo": "bar"},
+                    severity="INFO",
+                    message="Test log message",
+                ),
+            ),
+            {
+                "id": "123e4567-e89b-12d3-a456-426614174000",
+                "api_version": "2024-10-25",
+                "timestamp": "2024-01-01T12:00:00Z",
+                "trace_id": "123e4567-e89b-12d3-a456-426614174000",
+                "span_id": "123e4567-e89b-12d3-a456-426614174000",
+                "name": "node.execution.log",
+                "body": {
+                    "node_definition": {
+                        "id": mock_node_uuid,
+                        "name": "MockNode",
+                        "module": module_root + ["events", "tests", "test_event"],
+                        "exclude_from_monitoring": False,
+                    },
+                    "attributes": {"foo": "bar"},
+                    "severity": "INFO",
+                    "message": "Test log message",
+                },
+                "parent": None,
+                "links": None,
+            },
+        ),
     ],
     ids=[
         "workflow.execution.initiated",
@@ -488,6 +525,7 @@ mock_node_uuid = str(MockNode.__id__)
         "node.execution.fulfilled",
         "fulfilled_node_with_undefined_outputs",
         "mocked_node",
+        "node.execution.log",
     ],
 )
 def test_event_serialization(event, expected_json):

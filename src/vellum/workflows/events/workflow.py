@@ -18,6 +18,7 @@ from ..triggers import BaseTrigger
 from .node import (
     NodeExecutionFulfilledEvent,
     NodeExecutionInitiatedEvent,
+    NodeExecutionLogEvent,
     NodeExecutionPausedEvent,
     NodeExecutionRejectedEvent,
     NodeExecutionResumedEvent,
@@ -311,6 +312,7 @@ GenericWorkflowEvent = Union[
     NodeExecutionRejectedEvent,
     NodeExecutionPausedEvent,
     NodeExecutionResumedEvent,
+    NodeExecutionLogEvent,
 ]
 
 WorkflowEvent = Union[
