@@ -1,6 +1,9 @@
 import { python } from "@fern-api/python-ast";
 
-import { OUTPUTS_CLASS_NAME, VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH } from "src/constants";
+import {
+  OUTPUTS_CLASS_NAME,
+  VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH,
+} from "src/constants";
 import { AccessAttribute } from "src/generators/extensions/access-attribute";
 import { Class } from "src/generators/extensions/class";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
@@ -79,7 +82,8 @@ export class ChatMessageTrigger extends BaseTrigger<ChatMessageTriggerType> {
             classReference: new Reference({
               name: "LazyReference",
               modulePath: [
-                ...this.workflowContext.sdkModulePathNames.WORKFLOWS_MODULE_PATH,
+                ...this.workflowContext.sdkModulePathNames
+                  .WORKFLOWS_MODULE_PATH,
                 "references",
               ],
             }),
