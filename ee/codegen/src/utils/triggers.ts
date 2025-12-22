@@ -26,22 +26,6 @@ export function getTriggerClassInfo(
   }
 
   switch (trigger.type) {
-    case WorkflowTriggerType.CHAT_MESSAGE:
-      return {
-        className: "ChatMessageTrigger",
-        modulePath: [...VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH, "chat_message"],
-      };
-    case WorkflowTriggerType.INTEGRATION:
-      return {
-        className: createPythonClassName(trigger.execConfig.slug, {
-          force: true,
-        }),
-        modulePath: [
-          ...workflowContext.modulePath.slice(0, -1),
-          GENERATED_TRIGGERS_MODULE_NAME,
-          toPythonSafeSnakeCase(trigger.execConfig.slug),
-        ],
-      };
     case WorkflowTriggerType.MANUAL:
       return {
         className: "ManualTrigger",
@@ -58,5 +42,21 @@ export function getTriggerClassInfo(
         ],
       };
     }
+    case WorkflowTriggerType.INTEGRATION:
+      return {
+        className: createPythonClassName(trigger.execConfig.slug, {
+          force: true,
+        }),
+        modulePath: [
+          ...workflowContext.modulePath.slice(0, -1),
+          GENERATED_TRIGGERS_MODULE_NAME,
+          toPythonSafeSnakeCase(trigger.execConfig.slug),
+        ],
+      };
+    case WorkflowTriggerType.CHAT_MESSAGE:
+      return {
+        className: "ChatMessageTrigger",
+        modulePath: [...VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH, "chat_message"],
+      };
   }
 }

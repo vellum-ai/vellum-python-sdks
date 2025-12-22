@@ -809,10 +809,10 @@ export interface WorkflowOutputValue {
 }
 
 export enum WorkflowTriggerType {
-  CHAT_MESSAGE = "CHAT_MESSAGE",
-  INTEGRATION = "INTEGRATION",
   MANUAL = "MANUAL",
   SCHEDULED = "SCHEDULED",
+  INTEGRATION = "INTEGRATION",
+  CHAT_MESSAGE = "CHAT_MESSAGE",
 }
 
 export enum IntegrationProvider {
@@ -835,15 +835,6 @@ export interface BaseTrigger {
   displayData?: WorkflowTriggerDisplayData | null;
 }
 
-export interface ChatMessageTrigger extends BaseTrigger {
-  type: WorkflowTriggerType.CHAT_MESSAGE;
-}
-
-export interface IntegrationTrigger extends BaseTrigger {
-  type: WorkflowTriggerType.INTEGRATION;
-  execConfig: IntegrationTriggerExecConfig;
-}
-
 export interface ManualTrigger extends BaseTrigger {
   type: WorkflowTriggerType.MANUAL;
 }
@@ -854,11 +845,20 @@ export interface ScheduledTrigger extends BaseTrigger {
   timezone: string;
 }
 
+export interface IntegrationTrigger extends BaseTrigger {
+  type: WorkflowTriggerType.INTEGRATION;
+  execConfig: IntegrationTriggerExecConfig;
+}
+
+export interface ChatMessageTrigger extends BaseTrigger {
+  type: WorkflowTriggerType.CHAT_MESSAGE;
+}
+
 export type WorkflowTrigger =
-  | ChatMessageTrigger
-  | IntegrationTrigger
   | ManualTrigger
-  | ScheduledTrigger;
+  | ScheduledTrigger
+  | IntegrationTrigger
+  | ChatMessageTrigger;
 
 export interface WorkflowRawData {
   nodes: WorkflowNode[];
