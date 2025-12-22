@@ -872,7 +872,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             "integer": "NUMBER",
             "boolean": "BOOLEAN",
             "object": "JSON",
-            "array": "JSON",
+            "array": "ARRAY",
         }
 
         expected_types_by_key: Dict[str, str] = {}
