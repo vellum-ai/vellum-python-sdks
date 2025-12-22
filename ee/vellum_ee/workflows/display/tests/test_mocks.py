@@ -744,7 +744,7 @@ def test_mocks__validate_all__node_nested_in_subworkflow():
 def test_mocks__serialize__try_node_wrapped_node_has_correct_node_id():
     """
     Tests that when serializing a MockNodeExecution for a node wrapped in a TryNode adornment,
-    the serialized node_id matches the TryNode wrapper's ID (the adorned node class).
+    the serialized node_id matches the inner wrapped node's ID (not the adornment wrapper's ID).
     """
 
     # GIVEN a node wrapped in a TryNode adornment
@@ -769,8 +769,10 @@ def test_mocks__serialize__try_node_wrapped_node_has_correct_node_id():
     # WHEN we serialize the mock
     serialized_mock = mock.model_dump()
 
-    # THEN the serialized node_id should match the TryNode wrapper's ID
-    assert serialized_mock["node_id"] == str(WrappedNode.__id__)
+    # THEN the serialized node_id should match the inner wrapped node's ID
+    inner_node = WrappedNode.__wrapped_node__
+    assert inner_node is not None
+    assert serialized_mock["node_id"] == str(inner_node.__id__)
 
     # AND the serialized mock should have the correct type
     assert serialized_mock["type"] == "NODE_EXECUTION"

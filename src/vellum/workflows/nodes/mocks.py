@@ -29,7 +29,11 @@ class MockNodeExecution(UniversalBaseModel):
     def serialize_full_model(self, handler: Callable[[Any], Any], info: SerializationInfo) -> Dict[str, Any]:
         """Serialize the model and add node_id field computed from then_outputs."""
         serialized = handler(self)
-        serialized["node_id"] = str(self.then_outputs.__class__.__parent_class__.__id__)
+        node_class = self.then_outputs.__class__.__parent_class__
+        # Unwrap adornment nodes to get the inner wrapped node's ID
+        while hasattr(node_class, "__wrapped_node__") and node_class.__wrapped_node__ is not None:
+            node_class = node_class.__wrapped_node__
+        serialized["node_id"] = str(node_class.__id__)
         serialized["type"] = "NODE_EXECUTION"
         if self.disabled is None:
             del serialized["disabled"]
