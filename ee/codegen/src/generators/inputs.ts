@@ -97,6 +97,6 @@ export class Inputs extends BasePersistedFile {
     if (!this.inputsClass) {
       return;
     }
-    super.persist();
+    await super.persist();
   }
 }

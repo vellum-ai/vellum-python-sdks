@@ -88,6 +88,6 @@ export class State extends BasePersistedFile {
     if (!this.stateClass) {
       return;
     }
-    super.persist();
+    await super.persist();
   }
 }
