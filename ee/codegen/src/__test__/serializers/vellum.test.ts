@@ -24,9 +24,9 @@ describe("vellum", () => {
 
       // THEN it should succeed and have the correct type
       expect(result.ok).toBe(true);
-      if (result.ok) {
-        expect(result.value.type).toBe("CHAT_MESSAGE");
-      }
+      expect((result as { ok: true; value: { type: string } }).value.type).toBe(
+        "CHAT_MESSAGE"
+      );
     });
   });
 
