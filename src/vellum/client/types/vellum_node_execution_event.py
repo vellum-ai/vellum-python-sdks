@@ -4,6 +4,7 @@ import typing
 
 from .node_execution_fulfilled_event import NodeExecutionFulfilledEvent
 from .node_execution_initiated_event import NodeExecutionInitiatedEvent
+from .node_execution_log_event import NodeExecutionLogEvent
 from .node_execution_paused_event import NodeExecutionPausedEvent
 from .node_execution_rejected_event import NodeExecutionRejectedEvent
 from .node_execution_resumed_event import NodeExecutionResumedEvent
@@ -16,4 +17,5 @@ VellumNodeExecutionEvent = typing.Union[
     NodeExecutionRejectedEvent,
     NodeExecutionPausedEvent,
     NodeExecutionResumedEvent,
+    NodeExecutionLogEvent,
 ]

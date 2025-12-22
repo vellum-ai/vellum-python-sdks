@@ -309,6 +309,8 @@ from .node_execution_fulfilled_body import NodeExecutionFulfilledBody
 from .node_execution_fulfilled_event import NodeExecutionFulfilledEvent
 from .node_execution_initiated_body import NodeExecutionInitiatedBody
 from .node_execution_initiated_event import NodeExecutionInitiatedEvent
+from .node_execution_log_body import NodeExecutionLogBody
+from .node_execution_log_event import NodeExecutionLogEvent
 from .node_execution_paused_body import NodeExecutionPausedBody
 from .node_execution_paused_event import NodeExecutionPausedEvent
 from .node_execution_rejected_body import NodeExecutionRejectedBody
@@ -460,6 +462,7 @@ from .sentence_chunker_config import SentenceChunkerConfig
 from .sentence_chunker_config_request import SentenceChunkerConfigRequest
 from .sentence_chunking import SentenceChunking
 from .sentence_chunking_request import SentenceChunkingRequest
+from .severity_enum import SeverityEnum
 from .slim_composio_tool_definition import SlimComposioToolDefinition
 from .slim_deployment_read import SlimDeploymentRead
 from .slim_document import SlimDocument
@@ -1037,6 +1040,8 @@ __all__ = [
     "NodeExecutionFulfilledEvent",
     "NodeExecutionInitiatedBody",
     "NodeExecutionInitiatedEvent",
+    "NodeExecutionLogBody",
+    "NodeExecutionLogEvent",
     "NodeExecutionPausedBody",
     "NodeExecutionPausedEvent",
     "NodeExecutionRejectedBody",
@@ -1188,6 +1193,7 @@ __all__ = [
     "SentenceChunkerConfigRequest",
     "SentenceChunking",
     "SentenceChunkingRequest",
+    "SeverityEnum",
     "SlimComposioToolDefinition",
     "SlimDeploymentRead",
     "SlimDocument",
