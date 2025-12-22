@@ -39,6 +39,8 @@ from vellum.workflows.events.node import (
     NodeExecutionFulfilledEvent,
     NodeExecutionInitiatedBody,
     NodeExecutionInitiatedEvent,
+    NodeExecutionLogBody,
+    NodeExecutionLogEvent,
     NodeExecutionPausedBody,
     NodeExecutionPausedEvent,
     NodeExecutionRejectedBody,
@@ -1016,6 +1018,7 @@ NodeExecutionRejectedBody.model_rebuild()
 NodeExecutionPausedBody.model_rebuild()
 NodeExecutionResumedBody.model_rebuild()
 NodeExecutionStreamingBody.model_rebuild()
+NodeExecutionLogBody.model_rebuild()
 
 WorkflowExecutionInitiatedEvent.model_rebuild()
 WorkflowExecutionFulfilledEvent.model_rebuild()
@@ -1031,5 +1034,6 @@ NodeExecutionRejectedEvent.model_rebuild()
 NodeExecutionPausedEvent.model_rebuild()
 NodeExecutionResumedEvent.model_rebuild()
 NodeExecutionStreamingEvent.model_rebuild()
+NodeExecutionLogEvent.model_rebuild()
 
 StateMeta.model_rebuild()
