@@ -327,7 +327,13 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
 
     if isinstance(value, OutputReference):
         if issubclass(value.outputs_class, BaseWorkflow.Outputs):
-            return serialize_value(executable_id, display_context, value.instance)
+            # Only resolve workflow output references that point to node outputs
+            if isinstance(value.instance, OutputReference) and issubclass(
+                value.instance.outputs_class, BaseNode.Outputs
+            ):
+                return serialize_value(executable_id, display_context, value.instance)
+            # For other instances (constants, other workflow outputs), raise an error
+            raise InvalidOutputReferenceError(f"Reference to outputs '{value.outputs_class.__qualname__}' is invalid.")
 
         if value not in display_context.global_node_output_displays:
             if issubclass(value.outputs_class, BaseNode.Outputs):
