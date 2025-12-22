@@ -53,10 +53,16 @@ export function getTriggerClassInfo(
           toPythonSafeSnakeCase(trigger.execConfig.slug),
         ],
       };
-    case WorkflowTriggerType.CHAT_MESSAGE:
+    case WorkflowTriggerType.CHAT_MESSAGE: {
+      const label = trigger.displayData?.label || "ChatMessageTrigger";
       return {
-        className: "ChatMessageTrigger",
-        modulePath: [...VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH, "chat_message"],
+        className: createPythonClassName(label, { force: true }),
+        modulePath: [
+          ...workflowContext.modulePath.slice(0, -1),
+          GENERATED_TRIGGERS_MODULE_NAME,
+          toPythonSafeSnakeCase(trigger.displayData?.label || "chat_message"),
+        ],
       };
+    }
   }
 }

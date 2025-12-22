@@ -81,7 +81,7 @@ describe("getTriggerClassInfo", () => {
 
     expect(result).toEqual({
       className: "ChatMessageTrigger",
-      modulePath: ["vellum", "workflows", "triggers", "chat_message"],
+      modulePath: ["code", "triggers", "chat_message"],
     });
   });
 });
