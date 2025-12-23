@@ -67,7 +67,11 @@ from vellum_ee.workflows.display.types import (
     WorkflowOutputDisplays,
 )
 from vellum_ee.workflows.display.utils.auto_layout import auto_layout_nodes
-from vellum_ee.workflows.display.utils.exceptions import UserFacingException, WorkflowValidationError
+from vellum_ee.workflows.display.utils.exceptions import (
+    TriggerValidationError,
+    UserFacingException,
+    WorkflowValidationError,
+)
 from vellum_ee.workflows.display.utils.expressions import serialize_value
 from vellum_ee.workflows.display.utils.metadata import (
     get_entrypoint_edge_id,
@@ -688,6 +692,9 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                     exec_config = self._serialize_integration_trigger_exec_config(trigger_class)
                     trigger_data["exec_config"] = exec_config
 
+                    # Validate trigger attributes against the expected types from the API
+                    self._validate_integration_trigger_attributes(trigger_class, trigger_attributes)
+
             # Serialize display_data from trigger's Display class
             display_class = trigger_class.Display
             display_data: JsonObject = {}
@@ -793,6 +800,108 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                 "setup_attributes": setup_attributes,
             },
         )
+
+    def _fetch_integration_trigger_definition(
+        self, provider: str, integration_name: str, trigger_slug: str
+    ) -> Optional[JsonObject]:
+        """
+        Fetch the trigger/tool definition from the API to get the expected attribute types.
+
+        Uses the client's integrations.retrieve_integration_tool_definition method.
+
+        Returns the tool definition with output_parameters (payload schema) if found, None otherwise.
+        For triggers, output_parameters contains the webhook payload schema, while input_parameters
+        contains setup/config arguments.
+        """
+        try:
+            tool_definition = self._client.integrations.retrieve_integration_tool_definition(
+                integration_name=integration_name,
+                integration_provider=provider,
+                tool_name=trigger_slug,
+            )
+            return cast(
+                JsonObject,
+                {
+                    "name": tool_definition.name,
+                    "output_parameters": tool_definition.output_parameters,
+                },
+            )
+        except Exception as e:
+            logger.warning(f"Error fetching tool definition for {trigger_slug}: {e}")
+            return None
+
+    def _validate_integration_trigger_attributes(
+        self,
+        trigger_class: Type[IntegrationTrigger],
+        trigger_attributes: JsonArray,
+    ) -> None:
+        """
+        Validate that the trigger attributes match the expected types from the API.
+
+        Raises TriggerValidationError if there's a type mismatch.
+        """
+        config_class = trigger_class.Config
+        provider = getattr(config_class, "provider", None)
+        if isinstance(provider, Enum):
+            provider = provider.value
+        elif provider is not None:
+            provider = str(provider)
+
+        slug = getattr(config_class, "slug", None)
+        integration_name = getattr(config_class, "integration_name", None)
+
+        if not provider or not slug or not integration_name:
+            return
+
+        trigger_def = self._fetch_integration_trigger_definition(provider, integration_name, slug)
+        if not trigger_def:
+            return
+
+        # output_parameters contains the webhook payload schema for triggers
+        # (input_parameters contains setup/config arguments like team_id)
+        output_parameters = trigger_def.get("output_parameters", {})
+        if not output_parameters or not isinstance(output_parameters, dict):
+            return
+
+        # output_parameters is a JSON Schema object with structure:
+        # {"type": "object", "properties": {"key": {"type": "string"}, ...}, "required": [...]}
+        properties = output_parameters.get("properties", {})
+        if not properties or not isinstance(properties, dict):
+            return
+
+        # Map JSON Schema types to Vellum attribute types
+        json_schema_to_vellum_type: Dict[str, str] = {
+            "string": "STRING",
+            "number": "NUMBER",
+            "integer": "NUMBER",
+            "boolean": "BOOLEAN",
+            "object": "JSON",
+            "array": "ARRAY",
+        }
+
+        expected_types_by_key: Dict[str, str] = {}
+        for key, param_info in properties.items():
+            if not isinstance(param_info, dict):
+                continue
+            param_type = param_info.get("type")
+            if isinstance(param_type, str):
+                vellum_type = json_schema_to_vellum_type.get(param_type)
+                if vellum_type:
+                    expected_types_by_key[key] = vellum_type
+
+        for attr in trigger_attributes:
+            if not isinstance(attr, dict):
+                continue
+            attr_key = attr.get("key")
+            actual_type = attr.get("type")
+            if isinstance(attr_key, str) and isinstance(actual_type, str) and attr_key in expected_types_by_key:
+                expected_type = expected_types_by_key[attr_key]
+                if actual_type != expected_type:
+                    raise TriggerValidationError(
+                        message=f"Attribute '{attr_key}' has type '{actual_type}' but expected type '{expected_type}'. "
+                        "The trigger configuration is invalid or contains unsupported values.",
+                        trigger_class_name=trigger_class.__name__,
+                    )
 
     @staticmethod
     def _model_dump(value: Any) -> Any:
