@@ -292,7 +292,9 @@ class BaseOutputs(metaclass=_BaseOutputsMeta):
                 return cls(**value)
 
             node_class = workflow.resolve_node_ref(node_id)
-            return node_class.Outputs(**value)
+            declared_fields = {descriptor.name for descriptor in node_class.Outputs}
+            filtered_value = {k: v for k, v in value.items() if k in declared_fields}
+            return node_class.Outputs(**filtered_value)
 
         return core_schema.union_schema(
             [
