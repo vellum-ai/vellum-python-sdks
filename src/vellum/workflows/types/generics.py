@@ -6,6 +6,7 @@ if TYPE_CHECKING:
     from vellum.workflows import BaseWorkflow
     from vellum.workflows.inputs import BaseInputs
     from vellum.workflows.nodes import BaseNode
+    from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
     from vellum.workflows.outputs import BaseOutputs
     from vellum.workflows.state import BaseState
 
@@ -35,6 +36,17 @@ def import_workflow_class() -> Type["BaseWorkflow"]:
     from vellum.workflows.workflows import BaseWorkflow
 
     return BaseWorkflow
+
+
+@cache
+def import_base_adornment_node() -> Type["BaseAdornmentNode"]:
+    """
+    Helper function to help avoid circular imports.
+    """
+
+    from vellum.workflows.nodes.bases.base_adornment_node import BaseAdornmentNode
+
+    return BaseAdornmentNode
 
 
 def is_node_class(obj: Any) -> TypeGuard[Type["BaseNode"]]:

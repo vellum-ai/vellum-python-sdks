@@ -29,6 +29,7 @@ from vellum.workflows.expressions.not_in import NotInExpression
 from vellum.workflows.expressions.or_ import OrExpression
 from vellum.workflows.expressions.parse_json import ParseJsonExpression
 from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubworkflowNode
+from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.references.environment_variable import EnvironmentVariableReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
@@ -738,3 +739,43 @@ def test_mocks__validate_all__node_nested_in_subworkflow():
 
     # AND the output reflects the mocked value from the nested node
     assert terminal_event.outputs.final_result == "mocked_result"
+
+
+def test_mocks__serialize__try_node_wrapped_node_has_correct_node_id():
+    """
+    Tests that when serializing a MockNodeExecution for a node wrapped in a TryNode adornment,
+    the serialized node_id matches the inner wrapped node's ID (not the adornment wrapper's ID).
+    """
+
+    # GIVEN a node wrapped in a TryNode adornment
+    @TryNode.wrap()
+    class WrappedNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result: str
+
+    # AND a workflow that uses the wrapped node
+    class MyWorkflow(BaseWorkflow):
+        graph = WrappedNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_result = WrappedNode.Outputs.result
+
+    # AND a mock for the wrapped node
+    mock = MockNodeExecution(
+        when_condition=ConstantValueReference(True),
+        then_outputs=WrappedNode.Outputs(result="mocked_result"),
+    )
+
+    # WHEN we serialize the mock
+    serialized_mock = mock.model_dump()
+
+    # THEN the serialized node_id should match the inner wrapped node's ID
+    inner_node = WrappedNode.__wrapped_node__
+    assert inner_node is not None
+    assert serialized_mock["node_id"] == str(inner_node.__id__)
+
+    # AND the serialized mock should have the correct type
+    assert serialized_mock["type"] == "NODE_EXECUTION"
+
+    # AND the then_outputs should be serialized correctly
+    assert serialized_mock["then_outputs"]["result"] == "mocked_result"
