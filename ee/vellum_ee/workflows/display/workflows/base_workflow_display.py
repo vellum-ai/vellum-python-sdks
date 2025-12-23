@@ -31,6 +31,7 @@ from vellum.workflows.nodes.displayable.final_output_node.node import FinalOutpu
 from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port, get_wrapped_node
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, StateValueReference, WorkflowInputReference
+from vellum.workflows.triggers.chat_message import ChatMessageTrigger
 from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.triggers.manual import ManualTrigger
 from vellum.workflows.triggers.schedule import ScheduleTrigger
@@ -634,6 +635,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                     trigger_type = WorkflowTriggerType.INTEGRATION
                 elif issubclass(trigger_class, ScheduleTrigger):
                     trigger_type = WorkflowTriggerType.SCHEDULED
+                elif issubclass(trigger_class, ChatMessageTrigger):
+                    trigger_type = WorkflowTriggerType.CHAT_MESSAGE
                 else:
                     raise ValueError(
                         f"Unknown trigger type: {trigger_class.__name__}. "
@@ -644,6 +647,13 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
 
             # Serialize trigger attributes from attribute_references as VellumVariables
             attribute_references = trigger_class.attribute_references().values()
+
+            def get_attribute_type(reference: Any) -> str:
+                try:
+                    return primitive_type_to_vellum_variable_type(reference)
+                except ValueError:
+                    return "JSON"
+
             trigger_attributes: JsonArray = cast(
                 JsonArray,
                 [
@@ -652,10 +662,10 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                         {
                             "id": str(reference.id),
                             "key": reference.name,
-                            "type": primitive_type_to_vellum_variable_type(reference),
+                            "type": get_attribute_type(reference),
                             "required": type(None) not in reference.types,
                             "default": {
-                                "type": primitive_type_to_vellum_variable_type(reference),
+                                "type": get_attribute_type(reference),
                                 "value": None,
                             },
                             "extensions": None,
@@ -694,6 +704,11 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
 
                     # Validate trigger attributes against the expected types from the API
                     self._validate_integration_trigger_attributes(trigger_class, trigger_attributes)
+
+                if trigger_type == WorkflowTriggerType.CHAT_MESSAGE and issubclass(trigger_class, ChatMessageTrigger):
+                    chat_exec_config = self._serialize_chat_message_trigger_exec_config(trigger_class)
+                    if chat_exec_config:
+                        trigger_data["exec_config"] = chat_exec_config
 
             # Serialize display_data from trigger's Display class
             display_class = trigger_class.Display
@@ -902,6 +917,28 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                         "The trigger configuration is invalid or contains unsupported values.",
                         trigger_class_name=trigger_class.__name__,
                     )
+
+    def _serialize_chat_message_trigger_exec_config(
+        self, trigger_class: Type[ChatMessageTrigger]
+    ) -> Optional[JsonObject]:
+        config_class = trigger_class.Config
+        output = getattr(config_class, "output", None)
+
+        if output is None:
+            return None
+
+        serialized_output = serialize_value(
+            executable_id=trigger_class.__id__,
+            display_context=self.display_context,
+            value=output,
+        )
+
+        return cast(
+            JsonObject,
+            {
+                "output": serialized_output,
+            },
+        )
 
     @staticmethod
     def _model_dump(value: Any) -> Any:
