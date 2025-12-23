@@ -2,59 +2,32 @@ export default {
   workflow_raw_data: {
     nodes: [
       {
-        id: "top-node",
+        id: "some-node",
         type: "GENERIC",
-        label: "Top Node",
+        label: "Some Node",
         display_data: null,
         base: {
           name: "BaseNode",
           module: ["vellum", "workflows", "nodes", "bases", "base"],
         },
         definition: {
-          name: "TopNode",
-          module: ["testing", "nodes", "top_node"],
+          name: "SomeNode",
+          module: ["testing", "nodes", "some_node"],
         },
         trigger: {
-          id: "top-target",
+          id: "some-target",
           merge_behavior: "AWAIT_ATTRIBUTES",
         },
         ports: [
           {
-            id: "top-default-port-id",
-            name: "default",
-            type: "DEFAULT",
-          },
-        ],
-        outputs: [],
-        attributes: [],
-      },
-      {
-        id: "bottom-node",
-        type: "GENERIC",
-        label: "Bottom Node",
-        display_data: null,
-        base: {
-          name: "BaseNode",
-          module: ["vellum", "workflows", "nodes", "bases", "base"],
-        },
-        definition: {
-          name: "BottomNode",
-          module: ["testing", "nodes", "bottom_node"],
-        },
-        trigger: {
-          id: "bottom-target",
-          merge_behavior: "AWAIT_ATTRIBUTES",
-        },
-        ports: [
-          {
-            id: "bottom-default-port-id",
+            id: "some-default-port-id",
             name: "default",
             type: "DEFAULT",
           },
         ],
         outputs: [
           {
-            id: "bottom-output-id",
+            id: "some-output-id",
             name: "result",
             type: "STRING",
           },
@@ -67,8 +40,8 @@ export default {
         id: "edge-2",
         source_node_id: "chat-message-trigger",
         source_handle_id: "chat-message-trigger",
-        target_node_id: "bottom-node",
-        target_handle_id: "bottom-target",
+        target_node_id: "some-node",
+        target_handle_id: "some-target",
         type: "DEFAULT",
       },
     ],
@@ -90,8 +63,8 @@ export default {
       exec_config: {
         output: {
           type: "NODE_OUTPUT",
-          node_id: "bottom-node",
-          node_output_id: "bottom-output-id",
+          node_id: "some-node",
+          node_output_id: "some-output-id",
         },
       },
       display_data: {
