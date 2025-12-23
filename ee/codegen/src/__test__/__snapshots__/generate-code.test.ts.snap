@@ -70,10 +70,8 @@ from .triggers.chat_message import ChatMessage
 
 
 class Workflow(BaseWorkflow):
-    graph = {
-        TopNode,
-        ChatMessage >> BottomNode,
-    }
+    graph = ChatMessage >> BottomNode
+    unused_graphs = {TopNode}
 "
 `;
 
