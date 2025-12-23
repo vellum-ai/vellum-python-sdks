@@ -4,8 +4,10 @@ from typing import Optional, Set
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.string_vellum_value_request import StringVellumValueRequest
+from vellum.workflows import BaseWorkflow
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.tests.test_utils import FixtureState
+from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes import FinalOutputNode
 from vellum.workflows.nodes.bases.base import BaseNode
@@ -15,6 +17,7 @@ from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.references.node import NodeReference
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.state.base import BaseState, StateMeta
+from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 
 def test_base_node__node_resolution__unset_pydantic_fields():
@@ -379,3 +382,32 @@ def test_base_node__ports_inheritance__cumulative_ports():
     # Potentially in the future, we support inheriting ports from multiple parents.
     # For now, we take only the declared ports, so that not all nodes have the default port.
     assert ports == ["bar"]
+
+
+def test_base_node__trigger_should_initiate__invalid_merge_behavior():
+    """
+    Tests that an invalid merge behavior raises a NodeException with the invalid value in the error message.
+    """
+
+    # GIVEN a node with an invalid merge behavior
+    class InvalidMergeBehaviorNode(BaseNode):
+        class Trigger(BaseNode.Trigger):
+            merge_behavior = "INVALID_MERGE_BEHAVIOR"  # type: ignore[assignment]
+
+    # AND a workflow that uses the node
+    class InvalidMergeBehaviorWorkflow(BaseWorkflow):
+        graph = InvalidMergeBehaviorNode
+
+    # WHEN we stream the workflow
+    workflow = InvalidMergeBehaviorWorkflow()
+    events = list(workflow.stream(event_filter=all_workflow_event_filter))
+
+    # THEN the workflow should reject
+    workflow_rejected_event = events[-1]
+    assert workflow_rejected_event.name == "workflow.execution.rejected"
+
+    # AND the error should have the correct code
+    assert workflow_rejected_event.error.code == WorkflowErrorCode.INVALID_INPUTS
+
+    # AND the error message should contain the invalid merge behavior
+    assert "INVALID_MERGE_BEHAVIOR" in workflow_rejected_event.error.message
