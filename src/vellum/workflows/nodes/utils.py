@@ -34,7 +34,7 @@ from vellum.workflows.types.code_execution_node_wrappers import (
     clean_for_dict_wrapper,
 )
 from vellum.workflows.types.core import Json
-from vellum.workflows.types.generics import NodeType
+from vellum.workflows.types.generics import NodeType, import_base_adornment_node
 
 if TYPE_CHECKING:
     from vellum.workflows.nodes import BaseNode
@@ -61,12 +61,11 @@ def get_unadorned_port(port: Port) -> Port:
 
 
 def get_wrapped_node(node: Type[NodeType]) -> Optional[Type["BaseNode"]]:
-    # Use attribute-based detection instead of issubclass to avoid circular imports
-    wrapped_node = getattr(node, "__wrapped_node__", None)
-    if wrapped_node is None:
+    BaseAdornmentNode = import_base_adornment_node()
+    if not issubclass(node, BaseAdornmentNode):
         return None
 
-    return wrapped_node
+    return node.__wrapped_node__
 
 
 AdornableNode = TypeVar("AdornableNode", bound="BaseNode")
