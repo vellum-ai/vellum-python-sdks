@@ -9,6 +9,7 @@ from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.events.types import default_serializer
 from vellum.workflows.exceptions import NodeException, WorkflowInitializationException
+from vellum.workflows.nodes.utils import get_unadorned_node
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.references.constant import ConstantValueReference
 
@@ -30,10 +31,8 @@ class MockNodeExecution(UniversalBaseModel):
         """Serialize the model and add node_id field computed from then_outputs."""
         serialized = handler(self)
         node_class = self.then_outputs.__class__.__parent_class__
-        # Unwrap adornment nodes to get the inner wrapped node's ID
-        while hasattr(node_class, "__wrapped_node__") and node_class.__wrapped_node__ is not None:
-            node_class = node_class.__wrapped_node__
-        serialized["node_id"] = str(node_class.__id__)
+        unadorned_node = get_unadorned_node(node_class)  # type: ignore[arg-type]
+        serialized["node_id"] = str(unadorned_node.__id__)
         serialized["type"] = "NODE_EXECUTION"
         if self.disabled is None:
             del serialized["disabled"]
