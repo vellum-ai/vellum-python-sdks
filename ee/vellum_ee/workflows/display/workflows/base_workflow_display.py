@@ -809,7 +809,9 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
 
         Uses the client's integrations.retrieve_integration_tool_definition method.
 
-        Returns the tool definition with input_parameters if found, None otherwise.
+        Returns the tool definition with output_parameters (payload schema) if found, None otherwise.
+        For triggers, output_parameters contains the webhook payload schema, while input_parameters
+        contains setup/config arguments.
         """
         try:
             tool_definition = self._client.integrations.retrieve_integration_tool_definition(
@@ -821,7 +823,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                 JsonObject,
                 {
                     "name": tool_definition.name,
-                    "input_parameters": tool_definition.input_parameters,
+                    "output_parameters": tool_definition.output_parameters,
                 },
             )
         except Exception as e:
@@ -855,13 +857,15 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         if not trigger_def:
             return
 
-        input_parameters = trigger_def.get("input_parameters", {})
-        if not input_parameters or not isinstance(input_parameters, dict):
+        # output_parameters contains the webhook payload schema for triggers
+        # (input_parameters contains setup/config arguments like team_id)
+        output_parameters = trigger_def.get("output_parameters", {})
+        if not output_parameters or not isinstance(output_parameters, dict):
             return
 
-        # input_parameters is a JSON Schema object with structure:
+        # output_parameters is a JSON Schema object with structure:
         # {"type": "object", "properties": {"key": {"type": "string"}, ...}, "required": [...]}
-        properties = input_parameters.get("properties", {})
+        properties = output_parameters.get("properties", {})
         if not properties or not isinstance(properties, dict):
             return
 

@@ -43,11 +43,15 @@ class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
 
 
 def _create_mock_tool_definition(properties: Dict[str, dict]) -> MagicMock:
-    """Helper to create a mock tool definition with input_parameters as JSON Schema."""
+    """Helper to create a mock tool definition with output_parameters as JSON Schema.
+
+    For triggers, output_parameters contains the webhook payload schema,
+    while input_parameters contains setup/config arguments.
+    """
     mock_tool_def = MagicMock()
     mock_tool_def.name = "LINEAR_ISSUE_CREATED_TRIGGER"
-    # input_parameters is a JSON Schema object
-    mock_tool_def.input_parameters = {
+    # output_parameters is a JSON Schema object containing the payload schema
+    mock_tool_def.output_parameters = {
         "type": "object",
         "properties": properties,
         "required": list(properties.keys()),
@@ -159,7 +163,7 @@ def test_integration_trigger_validation__no_properties():
         "retrieve_integration_tool_definition",
         return_value=mock_tool_def,
     ):
-        # THEN serialization should succeed (validation is skipped when no input_parameters)
+        # THEN serialization should succeed (validation is skipped when no output_parameters)
         result = workflow_display.serialize()
 
     # AND the trigger should still be serialized
