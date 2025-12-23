@@ -2,15 +2,6 @@ export default {
   workflow_raw_data: {
     nodes: [
       {
-        id: "entrypoint-node",
-        type: "ENTRYPOINT",
-        data: {
-          label: "Entrypoint",
-          source_handle_id: "entrypoint-source",
-        },
-        inputs: [],
-      },
-      {
         id: "top-node",
         type: "GENERIC",
         label: "Top Node",
@@ -72,14 +63,6 @@ export default {
       },
     ],
     edges: [
-      {
-        id: "edge-1",
-        source_node_id: "entrypoint-node",
-        source_handle_id: "entrypoint-source",
-        target_node_id: "top-node",
-        target_handle_id: "top-target",
-        type: "DEFAULT",
-      },
       {
         id: "edge-2",
         source_node_id: "chat-message-trigger",
