@@ -584,6 +584,15 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
       }),
     ];
 
+    if (integrationTool.toolkit_version != null) {
+      args.push(
+        python.methodArgument({
+          name: "toolkit_version",
+          value: new StrInstantiation(integrationTool.toolkit_version),
+        })
+      );
+    }
+
     return python.instantiateClass({
       classReference: python.reference({
         name: "VellumIntegrationToolDefinition",
