@@ -62,6 +62,55 @@ def test_vellum_integration_service_get_tool_definition_success(vellum_client):
         integration_name="GITHUB",
         integration_provider="COMPOSIO",
         tool_name="GITHUB_CREATE_AN_ISSUE",
+        toolkit_version=None,
+    )
+
+
+def test_vellum_integration_service_get_tool_definition_with_toolkit_version(vellum_client):
+    """Test that toolkit_version is passed through when retrieving tool definitions"""
+    # GIVEN a mock client configured to return a tool definition
+    mock_client = vellum_client
+    tool_definition_response = ComponentsSchemasComposioToolDefinition(
+        integration=Integration(
+            id=str(uuid4()),
+            provider="COMPOSIO",
+            name="GITHUB",
+        ),
+        label="GITHUB_CREATE_AN_ISSUE",
+        name="GITHUB_CREATE_AN_ISSUE",
+        description="Create a new issue in a GitHub repository",
+        input_parameters={
+            "type": "object",
+            "properties": {
+                "repo": {"type": "string", "description": "Repository name"},
+            },
+            "required": ["repo"],
+        },
+        output_parameters={},
+        toolkit_version="2.0.0",
+    )
+    mock_client.integrations.retrieve_integration_tool_definition.return_value = tool_definition_response
+
+    # WHEN we request a tool definition with a specific toolkit_version
+    service = VellumIntegrationService(client=mock_client)
+    result = service.get_tool_definition(
+        integration="GITHUB",
+        provider="COMPOSIO",
+        tool_name="GITHUB_CREATE_AN_ISSUE",
+        toolkit_version="2.0.0",
+    )
+
+    # THEN the tool definition should be returned with the toolkit_version preserved
+    assert isinstance(result, VellumIntegrationToolDetails)
+    assert result.name == "GITHUB_CREATE_AN_ISSUE"
+    assert result.toolkit_version == "2.0.0"
+
+    # AND the API should have been called with the toolkit_version parameter
+    mock_client.integrations.retrieve_integration_tool_definition.assert_called_once_with(
+        integration_name="GITHUB",
+        integration_provider="COMPOSIO",
+        tool_name="GITHUB_CREATE_AN_ISSUE",
+        toolkit_version="2.0.0",
     )
 
 
@@ -129,6 +178,40 @@ def test_vellum_integration_service_execute_tool_success(vellum_client):
             "title": "Test Issue",
             "body": "Test body",
         },
+        toolkit_version=None,
+    )
+
+
+def test_vellum_integration_service_execute_tool_with_toolkit_version(vellum_client):
+    """Test that toolkit_version is passed through when executing tools"""
+    # GIVEN a mock client configured to return a successful response
+    mock_client = vellum_client
+    mock_client.integrations = mock.MagicMock()
+
+    mock_response = mock.MagicMock()
+    mock_response.data = {"success": True, "result": "executed with version"}
+    mock_client.integrations.execute_integration_tool.return_value = mock_response
+
+    # WHEN we execute a tool with a specific toolkit_version
+    service = VellumIntegrationService(client=mock_client)
+    result = service.execute_tool(
+        integration="GITHUB",
+        provider="COMPOSIO",
+        tool_name="GITHUB_CREATE_AN_ISSUE",
+        arguments={"repo": "user/repo"},
+        toolkit_version="2.0.0",
+    )
+
+    # THEN the execution result should contain expected data
+    assert result["success"] is True
+
+    # AND the API should have been called with the toolkit_version parameter
+    mock_client.integrations.execute_integration_tool.assert_called_once_with(
+        integration_name="GITHUB",
+        integration_provider="COMPOSIO",
+        tool_name="GITHUB_CREATE_AN_ISSUE",
+        arguments={"repo": "user/repo"},
+        toolkit_version="2.0.0",
     )
 
 

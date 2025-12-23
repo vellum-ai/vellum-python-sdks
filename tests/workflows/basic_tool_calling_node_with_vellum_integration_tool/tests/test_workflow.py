@@ -159,6 +159,7 @@ def test_run_workflow__happy_path(vellum_adhoc_prompt_client, vellum_client, moc
                 "title": "Bug in authentication",
                 "body": "There seems to be an issue with login functionality",
             },
+            toolkit_version=None,
         )
 
 
@@ -264,7 +265,7 @@ def test_tool_definition_and_function_compilation(vellum_client):
         assert result.parameters is not None and "properties" in result.parameters
         assert result.parameters["properties"] is not None and "title" in result.parameters["properties"]
         mock_service_instance.get_tool_definition.assert_called_once_with(
-            integration="GITHUB", provider="COMPOSIO", tool_name="create_issue"
+            integration="GITHUB", provider="COMPOSIO", tool_name="create_issue", toolkit_version=None
         )
 
     # Test fallback on service failure
