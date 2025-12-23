@@ -1457,6 +1457,14 @@ client.integrations.retrieve_integration_tool_definition(
 <dl>
 <dd>
 
+**toolkit_version:** `typing.Optional[str]` — The version of the toolkit to use. Pass 'latest' to get the latest version, or a specific version string to pin it. If not provided, uses the provider's default.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
     
 </dd>
@@ -1534,6 +1542,14 @@ client.integrations.execute_integration_tool(
 <dd>
 
 **arguments:** `typing.Dict[str, typing.Optional[typing.Any]]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**toolkit_version:** `typing.Optional[str]` 
     
 </dd>
 </dl>
@@ -4938,6 +4954,14 @@ client.integration_providers.retrieve_integration_provider_tool_definition(
 <dl>
 <dd>
 
+**toolkit_version:** `typing.Optional[str]` — The version of the toolkit to use. Pass 'latest' to get the latest version, or a specific version string to pin it. If not provided, uses the provider's default.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
     
 </dd>
@@ -5050,6 +5074,14 @@ client.integration_providers.list_integration_tools(
 <dd>
 
 **search:** `typing.Optional[str]` — The search term to filter the tools by
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**toolkit_version:** `typing.Optional[str]` — The version of the toolkit to lookup. Pass 'latest' to get the latest version, or a specific version string to pin it. If not provided, uses the provider's default.
     
 </dd>
 </dl>

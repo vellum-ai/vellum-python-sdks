@@ -34,6 +34,7 @@ class IntegrationProvidersClient:
         integration_provider: str,
         tool_name: str,
         *,
+        toolkit_version: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ComponentsSchemasComposioToolDefinition:
         """
@@ -49,6 +50,9 @@ class IntegrationProvidersClient:
 
         tool_name : str
             The tool's unique name, as specified by the integration provider
+
+        toolkit_version : typing.Optional[str]
+            The version of the toolkit to use. Pass 'latest' to get the latest version, or a specific version string to pin it. If not provided, uses the provider's default.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -73,7 +77,11 @@ class IntegrationProvidersClient:
         )
         """
         _response = self._raw_client.retrieve_integration_provider_tool_definition(
-            integration_name, integration_provider, tool_name, request_options=request_options
+            integration_name,
+            integration_provider,
+            tool_name,
+            toolkit_version=toolkit_version,
+            request_options=request_options,
         )
         return _response.data
 
@@ -87,6 +95,7 @@ class IntegrationProvidersClient:
         limit: typing.Optional[int] = None,
         offset: typing.Optional[int] = None,
         search: typing.Optional[str] = None,
+        toolkit_version: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> PaginatedSlimToolDefinitionList:
         """
@@ -114,6 +123,9 @@ class IntegrationProvidersClient:
 
         search : typing.Optional[str]
             The search term to filter the tools by
+
+        toolkit_version : typing.Optional[str]
+            The version of the toolkit to lookup. Pass 'latest' to get the latest version, or a specific version string to pin it. If not provided, uses the provider's default.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -143,6 +155,7 @@ class IntegrationProvidersClient:
             limit=limit,
             offset=offset,
             search=search,
+            toolkit_version=toolkit_version,
             request_options=request_options,
         )
         return _response.data
@@ -169,6 +182,7 @@ class AsyncIntegrationProvidersClient:
         integration_provider: str,
         tool_name: str,
         *,
+        toolkit_version: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ComponentsSchemasComposioToolDefinition:
         """
@@ -184,6 +198,9 @@ class AsyncIntegrationProvidersClient:
 
         tool_name : str
             The tool's unique name, as specified by the integration provider
+
+        toolkit_version : typing.Optional[str]
+            The version of the toolkit to use. Pass 'latest' to get the latest version, or a specific version string to pin it. If not provided, uses the provider's default.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -216,7 +233,11 @@ class AsyncIntegrationProvidersClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.retrieve_integration_provider_tool_definition(
-            integration_name, integration_provider, tool_name, request_options=request_options
+            integration_name,
+            integration_provider,
+            tool_name,
+            toolkit_version=toolkit_version,
+            request_options=request_options,
         )
         return _response.data
 
@@ -230,6 +251,7 @@ class AsyncIntegrationProvidersClient:
         limit: typing.Optional[int] = None,
         offset: typing.Optional[int] = None,
         search: typing.Optional[str] = None,
+        toolkit_version: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> PaginatedSlimToolDefinitionList:
         """
@@ -257,6 +279,9 @@ class AsyncIntegrationProvidersClient:
 
         search : typing.Optional[str]
             The search term to filter the tools by
+
+        toolkit_version : typing.Optional[str]
+            The version of the toolkit to lookup. Pass 'latest' to get the latest version, or a specific version string to pin it. If not provided, uses the provider's default.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -294,6 +319,7 @@ class AsyncIntegrationProvidersClient:
             limit=limit,
             offset=offset,
             search=search,
+            toolkit_version=toolkit_version,
             request_options=request_options,
         )
         return _response.data

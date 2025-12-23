@@ -19,6 +19,7 @@ class ComposioToolDefinition(UniversalBaseModel):
     description: str
     input_parameters: typing.Dict[str, typing.Optional[typing.Any]]
     output_parameters: typing.Dict[str, typing.Optional[typing.Any]]
+    toolkit_version: str
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

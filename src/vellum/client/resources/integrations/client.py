@@ -39,6 +39,7 @@ class IntegrationsClient:
         integration_provider: str,
         tool_name: str,
         *,
+        toolkit_version: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ComponentsSchemasComposioToolDefinition:
         """
@@ -52,6 +53,9 @@ class IntegrationsClient:
 
         tool_name : str
             The tool's unique name, as specified by the integration provider
+
+        toolkit_version : typing.Optional[str]
+            The version of the toolkit to use. Pass 'latest' to get the latest version, or a specific version string to pin it. If not provided, uses the provider's default.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -76,7 +80,11 @@ class IntegrationsClient:
         )
         """
         _response = self._raw_client.retrieve_integration_tool_definition(
-            integration_name, integration_provider, tool_name, request_options=request_options
+            integration_name,
+            integration_provider,
+            tool_name,
+            toolkit_version=toolkit_version,
+            request_options=request_options,
         )
         return _response.data
 
@@ -87,6 +95,7 @@ class IntegrationsClient:
         tool_name: str,
         *,
         arguments: typing.Dict[str, typing.Optional[typing.Any]],
+        toolkit_version: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ComponentsSchemasComposioExecuteToolResponse:
         """
@@ -102,6 +111,8 @@ class IntegrationsClient:
             The tool's unique name, as specified by the integration provider
 
         arguments : typing.Dict[str, typing.Optional[typing.Any]]
+
+        toolkit_version : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -127,7 +138,12 @@ class IntegrationsClient:
         )
         """
         _response = self._raw_client.execute_integration_tool(
-            integration_name, integration_provider, tool_name, arguments=arguments, request_options=request_options
+            integration_name,
+            integration_provider,
+            tool_name,
+            arguments=arguments,
+            toolkit_version=toolkit_version,
+            request_options=request_options,
         )
         return _response.data
 
@@ -247,6 +263,7 @@ class AsyncIntegrationsClient:
         integration_provider: str,
         tool_name: str,
         *,
+        toolkit_version: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ComponentsSchemasComposioToolDefinition:
         """
@@ -260,6 +277,9 @@ class AsyncIntegrationsClient:
 
         tool_name : str
             The tool's unique name, as specified by the integration provider
+
+        toolkit_version : typing.Optional[str]
+            The version of the toolkit to use. Pass 'latest' to get the latest version, or a specific version string to pin it. If not provided, uses the provider's default.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -292,7 +312,11 @@ class AsyncIntegrationsClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.retrieve_integration_tool_definition(
-            integration_name, integration_provider, tool_name, request_options=request_options
+            integration_name,
+            integration_provider,
+            tool_name,
+            toolkit_version=toolkit_version,
+            request_options=request_options,
         )
         return _response.data
 
@@ -303,6 +327,7 @@ class AsyncIntegrationsClient:
         tool_name: str,
         *,
         arguments: typing.Dict[str, typing.Optional[typing.Any]],
+        toolkit_version: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ComponentsSchemasComposioExecuteToolResponse:
         """
@@ -318,6 +343,8 @@ class AsyncIntegrationsClient:
             The tool's unique name, as specified by the integration provider
 
         arguments : typing.Dict[str, typing.Optional[typing.Any]]
+
+        toolkit_version : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -351,7 +378,12 @@ class AsyncIntegrationsClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.execute_integration_tool(
-            integration_name, integration_provider, tool_name, arguments=arguments, request_options=request_options
+            integration_name,
+            integration_provider,
+            tool_name,
+            arguments=arguments,
+            toolkit_version=toolkit_version,
+            request_options=request_options,
         )
         return _response.data
 

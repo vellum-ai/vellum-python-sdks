@@ -31,6 +31,7 @@ class RawIntegrationsClient:
         integration_provider: str,
         tool_name: str,
         *,
+        toolkit_version: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[ComponentsSchemasComposioToolDefinition]:
         """
@@ -45,6 +46,9 @@ class RawIntegrationsClient:
         tool_name : str
             The tool's unique name, as specified by the integration provider
 
+        toolkit_version : typing.Optional[str]
+            The version of the toolkit to use. Pass 'latest' to get the latest version, or a specific version string to pin it. If not provided, uses the provider's default.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -57,6 +61,9 @@ class RawIntegrationsClient:
             f"integrations/v1/providers/{jsonable_encoder(integration_provider)}/integrations/{jsonable_encoder(integration_name)}/tools/{jsonable_encoder(tool_name)}",
             base_url=self._client_wrapper.get_environment().default,
             method="GET",
+            params={
+                "toolkit_version": toolkit_version,
+            },
             request_options=request_options,
         )
         try:
@@ -92,6 +99,7 @@ class RawIntegrationsClient:
         tool_name: str,
         *,
         arguments: typing.Dict[str, typing.Optional[typing.Any]],
+        toolkit_version: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[ComponentsSchemasComposioExecuteToolResponse]:
         """
@@ -108,6 +116,8 @@ class RawIntegrationsClient:
 
         arguments : typing.Dict[str, typing.Optional[typing.Any]]
 
+        toolkit_version : typing.Optional[str]
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -122,6 +132,7 @@ class RawIntegrationsClient:
             method="POST",
             json={
                 "arguments": arguments,
+                "toolkit_version": toolkit_version,
                 "provider": "COMPOSIO",
             },
             headers={
@@ -299,6 +310,7 @@ class AsyncRawIntegrationsClient:
         integration_provider: str,
         tool_name: str,
         *,
+        toolkit_version: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[ComponentsSchemasComposioToolDefinition]:
         """
@@ -313,6 +325,9 @@ class AsyncRawIntegrationsClient:
         tool_name : str
             The tool's unique name, as specified by the integration provider
 
+        toolkit_version : typing.Optional[str]
+            The version of the toolkit to use. Pass 'latest' to get the latest version, or a specific version string to pin it. If not provided, uses the provider's default.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -325,6 +340,9 @@ class AsyncRawIntegrationsClient:
             f"integrations/v1/providers/{jsonable_encoder(integration_provider)}/integrations/{jsonable_encoder(integration_name)}/tools/{jsonable_encoder(tool_name)}",
             base_url=self._client_wrapper.get_environment().default,
             method="GET",
+            params={
+                "toolkit_version": toolkit_version,
+            },
             request_options=request_options,
         )
         try:
@@ -360,6 +378,7 @@ class AsyncRawIntegrationsClient:
         tool_name: str,
         *,
         arguments: typing.Dict[str, typing.Optional[typing.Any]],
+        toolkit_version: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[ComponentsSchemasComposioExecuteToolResponse]:
         """
@@ -376,6 +395,8 @@ class AsyncRawIntegrationsClient:
 
         arguments : typing.Dict[str, typing.Optional[typing.Any]]
 
+        toolkit_version : typing.Optional[str]
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -390,6 +411,7 @@ class AsyncRawIntegrationsClient:
             method="POST",
             json={
                 "arguments": arguments,
+                "toolkit_version": toolkit_version,
                 "provider": "COMPOSIO",
             },
             headers={

@@ -23,6 +23,7 @@ class RawIntegrationProvidersClient:
         integration_provider: str,
         tool_name: str,
         *,
+        toolkit_version: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[ComponentsSchemasComposioToolDefinition]:
         """
@@ -39,6 +40,9 @@ class RawIntegrationProvidersClient:
         tool_name : str
             The tool's unique name, as specified by the integration provider
 
+        toolkit_version : typing.Optional[str]
+            The version of the toolkit to use. Pass 'latest' to get the latest version, or a specific version string to pin it. If not provided, uses the provider's default.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -51,6 +55,9 @@ class RawIntegrationProvidersClient:
             f"v1/integration-providers/{jsonable_encoder(integration_provider)}/integrations/{jsonable_encoder(integration_name)}/tools/{jsonable_encoder(tool_name)}",
             base_url=self._client_wrapper.get_environment().default,
             method="GET",
+            params={
+                "toolkit_version": toolkit_version,
+            },
             request_options=request_options,
         )
         try:
@@ -78,6 +85,7 @@ class RawIntegrationProvidersClient:
         limit: typing.Optional[int] = None,
         offset: typing.Optional[int] = None,
         search: typing.Optional[str] = None,
+        toolkit_version: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[PaginatedSlimToolDefinitionList]:
         """
@@ -106,6 +114,9 @@ class RawIntegrationProvidersClient:
         search : typing.Optional[str]
             The search term to filter the tools by
 
+        toolkit_version : typing.Optional[str]
+            The version of the toolkit to lookup. Pass 'latest' to get the latest version, or a specific version string to pin it. If not provided, uses the provider's default.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -125,6 +136,7 @@ class RawIntegrationProvidersClient:
                 "limit": limit,
                 "offset": offset,
                 "search": search,
+                "toolkit_version": toolkit_version,
             },
             request_options=request_options,
         )
@@ -154,6 +166,7 @@ class AsyncRawIntegrationProvidersClient:
         integration_provider: str,
         tool_name: str,
         *,
+        toolkit_version: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[ComponentsSchemasComposioToolDefinition]:
         """
@@ -170,6 +183,9 @@ class AsyncRawIntegrationProvidersClient:
         tool_name : str
             The tool's unique name, as specified by the integration provider
 
+        toolkit_version : typing.Optional[str]
+            The version of the toolkit to use. Pass 'latest' to get the latest version, or a specific version string to pin it. If not provided, uses the provider's default.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -182,6 +198,9 @@ class AsyncRawIntegrationProvidersClient:
             f"v1/integration-providers/{jsonable_encoder(integration_provider)}/integrations/{jsonable_encoder(integration_name)}/tools/{jsonable_encoder(tool_name)}",
             base_url=self._client_wrapper.get_environment().default,
             method="GET",
+            params={
+                "toolkit_version": toolkit_version,
+            },
             request_options=request_options,
         )
         try:
@@ -209,6 +228,7 @@ class AsyncRawIntegrationProvidersClient:
         limit: typing.Optional[int] = None,
         offset: typing.Optional[int] = None,
         search: typing.Optional[str] = None,
+        toolkit_version: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[PaginatedSlimToolDefinitionList]:
         """
@@ -237,6 +257,9 @@ class AsyncRawIntegrationProvidersClient:
         search : typing.Optional[str]
             The search term to filter the tools by
 
+        toolkit_version : typing.Optional[str]
+            The version of the toolkit to lookup. Pass 'latest' to get the latest version, or a specific version string to pin it. If not provided, uses the provider's default.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -256,6 +279,7 @@ class AsyncRawIntegrationProvidersClient:
                 "limit": limit,
                 "offset": offset,
                 "search": search,
+                "toolkit_version": toolkit_version,
             },
             request_options=request_options,
         )
