@@ -63,17 +63,21 @@ def test_serialize_workflow__workflow_outputs_reference_non_node_outputs():
 
     # WHEN we serialize it
     workflow_display = get_workflow_display(workflow_class=Workflow)
+    serialized_workflow = workflow_display.serialize()
 
-    # THEN it should raise an error
-    with pytest.raises(UserFacingException) as exc_info:
-        workflow_display.serialize()
+    # THEN it should successfully serialize the workflow output reference to a constant
+    assert len(serialized_workflow["output_variables"]) == 1
+    output_variable = serialized_workflow["output_variables"][0]
+    assert output_variable["key"] == "final"
+    output_variable_id = output_variable["id"]
 
-    # AND the error message should be user friendly
-    assert (
-        str(exc_info.value)
-        == """Failed to serialize output 'final': Reference to outputs \
-'test_serialize_workflow__workflow_outputs_reference_non_node_outputs.<locals>.FirstWorkflow.Outputs' is invalid."""
-    )
+    # AND the output value should be a constant value
+    assert len(serialized_workflow["workflow_raw_data"]["output_values"]) == 1
+    output_value = serialized_workflow["workflow_raw_data"]["output_values"][0]
+    assert output_value["output_variable_id"] == output_variable_id
+    assert output_value["value"]["type"] == "CONSTANT_VALUE"
+    assert output_value["value"]["value"]["type"] == "STRING"
+    assert output_value["value"]["value"]["value"] == "bar"
 
 
 def test_serialize_workflow__node_display_class_not_registered():
