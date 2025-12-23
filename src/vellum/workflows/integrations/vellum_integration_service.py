@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from vellum.client.core.api_error import ApiError
 from vellum.workflows.constants import VellumIntegrationProviderType
@@ -25,6 +25,7 @@ class VellumIntegrationService:
         integration: str,
         provider: str,
         tool_name: str,
+        toolkit_version: Optional[str] = None,
     ) -> VellumIntegrationToolDetails:
         """Retrieve a tool definition from Vellum integrations.
 
@@ -32,6 +33,9 @@ class VellumIntegrationService:
             integration: The integration name (e.g., "GITHUB", "SLACK")
             provider: The integration provider name (e.g., "COMPOSIO")
             tool_name: The tool's unique name as specified by the provider
+            toolkit_version: The version of the toolkit to use. Pass 'latest' to get the
+                latest version, or a specific version string to pin it. If not provided,
+                uses the provider's default.
 
         Returns:
             VellumIntegrationToolDetails containing the tool definition with parameters
@@ -44,6 +48,7 @@ class VellumIntegrationService:
                 integration_name=integration,
                 integration_provider=provider,
                 tool_name=tool_name,
+                toolkit_version=toolkit_version,
             )
 
             return VellumIntegrationToolDetails(
@@ -52,6 +57,7 @@ class VellumIntegrationService:
                 name=response.name,
                 description=response.description,
                 parameters=response.input_parameters,
+                toolkit_version=toolkit_version,
             )
         except Exception as e:
             error_message = f"Failed to retrieve tool definition for {tool_name}: {str(e)}"
@@ -66,6 +72,7 @@ class VellumIntegrationService:
         provider: str,
         tool_name: str,
         arguments: Dict[str, Any],
+        toolkit_version: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Execute a tool through Vellum integrations.
 
@@ -74,6 +81,9 @@ class VellumIntegrationService:
             provider: The integration provider name (e.g., "COMPOSIO")
             tool_name: The tool's unique name as specified by the provider
             arguments: Arguments to pass to the tool
+            toolkit_version: The version of the toolkit to use. Pass 'latest' to get the
+                latest version, or a specific version string to pin it. If not provided,
+                uses the provider's default.
 
         Returns:
             Dict containing the execution result data
@@ -88,6 +98,7 @@ class VellumIntegrationService:
                 integration_provider=provider,
                 tool_name=tool_name,
                 arguments=arguments,
+                toolkit_version=toolkit_version,
             )
 
             # Return the data from the response

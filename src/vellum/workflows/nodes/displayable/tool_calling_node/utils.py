@@ -283,6 +283,7 @@ class VellumIntegrationNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
                 provider=self.vellum_integration_tool.provider.value,
                 tool_name=self.vellum_integration_tool.name,
                 arguments=self.arguments,
+                toolkit_version=self.vellum_integration_tool.toolkit_version,
             )
         except NodeException as e:
             error_payload = {
