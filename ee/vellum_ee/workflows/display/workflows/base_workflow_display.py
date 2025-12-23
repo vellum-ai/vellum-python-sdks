@@ -31,6 +31,7 @@ from vellum.workflows.nodes.displayable.final_output_node.node import FinalOutpu
 from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port, get_wrapped_node
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, StateValueReference, WorkflowInputReference
+from vellum.workflows.triggers.chat_message import ChatMessageTrigger
 from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.triggers.manual import ManualTrigger
 from vellum.workflows.triggers.schedule import ScheduleTrigger
@@ -272,6 +273,19 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         # - Only non-manual triggers with no regular entrypoints: skip ENTRYPOINT
         has_triggers = len(trigger_edges) > 0
         needs_entrypoint_node = has_manual_trigger or not has_triggers or len(non_trigger_entrypoint_nodes) > 0
+
+        # Check for ChatMessageTrigger - it's mutually exclusive with having an entrypoint node
+        chat_message_trigger_edges = [
+            edge for edge in trigger_edges if issubclass(edge.trigger_class, ChatMessageTrigger)
+        ]
+        has_chat_message_trigger = len(chat_message_trigger_edges) > 0
+
+        if has_chat_message_trigger and needs_entrypoint_node:
+            raise WorkflowValidationError(
+                message="ChatMessageTrigger and entrypoint nodes are mutually exclusive. "
+                "A workflow cannot have both a ChatMessageTrigger and an entrypoint node.",
+                workflow_class_name=self._workflow.__name__,
+            )
 
         entrypoint_node_id: Optional[UUID] = None
         entrypoint_node_source_handle_id: Optional[UUID] = None
@@ -634,6 +648,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                     trigger_type = WorkflowTriggerType.INTEGRATION
                 elif issubclass(trigger_class, ScheduleTrigger):
                     trigger_type = WorkflowTriggerType.SCHEDULED
+                elif issubclass(trigger_class, ChatMessageTrigger):
+                    trigger_type = WorkflowTriggerType.CHAT_MESSAGE
                 else:
                     raise ValueError(
                         f"Unknown trigger type: {trigger_class.__name__}. "
