@@ -63,17 +63,31 @@ def test_serialize_workflow__workflow_outputs_reference_non_node_outputs():
 
     # WHEN we serialize it
     workflow_display = get_workflow_display(workflow_class=Workflow)
+    serialized_workflow = workflow_display.serialize()
 
-    # THEN it should raise an error
-    with pytest.raises(UserFacingException) as exc_info:
-        workflow_display.serialize()
+    # THEN it should successfully serialize the workflow output reference to a constant
+    assert isinstance(serialized_workflow, dict)
+    output_variables = serialized_workflow["output_variables"]
+    assert isinstance(output_variables, list)
+    assert output_variables == [{"id": "2b32416b-ccfc-4231-a3a6-d08e76327815", "key": "final", "type": "STRING"}]
 
-    # AND the error message should be user friendly
-    assert (
-        str(exc_info.value)
-        == """Failed to serialize output 'final': Reference to outputs \
-'test_serialize_workflow__workflow_outputs_reference_non_node_outputs.<locals>.FirstWorkflow.Outputs' is invalid."""
-    )
+    # AND the output value should be a constant value
+    workflow_raw_data = serialized_workflow["workflow_raw_data"]
+    assert isinstance(workflow_raw_data, dict)
+    output_values = workflow_raw_data["output_values"]
+    assert isinstance(output_values, list)
+    assert output_values == [
+        {
+            "output_variable_id": "2b32416b-ccfc-4231-a3a6-d08e76327815",
+            "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "bar"}},
+        }
+    ]
+
+    first_output_variable = output_variables[0]
+    assert isinstance(first_output_variable, dict)
+    first_output_value = output_values[0]
+    assert isinstance(first_output_value, dict)
+    assert first_output_variable["id"] == first_output_value["output_variable_id"]
 
 
 def test_serialize_workflow__node_display_class_not_registered():
