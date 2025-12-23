@@ -225,7 +225,8 @@ def test_serialize_module_with_dataset_row_id_from_metadata():
 
     assert result.dataset[2]["label"] == "Scenario 3 without ID"
     assert result.dataset[2]["inputs"]["message"] == "No ID"
-    assert "id" not in result.dataset[2]
+    # AND the third row should have a deterministic hash-based ID since it has no explicit ID
+    assert result.dataset[2]["id"] == "cc40aa9b-179a-43fc-8fda-d40ea8a8e300"
 
 
 def test_serialize_module_with_base_inputs_and_metadata():
