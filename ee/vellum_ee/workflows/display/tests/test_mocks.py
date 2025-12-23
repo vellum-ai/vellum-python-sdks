@@ -844,3 +844,69 @@ def test_mocks__validate_all__try_node_wrapped_node_deserializes_correctly():
 
     # AND the then_outputs is the correct type with the expected value
     assert node_output_mocks[0].then_outputs == inner_node.Outputs(result="mocked_result")
+
+
+def test_mocks__validate_all__ignores_undefined_outputs():
+    """
+    Tests that validate_all ignores outputs that are not defined in the node's Outputs class.
+    """
+
+    # GIVEN a node wrapped in a TryNode adornment
+    @TryNode.wrap()
+    class WrappedNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result: str
+
+    # AND a workflow that uses the wrapped node
+    class MyWorkflow(BaseWorkflow):
+        graph = WrappedNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_result = WrappedNode.Outputs.result
+
+    # AND the inner wrapped node's ID
+    inner_node = WrappedNode.__wrapped_node__
+    assert inner_node is not None
+
+    # AND a raw mock workflow node execution with an undefined "error" output
+    raw_mock_workflow_node_executions = [
+        {
+            "node_id": str(inner_node.__id__),
+            "when_condition": {
+                "type": "BINARY_EXPRESSION",
+                "operator": ">=",
+                "lhs": {
+                    "type": "EXECUTION_COUNTER",
+                    "node_id": str(inner_node.__id__),
+                },
+                "rhs": {
+                    "type": "CONSTANT_VALUE",
+                    "value": {
+                        "type": "NUMBER",
+                        "value": 1,
+                    },
+                },
+            },
+            "then_outputs": {
+                "result": "mocked_result",
+                "error": "some error value",
+            },
+        },
+    ]
+
+    # WHEN we parse the raw data on MockNodeExecution
+    node_output_mocks = MockNodeExecution.validate_all(
+        raw_mock_workflow_node_executions,
+        MyWorkflow,
+        descriptor_validator=base_descriptor_validator,
+    )
+
+    # THEN we get a list with one MockNodeExecution object
+    assert node_output_mocks is not None
+    assert len(node_output_mocks) == 1
+
+    # AND the then_outputs only contains the declared "result" output
+    assert node_output_mocks[0].then_outputs == inner_node.Outputs(result="mocked_result")
+
+    # AND the "error" output was ignored and is not present
+    assert not hasattr(node_output_mocks[0].then_outputs, "error")
