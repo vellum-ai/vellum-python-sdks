@@ -39,15 +39,13 @@ from vellum.workflows.utils.vellum_variables import (
         (Optional[list[ChatMessage]], "CHAT_HISTORY"),
         (list[SearchResult], "SEARCH_RESULTS"),
         (Optional[list[SearchResult]], "SEARCH_RESULTS"),
-        pytest.param(
+        (
             list[VellumValue],
             "ARRAY",
-            marks=pytest.mark.xfail(reason="We should convert list[VellumValue] to ARRAY.", strict=True),
         ),
-        pytest.param(
+        (
             Optional[list[VellumValue]],
             "ARRAY",
-            marks=pytest.mark.xfail(reason="We should convert list[VellumValue] to ARRAY.", strict=True),
         ),
     ],
 )
