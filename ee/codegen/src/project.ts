@@ -927,7 +927,7 @@ ${errors.slice(0, 3).map((err) => {
           trigger,
         });
         triggerPromises.push(scheduledTrigger.persist());
-      } else if (trigger.type === "CHAT_MESSAGE" && trigger.execConfig) {
+      } else if (trigger.type === "CHAT_MESSAGE") {
         const chatMessageTrigger = new ChatMessageTrigger({
           workflowContext: this.workflowContext,
           trigger,

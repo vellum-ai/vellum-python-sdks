@@ -1,20 +1,20 @@
 import { python } from "@fern-api/python-ast";
 
-import {
-  OUTPUTS_CLASS_NAME,
-  VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH,
-} from "src/constants";
-import { AccessAttribute } from "src/generators/extensions/access-attribute";
+import { VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH } from "src/constants";
 import { Class } from "src/generators/extensions/class";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { Field } from "src/generators/extensions/field";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { BaseTrigger } from "src/generators/triggers/base-trigger";
+import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { createPythonClassName, toPythonSafeSnakeCase } from "src/utils/casing";
 
 import type { AstNode } from "src/generators/extensions/ast-node";
-import type { ChatMessageTrigger as ChatMessageTriggerType } from "src/types/vellum";
+import type {
+  ChatMessageTrigger as ChatMessageTriggerType,
+  WorkflowValueDescriptor as WorkflowValueDescriptorType,
+} from "src/types/vellum";
 
 export declare namespace ChatMessageTriggerGenerator {
   interface Args {
@@ -69,52 +69,46 @@ export class ChatMessageTrigger extends BaseTrigger<ChatMessageTriggerType> {
       ],
     });
 
-    if (output && output.type === "NODE_OUTPUT") {
-      const nodeContext = this.workflowContext.findNodeContext(output.nodeId);
-
-      if (nodeContext) {
-        const nodeOutputName = nodeContext.getNodeOutputNameById(
-          output.nodeOutputId
-        );
-
-        if (nodeOutputName) {
-          const lazyReferenceValue = new ClassInstantiation({
-            classReference: new Reference({
-              name: "LazyReference",
-              modulePath: [
-                ...this.workflowContext.sdkModulePathNames
-                  .WORKFLOWS_MODULE_PATH,
-                "references",
-              ],
-            }),
-            arguments_: [
-              new MethodArgument({
-                value: python.lambda({
-                  body: new AccessAttribute({
-                    lhs: new Reference({
-                      name: nodeContext.nodeClassName,
-                      modulePath: nodeContext.nodeModulePath,
-                    }),
-                    rhs: new Reference({
-                      name: `${OUTPUTS_CLASS_NAME}.${nodeOutputName}`,
-                      modulePath: [],
-                    }),
-                  }),
-                }),
-              }),
-            ],
-          });
-
-          configClass.add(
-            new Field({
-              name: "output",
-              initializer: lazyReferenceValue,
-            })
-          );
-        }
+    if (output) {
+      const outputField = this.createOutputField(output);
+      if (outputField) {
+        configClass.add(outputField);
       }
     }
 
     return configClass;
+  }
+
+  private createOutputField(
+    output: WorkflowValueDescriptorType
+  ): AstNode | undefined {
+    const workflowValueDescriptor = new WorkflowValueDescriptor({
+      workflowContext: this.workflowContext,
+      workflowValueDescriptor: output,
+    });
+
+    const lazyReferenceValue = new ClassInstantiation({
+      classReference: new Reference({
+        name: "LazyReference",
+        modulePath: [
+          ...this.workflowContext.sdkModulePathNames.WORKFLOWS_MODULE_PATH,
+          "references",
+        ],
+      }),
+      arguments_: [
+        new MethodArgument({
+          value: python.lambda({
+            body: workflowValueDescriptor,
+          }),
+        }),
+      ],
+    });
+
+    this.inheritReferences(lazyReferenceValue);
+
+    return new Field({
+      name: "output",
+      initializer: lazyReferenceValue,
+    });
   }
 }
