@@ -1469,7 +1469,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                         elif isinstance(inputs_obj, DatasetRow) and inputs_obj.id is not None:
                             row_data["id"] = inputs_obj.id
                         else:
-                            row_data["id"] = str(uuid4_from_hash(repr(normalized_row)))
+                            row_data["id"] = str(uuid4_from_hash(f"{module}.sandbox.dataset.{i}"))
 
                         dataset.append(row_data)
         except (ImportError, AttributeError):
