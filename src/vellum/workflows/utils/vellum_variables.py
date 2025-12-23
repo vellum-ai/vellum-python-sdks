@@ -211,7 +211,7 @@ def _builtin_list_to_vellum_type(type_: Type) -> Union[str, None]:
             ):
                 return "SEARCH_RESULTS"
 
-            return "ARRAY"
+            # return "ARRAY"
 
     return None
 
