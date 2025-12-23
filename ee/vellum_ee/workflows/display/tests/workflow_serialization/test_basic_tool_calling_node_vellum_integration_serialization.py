@@ -1,3 +1,11 @@
+from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
+from vellum.client.types.rich_text_prompt_block import RichTextPromptBlock
+from vellum.client.types.variable_prompt_block import VariablePromptBlock
+from vellum.workflows.constants import VellumIntegrationProviderType
+from vellum.workflows.nodes.displayable.tool_calling_node import ToolCallingNode
+from vellum.workflows.state.base import BaseState
+from vellum.workflows.types.definition import VellumIntegrationToolDefinition
+from vellum.workflows.workflows.base import BaseInputs, BaseWorkflow
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 from tests.workflows.basic_tool_calling_node_with_vellum_integration_tool.workflow import (
@@ -66,3 +74,114 @@ def test_serialize_workflow():
     assert function["integration_name"] == "GITHUB"
     assert function["name"] == "create_issue"
     assert function["description"] == "Create a new issue in a GitHub repository"
+
+
+def test_serialize_workflow__with_toolkit_version():
+    """
+    Tests that VellumIntegrationToolDefinition with toolkit_version serializes correctly.
+    """
+
+    # GIVEN a VellumIntegrationToolDefinition with toolkit_version
+    github_tool_with_version = VellumIntegrationToolDefinition(
+        provider=VellumIntegrationProviderType.COMPOSIO,
+        integration_name="GITHUB",
+        name="create_issue",
+        description="Create a new issue in a GitHub repository",
+        toolkit_version="1.2.3",
+    )
+
+    # AND a ToolCallingNode that uses this tool
+    class TestInputs(BaseInputs):
+        query: str
+
+    class TestToolCallingNode(ToolCallingNode):
+        ml_model = "gpt-4o-mini"
+        blocks = [
+            ChatMessagePromptBlock(
+                chat_role="USER",
+                blocks=[
+                    RichTextPromptBlock(
+                        blocks=[
+                            VariablePromptBlock(input_variable="question"),
+                        ],
+                    ),
+                ],
+            ),
+        ]
+        functions = [github_tool_with_version]
+        prompt_inputs = {"question": TestInputs.query}
+
+    class TestWorkflow(BaseWorkflow[TestInputs, BaseState]):
+        graph = TestToolCallingNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            text = TestToolCallingNode.Outputs.text
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the function should include the toolkit_version
+    workflow_raw_data = serialized_workflow["workflow_raw_data"]
+    tool_calling_node = workflow_raw_data["nodes"][1]
+    attributes = tool_calling_node["attributes"]
+    functions_attr = next(attr for attr in attributes if attr["name"] == "functions")
+    functions_value = functions_attr["value"]["value"]["value"]
+    function = functions_value[0]
+
+    assert function["toolkit_version"] == "1.2.3"
+
+
+def test_serialize_workflow__without_toolkit_version():
+    """
+    Tests that VellumIntegrationToolDefinition without toolkit_version serializes with null.
+    """
+
+    # GIVEN a VellumIntegrationToolDefinition without toolkit_version
+    github_tool_no_version = VellumIntegrationToolDefinition(
+        provider=VellumIntegrationProviderType.COMPOSIO,
+        integration_name="SLACK",
+        name="send_message",
+        description="Send a message to a Slack channel",
+    )
+
+    # AND a ToolCallingNode that uses this tool
+    class TestInputs(BaseInputs):
+        query: str
+
+    class TestToolCallingNode(ToolCallingNode):
+        ml_model = "gpt-4o-mini"
+        blocks = [
+            ChatMessagePromptBlock(
+                chat_role="USER",
+                blocks=[
+                    RichTextPromptBlock(
+                        blocks=[
+                            VariablePromptBlock(input_variable="question"),
+                        ],
+                    ),
+                ],
+            ),
+        ]
+        functions = [github_tool_no_version]
+        prompt_inputs = {"question": TestInputs.query}
+
+    class TestWorkflow(BaseWorkflow[TestInputs, BaseState]):
+        graph = TestToolCallingNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            text = TestToolCallingNode.Outputs.text
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the function should have toolkit_version as None
+    workflow_raw_data = serialized_workflow["workflow_raw_data"]
+    tool_calling_node = workflow_raw_data["nodes"][1]
+    attributes = tool_calling_node["attributes"]
+    functions_attr = next(attr for attr in attributes if attr["name"] == "functions")
+    functions_value = functions_attr["value"]["value"]["value"]
+    function = functions_value[0]
+
+    assert function["toolkit_version"] is None

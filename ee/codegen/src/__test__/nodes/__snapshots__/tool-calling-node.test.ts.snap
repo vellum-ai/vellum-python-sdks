@@ -428,6 +428,45 @@ class ToolCallingNode(BaseToolCallingNode):
 "
 `;
 
+exports[`ToolCallingNode > vellum integration tool > should generate vellum integration tool with toolkit_version 1`] = `
+"from vellum.workflows.nodes.displayable.tool_calling_node import (
+    ToolCallingNode as BaseToolCallingNode,
+)
+from vellum.workflows.types.definition import VellumIntegrationToolDefinition
+
+
+class ToolCallingNode(BaseToolCallingNode):
+    functions = [
+        VellumIntegrationToolDefinition(
+            provider="COMPOSIO",
+            integration_name="GITHUB",
+            name="github_create_issue",
+            description="Create a new issue in a GitHub repository",
+            toolkit_version="1.2.3",
+        )
+    ]
+"
+`;
+
+exports[`ToolCallingNode > vellum integration tool > should generate vellum integration tool without toolkit_version 1`] = `
+"from vellum.workflows.nodes.displayable.tool_calling_node import (
+    ToolCallingNode as BaseToolCallingNode,
+)
+from vellum.workflows.types.definition import VellumIntegrationToolDefinition
+
+
+class ToolCallingNode(BaseToolCallingNode):
+    functions = [
+        VellumIntegrationToolDefinition(
+            provider="COMPOSIO",
+            integration_name="SLACK",
+            name="slack_send_message",
+            description="Send a message to a Slack channel",
+        )
+    ]
+"
+`;
+
 exports[`ToolCallingNode > workflow deployment > should generate latest release tag if release_tag is null 1`] = `
 "from vellum.workflows.nodes.displayable.tool_calling_node import (
     ToolCallingNode as BaseToolCallingNode,

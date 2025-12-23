@@ -269,6 +269,101 @@ describe("ToolCallingNode", () => {
     });
   });
 
+  describe("vellum integration tool", () => {
+    it("should generate vellum integration tool with toolkit_version", async () => {
+      const nodePortData: NodePort[] = [
+        nodePortFactory({
+          id: "port-id",
+        }),
+      ];
+
+      const vellumIntegrationToolFunction = {
+        type: "VELLUM_INTEGRATION",
+        provider: "COMPOSIO",
+        integration_name: "GITHUB",
+        name: "github_create_issue",
+        description: "Create a new issue in a GitHub repository",
+        toolkit_version: "1.2.3",
+      };
+
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [vellumIntegrationToolFunction],
+          },
+        }
+      );
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [functionsAttribute],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("should generate vellum integration tool without toolkit_version", async () => {
+      const nodePortData: NodePort[] = [
+        nodePortFactory({
+          id: "port-id",
+        }),
+      ];
+
+      const vellumIntegrationToolFunction = {
+        type: "VELLUM_INTEGRATION",
+        provider: "COMPOSIO",
+        integration_name: "SLACK",
+        name: "slack_send_message",
+        description: "Send a message to a Slack channel",
+      };
+
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [vellumIntegrationToolFunction],
+          },
+        }
+      );
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [functionsAttribute],
+      });
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
   describe("function ordering", () => {
     const codeExecutionFunction: FunctionArgs = {
       type: "CODE_EXECUTION",

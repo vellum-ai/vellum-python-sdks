@@ -184,6 +184,9 @@ class VellumIntegrationToolDefinition(UniversalBaseModel):
     # Required for tool base consistency
     description: str
 
+    # Optional toolkit version for pinning
+    toolkit_version: Optional[str] = None
+
 
 class VellumIntegrationToolDetails(VellumIntegrationToolDefinition):
     """Extended version of VellumIntegrationToolDefinition with runtime parameters.
