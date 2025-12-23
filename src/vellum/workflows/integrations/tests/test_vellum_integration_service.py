@@ -33,6 +33,7 @@ def test_vellum_integration_service_get_tool_definition_success(vellum_client):
             "required": ["repo", "title"],
         },
         output_parameters={},
+        toolkit_version="1.0.0",
     )
     mock_client.integrations.retrieve_integration_tool_definition.return_value = tool_definition_response
 
