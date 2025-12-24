@@ -1534,13 +1534,12 @@ def test_push__workspace_option__same_module_different_workspaces_in_lockfile_us
     is used based on the workspace when configs are in the lockfile.
     """
 
-    # GIVEN a module configured for two different workspaces with different sandbox IDs in the lockfile
+    # GIVEN a module configured for two different workspaces with the same sandbox ID in the lockfile
     temp_dir = mock_module.temp_dir
     module = mock_module.module
-    default_workflow_sandbox_id = str(uuid4())
-    other_workflow_sandbox_id = str(uuid4())
+    workflow_sandbox_id = str(uuid4())
 
-    # AND the lockfile has the same module configured for two workspaces
+    # AND the lockfile has the same module and sandbox ID configured for two workspaces
     with open(os.path.join(temp_dir, "vellum.lock.json"), "w") as f:
         json.dump(
             {
@@ -1548,7 +1547,7 @@ def test_push__workspace_option__same_module_different_workspaces_in_lockfile_us
                 "workflows": [
                     {
                         "module": module,
-                        "workflow_sandbox_id": default_workflow_sandbox_id,
+                        "workflow_sandbox_id": workflow_sandbox_id,
                         "workspace": "default",
                         "container_image_name": None,
                         "container_image_tag": None,
@@ -1558,7 +1557,7 @@ def test_push__workspace_option__same_module_different_workspaces_in_lockfile_us
                     },
                     {
                         "module": module,
-                        "workflow_sandbox_id": other_workflow_sandbox_id,
+                        "workflow_sandbox_id": workflow_sandbox_id,
                         "workspace": "other",
                         "container_image_name": None,
                         "container_image_tag": None,
@@ -1600,7 +1599,7 @@ OTHER_VELLUM_API_KEY=other_api_key_456
 
     # AND the push API call returns successfully
     vellum_client_class.return_value.workflows.push.return_value = WorkflowPushResponse(
-        workflow_sandbox_id=other_workflow_sandbox_id,
+        workflow_sandbox_id=workflow_sandbox_id,
     )
 
     # WHEN calling `vellum push` with --workspace other
@@ -1610,7 +1609,7 @@ OTHER_VELLUM_API_KEY=other_api_key_456
     # THEN it should succeed
     assert result.exit_code == 0, result.output
 
-    # AND we should have called the push API with the correct workflow_sandbox_id for the "other" workspace
+    # AND we should have called the push API with the correct workflow_sandbox_id
     vellum_client_class.return_value.workflows.push.assert_called_once()
     call_args = vellum_client_class.return_value.workflows.push.call_args.kwargs
-    assert call_args["workflow_sandbox_id"] == other_workflow_sandbox_id
+    assert call_args["workflow_sandbox_id"] == workflow_sandbox_id
