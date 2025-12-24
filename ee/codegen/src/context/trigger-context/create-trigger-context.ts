@@ -1,7 +1,9 @@
 import { WorkflowContext } from "src/context";
+import { ChatMessageTriggerContext } from "src/context/trigger-context/chat-message-trigger";
 import { IntegrationTriggerContext } from "src/context/trigger-context/integration-trigger";
 import { ScheduledTriggerContext } from "src/context/trigger-context/scheduled-trigger";
 import {
+  ChatMessageTrigger,
   IntegrationTrigger,
   ScheduledTrigger,
   WorkflowTrigger,
@@ -33,6 +35,14 @@ export function createTriggerContext({
       const triggerContext = new ScheduledTriggerContext({
         workflowContext,
         triggerData: triggerData as ScheduledTrigger,
+      });
+      workflowContext.addTriggerContext(triggerContext);
+      break;
+    }
+    case "CHAT_MESSAGE": {
+      const triggerContext = new ChatMessageTriggerContext({
+        workflowContext,
+        triggerData: triggerData as ChatMessageTrigger,
       });
       workflowContext.addTriggerContext(triggerContext);
       break;

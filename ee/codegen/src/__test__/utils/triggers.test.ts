@@ -69,4 +69,19 @@ describe("getTriggerClassInfo", () => {
       modulePath: ["tests", "fixtures", "triggers", "slack_new_message"],
     });
   });
+
+  it("should return correct info for CHAT_MESSAGE trigger", () => {
+    const trigger: WorkflowTrigger = {
+      id: "chat-message-trigger-id",
+      type: WorkflowTriggerType.CHAT_MESSAGE,
+      attributes: [{ id: "attr-1", type: "JSON", key: "message" }],
+    };
+
+    const result = getTriggerClassInfo(trigger, workflowContextFactory());
+
+    expect(result).toEqual({
+      className: "ChatMessageTrigger",
+      modulePath: ["code", "triggers", "chat_message"],
+    });
+  });
 });
