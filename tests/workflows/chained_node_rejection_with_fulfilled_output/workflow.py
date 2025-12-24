@@ -1,20 +1,32 @@
+from vellum import ChatMessagePromptBlock, JinjaPromptBlock
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
+from vellum.workflows.nodes.displayable.bases.inline_prompt_node import BaseInlinePromptNode
 
 
-class FirstNode(BaseNode):
-    """A node that succeeds and produces an output."""
+class FirstNode(BaseInlinePromptNode):
+    """An inline prompt node that succeeds and produces streaming output."""
 
-    class Outputs(BaseNode.Outputs):
-        value: str = "success"
+    ml_model = "gpt-4o"
+    blocks = [
+        ChatMessagePromptBlock(
+            chat_role="SYSTEM",
+            blocks=[
+                JinjaPromptBlock(
+                    block_type="JINJA",
+                    template="Hello world",
+                ),
+            ],
+        ),
+    ]
 
 
 class SecondNode(BaseNode):
     """A node that fails after the first node succeeds."""
 
-    first_value = FirstNode.Outputs.value
+    first_value = FirstNode.Outputs.results
 
     class Outputs(BaseNode.Outputs):
         pass
@@ -26,7 +38,7 @@ class SecondNode(BaseNode):
 class ChainedNodeRejectionWithFulfilledOutputWorkflow(BaseWorkflow):
     """
     A workflow with two chained nodes where:
-    - The first node succeeds and produces an output
+    - The first node is an inline prompt node that succeeds and produces streaming output
     - The second node fails
     - The workflow output points to the first node's output
 
@@ -37,4 +49,4 @@ class ChainedNodeRejectionWithFulfilledOutputWorkflow(BaseWorkflow):
     graph = FirstNode >> SecondNode
 
     class Outputs(BaseWorkflow.Outputs):
-        final_value = FirstNode.Outputs.value
+        final_value = FirstNode.Outputs.results
