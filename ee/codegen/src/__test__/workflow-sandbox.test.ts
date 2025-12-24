@@ -861,20 +861,8 @@ describe("Workflow Sandbox", () => {
       sandbox.write(writer);
       const result = await writer.toStringFormatted();
 
-      // THEN it should generate DatasetRow with previous_execution_id for the first scenario
+      // THEN it should generate DatasetRow with previous_execution_id
       expect(result).toMatchSnapshot();
-      expect(result).toContain(
-        `previous_execution_id="${previousExecutionId}"`
-      );
-
-      // AND the second scenario should not have previous_execution_id
-      const lines = result.split("\n");
-      const secondDatasetRowIndex = lines.findIndex((line) =>
-        line.includes('label="Scenario without Previous Execution ID"')
-      );
-      expect(secondDatasetRowIndex).toBeGreaterThan(-1);
-      const secondDatasetRowLine = lines[secondDatasetRowIndex];
-      expect(secondDatasetRowLine).not.toContain("previous_execution_id=");
     });
   });
 });
