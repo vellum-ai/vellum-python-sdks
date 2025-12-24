@@ -1524,3 +1524,93 @@ def test_push__includes_metadata_json_in_artifact(mock_module, vellum_client):
     module_data = exec_config.get("module_data") or {}
     additional_files = module_data.get("additional_files") or {}
     assert "metadata.json" not in additional_files
+
+
+def test_push__workspace_option__same_module_different_workspaces_in_lockfile_uses_correct_sandbox_id(
+    mock_module, vellum_client_class
+):
+    """
+    Tests that when pushing with --workspace flag, the correct workflow_sandbox_id
+    is used based on the workspace when configs are in the lockfile.
+    """
+
+    # GIVEN a module configured for two different workspaces with different sandbox IDs in the lockfile
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+    default_workflow_sandbox_id = str(uuid4())
+    other_workflow_sandbox_id = str(uuid4())
+
+    # AND the lockfile has the same module configured for two workspaces
+    with open(os.path.join(temp_dir, "vellum.lock.json"), "w") as f:
+        json.dump(
+            {
+                "version": "1.0",
+                "workflows": [
+                    {
+                        "module": module,
+                        "workflow_sandbox_id": default_workflow_sandbox_id,
+                        "workspace": "default",
+                        "container_image_name": None,
+                        "container_image_tag": None,
+                        "deployments": [],
+                        "ignore": None,
+                        "target_directory": None,
+                    },
+                    {
+                        "module": module,
+                        "workflow_sandbox_id": other_workflow_sandbox_id,
+                        "workspace": "other",
+                        "container_image_name": None,
+                        "container_image_tag": None,
+                        "deployments": [],
+                        "ignore": None,
+                        "target_directory": None,
+                    },
+                ],
+                "workspaces": [],
+            },
+            f,
+            indent=2,
+        )
+
+    # AND the pyproject.toml has the workspace config but no workflow configs
+    mock_module.set_pyproject_toml(
+        {
+            "workflows": [],
+            "workspaces": [
+                {
+                    "name": "other",
+                    "api_key": "OTHER_VELLUM_API_KEY",
+                }
+            ],
+        }
+    )
+
+    # AND the .env file has both api keys stored
+    with open(os.path.join(temp_dir, ".env"), "w") as f:
+        f.write(
+            """\
+VELLUM_API_KEY=default_api_key_123
+OTHER_VELLUM_API_KEY=other_api_key_456
+"""
+        )
+
+    # AND a workflow exists in the module
+    _ensure_workflow_py(temp_dir, module)
+
+    # AND the push API call returns successfully
+    vellum_client_class.return_value.workflows.push.return_value = WorkflowPushResponse(
+        workflow_sandbox_id=other_workflow_sandbox_id,
+    )
+
+    # WHEN calling `vellum push` with --workspace other
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["push", module, "--workspace", "other"])
+
+    # THEN it should succeed
+    assert result.exit_code == 0, result.output
+
+    # AND we should have called the push API with the correct workflow_sandbox_id for the "other" workspace
+    vellum_client_class.return_value.workflows.push.assert_called_once()
+    call_args = vellum_client_class.return_value.workflows.push.call_args.kwargs
+    assert call_args["workflow_sandbox_id"] == other_workflow_sandbox_id
