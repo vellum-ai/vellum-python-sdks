@@ -274,6 +274,19 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         has_triggers = len(trigger_edges) > 0
         needs_entrypoint_node = has_manual_trigger or not has_triggers or len(non_trigger_entrypoint_nodes) > 0
 
+        # Check for ChatMessageTrigger - it's mutually exclusive with having an entrypoint node
+        chat_message_trigger_edges = [
+            edge for edge in trigger_edges if issubclass(edge.trigger_class, ChatMessageTrigger)
+        ]
+        has_chat_message_trigger = len(chat_message_trigger_edges) > 0
+
+        if has_chat_message_trigger and needs_entrypoint_node:
+            raise WorkflowValidationError(
+                message="ChatMessageTrigger and entrypoint nodes are mutually exclusive. "
+                "A workflow cannot have both a ChatMessageTrigger and an entrypoint node.",
+                workflow_class_name=self._workflow.__name__,
+            )
+
         entrypoint_node_id: Optional[UUID] = None
         entrypoint_node_source_handle_id: Optional[UUID] = None
         entrypoint_node_display = self.display_context.workflow_display.entrypoint_node_display
