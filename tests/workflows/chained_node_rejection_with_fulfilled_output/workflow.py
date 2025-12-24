@@ -3,10 +3,10 @@ from vellum.workflows import BaseWorkflow
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.bases import BaseNode
-from vellum.workflows.nodes.displayable.bases.inline_prompt_node import BaseInlinePromptNode
+from vellum.workflows.nodes.displayable.inline_prompt_node import InlinePromptNode
 
 
-class FirstNode(BaseInlinePromptNode):
+class FirstNode(InlinePromptNode):
     """An inline prompt node that succeeds and produces streaming output."""
 
     ml_model = "gpt-4o"
@@ -26,7 +26,7 @@ class FirstNode(BaseInlinePromptNode):
 class SecondNode(BaseNode):
     """A node that fails after the first node succeeds."""
 
-    first_value = FirstNode.Outputs.results
+    first_value = FirstNode.Outputs.text
 
     class Outputs(BaseNode.Outputs):
         pass
@@ -49,4 +49,4 @@ class ChainedNodeRejectionWithFulfilledOutputWorkflow(BaseWorkflow):
     graph = FirstNode >> SecondNode
 
     class Outputs(BaseWorkflow.Outputs):
-        final_value = FirstNode.Outputs.results
+        final_value = FirstNode.Outputs.text
