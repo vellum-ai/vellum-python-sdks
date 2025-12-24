@@ -1572,10 +1572,15 @@ def test_push__workspace_option__same_module_different_workspaces_in_lockfile_us
             indent=2,
         )
 
-    # AND the pyproject.toml has the workspace config but no workflow configs
+    # AND the pyproject.toml has the first workflow config and workspace config
     mock_module.set_pyproject_toml(
         {
-            "workflows": [],
+            "workflows": [
+                {
+                    "module": module,
+                    "workflow_sandbox_id": workflow_sandbox_id,
+                }
+            ],
             "workspaces": [
                 {
                     "name": "other",
