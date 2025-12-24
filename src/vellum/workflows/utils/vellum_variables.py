@@ -1,4 +1,5 @@
 from datetime import datetime
+import sys
 import typing
 from typing import Any, List, Tuple, Type, Union, get_args, get_origin
 
@@ -213,3 +214,50 @@ def _builtin_list_to_vellum_type(type_: Type) -> Union[str, None]:
             return "ARRAY"
 
     return None
+
+
+def _is_vellum_value_subtype(type_: Type) -> bool:
+    # This logic is here primarily for `ArrayVellumValue`, which is defined recursively.
+    # At class definition time, we invoke some Pydantic helpers to resolve its forward references.
+    vellum_value_types = [
+        (
+            t.__forward_value__
+            if isinstance(t, typing.ForwardRef) and t.__forward_evaluated__ and t.__forward_value__ is not None
+            else t
+        )
+        for t in typing.get_args(VellumValue)
+    ]
+    origin = get_origin(type_)
+    if not origin:
+        if isinstance(type_, type):
+            return any(issubclass(type_, vellum_value_type) for vellum_value_type in vellum_value_types)
+        elif isinstance(type_, typing.ForwardRef):
+            # If the forward ref hasn't been resolved yet, do the simple stupid thing and
+            # assume it's not a VellumValue subtype.
+            # This means user-defined types should use the fully resolved types!
+            if not type_.__forward_evaluated__ or type_.__forward_value__ is None:
+                return False
+
+            type_ = type_.__forward_value__
+            if isinstance(type_, type):
+                return any(issubclass(type_, vellum_value_type) for vellum_value_type in vellum_value_types)
+            else:
+                return False
+        else:
+            return False
+
+    if sys.version_info >= (3, 10) and sys.version_info < (3, 14):
+        # See https://docs.python.org/3/library/types.html#types.UnionType.
+        # In Python 3.10, `types.UnionType` was introduced to support X | Y union type expressions.
+        # In Python 3.14, `types.UnionType` is just an alias for `typing.Union`.
+        from types import UnionType
+
+        union_types = (typing.Union, UnionType)
+    else:
+        union_types = (typing.Union,)
+
+    if origin in union_types:
+        args = get_args(type_)
+        return all(_is_vellum_value_subtype(arg) for arg in args)
+
+    return False
