@@ -102,11 +102,22 @@ export class Expression extends AstNode {
       rawLhs = this.generateConstantReference(lhs);
     }
     this.inheritReferences(rawLhs);
-    this.inheritReferences(rhs);
+
+    let rawRhs = rhs;
+    if (
+      rawRhs &&
+      operator === "coalesce" &&
+      (this.isConstantValueReference(rawRhs) ||
+        this.isConstantValuePointer(rawRhs) ||
+        this.isTypeInstantiation(rawRhs))
+    ) {
+      rawRhs = this.generateConstantReference(rawRhs);
+    }
+    this.inheritReferences(rawRhs);
 
     return new BinaryExpression({
       lhs: rawLhs,
-      rhs,
+      rhs: rawRhs,
       operator,
       workflowContext: this.workflowContext,
     });
