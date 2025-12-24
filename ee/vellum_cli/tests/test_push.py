@@ -2,6 +2,7 @@ import pytest
 import io
 import json
 import os
+import pathlib
 import tarfile
 from unittest import mock
 from uuid import uuid4
@@ -716,7 +717,9 @@ def test_push__push_fails_due_to_404_error_with_id(mock_module, vellum_client):
     assert "Traceback" not in result.output
 
 
-def test_push__push_fails_due_to_404_error_without_id(tmp_path, vellum_client, monkeypatch):
+def test_push__push_fails_due_to_404_error_without_id(
+    tmp_path: pathlib.Path, vellum_client, monkeypatch: pytest.MonkeyPatch
+):
     """
     Tests that a 404 error without a workflow sandbox ID shows a helpful error message.
     """
@@ -737,6 +740,7 @@ def test_push__push_fails_due_to_404_error_without_id(tmp_path, vellum_client, m
     pyproject_file.write_text(f'[tool.vellum]\n[[tool.vellum.workflows]]\nmodule = "{module}"\n')
 
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("VELLUM_API_KEY", "abcdef123456")
 
     # AND the push API call returns a 404 response
     vellum_client.workflows.push.side_effect = ApiError(

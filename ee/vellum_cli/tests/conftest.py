@@ -1,8 +1,6 @@
 import pytest
 from dataclasses import dataclass
-import os
-import shutil
-import tempfile
+import pathlib
 from uuid import uuid4
 from typing import Any, Callable, Dict, Generator
 
@@ -18,17 +16,17 @@ class MockModuleResult:
 
 
 @pytest.fixture
-def mock_module(request) -> Generator[MockModuleResult, None, None]:
-    current_dir = os.getcwd()
-    temp_dir = tempfile.mkdtemp()
-    os.chdir(temp_dir)
+def mock_module(
+    request, monkeypatch: pytest.MonkeyPatch, tmp_path: pathlib.Path
+) -> Generator[MockModuleResult, None, None]:
+    monkeypatch.chdir(tmp_path)
 
     # Use the test name to create a unique module path
     module = f"examples.mock.{request.node.name}"
     workflow_sandbox_id = str(uuid4())
 
     def set_pyproject_toml(vellum_config: Dict[str, Any]) -> None:
-        pyproject_toml_path = os.path.join(temp_dir, "pyproject.toml")
+        pyproject_toml_path = tmp_path / "pyproject.toml"
         with open(pyproject_toml_path, "wb") as f:
             tomli_w.dump(
                 {"tool": {"vellum": vellum_config}},
@@ -46,18 +44,15 @@ def mock_module(request) -> Generator[MockModuleResult, None, None]:
         }
     )
 
-    with open(os.path.join(temp_dir, ".env"), "w") as f:
+    with open(tmp_path / ".env", "w") as f:
         f.write("VELLUM_API_KEY=abcdef123456")
 
     yield MockModuleResult(
-        temp_dir=temp_dir,
+        temp_dir=str(tmp_path),
         module=module,
         set_pyproject_toml=set_pyproject_toml,
         workflow_sandbox_id=workflow_sandbox_id,
     )
-
-    os.chdir(current_dir)
-    shutil.rmtree(temp_dir)
 
 
 @pytest.fixture

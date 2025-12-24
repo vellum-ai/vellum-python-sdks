@@ -1,7 +1,7 @@
 import pytest
 import json
 import os
-import tempfile
+import pathlib
 from unittest import mock
 from uuid import uuid4
 
@@ -227,7 +227,7 @@ def test_pull__with_nested_target_dir(vellum_client, mock_module, base_command):
         }
 
 
-def test_pull__sandbox_id_with_no_config(vellum_client):
+def test_pull__sandbox_id_with_no_config(vellum_client, monkeypatch: pytest.MonkeyPatch, tmp_path: pathlib.Path):
     # GIVEN a workflow sandbox id
     workflow_sandbox_id = "87654321-0000-0000-0000-000000000000"
 
@@ -237,28 +237,25 @@ def test_pull__sandbox_id_with_no_config(vellum_client):
     )
 
     # AND we are currently in a new directory
-    current_dir = os.getcwd()
-    temp_dir = tempfile.mkdtemp()
-    os.chdir(temp_dir)
+    monkeypatch.chdir(tmp_path)
 
     # WHEN the user runs the pull command with the workflow sandbox id and no module
     runner = CliRunner()
     result = runner.invoke(cli_main, ["workflows", "pull", "--workflow-sandbox-id", workflow_sandbox_id])
-    os.chdir(current_dir)
 
     # THEN the command returns successfully
     assert result.exit_code == 0
 
     # AND the pull api is called with the workflow sandbox id
     vellum_client.workflows.pull.assert_called_once()
-    workflow_py = os.path.join(temp_dir, "super_cool_workflow", "workflow.py")
-    assert os.path.exists(workflow_py)
+    workflow_py = tmp_path / "super_cool_workflow" / "workflow.py"
+    assert workflow_py.exists()
     with open(workflow_py) as f:
         assert f.read() == "print('hello')"
 
     # AND the vellum.lock.json file is created
-    vellum_lock_json = os.path.join(temp_dir, "vellum.lock.json")
-    assert os.path.exists(vellum_lock_json)
+    vellum_lock_json = tmp_path / "vellum.lock.json"
+    assert vellum_lock_json.exists()
     with open(vellum_lock_json) as f:
         lock_data = json.loads(f.read())
         assert lock_data == {
@@ -310,7 +307,9 @@ def test_pull__sandbox_id_with_other_workflow_configured(vellum_client, mock_mod
         assert f.read() == "print('hello')"
 
 
-def test_pull__workflow_deployment_with_no_config(vellum_client):
+def test_pull__workflow_deployment_with_no_config(
+    vellum_client, monkeypatch: pytest.MonkeyPatch, tmp_path: pathlib.Path
+):
     # GIVEN a workflow deployment
     workflow_deployment = "my-deployment"
     deployment_id = str(uuid4())
@@ -330,28 +329,25 @@ def test_pull__workflow_deployment_with_no_config(vellum_client):
     )
 
     # AND we are currently in a new directory
-    current_dir = os.getcwd()
-    temp_dir = tempfile.mkdtemp()
-    os.chdir(temp_dir)
+    monkeypatch.chdir(tmp_path)
 
     # WHEN the user runs the pull command with the workflow deployment
     runner = CliRunner()
     result = runner.invoke(cli_main, ["workflows", "pull", "--workflow-deployment", workflow_deployment])
-    os.chdir(current_dir)
 
     # THEN the command returns successfully
     assert result.exit_code == 0
 
     # AND the pull api is called with the workflow deployment
     vellum_client.workflows.pull.assert_called_once()
-    workflow_py = os.path.join(temp_dir, "my_deployment", "workflow.py")
-    assert os.path.exists(workflow_py)
+    workflow_py = tmp_path / "my_deployment" / "workflow.py"
+    assert workflow_py.exists()
     with open(workflow_py) as f:
         assert f.read() == "print('hello')"
 
     # AND the vellum.lock.json file is created
-    vellum_lock_json = os.path.join(temp_dir, "vellum.lock.json")
-    assert os.path.exists(vellum_lock_json)
+    vellum_lock_json = tmp_path / "vellum.lock.json"
+    assert vellum_lock_json.exists()
     with open(vellum_lock_json) as f:
         lock_data = json.loads(f.read())
         assert lock_data == {
@@ -381,7 +377,9 @@ def test_pull__workflow_deployment_with_no_config(vellum_client):
         }
 
 
-def test_pull__both_workflow_sandbox_id_and_deployment(vellum_client):
+def test_pull__both_workflow_sandbox_id_and_deployment(
+    vellum_client, monkeypatch: pytest.MonkeyPatch, tmp_path: pathlib.Path
+):
     # GIVEN a workflow sandbox id
     workflow_sandbox_id = "87654321-0000-0000-0000-000000000000"
 
@@ -392,9 +390,7 @@ def test_pull__both_workflow_sandbox_id_and_deployment(vellum_client):
     vellum_client.workflows.pull.return_value = iter([zip_file_map({"workflow.py": "print('hello')"})])
 
     # AND we are currently in a new directory
-    current_dir = os.getcwd()
-    temp_dir = tempfile.mkdtemp()
-    os.chdir(temp_dir)
+    monkeypatch.chdir(tmp_path)
 
     # WHEN the user runs the pull command with the workflow deployment
     runner = CliRunner()
@@ -409,7 +405,6 @@ def test_pull__both_workflow_sandbox_id_and_deployment(vellum_client):
             workflow_deployment,
         ],
     )
-    os.chdir(current_dir)
 
     # THEN the command returns successfully
     assert result.exit_code == 1
@@ -823,7 +818,7 @@ def test_pull__multiple_instances_of_same_module__keep_when_pulling_another_modu
         assert len(lock_data["workflows"]) == 3
 
 
-def test_pull__module_name_from_deployment_name(vellum_client):
+def test_pull__module_name_from_deployment_name(vellum_client, monkeypatch: pytest.MonkeyPatch, tmp_path: pathlib.Path):
     # GIVEN a workflow deployment
     workflow_deployment = "test-workflow-deployment-id"
 
@@ -841,30 +836,27 @@ def test_pull__module_name_from_deployment_name(vellum_client):
     )
 
     # AND we are currently in a new directory with a .env file
-    current_dir = os.getcwd()
-    temp_dir = tempfile.mkdtemp()
-    os.chdir(temp_dir)
-    with open(os.path.join(temp_dir, ".env"), "w") as f:
+    monkeypatch.chdir(tmp_path)
+    with open(tmp_path / ".env", "w") as f:
         f.write("VELLUM_API_KEY=test-api-key")
 
     # WHEN the user runs the pull command with the workflow deployment
     runner = CliRunner()
     result = runner.invoke(cli_main, ["workflows", "pull", "--workflow-deployment", workflow_deployment])
-    os.chdir(current_dir)
 
     # THEN the command returns successfully
     assert result.exit_code == 0
 
     # AND the module name is derived from the deployment_name in metadata.json (snake_cased)
-    vellum_lock_json = os.path.join(temp_dir, "vellum.lock.json")
-    assert os.path.exists(vellum_lock_json)
+    vellum_lock_json = tmp_path / "vellum.lock.json"
+    assert vellum_lock_json.exists()
     with open(vellum_lock_json) as f:
         lock_data = json.loads(f.read())
         assert lock_data["workflows"][0]["module"] == "test_deployment"
 
     # AND the workflow.py file is written to the module directory with the correct name
-    workflow_py = os.path.join(temp_dir, "test_deployment", "workflow.py")
-    assert os.path.exists(workflow_py)
+    workflow_py = tmp_path / "test_deployment" / "workflow.py"
+    assert workflow_py.exists()
     with open(workflow_py) as f:
         assert f.read() == "print('hello')"
 
@@ -963,7 +955,9 @@ def test_pull__unexpected_error_path(vellum_client):
         "377a59fb-1dd0-4760-9568-ae4bd6188da0",
     ],
 )
-def test_pull__workflow_deployment_adds_deployment_to_config(vellum_client, workflow_deployment):
+def test_pull__workflow_deployment_adds_deployment_to_config(
+    vellum_client, workflow_deployment, monkeypatch: pytest.MonkeyPatch, tmp_path: pathlib.Path
+):
     # GIVEN a workflow deployment ID
     deployment_id = str(uuid4())  # config will always use the deployment_id return from the API
     deployment_name = "Test Deployment"
@@ -988,9 +982,8 @@ def test_pull__workflow_deployment_adds_deployment_to_config(vellum_client, work
     )
 
     # AND we are currently in a new directory
-    current_dir = os.getcwd()
-    temp_dir = tempfile.mkdtemp()
-    os.chdir(temp_dir)
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("VELLUM_API_KEY", "abcdef123456")
 
     # WHEN the user runs the pull command with the workflow deployment
     runner = CliRunner()
@@ -1000,8 +993,8 @@ def test_pull__workflow_deployment_adds_deployment_to_config(vellum_client, work
     assert result.exit_code == 0
 
     # AND the deployment is saved in the config
-    vellum_lock_json = os.path.join(temp_dir, "vellum.lock.json")
-    assert os.path.exists(vellum_lock_json)
+    vellum_lock_json = tmp_path / "vellum.lock.json"
+    assert vellum_lock_json.exists()
     with open(vellum_lock_json) as f:
         lock_data = json.loads(f.read())
         assert len(lock_data["workflows"]) == 1
@@ -1011,21 +1004,18 @@ def test_pull__workflow_deployment_adds_deployment_to_config(vellum_client, work
         assert deployment["name"] == deployment_name
         assert deployment["label"] == deployment_label
 
-    os.chdir(current_dir)
 
-
-def test_pull__workflow_deployment_name_is_uuid(vellum_client):
+def test_pull__workflow_deployment_name_is_uuid(vellum_client, monkeypatch: pytest.MonkeyPatch, tmp_path: pathlib.Path):
     # GIVEN a workflow deployment name that is a valid UUID
     deployment_id = str(uuid4())
     deployment_name = str(uuid4())
 
     # AND an existing configuration with this deployment
-    current_dir = os.getcwd()
-    temp_dir = tempfile.mkdtemp()
-    os.chdir(temp_dir)
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("VELLUM_API_KEY", "abcdef123456")
 
     # Create initial config with a deployment
-    vellum_lock_json = os.path.join(temp_dir, "vellum.lock.json")
+    vellum_lock_json = tmp_path / "vellum.lock.json"
     with open(vellum_lock_json, "w") as f:
         json.dump(
             {
@@ -1091,11 +1081,11 @@ def test_pull__workflow_deployment_name_is_uuid(vellum_client):
         assert deployment["name"] == deployment_name
         assert deployment["label"] == updated_label
 
-    os.chdir(current_dir)
-
 
 @pytest.mark.parametrize("get_identifier", [(lambda d: d), (lambda d: "Test Name")])
-def test_pull__workflow_deployment_updates_existing_deployment(vellum_client, get_identifier):
+def test_pull__workflow_deployment_updates_existing_deployment(
+    vellum_client, get_identifier, monkeypatch: pytest.MonkeyPatch, tmp_path: pathlib.Path
+):
     """
     This test is to ensure that the deployment info is updated in the config
     when the user runs the pull command with the workflow deployment
@@ -1108,12 +1098,11 @@ def test_pull__workflow_deployment_updates_existing_deployment(vellum_client, ge
     deployment_name = "Test Name"
 
     # AND an existing configuration with this deployment
-    current_dir = os.getcwd()
-    temp_dir = tempfile.mkdtemp()
-    os.chdir(temp_dir)
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("VELLUM_API_KEY", "abcdef123456")
 
     # Create initial config with a deployment
-    vellum_lock_json = os.path.join(temp_dir, "vellum.lock.json")
+    vellum_lock_json = tmp_path / "vellum.lock.json"
     with open(vellum_lock_json, "w") as f:
         json.dump(
             {
@@ -1180,10 +1169,10 @@ def test_pull__workflow_deployment_updates_existing_deployment(vellum_client, ge
         assert deployment["name"] == deployment_name
         assert deployment["label"] == updated_label
 
-    os.chdir(current_dir)
 
-
-def test_pull__workflow_deployment_with_name_and_id(vellum_client):
+def test_pull__workflow_deployment_with_name_and_id(
+    vellum_client, monkeypatch: pytest.MonkeyPatch, tmp_path: pathlib.Path
+):
     """
     This test is to ensure that pulling with id and name will not add a new deployment to the config
     """
@@ -1212,9 +1201,8 @@ def test_pull__workflow_deployment_with_name_and_id(vellum_client):
     )
 
     # AND we are currently in a new directory
-    current_dir = os.getcwd()
-    temp_dir = tempfile.mkdtemp()
-    os.chdir(temp_dir)
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("VELLUM_API_KEY", "abcdef123456")
 
     # WHEN the user runs the pull command with the workflow deployment
     runner = CliRunner()
@@ -1224,8 +1212,8 @@ def test_pull__workflow_deployment_with_name_and_id(vellum_client):
     assert result.exit_code == 0
 
     # AND the deployment is saved in the config
-    vellum_lock_json = os.path.join(temp_dir, "vellum.lock.json")
-    assert os.path.exists(vellum_lock_json)
+    vellum_lock_json = tmp_path / "vellum.lock.json"
+    assert vellum_lock_json.exists()
     with open(vellum_lock_json) as f:
         lock_data = json.loads(f.read())
         assert len(lock_data["workflows"]) == 1
@@ -1235,8 +1223,6 @@ def test_pull__workflow_deployment_with_name_and_id(vellum_client):
         assert deployment["name"] == deployment_name
         assert deployment["label"] == deployment_label
         assert lock_data["workflows"][0]["workflow_sandbox_id"] == workflow_sandbox_id
-
-    os.chdir(current_dir)
 
     # AND pull with name will not add a new deployment to the config
     vellum_client.workflows.pull.return_value = iter(
@@ -1256,7 +1242,6 @@ def test_pull__workflow_deployment_with_name_and_id(vellum_client):
         ]
     )
 
-    os.chdir(temp_dir)
     result = runner.invoke(cli_main, ["workflows", "pull", "--workflow-deployment", deployment_name])
     assert result.exit_code == 0
     with open(vellum_lock_json) as f:
@@ -1265,8 +1250,6 @@ def test_pull__workflow_deployment_with_name_and_id(vellum_client):
         assert lock_data["workflows"][0]["deployments"][0]["id"] == deployment_id
         assert lock_data["workflows"][0]["deployments"][0]["name"] == deployment_name
         assert lock_data["workflows"][0]["deployments"][0]["label"] == deployment_label
-
-    os.chdir(current_dir)
 
 
 def test_pull__workspace_option__uses_different_api_key(mock_module, vellum_client_class):
