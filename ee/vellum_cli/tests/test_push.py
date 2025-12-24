@@ -740,6 +740,7 @@ def test_push__push_fails_due_to_404_error_without_id(
     pyproject_file.write_text(f'[tool.vellum]\n[[tool.vellum.workflows]]\nmodule = "{module}"\n')
 
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("VELLUM_API_KEY", "abcdef123456")
 
     # AND the push API call returns a 404 response
     vellum_client.workflows.push.side_effect = ApiError(

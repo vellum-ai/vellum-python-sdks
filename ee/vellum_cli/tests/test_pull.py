@@ -983,6 +983,7 @@ def test_pull__workflow_deployment_adds_deployment_to_config(
 
     # AND we are currently in a new directory
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("VELLUM_API_KEY", "abcdef123456")
 
     # WHEN the user runs the pull command with the workflow deployment
     runner = CliRunner()
@@ -1011,6 +1012,7 @@ def test_pull__workflow_deployment_name_is_uuid(vellum_client, monkeypatch: pyte
 
     # AND an existing configuration with this deployment
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("VELLUM_API_KEY", "abcdef123456")
 
     # Create initial config with a deployment
     vellum_lock_json = tmp_path / "vellum.lock.json"
@@ -1097,6 +1099,7 @@ def test_pull__workflow_deployment_updates_existing_deployment(
 
     # AND an existing configuration with this deployment
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("VELLUM_API_KEY", "abcdef123456")
 
     # Create initial config with a deployment
     vellum_lock_json = tmp_path / "vellum.lock.json"
@@ -1199,6 +1202,7 @@ def test_pull__workflow_deployment_with_name_and_id(
 
     # AND we are currently in a new directory
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("VELLUM_API_KEY", "abcdef123456")
 
     # WHEN the user runs the pull command with the workflow deployment
     runner = CliRunner()
