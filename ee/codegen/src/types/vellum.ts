@@ -908,12 +908,14 @@ export type WorkflowSandboxDatasetRow =
       inputs: WorkflowSandboxInputs;
       workflow_trigger_id?: string;
       mocks?: WorkflowSandboxDatasetRowMock[];
+      previous_execution_id?: string;
     }
   | {
       id?: string;
       label: string;
       workflow_trigger_id?: string;
       mocks?: WorkflowSandboxDatasetRowMock[];
+      previous_execution_id?: string;
     };
 
 export interface UnaryWorkflowExpression {

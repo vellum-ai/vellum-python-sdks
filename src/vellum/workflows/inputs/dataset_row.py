@@ -21,6 +21,7 @@ class DatasetRow(UniversalBaseModel):
         inputs: BaseInputs instance or dict containing the input data
         workflow_trigger: Optional Trigger instance for this scenario
         mocks: Optional sequence of node output mocks for testing scenarios
+        previous_execution_id: Optional ID of a previous Workflow Execution to reference for initial State loading
     """
 
     model_config = ConfigDict(populate_by_name=True, arbitrary_types_allowed=True)
@@ -30,6 +31,7 @@ class DatasetRow(UniversalBaseModel):
     inputs: Union[BaseInputs, Dict[str, Any]] = Field(default_factory=BaseInputs)
     workflow_trigger: Optional[BaseTrigger] = None
     mocks: Optional[Sequence[Union[BaseOutputs, MockNodeExecution]]] = None
+    previous_execution_id: Optional[str] = None
 
     @model_serializer(mode="wrap")
     def serialize_full_model(self, handler: Callable[[Any], Any], info: SerializationInfo) -> Dict[str, Any]:
