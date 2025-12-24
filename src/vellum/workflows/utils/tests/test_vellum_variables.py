@@ -39,14 +39,8 @@ from vellum.workflows.utils.vellum_variables import (
         (Optional[list[ChatMessage]], "CHAT_HISTORY"),
         (list[SearchResult], "SEARCH_RESULTS"),
         (Optional[list[SearchResult]], "SEARCH_RESULTS"),
-        (
-            list[VellumValue],
-            "ARRAY",
-        ),
-        (
-            Optional[list[VellumValue]],
-            "ARRAY",
-        ),
+        (list[VellumValue], "ARRAY"),
+        (Optional[list[VellumValue]], "ARRAY"),
     ],
 )
 def test_primitive_type_to_vellum_variable_type(type_, expected):
