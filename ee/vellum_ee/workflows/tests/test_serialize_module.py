@@ -173,7 +173,7 @@ def test_serialize_module_with_pydantic_array():
 
     items_input = input_variables[0]
     assert items_input["key"] == "items"
-    assert items_input["type"] == "ARRAY"
+    assert items_input["type"] == "JSON"
     # TODO: Add support for pydantic models
     assert "schema" not in items_input
 
