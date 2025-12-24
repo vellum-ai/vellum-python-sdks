@@ -1,9 +1,8 @@
 import pytest
 import json
 import os
-import shutil
+import pathlib
 import subprocess
-import tempfile
 from unittest.mock import MagicMock
 from uuid import uuid4
 from typing import Generator
@@ -16,15 +15,9 @@ from vellum_cli import main as cli_main
 
 
 @pytest.fixture
-def mock_temp_dir() -> Generator[str, None, None]:
-    current_dir = os.getcwd()
-    temp_dir = tempfile.mkdtemp()
-    os.chdir(temp_dir)
-
-    yield temp_dir
-
-    os.chdir(current_dir)
-    shutil.rmtree(temp_dir)
+def mock_temp_dir(monkeypatch: pytest.MonkeyPatch, tmp_path: pathlib.Path) -> Generator[str, None, None]:
+    monkeypatch.chdir(tmp_path)
+    yield str(tmp_path)
 
 
 @pytest.fixture
