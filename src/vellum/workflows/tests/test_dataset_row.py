@@ -189,3 +189,51 @@ def test_dataset_row_with_node_output_mocks():
         "when_condition": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": True}},
         "then_outputs": {"result": "mocked output"},
     }
+
+
+def test_dataset_row_with_previous_execution_id():
+    """
+    Test that DatasetRow can be created with previous_execution_id and properly serialized.
+    """
+
+    # GIVEN a DatasetRow with previous_execution_id set
+    class TestInputs(BaseInputs):
+        message: str
+
+    test_inputs = TestInputs(message="test message")
+    previous_exec_id = "550e8400-e29b-41d4-a716-446655440000"
+
+    dataset_row = DatasetRow(
+        label="test_with_previous_execution",
+        inputs=test_inputs,
+        previous_execution_id=previous_exec_id,
+    )
+
+    # WHEN we serialize the DatasetRow
+    serialized_dict = dataset_row.model_dump()
+
+    # THEN the serialized dict should contain the previous_execution_id
+    assert serialized_dict["label"] == "test_with_previous_execution"
+    assert serialized_dict["inputs"]["message"] == "test message"
+    assert serialized_dict["previous_execution_id"] == previous_exec_id
+
+
+def test_dataset_row_without_previous_execution_id():
+    """
+    Test that DatasetRow without previous_execution_id does not include it in serialization.
+    """
+
+    # GIVEN a DatasetRow without previous_execution_id
+    class TestInputs(BaseInputs):
+        message: str
+
+    test_inputs = TestInputs(message="test message")
+
+    dataset_row = DatasetRow(label="test_without_previous_execution", inputs=test_inputs)
+
+    # WHEN we serialize the DatasetRow
+    serialized_dict = dataset_row.model_dump()
+
+    # THEN the serialized dict should not contain previous_execution_id (or it should be None)
+    assert serialized_dict["label"] == "test_without_previous_execution"
+    assert serialized_dict.get("previous_execution_id") is None
