@@ -120,22 +120,36 @@ def merge_workflows_by_sandbox_id(
         else:
             # If the user defines a workflow in the pyproject.toml with a sandbox_id,
             # we merge the workflow with one of the ones in the lockfile with the same sandbox_id.
+            # First, try to find a lockfile workflow matching both sandbox_id AND workspace.
             other_workflow = next(
                 (
                     other_workflow
                     for other_workflow in other_workflows
                     if self_workflow.workflow_sandbox_id == other_workflow.workflow_sandbox_id
+                    and self_workflow.workspace == other_workflow.workspace
                 ),
                 None,
             )
+            # If no exact match, fall back to matching by sandbox_id alone.
+            if other_workflow is None:
+                other_workflow = next(
+                    (
+                        other_workflow
+                        for other_workflow in other_workflows
+                        if self_workflow.workflow_sandbox_id == other_workflow.workflow_sandbox_id
+                    ),
+                    None,
+                )
             if other_workflow is not None:
                 merged_workflows.append(self_workflow.merge(other_workflow))
             else:
                 merged_workflows.append(self_workflow)
 
-    workflow_sandbox_ids_so_far = {workflow.workflow_sandbox_id for workflow in merged_workflows}
+    # Use (workflow_sandbox_id, workspace) as the dedupe key to preserve workflows
+    # with the same sandbox_id but different workspaces.
+    workflow_keys_so_far = {(workflow.workflow_sandbox_id, workflow.workspace) for workflow in merged_workflows}
     for other_workflow in other_workflows:
-        if other_workflow.workflow_sandbox_id not in workflow_sandbox_ids_so_far:
+        if (other_workflow.workflow_sandbox_id, other_workflow.workspace) not in workflow_keys_so_far:
             merged_workflows.append(other_workflow)
 
     return merged_workflows
