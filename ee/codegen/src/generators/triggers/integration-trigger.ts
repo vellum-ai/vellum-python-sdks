@@ -2,18 +2,16 @@ import { VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH } from "src/constants";
 import { Class } from "src/generators/extensions/class";
 import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
 import { Field } from "src/generators/extensions/field";
-import { FloatInstantiation } from "src/generators/extensions/float-instantiation";
-import { IntInstantiation } from "src/generators/extensions/int-instantiation";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseTrigger } from "src/generators/triggers/base-trigger";
+import { VellumValue } from "src/generators/vellum-variable-value";
 import { createPythonClassName, toPythonSafeSnakeCase } from "src/utils/casing";
 
 import type { AstNode } from "src/generators/extensions/ast-node";
-import type { TypeInstantiation } from "src/generators/extensions/type-instantiation";
 import type { IntegrationTrigger as IntegrationTriggerType } from "src/types/vellum";
-import type { VellumValue } from "vellum-ai/api/types";
+import type { VellumValue as VellumValueType } from "vellum-ai/api/types";
 
 export declare namespace IntegrationTriggerGenerator {
   interface Args {
@@ -89,30 +87,14 @@ export class IntegrationTrigger extends BaseTrigger<IntegrationTriggerType> {
     return body;
   }
 
-  /**
-   * Helper method to create the appropriate AST node for a setup attribute value.
-   * Handles STRING, NUMBER, and null/undefined values.
-   */
   private createSetupAttributeValue(
-    defaultValue: VellumValue | null | undefined
-  ): TypeInstantiation {
+    defaultValue: VellumValueType | null | undefined
+  ): AstNode {
     if (defaultValue === null || defaultValue === undefined) {
       return new NoneInstantiation();
     }
 
-    const value = defaultValue.value;
-    if (typeof value === "string") {
-      return new StrInstantiation(value);
-    }
-
-    if (typeof value === "number") {
-      if (Number.isInteger(value)) {
-        return new IntInstantiation(value);
-      }
-      return new FloatInstantiation(value);
-    }
-
-    return new NoneInstantiation();
+    return new VellumValue({ vellumValue: defaultValue });
   }
 
   /**
