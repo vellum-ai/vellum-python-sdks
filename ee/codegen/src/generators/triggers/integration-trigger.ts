@@ -6,10 +6,12 @@ import { NoneInstantiation } from "src/generators/extensions/none-instantiation"
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseTrigger } from "src/generators/triggers/base-trigger";
+import { VellumValue } from "src/generators/vellum-variable-value";
 import { createPythonClassName, toPythonSafeSnakeCase } from "src/utils/casing";
 
 import type { AstNode } from "src/generators/extensions/ast-node";
 import type { IntegrationTrigger as IntegrationTriggerType } from "src/types/vellum";
+import type { VellumValue as VellumValueType } from "vellum-ai/api/types";
 
 export declare namespace IntegrationTriggerGenerator {
   interface Args {
@@ -73,10 +75,7 @@ export class IntegrationTrigger extends BaseTrigger<IntegrationTriggerType> {
           initializer: new DictInstantiation(
             this.trigger.execConfig.setupAttributes.map((attr) => ({
               key: new StrInstantiation(attr.key),
-              value:
-                typeof attr.default?.value === "string"
-                  ? new StrInstantiation(attr.default.value)
-                  : new NoneInstantiation(),
+              value: this.createSetupAttributeValue(attr.default),
             }))
           ),
         })
@@ -86,6 +85,16 @@ export class IntegrationTrigger extends BaseTrigger<IntegrationTriggerType> {
     body.push(this.createConfigClass(configFields));
 
     return body;
+  }
+
+  private createSetupAttributeValue(
+    defaultValue: VellumValueType | null | undefined
+  ): AstNode {
+    if (defaultValue === null || defaultValue === undefined) {
+      return new NoneInstantiation();
+    }
+
+    return new VellumValue({ vellumValue: defaultValue });
   }
 
   /**
