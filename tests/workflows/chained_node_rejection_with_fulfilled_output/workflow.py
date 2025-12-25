@@ -35,18 +35,27 @@ class SecondNode(BaseNode):
         raise NodeException(code=WorkflowErrorCode.USER_DEFINED_ERROR, message="Second node failed")
 
 
+class ThirdNode(BaseNode):
+    """A node that succeeds after the first node succeeds."""
+
+    first_value = FirstNode.Outputs.text
+
+    class Outputs(BaseNode.Outputs):
+        value: str = "success"
+
+
 class ChainedNodeRejectionWithFulfilledOutputWorkflow(BaseWorkflow):
     """
-    A workflow with two chained nodes where:
+    A workflow with nodes where:
     - The first node is an inline prompt node that succeeds and produces streaming output
-    - The second node fails
+    - The second node fails in parallel with the third node
     - The workflow output points to the first node's output
 
     This tests that the workflow should be rejected (not fulfilled) when any node fails,
     even if the workflow output was already resolved from a successful node.
     """
 
-    graph = FirstNode >> SecondNode
+    graph = FirstNode >> {SecondNode, ThirdNode}
 
     class Outputs(BaseWorkflow.Outputs):
         final_value = FirstNode.Outputs.text
