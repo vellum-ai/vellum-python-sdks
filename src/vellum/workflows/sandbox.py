@@ -1,4 +1,4 @@
-from typing import Any, Dict, Generic, Optional, Sequence, Union
+from typing import Any, Dict, Generic, Optional, Sequence, Type, Union
 
 import dotenv
 
@@ -16,7 +16,7 @@ class WorkflowSandboxRunner(Generic[WorkflowType]):
         self,
         workflow: WorkflowType,
         inputs: Optional[Sequence[BaseInputs]] = None,  # DEPRECATED - remove in v2.0.0
-        dataset: Optional[Sequence[Union[BaseInputs, DatasetRow]]] = None,
+        dataset: Optional[Sequence[Union[BaseInputs, DatasetRow, Type[BaseInputs]]]] = None,
     ):
         dotenv.load_dotenv()
         self._logger = load_logger()
@@ -59,6 +59,11 @@ class WorkflowSandboxRunner(Generic[WorkflowType]):
             raw_inputs = selected_inputs.inputs
             trigger_value = selected_inputs.workflow_trigger
             node_output_mocks = selected_inputs.mocks
+        elif isinstance(selected_inputs, type) and issubclass(selected_inputs, BaseInputs):
+            # Handle BaseInputs subclass (not an instance) - convert to instance with input references
+            raw_inputs = selected_inputs(
+                **{field_name: getattr(selected_inputs, field_name) for field_name in selected_inputs.__annotations__}
+            )
         else:
             raw_inputs = selected_inputs
 
