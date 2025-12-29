@@ -26,8 +26,12 @@ def test_workflow_error_to_vellum_error__preserves_raw_data():
     assert vellum_error.raw_data == raw_data
 
     # AND the integration details should be accessible
-    assert vellum_error.raw_data["integration"]["name"] == "GITHUB"
-    assert vellum_error.raw_data["integration"]["provider"] == "COMPOSIO"
+    raw_data_from_error = vellum_error.raw_data
+    assert raw_data_from_error is not None
+    integration = raw_data_from_error.get("integration")
+    assert isinstance(integration, dict)
+    assert integration["name"] == "GITHUB"
+    assert integration["provider"] == "COMPOSIO"
 
 
 def test_workflow_error_to_vellum_error__handles_none_raw_data():
