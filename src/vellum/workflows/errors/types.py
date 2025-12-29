@@ -115,4 +115,5 @@ def workflow_error_to_vellum_error(error: WorkflowError) -> VellumError:
     return VellumError(
         message=error.message,
         code=_WORKFLOW_ERROR_CODE_TO_VELLUM_ERROR_CODE.get(error.code, "INTERNAL_SERVER_ERROR"),
+        raw_data=error.raw_data,
     )
