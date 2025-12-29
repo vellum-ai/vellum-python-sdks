@@ -559,54 +559,6 @@ describe("GenericNode", () => {
     });
   });
 
-  describe("coalesce expression with null RHS", () => {
-    /**
-     * Tests that a coalesce expression with null RHS wraps None in ConstantValueReference.
-     */
-    it("should wrap null RHS in ConstantValueReference", async () => {
-      // GIVEN a coalesce expression with a valid LHS and null RHS
-      const nodeAttributes: NodeAttribute[] = [
-        {
-          id: "attr-1",
-          name: "coalesce-attribute",
-          value: {
-            type: "BINARY_EXPRESSION",
-            operator: "coalesce",
-            lhs: {
-              type: "CONSTANT_VALUE",
-              value: {
-                type: "STRING",
-                value: "primary_value",
-              },
-            },
-            rhs: null,
-          } as unknown as WorkflowValueDescriptor,
-        },
-      ];
-
-      const nodeData = genericNodeFactory({
-        label: "TestCoalesceNullRhsNode",
-        nodeAttributes: nodeAttributes,
-      });
-
-      const nodeContext = (await createNodeContext({
-        workflowContext,
-        nodeData,
-      })) as GenericNodeContext;
-
-      node = new GenericNode({
-        workflowContext,
-        nodeContext,
-      });
-
-      // WHEN we generate the node file
-      node.getNodeFile().write(writer);
-
-      // THEN the output should wrap None in ConstantValueReference
-      expect(await writer.toStringFormatted()).toMatchSnapshot();
-    });
-  });
-
   describe("basic with invalid blank unary expression", () => {
     beforeEach(async () => {
       const nodeAttributes: NodeAttribute[] = [

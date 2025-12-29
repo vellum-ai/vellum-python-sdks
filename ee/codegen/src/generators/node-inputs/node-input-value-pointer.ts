@@ -2,6 +2,7 @@ import { isNil } from "lodash";
 
 import { NodeInputValuePointerRule } from "./node-input-value-pointer-rules/node-input-value-pointer-rule";
 
+import { VELLUM_WORKFLOW_CONSTANTS_PATH } from "src/constants";
 import { BaseNodeContext } from "src/context/node-context/base";
 import { BaseCodegenError } from "src/generators/errors";
 import { AccessAttribute } from "src/generators/extensions/access-attribute";
@@ -12,6 +13,7 @@ import { MethodArgument } from "src/generators/extensions/method-argument";
 import { MethodInvocation } from "src/generators/extensions/method-invocation";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
+import { TypeInstantiation } from "src/generators/extensions/type-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 import {
   NodeInputValuePointer as NodeInputValuePointerType,
@@ -80,6 +82,17 @@ export class NodeInputValuePointer extends AstNode {
 
     let expression: AstNode = firstRule;
 
+    // If the first rule is a TypeInstantiation (e.g., NoneInstantiation from an unresolvable reference)
+    // and there are more rules to coalesce with, wrap it in ConstantValueReference
+    // to avoid generating invalid code like `None.coalesce("fallback")`
+    const firstRuleAstNode = firstRule.astNode?.getAstNode();
+    if (
+      rules.length > 1 &&
+      firstRuleAstNode instanceof TypeInstantiation
+    ) {
+      expression = this.wrapInConstantValueReference(firstRule);
+    }
+
     for (let i = 1; i < rules.length; i++) {
       const rule = rules[i];
       if (!rule) {
@@ -135,6 +148,21 @@ export class NodeInputValuePointer extends AstNode {
     );
 
     return referencedNodeContexts.has(this.nodeContext);
+  }
+
+  private wrapInConstantValueReference(node: AstNode): AstNode {
+    const constantValueReference = new Reference({
+      name: "ConstantValueReference",
+      modulePath: VELLUM_WORKFLOW_CONSTANTS_PATH,
+    });
+    return new ClassInstantiation({
+      classReference: constantValueReference,
+      arguments_: [
+        new MethodArgument({
+          value: node,
+        }),
+      ],
+    });
   }
 
   write(writer: Writer): void {

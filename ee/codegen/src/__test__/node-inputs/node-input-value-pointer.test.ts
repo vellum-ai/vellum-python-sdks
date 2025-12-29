@@ -295,4 +295,50 @@ describe("NodeInputValuePointer", () => {
 
     expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
+
+  describe("unresolvable input variable with constant fallback", () => {
+    /**
+     * Tests that an unresolvable input variable reference followed by a constant
+     * fallback wraps None in ConstantValueReference before calling coalesce.
+     */
+    it("should wrap None in ConstantValueReference for unresolvable input variable", async () => {
+      // GIVEN a non-strict workflow context (to allow errors to be logged instead of thrown)
+      const nonStrictWorkflowContext = workflowContextFactory({ strict: false });
+      const nonStrictNodeContext = await nodeContextFactory({
+        workflowContext: nonStrictWorkflowContext,
+      });
+
+      // AND an INPUT_VARIABLE rule with a non-existent input variable ID
+      // AND a CONSTANT_VALUE fallback rule
+      const nodeInputValuePointerData: NodeInputValuePointerType = {
+        combinator: "OR",
+        rules: [
+          {
+            type: "INPUT_VARIABLE",
+            data: {
+              inputVariableId: "non-existent-input-variable-id",
+            },
+          },
+          {
+            type: "CONSTANT_VALUE",
+            data: {
+              type: "STRING",
+              value: "fallback_value",
+            },
+          },
+        ],
+      };
+
+      const nodeInputValuePointer = new NodeInputValuePointer({
+        nodeContext: nonStrictNodeContext,
+        nodeInputValuePointerData,
+      });
+
+      // WHEN we write the node input value pointer
+      nodeInputValuePointer.write(writer);
+
+      // THEN the output should wrap None in ConstantValueReference before calling coalesce
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
 });
