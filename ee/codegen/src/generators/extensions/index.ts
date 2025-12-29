@@ -18,6 +18,7 @@ export * from "./dict-instantiation";
 export * from "./field";
 export * from "./float-instantiation";
 export * from "./int-instantiation";
+export * from "./lambda-instantiation";
 export * from "./list";
 export * from "./list-instantiation";
 export * from "./method-argument";

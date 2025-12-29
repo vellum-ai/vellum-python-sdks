@@ -1,7 +1,6 @@
-import { python } from "@fern-api/python-ast";
-
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { LambdaInstantiation } from "src/generators/extensions/lambda-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { BaseNodeInputWorkflowReference } from "src/generators/workflow-value-descriptor-reference/BaseNodeInputWorkflowReference";
@@ -38,7 +37,7 @@ export class ExecutionCounterWorkflowReference extends BaseNodeInputWorkflowRefe
         }),
         arguments_: [
           new MethodArgument({
-            value: python.lambda({
+            value: new LambdaInstantiation({
               body: reference,
             }),
           }),

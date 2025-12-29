@@ -1,4 +1,3 @@
-import { python } from "@fern-api/python-ast";
 import { isNil } from "lodash";
 import { VellumValue as VellumValueType } from "vellum-ai/api/types";
 
@@ -7,6 +6,7 @@ import { OptionalType } from "./extensions/optional";
 
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { LambdaInstantiation } from "src/generators/extensions/lambda-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
 import { Reference } from "src/generators/extensions/reference";
@@ -36,7 +36,7 @@ export declare namespace VellumVariable {
 }
 
 export class VellumVariable extends AstNode {
-  private readonly field: python.Field | Field;
+  private readonly field: Field;
   private readonly defaultRequired?: boolean;
 
   constructor({ variable, defaultRequired }: VellumVariable.Args) {
@@ -114,7 +114,7 @@ export class VellumVariable extends AstNode {
         ? new Reference({
             name: "list",
           })
-        : python.lambda({
+        : new LambdaInstantiation({
             body: new VellumValue({
               vellumValue: variable.default,
             }),
@@ -151,7 +151,7 @@ export class VellumVariable extends AstNode {
         ? new Reference({
             name: "dict",
           })
-        : python.lambda({
+        : new LambdaInstantiation({
             body: new VellumValue({
               vellumValue: variable.default,
             }),
