@@ -4,6 +4,7 @@ from typing import Any, Callable, Dict, List, Optional, Sequence, Union
 from pydantic import ConfigDict, Field, SerializationInfo, field_serializer, model_serializer
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
+from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.mocks import MockNodeExecution
 from vellum.workflows.outputs.base import BaseOutputs
@@ -77,12 +78,13 @@ class DatasetRow(UniversalBaseModel):
         return str(workflow_trigger.__class__.__id__)
 
     @field_serializer("inputs")
-    def serialize_inputs(self, inputs: Union[BaseInputs, Dict[str, Any]]) -> Dict[str, Any]:
+    def serialize_inputs(self, inputs: Union[BaseInputs, Dict[str, Any]], info: SerializationInfo) -> Dict[str, Any]:
         """
         Custom serializer for inputs that converts it to a dictionary.
 
         Args:
             inputs: Either a BaseInputs instance or dict to serialize
+            info: Serialization info containing context with optional serializer function
 
         Returns:
             Dictionary representation of the inputs
@@ -90,10 +92,15 @@ class DatasetRow(UniversalBaseModel):
         if isinstance(inputs, dict):
             return inputs
 
+        serializer = info.context.get("serializer") if info.context else None
+
         result = {}
         for input_descriptor, value in inputs:
             if not input_descriptor.name.startswith("__"):
-                result[input_descriptor.name] = value
+                if serializer is not None and isinstance(value, BaseDescriptor):
+                    result[input_descriptor.name] = serializer(value)
+                else:
+                    result[input_descriptor.name] = value
 
         return result
 
