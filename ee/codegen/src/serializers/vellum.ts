@@ -2435,17 +2435,54 @@ export declare namespace IntegrationTriggerSerializer {
   }
 }
 
+const ChatMessageTriggerExecConfigSerializer = objectSchema({
+  output: WorkflowValueDescriptorSerializer.optional(),
+});
+
+export declare namespace ChatMessageTriggerExecConfigSerializer {
+  interface Raw {
+    output?: WorkflowValueDescriptorSerializer.Raw | null;
+  }
+}
+
+const ChatMessageTriggerSerializer = objectSchema({
+  id: stringSchema(),
+  attributes: listSchema(VellumVariableSerializer),
+  definition: CodeResourceDefinitionSerializer.optional(),
+  displayData: propertySchema(
+    "display_data",
+    WorkflowTriggerDisplayDataSerializer.nullable().optional()
+  ),
+  execConfig: propertySchema(
+    "exec_config",
+    ChatMessageTriggerExecConfigSerializer.optional()
+  ),
+});
+
+export declare namespace ChatMessageTriggerSerializer {
+  interface Raw {
+    id: string;
+    type: "CHAT_MESSAGE";
+    attributes: VellumVariableSerializer.Raw[];
+    definition?: CodeResourceDefinitionSerializer.Raw | null;
+    display_data?: WorkflowTriggerDisplayDataSerializer.Raw | null;
+    exec_config?: ChatMessageTriggerExecConfigSerializer.Raw | null;
+  }
+}
+
 export const WorkflowTriggerSerializer = unionSchema("type", {
   MANUAL: ManualTriggerSerializer,
   SCHEDULED: ScheduleTriggerSerializer,
   INTEGRATION: IntegrationTriggerSerializer,
+  CHAT_MESSAGE: ChatMessageTriggerSerializer,
 }) as unknown as Schema<WorkflowTriggerSerializer.Raw, WorkflowTrigger>;
 
 export declare namespace WorkflowTriggerSerializer {
   type Raw =
     | ManualTriggerSerializer.Raw
     | ScheduleTriggerSerializer.Raw
-    | IntegrationTriggerSerializer.Raw;
+    | IntegrationTriggerSerializer.Raw
+    | ChatMessageTriggerSerializer.Raw;
 }
 
 export const WorkflowRawDataSerializer: ObjectSchema<
