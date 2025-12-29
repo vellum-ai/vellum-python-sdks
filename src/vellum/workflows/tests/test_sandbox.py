@@ -286,3 +286,48 @@ def test_sandbox_runner_with_node_output_mocks(mock_logger, mocker):
     call_kwargs = stream_mock.call_args.kwargs
     assert "node_output_mocks" in call_kwargs
     assert call_kwargs["node_output_mocks"] == [mock_outputs]
+
+
+def test_sandbox_runner_with_previous_execution_id(mock_logger, mocker):
+    """
+    Tests that WorkflowSandboxRunner passes previous_execution_id from DatasetRow to workflow.stream().
+    """
+
+    # GIVEN a simple workflow
+    class Inputs(BaseInputs):
+        message: str
+
+    class TestNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result: str
+
+    class Workflow(BaseWorkflow[Inputs, BaseState]):
+        graph = TestNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_output = TestNode.Outputs.result
+
+    # AND a dataset with previous_execution_id
+    previous_exec_id = "550e8400-e29b-41d4-a716-446655440000"
+    dataset = [
+        DatasetRow(
+            label="test_with_previous_execution_id",
+            inputs={"message": "test"},
+            previous_execution_id=previous_exec_id,
+        ),
+    ]
+
+    workflow_instance = Workflow()
+    original_stream = workflow_instance.stream
+    stream_mock = MagicMock(return_value=original_stream(inputs=Inputs(message="test")))
+    mocker.patch.object(workflow_instance, "stream", stream_mock)
+
+    # WHEN we run the sandbox with the DatasetRow containing previous_execution_id
+    runner = WorkflowSandboxRunner(workflow=workflow_instance, dataset=dataset)
+    runner.run()
+
+    # THEN the stream method should be called with previous_execution_id
+    stream_mock.assert_called_once()
+    call_kwargs = stream_mock.call_args.kwargs
+    assert "previous_execution_id" in call_kwargs
+    assert call_kwargs["previous_execution_id"] == previous_exec_id
