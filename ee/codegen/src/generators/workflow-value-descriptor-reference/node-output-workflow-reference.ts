@@ -1,9 +1,8 @@
-import { python } from "@fern-api/python-ast";
-
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { AccessAttribute } from "src/generators/extensions/access-attribute";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { LambdaInstantiation } from "src/generators/extensions/lambda-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
@@ -62,7 +61,7 @@ export class NodeOutputWorkflowReference extends BaseNodeInputWorkflowReference<
         }),
         arguments_: [
           new MethodArgument({
-            value: python.lambda({
+            value: new LambdaInstantiation({
               body: new AccessAttribute({
                 lhs: new Reference({
                   name: nodeContext.nodeClassName,

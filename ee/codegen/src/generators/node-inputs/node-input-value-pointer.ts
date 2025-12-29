@@ -1,4 +1,3 @@
-import { python } from "@fern-api/python-ast";
 import { isNil } from "lodash";
 
 import { NodeInputValuePointerRule } from "./node-input-value-pointer-rules/node-input-value-pointer-rule";
@@ -8,6 +7,7 @@ import { BaseCodegenError } from "src/generators/errors";
 import { AccessAttribute } from "src/generators/extensions/access-attribute";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { LambdaInstantiation } from "src/generators/extensions/lambda-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { MethodInvocation } from "src/generators/extensions/method-invocation";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
@@ -115,7 +115,7 @@ export class NodeInputValuePointer extends AstNode {
         }),
         arguments_: [
           new MethodArgument({
-            value: python.lambda({
+            value: new LambdaInstantiation({
               body: expression,
             }),
           }),
