@@ -13,6 +13,7 @@ class NodeExecutionFulfilledBody(UniversalBaseModel):
     invoked_ports: typing.Optional[typing.List[InvokedPort]] = None
     outputs: typing.Dict[str, typing.Optional[typing.Any]]
     mocked: typing.Optional[bool] = None
+    redacted: typing.Optional[bool] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
