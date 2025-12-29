@@ -11,6 +11,7 @@ export * from "./ast-node";
 export * from "./bool-instantiation";
 export * from "./class";
 export * from "./class-instantiation";
+export * from "./code-block";
 export * from "./comment";
 export * from "./decorator";
 export * from "./dict";
