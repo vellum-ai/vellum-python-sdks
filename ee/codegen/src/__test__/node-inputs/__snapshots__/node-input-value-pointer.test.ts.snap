@@ -23,3 +23,8 @@ exports[`NodeInputValuePointer > should handle two node output pointers with a c
 "TestNode.Outputs.my_output.coalesce("constant_value")
 "
 `;
+
+exports[`NodeInputValuePointer > unresolvable input variable with constant fallback > should wrap None in ConstantValueReference for unresolvable input variable 1`] = `
+"ConstantValueReference(None).coalesce("fallback_value")
+"
+`;
