@@ -35,6 +35,7 @@ export * from "./star-import";
 export * from "./str-instantiation";
 export * from "./type";
 export * from "./type-instantiation";
+export * from "./type-reference";
 export * from "./union";
 export * from "./uuid-instantiation";
 export * from "./wrapped-call";

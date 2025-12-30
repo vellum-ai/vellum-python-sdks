@@ -1,4 +1,3 @@
-import { python } from "@fern-api/python-ast";
 import { isNil } from "lodash";
 
 import { MapNodeContext } from "src/context/node-context/map-node";
@@ -7,6 +6,7 @@ import { AstNode } from "src/generators/extensions/ast-node";
 import { Field } from "src/generators/extensions/field";
 import { IntInstantiation } from "src/generators/extensions/int-instantiation";
 import { Reference } from "src/generators/extensions/reference";
+import { TypeReference } from "src/generators/extensions/type-reference";
 import { UuidInstantiation } from "src/generators/extensions/uuid-instantiation";
 import { BaseNestedWorkflowNode } from "src/generators/nodes/bases/nested-workflow-base";
 import { WorkflowProjectGenerator } from "src/project";
@@ -31,7 +31,7 @@ export class MapNode extends BaseNestedWorkflowNode<
     // MapNode requires two generic types: StateType and MapNodeItemType
     // We use Any as the item type since extracting the exact type from List[ItemType]
     // would require complex type inference
-    const itemType = python.Type.reference(
+    const itemType = new TypeReference(
       new Reference({
         name: "Any",
         modulePath: ["typing"],

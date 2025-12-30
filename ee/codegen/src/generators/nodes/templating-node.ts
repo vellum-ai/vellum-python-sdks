@@ -1,10 +1,8 @@
-import { python } from "@fern-api/python-ast";
 import { VellumVariableType } from "vellum-ai/api/types";
 
 import { OUTPUTS_CLASS_NAME, VELLUM_CLIENT_MODULE_PATH } from "src/constants";
 import { TemplatingNodeContext } from "src/context/node-context/templating-node";
 import { NodeAttributeGenerationError } from "src/generators/errors";
-import { PythonType } from "src/generators/extensions";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
@@ -12,6 +10,7 @@ import { Field } from "src/generators/extensions/field";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
+import { TypeReference } from "src/generators/extensions/type-reference";
 import { UuidInstantiation } from "src/generators/extensions/uuid-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { TemplatingNode as TemplatingNodeType } from "src/types/vellum";
@@ -185,11 +184,9 @@ export class TemplatingNode extends BaseNode<
     return this.nodeData.data.errorOutputId;
   }
 
-  private generateOutputType(
-    outputType: VellumVariableType
-  ): python.Type | PythonType {
+  private generateOutputType(outputType: VellumVariableType): AstNode {
     return outputType === VellumVariableType.Json
-      ? python.Type.reference(
+      ? new TypeReference(
           new Reference({
             name: "Json",
             modulePath: [
