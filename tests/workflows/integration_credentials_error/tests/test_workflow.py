@@ -12,8 +12,9 @@ def test_integration_credentials_error__node_rejected_event_contains_raw_data(ve
     the INTEGRATION_CREDENTIALS_UNAVAILABLE error.
     """
     # GIVEN the integration API raises a 403 error with integration details
+    # This matches the actual Django API response from ExecuteToolUnresolvableCredentialResponseSerializer
+    # which returns {"message": "...", "integration": {...}} without a "code" field
     structured_error_body = {
-        "code": "INTEGRATION_CREDENTIALS_UNAVAILABLE",
         "message": "You must authenticate with this integration before you can execute this tool.",
         "integration": {
             "id": "550e8400-e29b-41d4-a716-446655440000",

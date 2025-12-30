@@ -648,12 +648,9 @@ class WorkflowRunner(Generic[StateType]):
         except ApiError as e:
             captured_stacktrace = traceback.format_exc()
             # Handle structured 403 credential error responses with integration details
-            if (
-                e.status_code == 403
-                and isinstance(e.body, dict)
-                and e.body.get("code") == WorkflowErrorCode.INTEGRATION_CREDENTIALS_UNAVAILABLE.value
-                and e.body.get("integration")
-            ):
+            # The Django API returns {"message": "...", "integration": {...}} for unresolvable credentials
+            # We detect this by shape (403 + integration field present) rather than a code field
+            if e.status_code == 403 and isinstance(e.body, dict) and e.body.get("integration"):
                 error_message = e.body.get(
                     "message", "You must authenticate with this integration before you can execute this tool."
                 )
