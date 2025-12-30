@@ -9,7 +9,10 @@ import * as codegen from "./codegen";
 import { StateVariableContext } from "./context/state-variable-context";
 import { getAllFilesInDir } from "./utils/files";
 
-import { GENERATED_DISPLAY_MODULE_NAME } from "src/constants";
+import {
+  GENERATED_DISPLAY_MODULE_NAME,
+  GENERATED_NODES_MODULE_NAME,
+} from "src/constants";
 import {
   createNodeContext,
   createTriggerContext,
@@ -241,6 +244,14 @@ ${errors.slice(0, 3).map((err) => {
       ...(this.workflowContext.parentNode
         ? [this.generateDisplayRootInitFile().persist()]
         : []),
+      // nodes/__init__.py, display/__init__.py, display/nodes/__init__.py (only for non-nested workflows)
+      ...(this.workflowContext.parentNode
+        ? []
+        : [
+            this.generateNodesInitFile().persist(),
+            this.generateDisplayInitFile().persist(),
+            this.generateDisplayNodesInitFile().persist(),
+          ]),
       // display/workflow.py
       workflow.getWorkflowDisplayFile().persist(),
       // inputs.py
@@ -505,6 +516,40 @@ ${errors.slice(0, 3).map((err) => {
     });
 
     return rootDisplayInitFile;
+  }
+
+  private generateNodesInitFile(): InitFile {
+    return codegen.initFile({
+      workflowContext: this.workflowContext,
+      modulePath: [...this.getModulePath(), GENERATED_NODES_MODULE_NAME],
+      statements: [],
+      imports: [],
+      comments: [],
+    });
+  }
+
+  private generateDisplayInitFile(): InitFile {
+    return codegen.initFile({
+      workflowContext: this.workflowContext,
+      modulePath: [...this.getModulePath(), GENERATED_DISPLAY_MODULE_NAME],
+      statements: [],
+      imports: [],
+      comments: [],
+    });
+  }
+
+  private generateDisplayNodesInitFile(): InitFile {
+    return codegen.initFile({
+      workflowContext: this.workflowContext,
+      modulePath: [
+        ...this.getModulePath(),
+        GENERATED_DISPLAY_MODULE_NAME,
+        GENERATED_NODES_MODULE_NAME,
+      ],
+      statements: [],
+      imports: [],
+      comments: [],
+    });
   }
 
   private async generateAssets(): Promise<{
