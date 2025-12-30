@@ -180,6 +180,29 @@ class Workflow(BaseWorkflow):
 "
 `;
 
+exports[`generateCode > should generate code for %1 integration-trigger-with-number-setup-attribute.ts > triggers/gmail_new_gmail_message.py 1`] = `
+"from vellum.workflows.triggers import IntegrationTrigger
+
+
+class GmailNewMessageTrigger(IntegrationTrigger):
+    message: str
+
+    class Config(IntegrationTrigger.Config):
+        provider = "COMPOSIO"
+        integration_name = "GMAIL"
+        slug = "GMAIL_NEW_GMAIL_MESSAGE"
+        setup_attributes = {"interval": 1, "user_id": "me"}
+
+    class Display(IntegrationTrigger.Display):
+        label = "Gmail New Message Trigger"
+        x = 100
+        y = 200
+        z_index = 1
+        icon = "gmail"
+        color = "#EA4335"
+"
+`;
+
 exports[`generateCode > should generate code for %1 linear-integration-trigger.ts > triggers/linear_comment_event_trigger.py 1`] = `
 "from vellum.workflows.triggers import IntegrationTrigger
 
