@@ -86,10 +86,7 @@ export class NodeInputValuePointer extends AstNode {
     // and there are more rules to coalesce with, wrap it in ConstantValueReference
     // to avoid generating invalid code like `None.coalesce("fallback")`
     const firstRuleAstNode = firstRule.astNode?.getAstNode();
-    if (
-      rules.length > 1 &&
-      firstRuleAstNode instanceof TypeInstantiation
-    ) {
+    if (rules.length > 1 && firstRuleAstNode instanceof TypeInstantiation) {
       expression = this.wrapInConstantValueReference(firstRule);
     }
 

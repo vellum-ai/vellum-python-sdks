@@ -303,7 +303,9 @@ describe("NodeInputValuePointer", () => {
      */
     it("should wrap None in ConstantValueReference for unresolvable input variable", async () => {
       // GIVEN a non-strict workflow context (to allow errors to be logged instead of thrown)
-      const nonStrictWorkflowContext = workflowContextFactory({ strict: false });
+      const nonStrictWorkflowContext = workflowContextFactory({
+        strict: false,
+      });
       const nonStrictNodeContext = await nodeContextFactory({
         workflowContext: nonStrictWorkflowContext,
       });
