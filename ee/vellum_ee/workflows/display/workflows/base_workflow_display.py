@@ -1480,6 +1480,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             exec_config["module_data"] = {"additional_files": cast(JsonObject, additional_files)}
 
         dataset = None
+        sandbox_errors: List[Exception] = []
         try:
             sandbox_module_path = f"{module}.sandbox"
             sandbox_module = importlib.import_module(sandbox_module_path)
@@ -1509,9 +1510,14 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                             row_data["id"] = str(uuid4_from_hash(f"{module}.sandbox.dataset.{i}"))
 
                         dataset.append(row_data)
-        except (ImportError, AttributeError):
+        except ImportError:
+            # No sandbox module exists, which is fine
             pass
+        except Exception as e:
+            # Capture any other errors (AttributeError, TypeError, etc.) from sandbox module
+            sandbox_errors.append(e)
 
+        all_errors = list(workflow_display.display_context.errors) + sandbox_errors
         return WorkflowSerializationResult(
             exec_config=exec_config,
             errors=[
@@ -1519,7 +1525,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                     message=str(error),
                     stacktrace="".join(traceback.format_exception(type(error), error, error.__traceback__)),
                 )
-                for error in workflow_display.display_context.errors
+                for error in all_errors
             ],
             dataset=dataset,
         )
