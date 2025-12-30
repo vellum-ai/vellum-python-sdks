@@ -94,3 +94,5 @@ class WorkflowSandboxRunner(Generic[WorkflowType]):
             elif event.name == "node.execution.rejected":
                 self._logger.debug(f"Error: {event.error}")
                 self._logger.error(f"Failed to run Node: {event.node_definition.__name__}")
+            elif event.name == "workflow.execution.rejected":
+                self._logger.error(f"Workflow rejected! Error: {event.error}")

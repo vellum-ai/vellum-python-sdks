@@ -1103,9 +1103,11 @@ class WorkflowRunner(Generic[StateType]):
                 self._workflow_event_outer_queue.put(event)
 
                 with execution_context(parent_context=current_parent, trace_id=self._execution_context.trace_id):
-                    rejection_event = self._handle_work_item_event(event)
+                    new_rejection_event = self._handle_work_item_event(event)
 
-                if rejection_event:
+                if new_rejection_event:
+                    if rejection_event is None:
+                        rejection_event = new_rejection_event
                     break
         except Empty:
             pass
