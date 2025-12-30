@@ -1,7 +1,7 @@
 from dataclasses import asdict, is_dataclass
 import inspect
 from uuid import UUID
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Type, Union, cast, get_args
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Type, Union, cast, get_args, get_origin
 
 from pydantic import BaseModel
 
@@ -270,34 +270,70 @@ def serialize_key(key: Any) -> str:
         return str(key)
 
 
+def _extract_node_classes_from_object(obj: Any, seen: Set[Type[BaseNode]], node_classes: List[Type[BaseNode]]) -> None:
+    """
+    Extract BaseNode subclasses from an object, handling classes, instances, and typing constructs.
+
+    Modifies seen and node_classes in place.
+    """
+    if isinstance(obj, str):
+        return
+
+    if inspect.isclass(obj) and issubclass(obj, BaseNode) and obj is not BaseNode:
+        if obj not in seen:
+            seen.add(obj)
+            node_classes.append(obj)
+        return
+
+    if isinstance(obj, BaseNode):
+        obj_class = obj.__class__
+        if obj_class not in seen:
+            seen.add(obj_class)
+            node_classes.append(obj_class)
+        return
+
+    origin = get_origin(obj)
+    if origin is not None:
+        for arg in get_args(obj):
+            _extract_node_classes_from_object(arg, seen, node_classes)
+
+
 def _get_node_references_in_callable(func: Any) -> List[Type[BaseNode]]:
     """
     Check if a callable actually references any BaseNode subclasses.
 
-    Uses inspect.getclosurevars to only check globals/nonlocals that are actually
-    referenced by the function, avoiding false positives from module-level imports
-    that aren't used in the function.
+    Checks:
+    - globals/nonlocals referenced by the function (via inspect.getclosurevars)
+    - default argument values (__defaults__)
+    - keyword-only default values (__kwdefaults__)
+    - type annotations (__annotations__)
 
     Returns a list of node classes found in the callable's referenced scope.
     """
     node_classes: List[Type[BaseNode]] = []
-    seen: set = set()
+    seen: Set[Type[BaseNode]] = set()
 
     try:
         closure_vars = inspect.getclosurevars(func)
-    except TypeError:
-        return node_classes
+        for obj in list(closure_vars.globals.values()) + list(closure_vars.nonlocals.values()):
+            _extract_node_classes_from_object(obj, seen, node_classes)
+    except (TypeError, ValueError):
+        pass
 
-    for obj in list(closure_vars.globals.values()) + list(closure_vars.nonlocals.values()):
-        if inspect.isclass(obj) and issubclass(obj, BaseNode) and obj is not BaseNode:
-            if obj not in seen:
-                seen.add(obj)
-                node_classes.append(obj)
-        elif isinstance(obj, BaseNode):
-            obj_class = obj.__class__
-            if obj_class not in seen:
-                seen.add(obj_class)
-                node_classes.append(obj_class)
+    defaults = getattr(func, "__defaults__", None)
+    if defaults:
+        for obj in defaults:
+            _extract_node_classes_from_object(obj, seen, node_classes)
+
+    kwdefaults = getattr(func, "__kwdefaults__", None)
+    if kwdefaults:
+        for obj in kwdefaults.values():
+            _extract_node_classes_from_object(obj, seen, node_classes)
+
+    annotations = getattr(func, "__annotations__", None)
+    if annotations:
+        for obj in annotations.values():
+            _extract_node_classes_from_object(obj, seen, node_classes)
 
     return node_classes
 
