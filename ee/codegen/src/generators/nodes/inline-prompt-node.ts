@@ -1,4 +1,3 @@
-import { python } from "@fern-api/python-ast";
 import { isNil } from "lodash";
 
 import { OUTPUTS_CLASS_NAME, VELLUM_CLIENT_MODULE_PATH } from "src/constants";
@@ -8,6 +7,7 @@ import { NodeAttributeGenerationError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { BoolInstantiation } from "src/generators/extensions/bool-instantiation";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { CodeBlock } from "src/generators/extensions/code-block";
 import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
 import { Field } from "src/generators/extensions/field";
 import { FloatInstantiation } from "src/generators/extensions/float-instantiation";
@@ -337,7 +337,7 @@ export class InlinePromptNode extends BaseNode<
     if (!isNilOrEmpty(functions)) {
       functions?.forEach((f) => {
         if (f.type === "CODE_EXECUTION" && !isNil((f as FunctionArgs).src)) {
-          statements.push(python.codeBlock(f.src));
+          statements.push(new CodeBlock(f.src));
         }
       });
     }
@@ -377,7 +377,7 @@ export class InlinePromptNode extends BaseNode<
             initializer: new ListInstantiation(
               codeExecutionFunctions.map((f) => {
                 const funcName = this.getFunctionName(f.name);
-                return python.codeBlock(toPythonSafeSnakeCase(funcName));
+                return new CodeBlock(toPythonSafeSnakeCase(funcName));
               })
             ),
           })

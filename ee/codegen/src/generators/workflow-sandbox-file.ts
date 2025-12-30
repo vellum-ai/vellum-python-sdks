@@ -1,4 +1,3 @@
-import { python } from "@fern-api/python-ast";
 import { isNil } from "lodash";
 
 import { vellumValue } from "src/codegen";
@@ -8,6 +7,7 @@ import { NodeNotFoundError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { BoolInstantiation } from "src/generators/extensions/bool-instantiation";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
+import { CodeBlock } from "src/generators/extensions/code-block";
 import { Field } from "src/generators/extensions/field";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
@@ -94,7 +94,7 @@ export class WorkflowSandboxFile extends BasePersistedFile {
       sandboxRunnerField,
       // Using code block instead of method invocation since the latter tries to import `runner.run` after
       // specifying as a reference, even though it's a locally defined variable.
-      python.codeBlock(`\
+      new CodeBlock(`\
 if __name__ == "__main__":
     runner.run()
 `),
