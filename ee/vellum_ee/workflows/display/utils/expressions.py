@@ -272,25 +272,32 @@ def serialize_key(key: Any) -> str:
 
 def _get_node_references_in_callable(func: Any) -> List[Type[BaseNode]]:
     """
-    Check if a callable references any BaseNode subclasses in its closure or globals.
+    Check if a callable actually references any BaseNode subclasses.
 
-    Returns a list of node classes found in the callable's scope.
+    Uses inspect.getclosurevars to only check globals/nonlocals that are actually
+    referenced by the function, avoiding false positives from module-level imports
+    that aren't used in the function.
+
+    Returns a list of node classes found in the callable's referenced scope.
     """
     node_classes: List[Type[BaseNode]] = []
+    seen: set = set()
 
-    if hasattr(func, "__globals__"):
-        for name, obj in func.__globals__.items():
-            if inspect.isclass(obj) and issubclass(obj, BaseNode) and obj is not BaseNode:
+    try:
+        closure_vars = inspect.getclosurevars(func)
+    except TypeError:
+        return node_classes
+
+    for obj in list(closure_vars.globals.values()) + list(closure_vars.nonlocals.values()):
+        if inspect.isclass(obj) and issubclass(obj, BaseNode) and obj is not BaseNode:
+            if obj not in seen:
+                seen.add(obj)
                 node_classes.append(obj)
-
-    if hasattr(func, "__closure__") and func.__closure__:
-        for cell in func.__closure__:
-            try:
-                obj = cell.cell_contents
-                if inspect.isclass(obj) and issubclass(obj, BaseNode) and obj is not BaseNode:
-                    node_classes.append(obj)
-            except ValueError:
-                pass
+        elif isinstance(obj, BaseNode):
+            obj_class = obj.__class__
+            if obj_class not in seen:
+                seen.add(obj_class)
+                node_classes.append(obj_class)
 
     return node_classes
 

@@ -14,8 +14,7 @@ def test_serialize_workflow__code_tool_with_node_reference__raises_error():
 
     # GIVEN a function that references a node class
     def my_tool_with_node_reference(query: str) -> str:
-        node: InlinePromptNode = InlinePromptNode()
-        return str(node)
+        return str(InlinePromptNode)
 
     # AND a tool calling node that uses this function
     class MyToolCallingNode(ToolCallingNode):
@@ -40,3 +39,34 @@ def test_serialize_workflow__code_tool_with_node_reference__raises_error():
     assert "InlinePromptNode" in error_message
     assert "Code tools cannot reference workflow nodes" in error_message
     assert "inline subworkflow tool" in error_message
+
+
+def test_serialize_workflow__code_tool_without_node_reference__no_error():
+    """
+    Tests that no error is raised when a code tool does not reference any workflow nodes,
+    even if the module has node imports at the top level.
+    """
+
+    # GIVEN a function that does NOT reference any node class (even though InlinePromptNode
+    # is imported at the module level)
+    def my_simple_tool(query: str) -> str:
+        return query.upper()
+
+    # AND a tool calling node that uses this function
+    class MyToolCallingNode(ToolCallingNode):
+        functions = [my_simple_tool]
+
+    # AND a workflow with the tool calling node
+    class TestWorkflow(BaseWorkflow):
+        graph = MyToolCallingNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            result = MyToolCallingNode.Outputs.text
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    serialized_workflow = workflow_display.serialize()
+
+    # THEN no error should be raised and the workflow should serialize successfully
+    assert serialized_workflow is not None
+    assert "workflow_raw_data" in serialized_workflow
