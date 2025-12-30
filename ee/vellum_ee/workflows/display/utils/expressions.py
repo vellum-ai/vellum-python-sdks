@@ -270,6 +270,31 @@ def serialize_key(key: Any) -> str:
         return str(key)
 
 
+def _get_node_references_in_callable(func: Any) -> List[Type[BaseNode]]:
+    """
+    Check if a callable references any BaseNode subclasses in its closure or globals.
+
+    Returns a list of node classes found in the callable's scope.
+    """
+    node_classes: List[Type[BaseNode]] = []
+
+    if hasattr(func, "__globals__"):
+        for name, obj in func.__globals__.items():
+            if inspect.isclass(obj) and issubclass(obj, BaseNode) and obj is not BaseNode:
+                node_classes.append(obj)
+
+    if hasattr(func, "__closure__") and func.__closure__:
+        for cell in func.__closure__:
+            try:
+                obj = cell.cell_contents
+                if inspect.isclass(obj) and issubclass(obj, BaseNode) and obj is not BaseNode:
+                    node_classes.append(obj)
+            except ValueError:
+                pass
+
+    return node_classes
+
+
 def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContext", value: Any) -> Optional[JsonObject]:
     """
     Serialize a value to a JSON object. Returns `None` if the value resolves to `undefined`.
@@ -505,6 +530,15 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
         return dict_ref
 
     if callable(value):
+        node_references = _get_node_references_in_callable(value)
+        if node_references:
+            node_names = ", ".join(node.__name__ for node in node_references)
+            raise UnsupportedSerializationException(
+                f"Code tools cannot reference workflow nodes ({node_names}). "
+                "Consider inlining the node's run method logic directly in your function, "
+                "or use an inline subworkflow tool instead."
+            )
+
         function_definition = compile_function_definition(value)
 
         name = function_definition.name
