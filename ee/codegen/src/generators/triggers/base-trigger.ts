@@ -16,6 +16,7 @@ import { IntInstantiation } from "src/generators/extensions/int-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
+import { VellumValue } from "src/generators/vellum-variable-value";
 import { isNilOrEmpty } from "src/utils/typing";
 
 import type { AstNode } from "src/generators/extensions/ast-node";
@@ -228,12 +229,26 @@ export abstract class BaseTrigger<
    * All triggers have attributes, so this is a common helper.
    */
   protected createAttributeFields(): AstNode[] {
-    return this.trigger.attributes.map(
-      (attr) =>
-        new Field({
-          name: attr.key,
-          type: python.Type.str(),
-        })
-    );
+    return this.trigger.attributes.map((attr) => {
+      const field: Field = new Field({
+        name: attr.key,
+        type: python.Type.str(),
+      });
+
+      // Add default value if present
+      if (
+        attr.default &&
+        attr.default.value !== null &&
+        attr.default.value !== undefined
+      ) {
+        const vellumValue = new VellumValue({
+          vellumValue: attr.default,
+        });
+        this.inheritReferences(vellumValue);
+        field.initializer = vellumValue;
+      }
+
+      return field;
+    });
   }
 }
