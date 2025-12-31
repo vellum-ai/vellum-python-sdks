@@ -131,7 +131,14 @@ class FunctionCallNodeMixin:
         Returns:
             List of tuples containing (arguments, function_call_id) for each matching call.
         """
-        results = resolve_value(self.prompt_outputs, state)
+        # Get the OutputReference from the class attribute
+        # We need to access it from the class dict to avoid NodeDescriptor wrapping
+        prompt_outputs_ref = type(self).__dict__.get("prompt_outputs")
+        if prompt_outputs_ref is None:
+            return []
+
+        # Look up the results directly from state using the OutputReference
+        results = state.meta.node_outputs.get(prompt_outputs_ref)
         if not results:
             return []
 
@@ -212,11 +219,10 @@ class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode[ToolCallingStat
     """
 
     class Outputs(SubworkflowDeploymentNode.Outputs):
-        results: List[Any]
+        result: Any
 
     def run(self) -> Iterator[BaseOutput]:
         matching_calls = self._get_matching_function_calls(self.state)
-        all_results: List[Any] = []
 
         for arguments, function_call_id in matching_calls:
             # Mypy doesn't like instance assignments of class attributes. It's safe in our case tho bc it's what
@@ -232,9 +238,7 @@ class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode[ToolCallingStat
 
             # Add the result to the chat history
             self._add_function_result_to_chat_history(outputs, function_call_id, self.state)
-            all_results.append(outputs)
-
-        yield BaseOutput(name="results", value=all_results)
+            yield BaseOutput(name="result", value=outputs)
 
 
 class DynamicInlineSubworkflowNode(
@@ -246,11 +250,10 @@ class DynamicInlineSubworkflowNode(
     """
 
     class Outputs(InlineSubworkflowNode.Outputs):
-        results: List[Any]
+        result: Any
 
     def run(self) -> Iterator[BaseOutput]:
         matching_calls = self._get_matching_function_calls(self.state)
-        all_results: List[Any] = []
 
         for arguments, function_call_id in matching_calls:
             # Merge arguments with resolved inputs from __vellum_inputs__
@@ -276,9 +279,7 @@ class DynamicInlineSubworkflowNode(
 
             # Add the result to the chat history
             self._add_function_result_to_chat_history(outputs, function_call_id, self.state)
-            all_results.append(outputs)
-
-        yield BaseOutput(name="results", value=all_results)
+            yield BaseOutput(name="result", value=outputs)
 
 
 class FunctionNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
@@ -290,11 +291,10 @@ class FunctionNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
     function_definition: Callable[..., Any]
 
     class Outputs(BaseNode.Outputs):
-        results: List[Any]
+        result: Any
 
     def run(self) -> Iterator[BaseOutput]:
         matching_calls = self._get_matching_function_calls(self.state)
-        results: List[Any] = []
 
         for arguments, function_call_id in matching_calls:
             try:
@@ -304,9 +304,7 @@ class FunctionNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
 
             # Add the result to the chat history
             self._add_function_result_to_chat_history(result, function_call_id, self.state)
-            results.append(result)
-
-        yield BaseOutput(name="results", value=results)
+            yield BaseOutput(name="result", value=result)
 
 
 class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
@@ -318,11 +316,10 @@ class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
     composio_tool: ComposioToolDefinition
 
     class Outputs(BaseNode.Outputs):
-        results: List[Any]
+        result: Any
 
     def run(self) -> Iterator[BaseOutput]:
         matching_calls = self._get_matching_function_calls(self.state)
-        results: List[Any] = []
 
         for arguments, function_call_id in matching_calls:
             try:
@@ -339,9 +336,7 @@ class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
 
             # Add result to chat history
             self._add_function_result_to_chat_history(result, function_call_id, self.state)
-            results.append(result)
-
-        yield BaseOutput(name="results", value=results)
+            yield BaseOutput(name="result", value=result)
 
 
 class MCPNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
@@ -353,11 +348,10 @@ class MCPNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
     mcp_tool: MCPToolDefinition
 
     class Outputs(BaseNode.Outputs):
-        results: List[Any]
+        result: Any
 
     def run(self) -> Iterator[BaseOutput]:
         matching_calls = self._get_matching_function_calls(self.state)
-        results: List[Any] = []
 
         for arguments, function_call_id in matching_calls:
             try:
@@ -368,9 +362,7 @@ class MCPNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
 
             # Add result to chat history
             self._add_function_result_to_chat_history(result, function_call_id, self.state)
-            results.append(result)
-
-        yield BaseOutput(name="results", value=results)
+            yield BaseOutput(name="result", value=result)
 
 
 class VellumIntegrationNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
@@ -382,11 +374,10 @@ class VellumIntegrationNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
     vellum_integration_tool: VellumIntegrationToolDefinition
 
     class Outputs(BaseNode.Outputs):
-        results: List[Any]
+        result: Any
 
     def run(self) -> Iterator[BaseOutput]:
         matching_calls = self._get_matching_function_calls(self.state)
-        results: List[Any] = []
         vellum_client = self._context.vellum_client
 
         for arguments, function_call_id in matching_calls:
@@ -410,16 +401,14 @@ class VellumIntegrationNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
                     error_payload["error"]["raw_data"] = e.raw_data
 
                 self._add_function_result_to_chat_history(error_payload, function_call_id, self.state)
-                results.append(error_payload["error"])
+                yield BaseOutput(name="result", value=error_payload["error"])
                 continue
             except Exception as e:
                 self._handle_tool_exception(e, "Vellum Integration tool", self.vellum_integration_tool.name)
 
             # Add result to chat history
             self._add_function_result_to_chat_history(result, function_call_id, self.state)
-            results.append(result)
-
-        yield BaseOutput(name="results", value=results)
+            yield BaseOutput(name="result", value=result)
 
 
 class ElseNode(BaseNode[ToolCallingState]):

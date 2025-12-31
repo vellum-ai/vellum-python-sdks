@@ -53,13 +53,13 @@ def second_function() -> str:
 
 def test_router_node_port_ordering_with_multiple_tools():
     """
-    Test that router node ports are created in the correct order: on_if, on_elif, ..., on_else.
+    Test that router node ports are created with multiple IF port groups for parallel execution.
 
-    This test validates the fix for the bug where multiple tools would create multiple on_if
-    ports instead of on_if followed by on_elif ports, which violates port validation rules.
+    Each function gets its own IF port group, allowing multiple functions to be invoked
+    in parallel when the LLM returns multiple function calls in a single response.
     """
 
-    # GIVEN three functions to ensure we test multiple elif cases
+    # GIVEN three functions to test parallel execution
     def third_function() -> str:
         return "third_function"
 
@@ -78,23 +78,23 @@ def test_router_node_port_ordering_with_multiple_tools():
         tool_prompt_node=tool_prompt_node,
     )
 
-    # THEN the first function port should be an on_if port
+    # THEN each function port should be an on_if port (separate port groups for parallel execution)
     first_function_port = getattr(router_node.Ports, "first_function")
     assert first_function_port._condition_type.value == "IF"
 
-    # AND the second function port should be an on_elif port
+    # AND the second function port should also be an on_if port (its own port group)
     second_function_port = getattr(router_node.Ports, "second_function")
-    assert second_function_port._condition_type.value == "ELIF"
+    assert second_function_port._condition_type.value == "IF"
 
-    # AND the third function port should also be an on_elif port
+    # AND the third function port should also be an on_if port (its own port group)
     third_function_port = getattr(router_node.Ports, "third_function")
-    assert third_function_port._condition_type.value == "ELIF"
+    assert third_function_port._condition_type.value == "IF"
 
     # AND the default port should be an on_else port
     default_port = getattr(router_node.Ports, "default")
     assert default_port._condition_type.value == "ELSE"
 
-    # AND the ports should pass validation
+    # AND the ports should pass validation (multiple IF port groups are valid)
     ports = [first_function_port, second_function_port, third_function_port, default_port]
     # This should not raise an exception
     validate_ports(ports)
@@ -183,7 +183,7 @@ def test_tool_calling_node_inline_workflow_context():
         tool_prompt_node=tool_prompt_node,
     )
 
-    # AND we create a state with a function call
+    # AND we create a state with a function call (using snake_case function name)
     state = ToolCallingState(
         meta=StateMeta(
             node_outputs={
@@ -192,7 +192,7 @@ def test_tool_calling_node_inline_workflow_context():
                         value=FunctionCall(
                             arguments={},
                             id="call_test",
-                            name="MyWorkflow",
+                            name="my_workflow",
                             state="FULFILLED",
                         ),
                     )
@@ -210,11 +210,8 @@ def test_tool_calling_node_inline_workflow_context():
     )
     function_node._context = parent_context
 
-    # AND the _inputs should be populated with resolved values from state
-    assert function_node._inputs == {
-        function_node_class.arguments: {},
-        function_node_class.function_call_id: "call_test",
-    }
+    # AND the function node should have the correct function_name and prompt_outputs
+    assert function_node_class.__dict__["function_name"] == "my_workflow"
 
     # WHEN the function node runs
     outputs = list(function_node.run())
@@ -595,7 +592,7 @@ def test_mcp_node_outputs_result():
         tool_prompt_node=tool_prompt_node,
     )
 
-    # AND a state with a function call
+    # AND a state with a function call (using the full MCP tool name format: server_name__tool_name)
     state = ToolCallingState(
         meta=StateMeta(
             node_outputs={
@@ -604,7 +601,7 @@ def test_mcp_node_outputs_result():
                         value=FunctionCall(
                             arguments={"key": "value"},
                             id="call_mcp_test",
-                            name="test_tool",
+                            name="test_server__test_tool",
                             state="FULFILLED",
                         ),
                     )

@@ -46,6 +46,7 @@ from vellum.workflows.expressions.parse_json import ParseJsonExpression
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
+from vellum.workflows.nodes.displayable.tool_calling_node.utils import HasFunctionCallExpression
 from vellum.workflows.nodes.utils import get_unadorned_node
 from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.references.environment_variable import EnvironmentVariableReference
@@ -255,6 +256,16 @@ def _serialize_condition(
             "lhs": serialize_value(executable_id, display_context, condition._base),
             "operator": "accessField",
             "rhs": serialize_value(executable_id, display_context, condition._field),
+        }
+    elif isinstance(condition, HasFunctionCallExpression):
+        # Serialize HasFunctionCallExpression as a binary expression with "hasFunctionCall" operator
+        lhs = serialize_value(executable_id, display_context, condition._results)
+        rhs = serialize_value(executable_id, display_context, condition._function_name)
+        return {
+            "type": "BINARY_EXPRESSION",
+            "lhs": lhs,
+            "operator": "hasFunctionCall",
+            "rhs": rhs,
         }
 
     raise UnsupportedSerializationException(f"Unsupported condition type: {condition.__class__.__name__}")
