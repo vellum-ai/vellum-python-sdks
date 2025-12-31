@@ -16,6 +16,7 @@ from vellum.client.types.string_chat_message_content import StringChatMessageCon
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.utils.json_encoder import VellumJsonEncoder
 from vellum.workflows.descriptors.base import BaseDescriptor
+from vellum.workflows.descriptors.utils import resolve_value
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.expressions.concat import ConcatExpression
@@ -48,11 +49,45 @@ CHAT_HISTORY_VARIABLE = "chat_history"
 logger = logging.getLogger(__name__)
 
 
-class FunctionCallNodeMixin:
-    """Mixin providing common functionality for nodes that handle function calls."""
+class HasFunctionCallExpression(BaseDescriptor[bool]):
+    """Expression that checks if any result in the list matches a function name.
 
-    arguments: dict
-    function_call_id: Optional[str]
+    This is used by the router to determine which function nodes should be activated
+    for parallel execution.
+    """
+
+    def __init__(
+        self,
+        *,
+        results: BaseDescriptor,
+        function_name: str,
+    ) -> None:
+        super().__init__(name=f"has_function_call({function_name})", types=(bool,))
+        self._results = results
+        self._function_name = function_name
+
+    def resolve(self, state: "BaseState") -> bool:
+        results = resolve_value(self._results, state)
+        if not results:
+            return False
+
+        for result in results:
+            if hasattr(result, "type") and result.type == "FUNCTION_CALL":
+                if hasattr(result, "value") and hasattr(result.value, "name"):
+                    if result.value.name == self._function_name:
+                        return True
+        return False
+
+
+class FunctionCallNodeMixin:
+    """Mixin providing common functionality for nodes that handle function calls.
+
+    For parallel execution, function nodes process ALL matching calls for their function
+    in a single run, rather than processing one call at a time.
+    """
+
+    function_name: str
+    prompt_outputs: BaseDescriptor
 
     def _handle_tool_exception(self, e: Exception, tool_type: str, tool_name: str) -> None:
         """
@@ -76,9 +111,10 @@ class FunctionCallNodeMixin:
                 code=WorkflowErrorCode.NODE_EXECUTION,
             ) from e
 
-    def _add_function_result_to_chat_history(self, result: Any, state: ToolCallingState) -> None:
+    def _add_function_result_to_chat_history(
+        self, result: Any, function_call_id: Optional[str], state: ToolCallingState
+    ) -> None:
         """Add function execution result to chat history."""
-        function_call_id = self.function_call_id
         state.chat_history.append(
             ChatMessage(
                 role="FUNCTION",
@@ -88,7 +124,26 @@ class FunctionCallNodeMixin:
         )
         with state.__quiet__():
             state.current_function_calls_processed += 1
-            state.current_prompt_output_index += 1
+
+    def _get_matching_function_calls(self, state: ToolCallingState) -> List[tuple[dict, Optional[str]]]:
+        """Get all function calls from prompt outputs that match this node's function name.
+
+        Returns:
+            List of tuples containing (arguments, function_call_id) for each matching call.
+        """
+        results = resolve_value(self.prompt_outputs, state)
+        if not results:
+            return []
+
+        matching_calls: List[tuple[dict, Optional[str]]] = []
+        for result in results:
+            if hasattr(result, "type") and result.type == "FUNCTION_CALL":
+                if hasattr(result, "value") and hasattr(result.value, "name"):
+                    if result.value.name == self.function_name:
+                        arguments = getattr(result.value, "arguments", {}) or {}
+                        function_call_id = getattr(result.value, "id", None)
+                        matching_calls.append((arguments, function_call_id))
+        return matching_calls
 
 
 class ToolPromptNode(InlinePromptNode[ToolCallingState]):
@@ -151,160 +206,220 @@ class RouterNode(BaseNode[ToolCallingState]):
 
 
 class DynamicSubworkflowDeploymentNode(SubworkflowDeploymentNode[ToolCallingState], FunctionCallNodeMixin):
-    """Node that executes a deployment definition with function call output."""
+    """Node that executes a deployment definition with function call output.
+
+    Processes ALL matching function calls in parallel execution mode.
+    """
+
+    class Outputs(SubworkflowDeploymentNode.Outputs):
+        results: List[Any]
 
     def run(self) -> Iterator[BaseOutput]:
-        # Mypy doesn't like instance assignments of class attributes. It's safe in our case tho bc it's what
-        # we do in the `__init__` method.
-        self.subworkflow_inputs = self.arguments  # type:ignore[misc]
+        matching_calls = self._get_matching_function_calls(self.state)
+        all_results: List[Any] = []
 
-        # Call the parent run method to execute the subworkflow
-        outputs = {}
-        for output in super().run():
-            if output.is_fulfilled:
-                outputs[output.name] = output.value
-            yield output
+        for arguments, function_call_id in matching_calls:
+            # Mypy doesn't like instance assignments of class attributes. It's safe in our case tho bc it's what
+            # we do in the `__init__` method.
+            self.subworkflow_inputs = arguments  # type:ignore[misc]
 
-        # Add the result to the chat history
-        self._add_function_result_to_chat_history(outputs, self.state)
+            # Call the parent run method to execute the subworkflow
+            outputs = {}
+            for output in super().run():
+                if output.is_fulfilled:
+                    outputs[output.name] = output.value
+                yield output
+
+            # Add the result to the chat history
+            self._add_function_result_to_chat_history(outputs, function_call_id, self.state)
+            all_results.append(outputs)
+
+        yield BaseOutput(name="results", value=all_results)
 
 
 class DynamicInlineSubworkflowNode(
     InlineSubworkflowNode[ToolCallingState, BaseInputs, BaseState], FunctionCallNodeMixin
 ):
-    """Node that executes an inline subworkflow with function call output."""
+    """Node that executes an inline subworkflow with function call output.
+
+    Processes ALL matching function calls in parallel execution mode.
+    """
+
+    class Outputs(InlineSubworkflowNode.Outputs):
+        results: List[Any]
 
     def run(self) -> Iterator[BaseOutput]:
-        # Merge arguments with resolved inputs from __vellum_inputs__
-        merged_inputs = self.arguments.copy()
-        vellum_inputs = getattr(self.subworkflow, "__vellum_inputs__", {})
-        if vellum_inputs:
-            for param_name, param_ref in vellum_inputs.items():
-                if isinstance(param_ref, BaseDescriptor):
-                    resolved_value = param_ref.resolve(self.state)
-                else:
-                    resolved_value = param_ref
-                merged_inputs[param_name] = resolved_value
+        matching_calls = self._get_matching_function_calls(self.state)
+        all_results: List[Any] = []
 
-        self.subworkflow_inputs = merged_inputs  # type: ignore[misc]
+        for arguments, function_call_id in matching_calls:
+            # Merge arguments with resolved inputs from __vellum_inputs__
+            merged_inputs = arguments.copy()
+            vellum_inputs = getattr(self.subworkflow, "__vellum_inputs__", {})
+            if vellum_inputs:
+                for param_name, param_ref in vellum_inputs.items():
+                    if isinstance(param_ref, BaseDescriptor):
+                        resolved_value = param_ref.resolve(self.state)
+                    else:
+                        resolved_value = param_ref
+                    merged_inputs[param_name] = resolved_value
 
-        # Call the parent run method to execute the subworkflow with proper streaming
-        outputs = {}
+            self.subworkflow_inputs = merged_inputs  # type: ignore[misc]
 
-        for output in super().run():
-            if output.is_fulfilled:
-                outputs[output.name] = output.value
-            yield output
+            # Call the parent run method to execute the subworkflow with proper streaming
+            outputs = {}
 
-        # Add the result to the chat history
-        self._add_function_result_to_chat_history(outputs, self.state)
+            for output in super().run():
+                if output.is_fulfilled:
+                    outputs[output.name] = output.value
+                yield output
+
+            # Add the result to the chat history
+            self._add_function_result_to_chat_history(outputs, function_call_id, self.state)
+            all_results.append(outputs)
+
+        yield BaseOutput(name="results", value=all_results)
 
 
 class FunctionNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
-    """Node that executes a regular Python function with function call output."""
+    """Node that executes a regular Python function with function call output.
+
+    Processes ALL matching function calls in parallel execution mode.
+    """
 
     function_definition: Callable[..., Any]
 
     class Outputs(BaseNode.Outputs):
-        result: Any
+        results: List[Any]
 
     def run(self) -> Iterator[BaseOutput]:
-        try:
-            result = self.function_definition(**self.arguments)
-        except Exception as e:
-            self._handle_tool_exception(e, "function", self.function_definition.__name__)
+        matching_calls = self._get_matching_function_calls(self.state)
+        results: List[Any] = []
 
-        # Add the result to the chat history
-        self._add_function_result_to_chat_history(result, self.state)
+        for arguments, function_call_id in matching_calls:
+            try:
+                result = self.function_definition(**arguments)
+            except Exception as e:
+                self._handle_tool_exception(e, "function", self.function_definition.__name__)
 
-        yield BaseOutput(name="result", value=result)
+            # Add the result to the chat history
+            self._add_function_result_to_chat_history(result, function_call_id, self.state)
+            results.append(result)
+
+        yield BaseOutput(name="results", value=results)
 
 
 class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
-    """Node that executes a Composio tool with function call output."""
+    """Node that executes a Composio tool with function call output.
+
+    Processes ALL matching function calls in parallel execution mode.
+    """
 
     composio_tool: ComposioToolDefinition
 
+    class Outputs(BaseNode.Outputs):
+        results: List[Any]
+
     def run(self) -> Iterator[BaseOutput]:
-        try:
-            # Execute using ComposioService
-            composio_service = ComposioService()
-            if self.composio_tool.user_id is not None:
-                result = composio_service.execute_tool(
-                    tool_name=self.composio_tool.action, arguments=self.arguments, user_id=self.composio_tool.user_id
-                )
-            else:
-                result = composio_service.execute_tool(tool_name=self.composio_tool.action, arguments=self.arguments)
-        except Exception as e:
-            self._handle_tool_exception(e, "Composio tool", self.composio_tool.action)
+        matching_calls = self._get_matching_function_calls(self.state)
+        results: List[Any] = []
 
-        # Add result to chat history
-        self._add_function_result_to_chat_history(result, self.state)
+        for arguments, function_call_id in matching_calls:
+            try:
+                # Execute using ComposioService
+                composio_service = ComposioService()
+                if self.composio_tool.user_id is not None:
+                    result = composio_service.execute_tool(
+                        tool_name=self.composio_tool.action, arguments=arguments, user_id=self.composio_tool.user_id
+                    )
+                else:
+                    result = composio_service.execute_tool(tool_name=self.composio_tool.action, arguments=arguments)
+            except Exception as e:
+                self._handle_tool_exception(e, "Composio tool", self.composio_tool.action)
 
-        yield from []
+            # Add result to chat history
+            self._add_function_result_to_chat_history(result, function_call_id, self.state)
+            results.append(result)
+
+        yield BaseOutput(name="results", value=results)
 
 
 class MCPNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
-    """Node that executes an MCP tool with function call output."""
+    """Node that executes an MCP tool with function call output.
+
+    Processes ALL matching function calls in parallel execution mode.
+    """
 
     mcp_tool: MCPToolDefinition
 
     class Outputs(BaseNode.Outputs):
-        result: Any
+        results: List[Any]
 
     def run(self) -> Iterator[BaseOutput]:
-        try:
-            mcp_service = MCPService()
-            result = mcp_service.execute_tool(tool_def=self.mcp_tool, arguments=self.arguments)
-        except Exception as e:
-            self._handle_tool_exception(e, "MCP tool", self.mcp_tool.name)
+        matching_calls = self._get_matching_function_calls(self.state)
+        results: List[Any] = []
 
-        # Add result to chat history
-        self._add_function_result_to_chat_history(result, self.state)
+        for arguments, function_call_id in matching_calls:
+            try:
+                mcp_service = MCPService()
+                result = mcp_service.execute_tool(tool_def=self.mcp_tool, arguments=arguments)
+            except Exception as e:
+                self._handle_tool_exception(e, "MCP tool", self.mcp_tool.name)
 
-        yield BaseOutput(name="result", value=result)
+            # Add result to chat history
+            self._add_function_result_to_chat_history(result, function_call_id, self.state)
+            results.append(result)
+
+        yield BaseOutput(name="results", value=results)
 
 
 class VellumIntegrationNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
-    """Node that executes a Vellum Integration tool with function call output."""
+    """Node that executes a Vellum Integration tool with function call output.
+
+    Processes ALL matching function calls in parallel execution mode.
+    """
 
     vellum_integration_tool: VellumIntegrationToolDefinition
 
     class Outputs(BaseNode.Outputs):
-        result: Any
+        results: List[Any]
 
     def run(self) -> Iterator[BaseOutput]:
+        matching_calls = self._get_matching_function_calls(self.state)
+        results: List[Any] = []
         vellum_client = self._context.vellum_client
 
-        try:
-            vellum_service = VellumIntegrationService(vellum_client)
-            result = vellum_service.execute_tool(
-                integration=self.vellum_integration_tool.integration_name,
-                provider=self.vellum_integration_tool.provider.value,
-                tool_name=self.vellum_integration_tool.name,
-                arguments=self.arguments,
-                toolkit_version=self.vellum_integration_tool.toolkit_version,
-            )
-        except NodeException as e:
-            error_payload = {
-                "error": {
-                    "code": e.code.value,
-                    "message": e.message,
+        for arguments, function_call_id in matching_calls:
+            try:
+                vellum_service = VellumIntegrationService(vellum_client)
+                result = vellum_service.execute_tool(
+                    integration=self.vellum_integration_tool.integration_name,
+                    provider=self.vellum_integration_tool.provider.value,
+                    tool_name=self.vellum_integration_tool.name,
+                    arguments=arguments,
+                    toolkit_version=self.vellum_integration_tool.toolkit_version,
+                )
+            except NodeException as e:
+                error_payload = {
+                    "error": {
+                        "code": e.code.value,
+                        "message": e.message,
+                    }
                 }
-            }
-            if e.raw_data is not None:
-                error_payload["error"]["raw_data"] = e.raw_data
+                if e.raw_data is not None:
+                    error_payload["error"]["raw_data"] = e.raw_data
 
-            self._add_function_result_to_chat_history(error_payload, self.state)
-            yield BaseOutput(name="result", value=error_payload["error"])
-            return
-        except Exception as e:
-            self._handle_tool_exception(e, "Vellum Integration tool", self.vellum_integration_tool.name)
+                self._add_function_result_to_chat_history(error_payload, function_call_id, self.state)
+                results.append(error_payload["error"])
+                continue
+            except Exception as e:
+                self._handle_tool_exception(e, "Vellum Integration tool", self.vellum_integration_tool.name)
 
-        # Add result to chat history
-        self._add_function_result_to_chat_history(result, self.state)
+            # Add result to chat history
+            self._add_function_result_to_chat_history(result, function_call_id, self.state)
+            results.append(result)
 
-        yield BaseOutput(name="result", value=result)
+        yield BaseOutput(name="results", value=results)
 
 
 class ElseNode(BaseNode[ToolCallingState]):
@@ -403,31 +518,15 @@ def create_tool_prompt_node(
     return node
 
 
-def _create_function_call_expressions(
-    tool_prompt_node: Type[ToolPromptNode],
-) -> tuple[BaseDescriptor[dict], BaseDescriptor[Optional[str]]]:
-    """
-    Create expressions to extract arguments and function_call_id from tool_prompt_node outputs.
-
-    Returns:
-        A tuple of (arguments_expression, function_call_id_expression)
-
-    Note: These expressions assume the output at current_prompt_output_index is a valid FUNCTION_CALL.
-    The router node ensures this before routing to function nodes.
-    """
-    current_output = tool_prompt_node.Outputs.results[ToolCallingState.current_prompt_output_index]
-    # Extract arguments and function_call_id directly from the function call value
-    # Using coalesce to provide safe fallbacks if the structure is unexpected
-    arguments_expr: BaseDescriptor[dict] = current_output["value"]["arguments"].coalesce({})
-    function_call_id_expr: BaseDescriptor[Optional[str]] = current_output["value"]["id"].coalesce(None)
-    return arguments_expr, function_call_id_expr
-
-
 def create_router_node(
     functions: List[Union[ToolBase, MCPToolDefinition]],
     tool_prompt_node: Type[InlinePromptNode[ToolCallingState]],
 ) -> Type[RouterNode]:
-    """Create a RouterNode with dynamic ports that route based on tool_prompt_node outputs."""
+    """Create a RouterNode with dynamic ports that route based on tool_prompt_node outputs.
+
+    Each function gets its own IF port group, allowing multiple functions to be invoked
+    in parallel when the LLM returns multiple function calls in a single response.
+    """
 
     if functions and len(functions) > 0:
         # Create dynamic ports and convert functions in a single loop
@@ -437,23 +536,15 @@ def create_router_node(
         tool_names: List[str] = [get_function_name(function) for function in functions]
 
         # Build conditions for each tool name
-        conditions = [
-            (
-                name,
-                ToolCallingState.current_prompt_output_index.less_than(tool_prompt_node.Outputs.results.length())
-                & tool_prompt_node.Outputs.results[ToolCallingState.current_prompt_output_index]["type"].equals(
-                    "FUNCTION_CALL"
-                )
-                & tool_prompt_node.Outputs.results[ToolCallingState.current_prompt_output_index]["value"][
-                    "name"
-                ].equals(name),
+        # Each function gets its own IF port group to enable parallel execution
+        # The condition checks if ANY result in the outputs matches this function
+        for name in tool_names:
+            condition = HasFunctionCallExpression(
+                results=tool_prompt_node.Outputs.results,
+                function_name=name,
             )
-            for name in tool_names
-        ]
-
-        # Assign ports: first condition uses on_if, subsequent ones use on_elif
-        for idx, (name, condition) in enumerate(conditions):
-            port = Port.on_if(condition) if idx == 0 else Port.on_elif(condition)
+            # Each function gets its own IF port (separate port group) for parallel execution
+            port = Port.on_if(condition)
             setattr(Ports, name, port)
 
         # Add the else port for when no function conditions match
@@ -484,6 +575,10 @@ def create_function_node(
     """
     Create a FunctionNode class for a given function.
 
+    For parallel execution, each function node receives:
+    - function_name: The name of the function this node handles
+    - prompt_outputs: Reference to the tool_prompt_node outputs for extracting matching calls
+
     For workflow functions: BaseNode
     For regular functions: BaseNode with direct function call
     For MCP tools: MCPNode
@@ -492,10 +587,11 @@ def create_function_node(
         function: The function to create a node for
         tool_prompt_node: The tool prompt node class
     """
+    func_name = get_function_name(function)
+    prompt_outputs = tool_prompt_node.Outputs.results
+
     if isinstance(function, MCPToolDefinition):
         return create_mcp_tool_node(function, tool_prompt_node)
-
-    arguments_expr, function_call_id_expr = _create_function_call_expressions(tool_prompt_node)
 
     if isinstance(function, DeploymentDefinition):
         deployment = function.deployment_id or function.deployment_name
@@ -507,8 +603,8 @@ def create_function_node(
             {
                 "deployment": deployment,
                 "release_tag": release_tag,
-                "arguments": arguments_expr,
-                "function_call_id": function_call_id_expr,
+                "function_name": func_name,
+                "prompt_outputs": prompt_outputs,
                 "__module__": __name__,
             },
         )
@@ -521,8 +617,8 @@ def create_function_node(
             (ComposioNode,),
             {
                 "composio_tool": function,
-                "arguments": arguments_expr,
-                "function_call_id": function_call_id_expr,
+                "function_name": func_name,
+                "prompt_outputs": prompt_outputs,
                 "__module__": __name__,
             },
         )
@@ -538,8 +634,8 @@ def create_function_node(
             (VellumIntegrationNode,),
             {
                 "vellum_integration_tool": function,
-                "arguments": arguments_expr,
-                "function_call_id": function_call_id_expr,
+                "function_name": func_name,
+                "prompt_outputs": prompt_outputs,
                 "Display": display_class,
                 "__module__": __name__,
             },
@@ -552,8 +648,8 @@ def create_function_node(
             (DynamicInlineSubworkflowNode,),
             {
                 "subworkflow": function,
-                "arguments": arguments_expr,
-                "function_call_id": function_call_id_expr,
+                "function_name": func_name,
+                "prompt_outputs": prompt_outputs,
                 "__module__": __name__,
             },
         )
@@ -587,8 +683,8 @@ def create_function_node(
             (FunctionNode,),
             {
                 "function_definition": create_function_wrapper(function),
-                "arguments": arguments_expr,
-                "function_call_id": function_call_id_expr,
+                "function_name": func_name,
+                "prompt_outputs": prompt_outputs,
                 "Display": display_class,
                 "__module__": __name__,
             },
@@ -601,14 +697,16 @@ def create_mcp_tool_node(
     tool_def: MCPToolDefinition,
     tool_prompt_node: Type[ToolPromptNode],
 ) -> Type[BaseNode]:
-    arguments_expr, function_call_id_expr = _create_function_call_expressions(tool_prompt_node)
+    func_name = get_mcp_tool_name(tool_def)
+    prompt_outputs = tool_prompt_node.Outputs.results
+
     node = type(
         f"MCPNode_{tool_def.name}",
         (MCPNode,),
         {
             "mcp_tool": tool_def,
-            "arguments": arguments_expr,
-            "function_call_id": function_call_id_expr,
+            "function_name": func_name,
+            "prompt_outputs": prompt_outputs,
             "__module__": __name__,
         },
     )
@@ -618,11 +716,15 @@ def create_mcp_tool_node(
 def create_else_node(
     tool_prompt_node: Type[ToolPromptNode],
 ) -> Type[ElseNode]:
+    """Create an ElseNode for parallel execution flow.
+
+    In parallel execution mode, all function nodes process their matching calls in a single pass,
+    so we only need to check if any function calls were processed to decide whether to loop
+    back to the prompt or end.
+    """
+
     class Ports(ElseNode.Ports):
-        loop_to_router = Port.on_if(
-            ToolCallingState.current_prompt_output_index.less_than(tool_prompt_node.Outputs.results.length())
-        )
-        loop_to_prompt = Port.on_elif(ToolCallingState.current_function_calls_processed.greater_than(0))
+        loop_to_prompt = Port.on_if(ToolCallingState.current_function_calls_processed.greater_than(0))
         end = Port.on_else()
 
     node = cast(

@@ -211,20 +211,27 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
                 tool_prompt_node=self.tool_prompt_node,
             )
 
+        # Build the graph for parallel tool execution
+        # All function nodes run in parallel and route to ElseNode
+        else_node = create_else_node(self.tool_prompt_node)
+
         graph: Graph = self.tool_prompt_node >> self.router_node
 
         for function_name, FunctionNodeClass in self._function_nodes.items():
             router_port = getattr(self.router_node.Ports, function_name)
-            function_subgraph = router_port >> FunctionNodeClass >> self.router_node
+            # Function nodes route to else_node instead of router_node for parallel execution
+            function_subgraph = router_port >> FunctionNodeClass >> else_node
             graph._extend_edges(function_subgraph.edges)
 
-        else_node = create_else_node(self.tool_prompt_node)
-        default_port_graph = self.router_node.Ports.default >> {
-            else_node.Ports.loop_to_router >> self.router_node,  # More outputs to process
+        # ElseNode handles the decision to loop back to prompt or end
+        default_port_graph = self.router_node.Ports.default >> else_node
+        graph._extend_edges(default_port_graph.edges)
+
+        else_node_graph = {
             else_node.Ports.loop_to_prompt >> self.tool_prompt_node,  # Need new prompt iteration
             else_node.Ports.end,  # Finished
         }
-        graph._extend_edges(default_port_graph.edges)
+        graph._extend_edges(Graph.from_set(else_node_graph).edges)
 
         self._graph = graph
 
