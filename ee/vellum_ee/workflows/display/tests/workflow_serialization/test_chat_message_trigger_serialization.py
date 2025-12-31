@@ -43,9 +43,8 @@ def test_simple_chat_workflow_serialization():
             ],
             "exec_config": {
                 "output": {
-                    "type": "NODE_OUTPUT",
-                    "node_id": "6c43f557-304c-4f08-a8fd-13d1fb02d96a",
-                    "node_output_id": "14f1265b-d5fb-4b60-b06b-9012029f6c6c",
+                    "type": "WORKFLOW_OUTPUT",
+                    "output_variable_id": "cc1208e9-c043-47f4-abea-c01ac0dbf04c",
                 },
             },
             "display_data": {
