@@ -237,7 +237,10 @@ export abstract class BaseTrigger<
 
   private createAttributeField(attr: VellumVariable): AstNode {
     const defaultValue = attr.default;
-    if (defaultValue) {
+    // Only add an initializer when the default value is non-null.
+    // The API returns { type: ..., value: null } for attributes without defaults,
+    // and we don't want to generate `attr: str = None` for required attributes.
+    if (defaultValue != null && defaultValue.value != null) {
       const vellumValue = new VellumValue({ vellumValue: defaultValue });
       return new Field({
         name: attr.key,
