@@ -277,9 +277,8 @@ class BaseTriggerMeta(ABCMeta):
         if isinstance(attribute, TriggerAttributeReference):
             return attribute
 
-        if name in cls.__dict__:
-            return attribute
-
+        # Check if this is an annotated attribute (trigger attribute) before returning raw value
+        # This allows subclasses to override trigger attributes with default values
         if not _is_annotated(cls, name):
             return attribute
 

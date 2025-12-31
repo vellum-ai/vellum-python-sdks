@@ -654,6 +654,25 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                 except ValueError:
                     return "JSON"
 
+            def get_attribute_default(reference: Any) -> JsonObject:
+                """Get the default value for a trigger attribute, properly serialized."""
+                attr_type = get_attribute_type(reference)
+                default_value = reference.instance
+
+                if default_value is None or default_value is undefined:
+                    return {"type": attr_type, "value": None}
+
+                # Use primitive_to_vellum_value to serialize the default value
+                vellum_value = primitive_to_vellum_value(default_value)
+                serialized = vellum_value.dict() if hasattr(vellum_value, "dict") else vellum_value.model_dump()
+
+                # Ensure the serialized type matches the attribute type for consistency
+                # JSON attributes can hold any primitive type
+                if attr_type == "JSON":
+                    return {"type": "JSON", "value": serialized.get("value")}
+
+                return cast(JsonObject, serialized)
+
             trigger_attributes: JsonArray = cast(
                 JsonArray,
                 [
@@ -664,10 +683,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                             "key": reference.name,
                             "type": get_attribute_type(reference),
                             "required": type(None) not in reference.types,
-                            "default": {
-                                "type": get_attribute_type(reference),
-                                "value": None,
-                            },
+                            "default": get_attribute_default(reference),
                             "extensions": None,
                             "schema": None,
                         },
