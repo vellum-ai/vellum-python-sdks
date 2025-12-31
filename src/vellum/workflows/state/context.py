@@ -3,10 +3,12 @@ from functools import cached_property
 import json
 from queue import Queue
 from uuid import UUID, uuid4
-from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Type
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Type
 
 from vellum import Vellum, __version__
+from vellum.client.types import SeverityEnum
 from vellum.workflows.context import ExecutionContext, get_execution_context, set_execution_context
+from vellum.workflows.events.node import NodeExecutionLogBody, NodeExecutionLogEvent
 from vellum.workflows.events.types import ExternalParentContext
 from vellum.workflows.nodes.mocks import MockNodeExecution, MockNodeExecutionArg
 from vellum.workflows.outputs.base import BaseOutputs
@@ -18,6 +20,7 @@ from vellum.workflows.vellum_client import create_vellum_client
 
 if TYPE_CHECKING:
     from vellum.workflows.events.workflow import WorkflowEvent
+    from vellum.workflows.nodes.bases import BaseNode
     from vellum.workflows.state.base import BaseState
     from vellum.workflows.workflows.base import BaseWorkflow
 
@@ -145,6 +148,35 @@ class WorkflowContext:
         else:
             # For custom domains, assume the same pattern: api.* -> app.*
             return api_url.replace("api.", "app.", 1)
+
+    def emit_log_event(
+        self, severity: SeverityEnum, message: str, attributes: Dict[str, Any], node: "BaseNode"
+    ) -> None:
+        """Emit a log event for a particular node.
+
+        This is in active development and may have breaking changes.
+        """
+        if self._event_queue is None:
+            return
+
+        execution_context = self.execution_context
+        if execution_context.parent_context is None:
+            span_id = uuid4()
+        else:
+            span_id = execution_context.parent_context.span_id
+
+        self._event_queue.put(
+            NodeExecutionLogEvent(
+                trace_id=execution_context.trace_id,
+                span_id=span_id,
+                body=NodeExecutionLogBody(
+                    node_definition=node.__class__,
+                    severity=severity,
+                    message=message,
+                    attributes=attributes,
+                ),
+            )
+        )
 
     def _emit_subworkflow_event(self, event: "WorkflowEvent") -> None:
         if self._event_queue:
