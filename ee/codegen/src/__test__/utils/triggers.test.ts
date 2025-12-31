@@ -100,7 +100,6 @@ describe("getTriggerClassInfo", () => {
             value: "Hello",
           },
           extensions: null,
-          schema: null,
         },
       ],
       execConfig: {
@@ -116,7 +115,7 @@ describe("getTriggerClassInfo", () => {
           x: 0.0,
           y: 0.0,
         },
-        zIndex: 0,
+        z_index: 0,
         icon: "vellum:icon:message",
         color: "blue",
       },
