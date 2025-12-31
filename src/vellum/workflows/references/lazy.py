@@ -36,6 +36,11 @@ class LazyReference(BaseDescriptor[_T], Generic[_T]):
                 if str(output_reference) == self._get:
                     return value
 
+            # Check workflow outputs if the string matches a workflow output reference
+            workflow_output = self._resolve_workflow_output(state)
+            if workflow_output is not undefined:
+                return workflow_output  # type: ignore[return-value]
+
             child_reference = self.resolve(state.meta.parent) if state.meta.parent else None
 
             # Fix typing surrounding the return value of node outputs/output descriptors
@@ -43,6 +48,26 @@ class LazyReference(BaseDescriptor[_T], Generic[_T]):
             return child_reference or undefined  # type: ignore[return-value]
 
         return resolve_value(self._get(), state)
+
+    def _resolve_workflow_output(self, state: "BaseState") -> _T:
+        from vellum.workflows.descriptors.utils import resolve_value
+        from vellum.workflows.types.generics import is_workflow_class
+
+        if not isinstance(self._get, str):
+            return undefined  # type: ignore[return-value]
+
+        workflow_definition = state.meta.workflow_definition
+        if not is_workflow_class(workflow_definition):
+            return undefined  # type: ignore[return-value]
+
+        # Check if the string matches a workflow output (e.g., "MyWorkflow.Outputs.response")
+        for output_reference in workflow_definition.Outputs:
+            if str(output_reference) == self._get:
+                # The workflow output's instance is the underlying descriptor (e.g., a node output reference)
+                if isinstance(output_reference.instance, BaseDescriptor):
+                    return resolve_value(output_reference.instance, state)
+
+        return undefined  # type: ignore[return-value]
 
     def _get_name(self) -> str:
         """
