@@ -42,14 +42,12 @@ exports[`generateCode > should generate code for %1 chat-message-trigger.ts > tr
 "from vellum.workflows.references import LazyReference
 from vellum.workflows.triggers import ChatMessageTrigger
 
-from ..nodes.some_node import SomeNode
-
 
 class ChatMessage(ChatMessageTrigger):
     message: str
 
     class Config(ChatMessageTrigger.Config):
-        output = LazyReference(lambda: SomeNode.Outputs.result)
+        output = LazyReference("SomeNode.Outputs.result")
 
     class Display(ChatMessageTrigger.Display):
         label = "Chat Message"

@@ -1,13 +1,14 @@
-import { python } from "@fern-api/python-ast";
-
-import { VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH } from "src/constants";
+import {
+  OUTPUTS_CLASS_NAME,
+  VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH,
+} from "src/constants";
 import { Class } from "src/generators/extensions/class";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { Field } from "src/generators/extensions/field";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseTrigger } from "src/generators/triggers/base-trigger";
-import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { createPythonClassName, toPythonSafeSnakeCase } from "src/utils/casing";
 
 import type { AstNode } from "src/generators/extensions/ast-node";
@@ -82,10 +83,24 @@ export class ChatMessageTrigger extends BaseTrigger<ChatMessageTriggerType> {
   private createOutputField(
     output: WorkflowValueDescriptorType
   ): AstNode | undefined {
-    const workflowValueDescriptor = new WorkflowValueDescriptor({
-      workflowContext: this.workflowContext,
-      workflowValueDescriptor: output,
-    });
+    // For triggers, we always use string-based LazyReference to avoid circular imports
+    // when referencing node outputs. This prevents top-level imports that could cause
+    // circular dependency issues.
+    if (output.type !== "NODE_OUTPUT") {
+      return undefined;
+    }
+
+    const nodeContext = this.workflowContext.findNodeContext(output.nodeId);
+    if (!nodeContext) {
+      return undefined;
+    }
+
+    const nodeOutputName = nodeContext.getNodeOutputNameById(
+      output.nodeOutputId
+    );
+    if (!nodeOutputName) {
+      return undefined;
+    }
 
     const lazyReferenceValue = new ClassInstantiation({
       classReference: new Reference({
@@ -97,14 +112,12 @@ export class ChatMessageTrigger extends BaseTrigger<ChatMessageTriggerType> {
       }),
       arguments_: [
         new MethodArgument({
-          value: python.lambda({
-            body: workflowValueDescriptor,
-          }),
+          value: new StrInstantiation(
+            `${nodeContext.nodeClassName}.${OUTPUTS_CLASS_NAME}.${nodeOutputName}`
+          ),
         }),
       ],
     });
-
-    this.inheritReferences(lazyReferenceValue);
 
     return new Field({
       name: "output",
