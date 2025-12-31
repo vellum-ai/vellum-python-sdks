@@ -1,7 +1,8 @@
+import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { NodeInputNotFoundError } from "src/generators/errors";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
-import { Reference } from "src/generators/extensions/reference";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseNodeInputWorkflowReference } from "src/generators/workflow-value-descriptor-reference/BaseNodeInputWorkflowReference";
 import { WorkflowOutputWorkflowReference as WorkflowOutputWorkflowReferenceType } from "src/types/vellum";
 
@@ -27,10 +28,9 @@ export class WorkflowOutputReference extends BaseNodeInputWorkflowReference<Work
       );
       return new NoneInstantiation();
     }
-    return new Reference({
-      name: this.workflowContext.workflowClassName,
-      modulePath: this.workflowContext.modulePath,
-      attribute: ["Outputs", outputVariableContext.name],
-    });
+
+    return new StrInstantiation(
+      `${this.workflowContext.workflowClassName}.${OUTPUTS_CLASS_NAME}.${outputVariableContext.name}`
+    );
   }
 }
