@@ -17,6 +17,13 @@ class TestWorkflowWithOutput(BaseWorkflow):
         final_response = ResponseNode.Outputs.response
 
 
+class TestWorkflowWithLiteralOutput(BaseWorkflow):
+    graph = ResponseNode
+
+    class Outputs(BaseWorkflow.Outputs):
+        literal_value = "Hello literal!"
+
+
 @pytest.fixture
 def mock_inspect_getsource(mocker):
     return mocker.patch("inspect.getsource")
@@ -60,3 +67,22 @@ def test_lazy_reference__string_resolves_workflow_output():
 
     # THEN the resolved value matches the node output
     assert resolved_value == "Hello from node!"
+
+
+def test_lazy_reference__string_resolves_literal_workflow_output():
+    """Tests that string-based LazyReference can resolve literal workflow output values."""
+
+    # GIVEN a workflow with a literal output value (defined at module level)
+    # WHEN we run the workflow
+    terminal_event = TestWorkflowWithLiteralOutput().run()
+
+    # THEN the workflow completes successfully
+    assert terminal_event.name == "workflow.execution.fulfilled"
+    assert terminal_event.final_state is not None
+
+    # AND we can resolve a string-based LazyReference to the literal workflow output
+    lazy_ref = LazyReference[str]("TestWorkflowWithLiteralOutput.Outputs.literal_value")
+    resolved_value = lazy_ref.resolve(terminal_event.final_state)
+
+    # THEN the resolved value matches the literal output
+    assert resolved_value == "Hello literal!"

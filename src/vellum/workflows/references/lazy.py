@@ -63,9 +63,7 @@ class LazyReference(BaseDescriptor[_T], Generic[_T]):
         # Check if the string matches a workflow output (e.g., "MyWorkflow.Outputs.response")
         for output_reference in workflow_definition.Outputs:
             if str(output_reference) == self._get:
-                # The workflow output's instance is the underlying descriptor (e.g., a node output reference)
-                if isinstance(output_reference.instance, BaseDescriptor):
-                    return resolve_value(output_reference.instance, state)
+                return resolve_value(output_reference.instance, state)  # type: ignore[return-value]
 
         return undefined
 
