@@ -84,4 +84,49 @@ describe("getTriggerClassInfo", () => {
       modulePath: ["code", "triggers", "chat_message"],
     });
   });
+
+  it("should return correct info for CHAT_MESSAGE trigger with default attribute value", () => {
+    const trigger: WorkflowTrigger = {
+      id: "9e14c49b-c6d9-4fe5-9ff2-835fd695fe5f",
+      type: WorkflowTriggerType.CHAT_MESSAGE,
+      attributes: [
+        {
+          id: "5edbfd78-b634-4305-b2ad-d9feecbd5e5f",
+          key: "message",
+          type: "JSON",
+          required: true,
+          default: {
+            type: "STRING",
+            value: "Hello",
+          },
+          extensions: null,
+          schema: null,
+        },
+      ],
+      execConfig: {
+        output: {
+          type: "NODE_OUTPUT",
+          nodeId: "6c43f557-304c-4f08-a8fd-13d1fb02d96a",
+          nodeOutputId: "14f1265b-d5fb-4b60-b06b-9012029f6c6c",
+        },
+      },
+      displayData: {
+        label: "Chat Message",
+        position: {
+          x: 0.0,
+          y: 0.0,
+        },
+        zIndex: 0,
+        icon: "vellum:icon:message",
+        color: "blue",
+      },
+    };
+
+    const result = getTriggerClassInfo(trigger, workflowContextFactory());
+
+    expect(result).toEqual({
+      className: "ChatMessage",
+      modulePath: ["code", "triggers", "chat_message"],
+    });
+  });
 });
