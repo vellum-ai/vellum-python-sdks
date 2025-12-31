@@ -68,6 +68,7 @@ export function isReference(
   return (
     workflowValueDescriptor.type === "NODE_OUTPUT" ||
     workflowValueDescriptor.type === "WORKFLOW_INPUT" ||
+    workflowValueDescriptor.type === "WORKFLOW_OUTPUT" ||
     workflowValueDescriptor.type === "WORKFLOW_STATE" ||
     workflowValueDescriptor.type === "CONSTANT_VALUE" ||
     workflowValueDescriptor.type === "VELLUM_SECRET" ||
