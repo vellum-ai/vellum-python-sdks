@@ -19,8 +19,10 @@ import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { VellumValue } from "src/generators/vellum-variable-value";
 import { isNilOrEmpty } from "src/utils/typing";
 
+import type { VellumVariable } from "vellum-ai/api/types";
+
 import type { AstNode } from "src/generators/extensions/ast-node";
-import type { VellumVariable, WorkflowTrigger } from "src/types/vellum";
+import type { WorkflowTrigger } from "src/types/vellum";
 
 export declare namespace BaseTrigger {
   interface Args<T extends WorkflowTrigger> {
