@@ -1,10 +1,11 @@
 import ast
 import inspect
 import logging
-from typing import TYPE_CHECKING, Callable, Generic, TypeVar, Union, get_args
+from typing import TYPE_CHECKING, Callable, Generic, Type, TypeVar, Union, get_args
 
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
+from vellum.workflows.types.generics import is_workflow_class
 
 if TYPE_CHECKING:
     from vellum.workflows.state.base import BaseState
@@ -49,16 +50,15 @@ class LazyReference(BaseDescriptor[_T], Generic[_T]):
 
         return resolve_value(self._get(), state)
 
-    def _resolve_workflow_output(self, state: "BaseState") -> _T:
+    def _resolve_workflow_output(self, state: "BaseState") -> Union[_T, Type[undefined]]:
         from vellum.workflows.descriptors.utils import resolve_value
-        from vellum.workflows.types.generics import is_workflow_class
 
         if not isinstance(self._get, str):
-            return undefined  # type: ignore[return-value]
+            return undefined
 
         workflow_definition = state.meta.workflow_definition
         if not is_workflow_class(workflow_definition):
-            return undefined  # type: ignore[return-value]
+            return undefined
 
         # Check if the string matches a workflow output (e.g., "MyWorkflow.Outputs.response")
         for output_reference in workflow_definition.Outputs:
@@ -67,7 +67,7 @@ class LazyReference(BaseDescriptor[_T], Generic[_T]):
                 if isinstance(output_reference.instance, BaseDescriptor):
                     return resolve_value(output_reference.instance, state)
 
-        return undefined  # type: ignore[return-value]
+        return undefined
 
     def _get_name(self) -> str:
         """
