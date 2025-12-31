@@ -654,6 +654,20 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                 except ValueError:
                     return "JSON"
 
+            def get_attribute_default(reference: Any) -> JsonObject:
+                """Get the default value for a trigger attribute."""
+                instance = getattr(reference, "instance", None)
+                if instance is not None and instance is not undefined:
+                    try:
+                        vellum_value = primitive_to_vellum_value(instance)
+                        return cast(JsonObject, self._model_dump(vellum_value))
+                    except ValueError:
+                        pass
+                return {
+                    "type": get_attribute_type(reference),
+                    "value": None,
+                }
+
             trigger_attributes: JsonArray = cast(
                 JsonArray,
                 [
@@ -664,10 +678,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                             "key": reference.name,
                             "type": get_attribute_type(reference),
                             "required": type(None) not in reference.types,
-                            "default": {
-                                "type": get_attribute_type(reference),
-                                "value": None,
-                            },
+                            "default": get_attribute_default(reference),
                             "extensions": None,
                             "schema": None,
                         },
