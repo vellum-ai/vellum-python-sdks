@@ -3,7 +3,6 @@ from unittest import mock
 from uuid import uuid4
 from typing import Iterator, List
 
-from vellum import ChatMessage, StringChatMessageContent
 from vellum.client.types.ad_hoc_expand_meta import AdHocExpandMeta
 from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
 from vellum.client.types.execute_prompt_event import ExecutePromptEvent
