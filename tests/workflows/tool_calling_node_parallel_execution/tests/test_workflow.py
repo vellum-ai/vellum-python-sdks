@@ -132,7 +132,7 @@ def test_parallel_tool_calls_parallel(vellum_adhoc_prompt_client, mock_uuid4_gen
         ChatMessage(
             text=None,
             role="FUNCTION",
-            content=StringChatMessageContent(type="STRING", value='"slow_tool_three_result"'),
+            content=StringChatMessageContent(type="STRING", value='{"result": "slow_tool_three_result"}'),
             source="call_slow_tool_three_workflow",
         ),
     ]
