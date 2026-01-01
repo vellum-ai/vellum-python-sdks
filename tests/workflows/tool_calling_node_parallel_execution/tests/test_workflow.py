@@ -1,8 +1,9 @@
 import time
 from unittest import mock
 from uuid import uuid4
-from typing import Iterator
+from typing import Iterator, List
 
+from vellum import ChatMessage, StringChatMessageContent
 from vellum.client.types.ad_hoc_expand_meta import AdHocExpandMeta
 from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
 from vellum.client.types.execute_prompt_event import ExecutePromptEvent
@@ -70,7 +71,7 @@ def test_parallel_tool_calls_parallel(vellum_adhoc_prompt_client, mock_uuid4_gen
             # Second LLM call returns final response
             expected_outputs = [StringVellumValue(value="All three slow tools executed successfully.")]
 
-        events = [
+        events: List[ExecutePromptEvent] = [
             InitiatedExecutePromptEvent(execution_id=execution_id),
             FulfilledExecutePromptEvent(
                 execution_id=execution_id,
@@ -115,14 +116,26 @@ def test_parallel_tool_calls_parallel(vellum_adhoc_prompt_client, mock_uuid4_gen
     assert chat_history[4].role == "ASSISTANT"  # Final response
 
     function_results = [msg for msg in chat_history if msg.role == "FUNCTION"]
-    assert len(function_results) == 3
-
-    actual_results = {msg.content.value.strip('"') for msg in function_results}
-    expected_results = {"slow_tool_one_result", "slow_tool_two_result", "slow_tool_three_result"}
-    assert actual_results == expected_results
-
-    # AND slow_tool_four was NOT called
-    assert "slow_tool_four_result" not in actual_results, "slow_tool_four should not have been called!"
+    assert function_results == [
+        ChatMessage(
+            text=None,
+            role="FUNCTION",
+            content=StringChatMessageContent(type="STRING", value='"slow_tool_one_result"'),
+            source="call_slow_tool_one",
+        ),
+        ChatMessage(
+            text=None,
+            role="FUNCTION",
+            content=StringChatMessageContent(type="STRING", value='"slow_tool_two_result"'),
+            source="call_slow_tool_two",
+        ),
+        ChatMessage(
+            text=None,
+            role="FUNCTION",
+            content=StringChatMessageContent(type="STRING", value='"slow_tool_three_result"'),
+            source="call_slow_tool_three_workflow",
+        ),
+    ]
 
     first_call = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_args_list[0]
     assert first_call.kwargs == {
