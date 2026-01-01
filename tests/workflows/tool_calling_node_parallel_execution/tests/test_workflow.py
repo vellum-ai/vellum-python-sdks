@@ -115,6 +115,18 @@ def test_parallel_tool_execution_sequential_baseline(vellum_adhoc_prompt_client,
     assert chat_history[3].role == "FUNCTION"  # Third result
     assert chat_history[4].role == "ASSISTANT"  # Final response
 
+    # Verify all three tools actually executed by checking their results in chat history
+    function_results = [msg for msg in chat_history if msg.role == "FUNCTION"]
+    assert len(function_results) == 3
+
+    # Extract the tool results from the function messages
+    expected_results = ["slow_tool_one_result", "slow_tool_two_result", "slow_tool_three_result"]
+    actual_results = []
+    for result_msg in function_results:
+        actual_results.append(result_msg.content.value.strip('"'))
+
+    assert set(actual_results) == set(expected_results)
+
     first_call = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_args_list[0]
     assert first_call.kwargs == {
         "ml_model": "gpt-4o-mini",
