@@ -38,7 +38,7 @@ from vellum.workflows.triggers.schedule import ScheduleTrigger
 from vellum.workflows.types.core import Json, JsonArray, JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.types.utils import get_original_base
-from vellum.workflows.utils.uuids import uuid4_from_hash
+from vellum.workflows.utils.uuids import generate_entity_id_from_path, uuid4_from_hash
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
 from vellum.workflows.vellum_client import create_vellum_client
 from vellum_ee.workflows.display.base import (
@@ -1510,7 +1510,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                         elif isinstance(inputs_obj, DatasetRow) and inputs_obj.id is not None:
                             row_data["id"] = inputs_obj.id
                         else:
-                            row_data["id"] = str(uuid4_from_hash(f"{module}.sandbox.dataset.{i}"))
+                            row_data["id"] = str(generate_entity_id_from_path(f"{module}.sandbox.dataset.{i}"))
 
                         dataset.append(row_data)
         except ImportError:

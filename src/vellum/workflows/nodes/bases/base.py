@@ -46,7 +46,7 @@ from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.core import MergeBehavior
 from vellum.workflows.types.generics import StateType
 from vellum.workflows.types.utils import get_class_attr_names, get_original_base, infer_types
-from vellum.workflows.utils.uuids import uuid4_from_hash
+from vellum.workflows.utils.uuids import generate_entity_id_from_path, uuid4_from_hash
 
 
 def _is_nested_class(nested: Any, parent: Type) -> bool:
@@ -159,7 +159,8 @@ class BaseNodeMeta(ABCMeta):
         node_class.ExternalInputs.__parent_class__ = node_class
 
         # Use new ID generation (module + qualname)
-        node_class.__id__ = uuid4_from_hash(f"{node_class.__module__}.{node_class.__qualname__}")
+        # generate_entity_id_from_path normalizes the module path to filter out UUID namespace for stable ID generation
+        node_class.__id__ = generate_entity_id_from_path(f"{node_class.__module__}.{node_class.__qualname__}")
 
         node_class.__output_ids__ = {
             ref.name: uuid4_from_hash(f"{node_class.__id__}|{ref.name}")
