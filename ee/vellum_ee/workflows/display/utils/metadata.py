@@ -175,3 +175,31 @@ def load_dataset_row_index_to_id_mapping(module_path: str) -> Dict[int, str]:
             return {}
     except Exception:
         return {}
+
+
+def load_runner_config(module_path: str) -> Optional[Dict[str, Optional[str]]]:
+    """
+    Load runner_config from metadata.json for a given module.
+
+    This function searches up the module hierarchy for metadata.json and extracts
+    the runner_config.
+
+    Args:
+        module_path: The module path to search from (e.g., "workflows.my_workflow")
+
+    Returns:
+        The runner_config dictionary if found in metadata.json, None otherwise
+    """
+    try:
+        root = find_workflow_root_with_metadata(module_path)
+        if not root:
+            return None
+        file_path = os.path.join(root.replace(".", os.path.sep), "metadata.json")
+        with virtual_open(file_path) as f:
+            data = json.load(f)
+            runner_config = data.get("runner_config")
+            if isinstance(runner_config, dict):
+                return runner_config
+            return None
+    except Exception:
+        return None

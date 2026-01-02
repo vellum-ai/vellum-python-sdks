@@ -3,6 +3,7 @@ from enum import Enum
 import fnmatch
 from functools import cached_property
 import importlib
+from importlib import metadata as importlib_metadata
 import inspect
 import logging
 import os
@@ -79,6 +80,7 @@ from vellum_ee.workflows.display.utils.metadata import (
     get_regular_edge_id,
     get_trigger_edge_id,
     load_dataset_row_index_to_id_mapping,
+    load_runner_config,
 )
 from vellum_ee.workflows.display.utils.registry import register_workflow_display_class
 from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
@@ -1478,6 +1480,15 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
 
         if additional_files:
             exec_config["module_data"] = {"additional_files": cast(JsonObject, additional_files)}
+
+        sdk_version = importlib_metadata.version("vellum-ai")
+        runner_config = load_runner_config(module) or {}
+        exec_config["runner_config"] = {
+            "sdk_version": sdk_version,
+            "codegen_version": sdk_version,
+            "container_image_name": runner_config.get("container_image_name"),
+            "container_image_tag": runner_config.get("container_image_tag"),
+        }
 
         dataset = None
         sandbox_errors: List[Exception] = []

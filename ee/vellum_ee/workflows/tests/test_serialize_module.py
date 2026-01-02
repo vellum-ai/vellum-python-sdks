@@ -108,6 +108,53 @@ def test_serialize_module_happy_path():
     assert "output_variables" in result.exec_config
 
 
+def test_serialize_module__includes_runner_config():
+    """
+    Tests that serialize_module includes runner_config in exec_config with SDK version.
+    """
+    # GIVEN a valid module path
+    module_path = "tests.workflows.trivial"
+
+    # WHEN we serialize the module
+    result = BaseWorkflowDisplay.serialize_module(module_path)
+
+    # THEN the exec_config should contain runner_config
+    assert "runner_config" in result.exec_config
+
+    # AND runner_config should have the expected fields
+    runner_config = result.exec_config["runner_config"]
+    assert "sdk_version" in runner_config
+    assert "codegen_version" in runner_config
+    assert "container_image_name" in runner_config
+    assert "container_image_tag" in runner_config
+
+    # AND sdk_version and codegen_version should be set to the vellum-ai package version
+    assert runner_config["sdk_version"] is not None
+    assert runner_config["codegen_version"] is not None
+    assert runner_config["sdk_version"] == runner_config["codegen_version"]
+
+
+def test_serialize_module__runner_config_from_metadata():
+    """
+    Tests that serialize_module reads container image config from metadata.json.
+    """
+    # GIVEN a module path with metadata.json containing runner_config
+    module_path = "ee.vellum_ee.workflows.tests.local_workflow"
+
+    # WHEN we serialize the module
+    result = BaseWorkflowDisplay.serialize_module(module_path)
+
+    # THEN the exec_config should contain runner_config
+    assert "runner_config" in result.exec_config
+
+    # AND runner_config should have the expected fields
+    runner_config = result.exec_config["runner_config"]
+    assert "sdk_version" in runner_config
+    assert "codegen_version" in runner_config
+    assert "container_image_name" in runner_config
+    assert "container_image_tag" in runner_config
+
+
 def test_serialize_module_includes_additional_files():
     """
     Tests that serialize_module includes only Python files from the module directory.
