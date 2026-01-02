@@ -23,7 +23,7 @@ def generate_workflow_deployment_prefix(deployment_name: str, release_tag: str) 
     return f"vellum_workflow_deployment_{expected_hash}"
 
 
-def normalize_module_path(module_path: str) -> str:
+def _normalize_module_path(module_path: str) -> str:
     """
     Normalize a module path by filtering out a leading UUID namespace segment.
 
@@ -48,6 +48,24 @@ def normalize_module_path(module_path: str) -> str:
         return ".".join(parts[1:]) if len(parts) > 1 else ""
     except ValueError:
         return module_path
+
+
+def generate_entity_id_from_path(path: str) -> UUID:
+    """
+    Generate a deterministic entity ID from a path string.
+
+    This function normalizes the path by filtering out any leading UUID namespace segment
+    (which may change on each invocation when workflows are loaded dynamically), then
+    generates a stable UUID from the normalized path.
+
+    Args:
+        path: The path string to generate an ID from (e.g., "a1b2c3d4-e5f6-7890-abcd-ef1234567890.workflow.MyNode")
+
+    Returns:
+        A deterministic UUID based on the normalized path
+    """
+    normalized_path = _normalize_module_path(path)
+    return uuid4_from_hash(normalized_path)
 
 
 def uuid4_from_hash(input_str: str) -> UUID:
