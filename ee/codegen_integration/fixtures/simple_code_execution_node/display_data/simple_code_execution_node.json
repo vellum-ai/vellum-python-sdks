@@ -136,17 +136,22 @@
             "type": "DEFAULT"
           }
         ],
-        "outputs": [{
+        "outputs": [
+          {
             "id": "9d1dae27-6e6a-40bf-a401-611c974d4143",
             "name": "result",
-            "schema": {"type": "string"},
+            "schema": {
+              "type": "string"
+            },
             "type": "STRING",
             "value": null
           },
           {
             "id": "b57399ac-93ce-4225-8543-10bac4fe82f4",
             "name": "log",
-            "schema": {"type": "string"},
+            "schema": {
+              "type": "string"
+            },
             "type": "STRING",
             "value": null
           }
@@ -221,7 +226,9 @@
               "node_id": "97240cb9-94a0-4a1a-b69e-3c2d96ebb1e2",
               "node_output_id": "9d1dae27-6e6a-40bf-a401-611c974d4143"
             },
-            "schema": {"type": "string"}
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "trigger": {
@@ -296,5 +303,6 @@
       "key": "final-output",
       "type": "STRING"
     }
-  ]
+  ],
+  "runner_config": {}
 }

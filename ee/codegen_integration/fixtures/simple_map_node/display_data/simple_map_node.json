@@ -125,17 +125,22 @@
             "type": "DEFAULT"
           }
         ],
-        "outputs": [{
+        "outputs": [
+          {
             "id": "98ef146c-6603-4930-85c2-8a637a58476c",
             "name": "result",
-            "schema": {"type": "string"},
+            "schema": {
+              "type": "string"
+            },
             "type": "STRING",
             "value": null
           },
           {
             "id": "ce51ac26-1e30-4434-9915-429b55ed9f06",
             "name": "log",
-            "schema": {"type": "string"},
+            "schema": {
+              "type": "string"
+            },
             "type": "STRING",
             "value": null
           }
@@ -538,7 +543,9 @@
                       "node_id": "4b0a7578-e5ec-4d72-b396-62abdecbd101",
                       "node_output_id": "503aa2c1-6b99-43e8-98f7-1fef458a8d29"
                     },
-                    "schema": {"type": "string"}
+                    "schema": {
+                      "type": "string"
+                    }
                   }
                 ],
                 "trigger": {
@@ -677,7 +684,14 @@
         },
         "base": {
           "name": "MapNode",
-          "module": ["vellum", "workflows", "nodes", "core", "map_node", "node"]
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "core",
+            "map_node",
+            "node"
+          ]
         },
         "definition": {
           "name": "MapNode",
@@ -864,5 +878,6 @@
       "key": "final-output",
       "type": "JSON"
     }
-  ]
+  ],
+  "runner_config": {}
 }

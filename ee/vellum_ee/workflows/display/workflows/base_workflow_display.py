@@ -79,6 +79,7 @@ from vellum_ee.workflows.display.utils.metadata import (
     get_regular_edge_id,
     get_trigger_edge_id,
     load_dataset_row_index_to_id_mapping,
+    load_runner_config,
 )
 from vellum_ee.workflows.display.utils.registry import register_workflow_display_class
 from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
@@ -1478,6 +1479,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
 
         if additional_files:
             exec_config["module_data"] = {"additional_files": cast(JsonObject, additional_files)}
+
+        exec_config["runner_config"] = load_runner_config(module)
 
         dataset = None
         sandbox_errors: List[Exception] = []

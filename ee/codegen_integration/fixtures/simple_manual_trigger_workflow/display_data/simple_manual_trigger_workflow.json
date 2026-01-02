@@ -71,7 +71,9 @@
               "type": "WORKFLOW_INPUT",
               "input_variable_id": "2dc164d7-9512-4b68-8003-9439ea326249"
             },
-            "schema": {"type": "string"}
+            "schema": {
+              "type": "string"
+            }
           }
         ]
       },
@@ -147,7 +149,9 @@
               "node_id": "67c2abb9-6c61-47d6-b222-49fd5442ba8f",
               "node_output_id": "925c5cf8-25d0-429f-b849-2a98e542fe5d"
             },
-            "schema": {"type": "string"}
+            "schema": {
+              "type": "string"
+            }
           }
         ]
       }
@@ -224,5 +228,6 @@
       "type": "MANUAL",
       "attributes": []
     }
-  ]
+  ],
+  "runner_config": {}
 }

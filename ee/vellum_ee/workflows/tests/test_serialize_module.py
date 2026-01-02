@@ -108,6 +108,42 @@ def test_serialize_module_happy_path():
     assert "output_variables" in result.exec_config
 
 
+def test_serialize_module__includes_runner_config():
+    """
+    Tests that serialize_module includes runner_config in exec_config.
+    """
+    # GIVEN a valid module path without metadata.json runner_config
+    module_path = "tests.workflows.trivial"
+
+    # WHEN we serialize the module
+    result = BaseWorkflowDisplay.serialize_module(module_path)
+
+    # THEN the exec_config should contain runner_config
+    assert "runner_config" in result.exec_config
+
+    # AND runner_config should be an empty dict when no metadata.json runner_config exists
+    runner_config = result.exec_config["runner_config"]
+    assert isinstance(runner_config, dict)
+
+
+def test_serialize_module__runner_config_from_metadata():
+    """
+    Tests that serialize_module reads runner_config from metadata.json.
+    """
+    # GIVEN a module path with metadata.json containing runner_config
+    module_path = "ee.vellum_ee.workflows.tests.local_workflow"
+
+    # WHEN we serialize the module
+    result = BaseWorkflowDisplay.serialize_module(module_path)
+
+    # THEN the exec_config should contain runner_config
+    assert "runner_config" in result.exec_config
+
+    # AND runner_config should be a dict (loaded from metadata.json)
+    runner_config = result.exec_config["runner_config"]
+    assert isinstance(runner_config, dict)
+
+
 def test_serialize_module_includes_additional_files():
     """
     Tests that serialize_module includes only Python files from the module directory.

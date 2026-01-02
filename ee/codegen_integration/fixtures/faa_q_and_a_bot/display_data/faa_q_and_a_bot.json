@@ -151,7 +151,9 @@
                   "name": "Classification",
                   "schema": {
                     "type": "object",
-                    "required": ["classification"],
+                    "required": [
+                      "classification"
+                    ],
                     "properties": {
                       "classification": {
                         "type": "string",
@@ -367,7 +369,9 @@
                       "name": "Classification",
                       "schema": {
                         "type": "object",
-                        "required": ["classification"],
+                        "required": [
+                          "classification"
+                        ],
                         "properties": {
                           "classification": {
                             "type": "string",
@@ -1993,7 +1997,10 @@
             "name": "timeout",
             "value": {
               "type": "CONSTANT_VALUE",
-              "value": { "type": "JSON", "value": null }
+              "value": {
+                "type": "JSON",
+                "value": null
+              }
             }
           }
         ],
@@ -2003,7 +2010,12 @@
             "name": "headers",
             "type": "JSON",
             "value": null,
-            "schema": {"type": "object", "additionalProperties": {"type": "string"}}
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
           },
           {
             "id": "c3c38fac-f413-4dad-863d-3d388231ba22",
@@ -2019,14 +2031,18 @@
             "name": "status_code",
             "type": "NUMBER",
             "value": null,
-            "schema": {"type": "integer"}
+            "schema": {
+              "type": "integer"
+            }
           },
           {
             "id": "0c945315-0607-4ef6-8051-f4b6498e9526",
             "name": "text",
             "type": "STRING",
             "value": null,
-            "schema": {"type": "string"}
+            "schema": {
+              "type": "string"
+            }
           }
         ]
       },
@@ -2623,7 +2639,17 @@
             }
           }
         ],
-        "outputs": [{"id": "53970e88-0bf6-4364-86b3-840d78a2afe5", "name": "chat_history", "type": "STRING", "value": null, "schema": {"type": "string"}}],
+        "outputs": [
+          {
+            "id": "53970e88-0bf6-4364-86b3-840d78a2afe5",
+            "name": "chat_history",
+            "type": "STRING",
+            "value": null,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "data": {
           "label": "Subworkflow Node",
           "error_output_id": null,
@@ -3052,7 +3078,9 @@
                 "node_output_id": "7b1ca9d1-d829-4329-b9f3-a864c3ce4230"
               }
             },
-            "schema": {"type": "string"}
+            "schema": {
+              "type": "string"
+            }
           }
         ]
       }
@@ -3250,5 +3278,6 @@
       "key": "answer",
       "type": "STRING"
     }
-  ]
+  ],
+  "runner_config": {}
 }

@@ -3,7 +3,7 @@
 import json
 import os
 from uuid import UUID
-from typing import Dict, Optional, Tuple, Type
+from typing import Any, Dict, Optional, Tuple, Type
 
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.utils.files import virtual_open
@@ -33,6 +33,30 @@ def find_workflow_root_with_metadata(module_path: str) -> Optional[str]:
     return None
 
 
+def _load_workflow_metadata(module_path: str) -> Tuple[Optional[str], Optional[Dict]]:
+    """
+    Load the full metadata.json content for a given module.
+
+    This function searches up the module hierarchy for metadata.json and loads its content.
+
+    Args:
+        module_path: The module path to search from (e.g., "workflows.my_workflow")
+
+    Returns:
+        A tuple of (workflow_root, metadata_dict). Returns (None, None) if not found.
+    """
+    try:
+        workflow_root = find_workflow_root_with_metadata(module_path)
+        if not workflow_root:
+            return None, None
+        file_path = os.path.join(workflow_root.replace(".", os.path.sep), "metadata.json")
+        with virtual_open(file_path) as f:
+            data = json.load(f)
+            return workflow_root, data
+    except Exception:
+        return None, None
+
+
 def _load_edges_mapping(module_path: str) -> Tuple[Optional[str], Dict[str, str]]:
     """
     Load edge path to ID mapping from metadata.json for a given module.
@@ -46,19 +70,13 @@ def _load_edges_mapping(module_path: str) -> Tuple[Optional[str], Dict[str, str]
     Returns:
         Dictionary mapping edge keys to their UUID strings
     """
-    try:
-        workflow_root = find_workflow_root_with_metadata(module_path)
-        if not workflow_root:
-            return None, {}
-        file_path = os.path.join(workflow_root.replace(".", os.path.sep), "metadata.json")
-        with virtual_open(file_path) as f:
-            data = json.load(f)
-            edges_map = data.get("edges_to_id_mapping")
-            if isinstance(edges_map, dict):
-                return workflow_root, edges_map
-            return workflow_root, {}
-    except Exception:
+    workflow_root, data = _load_workflow_metadata(module_path)
+    if data is None:
         return None, {}
+    edges_map = data.get("edges_to_id_mapping")
+    if isinstance(edges_map, dict):
+        return workflow_root, edges_map
+    return workflow_root, {}
 
 
 def load_edges_to_id_mapping(module_path: str) -> Dict[str, str]:
@@ -162,16 +180,32 @@ def load_dataset_row_index_to_id_mapping(module_path: str) -> Dict[int, str]:
     Returns:
         Dictionary mapping dataset row indices (as integers) to their ID strings
     """
-    try:
-        root = find_workflow_root_with_metadata(module_path)
-        if not root:
-            return {}
-        file_path = os.path.join(root.replace(".", os.path.sep), "metadata.json")
-        with virtual_open(file_path) as f:
-            data = json.load(f)
-            mapping = data.get("dataset_row_index_to_id_mapping")
-            if isinstance(mapping, dict):
-                return {int(k): v for k, v in mapping.items()}
-            return {}
-    except Exception:
+    _, data = _load_workflow_metadata(module_path)
+    if data is None:
         return {}
+    mapping = data.get("dataset_row_index_to_id_mapping")
+    if isinstance(mapping, dict):
+        return {int(k): v for k, v in mapping.items()}
+    return {}
+
+
+def load_runner_config(module_path: str) -> Dict[str, Any]:
+    """
+    Load runner_config from metadata.json for a given module.
+
+    This function searches up the module hierarchy for metadata.json and extracts
+    the runner_config.
+
+    Args:
+        module_path: The module path to search from (e.g., "workflows.my_workflow")
+
+    Returns:
+        The runner_config dictionary if found in metadata.json, empty dict otherwise
+    """
+    _, data = _load_workflow_metadata(module_path)
+    if data is None:
+        return {}
+    runner_config = data.get("runner_config")
+    if isinstance(runner_config, dict):
+        return runner_config
+    return {}
