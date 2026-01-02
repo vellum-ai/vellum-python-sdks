@@ -14,12 +14,6 @@ import { TypeReference } from "src/generators/extensions/type-reference";
 import { assertUnreachable } from "src/utils/typing";
 
 /**
- * Common type for Python type annotations used throughout the codegen.
- * Includes both the original python-ast types and our custom PythonType subclasses.
- */
-export type CodegenType = python.Type | PythonType;
-
-/**
  * Parses a $ref path and extracts the type name and module path.
  * Examples:
  * - "#/$defs/vellum.client.types.chat_message.ChatMessage" -> { name: "ChatMessage", modulePath: ["vellum", "client", "types", "chat_message"] }
@@ -68,7 +62,9 @@ function parseRef(refPath: string): {
  * Converts a JSON Schema to a Python type annotation.
  * Currently supports basic types: string, number, integer, boolean, array, object, null, and $ref.
  */
-export function jsonSchemaToType(schema: Record<string, unknown>): CodegenType {
+export function jsonSchemaToType(
+  schema: Record<string, unknown>
+): python.Type | PythonType {
   // Handle $ref at the top level
   if (schema.$ref && typeof schema.$ref === "string") {
     const { name, modulePath } = parseRef(schema.$ref);
@@ -119,7 +115,7 @@ export function jsonSchemaToType(schema: Record<string, unknown>): CodegenType {
 
 export function getVellumVariablePrimitiveType(
   vellumVariableType: Vellum.VellumVariableType
-): CodegenType {
+): python.Type | PythonType {
   switch (vellumVariableType) {
     case "STRING":
       return python.Type.str();
