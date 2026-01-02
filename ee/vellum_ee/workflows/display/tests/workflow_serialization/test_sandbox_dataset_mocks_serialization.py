@@ -57,15 +57,18 @@ dataset = [
 """,
     }
 
-    namespace = str(uuid4())
+    # AND two different namespaces (simulating how the workflow server creates a new namespace per request)
+    namespace_1 = str(uuid4())
+    namespace_2 = str(uuid4())
 
-    # AND the virtual file loader is registered
-    sys.meta_path.append(VirtualFileFinder(files, namespace))
+    # AND the virtual file loaders are registered for both namespaces
+    sys.meta_path.append(VirtualFileFinder(files, namespace_1))
+    sys.meta_path.append(VirtualFileFinder(files, namespace_2))
 
     try:
-        # WHEN we serialize the module twice
-        result_1 = BaseWorkflowDisplay.serialize_module(namespace)
-        result_2 = BaseWorkflowDisplay.serialize_module(namespace)
+        # WHEN we serialize the module with different namespaces (like the workflow server does)
+        result_1 = BaseWorkflowDisplay.serialize_module(namespace_1)
+        result_2 = BaseWorkflowDisplay.serialize_module(namespace_2)
 
         # THEN both serializations should succeed without errors
         assert len(result_1.errors) == 0, f"First serialization had errors: {result_1.errors}"
@@ -82,5 +85,5 @@ dataset = [
             f"Second: {result_2.dataset}"
         )
     finally:
-        # Clean up the virtual file finder
+        # Clean up the virtual file finders
         sys.meta_path = [finder for finder in sys.meta_path if not isinstance(finder, VirtualFileFinder)]
