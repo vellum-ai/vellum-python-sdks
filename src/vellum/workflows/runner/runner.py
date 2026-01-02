@@ -25,6 +25,7 @@ from typing import (
     Union,
 )
 
+from vellum.client.core.api_error import ApiError
 from vellum.workflows.constants import undefined
 from vellum.workflows.context import ExecutionContext, execution_context, get_execution_context
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -644,6 +645,53 @@ class WorkflowRunner(Generic[StateType]):
             yield self._handle_run_node_exception(e, "Workflow Initialization Exception", execution, span_id, node)
         except InvalidExpressionException as e:
             yield self._handle_run_node_exception(e, "Invalid Expression Exception", execution, span_id, node)
+        except ApiError as e:
+            captured_stacktrace = traceback.format_exc()
+            # Handle structured 403 credential error responses with integration details
+            # The Django API returns {"message": "...", "integration": {...}} for unresolvable credentials
+            # We detect this by shape (403 + integration field present) rather than a code field
+            if e.status_code == 403 and isinstance(e.body, dict) and e.body.get("integration"):
+                error_message = e.body.get(
+                    "message", "You must authenticate with this integration before you can execute this tool."
+                )
+                raw_data = {"integration": e.body["integration"]}
+                yield NodeExecutionRejectedEvent(
+                    trace_id=execution.trace_id,
+                    span_id=span_id,
+                    body=NodeExecutionRejectedBody(
+                        node_definition=node.__class__,
+                        error=WorkflowError(
+                            message=error_message,
+                            code=WorkflowErrorCode.INTEGRATION_CREDENTIALS_UNAVAILABLE,
+                            raw_data=raw_data,
+                        ),
+                        stacktrace=captured_stacktrace,
+                    ),
+                    parent=execution.parent_context,
+                )
+            else:
+                # For all other ApiErrors, use the existing generic exception behavior
+                error_message = self._parse_error_message(e)
+                if error_message is None:
+                    logger.exception(f"An unexpected error occurred while running node {node.__class__.__name__}")
+                    error_code = WorkflowErrorCode.INTERNAL_ERROR
+                    error_message = "Internal error"
+                else:
+                    error_code = WorkflowErrorCode.NODE_EXECUTION
+
+                yield NodeExecutionRejectedEvent(
+                    trace_id=execution.trace_id,
+                    span_id=span_id,
+                    body=NodeExecutionRejectedBody(
+                        node_definition=node.__class__,
+                        error=WorkflowError(
+                            message=error_message,
+                            code=error_code,
+                        ),
+                        stacktrace=captured_stacktrace,
+                    ),
+                    parent=execution.parent_context,
+                )
         except Exception as e:
             error_message = self._parse_error_message(e)
             captured_stacktrace = traceback.format_exc()
