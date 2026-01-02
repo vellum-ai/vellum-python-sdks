@@ -189,7 +189,7 @@ def load_dataset_row_index_to_id_mapping(module_path: str) -> Dict[int, str]:
     return {}
 
 
-def load_runner_config(module_path: str) -> Optional[Dict[str, Any]]:
+def load_runner_config(module_path: str) -> Dict[str, Any]:
     """
     Load runner_config from metadata.json for a given module.
 
@@ -200,12 +200,12 @@ def load_runner_config(module_path: str) -> Optional[Dict[str, Any]]:
         module_path: The module path to search from (e.g., "workflows.my_workflow")
 
     Returns:
-        The runner_config dictionary if found in metadata.json, None otherwise
+        The runner_config dictionary if found in metadata.json, empty dict otherwise
     """
     _, data = _load_workflow_metadata(module_path)
     if data is None:
-        return None
+        return {}
     runner_config = data.get("runner_config")
     if isinstance(runner_config, dict):
         return runner_config
-    return None
+    return {}

@@ -124,5 +124,6 @@
     }
   ],
   "state_variables": [],
-  "output_variables": []
+  "output_variables": [],
+  "runner_config": {}
 }

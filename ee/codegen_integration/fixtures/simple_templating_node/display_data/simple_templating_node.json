@@ -159,7 +159,16 @@
               "type": "EXECUTION_COUNTER",
               "node_id": "7dffcbb1-0a5c-4149-a6e9-f83095b0a871"
             },
-            "schema": {"anyOf": [{"type": "number"}, {"type": "integer"}]}
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            }
           }
         ],
         "trigger": {
@@ -223,5 +232,6 @@
       "key": "final-output",
       "type": "NUMBER"
     }
-  ]
+  ],
+  "runner_config": {}
 }

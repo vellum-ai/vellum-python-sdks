@@ -1480,7 +1480,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         if additional_files:
             exec_config["module_data"] = {"additional_files": cast(JsonObject, additional_files)}
 
-        exec_config["runner_config"] = load_runner_config(module) or {}
+        exec_config["runner_config"] = load_runner_config(module)
 
         dataset = None
         sandbox_errors: List[Exception] = []

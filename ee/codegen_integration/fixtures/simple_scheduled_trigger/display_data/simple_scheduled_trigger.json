@@ -101,7 +101,9 @@
                 "value": "fdsaiofidasoj"
               }
             },
-            "schema": {"type": "string"}
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "ports": []
@@ -204,5 +206,6 @@
         "icon": "vellum:icon:clock"
       }
     }
-  ]
+  ],
+  "runner_config": {}
 }
