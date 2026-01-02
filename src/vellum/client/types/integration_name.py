@@ -77,6 +77,7 @@ IntegrationName = typing.Union[
         "SENDGRID",
         "SERPAPI",
         "SHARE_POINT",
+        "SHOPIFY",
         "SHORTCUT",
         "SPOTIFY",
         "STRIPE",
@@ -100,6 +101,7 @@ IntegrationName = typing.Union[
         "ACTIVE_CAMPAIGN",
         "CUSTOMER_IO",
         "SEGMENT",
+        "WHATSAPP",
     ],
     typing.Any,
 ]
