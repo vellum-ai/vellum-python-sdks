@@ -64,7 +64,7 @@ function parseRef(refPath: string): {
  */
 export function jsonSchemaToType(
   schema: Record<string, unknown>
-): python.Type | PythonType | TypeReference {
+): python.Type | PythonType {
   // Handle $ref at the top level
   if (schema.$ref && typeof schema.$ref === "string") {
     const { name, modulePath } = parseRef(schema.$ref);
@@ -115,7 +115,7 @@ export function jsonSchemaToType(
 
 export function getVellumVariablePrimitiveType(
   vellumVariableType: Vellum.VellumVariableType
-): python.Type | PythonType | TypeReference {
+): python.Type | PythonType {
   switch (vellumVariableType) {
     case "STRING":
       return python.Type.str();

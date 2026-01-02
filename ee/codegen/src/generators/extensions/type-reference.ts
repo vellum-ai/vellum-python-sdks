@@ -1,5 +1,5 @@
-import { AstNode } from "./ast-node";
 import { Reference } from "./reference";
+import { PythonType } from "./type";
 import { Writer } from "./writer";
 
 /**
@@ -8,7 +8,7 @@ import { Writer } from "./writer";
  *
  * This is part of the effort to eject from the @fern-api/python-ast package.
  */
-export class TypeReference extends AstNode {
+export class TypeReference extends PythonType {
   private readonly value: Reference;
 
   constructor(value: Reference) {
