@@ -34,6 +34,7 @@ export * from "./set-instantiation";
 export * from "./star-import";
 export * from "./str-instantiation";
 export * from "./type";
+export * from "./tuple-instantiation";
 export * from "./type-instantiation";
 export * from "./type-reference";
 export * from "./union";

@@ -1,4 +1,3 @@
-import { python } from "@fern-api/python-ast";
 import { isNil } from "lodash";
 
 import {
@@ -29,6 +28,7 @@ import { NoneInstantiation } from "src/generators/extensions/none-instantiation"
 import { Reference } from "src/generators/extensions/reference";
 import { SetInstantiation } from "src/generators/extensions/set-instantiation";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
+import { TupleInstantiation } from "src/generators/extensions/tuple-instantiation";
 import { TypeReference } from "src/generators/extensions/type-reference";
 import { UuidInstantiation } from "src/generators/extensions/uuid-instantiation";
 import { GraphAttribute } from "src/generators/graph-attribute";
@@ -505,7 +505,7 @@ export class Workflow {
           if (sourcePortContext && targetNode) {
             const zIndex = edge.display_data?.z_index;
             const edgeDisplayEntry = {
-              key: python.TypeInstantiation.tuple([
+              key: new TupleInstantiation([
                 new Reference({
                   name: sourcePortContext.nodeContext.nodeClassName,
                   modulePath: sourcePortContext.nodeContext.nodeModulePath,
