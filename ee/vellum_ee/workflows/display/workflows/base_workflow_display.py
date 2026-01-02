@@ -3,7 +3,6 @@ from enum import Enum
 import fnmatch
 from functools import cached_property
 import importlib
-from importlib import metadata as importlib_metadata
 import inspect
 import logging
 import os
@@ -1481,14 +1480,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         if additional_files:
             exec_config["module_data"] = {"additional_files": cast(JsonObject, additional_files)}
 
-        sdk_version = importlib_metadata.version("vellum-ai")
-        runner_config = load_runner_config(module) or {}
-        exec_config["runner_config"] = {
-            "sdk_version": sdk_version,
-            "codegen_version": sdk_version,
-            "container_image_name": runner_config.get("container_image_name"),
-            "container_image_tag": runner_config.get("container_image_tag"),
-        }
+        exec_config["runner_config"] = load_runner_config(module) or {}
 
         dataset = None
         sandbox_errors: List[Exception] = []
