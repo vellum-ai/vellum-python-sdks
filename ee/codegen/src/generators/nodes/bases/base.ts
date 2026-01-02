@@ -1,5 +1,3 @@
-import { python } from "@fern-api/python-ast";
-
 import * as codegen from "src/codegen";
 import {
   OUTPUTS_CLASS_NAME,
@@ -25,6 +23,7 @@ import { MethodArgument } from "src/generators/extensions/method-argument";
 import { MethodInvocation } from "src/generators/extensions/method-invocation";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
+import { TypeReference } from "src/generators/extensions/type-reference";
 import { UuidInstantiation } from "src/generators/extensions/uuid-instantiation";
 import { NodeDisplay } from "src/generators/node-display";
 import { NodeDisplayData } from "src/generators/node-display-data";
@@ -220,7 +219,7 @@ export abstract class BaseNode<
 
     if (firstStateVariableContext) {
       return [
-        python.Type.reference(
+        new TypeReference(
           new Reference({
             name: firstStateVariableContext.definition.name,
             modulePath: firstStateVariableContext.definition.module,
@@ -238,7 +237,7 @@ export abstract class BaseNode<
     );
 
     if (firstStateVariableContext) {
-      return python.Type.reference(
+      return new TypeReference(
         new Reference({
           name: firstStateVariableContext.definition.name,
           modulePath: firstStateVariableContext.definition.module,

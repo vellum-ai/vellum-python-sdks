@@ -1,5 +1,4 @@
 import { python } from "@fern-api/python-ast";
-import { Type } from "@fern-api/python-ast/Type";
 import { isNil } from "lodash";
 
 import {
@@ -30,6 +29,7 @@ import { NoneInstantiation } from "src/generators/extensions/none-instantiation"
 import { Reference } from "src/generators/extensions/reference";
 import { SetInstantiation } from "src/generators/extensions/set-instantiation";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
+import { TypeReference } from "src/generators/extensions/type-reference";
 import { UuidInstantiation } from "src/generators/extensions/uuid-instantiation";
 import { GraphAttribute } from "src/generators/graph-attribute";
 import { NodeDisplayData } from "src/generators/node-display-data";
@@ -65,7 +65,7 @@ export class Workflow {
   }
 
   private generateParentWorkflowClass(): Reference {
-    const parentGenerics: Type[] = [];
+    const parentGenerics: AstNode[] = [];
     let customGenericsUsed = false;
 
     const [firstInputVariableContext] = Array.from(
@@ -73,7 +73,7 @@ export class Workflow {
     );
     if (firstInputVariableContext) {
       parentGenerics.push(
-        python.Type.reference(
+        new TypeReference(
           new Reference({
             name: firstInputVariableContext.definition.name,
             modulePath: firstInputVariableContext.definition.module,
@@ -83,7 +83,7 @@ export class Workflow {
       customGenericsUsed = true;
     } else {
       parentGenerics.push(
-        python.Type.reference(
+        new TypeReference(
           new Reference({
             name: "BaseInputs",
             modulePath:
@@ -98,7 +98,7 @@ export class Workflow {
     );
     if (firstStateVariableContext) {
       parentGenerics.push(
-        python.Type.reference(
+        new TypeReference(
           new Reference({
             name: firstStateVariableContext.definition.name,
             modulePath: firstStateVariableContext.definition.module,
@@ -108,11 +108,9 @@ export class Workflow {
       customGenericsUsed = true;
     } else {
       parentGenerics.push(
-        python.Type.reference(
-          new BaseState({
-            workflowContext: this.workflowContext,
-          })
-        )
+        new BaseState({
+          workflowContext: this.workflowContext,
+        })
       );
     }
 
