@@ -1,5 +1,3 @@
-import { python } from "@fern-api/python-ast";
-
 import {
   GENERATED_TRIGGERS_MODULE_NAME,
   VELLUM_WORKFLOW_EDITOR_TYPES_PATH,
@@ -16,6 +14,7 @@ import { IntInstantiation } from "src/generators/extensions/int-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
+import { StrType } from "src/generators/extensions/str-type";
 import { isNilOrEmpty } from "src/utils/typing";
 
 import type { AstNode } from "src/generators/extensions/ast-node";
@@ -232,7 +231,7 @@ export abstract class BaseTrigger<
       (attr) =>
         new Field({
           name: attr.key,
-          type: python.Type.str(),
+          type: new StrType(),
         })
     );
   }
