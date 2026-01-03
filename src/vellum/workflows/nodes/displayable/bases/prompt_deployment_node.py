@@ -1,3 +1,4 @@
+from itertools import chain
 import json
 from uuid import UUID
 from typing import Any, ClassVar, Dict, Generator, Generic, Iterator, List, Optional, Sequence, Set, Union
@@ -113,12 +114,18 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
         if prompt_event_stream is None:
             try:
                 prompt_event_stream = self._get_prompt_event_stream()
-                next(prompt_event_stream)
+                first_event = next(prompt_event_stream)
             except ApiError as e:
                 if e.status_code and e.status_code < 500 and self.ml_model_fallbacks is not None:
                     prompt_event_stream = self._retry_prompt_stream_with_fallbacks(tried_fallbacks)
                 else:
                     self._handle_api_error(e)
+            else:
+                if first_event.state == "REJECTED":
+                    workflow_error = vellum_error_to_workflow_error(first_event.error)
+                    raise NodeException.of(workflow_error)
+                if first_event.state != "INITIATED":
+                    prompt_event_stream = chain([first_event], prompt_event_stream)
 
         outputs: Optional[List[PromptOutput]] = None
         if prompt_event_stream is not None:
@@ -159,7 +166,9 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
                 try:
                     tried_fallbacks.add(ml_model_fallback)
                     prompt_event_stream = self._get_prompt_event_stream(ml_model_fallback=ml_model_fallback)
-                    next(prompt_event_stream)
+                    first_event = next(prompt_event_stream)
+                    if first_event.state != "INITIATED":
+                        prompt_event_stream = chain([first_event], prompt_event_stream)
                     return prompt_event_stream
                 except ApiError:
                     continue
