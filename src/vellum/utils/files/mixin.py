@@ -1,6 +1,13 @@
+import base64
+import binascii
+import re
 from typing import Any, ContextManager, Iterator, Optional
 
+from pydantic import field_serializer
+
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
+from vellum.utils.files.constants import BASE64_DATA_URL_PATTERN
+from vellum.utils.files.exceptions import InvalidFileSourceError
 from vellum.utils.files.read import read_vellum_file
 from vellum.utils.files.stream import stream_vellum_file
 from vellum.utils.files.upload import upload_vellum_file
@@ -107,3 +114,22 @@ class VellumFileMixin(UniversalBaseModel):
             str: A signed URL for accessing the uploaded file
         """
         return get_signed_url(self, expiry_seconds=expiry_seconds, vellum_client=vellum_client)
+
+    @field_serializer("src", check_fields=False)
+    @classmethod
+    def validate_src_on_serialize(cls, src: str) -> str:
+        """Validate the src field during serialization.
+
+        For PDF base64 data URLs, this validates that the base64 content is properly encoded.
+        """
+        data_url_match = re.match(BASE64_DATA_URL_PATTERN, src)
+        if data_url_match:
+            mime_type = data_url_match.group(1) or ""
+            if mime_type == "application/pdf":
+                base64_content = data_url_match.group(3)
+                try:
+                    base64.b64decode(base64_content, validate=True)
+                except binascii.Error as e:
+                    raise InvalidFileSourceError(f"Invalid base64 encoding in PDF data URL: {e}") from e
+
+        return src

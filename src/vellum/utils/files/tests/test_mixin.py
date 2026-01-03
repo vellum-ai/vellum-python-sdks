@@ -1,5 +1,8 @@
+import pytest
 import base64
 from unittest.mock import Mock, patch
+
+from pydantic_core import PydanticSerializationError
 
 from vellum.utils.files import VellumFileMixin
 
@@ -203,3 +206,62 @@ def test_vellum_file_mixin_get_signed_url_method_already_uploaded():
         assert result == signed_url
         mock_client.uploaded_files.create.assert_not_called()
         mock_client.uploaded_files.retrieve.assert_called_once_with(file_id, expiry_seconds=604800)
+
+
+def test_vellum_file_mixin_serialization_valid_base64():
+    """Tests that serialization succeeds with valid base64 data URLs."""
+
+    # GIVEN a test document with valid base64 content
+    content = b"Hello, this is a test document!"
+    base64_content = base64.b64encode(content).decode("utf-8")
+    src = f"data:application/pdf;base64,{base64_content}"
+    test_file = TestDocument(src=src)
+
+    # WHEN serializing the document
+    serialized = test_file.model_dump()
+
+    # THEN the serialization should succeed and preserve the src
+    assert serialized["src"] == src
+
+
+def test_vellum_file_mixin_serialization_invalid_base64():
+    """Tests that serialization raises an error for invalid base64 data URLs."""
+
+    # GIVEN a test document with invalid base64 content
+    invalid_base64 = "not-valid-base64!!!"
+    src = f"data:application/pdf;base64,{invalid_base64}"
+    test_file = TestDocument(src=src)
+
+    # WHEN serializing the document
+    # THEN a PydanticSerializationError should be raised with InvalidFileSourceError as the cause
+    with pytest.raises(PydanticSerializationError, match="Invalid base64 encoding in PDF data URL"):
+        test_file.model_dump()
+
+
+def test_vellum_file_mixin_serialization_non_data_url():
+    """Tests that serialization succeeds for non-data URL sources."""
+
+    # GIVEN a test document with a regular URL source
+    src = "https://example.com/document.pdf"
+    test_file = TestDocument(src=src)
+
+    # WHEN serializing the document
+    serialized = test_file.model_dump()
+
+    # THEN the serialization should succeed and preserve the src
+    assert serialized["src"] == src
+
+
+def test_vellum_file_mixin_serialization_vellum_uploaded_file():
+    """Tests that serialization succeeds for vellum:uploaded-file sources."""
+
+    # GIVEN a test document with a vellum:uploaded-file source
+    file_id = "12345678-1234-1234-1234-123456789abc"
+    src = f"vellum:uploaded-file:{file_id}"
+    test_file = TestDocument(src=src)
+
+    # WHEN serializing the document
+    serialized = test_file.model_dump()
+
+    # THEN the serialization should succeed and preserve the src
+    assert serialized["src"] == src

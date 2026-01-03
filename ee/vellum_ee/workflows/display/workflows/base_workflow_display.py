@@ -1483,7 +1483,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         exec_config["runner_config"] = load_runner_config(module)
 
         dataset = None
-        sandbox_errors: List[Exception] = []
         try:
             sandbox_module_path = f"{module}.sandbox"
             sandbox_module = importlib.import_module(sandbox_module_path)
@@ -1498,11 +1497,15 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                             if isinstance(inputs_obj, BaseInputs)
                             else inputs_obj
                         )
+
                         row_data = normalized_row.model_dump(
                             mode="json",
                             by_alias=True,
                             exclude_none=True,
-                            context={"serializer": workflow_display.serialize_value},
+                            context={
+                                "add_error": workflow_display.display_context.add_validation_error,
+                                "serializer": workflow_display.serialize_value,
+                            },
                         )
 
                         if i in dataset_row_index_to_id:
@@ -1518,9 +1521,9 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             pass
         except Exception as e:
             # Capture any other errors (AttributeError, TypeError, etc.) from sandbox module
-            sandbox_errors.append(e)
+            workflow_display.display_context.add_validation_error(e)
 
-        all_errors = list(workflow_display.display_context.errors) + sandbox_errors
+        all_errors = list(workflow_display.display_context.errors)
         return WorkflowSerializationResult(
             exec_config=exec_config,
             errors=[
