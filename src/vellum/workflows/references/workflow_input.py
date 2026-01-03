@@ -37,12 +37,33 @@ class WorkflowInputReference(BaseDescriptor[_InputType], Generic[_InputType]):
         """Generate deterministic UUID from inputs class and input name."""
         return get_workflow_input_id(self._inputs_class, self.name)
 
+    def _coerce_to_declared_type(self, value: _InputType) -> _InputType:
+        """Coerce value to the declared type if needed.
+
+        This handles cases where the API returns a float for an int field
+        (since NumberVellumValue.value is typed as float).
+        """
+        if not self.types:
+            return value
+
+        expected_type = self.types[0]
+        if expected_type is int and isinstance(value, float):
+            if value.is_integer():
+                return cast(_InputType, int(value))
+            raise NodeException(
+                f"Expected integer for input '{self._name}', but received non-integer float: {value}",
+                code=WorkflowErrorCode.INVALID_INPUTS,
+            )
+
+        return value
+
     def resolve(self, state: "BaseState") -> _InputType:
         if hasattr(state.meta.workflow_inputs, self._name) and (
             state.meta.workflow_definition == self._inputs_class.__parent_class__
             or not issubclass(self._inputs_class.__parent_class__, import_workflow_class())
         ):
-            return cast(_InputType, getattr(state.meta.workflow_inputs, self._name))
+            value = getattr(state.meta.workflow_inputs, self._name)
+            return cast(_InputType, self._coerce_to_declared_type(value))
 
         if state.meta.parent:
             return self.resolve(state.meta.parent)

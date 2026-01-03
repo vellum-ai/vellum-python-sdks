@@ -416,10 +416,6 @@ def test_base_node__trigger_should_initiate__invalid_merge_behavior():
 def test_base_node__int_input_preserves_type_when_float_passed():
     """
     Tests that an int workflow input is correctly coerced to int when a float value is passed.
-
-    This reproduces the issue where AB generates an Inputs class with `total_requests: int`,
-    but the value comes from the API as a float (since NumberVellumValue.value is typed as float),
-    causing range(self.total_requests) to fail with "float object cannot be interpreted as an integer".
     """
 
     # GIVEN an Inputs class with an int field
@@ -448,8 +444,7 @@ def test_base_node__int_input_preserves_type_when_float_passed():
     # WHEN we run the workflow with a float value for an int input
     # This simulates what happens when the API returns a NUMBER value as a float
     workflow = IntInputWorkflow()
-    inputs = Inputs.__new__(Inputs)
-    object.__setattr__(inputs, "total_requests", 5.0)  # Simulate float from API
+    inputs = Inputs(**{"total_requests": 5.0})
     final_event = workflow.run(inputs=inputs)
 
     # THEN the workflow should complete successfully
