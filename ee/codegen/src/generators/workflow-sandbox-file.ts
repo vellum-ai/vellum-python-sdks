@@ -121,6 +121,11 @@ if __name__ == "__main__":
       : "mocks" in row
       ? row.mocks
       : undefined;
+    const previousExecutionId: string | undefined = Array.isArray(row)
+      ? undefined
+      : "previous_execution_id" in row
+      ? row.previous_execution_id
+      : undefined;
 
     const hasInputs = inputs.length > 0;
     const arguments_: MethodArgument[] = [
@@ -219,6 +224,15 @@ if __name__ == "__main__":
           })
         );
       }
+    }
+
+    if (!isNil(previousExecutionId)) {
+      arguments_.push(
+        new MethodArgument({
+          name: "previous_execution_id",
+          value: new StrInstantiation(previousExecutionId),
+        })
+      );
     }
 
     return new ClassInstantiation({

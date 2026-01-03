@@ -804,5 +804,65 @@ describe("Workflow Sandbox", () => {
       // THEN it should generate the Node's outputs directly without MockNodeExecution
       expect(result).toMatchSnapshot();
     });
+
+    it("should generate DatasetRow with previous_execution_id when provided", async () => {
+      /**
+       * Tests that dataset rows with previous_execution_id generate
+       * DatasetRow with the previous_execution_id parameter.
+       */
+
+      const writer = new Writer();
+      const uniqueWorkflowContext = workflowContextFactory();
+      const inputVariable: VellumVariable = {
+        id: "1",
+        key: "test_input",
+        type: "STRING",
+      };
+
+      uniqueWorkflowContext.addInputVariableContext(
+        inputVariableContextFactory({
+          inputVariableData: inputVariable,
+          workflowContext: uniqueWorkflowContext,
+        })
+      );
+
+      // GIVEN a dataset row with previous_execution_id
+      const previousExecutionId = "550e8400-e29b-41d4-a716-446655440000";
+      const sandboxInputs: WorkflowSandboxDatasetRow[] = [
+        {
+          label: "Scenario with Previous Execution ID",
+          inputs: [
+            {
+              name: inputVariable.key,
+              type: "STRING",
+              value: "test-value",
+            },
+          ],
+          previous_execution_id: previousExecutionId,
+        },
+        {
+          label: "Scenario without Previous Execution ID",
+          inputs: [
+            {
+              name: inputVariable.key,
+              type: "STRING",
+              value: "test-value-2",
+            },
+          ],
+        },
+      ];
+
+      // WHEN we generate the sandbox file
+      const sandbox = codegen.workflowSandboxFile({
+        workflowContext: uniqueWorkflowContext,
+        sandboxInputs,
+      });
+
+      sandbox.write(writer);
+      const result = await writer.toStringFormatted();
+
+      // THEN it should generate DatasetRow with previous_execution_id
+      expect(result).toMatchSnapshot();
+    });
   });
 });
