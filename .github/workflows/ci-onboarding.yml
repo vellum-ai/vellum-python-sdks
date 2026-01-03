@@ -1,0 +1,62 @@
+name: ci-onboarding
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+  workflow_dispatch:
+
+jobs:
+  test-onboarding:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: Bootstrap poetry
+        run: make setup-poetry
+
+      - name: Install dependencies
+        run: make install-deps
+
+      - name: Set up pre-commit
+        run: make setup-pre-commit
+
+      - name: Verify vellum CLI is installed
+        run: poetry run vellum --help
+
+      - name: Test vellum workflows commands
+        run: |
+          poetry run vellum workflows --help
+          poetry run vellum workflows push --help
+          poetry run vellum workflows pull --help
+          poetry run vellum workflows init --help
+
+      - name: Test vellum push/pull commands
+        run: |
+          poetry run vellum push --help
+          poetry run vellum pull --help
+
+      - name: Test vellum images commands
+        run: |
+          poetry run vellum images --help
+          poetry run vellum images push --help
+
+      - name: Test vellum ping command (help only)
+        run: poetry run vellum ping --help
+
+      - name: Test vellum ping with API key
+        if: ${{ env.VELLUM_API_KEY != '' }}
+        env:
+          VELLUM_API_KEY: ${{ secrets.VELLUM_API_KEY }}
+        run: poetry run vellum ping
