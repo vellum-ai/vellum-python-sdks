@@ -192,12 +192,34 @@ class BaseDescriptor(Generic[_T]):
         return LessThanExpression(lhs=self, rhs=other)
 
     @overload
+    def __lt__(self, other: "BaseDescriptor[_O]") -> "LessThanExpression[_T, _O]": ...  # type: ignore[misc]
+
+    @overload
+    def __lt__(self, other: _O) -> "LessThanExpression[_T, _O]": ...
+
+    def __lt__(self, other: "Union[BaseDescriptor[_O], _O]") -> "LessThanExpression[_T, _O]":
+        from vellum.workflows.expressions.less_than import LessThanExpression
+
+        return LessThanExpression(lhs=self, rhs=other)
+
+    @overload
     def greater_than(self, other: "BaseDescriptor[_O]") -> "GreaterThanExpression[_T, _O]": ...
 
     @overload
     def greater_than(self, other: _O) -> "GreaterThanExpression[_T, _O]": ...
 
     def greater_than(self, other: "Union[BaseDescriptor[_O], _O]") -> "GreaterThanExpression[_T, _O]":
+        from vellum.workflows.expressions.greater_than import GreaterThanExpression
+
+        return GreaterThanExpression(lhs=self, rhs=other)
+
+    @overload
+    def __gt__(self, other: "BaseDescriptor[_O]") -> "GreaterThanExpression[_T, _O]": ...  # type: ignore[misc]
+
+    @overload
+    def __gt__(self, other: _O) -> "GreaterThanExpression[_T, _O]": ...
+
+    def __gt__(self, other: "Union[BaseDescriptor[_O], _O]") -> "GreaterThanExpression[_T, _O]":
         from vellum.workflows.expressions.greater_than import GreaterThanExpression
 
         return GreaterThanExpression(lhs=self, rhs=other)
@@ -214,6 +236,17 @@ class BaseDescriptor(Generic[_T]):
         return LessThanOrEqualToExpression(lhs=self, rhs=other)
 
     @overload
+    def __le__(self, other: "BaseDescriptor[_O]") -> "LessThanOrEqualToExpression[_T, _O]": ...  # type: ignore[misc]
+
+    @overload
+    def __le__(self, other: _O) -> "LessThanOrEqualToExpression[_T, _O]": ...
+
+    def __le__(self, other: "Union[BaseDescriptor[_O], _O]") -> "LessThanOrEqualToExpression[_T, _O]":
+        from vellum.workflows.expressions.less_than_or_equal_to import LessThanOrEqualToExpression
+
+        return LessThanOrEqualToExpression(lhs=self, rhs=other)
+
+    @overload
     def greater_than_or_equal_to(self, other: "BaseDescriptor[_O]") -> "GreaterThanOrEqualToExpression[_T, _O]": ...
 
     @overload
@@ -222,6 +255,17 @@ class BaseDescriptor(Generic[_T]):
     def greater_than_or_equal_to(
         self, other: "Union[BaseDescriptor[_O], _O]"
     ) -> "GreaterThanOrEqualToExpression[_T, _O]":
+        from vellum.workflows.expressions.greater_than_or_equal_to import GreaterThanOrEqualToExpression
+
+        return GreaterThanOrEqualToExpression(lhs=self, rhs=other)
+
+    @overload
+    def __ge__(self, other: "BaseDescriptor[_O]") -> "GreaterThanOrEqualToExpression[_T, _O]": ...  # type: ignore[misc]
+
+    @overload
+    def __ge__(self, other: _O) -> "GreaterThanOrEqualToExpression[_T, _O]": ...
+
+    def __ge__(self, other: "Union[BaseDescriptor[_O], _O]") -> "GreaterThanOrEqualToExpression[_T, _O]":
         from vellum.workflows.expressions.greater_than_or_equal_to import GreaterThanOrEqualToExpression
 
         return GreaterThanOrEqualToExpression(lhs=self, rhs=other)

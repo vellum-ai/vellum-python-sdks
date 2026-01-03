@@ -132,6 +132,11 @@ class DummyNode(BaseNode[FixtureState]):
         (FixtureState.alpha + FixtureState.beta, 3),
         (FixtureState.gamma + FixtureState.delta, "helloel"),
         (FixtureState.theta + FixtureState.theta, ["baz", "baz"]),
+        # Test comparison operators
+        (FixtureState.alpha < FixtureState.beta, True),
+        (FixtureState.alpha > FixtureState.beta, False),
+        (FixtureState.alpha <= FixtureState.beta, True),
+        (FixtureState.alpha >= FixtureState.beta, False),
     ],
     ids=[
         "or",
@@ -194,6 +199,10 @@ class DummyNode(BaseNode[FixtureState]):
         "add_integers",
         "add_strings",
         "add_lists",
+        "lt_operator",
+        "gt_operator",
+        "le_operator",
+        "ge_operator",
     ],
 )
 def test_resolve_value__happy_path(descriptor, expected_value):
