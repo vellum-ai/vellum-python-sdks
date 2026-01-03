@@ -1,5 +1,6 @@
 import { ArrayWorkflowReference } from "./array-workflow-reference";
 import { DictionaryWorkflowReference } from "./dictionary-workflow-reference";
+import { WorkflowOutputReference } from "./workflow-output-reference";
 import { WorkflowStateReference } from "./workflow-state-reference";
 
 import { WorkflowContext } from "src/context";
@@ -82,6 +83,12 @@ export class WorkflowValueDescriptorReference extends AstNode {
       }
       case "WORKFLOW_INPUT":
         return new WorkflowInputReference({
+          nodeContext: this.nodeContext,
+          workflowContext: this.workflowContext,
+          nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
+        });
+      case "WORKFLOW_OUTPUT":
+        return new WorkflowOutputReference({
           nodeContext: this.nodeContext,
           workflowContext: this.workflowContext,
           nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
