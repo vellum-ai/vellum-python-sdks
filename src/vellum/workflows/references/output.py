@@ -62,11 +62,6 @@ class OutputReference(BaseDescriptor[_OutputType], Generic[_OutputType]):
         if state.meta.parent:
             return self.resolve(state.meta.parent)
 
-        if self._instance is not None and self._instance is not undefined:
-            from vellum.workflows.descriptors.utils import resolve_value
-
-            return resolve_value(self._instance, state)
-
         # Fix typing surrounding the return value of node outputs
         # https://app.shortcut.com/vellum/story/4783
         return cast(Type[undefined], undefined)  # type: ignore[return-value]

@@ -42,7 +42,7 @@ class LazyReference(BaseDescriptor[_T], Generic[_T]):
             if is_workflow_class(workflow_definition):
                 for output_reference in workflow_definition.Outputs:
                     if str(output_reference) == self._get:
-                        return output_reference.resolve(state)  # type: ignore[return-value]
+                        return resolve_value(output_reference.instance, state)  # type: ignore[return-value]
 
             child_reference = self.resolve(state.meta.parent) if state.meta.parent else None
 
