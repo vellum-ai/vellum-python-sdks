@@ -7,6 +7,7 @@ from vellum.workflows.state import BaseState
 
 class Inputs(BaseInputs):
     document: VellumDocument
+    name: str
 
 
 class PassthroughNode(BaseNode[BaseState]):

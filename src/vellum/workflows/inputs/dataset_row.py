@@ -77,12 +77,17 @@ class DatasetRow(UniversalBaseModel):
         return str(workflow_trigger.__class__.__id__)
 
     @field_serializer("inputs")
-    def serialize_inputs(self, inputs: Union[BaseInputs, Dict[str, Any]]) -> Dict[str, Any]:
+    def serialize_inputs(self, inputs: Union[BaseInputs, Dict[str, Any]], info: SerializationInfo) -> Dict[str, Any]:
         """
         Custom serializer for inputs that converts it to a dictionary.
 
+        When workflow_display is provided in the serialization context, this method
+        will serialize each input field individually and collect errors for fields
+        that fail to serialize, allowing valid fields to still be included.
+
         Args:
             inputs: Either a BaseInputs instance or dict to serialize
+            info: Serialization info containing context
 
         Returns:
             Dictionary representation of the inputs
@@ -91,8 +96,24 @@ class DatasetRow(UniversalBaseModel):
             return inputs
 
         result = {}
+        workflow_display = info.context.get("workflow_display") if info.context else None
+        serializer = info.context.get("serializer") if info.context else None
+
         for input_descriptor, value in inputs:
-            if not input_descriptor.name.startswith("__"):
+            if input_descriptor.name.startswith("__"):
+                continue
+
+            if workflow_display is not None and serializer is not None:
+                try:
+                    serialized_value = serializer(value)
+                    result[input_descriptor.name] = serialized_value
+                except Exception as field_error:
+                    error_msg = (
+                        f'Dataset row "{self.label}": input "{input_descriptor.name}" '
+                        f"failed serialization: {field_error}"
+                    )
+                    workflow_display.display_context.add_validation_error(Exception(error_msg))
+            else:
                 result[input_descriptor.name] = value
 
         return result

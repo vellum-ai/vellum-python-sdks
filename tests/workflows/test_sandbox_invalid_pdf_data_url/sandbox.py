@@ -14,12 +14,14 @@ dataset = [
         label="Scenario with invalid PDF",
         inputs=Inputs(
             document=VellumDocument(src="data:application/pdf;base64,not-valid-base64!!!"),
+            name="Test User",
         ),
     ),
     DatasetRow(
         label="Scenario with valid PDF",
         inputs=Inputs(
             document=VellumDocument(src=f"data:application/pdf;base64,{VALID_PDF_CONTENT}"),
+            name="Another User",
         ),
     ),
 ]

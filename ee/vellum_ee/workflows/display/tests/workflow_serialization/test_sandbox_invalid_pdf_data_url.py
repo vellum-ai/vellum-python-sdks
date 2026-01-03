@@ -34,12 +34,16 @@ def test_serialize_module__invalid_pdf_data_url():
     assert result.dataset is not None
     assert len(result.dataset) == 2
 
-    # AND the first row (invalid) should have an empty inputs dict (invalid input skipped)
+    # AND the first row should have the valid input (name) serialized but the invalid input (document) skipped
     invalid_row = result.dataset[0]
     assert invalid_row["label"] == "Scenario with invalid PDF"
-    assert invalid_row["inputs"] == {}
+    assert "document" not in invalid_row["inputs"]
+    assert "name" in invalid_row["inputs"]
+    assert invalid_row["inputs"]["name"]["value"]["value"] == "Test User"
 
-    # AND the second row (valid) should have the document input serialized
+    # AND the second row (valid) should have both inputs serialized
     valid_row = result.dataset[1]
     assert valid_row["label"] == "Scenario with valid PDF"
     assert "document" in valid_row["inputs"]
+    assert "name" in valid_row["inputs"]
+    assert valid_row["inputs"]["name"]["value"]["value"] == "Another User"
