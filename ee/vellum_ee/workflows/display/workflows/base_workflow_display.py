@@ -650,9 +650,23 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
 
             def get_attribute_type(reference: Any) -> str:
                 try:
-                    return primitive_type_to_vellum_variable_type(reference)
+                    attr_type = primitive_type_to_vellum_variable_type(reference)
                 except ValueError:
-                    return "JSON"
+                    attr_type = "JSON"
+
+                if attr_type != "JSON":
+                    return attr_type
+
+                instance = getattr(reference, "instance", None)
+                if instance is not None and instance is not undefined:
+                    try:
+                        vellum_value = primitive_to_vellum_value(instance)
+                        default_json = cast(JsonObject, self._model_dump(vellum_value))
+                        return cast(str, default_json.get("type", attr_type))
+                    except ValueError:
+                        pass
+
+                return attr_type
 
             def get_attribute_default(reference: Any) -> JsonObject:
                 instance = getattr(reference, "instance", None)
@@ -667,26 +681,24 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                     "value": None,
                 }
 
-            trigger_attributes: JsonArray = []
-            for reference in sorted(attribute_references, key=lambda ref: ref.name):
-                default_value = get_attribute_default(reference)
-                attr_type = get_attribute_type(reference)
-                if default_value.get("value") is not None:
-                    attr_type = cast(str, default_value.get("type", attr_type))
-                trigger_attributes.append(
+            trigger_attributes: JsonArray = cast(
+                JsonArray,
+                [
                     cast(
                         JsonObject,
                         {
                             "id": str(reference.id),
                             "key": reference.name,
-                            "type": attr_type,
+                            "type": get_attribute_type(reference),
                             "required": type(None) not in reference.types,
-                            "default": default_value,
+                            "default": get_attribute_default(reference),
                             "extensions": None,
                             "schema": None,
                         },
                     )
-                )
+                    for reference in sorted(attribute_references, key=lambda ref: ref.name)
+                ],
+            )
 
             trigger_data: JsonObject
             if trigger_type == WorkflowTriggerType.SCHEDULED:
