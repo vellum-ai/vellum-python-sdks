@@ -1,4 +1,3 @@
-import { python } from "@fern-api/python-ast";
 import * as Vellum from "vellum-ai/api";
 
 import {
@@ -7,9 +6,15 @@ import {
   VELLUM_WORKFLOWS_ROOT_MODULE_PATH,
 } from "src/constants";
 import { PythonType, UnionType } from "src/generators/extensions";
+import { AnyType } from "src/generators/extensions/any-type";
+import { BoolType } from "src/generators/extensions/bool-type";
 import { BuiltinDictType } from "src/generators/extensions/dict";
+import { FloatType } from "src/generators/extensions/float-type";
+import { IntType } from "src/generators/extensions/int-type";
 import { BuiltinListType } from "src/generators/extensions/list";
+import { NoneType } from "src/generators/extensions/none-type";
 import { Reference } from "src/generators/extensions/reference";
+import { StrType } from "src/generators/extensions/str-type";
 import { TypeReference } from "src/generators/extensions/type-reference";
 import { assertUnreachable } from "src/utils/typing";
 
@@ -62,9 +67,7 @@ function parseRef(refPath: string): {
  * Converts a JSON Schema to a Python type annotation.
  * Currently supports basic types: string, number, integer, boolean, array, object, null, and $ref.
  */
-export function jsonSchemaToType(
-  schema: Record<string, unknown>
-): python.Type | PythonType {
+export function jsonSchemaToType(schema: Record<string, unknown>): PythonType {
   // Handle $ref at the top level
   if (schema.$ref && typeof schema.$ref === "string") {
     const { name, modulePath } = parseRef(schema.$ref);
@@ -79,20 +82,20 @@ export function jsonSchemaToType(
   const schemaType = schema.type;
 
   if (schemaType === "string") {
-    return python.Type.str();
+    return new StrType();
   } else if (schemaType === "integer") {
-    return python.Type.int();
+    return new IntType();
   } else if (schemaType === "number") {
-    return python.Type.float();
+    return new FloatType();
   } else if (schemaType === "boolean") {
-    return python.Type.bool();
+    return new BoolType();
   } else if (schemaType === "array") {
     const items = schema.items as Record<string, unknown> | undefined;
     if (items) {
       const itemType = jsonSchemaToType(items);
       return new BuiltinListType(itemType);
     }
-    return new BuiltinListType(python.Type.any());
+    return new BuiltinListType(new AnyType());
   } else if (schemaType === "object") {
     // Handle additionalProperties for typed dict types
     const additionalProperties = schema.additionalProperties as
@@ -100,29 +103,29 @@ export function jsonSchemaToType(
       | undefined;
     if (additionalProperties) {
       const valueType = jsonSchemaToType(additionalProperties);
-      return new BuiltinDictType(python.Type.str(), valueType);
+      return new BuiltinDictType(new StrType(), valueType);
     }
     // Fallback to old behavior for plain objects
-    return new BuiltinDictType(python.Type.str(), python.Type.any());
+    return new BuiltinDictType(new StrType(), new AnyType());
   } else if (schemaType === "null") {
-    return python.Type.none();
+    return new NoneType();
   } else if ("anyOf" in schema && Array.isArray(schema.anyOf)) {
     return new UnionType(schema.anyOf.map(jsonSchemaToType));
   }
 
-  return python.Type.any();
+  return new AnyType();
 }
 
 export function getVellumVariablePrimitiveType(
   vellumVariableType: Vellum.VellumVariableType
-): python.Type | PythonType {
+): PythonType {
   switch (vellumVariableType) {
     case "STRING":
-      return python.Type.str();
+      return new StrType();
     case "NUMBER":
-      return python.Type.union([python.Type.float(), python.Type.int()]);
+      return new UnionType([new FloatType(), new IntType()]);
     case "JSON":
-      return python.Type.any();
+      return new AnyType();
     case "CHAT_HISTORY":
       return new BuiltinListType(
         new TypeReference(
@@ -200,7 +203,7 @@ export function getVellumVariablePrimitiveType(
         })
       );
     case "NULL":
-      return python.Type.none();
+      return new NoneType();
     default: {
       assertUnreachable(vellumVariableType);
     }
