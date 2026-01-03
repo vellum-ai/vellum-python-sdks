@@ -1,6 +1,6 @@
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Any, List, Optional, Union
 
-from vellum.client.types import ArrayChatMessageContentItem, ChatMessage, ChatMessageContent
+from vellum.client.types import ArrayChatMessageContent, ArrayChatMessageContentItem, ChatMessage, ChatMessageContent
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.utils import resolve_value
 from vellum.workflows.references.lazy import LazyReference
@@ -23,7 +23,7 @@ class ChatMessageTrigger(BaseTrigger):
         message: The incoming chat message content.
     """
 
-    message: ArrayChatMessageContentItem
+    message: List[ArrayChatMessageContentItem]
 
     class Config(BaseTrigger.Config):
         output: Optional[BaseDescriptor[Any]] = None
@@ -35,7 +35,7 @@ class ChatMessageTrigger(BaseTrigger):
 
         user_message = ChatMessage(
             role="USER",
-            content=self.message,
+            content=ArrayChatMessageContent(value=self.message),
         )
         state.chat_history.append(user_message)
 
