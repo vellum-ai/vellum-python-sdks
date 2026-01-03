@@ -1,7 +1,6 @@
-import { AbstractWriter } from "@fern-api/base-generator";
-import { AstNode } from "@fern-api/python-ast/python";
+import { AstNode } from "./ast-node";
+import { Writer } from "./writer";
 
 export class PythonType extends AstNode {
-  // Class that aims to replace the Type class from python-ast
-  write(_: AbstractWriter) {}
+  write(_: Writer) {}
 }

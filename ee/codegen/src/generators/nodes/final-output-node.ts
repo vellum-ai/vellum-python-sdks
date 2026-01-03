@@ -1,5 +1,3 @@
-import { python } from "@fern-api/python-ast";
-
 import { OUTPUTS_CLASS_NAME } from "src/constants";
 import { FinalOutputNodeContext } from "src/context/node-context/final-output-node";
 import { Class, PythonType } from "src/generators/extensions";
@@ -27,7 +25,7 @@ export class FinalOutputNode extends BaseNode<
   protected getNodeBaseGenericTypes(): AstNode[] {
     const stateType = this.getStateTypeOrBaseState();
 
-    let primitiveOutputType: python.Type | PythonType;
+    let primitiveOutputType: PythonType;
     const valueOutput = this.nodeData.outputs?.find(
       (output) => output.name === "value"
     );

@@ -1,6 +1,5 @@
-import { AttrPath, ModulePath } from "@fern-api/python-ast/core/types";
-
 import { AstNode } from "src/generators/extensions/ast-node";
+import { AttrPath, ModulePath } from "src/generators/extensions/reference";
 import { Writer } from "src/generators/extensions/writer";
 
 export declare namespace StarImport {
