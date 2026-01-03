@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Callable, Generic, TypeVar, Union, get_args
 
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
-from vellum.workflows.references.utils import resolve_output_reference_by_string
+from vellum.workflows.types.generics import is_workflow_class
 
 if TYPE_CHECKING:
     from vellum.workflows.state.base import BaseState
@@ -31,10 +31,20 @@ class LazyReference(BaseDescriptor[_T], Generic[_T]):
         from vellum.workflows.descriptors.utils import resolve_value
 
         if isinstance(self._get, str):
-            # Use shared utility to resolve output references by string
-            resolved = resolve_output_reference_by_string(self._get, state)
-            if resolved is not undefined:
-                return resolved  # type: ignore[return-value]
+            # Check node outputs
+            for output_reference, value in state.meta.node_outputs.items():
+                if str(output_reference) == self._get:
+                    return value
+
+            # Check workflow outputs
+            workflow_definition = state.meta.workflow_definition
+            if is_workflow_class(workflow_definition):
+                for output_reference in workflow_definition.Outputs:
+                    if str(output_reference) == self._get:
+                        instance = output_reference.instance
+                        if isinstance(instance, BaseDescriptor):
+                            return instance.resolve(state)  # type: ignore[return-value]
+                        return instance  # type: ignore[return-value]
 
             child_reference = self.resolve(state.meta.parent) if state.meta.parent else None
 
