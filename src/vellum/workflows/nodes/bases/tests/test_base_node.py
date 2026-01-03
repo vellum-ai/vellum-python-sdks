@@ -1,6 +1,6 @@
 import pytest
 from uuid import UUID
-from typing import Optional, Set
+from typing import Any, Dict, Optional, Set
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.string_vellum_value_request import StringVellumValueRequest
@@ -411,3 +411,49 @@ def test_base_node__trigger_should_initiate__invalid_merge_behavior():
 
     # AND the error message should contain the invalid merge behavior
     assert "INVALID_MERGE_BEHAVIOR" in workflow_rejected_event.error.message
+
+
+def test_base_node__int_input_preserves_type_when_float_passed():
+    """
+    Tests that an int workflow input is correctly coerced to int when a float value is passed.
+    """
+
+    # GIVEN an Inputs class with an int field
+    class Inputs(BaseInputs):
+        total_requests: int
+
+    # AND a custom node that references the int input
+    class CustomNode(BaseNode):
+        total_requests = Inputs.total_requests
+
+        class Outputs(BaseOutputs):
+            result: int
+
+        def run(self) -> BaseOutputs:
+            # This should work without error - range() requires an int, not a float
+            result = len(range(self.total_requests))
+            return self.Outputs(result=result)
+
+    # AND a workflow that uses the custom node
+    class IntInputWorkflow(BaseWorkflow[Inputs, BaseState]):
+        graph = CustomNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            result = CustomNode.Outputs.result
+
+    # WHEN we run the workflow with a float value for an int input
+    # This simulates what happens when the API returns a NUMBER value as a float
+    workflow = IntInputWorkflow()
+    raw_inputs: Dict[str, Any] = {"total_requests": 5.0}
+    inputs = Inputs(**raw_inputs)
+
+    # THEN the input should be coerced to an integer at construction time
+    assert inputs.total_requests == 5
+    assert type(inputs.total_requests) is int
+
+    # AND the workflow should complete successfully
+    final_event = workflow.run(inputs=inputs)
+    assert final_event.name == "workflow.execution.fulfilled"
+
+    # AND the result should be correct
+    assert final_event.outputs.result == 5

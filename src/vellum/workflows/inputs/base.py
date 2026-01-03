@@ -10,7 +10,7 @@ from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import WorkflowInitializationException
 from vellum.workflows.references import ExternalInputReference, WorkflowInputReference
 from vellum.workflows.references.input import InputReference
-from vellum.workflows.types.utils import get_class_attr_names, infer_types
+from vellum.workflows.types.utils import coerce_to_declared_type, get_class_attr_names, infer_types
 
 
 @dataclass_transform(kw_only_default=True)
@@ -128,6 +128,23 @@ class BaseInputs(metaclass=_BaseInputsMeta):
 
             # Set the value on the instance (either from kwargs or default)
             if value is not undefined:
+                # Coerce the value to the declared type if needed
+                # For Optional types, extract the non-None type for coercion
+                coercion_type = field_type
+                if is_optional:
+                    non_none_args = [arg for arg in args if arg is not type(None)]
+                    if len(non_none_args) == 1:
+                        coercion_type = non_none_args[0]
+
+                try:
+                    value = coerce_to_declared_type(value, coercion_type, name)
+                except ValueError as e:
+                    raise WorkflowInitializationException(
+                        message=str(e),
+                        code=WorkflowErrorCode.INVALID_INPUTS,
+                        workflow_definition=self.__class__.__parent_class__,
+                    )
+
                 setattr(self, name, value)
 
     def __iter__(self) -> Iterator[Tuple[InputReference, Any]]:
