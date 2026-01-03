@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Any, Type, Union
 
 from vellum.workflows.constants import undefined
+from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.types.generics import is_workflow_class
 
 if TYPE_CHECKING:
@@ -20,8 +21,6 @@ def resolve_output_reference_by_string(ref_string: str, state: "BaseState") -> U
     Returns:
         The resolved value if found, otherwise undefined
     """
-    from vellum.workflows.descriptors.utils import resolve_value
-
     # Check node outputs first
     for output_reference, value in state.meta.node_outputs.items():
         if str(output_reference) == ref_string:
@@ -32,6 +31,9 @@ def resolve_output_reference_by_string(ref_string: str, state: "BaseState") -> U
     if is_workflow_class(workflow_definition):
         for output_reference in workflow_definition.Outputs:
             if str(output_reference) == ref_string:
-                return resolve_value(output_reference.instance, state)
+                instance = output_reference.instance
+                if isinstance(instance, BaseDescriptor):
+                    return instance.resolve(state)
+                return instance
 
     return undefined
