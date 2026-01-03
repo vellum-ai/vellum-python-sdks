@@ -56,7 +56,7 @@ jobs:
         run: poetry run vellum ping --help
 
       - name: Test vellum ping with API key
-        if: ${{ env.VELLUM_API_KEY != '' }}
+        if: ${{ secrets.VELLUM_API_KEY != '' }}
         env:
           VELLUM_API_KEY: ${{ secrets.VELLUM_API_KEY }}
         run: poetry run vellum ping
