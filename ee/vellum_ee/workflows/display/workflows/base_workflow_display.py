@@ -28,9 +28,11 @@ from vellum.workflows.inputs.dataset_row import DatasetRow
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.nodes.displayable.final_output_node.node import FinalOutputNode
+from vellum.workflows.nodes.mocks import MockNodeExecution
 from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port, get_wrapped_node
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, StateValueReference, WorkflowInputReference
+from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.triggers.chat_message import ChatMessageTrigger
 from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.triggers.manual import ManualTrigger
@@ -1498,12 +1500,65 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                             if isinstance(inputs_obj, BaseInputs)
                             else inputs_obj
                         )
-                        row_data = normalized_row.model_dump(
-                            mode="json",
-                            by_alias=True,
-                            exclude_none=True,
-                            context={"serializer": workflow_display.serialize_value},
-                        )
+
+                        try:
+                            row_data = normalized_row.model_dump(
+                                mode="json",
+                                by_alias=True,
+                                exclude_none=True,
+                                context={"serializer": workflow_display.serialize_value},
+                            )
+                        except Exception:
+                            # Row serialization failed, try to serialize each input field individually
+                            # to identify which field failed and still include valid fields
+                            row_label = normalized_row.label
+                            inputs_data: Dict[str, Any] = {}
+                            inputs_obj_to_serialize = (
+                                normalized_row.inputs if isinstance(normalized_row.inputs, BaseInputs) else None
+                            )
+
+                            if inputs_obj_to_serialize is not None:
+                                for input_descriptor, value in inputs_obj_to_serialize:
+                                    if input_descriptor.name.startswith("__"):
+                                        continue
+                                    try:
+                                        # Try to serialize this specific input field
+                                        serialized_value = workflow_display.serialize_value(value)
+                                        inputs_data[input_descriptor.name] = serialized_value
+                                    except Exception as field_error:
+                                        # Record the error with row label and input name
+                                        error_msg = (
+                                            f'Dataset row "{row_label}": input "{input_descriptor.name}" '
+                                            f"failed serialization: {field_error}"
+                                        )
+                                        sandbox_errors.append(Exception(error_msg))
+
+                            # Build row_data with successfully serialized inputs
+                            row_data = {"label": row_label, "inputs": inputs_data}
+
+                            # Serialize mocks if present
+                            if normalized_row.mocks is not None:
+                                try:
+                                    mocks_data = []
+                                    for mock in normalized_row.mocks:
+                                        # Convert BaseOutputs to MockNodeExecution if needed
+                                        if isinstance(mock, MockNodeExecution):
+                                            mock_exec = mock
+                                        else:
+                                            mock_exec = MockNodeExecution(
+                                                when_condition=ConstantValueReference(True),
+                                                then_outputs=mock,
+                                            )
+                                        mock_data = mock_exec.model_dump(
+                                            mode="json",
+                                            by_alias=True,
+                                            exclude_none=True,
+                                            context={"serializer": workflow_display.serialize_value},
+                                        )
+                                        mocks_data.append(mock_data)
+                                    row_data["mocks"] = mocks_data
+                                except Exception:
+                                    pass  # Skip mocks if they fail to serialize
 
                         if i in dataset_row_index_to_id:
                             row_data["id"] = dataset_row_index_to_id[i]
