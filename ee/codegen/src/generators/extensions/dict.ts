@@ -1,5 +1,4 @@
-import { AstNode } from "@fern-api/python-ast/core/AstNode";
-
+import { AstNode } from "./ast-node";
 import { PythonType } from "./type";
 
 import { Writer } from "src/generators/extensions/writer";
