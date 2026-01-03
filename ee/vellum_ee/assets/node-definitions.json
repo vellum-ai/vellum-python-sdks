@@ -1213,10 +1213,10 @@
         {
           "id": "88a07223-94d0-411c-acb4-37a2b2ab108d",
           "key": "message",
-          "type": "JSON",
+          "type": "ARRAY",
           "required": true,
           "default": {
-            "type": "JSON",
+            "type": "ARRAY",
             "value": null
           },
           "extensions": null,
