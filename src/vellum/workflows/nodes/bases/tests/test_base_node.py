@@ -1,6 +1,6 @@
 import pytest
 from uuid import UUID
-from typing import Optional, Set
+from typing import Any, Dict, Optional, Set
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.string_vellum_value_request import StringVellumValueRequest
@@ -444,7 +444,8 @@ def test_base_node__int_input_preserves_type_when_float_passed():
     # WHEN we run the workflow with a float value for an int input
     # This simulates what happens when the API returns a NUMBER value as a float
     workflow = IntInputWorkflow()
-    inputs = Inputs(**{"total_requests": 5.0})
+    raw_inputs: Dict[str, Any] = {"total_requests": 5.0}
+    inputs = Inputs(**raw_inputs)
     final_event = workflow.run(inputs=inputs)
 
     # THEN the workflow should complete successfully
