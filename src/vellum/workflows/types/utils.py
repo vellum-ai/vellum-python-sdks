@@ -224,3 +224,28 @@ def get_original_base(cls: Type) -> Type:
     # in Python 3.12, there is `from types import get_original_bases`, making this future proof
     # https://docs.python.org/3/library/types.html#types.get_original_bases
     return cls.__orig_bases__[0]  # type: ignore[attr-defined]
+
+
+def coerce_to_declared_type(value: Any, declared_type: Type, field_name: str) -> Any:
+    """Coerce a value to the declared type if needed.
+
+    This handles cases where the API returns a float for an int field
+    (since NumberVellumValue.value is typed as float).
+
+    Args:
+        value: The value to coerce
+        declared_type: The expected type from the field annotation
+        field_name: The name of the field (for error messages)
+
+    Returns:
+        The coerced value
+
+    Raises:
+        ValueError: If the value cannot be safely coerced to the declared type
+    """
+    if declared_type is int and isinstance(value, float):
+        if value.is_integer():
+            return int(value)
+        raise ValueError(f"Expected integer for input '{field_name}', but received non-integer float: {value}")
+
+    return value

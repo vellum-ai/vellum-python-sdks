@@ -446,10 +446,13 @@ def test_base_node__int_input_preserves_type_when_float_passed():
     workflow = IntInputWorkflow()
     raw_inputs: Dict[str, Any] = {"total_requests": 5.0}
     inputs = Inputs(**raw_inputs)
-    final_event = workflow.run(inputs=inputs)
 
-    # THEN the workflow should complete successfully
-    # (currently fails because the float is not coerced to int)
+    # THEN the input should be coerced to an integer at construction time
+    assert inputs.total_requests == 5
+    assert type(inputs.total_requests) is int
+
+    # AND the workflow should complete successfully
+    final_event = workflow.run(inputs=inputs)
     assert final_event.name == "workflow.execution.fulfilled"
 
     # AND the result should be correct
