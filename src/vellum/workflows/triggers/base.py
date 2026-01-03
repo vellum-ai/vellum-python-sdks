@@ -277,9 +277,6 @@ class BaseTriggerMeta(ABCMeta):
         if isinstance(attribute, TriggerAttributeReference):
             return attribute
 
-        if name in cls.__dict__:
-            return attribute
-
         if not _is_annotated(cls, name):
             return attribute
 

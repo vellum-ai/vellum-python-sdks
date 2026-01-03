@@ -46,7 +46,7 @@ from ..nodes.some_node import SomeNode
 
 
 class ChatMessage(ChatMessageTrigger):
-    message: str
+    message: str = "Hello"
 
     class Config(ChatMessageTrigger.Config):
         output = LazyReference(lambda: SomeNode.Outputs.result)

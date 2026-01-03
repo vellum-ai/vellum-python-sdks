@@ -16,10 +16,12 @@ import { IntInstantiation } from "src/generators/extensions/int-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
+import { VellumValue } from "src/generators/vellum-variable-value";
 import { isNilOrEmpty } from "src/utils/typing";
 
 import type { AstNode } from "src/generators/extensions/ast-node";
 import type { WorkflowTrigger } from "src/types/vellum";
+import type { VellumVariable } from "vellum-ai/api/types";
 
 export declare namespace BaseTrigger {
   interface Args<T extends WorkflowTrigger> {
@@ -228,12 +230,27 @@ export abstract class BaseTrigger<
    * All triggers have attributes, so this is a common helper.
    */
   protected createAttributeFields(): AstNode[] {
-    return this.trigger.attributes.map(
-      (attr) =>
-        new Field({
-          name: attr.key,
-          type: python.Type.str(),
-        })
+    return this.trigger.attributes.map((attr) =>
+      this.createAttributeField(attr)
     );
+  }
+
+  private createAttributeField(attr: VellumVariable): AstNode {
+    const defaultValue = attr.default;
+    // Only add an initializer when the default value is non-null.
+    // The API returns { type: ..., value: null } for attributes without defaults,
+    // and we don't want to generate `attr: str = None` for required attributes.
+    if (defaultValue != null && defaultValue.value != null) {
+      const vellumValue = new VellumValue({ vellumValue: defaultValue });
+      return new Field({
+        name: attr.key,
+        type: python.Type.str(),
+        initializer: vellumValue,
+      });
+    }
+    return new Field({
+      name: attr.key,
+      type: python.Type.str(),
+    });
   }
 }

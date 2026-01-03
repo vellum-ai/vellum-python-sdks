@@ -27,6 +27,8 @@ class ResponseNode(BaseNode):
 class SimpleChatTrigger(ChatMessageTrigger):
     """Chat trigger that appends workflow output as assistant message."""
 
+    message = "Hello"
+
     class Config(ChatMessageTrigger.Config):
         output = LazyReference(lambda: SimpleChatWorkflow.Outputs.response)  # type: ignore[has-type]
 

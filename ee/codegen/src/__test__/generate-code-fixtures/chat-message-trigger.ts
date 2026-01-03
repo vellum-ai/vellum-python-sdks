@@ -57,7 +57,14 @@ export default {
         {
           id: "message-attribute-id",
           key: "message",
-          type: "JSON",
+          type: "STRING",
+          required: true,
+          default: {
+            type: "STRING",
+            value: "Hello",
+          },
+          extensions: null,
+          schema: null,
         },
       ],
       exec_config: {
