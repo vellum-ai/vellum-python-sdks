@@ -148,6 +148,26 @@
           "name": "default",
           "type": "DEFAULT"
         }
+      ],
+      "outputs": [
+        {
+          "id": "cd6cf124-b178-4852-b5d5-251f5835fc8f",
+          "name": "result",
+          "type": "STRING",
+          "value": null,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "id": "c86c2620-9192-412c-9423-4f594411fd47",
+          "name": "log",
+          "type": "STRING",
+          "value": null,
+          "schema": {
+            "type": "string"
+          }
+        }
       ]
     },
     {
@@ -632,7 +652,8 @@
           "name": "default",
           "type": "DEFAULT"
         }
-      ]
+      ],
+      "outputs": []
     },
     {
       "id": "e1c8d236-6131-4218-aed8-45f986723227",
@@ -1101,7 +1122,7 @@
         {
           "id": "9df3ddf0-675f-48d5-b4b2-e3a805bbf450",
           "name": "urls",
-          "type": "ARRAY",
+          "type": "JSON",
           "value": null,
           "schema": {
             "type": "array",
@@ -1113,7 +1134,7 @@
         {
           "id": "87994bf1-d8d7-40d0-a715-90b1e399c5f2",
           "name": "results",
-          "type": "ARRAY",
+          "type": "JSON",
           "value": null,
           "schema": {
             "type": "array",
@@ -1176,6 +1197,62 @@
           }
         }
       ]
+    }
+  ],
+  "triggers": [
+    {
+      "type": "MANUAL",
+      "name": "ManualTrigger",
+      "module": [
+        "vellum",
+        "workflows",
+        "triggers",
+        "manual"
+      ],
+      "display_data": {
+        "label": "Trigger"
+      }
+    },
+    {
+      "type": "INTEGRATION",
+      "name": "IntegrationTrigger",
+      "module": [
+        "vellum",
+        "workflows",
+        "triggers",
+        "integration"
+      ],
+      "display_data": {
+        "label": "Trigger"
+      }
+    },
+    {
+      "type": "SCHEDULED",
+      "name": "ScheduleTrigger",
+      "module": [
+        "vellum",
+        "workflows",
+        "triggers",
+        "schedule"
+      ],
+      "display_data": {
+        "label": "Trigger"
+      }
+    },
+    {
+      "type": "CHAT_MESSAGE",
+      "name": "ChatMessageTrigger",
+      "module": [
+        "vellum",
+        "workflows",
+        "triggers",
+        "chat_message"
+      ],
+      "display_data": {
+        "label": "Chat Message",
+        "icon": "vellum:icon:message",
+        "color": "blue"
+      }
     }
   ],
   "errors": []
