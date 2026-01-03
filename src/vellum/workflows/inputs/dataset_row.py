@@ -4,6 +4,7 @@ from typing import Any, Callable, Dict, List, Optional, Sequence, Union
 from pydantic import ConfigDict, Field, SerializationInfo, field_serializer, model_serializer
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
+from vellum.utils.files.mixin import VellumFileMixin
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.mocks import MockNodeExecution
 from vellum.workflows.outputs.base import BaseOutputs
@@ -81,9 +82,10 @@ class DatasetRow(UniversalBaseModel):
         """
         Custom serializer for inputs that converts it to a dictionary.
 
-        When workflow_display is provided in the serialization context, this method
-        will serialize each input field individually and collect errors for fields
-        that fail to serialize, allowing valid fields to still be included.
+        When add_error is provided in the serialization context, this method will
+        validate file-type inputs (VellumFileMixin) by attempting to serialize them,
+        and collect errors for fields that fail to serialize while still including
+        valid fields.
 
         Args:
             inputs: Either a BaseInputs instance or dict to serialize
@@ -96,23 +98,24 @@ class DatasetRow(UniversalBaseModel):
             return inputs
 
         result = {}
-        workflow_display = info.context.get("workflow_display") if info.context else None
-        serializer = info.context.get("serializer") if info.context else None
+        add_error = info.context.get("add_error") if info.context else None
 
         for input_descriptor, value in inputs:
             if input_descriptor.name.startswith("__"):
                 continue
 
-            if workflow_display is not None and serializer is not None:
+            # For file types, validate by attempting to serialize and catch errors
+            if add_error is not None and isinstance(value, VellumFileMixin):
                 try:
-                    serialized_value = serializer(value)
-                    result[input_descriptor.name] = serialized_value
+                    # Trigger validation by serializing the file type
+                    value.model_dump(mode="json", by_alias=True, exclude_none=True)
+                    result[input_descriptor.name] = value
                 except Exception as field_error:
                     error_msg = (
                         f'Dataset row "{self.label}": input "{input_descriptor.name}" '
                         f"failed serialization: {field_error}"
                     )
-                    workflow_display.display_context.add_validation_error(Exception(error_msg))
+                    add_error(Exception(error_msg))
             else:
                 result[input_descriptor.name] = value
 

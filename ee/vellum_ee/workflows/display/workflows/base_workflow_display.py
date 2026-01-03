@@ -1503,7 +1503,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                             by_alias=True,
                             exclude_none=True,
                             context={
-                                "workflow_display": workflow_display,
+                                "add_error": workflow_display.display_context.add_validation_error,
                                 "serializer": workflow_display.serialize_value,
                             },
                         )

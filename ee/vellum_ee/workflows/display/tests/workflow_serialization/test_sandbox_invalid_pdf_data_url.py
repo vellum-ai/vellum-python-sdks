@@ -39,11 +39,11 @@ def test_serialize_module__invalid_pdf_data_url():
     assert invalid_row["label"] == "Scenario with invalid PDF"
     assert "document" not in invalid_row["inputs"]
     assert "name" in invalid_row["inputs"]
-    assert invalid_row["inputs"]["name"]["value"]["value"] == "Test User"
+    assert invalid_row["inputs"]["name"] == "Test User"
 
     # AND the second row (valid) should have both inputs serialized
     valid_row = result.dataset[1]
     assert valid_row["label"] == "Scenario with valid PDF"
     assert "document" in valid_row["inputs"]
     assert "name" in valid_row["inputs"]
-    assert valid_row["inputs"]["name"]["value"]["value"] == "Another User"
+    assert valid_row["inputs"]["name"] == "Another User"
