@@ -1,5 +1,3 @@
-import { python } from "@fern-api/python-ast";
-
 import { Decorator } from "./decorator";
 import { Field } from "./field";
 import { Reference } from "./reference";
@@ -20,7 +18,7 @@ export class Class extends AstNode {
   readonly name: string;
   readonly extends_: Reference[];
   readonly decorators: Decorator[];
-  readonly fields: (python.Field | Field)[] = [];
+  readonly fields: Field[] = [];
   readonly docs?: string;
   private statements: AstNode[] = [];
   constructor({ docs, name, extends_, decorators }: Class.Args) {
@@ -83,7 +81,7 @@ export class Class extends AstNode {
       writer.writeNewLineIfLastLineNot();
     });
   }
-  addField(field: python.Field | Field) {
+  addField(field: Field) {
     this.add(field);
   }
 }
