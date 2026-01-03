@@ -20,10 +20,10 @@ class ChatMessageTrigger(BaseTrigger):
     conversation state across executions.
 
     Attributes:
-        message: The incoming chat message (text string or multi-modal content).
+        message: The incoming chat message text string.
     """
 
-    message: Union[str, ChatMessageContent]
+    message: str
 
     class Config(BaseTrigger.Config):
         output: Optional[BaseDescriptor[Any]] = None
@@ -35,8 +35,7 @@ class ChatMessageTrigger(BaseTrigger):
 
         user_message = ChatMessage(
             role="USER",
-            content=self.message if not isinstance(self.message, str) else None,
-            text=self.message if isinstance(self.message, str) else None,
+            text=self.message,
         )
         state.chat_history.append(user_message)
 
