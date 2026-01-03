@@ -31,7 +31,7 @@ def test_simple_chat_workflow_serialization():
                 {
                     "id": "5edbfd78-b634-4305-b2ad-d9feecbd5e5f",
                     "key": "message",
-                    "type": "JSON",
+                    "type": "STRING",
                     "required": True,
                     "default": {
                         "type": "STRING",

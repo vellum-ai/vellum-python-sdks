@@ -57,7 +57,7 @@ export default {
         {
           id: "message-attribute-id",
           key: "message",
-          type: "JSON",
+          type: "STRING",
           required: true,
           default: {
             type: "STRING",

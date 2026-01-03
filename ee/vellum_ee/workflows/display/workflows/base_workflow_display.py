@@ -654,35 +654,44 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                 except ValueError:
                     return "JSON"
 
-            def get_attribute_default(reference: Any) -> JsonObject:
-                """Get the default value for a trigger attribute."""
+            def get_attribute_default_and_type(reference: Any) -> Tuple[JsonObject, str]:
+                """Get the default value and inferred type for a trigger attribute.
+
+                Returns the default value object and the attribute type. When the attribute
+                has a default value, the type is inferred from the default value rather than
+                from the reference's types (which may be empty for unannotated attributes).
+                """
                 instance = getattr(reference, "instance", None)
                 if instance is not None and instance is not undefined:
                     try:
                         vellum_value = primitive_to_vellum_value(instance)
-                        return cast(JsonObject, self._model_dump(vellum_value))
+                        default_json = cast(JsonObject, self._model_dump(vellum_value))
+                        # Use the type from the default value when available
+                        inferred_type = cast(str, default_json.get("type", get_attribute_type(reference)))
+                        return default_json, inferred_type
                     except ValueError:
                         pass
                 return {
                     "type": get_attribute_type(reference),
                     "value": None,
+                }, get_attribute_type(reference)
+
+            def serialize_attribute(reference: Any) -> JsonObject:
+                default_value, attr_type = get_attribute_default_and_type(reference)
+                return {
+                    "id": str(reference.id),
+                    "key": reference.name,
+                    "type": attr_type,
+                    "required": type(None) not in reference.types,
+                    "default": default_value,
+                    "extensions": None,
+                    "schema": None,
                 }
 
             trigger_attributes: JsonArray = cast(
                 JsonArray,
                 [
-                    cast(
-                        JsonObject,
-                        {
-                            "id": str(reference.id),
-                            "key": reference.name,
-                            "type": get_attribute_type(reference),
-                            "required": type(None) not in reference.types,
-                            "default": get_attribute_default(reference),
-                            "extensions": None,
-                            "schema": None,
-                        },
-                    )
+                    cast(JsonObject, serialize_attribute(reference))
                     for reference in sorted(attribute_references, key=lambda ref: ref.name)
                 ],
             )
