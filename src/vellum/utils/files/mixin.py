@@ -120,14 +120,16 @@ class VellumFileMixin(UniversalBaseModel):
     def validate_src_on_serialize(cls, src: str) -> str:
         """Validate the src field during serialization.
 
-        For base64 data URLs, this validates that the base64 content is properly encoded.
+        For PDF base64 data URLs, this validates that the base64 content is properly encoded.
         """
         data_url_match = re.match(BASE64_DATA_URL_PATTERN, src)
         if data_url_match:
-            base64_content = data_url_match.group(3)
-            try:
-                base64.b64decode(base64_content, validate=True)
-            except binascii.Error as e:
-                raise InvalidFileSourceError(f"Invalid base64 encoding in data URL: {e}") from e
+            mime_type = data_url_match.group(1) or ""
+            if mime_type == "application/pdf":
+                base64_content = data_url_match.group(3)
+                try:
+                    base64.b64decode(base64_content, validate=True)
+                except binascii.Error as e:
+                    raise InvalidFileSourceError(f"Invalid base64 encoding in PDF data URL: {e}") from e
 
         return src

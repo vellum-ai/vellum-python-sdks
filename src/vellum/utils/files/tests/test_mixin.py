@@ -234,7 +234,7 @@ def test_vellum_file_mixin_serialization_invalid_base64():
 
     # WHEN serializing the document
     # THEN a PydanticSerializationError should be raised with InvalidFileSourceError as the cause
-    with pytest.raises(PydanticSerializationError, match="Invalid base64 encoding in data URL"):
+    with pytest.raises(PydanticSerializationError, match="Invalid base64 encoding in PDF data URL"):
         test_file.model_dump()
 
 
