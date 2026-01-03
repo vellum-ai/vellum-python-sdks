@@ -31,7 +31,8 @@ class LazyReference(BaseDescriptor[_T], Generic[_T]):
         from vellum.workflows.descriptors.utils import resolve_value
 
         if isinstance(self._get, str):
-            # Check node outputs
+            # We are comparing Output string references - when if we want to be exact,
+            # should be comparing the Output class themselves
             for output_reference, value in state.meta.node_outputs.items():
                 if str(output_reference) == self._get:
                     return value
