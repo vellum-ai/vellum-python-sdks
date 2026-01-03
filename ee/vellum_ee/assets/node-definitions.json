@@ -1201,16 +1201,37 @@
   ],
   "triggers": [
     {
-      "type": "MANUAL",
-      "name": "ManualTrigger",
+      "type": "CHAT_MESSAGE",
+      "name": "ChatMessageTrigger",
       "module": [
         "vellum",
         "workflows",
         "triggers",
-        "manual"
+        "chat_message"
+      ],
+      "attributes": [
+        {
+          "id": "88a07223-94d0-411c-acb4-37a2b2ab108d",
+          "key": "message",
+          "type": "JSON",
+          "required": true,
+          "default": {
+            "type": "JSON",
+            "value": null
+          },
+          "extensions": null,
+          "schema": null
+        }
       ],
       "display_data": {
-        "label": "Trigger"
+        "label": "Chat Message",
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "z_index": 0,
+        "icon": "vellum:icon:message",
+        "color": "blue"
       }
     },
     {
@@ -1222,9 +1243,26 @@
         "triggers",
         "integration"
       ],
+      "attributes": [],
       "display_data": {
-        "label": "Trigger"
+        "label": "Trigger",
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "z_index": 0
       }
+    },
+    {
+      "type": "MANUAL",
+      "name": "ManualTrigger",
+      "module": [
+        "vellum",
+        "workflows",
+        "triggers",
+        "manual"
+      ],
+      "attributes": []
     },
     {
       "type": "SCHEDULED",
@@ -1235,23 +1273,39 @@
         "triggers",
         "schedule"
       ],
-      "display_data": {
-        "label": "Trigger"
-      }
-    },
-    {
-      "type": "CHAT_MESSAGE",
-      "name": "ChatMessageTrigger",
-      "module": [
-        "vellum",
-        "workflows",
-        "triggers",
-        "chat_message"
+      "attributes": [
+        {
+          "id": "77f5f59d-d9b8-4a9c-b223-e3f5d9f4e376",
+          "key": "current_run_at",
+          "type": "STRING",
+          "required": true,
+          "default": {
+            "type": "STRING",
+            "value": null
+          },
+          "extensions": null,
+          "schema": null
+        },
+        {
+          "id": "e75ec8ba-2635-4be2-9c1d-f04ddcb8a7a1",
+          "key": "next_run_at",
+          "type": "STRING",
+          "required": true,
+          "default": {
+            "type": "STRING",
+            "value": null
+          },
+          "extensions": null,
+          "schema": null
+        }
       ],
       "display_data": {
-        "label": "Chat Message",
-        "icon": "vellum:icon:message",
-        "color": "blue"
+        "label": "Trigger",
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "z_index": 0
       }
     }
   ],

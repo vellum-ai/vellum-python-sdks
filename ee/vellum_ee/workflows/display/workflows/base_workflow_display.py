@@ -34,12 +34,10 @@ from vellum.workflows.references import OutputReference, StateValueReference, Wo
 from vellum.workflows.triggers.chat_message import ChatMessageTrigger
 from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.triggers.manual import ManualTrigger
-from vellum.workflows.triggers.schedule import ScheduleTrigger
 from vellum.workflows.types.core import Json, JsonArray, JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.types.utils import get_original_base
 from vellum.workflows.utils.uuids import generate_entity_id_from_path, uuid4_from_hash
-from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
 from vellum.workflows.vellum_client import create_vellum_client
 from vellum_ee.workflows.display.base import (
     EdgeDisplay,
@@ -82,6 +80,11 @@ from vellum_ee.workflows.display.utils.metadata import (
     load_runner_config,
 )
 from vellum_ee.workflows.display.utils.registry import register_workflow_display_class
+from vellum_ee.workflows.display.utils.triggers import (
+    get_trigger_type,
+    serialize_trigger_attributes,
+    serialize_trigger_display_data,
+)
 from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
@@ -626,56 +629,15 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         serialized_triggers: List[JsonObject] = []
 
         for trigger_class in unique_trigger_classes:
-            # Get the trigger type from the mapping, or check if it's a subclass
+            # Get the trigger type from the mapping, or use the utility function
             trigger_type = trigger_type_mapping.get(trigger_class)
             if trigger_type is None:
-                # Check if it's a subclass of a known trigger type
-                if issubclass(trigger_class, ManualTrigger):
-                    trigger_type = WorkflowTriggerType.MANUAL
-                elif issubclass(trigger_class, IntegrationTrigger):
-                    trigger_type = WorkflowTriggerType.INTEGRATION
-                elif issubclass(trigger_class, ScheduleTrigger):
-                    trigger_type = WorkflowTriggerType.SCHEDULED
-                elif issubclass(trigger_class, ChatMessageTrigger):
-                    trigger_type = WorkflowTriggerType.CHAT_MESSAGE
-                else:
-                    raise ValueError(
-                        f"Unknown trigger type: {trigger_class.__name__}. "
-                        f"Please add it to the trigger type mapping in get_trigger_type_mapping()."
-                    )
+                trigger_type = get_trigger_type(trigger_class)
 
             trigger_id = trigger_class.__id__
 
-            # Serialize trigger attributes from attribute_references as VellumVariables
-            attribute_references = trigger_class.attribute_references().values()
-
-            def get_attribute_type(reference: Any) -> str:
-                try:
-                    return primitive_type_to_vellum_variable_type(reference)
-                except ValueError:
-                    return "JSON"
-
-            trigger_attributes: JsonArray = cast(
-                JsonArray,
-                [
-                    cast(
-                        JsonObject,
-                        {
-                            "id": str(reference.id),
-                            "key": reference.name,
-                            "type": get_attribute_type(reference),
-                            "required": type(None) not in reference.types,
-                            "default": {
-                                "type": get_attribute_type(reference),
-                                "value": None,
-                            },
-                            "extensions": None,
-                            "schema": None,
-                        },
-                    )
-                    for reference in sorted(attribute_references, key=lambda ref: ref.name)
-                ],
-            )
+            # Serialize trigger attributes using the shared utility
+            trigger_attributes = serialize_trigger_attributes(trigger_class)
 
             trigger_data: JsonObject
             if trigger_type == WorkflowTriggerType.SCHEDULED:
@@ -711,44 +673,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                     if chat_exec_config:
                         trigger_data["exec_config"] = chat_exec_config
 
-            # Serialize display_data from trigger's Display class
-            display_class = trigger_class.Display
-            display_data: JsonObject = {}
-
-            # Add label if present
-            if hasattr(display_class, "label") and display_class.label is not None:
-                display_data["label"] = display_class.label
-
-            # Add x and y coordinates if present
-            if (
-                hasattr(display_class, "x")
-                and display_class.x is not None
-                and hasattr(display_class, "y")
-                and display_class.y is not None
-            ):
-                display_data["position"] = {
-                    "x": display_class.x,
-                    "y": display_class.y,
-                }
-
-            # Add z index if present
-            if hasattr(display_class, "z_index") and display_class.z_index is not None:
-                display_data["z_index"] = display_class.z_index
-
-            # Add icon if present
-            if hasattr(display_class, "icon") and display_class.icon is not None:
-                display_data["icon"] = display_class.icon
-
-            # Add color if present
-            if hasattr(display_class, "color") and display_class.color is not None:
-                display_data["color"] = display_class.color
-
-            # Add comment if present
-            if hasattr(display_class, "comment") and display_class.comment is not None:
-                display_data["comment"] = {
-                    "value": display_class.comment.value,
-                    "expanded": display_class.comment.expanded,
-                }
+            # Serialize display_data using the shared utility
+            display_data = serialize_trigger_display_data(trigger_class, trigger_type)
 
             # Don't include display_data for manual triggers
             if display_data and trigger_type != WorkflowTriggerType.MANUAL:
