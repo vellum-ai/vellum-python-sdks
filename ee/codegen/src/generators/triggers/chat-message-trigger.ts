@@ -1,9 +1,8 @@
-import { python } from "@fern-api/python-ast";
-
 import { VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH } from "src/constants";
 import { Class } from "src/generators/extensions/class";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { Field } from "src/generators/extensions/field";
+import { LambdaInstantiation } from "src/generators/extensions/lambda-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { BaseTrigger } from "src/generators/triggers/base-trigger";
@@ -97,7 +96,7 @@ export class ChatMessageTrigger extends BaseTrigger<ChatMessageTriggerType> {
       }),
       arguments_: [
         new MethodArgument({
-          value: python.lambda({
+          value: new LambdaInstantiation({
             body: workflowValueDescriptor,
           }),
         }),
