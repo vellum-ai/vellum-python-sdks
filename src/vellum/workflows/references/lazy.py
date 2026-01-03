@@ -42,6 +42,9 @@ class LazyReference(BaseDescriptor[_T], Generic[_T]):
             if is_workflow_class(workflow_definition):
                 for output_reference in workflow_definition.Outputs:
                     if str(output_reference) == self._get:
+                        resolved = output_reference.resolve(state)
+                        if resolved is not undefined:
+                            return resolved  # type: ignore[return-value]
                         instance = output_reference.instance
                         if isinstance(instance, BaseDescriptor):
                             return instance.resolve(state)  # type: ignore[return-value]
