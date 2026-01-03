@@ -28,7 +28,11 @@ class RunnerConfig(UniversalBaseModel):
     latest tag."""
 
     codegen_version: Optional[str] = None
-    """The version of codegen used to generate the workflow artifact."""
+    """The version of codegen used to generate the workflow artifact.
+
+    .. deprecated::
+        This field is deprecated. Use `sdk_version` instead.
+    """
 
     sdk_version: Optional[str] = None
     """The SDK version the workflow is intended to run on."""
@@ -56,10 +60,18 @@ class WorkflowMetadata(UniversalBaseModel):
     """Human-readable label for the workflow."""
 
     codegen_version: Optional[str] = None
-    """The version of codegen used to generate this workflow."""
+    """The version of codegen used to generate this workflow.
+
+    .. deprecated::
+        This field is deprecated. Use `runner_config.codegen_version` instead.
+    """
 
     server_version: Optional[str] = None
-    """The server version this workflow was generated for."""
+    """The server version this workflow was generated for.
+
+    .. deprecated::
+        This field is deprecated. Use `runner_config.server_version` instead.
+    """
 
     node_id_to_file_mapping: Dict[str, CodeResourceDefinition] = {}
     """Mapping of node IDs to their code resource definitions.
