@@ -62,9 +62,14 @@ class OutputReference(BaseDescriptor[_OutputType], Generic[_OutputType]):
         if state.meta.parent:
             return self.resolve(state.meta.parent)
 
+        if self._instance is not None and self._instance is not undefined:
+            if isinstance(self._instance, BaseDescriptor):
+                return self._instance.resolve(state)  # type: ignore[return-value]
+            return cast(_OutputType, self._instance)
+
         # Fix typing surrounding the return value of node outputs
         # https://app.shortcut.com/vellum/story/4783
-        return cast(Type[undefined], node_output)  # type: ignore[return-value]
+        return cast(Type[undefined], undefined)  # type: ignore[return-value]
 
     def _as_generator(self, node_output: Queue) -> Generator[_OutputType, None, Type[undefined]]:
         while True:
