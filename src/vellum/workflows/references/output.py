@@ -64,7 +64,7 @@ class OutputReference(BaseDescriptor[_OutputType], Generic[_OutputType]):
 
         # Fix typing surrounding the return value of node outputs
         # https://app.shortcut.com/vellum/story/4783
-        return cast(Type[undefined], undefined)  # type: ignore[return-value]
+        return cast(Type[undefined], node_output)  # type: ignore[return-value]
 
     def _as_generator(self, node_output: Queue) -> Generator[_OutputType, None, Type[undefined]]:
         while True:
