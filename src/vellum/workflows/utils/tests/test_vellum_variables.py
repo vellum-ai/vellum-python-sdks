@@ -2,7 +2,15 @@ import pytest
 from datetime import datetime
 from typing import List, Optional, Union
 
-from vellum import ChatMessage, SearchResult, VellumAudio, VellumDocument, VellumImage, VellumValue
+from vellum import (
+    ArrayChatMessageContentItem,
+    ChatMessage,
+    SearchResult,
+    VellumAudio,
+    VellumDocument,
+    VellumImage,
+    VellumValue,
+)
 import vellum.client.types as vellum_types
 from vellum.workflows.types.core import Json
 from vellum.workflows.utils.vellum_variables import (
@@ -41,6 +49,8 @@ from vellum.workflows.utils.vellum_variables import (
         (Optional[list[SearchResult]], "SEARCH_RESULTS"),
         (list[VellumValue], "ARRAY"),
         (Optional[list[VellumValue]], "ARRAY"),
+        (List[ArrayChatMessageContentItem], "ARRAY"),
+        (Optional[List[ArrayChatMessageContentItem]], "ARRAY"),
     ],
 )
 def test_primitive_type_to_vellum_variable_type(type_, expected):
