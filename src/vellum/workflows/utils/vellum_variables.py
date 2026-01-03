@@ -4,6 +4,7 @@ import typing
 from typing import Any, List, Tuple, Type, Union, get_args, get_origin
 
 from vellum import (
+    ArrayChatMessageContentItem,
     ChatMessage,
     ChatMessageRequest,
     FunctionCall,
@@ -214,7 +215,27 @@ def _builtin_list_to_vellum_type(type_: Type) -> Union[str, None]:
             if _is_vellum_value_subtype(item_type):
                 return "ARRAY"
 
+            if _is_array_chat_message_content_item(item_type):
+                return "ARRAY"
+
     return None
+
+
+def _is_array_chat_message_content_item(type_: Type) -> bool:
+    """Check if the type is ArrayChatMessageContentItem or a union of its subtypes."""
+    array_content_item_types = list(typing.get_args(ArrayChatMessageContentItem))
+
+    origin = get_origin(type_)
+    if not origin:
+        if isinstance(type_, type):
+            return any(issubclass(type_, t) for t in array_content_item_types if isinstance(t, type))
+        return False
+
+    if origin is typing.Union:
+        args = get_args(type_)
+        return all(_is_array_chat_message_content_item(arg) for arg in args)
+
+    return type_ == ArrayChatMessageContentItem
 
 
 def _is_vellum_value_subtype(type_: Type) -> bool:

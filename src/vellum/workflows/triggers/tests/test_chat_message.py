@@ -1,14 +1,14 @@
 """Tests for ChatMessageTrigger."""
 
 import pytest
-from typing import List, Union
+from typing import List
 
 from pydantic import Field
 
 from vellum.client.types import (
     ArrayChatMessageContent,
+    ArrayChatMessageContentItem,
     ChatMessage,
-    ChatMessageContent,
     ImageChatMessageContent,
     StringChatMessageContent,
     VellumImage,
@@ -23,29 +23,25 @@ class ChatState(BaseState):
 
 
 @pytest.mark.parametrize(
-    ["message", "expected_text", "expected_content"],
+    ["message", "expected_content"],
     [
-        pytest.param("Hello, world!", "Hello, world!", None, id="text_pure_string"),
         pytest.param(
-            StringChatMessageContent(value="Hello, world!"),
-            None,
-            StringChatMessageContent(value="Hello, world!"),
+            [StringChatMessageContent(value="Hello, world!")],
+            ArrayChatMessageContent(value=[StringChatMessageContent(value="Hello, world!")]),
             id="text_string_content",
         ),
         pytest.param(
-            ImageChatMessageContent(value=VellumImage(src="https://example.com/image.jpg")),
-            None,
-            ImageChatMessageContent(value=VellumImage(src="https://example.com/image.jpg")),
+            [ImageChatMessageContent(value=VellumImage(src="https://example.com/image.jpg"))],
+            ArrayChatMessageContent(
+                value=[ImageChatMessageContent(value=VellumImage(src="https://example.com/image.jpg"))]
+            ),
             id="multimodal_image",
         ),
         pytest.param(
-            ArrayChatMessageContent(
-                value=[
-                    StringChatMessageContent(value="Look at this image:"),
-                    ImageChatMessageContent(value=VellumImage(src="https://example.com/image.jpg")),
-                ]
-            ),
-            None,
+            [
+                StringChatMessageContent(value="Look at this image:"),
+                ImageChatMessageContent(value=VellumImage(src="https://example.com/image.jpg")),
+            ],
             ArrayChatMessageContent(
                 value=[
                     StringChatMessageContent(value="Look at this image:"),
@@ -57,9 +53,8 @@ class ChatState(BaseState):
     ],
 )
 def test_chat_message_trigger__initiated(
-    message: Union[str, ChatMessageContent],
-    expected_text: str,
-    expected_content: ChatMessageContent,
+    message: List[ArrayChatMessageContentItem],
+    expected_content: ArrayChatMessageContent,
 ):
     """Tests that ChatMessageTrigger appends user message on workflow initiation."""
 
@@ -75,7 +70,7 @@ def test_chat_message_trigger__initiated(
     # THEN the user message is appended to chat_history
     assert len(state.chat_history) == 1
     assert state.chat_history[0].role == "USER"
-    assert state.chat_history[0].text == expected_text
+    assert state.chat_history[0].text is None
     assert state.chat_history[0].content == expected_content
 
 
@@ -83,7 +78,7 @@ def test_chat_message_trigger__state_without_chat_history():
     """Tests that ChatMessageTrigger handles state without chat_history gracefully."""
 
     # GIVEN a ChatMessageTrigger with a message
-    trigger = ChatMessageTrigger(message="Hello")
+    trigger = ChatMessageTrigger(message=[StringChatMessageContent(value="Hello")])
 
     # AND a state without chat_history attribute
     state = BaseState()
