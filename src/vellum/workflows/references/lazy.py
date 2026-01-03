@@ -1,11 +1,11 @@
 import ast
 import inspect
 import logging
-from typing import TYPE_CHECKING, Callable, Generic, Type, TypeVar, Union, get_args
+from typing import TYPE_CHECKING, Callable, Generic, TypeVar, Union, get_args
 
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
-from vellum.workflows.types.generics import is_workflow_class
+from vellum.workflows.references.utils import resolve_output_reference_by_string
 
 if TYPE_CHECKING:
     from vellum.workflows.state.base import BaseState
@@ -31,16 +31,10 @@ class LazyReference(BaseDescriptor[_T], Generic[_T]):
         from vellum.workflows.descriptors.utils import resolve_value
 
         if isinstance(self._get, str):
-            # We are comparing Output string references - when if we want to be exact,
-            # should be comparing the Output class themselves
-            for output_reference, value in state.meta.node_outputs.items():
-                if str(output_reference) == self._get:
-                    return value
-
-            # Check workflow outputs if the string matches a workflow output reference
-            workflow_output = self._resolve_workflow_output(state)
-            if workflow_output is not undefined:
-                return workflow_output  # type: ignore[return-value]
+            # Use shared utility to resolve output references by string
+            resolved = resolve_output_reference_by_string(self._get, state)
+            if resolved is not undefined:
+                return resolved  # type: ignore[return-value]
 
             child_reference = self.resolve(state.meta.parent) if state.meta.parent else None
 
@@ -49,23 +43,6 @@ class LazyReference(BaseDescriptor[_T], Generic[_T]):
             return child_reference or undefined  # type: ignore[return-value]
 
         return resolve_value(self._get(), state)
-
-    def _resolve_workflow_output(self, state: "BaseState") -> Union[_T, Type[undefined]]:
-        from vellum.workflows.descriptors.utils import resolve_value
-
-        if not isinstance(self._get, str):
-            return undefined
-
-        workflow_definition = state.meta.workflow_definition
-        if not is_workflow_class(workflow_definition):
-            return undefined
-
-        # Check if the string matches a workflow output (e.g., "MyWorkflow.Outputs.response")
-        for output_reference in workflow_definition.Outputs:
-            if str(output_reference) == self._get:
-                return resolve_value(output_reference.instance, state)  # type: ignore[return-value]
-
-        return undefined
 
     def _get_name(self) -> str:
         """
