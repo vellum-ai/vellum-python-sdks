@@ -395,6 +395,42 @@ def test_serialize_module_with_node_output_mock_when_conditions():
     }
 
 
+def test_serialize_module_with_input_references():
+    """
+    Tests that serialize_module correctly serializes dataset with workflow input references.
+
+    When a sandbox.py file has Inputs references (like Inputs.message), the serialization
+    should properly convert them to WORKFLOW_INPUT type descriptors.
+    """
+    # GIVEN a module path with a dataset containing workflow input references
+    module_path = "tests.workflows.test_dataset_with_input_references"
+
+    # WHEN we serialize the module
+    result = BaseWorkflowDisplay.serialize_module(module_path)
+
+    # THEN the dataset should be serialized correctly
+    assert hasattr(result, "dataset")
+    assert result.dataset is not None
+    assert isinstance(result.dataset, list)
+    assert len(result.dataset) == 1
+
+    # AND the scenario should have the correct label
+    first_scenario = result.dataset[0]
+    assert first_scenario["label"] == "Scenario 1"
+
+    # AND the inputs should be serialized as WORKFLOW_INPUT references
+    assert "inputs" in first_scenario
+    inputs = first_scenario["inputs"]
+
+    assert "message" in inputs
+    assert inputs["message"]["type"] == "WORKFLOW_INPUT"
+    assert "input_variable_id" in inputs["message"]
+
+    assert "count" in inputs
+    assert inputs["count"]["type"] == "WORKFLOW_INPUT"
+    assert "input_variable_id" in inputs["count"]
+
+
 def test_serialize_module__with_invalid_nested_set_graph(temp_module_path):
     """
     Tests that serialize_module raises a clear user-facing exception for workflows with nested sets in graph attribute.

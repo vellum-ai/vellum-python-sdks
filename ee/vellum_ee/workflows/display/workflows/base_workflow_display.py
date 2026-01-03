@@ -1493,11 +1493,19 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                     dataset = []
                     dataset_row_index_to_id = load_dataset_row_index_to_id_mapping(module)
                     for i, inputs_obj in enumerate(dataset_attr):
-                        normalized_row = (
-                            DatasetRow(label=f"Scenario {i + 1}", inputs=inputs_obj)
-                            if isinstance(inputs_obj, BaseInputs)
-                            else inputs_obj
-                        )
+                        # Handle BaseInputs subclass (not an instance) - convert to instance with input references
+                        if isinstance(inputs_obj, type) and issubclass(inputs_obj, BaseInputs):
+                            inputs_instance = inputs_obj(
+                                **{
+                                    field_name: getattr(inputs_obj, field_name)
+                                    for field_name in inputs_obj.__annotations__
+                                }
+                            )
+                            normalized_row = DatasetRow(label=f"Scenario {i + 1}", inputs=inputs_instance)
+                        elif isinstance(inputs_obj, BaseInputs):
+                            normalized_row = DatasetRow(label=f"Scenario {i + 1}", inputs=inputs_obj)
+                        else:
+                            normalized_row = inputs_obj
                         row_data = normalized_row.model_dump(
                             mode="json",
                             by_alias=True,
