@@ -8,8 +8,11 @@ This is used to generate the code representation of a Vellum Workflow given its 
 - [Updating this README](#updating-this-readme)
 - [Setup](#setup)
 - [Testing](#testing)
-  - [Tips for Writing Tests](#tips-for-writing-tests) - [Unit Testing](#unit-testing) - [Integration Testing](#integration-testing)
-  <!-- END doctoc generated TOC please keep comment here to allow auto update -->
+  - [Tips for Writing Tests](#tips-for-writing-tests)
+    - [Unit Testing](#unit-testing)
+    - [Integration Testing](#integration-testing)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Updating this README
 
