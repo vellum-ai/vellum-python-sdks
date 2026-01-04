@@ -118,6 +118,7 @@ import {
   WorkflowEdgeDisplayData,
   WorkflowInputWorkflowReference,
   WorkflowNode,
+  WorkflowOutputWorkflowReference,
   WorkflowOutputValue,
   WorkflowRawData,
   WorkflowSandboxDatasetRowMock,
@@ -835,6 +836,19 @@ export declare namespace WorkflowInputWorkflowReferenceSerializer {
   }
 }
 
+export const WorkflowOutputWorkflowReferenceSerializer: ObjectSchema<
+  WorkflowOutputWorkflowReferenceSerializer.Raw,
+  Omit<WorkflowOutputWorkflowReference, "type">
+> = objectSchema({
+  outputVariableId: propertySchema("output_variable_id", stringSchema()),
+});
+
+export declare namespace WorkflowOutputWorkflowReferenceSerializer {
+  interface Raw {
+    output_variable_id: string;
+  }
+}
+
 export const WorkflowStateVariableWorkflowReferenceSerializer: ObjectSchema<
   WorkflowStateVariableWorkflowReferenceSerializer.Raw,
   Omit<WorkflowStateVariableWorkflowReference, "type">
@@ -969,6 +983,7 @@ export const WorkflowValueDescriptorSerializer: Schema<
   TERNARY_EXPRESSION: TernaryWorkflowExpressionSerializer,
   NODE_OUTPUT: NodeOutputWorkflowReferenceSerializer,
   WORKFLOW_INPUT: WorkflowInputWorkflowReferenceSerializer,
+  WORKFLOW_OUTPUT: WorkflowOutputWorkflowReferenceSerializer,
   WORKFLOW_STATE: WorkflowStateVariableWorkflowReferenceSerializer,
   CONSTANT_VALUE: ConstantValueWorkflowReferenceSerializer,
   VELLUM_SECRET: VellumSecretWorkflowReferenceSerializer,
@@ -986,6 +1001,7 @@ export declare namespace WorkflowValueDescriptorSerializer {
     | TernaryWorkflowExpressionSerializer.Raw
     | NodeOutputWorkflowReferenceSerializer.Raw
     | WorkflowInputWorkflowReferenceSerializer.Raw
+    | WorkflowOutputWorkflowReferenceSerializer.Raw
     | WorkflowStateVariableWorkflowReferenceSerializer.Raw
     | ConstantValueWorkflowReferenceSerializer.Raw
     | VellumSecretWorkflowReferenceSerializer.Raw
