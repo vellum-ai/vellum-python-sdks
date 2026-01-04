@@ -2,18 +2,16 @@ import { VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH } from "src/constants";
 import { Class } from "src/generators/extensions/class";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { Field } from "src/generators/extensions/field";
-import { LambdaInstantiation } from "src/generators/extensions/lambda-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseTrigger } from "src/generators/triggers/base-trigger";
-import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { createPythonClassName, toPythonSafeSnakeCase } from "src/utils/casing";
 
 import type { AstNode } from "src/generators/extensions/ast-node";
 import type {
   ChatMessageTrigger as ChatMessageTriggerType,
-  WorkflowValueDescriptor as WorkflowValueDescriptorType,
+  WorkflowOutputWorkflowReference,
 } from "src/types/vellum";
 
 export declare namespace ChatMessageTriggerGenerator {
@@ -43,12 +41,10 @@ export class ChatMessageTrigger extends BaseTrigger<ChatMessageTriggerType> {
   protected getTriggerClassBody(): AstNode[] {
     const body: AstNode[] = [];
 
-    // Add attribute fields
     body.push(...this.createAttributeFields());
 
-    // Create Config class if execConfig.output is present
     const execConfig = this.trigger.execConfig;
-    if (execConfig?.output) {
+    if (execConfig?.output && execConfig.output.type === "WORKFLOW_OUTPUT") {
       body.push(this.createConfigClass(execConfig.output));
     }
 
@@ -56,7 +52,7 @@ export class ChatMessageTrigger extends BaseTrigger<ChatMessageTriggerType> {
   }
 
   private createConfigClass(
-    output: NonNullable<ChatMessageTriggerType["execConfig"]>["output"]
+    output: WorkflowOutputWorkflowReference
   ): AstNode {
     const configClass = new Class({
       name: "Config",
@@ -69,59 +65,25 @@ export class ChatMessageTrigger extends BaseTrigger<ChatMessageTriggerType> {
       ],
     });
 
-    if (output) {
-      const outputField = this.createOutputField(output);
-      if (outputField) {
-        configClass.add(outputField);
-      }
+    const outputField = this.createOutputField(output);
+    if (outputField) {
+      configClass.add(outputField);
     }
 
     return configClass;
   }
 
   private createOutputField(
-    output: WorkflowValueDescriptorType
+    output: WorkflowOutputWorkflowReference
   ): AstNode | undefined {
-    // For WORKFLOW_OUTPUT references, use a string-based LazyReference to avoid circular imports
-    // (workflow.py imports trigger, and trigger would import workflow)
-    if (output.type === "WORKFLOW_OUTPUT") {
-      const outputVariableContext =
-        this.workflowContext.findOutputVariableContextById(
-          output.outputVariableId
-        );
+    const outputVariableContext =
+      this.workflowContext.findOutputVariableContextById(output.outputVariableId);
 
-      if (outputVariableContext) {
-        const stringPath = `${this.workflowContext.workflowClassName}.Outputs.${outputVariableContext.name}`;
-        const lazyReferenceValue = new ClassInstantiation({
-          classReference: new Reference({
-            name: "LazyReference",
-            modulePath: [
-              ...this.workflowContext.sdkModulePathNames.WORKFLOWS_MODULE_PATH,
-              "references",
-            ],
-          }),
-          arguments_: [
-            new MethodArgument({
-              value: new StrInstantiation(stringPath),
-            }),
-          ],
-        });
-
-        this.inheritReferences(lazyReferenceValue);
-
-        return new Field({
-          name: "output",
-          initializer: lazyReferenceValue,
-        });
-      }
+    if (!outputVariableContext) {
+      return undefined;
     }
 
-    // For other reference types, use lambda-based LazyReference
-    const workflowValueDescriptor = new WorkflowValueDescriptor({
-      workflowContext: this.workflowContext,
-      workflowValueDescriptor: output,
-    });
-
+    const stringPath = `${this.workflowContext.workflowClassName}.Outputs.${outputVariableContext.name}`;
     const lazyReferenceValue = new ClassInstantiation({
       classReference: new Reference({
         name: "LazyReference",
@@ -132,9 +94,7 @@ export class ChatMessageTrigger extends BaseTrigger<ChatMessageTriggerType> {
       }),
       arguments_: [
         new MethodArgument({
-          value: new LambdaInstantiation({
-            body: workflowValueDescriptor,
-          }),
+          value: new StrInstantiation(stringPath),
         }),
       ],
     });
