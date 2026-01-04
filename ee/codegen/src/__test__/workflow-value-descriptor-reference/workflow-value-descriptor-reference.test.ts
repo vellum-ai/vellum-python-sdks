@@ -11,6 +11,7 @@ import { searchNodeDataFactory } from "src/__test__/helpers/node-data-factories"
 import { stateVariableContextFactory } from "src/__test__/helpers/state-variable-context-factory";
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
+import { ValueGenerationError } from "src/generators/errors";
 import { Writer } from "src/generators/extensions/writer";
 import { WorkflowValueDescriptorReference } from "src/generators/workflow-value-descriptor-reference/workflow-value-descriptor-reference";
 import {
@@ -131,5 +132,22 @@ describe("WorkflowValueDescriptorReferencePointer", () => {
 
     reference.write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
+
+  it("should throw error for unsupported WORKFLOW_OUTPUT reference type", () => {
+    // GIVEN a WORKFLOW_OUTPUT reference type that is not currently supported
+    const workflowOutputReference = {
+      type: "WORKFLOW_OUTPUT",
+      output_variable_id: "1081e663-7a5b-4394-9fc4-00914f609c08",
+    } as unknown as WorkflowValueDescriptorReferenceType;
+
+    // WHEN attempting to create a WorkflowValueDescriptorReference with this type
+    // THEN it should throw a ValueGenerationError
+    expect(() => {
+      new WorkflowValueDescriptorReference({
+        workflowContext,
+        workflowValueReferencePointer: workflowOutputReference,
+      });
+    }).toThrow(ValueGenerationError);
   });
 });
