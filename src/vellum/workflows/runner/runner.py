@@ -627,7 +627,15 @@ class WorkflowRunner(Generic[StateType]):
                             continue
                         node.state.meta.node_outputs[descriptor] = output_value
 
-            invoked_ports = ports(outputs, node.state)
+            try:
+                invoked_ports = ports(outputs, node.state)
+            except NodeException as e:
+                raise NodeException(
+                    message=e.message,
+                    code=e.code,
+                    raw_data={"outputs": outputs.__vellum_encode__()},
+                    stacktrace=e.stacktrace,
+                ) from e
             yield NodeExecutionFulfilledEvent(
                 trace_id=execution.trace_id,
                 span_id=span_id,
