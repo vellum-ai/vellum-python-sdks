@@ -5,6 +5,7 @@ import { Field } from "src/generators/extensions/field";
 import { LambdaInstantiation } from "src/generators/extensions/lambda-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
+import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseTrigger } from "src/generators/triggers/base-trigger";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { createPythonClassName, toPythonSafeSnakeCase } from "src/utils/casing";
@@ -81,6 +82,41 @@ export class ChatMessageTrigger extends BaseTrigger<ChatMessageTriggerType> {
   private createOutputField(
     output: WorkflowValueDescriptorType
   ): AstNode | undefined {
+    // For WORKFLOW_OUTPUT references, use a string-based LazyReference to avoid circular imports
+    // (workflow.py imports trigger, and trigger would import workflow)
+    if (output.type === "WORKFLOW_OUTPUT") {
+      const outputVariableContext =
+        this.workflowContext.findOutputVariableContextById(
+          output.outputVariableId
+        );
+
+      if (outputVariableContext) {
+        const stringPath = `${this.workflowContext.workflowClassName}.Outputs.${outputVariableContext.name}`;
+        const lazyReferenceValue = new ClassInstantiation({
+          classReference: new Reference({
+            name: "LazyReference",
+            modulePath: [
+              ...this.workflowContext.sdkModulePathNames.WORKFLOWS_MODULE_PATH,
+              "references",
+            ],
+          }),
+          arguments_: [
+            new MethodArgument({
+              value: new StrInstantiation(stringPath),
+            }),
+          ],
+        });
+
+        this.inheritReferences(lazyReferenceValue);
+
+        return new Field({
+          name: "output",
+          initializer: lazyReferenceValue,
+        });
+      }
+    }
+
+    // For other reference types, use lambda-based LazyReference
     const workflowValueDescriptor = new WorkflowValueDescriptor({
       workflowContext: this.workflowContext,
       workflowValueDescriptor: output,
