@@ -181,12 +181,10 @@ class Output2(FinalOutputNode[BaseState, str]):
 """,
         "sandbox.py": """\
 from vellum.workflows.inputs import DatasetRow
-from vellum.workflows.sandbox import WorkflowSandboxRunner, WorkflowSandboxRunnerOptions
 
 from .inputs import Inputs
 from .nodes.code_execution import CodeExecution
 from .nodes.code_execution_2 import CodeExecution2
-from .workflow import Workflow
 
 dataset = [
     DatasetRow(
@@ -198,15 +196,6 @@ dataset = [
         ],
     ),
 ]
-
-runner = WorkflowSandboxRunner(
-    workflow=Workflow(),
-    dataset=dataset,
-    options=WorkflowSandboxRunnerOptions(apply_node_output_mocks=True),
-)
-
-if __name__ == "__main__":
-    runner.run()
 """,
         "workflow.py": """\
 from vellum.workflows import BaseWorkflow
@@ -239,10 +228,16 @@ class Workflow(BaseWorkflow[Inputs, BaseState]):
         # WHEN we serialize the module
         result = BaseWorkflowDisplay.serialize_module(namespace)
 
-        # THEN the serialization should succeed without errors
-        assert len(result.errors) == 0, f"Serialization had errors: {result.errors}"
+        # THEN the serialization should return exactly 1 deprecation error
+        assert len(result.errors) == 1, f"Expected 1 deprecation error, got {len(result.errors)}: {result.errors}"
 
-        # AND the dataset should not be None
+        # AND the error should prompt the user to use 'mocks' instead of 'node_output_mocks'
+        error_message = str(result.errors[0])
+        assert "node_output_mocks" in error_message, f"Error should mention 'node_output_mocks': {error_message}"
+        assert "mocks" in error_message, f"Error should mention 'mocks': {error_message}"
+        assert "deprecated" in error_message.lower(), f"Error should mention 'deprecated': {error_message}"
+
+        # AND the dataset should not be None (the deprecated field should still work)
         assert result.dataset is not None, "Dataset should not be None"
 
         # AND the dataset should have one row
