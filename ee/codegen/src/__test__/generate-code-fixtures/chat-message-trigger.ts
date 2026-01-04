@@ -45,10 +45,25 @@ export default {
         type: "DEFAULT",
       },
     ],
-    output_values: [],
+    output_values: [
+      {
+        output_variable_id: "workflow-output-variable-id",
+        value: {
+          type: "NODE_OUTPUT",
+          node_id: "some-node",
+          node_output_id: "some-output-id",
+        },
+      },
+    ],
   },
   input_variables: [],
-  output_variables: [],
+  output_variables: [
+    {
+      id: "workflow-output-variable-id",
+      key: "result",
+      type: "STRING",
+    },
+  ],
   triggers: [
     {
       id: "chat-message-trigger",
@@ -62,9 +77,8 @@ export default {
       ],
       exec_config: {
         output: {
-          type: "NODE_OUTPUT",
-          node_id: "some-node",
-          node_output_id: "some-output-id",
+          type: "WORKFLOW_OUTPUT",
+          output_variable_id: "workflow-output-variable-id",
         },
       },
       display_data: {
