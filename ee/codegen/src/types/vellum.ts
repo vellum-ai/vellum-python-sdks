@@ -948,6 +948,11 @@ export interface WorkflowInputWorkflowReference {
   inputVariableId: string;
 }
 
+export interface WorkflowOutputWorkflowReference {
+  type: "WORKFLOW_OUTPUT";
+  outputVariableId: string;
+}
+
 export interface WorkflowStateVariableWorkflowReference {
   type: "WORKFLOW_STATE";
   stateVariableId: string;
@@ -1004,6 +1009,7 @@ export type WorkflowExpression =
 export type WorkflowValueDescriptorReference =
   | NodeOutputWorkflowReference
   | WorkflowInputWorkflowReference
+  | WorkflowOutputWorkflowReference
   | WorkflowStateVariableWorkflowReference
   | ConstantValueWorkflowReference
   | VellumSecretWorkflowReference

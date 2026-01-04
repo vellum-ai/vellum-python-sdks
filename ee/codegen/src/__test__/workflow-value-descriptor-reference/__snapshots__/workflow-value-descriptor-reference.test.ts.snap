@@ -20,6 +20,11 @@ exports[`WorkflowValueDescriptorReferencePointer > should generate correct AST f
 "
 `;
 
+exports[`WorkflowValueDescriptorReferencePointer > should generate correct AST for WORKFLOW_OUTPUT reference 1`] = `
+"TestWorkflow.Outputs.my_output
+"
+`;
+
 exports[`WorkflowValueDescriptorReferencePointer > should generate correct AST for WORKFLOW_STATE reference 1`] = `
 "State.some_key
 "
