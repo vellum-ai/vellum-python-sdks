@@ -32,6 +32,7 @@
     "upgrade-codegen-service": "tsx scripts/upgrade-codegen-service.mts"
   },
   "dependencies": {
+    "@wasm-fmt/ruff_fmt": "^0.6.1",
     "lodash": "^4.17.21",
     "uuid": "^11.0.3",
     "vellum-ai": "1.11.3"
