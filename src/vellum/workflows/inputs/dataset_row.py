@@ -1,7 +1,8 @@
 from datetime import datetime
+import warnings
 from typing import Any, Callable, Dict, List, Optional, Sequence, Union
 
-from pydantic import ConfigDict, Field, SerializationInfo, field_serializer, model_serializer
+from pydantic import ConfigDict, Field, SerializationInfo, field_serializer, model_serializer, model_validator
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.utils.files.mixin import VellumFileMixin
@@ -31,6 +32,26 @@ class DatasetRow(UniversalBaseModel):
     inputs: Union[BaseInputs, Dict[str, Any]] = Field(default_factory=BaseInputs)
     workflow_trigger: Optional[BaseTrigger] = None
     mocks: Optional[Sequence[Union[BaseOutputs, MockNodeExecution]]] = None
+    # DEPRECATED: node_output_mocks - use mocks instead. Remove in v2.0.0
+    node_output_mocks: Optional[Sequence[Union[BaseOutputs, MockNodeExecution]]] = Field(
+        default=None,
+        exclude=True,  # Don't include in serialized output
+    )
+
+    @model_validator(mode="after")
+    def _handle_deprecated_node_output_mocks(self) -> "DatasetRow":
+        """Handle deprecated node_output_mocks field by mapping it to mocks."""
+        if self.node_output_mocks is not None:
+            warnings.warn(
+                "The 'node_output_mocks' parameter is deprecated and will be removed in v2.0.0. "
+                "Please use 'mocks' instead.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            # If mocks is not set, use node_output_mocks value
+            if self.mocks is None:
+                object.__setattr__(self, "mocks", self.node_output_mocks)
+        return self
 
     @model_serializer(mode="wrap")
     def serialize_full_model(self, handler: Callable[[Any], Any], info: SerializationInfo) -> Dict[str, Any]:
@@ -38,6 +59,17 @@ class DatasetRow(UniversalBaseModel):
         serialized = handler(self)
         if not isinstance(serialized, dict):
             return serialized
+
+        # Add deprecation error if node_output_mocks was used - remove in v2.0.0
+        if self.node_output_mocks is not None:
+            add_error = info.context.get("add_error") if info.context else None
+            if add_error is not None:
+                add_error(
+                    Exception(
+                        f'Dataset row "{self.label}": "node_output_mocks" is deprecated. '
+                        'Please use "mocks" instead. This will be removed in v2.0.0.'
+                    )
+                )
 
         if "mocks" in serialized and serialized.get("mocks") is None:
             serialized.pop("mocks")
