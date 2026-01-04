@@ -44,7 +44,7 @@ export class ChatMessageTrigger extends BaseTrigger<ChatMessageTriggerType> {
     body.push(...this.createAttributeFields());
 
     const execConfig = this.trigger.execConfig;
-    if (execConfig?.output && execConfig.output.type === "WORKFLOW_OUTPUT") {
+    if (execConfig?.output) {
       body.push(this.createConfigClass(execConfig.output));
     }
 
