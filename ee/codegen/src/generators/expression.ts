@@ -1,5 +1,3 @@
-import { TypeInstantiation as FernTypeInstantiation } from "@fern-api/python-ast/TypeInstantiation";
-
 import { NodeAttributeGenerationError } from "./errors";
 import { BinaryExpression } from "./expressions/binary";
 import { TernaryExpression } from "./expressions/ternary";
@@ -150,11 +148,7 @@ export class Expression extends AstNode {
   }
 
   private isTypeInstantiation(lhs: AstNode): boolean {
-    // Check for both our local TypeInstantiation (which NoneInstantiation, StrInstantiation, etc. extend)
-    // and the fern TypeInstantiation for backwards compatibility
-    return (
-      lhs instanceof TypeInstantiation || lhs instanceof FernTypeInstantiation
-    );
+    return lhs instanceof TypeInstantiation;
   }
 
   public write(writer: Writer) {
