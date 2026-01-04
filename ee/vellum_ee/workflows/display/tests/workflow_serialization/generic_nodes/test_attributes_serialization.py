@@ -191,7 +191,7 @@ def test_serialize_node__lazy_reference_with_string():
 
 
 def test_serialize_node__lazy_reference_workflow_output():
-    """Test that LazyReference can resolve to workflow output references during serialization."""
+    """Test that LazyReference to workflow output serializes as WORKFLOW_OUTPUT type."""
 
     # GIVEN a node with a LazyReference to a workflow output
     class NodeWithWorkflowOutputReference(BaseNode):
@@ -219,12 +219,17 @@ def test_serialize_node__lazy_reference_workflow_output():
         if node["id"] == str(NodeWithWorkflowOutputReference.__id__)
     )
 
-    # AND the workflow output reference should resolve to the underlying node output
+    # AND the workflow output reference should serialize as WORKFLOW_OUTPUT type
     assert len(node_with_lazy_reference["attributes"]) == 1
     attr = node_with_lazy_reference["attributes"][0]
     assert attr["name"] == "workflow_output_ref"
-    assert attr["value"]["type"] == "NODE_OUTPUT"
-    assert attr["value"]["node_id"] == str(TestNode.__id__)
+    assert attr["value"]["type"] == "WORKFLOW_OUTPUT"
+
+    # AND the output_variable_id should match the workflow output
+    workflow_output = next(
+        output for output in serialized_workflow["output_variables"] if output["key"] == "final_result"
+    )
+    assert attr["value"]["output_variable_id"] == workflow_output["id"]
 
 
 def test_serialize_node__workflow_input(serialize_node):

@@ -31,7 +31,6 @@ from vellum.workflows.nodes.displayable.final_output_node.node import FinalOutpu
 from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port, get_wrapped_node
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, StateValueReference, WorkflowInputReference
-from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.triggers.chat_message import ChatMessageTrigger
 from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.triggers.manual import ManualTrigger
@@ -855,33 +854,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         if output is None:
             return None
 
-        # Resolve LazyReference if needed
-        resolved_output = output
-        if isinstance(output, LazyReference):
-            # For serialization, call the getter directly to get the underlying descriptor
-            if callable(output._get):
-                resolved_output = output._get()
-            else:
-                # String-based LazyReference - fall back to generic serialization
-                pass
-
-        # For workflow output references, serialize as WORKFLOW_OUTPUT type
-        if isinstance(resolved_output, OutputReference) and issubclass(
-            resolved_output.outputs_class, BaseWorkflow.Outputs
-        ):
-            if resolved_output in self.display_context.workflow_output_displays:
-                workflow_output_display = self.display_context.workflow_output_displays[resolved_output]
-                return cast(
-                    JsonObject,
-                    {
-                        "output": {
-                            "type": "WORKFLOW_OUTPUT",
-                            "output_variable_id": str(workflow_output_display.id),
-                        },
-                    },
-                )
-
-        # Fall back to generic serialization for other cases
         serialized_output = serialize_value(
             executable_id=trigger_class.__id__,
             display_context=self.display_context,
