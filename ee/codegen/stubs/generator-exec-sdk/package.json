@@ -1,9 +1,0 @@
-{
-  "main": "index.js",
-  "type": "module",
-  "exports": {
-    ".": "./index.js",
-    "./serialization": "./serialization/index.js",
-    "./api": "./api/index.js"
-  }
-}
