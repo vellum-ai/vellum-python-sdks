@@ -87,3 +87,172 @@ dataset = [
     finally:
         # Clean up the virtual file finders
         sys.meta_path = [finder for finder in sys.meta_path if not isinstance(finder, VirtualFileFinder)]
+
+
+def test_serialize_module__dataset_with_node_output_mocks_field_name():
+    """
+    Tests that DatasetRow with node_output_mocks field (legacy field name) properly
+    serializes the mocks. This reproduces an issue where using node_output_mocks
+    instead of mocks caused the dataset to return None for the mocks field.
+    """
+
+    # GIVEN a workflow module with parallel code execution nodes
+    files = {
+        "__init__.py": "",
+        "inputs.py": """\
+from typing import Any, Optional
+
+from vellum.workflows.inputs import BaseInputs
+
+
+class Inputs(BaseInputs):
+    json: Optional[Any] = None
+""",
+        "nodes/__init__.py": "",
+        "nodes/code_execution/__init__.py": """\
+from vellum.workflows.nodes.displayable import CodeExecutionNode
+from vellum.workflows.state import BaseState
+from vellum.workflows.types.core import MergeBehavior
+
+
+class CodeExecution(CodeExecutionNode[BaseState, str]):
+    filepath = "./script.py"
+    code_inputs = {}
+    runtime = "PYTHON_3_11_6"
+    packages = []
+
+    class Trigger(CodeExecutionNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
+""",
+        "nodes/code_execution/script.py": '''\
+"""
+You must define a function called `main` whose arguments are named after the
+Input Variables.
+"""
+
+def main() -> str:
+    return "5".upper()
+''',
+        "nodes/code_execution_2/__init__.py": """\
+from vellum.workflows.nodes.displayable import CodeExecutionNode
+from vellum.workflows.state import BaseState
+from vellum.workflows.types.core import MergeBehavior
+
+
+class CodeExecution2(CodeExecutionNode[BaseState, str]):
+    filepath = "./script.py"
+    code_inputs = {}
+    runtime = "PYTHON_3_11_6"
+    packages = []
+
+    class Trigger(CodeExecutionNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
+""",
+        "nodes/code_execution_2/script.py": '''\
+"""
+You must define a function called `main` whose arguments are named after the
+Input Variables.
+"""
+
+def main() -> str:
+    return "TODO"
+''',
+        "nodes/output.py": """\
+from vellum.workflows.nodes.displayable import FinalOutputNode
+from vellum.workflows.state import BaseState
+
+
+class Output(FinalOutputNode[BaseState, str]):
+    class Outputs(FinalOutputNode.Outputs):
+        value = None
+""",
+        "nodes/output_2.py": """\
+from vellum.workflows.nodes.displayable import FinalOutputNode
+from vellum.workflows.state import BaseState
+from vellum.workflows.types.core import MergeBehavior
+
+
+class Output2(FinalOutputNode[BaseState, str]):
+    class Outputs(FinalOutputNode.Outputs):
+        value = ""
+
+    class Trigger(FinalOutputNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
+""",
+        "sandbox.py": """\
+from vellum.workflows.inputs import DatasetRow
+from vellum.workflows.sandbox import WorkflowSandboxRunner, WorkflowSandboxRunnerOptions
+
+from .inputs import Inputs
+from .nodes.code_execution import CodeExecution
+from .nodes.code_execution_2 import CodeExecution2
+from .workflow import Workflow
+
+dataset = [
+    DatasetRow(
+        label="With mocked code nodes",
+        inputs=Inputs(json={}),
+        node_output_mocks=[
+            CodeExecution.Outputs(result="hello world", log=""),
+            CodeExecution2.Outputs(result="hello world", log=""),
+        ],
+    ),
+]
+
+runner = WorkflowSandboxRunner(
+    workflow=Workflow(),
+    dataset=dataset,
+    options=WorkflowSandboxRunnerOptions(apply_node_output_mocks=True),
+)
+
+if __name__ == "__main__":
+    runner.run()
+""",
+        "workflow.py": """\
+from vellum.workflows import BaseWorkflow
+from vellum.workflows.state import BaseState
+
+from .inputs import Inputs
+from .nodes.code_execution import CodeExecution
+from .nodes.code_execution_2 import CodeExecution2
+from .nodes.output import Output
+from .nodes.output_2 import Output2
+
+
+class Workflow(BaseWorkflow[Inputs, BaseState]):
+    graph = {
+        CodeExecution >> Output,
+        CodeExecution2 >> Output2,
+    }
+
+    class Outputs(BaseWorkflow.Outputs):
+        output = Output.Outputs.value
+        output_2 = Output2.Outputs.value
+""",
+    }
+
+    # AND a namespace for the virtual file loader
+    namespace = str(uuid4())
+    sys.meta_path.append(VirtualFileFinder(files, namespace))
+
+    try:
+        # WHEN we serialize the module
+        result = BaseWorkflowDisplay.serialize_module(namespace)
+
+        # THEN the serialization should succeed without errors
+        assert len(result.errors) == 0, f"Serialization had errors: {result.errors}"
+
+        # AND the dataset should not be None
+        assert result.dataset is not None, "Dataset should not be None"
+
+        # AND the dataset should have one row
+        assert len(result.dataset) == 1, f"Dataset should have 1 row, got {len(result.dataset)}"
+
+        # AND the row should have mocks serialized
+        row = result.dataset[0]
+        assert "mocks" in row, f"Row should have 'mocks' field, got keys: {row.keys()}"
+        assert row["mocks"] is not None, "Mocks should not be None"
+        assert len(row["mocks"]) == 2, f"Should have 2 mocks, got {len(row['mocks'])}"
+    finally:
+        # Clean up the virtual file finders
+        sys.meta_path = [finder for finder in sys.meta_path if not isinstance(finder, VirtualFileFinder)]
