@@ -4,7 +4,7 @@ SHELL := /bin/bash
 # Setup
 ################################
 
-setup: setup-python setup-poetry install-deps setup-pre-commit setup-node setup-fern
+setup: setup-python setup-poetry install-deps setup-pre-commit setup-node
 
 setup-python:
 	brew list python@3.9 || brew install python@3.9
@@ -24,9 +24,6 @@ setup-pre-commit:
 
 setup-node:
 	$(HOME)/.nvm/nvm.sh use $$(cat ee/codegen/.nvmrc) || $(HOME)/.nvm/nvm.sh install $$(cat ee/codegen/.nvmrc)
-
-setup-fern:
-	which fern || npm install -g fern-api
 
 
 ################################

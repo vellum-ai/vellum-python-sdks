@@ -7,7 +7,6 @@ export default defineConfig({
     server: {
       deps: {
         fallbackCJS: true,
-        inline: [/@fern-api\/.*/], // Force inline these packages
       },
     },
     env: {
