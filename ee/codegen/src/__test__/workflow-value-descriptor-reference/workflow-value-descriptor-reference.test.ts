@@ -11,7 +11,7 @@ import { searchNodeDataFactory } from "src/__test__/helpers/node-data-factories"
 import { stateVariableContextFactory } from "src/__test__/helpers/state-variable-context-factory";
 import { WorkflowContext } from "src/context";
 import { BaseNodeContext } from "src/context/node-context/base";
-import { ValueGenerationError } from "src/generators/errors";
+import { OutputVariableContext } from "src/context/output-variable-context";
 import { Writer } from "src/generators/extensions/writer";
 import { WorkflowValueDescriptorReference } from "src/generators/workflow-value-descriptor-reference/workflow-value-descriptor-reference";
 import {
@@ -134,20 +134,33 @@ describe("WorkflowValueDescriptorReferencePointer", () => {
     expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
 
-  it("should throw error for unsupported WORKFLOW_OUTPUT reference type", () => {
-    // GIVEN a WORKFLOW_OUTPUT reference type that is not currently supported
-    const workflowOutputReference = {
-      type: "WORKFLOW_OUTPUT",
-      output_variable_id: "1081e663-7a5b-4394-9fc4-00914f609c08",
-    } as unknown as WorkflowValueDescriptorReferenceType;
+  it("should generate correct AST for WORKFLOW_OUTPUT reference", async () => {
+    // GIVEN a workflow context with an output variable
+    const workflowContext = workflowContextFactory({ strict: false });
+    const outputVariableContext = new OutputVariableContext({
+      workflowContext,
+      outputVariableData: {
+        id: "1081e663-7a5b-4394-9fc4-00914f609c08",
+        key: "my_output",
+        type: "STRING",
+      },
+    });
+    workflowContext.addOutputVariableContext(outputVariableContext);
 
-    // WHEN attempting to create a WorkflowValueDescriptorReference with this type
-    // THEN it should throw a ValueGenerationError
-    expect(() => {
-      new WorkflowValueDescriptorReference({
-        workflowContext,
-        workflowValueReferencePointer: workflowOutputReference,
-      });
-    }).toThrow(ValueGenerationError);
+    // AND a WORKFLOW_OUTPUT reference pointing to that output variable
+    const workflowOutputReference: WorkflowValueDescriptorReferenceType = {
+      type: "WORKFLOW_OUTPUT",
+      outputVariableId: "1081e663-7a5b-4394-9fc4-00914f609c08",
+    };
+
+    // WHEN creating a WorkflowValueDescriptorReference with this type
+    const reference = new WorkflowValueDescriptorReference({
+      workflowContext,
+      workflowValueReferencePointer: workflowOutputReference,
+    });
+
+    // THEN it should generate the correct AST
+    reference.write(writer);
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
 });
