@@ -1,13 +1,41 @@
-/**
- * Re-export AstNode from @fern-api/python-ast/core/AstNode
- * This centralizes the import path as part of the effort to eject from the python-ast package.
- *
- * All consumers should import AstNode from this module instead of directly from @fern-api/python-ast.
- * This allows us to eventually replace the implementation without updating all import sites.
- *
- * Note: Full inlining of the AstNode class is blocked by TypeScript type compatibility issues
- * with the @fern-api/python-ast types that reference the original AstNode.
- * The actual implementation inlining will happen in a future PR once more AST types are ejected.
- */
+import { Writer } from "./writer";
 
-export { AstNode } from "@fern-api/python-ast/core/AstNode";
+import type { Reference } from "./reference";
+import type { Config } from "@wasm-fmt/ruff_fmt";
+
+export abstract class AstNode {
+  protected references: Reference[] = [];
+
+  abstract write(writer: Writer): void;
+
+  addReference(reference: Reference): void {
+    this.references.push(reference);
+  }
+
+  inheritReferences(astNode: AstNode | undefined): void {
+    if (astNode === undefined) {
+      return;
+    }
+    astNode.references.forEach((reference) => {
+      if (!this.references.includes(reference)) {
+        this.addReference(reference);
+      }
+    });
+  }
+
+  getReferences(): Reference[] {
+    return this.references;
+  }
+
+  toString(): string {
+    const writer = new Writer();
+    this.write(writer);
+    return writer.toString();
+  }
+
+  async toStringFormatted(config?: Config): Promise<string> {
+    const writer = new Writer();
+    this.write(writer);
+    return await writer.toStringFormatted(config);
+  }
+}
