@@ -327,13 +327,6 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
 
     if isinstance(value, OutputReference):
         if issubclass(value.outputs_class, BaseWorkflow.Outputs):
-            # Check if this workflow output is in the workflow_output_displays
-            if value in display_context.workflow_output_displays:
-                workflow_output_display = display_context.workflow_output_displays[value]
-                return {
-                    "type": "WORKFLOW_OUTPUT",
-                    "output_variable_id": str(workflow_output_display.id),
-                }
             return serialize_value(executable_id, display_context, value.instance)
 
         if value not in display_context.global_node_output_displays:
