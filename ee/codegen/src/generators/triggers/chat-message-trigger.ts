@@ -51,9 +51,7 @@ export class ChatMessageTrigger extends BaseTrigger<ChatMessageTriggerType> {
     return body;
   }
 
-  private createConfigClass(
-    output: WorkflowOutputWorkflowReference
-  ): AstNode {
+  private createConfigClass(output: WorkflowOutputWorkflowReference): AstNode {
     const configClass = new Class({
       name: "Config",
       extends_: [
@@ -77,7 +75,9 @@ export class ChatMessageTrigger extends BaseTrigger<ChatMessageTriggerType> {
     output: WorkflowOutputWorkflowReference
   ): AstNode | undefined {
     const outputVariableContext =
-      this.workflowContext.findOutputVariableContextById(output.outputVariableId);
+      this.workflowContext.findOutputVariableContextById(
+        output.outputVariableId
+      );
 
     if (!outputVariableContext) {
       return undefined;
