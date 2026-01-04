@@ -633,7 +633,7 @@ class WorkflowRunner(Generic[StateType]):
                 raise NodeException(
                     message=e.message,
                     code=e.code,
-                    raw_data={"outputs": outputs.__vellum_encode__()},
+                    raw_data={**(e.raw_data or {}), "outputs": outputs.__vellum_encode__()},
                     stacktrace=e.stacktrace,
                 ) from e
             yield NodeExecutionFulfilledEvent(
