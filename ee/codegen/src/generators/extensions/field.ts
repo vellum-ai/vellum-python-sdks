@@ -1,14 +1,12 @@
-import { python } from "@fern-api/python-ast";
-import { AstNode } from "@fern-api/python-ast/python";
-
 import { PythonType } from "./type";
 
+import { AstNode } from "src/generators/extensions/ast-node";
 import { Writer } from "src/generators/extensions/writer";
 
 export declare namespace Field {
   interface Args {
     name: string;
-    type?: python.Type | PythonType | undefined;
+    type?: PythonType | undefined;
     initializer?: AstNode | undefined;
     docs?: string;
   }

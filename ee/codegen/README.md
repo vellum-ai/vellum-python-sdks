@@ -11,8 +11,6 @@ This is used to generate the code representation of a Vellum Workflow given its 
   - [Tips for Writing Tests](#tips-for-writing-tests)
     - [Unit Testing](#unit-testing)
     - [Integration Testing](#integration-testing)
-- [Developing Alongside Fern](#developing-alongside-fern)
-
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Updating this README
@@ -100,35 +98,6 @@ To run the integration tests, run this command from the root of the repo:
 ```bash
 make test
 ```
-
-## Developing Alongside Fern
-
-We use fern's python [codegen package](https://github.com/fern-api/fern/tree/main/generators/python-v2/codegen) to
-generate the python code representation of a Vellum Workflow. In some cases, you might find that fern doesn't yet have
-support for constructing the python syntax you need. In these cases, we can contribute to fern's open source repo directly.
-
-It's usually best to implement your changes in fern locally and confirm that they fulfill your needs in this repo
-before opening the PR to fern with your changes. To make changes to fern's python codegen package and test those
-changes in the workflow codegen package locally, follow these steps:
-
-1. Clone the fern repository
-   ```bash
-   git clone git@github.com:fern-api/fern.git
-   ```
-2. Update the `"@fern-api/python-ast"` dependency in `package.json` to point to the local fern repository.
-   It should be the relative file path to the `ast` directory in this repository.
-   ```json
-   "@fern-api/python-ast": "file:../../../../fern-api/fern/generators/python-v2/ast/lib",
-   ```
-3. Run `npm install` to install the updated dependency.
-4. Navigate to the `fern` repo and be sure to pull the `vargas/publish-python-ast` branch.
-5. Make changes to the fern python ast package.
-6. After making changes, run `pnpm compile` within `fern/generators/python-v2/ast` to compile the changes.
-7. Navigate back to this repo and make use of these changes
-8. Open a PR of the commit in its own branch (separate from the `vargas/publish-python-ast` branch) in the fern repository to merge your changes.
-9. Work with a Vellum Admin to cut a new release of the package as we'll need to rebase the `vargas/publish-python-ast`
-   branch
-10. Update the dependency in this repo to the new version.
 
 ## Publishing
 

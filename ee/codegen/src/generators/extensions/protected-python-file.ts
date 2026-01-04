@@ -1,20 +1,17 @@
-// This file is a direct copy paste of
-// https://github.com/fern-api/fern/blob/main/generators/python-v2/ast/src/PythonFile.ts
-// But the only difference is that all private methods are now protected
-
-import { Class } from "@fern-api/python-ast/Class";
-import { Field } from "@fern-api/python-ast/Field";
-import { Method } from "@fern-api/python-ast/Method";
-import { StarImport as PythonAstStarImport } from "@fern-api/python-ast/StarImport";
-import { ImportedName } from "@fern-api/python-ast/core/types";
-import { createPythonClassName } from "@fern-api/python-ast/core/utils";
-
+import { Class } from "./class";
 import { Comment } from "./comment";
+import { Field } from "./field";
 import { ModulePath, Reference } from "./reference";
 import { StarImport } from "./star-import";
 
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Writer } from "src/generators/extensions/writer";
+import { createPythonClassName } from "src/utils/casing";
+
+interface ImportedName {
+  name: string;
+  isAlias: boolean;
+}
 
 interface UniqueReferenceValue {
   modulePath: ModulePath;
@@ -129,10 +126,7 @@ export class PythonFile extends AstNode {
     ).flatMap(({ references }) => references);
     importedReferences.forEach((reference) => {
       // Skip star imports since we should never override their import alias
-      if (
-        reference instanceof StarImport ||
-        reference instanceof PythonAstStarImport
-      ) {
+      if (reference instanceof StarImport) {
         return;
       }
 
@@ -171,8 +165,6 @@ export class PythonFile extends AstNode {
 
     this.statements.forEach((statement) => {
       if (statement instanceof Class) {
-        usedNames.add(statement.name);
-      } else if (statement instanceof Method) {
         usedNames.add(statement.name);
       } else if (statement instanceof Field) {
         usedNames.add(statement.name);
