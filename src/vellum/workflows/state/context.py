@@ -9,7 +9,7 @@ from vellum import Vellum, __version__
 from vellum.client.types import SeverityEnum
 from vellum.workflows.context import ExecutionContext, get_execution_context, set_execution_context
 from vellum.workflows.events.node import NodeExecutionLogBody, NodeExecutionLogEvent
-from vellum.workflows.events.types import ExternalParentContext
+from vellum.workflows.events.types import ExternalParentContext, NodeParentContext
 from vellum.workflows.nodes.mocks import MockNodeExecution, MockNodeExecutionArg
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.references.constant import ConstantValueReference
@@ -20,7 +20,6 @@ from vellum.workflows.vellum_client import create_vellum_client
 
 if TYPE_CHECKING:
     from vellum.workflows.events.workflow import WorkflowEvent
-    from vellum.workflows.nodes.bases import BaseNode
     from vellum.workflows.state.base import BaseState
     from vellum.workflows.workflows.base import BaseWorkflow
 
@@ -149,9 +148,7 @@ class WorkflowContext:
             # For custom domains, assume the same pattern: api.* -> app.*
             return api_url.replace("api.", "app.", 1)
 
-    def emit_log_event(
-        self, severity: SeverityEnum, message: str, attributes: Dict[str, Any], node: "BaseNode"
-    ) -> None:
+    def emit_log_event(self, severity: SeverityEnum, message: str, attributes: Dict[str, Any]) -> None:
         """Emit a log event for a particular node.
 
         This is in active development and may have breaking changes.
@@ -160,17 +157,23 @@ class WorkflowContext:
             return
 
         execution_context = get_execution_context()
-        if execution_context.parent_context is None:
-            span_id = uuid4()
-        else:
-            span_id = execution_context.parent_context.span_id
+        parent_context = execution_context.parent_context
+        while parent_context:
+            if isinstance(parent_context, NodeParentContext):
+                break
+            parent_context = parent_context.parent
+
+        if not isinstance(parent_context, NodeParentContext):
+            return
+
+        node_class = parent_context.node_definition.decode()
 
         self._event_queue.put(
             NodeExecutionLogEvent(
                 trace_id=execution_context.trace_id,
-                span_id=span_id,
+                span_id=parent_context.span_id,
                 body=NodeExecutionLogBody(
-                    node_definition=node.__class__,
+                    node_definition=node_class,
                     severity=severity,
                     message=message,
                     attributes=attributes,

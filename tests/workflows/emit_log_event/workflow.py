@@ -14,7 +14,6 @@ class LoggingNode(BaseNode):
             severity="INFO",
             message="Custom log message",
             attributes={"key": "value", "count": 42},
-            node=self,
         )
         return self.Outputs(result="done")
 
