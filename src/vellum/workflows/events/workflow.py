@@ -182,6 +182,10 @@ class WorkflowExecutionFulfilledBody(_BaseWorkflowExecutionBody, Generic[Outputs
     # This field can be populated with arbitrary server metadata during event enrichment
     server_metadata: Optional[Dict[str, Any]] = None
 
+    # These fields hold direct child prompt executions and subworkflow execution ids for cost calculation
+    prompt_execution_ids: Optional[list[UUID]] = None
+    workflow_execution_ids: Optional[list[UUID]] = None
+
     @field_serializer("outputs")
     def serialize_outputs(self, outputs: OutputsType, _info: Any) -> Dict[str, Any]:
         return default_serializer(outputs)
