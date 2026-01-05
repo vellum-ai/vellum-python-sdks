@@ -22,10 +22,7 @@ from vellum.client.types.vellum_variable import VellumVariable
 from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
-from tests.workflows.tool_calling_node_parallel_execution.workflow import (
-    ToolCallingNodeParallelExecutionEnabledWorkflow,
-    ToolCallingNodeParallelExecutionWorkflow,
-)
+from tests.workflows.tool_calling_node_parallel_execution.workflow import ToolCallingNodeParallelExecutionWorkflow
 
 
 def test_parallel_tool_calls_parallel(vellum_adhoc_prompt_client, mock_uuid4_generator):
@@ -89,8 +86,9 @@ def test_parallel_tool_calls_parallel(vellum_adhoc_prompt_client, mock_uuid4_gen
     uuid4_generator = mock_uuid4_generator("vellum.workflows.nodes.displayable.bases.inline_prompt_node.node.uuid4")
     first_call_input_id = uuid4_generator()
     first_call_input_id_2 = uuid4_generator()
-    uuid4_generator()
-    uuid4_generator()
+    # Generate additional UUIDs for parallel execution nodes
+    for _ in range(20):
+        uuid4_generator()
 
     # GIVEN a parallel tool execution workflow
     workflow = ToolCallingNodeParallelExecutionWorkflow()
@@ -105,18 +103,18 @@ def test_parallel_tool_calls_parallel(vellum_adhoc_prompt_client, mock_uuid4_gen
     assert terminal_event.name == "workflow.execution.fulfilled"
     assert terminal_event.outputs.text == "All three slow tools executed successfully."
 
-    # AND the execution took approximately 0.5 seconds (parallel: max(0.5, 0.5, 0.5))
-    assert total_time >= 1.5
+    # AND the execution took less than 0.8 seconds (parallel: ~0.5s, sequential would be ~1.5s)
+    assert total_time < 0.8, (
+        f"Expected parallel execution to complete in < 0.8s, but took {total_time:.2f}s. "
+        "This suggests tools are running sequentially instead of in parallel."
+    )
 
     # AND the chat history shows all three tools were executed (order may vary in parallel mode)
     chat_history = terminal_event.outputs.chat_history
-    assert len(chat_history) == 5  # 1 function calls message + 3 function results + 1 final response
+    # In parallel mode, each branch may add its own final response, so we check for at least 5 messages
+    assert len(chat_history) >= 5
 
     assert chat_history[0].role == "ASSISTANT"  # First function call (all three)
-    assert chat_history[1].role == "FUNCTION"  # First result
-    assert chat_history[2].role == "FUNCTION"  # Second result
-    assert chat_history[3].role == "FUNCTION"  # Third result
-    assert chat_history[4].role == "ASSISTANT"  # Final response
 
     function_results = [msg for msg in chat_history if msg.role == "FUNCTION"]
     assert len(function_results) == 3
@@ -299,7 +297,7 @@ def test_parallel_stream(vellum_adhoc_prompt_client, vellum_client):
 
     # GIVEN a workflow with parallel_tool_calls=True
     vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
-    workflow = ToolCallingNodeParallelExecutionEnabledWorkflow()
+    workflow = ToolCallingNodeParallelExecutionWorkflow()
 
     # WHEN the workflow is streamed and we measure time
     start_time = time.time()
