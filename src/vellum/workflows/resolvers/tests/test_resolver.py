@@ -4,6 +4,7 @@ from uuid import uuid4
 from typing import List
 
 from vellum import ChatMessage
+from vellum.client.core.api_error import ApiError
 from vellum.client.types.workflow_resolved_state import WorkflowResolvedState
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
@@ -165,4 +166,34 @@ def test_load_state_with_chat_message_list():
     assert result.state.chat_history[2].role == "USER"
     assert result.state.chat_history[2].text == "What can you help me with?"
 
+    mock_client.workflows.retrieve_state.assert_called_once_with(span_id=str(execution_id))
+
+
+def test_load_state_returns_none_on_404():
+    """Test load_state returns None when retrieve_state returns 404 (e.g., rejected execution with no state)."""
+    resolver = VellumResolver()
+    execution_id = uuid4()
+
+    class TestState(BaseState):
+        test_key: str = "test_value"
+
+    class TestWorkflow(BaseWorkflow[BaseInputs, TestState]):
+        pass
+
+    # GIVEN a mock client that raises ApiError with 404 status
+    mock_client = Mock()
+    mock_client.workflows.retrieve_state.side_effect = ApiError(
+        status_code=404,
+        body={"detail": "No state found for the given span_id"},
+    )
+
+    # AND context with the test workflow class is set up
+    context = WorkflowContext(vellum_client=mock_client)
+    TestWorkflow(context=context, resolvers=[resolver])
+
+    # WHEN load_state is called with an execution ID that has no state
+    result = resolver.load_state(previous_execution_id=execution_id)
+
+    # THEN should return None instead of raising an exception
+    assert result is None
     mock_client.workflows.retrieve_state.assert_called_once_with(span_id=str(execution_id))

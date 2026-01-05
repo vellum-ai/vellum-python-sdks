@@ -2,6 +2,7 @@ import logging
 from uuid import UUID
 from typing import Iterator, Optional, Type, Union
 
+from vellum.client.core.api_error import ApiError
 from vellum.workflows.events.workflow import WorkflowEvent
 from vellum.workflows.nodes.utils import cast_to_output_type
 from vellum.workflows.resolvers.base import BaseWorkflowResolver
@@ -45,9 +46,18 @@ class VellumResolver(BaseWorkflowResolver):
             return None
 
         client = self._context.vellum_client
-        response = client.workflows.retrieve_state(
-            span_id=previous_execution_id,
-        )
+        try:
+            response = client.workflows.retrieve_state(
+                span_id=previous_execution_id,
+            )
+        except ApiError as e:
+            if e.status_code == 404:
+                logger.debug(
+                    "No state found for previous execution %s, continuing without previous state",
+                    previous_execution_id,
+                )
+                return None
+            raise
 
         if response.state is None:
             return None
