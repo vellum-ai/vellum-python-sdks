@@ -109,12 +109,15 @@ def test_parallel_tool_calls_parallel(vellum_adhoc_prompt_client, mock_uuid4_gen
         "This suggests tools are running sequentially instead of in parallel."
     )
 
-    # AND the chat history shows all three tools were executed (order may vary in parallel mode)
+    # AND the chat history shows all three tools were executed
     chat_history = terminal_event.outputs.chat_history
-    # In parallel mode, each branch may add its own final response, so we check for at least 5 messages
-    assert len(chat_history) >= 5
+    assert len(chat_history) == 5  # 1 function calls message + 3 function results + 1 final response
 
     assert chat_history[0].role == "ASSISTANT"  # First function call (all three)
+    assert chat_history[1].role == "FUNCTION"  # First result
+    assert chat_history[2].role == "FUNCTION"  # Second result
+    assert chat_history[3].role == "FUNCTION"  # Third result
+    assert chat_history[4].role == "ASSISTANT"  # Final response
 
     function_results = [msg for msg in chat_history if msg.role == "FUNCTION"]
     assert len(function_results) == 3

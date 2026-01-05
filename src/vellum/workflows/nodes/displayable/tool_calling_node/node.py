@@ -223,7 +223,7 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
         if self.parallel_tool_calls:
             # For parallel execution, function nodes execute in parallel and don't loop back
             # All function nodes go directly to the else node after execution
-            else_node = create_else_node(self.tool_prompt_node)
+            else_node = create_else_node(self.tool_prompt_node, parallel_tool_calls=True)
 
             for function_name, FunctionNodeClass in self._function_nodes.items():
                 router_port = getattr(self.router_node.Ports, function_name)

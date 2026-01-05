@@ -698,13 +698,34 @@ def create_mcp_tool_node(
 
 def create_else_node(
     tool_prompt_node: Type[ToolPromptNode],
+    parallel_tool_calls: bool = False,
 ) -> Type[ElseNode]:
-    class Ports(ElseNode.Ports):
-        loop_to_router = Port.on_if(
-            ToolCallingState.current_prompt_output_index.less_than(tool_prompt_node.Outputs.results.length())
-        )
-        loop_to_prompt = Port.on_elif(ToolCallingState.current_function_calls_processed.greater_than(0))
-        end = Port.on_else()
+    if parallel_tool_calls:
+        # In parallel mode, we need to wait for ALL function calls to be processed
+        # before triggering loop_to_prompt. The condition checks that:
+        # 1. At least one function call was made (function_calls_by_name is not empty)
+        # 2. All function calls have been processed (current_function_calls_processed >= len(function_calls_by_name))
+        # Note: loop_to_router is not used in parallel mode (no sequential processing)
+        class Ports(ElseNode.Ports):
+            loop_to_router = Port.on_if(
+                ToolCallingState.current_prompt_output_index.less_than(tool_prompt_node.Outputs.results.length())
+            )
+            loop_to_prompt = Port.on_elif(
+                ToolCallingState.function_calls_by_name.length().greater_than(0)
+                & ToolCallingState.current_function_calls_processed.greater_than_or_equal_to(
+                    ToolCallingState.function_calls_by_name.length()
+                )
+            )
+            end = Port.on_else()
+
+    else:
+
+        class Ports(ElseNode.Ports):  # type: ignore[no-redef]
+            loop_to_router = Port.on_if(
+                ToolCallingState.current_prompt_output_index.less_than(tool_prompt_node.Outputs.results.length())
+            )
+            loop_to_prompt = Port.on_elif(ToolCallingState.current_function_calls_processed.greater_than(0))
+            end = Port.on_else()
 
     node = cast(
         Type[ElseNode],
