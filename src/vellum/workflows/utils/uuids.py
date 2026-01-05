@@ -1,6 +1,9 @@
 import hashlib
+import sys
 from uuid import UUID
 from typing import TYPE_CHECKING
+
+from vellum.workflows.loaders.base import BaseWorkflowFinder
 
 if TYPE_CHECKING:
     from vellum.workflows.inputs.base import BaseInputs
@@ -25,17 +28,23 @@ def generate_workflow_deployment_prefix(deployment_name: str, release_tag: str) 
 
 def _normalize_module_path(module_path: str) -> str:
     """
-    Normalize a module path by filtering out a leading UUID namespace segment.
+    Normalize a module path by filtering out a leading ephemeral namespace segment.
 
     When workflows are loaded dynamically (e.g., via VirtualFileFinder), the module path
-    may start with a UUID namespace that changes on each invocation. This function strips
-    that leading UUID segment to ensure stable, deterministic ID generation.
+    may start with an ephemeral namespace that changes on each invocation. This function
+    strips that leading segment to ensure stable, deterministic ID generation.
+
+    The function checks if the first segment of the module path exactly matches the
+    namespace of any registered BaseWorkflowFinder in sys.meta_path. Only namespaces
+    that are actually registered are stripped, preventing accidental stripping of
+    legitimate module names.
 
     Args:
-        module_path: The module path to normalize (e.g., "a1b2c3d4-e5f6-7890-abcd-ef1234567890.workflow")
+        module_path: The module path to normalize (e.g., "a1b2c3d4-e5f6-7890-abcd-ef1234567890.workflow"
+                     or "workflow_tmp_ABC123xyz.workflow")
 
     Returns:
-        The normalized module path with the leading UUID segment removed if present
+        The normalized module path with the leading ephemeral segment removed if present
         (e.g., "workflow")
     """
     parts = module_path.split(".")
@@ -43,11 +52,13 @@ def _normalize_module_path(module_path: str) -> str:
         return module_path
 
     first_part = parts[0]
-    try:
-        UUID(first_part)
-        return ".".join(parts[1:]) if len(parts) > 1 else ""
-    except ValueError:
-        return module_path
+
+    # Check if the first part matches the namespace of any registered workflow finder
+    for finder in sys.meta_path:
+        if isinstance(finder, BaseWorkflowFinder) and finder.namespace == first_part:
+            return ".".join(parts[1:]) if len(parts) > 1 else ""
+
+    return module_path
 
 
 def generate_entity_id_from_path(path: str) -> UUID:

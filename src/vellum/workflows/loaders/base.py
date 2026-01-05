@@ -9,6 +9,8 @@ class BaseWorkflowFinder(importlib.abc.MetaPathFinder, ABC):
     Abstract base class for workflow finders that support custom error message formatting.
     """
 
+    namespace: str
+
     @abstractmethod
     def format_error_message(self, error_message: str) -> str:
         """
