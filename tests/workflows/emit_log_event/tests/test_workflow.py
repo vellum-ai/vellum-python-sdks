@@ -15,10 +15,23 @@ def test_emit_log_event__happy_path():
     events = list(workflow.stream(event_filter=all_workflow_event_filter))
 
     # THEN
+    node_events = [e for e in events if e.name in ["node.execution.initiated", "node.execution.fulfilled"]]
+    assert len(node_events) == 2
+
+    trace_ids = [node_event.trace_id for node_event in node_events]
+    assert len(set(trace_ids)) == 1, trace_ids
+    expected_trace_id = trace_ids[0]
+
+    span_ids = [node_event.span_id for node_event in node_events]
+    assert len(set(span_ids)) == 1, span_ids
+    expected_span_id = span_ids[0]
+
     log_events = [e for e in events if e.name == "node.execution.log"]
     assert len(log_events) == 1
 
     log_event = log_events[0]
+    assert log_event.trace_id == expected_trace_id
+    assert log_event.span_id == expected_span_id
     assert log_event.body.severity == "INFO"
     assert log_event.body.message == "Custom log message"
     assert log_event.body.attributes == {"key": "value", "count": 42}
@@ -46,6 +59,17 @@ def test_emit_log_event__sent_to_monitoring_api(mock_httpx_transport):
             events_in_request = json.loads(mocked_request.content)
             all_events.extend(events_in_request)
 
+    node_events = [e for e in all_events if e.get("name") in ["node.execution.initiated", "node.execution.fulfilled"]]
+    assert len(node_events) == 2
+
+    node_event_trace_ids = [node_event["trace_id"] for node_event in node_events]
+    assert len(set(node_event_trace_ids)) == 1, node_event_trace_ids
+    expected_node_event_trace_id = node_event_trace_ids[0]
+
+    node_event_span_ids = [node_event["span_id"] for node_event in node_events]
+    assert len(set(node_event_span_ids)) == 1, node_event_span_ids
+    expected_node_event_span_id = node_event_span_ids[0]
+
     log_events = [e for e in all_events if e.get("name") == "node.execution.log"]
     assert len(log_events) == 1
 
@@ -65,7 +89,7 @@ def test_emit_log_event__sent_to_monitoring_api(mock_httpx_transport):
         },
         "id": mock.ANY,
         "name": "node.execution.log",
-        "span_id": mock.ANY,
+        "span_id": expected_node_event_span_id,
         "timestamp": mock.ANY,
-        "trace_id": mock.ANY,
+        "trace_id": expected_node_event_trace_id,
     }

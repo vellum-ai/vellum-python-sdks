@@ -159,7 +159,7 @@ class WorkflowContext:
         if self._event_queue is None:
             return
 
-        execution_context = self.execution_context
+        execution_context = get_execution_context()
         if execution_context.parent_context is None:
             span_id = uuid4()
         else:
