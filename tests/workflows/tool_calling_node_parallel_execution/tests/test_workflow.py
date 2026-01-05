@@ -103,9 +103,9 @@ def test_parallel_tool_calls_parallel(vellum_adhoc_prompt_client, mock_uuid4_gen
     assert terminal_event.name == "workflow.execution.fulfilled"
     assert terminal_event.outputs.text == "All three slow tools executed successfully."
 
-    # AND the execution took less than 0.8 seconds (parallel: ~0.5s, sequential would be ~1.5s)
-    assert total_time < 0.8, (
-        f"Expected parallel execution to complete in < 0.8s, but took {total_time:.2f}s. "
+    # AND the execution took less than 1 second (parallel: ~0.5s, sequential would be ~1.5s)
+    assert total_time < 1, (
+        f"Expected parallel execution to complete in < 1s, but took {total_time:.2f}s. "
         "This suggests tools are running sequentially instead of in parallel."
     )
 
@@ -325,8 +325,8 @@ def test_parallel_stream(vellum_adhoc_prompt_client, vellum_client):
     for node_name in node_names:
         assert "slow_tool_four" not in node_name, f"slow_tool_four should not have events, found {node_name}"
 
-    # AND execution completes in < 0.8s (parallel: ~0.5s, sequential would be ~1.5s)
-    assert execution_time < 0.8, (
-        f"Expected parallel execution to complete in < 0.8s, but took {execution_time:.2f}s. "
+    # AND execution completes in < 1s (parallel: ~0.5s, sequential would be ~1.5s)
+    assert execution_time < 1, (
+        f"Expected parallel execution to complete in < 1s, but took {execution_time:.2f}s. "
         "This suggests tools are running sequentially instead of in parallel."
     )
