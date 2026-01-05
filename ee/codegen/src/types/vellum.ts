@@ -851,7 +851,7 @@ export interface IntegrationTrigger extends BaseTrigger {
 }
 
 export interface ChatMessageTriggerExecConfig {
-  output?: WorkflowValueDescriptor;
+  output?: WorkflowOutputWorkflowReference;
 }
 
 export interface ChatMessageTrigger extends BaseTrigger {
