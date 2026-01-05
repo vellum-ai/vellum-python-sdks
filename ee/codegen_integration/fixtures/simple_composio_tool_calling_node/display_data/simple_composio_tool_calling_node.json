@@ -161,6 +161,17 @@
                 "value": null
               }
             }
+          },
+          {
+            "id": "142b8a35-48df-4b3f-b6c1-99e72d10e39f",
+            "name": "parallel_tool_calls",
+            "value": {
+              "type": "CONSTANT_VALUE",
+              "value": {
+                "type": "JSON",
+                "value": false
+              }
+            }
           }
         ],
         "outputs": [
