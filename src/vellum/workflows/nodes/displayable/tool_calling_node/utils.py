@@ -115,6 +115,7 @@ class ToolPromptNode(InlinePromptNode[ToolCallingState]):
             self.state.current_prompt_output_index = 0
             self.state.current_function_calls_processed = 0
             self.state.prompt_iterations += 1
+            self.state.function_calls_by_name = {}
         for output in generator:
             if output.name == InlinePromptNode.Outputs.results.name and output.value:
                 prompt_outputs = cast(List[PromptOutput], output.value)
@@ -131,6 +132,13 @@ class ToolPromptNode(InlinePromptNode[ToolCallingState]):
                                 value=FunctionCallChatMessageContentValue.model_validate(raw_function_call)
                             )
                         )
+                        # Populate function_calls_by_name for parallel execution
+                        function_name = prompt_output.value.name
+                        if function_name:
+                            self.state.function_calls_by_name[function_name] = {
+                                "arguments": prompt_output.value.arguments or {},
+                                "function_call_id": prompt_output.value.id,
+                            }
 
                 if len(chat_contents) == 1:
                     if chat_contents[0].type == "STRING":
@@ -219,85 +227,6 @@ class FunctionNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
         self._add_function_result_to_chat_history(result, self.state)
 
         yield BaseOutput(name="result", value=result)
-
-
-class ParallelFunctionCallMixin(FunctionCallNodeMixin):
-    """Mixin for parallel function nodes that find arguments by function name."""
-
-    _target_function_name: str
-    _prompt_results: BaseDescriptor[List[PromptOutput]]
-
-    def _find_function_call_arguments(self) -> tuple[dict, Optional[str]]:
-        """Find arguments for this function by searching through prompt results."""
-        # Resolve the prompt results from the descriptor
-        # self.state is provided by BaseNode which this mixin is used with
-        results = self._prompt_results.resolve(self.state)  # type: ignore[attr-defined]
-        for output in results:
-            if output.type == "FUNCTION_CALL" and output.value is not None:
-                if output.value.name == self._target_function_name:
-                    arguments = output.value.arguments or {}
-                    function_call_id = output.value.id
-                    return arguments, function_call_id
-        return {}, None
-
-
-class ParallelFunctionNode(BaseNode[ToolCallingState], ParallelFunctionCallMixin):
-    """Node that executes a function in parallel mode, finding arguments by function name."""
-
-    function_definition: Callable[..., Any]
-
-    class Outputs(BaseNode.Outputs):
-        result: Any
-
-    def run(self) -> Iterator[BaseOutput]:
-        # Find arguments for this specific function
-        arguments, function_call_id = self._find_function_call_arguments()
-        self.function_call_id = function_call_id
-
-        try:
-            result = self.function_definition(**arguments)
-        except Exception as e:
-            self._handle_tool_exception(e, "function", self.function_definition.__name__)
-
-        # Add the result to the chat history
-        self._add_function_result_to_chat_history(result, self.state)
-
-        yield BaseOutput(name="result", value=result)
-
-
-class ParallelDynamicInlineSubworkflowNode(
-    InlineSubworkflowNode[ToolCallingState, BaseInputs, BaseState], ParallelFunctionCallMixin
-):
-    """Node that executes an inline subworkflow in parallel mode."""
-
-    def run(self) -> Iterator[BaseOutput]:
-        # Find arguments for this specific function
-        arguments, function_call_id = self._find_function_call_arguments()
-        self.function_call_id = function_call_id
-
-        # Merge arguments with resolved inputs from __vellum_inputs__
-        merged_inputs = arguments.copy()
-        vellum_inputs = getattr(self.subworkflow, "__vellum_inputs__", {})
-        if vellum_inputs:
-            for param_name, param_ref in vellum_inputs.items():
-                if isinstance(param_ref, BaseDescriptor):
-                    resolved_value = param_ref.resolve(self.state)
-                else:
-                    resolved_value = param_ref
-                merged_inputs[param_name] = resolved_value
-
-        self.subworkflow_inputs = merged_inputs  # type: ignore[misc]
-
-        # Call the parent run method to execute the subworkflow with proper streaming
-        outputs = {}
-
-        for output in super().run():
-            if output.is_fulfilled:
-                outputs[output.name] = output.value
-            yield output
-
-        # Add the result to the chat history
-        self._add_function_result_to_chat_history(outputs, self.state)
 
 
 class ComposioNode(BaseNode[ToolCallingState], FunctionCallNodeMixin):
@@ -503,6 +432,24 @@ def _create_function_call_expressions(
     return arguments_expr, function_call_id_expr
 
 
+def _create_function_call_expressions_from_state(
+    function_name: str,
+) -> tuple[BaseDescriptor[dict], BaseDescriptor[Optional[str]]]:
+    """
+    Create expressions to extract arguments and function_call_id from state.function_calls_by_name.
+
+    This is used for parallel execution where function calls are looked up by name
+    rather than by index.
+
+    Returns:
+        A tuple of (arguments_expression, function_call_id_expression)
+    """
+    function_call_data = ToolCallingState.function_calls_by_name[function_name]
+    arguments_expr: BaseDescriptor[dict] = function_call_data["arguments"].coalesce({})
+    function_call_id_expr: BaseDescriptor[Optional[str]] = function_call_data["function_call_id"].coalesce(None)
+    return arguments_expr, function_call_id_expr
+
+
 def _build_function_exists_condition(
     tool_prompt_node: Type[InlinePromptNode[ToolCallingState]],
     function_name: str,
@@ -537,130 +484,6 @@ def _build_function_exists_condition(
         return ConstantValueReference(False)
 
     return condition
-
-
-def _create_parallel_function_node(
-    function: ToolBase,
-    function_name: str,
-    tool_prompt_node: Type[ToolPromptNode],
-) -> Type[BaseNode]:
-    """
-    Create a parallel-aware function node that finds arguments by function name.
-
-    Args:
-        function: The function to create a node for
-        function_name: The name of the function (used to find arguments in results)
-        tool_prompt_node: The tool prompt node class
-    """
-    prompt_results_ref = tool_prompt_node.Outputs.results
-
-    if isinstance(function, DeploymentDefinition):
-        # For deployment definitions, we don't have a parallel version yet
-        # Fall back to sequential behavior
-        arguments_expr, function_call_id_expr = _create_function_call_expressions(tool_prompt_node)
-        deployment = function.deployment_id or function.deployment_name
-        release_tag = function.release_tag
-
-        node = type(
-            f"DynamicSubworkflowDeploymentNode_{deployment}",
-            (DynamicSubworkflowDeploymentNode,),
-            {
-                "deployment": deployment,
-                "release_tag": release_tag,
-                "arguments": arguments_expr,
-                "function_call_id": function_call_id_expr,
-                "__module__": __name__,
-            },
-        )
-        return node
-
-    elif isinstance(function, ComposioToolDefinition):
-        # For Composio tools, we don't have a parallel version yet
-        arguments_expr, function_call_id_expr = _create_function_call_expressions(tool_prompt_node)
-        node = type(
-            f"ComposioNode_{function.name}",
-            (ComposioNode,),
-            {
-                "composio_tool": function,
-                "arguments": arguments_expr,
-                "function_call_id": function_call_id_expr,
-                "__module__": __name__,
-            },
-        )
-        return node
-
-    elif isinstance(function, VellumIntegrationToolDefinition):
-        # For Vellum Integration tools, we don't have a parallel version yet
-        arguments_expr, function_call_id_expr = _create_function_call_expressions(tool_prompt_node)
-        display_class = type(
-            f"VellumIntegrationNodeDisplay_{function.name}",
-            (VellumIntegrationNode.Display,),
-            {"icon": "vellum:icon:plug", "color": "navy"},
-        )
-        node = type(
-            f"VellumIntegrationNode_{function.name}",
-            (VellumIntegrationNode,),
-            {
-                "vellum_integration_tool": function,
-                "arguments": arguments_expr,
-                "function_call_id": function_call_id_expr,
-                "Display": display_class,
-                "__module__": __name__,
-            },
-        )
-        return node
-
-    elif is_workflow_class(function):
-        function.is_dynamic = True
-        node = type(
-            f"ParallelDynamicInlineSubworkflowNode_{function.__name__}",
-            (ParallelDynamicInlineSubworkflowNode,),
-            {
-                "subworkflow": function,
-                "_target_function_name": function_name,
-                "_prompt_results": prompt_results_ref,
-                "__module__": __name__,
-            },
-        )
-        return node
-
-    else:
-        # Regular Python function
-
-        def create_function_wrapper(func):
-            def wrapper(self, **kwargs):
-                merged_kwargs = kwargs.copy()
-                inputs = getattr(func, "__vellum_inputs__", {})
-                if inputs:
-                    for param_name, param_ref in inputs.items():
-                        if isinstance(param_ref, BaseDescriptor):
-                            resolved_value = param_ref.resolve(self.state)
-                        else:
-                            resolved_value = param_ref
-                        merged_kwargs[param_name] = resolved_value
-
-                return func(**merged_kwargs)
-
-            wrapper.__name__ = func.__name__
-            return wrapper
-
-        display_class = type(
-            f"ParallelFunctionNodeDisplay_{function.__name__}",
-            (ParallelFunctionNode.Display,),
-            {"icon": "vellum:icon:rectangle-code", "color": "purple"},
-        )
-        node = type(
-            f"ParallelFunctionNode_{function.__name__}",
-            (ParallelFunctionNode,),
-            {
-                "function_definition": create_function_wrapper(function),
-                "_target_function_name": function_name,
-                "_prompt_results": prompt_results_ref,
-                "Display": display_class,
-                "__module__": __name__,
-            },
-        )
-        return node
 
 
 def create_router_node(
@@ -750,18 +573,18 @@ def create_function_node(
     Args:
         function: The function to create a node for
         tool_prompt_node: The tool prompt node class
-        parallel_tool_calls: If True, creates parallel-aware function nodes
+        parallel_tool_calls: If True, uses state-based argument lookup by function name
     """
     if isinstance(function, MCPToolDefinition):
         return create_mcp_tool_node(function, tool_prompt_node, parallel_tool_calls)
 
     function_name = get_function_name(function)
 
+    # Choose expression source based on parallel mode
     if parallel_tool_calls:
-        # For parallel execution, use parallel node classes that find arguments by name
-        return _create_parallel_function_node(function, function_name, tool_prompt_node)
-
-    arguments_expr, function_call_id_expr = _create_function_call_expressions(tool_prompt_node)
+        arguments_expr, function_call_id_expr = _create_function_call_expressions_from_state(function_name)
+    else:
+        arguments_expr, function_call_id_expr = _create_function_call_expressions(tool_prompt_node)
 
     if isinstance(function, DeploymentDefinition):
         deployment = function.deployment_id or function.deployment_name
@@ -877,9 +700,14 @@ def create_mcp_tool_node(
     tool_prompt_node: Type[ToolPromptNode],
     parallel_tool_calls: bool = False,
 ) -> Type[BaseNode]:
-    # For MCP tools, we don't have a parallel version yet
-    # Fall back to sequential behavior
-    arguments_expr, function_call_id_expr = _create_function_call_expressions(tool_prompt_node)
+    function_name = get_mcp_tool_name(tool_def)
+
+    # Choose expression source based on parallel mode
+    if parallel_tool_calls:
+        arguments_expr, function_call_id_expr = _create_function_call_expressions_from_state(function_name)
+    else:
+        arguments_expr, function_call_id_expr = _create_function_call_expressions(tool_prompt_node)
+
     node = type(
         f"MCPNode_{tool_def.name}",
         (MCPNode,),
