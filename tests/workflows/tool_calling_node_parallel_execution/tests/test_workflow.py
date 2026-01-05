@@ -122,8 +122,8 @@ def test_parallel_tool_calling_node__only_called_tools_have_events(vellum_adhoc_
         ), f"Expected slow_tool_four to NOT have events, but found in {node_name}"
 
     # AND - Verify parallel execution (3 tools at 0.5s each should complete in ~0.5s if parallel,
-    # but we use 1.2s threshold to account for CI overhead. Sequential would take ~1.5s)
-    assert execution_time <= 1.2, (
-        f"Expected parallel execution to complete in <= 1.2s, but took {execution_time:.2f}s. "
+    # Sequential would take ~1.5s, so 0.8s threshold demonstrates parallelism)
+    assert execution_time <= 0.8, (
+        f"Expected parallel execution to complete in <= 0.8s, but took {execution_time:.2f}s. "
         "This suggests tools are running sequentially instead of in parallel."
     )
