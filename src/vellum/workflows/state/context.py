@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from functools import cached_property
 import json
+import logging
 from queue import Queue
 from uuid import UUID, uuid4
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Type
@@ -22,6 +23,8 @@ if TYPE_CHECKING:
     from vellum.workflows.events.workflow import WorkflowEvent
     from vellum.workflows.state.base import BaseState
     from vellum.workflows.workflows.base import BaseWorkflow
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -153,6 +156,8 @@ class WorkflowContext:
 
         This is in active development and may have breaking changes.
         """
+        from vellum.workflows.nodes.bases import BaseNode
+
         if self._event_queue is None:
             return
 
@@ -166,7 +171,15 @@ class WorkflowContext:
         if not isinstance(parent_context, NodeParentContext):
             return
 
-        node_class = parent_context.node_definition.decode()
+        try:
+            node_class = parent_context.node_definition.decode()
+        except Exception:
+            logger.exception("Failed to decode node definition.")
+            return
+
+        if not isinstance(node_class, type) or not issubclass(node_class, BaseNode):
+            logger.warning("Node definition is not a subclass of BaseNode.")
+            return
 
         self._event_queue.put(
             NodeExecutionLogEvent(
