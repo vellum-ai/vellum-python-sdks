@@ -1,14 +1,36 @@
+import pytest
+import random
+import string
 import sys
 from uuid import uuid4
+from typing import Callable
 
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 from vellum_ee.workflows.server.virtual_file_loader import VirtualFileFinder
 
 
-def test_serialize_module__dataset_mocks_are_stable():
+def _generate_uuid_namespace() -> str:
+    """Generate a UUID namespace like the workflow server uses for some requests."""
+    return str(uuid4())
+
+
+def _generate_workflow_tmp_namespace() -> str:
+    """Generate a workflow_tmp_* namespace like vembda uses."""
+    random_suffix = "".join(random.choices(string.ascii_letters + string.digits, k=16))
+    return f"workflow_tmp_{random_suffix}"
+
+
+@pytest.mark.parametrize(
+    "namespace_generator",
+    [
+        pytest.param(_generate_uuid_namespace, id="uuid_namespace"),
+        pytest.param(_generate_workflow_tmp_namespace, id="workflow_tmp_namespace"),
+    ],
+)
+def test_serialize_module__dataset_mocks_are_stable(namespace_generator: Callable[[], str]):
     """
     Tests that serialization produces stable, deterministic output for DatasetRow mocks
-    across multiple serializations.
+    across multiple serializations, regardless of the namespace format used.
     """
 
     # GIVEN a workflow module with a sandbox.py that has DatasetRow with mocks
@@ -58,8 +80,8 @@ dataset = [
     }
 
     # AND two different namespaces (simulating how the workflow server creates a new namespace per request)
-    namespace_1 = str(uuid4())
-    namespace_2 = str(uuid4())
+    namespace_1 = namespace_generator()
+    namespace_2 = namespace_generator()
 
     # AND the virtual file loaders are registered for both namespaces
     sys.meta_path.append(VirtualFileFinder(files, namespace_1))

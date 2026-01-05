@@ -25,17 +25,22 @@ def generate_workflow_deployment_prefix(deployment_name: str, release_tag: str) 
 
 def _normalize_module_path(module_path: str) -> str:
     """
-    Normalize a module path by filtering out a leading UUID namespace segment.
+    Normalize a module path by filtering out a leading ephemeral namespace segment.
 
     When workflows are loaded dynamically (e.g., via VirtualFileFinder), the module path
-    may start with a UUID namespace that changes on each invocation. This function strips
-    that leading UUID segment to ensure stable, deterministic ID generation.
+    may start with an ephemeral namespace that changes on each invocation. This function
+    strips that leading segment to ensure stable, deterministic ID generation.
+
+    Supported ephemeral namespace formats:
+    - UUID format (e.g., "a1b2c3d4-e5f6-7890-abcd-ef1234567890")
+    - workflow_tmp_* format (e.g., "workflow_tmp_ABC123xyz")
 
     Args:
-        module_path: The module path to normalize (e.g., "a1b2c3d4-e5f6-7890-abcd-ef1234567890.workflow")
+        module_path: The module path to normalize (e.g., "a1b2c3d4-e5f6-7890-abcd-ef1234567890.workflow"
+                     or "workflow_tmp_ABC123xyz.workflow")
 
     Returns:
-        The normalized module path with the leading UUID segment removed if present
+        The normalized module path with the leading ephemeral segment removed if present
         (e.g., "workflow")
     """
     parts = module_path.split(".")
@@ -43,11 +48,19 @@ def _normalize_module_path(module_path: str) -> str:
         return module_path
 
     first_part = parts[0]
+
+    # Check if the first part is a UUID
     try:
         UUID(first_part)
         return ".".join(parts[1:]) if len(parts) > 1 else ""
     except ValueError:
-        return module_path
+        pass
+
+    # Check if the first part is a workflow_tmp_* namespace
+    if first_part.startswith("workflow_tmp_"):
+        return ".".join(parts[1:]) if len(parts) > 1 else ""
+
+    return module_path
 
 
 def generate_entity_id_from_path(path: str) -> UUID:
