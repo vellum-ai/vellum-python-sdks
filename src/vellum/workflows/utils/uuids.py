@@ -1,6 +1,9 @@
 import hashlib
+import sys
 from uuid import UUID
 from typing import TYPE_CHECKING
+
+from vellum.workflows.loaders.base import BaseWorkflowFinder
 
 if TYPE_CHECKING:
     from vellum.workflows.inputs.base import BaseInputs
@@ -31,9 +34,10 @@ def _normalize_module_path(module_path: str) -> str:
     may start with an ephemeral namespace that changes on each invocation. This function
     strips that leading segment to ensure stable, deterministic ID generation.
 
-    Supported ephemeral namespace formats:
-    - UUID format (e.g., "a1b2c3d4-e5f6-7890-abcd-ef1234567890")
-    - workflow_tmp_* format (e.g., "workflow_tmp_ABC123xyz")
+    The function checks if the first segment of the module path exactly matches the
+    namespace of any registered BaseWorkflowFinder in sys.meta_path. Only namespaces
+    that are actually registered are stripped, preventing accidental stripping of
+    legitimate module names.
 
     Args:
         module_path: The module path to normalize (e.g., "a1b2c3d4-e5f6-7890-abcd-ef1234567890.workflow"
@@ -49,16 +53,10 @@ def _normalize_module_path(module_path: str) -> str:
 
     first_part = parts[0]
 
-    # Check if the first part is a UUID
-    try:
-        UUID(first_part)
-        return ".".join(parts[1:]) if len(parts) > 1 else ""
-    except ValueError:
-        pass
-
-    # Check if the first part is a workflow_tmp_* namespace
-    if first_part.startswith("workflow_tmp_"):
-        return ".".join(parts[1:]) if len(parts) > 1 else ""
+    # Check if the first part matches the namespace of any registered workflow finder
+    for finder in sys.meta_path:
+        if isinstance(finder, BaseWorkflowFinder) and finder.namespace == first_part:
+            return ".".join(parts[1:]) if len(parts) > 1 else ""
 
     return module_path
 

@@ -1,11 +1,10 @@
 import pytest
-import random
-import string
 import sys
 from uuid import uuid4
 from typing import Callable
 
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
+from vellum_ee.workflows.server.namespaces import get_random_namespace
 from vellum_ee.workflows.server.virtual_file_loader import VirtualFileFinder
 
 
@@ -14,17 +13,11 @@ def _generate_uuid_namespace() -> str:
     return str(uuid4())
 
 
-def _generate_workflow_tmp_namespace() -> str:
-    """Generate a workflow_tmp_* namespace like vembda uses."""
-    random_suffix = "".join(random.choices(string.ascii_letters + string.digits, k=16))
-    return f"workflow_tmp_{random_suffix}"
-
-
 @pytest.mark.parametrize(
     "namespace_generator",
     [
         pytest.param(_generate_uuid_namespace, id="uuid_namespace"),
-        pytest.param(_generate_workflow_tmp_namespace, id="workflow_tmp_namespace"),
+        pytest.param(get_random_namespace, id="workflow_tmp_namespace"),
     ],
 )
 def test_serialize_module__dataset_mocks_are_stable(namespace_generator: Callable[[], str]):
