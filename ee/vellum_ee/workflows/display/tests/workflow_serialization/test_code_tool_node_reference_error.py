@@ -39,7 +39,7 @@ def test_serialize_workflow__code_tool_with_node_reference__raises_error():
     error_message = str(exc_info.value)
     assert "InlinePromptNode" in error_message
     assert "Code tools cannot reference workflow nodes" in error_message
-    assert "inline subworkflow tool" in error_message
+    assert "Inline Subworkflow tool" in error_message
 
 
 def test_serialize_workflow__code_tool_without_node_reference__no_error():
@@ -184,6 +184,40 @@ def test_serialize_workflow__code_tool_with_optional_node_annotation__raises_err
     # AND a tool calling node that uses this function
     class MyToolCallingNode(ToolCallingNode):
         functions = [my_tool_with_optional_node]
+
+    # AND a workflow with the tool calling node
+    class TestWorkflow(BaseWorkflow):
+        graph = MyToolCallingNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            result = MyToolCallingNode.Outputs.text
+
+    # WHEN we try to serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+
+    # THEN a serialization error should be raised
+    with pytest.raises(UnsupportedSerializationException) as exc_info:
+        workflow_display.serialize()
+
+    # AND the error message should mention the node class
+    error_message = str(exc_info.value)
+    assert "InlinePromptNode" in error_message
+    assert "Code tools cannot reference workflow nodes" in error_message
+
+
+def test_serialize_workflow__code_tool_with_node_instantiation__raises_error():
+    """
+    Tests that a serialization error is raised when a code tool instantiates a node and calls its run method.
+    """
+
+    # GIVEN a function that instantiates a node and calls its run method
+    def my_tool():
+        node = InlinePromptNode()
+        return node.run()
+
+    # AND a tool calling node that uses this function
+    class MyToolCallingNode(ToolCallingNode):
+        functions = [my_tool]
 
     # AND a workflow with the tool calling node
     class TestWorkflow(BaseWorkflow):

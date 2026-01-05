@@ -579,7 +579,7 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
             raise UnsupportedSerializationException(
                 f"Code tools cannot reference workflow nodes ({node_names}). "
                 "Consider inlining the node's run method logic directly in your function, "
-                "or use an inline subworkflow tool instead."
+                "or use an Inline Subworkflow tool instead."
             )
 
         function_definition = compile_function_definition(value)
