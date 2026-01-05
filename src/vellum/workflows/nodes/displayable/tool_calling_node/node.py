@@ -55,6 +55,8 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
         prompt_inputs: Optional[EntityInputsInterface] - Mapping of input variable names to values
         parameters: PromptParameters - The parameters for the Prompt
         max_prompt_iterations: Optional[int] - Maximum number of prompt iterations before stopping
+        parallel_tool_calls: bool - Whether to execute tool calls in parallel (default: False).
+            When True, only routes to tools that are included in the function calls.
     """
 
     class Display(BaseNode.Display):
@@ -68,6 +70,7 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
     parameters: PromptParameters = DEFAULT_PROMPT_PARAMETERS
     max_prompt_iterations: ClassVar[Optional[int]] = 25
     settings: ClassVar[Optional[Union[PromptSettings, Dict[str, Any]]]] = None
+    parallel_tool_calls: ClassVar[bool] = False
 
     class Outputs(BaseOutputs):
         """
@@ -203,6 +206,7 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
         self.router_node = create_router_node(
             functions=hydrated_functions,
             tool_prompt_node=self.tool_prompt_node,
+            parallel_tool_calls=self.parallel_tool_calls,
         )
 
         self._function_nodes = {}
@@ -211,22 +215,46 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
             self._function_nodes[function_name] = create_function_node(
                 function=hydrated_function,
                 tool_prompt_node=self.tool_prompt_node,
+                parallel_tool_calls=self.parallel_tool_calls,
             )
 
         graph: Graph = self.tool_prompt_node >> self.router_node
 
-        for function_name, FunctionNodeClass in self._function_nodes.items():
-            router_port = getattr(self.router_node.Ports, function_name)
-            function_subgraph = router_port >> FunctionNodeClass >> self.router_node
-            graph._extend_edges(function_subgraph.edges)
+        if self.parallel_tool_calls:
+            # For parallel execution, function nodes execute in parallel and don't loop back
+            # All function nodes go directly to the else node after execution
+            else_node = create_else_node(self.tool_prompt_node)
 
-        else_node = create_else_node(self.tool_prompt_node)
-        default_port_graph = self.router_node.Ports.default >> {
-            else_node.Ports.loop_to_router >> self.router_node,  # More outputs to process
-            else_node.Ports.loop_to_prompt >> self.tool_prompt_node,  # Need new prompt iteration
-            else_node.Ports.end,  # Finished
-        }
-        graph._extend_edges(default_port_graph.edges)
+            for function_name, FunctionNodeClass in self._function_nodes.items():
+                router_port = getattr(self.router_node.Ports, function_name)
+                # Function nodes execute in parallel and go to else_node
+                function_subgraph = router_port >> FunctionNodeClass >> else_node
+                graph._extend_edges(function_subgraph.edges)
+
+            # Default port goes directly to else_node (for when no functions match)
+            default_port_graph = self.router_node.Ports.default >> else_node
+            graph._extend_edges(default_port_graph.edges)
+
+            # Else node can loop back to prompt for another iteration or end
+            else_port_graph = {
+                else_node.Ports.loop_to_prompt >> self.tool_prompt_node,  # Need new prompt iteration
+                else_node.Ports.end,  # Finished
+            }
+            graph._extend_edges(Graph.from_set(else_port_graph).edges)
+        else:
+            # Sequential execution: function nodes loop back to router
+            for function_name, FunctionNodeClass in self._function_nodes.items():
+                router_port = getattr(self.router_node.Ports, function_name)
+                function_subgraph = router_port >> FunctionNodeClass >> self.router_node
+                graph._extend_edges(function_subgraph.edges)
+
+            else_node = create_else_node(self.tool_prompt_node)
+            default_port_graph = self.router_node.Ports.default >> {
+                else_node.Ports.loop_to_router >> self.router_node,  # More outputs to process
+                else_node.Ports.loop_to_prompt >> self.tool_prompt_node,  # Need new prompt iteration
+                else_node.Ports.end,  # Finished
+            }
+            graph._extend_edges(default_port_graph.edges)
 
         self._graph = graph
 
