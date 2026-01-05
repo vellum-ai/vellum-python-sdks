@@ -85,6 +85,7 @@ class ToolCallingNodeParallelExecution(ToolCallingNode):
     prompt_inputs = {
         "question": "Execute all three slow tools and summarize the results.",
     }
+    parallel_tool_calls = True
 
 
 class ToolCallingNodeParallelExecutionWorkflow(BaseWorkflow):
@@ -97,54 +98,3 @@ class ToolCallingNodeParallelExecutionWorkflow(BaseWorkflow):
     class Outputs(BaseWorkflow.Outputs):
         text = ToolCallingNodeParallelExecution.Outputs.text
         chat_history = ToolCallingNodeParallelExecution.Outputs.chat_history
-
-
-class ToolCallingNodeParallelExecutionEnabled(ToolCallingNode):
-    """
-    A tool calling node with parallel_tool_calls=True to test parallel execution.
-    """
-
-    ml_model = "gpt-4o-mini"
-    blocks = [
-        ChatMessagePromptBlock(
-            chat_role="SYSTEM",
-            blocks=[
-                RichTextPromptBlock(
-                    blocks=[
-                        PlainTextPromptBlock(
-                            text="You are a helpful assistant with access to slow tools.",
-                        ),
-                    ],
-                ),
-            ],
-        ),
-        ChatMessagePromptBlock(
-            chat_role="USER",
-            blocks=[
-                RichTextPromptBlock(
-                    blocks=[
-                        VariablePromptBlock(
-                            input_variable="question",
-                        ),
-                    ],
-                ),
-            ],
-        ),
-    ]
-    functions = [slow_tool_one, slow_tool_two, SlowToolThreeWorkflow, slow_tool_four]
-    prompt_inputs = {
-        "question": "Execute all three slow tools and summarize the results.",
-    }
-    parallel_tool_calls = True
-
-
-class ToolCallingNodeParallelExecutionEnabledWorkflow(BaseWorkflow):
-    """
-    A workflow that uses ToolCallingNodeParallelExecutionEnabled to test parallel tool execution.
-    """
-
-    graph = ToolCallingNodeParallelExecutionEnabled
-
-    class Outputs(BaseWorkflow.Outputs):
-        text = ToolCallingNodeParallelExecutionEnabled.Outputs.text
-        chat_history = ToolCallingNodeParallelExecutionEnabled.Outputs.chat_history
