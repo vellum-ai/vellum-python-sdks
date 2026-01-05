@@ -1,3 +1,4 @@
+import time
 from uuid import uuid4
 from typing import Dict, Iterator, List
 
@@ -76,7 +77,9 @@ def test_parallel_tool_calling_node__only_called_tools_have_events(vellum_adhoc_
     workflow = ParallelToolCallingWorkflow()
 
     # WHEN
+    start_time = time.time()
     all_events = list(workflow.stream(event_filter=all_workflow_event_filter))
+    execution_time = time.time() - start_time
 
     # Filter node events by name
     node_initiated = [e for e in all_events if e.name == "node.execution.initiated"]
@@ -117,3 +120,9 @@ def test_parallel_tool_calling_node__only_called_tools_have_events(vellum_adhoc_
         assert (
             "slow_tool_four" not in node_name.lower()
         ), f"Expected slow_tool_four to NOT have events, but found in {node_name}"
+
+    # AND - Verify parallel execution (3 tools at 0.5s each should complete in <= 0.8s if parallel)
+    assert execution_time <= 0.8, (
+        f"Expected parallel execution to complete in <= 0.8s, but took {execution_time:.2f}s. "
+        "This suggests tools are running sequentially instead of in parallel."
+    )
