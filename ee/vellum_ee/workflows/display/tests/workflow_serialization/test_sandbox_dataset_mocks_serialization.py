@@ -251,3 +251,188 @@ class Workflow(BaseWorkflow[Inputs, BaseState]):
     finally:
         # Clean up the virtual file finders
         sys.meta_path = [finder for finder in sys.meta_path if not isinstance(finder, VirtualFileFinder)]
+
+
+def test_serialize_module__dataset_with_mocks_field_multiple_rows():
+    """
+    Tests that DatasetRow with mocks field properly serializes mocks across multiple
+    dataset rows with different mock configurations. This reproduces an issue where
+    the mocks array was being serialized as empty.
+    """
+
+    # GIVEN a workflow module with parallel code execution nodes (exact structure from user report)
+    files = {
+        "__init__.py": "",
+        "inputs.py": """\
+from typing import Any, Optional, Union
+
+from vellum.workflows.inputs import BaseInputs
+
+
+class Inputs(BaseInputs):
+    json: Optional[Any] = None
+    number: Optional[Union[float, int]] = None
+""",
+        "nodes/__init__.py": "",
+        "nodes/code_execution/__init__.py": """\
+from vellum.workflows.nodes.displayable import CodeExecutionNode
+from vellum.workflows.state import BaseState
+from vellum.workflows.types.core import MergeBehavior
+
+
+class CodeExecution(CodeExecutionNode[BaseState, str]):
+    filepath = "./script.py"
+    code_inputs = {}
+    runtime = "PYTHON_3_11_6"
+    packages = []
+
+    class Trigger(CodeExecutionNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
+""",
+        "nodes/code_execution/script.py": '''\
+"""
+You must define a function called `main` whose arguments are named after the
+Input Variables.
+"""
+
+def main() -> str:
+    return "5".upper()
+''',
+        "nodes/code_execution_2/__init__.py": """\
+from vellum.workflows.nodes.displayable import CodeExecutionNode
+from vellum.workflows.state import BaseState
+from vellum.workflows.types.core import MergeBehavior
+
+
+class CodeExecution2(CodeExecutionNode[BaseState, str]):
+    filepath = "./script.py"
+    code_inputs = {}
+    runtime = "PYTHON_3_11_6"
+    packages = []
+
+    class Trigger(CodeExecutionNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
+""",
+        "nodes/code_execution_2/script.py": '''\
+"""
+You must define a function called `main` whose arguments are named after the
+Input Variables.
+"""
+
+def main() -> str:
+    return "TODO"
+''',
+        "nodes/output.py": """\
+from vellum.workflows.nodes.displayable import FinalOutputNode
+from vellum.workflows.state import BaseState
+
+
+class Output(FinalOutputNode[BaseState, str]):
+    class Outputs(FinalOutputNode.Outputs):
+        value = None
+""",
+        "nodes/output_2.py": """\
+from vellum.workflows.nodes.displayable import FinalOutputNode
+from vellum.workflows.state import BaseState
+from vellum.workflows.types.core import MergeBehavior
+
+
+class Output2(FinalOutputNode[BaseState, str]):
+    class Outputs(FinalOutputNode.Outputs):
+        value = ""
+
+    class Trigger(FinalOutputNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
+""",
+        "sandbox.py": """\
+from vellum.workflows import DatasetRow
+
+from .inputs import Inputs
+from .nodes.code_execution import CodeExecution
+from .nodes.code_execution_2 import CodeExecution2
+
+dataset = [
+    DatasetRow(
+        label="Hello World - Code Execution 1",
+        inputs=Inputs(),
+        mocks=[
+            CodeExecution.Outputs(result="hello world", log=""),
+        ],
+    ),
+    DatasetRow(
+        label="Hello World - Code Execution 2",
+        inputs=Inputs(),
+        mocks=[
+            CodeExecution2.Outputs(result="hello world", log=""),
+        ],
+    ),
+    DatasetRow(
+        label="Hello World - Both Nodes",
+        inputs=Inputs(),
+        mocks=[
+            CodeExecution.Outputs(result="hello world", log=""),
+            CodeExecution2.Outputs(result="hello world", log=""),
+        ],
+    ),
+]
+""",
+        "workflow.py": """\
+from vellum.workflows import BaseWorkflow
+from vellum.workflows.state import BaseState
+
+from .inputs import Inputs
+from .nodes.code_execution import CodeExecution
+from .nodes.code_execution_2 import CodeExecution2
+from .nodes.output import Output
+from .nodes.output_2 import Output2
+
+
+class Workflow(BaseWorkflow[Inputs, BaseState]):
+    graph = {
+        CodeExecution >> Output,
+        CodeExecution2 >> Output2,
+    }
+
+    class Outputs(BaseWorkflow.Outputs):
+        output = Output.Outputs.value
+        output_2 = Output2.Outputs.value
+""",
+    }
+
+    # AND a namespace for the virtual file loader
+    namespace = str(uuid4())
+    sys.meta_path.append(VirtualFileFinder(files, namespace))
+
+    try:
+        # WHEN we serialize the module
+        result = BaseWorkflowDisplay.serialize_module(namespace)
+
+        # THEN the serialization should succeed without errors
+        assert len(result.errors) == 0, f"Serialization had errors: {result.errors}"
+
+        # AND the dataset should not be None
+        assert result.dataset is not None, "Dataset should not be None"
+
+        # AND the dataset should have three rows
+        assert len(result.dataset) == 3, f"Dataset should have 3 rows, got {len(result.dataset)}"
+
+        # AND the first row should have 1 mock for CodeExecution
+        row_1 = result.dataset[0]
+        assert "mocks" in row_1, f"Row 1 should have 'mocks' field, got keys: {row_1.keys()}"
+        assert row_1["mocks"] is not None, "Row 1 mocks should not be None"
+        assert len(row_1["mocks"]) == 1, f"Row 1 should have 1 mock, got {len(row_1['mocks'])}"
+
+        # AND the second row should have 1 mock for CodeExecution2
+        row_2 = result.dataset[1]
+        assert "mocks" in row_2, f"Row 2 should have 'mocks' field, got keys: {row_2.keys()}"
+        assert row_2["mocks"] is not None, "Row 2 mocks should not be None"
+        assert len(row_2["mocks"]) == 1, f"Row 2 should have 1 mock, got {len(row_2['mocks'])}"
+
+        # AND the third row should have 2 mocks for both nodes
+        row_3 = result.dataset[2]
+        assert "mocks" in row_3, f"Row 3 should have 'mocks' field, got keys: {row_3.keys()}"
+        assert row_3["mocks"] is not None, "Row 3 mocks should not be None"
+        assert len(row_3["mocks"]) == 2, f"Row 3 should have 2 mocks, got {len(row_3['mocks'])}"
+    finally:
+        # Clean up the virtual file finders
+        sys.meta_path = [finder for finder in sys.meta_path if not isinstance(finder, VirtualFileFinder)]
