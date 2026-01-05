@@ -450,40 +450,16 @@ def _create_function_call_expressions_from_state(
     return arguments_expr, function_call_id_expr
 
 
-def _build_function_exists_condition(
-    tool_prompt_node: Type[InlinePromptNode[ToolCallingState]],
+def _build_function_exists_condition_from_state(
     function_name: str,
-    max_results: int = 10,
-) -> BaseDescriptor:
-    """Build a condition that checks if a function name exists anywhere in the results.
+) -> BaseDescriptor[bool]:
+    """Build a condition that checks if a function name exists in state.function_calls_by_name.
 
-    Since the descriptor system doesn't have an `.any()` method, we build an OR condition
-    that checks each possible index up to max_results.
+    This uses the precomputed function_calls_by_name dict in state, which is populated
+    by ToolPromptNode.run when processing FUNCTION_CALL outputs. This approach has no
+    arbitrary limit on the number of function calls.
     """
-    results = tool_prompt_node.Outputs.results
-
-    # Start with a condition that's always false (length > max_results and first check)
-    # We'll OR together conditions for each index
-    condition: Optional[BaseDescriptor] = None
-
-    for i in range(max_results):
-        index_condition = (
-            results.length().greater_than(i)
-            & results[i]["type"].equals("FUNCTION_CALL")
-            & results[i]["value"]["name"].equals(function_name)
-        )
-        if condition is None:
-            condition = index_condition
-        else:
-            condition = condition | index_condition
-
-    # If no conditions were built (shouldn't happen with max_results > 0), return False
-    if condition is None:
-        from vellum.workflows.references.constant import ConstantValueReference
-
-        return ConstantValueReference(False)
-
-    return condition
+    return ToolCallingState.function_calls_by_name.contains(function_name)
 
 
 def create_router_node(
@@ -509,11 +485,10 @@ def create_router_node(
 
         if parallel_tool_calls:
             # For parallel execution, each port checks if its function name exists
-            # anywhere in the results (not just at current index)
+            # in state.function_calls_by_name (populated by ToolPromptNode.run)
             # All matching ports can activate simultaneously
             for name in tool_names:
-                # Check if this function name exists in any FUNCTION_CALL output
-                condition = _build_function_exists_condition(tool_prompt_node, name)
+                condition = _build_function_exists_condition_from_state(name)
                 port = Port.on_if(condition)
                 setattr(Ports, name, port)
         else:
