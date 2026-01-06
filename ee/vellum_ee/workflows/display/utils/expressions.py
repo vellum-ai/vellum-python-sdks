@@ -140,21 +140,30 @@ def get_child_descriptor(value: LazyReference, display_context: "WorkflowDisplay
     if isinstance(value._get, str):
         reference_parts = value._get.split(".")
         if len(reference_parts) < 3:
-            raise Exception(f"Failed to parse lazy reference: {value._get}. Only Node Output references are supported.")
+            raise Exception(
+                f"Failed to parse lazy reference: {value._get}. Only Node and Workflow Output references are supported."
+            )
 
         output_name = reference_parts[-1]
         nested_class_name = reference_parts[-2]
         if nested_class_name != "Outputs":
-            raise Exception(
-                f"Failed to parse lazy reference: {value._get}. Outputs are the only node reference supported."
-            )
+            raise Exception(f"Failed to parse lazy reference: {value._get}. Outputs are the only supported references.")
 
-        node_class_name = ".".join(reference_parts[:-2])
+        reference_class_name = ".".join(reference_parts[:-2])
+
+        # First try to find a node with the matching name
         for node in display_context.global_node_displays.keys():
-            if node.__name__ == node_class_name:
+            if node.__name__ == reference_class_name:
                 return getattr(node.Outputs, output_name)
 
-        raise Exception(f"Failed to parse lazy reference: {value._get}")
+        # If no node found, check if it's a reference to the current workflow's outputs
+        workflow_class = display_context.workflow_display_class.infer_workflow_class()
+        if workflow_class.__name__ == reference_class_name:
+            return getattr(workflow_class.Outputs, output_name)
+
+        raise Exception(
+            f"Failed to parse lazy reference: {value._get}. Could not find node or workflow class '{reference_class_name}'."
+        )
 
     return value._get()
 
