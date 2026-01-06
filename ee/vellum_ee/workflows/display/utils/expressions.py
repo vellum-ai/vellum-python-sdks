@@ -162,7 +162,8 @@ def get_child_descriptor(value: LazyReference, display_context: "WorkflowDisplay
             return getattr(workflow_class.Outputs, output_name)
 
         raise Exception(
-            f"Failed to parse lazy reference: {value._get}. Could not find node or workflow class '{reference_class_name}'."
+            f"Failed to parse lazy reference: {value._get}. "
+            f"Could not find node or workflow class '{reference_class_name}'."
         )
 
     return value._get()
