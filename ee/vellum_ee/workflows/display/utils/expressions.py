@@ -1,7 +1,7 @@
 from dataclasses import asdict, is_dataclass
 import inspect
 from uuid import UUID
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Type, Union, cast, get_args
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Type, Union, cast, get_args, get_origin
 
 from pydantic import BaseModel
 
@@ -270,6 +270,55 @@ def serialize_key(key: Any) -> str:
         return str(key)
 
 
+def _extract_node_classes_from_object(obj: Any, seen: Set[Type[BaseNode]], node_classes: List[Type[BaseNode]]) -> None:
+    """
+    Extract BaseNode subclasses from an object, handling classes, instances, and typing constructs.
+
+    Modifies seen and node_classes in place.
+    """
+    if isinstance(obj, str):
+        return
+
+    if inspect.isclass(obj) and issubclass(obj, BaseNode) and obj is not BaseNode:
+        if obj not in seen:
+            seen.add(obj)
+            node_classes.append(obj)
+        return
+
+    if isinstance(obj, BaseNode):
+        obj_class = obj.__class__
+        if obj_class not in seen:
+            seen.add(obj_class)
+            node_classes.append(obj_class)
+        return
+
+    origin = get_origin(obj)
+    if origin is not None:
+        for arg in get_args(obj):
+            _extract_node_classes_from_object(arg, seen, node_classes)
+
+
+def _get_node_references_in_callable(func: Any) -> List[Type[BaseNode]]:
+    """
+    Check if a callable actually references any BaseNode subclasses in its body.
+
+    Uses inspect.getclosurevars to detect globals/nonlocals referenced by the function.
+
+    Returns a list of node classes found in the callable's referenced scope.
+    """
+    node_classes: List[Type[BaseNode]] = []
+    seen: Set[Type[BaseNode]] = set()
+
+    try:
+        closure_vars = inspect.getclosurevars(func)
+        for obj in list(closure_vars.globals.values()) + list(closure_vars.nonlocals.values()):
+            _extract_node_classes_from_object(obj, seen, node_classes)
+    except (TypeError, ValueError):
+        pass
+
+    return node_classes
+
+
 def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContext", value: Any) -> Optional[JsonObject]:
     """
     Serialize a value to a JSON object. Returns `None` if the value resolves to `undefined`.
@@ -511,6 +560,15 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
         return dict_ref
 
     if callable(value):
+        node_references = _get_node_references_in_callable(value)
+        if node_references:
+            node_names = ", ".join(node.__name__ for node in node_references)
+            raise UnsupportedSerializationException(
+                f"Code tools cannot reference workflow nodes ({node_names}). "
+                "Consider inlining the node's run method logic directly in your function, "
+                "or use an Inline Subworkflow tool instead."
+            )
+
         function_definition = compile_function_definition(value)
 
         name = function_definition.name
