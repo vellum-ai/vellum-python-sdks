@@ -38,6 +38,11 @@ export class ChatMessageTrigger extends BaseTrigger<ChatMessageTriggerType> {
     return "ChatMessageTrigger";
   }
 
+  protected createAttributeFields(): AstNode[] {
+    // Don't generate attribute fields for ChatMessageTrigger (message is handled internally)
+    return [];
+  }
+
   protected getTriggerClassBody(): AstNode[] {
     const body: AstNode[] = [];
 
