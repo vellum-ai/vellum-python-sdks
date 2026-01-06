@@ -28,7 +28,7 @@ class SimpleChatTrigger(ChatMessageTrigger):
     """Chat trigger that appends workflow output as assistant message."""
 
     class Config(ChatMessageTrigger.Config):
-        output = LazyReference(lambda: SimpleChatWorkflow.Outputs.response)  # type: ignore[has-type]
+        output = LazyReference("SimpleChatWorkflow.Outputs.response")  # type: ignore[has-type]
 
 
 class SimpleChatWorkflow(BaseWorkflow[BaseInputs, ChatState]):
