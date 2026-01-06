@@ -286,8 +286,9 @@ if __name__ == "__main__":
       arguments_: outputsArguments,
     });
 
-    // If when_condition is a constant true value, return the Node's Outputs directly
-    if (this.isConstantTrueCondition(mock.when_condition)) {
+    // If when_condition is a constant true value and mock is not disabled,
+    // return the Node's Outputs directly (shorthand notation)
+    if (this.isConstantTrueCondition(mock.when_condition) && !mock.disabled) {
       return thenOutputsInstance;
     }
 
