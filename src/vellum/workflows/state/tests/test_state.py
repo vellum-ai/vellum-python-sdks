@@ -404,3 +404,52 @@ def test_state_deepcopy__cloned_state_uses_own_snapshot_callback():
     # THEN only the clone's callback should be invoked
     assert clone_snapshot_count == 1, "Clone's callback should be invoked"
     assert original_snapshot_count == 0, "Original's callback should not be invoked"
+
+
+def test_state_snapshot__top_level_attribute_assignment_blocks_during_deepcopy():
+    """Test that top-level attribute assignments block while deepcopy holds the lock."""
+
+    # GIVEN a state with a blocking value in a dict attribute
+    class TestState(BaseState):
+        data: Dict[str, Any] = Field(default_factory=dict)
+        counter: int = 0
+
+    state = TestState()
+
+    entered_event = threading.Event()
+    proceed_event = threading.Event()
+    state.data["blocking"] = BlockingValue(entered_event, proceed_event)
+
+    mutation_completed = threading.Event()
+
+    def snapshot_thread_fn() -> None:
+        with state.__lock__:
+            deepcopy(state)
+
+    def mutation_thread_fn() -> None:
+        state.__is_quiet__ = True
+        state.counter = 42
+        mutation_completed.set()
+
+    # WHEN we start a snapshot (deepcopy) in one thread
+    snapshot_thread = threading.Thread(target=snapshot_thread_fn)
+    snapshot_thread.start()
+
+    # AND wait for the deepcopy to be in progress (blocked on our blocking value)
+    entered_event.wait(timeout=5.0)
+
+    # AND try to assign a top-level attribute from another thread
+    mutation_thread = threading.Thread(target=mutation_thread_fn)
+    mutation_thread.start()
+
+    # THEN the mutation should block waiting for the lock (not complete immediately)
+    mutation_completed.wait(timeout=0.2)
+    mutation_blocked = not mutation_completed.is_set()
+
+    # AND when we allow the deepcopy to proceed
+    proceed_event.set()
+    snapshot_thread.join(timeout=5.0)
+    mutation_thread.join(timeout=5.0)
+
+    # THEN the mutation should have been blocked by the lock
+    assert mutation_blocked, "Top-level attribute assignment should block while deepcopy holds the lock"

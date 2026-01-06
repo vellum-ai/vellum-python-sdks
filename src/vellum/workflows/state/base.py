@@ -672,7 +672,8 @@ class BaseState(metaclass=_BaseStateMeta):
             return
 
         snapshottable_value = _make_snapshottable(name, delta, self.__snapshot__, self.__lock__)
-        super().__setattr__(name, snapshottable_value)
+        with self.__lock__:
+            super().__setattr__(name, snapshottable_value)
         self.meta.updated_ts = datetime_now()
         self.__snapshot__(SetStateDelta(name=name, delta=delta))
 
