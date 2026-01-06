@@ -1,37 +1,30 @@
-"""Tests for ChatMessageTrigger with required inputs attribute serialization."""
+"""Tests for ChatMessageTrigger with required inputs attribute execution."""
 
-from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
+from uuid import uuid4
 
-from tests.workflows.chat_message_trigger_required_inputs.workflow import ChatTriggerRequiredInputsWorkflow
+from tests.workflows.chat_message_trigger_required_inputs.workflow import (
+    ChatTriggerRequiredInputsWorkflow,
+    SimpleChatTrigger,
+)
 
 
-def test_chat_trigger_required_inputs_serialization():
-    """Tests that ChatMessageTrigger attributes serialize with correct required field values."""
+def test_chat_trigger_with_required_inputs_resolves_state_correctly():
+    """Tests that workflow with chat trigger and required Inputs resolves state correctly when resolver fails."""
 
-    # GIVEN a Workflow that uses a ChatMessageTrigger with both required and optional attributes
-    # WHEN we serialize it
-    workflow_display = get_workflow_display(workflow_class=ChatTriggerRequiredInputsWorkflow)
-    serialized_workflow: dict = workflow_display.serialize()
+    # GIVEN a workflow with a ChatMessageTrigger and an Inputs interface with a required attribute
+    workflow = ChatTriggerRequiredInputsWorkflow()
 
-    # THEN we should get a serialized representation of the Workflow with triggers
-    assert "triggers" in serialized_workflow
-    assert len(serialized_workflow["triggers"]) == 1
+    # AND a trigger instance with a message
+    trigger = SimpleChatTrigger(message="Hello, how can I help you?")
 
-    # AND the trigger should be a CHAT_MESSAGE type
-    trigger = serialized_workflow["triggers"][0]
-    assert trigger["type"] == "CHAT_MESSAGE"
+    # AND a previous_execution_id that will cause the resolver to fail
+    previous_execution_id = str(uuid4())
 
-    # AND the trigger should have attributes
-    assert "attributes" in trigger
-    attributes = trigger["attributes"]
+    # WHEN we execute the workflow with the trigger and previous_execution_id
+    events = list(workflow.stream(trigger=trigger, previous_execution_id=previous_execution_id))
 
-    # AND we should have both the required 'message' attribute and optional 'context' attribute
-    attribute_required_map = {attr["key"]: attr["required"] for attr in attributes}
+    # THEN the workflow should execute successfully (fall back to default state)
+    assert len(events) > 0
 
-    # AND the 'context' attribute should be marked as not required (optional)
-    assert "context" in attribute_required_map
-    assert attribute_required_map["context"] is False
-
-    # AND the 'message' attribute should be marked as required
-    assert "message" in attribute_required_map
-    assert attribute_required_map["message"] is True
+    # AND the last event should be workflow.execution.fulfilled
+    assert events[-1].name == "workflow.execution.fulfilled"
