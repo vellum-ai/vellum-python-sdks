@@ -151,7 +151,7 @@ class WorkflowContext:
             # For custom domains, assume the same pattern: api.* -> app.*
             return api_url.replace("api.", "app.", 1)
 
-    def emit_log_event(self, severity: SeverityEnum, message: str, attributes: Dict[str, Any]) -> None:
+    def emit_log_event(self, severity: SeverityEnum, message: str, attributes: Optional[Dict[str, Any]] = None) -> None:
         """Emit a log event for a particular node.
 
         This is in active development and may have breaking changes.
