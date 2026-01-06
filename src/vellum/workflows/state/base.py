@@ -686,7 +686,9 @@ class BaseState(metaclass=_BaseStateMeta):
             return
 
         try:
-            self.__snapshot_callback__(deepcopy(self), self.__deltas__)
+            with self.__lock__:
+                state_copy = deepcopy(self)
+            self.__snapshot_callback__(state_copy, self.__deltas__)
         except Exception:
             logger.exception("Failed to snapshot Workflow state.")
 
