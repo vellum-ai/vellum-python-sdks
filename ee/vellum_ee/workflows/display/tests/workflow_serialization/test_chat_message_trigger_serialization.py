@@ -1,5 +1,10 @@
 """Tests for ChatMessageTrigger serialization."""
 
+from typing import List
+
+from pydantic import Field
+
+from vellum.client.types import ChatMessage
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
@@ -108,3 +113,72 @@ def test_chat_message_trigger_validation__output_not_specified():
     error = errors[0]
     assert isinstance(error, TriggerValidationError)
     assert "Chat Trigger output must be specified" in str(error)
+
+
+def test_chat_message_trigger_serialization__custom_chat_history_key():
+    """Tests that ChatMessageTrigger serializes custom chat_history_key correctly."""
+
+    # GIVEN a state with a custom chat history attribute
+    class CustomChatHistoryState(BaseState):
+        messages: List[ChatMessage] = Field(default_factory=list)
+
+    # AND a trigger with a custom chat_history_key
+    class CustomChatHistoryKeyTrigger(ChatMessageTrigger):
+        class Config(ChatMessageTrigger.Config):
+            chat_history_key = "messages"
+
+    # AND a simple node
+    class ResponseNodeCustom(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            response: str = "Hello!"
+
+    # AND a workflow using the custom trigger
+    class CustomChatHistoryWorkflow(BaseWorkflow[BaseInputs, CustomChatHistoryState]):
+        graph = CustomChatHistoryKeyTrigger >> ResponseNodeCustom
+
+        class Outputs(BaseWorkflow.Outputs):
+            response = ResponseNodeCustom.Outputs.response
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=CustomChatHistoryWorkflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the trigger should have the custom chat_history_key in exec_config
+    triggers = serialized_workflow["triggers"]
+    assert len(triggers) == 1
+    assert triggers[0]["type"] == "CHAT_MESSAGE"
+    assert triggers[0]["exec_config"] == {"chat_history_key": "messages"}
+
+
+def test_chat_message_trigger_serialization__default_chat_history_key():
+    """Tests that ChatMessageTrigger does not serialize default chat_history_key."""
+
+    # GIVEN a state with default chat_history attribute
+    class DefaultChatHistoryState(BaseState):
+        chat_history: List[ChatMessage] = Field(default_factory=list)
+
+    # AND a trigger with default chat_history_key (no Config override)
+    class DefaultChatHistoryKeyTrigger(ChatMessageTrigger):
+        pass
+
+    # AND a simple node
+    class ResponseNodeDefault(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            response: str = "Hello!"
+
+    # AND a workflow using the default trigger
+    class DefaultChatHistoryWorkflow(BaseWorkflow[BaseInputs, DefaultChatHistoryState]):
+        graph = DefaultChatHistoryKeyTrigger >> ResponseNodeDefault
+
+        class Outputs(BaseWorkflow.Outputs):
+            response = ResponseNodeDefault.Outputs.response
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=DefaultChatHistoryWorkflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the trigger should not have exec_config (since default chat_history_key is used)
+    triggers = serialized_workflow["triggers"]
+    assert len(triggers) == 1
+    assert triggers[0]["type"] == "CHAT_MESSAGE"
+    assert "exec_config" not in triggers[0]

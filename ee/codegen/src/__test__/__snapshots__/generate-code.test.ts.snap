@@ -72,6 +72,41 @@ class Workflow(BaseWorkflow):
 "
 `;
 
+exports[`generateCode > should generate code for %1 chat-message-trigger-custom-key.ts > triggers/custom_chat_history_key.py 1`] = `
+"from vellum.workflows.triggers import ChatMessageTrigger
+
+
+class CustomChatHistoryKey(ChatMessageTrigger):
+    message: str
+
+    class Config(ChatMessageTrigger.Config):
+        chat_history_key = "messages"
+
+    class Display(ChatMessageTrigger.Display):
+        label = "Custom Chat History Key"
+        x = 100
+        y = 200
+        z_index = 1
+        icon = "vellum:icon:message"
+        color = "blue"
+"
+`;
+
+exports[`generateCode > should generate code for %1 chat-message-trigger-custom-key.ts > workflow.py 1`] = `
+"from vellum.workflows import BaseWorkflow
+
+from .nodes.some_node import SomeNode
+from .triggers.custom_chat_history_key import CustomChatHistoryKey
+
+
+class Workflow(BaseWorkflow):
+    graph = CustomChatHistoryKey >> SomeNode
+
+    class Outputs(BaseWorkflow.Outputs):
+        result = SomeNode.Outputs.result
+"
+`;
+
 exports[`generateCode > should generate code for %1 code-execution-node-with-await-all.ts > nodes/code_execution_with_await_all/__init__.py 1`] = `
 "from vellum.workflows.nodes.displayable import CodeExecutionNode
 from vellum.workflows.state import BaseState

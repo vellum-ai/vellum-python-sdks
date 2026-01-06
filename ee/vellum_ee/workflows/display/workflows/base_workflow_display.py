@@ -850,28 +850,36 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
     ) -> Optional[JsonObject]:
         config_class = trigger_class.Config
         output = getattr(config_class, "output", None)
+        chat_history_key = getattr(config_class, "chat_history_key", "chat_history")
 
-        if output is None:
+        has_output = output is not None
+        has_custom_chat_history_key = chat_history_key != "chat_history"
+
+        if not has_output:
             self.display_context.add_validation_error(
                 TriggerValidationError(
                     message="Chat Trigger output must be specified.",
                     trigger_class_name=trigger_class.__name__,
                 )
             )
+
+        if not has_output and not has_custom_chat_history_key:
             return None
 
-        serialized_output = serialize_value(
-            executable_id=trigger_class.__id__,
-            display_context=self.display_context,
-            value=output,
-        )
+        exec_config: JsonObject = {}
 
-        return cast(
-            JsonObject,
-            {
-                "output": serialized_output,
-            },
-        )
+        if has_output:
+            serialized_output = serialize_value(
+                executable_id=trigger_class.__id__,
+                display_context=self.display_context,
+                value=output,
+            )
+            exec_config["output"] = serialized_output
+
+        if has_custom_chat_history_key:
+            exec_config["chat_history_key"] = chat_history_key
+
+        return cast(JsonObject, exec_config)
 
     @staticmethod
     def _model_dump(value: Any) -> Any:

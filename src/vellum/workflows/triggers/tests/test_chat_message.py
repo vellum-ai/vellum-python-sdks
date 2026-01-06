@@ -105,3 +105,58 @@ def test_chat_message_trigger__graph_syntax():
     assert len(list(graph.trigger_edges)) == 1
     assert list(graph.trigger_edges)[0].trigger_class == ChatMessageTrigger
     assert list(graph.trigger_edges)[0].to_node == TestNode
+
+
+class CustomChatHistoryState(BaseState):
+    messages: List[ChatMessage] = Field(default_factory=list)
+
+
+class CustomChatHistoryKeyTrigger(ChatMessageTrigger):
+    """Trigger with custom chat_history_key."""
+
+    class Config(ChatMessageTrigger.Config):
+        chat_history_key = "messages"
+
+
+def test_chat_message_trigger__custom_chat_history_key_initiated():
+    """Tests that ChatMessageTrigger uses custom chat_history_key on initiation."""
+
+    # GIVEN a ChatMessageTrigger with a custom chat_history_key
+    trigger = CustomChatHistoryKeyTrigger(message="Hello, world!")
+
+    # AND a state with the custom chat history attribute
+    state = CustomChatHistoryState()
+
+    # WHEN the initiated lifecycle hook is called
+    trigger.__on_workflow_initiated__(state)
+
+    # THEN the user message is appended to the custom chat history attribute
+    assert len(state.messages) == 1
+    assert state.messages[0].role == "USER"
+    assert state.messages[0].text == "Hello, world!"
+
+
+def test_chat_message_trigger__custom_chat_history_key_missing_attribute():
+    """Tests that ChatMessageTrigger handles missing custom chat_history_key gracefully."""
+
+    # GIVEN a ChatMessageTrigger with a custom chat_history_key
+    trigger = CustomChatHistoryKeyTrigger(message="Hello")
+
+    # AND a state without the custom chat history attribute
+    state = BaseState()
+
+    # WHEN the initiated lifecycle hook is called
+    trigger.__on_workflow_initiated__(state)
+
+    # THEN no error is raised and state is unchanged
+    assert not hasattr(state, "messages")
+
+
+def test_chat_message_trigger__default_chat_history_key():
+    """Tests that ChatMessageTrigger uses default chat_history_key."""
+
+    # GIVEN a ChatMessageTrigger with default config
+    trigger = ChatMessageTrigger(message="Hello")
+
+    # THEN the default chat_history_key is "chat_history"
+    assert trigger.Config.chat_history_key == "chat_history"

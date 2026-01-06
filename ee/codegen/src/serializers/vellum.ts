@@ -2453,11 +2453,13 @@ export declare namespace IntegrationTriggerSerializer {
 
 const ChatMessageTriggerExecConfigSerializer = objectSchema({
   output: WorkflowValueDescriptorSerializer.optional(),
+  chatHistoryKey: propertySchema("chat_history_key", stringSchema().optional()),
 });
 
 export declare namespace ChatMessageTriggerExecConfigSerializer {
   interface Raw {
     output?: WorkflowValueDescriptorSerializer.Raw | null;
+    chat_history_key?: string | null;
   }
 }
 

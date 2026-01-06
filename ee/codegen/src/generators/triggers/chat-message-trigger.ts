@@ -49,14 +49,23 @@ export class ChatMessageTrigger extends BaseTrigger<ChatMessageTriggerType> {
     body.push(...this.createAttributeFields());
 
     const execConfig = this.trigger.execConfig;
-    if (execConfig?.output) {
-      body.push(this.createConfigClass(execConfig.output));
+    const hasOutput = execConfig?.output;
+    const hasChatHistoryKey =
+      execConfig?.chatHistoryKey && execConfig.chatHistoryKey !== "chat_history";
+
+    if (hasOutput || hasChatHistoryKey) {
+      body.push(
+        this.createConfigClass(execConfig?.output, execConfig?.chatHistoryKey)
+      );
     }
 
     return body;
   }
 
-  private createConfigClass(output: WorkflowOutputWorkflowReference): AstNode {
+  private createConfigClass(
+    output?: WorkflowOutputWorkflowReference,
+    chatHistoryKey?: string
+  ): AstNode {
     const configClass = new Class({
       name: "Config",
       extends_: [
@@ -68,9 +77,20 @@ export class ChatMessageTrigger extends BaseTrigger<ChatMessageTriggerType> {
       ],
     });
 
-    const outputField = this.createOutputField(output);
-    if (outputField) {
-      configClass.add(outputField);
+    if (output) {
+      const outputField = this.createOutputField(output);
+      if (outputField) {
+        configClass.add(outputField);
+      }
+    }
+
+    if (chatHistoryKey && chatHistoryKey !== "chat_history") {
+      configClass.add(
+        new Field({
+          name: "chat_history_key",
+          initializer: new StrInstantiation(chatHistoryKey),
+        })
+      );
     }
 
     return configClass;
