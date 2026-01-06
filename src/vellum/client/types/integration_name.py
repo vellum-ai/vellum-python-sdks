@@ -48,6 +48,7 @@ IntegrationName = typing.Union[
         "BITBUCKET",
         "BOX",
         "BREVO",
+        "BREX",
         "BROWSERBASE_TOOL",
         "CAL",
         "CANVAS",
