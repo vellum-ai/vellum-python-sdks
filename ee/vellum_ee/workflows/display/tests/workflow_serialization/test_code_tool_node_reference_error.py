@@ -212,7 +212,7 @@ def test_serialize_workflow__code_tool_with_node_instantiation__raises_error():
 
     # GIVEN a function that instantiates a node and calls its run method
     def my_tool():
-        node = InlinePromptNode()
+        node = InlinePromptNode()  # type: InlinePromptNode
         return node.run()
 
     # AND a tool calling node that uses this function
