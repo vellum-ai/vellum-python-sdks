@@ -203,11 +203,12 @@ class WorkflowRunner(Generic[StateType]):
                     continue
 
             if resolver_failed:
-                raise WorkflowInitializationException(
-                    message=f"All resolvers failed to load initial state for execution ID: {previous_execution_id}",
-                    workflow_definition=self.workflow.__class__,
-                    code=WorkflowErrorCode.INVALID_INPUTS,
+                logger.warning(
+                    f"All resolvers failed to load initial state for execution ID: {previous_execution_id}. "
+                    "Falling back to default state."
                 )
+                normalized_inputs = deepcopy(inputs) if inputs else self.workflow.get_default_inputs()
+                self._initial_state = self.workflow.get_default_state(normalized_inputs, execution_id)
 
             self._entrypoints = self.workflow.get_entrypoints()
         elif trigger:
