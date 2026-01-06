@@ -69,57 +69,55 @@ class TestWorkflowWithNoResolvers(BaseWorkflow):
     resolvers = []
 
 
-def test_workflow_initialization_exception_when_resolver_returns_none():
+def test_workflow_falls_back_to_default_state_when_resolver_returns_none():
     """
-    Tests that WorkflowInitializationException is raised when resolver returns None.
+    Tests that workflow falls back to default state when resolver returns None.
     """
 
     workflow = TestWorkflowWithFailingResolver()
 
     previous_execution_id = str(uuid4())
 
-    with pytest.raises(WorkflowInitializationException) as exc_info:
-        WorkflowRunner(workflow=workflow, previous_execution_id=previous_execution_id)
+    # WHEN we create a runner with a previous_execution_id but resolver returns None
+    runner = WorkflowRunner(workflow=workflow, previous_execution_id=previous_execution_id)
 
-    assert "All resolvers failed to load initial state" in str(exc_info.value)
-
-    assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
-
-    assert exc_info.value.definition == TestWorkflowWithFailingResolver
+    # THEN the runner should be created successfully with default state
+    assert runner is not None
+    assert runner._initial_state is not None
 
 
-def test_workflow_initialization_exception_when_resolver_throws_exception():
+def test_workflow_falls_back_to_default_state_when_resolver_throws_exception():
     """
-    Tests that WorkflowInitializationException is raised when resolver throws an exception.
+    Tests that workflow falls back to default state when resolver throws an exception.
     """
 
     workflow = TestWorkflowWithExceptionThrowingResolver()
 
     previous_execution_id = str(uuid4())
 
-    with pytest.raises(WorkflowInitializationException) as exc_info:
-        WorkflowRunner(workflow=workflow, previous_execution_id=previous_execution_id)
+    # WHEN we create a runner with a previous_execution_id but resolver throws exception
+    runner = WorkflowRunner(workflow=workflow, previous_execution_id=previous_execution_id)
 
-    assert "All resolvers failed to load initial state" in str(exc_info.value)
+    # THEN the runner should be created successfully with default state
+    assert runner is not None
+    assert runner._initial_state is not None
 
-    assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
 
-
-def test_workflow_initialization_exception_when_multiple_resolvers_fail():
+def test_workflow_falls_back_to_default_state_when_multiple_resolvers_fail():
     """
-    Tests that WorkflowInitializationException is raised when multiple resolvers all fail.
+    Tests that workflow falls back to default state when multiple resolvers all fail.
     """
 
     workflow = TestWorkflowWithMultipleFailingResolvers()
 
     previous_execution_id = str(uuid4())
 
-    with pytest.raises(WorkflowInitializationException) as exc_info:
-        WorkflowRunner(workflow=workflow, previous_execution_id=previous_execution_id)
+    # WHEN we create a runner with a previous_execution_id but all resolvers fail
+    runner = WorkflowRunner(workflow=workflow, previous_execution_id=previous_execution_id)
 
-    assert "All resolvers failed to load initial state" in str(exc_info.value)
-
-    assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
+    # THEN the runner should be created successfully with default state
+    assert runner is not None
+    assert runner._initial_state is not None
 
 
 def test_workflow_initialization_exception_when_no_resolvers_and_previous_execution_id():
