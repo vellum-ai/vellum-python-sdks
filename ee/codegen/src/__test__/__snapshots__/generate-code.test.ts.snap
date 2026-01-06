@@ -44,8 +44,6 @@ from vellum.workflows.triggers import ChatMessageTrigger
 
 
 class ChatMessage(ChatMessageTrigger):
-    message: str
-
     class Config(ChatMessageTrigger.Config):
         output = LazyReference("Workflow.Outputs.result")
 
