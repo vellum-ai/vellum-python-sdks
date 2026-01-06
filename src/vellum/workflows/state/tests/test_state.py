@@ -2,7 +2,8 @@ import pytest
 from copy import deepcopy
 import json
 from queue import Queue
-from typing import Dict, List, cast
+import threading
+from typing import Any, Dict, List, cast
 
 from pydantic import Field
 
@@ -295,3 +296,111 @@ def test_base_state_field_with_default_factory_creates_separate_instances():
     state1.items.append("item1")
     assert state1.items == ["item1"]
     assert state2.items == []
+
+
+class BlockingValue:
+    """A value that blocks during deepcopy until signaled to proceed."""
+
+    def __init__(self, entered_event: threading.Event, proceed_event: threading.Event):
+        self.entered_event = entered_event
+        self.proceed_event = proceed_event
+
+    def __deepcopy__(self, memo: Any) -> "BlockingValue":
+        self.entered_event.set()
+        self.proceed_event.wait(timeout=5.0)
+        return BlockingValue(self.entered_event, self.proceed_event)
+
+
+def test_state_snapshot__concurrent_mutation_during_deepcopy():
+    """Test that concurrent mutations during deepcopy don't cause RuntimeError."""
+
+    # GIVEN a state with a dict containing a blocking value
+    class TestState(BaseState):
+        data: Dict[str, Any] = Field(default_factory=dict)
+
+    state = TestState()
+
+    entered_event = threading.Event()
+    proceed_event = threading.Event()
+    state.data["blocking"] = BlockingValue(entered_event, proceed_event)
+    state.data["other"] = "value"
+
+    snapshot_exception: List[Exception] = []
+    mutation_completed = threading.Event()
+
+    def snapshot_thread_fn() -> None:
+        try:
+            with state.__lock__:
+                deepcopy(state)
+        except Exception as e:
+            snapshot_exception.append(e)
+
+    def mutation_thread_fn() -> None:
+        state.data["new_key"] = "new_value"
+        mutation_completed.set()
+
+    # WHEN we start a snapshot (deepcopy) in one thread
+    snapshot_thread = threading.Thread(target=snapshot_thread_fn)
+    snapshot_thread.start()
+
+    # AND wait for the deepcopy to be in progress (blocked on our blocking value)
+    entered_event.wait(timeout=5.0)
+
+    # AND try to mutate the dict from another thread
+    mutation_thread = threading.Thread(target=mutation_thread_fn)
+    mutation_thread.start()
+
+    # THEN the mutation should block waiting for the lock (not complete immediately)
+    mutation_completed.wait(timeout=0.2)
+    mutation_blocked = not mutation_completed.is_set()
+
+    # AND when we allow the deepcopy to proceed
+    proceed_event.set()
+    snapshot_thread.join(timeout=5.0)
+    mutation_thread.join(timeout=5.0)
+
+    # THEN the mutation should have been blocked by the lock
+    assert mutation_blocked, "Mutation should block while deepcopy holds the lock"
+
+    # AND no exception should have been raised during snapshot
+    assert len(snapshot_exception) == 0, f"Snapshot raised exception: {snapshot_exception}"
+
+
+def test_state_deepcopy__cloned_state_uses_own_snapshot_callback():
+    """Test that deepcopied state's snapshottable containers use the clone's callback."""
+
+    # GIVEN a state with a snapshottable dict attribute
+    original_snapshot_count = 0
+    clone_snapshot_count = 0
+
+    class TestState(BaseState):
+        data: Dict[str, int] = Field(default_factory=dict)
+
+    state = TestState()
+    state.data["key1"] = 1
+
+    def original_callback(state_copy: BaseState, deltas: List[StateDelta]) -> None:
+        nonlocal original_snapshot_count
+        original_snapshot_count += 1
+
+    state.__snapshot_callback__ = original_callback
+
+    # WHEN we deepcopy the state
+    cloned_state = deepcopy(state)
+
+    def clone_callback(state_copy: BaseState, deltas: List[StateDelta]) -> None:
+        nonlocal clone_snapshot_count
+        clone_snapshot_count += 1
+
+    cloned_state.__snapshot_callback__ = clone_callback
+
+    # AND reset counters
+    original_snapshot_count = 0
+    clone_snapshot_count = 0
+
+    # AND mutate the cloned state's snapshottable dict
+    cloned_state.data["key2"] = 2
+
+    # THEN only the clone's callback should be invoked
+    assert clone_snapshot_count == 1, "Clone's callback should be invoked"
+    assert original_snapshot_count == 0, "Original's callback should not be invoked"
