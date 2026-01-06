@@ -5,7 +5,7 @@ from dataclasses import field
 from datetime import datetime
 import logging
 from queue import Queue
-from threading import Lock
+from threading import RLock
 from uuid import UUID, uuid4
 from typing import (
     TYPE_CHECKING,
@@ -555,7 +555,7 @@ class StateMeta(UniversalBaseModel):
 class BaseState(metaclass=_BaseStateMeta):
     meta: StateMeta = field(init=False)
 
-    __lock__: Lock = field(init=False)
+    __lock__: RLock = field(init=False)
     __is_quiet__: bool = field(init=False)
     __is_atomic__: bool = field(init=False)
     __snapshot_callback__: Callable[["BaseState", List[StateDelta]], None] = field(init=False)
@@ -566,7 +566,7 @@ class BaseState(metaclass=_BaseStateMeta):
         self.__is_atomic__ = False
         self.__snapshot_callback__ = lambda state, deltas: None
         self.__deltas__ = []
-        self.__lock__ = Lock()
+        self.__lock__ = RLock()
 
         self.meta = meta or StateMeta()
         self.meta.add_snapshot_callback(self.__snapshot__)
@@ -594,7 +594,7 @@ class BaseState(metaclass=_BaseStateMeta):
         new_state = deepcopy_with_exclusions(
             self,
             exclusions={
-                "__lock__": Lock(),
+                "__lock__": RLock(),
             },
             memo=memo,
         )
