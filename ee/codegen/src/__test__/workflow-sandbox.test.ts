@@ -804,5 +804,77 @@ describe("Workflow Sandbox", () => {
       // THEN it should generate the Node's outputs directly without MockNodeExecution
       expect(result).toMatchSnapshot();
     });
+
+    it("should generate MockNodeExecution with disabled flag when mock is disabled with constant true when_condition", async () => {
+      /**
+       * Tests that mocks with when_condition as a constant true value but with disabled=true
+       * generate MockNodeExecution with the disabled flag instead of shorthand notation.
+       */
+
+      const writer = new Writer();
+      const uniqueWorkflowContext = workflowContextFactory();
+      const inputVariable: VellumVariable = {
+        id: "1",
+        key: "test_input",
+        type: "STRING",
+      };
+
+      uniqueWorkflowContext.addInputVariableContext(
+        inputVariableContextFactory({
+          inputVariableData: inputVariable,
+          workflowContext: uniqueWorkflowContext,
+        })
+      );
+
+      const genericNodeData = genericNodeFactory();
+      await nodeContextFactory({
+        workflowContext: uniqueWorkflowContext,
+        nodeData: genericNodeData,
+      });
+
+      // GIVEN a mock with when_condition as a constant true value and disabled=true
+      const sandboxInputs: WorkflowSandboxDatasetRow[] = [
+        {
+          label: "Scenario with disabled mock",
+          inputs: [
+            {
+              name: inputVariable.key,
+              type: "STRING",
+              value: "test-value",
+            },
+          ],
+          mocks: [
+            {
+              node_id: genericNodeData.id,
+              when_condition: {
+                type: "CONSTANT_VALUE",
+                value: {
+                  type: "JSON",
+                  value: true,
+                },
+              },
+              then_outputs: {
+                result: "mocked_result",
+              },
+              disabled: true,
+            },
+          ],
+        },
+      ];
+
+      // WHEN we generate the sandbox file
+      const sandbox = codegen.workflowSandboxFile({
+        workflowContext: uniqueWorkflowContext,
+        sandboxInputs,
+      });
+
+      sandbox.write(writer);
+      const result = await writer.toStringFormatted();
+
+      // THEN it should generate MockNodeExecution with disabled=True instead of shorthand notation
+      expect(result).toMatchSnapshot();
+      expect(result).toContain("MockNodeExecution");
+      expect(result).toContain("disabled=True");
+    });
   });
 });
