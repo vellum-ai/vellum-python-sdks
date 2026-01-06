@@ -625,6 +625,12 @@ class BaseState(metaclass=_BaseStateMeta):
             memo=memo,
         )
         new_state.meta.add_snapshot_callback(new_state.__snapshot__, new_state.__lock__)
+
+        for name, value in list(vars(new_state).items()):
+            if not name.startswith("_") and name != "meta":
+                rebound_value = _make_snapshottable(name, value, new_state.__snapshot__, new_state.__lock__)
+                object.__setattr__(new_state, name, rebound_value)
+
         return new_state
 
     def __repr__(self) -> str:
