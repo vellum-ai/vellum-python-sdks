@@ -111,18 +111,18 @@ class CustomChatHistoryState(BaseState):
     messages: List[ChatMessage] = Field(default_factory=list)
 
 
-class CustomChatHistoryKeyTrigger(ChatMessageTrigger):
-    """Trigger with custom chat_history_key."""
+class CustomStateTrigger(ChatMessageTrigger):
+    """Trigger with custom state reference."""
 
     class Config(ChatMessageTrigger.Config):
-        chat_history_key = "messages"
+        state = CustomChatHistoryState.messages
 
 
-def test_chat_message_trigger__custom_chat_history_key_initiated():
-    """Tests that ChatMessageTrigger uses custom chat_history_key on initiation."""
+def test_chat_message_trigger__custom_state_initiated():
+    """Tests that ChatMessageTrigger uses custom state reference on initiation."""
 
-    # GIVEN a ChatMessageTrigger with a custom chat_history_key
-    trigger = CustomChatHistoryKeyTrigger(message="Hello, world!")
+    # GIVEN a ChatMessageTrigger with a custom state reference
+    trigger = CustomStateTrigger(message="Hello, world!")
 
     # AND a state with the custom chat history attribute
     state = CustomChatHistoryState()
@@ -136,11 +136,11 @@ def test_chat_message_trigger__custom_chat_history_key_initiated():
     assert state.messages[0].text == "Hello, world!"
 
 
-def test_chat_message_trigger__custom_chat_history_key_missing_attribute():
-    """Tests that ChatMessageTrigger handles missing custom chat_history_key gracefully."""
+def test_chat_message_trigger__custom_state_missing_attribute():
+    """Tests that ChatMessageTrigger handles missing custom state attribute gracefully."""
 
-    # GIVEN a ChatMessageTrigger with a custom chat_history_key
-    trigger = CustomChatHistoryKeyTrigger(message="Hello")
+    # GIVEN a ChatMessageTrigger with a custom state reference
+    trigger = CustomStateTrigger(message="Hello")
 
     # AND a state without the custom chat history attribute
     state = BaseState()
@@ -152,11 +152,12 @@ def test_chat_message_trigger__custom_chat_history_key_missing_attribute():
     assert not hasattr(state, "messages")
 
 
-def test_chat_message_trigger__default_chat_history_key():
-    """Tests that ChatMessageTrigger uses default chat_history_key."""
+def test_chat_message_trigger__default_state():
+    """Tests that ChatMessageTrigger uses default state (None) which falls back to chat_history."""
 
     # GIVEN a ChatMessageTrigger with default config
     trigger = ChatMessageTrigger(message="Hello")
 
-    # THEN the default chat_history_key is "chat_history"
-    assert trigger.Config.chat_history_key == "chat_history"
+    # THEN the default state is None (falls back to "chat_history")
+    assert trigger.Config.state is None
+    assert trigger._get_chat_history_key() == "chat_history"

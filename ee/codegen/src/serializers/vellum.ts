@@ -2451,15 +2451,25 @@ export declare namespace IntegrationTriggerSerializer {
   }
 }
 
+const ChatMessageTriggerStateReferenceSerializer = objectSchema({
+  stateVariableId: propertySchema("state_variable_id", stringSchema()),
+});
+
+export declare namespace ChatMessageTriggerStateReferenceSerializer {
+  interface Raw {
+    state_variable_id: string;
+  }
+}
+
 const ChatMessageTriggerExecConfigSerializer = objectSchema({
   output: WorkflowValueDescriptorSerializer.optional(),
-  chatHistoryKey: propertySchema("chat_history_key", stringSchema().optional()),
+  state: ChatMessageTriggerStateReferenceSerializer.optional(),
 });
 
 export declare namespace ChatMessageTriggerExecConfigSerializer {
   interface Raw {
     output?: WorkflowValueDescriptorSerializer.Raw | null;
-    chat_history_key?: string | null;
+    state?: ChatMessageTriggerStateReferenceSerializer.Raw | null;
   }
 }
 

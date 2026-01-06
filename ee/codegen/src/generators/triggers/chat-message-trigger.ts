@@ -11,6 +11,7 @@ import { createPythonClassName, toPythonSafeSnakeCase } from "src/utils/casing";
 import type { AstNode } from "src/generators/extensions/ast-node";
 import type {
   ChatMessageTrigger as ChatMessageTriggerType,
+  ChatMessageTriggerStateReference,
   WorkflowOutputWorkflowReference,
 } from "src/types/vellum";
 
@@ -50,13 +51,10 @@ export class ChatMessageTrigger extends BaseTrigger<ChatMessageTriggerType> {
 
     const execConfig = this.trigger.execConfig;
     const hasOutput = execConfig?.output;
-    const hasChatHistoryKey =
-      execConfig?.chatHistoryKey && execConfig.chatHistoryKey !== "chat_history";
+    const hasState = execConfig?.state;
 
-    if (hasOutput || hasChatHistoryKey) {
-      body.push(
-        this.createConfigClass(execConfig?.output, execConfig?.chatHistoryKey)
-      );
+    if (hasOutput || hasState) {
+      body.push(this.createConfigClass(execConfig?.output, execConfig?.state));
     }
 
     return body;
@@ -64,7 +62,7 @@ export class ChatMessageTrigger extends BaseTrigger<ChatMessageTriggerType> {
 
   private createConfigClass(
     output?: WorkflowOutputWorkflowReference,
-    chatHistoryKey?: string
+    state?: ChatMessageTriggerStateReference
   ): AstNode {
     const configClass = new Class({
       name: "Config",
@@ -84,16 +82,39 @@ export class ChatMessageTrigger extends BaseTrigger<ChatMessageTriggerType> {
       }
     }
 
-    if (chatHistoryKey && chatHistoryKey !== "chat_history") {
-      configClass.add(
-        new Field({
-          name: "chat_history_key",
-          initializer: new StrInstantiation(chatHistoryKey),
-        })
-      );
+    if (state) {
+      const stateField = this.createStateField(state);
+      if (stateField) {
+        configClass.add(stateField);
+      }
     }
 
     return configClass;
+  }
+
+  private createStateField(
+    state: ChatMessageTriggerStateReference
+  ): AstNode | undefined {
+    const stateVariableContext = this.workflowContext.findStateVariableContextById(
+      state.state_variable_id
+    );
+
+    if (!stateVariableContext) {
+      return undefined;
+    }
+
+    const stateReference = new Reference({
+      name: "State",
+      modulePath: stateVariableContext.definition.module,
+      attribute: [stateVariableContext.name],
+    });
+
+    this.inheritReferences(stateReference);
+
+    return new Field({
+      name: "state",
+      initializer: stateReference,
+    });
   }
 
   private createOutputField(

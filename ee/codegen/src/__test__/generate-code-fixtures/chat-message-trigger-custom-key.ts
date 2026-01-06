@@ -64,6 +64,13 @@ export default {
       type: "STRING",
     },
   ],
+  state_variables: [
+    {
+      id: "messages-state-variable-id",
+      key: "messages",
+      type: "CHAT_HISTORY",
+    },
+  ],
   triggers: [
     {
       id: "chat-message-trigger",
@@ -76,10 +83,12 @@ export default {
         },
       ],
       exec_config: {
-        chat_history_key: "messages",
+        state: {
+          state_variable_id: "messages-state-variable-id",
+        },
       },
       display_data: {
-        label: "Custom Chat History Key",
+        label: "Custom State Trigger",
         position: {
           x: 100,
           y: 200,
@@ -90,5 +99,5 @@ export default {
       },
     },
   ],
-  assertions: ["workflow.py", "triggers/custom_chat_history_key.py"],
+  assertions: ["workflow.py", "triggers/custom_state_trigger.py"],
 };

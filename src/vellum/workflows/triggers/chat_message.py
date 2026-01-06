@@ -5,6 +5,7 @@ from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.utils import resolve_value
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.references.output import OutputReference
+from vellum.workflows.references.state_value import StateValueReference
 from vellum.workflows.triggers.base import BaseTrigger
 
 if TYPE_CHECKING:
@@ -24,18 +25,26 @@ class ChatMessageTrigger(BaseTrigger):
 
     Config:
         output: Optional reference to the workflow output to use as the assistant response.
-        chat_history_key: The state attribute key to use for chat history (default: "chat_history").
+        state: Optional reference to the state attribute to use for chat history (e.g., State.messages).
+               If not specified, defaults to using "chat_history" attribute.
     """
 
     message: List[ArrayChatMessageContentItem]
 
     class Config(BaseTrigger.Config):
         output: Optional[BaseDescriptor[Any]] = None
-        chat_history_key: str = "chat_history"
+        state: Optional[StateValueReference[List[ChatMessage]]] = None
+
+    def _get_chat_history_key(self) -> str:
+        """Returns the state attribute key to use for chat history."""
+        state_ref = self.Config.state
+        if state_ref is not None:
+            return state_ref.name
+        return "chat_history"
 
     def __on_workflow_initiated__(self, state: "BaseState") -> None:
         """Appends user message to state chat history at workflow start."""
-        chat_history_key = self.Config.chat_history_key
+        chat_history_key = self._get_chat_history_key()
         if not hasattr(state, chat_history_key):
             return
 
@@ -47,7 +56,7 @@ class ChatMessageTrigger(BaseTrigger):
 
     def __on_workflow_fulfilled__(self, state: "BaseState") -> None:
         """Appends assistant response to state chat history after workflow completion."""
-        chat_history_key = self.Config.chat_history_key
+        chat_history_key = self._get_chat_history_key()
         if not hasattr(state, chat_history_key):
             return
 

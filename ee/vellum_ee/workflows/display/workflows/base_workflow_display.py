@@ -850,10 +850,10 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
     ) -> Optional[JsonObject]:
         config_class = trigger_class.Config
         output = getattr(config_class, "output", None)
-        chat_history_key = getattr(config_class, "chat_history_key", "chat_history")
+        state = getattr(config_class, "state", None)
 
         has_output = output is not None
-        has_custom_chat_history_key = chat_history_key != "chat_history"
+        has_state = state is not None
 
         if not has_output:
             self.display_context.add_validation_error(
@@ -863,7 +863,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                 )
             )
 
-        if not has_output and not has_custom_chat_history_key:
+        if not has_output and not has_state:
             return None
 
         exec_config: JsonObject = {}
@@ -876,8 +876,9 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             )
             exec_config["output"] = serialized_output
 
-        if has_custom_chat_history_key:
-            exec_config["chat_history_key"] = chat_history_key
+        if has_state:
+            state_value_display = self.display_context.global_state_value_displays[state]
+            exec_config["state"] = {"state_variable_id": str(state_value_display.id)}
 
         return cast(JsonObject, exec_config)
 

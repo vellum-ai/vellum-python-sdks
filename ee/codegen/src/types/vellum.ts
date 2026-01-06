@@ -850,9 +850,13 @@ export interface IntegrationTrigger extends BaseTrigger {
   execConfig: IntegrationTriggerExecConfig;
 }
 
+export interface ChatMessageTriggerStateReference {
+  state_variable_id: string;
+}
+
 export interface ChatMessageTriggerExecConfig {
   output?: WorkflowOutputWorkflowReference;
-  chatHistoryKey?: string;
+  state?: ChatMessageTriggerStateReference;
 }
 
 export interface ChatMessageTrigger extends BaseTrigger {
