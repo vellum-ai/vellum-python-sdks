@@ -15,6 +15,10 @@ class LoggingNode(BaseNode):
             message="Custom log message",
             attributes={"key": "value", "count": 42},
         )
+        self._context.emit_log_event(
+            severity="WARNING",
+            message="Warning log message with no attributes",
+        )
         return self.Outputs(result="done")
 
 

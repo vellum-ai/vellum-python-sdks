@@ -27,15 +27,23 @@ def test_emit_log_event__happy_path():
     expected_span_id = span_ids[0]
 
     log_events = [e for e in events if e.name == "node.execution.log"]
-    assert len(log_events) == 1
+    assert len(log_events) == 2
 
-    log_event = log_events[0]
-    assert log_event.trace_id == expected_trace_id
-    assert log_event.span_id == expected_span_id
-    assert log_event.body.severity == "INFO"
-    assert log_event.body.message == "Custom log message"
-    assert log_event.body.attributes == {"key": "value", "count": 42}
-    assert log_event.body.node_definition == LoggingNode
+    info_log_event = log_events[0]
+    assert info_log_event.trace_id == expected_trace_id
+    assert info_log_event.span_id == expected_span_id
+    assert info_log_event.body.severity == "INFO"
+    assert info_log_event.body.message == "Custom log message"
+    assert info_log_event.body.attributes == {"key": "value", "count": 42}
+    assert info_log_event.body.node_definition == LoggingNode
+
+    warning_log_event = log_events[1]
+    assert warning_log_event.trace_id == expected_trace_id
+    assert warning_log_event.span_id == expected_span_id
+    assert warning_log_event.body.severity == "WARNING"
+    assert warning_log_event.body.message == "Warning log message with no attributes"
+    assert warning_log_event.body.attributes is None
+    assert warning_log_event.body.node_definition == LoggingNode
 
 
 def test_emit_log_event__sent_to_monitoring_api(mock_httpx_transport):
@@ -71,25 +79,45 @@ def test_emit_log_event__sent_to_monitoring_api(mock_httpx_transport):
     expected_node_event_span_id = node_event_span_ids[0]
 
     log_events = [e for e in all_events if e.get("name") == "node.execution.log"]
-    assert len(log_events) == 1
+    assert len(log_events) == 2
 
-    log_event = log_events[0]
-    assert log_event == {
-        "api_version": "2024-10-25",
-        "body": {
-            "attributes": {"count": 42, "key": "value"},
-            "message": "Custom log message",
-            "node_definition": {
-                "exclude_from_monitoring": False,
-                "id": mock.ANY,
-                "module": ["tests", "workflows", "emit_log_event", "workflow"],
-                "name": "LoggingNode",
+    assert log_events == [
+        {
+            "api_version": "2024-10-25",
+            "body": {
+                "attributes": {"count": 42, "key": "value"},
+                "message": "Custom log message",
+                "node_definition": {
+                    "exclude_from_monitoring": False,
+                    "id": mock.ANY,
+                    "module": ["tests", "workflows", "emit_log_event", "workflow"],
+                    "name": "LoggingNode",
+                },
+                "severity": "INFO",
             },
-            "severity": "INFO",
+            "id": mock.ANY,
+            "name": "node.execution.log",
+            "span_id": expected_node_event_span_id,
+            "timestamp": mock.ANY,
+            "trace_id": expected_node_event_trace_id,
         },
-        "id": mock.ANY,
-        "name": "node.execution.log",
-        "span_id": expected_node_event_span_id,
-        "timestamp": mock.ANY,
-        "trace_id": expected_node_event_trace_id,
-    }
+        {
+            "api_version": "2024-10-25",
+            "body": {
+                "attributes": None,
+                "message": "Warning log message with no attributes",
+                "node_definition": {
+                    "exclude_from_monitoring": False,
+                    "id": mock.ANY,
+                    "module": ["tests", "workflows", "emit_log_event", "workflow"],
+                    "name": "LoggingNode",
+                },
+                "severity": "WARNING",
+            },
+            "id": mock.ANY,
+            "name": "node.execution.log",
+            "span_id": expected_node_event_span_id,
+            "timestamp": mock.ANY,
+            "trace_id": expected_node_event_trace_id,
+        },
+    ]
