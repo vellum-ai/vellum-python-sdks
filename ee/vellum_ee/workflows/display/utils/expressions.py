@@ -300,13 +300,9 @@ def _extract_node_classes_from_object(obj: Any, seen: Set[Type[BaseNode]], node_
 
 def _get_node_references_in_callable(func: Any) -> List[Type[BaseNode]]:
     """
-    Check if a callable actually references any BaseNode subclasses.
+    Check if a callable actually references any BaseNode subclasses in its body.
 
-    Checks:
-    - globals/nonlocals referenced by the function (via inspect.getclosurevars)
-    - default argument values (__defaults__)
-    - keyword-only default values (__kwdefaults__)
-    - type annotations (__annotations__)
+    Uses inspect.getclosurevars to detect globals/nonlocals referenced by the function.
 
     Returns a list of node classes found in the callable's referenced scope.
     """
@@ -319,21 +315,6 @@ def _get_node_references_in_callable(func: Any) -> List[Type[BaseNode]]:
             _extract_node_classes_from_object(obj, seen, node_classes)
     except (TypeError, ValueError):
         pass
-
-    defaults = getattr(func, "__defaults__", None)
-    if defaults:
-        for obj in defaults:
-            _extract_node_classes_from_object(obj, seen, node_classes)
-
-    kwdefaults = getattr(func, "__kwdefaults__", None)
-    if kwdefaults:
-        for obj in kwdefaults.values():
-            _extract_node_classes_from_object(obj, seen, node_classes)
-
-    annotations = getattr(func, "__annotations__", None)
-    if annotations:
-        for obj in annotations.values():
-            _extract_node_classes_from_object(obj, seen, node_classes)
 
     return node_classes
 
