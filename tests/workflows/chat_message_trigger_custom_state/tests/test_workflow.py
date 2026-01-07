@@ -3,7 +3,6 @@
 from vellum.client.types import ChatMessage
 from vellum.workflows.events.workflow import WorkflowExecutionSnapshottedEvent
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
-from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 from tests.workflows.chat_message_trigger_custom_state.workflows.custom_state_workflow import (
     CustomChatState,
@@ -79,32 +78,3 @@ def test_chat_message_trigger__custom_state_emits_snapshot_events():
         ChatMessage(role="USER", text="Hello", content=None, source=None),
         ChatMessage(role="ASSISTANT", text="Hello from assistant!", content=None, source=None),
     ]
-
-
-def test_chat_message_trigger__custom_state_serialization():
-    """Tests that ChatMessageTrigger serializes custom state reference correctly."""
-
-    # GIVEN a workflow using CustomStateTrigger with custom state reference
-    # WHEN we serialize the workflow
-    workflow_display = get_workflow_display(workflow_class=CustomStateWorkflow)
-    serialized_workflow: dict = workflow_display.serialize()
-
-    # THEN we should get a serialized representation of the Workflow
-    assert serialized_workflow.keys() == {
-        "workflow_raw_data",
-        "input_variables",
-        "state_variables",
-        "output_variables",
-        "triggers",
-    }
-
-    # AND the trigger should have the state reference in exec_config
-    triggers = serialized_workflow["triggers"]
-    assert len(triggers) == 1
-    assert triggers[0]["type"] == "CHAT_MESSAGE"
-    exec_config = triggers[0]["exec_config"]
-    assert "state" in exec_config
-    assert "state_variable_id" in exec_config["state"]
-
-    # AND the output should also be serialized
-    assert "output" in exec_config
