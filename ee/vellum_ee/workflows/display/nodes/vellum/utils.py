@@ -1,3 +1,4 @@
+import logging
 from uuid import UUID
 from typing import Any, List, Optional, Type, Union, cast
 
@@ -9,7 +10,11 @@ from vellum.workflows.references import NodeReference
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
-from vellum_ee.workflows.display.utils.exceptions import UnsupportedSerializationException, UserFacingException
+from vellum_ee.workflows.display.utils.exceptions import (
+    InvalidOutputReferenceError,
+    UnsupportedSerializationException,
+    UserFacingException,
+)
 from vellum_ee.workflows.display.utils.expressions import get_child_descriptor, serialize_value
 from vellum_ee.workflows.display.utils.vellum import (
     ConstantValuePointer,
@@ -23,6 +28,8 @@ from vellum_ee.workflows.display.utils.vellum import (
     create_node_input_value_pointer_rule,
 )
 from vellum_ee.workflows.display.vellum import NodeInput, NodeInputValuePointer
+
+logger = logging.getLogger(__name__)
 
 
 def create_node_input(
@@ -78,7 +85,12 @@ def create_node_input_value_pointer_rules(
             value = cast(BaseDescriptor, value.instance)
 
         if isinstance(value, LazyReference):
-            child_descriptor = get_child_descriptor(value, display_context)
+            try:
+                child_descriptor = get_child_descriptor(value, display_context)
+            except InvalidOutputReferenceError as e:
+                logger.warning("Failed to parse lazy reference '%s', skipping serialization", value.name)
+                display_context.add_validation_error(e)
+                return node_input_value_pointer_rules
             return create_node_input_value_pointer_rules(
                 child_descriptor, display_context, node_id, existing_rules=[], pointer_type=pointer_type
             )

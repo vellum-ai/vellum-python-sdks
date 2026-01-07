@@ -1,5 +1,6 @@
 from dataclasses import asdict, is_dataclass
 import inspect
+import logging
 from uuid import UUID
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Type, Union, cast, get_args, get_origin
 
@@ -71,6 +72,8 @@ from vellum_ee.workflows.display.utils.exceptions import (
 
 if TYPE_CHECKING:
     from vellum_ee.workflows.display.types import WorkflowDisplayContext
+
+logger = logging.getLogger(__name__)
 
 
 def convert_descriptor_to_operator(descriptor: BaseDescriptor) -> LogicalOperator:
@@ -352,7 +355,12 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
         return serialize_value(executable_id, display_context, value._value)
 
     if isinstance(value, LazyReference):
-        child_descriptor = get_child_descriptor(value, display_context)
+        try:
+            child_descriptor = get_child_descriptor(value, display_context)
+        except InvalidOutputReferenceError as e:
+            logger.warning("Failed to parse lazy reference '%s', skipping serialization", value.name)
+            display_context.add_validation_error(e)
+            return None
         return serialize_value(executable_id, display_context, child_descriptor)
 
     if isinstance(value, WorkflowInputReference):
