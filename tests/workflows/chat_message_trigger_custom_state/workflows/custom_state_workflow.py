@@ -28,7 +28,7 @@ class CustomStateTrigger(ChatMessageTrigger):
     """Chat trigger that uses custom state reference for chat history."""
 
     class Config(ChatMessageTrigger.Config):
-        output = LazyReference(lambda: CustomStateWorkflow.Outputs.response)  # type: ignore[has-type]
+        output = LazyReference("CustomStateWorkflow.Outputs.response")
         state = CustomChatState.messages
 
 
