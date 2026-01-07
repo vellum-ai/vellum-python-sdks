@@ -1,9 +1,4 @@
-import { python } from "@fern-api/python-ast";
-
-import {
-  VELLUM_CLIENT_MODULE_PATH,
-  VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH,
-} from "src/constants";
+import { VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH } from "src/constants";
 import { Class } from "src/generators/extensions/class";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { Field } from "src/generators/extensions/field";
