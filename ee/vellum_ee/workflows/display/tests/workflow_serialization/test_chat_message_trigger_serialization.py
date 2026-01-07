@@ -1,7 +1,5 @@
 """Tests for ChatMessageTrigger serialization."""
 
-import pytest
-
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
@@ -93,16 +91,20 @@ class WorkflowWithUnspecifiedChatTriggerOutput(BaseWorkflow[BaseInputs, BaseStat
 
 def test_chat_message_trigger_validation__output_not_specified():
     """
-    Tests that serialization raises TriggerValidationError when Chat Trigger output is not specified.
+    Tests that serialization adds TriggerValidationError to errors when Chat Trigger output is not specified.
     """
 
     # GIVEN a Workflow that uses a ChatMessageTrigger without Config.output specified
     workflow_display = get_workflow_display(workflow_class=WorkflowWithUnspecifiedChatTriggerOutput)
 
     # WHEN we serialize the workflow
-    # THEN serialization should raise TriggerValidationError
-    with pytest.raises(TriggerValidationError) as exc_info:
-        workflow_display.serialize()
+    workflow_display.serialize()
 
-    # AND the error message should indicate that output must be specified
-    assert "Chat Trigger output must be specified" in str(exc_info.value)
+    # THEN the display_context should contain a TriggerValidationError
+    errors = list(workflow_display.display_context.errors)
+    assert len(errors) == 1
+
+    # AND the error should be a TriggerValidationError with the expected message
+    error = errors[0]
+    assert isinstance(error, TriggerValidationError)
+    assert "Chat Trigger output must be specified" in str(error)
