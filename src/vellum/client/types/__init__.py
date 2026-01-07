@@ -55,6 +55,7 @@ from .chat_message_content_request import ChatMessageContentRequest
 from .chat_message_prompt_block import ChatMessagePromptBlock
 from .chat_message_request import ChatMessageRequest
 from .chat_message_role import ChatMessageRole
+from .check_workflow_execution_status_response import CheckWorkflowExecutionStatusResponse
 from .code_execution_node_array_result import CodeExecutionNodeArrayResult
 from .code_execution_node_chat_history_result import CodeExecutionNodeChatHistoryResult
 from .code_execution_node_error_result import CodeExecutionNodeErrorResult
@@ -790,6 +791,7 @@ __all__ = [
     "ChatMessagePromptBlock",
     "ChatMessageRequest",
     "ChatMessageRole",
+    "CheckWorkflowExecutionStatusResponse",
     "CodeExecutionNodeArrayResult",
     "CodeExecutionNodeChatHistoryResult",
     "CodeExecutionNodeErrorResult",

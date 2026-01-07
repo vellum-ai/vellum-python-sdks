@@ -5,6 +5,7 @@ import typing
 from ... import core
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.request_options import RequestOptions
+from ...types.check_workflow_execution_status_response import CheckWorkflowExecutionStatusResponse
 from ...types.dataset_row_push_request import DatasetRowPushRequest
 from ...types.runner_config_request import RunnerConfigRequest
 from ...types.workflow_push_deployment_config_request import WorkflowPushDeploymentConfigRequest
@@ -126,6 +127,40 @@ class WorkflowsClient:
         )
         """
         _response = self._raw_client.retrieve_state(span_id, request_options=request_options)
+        return _response.data
+
+    def workflow_execution_status(
+        self, execution_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> CheckWorkflowExecutionStatusResponse:
+        """
+        Checks if a workflow execution is currently executing (not fulfilled, not rejected, and has no end time).
+        Uses the ClickHouse Prime summary materialized view.
+
+        Parameters
+        ----------
+        execution_id : str
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        CheckWorkflowExecutionStatusResponse
+
+
+        Examples
+        --------
+        from vellum import Vellum
+
+        client = Vellum(
+            api_version="YOUR_API_VERSION",
+            api_key="YOUR_API_KEY",
+        )
+        client.workflows.workflow_execution_status(
+            execution_id="execution_id",
+        )
+        """
+        _response = self._raw_client.workflow_execution_status(execution_id, request_options=request_options)
         return _response.data
 
     def push(
@@ -339,6 +374,48 @@ class AsyncWorkflowsClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.retrieve_state(span_id, request_options=request_options)
+        return _response.data
+
+    async def workflow_execution_status(
+        self, execution_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> CheckWorkflowExecutionStatusResponse:
+        """
+        Checks if a workflow execution is currently executing (not fulfilled, not rejected, and has no end time).
+        Uses the ClickHouse Prime summary materialized view.
+
+        Parameters
+        ----------
+        execution_id : str
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        CheckWorkflowExecutionStatusResponse
+
+
+        Examples
+        --------
+        import asyncio
+
+        from vellum import AsyncVellum
+
+        client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.workflows.workflow_execution_status(
+                execution_id="execution_id",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.workflow_execution_status(execution_id, request_options=request_options)
         return _response.data
 
     async def push(

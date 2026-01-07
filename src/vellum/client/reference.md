@@ -7835,6 +7835,78 @@ client.workflows.retrieve_state(
 </dl>
 </details>
 
+<details><summary><code>client.workflows.<a href="src/vellum/resources/workflows/client.py">workflow_execution_status</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Checks if a workflow execution is currently executing (not fulfilled, not rejected, and has no end time).
+Uses the ClickHouse Prime summary materialized view.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import Vellum
+
+client = Vellum(
+    api_version="YOUR_API_VERSION",
+    api_key="YOUR_API_KEY",
+)
+client.workflows.workflow_execution_status(
+    execution_id="execution_id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**execution_id:** `str` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.workflows.<a href="src/vellum/resources/workflows/client.py">serialize_workflow_files</a>(...)</code></summary>
 <dl>
 <dd>
