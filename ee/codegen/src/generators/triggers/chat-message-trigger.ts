@@ -11,8 +11,8 @@ import { createPythonClassName, toPythonSafeSnakeCase } from "src/utils/casing";
 import type { AstNode } from "src/generators/extensions/ast-node";
 import type {
   ChatMessageTrigger as ChatMessageTriggerType,
-  ChatMessageTriggerStateReference,
   WorkflowOutputWorkflowReference,
+  WorkflowStateVariableWorkflowReference,
 } from "src/types/vellum";
 
 export declare namespace ChatMessageTriggerGenerator {
@@ -63,7 +63,7 @@ export class ChatMessageTrigger extends BaseTrigger<ChatMessageTriggerType> {
 
   private createConfigClass(
     output?: WorkflowOutputWorkflowReference,
-    state?: ChatMessageTriggerStateReference
+    state?: Omit<WorkflowStateVariableWorkflowReference, "type">
   ): AstNode {
     const configClass = new Class({
       name: "Config",
@@ -94,7 +94,7 @@ export class ChatMessageTrigger extends BaseTrigger<ChatMessageTriggerType> {
   }
 
   private createStateField(
-    state: ChatMessageTriggerStateReference
+    state: Omit<WorkflowStateVariableWorkflowReference, "type">
   ): AstNode | undefined {
     const stateVariableContext =
       this.workflowContext.findStateVariableContextById(state.stateVariableId);

@@ -83,6 +83,10 @@ export default {
         },
       ],
       exec_config: {
+        output: {
+          type: "WORKFLOW_OUTPUT",
+          output_variable_id: "workflow-output-variable-id",
+        },
         state: {
           state_variable_id: "messages-state-variable-id",
         },
