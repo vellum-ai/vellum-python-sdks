@@ -381,3 +381,38 @@ def test_vellum_integration_service_execute_tool_legacy_403_error(vellum_client)
 
     # AND raw_data should be None (no integration details available)
     assert exc_info.value.raw_data is None
+
+
+def test_vellum_integration_service_execute_tool_400_bad_request_error(vellum_client):
+    """Test that 400 Bad Request errors are handled with INVALID_INPUTS code"""
+    from vellum.client.core.api_error import ApiError
+    from vellum.workflows.errors.types import WorkflowErrorCode
+
+    # GIVEN a mock client configured to raise a 400 Bad Request error
+    mock_client = vellum_client
+    mock_client.integrations = mock.MagicMock()
+
+    bad_request_body = {"detail": "Invalid spreadsheet_id: The spreadsheet ID cannot be empty."}
+    mock_client.integrations.execute_integration_tool.side_effect = ApiError(
+        status_code=400,
+        body=bad_request_body,
+    )
+
+    # WHEN we attempt to execute a tool with invalid inputs
+    service = VellumIntegrationService(client=mock_client)
+    with pytest.raises(NodeException) as exc_info:
+        service.execute_tool(
+            integration="GOOGLESHEETS",
+            provider="COMPOSIO",
+            tool_name="GOOGLESHEETS_BATCH_UPDATE",
+            arguments={"spreadsheet_id": ""},
+        )
+
+    # THEN it should raise NodeException with INVALID_INPUTS code
+    assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
+
+    # AND the error message should contain the detail from the response
+    assert "Invalid spreadsheet_id" in exc_info.value.message
+
+    # AND raw_data should be None (no additional data for validation errors)
+    assert exc_info.value.raw_data is None
