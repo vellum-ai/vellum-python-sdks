@@ -31,6 +31,7 @@ from vellum.workflows.nodes.displayable.final_output_node.node import FinalOutpu
 from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port, get_wrapped_node
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, StateValueReference, WorkflowInputReference
+from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.triggers.chat_message import ChatMessageTrigger
 from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.triggers.manual import ManualTrigger
@@ -71,7 +72,7 @@ from vellum_ee.workflows.display.utils.exceptions import (
     UserFacingException,
     WorkflowValidationError,
 )
-from vellum_ee.workflows.display.utils.expressions import serialize_value
+from vellum_ee.workflows.display.utils.expressions import get_child_descriptor, serialize_value
 from vellum_ee.workflows.display.utils.metadata import (
     get_entrypoint_edge_id,
     get_regular_edge_id,
@@ -854,16 +855,28 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         if output is None:
             return None
 
-        serialized_output = serialize_value(
-            executable_id=trigger_class.__id__,
-            display_context=self.display_context,
-            value=output,
-        )
+        descriptor = output
+        if isinstance(output, LazyReference):
+            descriptor = get_child_descriptor(output, self.display_context)
+
+        if not isinstance(descriptor, OutputReference):
+            return None
+
+        if not issubclass(descriptor.outputs_class, BaseWorkflow.Outputs):
+            return None
+
+        if descriptor not in self.display_context.workflow_output_displays:
+            return None
+
+        workflow_output_display = self.display_context.workflow_output_displays[descriptor]
 
         return cast(
             JsonObject,
             {
-                "output": serialized_output,
+                "output": {
+                    "type": "WORKFLOW_OUTPUT",
+                    "output_variable_id": str(workflow_output_display.id),
+                },
             },
         )
 
