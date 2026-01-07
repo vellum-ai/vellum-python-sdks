@@ -18,6 +18,7 @@ from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.base import WorkflowInputsDisplay
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
+from vellum_ee.workflows.display.utils.exceptions import InvalidOutputReferenceError
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 
@@ -272,6 +273,30 @@ def test_serialize_node__lazy_reference_workflow_output_with_string():
         output for output in serialized_workflow["output_variables"] if output["key"] == "final_result"
     )
     assert attr["value"]["output_variable_id"] == workflow_output["id"]
+
+
+def test_serialize_node__lazy_reference_with_string__class_not_found():
+    """Test that InvalidOutputReferenceError is raised when the referenced class is not found."""
+
+    # GIVEN a node with a string-based LazyReference to a non-existent class
+    class NodeWithInvalidReference(BaseNode):
+        invalid_ref = LazyReference[str]("NonExistentClass.Outputs.result")
+
+    # AND a workflow that contains the node
+    class TestWorkflow(BaseWorkflow):
+        graph = NodeWithInvalidReference
+
+    # WHEN we try to serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+
+    # THEN an InvalidOutputReferenceError should be raised
+    with pytest.raises(InvalidOutputReferenceError) as exc_info:
+        workflow_display.serialize()
+
+    # AND the error message should mention the class that could not be found
+    error_message = str(exc_info.value)
+    assert "NonExistentClass" in error_message
+    assert "Could not find node or workflow class" in error_message
 
 
 def test_serialize_node__workflow_input(serialize_node):
