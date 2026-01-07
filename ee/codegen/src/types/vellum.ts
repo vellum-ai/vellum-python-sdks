@@ -851,7 +851,7 @@ export interface IntegrationTrigger extends BaseTrigger {
 }
 
 export interface ChatMessageTriggerStateReference {
-  state_variable_id: string;
+  stateVariableId: string;
 }
 
 export interface ChatMessageTriggerExecConfig {

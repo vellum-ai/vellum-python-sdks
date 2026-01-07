@@ -47,7 +47,8 @@ export class ChatMessageTrigger extends BaseTrigger<ChatMessageTriggerType> {
   protected getTriggerClassBody(): AstNode[] {
     const body: AstNode[] = [];
 
-    body.push(...this.createAttributeFields());
+    // Note: We don't call createAttributeFields() here because the `message` attribute
+    // is inherited from the Python ChatMessageTrigger base class
 
     const execConfig = this.trigger.execConfig;
     const hasOutput = execConfig?.output;
@@ -96,7 +97,7 @@ export class ChatMessageTrigger extends BaseTrigger<ChatMessageTriggerType> {
     state: ChatMessageTriggerStateReference
   ): AstNode | undefined {
     const stateVariableContext = this.workflowContext.findStateVariableContextById(
-      state.state_variable_id
+      state.stateVariableId
     );
 
     if (!stateVariableContext) {
