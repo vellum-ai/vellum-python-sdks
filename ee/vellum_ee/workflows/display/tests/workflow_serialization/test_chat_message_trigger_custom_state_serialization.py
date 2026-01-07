@@ -62,3 +62,8 @@ def test_custom_state_workflow_serialization():
             },
         }
     ]
+
+    # AND the state_variable_id should match the corresponding state variable
+    state_variable_id = serialized_workflow["triggers"][0]["exec_config"]["state"]["state_variable_id"]
+    state_variable_ids = [sv["id"] for sv in serialized_workflow["state_variables"]]
+    assert state_variable_id in state_variable_ids
