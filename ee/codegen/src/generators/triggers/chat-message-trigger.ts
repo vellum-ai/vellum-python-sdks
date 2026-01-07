@@ -96,9 +96,8 @@ export class ChatMessageTrigger extends BaseTrigger<ChatMessageTriggerType> {
   private createStateField(
     state: ChatMessageTriggerStateReference
   ): AstNode | undefined {
-    const stateVariableContext = this.workflowContext.findStateVariableContextById(
-      state.stateVariableId
-    );
+    const stateVariableContext =
+      this.workflowContext.findStateVariableContextById(state.stateVariableId);
 
     if (!stateVariableContext) {
       return undefined;
