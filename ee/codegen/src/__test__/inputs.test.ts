@@ -1,5 +1,4 @@
 import { Vellum } from "vellum-ai";
-import { VellumVariable } from "vellum-ai/api";
 import { VellumVariableType } from "vellum-ai/api/types";
 
 import { workflowContextFactory } from "./helpers";
@@ -8,6 +7,7 @@ import { inputVariableContextFactory } from "./helpers/input-variable-context-fa
 import * as codegen from "src/codegen";
 import { WorkflowContext } from "src/context";
 import { Writer } from "src/generators/extensions/writer";
+import { VellumVariable } from "src/types/vellum";
 
 describe("Inputs", () => {
   let workflowContext: WorkflowContext;
@@ -339,6 +339,32 @@ describe("Inputs", () => {
         workflowContext.addInputVariableContext(
           inputVariableContextFactory({
             inputVariableData: inputVariableData,
+            workflowContext,
+          })
+        );
+      });
+
+      const inputs = codegen.inputs({ workflowContext });
+      inputs.write(writer);
+
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+
+    it("should generate int type when NUMBER input has integer schema", async () => {
+      const inputVariables: VellumVariable[] = [
+        {
+          id: "int-input",
+          key: "list_id",
+          type: "NUMBER",
+          required: true,
+          schema: { type: "integer" },
+        },
+      ];
+
+      inputVariables.forEach((inputVariableData) => {
+        workflowContext.addInputVariableContext(
+          inputVariableContextFactory({
+            inputVariableData,
             workflowContext,
           })
         );

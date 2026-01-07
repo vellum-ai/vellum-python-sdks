@@ -54,6 +54,7 @@ from vellum.workflows.triggers.manual import ManualTrigger
 from vellum.workflows.types.core import Json, JsonArray, JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.types.utils import get_original_base
+from vellum.workflows.utils.functions import compile_annotation
 from vellum.workflows.utils.uuids import generate_entity_id_from_path, uuid4_from_hash
 from vellum.workflows.vellum_client import create_vellum_client
 from vellum_ee.workflows.display.base import (
@@ -232,6 +233,11 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
 
             is_required = self._is_reference_required(workflow_input_reference)
 
+            # Compile the type annotation to a JSON schema to preserve specific types like int
+            # workflow_input_reference.types returns a tuple, so we extract the first element
+            input_type = workflow_input_reference.types[0] if workflow_input_reference.types else None
+            schema = compile_annotation(input_type, {})
+
             input_variables.append(
                 {
                     "id": str(workflow_input_display.id),
@@ -240,6 +246,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                     "default": default.dict() if default else None,
                     "required": is_required,
                     "extensions": {"color": workflow_input_display.color},
+                    "schema": schema,
                 }
             )
 

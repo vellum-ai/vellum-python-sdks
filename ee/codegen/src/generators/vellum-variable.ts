@@ -12,7 +12,10 @@ import { NoneInstantiation } from "src/generators/extensions/none-instantiation"
 import { Reference } from "src/generators/extensions/reference";
 import { Writer } from "src/generators/extensions/writer";
 import { VellumValue } from "src/generators/vellum-variable-value";
-import { getVellumVariablePrimitiveType } from "src/utils/vellum-variables";
+import {
+  getVellumVariablePrimitiveType,
+  jsonSchemaToType,
+} from "src/utils/vellum-variables";
 
 // VellumVariable.defaultRequired:
 // Prompt Inputs: required: undefined == required: true,
@@ -32,7 +35,9 @@ export class VellumVariable extends AstNode {
   constructor({ variable, defaultRequired }: VellumVariable.Args) {
     super();
 
-    const baseType = getVellumVariablePrimitiveType(variable.type);
+    const baseType = variable.schema
+      ? jsonSchemaToType(variable.schema)
+      : getVellumVariablePrimitiveType(variable.type);
     const name = variable.key;
     this.defaultRequired = defaultRequired;
 
