@@ -88,7 +88,7 @@ export default {
           y: 200,
         },
         z_index: 1,
-        icon: "vellum:icon:message",
+        icon: "vellum:icon:message-dots",
         color: "blue",
       },
     },
