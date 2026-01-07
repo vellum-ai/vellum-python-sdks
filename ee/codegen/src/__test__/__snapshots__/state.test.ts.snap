@@ -1,22 +1,65 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`State > write > should generate correct code when State has a custom name 1`] = `
-"from vellum.workflows.state import BaseState
+exports[`State > chat history state default value handling > should generate correct code for chat history state with empty list default 1`] = `
+"from pydantic import Field
+from typing import Optional
 
-
-class CustomState(BaseState):
-    variable1: str
-"
-`;
-
-exports[`State > write > should generate correct code when State has no variables 1`] = `""`;
-
-exports[`State > write > should generate correct code when State has variables 1`] = `
-"from vellum.workflows.state import BaseState
+from vellum import ChatMessage
+from vellum.workflows.state import BaseState
 
 
 class State(BaseState):
-    variable1: str
-    variable2: float
+    chat_history: Optional[list[ChatMessage]] = Field(default_factory=list)
+"
+`;
+
+exports[`State > chat history state default value handling > should generate correct code for chat history state with non-empty list default 1`] = `
+"from pydantic import Field
+from typing import Optional
+
+from vellum import ChatMessage
+from vellum.workflows.state import BaseState
+
+
+class State(BaseState):
+    chat_history: Optional[list[ChatMessage]] = Field(
+        default_factory=lambda: [
+            ChatMessage(role="ASSISTANT", text="Hello, how can I help you?"),
+        ]
+    )
+"
+`;
+
+exports[`State > chat history state default value handling > should generate correct code for chat history state without default 1`] = `
+"from vellum import ChatMessage
+from vellum.workflows.state import BaseState
+
+
+class State(BaseState):
+    chat_history: list[ChatMessage]
+"
+`;
+
+exports[`State > chat history state default value handling > should generate correct code for optional chat history state without default 1`] = `
+"from typing import Optional
+
+from vellum import ChatMessage
+from vellum.workflows.state import BaseState
+
+
+class State(BaseState):
+    chat_history: Optional[list[ChatMessage]] = None
+"
+`;
+
+exports[`State > chat history state default value handling > should generate correct code for required chat history state with empty list default 1`] = `
+"from pydantic import Field
+
+from vellum import ChatMessage
+from vellum.workflows.state import BaseState
+
+
+class State(BaseState):
+    chat_history: list[ChatMessage] = Field(default_factory=list)
 "
 `;
