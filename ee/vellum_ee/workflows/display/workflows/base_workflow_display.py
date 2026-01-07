@@ -669,9 +669,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                     self._validate_integration_trigger_attributes(trigger_class, trigger_attributes)
 
                 if trigger_type == WorkflowTriggerType.CHAT_MESSAGE and issubclass(trigger_class, ChatMessageTrigger):
-                    chat_exec_config = self._serialize_chat_message_trigger_exec_config(trigger_class)
-                    if chat_exec_config:
-                        trigger_data["exec_config"] = chat_exec_config
+                    trigger_data["exec_config"] = self._serialize_chat_message_trigger_exec_config(trigger_class)
 
             # Serialize display_data using the shared utility
             display_data = serialize_trigger_display_data(trigger_class, trigger_type)
@@ -845,14 +843,15 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                         trigger_class_name=trigger_class.__name__,
                     )
 
-    def _serialize_chat_message_trigger_exec_config(
-        self, trigger_class: Type[ChatMessageTrigger]
-    ) -> Optional[JsonObject]:
+    def _serialize_chat_message_trigger_exec_config(self, trigger_class: Type[ChatMessageTrigger]) -> JsonObject:
         config_class = trigger_class.Config
         output = getattr(config_class, "output", None)
 
         if output is None:
-            return None
+            raise TriggerValidationError(
+                message="Chat Trigger output must be specified.",
+                trigger_class_name=trigger_class.__name__,
+            )
 
         serialized_output = serialize_value(
             executable_id=trigger_class.__id__,
