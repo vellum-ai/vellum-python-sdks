@@ -35,7 +35,7 @@ class ChatMessageTrigger(BaseTrigger):
         output: Optional[BaseDescriptor[Any]] = None
         state: Optional[StateValueReference[List[ChatMessage]]] = None
 
-    def get_state_key(self) -> str:
+    def _get_state_key(self) -> str:
         """Returns the state attribute key to use for chat history."""
         state_ref = self.Config.state
         if state_ref is not None:
@@ -44,7 +44,7 @@ class ChatMessageTrigger(BaseTrigger):
 
     def __on_workflow_initiated__(self, state: "BaseState") -> None:
         """Appends user message to state chat history at workflow start."""
-        chat_history_key = self.get_state_key()
+        chat_history_key = self._get_state_key()
         if not hasattr(state, chat_history_key):
             return
 
@@ -56,7 +56,7 @@ class ChatMessageTrigger(BaseTrigger):
 
     def __on_workflow_fulfilled__(self, state: "BaseState") -> None:
         """Appends assistant response to state chat history after workflow completion."""
-        chat_history_key = self.get_state_key()
+        chat_history_key = self._get_state_key()
         if not hasattr(state, chat_history_key):
             return
 

@@ -160,4 +160,4 @@ def test_chat_message_trigger__default_state():
 
     # THEN the default state is None (falls back to "chat_history")
     assert trigger.Config.state is None
-    assert trigger.get_state_key() == "chat_history"
+    assert trigger._get_state_key() == "chat_history"
