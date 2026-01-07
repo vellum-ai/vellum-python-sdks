@@ -3,10 +3,11 @@ from copy import deepcopy
 import json
 from queue import Queue
 import threading
-from typing import Any, Dict, List, cast
+from typing import Any, Dict, List, Optional, cast
 
 from pydantic import Field
 
+from vellum import ChatMessage
 from vellum.utils.json_encoder import VellumJsonEncoder
 from vellum.workflows.constants import undefined
 from vellum.workflows.nodes.bases import BaseNode
@@ -453,3 +454,60 @@ def test_state_snapshot__top_level_attribute_assignment_blocks_during_deepcopy()
 
     # THEN the mutation should have been blocked by the lock
     assert mutation_blocked, "Top-level attribute assignment should block while deepcopy holds the lock"
+
+
+def test_base_state_chat_history_with_default_factory_initializes_to_list():
+    """
+    Tests that a chat_history state variable with Optional[list[ChatMessage]] = Field(default_factory=list)
+    initializes to an empty list instead of None.
+    """
+
+    # GIVEN a state class with chat_history using Field(default_factory=list)
+    class TestState(BaseState):
+        chat_history: Optional[List[ChatMessage]] = Field(default_factory=list)  # type: ignore[arg-type]
+
+    # WHEN we create a state instance without providing a value
+    state = TestState()
+
+    # THEN the chat_history should be an empty list, not None
+    assert state.chat_history is not None
+    assert isinstance(state.chat_history, list)
+    assert state.chat_history == []
+
+    # AND we should be able to append ChatMessage objects to it
+    chat_history = state.chat_history
+    chat_history.append(ChatMessage(role="USER", text="Hello"))
+    assert len(chat_history) == 1
+    assert chat_history[0].role == "USER"
+    assert chat_history[0].text == "Hello"
+
+
+def test_base_state_chat_history_with_default_factory_creates_separate_instances():
+    """
+    Tests that Field(default_factory=list) creates separate list instances for each state,
+    avoiding the mutable default argument issue.
+    """
+
+    # GIVEN a state class with chat_history using Field(default_factory=list)
+    class TestState(BaseState):
+        chat_history: Optional[List[ChatMessage]] = Field(default_factory=list)  # type: ignore[arg-type]
+
+    # WHEN we create two state instances
+    state1 = TestState()
+    state2 = TestState()
+
+    # THEN they should have separate list instances
+    assert state1.chat_history is not state2.chat_history
+
+    # AND modifying one should not affect the other
+    chat_history1 = state1.chat_history
+    chat_history2 = state2.chat_history
+    assert chat_history1 is not None
+    assert chat_history2 is not None
+    chat_history1.append(ChatMessage(role="USER", text="Message 1"))
+    chat_history2.append(ChatMessage(role="ASSISTANT", text="Message 2"))
+
+    assert len(chat_history1) == 1
+    assert len(chat_history2) == 1
+    assert chat_history1[0].text == "Message 1"
+    assert chat_history2[0].text == "Message 2"

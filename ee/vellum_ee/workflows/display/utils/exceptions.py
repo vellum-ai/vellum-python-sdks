@@ -48,3 +48,13 @@ class TriggerValidationError(UserFacingException):
         self.message = message
         self.trigger_class_name = trigger_class_name
         super().__init__(f"Trigger validation error in {trigger_class_name}: {message}")
+
+
+class StateValidationError(UserFacingException):
+    """Exception raised when a state class fails validation during serialization."""
+
+    def __init__(self, message: str, state_class_name: str, attribute_name: str):
+        self.message = message
+        self.state_class_name = state_class_name
+        self.attribute_name = attribute_name
+        super().__init__(f"State validation error in {state_class_name}.{attribute_name}: {message}")
