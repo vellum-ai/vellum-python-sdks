@@ -850,12 +850,9 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
     ) -> Optional[JsonObject]:
         config_class = trigger_class.Config
         output = getattr(config_class, "output", None)
-        state = getattr(config_class, "state", None)
+        state: Optional[StateValueReference[Any]] = getattr(config_class, "state", None)
 
-        has_output = output is not None
-        has_state = state is not None
-
-        if not has_output:
+        if output is None:
             self.display_context.add_validation_error(
                 TriggerValidationError(
                     message="Chat Trigger output must be specified.",
@@ -863,12 +860,12 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                 )
             )
 
-        if not has_output and not has_state:
+        if output is None and state is None:
             return None
 
         exec_config: JsonObject = {}
 
-        if has_output:
+        if output is not None:
             serialized_output = serialize_value(
                 executable_id=trigger_class.__id__,
                 display_context=self.display_context,
@@ -876,7 +873,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             )
             exec_config["output"] = serialized_output
 
-        if has_state:
+        if state is not None:
             state_value_display = self.display_context.global_state_value_displays[state]
             exec_config["state"] = {"state_variable_id": str(state_value_display.id)}
 
