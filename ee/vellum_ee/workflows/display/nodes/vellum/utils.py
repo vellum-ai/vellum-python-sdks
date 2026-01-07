@@ -87,8 +87,9 @@ def create_node_input_value_pointer_rules(
         if isinstance(value, LazyReference):
             try:
                 child_descriptor = get_child_descriptor(value, display_context)
-            except InvalidOutputReferenceError:
+            except InvalidOutputReferenceError as e:
                 logger.warning("Failed to parse lazy reference '%s', skipping serialization", value.name)
+                display_context.add_validation_error(e)
                 return node_input_value_pointer_rules
             return create_node_input_value_pointer_rules(
                 child_descriptor, display_context, node_id, existing_rules=[], pointer_type=pointer_type

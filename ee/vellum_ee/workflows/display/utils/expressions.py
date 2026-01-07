@@ -357,8 +357,9 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
     if isinstance(value, LazyReference):
         try:
             child_descriptor = get_child_descriptor(value, display_context)
-        except InvalidOutputReferenceError:
+        except InvalidOutputReferenceError as e:
             logger.warning("Failed to parse lazy reference '%s', skipping serialization", value.name)
+            display_context.add_validation_error(e)
             return None
         return serialize_value(executable_id, display_context, child_descriptor)
 

@@ -164,8 +164,9 @@ def create_node_input_value_pointer_rule(
     if isinstance(value, LazyReference):
         try:
             child_descriptor = get_child_descriptor(value, display_context)
-        except InvalidOutputReferenceError:
+        except InvalidOutputReferenceError as e:
             logger.warning("Failed to parse lazy reference '%s', skipping serialization", value.name)
+            display_context.add_validation_error(e)
             raise UnsupportedSerializationException(f"Failed to parse lazy reference: {value.name}")
         return create_node_input_value_pointer_rule(child_descriptor, display_context)
     if isinstance(value, WorkflowInputReference):

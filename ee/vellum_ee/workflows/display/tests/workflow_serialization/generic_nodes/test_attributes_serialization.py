@@ -18,7 +18,6 @@ from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.base import WorkflowInputsDisplay
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
-from vellum_ee.workflows.display.utils.exceptions import InvalidOutputReferenceError
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 
@@ -276,7 +275,7 @@ def test_serialize_node__lazy_reference_workflow_output_with_string():
 
 
 def test_serialize_node__lazy_reference_with_string__class_not_found():
-    """Test that InvalidOutputReferenceError is raised when the referenced class is not found."""
+    """Test that InvalidOutputReferenceError is added to display context when the referenced class is not found."""
 
     # GIVEN a node with a string-based LazyReference to a non-existent class
     class NodeWithInvalidReference(BaseNode):
@@ -288,13 +287,14 @@ def test_serialize_node__lazy_reference_with_string__class_not_found():
 
     # WHEN we try to serialize the workflow
     workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    workflow_display.serialize()
 
-    # THEN an InvalidOutputReferenceError should be raised
-    with pytest.raises(InvalidOutputReferenceError) as exc_info:
-        workflow_display.serialize()
+    # THEN the error should be added to the display context
+    errors = list(workflow_display.display_context.errors)
+    assert len(errors) == 1
 
     # AND the error message should mention the class that could not be found
-    error_message = str(exc_info.value)
+    error_message = str(errors[0])
     assert "NonExistentClass" in error_message
     assert "Could not find node or workflow class" in error_message
 
