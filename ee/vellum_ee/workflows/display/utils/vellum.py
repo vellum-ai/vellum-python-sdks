@@ -1,3 +1,4 @@
+import logging
 from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
 from vellum.client.core.api_error import ApiError
@@ -18,11 +19,17 @@ from vellum.workflows.references.state_value import StateValueReference
 from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
-from vellum_ee.workflows.display.utils.exceptions import InvalidInputReferenceError, UnsupportedSerializationException
+from vellum_ee.workflows.display.utils.exceptions import (
+    InvalidInputReferenceError,
+    InvalidOutputReferenceError,
+    UnsupportedSerializationException,
+)
 from vellum_ee.workflows.display.utils.expressions import get_child_descriptor
 
 if TYPE_CHECKING:
     from vellum_ee.workflows.display.types import WorkflowDisplayContext
+
+logger = logging.getLogger(__name__)
 
 
 class ConstantValuePointer(UniversalBaseModel):
@@ -155,7 +162,11 @@ def create_node_input_value_pointer_rule(
             data=NodeOutputData(node_id=str(upstream_node_display.node_id), output_id=str(output_display.id)),
         )
     if isinstance(value, LazyReference):
-        child_descriptor = get_child_descriptor(value, display_context)
+        try:
+            child_descriptor = get_child_descriptor(value, display_context)
+        except InvalidOutputReferenceError:
+            logger.warning("Failed to parse lazy reference '%s', skipping serialization", value.name)
+            raise UnsupportedSerializationException(f"Failed to parse lazy reference: {value.name}")
         return create_node_input_value_pointer_rule(child_descriptor, display_context)
     if isinstance(value, WorkflowInputReference):
         if value not in display_context.global_workflow_input_displays:
