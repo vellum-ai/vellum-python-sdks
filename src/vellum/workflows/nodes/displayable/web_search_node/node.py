@@ -64,7 +64,7 @@ class WebSearchNode(BaseNode[StateType]):
                 arguments={"query": query},
             )
         except ApiError as e:
-            if e.status_code in (400, 403) and isinstance(e.body, dict):
+            if e.status_code == 403 and isinstance(e.body, dict):
                 raise NodeException(
                     message=e.body.get("detail", "You must provide authenticate with the search provider."),
                     code=WorkflowErrorCode.PROVIDER_CREDENTIALS_UNAVAILABLE,

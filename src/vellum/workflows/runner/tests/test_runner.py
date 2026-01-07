@@ -10,7 +10,7 @@ from vellum.workflows.workflows.base import BaseWorkflow
 def test_workflow_runner__handles_400_api_error_with_integration_details():
     """
     Tests that WorkflowRunner handles 400 API errors with integration details
-    the same way it handles 403 errors.
+    as INVALID_INPUTS errors.
     """
 
     # GIVEN a node that raises an ApiError with status_code 400 and integration details
@@ -28,7 +28,7 @@ def test_workflow_runner__handles_400_api_error_with_integration_details():
             raise ApiError(
                 status_code=400,
                 body={
-                    "message": "Integration credentials are invalid",
+                    "message": "Invalid request to integration",
                     "integration": {
                         "name": "test_integration",
                         "provider": "test_provider",
@@ -47,15 +47,15 @@ def test_workflow_runner__handles_400_api_error_with_integration_details():
     # WHEN we run the node
     events = list(workflow.run_node(node=TestNode))
 
-    # THEN we should get a rejected event with INTEGRATION_CREDENTIALS_UNAVAILABLE error code
+    # THEN we should get a rejected event with INVALID_INPUTS error code
     assert len(events) == 2
     assert isinstance(events[0], NodeExecutionInitiatedEvent)
     assert isinstance(events[1], NodeExecutionRejectedEvent)
 
     # AND the error should have the correct code and message
     rejected_event = events[1]
-    assert rejected_event.body.error.code == WorkflowErrorCode.INTEGRATION_CREDENTIALS_UNAVAILABLE
-    assert rejected_event.body.error.message == "Integration credentials are invalid"
+    assert rejected_event.body.error.code == WorkflowErrorCode.INVALID_INPUTS
+    assert rejected_event.body.error.message == "Invalid request to integration"
 
     # AND the raw_data should contain the integration details
     assert rejected_event.body.error.raw_data == {

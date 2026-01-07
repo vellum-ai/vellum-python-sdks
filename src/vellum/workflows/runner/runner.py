@@ -656,10 +656,10 @@ class WorkflowRunner(Generic[StateType]):
             yield self._handle_run_node_exception(e, "Invalid Expression Exception", execution, span_id, node)
         except ApiError as e:
             captured_stacktrace = traceback.format_exc()
-            # Handle structured 400/403 credential error responses with integration details
+            # Handle structured 403 credential error responses with integration details
             # The Django API returns {"message": "...", "integration": {...}} for unresolvable credentials
-            # We detect this by shape (400/403 + integration field present) rather than a code field
-            if e.status_code in (400, 403) and isinstance(e.body, dict) and e.body.get("integration"):
+            # We detect this by shape (403 + integration field present) rather than a code field
+            if e.status_code == 403 and isinstance(e.body, dict) and e.body.get("integration"):
                 error_message = e.body.get(
                     "message", "You must authenticate with this integration before you can execute this tool."
                 )
@@ -672,6 +672,24 @@ class WorkflowRunner(Generic[StateType]):
                         error=WorkflowError(
                             message=error_message,
                             code=WorkflowErrorCode.INTEGRATION_CREDENTIALS_UNAVAILABLE,
+                            raw_data=raw_data,
+                        ),
+                        stacktrace=captured_stacktrace,
+                    ),
+                    parent=execution.parent_context,
+                )
+            # Handle structured 400 error responses with integration details as INVALID_INPUTS
+            elif e.status_code == 400 and isinstance(e.body, dict) and e.body.get("integration"):
+                error_message = e.body.get("message", "Invalid request to integration.")
+                raw_data = {"integration": e.body["integration"]}
+                yield NodeExecutionRejectedEvent(
+                    trace_id=execution.trace_id,
+                    span_id=span_id,
+                    body=NodeExecutionRejectedBody(
+                        node_definition=node.__class__,
+                        error=WorkflowError(
+                            message=error_message,
+                            code=WorkflowErrorCode.INVALID_INPUTS,
                             raw_data=raw_data,
                         ),
                         stacktrace=captured_stacktrace,
