@@ -232,6 +232,48 @@ def test_serialize_node__lazy_reference_workflow_output():
     assert attr["value"]["output_variable_id"] == workflow_output["id"]
 
 
+def test_serialize_node__lazy_reference_workflow_output_with_string():
+    """Test that string-based LazyReference to workflow output serializes as WORKFLOW_OUTPUT type."""
+
+    # GIVEN a node with a string-based LazyReference to a workflow output
+    class NodeWithWorkflowOutputReference(BaseNode):
+        workflow_output_ref = LazyReference[str]("StringWorkflow.Outputs.final_result")
+
+    class TestNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result: str = "test result"
+
+    # AND a workflow that defines an output
+    class StringWorkflow(BaseWorkflow):
+        graph = NodeWithWorkflowOutputReference >> TestNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_result = TestNode.Outputs.result
+
+    # WHEN the node is serialized in the context of the workflow
+    workflow_display = get_workflow_display(workflow_class=StringWorkflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the node should properly serialize the workflow output reference
+    node_with_lazy_reference = next(
+        node
+        for node in serialized_workflow["workflow_raw_data"]["nodes"]
+        if node["id"] == str(NodeWithWorkflowOutputReference.__id__)
+    )
+
+    # AND the workflow output reference should serialize as WORKFLOW_OUTPUT type
+    assert len(node_with_lazy_reference["attributes"]) == 1
+    attr = node_with_lazy_reference["attributes"][0]
+    assert attr["name"] == "workflow_output_ref"
+    assert attr["value"]["type"] == "WORKFLOW_OUTPUT"
+
+    # AND the output_variable_id should match the workflow output
+    workflow_output = next(
+        output for output in serialized_workflow["output_variables"] if output["key"] == "final_result"
+    )
+    assert attr["value"]["output_variable_id"] == workflow_output["id"]
+
+
 def test_serialize_node__workflow_input(serialize_node):
     class WorkflowInputGenericNode(BaseNode):
         attr: str = Inputs.input
