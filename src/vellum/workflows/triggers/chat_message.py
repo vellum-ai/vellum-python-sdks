@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Any, List, Optional, Union
 from vellum.client.types import ArrayChatMessageContent, ArrayChatMessageContentItem, ChatMessage, ChatMessageContent
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.utils import resolve_value
+from vellum.workflows.exceptions import NodeException
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.references.state_value import StateValueReference
@@ -35,29 +36,34 @@ class ChatMessageTrigger(BaseTrigger):
         output: Optional[BaseDescriptor[Any]] = None
         state: Optional[StateValueReference[List[ChatMessage]]] = None
 
-    def _get_state_key(self) -> str:
-        """Returns the state attribute key to use for chat history."""
+    def _resolve_state(self, state: "BaseState") -> Optional[List[ChatMessage]]:
+        """Resolves the chat history list from state, handling parent state walking."""
         state_ref = self.Config.state
         if state_ref is not None:
-            return state_ref.name
-        return "chat_history"
+            try:
+                return state_ref.resolve(state)
+            except NodeException:
+                return None
+        if not hasattr(state, "chat_history"):
+            return None
+        return state.chat_history
 
     def __on_workflow_initiated__(self, state: "BaseState") -> None:
         """Appends user message to state chat history at workflow start."""
-        chat_history_key = self._get_state_key()
-        if not hasattr(state, chat_history_key):
+        chat_history = self._resolve_state(state)
+        if chat_history is None:
             return
 
         user_message = ChatMessage(
             role="USER",
             content=ArrayChatMessageContent(value=self.message),
         )
-        getattr(state, chat_history_key).append(user_message)
+        chat_history.append(user_message)
 
     def __on_workflow_fulfilled__(self, state: "BaseState") -> None:
         """Appends assistant response to state chat history after workflow completion."""
-        chat_history_key = self._get_state_key()
-        if not hasattr(state, chat_history_key):
+        chat_history = self._resolve_state(state)
+        if chat_history is None:
             return
 
         output = self.Config.output
@@ -68,7 +74,7 @@ class ChatMessageTrigger(BaseTrigger):
                 content=resolved_output if not isinstance(resolved_output, str) else None,
                 text=resolved_output if isinstance(resolved_output, str) else None,
             )
-            getattr(state, chat_history_key).append(assistant_message)
+            chat_history.append(assistant_message)
 
     def _resolve_output(
         self,
