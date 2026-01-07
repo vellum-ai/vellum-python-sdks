@@ -983,7 +983,6 @@ export const WorkflowValueDescriptorSerializer: Schema<
   TERNARY_EXPRESSION: TernaryWorkflowExpressionSerializer,
   NODE_OUTPUT: NodeOutputWorkflowReferenceSerializer,
   WORKFLOW_INPUT: WorkflowInputWorkflowReferenceSerializer,
-  WORKFLOW_OUTPUT: WorkflowOutputWorkflowReferenceSerializer,
   WORKFLOW_STATE: WorkflowStateVariableWorkflowReferenceSerializer,
   CONSTANT_VALUE: ConstantValueWorkflowReferenceSerializer,
   VELLUM_SECRET: VellumSecretWorkflowReferenceSerializer,
@@ -1001,7 +1000,6 @@ export declare namespace WorkflowValueDescriptorSerializer {
     | TernaryWorkflowExpressionSerializer.Raw
     | NodeOutputWorkflowReferenceSerializer.Raw
     | WorkflowInputWorkflowReferenceSerializer.Raw
-    | WorkflowOutputWorkflowReferenceSerializer.Raw
     | WorkflowStateVariableWorkflowReferenceSerializer.Raw
     | ConstantValueWorkflowReferenceSerializer.Raw
     | VellumSecretWorkflowReferenceSerializer.Raw
@@ -2452,12 +2450,14 @@ export declare namespace IntegrationTriggerSerializer {
 }
 
 const ChatMessageTriggerExecConfigSerializer = objectSchema({
-  output: WorkflowValueDescriptorSerializer.optional(),
+  output: unionSchema("type", {
+    WORKFLOW_OUTPUT: WorkflowOutputWorkflowReferenceSerializer,
+  }).optional(),
 });
 
 export declare namespace ChatMessageTriggerExecConfigSerializer {
   interface Raw {
-    output?: WorkflowValueDescriptorSerializer.Raw | null;
+    output?: WorkflowOutputWorkflowReferenceSerializer.Raw | null;
   }
 }
 

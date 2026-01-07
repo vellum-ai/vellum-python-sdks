@@ -1009,7 +1009,6 @@ export type WorkflowExpression =
 export type WorkflowValueDescriptorReference =
   | NodeOutputWorkflowReference
   | WorkflowInputWorkflowReference
-  | WorkflowOutputWorkflowReference
   | WorkflowStateVariableWorkflowReference
   | ConstantValueWorkflowReference
   | VellumSecretWorkflowReference
