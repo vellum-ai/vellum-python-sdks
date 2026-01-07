@@ -132,5 +132,4 @@ describe("WorkflowValueDescriptorReferencePointer", () => {
     reference.write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
   });
-
 });
