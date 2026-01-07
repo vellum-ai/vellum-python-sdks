@@ -158,6 +158,14 @@ def test_chat_message_trigger__default_state():
     # GIVEN a ChatMessageTrigger with default config
     trigger = ChatMessageTrigger(message="Hello")
 
-    # THEN the default state is None (falls back to "chat_history")
+    # AND a state with chat_history attribute
+    state = ChatState()
+
+    # WHEN we resolve the state
+    chat_history = trigger._resolve_state(state)
+
+    # THEN the default state config is None
     assert trigger.Config.state is None
-    assert trigger._get_state_key() == "chat_history"
+
+    # AND the resolved chat history is the state's chat_history attribute
+    assert chat_history is state.chat_history
