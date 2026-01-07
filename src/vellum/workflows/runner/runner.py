@@ -678,6 +678,24 @@ class WorkflowRunner(Generic[StateType]):
                     ),
                     parent=execution.parent_context,
                 )
+            # Handle structured 400 error responses with integration details as INVALID_INPUTS
+            elif e.status_code == 400 and isinstance(e.body, dict) and e.body.get("integration"):
+                error_message = e.body.get("message", "Invalid request to integration.")
+                raw_data = {"integration": e.body["integration"]}
+                yield NodeExecutionRejectedEvent(
+                    trace_id=execution.trace_id,
+                    span_id=span_id,
+                    body=NodeExecutionRejectedBody(
+                        node_definition=node.__class__,
+                        error=WorkflowError(
+                            message=error_message,
+                            code=WorkflowErrorCode.INVALID_INPUTS,
+                            raw_data=raw_data,
+                        ),
+                        stacktrace=captured_stacktrace,
+                    ),
+                    parent=execution.parent_context,
+                )
             else:
                 # For all other ApiErrors, use the existing generic exception behavior
                 error_message = self._parse_error_message(e)
