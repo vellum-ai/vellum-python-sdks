@@ -1,17 +1,15 @@
 import { VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH } from "src/constants";
 import { Class } from "src/generators/extensions/class";
-import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { Field } from "src/generators/extensions/field";
-import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
-import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { BaseTrigger } from "src/generators/triggers/base-trigger";
+import { WorkflowOutputWorkflowReference } from "src/generators/workflow-value-descriptor-reference/workflow-output-workflow-reference";
 import { createPythonClassName, toPythonSafeSnakeCase } from "src/utils/casing";
 
 import type { AstNode } from "src/generators/extensions/ast-node";
 import type {
   ChatMessageTrigger as ChatMessageTriggerType,
-  WorkflowOutputWorkflowReference,
+  WorkflowOutputWorkflowReference as WorkflowOutputWorkflowReferenceType,
 } from "src/types/vellum";
 
 export declare namespace ChatMessageTriggerGenerator {
@@ -56,7 +54,9 @@ export class ChatMessageTrigger extends BaseTrigger<ChatMessageTriggerType> {
     return body;
   }
 
-  private createConfigClass(output: WorkflowOutputWorkflowReference): AstNode {
+  private createConfigClass(
+    output: WorkflowOutputWorkflowReferenceType
+  ): AstNode {
     const configClass = new Class({
       name: "Config",
       extends_: [
@@ -77,38 +77,23 @@ export class ChatMessageTrigger extends BaseTrigger<ChatMessageTriggerType> {
   }
 
   private createOutputField(
-    output: WorkflowOutputWorkflowReference
+    output: WorkflowOutputWorkflowReferenceType
   ): AstNode | undefined {
-    const outputVariableContext =
-      this.workflowContext.findOutputVariableContextById(
-        output.outputVariableId
-      );
+    const workflowOutputReference = new WorkflowOutputWorkflowReference({
+      workflowContext: this.workflowContext,
+      nodeInputWorkflowReferencePointer: output,
+    });
 
-    if (!outputVariableContext) {
+    const astNode = workflowOutputReference.getAstNode();
+    if (!astNode) {
       return undefined;
     }
 
-    const stringPath = `${this.workflowContext.workflowClassName}.Outputs.${outputVariableContext.name}`;
-    const lazyReferenceValue = new ClassInstantiation({
-      classReference: new Reference({
-        name: "LazyReference",
-        modulePath: [
-          ...this.workflowContext.sdkModulePathNames.WORKFLOWS_MODULE_PATH,
-          "references",
-        ],
-      }),
-      arguments_: [
-        new MethodArgument({
-          value: new StrInstantiation(stringPath),
-        }),
-      ],
-    });
-
-    this.inheritReferences(lazyReferenceValue);
+    this.inheritReferences(workflowOutputReference);
 
     return new Field({
       name: "output",
-      initializer: lazyReferenceValue,
+      initializer: astNode,
     });
   }
 }
