@@ -72,5 +72,5 @@ class ChatMessageTrigger(BaseTrigger):
 
     class Display(BaseTrigger.Display):
         label: str = "Chat Message"
-        icon: Optional[str] = "vellum:icon:message"
+        icon: Optional[str] = "vellum:icon:message-dots"
         color: Optional[str] = "blue"

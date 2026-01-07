@@ -54,7 +54,7 @@ def test_simple_chat_workflow_serialization():
                     "y": 0.0,
                 },
                 "z_index": 0,
-                "icon": "vellum:icon:message",
+                "icon": "vellum:icon:message-dots",
                 "color": "blue",
             },
         }
