@@ -859,19 +859,15 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                     trigger_class_name=trigger_class.__name__,
                 )
             )
-
-        if output is None and state is None:
             return None
 
-        exec_config: JsonObject = {}
-
-        if output is not None:
-            serialized_output = serialize_value(
+        exec_config: JsonObject = {
+            "output": serialize_value(
                 executable_id=trigger_class.__id__,
                 display_context=self.display_context,
                 value=output,
             )
-            exec_config["output"] = serialized_output
+        }
 
         if state is not None:
             state_value_display = self.display_context.global_state_value_displays[state]
