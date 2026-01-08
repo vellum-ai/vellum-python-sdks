@@ -1,8 +1,14 @@
 """Tests for ChatMessageTrigger serialization."""
 
+from typing import List
+
+from pydantic import Field
+
+from vellum.client.types import ChatMessage
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
+from vellum.workflows.references import LazyReference
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.triggers.chat_message import ChatMessageTrigger
 from vellum_ee.workflows.display.utils.exceptions import TriggerValidationError
@@ -77,16 +83,16 @@ class ResponseNode(BaseNode):
         response: str = "Hello!"
 
 
-class ChatTriggerWithoutOutputOrState(ChatMessageTrigger):
-    """Chat trigger without Config.output or Config.state specified."""
+class ChatTriggerWithoutOutput(ChatMessageTrigger):
+    """Chat trigger without Config.output specified."""
 
     pass
 
 
-class WorkflowWithUnspecifiedChatTriggerConfig(BaseWorkflow[BaseInputs, BaseState]):
-    """Workflow using ChatTrigger without output or state specified."""
+class WorkflowWithUnspecifiedChatTriggerOutput(BaseWorkflow[BaseInputs, BaseState]):
+    """Workflow using ChatTrigger without output specified."""
 
-    graph = ChatTriggerWithoutOutputOrState >> ResponseNode
+    graph = ChatTriggerWithoutOutput >> ResponseNode
 
     class Outputs(BaseWorkflow.Outputs):
         response = ResponseNode.Outputs.response
@@ -94,11 +100,11 @@ class WorkflowWithUnspecifiedChatTriggerConfig(BaseWorkflow[BaseInputs, BaseStat
 
 def test_chat_message_trigger_validation__output_not_specified():
     """
-    Tests that serialization adds TriggerValidationError when Chat Trigger output is not specified.
+    Tests that serialization adds TriggerValidationError to errors when Chat Trigger output is not specified.
     """
 
     # GIVEN a Workflow that uses a ChatMessageTrigger without Config.output specified
-    workflow_display = get_workflow_display(workflow_class=WorkflowWithUnspecifiedChatTriggerConfig)
+    workflow_display = get_workflow_display(workflow_class=WorkflowWithUnspecifiedChatTriggerOutput)
 
     # WHEN we serialize the workflow
     workflow_display.serialize()
@@ -114,13 +120,33 @@ def test_chat_message_trigger_validation__output_not_specified():
     assert "Chat Trigger output must be specified" in str(error)
 
 
+class CustomChatState(BaseState):
+    messages: List[ChatMessage] = Field(default_factory=list)
+
+
+class ChatTriggerWithoutState(ChatMessageTrigger):
+    """Chat trigger with output but without Config.state specified."""
+
+    class Config(ChatMessageTrigger.Config):
+        output = LazyReference("WorkflowWithUnspecifiedChatTriggerState.Outputs.response")
+
+
+class WorkflowWithUnspecifiedChatTriggerState(BaseWorkflow[BaseInputs, CustomChatState]):
+    """Workflow using ChatTrigger without state specified."""
+
+    graph = ChatTriggerWithoutState >> ResponseNode
+
+    class Outputs(BaseWorkflow.Outputs):
+        response = ResponseNode.Outputs.response
+
+
 def test_chat_message_trigger_validation__state_not_specified():
     """
-    Tests that serialization adds TriggerValidationError when Chat Trigger state is not specified.
+    Tests that serialization adds TriggerValidationError to errors when Chat Trigger state is not specified.
     """
 
     # GIVEN a Workflow that uses a ChatMessageTrigger without Config.state specified
-    workflow_display = get_workflow_display(workflow_class=WorkflowWithUnspecifiedChatTriggerConfig)
+    workflow_display = get_workflow_display(workflow_class=WorkflowWithUnspecifiedChatTriggerState)
 
     # WHEN we serialize the workflow
     workflow_display.serialize()
