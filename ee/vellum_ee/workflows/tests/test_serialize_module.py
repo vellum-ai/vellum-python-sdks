@@ -210,8 +210,11 @@ def test_serialize_module_with_pydantic_array():
     items_input = input_variables[0]
     assert items_input["key"] == "items"
     assert items_input["type"] == "JSON"
-    # TODO: Add support for pydantic models
-    assert "schema" not in items_input
+    # The schema field now includes the OpenAPI spec for the input type
+    assert items_input["schema"] == {
+        "type": "array",
+        "items": {"$ref": "#/$defs/tests.workflows.pydantic_array_serialization.workflow.CustomItem"},
+    }
 
     assert result.dataset is not None
     assert isinstance(result.dataset, list)

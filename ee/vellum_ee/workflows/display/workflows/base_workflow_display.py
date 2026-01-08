@@ -233,23 +233,21 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
 
             is_required = self._is_reference_required(workflow_input_reference)
 
-            # Only include schema field when it provides additional type information
-            # beyond what the type field already provides (e.g., int vs float | int for NUMBER type)
+            # Compile the type annotation to a JSON schema to preserve specific types
             input_type = workflow_input_reference.types[0] if workflow_input_reference.types else None
-            schema = compile_annotation(input_type, {}) if input_type is int else None
+            schema = compile_annotation(input_type, {})
 
-            input_variable_data: JsonObject = {
-                "id": str(workflow_input_display.id),
-                "key": workflow_input_display.name or workflow_input_reference.name,
-                "type": infer_vellum_variable_type(workflow_input_reference),
-                "default": default.dict() if default else None,
-                "required": is_required,
-                "extensions": {"color": workflow_input_display.color},
-            }
-            if schema is not None:
-                input_variable_data["schema"] = schema
-
-            input_variables.append(input_variable_data)
+            input_variables.append(
+                {
+                    "id": str(workflow_input_display.id),
+                    "key": workflow_input_display.name or workflow_input_reference.name,
+                    "type": infer_vellum_variable_type(workflow_input_reference),
+                    "default": default.dict() if default else None,
+                    "required": is_required,
+                    "extensions": {"color": workflow_input_display.color},
+                    "schema": schema,
+                }
+            )
 
         state_variables: JsonArray = []
         for state_value_reference, state_value_display in self.display_context.state_value_displays.items():

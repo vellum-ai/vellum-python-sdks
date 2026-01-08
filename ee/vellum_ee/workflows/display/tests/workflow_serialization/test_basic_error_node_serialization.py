@@ -32,6 +32,7 @@ def test_serialize_workflow():
                 "default": None,
                 "required": True,
                 "extensions": {"color": None},
+                "schema": {"type": "integer"},
             }
         ],
         input_variables,

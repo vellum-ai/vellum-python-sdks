@@ -365,6 +365,9 @@
       "default": null,
       "extensions": {
         "color": null
+      },
+      "schema": {
+        "type": "string"
       }
     },
     {
@@ -375,6 +378,9 @@
       "default": null,
       "extensions": {
         "color": null
+      },
+      "schema": {
+        "type": "string"
       }
     }
   ],

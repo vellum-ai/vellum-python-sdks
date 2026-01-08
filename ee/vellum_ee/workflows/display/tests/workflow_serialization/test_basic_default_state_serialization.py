@@ -31,6 +31,7 @@ def test_serialize_workflow():
                 "default": {"type": "STRING", "value": "hello"},
                 "required": False,
                 "extensions": {"color": None},
+                "schema": {"type": "string"},
             },
         ],
         input_variables,

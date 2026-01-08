@@ -562,6 +562,9 @@
       "default": null,
       "extensions": {
         "color": null
+      },
+      "schema": {
+        "type": "string"
       }
     }
   ],

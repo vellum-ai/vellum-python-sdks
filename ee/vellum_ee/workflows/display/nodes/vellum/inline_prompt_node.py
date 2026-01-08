@@ -9,6 +9,7 @@ from vellum.workflows.types.core import JsonObject
 from vellum.workflows.types.definition import DeploymentDefinition, MCPToolDefinition, VellumIntegrationToolDefinition
 from vellum.workflows.types.generics import is_workflow_class
 from vellum.workflows.utils.functions import (
+    compile_annotation,
     compile_function_definition,
     compile_inline_workflow_function_definition,
     compile_vellum_integration_tool_definition,
@@ -148,8 +149,20 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
                 or self.node_input_ids_by_name.get(variable_name),
             )
             vellum_variable_type = infer_vellum_variable_type(variable_value)
+            if isinstance(variable_value, BaseDescriptor):
+                input_type = variable_value.types[0] if variable_value.types else None
+            else:
+                input_type = type(variable_value)
+            schema = compile_annotation(input_type, {})
             node_inputs.append(node_input)
-            prompt_inputs.append(VellumVariable(id=str(node_input.id), key=variable_name, type=vellum_variable_type))
+            prompt_inputs.append(
+                VellumVariable(
+                    id=str(node_input.id),
+                    key=variable_name,
+                    type=vellum_variable_type,
+                    schema=schema,
+                )
+            )
 
         return node_inputs, prompt_inputs
 

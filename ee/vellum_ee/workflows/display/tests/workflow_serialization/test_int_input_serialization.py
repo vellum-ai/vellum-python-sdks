@@ -1,6 +1,24 @@
+from vellum.workflows import BaseWorkflow
+from vellum.workflows.inputs import BaseInputs
+from vellum.workflows.nodes import FinalOutputNode
+from vellum.workflows.state import BaseState
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
-from tests.workflows.int_input_workflow.workflow import IntInputWorkflow
+
+class IntInputs(BaseInputs):
+    count: int
+
+
+class OutputNode(FinalOutputNode):
+    class Outputs(FinalOutputNode.Outputs):
+        value = IntInputs.count
+
+
+class IntInputWorkflow(BaseWorkflow[IntInputs, BaseState]):
+    graph = OutputNode
+
+    class Outputs(BaseWorkflow.Outputs):
+        value = OutputNode.Outputs.value
 
 
 def test_serialize_workflow__int_input_schema_preserved():

@@ -1,8 +1,7 @@
 import { isEmpty, isNil } from "lodash";
-import { CodeResourceDefinition } from "vellum-ai/api/types";
+import { CodeResourceDefinition, VellumVariable } from "vellum-ai/api/types";
 
 import { WorkflowContext } from "src/context/workflow-context";
-import { VellumVariable } from "src/types/vellum";
 import {
   removeEscapeCharacters,
   toValidPythonIdentifier,

@@ -12,20 +12,12 @@ import {
   SearchResult,
   SearchResultRequest,
   VellumValue,
-  VellumVariable as SdkVellumVariable,
+  VellumVariable,
   VellumVariableType,
   WorkflowInput,
 } from "vellum-ai/api/types";
 
 import { Reference } from "src/generators/extensions/reference";
-
-/**
- * Extended VellumVariable type that includes the optional schema field.
- * This allows workflow inputs to specify a more specific type (e.g., int instead of float | int for NUMBER type).
- */
-export interface VellumVariable extends SdkVellumVariable {
-  schema?: Record<string, unknown>;
-}
 
 export enum WorkflowNodeType {
   PROMPT = "PROMPT",

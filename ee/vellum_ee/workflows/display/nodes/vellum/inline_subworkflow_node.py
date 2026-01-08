@@ -8,6 +8,7 @@ from vellum.workflows.nodes import InlineSubworkflowNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.types.generics import is_workflow_class
+from vellum.workflows.utils.functions import compile_annotation
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
@@ -111,20 +112,24 @@ class BaseInlineSubworkflowNodeDisplay(
             for variable_name, variable_value in subworkflow_entries
         ]
         node_inputs_by_key = {node_input.key: node_input for node_input in node_inputs}
-        workflow_inputs = [
-            VellumVariable(
-                id=node_inputs_by_key[descriptor.name].id,
-                key=descriptor.name,
-                type=infer_vellum_variable_type(descriptor),
-                required=descriptor.instance is undefined,
-                default=(
-                    primitive_to_vellum_value(descriptor.instance).dict()
-                    if descriptor.instance is not undefined
-                    else None
-                ),
+        workflow_inputs = []
+        for descriptor in subworkflow_inputs_class:
+            input_type = descriptor.types[0] if descriptor.types else None
+            schema = compile_annotation(input_type, {})
+            workflow_inputs.append(
+                VellumVariable(
+                    id=node_inputs_by_key[descriptor.name].id,
+                    key=descriptor.name,
+                    type=infer_vellum_variable_type(descriptor),
+                    required=descriptor.instance is undefined,
+                    default=(
+                        primitive_to_vellum_value(descriptor.instance).dict()
+                        if descriptor.instance is not undefined
+                        else None
+                    ),
+                    schema=schema,
+                )
             )
-            for descriptor in subworkflow_inputs_class
-        ]
 
         return node_inputs, workflow_inputs
 

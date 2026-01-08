@@ -427,6 +427,9 @@
       "required": true,
       "extensions": {
         "color": "someColor"
+      },
+      "schema": {
+        "type": "string"
       }
     },
     {
@@ -437,6 +440,9 @@
       "default": null,
       "extensions": {
         "color": "someColor"
+      },
+      "schema": {
+        "type": "string"
       }
     }
   ],

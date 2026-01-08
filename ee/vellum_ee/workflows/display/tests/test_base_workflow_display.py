@@ -92,6 +92,7 @@ def test_vellum_workflow_display__serialize_input_variables_with_capitalized_var
             "default": None,
             "required": True,
             "extensions": {"color": None},
+            "schema": {"type": "string"},
         }
     ]
 

@@ -1,5 +1,5 @@
 import { Vellum } from "vellum-ai";
-import { VellumVariableType } from "vellum-ai/api/types";
+import { VellumVariable, VellumVariableType } from "vellum-ai/api/types";
 
 import { workflowContextFactory } from "./helpers";
 import { inputVariableContextFactory } from "./helpers/input-variable-context-factory";
@@ -7,7 +7,6 @@ import { inputVariableContextFactory } from "./helpers/input-variable-context-fa
 import * as codegen from "src/codegen";
 import { WorkflowContext } from "src/context";
 import { Writer } from "src/generators/extensions/writer";
-import { VellumVariable } from "src/types/vellum";
 
 describe("Inputs", () => {
   let workflowContext: WorkflowContext;
