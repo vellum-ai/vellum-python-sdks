@@ -31,6 +31,7 @@ from vellum.workflows.nodes.displayable.final_output_node.node import FinalOutpu
 from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port, get_wrapped_node
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, StateValueReference, WorkflowInputReference
+from vellum.workflows.triggers.base import BaseTrigger
 from vellum.workflows.triggers.chat_message import ChatMessageTrigger
 from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.triggers.manual import ManualTrigger
@@ -253,6 +254,24 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         trigger_edges: List[TriggerEdge] = []
         for subgraph in self._workflow.get_subgraphs():
             trigger_edges.extend(list(subgraph.trigger_edges))
+
+        # Deduplicate trigger edges and report errors for duplicates
+        seen_trigger_edges: Set[Tuple[Type[BaseTrigger], Type[BaseNode]]] = set()
+        unique_trigger_edges: List[TriggerEdge] = []
+        for edge in trigger_edges:
+            edge_key = (edge.trigger_class, get_unadorned_node(edge.to_node))
+            if edge_key in seen_trigger_edges:
+                self.display_context.add_validation_error(
+                    WorkflowValidationError(
+                        message=f"Duplicate trigger edge from {edge.trigger_class.__name__} to "
+                        f"{edge.to_node.__name__}",
+                        workflow_class_name=self._workflow.__name__,
+                    )
+                )
+            else:
+                seen_trigger_edges.add(edge_key)
+                unique_trigger_edges.append(edge)
+        trigger_edges = unique_trigger_edges
 
         # Determine if we need an ENTRYPOINT node and what ID to use
         manual_trigger_edges = [edge for edge in trigger_edges if issubclass(edge.trigger_class, ManualTrigger)]
