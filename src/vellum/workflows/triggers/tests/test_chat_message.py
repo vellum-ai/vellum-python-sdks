@@ -122,7 +122,7 @@ def test_chat_message_trigger__custom_state_initiated():
     """Tests that ChatMessageTrigger uses custom state reference on initiation."""
 
     # GIVEN a ChatMessageTrigger with a custom state reference
-    trigger = CustomStateTrigger(message="Hello, world!")
+    trigger = CustomStateTrigger(message=[StringChatMessageContent(value="Hello, world!")])
 
     # AND a state with the custom chat history attribute
     state = CustomChatHistoryState()
@@ -133,14 +133,14 @@ def test_chat_message_trigger__custom_state_initiated():
     # THEN the user message is appended to the custom chat history attribute
     assert len(state.messages) == 1
     assert state.messages[0].role == "USER"
-    assert state.messages[0].text == "Hello, world!"
+    assert state.messages[0].content == ArrayChatMessageContent(value=[StringChatMessageContent(value="Hello, world!")])
 
 
 def test_chat_message_trigger__custom_state_missing_attribute():
     """Tests that ChatMessageTrigger handles missing custom state attribute gracefully."""
 
     # GIVEN a ChatMessageTrigger with a custom state reference
-    trigger = CustomStateTrigger(message="Hello")
+    trigger = CustomStateTrigger(message=[StringChatMessageContent(value="Hello")])
 
     # AND a state without the custom chat history attribute
     state = BaseState()
@@ -156,7 +156,7 @@ def test_chat_message_trigger__default_state():
     """Tests that ChatMessageTrigger uses default state (None) which falls back to chat_history."""
 
     # GIVEN a ChatMessageTrigger with default config
-    trigger = ChatMessageTrigger(message="Hello")
+    trigger = ChatMessageTrigger(message=[StringChatMessageContent(value="Hello")])
 
     # AND a state with chat_history attribute
     state = ChatState()
