@@ -19,6 +19,14 @@ class LoggingNode(BaseNode):
             severity="WARNING",
             message="Warning log message with no attributes",
         )
+        try:
+            raise ValueError("asdf")
+        except ValueError:
+            self._context.emit_log_event(
+                severity="ERROR",
+                message="Error log message",
+                exc_info=True,
+            )
         return self.Outputs(result="done")
 
 

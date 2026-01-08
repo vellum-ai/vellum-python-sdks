@@ -1,7 +1,9 @@
 import json
+import re
 from unittest import mock
 
 from vellum.workflows.emitters.vellum_emitter import VellumEmitter
+from vellum.workflows.events.node import NodeExecutionLogBody, NodeExecutionLogEvent
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 from tests.workflows.emit_log_event.workflow import EmitLogEventWorkflow, LoggingNode
@@ -27,23 +29,69 @@ def test_emit_log_event__happy_path():
     expected_span_id = span_ids[0]
 
     log_events = [e for e in events if e.name == "node.execution.log"]
-    assert len(log_events) == 2
 
-    info_log_event = log_events[0]
-    assert info_log_event.trace_id == expected_trace_id
-    assert info_log_event.span_id == expected_span_id
-    assert info_log_event.body.severity == "INFO"
-    assert info_log_event.body.message == "Custom log message"
-    assert info_log_event.body.attributes == {"key": "value", "count": 42}
-    assert info_log_event.body.node_definition == LoggingNode
+    assert log_events == [
+        NodeExecutionLogEvent.model_construct(
+            id=mock.ANY,
+            timestamp=mock.ANY,
+            api_version="2024-10-25",
+            trace_id=expected_trace_id,
+            span_id=expected_span_id,
+            parent=None,
+            links=None,
+            body=NodeExecutionLogBody(
+                node_definition=LoggingNode,
+                attributes={"key": "value", "count": 42},
+                severity="INFO",
+                message="Custom log message",
+            ),
+        ),
+        NodeExecutionLogEvent.model_construct(
+            id=mock.ANY,
+            timestamp=mock.ANY,
+            api_version="2024-10-25",
+            trace_id=expected_trace_id,
+            span_id=expected_span_id,
+            parent=None,
+            links=None,
+            body=NodeExecutionLogBody(
+                node_definition=LoggingNode,
+                attributes=None,
+                severity="WARNING",
+                message="Warning log message with no attributes",
+            ),
+        ),
+        NodeExecutionLogEvent.model_construct(
+            id=mock.ANY,
+            timestamp=mock.ANY,
+            api_version="2024-10-25",
+            trace_id=expected_trace_id,
+            span_id=expected_span_id,
+            parent=None,
+            links=None,
+            body=NodeExecutionLogBody(
+                node_definition=LoggingNode,
+                attributes={
+                    "exc_info": mock.ANY,
+                },
+                severity="ERROR",
+                message="Error log message",
+            ),
+        ),
+    ]
 
-    warning_log_event = log_events[1]
-    assert warning_log_event.trace_id == expected_trace_id
-    assert warning_log_event.span_id == expected_span_id
-    assert warning_log_event.body.severity == "WARNING"
-    assert warning_log_event.body.message == "Warning log message with no attributes"
-    assert warning_log_event.body.attributes is None
-    assert warning_log_event.body.node_definition == LoggingNode
+    attributes = log_events[2].body.attributes
+    assert attributes is not None
+    exc_info = attributes["exc_info"]
+    pattern = r"""Traceback \(most recent call last\):
+  File ".*/tests/workflows/emit_log_event/workflow.py", line \d+, in run
+    raise ValueError\("asdf"\)
+ValueError: asdf
+"""
+    assert re.match(
+        pattern=pattern,
+        string=exc_info,
+    )
 
 
 def test_emit_log_event__sent_to_monitoring_api(mock_httpx_transport):
@@ -79,8 +127,6 @@ def test_emit_log_event__sent_to_monitoring_api(mock_httpx_transport):
     expected_node_event_span_id = node_event_span_ids[0]
 
     log_events = [e for e in all_events if e.get("name") == "node.execution.log"]
-    assert len(log_events) == 2
-
     assert log_events == [
         {
             "api_version": "2024-10-25",
@@ -120,4 +166,35 @@ def test_emit_log_event__sent_to_monitoring_api(mock_httpx_transport):
             "timestamp": mock.ANY,
             "trace_id": expected_node_event_trace_id,
         },
+        {
+            "api_version": "2024-10-25",
+            "body": {
+                "attributes": {
+                    "exc_info": mock.ANY,
+                },
+                "message": "Error log message",
+                "node_definition": {
+                    "exclude_from_monitoring": False,
+                    "id": mock.ANY,
+                    "module": ["tests", "workflows", "emit_log_event", "workflow"],
+                    "name": "LoggingNode",
+                },
+                "severity": "ERROR",
+            },
+            "id": mock.ANY,
+            "name": "node.execution.log",
+            "span_id": expected_node_event_span_id,
+            "timestamp": mock.ANY,
+            "trace_id": expected_node_event_trace_id,
+        },
     ]
+    exc_info = log_events[2]["body"]["attributes"]["exc_info"]
+    pattern = r"""Traceback \(most recent call last\):
+  File ".*/tests/workflows/emit_log_event/workflow.py", line \d+, in run
+    raise ValueError\("asdf"\)
+ValueError: asdf
+"""
+    assert re.match(
+        pattern=pattern,
+        string=exc_info,
+    )

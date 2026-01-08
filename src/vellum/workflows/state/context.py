@@ -3,6 +3,7 @@ from functools import cached_property
 import json
 import logging
 from queue import Queue
+import traceback
 from uuid import UUID, uuid4
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Type
 
@@ -151,7 +152,13 @@ class WorkflowContext:
             # For custom domains, assume the same pattern: api.* -> app.*
             return api_url.replace("api.", "app.", 1)
 
-    def emit_log_event(self, severity: SeverityEnum, message: str, attributes: Optional[Dict[str, Any]] = None) -> None:
+    def emit_log_event(
+        self,
+        severity: SeverityEnum,
+        message: str,
+        attributes: Optional[Dict[str, Any]] = None,
+        exc_info: Optional[bool] = None,
+    ) -> None:
         """Emit a log event for a particular node.
 
         This is in active development and may have breaking changes.
@@ -180,6 +187,12 @@ class WorkflowContext:
         if not isinstance(node_class, type) or not issubclass(node_class, BaseNode):
             logger.warning("Node definition is not a subclass of BaseNode.")
             return
+
+        if exc_info:
+            attributes = {
+                **(attributes or {}),
+                "exc_info": traceback.format_exc(),
+            }
 
         self._event_queue.put(
             NodeExecutionLogEvent(
