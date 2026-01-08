@@ -80,7 +80,9 @@ def test_emit_log_event__happy_path():
         ),
     ]
 
-    exc_info = log_events[2].body.attributes["exc_info"]
+    attributes = log_events[2].body.attributes
+    assert attributes is not None
+    exc_info = attributes["exc_info"]
     pattern = r"""Traceback \(most recent call last\):
   File ".*/tests/workflows/emit_log_event/workflow.py", line \d+, in run
     raise ValueError\("asdf"\)
