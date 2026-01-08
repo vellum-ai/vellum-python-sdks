@@ -10,7 +10,23 @@ import pkgutil
 import re
 import traceback
 from uuid import UUID
-from typing import Any, Dict, ForwardRef, Generic, List, Optional, Set, Tuple, Type, TypeVar, Union, cast, get_args
+from typing import (
+    Any,
+    Dict,
+    ForwardRef,
+    FrozenSet,
+    Generic,
+    List,
+    Literal,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+    cast,
+    get_args,
+)
 
 import jsonschema
 
@@ -31,6 +47,7 @@ from vellum.workflows.nodes.displayable.final_output_node.node import FinalOutpu
 from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port, get_wrapped_node
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, StateValueReference, WorkflowInputReference
+from vellum.workflows.triggers.base import BaseTrigger
 from vellum.workflows.triggers.chat_message import ChatMessageTrigger
 from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.triggers.manual import ManualTrigger
@@ -250,10 +267,41 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         serialized_nodes: Dict[UUID, JsonObject] = {}
         edges: JsonArray = []
 
-        # Get all trigger edges from the workflow's subgraphs to check if trigger exists
+        # Detect duplicate graph paths in the top-level set
+        # Signature includes: regular edges (with port identity) + trigger edges
+        seen_graph_signatures: Set[FrozenSet[Tuple[Literal["regular", "trigger"], int, Type[BaseNode]]]] = set()
+        seen_trigger_edges: Set[Tuple[Type[BaseTrigger], Type[BaseNode]]] = set()
         trigger_edges: List[TriggerEdge] = []
         for subgraph in self._workflow.get_subgraphs():
-            trigger_edges.extend(list(subgraph.trigger_edges))
+            # Build signature from regular edges (include port identity to distinguish different ports)
+            edge_signature: Set[Tuple[Any, ...]] = set()
+            for edge in subgraph.edges:
+                # Use port identity (id(port)) to distinguish different ports from the same node
+                edge_signature.add(("regular", id(edge.from_port), get_unadorned_node(edge.to_node)))
+
+            # Include trigger edges in the signature
+            for trigger_edge in subgraph.trigger_edges:
+                edge_signature.add(
+                    ("trigger", id(trigger_edge.trigger_class), get_unadorned_node(trigger_edge.to_node))
+                )
+
+            frozen_signature = frozenset(edge_signature)
+            if frozen_signature and frozen_signature in seen_graph_signatures:
+                self.display_context.add_validation_error(
+                    WorkflowValidationError(
+                        message="Duplicate graph path detected in workflow",
+                        workflow_class_name=self._workflow.__name__,
+                    )
+                )
+            elif frozen_signature:
+                seen_graph_signatures.add(frozen_signature)
+
+            # Collect and deduplicate trigger edges (for the trigger_edges list only)
+            for trigger_edge in subgraph.trigger_edges:
+                edge_key = (trigger_edge.trigger_class, get_unadorned_node(trigger_edge.to_node))
+                if edge_key not in seen_trigger_edges:
+                    seen_trigger_edges.add(edge_key)
+                    trigger_edges.append(trigger_edge)
 
         # Determine if we need an ENTRYPOINT node and what ID to use
         manual_trigger_edges = [edge for edge in trigger_edges if issubclass(edge.trigger_class, ManualTrigger)]
