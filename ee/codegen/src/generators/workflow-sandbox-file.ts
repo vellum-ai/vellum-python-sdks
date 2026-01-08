@@ -359,14 +359,18 @@ if __name__ == "__main__":
 
       // For chat message triggers, if the input is an array with a single string,
       // unwrap it to just the string for cleaner codegen
+      const firstArrayElement =
+        matchingInput?.type === "ARRAY" &&
+        Array.isArray(matchingInput.value) &&
+        matchingInput.value.length === 1
+          ? matchingInput.value[0]
+          : null;
       const inputToUse =
         trigger.type === WorkflowTriggerType.CHAT_MESSAGE &&
         matchingInput &&
-        matchingInput.type === "ARRAY" &&
-        Array.isArray(matchingInput.value) &&
-        matchingInput.value.length === 1 &&
-        matchingInput.value[0].type === "STRING"
-          ? { ...matchingInput.value[0], name: matchingInput.name }
+        firstArrayElement &&
+        firstArrayElement.type === "STRING"
+          ? { ...firstArrayElement, name: matchingInput.name }
           : matchingInput;
 
       return new MethodArgument({
