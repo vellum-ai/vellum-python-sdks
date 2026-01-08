@@ -37,7 +37,6 @@ class ChatMessageTrigger(BaseTrigger):
         message: The incoming chat message content.
     """
 
-    name: str = "chat"
     message: List[ArrayChatMessageContentItem]
 
     class Config(BaseTrigger.Config):
