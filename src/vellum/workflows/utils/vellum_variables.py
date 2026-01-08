@@ -5,12 +5,17 @@ from typing import Any, List, Tuple, Type, Union, get_args, get_origin
 
 from vellum import (
     ArrayChatMessageContentItem,
+    AudioChatMessageContent,
     ChatMessage,
     ChatMessageRequest,
+    DocumentChatMessageContent,
     FunctionCall,
+    FunctionCallChatMessageContent,
     FunctionCallRequest,
+    ImageChatMessageContent,
     SearchResult,
     SearchResultRequest,
+    StringChatMessageContent,
     VellumAudio,
     VellumAudioRequest,
     VellumDocument,
@@ -24,6 +29,7 @@ from vellum import (
     VellumVariableType,
     VellumVideo,
     VellumVideoRequest,
+    VideoChatMessageContent,
 )
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -283,3 +289,73 @@ def _is_vellum_value_subtype(type_: Type) -> bool:
         return all(_is_vellum_value_subtype(arg) for arg in args)
 
     return False
+
+
+def convert_vellum_value_to_chat_message_content(item: Any) -> ArrayChatMessageContentItem:
+    """
+    Convert a VellumValue item to an ArrayChatMessageContentItem.
+
+    The frontend sends VellumValue types (e.g., StringVellumValue) but the SDK expects
+    ArrayChatMessageContentItem types (e.g., StringChatMessageContent). This function
+    handles the conversion based on the 'type' field.
+
+    Args:
+        item: A VellumValue item, dict, or ArrayChatMessageContentItem
+
+    Returns:
+        The corresponding ArrayChatMessageContentItem
+
+    Raises:
+        ValueError: If the item cannot be converted
+    """
+    # If it's already an ArrayChatMessageContentItem, return as-is
+    if isinstance(
+        item,
+        (
+            StringChatMessageContent,
+            FunctionCallChatMessageContent,
+            AudioChatMessageContent,
+            VideoChatMessageContent,
+            ImageChatMessageContent,
+            DocumentChatMessageContent,
+        ),
+    ):
+        return item
+
+    # Handle object-like objects (including VellumValue types)
+    if hasattr(item, "type") and hasattr(item, "value"):
+        item_type = item.type
+        item_value = item.value
+
+        if item_type == "STRING":
+            return StringChatMessageContent(value=item_value or "")
+        elif item_type == "FUNCTION_CALL":
+            return FunctionCallChatMessageContent(value=item_value)
+        elif item_type == "AUDIO":
+            return AudioChatMessageContent(value=item_value)
+        elif item_type == "VIDEO":
+            return VideoChatMessageContent(value=item_value)
+        elif item_type == "IMAGE":
+            return ImageChatMessageContent(value=item_value)
+        elif item_type == "DOCUMENT":
+            return DocumentChatMessageContent(value=item_value)
+
+    # Handle plain dicts
+    if isinstance(item, dict):
+        item_type = item.get("type")
+        item_value = item.get("value")
+
+        if item_type == "STRING":
+            return StringChatMessageContent(value=item_value or "")
+        elif item_type == "FUNCTION_CALL":
+            return FunctionCallChatMessageContent(value=item_value)
+        elif item_type == "AUDIO":
+            return AudioChatMessageContent(value=item_value)
+        elif item_type == "VIDEO":
+            return VideoChatMessageContent(value=item_value)
+        elif item_type == "IMAGE":
+            return ImageChatMessageContent(value=item_value)
+        elif item_type == "DOCUMENT":
+            return DocumentChatMessageContent(value=item_value)
+
+    raise ValueError(f"Cannot convert {type(item)} to ArrayChatMessageContentItem: {item}")
