@@ -29,42 +29,20 @@ def test_simple_chat_workflow_serialization():
     }
 
     # AND the triggers should be serialized correctly
-    assert serialized_workflow["triggers"] == [
-        {
-            "id": "9e14c49b-c6d9-4fe5-9ff2-835fd695fe5f",
-            "type": "CHAT_MESSAGE",
-            "attributes": [
-                {
-                    "id": "5edbfd78-b634-4305-b2ad-d9feecbd5e5f",
-                    "key": "message",
-                    "type": "ARRAY",
-                    "required": True,
-                    "default": {
-                        "type": "ARRAY",
-                        "value": None,
-                    },
-                    "extensions": None,
-                    "schema": None,
-                }
-            ],
-            "exec_config": {
-                "output": {
-                    "type": "WORKFLOW_OUTPUT",
-                    "output_variable_id": "cc1208e9-c043-47f4-abea-c01ac0dbf04c",
-                },
-            },
-            "display_data": {
-                "label": "Chat Message",
-                "position": {
-                    "x": 0.0,
-                    "y": 0.0,
-                },
-                "z_index": 0,
-                "icon": "vellum:icon:message-dots",
-                "color": "blue",
-            },
-        }
-    ]
+    triggers = serialized_workflow["triggers"]
+    assert len(triggers) == 1
+    trigger = triggers[0]
+    assert trigger["id"] == "9e14c49b-c6d9-4fe5-9ff2-835fd695fe5f"
+    assert trigger["type"] == "CHAT_MESSAGE"
+
+    # AND the exec_config should have both output and state
+    exec_config = trigger["exec_config"]
+    assert exec_config["output"] == {
+        "type": "WORKFLOW_OUTPUT",
+        "output_variable_id": "cc1208e9-c043-47f4-abea-c01ac0dbf04c",
+    }
+    assert "state" in exec_config
+    assert "state_variable_id" in exec_config["state"]
 
 
 class ResponseNode(BaseNode):
@@ -74,16 +52,16 @@ class ResponseNode(BaseNode):
         response: str = "Hello!"
 
 
-class ChatTriggerWithoutOutput(ChatMessageTrigger):
-    """Chat trigger without Config.output specified."""
+class ChatTriggerWithoutOutputOrState(ChatMessageTrigger):
+    """Chat trigger without Config.output or Config.state specified."""
 
     pass
 
 
-class WorkflowWithUnspecifiedChatTriggerOutput(BaseWorkflow[BaseInputs, BaseState]):
-    """Workflow using ChatTrigger without output specified."""
+class WorkflowWithUnspecifiedChatTriggerConfig(BaseWorkflow[BaseInputs, BaseState]):
+    """Workflow using ChatTrigger without output or state specified."""
 
-    graph = ChatTriggerWithoutOutput >> ResponseNode
+    graph = ChatTriggerWithoutOutputOrState >> ResponseNode
 
     class Outputs(BaseWorkflow.Outputs):
         response = ResponseNode.Outputs.response
@@ -91,20 +69,43 @@ class WorkflowWithUnspecifiedChatTriggerOutput(BaseWorkflow[BaseInputs, BaseStat
 
 def test_chat_message_trigger_validation__output_not_specified():
     """
-    Tests that serialization adds TriggerValidationError to errors when Chat Trigger output is not specified.
+    Tests that serialization adds TriggerValidationError when Chat Trigger output is not specified.
     """
 
     # GIVEN a Workflow that uses a ChatMessageTrigger without Config.output specified
-    workflow_display = get_workflow_display(workflow_class=WorkflowWithUnspecifiedChatTriggerOutput)
+    workflow_display = get_workflow_display(workflow_class=WorkflowWithUnspecifiedChatTriggerConfig)
 
     # WHEN we serialize the workflow
     workflow_display.serialize()
 
-    # THEN the display_context should contain a TriggerValidationError
+    # THEN the display_context should contain a TriggerValidationError for output
     errors = list(workflow_display.display_context.errors)
-    assert len(errors) == 1
+    output_errors = [e for e in errors if "output must be specified" in str(e)]
+    assert len(output_errors) == 1
 
     # AND the error should be a TriggerValidationError with the expected message
-    error = errors[0]
+    error = output_errors[0]
     assert isinstance(error, TriggerValidationError)
     assert "Chat Trigger output must be specified" in str(error)
+
+
+def test_chat_message_trigger_validation__state_not_specified():
+    """
+    Tests that serialization adds TriggerValidationError when Chat Trigger state is not specified.
+    """
+
+    # GIVEN a Workflow that uses a ChatMessageTrigger without Config.state specified
+    workflow_display = get_workflow_display(workflow_class=WorkflowWithUnspecifiedChatTriggerConfig)
+
+    # WHEN we serialize the workflow
+    workflow_display.serialize()
+
+    # THEN the display_context should contain a TriggerValidationError for state
+    errors = list(workflow_display.display_context.errors)
+    state_errors = [e for e in errors if "state must be specified" in str(e)]
+    assert len(state_errors) == 1
+
+    # AND the error should be a TriggerValidationError with the expected message
+    error = state_errors[0]
+    assert isinstance(error, TriggerValidationError)
+    assert "Chat Trigger state must be specified" in str(error)

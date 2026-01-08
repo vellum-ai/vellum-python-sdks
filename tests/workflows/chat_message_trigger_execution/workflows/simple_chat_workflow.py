@@ -29,6 +29,7 @@ class SimpleChatTrigger(ChatMessageTrigger):
 
     class Config(ChatMessageTrigger.Config):
         output = LazyReference("SimpleChatWorkflow.Outputs.response")  # type: ignore[has-type]
+        state = ChatState.chat_history
 
 
 class SimpleChatWorkflow(BaseWorkflow[BaseInputs, ChatState]):
