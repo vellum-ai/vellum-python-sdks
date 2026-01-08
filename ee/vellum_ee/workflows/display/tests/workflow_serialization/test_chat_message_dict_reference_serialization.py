@@ -148,23 +148,40 @@ def test_serialize_chat_message_with_message_parameter(chat_message, expected_te
 
     # THEN the ChatMessage should be serialized with the text field populated
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
+    assert isinstance(workflow_raw_data, dict)
     nodes = workflow_raw_data["nodes"]
+    assert isinstance(nodes, list)
 
     set_state_node = next(
         node
         for node in nodes
         if isinstance(node, dict) and node.get("type") == "GENERIC" and node.get("label") == "Store Message"
     )
+    assert isinstance(set_state_node, dict)
 
     attributes = set_state_node["attributes"]
+    assert isinstance(attributes, list)
     operations_attribute = next(
         attribute for attribute in attributes if isinstance(attribute, dict) and attribute.get("name") == "operations"
     )
+    assert isinstance(operations_attribute, dict)
 
-    chat_history_entry = operations_attribute["value"]["entries"][0]
-    chat_message_value = chat_history_entry["value"]["rhs"]
+    operations_value = operations_attribute["value"]
+    assert isinstance(operations_value, dict)
+    entries = operations_value["entries"]
+    assert isinstance(entries, list)
+    chat_history_entry = entries[0]
+    assert isinstance(chat_history_entry, dict)
+    entry_value = chat_history_entry["value"]
+    assert isinstance(entry_value, dict)
+    chat_message_value = entry_value["rhs"]
+    assert isinstance(chat_message_value, dict)
 
     # AND the text field should have the expected value
     assert chat_message_value["type"] == "CONSTANT_VALUE"
-    assert chat_message_value["value"]["type"] == "JSON"
-    assert chat_message_value["value"]["value"]["text"] == expected_text
+    inner_value = chat_message_value["value"]
+    assert isinstance(inner_value, dict)
+    assert inner_value["type"] == "JSON"
+    json_value = inner_value["value"]
+    assert isinstance(json_value, dict)
+    assert json_value["text"] == expected_text
