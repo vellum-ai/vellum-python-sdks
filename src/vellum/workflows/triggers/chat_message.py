@@ -1,6 +1,18 @@
 from typing import TYPE_CHECKING, Any, List, Optional, Union
 
-from vellum.client.types import ArrayChatMessageContent, ArrayChatMessageContentItem, ChatMessage, ChatMessageContent
+from vellum.client.core.pydantic_utilities import parse_obj_as
+from vellum.client.types import (
+    ArrayChatMessageContent,
+    ArrayChatMessageContentItem,
+    AudioChatMessageContent,
+    ChatMessage,
+    ChatMessageContent,
+    DocumentChatMessageContent,
+    FunctionCallChatMessageContent,
+    ImageChatMessageContent,
+    StringChatMessageContent,
+    VideoChatMessageContent,
+)
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.utils import resolve_value
 from vellum.workflows.references.lazy import LazyReference
@@ -27,6 +39,41 @@ class ChatMessageTrigger(BaseTrigger):
 
     class Config(BaseTrigger.Config):
         output: Optional[BaseDescriptor[Any]] = None
+
+    def __init__(self, **kwargs: Any):
+        """Initialize ChatMessageTrigger, converting VellumValue objects to ChatMessageContent if needed."""
+        # Convert message from VellumValue format to ChatMessageContent format if needed
+        if "message" in kwargs:
+            message = kwargs["message"]
+            # Handle string messages by converting to a list with a single StringChatMessageContent
+            if isinstance(message, str):
+                kwargs["message"] = [StringChatMessageContent(value=message)]
+            elif isinstance(message, list):
+                converted_message = []
+                for item in message:
+                    # If it's already a ChatMessageContent type, keep it as-is
+                    if isinstance(
+                        item,
+                        (
+                            StringChatMessageContent,
+                            ImageChatMessageContent,
+                            AudioChatMessageContent,
+                            VideoChatMessageContent,
+                            DocumentChatMessageContent,
+                            FunctionCallChatMessageContent,
+                        ),
+                    ):
+                        converted_message.append(item)
+                    # Convert VellumValue objects or dicts to ChatMessageContent
+                    # Use discriminated union validation
+                    else:
+                        # Get the dict representation (either from Pydantic model or already a dict)
+                        item_dict = item.model_dump() if hasattr(item, "model_dump") else item
+                        converted_message.append(parse_obj_as(ChatMessageContent, item_dict))  # type: ignore[arg-type]  # noqa: E501
+
+                kwargs["message"] = converted_message
+
+        super().__init__(**kwargs)
 
     def __on_workflow_initiated__(self, state: "BaseState") -> None:
         """Appends user message to state.chat_history at workflow start."""

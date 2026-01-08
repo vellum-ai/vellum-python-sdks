@@ -11,6 +11,7 @@ from vellum.client.types import (
     ChatMessage,
     ImageChatMessageContent,
     StringChatMessageContent,
+    StringVellumValue,
     VellumImage,
 )
 from vellum.workflows.nodes.bases.base import BaseNode
@@ -105,3 +106,72 @@ def test_chat_message_trigger__graph_syntax():
     assert len(list(graph.trigger_edges)) == 1
     assert list(graph.trigger_edges)[0].trigger_class == ChatMessageTrigger
     assert list(graph.trigger_edges)[0].to_node == TestNode
+
+
+def test_chat_message_trigger__converts_vellum_value_objects():
+    """Tests that ChatMessageTrigger converts VellumValue objects to ChatMessageContent."""
+
+    # GIVEN a message as VellumValue objects (as received from codegen/API)
+    vellum_value_message = [
+        StringVellumValue(type="STRING", value="Hello, world!"),
+    ]
+
+    # WHEN a ChatMessageTrigger is created with VellumValue objects
+    trigger = ChatMessageTrigger(message=vellum_value_message)
+
+    # THEN the message is converted to ChatMessageContent
+    assert len(trigger.message) == 1
+    assert isinstance(trigger.message[0], StringChatMessageContent)
+    assert trigger.message[0].value == "Hello, world!"
+
+    # AND the trigger works correctly with state
+    state = ChatState()
+    trigger.__on_workflow_initiated__(state)
+
+    assert len(state.chat_history) == 1
+    assert state.chat_history[0].role == "USER"
+    assert state.chat_history[0].content == ArrayChatMessageContent(
+        value=[StringChatMessageContent(value="Hello, world!")]
+    )
+
+
+def test_chat_message_trigger__converts_dict_format():
+    """Tests that ChatMessageTrigger converts dict format to ChatMessageContent."""
+
+    # GIVEN a message as dict objects (alternative API format)
+    dict_message = [
+        {"type": "STRING", "value": "Hello from dict!"},
+    ]
+
+    # WHEN a ChatMessageTrigger is created with dict objects
+    trigger = ChatMessageTrigger(message=dict_message)
+
+    # THEN the message is converted to ChatMessageContent
+    assert len(trigger.message) == 1
+    assert isinstance(trigger.message[0], StringChatMessageContent)
+    assert trigger.message[0].value == "Hello from dict!"
+
+
+def test_chat_message_trigger__converts_string_message():
+    """Tests that ChatMessageTrigger converts string messages to ChatMessageContent list."""
+
+    # GIVEN a message as a string
+    string_message = "Hello, world!"
+
+    # WHEN a ChatMessageTrigger is created with a string message
+    trigger = ChatMessageTrigger(message=string_message)
+
+    # THEN the message is converted to a list with a single StringChatMessageContent
+    assert len(trigger.message) == 1
+    assert isinstance(trigger.message[0], StringChatMessageContent)
+    assert trigger.message[0].value == "Hello, world!"
+
+    # AND the trigger works correctly with state
+    state = ChatState()
+    trigger.__on_workflow_initiated__(state)
+
+    assert len(state.chat_history) == 1
+    assert state.chat_history[0].role == "USER"
+    assert state.chat_history[0].content == ArrayChatMessageContent(
+        value=[StringChatMessageContent(value="Hello, world!")]
+    )
