@@ -1,6 +1,6 @@
 """Tests for ChatMessageTrigger workflow execution."""
 
-from vellum.client.types import ChatMessage
+from vellum.client.types import ArrayChatMessageContent, ChatMessage, StringChatMessageContent
 from vellum.workflows.events.workflow import WorkflowExecutionSnapshottedEvent
 from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
@@ -17,8 +17,8 @@ def test_chat_message_trigger__workflow_output_reference():
     # GIVEN a workflow using SimpleChatTrigger (subclass with workflow output reference)
     workflow = SimpleChatWorkflow()
 
-    # AND a trigger with message
-    trigger = SimpleChatTrigger(message="Hello")
+    # AND a trigger with message as List[ArrayChatMessageContentItem]
+    trigger = SimpleChatTrigger(message=[StringChatMessageContent(value="Hello")])
 
     # WHEN we run the workflow with the trigger
     terminal_event = workflow.run(trigger=trigger)
@@ -33,7 +33,7 @@ def test_chat_message_trigger__workflow_output_reference():
     chat_history = terminal_event.outputs["chat_history"]
     assert len(chat_history) == 2
     assert chat_history[0].role == "USER"
-    assert chat_history[0].text == "Hello"
+    assert chat_history[0].content == ArrayChatMessageContent(value=[StringChatMessageContent(value="Hello")])
     assert chat_history[1].role == "ASSISTANT"
     assert chat_history[1].text == "Hello from assistant!"
 
@@ -43,7 +43,8 @@ def test_chat_message_trigger__workflow_output_reference():
     assert isinstance(final_state, ChatState)
     assert len(final_state.chat_history) == 2
     assert final_state.chat_history[0].role == "USER"
-    assert final_state.chat_history[0].text == "Hello"
+    expected_content = ArrayChatMessageContent(value=[StringChatMessageContent(value="Hello")])
+    assert final_state.chat_history[0].content == expected_content
     assert final_state.chat_history[1].role == "ASSISTANT"
     assert final_state.chat_history[1].text == "Hello from assistant!"
 
@@ -54,8 +55,8 @@ def test_chat_message_trigger__emits_snapshot_events_for_trigger_state_mutations
     # GIVEN a workflow using SimpleChatTrigger
     workflow = SimpleChatWorkflow()
 
-    # AND a trigger with message
-    trigger = SimpleChatTrigger(message="Hello")
+    # AND a trigger with message as List[ArrayChatMessageContentItem]
+    trigger = SimpleChatTrigger(message=[StringChatMessageContent(value="Hello")])
 
     # WHEN we stream the workflow events with all_workflow_event_filter to include snapshot events
     events = list(workflow.stream(trigger=trigger, event_filter=all_workflow_event_filter))
@@ -70,15 +71,16 @@ def test_chat_message_trigger__emits_snapshot_events_for_trigger_state_mutations
 
     # AND the first snapshot event should contain just the user message (from __on_workflow_initiated__)
     user_message_snapshot = snapshot_events[0]
+    expected_user_content = ArrayChatMessageContent(value=[StringChatMessageContent(value="Hello")])
     assert user_message_snapshot.state.chat_history == [
-        ChatMessage(role="USER", text="Hello", content=None, source=None),
+        ChatMessage(role="USER", content=expected_user_content, source=None),
     ]
 
     # AND the last snapshot event should contain the full chat history with both messages
     # (from __on_workflow_fulfilled__)
     last_snapshot = snapshot_events[-1]
     assert last_snapshot.state.chat_history == [
-        ChatMessage(role="USER", text="Hello", content=None, source=None),
+        ChatMessage(role="USER", content=expected_user_content, source=None),
         ChatMessage(role="ASSISTANT", text="Hello from assistant!", content=None, source=None),
     ]
 

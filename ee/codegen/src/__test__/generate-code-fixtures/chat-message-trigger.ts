@@ -72,7 +72,7 @@ export default {
         {
           id: "message-attribute-id",
           key: "message",
-          type: "JSON",
+          type: "ARRAY",
         },
       ],
       exec_config: {
