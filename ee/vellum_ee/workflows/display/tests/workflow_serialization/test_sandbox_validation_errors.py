@@ -42,3 +42,26 @@ def test_serialize_module__invalid_runner_kwarg():
     assert any(
         "scenarios" in msg for msg in error_messages
     ), f"Expected 'scenarios' in error messages, got: {error_messages}"
+
+
+def test_serialize_module__state_mutable_default_validation():
+    """
+    Tests that serialization returns a validation error when a state variable uses a mutable default
+    (e.g., = []) instead of Field(default_factory=list).
+    """
+
+    # GIVEN a workflow module with a state class that uses a mutable default (= [])
+    module = "tests.workflows.test_state_mutable_default_validation"
+
+    # WHEN we serialize the module
+    result = BaseWorkflowDisplay.serialize_module(module)
+
+    # THEN the result should contain an error about mutable defaults
+    assert len(result.errors) > 0
+
+    # AND the error message should mention mutable default, Field(default_factory=list), and the attribute name
+    error_messages = [error.message for error in result.errors]
+    assert any(
+        "Mutable default value detected" in msg and "Field(default_factory=list)" in msg and "State.chat_history" in msg
+        for msg in error_messages
+    ), f"Expected mutable default error in error messages, got: {error_messages}"

@@ -67,6 +67,7 @@ from vellum_ee.workflows.display.types import (
 )
 from vellum_ee.workflows.display.utils.auto_layout import auto_layout_nodes
 from vellum_ee.workflows.display.utils.exceptions import (
+    StateValidationError,
     TriggerValidationError,
     UserFacingException,
     WorkflowValidationError,
@@ -1029,6 +1030,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         )
         for state_value in self._workflow.get_state_class():
             state_value_display_overrides = self.state_value_displays.get(state_value)
+            self._validate_state_value_default(state_value, errors)
             state_value_display = self._generate_state_value_display(
                 state_value, overrides=state_value_display_overrides
             )
@@ -1154,6 +1156,21 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             state_value_id = state_value.id
 
         return StateValueDisplay(id=state_value_id, name=name, color=color)
+
+    def _validate_state_value_default(self, state_value: StateValueReference, errors: List[Exception]) -> None:
+        default_value = state_value.instance
+
+        if isinstance(default_value, (list, dict, set)):
+            errors.append(
+                StateValidationError(
+                    message=(
+                        "Mutable default value detected. Use Field(default_factory=list) instead of = [] "
+                        "to avoid shared mutable state between instances."
+                    ),
+                    state_class_name=state_value.state_class.__name__,
+                    attribute_name=state_value.name,
+                )
+            )
 
     def _generate_entrypoint_display(
         self,
