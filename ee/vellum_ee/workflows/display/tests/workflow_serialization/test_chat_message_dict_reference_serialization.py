@@ -1,3 +1,4 @@
+import pytest
 from typing import List
 
 from vellum import ChatMessage
@@ -106,3 +107,64 @@ def test_serialize_chat_message_dict_reference_with_definition():
             ],
         },
     }
+
+
+@pytest.mark.parametrize(
+    ["chat_message", "expected_text"],
+    [
+        pytest.param(
+            ChatMessage(role="USER", text="hello"),
+            "hello",
+            id="text_parameter",
+        ),
+        pytest.param(
+            ChatMessage(role="USER", message="I have this idea"),
+            "I have this idea",
+            id="message_parameter",
+        ),
+    ],
+)
+def test_serialize_chat_message_with_message_parameter(chat_message, expected_text):
+    """Test that ChatMessage serializes correctly when using the message parameter."""
+
+    # GIVEN a workflow that uses a ChatMessage with the message parameter
+    class State(BaseState):
+        chat_history: List[ChatMessage] = []
+
+    class StoreMessage(SetStateNode[State]):
+        operations = {
+            "chat_history": State.chat_history + chat_message,
+        }
+
+    class TestWorkflow(BaseWorkflow[BaseInputs, State]):
+        graph = StoreMessage
+
+        class Outputs(BaseWorkflow.Outputs):
+            chat_history = State.chat_history
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    serialized_workflow = workflow_display.serialize()
+
+    # THEN the ChatMessage should be serialized with the text field populated
+    workflow_raw_data = serialized_workflow["workflow_raw_data"]
+    nodes = workflow_raw_data["nodes"]
+
+    set_state_node = next(
+        node
+        for node in nodes
+        if isinstance(node, dict) and node.get("type") == "GENERIC" and node.get("label") == "Store Message"
+    )
+
+    attributes = set_state_node["attributes"]
+    operations_attribute = next(
+        attribute for attribute in attributes if isinstance(attribute, dict) and attribute.get("name") == "operations"
+    )
+
+    chat_history_entry = operations_attribute["value"]["entries"][0]
+    chat_message_value = chat_history_entry["value"]["rhs"]
+
+    # AND the text field should have the expected value
+    assert chat_message_value["type"] == "CONSTANT_VALUE"
+    assert chat_message_value["value"]["type"] == "JSON"
+    assert chat_message_value["value"]["value"]["text"] == expected_text

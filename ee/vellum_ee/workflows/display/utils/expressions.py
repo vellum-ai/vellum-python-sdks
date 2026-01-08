@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Type, Union, c
 
 from pydantic import BaseModel
 
+from vellum.client.types.chat_message import ChatMessage
 from vellum.client.types.logical_operator import LogicalOperator
 from vellum.utils.uuid import is_valid_uuid
 from vellum.workflows.constants import undefined
@@ -574,6 +575,10 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
     if isinstance(value, BaseModel):
         context = {"executable_id": executable_id, "client": display_context.client}
         dict_value = value.model_dump(context=context)
+        if isinstance(value, ChatMessage):
+            message_value = dict_value.pop("message", None)
+            if message_value is not None and dict_value.get("text") is None and dict_value.get("content") is None:
+                dict_value["text"] = message_value
         dict_ref = serialize_value(executable_id, display_context, dict_value)
         if dict_ref is not None and dict_ref.get("type") == "DICTIONARY_REFERENCE":
             dict_ref["definition"] = _get_pydantic_model_definition(value.__class__)
