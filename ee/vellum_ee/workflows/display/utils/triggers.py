@@ -31,9 +31,9 @@ def serialize_trigger_attributes(trigger_class: Type[BaseTrigger]) -> JsonArray:
     """Serialize trigger attributes from attribute_references as VellumVariables."""
     attribute_references = trigger_class.attribute_references().values()
 
-    def get_attribute_type(reference: Any, trigger_cls: Type[BaseTrigger]) -> str:
+    def get_attribute_type(reference: Any) -> str:
         # For ChatMessageTrigger.message, always return ARRAY to maintain backwards compatibility
-        if issubclass(trigger_cls, ChatMessageTrigger) and reference.name == "message":
+        if issubclass(trigger_class, ChatMessageTrigger) and reference.name == "message":
             return "ARRAY"
         try:
             return primitive_type_to_vellum_variable_type(reference)
@@ -48,10 +48,10 @@ def serialize_trigger_attributes(trigger_class: Type[BaseTrigger]) -> JsonArray:
                 {
                     "id": str(reference.id),
                     "key": reference.name,
-                    "type": get_attribute_type(reference, trigger_class),
+                    "type": get_attribute_type(reference),
                     "required": type(None) not in reference.types,
                     "default": {
-                        "type": get_attribute_type(reference, trigger_class),
+                        "type": get_attribute_type(reference),
                         "value": None,
                     },
                     "extensions": None,

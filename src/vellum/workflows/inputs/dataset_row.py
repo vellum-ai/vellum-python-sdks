@@ -11,6 +11,7 @@ from vellum.workflows.nodes.mocks import MockNodeExecution
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.triggers import BaseTrigger
+from vellum.workflows.triggers.chat_message import ChatMessageTrigger
 
 
 class DatasetRow(UniversalBaseModel):
@@ -86,6 +87,13 @@ class DatasetRow(UniversalBaseModel):
                 # Convert datetime objects to ISO format strings for JSON serialization
                 if isinstance(attr_value, datetime):
                     attr_value = attr_value.isoformat()
+                # For ChatMessageTrigger.message, normalize string values to array format
+                elif (
+                    isinstance(self.workflow_trigger, ChatMessageTrigger)
+                    and ref.name == "message"
+                    and isinstance(attr_value, str)
+                ):
+                    attr_value = [{"type": "STRING", "value": attr_value}]
                 serialized["inputs"][ref.name] = attr_value
 
         if "id" in serialized and serialized.get("id") is None:
