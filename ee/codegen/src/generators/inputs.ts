@@ -77,13 +77,14 @@ export class Inputs extends BasePersistedFile {
       const vellumVariableField = codegen.vellumVariable({
         variable: {
           id: inputVariableData.id,
+          key: inputVariableData.key,
           // Use the sanitized name from the input variable context to ensure it's a valid
           // attribute name (as opposed to the raw name from the input variable data).
           key: inputVariableName,
           type: inputVariableData.type,
           required: inputVariableData.required,
           default: inputVariableData.default,
-          schema: inputVariableData.schema,
+          schema: inputVariableData.schema ?? undefined,
         },
         defaultRequired: false,
       });

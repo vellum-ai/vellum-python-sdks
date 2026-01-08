@@ -204,6 +204,10 @@ export function getVellumVariablePrimitiveType(
       );
     case "NULL":
       return new NoneType();
+    case "REFERENCE":
+      // REFERENCE type is used internally and should not appear in codegen
+      // Fall back to Any type if encountered
+      return new AnyType();
     default: {
       assertUnreachable(vellumVariableType);
     }

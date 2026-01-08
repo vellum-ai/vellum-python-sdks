@@ -68,6 +68,7 @@ export class State extends BasePersistedFile {
       const vellumVariableField = codegen.vellumVariable({
         variable: {
           id: stateVariableData.id,
+          key: stateVariableData.key,
           // Use the sanitized name from the input variable context to ensure it's a valid
           // attribute name (as opposed to the raw name from the input variable data).
           key: stateVariableName,
