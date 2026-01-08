@@ -129,14 +129,14 @@ def test_chat_message_trigger_graph_with_duplicate_edges():
 
     # WHEN we serialize the workflow
     workflow_display = get_workflow_display(workflow_class=TestWorkflow)
-    result = workflow_display.serialize()
+    result: dict = workflow_display.serialize()
 
     # THEN the workflow should serialize successfully
     assert "workflow_raw_data" in result
     assert "triggers" in result
 
     # AND there should be a CHAT_MESSAGE trigger
-    triggers = result["triggers"]
+    triggers: list = result["triggers"]
     assert len(triggers) == 1
     assert triggers[0]["type"] == "CHAT_MESSAGE"
 
@@ -145,13 +145,13 @@ def test_chat_message_trigger_graph_with_duplicate_edges():
     assert len(manual_triggers) == 0
 
     # AND there should NOT be an ENTRYPOINT node
-    workflow_raw_data = result["workflow_raw_data"]
-    nodes = workflow_raw_data["nodes"]
+    workflow_raw_data: dict = result["workflow_raw_data"]
+    nodes: list = workflow_raw_data["nodes"]
     entrypoint_nodes = [n for n in nodes if isinstance(n, dict) and n.get("type") == "ENTRYPOINT"]
     assert len(entrypoint_nodes) == 0, "ChatMessageTrigger workflows should NOT have an ENTRYPOINT node"
 
     # AND edges should have unique IDs (no duplicates)
-    edges = workflow_raw_data["edges"]
+    edges: list = workflow_raw_data["edges"]
     edge_ids = [e["id"] for e in edges if isinstance(e, dict)]
     assert len(edge_ids) == len(set(edge_ids)), f"Duplicate edge IDs found: {edge_ids}"
 
