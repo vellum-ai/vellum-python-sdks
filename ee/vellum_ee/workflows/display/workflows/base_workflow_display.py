@@ -17,6 +17,7 @@ from typing import (
     FrozenSet,
     Generic,
     List,
+    Literal,
     Optional,
     Set,
     Tuple,
@@ -267,7 +268,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
 
         # Detect duplicate graph paths in the top-level set
         # Signature includes: regular edges (with port identity) + trigger edges
-        seen_graph_signatures: Set[FrozenSet[Tuple[Any, ...]]] = set()
+        seen_graph_signatures: Set[FrozenSet[Tuple[Literal["regular", "trigger"], int, Type[BaseNode]]]] = set()
         seen_trigger_edges: Set[Tuple[Type[BaseTrigger], Type[BaseNode]]] = set()
         trigger_edges: List[TriggerEdge] = []
         for subgraph in self._workflow.get_subgraphs():
@@ -275,11 +276,13 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             edge_signature: Set[Tuple[Any, ...]] = set()
             for edge in subgraph.edges:
                 # Use port identity (id(port)) to distinguish different ports from the same node
-                edge_signature.add((id(edge.from_port), get_unadorned_node(edge.to_node)))
+                edge_signature.add(("regular", id(edge.from_port), get_unadorned_node(edge.to_node)))
 
             # Include trigger edges in the signature
             for trigger_edge in subgraph.trigger_edges:
-                edge_signature.add(("trigger", trigger_edge.trigger_class, get_unadorned_node(trigger_edge.to_node)))
+                edge_signature.add(
+                    ("trigger", id(trigger_edge.trigger_class), get_unadorned_node(trigger_edge.to_node))
+                )
 
             frozen_signature = frozenset(edge_signature)
             if frozen_signature and frozen_signature in seen_graph_signatures:
