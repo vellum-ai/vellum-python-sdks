@@ -161,3 +161,72 @@ def test_chat_message_trigger_graph_with_duplicate_edges():
         e for e in errors if isinstance(e, WorkflowValidationError) and "duplicate" in str(e).lower()
     ]
     assert len(duplicate_edge_errors) == 1, f"Expected 1 duplicate edge error, got {len(duplicate_edge_errors)}"
+
+
+def test_graph_with_shared_prefix_different_paths__no_validation_error():
+    """Graph with shared prefix but different paths should not produce validation errors."""
+
+    # GIVEN nodes for a workflow
+    class A(BaseNode):
+        pass
+
+    class B(BaseNode):
+        pass
+
+    class C(BaseNode):
+        pass
+
+    class D(BaseNode):
+        pass
+
+    # AND a workflow with a graph containing shared prefix but different paths
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = {
+            A >> B >> C,
+            A >> B >> D,
+        }
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    result: dict = workflow_display.serialize()
+
+    # THEN the workflow should serialize successfully
+    assert "workflow_raw_data" in result
+
+    # AND there should be NO validation errors about duplicates
+    errors = list(workflow_display.display_context.errors)
+    duplicate_errors = [e for e in errors if isinstance(e, WorkflowValidationError) and "duplicate" in str(e).lower()]
+    assert len(duplicate_errors) == 0, f"Expected no duplicate errors, got {len(duplicate_errors)}: {duplicate_errors}"
+
+
+def test_graph_with_duplicate_paths__validation_error():
+    """Graph with duplicate paths should produce a validation error."""
+
+    # GIVEN nodes for a workflow
+    class A(BaseNode):
+        pass
+
+    class B(BaseNode):
+        pass
+
+    class C(BaseNode):
+        pass
+
+    # AND a workflow with a graph containing duplicate paths
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = {
+            A >> B >> C,
+            A >> B >> C,
+        }
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    result: dict = workflow_display.serialize()
+
+    # THEN the workflow should serialize successfully
+    assert "workflow_raw_data" in result
+
+    # AND there should be a validation error about the duplicate path
+    errors = list(workflow_display.display_context.errors)
+    duplicate_errors = [e for e in errors if isinstance(e, WorkflowValidationError) and "duplicate" in str(e).lower()]
+    assert len(duplicate_errors) == 1, f"Expected 1 duplicate error, got {len(duplicate_errors)}"
