@@ -1,7 +1,5 @@
 from typing import TYPE_CHECKING, Any, List, Optional, Union
 
-from pydantic import ValidationError
-
 from vellum.client.core.pydantic_utilities import parse_obj_as
 from vellum.client.types import (
     ArrayChatMessageContent,
@@ -71,10 +69,7 @@ class ChatMessageTrigger(BaseTrigger):
                     else:
                         # Get the dict representation (either from Pydantic model or already a dict)
                         item_dict = item.model_dump() if hasattr(item, "model_dump") else item
-                        try:
-                            converted_message.append(parse_obj_as(ChatMessageContent, item_dict))  # type: ignore[arg-type]  # noqa: E501
-                        except ValidationError as e:
-                            raise ValueError(f"Invalid message content: {e}") from e
+                        converted_message.append(parse_obj_as(ChatMessageContent, item_dict))  # type: ignore[arg-type]  # noqa: E501
 
                 kwargs["message"] = converted_message
 
