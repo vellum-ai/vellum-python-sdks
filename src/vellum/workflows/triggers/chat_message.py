@@ -117,4 +117,6 @@ class ChatMessageTrigger(BaseTrigger):
         return resolve_value(output, state)
 
     class Display(BaseTrigger.Display):
-        name: Optional[str] = "Chat"
+        label: str = "Chat Message"
+        icon: Optional[str] = "vellum:icon:message-dots"
+        color: Optional[str] = "blue"
