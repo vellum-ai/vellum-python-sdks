@@ -1,7 +1,8 @@
-from typing import TYPE_CHECKING, Any, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Callable, List, Optional, Union
 
-from pydantic import TypeAdapter
+import pydantic
 
+from vellum.client.core.pydantic_utilities import IS_PYDANTIC_V2
 from vellum.client.types import (
     ArrayChatMessageContent,
     ArrayChatMessageContentItem,
@@ -23,7 +24,17 @@ from vellum.workflows.triggers.base import BaseTrigger
 if TYPE_CHECKING:
     from vellum.workflows.state.base import BaseState
 
-_chat_message_content_adapter: TypeAdapter[ArrayChatMessageContentItem] = TypeAdapter(ArrayChatMessageContentItem)
+if IS_PYDANTIC_V2:
+    _chat_message_content_adapter: pydantic.TypeAdapter[ArrayChatMessageContentItem] = pydantic.TypeAdapter(
+        ArrayChatMessageContentItem
+    )
+    _validate_chat_message_content: Callable[[Any], ArrayChatMessageContentItem] = (
+        _chat_message_content_adapter.validate_python
+    )
+else:
+
+    def _validate_chat_message_content(obj: Any) -> ArrayChatMessageContentItem:
+        return pydantic.parse_obj_as(ArrayChatMessageContentItem, obj)  # type: ignore[attr-defined, arg-type]
 
 
 class ChatMessageTrigger(BaseTrigger):
@@ -72,7 +83,7 @@ class ChatMessageTrigger(BaseTrigger):
                     else:
                         # Get the dict representation (either from Pydantic model or already a dict)
                         item_dict = item.model_dump() if hasattr(item, "model_dump") else item
-                        converted_message.append(_chat_message_content_adapter.validate_python(item_dict))
+                        converted_message.append(_validate_chat_message_content(item_dict))
 
                 kwargs["message"] = converted_message
 
