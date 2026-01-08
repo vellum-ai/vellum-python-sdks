@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Any, ClassVar, Dict
+from typing import Any, ClassVar, Dict, Optional
 
 from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.references.trigger import TriggerAttributeReference
@@ -84,6 +84,8 @@ class IntegrationTrigger(BaseTrigger, ABC, metaclass=IntegrationTriggerMeta):
             >>> trigger.message
             'Hello world'
     """
+
+    name: Optional[str] = "Integration"
 
     class Config:
         """

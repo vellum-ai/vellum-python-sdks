@@ -1,3 +1,5 @@
+from typing import Optional
+
 from vellum.workflows.triggers.base import BaseTrigger
 
 
@@ -34,4 +36,4 @@ class ManualTrigger(BaseTrigger):
         - ManualTrigger: Executes when explicitly called
     """
 
-    pass
+    name: Optional[str] = "Manual"

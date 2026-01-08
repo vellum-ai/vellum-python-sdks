@@ -414,6 +414,7 @@ class BaseTrigger(ABC, metaclass=BaseTriggerMeta):
     """
 
     __id__: UUID
+    name: Optional[str] = None
 
     class Display:
         """Optional display metadata for visual representation."""

@@ -10,6 +10,8 @@ class ScheduleTrigger(BaseTrigger):
     Supports Cron-based schedules (e.g., "0 9 * * MON" for every Monday at 9am)
     """
 
+    name: Optional[str] = "Scheduled"
+
     current_run_at: datetime
     next_run_at: datetime
 
