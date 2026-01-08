@@ -206,4 +206,4 @@ def test_chat_message_trigger_validation__state_not_specified_no_chat_history():
     # AND the error should be a TriggerValidationError with the expected message
     error = state_errors[0]
     assert isinstance(error, TriggerValidationError)
-    assert "Chat Trigger state must be specified or state class must have 'chat_history' attribute" in str(error)
+    assert "Chat Trigger state must be specified" in str(error)

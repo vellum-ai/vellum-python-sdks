@@ -871,7 +871,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         if state is None:
             self.display_context.add_validation_error(
                 TriggerValidationError(
-                    message="Chat Trigger state must be specified or state class must have 'chat_history' attribute.",
+                    message="Chat Trigger state must be specified.",
                     trigger_class_name=trigger_class.__name__,
                 )
             )
