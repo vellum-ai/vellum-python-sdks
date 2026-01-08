@@ -1,0 +1,24 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`State > write > should generate correct code when State has a custom name 1`] = `
+"from vellum.workflows.state import BaseState
+
+
+class CustomState(BaseState):
+    variable1: str
+"
+`;
+
+exports[`State > write > should generate correct code when State has no variables 1`] = `""`;
+
+exports[`State > write > should generate correct code when State has variables 1`] = `
+"from typing import Union
+
+from vellum.workflows.state import BaseState
+
+
+class State(BaseState):
+    variable1: str
+    variable2: Union[float, int]
+"
+`;
