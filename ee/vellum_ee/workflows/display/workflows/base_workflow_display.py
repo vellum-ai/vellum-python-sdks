@@ -869,6 +869,12 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                     break
 
         if state is None:
+            self.display_context.add_validation_error(
+                TriggerValidationError(
+                    message="Chat Trigger state must be specified or state class must have 'chat_history' attribute.",
+                    trigger_class_name=trigger_class.__name__,
+                )
+            )
             return None
 
         state_value_display = self.display_context.global_state_value_displays[state]

@@ -163,3 +163,47 @@ def test_chat_message_trigger_serialization__default_chat_history():
     # AND there should be no validation errors
     errors = list(workflow_display.display_context.errors)
     assert len(errors) == 0
+
+
+class CustomChatState(BaseState):
+    messages: List[ChatMessage] = Field(default_factory=list)
+
+
+class ChatTriggerWithoutState(ChatMessageTrigger):
+    """Chat trigger with output but without Config.state specified and no chat_history on state."""
+
+    class Config(ChatMessageTrigger.Config):
+        output = LazyReference("WorkflowWithoutChatHistory.Outputs.response")
+
+
+class WorkflowWithoutChatHistory(BaseWorkflow[BaseInputs, CustomChatState]):
+    """Workflow using ChatTrigger without state specified and no chat_history on state."""
+
+    graph = ChatTriggerWithoutState >> ResponseNode
+
+    class Outputs(BaseWorkflow.Outputs):
+        response = ResponseNode.Outputs.response
+
+
+def test_chat_message_trigger_validation__state_not_specified_no_chat_history():
+    """
+    Tests that serialization adds TriggerValidationError when Config.state is not specified
+    and state class doesn't have chat_history attribute.
+    """
+
+    # GIVEN a Workflow that uses a ChatMessageTrigger without Config.state specified
+    # AND the state class does NOT have a chat_history attribute
+    workflow_display = get_workflow_display(workflow_class=WorkflowWithoutChatHistory)
+
+    # WHEN we serialize the workflow
+    workflow_display.serialize()
+
+    # THEN the display_context should contain a TriggerValidationError for state
+    errors = list(workflow_display.display_context.errors)
+    state_errors = [e for e in errors if "state must be specified" in str(e)]
+    assert len(state_errors) == 1
+
+    # AND the error should be a TriggerValidationError with the expected message
+    error = state_errors[0]
+    assert isinstance(error, TriggerValidationError)
+    assert "Chat Trigger state must be specified or state class must have 'chat_history' attribute" in str(error)
