@@ -32,6 +32,11 @@ def serialize_trigger_attributes(trigger_class: Type[BaseTrigger]) -> JsonArray:
     attribute_references = trigger_class.attribute_references().values()
 
     def get_attribute_type(reference: Any) -> str:
+        # We can remove this type ignore with some mypy plugin changes
+        message_name = ChatMessageTrigger.message.name  # type: ignore[union-attr]
+        # For ChatMessageTrigger.message, always return ARRAY to maintain backwards compatibility
+        if issubclass(trigger_class, ChatMessageTrigger) and reference.name == message_name:
+            return "ARRAY"
         try:
             return primitive_type_to_vellum_variable_type(reference)
         except ValueError:

@@ -5,6 +5,7 @@ from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.displayable.set_state_node import SetStateNode
 from vellum.workflows.state.base import BaseState
+from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 
@@ -106,3 +107,23 @@ def test_serialize_chat_message_dict_reference_with_definition():
             ],
         },
     }
+
+
+def test_serialize_chat_message_trigger_with_message_parameter():
+    """Test that ChatMessageTrigger with message parameter serializes correctly in dataset."""
+    # GIVEN a workflow module with a ChatMessageTrigger that has a message parameter
+    module_path = "tests.workflows.test_chat_message_trigger_serialization"
+
+    # WHEN we serialize the module
+    result = BaseWorkflowDisplay.serialize_module(module_path)
+
+    # THEN the dataset should contain the trigger's message in inputs
+    assert result.dataset is not None
+    assert isinstance(result.dataset, list)
+    assert len(result.dataset) == 1
+
+    # AND the message should be serialized in the inputs as array format
+    dataset_row = result.dataset[0]
+    assert dataset_row["label"] == "New conversation"
+    assert "inputs" in dataset_row
+    assert dataset_row["inputs"]["message"] == [{"type": "STRING", "value": "I want to tweet about AI agents"}]

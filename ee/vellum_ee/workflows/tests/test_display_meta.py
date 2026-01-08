@@ -16,6 +16,8 @@ def files() -> dict[str, str]:
 
     for root, _, filenames in os.walk(base_directory):
         for filename in filenames:
+            if filename.endswith(".pyc"):
+                continue
             file_path = os.path.join(root, filename)
             # Key will be the relative path inside `local_files`
             relative_path = str(os.path.relpath(file_path, start=base_directory))
