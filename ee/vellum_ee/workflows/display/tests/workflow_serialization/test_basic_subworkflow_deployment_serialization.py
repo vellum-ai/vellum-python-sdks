@@ -13,6 +13,7 @@ from vellum import (
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes import SubworkflowDeploymentNode, TemplatingNode
+from vellum.workflows.nodes.core.try_node.node import TryNode
 from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.state import BaseState
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
@@ -313,3 +314,65 @@ def test_serialize_workflow__subworkflow_deployment_node_outputs_from_release(ve
     assert bar_rule["data"]["node_id"] == subworkflow_node["id"]
     # The output_id should match the bar output from the subworkflow node's outputs list
     assert bar_rule["data"]["output_id"] == bar_output["id"]
+
+
+def test_serialize_workflow__wrapped_subworkflow_deployment_node_calls_build_once(vellum_client):
+    """
+    Tests that a SubworkflowDeploymentNode wrapped in TryNode only calls the deployment
+    release API once during serialization, and that the serialized output contains the
+    correct deployment_id and release_tag.
+    """
+
+    # GIVEN a SubworkflowDeploymentNode wrapped in TryNode
+    @TryNode.wrap()
+    class WrappedSubworkflowDeploymentNode(SubworkflowDeploymentNode):
+        deployment = "test_wrapped_subworkflow_deployment"
+        release_tag = "LATEST"
+
+        class Outputs(BaseOutputs):
+            result: str
+
+    # AND a workflow that uses the wrapped node
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = WrappedSubworkflowDeploymentNode
+
+        class Outputs(BaseOutputs):
+            final_result = WrappedSubworkflowDeploymentNode.Outputs.result
+
+    # AND a deployment release with specific deployment_id and release_tag
+    deployment_id = "test-deployment-id-12345"
+    result_output_id = "result-output-id-67890"
+    deployment_release = WorkflowDeploymentRelease(
+        id=str(uuid4()),
+        created=datetime.now(),
+        environment=ReleaseEnvironment(id=str(uuid4()), name="DEVELOPMENT", label="Development"),
+        workflow_version=WorkflowDeploymentReleaseWorkflowVersion(
+            id=str(uuid4()),
+            input_variables=[],
+            output_variables=[
+                VellumVariable(id=result_output_id, key="result", type="STRING"),
+            ],
+        ),
+        deployment=WorkflowDeploymentReleaseWorkflowDeployment(
+            id=deployment_id,
+            name="test_wrapped_subworkflow_deployment",
+        ),
+        release_tags=[],
+        reviews=[],
+    )
+    vellum_client.workflow_deployments.retrieve_workflow_deployment_release.return_value = deployment_release
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the deployment release API should only be called once
+    assert vellum_client.workflow_deployments.retrieve_workflow_deployment_release.call_count == 1
+
+    # AND the serialized subworkflow node should have the correct deployment_id
+    workflow_raw_data = serialized_workflow["workflow_raw_data"]
+    subworkflow_node = next(node for node in workflow_raw_data["nodes"] if node["type"] == "SUBWORKFLOW")
+    assert subworkflow_node["data"]["workflow_deployment_id"] == deployment_id
+
+    # AND the serialized subworkflow node should have the correct release_tag
+    assert subworkflow_node["data"]["release_tag"] == "LATEST"
