@@ -29,20 +29,45 @@ def test_simple_chat_workflow_serialization():
     }
 
     # AND the triggers should be serialized correctly
-    triggers = serialized_workflow["triggers"]
-    assert len(triggers) == 1
-    trigger = triggers[0]
-    assert trigger["id"] == "9e14c49b-c6d9-4fe5-9ff2-835fd695fe5f"
-    assert trigger["type"] == "CHAT_MESSAGE"
-
-    # AND the exec_config should have both output and state
-    exec_config = trigger["exec_config"]
-    assert exec_config["output"] == {
-        "type": "WORKFLOW_OUTPUT",
-        "output_variable_id": "cc1208e9-c043-47f4-abea-c01ac0dbf04c",
-    }
-    assert "state" in exec_config
-    assert "state_variable_id" in exec_config["state"]
+    assert serialized_workflow["triggers"] == [
+        {
+            "id": "9e14c49b-c6d9-4fe5-9ff2-835fd695fe5f",
+            "type": "CHAT_MESSAGE",
+            "attributes": [
+                {
+                    "id": "5edbfd78-b634-4305-b2ad-d9feecbd5e5f",
+                    "key": "message",
+                    "type": "ARRAY",
+                    "required": True,
+                    "default": {
+                        "type": "ARRAY",
+                        "value": None,
+                    },
+                    "extensions": None,
+                    "schema": None,
+                }
+            ],
+            "exec_config": {
+                "output": {
+                    "type": "WORKFLOW_OUTPUT",
+                    "output_variable_id": "cc1208e9-c043-47f4-abea-c01ac0dbf04c",
+                },
+                "state": {
+                    "state_variable_id": "391dcc1d-c340-49fb-a153-14f5fd7be948",
+                },
+            },
+            "display_data": {
+                "label": "Chat Message",
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0,
+                },
+                "z_index": 0,
+                "icon": "vellum:icon:message-dots",
+                "color": "blue",
+            },
+        }
+    ]
 
 
 class ResponseNode(BaseNode):
