@@ -21,6 +21,7 @@ import {
   WorkflowSandboxDatasetRow,
   WorkflowSandboxDatasetRowMock,
   WorkflowSandboxInputs,
+  WorkflowTriggerType,
 } from "src/types/vellum";
 import { removeEscapeCharacters } from "src/utils/casing";
 import { getGeneratedInputsModulePath } from "src/utils/paths";
@@ -356,10 +357,22 @@ if __name__ == "__main__":
           (i) => removeEscapeCharacters(i.name) === attr.key && !isNil(i.value)
         ) ?? null;
 
+      // For chat message triggers, if the input is an array with a single string,
+      // unwrap it to just the string for cleaner codegen
+      const inputToUse =
+        trigger.type === WorkflowTriggerType.CHAT_MESSAGE &&
+        matchingInput &&
+        matchingInput.type === "ARRAY" &&
+        Array.isArray(matchingInput.value) &&
+        matchingInput.value.length === 1 &&
+        matchingInput.value[0].type === "STRING"
+          ? { ...matchingInput.value[0], name: matchingInput.name }
+          : matchingInput;
+
       return new MethodArgument({
         name: attr.key,
-        value: matchingInput
-          ? vellumValue({ vellumValue: matchingInput })
+        value: inputToUse
+          ? vellumValue({ vellumValue: inputToUse })
           : new NoneInstantiation(),
       });
     });
