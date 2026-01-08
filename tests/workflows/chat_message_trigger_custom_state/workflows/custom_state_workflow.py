@@ -1,4 +1,4 @@
-"""Simple workflow with ChatMessageTrigger for testing."""
+"""Workflow with ChatMessageTrigger using custom state reference for testing."""
 
 from typing import List
 
@@ -13,8 +13,8 @@ from vellum.workflows.state.base import BaseState
 from vellum.workflows.triggers.chat_message import ChatMessageTrigger
 
 
-class ChatState(BaseState):
-    chat_history: List[ChatMessage] = Field(default_factory=list)
+class CustomChatState(BaseState):
+    messages: List[ChatMessage] = Field(default_factory=list)
 
 
 class ResponseNode(BaseNode):
@@ -24,19 +24,19 @@ class ResponseNode(BaseNode):
         response: str = "Hello from assistant!"
 
 
-class SimpleChatTrigger(ChatMessageTrigger):
-    """Chat trigger that appends workflow output as assistant message."""
+class CustomStateTrigger(ChatMessageTrigger):
+    """Chat trigger that uses custom state reference for chat history."""
 
     class Config(ChatMessageTrigger.Config):
-        output = LazyReference("SimpleChatWorkflow.Outputs.response")  # type: ignore[has-type]
-        state = ChatState.chat_history
+        output = LazyReference("CustomStateWorkflow.Outputs.response")
+        state = CustomChatState.messages
 
 
-class SimpleChatWorkflow(BaseWorkflow[BaseInputs, ChatState]):
-    """Workflow using SimpleChatTrigger with workflow output reference."""
+class CustomStateWorkflow(BaseWorkflow[BaseInputs, CustomChatState]):
+    """Workflow using CustomStateTrigger with custom state reference."""
 
-    graph = SimpleChatTrigger >> ResponseNode
+    graph = CustomStateTrigger >> ResponseNode
 
     class Outputs(BaseWorkflow.Outputs):
         response = ResponseNode.Outputs.response
-        chat_history = ChatState.chat_history
+        messages = CustomChatState.messages

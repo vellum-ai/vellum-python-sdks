@@ -1,8 +1,14 @@
 """Tests for ChatMessageTrigger serialization."""
 
+from typing import List
+
+from pydantic import Field
+
+from vellum.client.types import ChatMessage
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
+from vellum.workflows.references import LazyReference
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.triggers.chat_message import ChatMessageTrigger
 from vellum_ee.workflows.display.utils.exceptions import TriggerValidationError
@@ -52,6 +58,9 @@ def test_simple_chat_workflow_serialization():
                     "type": "WORKFLOW_OUTPUT",
                     "output_variable_id": "cc1208e9-c043-47f4-abea-c01ac0dbf04c",
                 },
+                "state": {
+                    "state_variable_id": "391dcc1d-c340-49fb-a153-14f5fd7be948",
+                },
             },
             "display_data": {
                 "label": "Chat Message",
@@ -100,11 +109,103 @@ def test_chat_message_trigger_validation__output_not_specified():
     # WHEN we serialize the workflow
     workflow_display.serialize()
 
-    # THEN the display_context should contain a TriggerValidationError
+    # THEN the display_context should contain a TriggerValidationError for output
     errors = list(workflow_display.display_context.errors)
-    assert len(errors) == 1
+    output_errors = [e for e in errors if "output must be specified" in str(e)]
+    assert len(output_errors) == 1
 
     # AND the error should be a TriggerValidationError with the expected message
-    error = errors[0]
+    error = output_errors[0]
     assert isinstance(error, TriggerValidationError)
     assert "Chat Trigger output must be specified" in str(error)
+
+
+class DefaultChatHistoryState(BaseState):
+    chat_history: List[ChatMessage] = Field(default_factory=list)
+
+
+class ChatTriggerWithDefaultState(ChatMessageTrigger):
+    """Chat trigger with output but without Config.state specified, using default chat_history."""
+
+    class Config(ChatMessageTrigger.Config):
+        output = LazyReference("WorkflowWithDefaultChatHistory.Outputs.response")
+
+
+class WorkflowWithDefaultChatHistory(BaseWorkflow[BaseInputs, DefaultChatHistoryState]):
+    """Workflow using ChatTrigger without state specified but with chat_history on state."""
+
+    graph = ChatTriggerWithDefaultState >> ResponseNode
+
+    class Outputs(BaseWorkflow.Outputs):
+        response = ResponseNode.Outputs.response
+
+
+def test_chat_message_trigger_serialization__default_chat_history():
+    """
+    Tests that serialization defaults to chat_history state when Config.state is not specified.
+    """
+
+    # GIVEN a Workflow that uses a ChatMessageTrigger without Config.state specified
+    # AND the state class has a chat_history attribute
+    workflow_display = get_workflow_display(workflow_class=WorkflowWithDefaultChatHistory)
+
+    # WHEN we serialize the workflow
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the trigger should have exec_config with state referencing chat_history
+    triggers = serialized_workflow["triggers"]
+    assert len(triggers) == 1
+    exec_config = triggers[0].get("exec_config")
+    assert exec_config is not None
+    assert "state" in exec_config
+    assert "state_variable_id" in exec_config["state"]
+
+    # AND there should be no validation errors
+    errors = list(workflow_display.display_context.errors)
+    assert len(errors) == 0
+
+
+class CustomChatState(BaseState):
+    messages: List[ChatMessage] = Field(default_factory=list)
+
+
+class ChatTriggerWithoutState(ChatMessageTrigger):
+    """Chat trigger with output but without Config.state specified and no chat_history on state."""
+
+    class Config(ChatMessageTrigger.Config):
+        output = LazyReference("WorkflowWithoutChatHistory.Outputs.response")
+
+
+class WorkflowWithoutChatHistory(BaseWorkflow[BaseInputs, CustomChatState]):
+    """Workflow using ChatTrigger without state specified and no chat_history on state."""
+
+    graph = ChatTriggerWithoutState >> ResponseNode
+
+    class Outputs(BaseWorkflow.Outputs):
+        response = ResponseNode.Outputs.response
+
+
+def test_chat_message_trigger_serialization__no_state_no_chat_history():
+    """
+    Tests that serialization works when Config.state is not specified and state class
+    doesn't have chat_history attribute (backward compatibility).
+    """
+
+    # GIVEN a Workflow that uses a ChatMessageTrigger without Config.state specified
+    # AND the state class does NOT have a chat_history attribute
+    workflow_display = get_workflow_display(workflow_class=WorkflowWithoutChatHistory)
+
+    # WHEN we serialize the workflow
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the trigger should have exec_config with output but no state
+    triggers = serialized_workflow["triggers"]
+    assert len(triggers) == 1
+    exec_config = triggers[0].get("exec_config")
+    assert exec_config is not None
+    assert "output" in exec_config
+    assert "state" not in exec_config
+
+    # AND there should be no validation errors
+    errors = list(workflow_display.display_context.errors)
+    assert len(errors) == 0

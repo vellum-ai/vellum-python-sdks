@@ -72,6 +72,45 @@ class Workflow(BaseWorkflow):
 "
 `;
 
+exports[`generateCode > should generate code for %1 chat-message-trigger-custom-key.ts > triggers/custom_state_trigger.py 1`] = `
+"from vellum.workflows.references import LazyReference
+from vellum.workflows.triggers import ChatMessageTrigger
+
+from ..state import State
+
+
+class CustomStateTrigger(ChatMessageTrigger):
+    class Config(ChatMessageTrigger.Config):
+        output = LazyReference("Workflow.Outputs.result")
+        state = State.messages
+
+    class Display(ChatMessageTrigger.Display):
+        label = "Custom State Trigger"
+        x = 100
+        y = 200
+        z_index = 1
+        icon = "vellum:icon:message"
+        color = "blue"
+"
+`;
+
+exports[`generateCode > should generate code for %1 chat-message-trigger-custom-key.ts > workflow.py 1`] = `
+"from vellum.workflows import BaseWorkflow
+from vellum.workflows.inputs import BaseInputs
+
+from .nodes.some_node import SomeNode
+from .state import State
+from .triggers.custom_state_trigger import CustomStateTrigger
+
+
+class Workflow(BaseWorkflow[BaseInputs, State]):
+    graph = CustomStateTrigger >> SomeNode
+
+    class Outputs(BaseWorkflow.Outputs):
+        result = SomeNode.Outputs.result
+"
+`;
+
 exports[`generateCode > should generate code for %1 code-execution-node-with-await-all.ts > nodes/code_execution_with_await_all/__init__.py 1`] = `
 "from vellum.workflows.nodes.displayable import CodeExecutionNode
 from vellum.workflows.state import BaseState

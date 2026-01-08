@@ -851,6 +851,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
     ) -> Optional[JsonObject]:
         config_class = trigger_class.Config
         output = getattr(config_class, "output", None)
+        state: Optional[StateValueReference[Any]] = getattr(config_class, "state", None)
 
         if output is None:
             self.display_context.add_validation_error(
@@ -861,18 +862,26 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             )
             return None
 
-        serialized_output = serialize_value(
-            executable_id=trigger_class.__id__,
-            display_context=self.display_context,
-            value=output,
-        )
+        # If state is not specified, default to "chat_history" state value
+        if state is None:
+            for state_value in self.display_context.global_state_value_displays:
+                if state_value.name == "chat_history":
+                    state = state_value
+                    break
 
-        return cast(
-            JsonObject,
-            {
-                "output": serialized_output,
-            },
-        )
+        exec_config: JsonObject = {
+            "output": serialize_value(
+                executable_id=trigger_class.__id__,
+                display_context=self.display_context,
+                value=output,
+            ),
+        }
+
+        if state is not None:
+            state_value_display = self.display_context.global_state_value_displays[state]
+            exec_config["state"] = {"state_variable_id": str(state_value_display.id)}
+
+        return exec_config
 
     @staticmethod
     def _model_dump(value: Any) -> Any:

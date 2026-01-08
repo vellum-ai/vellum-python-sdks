@@ -105,3 +105,67 @@ def test_chat_message_trigger__graph_syntax():
     assert len(list(graph.trigger_edges)) == 1
     assert list(graph.trigger_edges)[0].trigger_class == ChatMessageTrigger
     assert list(graph.trigger_edges)[0].to_node == TestNode
+
+
+class CustomChatHistoryState(BaseState):
+    messages: List[ChatMessage] = Field(default_factory=list)
+
+
+class CustomStateTrigger(ChatMessageTrigger):
+    """Trigger with custom state reference."""
+
+    class Config(ChatMessageTrigger.Config):
+        state = CustomChatHistoryState.messages
+
+
+def test_chat_message_trigger__custom_state_initiated():
+    """Tests that ChatMessageTrigger uses custom state reference on initiation."""
+
+    # GIVEN a ChatMessageTrigger with a custom state reference
+    trigger = CustomStateTrigger(message=[StringChatMessageContent(value="Hello, world!")])
+
+    # AND a state with the custom chat history attribute
+    state = CustomChatHistoryState()
+
+    # WHEN the initiated lifecycle hook is called
+    trigger.__on_workflow_initiated__(state)
+
+    # THEN the user message is appended to the custom chat history attribute
+    assert len(state.messages) == 1
+    assert state.messages[0].role == "USER"
+    assert state.messages[0].content == ArrayChatMessageContent(value=[StringChatMessageContent(value="Hello, world!")])
+
+
+def test_chat_message_trigger__custom_state_missing_attribute():
+    """Tests that ChatMessageTrigger handles missing custom state attribute gracefully."""
+
+    # GIVEN a ChatMessageTrigger with a custom state reference
+    trigger = CustomStateTrigger(message=[StringChatMessageContent(value="Hello")])
+
+    # AND a state without the custom chat history attribute
+    state = BaseState()
+
+    # WHEN the initiated lifecycle hook is called
+    trigger.__on_workflow_initiated__(state)
+
+    # THEN no error is raised and state is unchanged
+    assert not hasattr(state, "messages")
+
+
+def test_chat_message_trigger__default_state():
+    """Tests that ChatMessageTrigger uses default state (None) which falls back to chat_history."""
+
+    # GIVEN a ChatMessageTrigger with default config
+    trigger = ChatMessageTrigger(message=[StringChatMessageContent(value="Hello")])
+
+    # AND a state with chat_history attribute
+    state = ChatState()
+
+    # WHEN we resolve the state
+    chat_history = trigger._resolve_state(state)
+
+    # THEN the default state config is None
+    assert trigger.Config.state is None
+
+    # AND the resolved chat history is the state's chat_history attribute
+    assert chat_history is state.chat_history

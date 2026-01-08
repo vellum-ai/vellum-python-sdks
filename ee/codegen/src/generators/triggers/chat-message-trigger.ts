@@ -12,6 +12,7 @@ import type { AstNode } from "src/generators/extensions/ast-node";
 import type {
   ChatMessageTrigger as ChatMessageTriggerType,
   WorkflowOutputWorkflowReference,
+  WorkflowStateVariableWorkflowReference,
 } from "src/types/vellum";
 
 export declare namespace ChatMessageTriggerGenerator {
@@ -46,17 +47,24 @@ export class ChatMessageTrigger extends BaseTrigger<ChatMessageTriggerType> {
   protected getTriggerClassBody(): AstNode[] {
     const body: AstNode[] = [];
 
-    body.push(...this.createAttributeFields());
+    // Note: We don't call createAttributeFields() here because the `message` attribute
+    // is inherited from the Python ChatMessageTrigger base class
 
     const execConfig = this.trigger.execConfig;
-    if (execConfig?.output) {
-      body.push(this.createConfigClass(execConfig.output));
+    const hasOutput = execConfig?.output;
+    const hasState = execConfig?.state;
+
+    if (hasOutput || hasState) {
+      body.push(this.createConfigClass(execConfig?.output, execConfig?.state));
     }
 
     return body;
   }
 
-  private createConfigClass(output: WorkflowOutputWorkflowReference): AstNode {
+  private createConfigClass(
+    output?: WorkflowOutputWorkflowReference,
+    state?: Omit<WorkflowStateVariableWorkflowReference, "type">
+  ): AstNode {
     const configClass = new Class({
       name: "Config",
       extends_: [
@@ -68,12 +76,45 @@ export class ChatMessageTrigger extends BaseTrigger<ChatMessageTriggerType> {
       ],
     });
 
-    const outputField = this.createOutputField(output);
-    if (outputField) {
-      configClass.add(outputField);
+    if (output) {
+      const outputField = this.createOutputField(output);
+      if (outputField) {
+        configClass.add(outputField);
+      }
+    }
+
+    if (state) {
+      const stateField = this.createStateField(state);
+      if (stateField) {
+        configClass.add(stateField);
+      }
     }
 
     return configClass;
+  }
+
+  private createStateField(
+    state: Omit<WorkflowStateVariableWorkflowReference, "type">
+  ): AstNode | undefined {
+    const stateVariableContext =
+      this.workflowContext.findStateVariableContextById(state.stateVariableId);
+
+    if (!stateVariableContext) {
+      return undefined;
+    }
+
+    const stateReference = new Reference({
+      name: "State",
+      modulePath: stateVariableContext.definition.module,
+      attribute: [stateVariableContext.name],
+    });
+
+    this.inheritReferences(stateReference);
+
+    return new Field({
+      name: "state",
+      initializer: stateReference,
+    });
   }
 
   private createOutputField(
