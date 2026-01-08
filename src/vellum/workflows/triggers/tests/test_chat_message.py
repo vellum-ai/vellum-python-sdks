@@ -150,3 +150,17 @@ def test_chat_message_trigger__converts_dict_format():
     assert len(trigger.message) == 1
     assert isinstance(trigger.message[0], StringChatMessageContent)
     assert trigger.message[0].value == "Hello from dict!"
+
+
+def test_chat_message_trigger__raises_value_error_for_invalid_content():
+    """Tests that ChatMessageTrigger raises ValueError for invalid message content."""
+
+    # GIVEN a message with invalid content (missing required fields)
+    invalid_message = [
+        {"invalid_field": "not a valid ChatMessageContent"},
+    ]
+
+    # WHEN a ChatMessageTrigger is created with invalid content
+    # THEN a ValueError is raised
+    with pytest.raises(ValueError, match="Invalid message content"):
+        ChatMessageTrigger(message=invalid_message)
