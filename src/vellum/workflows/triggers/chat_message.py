@@ -47,7 +47,10 @@ class ChatMessageTrigger(BaseTrigger):
         # Convert message from VellumValue format to ChatMessageContent format if needed
         if "message" in kwargs:
             message = kwargs["message"]
-            if isinstance(message, list):
+            # Handle string messages by converting to a list with a single StringChatMessageContent
+            if isinstance(message, str):
+                kwargs["message"] = [StringChatMessageContent(value=message)]
+            elif isinstance(message, list):
                 converted_message = []
                 for item in message:
                     # If it's already a ChatMessageContent type, keep it as-is
@@ -119,6 +122,4 @@ class ChatMessageTrigger(BaseTrigger):
         return resolve_value(output, state)
 
     class Display(BaseTrigger.Display):
-        label: str = "Chat Message"
-        icon: Optional[str] = "vellum:icon:message-dots"
-        color: Optional[str] = "blue"
+        name: Optional[str] = "Chat"

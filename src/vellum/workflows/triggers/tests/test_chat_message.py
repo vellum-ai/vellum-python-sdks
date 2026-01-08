@@ -152,6 +152,31 @@ def test_chat_message_trigger__converts_dict_format():
     assert trigger.message[0].value == "Hello from dict!"
 
 
+def test_chat_message_trigger__converts_string_message():
+    """Tests that ChatMessageTrigger converts string messages to ChatMessageContent list."""
+
+    # GIVEN a message as a string
+    string_message = "Hello, world!"
+
+    # WHEN a ChatMessageTrigger is created with a string message
+    trigger = ChatMessageTrigger(message=string_message)
+
+    # THEN the message is converted to a list with a single StringChatMessageContent
+    assert len(trigger.message) == 1
+    assert isinstance(trigger.message[0], StringChatMessageContent)
+    assert trigger.message[0].value == "Hello, world!"
+
+    # AND the trigger works correctly with state
+    state = ChatState()
+    trigger.__on_workflow_initiated__(state)
+
+    assert len(state.chat_history) == 1
+    assert state.chat_history[0].role == "USER"
+    assert state.chat_history[0].content == ArrayChatMessageContent(
+        value=[StringChatMessageContent(value="Hello, world!")]
+    )
+
+
 def test_chat_message_trigger__raises_value_error_for_invalid_content():
     """Tests that ChatMessageTrigger raises ValueError for invalid message content."""
 
