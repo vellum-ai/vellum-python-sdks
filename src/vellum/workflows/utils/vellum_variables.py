@@ -59,6 +59,13 @@ def primitive_type_to_vellum_variable_type(type_: Union[Type, BaseDescriptor]) -
             if len(collapse_types) == 1:
                 return primitive_type_to_vellum_variable_type(collapse_types[0])
 
+            # Handle Union[str, List[ArrayChatMessageContentItem]] for ChatMessageTrigger
+            if len(collapse_types) == 2:
+                has_str = str in collapse_types
+                has_array_content = any(_builtin_list_to_vellum_type(t) == "ARRAY" for t in collapse_types)
+                if has_str and has_array_content:
+                    return "ARRAY"
+
             raise ValueError(f"Expected Descriptor to only have one type, got {types}")
 
         type_ = type_.types[0]

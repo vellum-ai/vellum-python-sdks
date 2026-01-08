@@ -7,7 +7,6 @@ from pydantic import Field
 
 from vellum.client.types import (
     ArrayChatMessageContent,
-    ArrayChatMessageContentItem,
     ChatMessage,
     ImageChatMessageContent,
     StringChatMessageContent,
@@ -23,15 +22,23 @@ class ChatState(BaseState):
 
 
 @pytest.mark.parametrize(
-    ["message", "expected_content"],
+    ["message", "expected_text", "expected_content"],
     [
         pytest.param(
+            "Hello, world!",
+            "Hello, world!",
+            None,
+            id="plain_string",
+        ),
+        pytest.param(
             [StringChatMessageContent(value="Hello, world!")],
+            None,
             ArrayChatMessageContent(value=[StringChatMessageContent(value="Hello, world!")]),
             id="text_string_content",
         ),
         pytest.param(
             [ImageChatMessageContent(value=VellumImage(src="https://example.com/image.jpg"))],
+            None,
             ArrayChatMessageContent(
                 value=[ImageChatMessageContent(value=VellumImage(src="https://example.com/image.jpg"))]
             ),
@@ -42,6 +49,7 @@ class ChatState(BaseState):
                 StringChatMessageContent(value="Look at this image:"),
                 ImageChatMessageContent(value=VellumImage(src="https://example.com/image.jpg")),
             ],
+            None,
             ArrayChatMessageContent(
                 value=[
                     StringChatMessageContent(value="Look at this image:"),
@@ -53,10 +61,11 @@ class ChatState(BaseState):
     ],
 )
 def test_chat_message_trigger__initiated(
-    message: List[ArrayChatMessageContentItem],
-    expected_content: ArrayChatMessageContent,
+    message,
+    expected_text,
+    expected_content,
 ):
-    """Tests that ChatMessageTrigger appends user message on workflow initiation."""
+    """Tests that ChatMessageTrigger appends user message on workflow initiation with string or array input."""
 
     # GIVEN a ChatMessageTrigger with a message
     trigger = ChatMessageTrigger(message=message)
@@ -70,7 +79,7 @@ def test_chat_message_trigger__initiated(
     # THEN the user message is appended to chat_history
     assert len(state.chat_history) == 1
     assert state.chat_history[0].role == "USER"
-    assert state.chat_history[0].text is None
+    assert state.chat_history[0].text == expected_text
     assert state.chat_history[0].content == expected_content
 
 
