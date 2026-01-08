@@ -11,6 +11,7 @@ from vellum.client.types import (
     ChatMessage,
     ImageChatMessageContent,
     StringChatMessageContent,
+    StringVellumValue,
     VellumImage,
 )
 from vellum.workflows.nodes.bases.base import BaseNode
@@ -105,3 +106,29 @@ def test_chat_message_trigger__graph_syntax():
     assert len(list(graph.trigger_edges)) == 1
     assert list(graph.trigger_edges)[0].trigger_class == ChatMessageTrigger
     assert list(graph.trigger_edges)[0].to_node == TestNode
+
+
+def test_chat_message_trigger__converts_vellum_value_to_chat_message_content():
+    """Tests that ChatMessageTrigger converts VellumValue items to ArrayChatMessageContentItem."""
+
+    # GIVEN a list of StringVellumValue items (as sent by the frontend)
+    vellum_values = [StringVellumValue(value="Hello from frontend")]
+
+    # WHEN we create a ChatMessageTrigger with these values
+    trigger = ChatMessageTrigger(message=vellum_values)
+
+    # THEN the message is converted to StringChatMessageContent
+    assert len(trigger.message) == 1
+    assert isinstance(trigger.message[0], StringChatMessageContent)
+    assert trigger.message[0].value == "Hello from frontend"
+
+    # AND when the initiated lifecycle hook is called
+    state = ChatState()
+    trigger.__on_workflow_initiated__(state)
+
+    # THEN the user message is appended to chat_history with the converted content
+    assert len(state.chat_history) == 1
+    assert state.chat_history[0].role == "USER"
+    assert state.chat_history[0].content == ArrayChatMessageContent(
+        value=[StringChatMessageContent(value="Hello from frontend")]
+    )
