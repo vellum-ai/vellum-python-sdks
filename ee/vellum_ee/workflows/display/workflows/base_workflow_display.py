@@ -868,28 +868,19 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                     state = state_value
                     break
 
-        if state is None:
-            self.display_context.add_validation_error(
-                TriggerValidationError(
-                    message="Chat Trigger state must be specified.",
-                    trigger_class_name=trigger_class.__name__,
-                )
-            )
-            return None
+        exec_config: JsonObject = {
+            "output": serialize_value(
+                executable_id=trigger_class.__id__,
+                display_context=self.display_context,
+                value=output,
+            ),
+        }
 
-        state_value_display = self.display_context.global_state_value_displays[state]
+        if state is not None:
+            state_value_display = self.display_context.global_state_value_displays[state]
+            exec_config["state"] = {"state_variable_id": str(state_value_display.id)}
 
-        return cast(
-            JsonObject,
-            {
-                "output": serialize_value(
-                    executable_id=trigger_class.__id__,
-                    display_context=self.display_context,
-                    value=output,
-                ),
-                "state": {"state_variable_id": str(state_value_display.id)},
-            },
-        )
+        return exec_config
 
     @staticmethod
     def _model_dump(value: Any) -> Any:
