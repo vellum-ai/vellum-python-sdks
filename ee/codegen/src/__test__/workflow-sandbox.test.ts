@@ -876,5 +876,126 @@ describe("Workflow Sandbox", () => {
       expect(result).toContain("MockNodeExecution");
       expect(result).toContain("disabled=True");
     });
+
+    it("should unwrap single-string array to string for chat message trigger", async () => {
+      /**
+       * Tests that chat message triggers with array inputs containing a single string
+       * are unwrapped to just the string for cleaner codegen.
+       */
+
+      const writer = new Writer();
+      const triggerId = "chat-message-trigger-id";
+      const triggers: WorkflowTrigger[] = [
+        {
+          id: triggerId,
+          type: WorkflowTriggerType.CHAT_MESSAGE,
+          attributes: [
+            {
+              id: "message-attribute-id",
+              key: "message",
+              type: "ARRAY",
+            },
+          ],
+        },
+      ];
+      const uniqueWorkflowContext = workflowContextFactory({ triggers });
+
+      // GIVEN a chat message trigger with an array input containing a single string
+      const sandboxInputs: WorkflowSandboxDatasetRow[] = [
+        {
+          label: "Scenario with single string array",
+          inputs: [
+            {
+              name: "message",
+              type: "ARRAY",
+              value: [
+                {
+                  type: "STRING",
+                  value: "Hello, world!",
+                },
+              ],
+            },
+          ],
+          workflow_trigger_id: triggerId,
+        },
+      ];
+
+      // WHEN we generate the sandbox file
+      const sandbox = codegen.workflowSandboxFile({
+        workflowContext: uniqueWorkflowContext,
+        sandboxInputs,
+      });
+
+      sandbox.write(writer);
+      const result = await writer.toStringFormatted();
+
+      // THEN it should generate the string directly instead of an array
+      expect(result).toMatchSnapshot();
+      expect(result).toContain('message="Hello, world!"');
+      expect(result).not.toContain("message=[");
+    });
+
+    it("should keep array for chat message trigger with multiple strings", async () => {
+      /**
+       * Tests that chat message triggers with array inputs containing multiple strings
+       * are kept as arrays.
+       */
+
+      const writer = new Writer();
+      const triggerId = "chat-message-trigger-id";
+      const triggers: WorkflowTrigger[] = [
+        {
+          id: triggerId,
+          type: WorkflowTriggerType.CHAT_MESSAGE,
+          attributes: [
+            {
+              id: "message-attribute-id",
+              key: "message",
+              type: "ARRAY",
+            },
+          ],
+        },
+      ];
+      const uniqueWorkflowContext = workflowContextFactory({ triggers });
+
+      // GIVEN a chat message trigger with an array input containing multiple strings
+      const sandboxInputs: WorkflowSandboxDatasetRow[] = [
+        {
+          label: "Scenario with multiple strings array",
+          inputs: [
+            {
+              name: "message",
+              type: "ARRAY",
+              value: [
+                {
+                  type: "STRING",
+                  value: "Hello",
+                },
+                {
+                  type: "STRING",
+                  value: "World",
+                },
+              ],
+            },
+          ],
+          workflow_trigger_id: triggerId,
+        },
+      ];
+
+      // WHEN we generate the sandbox file
+      const sandbox = codegen.workflowSandboxFile({
+        workflowContext: uniqueWorkflowContext,
+        sandboxInputs,
+      });
+
+      sandbox.write(writer);
+      const result = await writer.toStringFormatted();
+
+      // THEN it should keep the array format
+      expect(result).toMatchSnapshot();
+      expect(result).toContain("[");
+      expect(result).toContain("Hello");
+      expect(result).toContain("World");
+    });
   });
 });
