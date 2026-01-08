@@ -1030,13 +1030,10 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         )
         for state_value in self._workflow.get_state_class():
             state_value_display_overrides = self.state_value_displays.get(state_value)
-            try:
-                state_value_display = self._generate_state_value_display(
-                    state_value, overrides=state_value_display_overrides
-                )
-            except StateValidationError as e:
-                errors.append(e)
-                continue
+            self._validate_state_value_default(state_value, errors)
+            state_value_display = self._generate_state_value_display(
+                state_value, overrides=state_value_display_overrides
+            )
             state_value_displays[state_value] = state_value_display
             global_state_value_displays[state_value] = state_value_display
 
@@ -1148,8 +1145,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
     def _generate_state_value_display(
         self, state_value: StateValueReference, overrides: Optional[StateValueDisplay] = None
     ) -> StateValueDisplay:
-        self._validate_state_value_default(state_value)
-
         state_value_id: UUID
         name = None
         color = None
@@ -1162,19 +1157,19 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
 
         return StateValueDisplay(id=state_value_id, name=name, color=color)
 
-    def _validate_state_value_default(self, state_value: StateValueReference) -> None:
-        state_class = state_value.state_class
-        attr_name = state_value.name
-        default_value = vars(state_class).get(attr_name)
+    def _validate_state_value_default(self, state_value: StateValueReference, errors: List[Exception]) -> None:
+        default_value = state_value.instance
 
         if isinstance(default_value, (list, dict, set)):
-            raise StateValidationError(
-                message=(
-                    "Mutable default value detected. Use Field(default_factory=list) instead of = [] "
-                    "to avoid shared mutable state between instances."
-                ),
-                state_class_name=state_class.__name__,
-                attribute_name=attr_name,
+            errors.append(
+                StateValidationError(
+                    message=(
+                        "Mutable default value detected. Use Field(default_factory=list) instead of = [] "
+                        "to avoid shared mutable state between instances."
+                    ),
+                    state_class_name=state_value.state_class.__name__,
+                    attribute_name=state_value.name,
+                )
             )
 
     def _generate_entrypoint_display(
