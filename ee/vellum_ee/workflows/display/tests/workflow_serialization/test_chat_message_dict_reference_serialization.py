@@ -1,4 +1,3 @@
-import pytest
 from typing import List
 
 from vellum import ChatMessage
@@ -109,79 +108,23 @@ def test_serialize_chat_message_dict_reference_with_definition():
     }
 
 
-@pytest.mark.parametrize(
-    ["chat_message", "expected_text"],
-    [
-        pytest.param(
-            ChatMessage(role="USER", text="hello"),
-            "hello",
-            id="text_parameter",
-        ),
-        pytest.param(
-            ChatMessage(role="USER", message="I have this idea"),
-            "I have this idea",
-            id="message_parameter",
-        ),
-    ],
-)
-def test_serialize_chat_message_with_message_parameter(chat_message, expected_text):
-    """Test that ChatMessage serializes correctly when using the message parameter."""
+def test_serialize_chat_message_trigger_with_message_parameter():
+    """Test that ChatMessageTrigger with message parameter serializes correctly in dataset."""
+    from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 
-    # GIVEN a workflow that uses a ChatMessage with the message parameter
-    class State(BaseState):
-        chat_history: List[ChatMessage] = []
+    # GIVEN a workflow module with a ChatMessageTrigger that has a message parameter
+    module_path = "tests.workflows.test_chat_message_trigger_serialization"
 
-    class StoreMessage(SetStateNode[State]):
-        operations = {
-            "chat_history": State.chat_history + chat_message,
-        }
+    # WHEN we serialize the module
+    result = BaseWorkflowDisplay.serialize_module(module_path)
 
-    class TestWorkflow(BaseWorkflow[BaseInputs, State]):
-        graph = StoreMessage
+    # THEN the dataset should contain the trigger's message in inputs
+    assert result.dataset is not None
+    assert isinstance(result.dataset, list)
+    assert len(result.dataset) == 1
 
-        class Outputs(BaseWorkflow.Outputs):
-            chat_history = State.chat_history
-
-    # WHEN we serialize the workflow
-    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
-    serialized_workflow = workflow_display.serialize()
-
-    # THEN the ChatMessage should be serialized with the text field populated
-    workflow_raw_data = serialized_workflow["workflow_raw_data"]
-    assert isinstance(workflow_raw_data, dict)
-    nodes = workflow_raw_data["nodes"]
-    assert isinstance(nodes, list)
-
-    set_state_node = next(
-        node
-        for node in nodes
-        if isinstance(node, dict) and node.get("type") == "GENERIC" and node.get("label") == "Store Message"
-    )
-    assert isinstance(set_state_node, dict)
-
-    attributes = set_state_node["attributes"]
-    assert isinstance(attributes, list)
-    operations_attribute = next(
-        attribute for attribute in attributes if isinstance(attribute, dict) and attribute.get("name") == "operations"
-    )
-    assert isinstance(operations_attribute, dict)
-
-    operations_value = operations_attribute["value"]
-    assert isinstance(operations_value, dict)
-    entries = operations_value["entries"]
-    assert isinstance(entries, list)
-    chat_history_entry = entries[0]
-    assert isinstance(chat_history_entry, dict)
-    entry_value = chat_history_entry["value"]
-    assert isinstance(entry_value, dict)
-    chat_message_value = entry_value["rhs"]
-    assert isinstance(chat_message_value, dict)
-
-    # AND the text field should have the expected value
-    assert chat_message_value["type"] == "CONSTANT_VALUE"
-    inner_value = chat_message_value["value"]
-    assert isinstance(inner_value, dict)
-    assert inner_value["type"] == "JSON"
-    json_value = inner_value["value"]
-    assert isinstance(json_value, dict)
-    assert json_value["text"] == expected_text
+    # AND the message should be serialized in the inputs
+    dataset_row = result.dataset[0]
+    assert dataset_row["label"] == "New conversation"
+    assert "inputs" in dataset_row
+    assert dataset_row["inputs"]["message"] == "I want to tweet about AI agents"
