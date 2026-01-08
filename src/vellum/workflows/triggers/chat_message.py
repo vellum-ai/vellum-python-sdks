@@ -32,10 +32,10 @@ class ChatMessageTrigger(BaseTrigger):
     conversation state across executions.
 
     Attributes:
-        message: The incoming chat message content.
+        message: The incoming chat message content. Can be a string or a list of content items.
     """
 
-    message: List[ArrayChatMessageContentItem]
+    message: Union[str, List[ArrayChatMessageContentItem]]
 
     class Config(BaseTrigger.Config):
         output: Optional[BaseDescriptor[Any]] = None
@@ -80,10 +80,16 @@ class ChatMessageTrigger(BaseTrigger):
         if not hasattr(state, "chat_history"):
             return
 
-        user_message = ChatMessage(
-            role="USER",
-            content=ArrayChatMessageContent(value=self.message),
-        )
+        if isinstance(self.message, str):
+            user_message = ChatMessage(
+                role="USER",
+                text=self.message,
+            )
+        else:
+            user_message = ChatMessage(
+                role="USER",
+                content=ArrayChatMessageContent(value=self.message),
+            )
         state.chat_history.append(user_message)
 
     def __on_workflow_fulfilled__(self, state: "BaseState") -> None:
