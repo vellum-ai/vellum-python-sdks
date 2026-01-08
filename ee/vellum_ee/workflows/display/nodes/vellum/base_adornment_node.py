@@ -89,8 +89,11 @@ class BaseAdornmentNodeDisplay(BaseNodeDisplay[_BaseAdornmentNodeType], Generic[
                 "Unable to serialize standalone adornment nodes. Please use adornment nodes as a decorator."
             )
 
-        wrapped_node_display_class = get_node_display_class(wrapped_node)
-        wrapped_node_display = wrapped_node_display_class()
+        # Use existing node display instance from display_context if available to preserve build() data
+        wrapped_node_display = display_context.node_displays.get(wrapped_node)
+        if not wrapped_node_display:
+            wrapped_node_display_class = get_node_display_class(wrapped_node)
+            wrapped_node_display = wrapped_node_display_class()
         additional_kwargs = get_additional_kwargs(wrapped_node_display.node_id) if get_additional_kwargs else {}
         serialized_wrapped_node = wrapped_node_display.serialize(display_context, **kwargs, **additional_kwargs)
 
