@@ -31,10 +31,10 @@ def test_custom_state_workflow_serialization():
                 {
                     "id": "6b15244a-d2ee-450f-a702-678e67c62b4a",
                     "key": "message",
-                    "type": "JSON",
+                    "type": "ARRAY",
                     "required": True,
                     "default": {
-                        "type": "JSON",
+                        "type": "ARRAY",
                         "value": None,
                     },
                     "extensions": None,
