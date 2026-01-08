@@ -80,6 +80,7 @@ IntegrationName = typing.Union[
         "SHARE_POINT",
         "SHOPIFY",
         "SHORTCUT",
+        "SLACKBOT",
         "SPOTIFY",
         "STRIPE",
         "SUPABASE",

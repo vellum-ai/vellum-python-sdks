@@ -4,6 +4,7 @@ import typing
 
 import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
+from .check_workflow_execution_status_error import CheckWorkflowExecutionStatusError
 from .workflow_result_event_state import WorkflowResultEventState
 
 
@@ -14,6 +15,7 @@ class CheckWorkflowExecutionStatusResponse(UniversalBaseModel):
 
     status: WorkflowResultEventState
     outputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = None
+    error: typing.Optional[CheckWorkflowExecutionStatusError] = None
     execution_id: str
     execution_detail_url: typing.Optional[str] = None
 
