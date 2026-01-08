@@ -340,6 +340,32 @@ def test_workflow__unsupported_graph_item():
     assert "Unexpected graph type: <class 'int'>" in str(exc_info.value)
 
 
+def test_resolve_graph__non_class_item_in_set():
+    """Test that _resolve_graph properly handles non-class items in a set without crashing on issubclass()."""
+    # GIVEN a non-class value (a string, not a class)
+    # WHEN we call _resolve_graph with a set containing a non-class value
+    with pytest.raises(ValueError) as exc_info:
+        BaseWorkflow._resolve_graph({"not_a_class"})  # type: ignore
+
+    # THEN it should raise ValueError instead of crashing with "issubclass() arg 1 must be a class"
+    assert "Unexpected graph type:" in str(exc_info.value)
+    assert "<class 'str'>" in str(exc_info.value)
+
+
+def test_resolve_graph__non_class_value():
+    """Test that _resolve_graph properly handles non-class values without crashing on issubclass()."""
+    # GIVEN a non-class value (a string, not a class)
+    non_class_value = "not_a_class"
+
+    # WHEN we call _resolve_graph with a non-class value
+    with pytest.raises(ValueError) as exc_info:
+        BaseWorkflow._resolve_graph(non_class_value)  # type: ignore
+
+    # THEN it should raise ValueError instead of crashing with "issubclass() arg 1 must be a class"
+    assert "Unexpected graph type:" in str(exc_info.value)
+    assert "<class 'str'>" in str(exc_info.value)
+
+
 def test_base_workflow__deserialize_state():
     # GIVEN a state definition
     class State(BaseState):
