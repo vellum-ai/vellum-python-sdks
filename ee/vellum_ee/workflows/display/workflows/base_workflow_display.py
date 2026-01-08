@@ -859,16 +859,16 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                     trigger_class_name=trigger_class.__name__,
                 )
             )
+            return None
+
+        # If state is not specified, default to "chat_history" state value
+        if state is None:
+            for state_value in self.display_context.global_state_value_displays:
+                if state_value.name == "chat_history":
+                    state = state_value
+                    break
 
         if state is None:
-            self.display_context.add_validation_error(
-                TriggerValidationError(
-                    message="Chat Trigger state must be specified.",
-                    trigger_class_name=trigger_class.__name__,
-                )
-            )
-
-        if output is None or state is None:
             return None
 
         state_value_display = self.display_context.global_state_value_displays[state]
