@@ -265,12 +265,22 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         serialized_nodes: Dict[UUID, JsonObject] = {}
         edges: JsonArray = []
 
-        # Detect duplicate graph paths in the top-level set and report errors
-        seen_graph_signatures: Set[FrozenSet[Tuple[Type[BaseNode], Type[BaseNode]]]] = set()
+        # Detect duplicate graph paths in the top-level set
+        # Signature includes: regular edges (with port identity) + trigger edges
+        seen_graph_signatures: Set[FrozenSet[Tuple[Any, ...]]] = set()
+        seen_trigger_edges: Set[Tuple[Type[BaseTrigger], Type[BaseNode]]] = set()
+        trigger_edges: List[TriggerEdge] = []
         for subgraph in self._workflow.get_subgraphs():
-            edge_signature: Set[Tuple[Type[BaseNode], Type[BaseNode]]] = set()
+            # Build signature from regular edges (include port identity to distinguish different ports)
+            edge_signature: Set[Tuple[Any, ...]] = set()
             for edge in subgraph.edges:
-                edge_signature.add((get_unadorned_node(edge.from_port.node_class), get_unadorned_node(edge.to_node)))
+                # Use port identity (id(port)) to distinguish different ports from the same node
+                edge_signature.add((id(edge.from_port), get_unadorned_node(edge.to_node)))
+
+            # Include trigger edges in the signature
+            for trigger_edge in subgraph.trigger_edges:
+                edge_signature.add(("trigger", trigger_edge.trigger_class, get_unadorned_node(trigger_edge.to_node)))
+
             frozen_signature = frozenset(edge_signature)
             if frozen_signature and frozen_signature in seen_graph_signatures:
                 self.display_context.add_validation_error(
@@ -282,28 +292,12 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             elif frozen_signature:
                 seen_graph_signatures.add(frozen_signature)
 
-        # Get all trigger edges from the workflow's subgraphs to check if trigger exists
-        trigger_edges: List[TriggerEdge] = []
-        for subgraph in self._workflow.get_subgraphs():
-            trigger_edges.extend(list(subgraph.trigger_edges))
-
-        # Deduplicate trigger edges and report errors for duplicates
-        seen_trigger_edges: Set[Tuple[Type[BaseTrigger], Type[BaseNode]]] = set()
-        unique_trigger_edges: List[TriggerEdge] = []
-        for trigger_edge in trigger_edges:
-            edge_key = (trigger_edge.trigger_class, get_unadorned_node(trigger_edge.to_node))
-            if edge_key in seen_trigger_edges:
-                self.display_context.add_validation_error(
-                    WorkflowValidationError(
-                        message=f"Duplicate trigger edge from {trigger_edge.trigger_class.__name__} to "
-                        f"{trigger_edge.to_node.__name__}",
-                        workflow_class_name=self._workflow.__name__,
-                    )
-                )
-            else:
-                seen_trigger_edges.add(edge_key)
-                unique_trigger_edges.append(trigger_edge)
-        trigger_edges = unique_trigger_edges
+            # Collect and deduplicate trigger edges (for the trigger_edges list only)
+            for trigger_edge in subgraph.trigger_edges:
+                edge_key = (trigger_edge.trigger_class, get_unadorned_node(trigger_edge.to_node))
+                if edge_key not in seen_trigger_edges:
+                    seen_trigger_edges.add(edge_key)
+                    trigger_edges.append(trigger_edge)
 
         # Determine if we need an ENTRYPOINT node and what ID to use
         manual_trigger_edges = [edge for edge in trigger_edges if issubclass(edge.trigger_class, ManualTrigger)]

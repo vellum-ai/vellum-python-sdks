@@ -3,6 +3,7 @@
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
+from vellum.workflows.ports import Port
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.triggers.chat_message import ChatMessageTrigger
 from vellum_ee.workflows.display.utils.exceptions import TriggerValidationError, WorkflowValidationError
@@ -166,10 +167,11 @@ def test_chat_message_trigger_graph_with_duplicate_edges():
 def test_graph_with_shared_prefix_different_paths__no_validation_error():
     """Graph with shared prefix but different paths should not produce validation errors."""
 
-    # GIVEN nodes for a workflow
-    class A(BaseNode):
+    # GIVEN a ChatMessageTrigger subclass as the entry point
+    class A(ChatMessageTrigger):
         pass
 
+    # AND nodes for a workflow
     class B(BaseNode):
         pass
 
@@ -230,3 +232,36 @@ def test_graph_with_duplicate_paths__validation_error():
     errors = list(workflow_display.display_context.errors)
     duplicate_errors = [e for e in errors if isinstance(e, WorkflowValidationError) and "duplicate" in str(e).lower()]
     assert len(duplicate_errors) == 1, f"Expected 1 duplicate error, got {len(duplicate_errors)}"
+
+
+def test_graph_with_different_ports_same_target__no_validation_error():
+    """Graph with different ports from same node to same target should not produce validation errors."""
+
+    # GIVEN a node with multiple ports
+    class A(BaseNode):
+        class Ports(BaseNode.Ports):
+            foo = Port()
+            bar = Port()
+
+    # AND a target node
+    class B(BaseNode):
+        pass
+
+    # AND a workflow with a graph where different ports connect to the same target
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = {
+            A.Ports.foo >> B,
+            A.Ports.bar >> B,
+        }
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    result: dict = workflow_display.serialize()
+
+    # THEN the workflow should serialize successfully
+    assert "workflow_raw_data" in result
+
+    # AND there should be NO validation errors about duplicates
+    errors = list(workflow_display.display_context.errors)
+    duplicate_errors = [e for e in errors if isinstance(e, WorkflowValidationError) and "duplicate" in str(e).lower()]
+    assert len(duplicate_errors) == 0, f"Expected no duplicate errors, got {len(duplicate_errors)}: {duplicate_errors}"
