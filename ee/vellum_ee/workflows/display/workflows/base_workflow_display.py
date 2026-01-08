@@ -852,6 +852,12 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         output = getattr(config_class, "output", None)
 
         if output is None:
+            self.display_context.add_validation_error(
+                TriggerValidationError(
+                    message="Chat Trigger output must be specified.",
+                    trigger_class_name=trigger_class.__name__,
+                )
+            )
             return None
 
         serialized_output = serialize_value(

@@ -1,5 +1,11 @@
 """Tests for ChatMessageTrigger serialization."""
 
+from vellum.workflows import BaseWorkflow
+from vellum.workflows.inputs import BaseInputs
+from vellum.workflows.nodes.bases import BaseNode
+from vellum.workflows.state.base import BaseState
+from vellum.workflows.triggers.chat_message import ChatMessageTrigger
+from vellum_ee.workflows.display.utils.exceptions import TriggerValidationError
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 from tests.workflows.chat_message_trigger_execution.workflows.simple_chat_workflow import SimpleChatWorkflow
@@ -59,3 +65,46 @@ def test_simple_chat_workflow_serialization():
             },
         }
     ]
+
+
+class ResponseNode(BaseNode):
+    """Node that returns a simple response."""
+
+    class Outputs(BaseNode.Outputs):
+        response: str = "Hello!"
+
+
+class ChatTriggerWithoutOutput(ChatMessageTrigger):
+    """Chat trigger without Config.output specified."""
+
+    pass
+
+
+class WorkflowWithUnspecifiedChatTriggerOutput(BaseWorkflow[BaseInputs, BaseState]):
+    """Workflow using ChatTrigger without output specified."""
+
+    graph = ChatTriggerWithoutOutput >> ResponseNode
+
+    class Outputs(BaseWorkflow.Outputs):
+        response = ResponseNode.Outputs.response
+
+
+def test_chat_message_trigger_validation__output_not_specified():
+    """
+    Tests that serialization adds TriggerValidationError to errors when Chat Trigger output is not specified.
+    """
+
+    # GIVEN a Workflow that uses a ChatMessageTrigger without Config.output specified
+    workflow_display = get_workflow_display(workflow_class=WorkflowWithUnspecifiedChatTriggerOutput)
+
+    # WHEN we serialize the workflow
+    workflow_display.serialize()
+
+    # THEN the display_context should contain a TriggerValidationError
+    errors = list(workflow_display.display_context.errors)
+    assert len(errors) == 1
+
+    # AND the error should be a TriggerValidationError with the expected message
+    error = errors[0]
+    assert isinstance(error, TriggerValidationError)
+    assert "Chat Trigger output must be specified" in str(error)
