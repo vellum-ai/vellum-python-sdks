@@ -10,7 +10,7 @@ describe("VellumVariableField", () => {
 
   test("StringVellumVariable snapshot", async () => {
     const stringVar = codegen.vellumVariable({
-      variable: { id: "1", name: "test", type: "STRING", required: true },
+      variable: { id: "1", key: "test", type: "STRING", required: true },
     });
     stringVar.write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -18,7 +18,7 @@ describe("VellumVariableField", () => {
 
   test("NumberVellumVariable snapshot", async () => {
     const numberVar = codegen.vellumVariable({
-      variable: { id: "1", name: "test", type: "NUMBER", required: true },
+      variable: { id: "1", key: "test", type: "NUMBER", required: true },
     });
     numberVar.write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -26,7 +26,7 @@ describe("VellumVariableField", () => {
 
   test("JsonVellumVariable snapshot", async () => {
     const jsonVar = codegen.vellumVariable({
-      variable: { id: "1", name: "test", type: "JSON", required: true },
+      variable: { id: "1", key: "test", type: "JSON", required: true },
     });
     jsonVar.write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -34,7 +34,7 @@ describe("VellumVariableField", () => {
 
   test("AudioVellumVariable snapshot", async () => {
     const audioVar = codegen.vellumVariable({
-      variable: { id: "1", name: "test", type: "AUDIO", required: true },
+      variable: { id: "1", key: "test", type: "AUDIO", required: true },
     });
     audioVar.write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -42,7 +42,7 @@ describe("VellumVariableField", () => {
 
   test("VideoVellumVariable snapshot", async () => {
     const videoVar = codegen.vellumVariable({
-      variable: { id: "1", name: "test", type: "VIDEO", required: true },
+      variable: { id: "1", key: "test", type: "VIDEO", required: true },
     });
     videoVar.write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -50,7 +50,7 @@ describe("VellumVariableField", () => {
 
   test("ImageVellumVariable snapshot", async () => {
     const imageVar = codegen.vellumVariable({
-      variable: { id: "1", name: "test", type: "IMAGE", required: true },
+      variable: { id: "1", key: "test", type: "IMAGE", required: true },
     });
     imageVar.write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -58,7 +58,7 @@ describe("VellumVariableField", () => {
 
   test("DocumentVellumVariable snapshot", async () => {
     const documentVar = codegen.vellumVariable({
-      variable: { id: "1", name: "test", type: "DOCUMENT", required: true },
+      variable: { id: "1", key: "test", type: "DOCUMENT", required: true },
     });
     documentVar.write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -68,7 +68,7 @@ describe("VellumVariableField", () => {
     const functionCallVar = codegen.vellumVariable({
       variable: {
         id: "1",
-        name: "test",
+        key: "test",
         type: "FUNCTION_CALL",
         required: true,
       },
@@ -79,7 +79,7 @@ describe("VellumVariableField", () => {
 
   test("ErrorVellumVariable snapshot", async () => {
     const errorVar = codegen.vellumVariable({
-      variable: { id: "1", name: "test", type: "ERROR", required: true },
+      variable: { id: "1", key: "test", type: "ERROR", required: true },
     });
     errorVar.write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -87,7 +87,7 @@ describe("VellumVariableField", () => {
 
   test("ArrayVellumVariable snapshot", async () => {
     const arrayVar = codegen.vellumVariable({
-      variable: { id: "1", name: "test", type: "ARRAY", required: true },
+      variable: { id: "1", key: "test", type: "ARRAY", required: true },
     });
     arrayVar.write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -95,7 +95,7 @@ describe("VellumVariableField", () => {
 
   test("ChatHistoryVellumVariable snapshot", async () => {
     const chatHistoryVar = codegen.vellumVariable({
-      variable: { id: "1", name: "test", type: "CHAT_HISTORY", required: true },
+      variable: { id: "1", key: "test", type: "CHAT_HISTORY", required: true },
     });
     chatHistoryVar.write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -105,7 +105,7 @@ describe("VellumVariableField", () => {
     const searchResultsVar = codegen.vellumVariable({
       variable: {
         id: "1",
-        name: "test",
+        key: "test",
         type: "SEARCH_RESULTS",
         required: true,
       },
@@ -116,7 +116,7 @@ describe("VellumVariableField", () => {
 
   test("NullVellumVariable snapshot", async () => {
     const nullVar = codegen.vellumVariable({
-      variable: { id: "1", name: "test", type: "NULL" },
+      variable: { id: "1", key: "test", type: "NULL" },
     });
     nullVar.write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();
@@ -124,7 +124,7 @@ describe("VellumVariableField", () => {
 
   test("OptionalVellumVariable defaultRequired=true snapshot", async () => {
     const optionalVar = codegen.vellumVariable({
-      variable: { id: "1", name: "test", type: "STRING" },
+      variable: { id: "1", key: "test", type: "STRING" },
       defaultRequired: true,
     });
     optionalVar.write(writer);
@@ -133,7 +133,7 @@ describe("VellumVariableField", () => {
 
   test("OptionalVellumVariable defaultRequired=false snapshot", async () => {
     const optionalVar = codegen.vellumVariable({
-      variable: { id: "1", name: "test", type: "STRING" },
+      variable: { id: "1", key: "test", type: "STRING" },
       defaultRequired: false,
     });
     optionalVar.write(writer);
@@ -146,7 +146,7 @@ describe("VellumVariableField", () => {
       const arrayVar = codegen.vellumVariable({
         variable: {
           id: "1",
-          name: "test",
+          key: "test",
           type: "ARRAY",
           required: required,
           default: { type: "ARRAY", value: [] },
@@ -163,7 +163,7 @@ describe("VellumVariableField", () => {
       const chatHistoryVar = codegen.vellumVariable({
         variable: {
           id: "1",
-          name: "test",
+          key: "test",
           type: "CHAT_HISTORY",
           required: required,
           default: { type: "CHAT_HISTORY", value: [] },
@@ -180,7 +180,7 @@ describe("VellumVariableField", () => {
       const jsonVar = codegen.vellumVariable({
         variable: {
           id: "1",
-          name: "test",
+          key: "test",
           type: "JSON",
           required: required,
           default: { type: "JSON", value: {} },
@@ -197,7 +197,7 @@ describe("VellumVariableField", () => {
       const arrayVar = codegen.vellumVariable({
         variable: {
           id: "1",
-          name: "test",
+          key: "test",
           type: "ARRAY",
           required: required,
           default: {
@@ -220,7 +220,7 @@ describe("VellumVariableField", () => {
       const jsonVar = codegen.vellumVariable({
         variable: {
           id: "1",
-          name: "test",
+          key: "test",
           type: "JSON",
           required: required,
           default: {
@@ -240,7 +240,7 @@ describe("VellumVariableField", () => {
       const stringVar = codegen.vellumVariable({
         variable: {
           id: "1",
-          name: "test",
+          key: "test",
           type: "STRING",
           required: required,
           default: { type: "STRING", value: null },
@@ -253,7 +253,7 @@ describe("VellumVariableField", () => {
 
   test("ThinkingVellumVariable snapshot", async () => {
     const thinkingVar = codegen.vellumVariable({
-      variable: { id: "1", name: "test", type: "THINKING", required: true },
+      variable: { id: "1", key: "test", type: "THINKING", required: true },
     });
     thinkingVar.write(writer);
     expect(await writer.toStringFormatted()).toMatchSnapshot();

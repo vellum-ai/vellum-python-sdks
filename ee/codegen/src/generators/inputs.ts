@@ -79,7 +79,7 @@ export class Inputs extends BasePersistedFile {
           id: inputVariableData.id,
           // Use the sanitized name from the input variable context to ensure it's a valid
           // attribute name (as opposed to the raw name from the input variable data).
-          name: inputVariableName,
+          key: inputVariableName,
           type: inputVariableData.type,
           required: inputVariableData.required,
           default: inputVariableData.default,
