@@ -59,6 +59,10 @@ def primitive_type_to_vellum_variable_type(type_: Union[Type, BaseDescriptor]) -
             if len(collapse_types) == 1:
                 return primitive_type_to_vellum_variable_type(collapse_types[0])
 
+            # Handle Union[str, List[ArrayChatMessageContentItem]] for ChatMessageTrigger.message
+            if _is_string_and_array_chat_message_content_union(types):
+                return "ARRAY"
+
             raise ValueError(f"Expected Descriptor to only have one type, got {types}")
 
         type_ = type_.types[0]
@@ -236,6 +240,22 @@ def _is_array_chat_message_content_item(type_: Type) -> bool:
         return all(_is_array_chat_message_content_item(arg) for arg in args)
 
     return type_ == ArrayChatMessageContentItem
+
+
+def _is_string_and_array_chat_message_content_union(types: List[Type]) -> bool:
+    """Check if types represent Union[str, List[ArrayChatMessageContentItem]]."""
+    if len(types) != 2:
+        return False
+
+    has_str = str in types
+    has_list_array_content = any(
+        get_origin(t) in (list, typing.List)
+        and len(get_args(t)) == 1
+        and _is_array_chat_message_content_item(get_args(t)[0])
+        for t in types
+    )
+
+    return has_str and has_list_array_content
 
 
 def _is_vellum_value_subtype(type_: Type) -> bool:

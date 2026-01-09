@@ -1,7 +1,9 @@
 """Tests for ChatMessageTrigger serialization."""
 
+from vellum import ChatMessagePromptBlock, JinjaPromptBlock
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
+from vellum.workflows.nodes import InlinePromptNode
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.ports import Port
 from vellum.workflows.state.base import BaseState
@@ -265,3 +267,60 @@ def test_graph_with_different_ports_same_target__no_validation_error():
     errors = list(workflow_display.display_context.errors)
     duplicate_errors = [e for e in errors if isinstance(e, WorkflowValidationError) and "duplicate" in str(e).lower()]
     assert len(duplicate_errors) == 0, f"Expected no duplicate errors, got {len(duplicate_errors)}: {duplicate_errors}"
+
+
+def test_chat_message_trigger_message_wired_to_prompt_inputs():
+    """Tests that ChatMessageTrigger.message can be wired to InlinePromptNode.prompt_inputs."""
+
+    # GIVEN a ChatMessageTrigger subclass
+    class Chat(ChatMessageTrigger):
+        class Display(ChatMessageTrigger.Display):
+            label: str = "Chat"
+
+    # AND an InlinePromptNode that uses the trigger's message as a prompt input
+    class PromptNode(InlinePromptNode):
+        ml_model = "gpt-4o"
+        blocks = [
+            ChatMessagePromptBlock(
+                chat_role="USER",
+                blocks=[JinjaPromptBlock(template="{{ message }}")],
+            ),
+        ]
+        prompt_inputs = {"message": Chat.message}
+
+    # AND a workflow that wires the trigger to the prompt node
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = Chat >> PromptNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            result = PromptNode.Outputs.text
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the workflow should serialize successfully
+    assert "workflow_raw_data" in serialized_workflow
+
+    # AND the prompt node should have the message input wired correctly
+    workflow_raw_data = serialized_workflow["workflow_raw_data"]
+    nodes = workflow_raw_data["nodes"]
+    prompt_nodes = [n for n in nodes if isinstance(n, dict) and n.get("type") == "PROMPT"]
+    assert len(prompt_nodes) == 1
+
+    prompt_node = prompt_nodes[0]
+    inputs = prompt_node.get("inputs", [])
+    message_input = next((i for i in inputs if i.get("key") == "message"), None)
+    assert message_input is not None
+
+    # AND the input should reference the trigger attribute
+    rules = message_input.get("value", {}).get("rules", [])
+    trigger_attr_rule = next((r for r in rules if r.get("type") == "TRIGGER_ATTRIBUTE"), None)
+    assert trigger_attr_rule is not None
+
+    # AND the prompt input variable type should be ARRAY
+    exec_config = prompt_node.get("data", {}).get("exec_config", {})
+    input_variables = exec_config.get("input_variables", [])
+    message_var = next((v for v in input_variables if v.get("key") == "message"), None)
+    assert message_var is not None
+    assert message_var.get("type") == "ARRAY"
