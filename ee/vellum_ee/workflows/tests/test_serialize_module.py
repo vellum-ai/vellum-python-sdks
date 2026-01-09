@@ -87,9 +87,10 @@ def test_serialize_module_with_actual_dataset_with_scheduled_trigger(metadata_tr
     assert result.dataset[0]["workflow_trigger_id"] == str(metadata_trigger_id)
 
     inputs = result.dataset[0]["inputs"]
-    assert len(inputs) == 2
+    assert len(inputs) == 3
 
     assert "current_run_at" in inputs
+    assert "name" in inputs
     assert "next_run_at" in inputs
 
 

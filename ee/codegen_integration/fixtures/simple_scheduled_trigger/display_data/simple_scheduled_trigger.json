@@ -184,6 +184,18 @@
           "schema": null
         },
         {
+          "id": "fd6c99fa-9da9-43fb-918f-ce10363f0086",
+          "key": "name",
+          "type": "STRING",
+          "required": false,
+          "default": {
+            "type": "STRING",
+            "value": null
+          },
+          "extensions": null,
+          "schema": null
+        },
+        {
           "id": "051faa28-5589-42b8-ad09-0dede7196bd8",
           "key": "next_run_at",
           "type": "STRING",

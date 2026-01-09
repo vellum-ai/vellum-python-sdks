@@ -251,13 +251,13 @@ def test_scheduled_trigger_serialization_full():
     assert trigger["cron"] == "0 9 * * *"
     assert trigger["timezone"] == "UTC"
 
-    # AND attributes are serialized (current_run_at and next_run_at from ScheduleTrigger)
+    # AND attributes are serialized (current_run_at, next_run_at, and name from ScheduleTrigger)
     assert "attributes" in trigger
     attributes = trigger["attributes"]
     assert isinstance(attributes, list)
-    assert len(attributes) == 2
+    assert len(attributes) == 3
     attribute_keys = {attr["key"] for attr in attributes}
-    assert attribute_keys == {"current_run_at", "next_run_at"}
+    assert attribute_keys == {"current_run_at", "name", "next_run_at"}
 
     # AND display_data is serialized correctly
     assert not DeepDiff(

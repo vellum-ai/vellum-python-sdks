@@ -53,10 +53,10 @@ def test_vellum_integration_trigger_serialization():
     assert "attributes" in trigger
     attributes = trigger["attributes"]
     assert isinstance(attributes, list)
-    assert len(attributes) == 3
+    assert len(attributes) == 4
 
     attribute_names = {attr["key"] for attr in attributes if isinstance(attr, dict)}
-    assert attribute_names == {"message", "channel", "user"}
+    assert attribute_names == {"message", "channel", "name", "user"}
 
     exec_config = trigger["exec_config"]
     assert isinstance(exec_config, dict)
