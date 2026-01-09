@@ -1,7 +1,5 @@
 """Tests for ChatMessageTrigger serialization."""
 
-import pytest
-
 from vellum import ChatMessagePromptBlock, JinjaPromptBlock
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
@@ -272,18 +270,7 @@ def test_graph_with_different_ports_same_target__no_validation_error():
 
 
 def test_chat_message_trigger_message_wired_to_prompt_inputs():
-    """
-    Tests that ChatMessageTrigger.message wired to InlinePromptNode.prompt_inputs
-    currently fails serialization due to the Union type not being handled.
-
-    This reproduces the issue identified by Codex in PR #3555: when ChatMessageTrigger.message
-    (Union[str, List[ArrayChatMessageContentItem]]) is used as a prompt input,
-    primitive_type_to_vellum_variable_type raises ValueError because it doesn't
-    handle unions with multiple incompatible types.
-
-    TODO: Once the serialization layer is updated to handle this Union type,
-    this test should be updated to verify successful serialization with type ARRAY.
-    """
+    """Tests that ChatMessageTrigger.message can be wired to InlinePromptNode.prompt_inputs."""
 
     # GIVEN a ChatMessageTrigger subclass
     class Chat(ChatMessageTrigger):
@@ -310,10 +297,30 @@ def test_chat_message_trigger_message_wired_to_prompt_inputs():
 
     # WHEN we serialize the workflow
     workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    serialized_workflow: dict = workflow_display.serialize()
 
-    # THEN serialization should fail with ValueError due to Union type handling
-    with pytest.raises(ValueError) as exc_info:
-        workflow_display.serialize()
+    # THEN the workflow should serialize successfully
+    assert "workflow_raw_data" in serialized_workflow
 
-    # AND the error message should indicate the type inference issue
-    assert "Expected Descriptor to only have one type" in str(exc_info.value)
+    # AND the prompt node should have the message input wired correctly
+    workflow_raw_data = serialized_workflow["workflow_raw_data"]
+    nodes = workflow_raw_data["nodes"]
+    prompt_nodes = [n for n in nodes if isinstance(n, dict) and n.get("type") == "PROMPT"]
+    assert len(prompt_nodes) == 1
+
+    prompt_node = prompt_nodes[0]
+    inputs = prompt_node.get("inputs", [])
+    message_input = next((i for i in inputs if i.get("key") == "message"), None)
+    assert message_input is not None
+
+    # AND the input should reference the trigger attribute
+    rules = message_input.get("value", {}).get("rules", [])
+    trigger_attr_rule = next((r for r in rules if r.get("type") == "TRIGGER_ATTRIBUTE"), None)
+    assert trigger_attr_rule is not None
+
+    # AND the prompt input variable type should be ARRAY
+    exec_config = prompt_node.get("data", {}).get("exec_config", {})
+    input_variables = exec_config.get("input_variables", [])
+    message_var = next((v for v in input_variables if v.get("key") == "message"), None)
+    assert message_var is not None
+    assert message_var.get("type") == "ARRAY"
