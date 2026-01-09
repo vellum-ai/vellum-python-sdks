@@ -55,7 +55,9 @@ class ChatMessageTrigger(BaseTrigger):
                     kwargs["message"] = [StringChatMessageContent(value=message["value"])]
                 else:
                     # For other dict formats, try to validate as ChatMessageContent
-                    validated = validate_obj_as(ArrayChatMessageContentItem, message)  # type: ignore[arg-type]
+                    validated: ArrayChatMessageContentItem = validate_obj_as(
+                        ArrayChatMessageContentItem, message  # type: ignore[arg-type]
+                    )
                     kwargs["message"] = [validated]
             elif isinstance(message, list):
                 converted_message = []
