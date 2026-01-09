@@ -1,5 +1,5 @@
 import { isNil } from "lodash";
-import { VellumValue as VellumValueType } from "vellum-ai/api/types";
+import { VellumVariable as SdkVellumVariable } from "vellum-ai/api/types";
 
 import { Field } from "./extensions";
 import { OptionalType } from "./extensions/optional";
@@ -14,23 +14,13 @@ import { Writer } from "src/generators/extensions/writer";
 import { VellumValue } from "src/generators/vellum-variable-value";
 import { getVellumVariablePrimitiveType } from "src/utils/vellum-variables";
 
-type VellumVariableWithName = (
-  | VellumValueType
-  | { type: "NULL"; value?: null }
-) &
-  ({ name: string; key?: undefined } | { name?: undefined; key: string }) & {
-    id: string;
-    required?: boolean | null;
-    default?: VellumValueType | null;
-  };
-
 // VellumVariable.defaultRequired:
 // Prompt Inputs: required: undefined == required: true,
 // Workflow Inputs: required: undefined == required: false
 // Workflow Outputs: required: undefined == required: true
 export declare namespace VellumVariable {
   interface Args {
-    variable: VellumVariableWithName;
+    variable: SdkVellumVariable;
     defaultRequired?: boolean;
   }
 }
@@ -43,7 +33,7 @@ export class VellumVariable extends AstNode {
     super();
 
     const baseType = getVellumVariablePrimitiveType(variable.type);
-    const name = variable.name ?? variable.key;
+    const name = variable.key;
     this.defaultRequired = defaultRequired;
 
     // NULL type do not need to be optional
@@ -76,7 +66,7 @@ export class VellumVariable extends AstNode {
   }
 
   private generateInitializerIfDefault(
-    variable: VellumVariableWithName
+    variable: SdkVellumVariable
   ): AstNode | undefined {
     if (!variable.default) {
       return variable.default == null ? new NoneInstantiation() : undefined;

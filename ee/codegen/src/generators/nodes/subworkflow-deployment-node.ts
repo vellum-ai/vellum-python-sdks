@@ -116,7 +116,7 @@ export class SubworkflowDeploymentNode extends BaseNode<
           outputsClass.add(
             codegen.vellumVariable({
               variable: {
-                name: outputName,
+                key: outputName,
                 type: output.type,
                 id: output.id,
                 required: output.required,

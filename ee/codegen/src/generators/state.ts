@@ -70,7 +70,7 @@ export class State extends BasePersistedFile {
           id: stateVariableData.id,
           // Use the sanitized name from the input variable context to ensure it's a valid
           // attribute name (as opposed to the raw name from the input variable data).
-          name: stateVariableName,
+          key: stateVariableName,
           type: stateVariableData.type,
           required: stateVariableData.required,
           default: stateVariableData.default,
