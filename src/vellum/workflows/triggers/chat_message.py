@@ -48,6 +48,15 @@ class ChatMessageTrigger(BaseTrigger):
             # Handle string messages by converting to a list with a single StringChatMessageContent
             if isinstance(message, str):
                 kwargs["message"] = [StringChatMessageContent(value=message)]
+            elif isinstance(message, dict):
+                # Handle single VellumValue dict format (e.g., {"type": "STRING", "value": "Hello"})
+                # Extract the value from the dict and convert to ChatMessageContent
+                if message.get("type") == "STRING" and "value" in message:
+                    kwargs["message"] = [StringChatMessageContent(value=message["value"])]
+                else:
+                    # For other dict formats, try to validate as ChatMessageContent
+                    validated = validate_obj_as(ArrayChatMessageContentItem, message)  # type: ignore[arg-type]
+                    kwargs["message"] = [validated]
             elif isinstance(message, list):
                 converted_message = []
                 for item in message:
