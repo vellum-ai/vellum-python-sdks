@@ -1,7 +1,11 @@
 """Tests for ChatMessageTrigger serialization."""
 
+import pytest
+
+from vellum import ChatMessagePromptBlock, JinjaPromptBlock
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
+from vellum.workflows.nodes import InlinePromptNode
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.ports import Port
 from vellum.workflows.state.base import BaseState
@@ -265,3 +269,51 @@ def test_graph_with_different_ports_same_target__no_validation_error():
     errors = list(workflow_display.display_context.errors)
     duplicate_errors = [e for e in errors if isinstance(e, WorkflowValidationError) and "duplicate" in str(e).lower()]
     assert len(duplicate_errors) == 0, f"Expected no duplicate errors, got {len(duplicate_errors)}: {duplicate_errors}"
+
+
+def test_chat_message_trigger_message_wired_to_prompt_inputs():
+    """
+    Tests that ChatMessageTrigger.message wired to InlinePromptNode.prompt_inputs
+    currently fails serialization due to the Union type not being handled.
+
+    This reproduces the issue identified by Codex in PR #3555: when ChatMessageTrigger.message
+    (Union[str, List[ArrayChatMessageContentItem]]) is used as a prompt input,
+    primitive_type_to_vellum_variable_type raises ValueError because it doesn't
+    handle unions with multiple incompatible types.
+
+    TODO: Once the serialization layer is updated to handle this Union type,
+    this test should be updated to verify successful serialization with type ARRAY.
+    """
+
+    # GIVEN a ChatMessageTrigger subclass
+    class Chat(ChatMessageTrigger):
+        class Display(ChatMessageTrigger.Display):
+            label: str = "Chat"
+
+    # AND an InlinePromptNode that uses the trigger's message as a prompt input
+    class PromptNode(InlinePromptNode):
+        ml_model = "gpt-4o"
+        blocks = [
+            ChatMessagePromptBlock(
+                chat_role="USER",
+                blocks=[JinjaPromptBlock(template="{{ message }}")],
+            ),
+        ]
+        prompt_inputs = {"message": Chat.message}
+
+    # AND a workflow that wires the trigger to the prompt node
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = Chat >> PromptNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            result = PromptNode.Outputs.text
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+
+    # THEN serialization should fail with ValueError due to Union type handling
+    with pytest.raises(ValueError) as exc_info:
+        workflow_display.serialize()
+
+    # AND the error message should indicate the type inference issue
+    assert "Expected Descriptor to only have one type" in str(exc_info.value)
