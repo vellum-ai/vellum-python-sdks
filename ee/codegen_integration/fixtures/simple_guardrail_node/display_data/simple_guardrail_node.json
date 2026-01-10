@@ -175,14 +175,7 @@
               "node_output_id": "0e455862-ccc4-47a4-a9a5-061fadc94fd6"
             },
             "schema": {
-              "anyOf": [
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "integer"
-                }
-              ]
+              "type": "number"
             }
           }
         ],

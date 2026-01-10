@@ -26,7 +26,7 @@ describe("jsonSchemaToType", () => {
     const schema = { type: "number" };
     const result = jsonSchemaToType(schema);
     result.write(writer);
-    expect(writer.toString()).toBe("float");
+    expect(writer.toString()).toBe("Union[float, int]");
   });
 
   it("should convert boolean schema to bool type", () => {
