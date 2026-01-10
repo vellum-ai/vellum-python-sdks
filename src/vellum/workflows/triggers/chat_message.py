@@ -85,6 +85,9 @@ class ChatMessageTrigger(BaseTrigger):
         if not hasattr(state, "chat_history"):
             return
 
+        if state.chat_history is None:
+            state.chat_history = []
+
         if isinstance(self.message, str):
             user_message = ChatMessage(
                 role="USER",
@@ -101,6 +104,9 @@ class ChatMessageTrigger(BaseTrigger):
         """Appends assistant response to state.chat_history after workflow completion."""
         if not hasattr(state, "chat_history"):
             return
+
+        if state.chat_history is None:
+            state.chat_history = []
 
         output = self.Config.output
         if output is not None:
