@@ -644,7 +644,7 @@
                 "color": null
               },
               "schema": {
-                "type": "number"
+                "type": "integer"
               }
             }
           ],

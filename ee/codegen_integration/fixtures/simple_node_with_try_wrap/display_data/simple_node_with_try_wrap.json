@@ -47,10 +47,7 @@
               {
                 "id": "b2bc9402-6e50-4982-800c-1662c188899b",
                 "key": "text",
-                "type": "STRING",
-                "schema": {
-                  "type": "string"
-                }
+                "type": "STRING"
               }
             ],
             "prompt_template_block_data": {

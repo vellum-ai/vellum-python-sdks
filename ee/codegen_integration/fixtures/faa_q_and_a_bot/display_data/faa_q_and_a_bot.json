@@ -169,10 +169,7 @@
               {
                 "id": "183b03e5-b903-4d39-abe4-9267c78285f6",
                 "key": "var_1",
-                "type": "STRING",
-                "schema": {
-                  "type": "string"
-                }
+                "type": "STRING"
               }
             ],
             "prompt_template_block_data": {
@@ -1162,18 +1159,12 @@
               {
                 "id": "c583f59e-2a5e-47c0-b244-2894b90d3d21",
                 "key": "question",
-                "type": "STRING",
-                "schema": {
-                  "type": "string"
-                }
+                "type": "STRING"
               },
               {
                 "id": "ded72461-3d6a-4633-a45e-e7cc9189941b",
                 "key": "context",
-                "type": "STRING",
-                "schema": {
-                  "type": "string"
-                }
+                "type": "STRING"
               }
             ],
             "prompt_template_block_data": {
@@ -1493,10 +1484,7 @@
               {
                 "id": "0f0f394c-dc7d-46a1-9217-24c1e59b273a",
                 "key": "most_recent_message",
-                "type": "STRING",
-                "schema": {
-                  "type": "string"
-                }
+                "type": "STRING"
               }
             ],
             "prompt_template_block_data": {
@@ -2103,10 +2091,7 @@
               {
                 "id": "fbd03331-bbef-45f3-98fd-2106fd3cdb8a",
                 "key": "text",
-                "type": "JSON",
-                "schema": {
-                  "type": "null"
-                }
+                "type": "JSON"
               }
             ],
             "prompt_template_block_data": {
@@ -2759,10 +2744,7 @@
               {
                 "id": "b6524b5f-7697-4923-8b87-f85baadb505a",
                 "key": "chat_history",
-                "type": "STRING",
-                "schema": {
-                  "type": "string"
-                }
+                "type": "STRING"
               }
             ],
             "prompt_template_block_data": {

@@ -47,10 +47,7 @@
               {
                 "id": "7b8af68b-cf60-4fca-9c57-868042b5b616",
                 "key": "text",
-                "type": "STRING",
-                "schema": {
-                  "type": "string"
-                }
+                "type": "STRING"
               }
             ],
             "prompt_template_block_data": {
