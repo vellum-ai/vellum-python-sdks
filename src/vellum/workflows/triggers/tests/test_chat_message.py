@@ -200,3 +200,33 @@ def test_chat_message_trigger__converts_single_dict_vellum_value():
     assert state.chat_history[0].content == ArrayChatMessageContent(
         value=[StringChatMessageContent(value="Hello from single dict!")]
     )
+
+
+def test_chat_message_trigger__converts_raw_string_array():
+    """Tests that ChatMessageTrigger converts a raw array of strings to ChatMessageContent list."""
+
+    # GIVEN a message as a raw array of strings (not wrapped in VellumValue format)
+    raw_string_array = ["Hello", "World"]
+
+    # WHEN a ChatMessageTrigger is created with a raw string array
+    trigger = ChatMessageTrigger(message=raw_string_array)
+
+    # THEN the message is converted to a list of StringChatMessageContent
+    assert len(trigger.message) == 2
+    assert isinstance(trigger.message[0], StringChatMessageContent)
+    assert trigger.message[0].value == "Hello"
+    assert isinstance(trigger.message[1], StringChatMessageContent)
+    assert trigger.message[1].value == "World"
+
+    # AND the trigger works correctly with state
+    state = ChatState()
+    trigger.__on_workflow_initiated__(state)
+
+    assert len(state.chat_history) == 1
+    assert state.chat_history[0].role == "USER"
+    assert state.chat_history[0].content == ArrayChatMessageContent(
+        value=[
+            StringChatMessageContent(value="Hello"),
+            StringChatMessageContent(value="World"),
+        ]
+    )

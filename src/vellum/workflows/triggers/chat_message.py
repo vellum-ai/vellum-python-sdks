@@ -75,6 +75,9 @@ class ChatMessageTrigger(BaseTrigger):
                         ),
                     ):
                         converted_message.append(item)
+                    # Handle raw strings in the array by wrapping them in StringChatMessageContent
+                    elif isinstance(item, str):
+                        converted_message.append(StringChatMessageContent(value=item))
                     # Convert VellumValue objects or dicts to ChatMessageContent
                     # Use discriminated union validation
                     else:
