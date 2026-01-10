@@ -1488,44 +1488,88 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         return cast(Type[WorkflowType], self.__class__.infer_workflow_class())
 
     @staticmethod
-    def _find_orphan_nodes(
-        workflow_module_path: str,
-        workflow: Type[BaseWorkflow],
+    def _collect_node_classes_from_module(
+        module: Any,
+        expected_module_prefix: str,
     ) -> List[Type[BaseNode]]:
         """
-        Find nodes defined in the workflow module but not included in graph or unused_graphs.
+        Collect BaseNode subclasses defined in a module.
 
         Args:
-            workflow_module_path: The full module path (e.g., "my_module.workflow")
-            workflow: The workflow class to check
+            module: The imported module to scan
+            expected_module_prefix: Module path prefix to filter by (e.g., "my_module")
 
         Returns:
-            List of orphan node classes
+            List of BaseNode subclasses defined in the module
         """
-        try:
-            workflow_module = importlib.import_module(workflow_module_path)
-        except ImportError:
-            return []
-
-        workflow_nodes = set(workflow.get_all_nodes())
-
-        orphan_nodes: List[Type[BaseNode]] = []
-        for name in dir(workflow_module):
+        node_classes: List[Type[BaseNode]] = []
+        for name, attr in vars(module).items():
             if name.startswith("_"):
                 continue
 
-            attr = getattr(workflow_module, name)
             if not (inspect.isclass(attr) and issubclass(attr, BaseNode) and attr is not BaseNode):
                 continue
 
-            if attr.__module__ != workflow_module_path:
+            if not attr.__module__.startswith(expected_module_prefix):
                 continue
 
             if "<locals>" in attr.__qualname__:
                 continue
 
-            if attr not in workflow_nodes:
-                orphan_nodes.append(attr)
+            node_classes.append(attr)
+
+        return node_classes
+
+    @staticmethod
+    def _find_orphan_nodes(
+        base_module: str,
+        workflow: Type[BaseWorkflow],
+    ) -> List[Type[BaseNode]]:
+        """
+        Find nodes defined in the workflow package but not included in graph or unused_graphs.
+
+        Scans both the workflow.py file and the nodes/ subpackage for BaseNode subclasses.
+
+        Args:
+            base_module: The base module path (e.g., "my_module")
+            workflow: The workflow class to check
+
+        Returns:
+            List of orphan node classes
+        """
+        workflow_nodes = set(workflow.get_all_nodes())
+        candidate_nodes: List[Type[BaseNode]] = []
+
+        workflow_module_path = f"{base_module}.workflow"
+        try:
+            workflow_module = importlib.import_module(workflow_module_path)
+            candidate_nodes.extend(BaseWorkflowDisplay._collect_node_classes_from_module(workflow_module, base_module))
+        except ImportError:
+            pass
+
+        nodes_package_path = f"{base_module}.nodes"
+        try:
+            nodes_package = importlib.import_module(nodes_package_path)
+            if hasattr(nodes_package, "__path__"):
+                for module_info in pkgutil.walk_packages(nodes_package.__path__, nodes_package.__name__ + "."):
+                    try:
+                        submodule = importlib.import_module(module_info.name)
+                        candidate_nodes.extend(
+                            BaseWorkflowDisplay._collect_node_classes_from_module(submodule, base_module)
+                        )
+                    except Exception:
+                        continue
+        except ImportError:
+            pass
+
+        seen: Set[Type[BaseNode]] = set()
+        orphan_nodes: List[Type[BaseNode]] = []
+        for node in candidate_nodes:
+            if node in seen:
+                continue
+            seen.add(node)
+            if node not in workflow_nodes:
+                orphan_nodes.append(node)
 
         return orphan_nodes
 
@@ -1554,8 +1598,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             dry_run=dry_run,
         )
 
-        workflow_module_path = f"{module}.workflow"
-        orphan_nodes = BaseWorkflowDisplay._find_orphan_nodes(workflow_module_path, workflow)
+        orphan_nodes = BaseWorkflowDisplay._find_orphan_nodes(module, workflow)
         for orphan_node in orphan_nodes:
             workflow_display.display_context.add_validation_error(
                 WorkflowValidationError(

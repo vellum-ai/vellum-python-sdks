@@ -67,13 +67,13 @@ def test_serialize_module__state_mutable_default_validation():
     ), f"Expected mutable default error in error messages, got: {error_messages}"
 
 
-def test_serialize_module__orphan_node_not_in_graph_or_unused_graphs():
+def test_serialize_module__orphan_node_in_workflow_file():
     """
-    Tests that serialization returns an error when a node is defined in the module
+    Tests that serialization returns an error when a node is defined in workflow.py
     but not included in the workflow's graph or unused_graphs.
     """
 
-    # GIVEN a workflow module with a node that is defined but not in graph or unused_graphs
+    # GIVEN a workflow module with a node defined in workflow.py that is not in graph or unused_graphs
     module = "tests.workflows.test_orphan_node_serialization_error"
 
     # WHEN we serialize the module
@@ -86,4 +86,27 @@ def test_serialize_module__orphan_node_not_in_graph_or_unused_graphs():
     error_messages = [error.message for error in result.errors]
     assert any(
         "OrphanNode" in msg and "not included in" in msg and "graph or unused_graphs" in msg for msg in error_messages
+    ), f"Expected orphan node error in error messages, got: {error_messages}"
+
+
+def test_serialize_module__orphan_node_in_nodes_directory():
+    """
+    Tests that serialization returns an error when a node is defined in the nodes/ directory
+    but not included in the workflow's graph or unused_graphs.
+    """
+
+    # GIVEN a workflow module with a node defined in nodes/orphan_node.py that is not in graph or unused_graphs
+    module = "tests.workflows.test_orphan_node_in_nodes_dir"
+
+    # WHEN we serialize the module
+    result = BaseWorkflowDisplay.serialize_module(module)
+
+    # THEN the result should contain an error about the orphan node
+    assert len(result.errors) > 0
+
+    # AND the error message should mention the orphan node and that it's not in graph or unused_graphs
+    error_messages = [error.message for error in result.errors]
+    assert any(
+        "OrphanNodeInNodesDir" in msg and "not included in" in msg and "graph or unused_graphs" in msg
+        for msg in error_messages
     ), f"Expected orphan node error in error messages, got: {error_messages}"
