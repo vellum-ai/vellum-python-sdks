@@ -55,19 +55,6 @@ def parse_obj_as(type_: Type[T], object_: Any) -> T:
     return pydantic.parse_obj_as(type_, dealiased_object)
 
 
-def validate_obj_as(type_: Type[T], object_: Any) -> T:
-    """Validate an object as a given type using pydantic's TypeAdapter (v2) or parse_obj_as (v1).
-
-    This is similar to parse_obj_as but without the convert_and_respect_annotation_metadata step,
-    making it suitable for simple type validation without annotation metadata handling.
-    """
-    if IS_PYDANTIC_V2:
-        if type_ not in type_adapter_cache:
-            type_adapter_cache[type_] = pydantic.TypeAdapter(type_)  # type: ignore[attr-defined]
-        return type_adapter_cache[type_].validate_python(object_)
-    return pydantic.parse_obj_as(type_, object_)  # type: ignore[attr-defined]
-
-
 def to_jsonable_with_fallback(obj: Any, fallback_serializer: Callable[[Any], Any]) -> Any:
     if IS_PYDANTIC_V2:
         from pydantic_core import to_jsonable_python
