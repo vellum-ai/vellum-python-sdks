@@ -928,6 +928,16 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         state_class = self._workflow.get_state_class()
 
         if not hasattr(state_class, "chat_history"):
+            self.display_context.add_validation_error(
+                StateValidationError(
+                    message=(
+                        "Chat triggers require a `chat_history` state variable. "
+                        "Add `chat_history: List[ChatMessage] = Field(default_factory=list)` to your state class."
+                    ),
+                    state_class_name=state_class.__name__,
+                    attribute_name="chat_history",
+                )
+            )
             return
 
         chat_history_ref = getattr(state_class, "chat_history")
@@ -936,7 +946,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                 StateValidationError(
                     message=(
                         "Chat triggers expect chat_history to default to an empty array. "
-                        "Use Field(default_factory=list) instead of = None."
+                        "Use `Field(default_factory=list)` instead of `= None`."
                     ),
                     state_class_name=state_class.__name__,
                     attribute_name="chat_history",

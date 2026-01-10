@@ -365,3 +365,37 @@ def test_chat_message_trigger_validation__chat_history_none_default():
     error = state_errors[0]
     assert "chat_history" in str(error)
     assert "empty array" in str(error)
+
+
+def test_chat_message_trigger_validation__chat_history_missing():
+    """Tests that serialization adds StateValidationError when chat_history is missing from state class."""
+
+    # GIVEN a state class without chat_history
+    class StateMissingChatHistory(BaseState):
+        pass
+
+    # AND a ChatMessageTrigger with output specified
+    class ChatTrigger(ChatMessageTrigger):
+        class Config(ChatMessageTrigger.Config):
+            output = LazyReference("MissingChatHistoryWorkflow.Outputs.response")
+
+    # AND a workflow using the trigger with the state missing chat_history
+    class MissingChatHistoryWorkflow(BaseWorkflow[BaseInputs, StateMissingChatHistory]):
+        graph = ChatTrigger >> ResponseNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            response = ResponseNode.Outputs.response
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=MissingChatHistoryWorkflow)
+    workflow_display.serialize()
+
+    # THEN the display_context should contain a StateValidationError
+    errors = list(workflow_display.display_context.errors)
+    state_errors = [e for e in errors if isinstance(e, StateValidationError)]
+    assert len(state_errors) == 1
+
+    # AND the error should mention chat_history is required
+    error = state_errors[0]
+    assert "chat_history" in str(error)
+    assert "require" in str(error)
