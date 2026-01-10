@@ -15,8 +15,10 @@ from vellum.client.types import (
     VellumImage,
 )
 from vellum.workflows.nodes.bases.base import BaseNode
+from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.triggers.chat_message import ChatMessageTrigger
+from vellum.workflows.workflows.base import BaseWorkflow
 
 
 class ChatState(BaseState):
@@ -175,3 +177,42 @@ def test_chat_message_trigger__converts_string_message():
     assert state.chat_history[0].content == ArrayChatMessageContent(
         value=[StringChatMessageContent(value="Hello, world!")]
     )
+
+
+def test_chat_message_trigger__raw_string_array__workflow_stream():
+    """Tests that workflow.stream() works with raw string array after deserialize_trigger."""
+
+    # GIVEN a workflow with ChatMessageTrigger
+    class TestNode(BaseNode):
+        class Outputs(BaseOutputs):
+            result: str
+
+        def run(self) -> Outputs:
+            return self.Outputs(result="success")
+
+    class TestWorkflow(BaseWorkflow):
+        graph = ChatMessageTrigger >> TestNode
+
+    # AND a raw string array input (not wrapped in VellumValue format)
+    raw_string_array_input = {"message": ["Hello", "World"]}
+
+    # WHEN we deserialize the trigger with raw string array
+    trigger = TestWorkflow.deserialize_trigger(
+        trigger_id=ChatMessageTrigger.__id__,
+        inputs=raw_string_array_input,
+    )
+
+    # THEN the trigger is properly deserialized
+    assert isinstance(trigger, ChatMessageTrigger)
+    assert len(trigger.message) == 2
+    assert isinstance(trigger.message[0], StringChatMessageContent)
+    assert trigger.message[0].value == "Hello"
+    assert isinstance(trigger.message[1], StringChatMessageContent)
+    assert trigger.message[1].value == "World"
+
+    # AND the workflow can be streamed successfully
+    workflow = TestWorkflow()
+    events = list(workflow.stream(trigger=trigger))
+
+    # THEN the workflow completes successfully
+    assert len(events) > 0
