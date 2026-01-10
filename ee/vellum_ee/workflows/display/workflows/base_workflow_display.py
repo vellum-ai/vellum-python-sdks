@@ -1488,6 +1488,48 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         return cast(Type[WorkflowType], self.__class__.infer_workflow_class())
 
     @staticmethod
+    def _find_orphan_nodes(
+        workflow_module_path: str,
+        workflow: Type[BaseWorkflow],
+    ) -> List[Type[BaseNode]]:
+        """
+        Find nodes defined in the workflow module but not included in graph or unused_graphs.
+
+        Args:
+            workflow_module_path: The full module path (e.g., "my_module.workflow")
+            workflow: The workflow class to check
+
+        Returns:
+            List of orphan node classes
+        """
+        try:
+            workflow_module = importlib.import_module(workflow_module_path)
+        except ImportError:
+            return []
+
+        workflow_nodes = set(workflow.get_all_nodes())
+
+        orphan_nodes: List[Type[BaseNode]] = []
+        for name in dir(workflow_module):
+            if name.startswith("_"):
+                continue
+
+            attr = getattr(workflow_module, name)
+            if not (inspect.isclass(attr) and issubclass(attr, BaseNode) and attr is not BaseNode):
+                continue
+
+            if attr.__module__ != workflow_module_path:
+                continue
+
+            if "<locals>" in attr.__qualname__:
+                continue
+
+            if attr not in workflow_nodes:
+                orphan_nodes.append(attr)
+
+        return orphan_nodes
+
+    @staticmethod
     def serialize_module(
         module: str,
         *,
@@ -1511,6 +1553,17 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             client=client,
             dry_run=dry_run,
         )
+
+        workflow_module_path = f"{module}.workflow"
+        orphan_nodes = BaseWorkflowDisplay._find_orphan_nodes(workflow_module_path, workflow)
+        for orphan_node in orphan_nodes:
+            workflow_display.display_context.add_validation_error(
+                WorkflowValidationError(
+                    message=f"Node '{orphan_node.__name__}' is defined in the module but not included in "
+                    "the workflow's graph or unused_graphs.",
+                    workflow_class_name=workflow.__name__,
+                )
+            )
 
         exec_config = workflow_display.serialize()
         additional_files = workflow_display._gather_additional_module_files(module)
