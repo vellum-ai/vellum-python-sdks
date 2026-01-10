@@ -1,9 +1,27 @@
 import inspect
-from typing import Any, Dict
+from typing import Any, Dict, Type, TypeVar
 
+import pydantic
 from pydantic import BaseModel
 
 from vellum.workflows.utils.functions import compile_annotation
+
+T = TypeVar("T")
+IS_PYDANTIC_V2 = pydantic.VERSION.startswith("2.")
+_type_adapter_cache: Dict[Type, "pydantic.TypeAdapter"] = {}  # type: ignore[type-arg]
+
+
+def validate_obj_as(type_: Type[T], object_: Any) -> T:
+    """Validate an object as a given type using pydantic's TypeAdapter (v2) or parse_obj_as (v1).
+
+    This is similar to parse_obj_as but without the convert_and_respect_annotation_metadata step,
+    making it suitable for simple type validation without annotation metadata handling.
+    """
+    if IS_PYDANTIC_V2:
+        if type_ not in _type_adapter_cache:
+            _type_adapter_cache[type_] = pydantic.TypeAdapter(type_)  # type: ignore[attr-defined]
+        return _type_adapter_cache[type_].validate_python(object_)
+    return pydantic.parse_obj_as(type_, object_)  # type: ignore[attr-defined]
 
 
 def normalize_json(schema_input: Any) -> Any:

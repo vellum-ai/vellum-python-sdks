@@ -1,6 +1,5 @@
 from typing import TYPE_CHECKING, Any, List, Optional, Union
 
-from vellum.client.core.pydantic_utilities import validate_obj_as
 from vellum.client.types import (
     ArrayChatMessageContent,
     ArrayChatMessageContentItem,
@@ -18,6 +17,7 @@ from vellum.workflows.descriptors.utils import resolve_value
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.references.output import OutputReference
 from vellum.workflows.triggers.base import BaseTrigger
+from vellum.workflows.utils.pydantic_schema import validate_obj_as
 
 if TYPE_CHECKING:
     from vellum.workflows.state.base import BaseState
