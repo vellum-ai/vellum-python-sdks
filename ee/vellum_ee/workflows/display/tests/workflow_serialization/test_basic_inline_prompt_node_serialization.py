@@ -108,7 +108,6 @@ def test_serialize_workflow():
                             "id": "15381676-75eb-4688-8ae1-7f9f937d6bb0",
                             "key": "noun",
                             "type": "STRING",
-                            "schema": {"type": "string"},
                         }
                     ],
                     "prompt_template_block_data": {

@@ -86,7 +86,7 @@ export function jsonSchemaToType(schema: Record<string, unknown>): PythonType {
   } else if (schemaType === "integer") {
     return new IntType();
   } else if (schemaType === "number") {
-    return new FloatType();
+    return new UnionType([new FloatType(), new IntType()]);
   } else if (schemaType === "boolean") {
     return new BoolType();
   } else if (schemaType === "array") {

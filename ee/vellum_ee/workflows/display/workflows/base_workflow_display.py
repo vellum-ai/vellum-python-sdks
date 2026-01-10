@@ -54,7 +54,6 @@ from vellum.workflows.triggers.manual import ManualTrigger
 from vellum.workflows.types.core import Json, JsonArray, JsonObject
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.types.utils import get_original_base
-from vellum.workflows.utils.functions import compile_annotation
 from vellum.workflows.utils.uuids import generate_entity_id_from_path, uuid4_from_hash
 from vellum.workflows.vellum_client import create_vellum_client
 from vellum_ee.workflows.display.base import (
@@ -104,7 +103,7 @@ from vellum_ee.workflows.display.utils.triggers import (
     serialize_trigger_attributes,
     serialize_trigger_display_data,
 )
-from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
+from vellum_ee.workflows.display.utils.vellum import compile_descriptor_annotation, infer_vellum_variable_type
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 logger = logging.getLogger(__name__)
@@ -233,9 +232,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
 
             is_required = self._is_reference_required(workflow_input_reference)
 
-            # Compile the type annotation to a JSON schema to preserve specific types
-            input_type = workflow_input_reference.types[0] if workflow_input_reference.types else None
-            schema = compile_annotation(input_type, {})
+            schema = compile_descriptor_annotation(workflow_input_reference)
 
             input_variables.append(
                 {

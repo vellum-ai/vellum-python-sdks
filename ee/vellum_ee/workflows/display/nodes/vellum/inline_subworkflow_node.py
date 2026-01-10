@@ -8,14 +8,13 @@ from vellum.workflows.nodes import InlineSubworkflowNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.types.generics import is_workflow_class
-from vellum.workflows.utils.functions import compile_annotation
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
 from vellum_ee.workflows.display.utils.exceptions import NodeValidationError
-from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
+from vellum_ee.workflows.display.utils.vellum import compile_descriptor_annotation, infer_vellum_variable_type
 from vellum_ee.workflows.display.vellum import NodeInput
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
@@ -114,8 +113,7 @@ class BaseInlineSubworkflowNodeDisplay(
         node_inputs_by_key = {node_input.key: node_input for node_input in node_inputs}
         workflow_inputs = []
         for descriptor in subworkflow_inputs_class:
-            input_type = descriptor.types[0] if descriptor.types else None
-            schema = compile_annotation(input_type, {})
+            schema = compile_descriptor_annotation(descriptor)
             workflow_inputs.append(
                 VellumVariable(
                     id=node_inputs_by_key[descriptor.name].id,
