@@ -82,7 +82,7 @@ class ChatMessageTrigger(BaseTrigger):
 
     def __on_workflow_initiated__(self, state: "BaseState") -> None:
         """Appends user message to state.chat_history at workflow start."""
-        if not hasattr(state, "chat_history"):
+        if not hasattr(state, "chat_history") or state.chat_history is None:
             return
 
         if isinstance(self.message, str):
@@ -99,7 +99,7 @@ class ChatMessageTrigger(BaseTrigger):
 
     def __on_workflow_fulfilled__(self, state: "BaseState") -> None:
         """Appends assistant response to state.chat_history after workflow completion."""
-        if not hasattr(state, "chat_history"):
+        if not hasattr(state, "chat_history") or state.chat_history is None:
             return
 
         output = self.Config.output
