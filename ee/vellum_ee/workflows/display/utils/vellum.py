@@ -18,6 +18,7 @@ from vellum.workflows.references.node import NodeReference
 from vellum.workflows.references.state_value import StateValueReference
 from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
+from vellum.workflows.utils.functions import compile_annotation
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
 from vellum_ee.workflows.display.utils.exceptions import (
     InvalidInputReferenceError,
@@ -136,6 +137,12 @@ def infer_vellum_variable_type(value: Any) -> VellumVariableType:
         inferred_type = vellum_variable_value.type
 
     return inferred_type
+
+
+def compile_descriptor_annotation(descriptor: BaseDescriptor) -> dict:
+    """Compile a BaseDescriptor's type annotation to a JSON schema."""
+    input_type = descriptor.types[0] if descriptor.types else None
+    return compile_annotation(input_type, {})
 
 
 def create_node_input_value_pointer_rule(

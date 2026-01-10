@@ -22,7 +22,7 @@ describe("jsonSchemaToType", () => {
     expect(writer.toString()).toBe("int");
   });
 
-  it("should convert number schema to Union[float, int] type", () => {
+  it("should convert number schema to float type", () => {
     const schema = { type: "number" };
     const result = jsonSchemaToType(schema);
     result.write(writer);

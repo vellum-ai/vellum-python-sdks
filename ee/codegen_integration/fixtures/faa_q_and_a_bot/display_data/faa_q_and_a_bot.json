@@ -3268,6 +3268,12 @@
       "required": false,
       "extensions": {
         "color": null
+      },
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/vellum.client.types.chat_message.ChatMessage"
+        }
       }
     }
   ],

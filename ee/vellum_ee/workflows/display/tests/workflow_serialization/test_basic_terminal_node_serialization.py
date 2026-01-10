@@ -28,6 +28,7 @@ def test_serialize_workflow():
             "required": True,
             "default": None,
             "extensions": {"color": None},
+            "schema": {"type": "string"},
         }
     ]
 

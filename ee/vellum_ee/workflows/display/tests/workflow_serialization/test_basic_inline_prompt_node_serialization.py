@@ -39,6 +39,7 @@ def test_serialize_workflow():
                 "default": None,
                 "required": True,
                 "extensions": {"color": None},
+                "schema": {"type": "string"},
             }
         ],
         input_variables,
@@ -103,7 +104,11 @@ def test_serialize_workflow():
                         "custom_parameters": None,
                     },
                     "input_variables": [
-                        {"id": "15381676-75eb-4688-8ae1-7f9f937d6bb0", "key": "noun", "type": "STRING"}
+                        {
+                            "id": "15381676-75eb-4688-8ae1-7f9f937d6bb0",
+                            "key": "noun",
+                            "type": "STRING",
+                        }
                     ],
                     "prompt_template_block_data": {
                         "version": 1,

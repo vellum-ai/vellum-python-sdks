@@ -50,6 +50,7 @@ def test_serialize_workflow(vellum_client):
                 "required": True,
                 "default": None,
                 "extensions": {"color": None},
+                "schema": {"type": "string"},
             },
             {
                 "id": "aa3ca842-250c-4a3f-853f-23928c28d0f8",
@@ -58,6 +59,7 @@ def test_serialize_workflow(vellum_client):
                 "required": True,
                 "default": None,
                 "extensions": {"color": None},
+                "schema": {"type": "string"},
             },
         ],
         input_variables,
@@ -221,6 +223,7 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
                 "default": None,
                 "required": True,
                 "extensions": {"color": None},
+                "schema": {"type": "string"},
             },
             {
                 "id": "066124c4-42bd-4764-aa75-6f230dbbed4a",
@@ -229,6 +232,7 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
                 "default": None,
                 "required": True,
                 "extensions": {"color": None},
+                "schema": {"type": "string"},
             },
         ],
         input_variables,

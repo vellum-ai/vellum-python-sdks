@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any
 
 from vellum.workflows.inputs import BaseInputs
 
@@ -6,4 +6,4 @@ from vellum.workflows.inputs import BaseInputs
 class Inputs(BaseInputs):
     items: Any
     item: Any
-    index: Union[float, int]
+    index: int

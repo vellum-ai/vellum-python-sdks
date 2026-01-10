@@ -33,6 +33,7 @@ def test_serialize_workflow():
                 "required": True,
                 "default": None,
                 "extensions": {"color": None},
+                "schema": {"type": "string"},
             },
             {
                 "id": "aba1e6e0-dfa7-4c15-a4e6-aec6feebfaca",
@@ -41,6 +42,7 @@ def test_serialize_workflow():
                 "required": True,
                 "default": None,
                 "extensions": {"color": None},
+                "schema": {"type": "string"},
             },
         ],
         input_variables,
@@ -121,6 +123,7 @@ def test_serialize_workflow():
                         "type": "STRING",
                         "required": True,
                         "default": None,
+                        "schema": {"type": "string"},
                     }
                 ],
                 "output_variables": [

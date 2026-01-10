@@ -211,6 +211,9 @@
       "required": true,
       "extensions": {
         "color": null
+      },
+      "schema": {
+        "type": "string"
       }
     }
   ],

@@ -174,16 +174,7 @@
               "node_id": "c207b440-6aac-4047-a37c-e25fcb5b9cfb",
               "node_output_id": "0e455862-ccc4-47a4-a9a5-061fadc94fd6"
             },
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "integer"
-                }
-              ]
-            }
+            "schema": { "anyOf": [{ "type": "number" }, { "type": "integer" }] }
           }
         ],
         "trigger": {
@@ -248,6 +239,9 @@
       "default": null,
       "extensions": {
         "color": null
+      },
+      "schema": {
+        "type": "string"
       }
     },
     {
@@ -258,6 +252,9 @@
       "default": null,
       "extensions": {
         "color": null
+      },
+      "schema": {
+        "type": "string"
       }
     }
   ],

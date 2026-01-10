@@ -11,6 +11,7 @@ from typing import (
     Literal,
     Optional,
     Type,
+    TypeVar,
     Union,
     get_args,
     get_origin,
@@ -65,6 +66,10 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
         return {"type": "null"}
 
     if annotation is Any:
+        return {}
+
+    # Handle type variables (e.g., MapNodeItemType) - return empty schema since we can't determine the type
+    if isinstance(annotation, TypeVar):
         return {}
 
     if annotation is datetime:

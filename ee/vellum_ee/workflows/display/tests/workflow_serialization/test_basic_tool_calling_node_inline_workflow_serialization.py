@@ -59,6 +59,7 @@ def test_serialize_workflow():
             "default": None,
             "required": True,
             "extensions": {"color": None},
+            "schema": {"type": "string"},
         },
         {
             "id": "aba1e6e0-dfa7-4c15-a4e6-aec6feebfaca",
@@ -67,6 +68,7 @@ def test_serialize_workflow():
             "default": None,
             "required": True,
             "extensions": {"color": None},
+            "schema": {"type": "string"},
         },
     ]
     assert inline_workflow_tool["exec_config"]["output_variables"] == [

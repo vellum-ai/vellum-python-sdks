@@ -103,7 +103,7 @@ from vellum_ee.workflows.display.utils.triggers import (
     serialize_trigger_attributes,
     serialize_trigger_display_data,
 )
-from vellum_ee.workflows.display.utils.vellum import infer_vellum_variable_type
+from vellum_ee.workflows.display.utils.vellum import compile_descriptor_annotation, infer_vellum_variable_type
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 logger = logging.getLogger(__name__)
@@ -232,6 +232,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
 
             is_required = self._is_reference_required(workflow_input_reference)
 
+            schema = compile_descriptor_annotation(workflow_input_reference)
+
             input_variables.append(
                 {
                     "id": str(workflow_input_display.id),
@@ -240,6 +242,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                     "default": default.dict() if default else None,
                     "required": is_required,
                     "extensions": {"color": workflow_input_display.color},
+                    "schema": schema,
                 }
             )
 
