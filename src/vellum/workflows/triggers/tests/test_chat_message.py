@@ -245,3 +245,13 @@ def test_chat_message_trigger__chat_history_defaulted_to_none():
 
     # THEN the workflow completes successfully
     assert terminal_event.name == "workflow.execution.fulfilled"
+
+    # AND the final state has a contentful chat_history
+    final_state = terminal_event.final_state
+    assert final_state is not None
+    assert final_state.chat_history is not None
+    assert len(final_state.chat_history) == 1
+    assert final_state.chat_history[0].role == "USER"
+    assert final_state.chat_history[0].content == ArrayChatMessageContent(
+        value=[StringChatMessageContent(value="Hello")]
+    )
