@@ -1,7 +1,7 @@
 """Tests for ChatMessageTrigger."""
 
 import pytest
-from typing import List
+from typing import List, Optional
 
 from pydantic import Field
 
@@ -14,6 +14,7 @@ from vellum.client.types import (
     StringVellumValue,
     VellumImage,
 )
+from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.state.base import BaseState
@@ -216,3 +217,31 @@ def test_chat_message_trigger__raw_string_array__workflow_stream():
 
     # THEN the workflow completes successfully
     assert len(events) > 0
+
+
+def test_chat_message_trigger__chat_history_defaulted_to_none():
+    """Tests that workflow runs successfully when chat_history is defaulted to None."""
+
+    # GIVEN a state with chat_history defaulted to None
+    class NullableChatHistoryState(BaseState):
+        chat_history: Optional[List[ChatMessage]] = None
+
+    # AND a simple node
+    class TestNode(BaseNode):
+        class Outputs(BaseOutputs):
+            result: str
+
+        def run(self) -> Outputs:
+            return self.Outputs(result="success")
+
+    # AND a workflow with ChatMessageTrigger and the nullable chat_history state
+    class TestWorkflow(BaseWorkflow[BaseInputs, NullableChatHistoryState]):
+        graph = ChatMessageTrigger >> TestNode
+
+    # WHEN we run the workflow with a trigger
+    trigger = ChatMessageTrigger(message="Hello")
+    workflow = TestWorkflow()
+    terminal_event = workflow.run(trigger=trigger)
+
+    # THEN the workflow completes successfully
+    assert terminal_event.name == "workflow.execution.fulfilled"
