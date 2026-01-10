@@ -884,7 +884,13 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         for subgraph in cls.get_subgraphs():
             for trigger_class in subgraph.triggers:
                 if trigger_class.__id__ == trigger_id:
-                    return trigger_class(**inputs)
+                    try:
+                        return trigger_class(**inputs)
+                    except Exception as e:
+                        raise WorkflowInitializationException(
+                            message=f"Failed to instantiate trigger {trigger_class.__name__}: {e}",
+                            workflow_definition=cls,
+                        ) from e
 
                 trigger_classes.append(trigger_class)
 

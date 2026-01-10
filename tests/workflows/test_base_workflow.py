@@ -214,6 +214,22 @@ class TestSlackTrigger(IntegrationTrigger):
         slug = "slack_test"
 
 
+class FailingConstructorTrigger(IntegrationTrigger):
+    """Test trigger that fails during construction when required_field is missing."""
+
+    required_field: str
+
+    class Config(IntegrationTrigger.Config):
+        provider = VellumIntegrationProviderType.COMPOSIO
+        integration_name = "TEST"
+        slug = "failing_constructor"
+
+    def __init__(self, **kwargs):
+        if "required_field" not in kwargs:
+            raise ValueError("required_field is required")
+        super().__init__(**kwargs)
+
+
 class WorkflowWithInputsInputs(BaseInputs):
     user_query: str
     count: int = 0
@@ -229,6 +245,12 @@ class WorkflowWithSlackTrigger(BaseWorkflow):
     """Test workflow with Slack trigger."""
 
     graph = TestSlackTrigger >> TestNode
+
+
+class WorkflowWithFailingConstructorTrigger(BaseWorkflow):
+    """Test workflow with a trigger that fails during construction."""
+
+    graph = FailingConstructorTrigger >> TestNode
 
 
 class WorkflowWithMultipleTriggers(BaseWorkflow):
@@ -312,3 +334,24 @@ def test_deserialize_trigger__raises_error_when_trigger_id_not_found():
 
     assert "No trigger class found" in str(exc_info.value)
     assert str(non_existent_trigger_id) in str(exc_info.value)
+
+
+def test_deserialize_trigger__raises_workflow_initialization_exception_when_trigger_constructor_fails():
+    """
+    Tests that deserialize_trigger raises WorkflowInitializationException when trigger constructor fails.
+    """
+
+    # GIVEN a workflow with a trigger that validates required fields in its constructor
+    trigger_id = FailingConstructorTrigger.__id__
+
+    # AND inputs that are missing the required field
+    invalid_inputs = {"some_other_field": "value"}
+
+    # WHEN we call deserialize_trigger with invalid inputs
+    # THEN it should raise WorkflowInitializationException
+    with pytest.raises(WorkflowInitializationException) as exc_info:
+        WorkflowWithFailingConstructorTrigger.deserialize_trigger(trigger_id=trigger_id, inputs=invalid_inputs)
+
+    # AND the error message should mention the trigger class name
+    assert "Failed to instantiate trigger" in str(exc_info.value)
+    assert "FailingConstructorTrigger" in str(exc_info.value)
