@@ -909,6 +909,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             )
             return None
 
+        self._validate_chat_history_state(trigger_class)
+
         serialized_output = serialize_value(
             executable_id=trigger_class.__id__,
             display_context=self.display_context,
@@ -921,6 +923,25 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                 "output": serialized_output,
             },
         )
+
+    def _validate_chat_history_state(self, trigger_class: Type[ChatMessageTrigger]) -> None:
+        state_class = self._workflow.get_state_class()
+
+        if not hasattr(state_class, "chat_history"):
+            return
+
+        chat_history_ref = getattr(state_class, "chat_history")
+        if chat_history_ref.instance is None:
+            self.display_context.add_validation_error(
+                StateValidationError(
+                    message=(
+                        "Chat triggers expect chat_history to default to an empty array. "
+                        "Use Field(default_factory=list) instead of = None."
+                    ),
+                    state_class_name=state_class.__name__,
+                    attribute_name="chat_history",
+                )
+            )
 
     @staticmethod
     def _model_dump(value: Any) -> Any:
