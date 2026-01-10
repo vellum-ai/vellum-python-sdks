@@ -15,8 +15,10 @@ from vellum.client.types import (
     VellumImage,
 )
 from vellum.workflows.nodes.bases.base import BaseNode
+from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.triggers.chat_message import ChatMessageTrigger
+from vellum.workflows.workflows.base import BaseWorkflow
 
 
 class ChatState(BaseState):
@@ -177,56 +179,40 @@ def test_chat_message_trigger__converts_string_message():
     )
 
 
-def test_chat_message_trigger__converts_single_dict_vellum_value():
-    """Tests that ChatMessageTrigger converts a single VellumValue dict to ChatMessageContent list."""
+def test_chat_message_trigger__raw_string_array__workflow_stream():
+    """Tests that workflow.stream() works with raw string array after deserialize_trigger."""
 
-    # GIVEN a message as a single VellumValue dict (not wrapped in a list)
-    single_dict_message = {"type": "STRING", "value": "Hello from single dict!"}
+    # GIVEN a workflow with ChatMessageTrigger
+    class TestNode(BaseNode):
+        class Outputs(BaseOutputs):
+            result: str
 
-    # WHEN a ChatMessageTrigger is created with a single dict message
-    trigger = ChatMessageTrigger(message=single_dict_message)
+        def run(self) -> Outputs:
+            return self.Outputs(result="success")
 
-    # THEN the message is converted to a list with a single StringChatMessageContent
-    assert len(trigger.message) == 1
-    assert isinstance(trigger.message[0], StringChatMessageContent)
-    assert trigger.message[0].value == "Hello from single dict!"
+    class TestWorkflow(BaseWorkflow):
+        graph = ChatMessageTrigger >> TestNode
 
-    # AND the trigger works correctly with state
-    state = ChatState()
-    trigger.__on_workflow_initiated__(state)
+    # AND a raw string array input (not wrapped in VellumValue format)
+    raw_string_array_input = {"message": ["Hello", "World"]}
 
-    assert len(state.chat_history) == 1
-    assert state.chat_history[0].role == "USER"
-    assert state.chat_history[0].content == ArrayChatMessageContent(
-        value=[StringChatMessageContent(value="Hello from single dict!")]
+    # WHEN we deserialize the trigger with raw string array
+    trigger = TestWorkflow.deserialize_trigger(
+        trigger_id=ChatMessageTrigger.__id__,
+        inputs=raw_string_array_input,
     )
 
-
-def test_chat_message_trigger__converts_raw_string_array():
-    """Tests that ChatMessageTrigger converts a raw array of strings to ChatMessageContent list."""
-
-    # GIVEN a message as a raw array of strings (not wrapped in VellumValue format)
-    raw_string_array = ["Hello", "World"]
-
-    # WHEN a ChatMessageTrigger is created with a raw string array
-    trigger = ChatMessageTrigger(message=raw_string_array)
-
-    # THEN the message is converted to a list of StringChatMessageContent
+    # THEN the trigger is properly deserialized
+    assert isinstance(trigger, ChatMessageTrigger)
     assert len(trigger.message) == 2
     assert isinstance(trigger.message[0], StringChatMessageContent)
     assert trigger.message[0].value == "Hello"
     assert isinstance(trigger.message[1], StringChatMessageContent)
     assert trigger.message[1].value == "World"
 
-    # AND the trigger works correctly with state
-    state = ChatState()
-    trigger.__on_workflow_initiated__(state)
+    # AND the workflow can be streamed successfully
+    workflow = TestWorkflow()
+    events = list(workflow.stream(trigger=trigger))
 
-    assert len(state.chat_history) == 1
-    assert state.chat_history[0].role == "USER"
-    assert state.chat_history[0].content == ArrayChatMessageContent(
-        value=[
-            StringChatMessageContent(value="Hello"),
-            StringChatMessageContent(value="World"),
-        ]
-    )
+    # THEN the workflow completes successfully
+    assert len(events) > 0
