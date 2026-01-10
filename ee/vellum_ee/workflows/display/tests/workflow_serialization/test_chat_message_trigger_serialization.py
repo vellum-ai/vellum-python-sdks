@@ -1,14 +1,21 @@
 """Tests for ChatMessageTrigger serialization."""
 
-from vellum import ChatMessagePromptBlock, JinjaPromptBlock
+from typing import Optional
+
+from vellum import ChatMessage, ChatMessagePromptBlock, JinjaPromptBlock
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes import InlinePromptNode
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.ports import Port
+from vellum.workflows.references import LazyReference
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.triggers.chat_message import ChatMessageTrigger
-from vellum_ee.workflows.display.utils.exceptions import TriggerValidationError, WorkflowValidationError
+from vellum_ee.workflows.display.utils.exceptions import (
+    StateValidationError,
+    TriggerValidationError,
+    WorkflowValidationError,
+)
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 from tests.workflows.chat_message_trigger_execution.workflows.simple_chat_workflow import SimpleChatWorkflow
@@ -324,3 +331,71 @@ def test_chat_message_trigger_message_wired_to_prompt_inputs():
     message_var = next((v for v in input_variables if v.get("key") == "message"), None)
     assert message_var is not None
     assert message_var.get("type") == "ARRAY"
+
+
+def test_chat_message_trigger_validation__chat_history_none_default():
+    """Tests that serialization adds StateValidationError when chat_history defaults to None instead of empty array."""
+
+    # GIVEN a state class with chat_history defaulting to None
+    class InvalidChatState(BaseState):
+        chat_history: Optional[ChatMessage] = None
+
+    # AND a ChatMessageTrigger with output specified
+    class ChatTrigger(ChatMessageTrigger):
+        class Config(ChatMessageTrigger.Config):
+            output = LazyReference("ChatHistoryNoneWorkflow.Outputs.response")
+
+    # AND a workflow using the trigger with the invalid state
+    class ChatHistoryNoneWorkflow(BaseWorkflow[BaseInputs, InvalidChatState]):
+        graph = ChatTrigger >> ResponseNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            response = ResponseNode.Outputs.response
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=ChatHistoryNoneWorkflow)
+    workflow_display.serialize()
+
+    # THEN the display_context should contain a StateValidationError
+    errors = list(workflow_display.display_context.errors)
+    state_errors = [e for e in errors if isinstance(e, StateValidationError)]
+    assert len(state_errors) == 1
+
+    # AND the error should mention chat_history and empty array
+    error = state_errors[0]
+    assert "chat_history" in str(error)
+    assert "empty array" in str(error)
+
+
+def test_chat_message_trigger_validation__chat_history_missing():
+    """Tests that serialization adds StateValidationError when chat_history is missing from state class."""
+
+    # GIVEN a state class without chat_history
+    class StateMissingChatHistory(BaseState):
+        pass
+
+    # AND a ChatMessageTrigger with output specified
+    class ChatTrigger(ChatMessageTrigger):
+        class Config(ChatMessageTrigger.Config):
+            output = LazyReference("MissingChatHistoryWorkflow.Outputs.response")
+
+    # AND a workflow using the trigger with the state missing chat_history
+    class MissingChatHistoryWorkflow(BaseWorkflow[BaseInputs, StateMissingChatHistory]):
+        graph = ChatTrigger >> ResponseNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            response = ResponseNode.Outputs.response
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=MissingChatHistoryWorkflow)
+    workflow_display.serialize()
+
+    # THEN the display_context should contain a StateValidationError
+    errors = list(workflow_display.display_context.errors)
+    state_errors = [e for e in errors if isinstance(e, StateValidationError)]
+    assert len(state_errors) == 1
+
+    # AND the error should mention chat_history is required
+    error = state_errors[0]
+    assert "chat_history" in str(error)
+    assert "require" in str(error)
