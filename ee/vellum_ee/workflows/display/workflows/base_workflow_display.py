@@ -664,7 +664,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
 
         Returns:
             JsonArray with trigger data if a trigger is present, None otherwise.
-            Each trigger in the array has: id (UUID), type (str), attributes (list)
+            Each trigger in the array has: id (UUID), type (str), name (str), attributes (list)
         """
         # Get all trigger edges from the workflow's subgraphs
         trigger_edges = []
@@ -679,6 +679,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
 
         trigger_type_mapping = get_trigger_type_mapping()
         serialized_triggers: List[JsonObject] = []
+        seen_trigger_names: Set[str] = set()
 
         for trigger_class in unique_trigger_classes:
             # Get the trigger type from the mapping, or use the utility function
@@ -687,6 +688,19 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                 trigger_type = get_trigger_type(trigger_class)
 
             trigger_id = trigger_class.__id__
+
+            # Determine trigger name based on type
+            trigger_name = self._get_trigger_name(trigger_class, trigger_type)
+
+            # Validate that trigger names are unique
+            if trigger_name in seen_trigger_names:
+                self.display_context.add_validation_error(
+                    TriggerValidationError(
+                        message=f"Duplicate trigger name '{trigger_name}' found. Each trigger must have a unique name.",
+                        trigger_class_name=trigger_class.__name__,
+                    )
+                )
+            seen_trigger_names.add(trigger_name)
 
             # Serialize trigger attributes using the shared utility
             trigger_attributes = serialize_trigger_attributes(trigger_class)
@@ -701,6 +715,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                 trigger_data = {
                     "id": str(trigger_id),
                     "type": trigger_type.value,
+                    "name": trigger_name,
                     "cron": cron_value,
                     "timezone": timezone_value,
                     "attributes": trigger_attributes,
@@ -710,6 +725,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                 trigger_data = {
                     "id": str(trigger_id),
                     "type": trigger_type.value,
+                    "name": trigger_name,
                     "attributes": trigger_attributes,
                 }
 
@@ -735,6 +751,28 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             serialized_triggers.append(trigger_data)
 
         return cast(JsonArray, serialized_triggers)
+
+    def _get_trigger_name(self, trigger_class: Type[BaseTrigger], trigger_type: WorkflowTriggerType) -> str:
+        """
+        Get the name for a trigger based on its type.
+
+        Chat triggers use 'chat', scheduled triggers use 'scheduled',
+        and integration triggers use the slug from their Config.
+        """
+        if trigger_type == WorkflowTriggerType.CHAT_MESSAGE:
+            return "chat"
+        elif trigger_type == WorkflowTriggerType.SCHEDULED:
+            return "scheduled"
+        elif trigger_type == WorkflowTriggerType.INTEGRATION and issubclass(trigger_class, IntegrationTrigger):
+            config_class = trigger_class.Config
+            slug = getattr(config_class, "slug", None)
+            if slug:
+                return str(slug)
+            return "integration"
+        elif trigger_type == WorkflowTriggerType.MANUAL:
+            return "manual"
+        else:
+            return "trigger"
 
     def _serialize_edge_display_data(self, edge_display: EdgeDisplay) -> Optional[JsonObject]:
         """Serialize edge display data, returning None if no display data is present."""
