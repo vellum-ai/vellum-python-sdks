@@ -3,5 +3,5 @@
 import typing
 
 ApiActorTypeEnum = typing.Union[
-    typing.Literal["WORKSPACE_API_KEY", "ENVIRONMENT_API_KEY", "JWT", "SERVICE_TOKEN"], typing.Any
+    typing.Literal["ANONYMOUS", "WORKSPACE_API_KEY", "ENVIRONMENT_API_KEY", "JWT", "SERVICE_TOKEN"], typing.Any
 ]

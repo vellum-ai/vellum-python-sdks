@@ -6814,6 +6814,127 @@ client.workflow_deployments.retrieve(
 </dl>
 </details>
 
+<details><summary><code>client.workflow_deployments.<a href="src/vellum/resources/workflow_deployments/client.py">execute_stream</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Executes a deployed Workflow and streams back its results.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import Vellum
+
+client = Vellum(
+    api_version="YOUR_API_VERSION",
+    api_key="YOUR_API_KEY",
+)
+response = client.workflow_deployments.execute_stream(
+    id="id",
+)
+for chunk in response.data:
+    yield chunk
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Either the Workflow Deployment's ID or its unique name
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**inputs:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — A mapping from input name to value.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**trigger:** `typing.Optional[str]` — The name or ID of a workflow trigger to use for this execution. If not specified, then a default manual trigger will be chosen.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**release_tag:** `typing.Optional[str]` — Optionally specify a release tag if you want to pin to a specific release of the Workflow Deployment
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**external_id:** `typing.Optional[str]` — Optionally include a unique identifier for tracking purposes. Must be unique within a given Workspace.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Arbitrary JSON metadata associated with this request. Can be used to capture additional monitoring data such as user id, session id, etc. for future analysis.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**previous_execution_id:** `typing.Optional[str]` — The ID of a previous workflow execution to reference for context.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.workflow_deployments.<a href="src/vellum/resources/workflow_deployments/client.py">list_workflow_deployment_event_executions</a>(...)</code></summary>
 <dl>
 <dd>

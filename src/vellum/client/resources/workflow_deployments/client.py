@@ -11,6 +11,7 @@ from ...types.workflow_deployment_event_executions_response import WorkflowDeplo
 from ...types.workflow_deployment_history_item import WorkflowDeploymentHistoryItem
 from ...types.workflow_deployment_read import WorkflowDeploymentRead
 from ...types.workflow_deployment_release import WorkflowDeploymentRelease
+from ...types.workflow_event import WorkflowEvent
 from ...types.workflow_event_execution_read import WorkflowEventExecutionRead
 from ...types.workflow_release_tag_read import WorkflowReleaseTagRead
 from .raw_client import AsyncRawWorkflowDeploymentsClient, RawWorkflowDeploymentsClient
@@ -120,6 +121,78 @@ class WorkflowDeploymentsClient:
         """
         _response = self._raw_client.retrieve(id, request_options=request_options)
         return _response.data
+
+    def execute_stream(
+        self,
+        id: str,
+        *,
+        inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        trigger: typing.Optional[str] = OMIT,
+        release_tag: typing.Optional[str] = OMIT,
+        external_id: typing.Optional[str] = OMIT,
+        metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        previous_execution_id: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.Iterator[WorkflowEvent]:
+        """
+        Executes a deployed Workflow and streams back its results.
+
+        Parameters
+        ----------
+        id : str
+            Either the Workflow Deployment's ID or its unique name
+
+        inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            A mapping from input name to value.
+
+        trigger : typing.Optional[str]
+            The name or ID of a workflow trigger to use for this execution. If not specified, then a default manual trigger will be chosen.
+
+        release_tag : typing.Optional[str]
+            Optionally specify a release tag if you want to pin to a specific release of the Workflow Deployment
+
+        external_id : typing.Optional[str]
+            Optionally include a unique identifier for tracking purposes. Must be unique within a given Workspace.
+
+        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Arbitrary JSON metadata associated with this request. Can be used to capture additional monitoring data such as user id, session id, etc. for future analysis.
+
+        previous_execution_id : typing.Optional[str]
+            The ID of a previous workflow execution to reference for context.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Yields
+        ------
+        typing.Iterator[WorkflowEvent]
+
+
+        Examples
+        --------
+        from vellum import Vellum
+
+        client = Vellum(
+            api_version="YOUR_API_VERSION",
+            api_key="YOUR_API_KEY",
+        )
+        response = client.workflow_deployments.execute_stream(
+            id="id",
+        )
+        for chunk in response:
+            yield chunk
+        """
+        with self._raw_client.execute_stream(
+            id,
+            inputs=inputs,
+            trigger=trigger,
+            release_tag=release_tag,
+            external_id=external_id,
+            metadata=metadata,
+            previous_execution_id=previous_execution_id,
+            request_options=request_options,
+        ) as r:
+            yield from r.data
 
     def list_workflow_deployment_event_executions(
         self,
@@ -593,6 +666,87 @@ class AsyncWorkflowDeploymentsClient:
         """
         _response = await self._raw_client.retrieve(id, request_options=request_options)
         return _response.data
+
+    async def execute_stream(
+        self,
+        id: str,
+        *,
+        inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        trigger: typing.Optional[str] = OMIT,
+        release_tag: typing.Optional[str] = OMIT,
+        external_id: typing.Optional[str] = OMIT,
+        metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        previous_execution_id: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.AsyncIterator[WorkflowEvent]:
+        """
+        Executes a deployed Workflow and streams back its results.
+
+        Parameters
+        ----------
+        id : str
+            Either the Workflow Deployment's ID or its unique name
+
+        inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            A mapping from input name to value.
+
+        trigger : typing.Optional[str]
+            The name or ID of a workflow trigger to use for this execution. If not specified, then a default manual trigger will be chosen.
+
+        release_tag : typing.Optional[str]
+            Optionally specify a release tag if you want to pin to a specific release of the Workflow Deployment
+
+        external_id : typing.Optional[str]
+            Optionally include a unique identifier for tracking purposes. Must be unique within a given Workspace.
+
+        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Arbitrary JSON metadata associated with this request. Can be used to capture additional monitoring data such as user id, session id, etc. for future analysis.
+
+        previous_execution_id : typing.Optional[str]
+            The ID of a previous workflow execution to reference for context.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Yields
+        ------
+        typing.AsyncIterator[WorkflowEvent]
+
+
+        Examples
+        --------
+        import asyncio
+
+        from vellum import AsyncVellum
+
+        client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            response = await client.workflow_deployments.execute_stream(
+                id="id",
+            )
+            async for chunk in response:
+                yield chunk
+
+
+        asyncio.run(main())
+        """
+        async with self._raw_client.execute_stream(
+            id,
+            inputs=inputs,
+            trigger=trigger,
+            release_tag=release_tag,
+            external_id=external_id,
+            metadata=metadata,
+            previous_execution_id=previous_execution_id,
+            request_options=request_options,
+        ) as r:
+            async for _chunk in r.data:
+                yield _chunk
 
     async def list_workflow_deployment_event_executions(
         self,
