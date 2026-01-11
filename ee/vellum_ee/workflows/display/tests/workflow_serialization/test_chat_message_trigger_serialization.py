@@ -43,6 +43,7 @@ def test_simple_chat_workflow_serialization():
         {
             "id": "9e14c49b-c6d9-4fe5-9ff2-835fd695fe5f",
             "type": "CHAT_MESSAGE",
+            "name": "chat",
             "attributes": [
                 {
                     "id": "5edbfd78-b634-4305-b2ad-d9feecbd5e5f",

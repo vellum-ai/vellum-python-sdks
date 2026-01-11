@@ -168,6 +168,7 @@
     {
       "id": "c484ce55-a392-4a1b-8c10-1233b81c4539",
       "type": "SCHEDULED",
+      "name": "scheduled",
       "cron": "* * * * *",
       "timezone": "America/New_York",
       "attributes": [
