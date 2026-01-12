@@ -14,8 +14,10 @@ from vellum.client.types.workflow_output_string import WorkflowOutputString
 from vellum.client.types.workflow_request_chat_history_input_request import WorkflowRequestChatHistoryInputRequest
 from vellum.client.types.workflow_request_json_input_request import WorkflowRequestJsonInputRequest
 from vellum.client.types.workflow_request_number_input_request import WorkflowRequestNumberInputRequest
+from vellum.client.types.workflow_request_string_input_request import WorkflowRequestStringInputRequest
 from vellum.client.types.workflow_result_event import WorkflowResultEvent
 from vellum.client.types.workflow_stream_event import WorkflowStreamEvent
+from vellum.workflows.constants import undefined
 from vellum.workflows.context import execution_context
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
@@ -493,3 +495,61 @@ def test_run_workflow__missing_required_input(vellum_client):
     # AND the error should indicate the missing required input
     assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
     assert exc_info.value.message == "Missing required input for 'my_var_1'"
+
+
+def test_run_workflow__undefined_input_filtered(vellum_client):
+    """Confirm that undefined input values are filtered out when compiling subworkflow inputs."""
+
+    # GIVEN a Subworkflow Deployment Node with an undefined input value
+    class ExampleSubworkflowDeploymentNode(SubworkflowDeploymentNode):
+        deployment = "example_subworkflow_deployment"
+        subworkflow_inputs = {
+            "required_input": "hello",
+            "optional_input": undefined,
+        }
+
+    # AND we know what the Subworkflow Deployment will respond with
+    def generate_subworkflow_events(*args: Any, **kwargs: Any) -> Iterator[WorkflowStreamEvent]:
+        execution_id = str(uuid4())
+        expected_events: List[WorkflowStreamEvent] = [
+            WorkflowExecutionWorkflowResultEvent(
+                execution_id=execution_id,
+                data=WorkflowResultEvent(
+                    id=str(uuid4()),
+                    state="INITIATED",
+                    ts=datetime.now(),
+                ),
+            ),
+            WorkflowExecutionWorkflowResultEvent(
+                execution_id=execution_id,
+                data=WorkflowResultEvent(
+                    id=str(uuid4()),
+                    state="FULFILLED",
+                    ts=datetime.now(),
+                    outputs=[
+                        WorkflowOutputString(
+                            id=str(uuid4()),
+                            name="result",
+                            value="success",
+                        )
+                    ],
+                ),
+            ),
+        ]
+        yield from expected_events
+
+    vellum_client.execute_workflow_stream.side_effect = generate_subworkflow_events
+
+    # WHEN we run the node
+    node = ExampleSubworkflowDeploymentNode()
+    events = list(node.run())
+
+    # THEN the node should have completed successfully
+    assert events[-1].name == "result"
+    assert events[-1].value == "success"
+
+    # AND the undefined input should be filtered out from the API call
+    call_kwargs = vellum_client.execute_workflow_stream.call_args.kwargs
+    assert call_kwargs["inputs"] == [
+        WorkflowRequestStringInputRequest(name="required_input", value="hello"),
+    ]
