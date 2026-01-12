@@ -61,32 +61,7 @@ def test_simple_chat_workflow_serialization():
                             {
                                 "type": "array",
                                 "items": {
-                                    "anyOf": [
-                                        {
-                                            "$ref": "#/$defs/vellum.client.types."
-                                            "string_chat_message_content.StringChatMessageContent"
-                                        },
-                                        {
-                                            "$ref": "#/$defs/vellum.client.types."
-                                            "function_call_chat_message_content.FunctionCallChatMessageContent"
-                                        },
-                                        {
-                                            "$ref": "#/$defs/vellum.client.types."
-                                            "audio_chat_message_content.AudioChatMessageContent"
-                                        },
-                                        {
-                                            "$ref": "#/$defs/vellum.client.types."
-                                            "video_chat_message_content.VideoChatMessageContent"
-                                        },
-                                        {
-                                            "$ref": "#/$defs/vellum.client.types."
-                                            "image_chat_message_content.ImageChatMessageContent"
-                                        },
-                                        {
-                                            "$ref": "#/$defs/vellum.client.types."
-                                            "document_chat_message_content.DocumentChatMessageContent"
-                                        },
-                                    ]
+                                    "$ref": "#/$defs/vellum.client.types.array_chat_message_content_item.ArrayChatMessageContentItem"  # noqa: E501
                                 },
                             },
                         ]

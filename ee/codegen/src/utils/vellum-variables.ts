@@ -5,7 +5,7 @@ import {
   VELLUM_CLIENT_MODULE_PATH,
   VELLUM_WORKFLOWS_ROOT_MODULE_PATH,
 } from "src/constants";
-import { PythonType, UnionType } from "src/generators/extensions";
+import { OptionalType, PythonType, UnionType } from "src/generators/extensions";
 import { AnyType } from "src/generators/extensions/any-type";
 import { BoolType } from "src/generators/extensions/bool-type";
 import { BuiltinDictType } from "src/generators/extensions/dict";
@@ -110,6 +110,21 @@ export function jsonSchemaToType(schema: Record<string, unknown>): PythonType {
   } else if (schemaType === "null") {
     return new NoneType();
   } else if ("anyOf" in schema && Array.isArray(schema.anyOf)) {
+    const childTypes = schema.anyOf.map(jsonSchemaToType);
+    if (childTypes.length === 1 && childTypes[0] !== undefined) {
+      return childTypes[0];
+    }
+    if (
+      childTypes.length === 2 &&
+      (childTypes[0] instanceof NoneType ||
+        childTypes[1] instanceof NoneType) &&
+      childTypes[0] !== undefined &&
+      childTypes[1] !== undefined
+    ) {
+      return new OptionalType(
+        childTypes[0] instanceof NoneType ? childTypes[1] : childTypes[0]
+      );
+    }
     return new UnionType(schema.anyOf.map(jsonSchemaToType));
   }
 

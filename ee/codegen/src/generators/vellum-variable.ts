@@ -50,9 +50,14 @@ export class VellumVariable extends AstNode {
       (variable.required === false ||
         (variable.required === undefined && defaultRequired === false))
     ) {
+      const normalizedBaseType =
+        baseType instanceof OptionalType
+          ? baseType
+          : new OptionalType(baseType);
+
       this.field = new Field({
         name,
-        type: new OptionalType(baseType),
+        type: normalizedBaseType,
         initializer: variable.default
           ? this.generateInitializerIfDefault(variable)
           : new NoneInstantiation(),
