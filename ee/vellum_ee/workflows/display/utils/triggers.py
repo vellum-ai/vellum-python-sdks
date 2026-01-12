@@ -8,6 +8,7 @@ from vellum.workflows.triggers.schedule import ScheduleTrigger
 from vellum.workflows.types.core import JsonArray, JsonObject
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
 from vellum_ee.workflows.display.base import WorkflowTriggerType
+from vellum_ee.workflows.display.utils.vellum import compile_descriptor_annotation
 
 
 def get_trigger_type(trigger_class: Type[BaseTrigger]) -> WorkflowTriggerType:
@@ -57,7 +58,7 @@ def serialize_trigger_attributes(trigger_class: Type[BaseTrigger]) -> JsonArray:
                         "value": None,
                     },
                     "extensions": None,
-                    "schema": None,
+                    "schema": compile_descriptor_annotation(reference),
                 },
             )
             for reference in sorted(attribute_references, key=lambda ref: ref.name)

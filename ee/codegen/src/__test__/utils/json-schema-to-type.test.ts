@@ -125,4 +125,13 @@ describe("jsonSchemaToType", () => {
     result.write(writer);
     expect(writer.toString()).toBe("ChatMessage");
   });
+
+  it("should convert union type with null to Optional[T] type", () => {
+    const schema = {
+      anyOf: [{ type: "string" }, { type: "null" }],
+    };
+    const result = jsonSchemaToType(schema);
+    result.write(writer);
+    expect(writer.toString()).toBe("Optional[str]");
+  });
 });

@@ -935,7 +935,7 @@ def test_serialize_workflow__input_variables():
         "default": None,
         "required": False,
         "extensions": {"color": None},
-        "schema": {"type": "string"},
+        "schema": {"anyOf": [{"type": "string"}, {"type": "null"}]},
     }
 
     input_3 = next(var for var in input_variables if isinstance(var, dict) and var["key"] == "input_3")
@@ -957,7 +957,7 @@ def test_serialize_workflow__input_variables():
         "default": {"type": "NUMBER", "value": 2.0},
         "required": False,
         "extensions": {"color": None},
-        "schema": {"type": "integer"},
+        "schema": {"anyOf": [{"type": "integer"}, {"type": "null"}]},
     }
 
 

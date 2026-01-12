@@ -151,9 +151,7 @@
                   "name": "Classification",
                   "schema": {
                     "type": "object",
-                    "required": [
-                      "classification"
-                    ],
+                    "required": ["classification"],
                     "properties": {
                       "classification": {
                         "type": "string",
@@ -369,9 +367,7 @@
                       "name": "Classification",
                       "schema": {
                         "type": "object",
-                        "required": [
-                          "classification"
-                        ],
+                        "required": ["classification"],
                         "properties": {
                           "classification": {
                             "type": "string",
@@ -3270,10 +3266,17 @@
         "color": null
       },
       "schema": {
-        "type": "array",
-        "items": {
-          "$ref": "#/$defs/vellum.client.types.chat_message.ChatMessage"
-        }
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/vellum.client.types.chat_message.ChatMessage"
+            }
+          },
+          {
+            "type": "null"
+          }
+        ]
       }
     }
   ],

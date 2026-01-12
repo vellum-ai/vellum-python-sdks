@@ -22,6 +22,7 @@ from pydantic_core import PydanticUndefined
 from pydash import snake_case
 
 from vellum import Vellum
+from vellum.client.types.array_chat_message_content_item import ArrayChatMessageContentItem
 from vellum.client.types.function_definition import FunctionDefinition
 from vellum.workflows.integrations.composio_service import ComposioService
 from vellum.workflows.integrations.mcp_service import MCPService
@@ -61,6 +62,11 @@ def _get_def_name(annotation: Type) -> str:
     return f"{annotation.__module__}.{annotation.__qualname__}"
 
 
+recorded_unions = {
+    ArrayChatMessageContentItem: "vellum.client.types.array_chat_message_content_item.ArrayChatMessageContentItem",
+}
+
+
 def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
     if annotation is None:
         return {"type": "null"}
@@ -78,6 +84,9 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
     if get_origin(annotation) is Union:
         if is_json_type(get_args(annotation)):
             return {"$ref": "#/$defs/vellum.workflows.types.core.Json"}
+
+        if annotation in recorded_unions:
+            return {"$ref": f"#/$defs/{recorded_unions[annotation]}"}
 
         return {"anyOf": [compile_annotation(a, defs) for a in get_args(annotation)]}
 

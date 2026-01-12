@@ -1220,7 +1220,38 @@
             "value": null
           },
           "extensions": null,
-          "schema": null
+          "schema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/vellum.client.types.string_chat_message_content.StringChatMessageContent"
+                    },
+                    {
+                      "$ref": "#/$defs/vellum.client.types.function_call_chat_message_content.FunctionCallChatMessageContent"
+                    },
+                    {
+                      "$ref": "#/$defs/vellum.client.types.audio_chat_message_content.AudioChatMessageContent"
+                    },
+                    {
+                      "$ref": "#/$defs/vellum.client.types.video_chat_message_content.VideoChatMessageContent"
+                    },
+                    {
+                      "$ref": "#/$defs/vellum.client.types.image_chat_message_content.ImageChatMessageContent"
+                    },
+                    {
+                      "$ref": "#/$defs/vellum.client.types.document_chat_message_content.DocumentChatMessageContent"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
         }
       ],
       "display_data": {
@@ -1284,7 +1315,10 @@
             "value": null
           },
           "extensions": null,
-          "schema": null
+          "schema": {
+            "type": "string",
+            "format": "date-time"
+          }
         },
         {
           "id": "e75ec8ba-2635-4be2-9c1d-f04ddcb8a7a1",
@@ -1296,7 +1330,10 @@
             "value": null
           },
           "extensions": null,
-          "schema": null
+          "schema": {
+            "type": "string",
+            "format": "date-time"
+          }
         }
       ],
       "display_data": {

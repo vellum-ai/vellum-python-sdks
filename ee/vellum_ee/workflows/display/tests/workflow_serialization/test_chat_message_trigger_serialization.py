@@ -55,7 +55,17 @@ def test_simple_chat_workflow_serialization():
                         "value": None,
                     },
                     "extensions": None,
-                    "schema": None,
+                    "schema": {
+                        "anyOf": [
+                            {"type": "string"},
+                            {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/$defs/vellum.client.types.array_chat_message_content_item.ArrayChatMessageContentItem"  # noqa: E501
+                                },
+                            },
+                        ]
+                    },
                 }
             ],
             "exec_config": {
