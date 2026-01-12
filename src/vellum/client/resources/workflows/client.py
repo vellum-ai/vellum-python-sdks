@@ -12,6 +12,7 @@ from ...types.workflow_push_deployment_config_request import WorkflowPushDeploym
 from ...types.workflow_push_exec_config import WorkflowPushExecConfig
 from ...types.workflow_push_response import WorkflowPushResponse
 from ...types.workflow_resolved_state import WorkflowResolvedState
+from ...types.workflow_sandbox_execute_node_response import WorkflowSandboxExecuteNodeResponse
 from .raw_client import AsyncRawWorkflowsClient, RawWorkflowsClient
 
 # this is used as the default value for optional parameters
@@ -127,6 +128,49 @@ class WorkflowsClient:
         )
         """
         _response = self._raw_client.retrieve_state(span_id, request_options=request_options)
+        return _response.data
+
+    def execute_node(
+        self,
+        *,
+        files: typing.Dict[str, str],
+        node: str,
+        inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> WorkflowSandboxExecuteNodeResponse:
+        """
+        Parameters
+        ----------
+        files : typing.Dict[str, str]
+
+        node : str
+
+        inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        WorkflowSandboxExecuteNodeResponse
+
+
+        Examples
+        --------
+        from vellum import Vellum
+
+        client = Vellum(
+            api_version="YOUR_API_VERSION",
+            api_key="YOUR_API_KEY",
+        )
+        client.workflows.execute_node(
+            files={"files": "files"},
+            node="x",
+        )
+        """
+        _response = self._raw_client.execute_node(
+            files=files, node=node, inputs=inputs, request_options=request_options
+        )
         return _response.data
 
     def workflow_execution_status(
@@ -374,6 +418,57 @@ class AsyncWorkflowsClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.retrieve_state(span_id, request_options=request_options)
+        return _response.data
+
+    async def execute_node(
+        self,
+        *,
+        files: typing.Dict[str, str],
+        node: str,
+        inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> WorkflowSandboxExecuteNodeResponse:
+        """
+        Parameters
+        ----------
+        files : typing.Dict[str, str]
+
+        node : str
+
+        inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        WorkflowSandboxExecuteNodeResponse
+
+
+        Examples
+        --------
+        import asyncio
+
+        from vellum import AsyncVellum
+
+        client = AsyncVellum(
+            api_version="YOUR_API_VERSION",
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.workflows.execute_node(
+                files={"files": "files"},
+                node="x",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._raw_client.execute_node(
+            files=files, node=node, inputs=inputs, request_options=request_options
+        )
         return _response.data
 
     async def workflow_execution_status(

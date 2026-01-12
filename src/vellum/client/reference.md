@@ -7956,6 +7956,80 @@ client.workflows.retrieve_state(
 </dl>
 </details>
 
+<details><summary><code>client.workflows.<a href="src/vellum/resources/workflows/client.py">execute_node</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from vellum import Vellum
+
+client = Vellum(
+    api_version="YOUR_API_VERSION",
+    api_key="YOUR_API_KEY",
+)
+client.workflows.execute_node(
+    files={"files": "files"},
+    node="x",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**files:** `typing.Dict[str, str]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**node:** `str` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**inputs:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.workflows.<a href="src/vellum/resources/workflows/client.py">workflow_execution_status</a>(...)</code></summary>
 <dl>
 <dd>
