@@ -30,7 +30,7 @@ export declare namespace PythonFile {
     /* Any comments that should be at the top of the file */
     comments?: Comment[];
     /* Any explicit imports that should be included */
-    imports?: StarImport[];
+    imports?: (StarImport | Reference)[];
   }
 }
 

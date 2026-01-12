@@ -152,7 +152,7 @@ export abstract class BasePersistedFile extends AstNode {
 
   protected abstract getFileStatements(): AstNode[] | undefined;
 
-  protected getFileImports(): StarImport[] | undefined {
+  protected getFileImports(): (StarImport | Reference)[] | undefined {
     return undefined;
   }
 
