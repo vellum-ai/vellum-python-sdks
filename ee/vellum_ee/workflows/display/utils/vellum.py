@@ -141,8 +141,9 @@ def infer_vellum_variable_type(value: Any) -> VellumVariableType:
 
 def compile_descriptor_annotation(descriptor: BaseDescriptor) -> dict:
     """Compile a BaseDescriptor's type annotation to a JSON schema."""
-    input_type = descriptor.types[0] if descriptor.types else None
-    return compile_annotation(input_type, {})
+    if not descriptor.types:
+        return {}
+    return compile_annotation(descriptor.normalized_type, {})
 
 
 def create_node_input_value_pointer_rule(

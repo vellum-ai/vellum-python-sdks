@@ -39,48 +39,78 @@ def test_simple_chat_workflow_serialization():
     }
 
     # AND the triggers should be serialized correctly
-    triggers = serialized_workflow["triggers"]
-    assert len(triggers) == 1
-    trigger = triggers[0]
-    assert trigger["id"] == "9e14c49b-c6d9-4fe5-9ff2-835fd695fe5f"
-    assert trigger["type"] == "CHAT_MESSAGE"
-    assert trigger["name"] == "chat"
-
-    # AND the trigger attributes should be serialized correctly
-    attributes = trigger["attributes"]
-    assert len(attributes) == 1
-    message_attr = attributes[0]
-    assert message_attr["id"] == "5edbfd78-b634-4305-b2ad-d9feecbd5e5f"
-    assert message_attr["key"] == "message"
-    assert message_attr["type"] == "ARRAY"
-    assert message_attr["required"] is True
-    assert message_attr["default"] == {"type": "ARRAY", "value": None}
-    assert message_attr["extensions"] is None
-
-    # AND the schema should be compiled from the type annotation
-    schema = message_attr["schema"]
-    assert schema is not None
-    assert "anyOf" in schema
-
-    # AND the exec_config should be serialized correctly
-    assert trigger["exec_config"] == {
-        "output": {
-            "type": "WORKFLOW_OUTPUT",
-            "output_variable_id": "cc1208e9-c043-47f4-abea-c01ac0dbf04c",
-        },
-    }
-
-    # AND the display_data should be serialized correctly
-    assert trigger["display_data"] == {
-        "label": "Chat Message",
-        "position": {
-            "x": 0.0,
-            "y": 0.0,
-        },
-        "z_index": 0,
-        "icon": "vellum:icon:message-dots",
-        "color": "blue",
-    }
+    assert serialized_workflow["triggers"] == [
+        {
+            "id": "9e14c49b-c6d9-4fe5-9ff2-835fd695fe5f",
+            "type": "CHAT_MESSAGE",
+            "name": "chat",
+            "attributes": [
+                {
+                    "id": "5edbfd78-b634-4305-b2ad-d9feecbd5e5f",
+                    "key": "message",
+                    "type": "ARRAY",
+                    "required": True,
+                    "default": {
+                        "type": "ARRAY",
+                        "value": None,
+                    },
+                    "extensions": None,
+                    "schema": {
+                        "anyOf": [
+                            {"type": "string"},
+                            {
+                                "type": "array",
+                                "items": {
+                                    "anyOf": [
+                                        {
+                                            "$ref": "#/$defs/vellum.client.types."
+                                            "string_chat_message_content.StringChatMessageContent"
+                                        },
+                                        {
+                                            "$ref": "#/$defs/vellum.client.types."
+                                            "function_call_chat_message_content.FunctionCallChatMessageContent"
+                                        },
+                                        {
+                                            "$ref": "#/$defs/vellum.client.types."
+                                            "audio_chat_message_content.AudioChatMessageContent"
+                                        },
+                                        {
+                                            "$ref": "#/$defs/vellum.client.types."
+                                            "video_chat_message_content.VideoChatMessageContent"
+                                        },
+                                        {
+                                            "$ref": "#/$defs/vellum.client.types."
+                                            "image_chat_message_content.ImageChatMessageContent"
+                                        },
+                                        {
+                                            "$ref": "#/$defs/vellum.client.types."
+                                            "document_chat_message_content.DocumentChatMessageContent"
+                                        },
+                                    ]
+                                },
+                            },
+                        ]
+                    },
+                }
+            ],
+            "exec_config": {
+                "output": {
+                    "type": "WORKFLOW_OUTPUT",
+                    "output_variable_id": "cc1208e9-c043-47f4-abea-c01ac0dbf04c",
+                },
+            },
+            "display_data": {
+                "label": "Chat Message",
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0,
+                },
+                "z_index": 0,
+                "icon": "vellum:icon:message-dots",
+                "color": "blue",
+            },
+        }
+    ]
 
 
 class ResponseNode(BaseNode):

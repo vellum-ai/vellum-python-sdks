@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Type, cast
+from typing import Any, Dict, List, Type, cast
 
 from vellum.workflows.triggers.base import BaseTrigger
 from vellum.workflows.triggers.chat_message import ChatMessageTrigger
@@ -6,9 +6,9 @@ from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.triggers.manual import ManualTrigger
 from vellum.workflows.triggers.schedule import ScheduleTrigger
 from vellum.workflows.types.core import JsonArray, JsonObject
-from vellum.workflows.utils.functions import compile_annotation
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
 from vellum_ee.workflows.display.base import WorkflowTriggerType
+from vellum_ee.workflows.display.utils.vellum import compile_descriptor_annotation
 
 
 def get_trigger_type(trigger_class: Type[BaseTrigger]) -> WorkflowTriggerType:
@@ -43,12 +43,6 @@ def serialize_trigger_attributes(trigger_class: Type[BaseTrigger]) -> JsonArray:
         except ValueError:
             return "JSON"
 
-    def get_attribute_schema(reference: Any) -> Optional[JsonObject]:
-        try:
-            return cast(Optional[JsonObject], compile_annotation(reference.normalized_type, {}))
-        except Exception:
-            return None
-
     trigger_attributes: JsonArray = cast(
         JsonArray,
         [
@@ -64,7 +58,7 @@ def serialize_trigger_attributes(trigger_class: Type[BaseTrigger]) -> JsonArray:
                         "value": None,
                     },
                     "extensions": None,
-                    "schema": get_attribute_schema(reference),
+                    "schema": compile_descriptor_annotation(reference),
                 },
             )
             for reference in sorted(attribute_references, key=lambda ref: ref.name)
