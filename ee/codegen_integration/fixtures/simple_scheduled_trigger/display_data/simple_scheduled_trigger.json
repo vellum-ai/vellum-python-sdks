@@ -182,7 +182,10 @@
             "value": null
           },
           "extensions": null,
-          "schema": null
+          "schema": {
+            "type": "string",
+            "format": "date-time"
+          }
         },
         {
           "id": "051faa28-5589-42b8-ad09-0dede7196bd8",
@@ -194,7 +197,10 @@
             "value": null
           },
           "extensions": null,
-          "schema": null
+          "schema": {
+            "type": "string",
+            "format": "date-time"
+          }
         }
       ],
       "display_data": {
