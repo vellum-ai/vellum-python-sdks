@@ -457,3 +457,28 @@ def test_base_node__int_input_preserves_type_when_float_passed():
 
     # AND the result should be correct
     assert final_event.outputs.result == 5
+
+
+def test_base_node__bytes_output_raises_serialization_error():
+    """Test that returning bytes in node outputs rejects the workflow execution."""
+
+    class BytesOutputNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result: str
+
+        def run(self) -> "BytesOutputNode.Outputs":
+            b = b"hello"
+            return self.Outputs(result=b)  # type: ignore[arg-type]
+
+    class BytesWorkflow(BaseWorkflow):
+        graph = BytesOutputNode
+
+    workflow = BytesWorkflow()
+
+    # WHEN we run the workflow
+    result = workflow.run()
+
+    # THEN the execution is rejected with a helpful error
+    assert result.name == "workflow.execution.rejected"
+    assert result.error.code == WorkflowErrorCode.INVALID_OUTPUTS
+    assert "bytes" in result.error.message.lower()
