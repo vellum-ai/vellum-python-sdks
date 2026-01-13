@@ -27,6 +27,39 @@ NODE_ATTRIBUTE_PATTERN = re.compile(NODE_ATTRIBUTE_REGEX)
 NON_UNDERSCORE_PATTERN = re.compile(r"^[^_].*$")
 COUNT_PATTERN = re.compile(r"^count$")
 
+# Check if mypy.nodes.TypeAlias supports the 'module' parameter (added in mypy 1.14+)
+_MYPY_TYPE_ALIAS_HAS_MODULE = hasattr(MypyTypeAlias, "module")
+
+
+def _create_type_alias(
+    target: MypyType,
+    fullname: str,
+    line: int,
+    column: int,
+    module: Optional[str] = None,
+) -> MypyTypeAlias:
+    """Create a TypeAlias with backward compatibility for different mypy versions.
+
+    In mypy 1.14+, the TypeAlias constructor requires a 'module' parameter.
+    This helper function handles both old and new mypy versions.
+    """
+    if _MYPY_TYPE_ALIAS_HAS_MODULE:
+        return MypyTypeAlias(  # type: ignore[call-arg]
+            target=target,
+            fullname=fullname,
+            module=module,
+            line=line,
+            column=column,
+        )
+    else:
+        return MypyTypeAlias(
+            target=target,
+            fullname=fullname,
+            line=line,
+            column=column,
+        )
+
+
 DESCRIPTOR_PATHS: list[tuple[str, str, re.Pattern[str]]] = [
     (
         "vellum.workflows.outputs.base.BaseOutputs",
@@ -617,11 +650,11 @@ class VellumMypyPlugin(Plugin):
 
         new_fulfilled_event = fulfilled_event.copy_modified(args=(Instance(outputs_node, []),))
         return TypeAliasType(
-            alias=MypyTypeAlias(
+            alias=_create_type_alias(
                 target=alias_target.copy_modified(
                     args=[
                         TypeAliasType(
-                            alias=MypyTypeAlias(
+                            alias=_create_type_alias(
                                 target=UnionType(
                                     items=[
                                         new_fulfilled_event if index == fulfilled_event_index else item
@@ -631,6 +664,7 @@ class VellumMypyPlugin(Plugin):
                                 fullname=union_alias.alias.fullname,
                                 line=union_alias.alias.line,
                                 column=union_alias.alias.column,
+                                module=getattr(union_alias.alias, "module", None),
                             ),
                             args=union_alias.args,
                             line=union_alias.line,
@@ -642,6 +676,7 @@ class VellumMypyPlugin(Plugin):
                 fullname=alias.fullname,
                 line=alias.line,
                 column=alias.column,
+                module=getattr(alias, "module", None),
             ),
             args=ctx.default_return_type.args,
             line=ctx.default_return_type.line,
