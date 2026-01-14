@@ -226,43 +226,65 @@ def test_stream_workflow__happy_path(vellum_client):
     events = list(event for event in result if event.name.startswith("workflow."))
     node_events = list(event for event in result if event.name.startswith("node."))
 
-    # THEN the workflow should have completed successfully with 8 events
-    assert len(events) == 8
+    # THEN the workflow should have completed successfully with 12 events
+    # (initiated + 4 results streaming + 4 text streaming + results fulfilled + text fulfilled + fulfilled)
+    assert len(events) == 12
 
     # AND the outputs should be as expected
     assert events[0].name == "workflow.execution.initiated"
 
+    # Results and text streaming events are interleaved (both outputs get each event type)
     assert events[1].name == "workflow.execution.streaming"
     assert events[1].output.is_initiated
     assert events[1].output.name == "results"
 
     assert events[2].name == "workflow.execution.streaming"
-    assert events[2].output.is_streaming
-    assert events[2].output.name == "results"
-    assert events[2].output.delta == "It"
+    assert events[2].output.is_initiated
+    assert events[2].output.name == "text"
 
     assert events[3].name == "workflow.execution.streaming"
     assert events[3].output.is_streaming
     assert events[3].output.name == "results"
-    assert events[3].output.delta == " was"
+    assert events[3].output.delta == "It"
 
     assert events[4].name == "workflow.execution.streaming"
     assert events[4].output.is_streaming
-    assert events[4].output.name == "results"
-    assert events[4].output.delta == " hot"
+    assert events[4].output.name == "text"
+    assert events[4].output.delta == "It"
 
     assert events[5].name == "workflow.execution.streaming"
-    assert events[5].output.is_fulfilled
+    assert events[5].output.is_streaming
     assert events[5].output.name == "results"
-    assert events[5].output.value == expected_outputs
+    assert events[5].output.delta == " was"
 
     assert events[6].name == "workflow.execution.streaming"
-    assert events[6].output.is_fulfilled
+    assert events[6].output.is_streaming
     assert events[6].output.name == "text"
-    assert events[6].output.value == "It was hot"
+    assert events[6].output.delta == " was"
 
-    assert events[7].name == "workflow.execution.fulfilled"
-    assert events[7].outputs == {
+    assert events[7].name == "workflow.execution.streaming"
+    assert events[7].output.is_streaming
+    assert events[7].output.name == "results"
+    assert events[7].output.delta == " hot"
+
+    assert events[8].name == "workflow.execution.streaming"
+    assert events[8].output.is_streaming
+    assert events[8].output.name == "text"
+    assert events[8].output.delta == " hot"
+
+    # Fulfilled events
+    assert events[9].name == "workflow.execution.streaming"
+    assert events[9].output.is_fulfilled
+    assert events[9].output.name == "results"
+    assert events[9].output.value == expected_outputs
+
+    assert events[10].name == "workflow.execution.streaming"
+    assert events[10].output.is_fulfilled
+    assert events[10].output.name == "text"
+    assert events[10].output.value == "It was hot"
+
+    assert events[11].name == "workflow.execution.fulfilled"
+    assert events[11].outputs == {
         "results": expected_outputs,
         "text": "It was hot",
     }
