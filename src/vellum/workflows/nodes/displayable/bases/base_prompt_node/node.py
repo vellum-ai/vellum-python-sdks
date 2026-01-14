@@ -129,6 +129,12 @@ class BasePromptNode(BaseNode[StateType], Generic[StateType]):
         if not isinstance(event.output.delta, str) and not event.output.is_initiated:
             return False
 
+        # Check if workflow output directly references this node's text output
+        if isinstance(workflow_output_descriptor.instance, BaseDescriptor):
+            if _contains_reference_to_output(workflow_output_descriptor.instance, event.node_definition.Outputs.text):
+                return True
+
+        # Check if workflow output references this node's text output through a FinalOutputNode
         target_nodes = [e.to_node for port in self.Ports for e in port.edges if e.to_node.__simulates_workflow_output__]
         target_node_output = next(
             (

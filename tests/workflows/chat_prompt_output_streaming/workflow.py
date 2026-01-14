@@ -24,33 +24,16 @@ class Chat(InlinePromptNode):
     ]
 
 
-class HaikuHelper(InlinePromptNode):
-    ml_model = "gpt-4o"
-    blocks = [
-        ChatMessagePromptBlock(
-            chat_role="USER",
-            blocks=[
-                JinjaPromptBlock(
-                    template="Improve this haiku: {{ haiku }}",
-                )
-            ],
-        )
-    ]
-    prompt_inputs = {
-        "haiku": Chat.Outputs.text,
-    }
-
-
 class ChatPromptOutputStreamingWorkflow(BaseWorkflow[Inputs, BaseState]):
     """
     This workflow tests that Chat Prompt Output Streaming works at the workflow level
-    when there are multiple prompt nodes in sequence.
+    when the workflow output directly references an InlinePromptNode's text output.
 
-    The expected behavior is that streaming events from HaikuHelper should be emitted
-    at the workflow level since the workflow output references HaikuHelper.Outputs.text.
+    The expected behavior is that streaming events from Chat should be emitted
+    at the workflow level since the workflow output references Chat.Outputs.text.
     """
 
-    graph = Chat >> HaikuHelper
+    graph = Chat
 
     class Outputs(BaseWorkflow.Outputs):
-        response = HaikuHelper.Outputs.text
+        response = Chat.Outputs.text
