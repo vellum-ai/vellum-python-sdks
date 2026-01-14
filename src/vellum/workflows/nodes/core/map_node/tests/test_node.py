@@ -1,6 +1,7 @@
 import datetime
 import threading
 import time
+from typing import Any, List, cast
 
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes import FinalOutputNode
@@ -71,6 +72,8 @@ def test_map_node__use_parallelism():
 
 
 def test_map_node__empty_list():
+    """Tests that a map node with an empty list returns an empty output."""
+
     # GIVEN a map node that is configured to use the parent's inputs and state
     @MapNode.wrap(items=[])
     class TestNode(BaseNode):
@@ -88,6 +91,38 @@ def test_map_node__empty_list():
     outputs = list(node.run())
 
     # THEN the node should return an empty output
+    fulfilled_output = outputs[-1]
+    assert fulfilled_output == BaseOutput(name="value", value=[])
+
+
+def test_map_node__none_items():
+    """Tests that a map node with None items treats it as an empty array and fulfills successfully."""
+
+    # GIVEN a map node with items set to None
+    class TestNode(BaseNode):
+        item = MapNode.SubworkflowInputs.item
+
+        class Outputs(BaseOutputs):
+            value: str
+
+        def run(self) -> Outputs:
+            return self.Outputs(value=str(self.item))
+
+    class TestSubworkflow(BaseWorkflow[MapNode.SubworkflowInputs, BaseState]):
+        graph = TestNode
+
+        class Outputs(BaseOutputs):
+            value = TestNode.Outputs.value
+
+    class TestMapNode(MapNode):
+        items = cast(List[Any], None)
+        subworkflow = TestSubworkflow
+
+    # WHEN the node is run
+    node = TestMapNode()
+    outputs = list(node.run())
+
+    # THEN the node should return an empty output without error
     fulfilled_output = outputs[-1]
     assert fulfilled_output == BaseOutput(name="value", value=[])
 
