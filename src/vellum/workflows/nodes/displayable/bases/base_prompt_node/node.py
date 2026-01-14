@@ -105,6 +105,13 @@ class BasePromptNode(BaseNode[StateType], Generic[StateType]):
                 raw_data=e.body,
             )
 
+        elif e.status_code and e.status_code == 429 and isinstance(e.body, dict):
+            raise NodeException(
+                message=e.body.get("detail", "Provider quota exceeded"),
+                code=WorkflowErrorCode.PROVIDER_QUOTA_EXCEEDED,
+                raw_data=e.body,
+            ) from e
+
         elif e.status_code and e.status_code >= 400 and e.status_code < 500 and isinstance(e.body, dict):
             raise NodeException(
                 message=e.body.get("detail", "Failed to execute Prompt"),
