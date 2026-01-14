@@ -916,6 +916,18 @@ class WorkflowRunner(Generic[StateType]):
             )
             worker_thread.start()
 
+    def _workflow_has_results_output_for_node(self, outputs_class: Type) -> bool:
+        """Check if the workflow has a 'results' output that references the given node's Outputs class."""
+        for workflow_output_descriptor in self.workflow.Outputs:
+            node_output_descriptor = workflow_output_descriptor.instance
+            if not isinstance(node_output_descriptor, OutputReference):
+                continue
+            if node_output_descriptor.outputs_class != outputs_class:
+                continue
+            if node_output_descriptor.name == "results":
+                return True
+        return False
+
     def _handle_work_item_event(self, event: WorkflowEvent) -> Optional[NodeExecutionRejectedEvent]:
         active_node = self._active_nodes_by_execution_id.get(event.span_id)
         if not active_node:
@@ -946,7 +958,22 @@ class WorkflowRunner(Generic[StateType]):
                     continue
                 if node_output_descriptor.outputs_class != event.node_definition.Outputs:
                     continue
-                if node_output_descriptor.name != event.output.name:
+
+                # Check if the workflow output references the same output as the streaming event,
+                # OR if the streaming event is for "results" and the workflow output references "text"
+                # (for prompt nodes that stream via "results" but expose a "text" output).
+                # We only do this for streaming/initiated events, not fulfilled events, since the
+                # text output is yielded separately by the node's run() method.
+                # We also check that there's no "results" output for the same node to avoid duplicate events.
+                output_name_matches = node_output_descriptor.name == event.output.name
+                text_output_from_results = (
+                    event.output.name == "results"
+                    and node_output_descriptor.name == "text"
+                    and hasattr(event.node_definition.Outputs, "text")
+                    and (event.output.is_streaming or event.output.is_initiated)
+                    and not self._workflow_has_results_output_for_node(event.node_definition.Outputs)
+                )
+                if not output_name_matches and not text_output_from_results:
                     continue
 
                 active_node.was_outputs_streamed = True
