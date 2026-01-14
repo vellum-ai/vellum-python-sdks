@@ -31,10 +31,6 @@ class BasePromptNode(BaseNode[StateType], Generic[StateType]):
     # Inputs that are passed to the Prompt
     prompt_inputs: ClassVar[Optional[EntityInputsInterface]] = None
 
-    # Whether to emit streaming events for text output when the workflow output directly references it.
-    # Set to False for nodes used in contexts where results streaming should be used instead (e.g., ToolCallingNode).
-    __emit_streaming_for_direct_text_output__: ClassVar[bool] = True
-
     request_options: Optional[RequestOptions] = None
 
     class Trigger(BaseNode.Trigger):
@@ -133,13 +129,14 @@ class BasePromptNode(BaseNode[StateType], Generic[StateType]):
         if not isinstance(event.output.delta, str) and not event.output.is_initiated:
             return False
 
-        # Check if workflow output directly references this node's text output.
-        # This is controlled by the __emit_streaming_for_direct_text_output__ class attribute.
-        if self.__emit_streaming_for_direct_text_output__:
-            text_output = getattr(event.node_definition.Outputs, "text", None)
-            if text_output is not None and isinstance(workflow_output_descriptor.instance, BaseDescriptor):
-                if _contains_reference_to_output(workflow_output_descriptor.instance, text_output):
-                    return True
+        # Check if workflow output directly references this node's text output
+        text_output = getattr(event.node_definition.Outputs, "text", None)
+        if text_output is None:
+            return False
+
+        if isinstance(workflow_output_descriptor.instance, BaseDescriptor):
+            if _contains_reference_to_output(workflow_output_descriptor.instance, text_output):
+                return True
 
         # Check if workflow output references this node's text output through a FinalOutputNode
         target_nodes = [e.to_node for port in self.Ports for e in port.edges if e.to_node.__simulates_workflow_output__]
@@ -158,4 +155,4 @@ class BasePromptNode(BaseNode[StateType], Generic[StateType]):
         if not isinstance(target_node_output.instance, BaseDescriptor):
             return False
 
-        return _contains_reference_to_output(target_node_output.instance, event.node_definition.Outputs.text)
+        return _contains_reference_to_output(target_node_output.instance, text_output)

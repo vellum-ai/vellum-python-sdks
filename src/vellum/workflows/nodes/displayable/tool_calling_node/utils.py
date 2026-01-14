@@ -94,9 +94,6 @@ class FunctionCallNodeMixin:
 class ToolPromptNode(InlinePromptNode[ToolCallingState]):
     max_prompt_iterations: Optional[int] = 25
 
-    # Disable direct text streaming because ToolCallingNode handles streaming via results
-    __emit_streaming_for_direct_text_output__ = False
-
     class Trigger(InlinePromptNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 
