@@ -131,11 +131,26 @@ class BasePromptNode(BaseNode[StateType], Generic[StateType]):
 
         # Check if workflow output directly references this node's text output
         text_output = getattr(event.node_definition.Outputs, "text", None)
-        if text_output is None:
-            return False
 
-        if isinstance(workflow_output_descriptor.instance, BaseDescriptor):
+        if text_output is not None and isinstance(workflow_output_descriptor.instance, BaseDescriptor):
             if _contains_reference_to_output(workflow_output_descriptor.instance, text_output):
+                # Check if the workflow is dynamic AND has a "results" output that references this node's results.
+                # If so, we should NOT return True here, to allow the runner to continue and emit
+                # "results" streaming events via the normal path (which ToolCallingNode needs).
+                # We only do this for dynamic workflows (like ToolCallingNode's internal AgentWorkflow)
+                # because user-defined workflows may explicitly want both text and results streaming events.
+                workflow_class = getattr(workflow_output_descriptor.outputs_class, "__parent_class__", None)
+                is_dynamic = getattr(workflow_class, "is_dynamic", False) if workflow_class else False
+                if is_dynamic:
+                    results_output = getattr(event.node_definition.Outputs, "results", None)
+                    if results_output is not None:
+                        workflow_has_results_output = any(
+                            isinstance(o.instance, BaseDescriptor)
+                            and _contains_reference_to_output(o.instance, results_output)
+                            for o in workflow_output_descriptor.outputs_class
+                        )
+                        if workflow_has_results_output:
+                            return False
                 return True
 
         # Check if workflow output references this node's text output through a FinalOutputNode
@@ -153,6 +168,9 @@ class BasePromptNode(BaseNode[StateType], Generic[StateType]):
             return False
 
         if not isinstance(target_node_output.instance, BaseDescriptor):
+            return False
+
+        if text_output is None:
             return False
 
         return _contains_reference_to_output(target_node_output.instance, text_output)

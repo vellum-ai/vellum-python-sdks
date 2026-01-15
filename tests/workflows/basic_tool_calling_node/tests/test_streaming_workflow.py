@@ -15,7 +15,7 @@ from tests.workflows.basic_tool_calling_node.workflow import BasicToolCallingNod
 
 def test_stream_workflow__happy_path(vellum_adhoc_prompt_client):
     """
-    Test that ToolCallingNode streams text updates as they become available.
+    Test that ToolCallingNode streams both text and chat_history updates as they become available.
     """
 
     # GIVEN a mock that returns function call on first invocation and streaming text on second
@@ -103,8 +103,27 @@ def test_stream_workflow__happy_path(vellum_adhoc_prompt_client):
         == "Based on the function call, the current temperature in San Francisco is 70 degrees celsius."
     )  # noqa: E501
 
-    # AND we should still receive chat_history fulfilled event
+    # AND we should receive chat_history streaming events with the correct content
     chat_history_events = [e for e in streaming_events if e.output.name == "chat_history"]
+    chat_history_streaming_events = [
+        event
+        for event in chat_history_events
+        if event.output.is_streaming
+        and isinstance(event.output.delta, list)
+        and len(event.output.delta) == 1
+        and event.output.delta[0].text is not None
+    ]
+    assert len(chat_history_streaming_events) == 3
+
+    # AND the chat_history streaming content should match our mocked deltas
+    delta_0 = chat_history_streaming_events[0].output.delta
+    delta_1 = chat_history_streaming_events[1].output.delta
+    delta_2 = chat_history_streaming_events[2].output.delta
+    assert isinstance(delta_0, list) and delta_0[0].text == "Based on the function call, "
+    assert isinstance(delta_1, list) and delta_1[0].text == "the current temperature in San Francisco "
+    assert isinstance(delta_2, list) and delta_2[0].text == "is 70 degrees celsius."
+
+    # AND we should receive chat_history fulfilled event
     chat_history_fulfilled = [e for e in chat_history_events if e.output.is_fulfilled]
     assert len(chat_history_fulfilled) == 1
     assert len(chat_history_fulfilled[0].output.value) == 3
