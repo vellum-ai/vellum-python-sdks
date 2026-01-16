@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, List, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, List, Optional, Union
 
 from vellum.client.types import (
     ArrayChatMessageContent,
@@ -133,9 +133,7 @@ class ChatMessageTrigger(BaseTrigger):
 
         return resolve_value(output, state)
 
-    @classmethod
-    def get_trigger_name(cls) -> str:
-        return "chat"
+    __trigger_name__: ClassVar[str] = "chat"
 
     class Display(BaseTrigger.Display):
         label: str = "Chat Message"

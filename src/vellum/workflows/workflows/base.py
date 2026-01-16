@@ -866,7 +866,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             - None: Returns workflow Inputs
             - UUID: Matches by trigger class __id__
             - str (valid UUID): Matches by trigger class __id__
-            - str (non-UUID): Matches by trigger name (from get_trigger_name())
+            - str (non-UUID): Matches by trigger name (from __trigger_name__)
 
         inputs: dict
             The inputs to pass to the trigger or Inputs constructor.
@@ -911,7 +911,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
                         ) from e
 
                 # Match by name
-                if trigger_name is not None and trigger_class.get_trigger_name() == trigger_name:
+                if trigger_name is not None and trigger_class.__trigger_name__ == trigger_name:
                     try:
                         return trigger_class(**inputs)
                     except Exception as e:
@@ -924,7 +924,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
 
         # Build helpful error message
         if trigger_name is not None:
-            available_names = [trigger_class.get_trigger_name() for trigger_class in trigger_classes]
+            available_names = [trigger_class.__trigger_name__ for trigger_class in trigger_classes]
             raise WorkflowInitializationException(
                 message=f"No trigger class found with name '{trigger_name}' in workflow {cls.__name__}. "
                 f"Available trigger names: {available_names}"

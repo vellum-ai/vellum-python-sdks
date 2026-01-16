@@ -468,19 +468,7 @@ class BaseTrigger(ABC, metaclass=BaseTriggerMeta):
             state.meta.trigger_attributes = {}
         state.meta.trigger_attributes.update(self.to_trigger_attribute_values())
 
-    @classmethod
-    def get_trigger_name(cls) -> str:
-        """
-        Get the name for this trigger class.
-
-        This name is used for serialization and for resolving triggers by name
-        in deserialize_trigger. Subclasses should override this method to provide
-        their specific trigger name.
-
-        Returns:
-            The trigger name string (e.g., "manual", "scheduled", "chat", or a slug for integration triggers)
-        """
-        return "trigger"
+    __trigger_name__: ClassVar[str] = "trigger"
 
     @classmethod
     def get_attribute_id(cls, attribute_name: str) -> UUID:

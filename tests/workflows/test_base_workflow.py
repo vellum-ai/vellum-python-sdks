@@ -363,8 +363,8 @@ def test_deserialize_trigger__returns_trigger_instance_when_trigger_name_matches
     """
 
     # GIVEN a workflow with a Slack trigger that has slug "slack_test"
-    # AND the trigger name from get_trigger_name()
-    trigger_name = TestSlackTrigger.get_trigger_name()
+    # AND the trigger name from __trigger_name__
+    trigger_name = TestSlackTrigger.__trigger_name__
 
     # WHEN we call deserialize_trigger with the trigger name
     result = WorkflowWithSlackTrigger.deserialize_trigger(

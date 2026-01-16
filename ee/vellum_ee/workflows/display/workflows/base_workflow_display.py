@@ -689,8 +689,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
 
             trigger_id = trigger_class.__id__
 
-            # Determine trigger name based on type
-            trigger_name = self._get_trigger_name(trigger_class, trigger_type)
+            # Determine trigger name from the trigger class's __trigger_name__ attribute
+            trigger_name = trigger_class.__trigger_name__
 
             # Validate that trigger names are unique
             if trigger_name in seen_trigger_names:
@@ -751,15 +751,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             serialized_triggers.append(trigger_data)
 
         return cast(JsonArray, serialized_triggers)
-
-    def _get_trigger_name(self, trigger_class: Type[BaseTrigger], trigger_type: WorkflowTriggerType) -> str:
-        """
-        Get the name for a trigger based on its type.
-
-        Delegates to the trigger class's get_trigger_name() method which is defined
-        on the SDK side (BaseTrigger and its subclasses).
-        """
-        return trigger_class.get_trigger_name()
 
     def _serialize_edge_display_data(self, edge_display: EdgeDisplay) -> Optional[JsonObject]:
         """Serialize edge display data, returning None if no display data is present."""

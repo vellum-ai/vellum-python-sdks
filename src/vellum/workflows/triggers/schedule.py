@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import ClassVar, Optional
 
 from vellum.workflows.triggers.base import BaseTrigger
 
@@ -17,6 +17,4 @@ class ScheduleTrigger(BaseTrigger):
         cron: str
         timezone: Optional[str] = None
 
-    @classmethod
-    def get_trigger_name(cls) -> str:
-        return "scheduled"
+    __trigger_name__: ClassVar[str] = "scheduled"

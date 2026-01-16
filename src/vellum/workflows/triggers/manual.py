@@ -1,3 +1,5 @@
+from typing import ClassVar
+
 from vellum.workflows.triggers.base import BaseTrigger
 
 
@@ -34,6 +36,4 @@ class ManualTrigger(BaseTrigger):
         - ManualTrigger: Executes when explicitly called
     """
 
-    @classmethod
-    def get_trigger_name(cls) -> str:
-        return "manual"
+    __trigger_name__: ClassVar[str] = "manual"
