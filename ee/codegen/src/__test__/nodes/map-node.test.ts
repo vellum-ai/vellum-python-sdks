@@ -194,7 +194,7 @@ describe("MapNode", () => {
         outputs: [
           {
             id: jsonOutputId,
-            key: "json",
+            name: "json",
             type: "JSON",
           },
         ],
