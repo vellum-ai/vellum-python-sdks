@@ -1,7 +1,6 @@
 import datetime
 import threading
 import time
-from typing import Any, List, cast
 
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes import FinalOutputNode
@@ -115,7 +114,6 @@ def test_map_node__none_items():
             value = TestNode.Outputs.value
 
     class TestMapNode(MapNode):
-        items = cast(List[Any], None)
         subworkflow = TestSubworkflow
 
     # WHEN the node is run

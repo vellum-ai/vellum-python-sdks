@@ -84,12 +84,7 @@ def test_serialize_workflow():
 
 
 def test_serialize_workflow__dynamic_field_reference_items():
-    """Tests that a map node with items set to a dynamic field reference serializes correctly.
-
-    Note: Currently, AccessorExpression (e.g., MyPromptNode.Outputs.json["items"]) is not fully
-    supported in the serialization layer for map node items. This test documents the current
-    behavior where the items input produces empty rules.
-    """
+    """Tests that a map node with items set to a dynamic field reference serializes correctly."""
 
     # GIVEN a prompt node with json output
     class MyPromptNode(InlinePromptNode):
@@ -132,13 +127,11 @@ def test_serialize_workflow__dynamic_field_reference_items():
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
     map_node = next(n for n in workflow_raw_data["nodes"] if n.get("type") == "MAP")
 
-    # AND the items input should be present
-    items_input = map_node["inputs"][0]
-    assert items_input["key"] == "items"
-
-    # AND the value should have empty rules (AccessorExpression serialization not yet supported)
-    # TODO: When AccessorExpression serialization is implemented, update this test to verify
-    # the BINARY_EXPRESSION with accessField operator is correctly serialized
-    items_value = items_input["value"]
-    assert items_value["rules"] == []
-    assert items_value["combinator"] == "OR"
+    # AND the attributes should contain the items with a BINARY_EXPRESSION
+    attributes = map_node["attributes"]
+    items_attribute = next(attr for attr in attributes if attr["name"] == "items")
+    items_value = items_attribute["value"]
+    assert items_value["type"] == "BINARY_EXPRESSION"
+    assert items_value["operator"] == "accessField"
+    assert items_value["rhs"]["type"] == "CONSTANT_VALUE"
+    assert items_value["rhs"]["value"]["value"] == "items"
