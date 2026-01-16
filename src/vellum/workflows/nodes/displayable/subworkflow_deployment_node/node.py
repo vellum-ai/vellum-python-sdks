@@ -88,9 +88,9 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
     def _add_compiled_input(
         self, compiled_inputs: List[WorkflowRequestInputRequest], input_name: str, input_value: Any
     ) -> None:
-        # Exclude inputs that resolved to be null. This ensure that we don't pass input values
+        # Exclude inputs that resolved to be null or undefined. This ensures that we don't pass input values
         # to optional subworkflow inputs whose values were unresolved.
-        if input_value is None:
+        if input_value is None or input_value is undefined:
             return
         if isinstance(input_value, str):
             compiled_inputs.append(
@@ -155,12 +155,12 @@ class SubworkflowDeploymentNode(BaseNode[StateType], Generic[StateType]):
         if isinstance(self.subworkflow_inputs, BaseInputs):
             inputs_dict = {}
             for input_descriptor, input_value in self.subworkflow_inputs:
-                if input_value is not None:
+                if input_value is not None and input_value is not undefined:
                     inputs_dict[input_descriptor.name] = input_value
             return inputs_class(**inputs_dict)
         else:
-            # Filter out None values for direct invocation
-            filtered_inputs = {k: v for k, v in self.subworkflow_inputs.items() if v is not None}
+            # Filter out None and undefined values for direct invocation
+            filtered_inputs = {k: v for k, v in self.subworkflow_inputs.items() if v is not None and v is not undefined}
             return inputs_class(**filtered_inputs)
 
     def _run_resolved_workflow(
