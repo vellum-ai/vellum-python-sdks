@@ -103,9 +103,9 @@ class RawEventsClient:
                 raise TooManyRequestsError(
                     headers=dict(_response.headers),
                     body=typing.cast(
-                        ErrorDetailResponse,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=ErrorDetailResponse,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     ),
@@ -198,9 +198,9 @@ class AsyncRawEventsClient:
                 raise TooManyRequestsError(
                     headers=dict(_response.headers),
                     body=typing.cast(
-                        ErrorDetailResponse,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=ErrorDetailResponse,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     ),
