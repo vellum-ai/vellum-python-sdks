@@ -239,13 +239,13 @@ def test_stream_workflow__happy_path(vellum_client):
     assert events[1].output.name == "results"
 
     assert events[2].name == "workflow.execution.streaming"
-    assert events[2].output.is_initiated
-    assert events[2].output.name == "text"
+    assert events[2].output.is_streaming
+    assert events[2].output.name == "results"
+    assert events[2].output.delta == "It"
 
     assert events[3].name == "workflow.execution.streaming"
-    assert events[3].output.is_streaming
-    assert events[3].output.name == "results"
-    assert events[3].output.delta == "It"
+    assert events[3].output.is_initiated
+    assert events[3].output.name == "text"
 
     assert events[4].name == "workflow.execution.streaming"
     assert events[4].output.is_streaming

@@ -134,6 +134,8 @@ class BasePromptDeploymentNode(BasePromptNode, Generic[StateType]):
                     continue
                 elif event.state == "STREAMING":
                     yield BaseOutput(name="results", delta=event.output.value)
+                    if event.output.type == "STRING":
+                        yield BaseOutput(name="text", delta=event.output.value)
                 elif event.state == "FULFILLED":
                     outputs = event.outputs
                     yield BaseOutput(name="results", value=event.outputs)
