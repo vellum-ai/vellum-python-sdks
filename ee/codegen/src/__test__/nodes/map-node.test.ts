@@ -4,7 +4,10 @@ import { join } from "path";
 import { afterEach, beforeEach } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
-import { mapNodeDataFactory } from "src/__test__/helpers/node-data-factories";
+import {
+  inlinePromptNodeDataInlineVariantFactory,
+  mapNodeDataFactory,
+} from "src/__test__/helpers/node-data-factories";
 import { stateVariableContextFactory } from "src/__test__/helpers/state-variable-context-factory";
 import { makeTempDir } from "src/__test__/helpers/temp-dir";
 import { createNodeContext } from "src/context";
@@ -169,6 +172,86 @@ describe("MapNode", () => {
       expect(content).toContain("MapNode[State, Any]");
       expect(content).toContain("from typing import Any");
       expect(content).toContain("from ...state import State");
+    });
+  });
+
+  describe("with node output accessor items", () => {
+    it(`should generate items with accessor like PromptNode.Outputs.json["foo"]`, async () => {
+      /**
+       * Tests that MapNode can generate an accessor expression for its items attribute
+       * using attributes with BINARY_EXPRESSION and accessField operator.
+       */
+
+      // GIVEN a workflow context
+      const workflowContext = workflowContextFactory({
+        absolutePathToOutputDirectory: tempDir,
+        moduleName: "code",
+      });
+
+      // AND a PromptNode with a json output
+      const jsonOutputId = "af576eaa-d39d-4c19-8992-1f01a65a709a";
+      const promptNodeData = inlinePromptNodeDataInlineVariantFactory({
+        outputs: [
+          {
+            id: jsonOutputId,
+            name: "json",
+            type: "JSON",
+          },
+        ],
+      }).build();
+      const promptNodeId = promptNodeData.id;
+
+      await createNodeContext({
+        workflowContext,
+        nodeData: promptNodeData,
+      });
+
+      // AND a MapNode with items attribute using BINARY_EXPRESSION with accessField operator
+      const nodeData = mapNodeDataFactory({
+        attributes: [
+          {
+            id: "f34872c2-5c0e-45a3-b204-3af22d1028d3",
+            name: "items",
+            value: {
+              type: "BINARY_EXPRESSION",
+              operator: "accessField",
+              lhs: {
+                type: "NODE_OUTPUT",
+                nodeId: promptNodeId,
+                nodeOutputId: jsonOutputId,
+              },
+              rhs: {
+                type: "CONSTANT_VALUE",
+                value: {
+                  type: "STRING",
+                  value: "foo",
+                },
+              },
+            },
+          },
+        ],
+      }).build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as MapNodeContext;
+
+      const node = new MapNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      // WHEN we persist the node
+      await node.persist();
+
+      // THEN the generated code should have the accessor expression
+      const content = await readFile(
+        join(tempDir, "code", "nodes", "map_node", "__init__.py"),
+        "utf-8"
+      );
+      expect(content).toMatchSnapshot();
+      expect(content).toContain('PromptNode.Outputs.json["foo"]');
     });
   });
 });

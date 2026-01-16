@@ -479,6 +479,7 @@ export function inlinePromptNodeDataInlineVariantFactory({
   settings,
   inputs,
   attributes,
+  outputs,
 }: {
   blockType?: string;
   errorOutputId?: string;
@@ -487,6 +488,7 @@ export function inlinePromptNodeDataInlineVariantFactory({
   settings?: PromptSettings;
   inputs?: NodeInput[];
   attributes?: NodeAttribute[];
+  outputs?: NodeOutput[];
 } = {}): NodeDataFactoryBuilder<PromptNode> {
   const block = defaultBlock ?? generateBlockGivenType(blockType ?? "JINJA");
   const nodeData: PromptNode = {
@@ -544,6 +546,7 @@ export function inlinePromptNodeDataInlineVariantFactory({
       },
     ],
     attributes,
+    outputs,
   };
   return new NodeDataFactoryBuilder<PromptNode>(nodeData);
 }
@@ -1647,12 +1650,32 @@ export function finalOutputNodeFactory({
 }
 
 export function mapNodeDataFactory({
+  items,
+  attributes,
   outputVariables,
 }: {
+  items?: NodeInput;
+  attributes?: NodeAttribute[];
   outputVariables?: VellumVariable[];
 } = {}): NodeDataFactoryBuilder<MapNode> {
   const entrypoint = entrypointNodeDataFactory();
   const templatingNode = templatingNodeFactory().build();
+  const defaultItemsInput: NodeInput = {
+    id: "f34872c2-5c0e-45a3-b204-3af22d1028d3",
+    key: "items",
+    value: {
+      rules: [
+        {
+          type: "CONSTANT_VALUE",
+          data: {
+            type: "JSON",
+            value: ["apple", "banana", "cherry"],
+          },
+        },
+      ],
+      combinator: "OR",
+    },
+  };
   const nodeData: MapNode = {
     id: "14fee4a0-ad25-402f-b942-104d3a5a0824",
     type: "MAP",
@@ -1694,24 +1717,8 @@ export function mapNodeDataFactory({
       itemInputId: "8e8f462c-8f07-4f5f-80dd-a33eb2cd6061",
       indexInputId: "95236886-08a8-4b38-8595-f330cb515698",
     },
-    inputs: [
-      {
-        id: "f34872c2-5c0e-45a3-b204-3af22d1028d3",
-        key: "items",
-        value: {
-          rules: [
-            {
-              type: "CONSTANT_VALUE",
-              data: {
-                type: "JSON",
-                value: ["apple", "banana", "cherry"],
-              },
-            },
-          ],
-          combinator: "OR",
-        },
-      },
-    ],
+    inputs: attributes ? [] : [items ?? defaultItemsInput],
+    attributes,
   };
   return new NodeDataFactoryBuilder<MapNode>(nodeData);
 }
