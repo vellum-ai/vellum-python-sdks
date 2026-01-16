@@ -1,6 +1,7 @@
 import pytest
 from datetime import datetime
 import json
+import unittest.mock
 from uuid import uuid4
 from typing import Any, Iterator, List
 
@@ -14,14 +15,17 @@ from vellum.client.types.workflow_output_string import WorkflowOutputString
 from vellum.client.types.workflow_request_chat_history_input_request import WorkflowRequestChatHistoryInputRequest
 from vellum.client.types.workflow_request_json_input_request import WorkflowRequestJsonInputRequest
 from vellum.client.types.workflow_request_number_input_request import WorkflowRequestNumberInputRequest
-from vellum.client.types.workflow_request_string_input_request import WorkflowRequestStringInputRequest
 from vellum.client.types.workflow_result_event import WorkflowResultEvent
 from vellum.client.types.workflow_stream_event import WorkflowStreamEvent
-from vellum.workflows.constants import undefined
 from vellum.workflows.context import execution_context
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
+from vellum.workflows.inputs.base import BaseInputs
+from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.displayable.subworkflow_deployment_node.node import SubworkflowDeploymentNode
+from vellum.workflows.state.base import BaseState
+from vellum.workflows.state.context import WorkflowContext
+from vellum.workflows.workflows.base import BaseWorkflow
 
 
 @pytest.mark.parametrize("ChatMessageClass", [ChatMessageRequest, ChatMessage])
@@ -497,59 +501,43 @@ def test_run_workflow__missing_required_input(vellum_client):
     assert exc_info.value.message == "Missing required input for 'my_var_1'"
 
 
-def test_run_workflow__undefined_input_filtered(vellum_client):
-    """Confirm that undefined input values are filtered out when compiling subworkflow inputs."""
+def test_run_workflow__resolved_workflow_path(vellum_client):
+    """Confirm that the resolved workflow path works correctly when pull API returns a workflow."""
 
-    # GIVEN a Subworkflow Deployment Node with an undefined input value
+    # GIVEN a subworkflow with a required input and an optional input with a default
+    class SubworkflowInputs(BaseInputs):
+        required_input: str
+        optional_input: str = "default_value"
+
+    class InnerNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result = SubworkflowInputs.required_input
+
+    class TestSubworkflow(BaseWorkflow[SubworkflowInputs, BaseState]):
+        graph = InnerNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            result = InnerNode.Outputs.result
+
+    # AND a Subworkflow Deployment Node that only provides the required input
     class ExampleSubworkflowDeploymentNode(SubworkflowDeploymentNode):
         deployment = "example_subworkflow_deployment"
         subworkflow_inputs = {
             "required_input": "hello",
-            "optional_input": undefined,
         }
 
-    # AND we know what the Subworkflow Deployment will respond with
-    def generate_subworkflow_events(*args: Any, **kwargs: Any) -> Iterator[WorkflowStreamEvent]:
-        execution_id = str(uuid4())
-        expected_events: List[WorkflowStreamEvent] = [
-            WorkflowExecutionWorkflowResultEvent(
-                execution_id=execution_id,
-                data=WorkflowResultEvent(
-                    id=str(uuid4()),
-                    state="INITIATED",
-                    ts=datetime.now(),
-                ),
-            ),
-            WorkflowExecutionWorkflowResultEvent(
-                execution_id=execution_id,
-                data=WorkflowResultEvent(
-                    id=str(uuid4()),
-                    state="FULFILLED",
-                    ts=datetime.now(),
-                    outputs=[
-                        WorkflowOutputString(
-                            id=str(uuid4()),
-                            name="result",
-                            value="success",
-                        )
-                    ],
-                ),
-            ),
-        ]
-        yield from expected_events
+    # AND we mock resolve_workflow_deployment to return our test workflow
+    # This simulates the scenario where the pull API successfully returns a workflow
+    with unittest.mock.patch.object(
+        WorkflowContext, "resolve_workflow_deployment", return_value=(TestSubworkflow, None)
+    ):
+        # WHEN we run the node
+        node = ExampleSubworkflowDeploymentNode()
+        events = list(node.run())
 
-    vellum_client.execute_workflow_stream.side_effect = generate_subworkflow_events
-
-    # WHEN we run the node
-    node = ExampleSubworkflowDeploymentNode()
-    events = list(node.run())
-
-    # THEN the node should have completed successfully
+    # THEN the node should have completed successfully using the resolved workflow path
     assert events[-1].name == "result"
-    assert events[-1].value == "success"
+    assert events[-1].value == "hello"
 
-    # AND the undefined input should be filtered out from the API call
-    call_kwargs = vellum_client.execute_workflow_stream.call_args.kwargs
-    assert call_kwargs["inputs"] == [
-        WorkflowRequestStringInputRequest(name="required_input", value="hello"),
-    ]
+    # AND execute_workflow_stream should NOT have been called (we used the resolved path)
+    vellum_client.execute_workflow_stream.assert_not_called()

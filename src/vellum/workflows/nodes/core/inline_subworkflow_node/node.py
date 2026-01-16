@@ -152,15 +152,10 @@ class InlineSubworkflowNode(
                 inputs_dict = {}
                 for descriptor in inputs_class:
                     if hasattr(self, descriptor.name):
-                        value = getattr(self, descriptor.name)
-                        # Filter out undefined values to allow optional inputs to use their defaults
-                        if value is not undefined:
-                            inputs_dict[descriptor.name] = value
+                        inputs_dict[descriptor.name] = getattr(self, descriptor.name)
                 return inputs_class(**inputs_dict)
             elif isinstance(self.subworkflow_inputs, dict):
-                # Filter out undefined values to allow optional inputs to use their defaults
-                filtered_inputs = {k: v for k, v in self.subworkflow_inputs.items() if v is not undefined}
-                return inputs_class(**filtered_inputs)
+                return inputs_class(**self.subworkflow_inputs)
             elif isinstance(self.subworkflow_inputs, inputs_class):
                 return self.subworkflow_inputs
             else:

@@ -1,6 +1,5 @@
 import pytest
 
-from vellum.workflows.constants import undefined
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
@@ -179,38 +178,3 @@ def test_inline_subworkflow_node__is_dynamic_subworkflow():
 
     assert initiated_events[0].body.workflow_definition.is_dynamic is False  # Main workflow
     assert initiated_events[1].body.workflow_definition.is_dynamic is True  # Inline workflow
-
-
-def test_inline_subworkflow_node__undefined_input_filtered():
-    """Test that undefined input values are filtered out when compiling subworkflow inputs."""
-
-    # GIVEN a subworkflow with a required input and an optional input with a default
-    class SubworkflowInputs(BaseInputs):
-        required_input: str
-        optional_input: str = "default_value"
-
-    class InnerNode(BaseNode):
-        class Outputs(BaseNode.Outputs):
-            result = SubworkflowInputs.required_input
-
-    class TestSubworkflow(BaseWorkflow[SubworkflowInputs, BaseState]):
-        graph = InnerNode
-
-        class Outputs(BaseWorkflow.Outputs):
-            result = InnerNode.Outputs.result
-
-    # AND a node that passes an undefined value for the optional input
-    class TestNode(InlineSubworkflowNode):
-        subworkflow = TestSubworkflow
-        subworkflow_inputs = {
-            "required_input": "hello",
-            "optional_input": undefined,
-        }
-
-    # WHEN we run the node
-    node = TestNode()
-    events = list(node.run())
-
-    # THEN the node should complete successfully using the default value for optional_input
-    assert events[-1].name == "result"
-    assert events[-1].value == "hello"
