@@ -13,6 +13,8 @@ class IntegrationTriggerMeta(BaseTriggerMeta):
     This metaclass extends BaseTriggerMeta to automatically convert type annotations
     into TriggerAttributeReference objects during class creation. This enables trigger
     attributes to be referenced in workflow graphs while maintaining type safety.
+
+    It also sets __trigger_name__ based on Config.slug for trigger name resolution.
     """
 
     def __new__(mcs, name: str, bases: tuple, namespace: dict, **kwargs: Any) -> "IntegrationTriggerMeta":
@@ -35,6 +37,16 @@ class IntegrationTriggerMeta(BaseTriggerMeta):
                 )
                 # Set as class attribute so it's directly accessible
                 setattr(cls, attr_name, reference)
+
+        # Set __trigger_name__ based on Config.slug if available
+        if has_config:
+            config_class = namespace.get("Config")
+            if config_class is not None:
+                slug = getattr(config_class, "slug", None)
+                if slug:
+                    cls.__trigger_name__ = str(slug)
+                else:
+                    cls.__trigger_name__ = "integration"
 
         return cls
 

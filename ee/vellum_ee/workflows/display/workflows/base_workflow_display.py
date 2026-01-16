@@ -689,8 +689,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
 
             trigger_id = trigger_class.__id__
 
-            # Determine trigger name based on type
-            trigger_name = self._get_trigger_name(trigger_class, trigger_type)
+            # Determine trigger name from the trigger class's __trigger_name__ attribute
+            trigger_name = trigger_class.__trigger_name__
 
             # Validate that trigger names are unique
             if trigger_name in seen_trigger_names:
@@ -751,28 +751,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             serialized_triggers.append(trigger_data)
 
         return cast(JsonArray, serialized_triggers)
-
-    def _get_trigger_name(self, trigger_class: Type[BaseTrigger], trigger_type: WorkflowTriggerType) -> str:
-        """
-        Get the name for a trigger based on its type.
-
-        Chat triggers use 'chat', scheduled triggers use 'scheduled',
-        and integration triggers use the slug from their Config.
-        """
-        if trigger_type == WorkflowTriggerType.CHAT_MESSAGE:
-            return "chat"
-        elif trigger_type == WorkflowTriggerType.SCHEDULED:
-            return "scheduled"
-        elif trigger_type == WorkflowTriggerType.INTEGRATION and issubclass(trigger_class, IntegrationTrigger):
-            config_class = trigger_class.Config
-            slug = getattr(config_class, "slug", None)
-            if slug:
-                return str(slug)
-            return "integration"
-        elif trigger_type == WorkflowTriggerType.MANUAL:
-            return "manual"
-        else:
-            return "trigger"
 
     def _serialize_edge_display_data(self, edge_display: EdgeDisplay) -> Optional[JsonObject]:
         """Serialize edge display data, returning None if no display data is present."""

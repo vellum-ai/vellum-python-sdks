@@ -468,6 +468,8 @@ class BaseTrigger(ABC, metaclass=BaseTriggerMeta):
             state.meta.trigger_attributes = {}
         state.meta.trigger_attributes.update(self.to_trigger_attribute_values())
 
+    __trigger_name__: ClassVar[str] = "trigger"
+
     @classmethod
     def get_attribute_id(cls, attribute_name: str) -> UUID:
         """
