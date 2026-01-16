@@ -939,7 +939,7 @@ class WorkflowRunner(Generic[StateType]):
                             )
                         )
                     )
-                    return None
+                    continue
 
                 node_output_descriptor = workflow_output_descriptor.instance
                 if not isinstance(node_output_descriptor, OutputReference):
