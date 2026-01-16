@@ -17,6 +17,7 @@ _MapNodeType = TypeVar("_MapNodeType", bound=MapNode)
 
 class BaseMapNodeDisplay(BaseAdornmentNodeDisplay[_MapNodeType], Generic[_MapNodeType]):
     __serializable_inputs__ = {MapNode.items}  # type: ignore[misc]
+    __unserializable_attributes__ = {MapNode.subworkflow, MapNode.max_concurrency}  # type: ignore[misc]
 
     def serialize(
         self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **_kwargs
@@ -89,6 +90,7 @@ class BaseMapNodeDisplay(BaseAdornmentNodeDisplay[_MapNodeType], Generic[_MapNod
                 "item_input_id": item_workflow_input_id,
                 "index_input_id": index_workflow_input_id,
             },
+            "attributes": self._serialize_attributes(display_context),
             **self.serialize_generic_fields(display_context, exclude=["outputs"]),
         }
 

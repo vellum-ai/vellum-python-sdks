@@ -69,23 +69,24 @@ class MapNode(BaseAdornmentNode[StateType], Generic[StateType, MapNodeItemType])
 
     def run(self) -> Iterator[BaseOutput]:
         mapped_items: Dict[str, List] = defaultdict(list)
+        items = self.items or []
         for output_descripter in self.subworkflow.Outputs:
-            mapped_items[output_descripter.name] = [None] * len(self.items)
+            mapped_items[output_descripter.name] = [None] * len(items)
 
-        if not self.items:
+        if not items:
             for output_name, output_list in mapped_items.items():
                 yield BaseOutput(name=output_name, value=output_list)
             return
 
         self._event_queue: Queue[Tuple[int, WorkflowEvent]] = Queue()
-        fulfilled_iterations: List[bool] = [False] * len(self.items)
+        fulfilled_iterations: List[bool] = [False] * len(items)
 
-        max_workers = self.max_concurrency if self.max_concurrency is not None else len(self.items)
+        max_workers = self.max_concurrency if self.max_concurrency is not None else len(items)
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
             futures = []
             current_execution_context = get_execution_context()
-            for index, item in enumerate(self.items):
+            for index, item in enumerate(items):
                 future = executor.submit(
                     self._context_run_subworkflow,
                     item=item,

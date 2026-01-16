@@ -1,5 +1,11 @@
 from deepdiff import DeepDiff
 
+from vellum.workflows import BaseWorkflow
+from vellum.workflows.nodes import MapNode
+from vellum.workflows.nodes.bases import BaseNode
+from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
+from vellum.workflows.outputs import BaseOutputs
+from vellum.workflows.state.base import BaseState
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 from tests.workflows.basic_map_node.workflow import SimpleMapExample
@@ -75,3 +81,57 @@ def test_serialize_workflow():
     # AND the map node's items input ID should match the subworkflow's items input ID
     items_input_id = map_node["data"]["items_input_id"]
     assert map_node["inputs"][0]["id"] == items_input_id
+
+
+def test_serialize_workflow__dynamic_field_reference_items():
+    """Tests that a map node with items set to a dynamic field reference serializes correctly."""
+
+    # GIVEN a prompt node with json output
+    class MyPromptNode(InlinePromptNode):
+        ml_model = "gpt-4o"
+        blocks = []
+
+    # AND a simple subworkflow for the map node
+    class IterationNode(BaseNode):
+        item = MapNode.SubworkflowInputs.item
+
+        class Outputs(BaseOutputs):
+            value: str
+
+        def run(self) -> Outputs:
+            return self.Outputs(value=str(self.item))
+
+    class IterationSubworkflow(BaseWorkflow[MapNode.SubworkflowInputs, BaseState]):
+        graph = IterationNode
+
+        class Outputs(BaseOutputs):
+            value = IterationNode.Outputs.value
+
+    # AND a map node with items set to a dynamic field reference
+    class DynamicItemsMapNode(MapNode):
+        items = MyPromptNode.Outputs.json["items"]
+        subworkflow = IterationSubworkflow
+
+    # AND a workflow using these nodes
+    class DynamicFieldReferenceWorkflow(BaseWorkflow):
+        graph = MyPromptNode >> DynamicItemsMapNode
+
+        class Outputs(BaseOutputs):
+            result = DynamicItemsMapNode.Outputs.value
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=DynamicFieldReferenceWorkflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the map node should be serialized
+    workflow_raw_data = serialized_workflow["workflow_raw_data"]
+    map_node = next(n for n in workflow_raw_data["nodes"] if n.get("type") == "MAP")
+
+    # AND the attributes should contain the items with a BINARY_EXPRESSION
+    attributes = map_node["attributes"]
+    items_attribute = next(attr for attr in attributes if attr["name"] == "items")
+    items_value = items_attribute["value"]
+    assert items_value["type"] == "BINARY_EXPRESSION"
+    assert items_value["operator"] == "accessField"
+    assert items_value["rhs"]["type"] == "CONSTANT_VALUE"
+    assert items_value["rhs"]["value"]["value"] == "items"
