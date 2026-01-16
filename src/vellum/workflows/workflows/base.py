@@ -850,7 +850,9 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         return state_class(**state)
 
     @classmethod
-    def deserialize_trigger(cls, trigger_id: Optional[UUID], inputs: dict) -> Union[InputsType, BaseTrigger]:
+    def deserialize_trigger(
+        cls, trigger_id: Optional[Union[str, UUID]], inputs: dict
+    ) -> Union[InputsType, BaseTrigger]:
         """
         Deserialize a trigger from a trigger_id and inputs dict.
 
@@ -859,8 +861,12 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
 
         Parameters
         ----------
-        trigger_id: Optional[UUID]
-            The UUID of the trigger class to instantiate. If None, returns workflow Inputs.
+        trigger_id: Optional[Union[str, UUID]]
+            The identifier of the trigger class to instantiate. Can be:
+            - None: Returns workflow Inputs
+            - UUID: Matches by trigger class __id__
+            - str (valid UUID): Matches by trigger class __id__
+            - str (non-UUID): Matches by trigger name (from get_trigger_name())
 
         inputs: dict
             The inputs to pass to the trigger or Inputs constructor.
@@ -880,10 +886,32 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             inputs_class = cls.get_inputs_class()
             return inputs_class(**inputs)
 
+        # Determine if trigger_id is a UUID or a name string
+        resolved_trigger_id: Optional[UUID] = None
+        trigger_name: Optional[str] = None
+
+        if isinstance(trigger_id, UUID):
+            resolved_trigger_id = trigger_id
+        elif is_valid_uuid(trigger_id):
+            resolved_trigger_id = UUID(trigger_id)
+        else:
+            trigger_name = trigger_id
+
         trigger_classes = []
         for subgraph in cls.get_subgraphs():
             for trigger_class in subgraph.triggers:
-                if trigger_class.__id__ == trigger_id:
+                # Match by UUID
+                if resolved_trigger_id is not None and trigger_class.__id__ == resolved_trigger_id:
+                    try:
+                        return trigger_class(**inputs)
+                    except Exception as e:
+                        raise WorkflowInitializationException(
+                            message=f"Failed to instantiate trigger {trigger_class.__name__}: {e}",
+                            workflow_definition=cls,
+                        ) from e
+
+                # Match by name
+                if trigger_name is not None and trigger_class.get_trigger_name() == trigger_name:
                     try:
                         return trigger_class(**inputs)
                     except Exception as e:
@@ -894,10 +922,18 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
 
                 trigger_classes.append(trigger_class)
 
-        raise WorkflowInitializationException(
-            message=f"No trigger class found with id {trigger_id} in workflow {cls.__name__}. "
-            f"Available trigger classes: {[trigger_class.__name__ for trigger_class in trigger_classes]}"
-        )
+        # Build helpful error message
+        if trigger_name is not None:
+            available_names = [trigger_class.get_trigger_name() for trigger_class in trigger_classes]
+            raise WorkflowInitializationException(
+                message=f"No trigger class found with name '{trigger_name}' in workflow {cls.__name__}. "
+                f"Available trigger names: {available_names}"
+            )
+        else:
+            raise WorkflowInitializationException(
+                message=f"No trigger class found with id {trigger_id} in workflow {cls.__name__}. "
+                f"Available trigger classes: {[trigger_class.__name__ for trigger_class in trigger_classes]}"
+            )
 
     @staticmethod
     def load_from_module(module_path: str) -> Type["BaseWorkflow"]:

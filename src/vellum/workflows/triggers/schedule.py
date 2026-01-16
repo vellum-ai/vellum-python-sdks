@@ -16,3 +16,7 @@ class ScheduleTrigger(BaseTrigger):
     class Config:
         cron: str
         timezone: Optional[str] = None
+
+    @classmethod
+    def get_trigger_name(cls) -> str:
+        return "scheduled"

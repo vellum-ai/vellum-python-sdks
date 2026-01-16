@@ -133,6 +133,10 @@ class ChatMessageTrigger(BaseTrigger):
 
         return resolve_value(output, state)
 
+    @classmethod
+    def get_trigger_name(cls) -> str:
+        return "chat"
+
     class Display(BaseTrigger.Display):
         label: str = "Chat Message"
         icon: Optional[str] = "vellum:icon:message-dots"

@@ -355,3 +355,82 @@ def test_deserialize_trigger__raises_workflow_initialization_exception_when_trig
     # AND the error message should mention the trigger class name
     assert "Failed to instantiate trigger" in str(exc_info.value)
     assert "FailingConstructorTrigger" in str(exc_info.value)
+
+
+def test_deserialize_trigger__returns_trigger_instance_when_trigger_name_matches():
+    """
+    Tests that deserialize_trigger returns trigger instance when trigger_name (non-UUID string) matches.
+    """
+
+    # GIVEN a workflow with a Slack trigger that has slug "slack_test"
+    # AND the trigger name from get_trigger_name()
+    trigger_name = TestSlackTrigger.get_trigger_name()
+
+    # WHEN we call deserialize_trigger with the trigger name
+    result = WorkflowWithSlackTrigger.deserialize_trigger(
+        trigger_id=trigger_name, inputs={"message": "Hello by name", "channel": "#general"}
+    )
+
+    # THEN it should return the correct trigger instance
+    assert isinstance(result, TestSlackTrigger)
+
+    # AND the trigger should have the correct attributes
+    assert result.message == "Hello by name"
+    assert result.channel == "#general"
+
+
+def test_deserialize_trigger__returns_trigger_instance_when_uuid_string_matches():
+    """
+    Tests that deserialize_trigger returns trigger instance when trigger_id is a UUID string.
+    """
+
+    # GIVEN a workflow with a Slack trigger
+    # AND the trigger ID as a string
+    trigger_id_str = str(TestSlackTrigger.__id__)
+
+    # WHEN we call deserialize_trigger with the UUID string
+    result = WorkflowWithSlackTrigger.deserialize_trigger(
+        trigger_id=trigger_id_str, inputs={"message": "Hello by UUID string", "channel": "#test"}
+    )
+
+    # THEN it should return the correct trigger instance
+    assert isinstance(result, TestSlackTrigger)
+
+    # AND the trigger should have the correct attributes
+    assert result.message == "Hello by UUID string"
+    assert result.channel == "#test"
+
+
+def test_deserialize_trigger__returns_manual_trigger_by_name():
+    """
+    Tests that deserialize_trigger returns ManualTrigger when trigger_name is "manual".
+    """
+
+    # GIVEN a workflow with multiple triggers including ManualTrigger
+    # WHEN we call deserialize_trigger with the name "manual"
+    result = WorkflowWithMultipleTriggers.deserialize_trigger(trigger_id="manual", inputs={})
+
+    # THEN it should return a ManualTrigger instance
+    assert isinstance(result, ManualTrigger)
+
+
+def test_deserialize_trigger__raises_error_when_trigger_name_not_found():
+    """
+    Tests that deserialize_trigger raises WorkflowInitializationException when trigger_name doesn't match.
+    """
+
+    # GIVEN a workflow with a Slack trigger
+    # AND a non-existent trigger name
+    non_existent_name = "non_existent_trigger"
+
+    # WHEN we call deserialize_trigger with the non-existent name
+    # THEN it should raise WorkflowInitializationException
+    with pytest.raises(WorkflowInitializationException) as exc_info:
+        WorkflowWithSlackTrigger.deserialize_trigger(trigger_id=non_existent_name, inputs={"message": "test"})
+
+    # AND the error message should mention the trigger name
+    assert "No trigger class found with name" in str(exc_info.value)
+    assert non_existent_name in str(exc_info.value)
+
+    # AND the error message should list available trigger names
+    assert "Available trigger names" in str(exc_info.value)

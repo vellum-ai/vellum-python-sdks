@@ -34,4 +34,6 @@ class ManualTrigger(BaseTrigger):
         - ManualTrigger: Executes when explicitly called
     """
 
-    pass
+    @classmethod
+    def get_trigger_name(cls) -> str:
+        return "manual"

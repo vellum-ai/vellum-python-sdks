@@ -162,6 +162,19 @@ class IntegrationTrigger(BaseTrigger, ABC, metaclass=IntegrationTriggerMeta):
         for key, value in kwargs.items():
             setattr(self, key, value)
 
+    @classmethod
+    def get_trigger_name(cls) -> str:
+        """
+        Get the name for this integration trigger.
+
+        Returns the slug from the Config class if available, otherwise "integration".
+        """
+        config_class = cls.Config
+        slug = getattr(config_class, "slug", None)
+        if slug:
+            return str(slug)
+        return "integration"
+
     def to_trigger_attribute_values(self) -> Dict["TriggerAttributeReference[Any]", Any]:
         """
         Materialize attribute descriptor/value pairs for this trigger instance.
