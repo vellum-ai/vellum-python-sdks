@@ -9,6 +9,7 @@ import { Reference } from "src/generators/extensions/reference";
 import { TypeReference } from "src/generators/extensions/type-reference";
 import { UuidInstantiation } from "src/generators/extensions/uuid-instantiation";
 import { BaseNestedWorkflowNode } from "src/generators/nodes/bases/nested-workflow-base";
+import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { WorkflowProjectGenerator } from "src/project";
 import { MapNode as MapNodeType, WorkflowRawData } from "src/types/vellum";
 
@@ -52,13 +53,32 @@ export class MapNode extends BaseNestedWorkflowNode<
   getNodeClassBodyStatements(): AstNode[] {
     const statements: AstNode[] = [];
 
-    const items = this.getNodeInputByName("items");
-    if (items) {
-      const itemsField = new Field({
-        name: "items",
-        initializer: items,
-      });
-      statements.push(itemsField);
+    // Check for items attribute first (supports accessor patterns like PromptNode.Outputs.json["foo"])
+    const itemsAttr = this.nodeData.attributes?.find(
+      (attr) => attr.name === "items"
+    );
+
+    if (itemsAttr) {
+      statements.push(
+        new Field({
+          name: "items",
+          initializer: new WorkflowValueDescriptor({
+            nodeContext: this.nodeContext,
+            workflowContext: this.workflowContext,
+            workflowValueDescriptor: itemsAttr.value,
+          }),
+        })
+      );
+    } else {
+      // Fall back to legacy input-based items
+      const items = this.getNodeInputByName("items");
+      if (items) {
+        const itemsField = new Field({
+          name: "items",
+          initializer: items,
+        });
+        statements.push(itemsField);
+      }
     }
 
     const nestedWorkflowContext = this.getNestedWorkflowContextByName(

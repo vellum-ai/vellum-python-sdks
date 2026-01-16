@@ -106,7 +106,7 @@ class MapNode(BaseMapNode):
 "
 `;
 
-exports[`MapNode > with node output items > should generate items referencing another node's output 1`] = `
+exports[`MapNode > with node output accessor items > should generate items with accessor like PromptNode.Outputs.json["foo"] 1`] = `
 "from vellum.workflows.nodes.displayable import MapNode as BaseMapNode
 
 from .workflow import MapNodeWorkflow
@@ -114,7 +114,7 @@ from ..prompt_node import PromptNode
 
 
 class MapNode(BaseMapNode):
-    items = PromptNode.Outputs.text
+    items = PromptNode.Outputs.json["foo"]
     subworkflow = MapNodeWorkflow
     max_concurrency = 4
 "

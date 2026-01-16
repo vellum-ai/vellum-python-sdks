@@ -175,11 +175,11 @@ describe("MapNode", () => {
     });
   });
 
-  describe("with node output items", () => {
-    it(`should generate items referencing another node's output`, async () => {
+  describe("with node output accessor items", () => {
+    it(`should generate items with accessor like PromptNode.Outputs.json["foo"]`, async () => {
       /**
-       * Tests that MapNode can reference another node's output for its items attribute.
-       * This demonstrates the foundation for accessor patterns like PromptNode.Outputs.json["foo"].
+       * Tests that MapNode can generate an accessor expression for its items attribute
+       * using attributes with BINARY_EXPRESSION and accessField operator.
        */
 
       // GIVEN a workflow context
@@ -188,34 +188,48 @@ describe("MapNode", () => {
         moduleName: "code",
       });
 
-      // AND a PromptNode with an output
-      const promptNodeData = inlinePromptNodeDataInlineVariantFactory().build();
+      // AND a PromptNode with a json output
+      const jsonOutputId = "af576eaa-d39d-4c19-8992-1f01a65a709a";
+      const promptNodeData = inlinePromptNodeDataInlineVariantFactory({
+        outputs: [
+          {
+            id: jsonOutputId,
+            key: "json",
+            type: "JSON",
+          },
+        ],
+      }).build();
       const promptNodeId = promptNodeData.id;
-      const promptNodeOutputId = promptNodeData.data.outputId;
 
       await createNodeContext({
         workflowContext,
         nodeData: promptNodeData,
       });
 
-      // AND a MapNode with items referencing the PromptNode's output
+      // AND a MapNode with items attribute using BINARY_EXPRESSION with accessField operator
       const nodeData = mapNodeDataFactory({
-        items: {
-          id: "f34872c2-5c0e-45a3-b204-3af22d1028d3",
-          key: "items",
-          value: {
-            rules: [
-              {
+        attributes: [
+          {
+            id: "f34872c2-5c0e-45a3-b204-3af22d1028d3",
+            name: "items",
+            value: {
+              type: "BINARY_EXPRESSION",
+              operator: "accessField",
+              lhs: {
                 type: "NODE_OUTPUT",
-                data: {
-                  nodeId: promptNodeId,
-                  outputId: promptNodeOutputId,
+                nodeId: promptNodeId,
+                nodeOutputId: jsonOutputId,
+              },
+              rhs: {
+                type: "CONSTANT_VALUE",
+                value: {
+                  type: "STRING",
+                  value: "foo",
                 },
               },
-            ],
-            combinator: "OR",
+            },
           },
-        },
+        ],
       }).build();
 
       const nodeContext = (await createNodeContext({
@@ -231,13 +245,13 @@ describe("MapNode", () => {
       // WHEN we persist the node
       await node.persist();
 
-      // THEN the generated code should reference the PromptNode's output
+      // THEN the generated code should have the accessor expression
       const content = await readFile(
         join(tempDir, "code", "nodes", "map_node", "__init__.py"),
         "utf-8"
       );
       expect(content).toMatchSnapshot();
-      expect(content).toContain("PromptNode.Outputs.text");
+      expect(content).toContain('PromptNode.Outputs.json["foo"]');
     });
   });
 });
