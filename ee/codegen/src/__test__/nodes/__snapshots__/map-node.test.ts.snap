@@ -106,6 +106,20 @@ class MapNode(BaseMapNode):
 "
 `;
 
+exports[`MapNode > with node output items > should generate items referencing another node's output 1`] = `
+"from vellum.workflows.nodes.displayable import MapNode as BaseMapNode
+
+from .workflow import MapNodeWorkflow
+from ..prompt_node import PromptNode
+
+
+class MapNode(BaseMapNode):
+    items = PromptNode.Outputs.text
+    subworkflow = MapNodeWorkflow
+    max_concurrency = 4
+"
+`;
+
 exports[`MapNode > with state > map node file with state should include second generic type parameter 1`] = `
 "from typing import Any
 

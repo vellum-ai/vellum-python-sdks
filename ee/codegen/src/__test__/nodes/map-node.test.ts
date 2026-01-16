@@ -4,7 +4,10 @@ import { join } from "path";
 import { afterEach, beforeEach } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
-import { mapNodeDataFactory } from "src/__test__/helpers/node-data-factories";
+import {
+  inlinePromptNodeDataInlineVariantFactory,
+  mapNodeDataFactory,
+} from "src/__test__/helpers/node-data-factories";
 import { stateVariableContextFactory } from "src/__test__/helpers/state-variable-context-factory";
 import { makeTempDir } from "src/__test__/helpers/temp-dir";
 import { createNodeContext } from "src/context";
@@ -169,6 +172,72 @@ describe("MapNode", () => {
       expect(content).toContain("MapNode[State, Any]");
       expect(content).toContain("from typing import Any");
       expect(content).toContain("from ...state import State");
+    });
+  });
+
+  describe("with node output items", () => {
+    it(`should generate items referencing another node's output`, async () => {
+      /**
+       * Tests that MapNode can reference another node's output for its items attribute.
+       * This demonstrates the foundation for accessor patterns like PromptNode.Outputs.json["foo"].
+       */
+
+      // GIVEN a workflow context
+      const workflowContext = workflowContextFactory({
+        absolutePathToOutputDirectory: tempDir,
+        moduleName: "code",
+      });
+
+      // AND a PromptNode with an output
+      const promptNodeData = inlinePromptNodeDataInlineVariantFactory().build();
+      const promptNodeId = promptNodeData.id;
+      const promptNodeOutputId = promptNodeData.data.outputId;
+
+      await createNodeContext({
+        workflowContext,
+        nodeData: promptNodeData,
+      });
+
+      // AND a MapNode with items referencing the PromptNode's output
+      const nodeData = mapNodeDataFactory({
+        items: {
+          id: "f34872c2-5c0e-45a3-b204-3af22d1028d3",
+          key: "items",
+          value: {
+            rules: [
+              {
+                type: "NODE_OUTPUT",
+                data: {
+                  nodeId: promptNodeId,
+                  outputId: promptNodeOutputId,
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+      }).build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as MapNodeContext;
+
+      const node = new MapNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      // WHEN we persist the node
+      await node.persist();
+
+      // THEN the generated code should reference the PromptNode's output
+      const content = await readFile(
+        join(tempDir, "code", "nodes", "map_node", "__init__.py"),
+        "utf-8"
+      );
+      expect(content).toMatchSnapshot();
+      expect(content).toContain("PromptNode.Outputs.text");
     });
   });
 });
