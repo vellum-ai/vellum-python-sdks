@@ -85,6 +85,8 @@ class BasePromptNode(BaseNode[StateType], Generic[StateType]):
                 continue
             elif event.state == "STREAMING":
                 yield BaseOutput(name="results", delta=event.output.value)
+                if event.output.type == "STRING":
+                    yield BaseOutput(name="text", delta=event.output.value)
             elif event.state == "FULFILLED":
                 outputs = event.outputs
                 yield BaseOutput(name="results", value=event.outputs)
@@ -123,12 +125,24 @@ class BasePromptNode(BaseNode[StateType], Generic[StateType]):
         event: NodeExecutionStreamingEvent,
         workflow_output_descriptor: OutputReference,
     ) -> bool:
+        # Check if workflow output directly references this node's text output
+        text_output = getattr(event.node_definition.Outputs, "text", None)
+
+        if (
+            text_output is not None
+            and event.output.name == "text"
+            and isinstance(workflow_output_descriptor.instance, BaseDescriptor)
+            and _contains_reference_to_output(workflow_output_descriptor.instance, text_output)
+        ):
+            return True
+
         if event.output.name != "results":
             return False
 
         if not isinstance(event.output.delta, str) and not event.output.is_initiated:
             return False
 
+        # Check if workflow output references this node's text output through a FinalOutputNode
         target_nodes = [e.to_node for port in self.Ports for e in port.edges if e.to_node.__simulates_workflow_output__]
         target_node_output = next(
             (
@@ -145,4 +159,7 @@ class BasePromptNode(BaseNode[StateType], Generic[StateType]):
         if not isinstance(target_node_output.instance, BaseDescriptor):
             return False
 
-        return _contains_reference_to_output(target_node_output.instance, event.node_definition.Outputs.text)
+        if text_output is None:
+            return False
+
+        return _contains_reference_to_output(target_node_output.instance, text_output)

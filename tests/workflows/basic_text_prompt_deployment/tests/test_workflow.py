@@ -139,18 +139,39 @@ def test_stream_workflow__happy_path(vellum_client):
     )
     events = list(result)
 
-    # THEN the workflow should have completed successfully with 3 events
-    assert len(events) == 3
+    # THEN the workflow should have completed successfully with 7 events
+    # (initiated + 1 text initiated + 3 text streaming + 1 text fulfilled + fulfilled)
+    assert len(events) == 7
 
     # AND the outputs should be as expected
     assert events[0].name == "workflow.execution.initiated"
 
+    # Text streaming events
     assert events[1].name == "workflow.execution.streaming"
-    assert events[1].output.is_fulfilled
+    assert events[1].output.is_initiated
     assert events[1].output.name == "text"
-    assert events[1].output.value == "It was hot"
 
-    assert events[2].name == "workflow.execution.fulfilled"
-    assert events[2].outputs == {
+    assert events[2].name == "workflow.execution.streaming"
+    assert events[2].output.is_streaming
+    assert events[2].output.name == "text"
+    assert events[2].output.delta == "It"
+
+    assert events[3].name == "workflow.execution.streaming"
+    assert events[3].output.is_streaming
+    assert events[3].output.name == "text"
+    assert events[3].output.delta == " was"
+
+    assert events[4].name == "workflow.execution.streaming"
+    assert events[4].output.is_streaming
+    assert events[4].output.name == "text"
+    assert events[4].output.delta == " hot"
+
+    assert events[5].name == "workflow.execution.streaming"
+    assert events[5].output.is_fulfilled
+    assert events[5].output.name == "text"
+    assert events[5].output.value == "It was hot"
+
+    assert events[6].name == "workflow.execution.fulfilled"
+    assert events[6].outputs == {
         "text": "It was hot",
     }

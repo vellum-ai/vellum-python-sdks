@@ -344,6 +344,8 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
                 continue
             elif event.state == "STREAMING":
                 yield BaseOutput(name="results", delta=event.output.value)
+                if event.output.type == "STRING":
+                    yield BaseOutput(name="text", delta=event.output.value)
             elif event.state == "FULFILLED":
                 if event.meta and event.meta.finish_reason == "LENGTH":
                     text_value, json_value = process_additional_prompt_outputs(event.outputs)

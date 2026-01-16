@@ -129,8 +129,6 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
                 if event.output.name == "results":
                     if event.output.is_streaming:
                         if isinstance(event.output.delta, str):
-                            yield BaseOutput(name="text", delta=event.output.delta)
-
                             text_message = ChatMessage(
                                 text=event.output.delta,
                                 role="ASSISTANT",
