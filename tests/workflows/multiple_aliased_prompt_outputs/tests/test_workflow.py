@@ -1,4 +1,3 @@
-import pytest
 from uuid import uuid4
 from typing import Any, Iterator, List
 
@@ -12,7 +11,6 @@ from vellum.client.types.string_vellum_value import StringVellumValue
 from tests.workflows.multiple_aliased_prompt_outputs.workflow import Inputs, MultipleAliasedPromptOutputsWorkflow
 
 
-@pytest.mark.xfail(reason="Multiple workflow outputs aliasing the same prompt text only stream for the first output")
 def test_workflow_stream__multiple_aliased_outputs(vellum_adhoc_prompt_client):
     """
     Tests that streaming events are emitted for ALL workflow outputs that alias
