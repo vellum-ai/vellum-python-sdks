@@ -2236,7 +2236,32 @@ files = [
     {file = "wcwidth-0.2.14.tar.gz", hash = "sha256:4d478375d31bc5395a3c55c40ccdf3354688364cd61c4f6adacaa9215d0b3605"},
 ]
 
+[[package]]
+name = "zuban"
+version = "0.4.2"
+description = "Zuban - The Zuban Language Server"
+optional = true
+python-versions = ">=3.7"
+files = [
+    {file = "zuban-0.4.2-py3-none-macosx_10_12_x86_64.whl", hash = "sha256:18971e9d64607f77a72ddbc54a99c481d9efa006acf1de7bfab84f21259533df"},
+    {file = "zuban-0.4.2-py3-none-macosx_11_0_arm64.whl", hash = "sha256:4eed0d6f08ce02dd7d6dc6245cd1eb4f618fcd12c7249e45c165d538e0687cc9"},
+    {file = "zuban-0.4.2-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:3ea8fec37858450ab7e0011e9ad76e35bc6976569ea386947c75f3eb5cf09a8a"},
+    {file = "zuban-0.4.2-py3-none-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:53c3c8a242df60d2bf17f43861ef899738abea448bbe728737522b8f46e46ad5"},
+    {file = "zuban-0.4.2-py3-none-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:4ccdba3efe378db5496913f562ee6548bf8e20b433337e87efc144b07ccfdb17"},
+    {file = "zuban-0.4.2-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:d95f9640435b26bd6499ad8d4d66081718dd5dd7d3c6a276c3949103da7f1011"},
+    {file = "zuban-0.4.2-py3-none-musllinux_1_2_aarch64.whl", hash = "sha256:29ce85194e1c2cc9e5fc4ac98ea83e95d7a250d149088712536f6df430327ec5"},
+    {file = "zuban-0.4.2-py3-none-musllinux_1_2_armv7l.whl", hash = "sha256:be20f8953f3e9db65948aa4b7c4d59f1d71df2abde5eb6de9048c5486bbce95d"},
+    {file = "zuban-0.4.2-py3-none-musllinux_1_2_i686.whl", hash = "sha256:8cb04b5e9a9bbc4729438dc43318ea9e8a2ef7e721fe41c685d8434679632b8c"},
+    {file = "zuban-0.4.2-py3-none-musllinux_1_2_x86_64.whl", hash = "sha256:6d4ba3de90d77dcaa125ac8eeae327df5128bf39325f9254c481c7b18cbac5cd"},
+    {file = "zuban-0.4.2-py3-none-win32.whl", hash = "sha256:3174271a4c93458b264cfefb97929622431ca218e53d2324fac971e2f1a443b2"},
+    {file = "zuban-0.4.2-py3-none-win_amd64.whl", hash = "sha256:ec58f2eb4c4ae4af4992ffe71ef95017a2a41d6afd584f686429ff65a8200ea1"},
+]
+
+[extras]
+mypy = ["mypy"]
+zuban = ["zuban"]
+
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "67d8e02f5ac12685a37ed264146f6e843ffadee24089bd5d25dd1954d8729cdf"
+content-hash = "9c79b539b0b87c47f85d7d64c56e00b1b9b2994687891b16d7aeaaa8b9113e08"
