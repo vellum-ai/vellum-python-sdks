@@ -6,9 +6,9 @@ from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosit
 from vellum_ee.workflows.display.nodes import BaseInlineSubworkflowNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 
+from . import workflow
 from ....nodes.subworkflow_node import SubworkflowNode
 from .nodes import *
-from .workflow import *
 
 
 class SubworkflowNodeDisplay(BaseInlineSubworkflowNodeDisplay[SubworkflowNode]):

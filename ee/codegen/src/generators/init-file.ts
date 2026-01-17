@@ -1,5 +1,6 @@
 import { BasePersistedFile } from "./base-persisted-file";
 import { Comment } from "./extensions/comment";
+import { Reference } from "./extensions/reference";
 import { StarImport } from "./extensions/star-import";
 
 import { AstNode } from "src/generators/extensions/ast-node";
@@ -8,7 +9,7 @@ export declare namespace InitFile {
   interface Args extends BasePersistedFile.Args {
     modulePath: string[] | Readonly<string[]>;
     statements?: AstNode[];
-    imports?: StarImport[];
+    imports?: (StarImport | Reference)[];
     comments?: Comment[];
   }
 }
@@ -16,7 +17,7 @@ export declare namespace InitFile {
 export class InitFile extends BasePersistedFile {
   private readonly modulePath: string[];
   private readonly statements: AstNode[];
-  private readonly imports: StarImport[] | undefined;
+  private readonly imports: (StarImport | Reference)[] | undefined;
   private readonly comments: Comment[] | undefined;
 
   public constructor({
@@ -47,7 +48,7 @@ export class InitFile extends BasePersistedFile {
     return this.statements;
   }
 
-  protected getFileImports(): StarImport[] | undefined {
+  protected getFileImports(): (StarImport | Reference)[] | undefined {
     return this.imports;
   }
 

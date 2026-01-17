@@ -42,7 +42,7 @@ import {
   ProjectSerializationError,
   WorkflowGenerationError,
 } from "src/generators/errors";
-import { StarImport, Comment } from "src/generators/extensions";
+import { Comment, Reference, StarImport } from "src/generators/extensions";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { ApiNode } from "src/generators/nodes/api-node";
 import { BaseNode } from "src/generators/nodes/bases";
@@ -454,7 +454,7 @@ ${errors.slice(0, 3).map((err) => {
 
   private generateDisplayRootInitFile(): InitFile {
     const statements: AstNode[] = [];
-    const imports: StarImport[] = [];
+    const imports: (StarImport | Reference)[] = [];
     const comments: Comment[] = [];
 
     const parentNode = this.workflowContext.parentNode;
@@ -467,8 +467,9 @@ ${errors.slice(0, 3).map((err) => {
         );
 
         imports.push(
-          new StarImport({
-            modulePath: [".workflow"],
+          new Reference({
+            name: "workflow",
+            modulePath: ["."],
           })
         );
         comments.push(new Comment({ docs: "flake8: noqa: F401, F403" }));
@@ -480,8 +481,9 @@ ${errors.slice(0, 3).map((err) => {
           })
         );
         imports.push(
-          new StarImport({
-            modulePath: [...parentModulePath, "workflow"],
+          new Reference({
+            name: "workflow",
+            modulePath: [...parentModulePath, ""],
           })
         );
         statements.push(...parentNode.generateNodeDisplayClasses());

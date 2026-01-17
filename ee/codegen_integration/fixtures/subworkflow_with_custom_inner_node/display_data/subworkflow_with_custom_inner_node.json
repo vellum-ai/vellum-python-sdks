@@ -1,0 +1,266 @@
+{
+  "workflow_raw_data": {
+    "nodes": [
+      {
+        "id": "63884a7b-c01c-4cbc-b8d4-abe0a8796f6b",
+        "type": "ENTRYPOINT",
+        "inputs": [],
+        "data": {
+          "label": "Entrypoint Node",
+          "source_handle_id": "eba8fd73-57ab-4d7b-8f75-b54dbe5fc8ba"
+        },
+        "display_data": {
+          "position": {
+            "x": -30.0,
+            "y": 0.0
+          },
+          "z_index": 1,
+          "width": 306,
+          "height": 88,
+          "icon": "vellum:icon:play",
+          "color": "default"
+        },
+        "base": null,
+        "definition": null
+      },
+      {
+        "id": "04fea948-6682-47b8-8646-bab40e720038",
+        "type": "SUBWORKFLOW",
+        "inputs": [],
+        "data": {
+          "label": "My Node",
+          "error_output_id": null,
+          "source_handle_id": "0cb70d33-28e5-4d90-ad50-f3b59f6ed4b1",
+          "target_handle_id": "9dec56e2-4ac1-4040-b0a5-0b1b395a8af2",
+          "variant": "INLINE",
+          "workflow_raw_data": {
+            "nodes": [
+              {
+                "id": "0fc5a026-f775-43f6-9761-dd68f3b3dbb4",
+                "type": "ENTRYPOINT",
+                "inputs": [],
+                "data": {
+                  "label": "Entrypoint Node",
+                  "source_handle_id": "eb9225cc-863b-4ef4-adb4-93f058ebb573"
+                },
+                "display_data": {
+                  "position": {
+                    "x": -30.0,
+                    "y": 0.0
+                  },
+                  "z_index": 1,
+                  "icon": "vellum:icon:play",
+                  "color": "default"
+                },
+                "base": null,
+                "definition": null
+              },
+              {
+                "id": "fce721b0-2e11-4070-9acd-502292dd682b",
+                "label": "My Subworkflow Node",
+                "type": "GENERIC",
+                "adornments": null,
+                "attributes": [],
+                "display_data": {
+                  "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                  },
+                  "icon": "vellum:icon:square",
+                  "color": "peach"
+                },
+                "base": {
+                  "name": "BaseNode",
+                  "module": [
+                    "vellum",
+                    "workflows",
+                    "nodes",
+                    "bases",
+                    "base"
+                  ]
+                },
+                "definition": {
+                  "name": "MySubworkflowNode",
+                  "module": [
+                    "codegen_integration",
+                    "fixtures",
+                    "subworkflow_with_custom_inner_node",
+                    "code",
+                    "nodes",
+                    "node",
+                    "nodes",
+                    "my_subworkflow"
+                  ]
+                },
+                "trigger": {
+                  "id": "1715c001-55ef-40c0-a60a-4d0c2e424cc4",
+                  "merge_behavior": "AWAIT_ATTRIBUTES"
+                },
+                "ports": [
+                  {
+                    "id": "675ad077-fa40-42b3-a0f9-7770b0371755",
+                    "name": "default",
+                    "type": "DEFAULT"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "id": "eadbf483-a1de-4287-9b8a-3624901c856f",
+                    "name": "result",
+                    "type": "STRING",
+                    "value": null,
+                    "schema": {
+                      "type": "string"
+                    }
+                  }
+                ]
+              }
+            ],
+            "edges": [
+              {
+                "id": "1a526045-0550-488b-a6c4-29bc86050bcd",
+                "source_node_id": "0fc5a026-f775-43f6-9761-dd68f3b3dbb4",
+                "source_handle_id": "eb9225cc-863b-4ef4-adb4-93f058ebb573",
+                "target_node_id": "fce721b0-2e11-4070-9acd-502292dd682b",
+                "target_handle_id": "1715c001-55ef-40c0-a60a-4d0c2e424cc4",
+                "type": "DEFAULT"
+              }
+            ],
+            "display_data": {
+              "viewport": {
+                "x": 0.0,
+                "y": 0.0,
+                "zoom": 1.0
+              }
+            },
+            "definition": {
+              "name": "MyNodeWorkflow",
+              "module": [
+                "codegen_integration",
+                "fixtures",
+                "subworkflow_with_custom_inner_node",
+                "code",
+                "nodes",
+                "node",
+                "workflow"
+              ]
+            },
+            "output_values": [
+              {
+                "output_variable_id": "4b59eb8b-8f00-4e8f-91d6-423eff3d4663",
+                "value": {
+                  "type": "NODE_OUTPUT",
+                  "node_id": "fce721b0-2e11-4070-9acd-502292dd682b",
+                  "node_output_id": "eadbf483-a1de-4287-9b8a-3624901c856f"
+                }
+              }
+            ]
+          },
+          "input_variables": [],
+          "output_variables": [
+            {
+              "id": "4b59eb8b-8f00-4e8f-91d6-423eff3d4663",
+              "key": "result",
+              "type": "STRING"
+            }
+          ]
+        },
+        "display_data": {
+          "position": {
+            "x": 470.0,
+            "y": 0.0
+          },
+          "z_index": 2,
+          "width": 370,
+          "height": 124,
+          "comment": {
+            "value": "An inline subworkflow node.",
+            "expanded": true
+          },
+          "icon": "vellum:icon:diagram-sankey",
+          "color": "grass"
+        },
+        "base": {
+          "name": "InlineSubworkflowNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "core",
+            "inline_subworkflow_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "name": "MySubworkflowNode",
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "subworkflow_with_custom_inner_node",
+            "code",
+            "nodes",
+            "node"
+          ]
+        },
+        "trigger": {
+          "id": "9dec56e2-4ac1-4040-b0a5-0b1b395a8af2",
+          "merge_behavior": "AWAIT_ATTRIBUTES"
+        },
+        "ports": [
+          {
+            "id": "0cb70d33-28e5-4d90-ad50-f3b59f6ed4b1",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "id": "227a29f5-cfaf-4dc4-b9d9-7a5bd5c508ad",
+        "source_node_id": "63884a7b-c01c-4cbc-b8d4-abe0a8796f6b",
+        "source_handle_id": "eba8fd73-57ab-4d7b-8f75-b54dbe5fc8ba",
+        "target_node_id": "04fea948-6682-47b8-8646-bab40e720038",
+        "target_handle_id": "9dec56e2-4ac1-4040-b0a5-0b1b395a8af2",
+        "type": "DEFAULT"
+      }
+    ],
+    "display_data": {
+      "viewport": {
+        "x": 0.0,
+        "y": 0.0,
+        "zoom": 1.0
+      }
+    },
+    "definition": {
+      "name": "Workflow",
+      "module": [
+        "codegen_integration",
+        "fixtures",
+        "subworkflow_with_custom_inner_node",
+        "code",
+        "workflow"
+      ]
+    },
+    "output_values": [
+      {
+        "output_variable_id": "6a2f0fad-8670-4cee-b2b2-c94ad3b4807f",
+        "value": {
+          "type": "NODE_OUTPUT",
+          "node_id": "04fea948-6682-47b8-8646-bab40e720038",
+          "node_output_id": "4b59eb8b-8f00-4e8f-91d6-423eff3d4663"
+        }
+      }
+    ]
+  },
+  "input_variables": [],
+  "state_variables": [],
+  "output_variables": [
+    {
+      "id": "6a2f0fad-8670-4cee-b2b2-c94ad3b4807f",
+      "key": "result",
+      "type": "STRING"
+    }
+  ],
+  "runner_config": {}
+}
