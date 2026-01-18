@@ -181,8 +181,8 @@ class VellumIntegrationToolDefinition(UniversalBaseModel):
     integration_name: str  # "GITHUB", "SLACK", etc.
     name: str  # Specific action like "GITHUB_CREATE_AN_ISSUE"
 
-    # Required for tool base consistency
-    description: str
+    # Optional description for tool base consistency
+    description: str = ""
 
     # Optional toolkit version for pinning
     toolkit_version: Optional[str] = None
