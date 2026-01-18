@@ -131,5 +131,26 @@ describe("Json", () => {
         "Unsupported JSON value type: symbol"
       );
     });
+
+    it("should properly escape strings containing backslash-quote sequences", async () => {
+      /**
+       * Tests that strings containing literal backslash followed by quote characters
+       * are properly escaped to produce valid Python code.
+       *
+       * This reproduces the bug from CODEGEN-SERVICE-6Y where the escapeString function
+       * uses a negative lookbehind that incorrectly skips escaping quotes preceded by backslashes.
+       */
+
+      // GIVEN a string containing a literal backslash followed by a quote
+      const stringWithBackslashQuote = 'Hello \\"world';
+
+      // WHEN we generate the JSON representation
+      const json = new Json(stringWithBackslashQuote);
+      json.write(writer);
+
+      // THEN the output should be valid Python code that can be formatted
+      const result = await writer.toStringFormatted();
+      expect(result).toMatchSnapshot();
+    });
   });
 });
