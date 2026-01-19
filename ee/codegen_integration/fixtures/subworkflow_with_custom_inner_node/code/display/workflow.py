@@ -20,12 +20,7 @@ class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
         entrypoint_node_id=UUID("63884a7b-c01c-4cbc-b8d4-abe0a8796f6b"),
         entrypoint_node_source_handle_id=UUID("eba8fd73-57ab-4d7b-8f75-b54dbe5fc8ba"),
         entrypoint_node_display=NodeDisplayData(
-            position=NodeDisplayPosition(x=-30, y=0),
-            z_index=1,
-            width=306,
-            height=88,
-            icon="vellum:icon:play",
-            color="default",
+            position=NodeDisplayPosition(x=-30, y=0), z_index=1, width=306, height=88
         ),
         display_data=WorkflowDisplayData(viewport=WorkflowDisplayDataViewport(x=0, y=0, zoom=1)),
     )

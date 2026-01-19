@@ -19,9 +19,7 @@ class MyNodeWorkflowDisplay(BaseWorkflowDisplay[MyNodeWorkflow]):
     workflow_display = WorkflowMetaDisplay(
         entrypoint_node_id=UUID("0fc5a026-f775-43f6-9761-dd68f3b3dbb4"),
         entrypoint_node_source_handle_id=UUID("eb9225cc-863b-4ef4-adb4-93f058ebb573"),
-        entrypoint_node_display=NodeDisplayData(
-            position=NodeDisplayPosition(x=-30, y=0), z_index=1, icon="vellum:icon:play", color="default"
-        ),
+        entrypoint_node_display=NodeDisplayData(position=NodeDisplayPosition(x=-30, y=0), z_index=1),
         display_data=WorkflowDisplayData(viewport=WorkflowDisplayDataViewport(x=0, y=0, zoom=1)),
     )
     entrypoint_displays = {

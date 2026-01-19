@@ -29,7 +29,5 @@ class MySubworkflowNodeDisplay(BaseInlineSubworkflowNodeDisplay[MySubworkflowNod
         z_index=2,
         width=370,
         height=124,
-        icon="vellum:icon:diagram-sankey",
-        color="grass",
         comment=NodeDisplayComment(expanded=True, value="An inline subworkflow node."),
     )
