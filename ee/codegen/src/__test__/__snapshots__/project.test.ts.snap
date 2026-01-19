@@ -139,7 +139,6 @@ class Workflow(BaseWorkflow):
 exports[`WorkflowProjectGenerator > Nodes present but not in graph > should still generate a file for the second node > code/display/nodes/second_node.py 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 
@@ -151,7 +150,6 @@ class SecondNodeDisplay(BaseNodeDisplay[SecondNode]):
     output_display = {
         SecondNode.Outputs.output: NodeOutputDisplay(id=UUID("bd71c32b-0762-4556-a1bc-2c36b15f6428"), name="output")
     }
-    display_data = NodeDisplayData()
 "
 `;
 
@@ -387,7 +385,6 @@ class BadNode(TemplatingNode[BaseState, str]):
 exports[`WorkflowProjectGenerator > function > should generate <function_name>.py file > code/display/nodes/tool_call/__init__.py 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 
@@ -415,7 +412,6 @@ class GetCurrentWeatherNodeDisplay(BaseNodeDisplay[GetCurrentWeatherNode]):
     port_displays = {
         GetCurrentWeatherNode.Ports.default: PortDisplayOverrides(id=UUID("7b97f998-4be5-478d-94c4-9423db5f6392"))
     }
-    display_data = NodeDisplayData()
 "
 `;
 
@@ -587,7 +583,6 @@ from vellum_ee.workflows.display.base import (
     WorkflowMetaDisplay,
     WorkflowOutputDisplay,
 )
-from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
 
 from .....nodes.tool_call_get_current_weather_node.weather_function.inputs import Inputs
@@ -602,7 +597,6 @@ class WeatherFunctionDisplay(BaseWorkflowDisplay[WeatherFunction]):
     workflow_display = WorkflowMetaDisplay(
         entrypoint_node_id=UUID("d97d2a36-3347-487e-b915-3bc874aaded4"),
         entrypoint_node_source_handle_id=UUID("c55f8e1e-0422-4009-af54-86df5625ba71"),
-        entrypoint_node_display=NodeDisplayData(),
         display_data=WorkflowDisplayData(viewport=WorkflowDisplayDataViewport(x=0, y=0, zoom=1)),
     )
     inputs_display = {
@@ -656,10 +650,6 @@ from ..inputs import Inputs
 class FinalOutput(FinalOutputNode[BaseState, str]):
     class Outputs(FinalOutputNode.Outputs):
         value = Inputs.city
-
-    class Display(FinalOutputNode.Display):
-        x = 0
-        y = 0
 "
 `;
 
@@ -673,10 +663,6 @@ from .tool_call_get_current_weather_node import GetCurrentWeatherNode
 class FinalOutput1(FinalOutputNode[BaseState, str]):
     class Outputs(FinalOutputNode.Outputs):
         value = GetCurrentWeatherNode.Outputs.text
-
-    class Display(FinalOutputNode.Display):
-        x = 0
-        y = 0
 "
 `;
 
@@ -691,10 +677,6 @@ from .tool_call_get_current_weather_node import GetCurrentWeatherNode
 class FinalOutput2(FinalOutputNode[BaseState, list[ChatMessage]]):
     class Outputs(FinalOutputNode.Outputs):
         value = GetCurrentWeatherNode.Outputs.chat_history
-
-    class Display(FinalOutputNode.Display):
-        x = 0
-        y = 0
 "
 `;
 
@@ -739,10 +721,6 @@ class GetCurrentWeatherNode(ToolCallingNode):
         "city": Inputs.city,
         "date": Inputs.date,
     }
-
-    class Display(ToolCallingNode.Display):
-        x = 0
-        y = 0
 "
 `;
 
@@ -775,10 +753,6 @@ from .tool_call_start_node import StartNode
 class FinalOutput3(FinalOutputNode[BaseState, Union[float, int]]):
     class Outputs(FinalOutputNode.Outputs):
         value = StartNode.Outputs.temperature
-
-    class Display(FinalOutputNode.Display):
-        x = 0
-        y = 0
 "
 `;
 
@@ -792,10 +766,6 @@ from .tool_call_start_node import StartNode
 class FinalOutput4(FinalOutputNode[BaseState, str]):
     class Outputs(FinalOutputNode.Outputs):
         value = StartNode.Outputs.reasoning
-
-    class Display(FinalOutputNode.Display):
-        x = 0
-        y = 0
 "
 `;
 
@@ -814,10 +784,6 @@ class StartNode(BaseNode):
     class Outputs(BaseNode.Outputs):
         temperature: Union[float, int]
         reasoning: str
-
-    class Display(BaseNode.Display):
-        x = 0
-        y = 0
 "
 `;
 
@@ -933,7 +899,6 @@ from vellum_ee.workflows.display.base import (
     WorkflowMetaDisplay,
     WorkflowOutputDisplay,
 )
-from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
 
 from .....nodes.tool_call_get_current_weather_node.weather_function.inputs import Inputs
@@ -948,7 +913,6 @@ class WeatherFunctionDisplay(BaseWorkflowDisplay[WeatherFunction]):
     workflow_display = WorkflowMetaDisplay(
         entrypoint_node_id=UUID("d97d2a36-3347-487e-b915-3bc874aaded4"),
         entrypoint_node_source_handle_id=UUID("c55f8e1e-0422-4009-af54-86df5625ba71"),
-        entrypoint_node_display=NodeDisplayData(),
         display_data=WorkflowDisplayData(viewport=WorkflowDisplayDataViewport(x=0, y=0, zoom=1)),
     )
     inputs_display = {
@@ -1002,10 +966,6 @@ from ..inputs import Inputs
 class FinalOutput(FinalOutputNode[BaseState, str]):
     class Outputs(FinalOutputNode.Outputs):
         value = Inputs.city
-
-    class Display(FinalOutputNode.Display):
-        x = 0
-        y = 0
 "
 `;
 
@@ -1019,10 +979,6 @@ from .tool_call_get_current_weather_node import GetCurrentWeatherNode
 class FinalOutput1(FinalOutputNode[BaseState, str]):
     class Outputs(FinalOutputNode.Outputs):
         value = GetCurrentWeatherNode.Outputs.text
-
-    class Display(FinalOutputNode.Display):
-        x = 0
-        y = 0
 "
 `;
 
@@ -1037,10 +993,6 @@ from .tool_call_get_current_weather_node import GetCurrentWeatherNode
 class FinalOutput2(FinalOutputNode[BaseState, list[ChatMessage]]):
     class Outputs(FinalOutputNode.Outputs):
         value = GetCurrentWeatherNode.Outputs.chat_history
-
-    class Display(FinalOutputNode.Display):
-        x = 0
-        y = 0
 "
 `;
 
@@ -1085,10 +1037,6 @@ class GetCurrentWeatherNode(ToolCallingNode):
         "city": Inputs.city,
         "date": Inputs.date,
     }
-
-    class Display(ToolCallingNode.Display):
-        x = 0
-        y = 0
 "
 `;
 
@@ -1121,10 +1069,6 @@ from .tool_call_start_node import StartNode
 class FinalOutput3(FinalOutputNode[BaseState, Union[float, int]]):
     class Outputs(FinalOutputNode.Outputs):
         value = StartNode.Outputs.temperature
-
-    class Display(FinalOutputNode.Display):
-        x = 0
-        y = 0
 "
 `;
 
@@ -1138,10 +1082,6 @@ from .tool_call_start_node import StartNode
 class FinalOutput4(FinalOutputNode[BaseState, str]):
     class Outputs(FinalOutputNode.Outputs):
         value = StartNode.Outputs.reasoning
-
-    class Display(FinalOutputNode.Display):
-        x = 0
-        y = 0
 "
 `;
 
@@ -1160,10 +1100,6 @@ class StartNode(BaseNode):
     class Outputs(BaseNode.Outputs):
         temperature: Union[float, int]
         reasoning: str
-
-    class Display(BaseNode.Display):
-        x = 0
-        y = 0
 "
 `;
 
@@ -1231,10 +1167,6 @@ class MyToolCallingNode(ToolCallingNode):
     blocks = []
     functions = [DeploymentDefinition(deployment="add-code-exec", release_tag="LATEST")]
     prompt_inputs = {}
-
-    class Display(ToolCallingNode.Display):
-        x = 0
-        y = 0
 "
 `;
 
@@ -1446,7 +1378,6 @@ exports[`WorkflowProjectGenerator > state > should generate a state.py file > co
 "from uuid import UUID
 
 from vellum_ee.workflows.display.base import EdgeDisplay, EntrypointDisplay, StateValueDisplay, WorkflowMetaDisplay
-from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
 
 from ..nodes.templating_node import TemplatingNode
@@ -1456,9 +1387,7 @@ from ..workflow import Workflow
 
 class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
     workflow_display = WorkflowMetaDisplay(
-        entrypoint_node_id=UUID("entry"),
-        entrypoint_node_source_handle_id=UUID("entry_source"),
-        entrypoint_node_display=NodeDisplayData(),
+        entrypoint_node_id=UUID("entry"), entrypoint_node_source_handle_id=UUID("entry_source")
     )
     state_value_displays = {
         State.foo: StateValueDisplay(id=UUID("5bc5356a-154f-4bba-a8ee-eb283bfd2a25"), name="foo"),

@@ -3,7 +3,6 @@
 exports[`NoteNode > basic > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseNoteNodeDisplay
 
 from ...nodes.note_node import NoteNode
@@ -11,7 +10,6 @@ from ...nodes.note_node import NoteNode
 
 class NoteNodeDisplay(BaseNoteNodeDisplay[NoteNode]):
     node_id = UUID("<note-node-id>")
-    display_data = NodeDisplayData()
 "
 `;
 
@@ -26,8 +24,5 @@ class NoteNode(BaseNoteNode):
         "fontSize": 12,
         "fontWeight": "bold",
     }
-
-    class Display(BaseNoteNode.Display):
-        pass
 "
 `;

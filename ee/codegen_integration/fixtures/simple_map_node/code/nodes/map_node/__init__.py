@@ -11,4 +11,3 @@ class MapNode(BaseMapNode):
 
     class Display(BaseMapNode.Display):
         x = 254
-        y = 0

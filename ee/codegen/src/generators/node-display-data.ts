@@ -22,7 +22,7 @@ export namespace NodeDisplayData {
 
 export class NodeDisplayData extends AstNode {
   private readonly sourceNodeDisplayData: NodeDisplayDataType | undefined;
-  private readonly nodeDisplayData: AstNode;
+  private readonly nodeDisplayData: AstNode | undefined;
   private readonly workflowContext: WorkflowContext;
 
   public constructor({
@@ -35,7 +35,11 @@ export class NodeDisplayData extends AstNode {
     this.nodeDisplayData = this.generateNodeDisplayData();
   }
 
-  private generateNodeDisplayData(): ClassInstantiation {
+  public isEmpty(): boolean {
+    return this.nodeDisplayData === undefined;
+  }
+
+  private generateNodeDisplayData(): ClassInstantiation | undefined {
     const args: MethodArgument[] = [];
 
     if (!isNil(this.sourceNodeDisplayData?.width)) {
@@ -59,6 +63,10 @@ export class NodeDisplayData extends AstNode {
     const commentArg = this.generateCommentArg();
     if (commentArg) {
       args.push(commentArg);
+    }
+
+    if (isNilOrEmpty(args)) {
+      return undefined;
     }
 
     const clazz = new ClassInstantiation({
@@ -115,6 +123,8 @@ export class NodeDisplayData extends AstNode {
   }
 
   public write(writer: Writer) {
-    this.nodeDisplayData.write(writer);
+    if (this.nodeDisplayData) {
+      this.nodeDisplayData.write(writer);
+    }
   }
 }

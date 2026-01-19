@@ -14,6 +14,7 @@ import {
   WorkflowDataNode,
 } from "src/types/vellum";
 import { findNodeDefinitionByBaseClassName } from "src/utils/node-definitions";
+import { isNilOrEmpty } from "src/utils/typing";
 
 export declare namespace NodeDisplay {
   export interface Args {
@@ -60,19 +61,22 @@ export class NodeDisplay extends AstNode {
 
     const fields: AstNode[] = [];
 
-    // Add position fields (x, y) only when position data is provided
-    if (!isNil(nodeDisplayData?.position)) {
+    // Add position fields (x, y) only when non-zero
+    const x = nodeDisplayData?.position?.x ?? 0;
+    const y = nodeDisplayData?.position?.y ?? 0;
+    if (x !== 0) {
       fields.push(
         new Field({
           name: "x",
-          initializer: new FloatInstantiation(nodeDisplayData.position.x ?? 0),
+          initializer: new FloatInstantiation(x),
         })
       );
-
+    }
+    if (y !== 0) {
       fields.push(
         new Field({
           name: "y",
-          initializer: new FloatInstantiation(nodeDisplayData.position.y ?? 0),
+          initializer: new FloatInstantiation(y),
         })
       );
     }
@@ -109,6 +113,10 @@ export class NodeDisplay extends AstNode {
           initializer: new StrInstantiation(nodeDisplayData.color),
         })
       );
+    }
+
+    if (isNilOrEmpty(fields)) {
+      return undefined;
     }
 
     const clazz = new Class({

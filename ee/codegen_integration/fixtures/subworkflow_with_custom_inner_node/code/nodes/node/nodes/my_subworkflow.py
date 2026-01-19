@@ -6,7 +6,5 @@ class MySubworkflowNode(BaseNode):
         result: str
 
     class Display(BaseNode.Display):
-        x = 0
-        y = 0
         icon = "vellum:icon:square"
         color = "peach"

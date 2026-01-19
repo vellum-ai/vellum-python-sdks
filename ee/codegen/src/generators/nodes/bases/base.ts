@@ -499,10 +499,14 @@ export abstract class BaseNode<
     });
   }
 
-  private getDisplayData(): Field {
+  private getDisplayData(): Field | undefined {
+    const displayData = this.generateNodeDisplayDataWithoutComment();
+    if (displayData.isEmpty()) {
+      return undefined;
+    }
     return new Field({
       name: "display_data",
-      initializer: this.generateNodeDisplayDataWithoutComment(),
+      initializer: displayData,
     });
   }
 
@@ -856,7 +860,10 @@ export abstract class BaseNode<
       nodeClass.add(portDisplay);
     }
 
-    nodeClass.add(this.getDisplayData());
+    const displayData = this.getDisplayData();
+    if (displayData) {
+      nodeClass.add(displayData);
+    }
 
     return [nodeClass];
   }

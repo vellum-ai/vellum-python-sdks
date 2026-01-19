@@ -215,13 +215,21 @@ export class Workflow {
                       entrypointNode.data.sourceHandleId
                     ),
                   }),
-                  new MethodArgument({
-                    name: "entrypoint_node_display",
-                    value: new NodeDisplayData({
+                  ...(() => {
+                    const entrypointNodeDisplay = new NodeDisplayData({
                       workflowContext: this.workflowContext,
                       nodeDisplayData: entrypointNode.displayData,
-                    }),
-                  }),
+                    });
+                    if (entrypointNodeDisplay.isEmpty()) {
+                      return [];
+                    }
+                    return [
+                      new MethodArgument({
+                        name: "entrypoint_node_display",
+                        value: entrypointNodeDisplay,
+                      }),
+                    ];
+                  })(),
                 ]
               : []),
             ...(this.displayData

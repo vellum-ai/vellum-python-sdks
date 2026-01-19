@@ -25,9 +25,6 @@ exports[`NodeDisplay > 'with null icon and color' 1`] = `
     class Outputs(BaseNode.Outputs):
         output = "default-value"
 
-    class Display(BaseNode.Display):
-        pass
-
     class Trigger(BaseNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ALL
 "

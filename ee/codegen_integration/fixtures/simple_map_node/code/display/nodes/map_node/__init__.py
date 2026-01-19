@@ -2,7 +2,6 @@
 
 from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseMapNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 
@@ -21,4 +20,3 @@ class MapNodeDisplay(BaseMapNodeDisplay[MapNode]):
         )
     }
     port_displays = {MapNode.Ports.default: PortDisplayOverrides(id=UUID("239a1483-e4f5-4650-81a4-21c77d72cc5e"))}
-    display_data = NodeDisplayData()

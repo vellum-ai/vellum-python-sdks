@@ -3,7 +3,6 @@
 exports[`TemplatingNode > basic > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseTemplatingNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
@@ -27,7 +26,6 @@ class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
             id=UUID("6ee2c814-d0a5-4ec9-83b6-45156e2f22c4")
         )
     }
-    display_data = NodeDisplayData()
 "
 `;
 
@@ -45,7 +43,6 @@ class TemplatingNode(BaseTemplatingNode[BaseState, str]):
 exports[`TemplatingNode > basic with json output type > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseTemplatingNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
@@ -69,7 +66,6 @@ class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
             id=UUID("6ee2c814-d0a5-4ec9-83b6-45156e2f22c4")
         )
     }
-    display_data = NodeDisplayData()
 "
 `;
 
@@ -88,7 +84,6 @@ class TemplatingNode(BaseTemplatingNode[BaseState, Json]):
 exports[`TemplatingNode > basic with node ports > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseTemplatingNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
@@ -115,7 +110,6 @@ class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
             id=UUID("1db0ebfd-c07e-49ed-9c4e-4822d3010367")
         ),
     }
-    display_data = NodeDisplayData()
 "
 `;
 
@@ -135,7 +129,6 @@ class TemplatingNode(BaseTemplatingNode[BaseState, str]):
 exports[`TemplatingNode > reject on error enabled > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import (
     BaseTemplatingNodeDisplay,
     BaseTryNodeDisplay,
@@ -166,7 +159,6 @@ class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
             id=UUID("6ee2c814-d0a5-4ec9-83b6-45156e2f22c4")
         )
     }
-    display_data = NodeDisplayData()
 "
 `;
 

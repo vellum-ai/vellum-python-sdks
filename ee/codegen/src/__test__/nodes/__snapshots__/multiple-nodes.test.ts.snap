@@ -127,7 +127,6 @@ class ConditionalNode(BaseConditionalNode):
 exports[`InlinePromptNode referenced by Templating Node > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseTemplatingNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
@@ -154,7 +153,6 @@ class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
             id=UUID("6ee2c814-d0a5-4ec9-83b6-45156e2f22c4")
         )
     }
-    display_data = NodeDisplayData()
 "
 `;
 
@@ -204,7 +202,6 @@ class PromptNode(InlinePromptNode):
 exports[`Non-existent Subworkflow Deployment Node referenced by Templating Node > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseTemplatingNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
@@ -231,7 +228,6 @@ class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
             id=UUID("6ee2c814-d0a5-4ec9-83b6-45156e2f22c4")
         )
     }
-    display_data = NodeDisplayData()
 "
 `;
 
