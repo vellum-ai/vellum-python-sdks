@@ -28,7 +28,6 @@ class NoteNode(BaseNoteNode):
     }
 
     class Display(BaseNoteNode.Display):
-        x = 0
-        y = 0
+        pass
 "
 `;

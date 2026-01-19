@@ -60,20 +60,22 @@ export class NodeDisplay extends AstNode {
 
     const fields: AstNode[] = [];
 
-    // Add position fields (x, y) - these are always present
-    fields.push(
-      new Field({
-        name: "x",
-        initializer: new FloatInstantiation(nodeDisplayData?.position?.x ?? 0),
-      })
-    );
+    // Add position fields (x, y) only when position data is provided
+    if (!isNil(nodeDisplayData?.position)) {
+      fields.push(
+        new Field({
+          name: "x",
+          initializer: new FloatInstantiation(nodeDisplayData.position.x ?? 0),
+        })
+      );
 
-    fields.push(
-      new Field({
-        name: "y",
-        initializer: new FloatInstantiation(nodeDisplayData?.position?.y ?? 0),
-      })
-    );
+      fields.push(
+        new Field({
+          name: "y",
+          initializer: new FloatInstantiation(nodeDisplayData.position.y ?? 0),
+        })
+      );
+    }
 
     // Add z_index if provided
     if (!isNil(nodeDisplayData?.z_index)) {

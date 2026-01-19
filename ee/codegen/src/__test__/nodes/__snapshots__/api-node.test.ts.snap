@@ -296,8 +296,7 @@ class APINode(BaseAPINode):
     bearer_token_value = "<my-bearer-token>"
 
     class Display(BaseAPINode.Display):
-        x = 0
-        y = 0
+        pass
 "
 `;
 
