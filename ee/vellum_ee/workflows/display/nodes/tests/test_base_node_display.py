@@ -246,3 +246,96 @@ def test_serialize_display_class_used_as_fallback():
     assert display_data["icon"] == "vellum:icon:star"  # Falls back to Display class
     assert display_data["color"] == "green"  # Falls back to Display class
     assert display_data["position"] == {"x": 50, "y": 75}  # From BaseNodeDisplay
+
+
+def test_serialize_basenode_display_with_xyz():
+    """Tests that BaseNode.Display x, y, z attributes serialize correctly."""
+
+    # GIVEN a node with x, y, z in Display class
+    class MyNode(BaseNode):
+        class Display:
+            x = 100.0
+            y = 200.0
+            z = 5
+
+    # WHEN we serialize the node
+    node_display_class = get_node_display_class(MyNode)
+    data = node_display_class().serialize(WorkflowDisplayContext())
+
+    # THEN the display_data should include position and z_index from Display class
+    display_data = data["display_data"]
+    assert isinstance(display_data, dict)
+    assert display_data["position"] == {"x": 100.0, "y": 200.0}
+    assert display_data["z_index"] == 5
+
+
+def test_serialize_basenode_display_with_partial_xy():
+    """Tests that BaseNode.Display with only x or y still creates position."""
+
+    # GIVEN a node with only x in Display class
+    class MyNodeX(BaseNode):
+        class Display:
+            x = 150.0
+
+    # WHEN we serialize the node
+    node_display_class = get_node_display_class(MyNodeX)
+    data = node_display_class().serialize(WorkflowDisplayContext())
+
+    # THEN the display_data should include position with x and default y
+    display_data = data["display_data"]
+    assert isinstance(display_data, dict)
+    assert display_data["position"] == {"x": 150.0, "y": 0.0}
+
+
+def test_serialize_explicit_display_data_overrides_display_class_xyz():
+    """Tests that BaseNodeDisplay's explicit display_data takes precedence over Display class x, y, z."""
+
+    # GIVEN a node with x, y, z in Display class
+    class MyNode(BaseNode):
+        class Display:
+            x = 100.0
+            y = 200.0
+            z = 5
+
+    # AND a BaseNodeDisplay with explicit display_data
+    class MyNodeDisplay(BaseNodeDisplay[MyNode]):
+        display_data = NodeDisplayData(
+            position=NodeDisplayPosition(x=300, y=400),
+            z_index=10,
+        )
+
+    # WHEN we serialize the node
+    data = MyNodeDisplay().serialize(WorkflowDisplayContext())
+
+    # THEN the display_data should use values from BaseNodeDisplay
+    display_data = data["display_data"]
+    assert isinstance(display_data, dict)
+    assert display_data["position"] == {"x": 300, "y": 400}  # BaseNodeDisplay overrides
+    assert display_data["z_index"] == 10  # BaseNodeDisplay overrides
+
+
+def test_serialize_display_class_xyz_used_as_fallback():
+    """Tests that Display class x, y, z are used when BaseNodeDisplay doesn't specify them."""
+
+    # GIVEN a node with x, y, z in Display class
+    class MyNode(BaseNode):
+        class Display:
+            x = 50.0
+            y = 75.0
+            z = 3
+
+    # AND a BaseNodeDisplay with only icon specified
+    class MyNodeDisplay(BaseNodeDisplay[MyNode]):
+        display_data = NodeDisplayData(
+            icon="vellum:icon:star",
+        )
+
+    # WHEN we serialize the node
+    data = MyNodeDisplay().serialize(WorkflowDisplayContext())
+
+    # THEN the display_data should use x, y, z from Display class as fallback
+    display_data = data["display_data"]
+    assert isinstance(display_data, dict)
+    assert display_data["position"] == {"x": 50.0, "y": 75.0}  # Falls back to Display class
+    assert display_data["z_index"] == 3  # Falls back to Display class
+    assert display_data["icon"] == "vellum:icon:star"  # From BaseNodeDisplay

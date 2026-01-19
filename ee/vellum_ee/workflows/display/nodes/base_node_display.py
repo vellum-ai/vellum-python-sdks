@@ -35,7 +35,7 @@ from vellum.workflows.utils.functions import compile_annotation
 from vellum.workflows.utils.names import pascal_to_title_case
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
-from vellum_ee.workflows.display.editor.types import NodeDisplayComment, NodeDisplayData
+from vellum_ee.workflows.display.editor.types import NodeDisplayComment, NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
 from vellum_ee.workflows.display.utils.exceptions import NodeValidationError, UnsupportedSerializationException
@@ -496,11 +496,31 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
         base_kwargs: Dict[str, Any] = {}
         base_node = next((base for base in self._node.__bases__ if issubclass(base, BaseNode)), BaseNode)
 
-        # Add Display class attributes if they exist
-        if self._node.Display.icon is not None and self._node.Display.icon != base_node.Display.icon:
-            base_kwargs["icon"] = self._node.Display.icon
-        if self._node.Display.color is not None and self._node.Display.color != base_node.Display.color:
-            base_kwargs["color"] = self._node.Display.color
+        # Add Display class attributes if they exist (use getattr for safe access)
+        display_icon = getattr(self._node.Display, "icon", None)
+        display_color = getattr(self._node.Display, "color", None)
+        base_icon = getattr(base_node.Display, "icon", None)
+        base_color = getattr(base_node.Display, "color", None)
+
+        if display_icon is not None and display_icon != base_icon:
+            base_kwargs["icon"] = display_icon
+        if display_color is not None and display_color != base_color:
+            base_kwargs["color"] = display_color
+
+        # Add position from x, y if they exist
+        display_x = getattr(self._node.Display, "x", None)
+        display_y = getattr(self._node.Display, "y", None)
+        if display_x is not None or display_y is not None:
+            base_kwargs["position"] = NodeDisplayPosition(
+                x=display_x if display_x is not None else 0.0,
+                y=display_y if display_y is not None else 0.0,
+            )
+
+        # Add z_index from z if it exists
+        display_z = getattr(self._node.Display, "z", None)
+        base_z = getattr(base_node.Display, "z", None)
+        if display_z is not None and display_z != base_z:
+            base_kwargs["z_index"] = display_z
 
         # Add docstring as comment if present
         if docstring:
@@ -514,8 +534,12 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             # Get fields that were explicitly set for z_index handling
             fields_set = explicit_value.model_fields_set
 
+            # Override position only if explicitly set (since it has a default value)
+            if "position" in fields_set:
+                base_kwargs["position"] = explicit_value.position
+
             # Override simple attributes (only if not None)
-            for attr in ("position", "width", "height", "icon", "color"):
+            for attr in ("width", "height", "icon", "color"):
                 value = getattr(explicit_value, attr, None)
                 if value is not None:
                     base_kwargs[attr] = value

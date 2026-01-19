@@ -315,6 +315,9 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
 
         icon: Optional[str] = None
         color: Optional[str] = None
+        x: Optional[float] = None
+        y: Optional[float] = None
+        z: Optional[int] = None
 
     class Trigger(metaclass=_BaseNodeTriggerMeta):
         node_class: Type["BaseNode"]
