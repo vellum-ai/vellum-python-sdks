@@ -115,7 +115,21 @@ class BaseNodeMeta(ABCMeta):
                     dct["Ports"] = type(f"{name}.Ports", (base.Ports,), ports_dct)
                     break
 
-        if "Display" not in dct:
+        if "Display" in dct:
+            display_class = dct["Display"]
+            parent_display_class = next(
+                (base.Display for base in bases if hasattr(base, "Display")),
+                None,
+            )
+            # Ensure user-defined Display class inherits from parent's Display
+            if parent_display_class and not issubclass(display_class, parent_display_class):
+                filtered_bases = tuple(base for base in display_class.__bases__ if base is not object)
+                dct["Display"] = type(
+                    f"{name}.Display",
+                    (parent_display_class,) + filtered_bases,
+                    {**display_class.__dict__, "__module__": dct["__module__"]},
+                )
+        else:
             for base in reversed(bases):
                 if issubclass(base, BaseNode):
                     dct["Display"] = type(
@@ -317,7 +331,7 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
         color: Optional[str] = None
         x: Optional[float] = None
         y: Optional[float] = None
-        z: Optional[int] = None
+        z_index: Optional[int] = None
 
     class Trigger(metaclass=_BaseNodeTriggerMeta):
         node_class: Type["BaseNode"]

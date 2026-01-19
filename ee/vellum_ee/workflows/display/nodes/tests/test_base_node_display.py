@@ -249,14 +249,14 @@ def test_serialize_display_class_used_as_fallback():
 
 
 def test_serialize_basenode_display_with_xyz():
-    """Tests that BaseNode.Display x, y, z attributes serialize correctly."""
+    """Tests that BaseNode.Display x, y, z_index attributes serialize correctly."""
 
-    # GIVEN a node with x, y, z in Display class
+    # GIVEN a node with x, y, z_index in Display class
     class MyNode(BaseNode):
         class Display:
             x = 100.0
             y = 200.0
-            z = 5
+            z_index = 5
 
     # WHEN we serialize the node
     node_display_class = get_node_display_class(MyNode)
@@ -288,14 +288,14 @@ def test_serialize_basenode_display_with_partial_xy():
 
 
 def test_serialize_explicit_display_data_overrides_display_class_xyz():
-    """Tests that BaseNodeDisplay's explicit display_data takes precedence over Display class x, y, z."""
+    """Tests that BaseNodeDisplay's explicit display_data takes precedence over Display class x, y, z_index."""
 
-    # GIVEN a node with x, y, z in Display class
+    # GIVEN a node with x, y, z_index in Display class
     class MyNode(BaseNode):
         class Display:
             x = 100.0
             y = 200.0
-            z = 5
+            z_index = 5
 
     # AND a BaseNodeDisplay with explicit display_data
     class MyNodeDisplay(BaseNodeDisplay[MyNode]):
@@ -315,14 +315,14 @@ def test_serialize_explicit_display_data_overrides_display_class_xyz():
 
 
 def test_serialize_display_class_xyz_used_as_fallback():
-    """Tests that Display class x, y, z are used when BaseNodeDisplay doesn't specify them."""
+    """Tests that Display class x, y, z_index are used when BaseNodeDisplay doesn't specify them."""
 
-    # GIVEN a node with x, y, z in Display class
+    # GIVEN a node with x, y, z_index in Display class
     class MyNode(BaseNode):
         class Display:
             x = 50.0
             y = 75.0
-            z = 3
+            z_index = 3
 
     # AND a BaseNodeDisplay with only icon specified
     class MyNodeDisplay(BaseNodeDisplay[MyNode]):

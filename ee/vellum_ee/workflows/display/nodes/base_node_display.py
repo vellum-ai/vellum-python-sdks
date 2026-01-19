@@ -496,31 +496,22 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
         base_kwargs: Dict[str, Any] = {}
         base_node = next((base for base in self._node.__bases__ if issubclass(base, BaseNode)), BaseNode)
 
-        # Add Display class attributes if they exist (use getattr for safe access)
-        display_icon = getattr(self._node.Display, "icon", None)
-        display_color = getattr(self._node.Display, "color", None)
-        base_icon = getattr(base_node.Display, "icon", None)
-        base_color = getattr(base_node.Display, "color", None)
-
-        if display_icon is not None and display_icon != base_icon:
-            base_kwargs["icon"] = display_icon
-        if display_color is not None and display_color != base_color:
-            base_kwargs["color"] = display_color
+        # Add Display class attributes if they exist
+        if self._node.Display.icon is not None and self._node.Display.icon != base_node.Display.icon:
+            base_kwargs["icon"] = self._node.Display.icon
+        if self._node.Display.color is not None and self._node.Display.color != base_node.Display.color:
+            base_kwargs["color"] = self._node.Display.color
 
         # Add position from x, y if they exist
-        display_x = getattr(self._node.Display, "x", None)
-        display_y = getattr(self._node.Display, "y", None)
-        if display_x is not None or display_y is not None:
+        if self._node.Display.x is not None or self._node.Display.y is not None:
             base_kwargs["position"] = NodeDisplayPosition(
-                x=display_x if display_x is not None else 0.0,
-                y=display_y if display_y is not None else 0.0,
+                x=self._node.Display.x if self._node.Display.x is not None else 0.0,
+                y=self._node.Display.y if self._node.Display.y is not None else 0.0,
             )
 
-        # Add z_index from z if it exists
-        display_z = getattr(self._node.Display, "z", None)
-        base_z = getattr(base_node.Display, "z", None)
-        if display_z is not None and display_z != base_z:
-            base_kwargs["z_index"] = display_z
+        # Add z_index if it exists
+        if self._node.Display.z_index is not None and self._node.Display.z_index != base_node.Display.z_index:
+            base_kwargs["z_index"] = self._node.Display.z_index
 
         # Add docstring as comment if present
         if docstring:
@@ -539,14 +530,10 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 base_kwargs["position"] = explicit_value.position
 
             # Override simple attributes (only if not None)
-            for attr in ("width", "height", "icon", "color"):
+            for attr in ("width", "height", "icon", "color", "z_index"):
                 value = getattr(explicit_value, attr, None)
                 if value is not None:
                     base_kwargs[attr] = value
-
-            # Include z_index if explicitly set (even if None)
-            if "z_index" in fields_set:
-                base_kwargs["z_index"] = explicit_value.z_index
 
             # Special handling for comment: merge docstring with explicit comment's expanded state
             if explicit_value.comment:
