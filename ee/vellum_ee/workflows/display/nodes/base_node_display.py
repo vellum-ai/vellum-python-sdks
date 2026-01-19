@@ -35,7 +35,7 @@ from vellum.workflows.utils.functions import compile_annotation
 from vellum.workflows.utils.names import pascal_to_title_case
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_variable_type
-from vellum_ee.workflows.display.editor.types import NodeDisplayComment, NodeDisplayData
+from vellum_ee.workflows.display.editor.types import NodeDisplayComment, NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
 from vellum_ee.workflows.display.utils.exceptions import NodeValidationError, UnsupportedSerializationException
@@ -502,6 +502,17 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
         if self._node.Display.color is not None and self._node.Display.color != base_node.Display.color:
             base_kwargs["color"] = self._node.Display.color
 
+        # Add position from x, y if they exist
+        if self._node.Display.x is not None or self._node.Display.y is not None:
+            base_kwargs["position"] = NodeDisplayPosition(
+                x=self._node.Display.x if self._node.Display.x is not None else 0.0,
+                y=self._node.Display.y if self._node.Display.y is not None else 0.0,
+            )
+
+        # Add z_index if it exists
+        if self._node.Display.z_index is not None and self._node.Display.z_index != base_node.Display.z_index:
+            base_kwargs["z_index"] = self._node.Display.z_index
+
         # Add docstring as comment if present
         if docstring:
             base_kwargs["comment"] = NodeDisplayComment(value=docstring, expanded=True)
@@ -514,15 +525,15 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             # Get fields that were explicitly set for z_index handling
             fields_set = explicit_value.model_fields_set
 
+            # Override position only if explicitly set (since it has a default value)
+            if "position" in fields_set:
+                base_kwargs["position"] = explicit_value.position
+
             # Override simple attributes (only if not None)
-            for attr in ("position", "width", "height", "icon", "color"):
+            for attr in ("width", "height", "icon", "color", "z_index"):
                 value = getattr(explicit_value, attr, None)
                 if value is not None:
                     base_kwargs[attr] = value
-
-            # Include z_index if explicitly set (even if None)
-            if "z_index" in fields_set:
-                base_kwargs["z_index"] = explicit_value.z_index
 
             # Special handling for comment: merge docstring with explicit comment's expanded state
             if explicit_value.comment:
