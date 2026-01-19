@@ -48,9 +48,15 @@ def _ensure_file(temp_dir: str, module: str, file_name: str, content: str) -> st
 def _ensure_workflow_py(temp_dir: str, module: str) -> str:
     workflow_py_file_content = """\
 from vellum.workflows import BaseWorkflow
+from vellum.workflows.nodes.bases.base import BaseNode
+
+
+class ExampleNode(BaseNode):
+    pass
+
 
 class ExampleWorkflow(BaseWorkflow):
-    pass
+    graph = ExampleNode
 """
     return _ensure_file(temp_dir, module, "workflow.py", workflow_py_file_content)
 
