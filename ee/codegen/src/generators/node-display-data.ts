@@ -92,24 +92,6 @@ export class NodeDisplayData extends AstNode {
       );
     }
 
-    if (!isNil(this.sourceNodeDisplayData?.icon)) {
-      args.push(
-        new MethodArgument({
-          name: "icon",
-          value: new StrInstantiation(this.sourceNodeDisplayData.icon),
-        })
-      );
-    }
-
-    if (!isNil(this.sourceNodeDisplayData?.color)) {
-      args.push(
-        new MethodArgument({
-          name: "color",
-          value: new StrInstantiation(this.sourceNodeDisplayData.color),
-        })
-      );
-    }
-
     const commentArg = this.generateCommentArg();
     if (commentArg) {
       args.push(commentArg);

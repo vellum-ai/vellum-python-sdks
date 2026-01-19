@@ -49,13 +49,18 @@ describe("GenericNode DisplayData Integration", () => {
     outputs: [],
   });
 
-  it("should generate display data with icon and color when provided in serialized JSON", async () => {
+  it("should not include icon and color in display data even when provided in serialized JSON", async () => {
+    /**
+     * Tests that icon and color are not generated in NodeDisplayData since they're now generated in BaseNode.Display.
+     */
+    // GIVEN a generic node with icon and color in display data
     const nodeData = createGenericNodeWithDisplayData({
       position: { x: 100, y: 200 },
       icon: "vellum:icon:star",
       color: "navy",
     });
 
+    // WHEN we generate the node display file
     const nodeContext = (await createNodeContext({
       workflowContext,
       nodeData,
@@ -69,28 +74,7 @@ describe("GenericNode DisplayData Integration", () => {
     node.getNodeDisplayFile().write(writer);
     const result = await writer.toStringFormatted();
 
-    expect(result).toContain('icon="vellum:icon:star"');
-    expect(result).toContain('color="navy"');
-  });
-
-  it("should not include icon and color when not provided in serialized JSON", async () => {
-    const nodeData = createGenericNodeWithDisplayData({
-      position: { x: 50, y: 75 },
-    });
-
-    const nodeContext = (await createNodeContext({
-      workflowContext,
-      nodeData,
-    })) as GenericNodeContext;
-
-    const node = new GenericNode({
-      workflowContext,
-      nodeContext,
-    });
-
-    node.getNodeDisplayFile().write(writer);
-    const result = await writer.toStringFormatted();
-
+    // THEN icon and color should not be included in the display data
     expect(result).not.toContain("icon=");
     expect(result).not.toContain("color=");
   });
