@@ -3,7 +3,7 @@
 exports[`MergeNode > basic > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseMergeNodeDisplay
 from vellum_ee.workflows.display.nodes.types import PortDisplayOverrides
 
@@ -16,7 +16,7 @@ class MergeNodeDisplay(BaseMergeNodeDisplay[MergeNode]):
     port_displays = {
         MergeNode.Ports.default: PortDisplayOverrides(id=UUID("source-handle-id"))
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
+    display_data = NodeDisplayData()
 "
 `;
 

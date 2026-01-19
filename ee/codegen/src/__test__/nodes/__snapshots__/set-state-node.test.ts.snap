@@ -3,7 +3,7 @@
 exports[`SetStateNode > basic > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
@@ -26,7 +26,7 @@ class SetStateNodeDisplay(BaseNodeDisplay[SetStateNode]):
             id=UUID("set-state-port-id")
         )
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
+    display_data = NodeDisplayData()
 "
 `;
 

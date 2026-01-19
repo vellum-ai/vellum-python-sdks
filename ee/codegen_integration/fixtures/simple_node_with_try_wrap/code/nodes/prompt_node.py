@@ -45,3 +45,7 @@ What is the origin of the following phrase
         logit_bias={},
         custom_parameters=None,
     )
+
+    class Display(InlinePromptNode.Display):
+        x = 2083.6598676957
+        y = 288.95993689582167

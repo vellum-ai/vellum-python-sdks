@@ -18,7 +18,7 @@ exports[`InlineSubworkflowNode > adornments > should generate adornments 2`] = `
 
 from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseInlineSubworkflowNodeDisplay, BaseRetryNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 
@@ -39,7 +39,7 @@ class MyNodeDisplay(BaseInlineSubworkflowNodeDisplay[MyNode]):
         )
     }
     port_displays = {MyNode.Ports.default: PortDisplayOverrides(id=UUID("4878f525-d4a3-4e3d-9221-e146f282a96a"))}
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
+    display_data = NodeDisplayData()
 "
 `;
 
@@ -48,7 +48,7 @@ exports[`InlineSubworkflowNode > basic > inline subworkflow node display file 1`
 
 from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseInlineSubworkflowNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 
@@ -69,7 +69,7 @@ class InlineSubworkflowNodeDisplay(BaseInlineSubworkflowNodeDisplay[InlineSubwor
     port_displays = {
         InlineSubworkflowNode.Ports.default: PortDisplayOverrides(id=UUID("4878f525-d4a3-4e3d-9221-e146f282a96a"))
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
+    display_data = NodeDisplayData()
 "
 `;
 
@@ -100,7 +100,7 @@ exports[`InlineSubworkflowNode > name collision > should handle subworkflow with
 
 from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseInlineSubworkflowNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 
@@ -120,7 +120,7 @@ class MyNodeDisplay(BaseInlineSubworkflowNodeDisplay[MyNode]):
         )
     }
     port_displays = {MyNode.Ports.default: PortDisplayOverrides(id=UUID("4878f525-d4a3-4e3d-9221-e146f282a96a"))}
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
+    display_data = NodeDisplayData()
 "
 `;
 
@@ -138,7 +138,7 @@ class MyNode1(TemplatingNode[BaseState, str]):
 exports[`InlineSubworkflowNode > name collision > should handle subworkflow with same name as internal node 4`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseTemplatingNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 
@@ -154,7 +154,7 @@ class MyNode1Display(BaseTemplatingNodeDisplay[MyNode1]):
         MyNode1.Outputs.result: NodeOutputDisplay(id=UUID("2d4f1826-de75-499a-8f84-0a690c8136ad"), name="result")
     }
     port_displays = {MyNode1.Ports.default: PortDisplayOverrides(id=UUID("6ee2c814-d0a5-4ec9-83b6-45156e2f22c4"))}
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
+    display_data = NodeDisplayData()
 "
 `;
 

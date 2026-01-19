@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseTemplatingNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 
@@ -20,4 +20,4 @@ class TemplatingNodeDisplay(BaseTemplatingNodeDisplay[TemplatingNode]):
     port_displays = {
         TemplatingNode.Ports.default: PortDisplayOverrides(id=UUID("0f8cbd50-1919-4c2e-8b1b-1ad741b5da35"))
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=1474, y=540.5), width=480, height=221)
+    display_data = NodeDisplayData(width=480, height=221)

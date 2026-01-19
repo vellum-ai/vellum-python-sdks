@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseAPINodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 
@@ -31,6 +31,4 @@ class APINodeDisplay(BaseAPINodeDisplay[APINode]):
         APINode.Outputs.headers: NodeOutputDisplay(id=UUID("25c44c2c-c672-4805-976a-dc043d83a387"), name="headers"),
     }
     port_displays = {APINode.Ports.default: PortDisplayOverrides(id=UUID("5fd01b0b-f0fb-488b-a9c7-4ba1dd7df80e"))}
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=3916.027261439447, y=917.3816601522587), width=455, height=230
-    )
+    display_data = NodeDisplayData(width=455, height=230)

@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseSearchNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 
@@ -29,4 +29,4 @@ class FAADocumentStoreDisplay(BaseSearchNodeDisplay[FAADocumentStore]):
     port_displays = {
         FAADocumentStore.Ports.default: PortDisplayOverrides(id=UUID("0b203edd-ed4c-4593-9e17-deaeb2780e14"))
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=3318, y=271.25), width=452, height=177)
+    display_data = NodeDisplayData(width=452, height=177)

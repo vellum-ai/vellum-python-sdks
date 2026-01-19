@@ -9,5 +9,8 @@ class MySubworkflowNode(InlineSubworkflowNode):
     subworkflow = MyNodeWorkflow
 
     class Display(InlineSubworkflowNode.Display):
+        x = 470
+        y = 0
+        z_index = 2
         icon = "vellum:icon:diagram-sankey"
         color = "grass"

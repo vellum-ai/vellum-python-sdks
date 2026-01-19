@@ -9,3 +9,7 @@ from .guardrail_node import GuardrailNode
 class FinalOutput(FinalOutputNode[BaseState, Union[float, int]]):
     class Outputs(FinalOutputNode.Outputs):
         value = GuardrailNode.Outputs.score
+
+    class Display(FinalOutputNode.Display):
+        x = 2750
+        y = 210

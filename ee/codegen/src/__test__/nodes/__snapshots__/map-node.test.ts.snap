@@ -5,7 +5,7 @@ exports[`MapNode > basic > map node display file 1`] = `
 
 from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseMapNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 
@@ -24,7 +24,7 @@ class MapNodeDisplay(BaseMapNodeDisplay[MapNode]):
         )
     }
     port_displays = {MapNode.Ports.default: PortDisplayOverrides(id=UUID("4878f525-d4a3-4e3d-9221-e146f282a96a"))}
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
+    display_data = NodeDisplayData()
 "
 `;
 
@@ -63,7 +63,7 @@ exports[`MapNode > with additional output > map node display file 1`] = `
 
 from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseMapNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 
@@ -85,7 +85,7 @@ class MapNodeDisplay(BaseMapNodeDisplay[MapNode]):
         ),
     }
     port_displays = {MapNode.Ports.default: PortDisplayOverrides(id=UUID("4878f525-d4a3-4e3d-9221-e146f282a96a"))}
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
+    display_data = NodeDisplayData()
 "
 `;
 

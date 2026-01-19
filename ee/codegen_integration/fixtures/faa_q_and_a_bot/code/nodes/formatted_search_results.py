@@ -20,3 +20,7 @@ Policy {{ result.document.label }}:
     inputs = {
         "results": FAADocumentStore.Outputs.results,
     }
+
+    class Display(TemplatingNode.Display):
+        x = 3923.3878883718644
+        y = -458.89620665696896

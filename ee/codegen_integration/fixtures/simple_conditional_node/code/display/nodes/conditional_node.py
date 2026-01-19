@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseConditionalNodeDisplay
 from vellum_ee.workflows.display.nodes.types import PortDisplayOverrides
 from vellum_ee.workflows.display.nodes.vellum.conditional_node import ConditionId, RuleIdMap
@@ -60,6 +60,4 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
         ConditionalNode.Ports.branch_2: PortDisplayOverrides(id=UUID("babf673e-0bec-421e-aede-3ea323853bd8")),
         ConditionalNode.Ports.branch_3: PortDisplayOverrides(id=UUID("25d955d1-5c7e-4e37-8afe-1015b496e59d")),
     }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=1943.4147273142412, y=292.2355134030261), width=480, height=234
-    )
+    display_data = NodeDisplayData(width=480, height=234)

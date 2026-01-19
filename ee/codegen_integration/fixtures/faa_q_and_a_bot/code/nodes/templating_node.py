@@ -9,3 +9,7 @@ class TemplatingNode(BaseTemplatingNode[BaseState, str]):
     inputs = {
         "example_var_1": PromptNode.Outputs.text,
     }
+
+    class Display(BaseTemplatingNode.Display):
+        x = 1474
+        y = 540.5

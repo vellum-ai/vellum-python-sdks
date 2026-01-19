@@ -45,3 +45,7 @@ Respond with the IATA airport name this incoming message is about. For example, 
         logit_bias={},
         custom_parameters=None,
     )
+
+    class Display(InlinePromptNode.Display):
+        x = 2694
+        y = 1100

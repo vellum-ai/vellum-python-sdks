@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseSubworkflowDeploymentNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 
@@ -19,4 +19,4 @@ class SubworkflowDeploymentDisplay(BaseSubworkflowDeploymentNodeDisplay[Subworkf
     port_displays = {
         SubworkflowDeployment.Ports.default: PortDisplayOverrides(id=UUID("fc38b3bd-5c08-4729-9e37-211c415637ad"))
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=1873.116343490305, y=239.74958448753466))
+    display_data = NodeDisplayData()

@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseFinalOutputNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 
@@ -16,4 +16,4 @@ class FinalOutput2Display(BaseFinalOutputNodeDisplay[FinalOutput2]):
     output_display = {
         FinalOutput2.Outputs.value: NodeOutputDisplay(id=UUID("8c6e5464-8916-4039-b911-cf707855d372"), name="value"),
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=5134, y=443), width=480, height=271)
+    display_data = NodeDisplayData(width=480, height=271)

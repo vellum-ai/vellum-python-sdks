@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseSearchNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 
@@ -43,6 +43,4 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
         SearchNode.Outputs.text: NodeOutputDisplay(id=UUID("d56d7c49-7b45-4933-9779-2bd7f82c2141"), name="text"),
     }
     port_displays = {SearchNode.Ports.default: PortDisplayOverrides(id=UUID("e4dedb66-0638-4f0c-9941-6420bfe353b2"))}
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=1966.960664819945, y=223.1684037396122), width=480, height=180
-    )
+    display_data = NodeDisplayData(width=480, height=180)

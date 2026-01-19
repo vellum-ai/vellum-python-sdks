@@ -4,6 +4,8 @@ import { BaseNodeContext } from "src/context/node-context/base";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
 import { Field } from "src/generators/extensions/field";
+import { FloatInstantiation } from "src/generators/extensions/float-instantiation";
+import { IntInstantiation } from "src/generators/extensions/int-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
@@ -12,7 +14,6 @@ import {
   WorkflowDataNode,
 } from "src/types/vellum";
 import { findNodeDefinitionByBaseClassName } from "src/utils/node-definitions";
-import { isNilOrEmpty } from "src/utils/typing";
 
 export declare namespace NodeDisplay {
   export interface Args {
@@ -59,6 +60,31 @@ export class NodeDisplay extends AstNode {
 
     const fields: AstNode[] = [];
 
+    // Add position fields (x, y) - these are always present
+    fields.push(
+      new Field({
+        name: "x",
+        initializer: new FloatInstantiation(nodeDisplayData?.position?.x ?? 0),
+      })
+    );
+
+    fields.push(
+      new Field({
+        name: "y",
+        initializer: new FloatInstantiation(nodeDisplayData?.position?.y ?? 0),
+      })
+    );
+
+    // Add z_index if provided
+    if (!isNil(nodeDisplayData?.z_index)) {
+      fields.push(
+        new Field({
+          name: "z_index",
+          initializer: new IntInstantiation(nodeDisplayData.z_index),
+        })
+      );
+    }
+
     if (
       !isNil(nodeDisplayData?.icon) &&
       nodeDisplayData.icon !== baseDisplayDefaults?.icon
@@ -81,10 +107,6 @@ export class NodeDisplay extends AstNode {
           initializer: new StrInstantiation(nodeDisplayData.color),
         })
       );
-    }
-
-    if (isNilOrEmpty(fields)) {
-      return undefined;
     }
 
     const clazz = new Class({

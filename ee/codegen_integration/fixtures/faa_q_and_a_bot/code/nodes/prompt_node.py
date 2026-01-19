@@ -67,3 +67,7 @@ You are an expert classifier. You will analyze the chat and output one of the fo
             },
         },
     )
+
+    class Display(InlinePromptNode.Display):
+        x = 866.1444593268898
+        y = 545.562737655267

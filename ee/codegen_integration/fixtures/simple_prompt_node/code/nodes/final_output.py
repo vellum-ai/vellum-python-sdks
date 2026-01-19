@@ -7,3 +7,7 @@ from .prompt_node import PromptNode
 class FinalOutput(FinalOutputNode[BaseState, str]):
     class Outputs(FinalOutputNode.Outputs):
         value = PromptNode.Outputs.text
+
+    class Display(FinalOutputNode.Display):
+        x = 2761.0242006615217
+        y = 208.9757993384785

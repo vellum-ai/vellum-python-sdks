@@ -3,7 +3,7 @@
 exports[`GuardrailNode > basic > getNodeDisplayFile - multiple output variables 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseGuardrailNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
@@ -34,14 +34,14 @@ class GuardrailNodeDisplay(BaseGuardrailNodeDisplay[GuardrailNode]):
             id=UUID("92aafe31-101b-47d3-86f2-e261c7747c16")
         )
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
+    display_data = NodeDisplayData()
 "
 `;
 
 exports[`GuardrailNode > basic > getNodeDisplayFile - single output variable 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseGuardrailNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
@@ -68,7 +68,7 @@ class GuardrailNodeDisplay(BaseGuardrailNodeDisplay[GuardrailNode]):
             id=UUID("92aafe31-101b-47d3-86f2-e261c7747c16")
         )
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
+    display_data = NodeDisplayData()
 "
 `;
 
@@ -118,7 +118,7 @@ class GuardrailNode(BaseGuardrailNode):
 exports[`GuardrailNode > reject on error enabled > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import (
     BaseGuardrailNodeDisplay,
     BaseTryNodeDisplay,
@@ -156,7 +156,7 @@ class GuardrailNodeDisplay(BaseGuardrailNodeDisplay[GuardrailNode]):
             id=UUID("92aafe31-101b-47d3-86f2-e261c7747c16")
         )
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
+    display_data = NodeDisplayData()
 "
 `;
 

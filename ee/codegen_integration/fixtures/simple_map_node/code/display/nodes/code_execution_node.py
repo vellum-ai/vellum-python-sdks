@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseCodeExecutionNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 
@@ -26,6 +26,4 @@ class CodeExecutionNodeDisplay(BaseCodeExecutionNodeDisplay[CodeExecutionNode]):
     port_displays = {
         CodeExecutionNode.Ports.default: PortDisplayOverrides(id=UUID("734e3a85-f96e-408e-89f1-703bcc486e8a"))
     }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=1855.8380935218793, y=384.6100572199606), width=480, height=224
-    )
+    display_data = NodeDisplayData(width=480, height=224)

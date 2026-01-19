@@ -16,3 +16,7 @@ class ApiNode(APINode):
     authorization_type = AuthorizationType.API_KEY
     api_key_header_value = None
     bearer_token_value = None
+
+    class Display(APINode.Display):
+        x = 1889.865705614568
+        y = 236.61265174506826

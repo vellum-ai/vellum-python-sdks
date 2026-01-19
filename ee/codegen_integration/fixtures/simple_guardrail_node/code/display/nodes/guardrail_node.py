@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseGuardrailNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 
@@ -18,6 +18,4 @@ class GuardrailNodeDisplay(BaseGuardrailNodeDisplay[GuardrailNode]):
         GuardrailNode.Outputs.score: NodeOutputDisplay(id=UUID("0e455862-ccc4-47a4-a9a5-061fadc94fd6"), name="score")
     }
     port_displays = {GuardrailNode.Ports.default: PortDisplayOverrides(id=UUID("92aafe31-101b-47d3-86f2-e261c7747c16"))}
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=1985.9562846580402, y=180.75743992606283), width=464, height=224
-    )
+    display_data = NodeDisplayData(width=464, height=224)

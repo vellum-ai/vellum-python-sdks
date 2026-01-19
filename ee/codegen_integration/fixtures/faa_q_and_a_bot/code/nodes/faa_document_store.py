@@ -13,3 +13,7 @@ class FAADocumentStore(SearchNode):
     result_merging = SearchResultMergingRequest(enabled=True)
     filters = SearchFilters(external_ids=None, metadata=None)
     chunk_separator = "\n\n#####\n\n"
+
+    class Display(SearchNode.Display):
+        x = 3318
+        y = 271.25

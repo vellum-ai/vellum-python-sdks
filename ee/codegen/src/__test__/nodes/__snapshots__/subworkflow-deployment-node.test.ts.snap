@@ -3,7 +3,7 @@
 exports[`SubworkflowDeploymentNode > basic > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseSubworkflowDeploymentNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
@@ -29,9 +29,7 @@ class SubworkflowNodeDisplay(BaseSubworkflowDeploymentNodeDisplay[SubworkflowNod
             id=UUID("600efd51-8677-4ba3-a582-b298bebb2868")
         )
     }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=2239.986322714681, y=484.74458968144046)
-    )
+    display_data = NodeDisplayData()
 "
 `;
 
@@ -49,13 +47,17 @@ class SubworkflowNode(SubworkflowDeploymentNode):
     class Outputs(SubworkflowDeploymentNode.Outputs):
         output_1: str
         output_2: Union[float, int]
+
+    class Display(SubworkflowDeploymentNode.Display):
+        x = 2239.986322714681
+        y = 484.74458968144046
 "
 `;
 
 exports[`SubworkflowDeploymentNode > failure > should generate subworkflow deployment node display as much as possible for non strict workflow contexts 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseSubworkflowDeploymentNodeDisplay
 from vellum_ee.workflows.display.nodes.types import PortDisplayOverrides
 
@@ -71,9 +73,7 @@ class SubworkflowNodeDisplay(BaseSubworkflowDeploymentNodeDisplay[SubworkflowNod
             id=UUID("600efd51-8677-4ba3-a582-b298bebb2868")
         )
     }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=2239.986322714681, y=484.74458968144046)
-    )
+    display_data = NodeDisplayData()
 "
 `;
 
@@ -84,5 +84,9 @@ exports[`SubworkflowDeploymentNode > failure > should generate subworkflow deplo
 class SubworkflowNode(SubworkflowDeploymentNode):
     release_tag = "LATEST"
     subworkflow_inputs = {}
+
+    class Display(SubworkflowDeploymentNode.Display):
+        x = 2239.986322714681
+        y = 484.74458968144046
 "
 `;

@@ -14,3 +14,7 @@ class FinalOutput2(FinalOutputNode[BaseState, str]):
             .coalesce(PromptNode18.Outputs.text)
             .coalesce(PromptNode19.Outputs.text)
         )
+
+    class Display(FinalOutputNode.Display):
+        x = 5134
+        y = 443

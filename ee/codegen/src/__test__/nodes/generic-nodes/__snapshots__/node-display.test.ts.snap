@@ -9,6 +9,8 @@ exports[`NodeDisplay > 'with icon and color' 1`] = `
         output = "default-value"
 
     class Display(BaseNode.Display):
+        x = 0
+        y = 0
         icon = "🎨"
         color = "#FF5733"
 
@@ -25,6 +27,10 @@ exports[`NodeDisplay > 'with null icon and color' 1`] = `
     class Outputs(BaseNode.Outputs):
         output = "default-value"
 
+    class Display(BaseNode.Display):
+        x = 0
+        y = 0
+
     class Trigger(BaseNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ALL
 "
@@ -39,6 +45,8 @@ exports[`NodeDisplay > 'with only color' 1`] = `
         output = "default-value"
 
     class Display(BaseNode.Display):
+        x = 0
+        y = 0
         color = "#00FF00"
 
     class Trigger(BaseNode.Trigger):
@@ -55,6 +63,8 @@ exports[`NodeDisplay > 'with only icon' 1`] = `
         output = "default-value"
 
     class Display(BaseNode.Display):
+        x = 0
+        y = 0
         icon = "🔧"
 
     class Trigger(BaseNode.Trigger):
@@ -69,6 +79,10 @@ exports[`NodeDisplay > 'without icon or color' 1`] = `
 
     class Outputs(BaseNode.Outputs):
         output = "default-value"
+
+    class Display(BaseNode.Display):
+        x = 100
+        y = 200
 
     class Trigger(BaseNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ALL

@@ -3,7 +3,7 @@
 exports[`InlinePromptRetryNode > basic > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import (
     BaseInlinePromptNodeDisplay,
     BaseRetryNodeDisplay,
@@ -38,7 +38,7 @@ class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
             id=UUID("dd8397b1-5a41-4fa0-8c24-e5dffee4fb98")
         )
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
+    display_data = NodeDisplayData()
 "
 `;
 
@@ -76,7 +76,7 @@ class PromptNode(InlinePromptNode):
 exports[`InlinePromptRetryNode > basic retry adornment and try adornment > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import (
     BaseInlinePromptNodeDisplay,
     BaseRetryNodeDisplay,
@@ -116,7 +116,7 @@ class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
             id=UUID("dd8397b1-5a41-4fa0-8c24-e5dffee4fb98")
         )
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
+    display_data = NodeDisplayData()
 "
 `;
 
@@ -156,7 +156,7 @@ class PromptNode(InlinePromptNode):
 exports[`InlinePromptRetryNode > basic retry adornment with delay > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import (
     BaseInlinePromptNodeDisplay,
     BaseRetryNodeDisplay,
@@ -191,7 +191,7 @@ class PromptNodeDisplay(BaseInlinePromptNodeDisplay[PromptNode]):
             id=UUID("dd8397b1-5a41-4fa0-8c24-e5dffee4fb98")
         )
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
+    display_data = NodeDisplayData()
 "
 `;
 
