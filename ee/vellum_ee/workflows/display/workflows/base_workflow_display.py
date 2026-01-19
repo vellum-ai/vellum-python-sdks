@@ -330,6 +330,16 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         has_triggers = len(trigger_edges) > 0
         needs_entrypoint_node = has_manual_trigger or not has_triggers or len(non_trigger_entrypoint_nodes) > 0
 
+        # Validate that the workflow has at least one trigger or entrypoint node
+        # Also allow workflows that have nodes in unused_graphs (even if no main graph entrypoints)
+        has_any_nodes = len(list(self._workflow.get_all_nodes())) > 0
+        if not has_triggers and len(non_trigger_entrypoint_nodes) == 0 and not has_any_nodes:
+            raise WorkflowValidationError(
+                message="Workflow has no triggers and no entrypoint nodes. "
+                "A workflow must have at least one trigger or one node in its graph.",
+                workflow_class_name=self._workflow.__name__,
+            )
+
         entrypoint_node_id: Optional[UUID] = None
         entrypoint_node_source_handle_id: Optional[UUID] = None
         entrypoint_node_display = self.display_context.workflow_display.entrypoint_node_display
