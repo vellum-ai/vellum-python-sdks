@@ -170,15 +170,8 @@
             "type": "JSON",
             "value": null,
             "schema": {
-              "anyOf": [
-                {
-                  "type": "object",
-                  "additionalProperties": {}
-                },
-                {
-                  "type": "null"
-                }
-              ]
+              "type": "object",
+              "additionalProperties": {}
             }
           },
           {

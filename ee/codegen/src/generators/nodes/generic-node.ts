@@ -695,25 +695,28 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
     // Check if all outputs in nodeData match the base node definition outputs
     // Compare by name, type, and value to ensure customized outputs are preserved
     // Base node definitions always have value: null, so we check if any output has a non-null value
-    const baseOutputNames = baseNodeDef.outputs.map((o) => o.name);
-    const baseOutputTypes = baseNodeDef.outputs.map((o) => o.type);
+    // Treat workflow outputs as a subset - if all workflow outputs exist in base and match,
+    // it's redundant (no need to generate an Outputs class override)
+    const baseOutputsByName = new Map(
+      baseNodeDef.outputs.map((o) => [o.name, o])
+    );
 
-    if (this.nodeData.outputs.length !== baseNodeDef.outputs.length) {
+    // If workflow has more outputs than base, it's not redundant (has custom outputs)
+    if (this.nodeData.outputs.length > baseNodeDef.outputs.length) {
       return false;
     }
 
     return this.nodeData.outputs.every((output) => {
-      const baseIndex = baseOutputNames.indexOf(output.name);
-      if (baseIndex === -1) {
-        return false;
-      }
-      if (baseOutputTypes[baseIndex] !== output.type) {
-        return false;
-      }
-      const baseOutput = baseNodeDef.outputs[baseIndex];
+      const baseOutput = baseOutputsByName.get(output.name);
       if (!baseOutput) {
+        // Output doesn't exist in base - not redundant (custom output)
         return false;
       }
+      if (baseOutput.type !== output.type) {
+        // Type mismatch - not redundant (customized output)
+        return false;
+      }
+      // Only redundant if value is null/undefined (not customized)
       return output.value === null || output.value === undefined;
     });
   }

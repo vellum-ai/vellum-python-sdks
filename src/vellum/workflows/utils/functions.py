@@ -89,7 +89,17 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
         if annotation in recorded_unions:
             return {"$ref": f"#/$defs/{recorded_unions[annotation]}"}
 
-        return {"anyOf": [compile_annotation(a, defs) for a in get_args(annotation)]}
+        # Filter out Type[undefined] from union args - it just makes the property optional
+        filtered_args = [
+            a
+            for a in get_args(annotation)
+            if not (get_origin(a) is type and get_args(a) and get_args(a)[0] is undefined)
+        ]
+
+        if len(filtered_args) == 1:
+            return compile_annotation(filtered_args[0], defs)
+
+        return {"anyOf": [compile_annotation(a, defs) for a in filtered_args]}
 
     if get_origin(annotation) is Literal:
         values = list(get_args(annotation))
@@ -164,11 +174,11 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
         # Ignore forward references for now
         return {}
 
-    # Handle Type[undefined] - compile to null type
+    # Handle Type[undefined] - skip it as it just makes the property optional
     if get_origin(annotation) is type:
         args = get_args(annotation)
         if args and args[0] is undefined:
-            return {"type": "null"}
+            return {}
 
     if annotation not in type_map:
         raise ValueError(f"Failed to compile type: {annotation}")

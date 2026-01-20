@@ -218,7 +218,7 @@ def test_serialize_workflow():
                 "name": "json",
                 "type": "JSON",
                 "value": None,
-                "schema": {"anyOf": [{"additionalProperties": {}, "type": "object"}, {"type": "null"}]},
+                "schema": {"type": "object", "additionalProperties": {}},
             },
             {
                 "id": "d0d0cd85-8546-4d90-bdc1-86c751ba04e5",
