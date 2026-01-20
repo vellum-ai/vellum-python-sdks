@@ -28,7 +28,7 @@ def test_serialize_workflow():
     output_variables = serialized_workflow["output_variables"]
     assert len(output_variables) == 2
 
-    # Find the text and chat_history outputs
+    # Find the text and chat_history outputs (json is not exposed as workflow output)
     text_output = next(var for var in output_variables if var["key"] == "text")
     chat_history_output = next(var for var in output_variables if var["key"] == "chat_history")
 
@@ -80,8 +80,10 @@ def test_serialize_workflow():
 
     # AND the outputs should be correct
     outputs = tool_calling_node["outputs"]
-    assert len(outputs) == 2
-    assert outputs[0]["name"] == "text"
-    assert outputs[0]["type"] == "STRING"
-    assert outputs[1]["name"] == "chat_history"
-    assert outputs[1]["type"] == "CHAT_HISTORY"
+    assert len(outputs) == 3
+    json_output = next(o for o in outputs if o["name"] == "json")
+    text_output = next(o for o in outputs if o["name"] == "text")
+    chat_history_output = next(o for o in outputs if o["name"] == "chat_history")
+    assert json_output["type"] == "JSON"
+    assert text_output["type"] == "STRING"
+    assert chat_history_output["type"] == "CHAT_HISTORY"

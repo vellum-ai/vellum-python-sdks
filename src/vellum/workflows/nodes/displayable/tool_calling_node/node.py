@@ -1,11 +1,10 @@
-from typing import Any, ClassVar, Dict, Generic, Iterator, List, Optional, Set, Type, Union, cast
+from typing import Any, ClassVar, Dict, Generic, Iterator, List, Optional, Set, Union, cast
 
 from vellum import ChatMessage, PromptBlock, PromptOutput
 from vellum.client.types.prompt_parameters import PromptParameters
 from vellum.client.types.prompt_settings import PromptSettings
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
 from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
-from vellum.workflows.constants import undefined
 from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.errors.types import WorkflowErrorCode
@@ -16,7 +15,6 @@ from vellum.workflows.expressions.coalesce_expression import CoalesceExpression
 from vellum.workflows.graph.graph import Graph
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
-from vellum.workflows.nodes.displayable.bases.utils import process_additional_prompt_outputs
 from vellum.workflows.nodes.displayable.tool_calling_node.state import ToolCallingState
 from vellum.workflows.nodes.displayable.tool_calling_node.utils import (
     create_else_node,
@@ -80,7 +78,7 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
         """
 
         text: str
-        json: Union[Dict[Any, Any], Type[undefined]] = undefined
+        json: Optional[Dict[Any, Any]] = None
         chat_history: List[ChatMessage]
 
     def run(self) -> Iterator[BaseOutput]:
@@ -103,6 +101,7 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
 
                 class Outputs(BaseWorkflow.Outputs):
                     text: str = self.tool_prompt_node.Outputs.text
+                    json: Any = self.tool_prompt_node.Outputs.json
                     chat_history: List[ChatMessage] = ToolCallingState.chat_history
                     results: List[PromptOutput] = self.tool_prompt_node.Outputs.results
 
@@ -171,12 +170,6 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
                     name=output_descriptor.name,
                     value=output_value,
                 )
-
-        results = getattr(outputs, "results", None)
-        if results:
-            _, json_output = process_additional_prompt_outputs(results)
-            if json_output:
-                yield BaseOutput(name="json", value=json_output)
 
     def _build_graph(self) -> None:
         # Get the process_parameters method if it exists on this class
