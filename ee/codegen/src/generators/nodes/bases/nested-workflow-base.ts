@@ -13,7 +13,6 @@ import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { UuidInstantiation } from "src/generators/extensions/uuid-instantiation";
 import { WorkflowProjectGenerator } from "src/project";
 import { WorkflowDataNode, WorkflowRawData } from "src/types/vellum";
-import { createPythonClassName } from "src/utils/casing";
 
 export abstract class BaseNestedWorkflowNode<
   T extends WorkflowDataNode,
@@ -72,7 +71,9 @@ export abstract class BaseNestedWorkflowNode<
 
   protected generateNestedWorkflowContexts(): Map<string, WorkflowContext> {
     const nestedWorkflowLabel = `${this.nodeContext.getNodeLabel()} Workflow`;
-    const nestedWorkflowClassName = createPythonClassName(nestedWorkflowLabel);
+    const nestedWorkflowClassName =
+      this.workflowContext.getUniqueClassName(nestedWorkflowLabel);
+    this.workflowContext.addUsedClassName(nestedWorkflowClassName);
 
     const innerWorkflowData = this.getInnerWorkflowData();
 
