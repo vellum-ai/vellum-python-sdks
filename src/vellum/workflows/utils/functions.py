@@ -24,6 +24,7 @@ from pydash import snake_case
 from vellum import Vellum
 from vellum.client.types.array_chat_message_content_item import ArrayChatMessageContentItem
 from vellum.client.types.function_definition import FunctionDefinition
+from vellum.workflows.constants import undefined
 from vellum.workflows.integrations.composio_service import ComposioService
 from vellum.workflows.integrations.mcp_service import MCPService
 from vellum.workflows.integrations.vellum_integration_service import VellumIntegrationService
@@ -162,6 +163,12 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
     if type(annotation) is ForwardRef:
         # Ignore forward references for now
         return {}
+
+    # Handle Type[undefined] - compile to null type
+    if get_origin(annotation) is type:
+        args = get_args(annotation)
+        if args and args[0] is undefined:
+            return {"type": "null"}
 
     if annotation not in type_map:
         raise ValueError(f"Failed to compile type: {annotation}")

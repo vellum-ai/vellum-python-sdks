@@ -470,6 +470,13 @@
     },
     {
       "id": "62ba7250-8508-41f1-8f14-709902c0e734",
+      "attributes": [
+        {
+          "id": "eb7d528f-3dae-4eac-91ff-957766be58c7",
+          "name": "items",
+          "value": null
+        }
+      ],
       "display_data": {
         "position": {
           "x": 0.0,
@@ -1026,6 +1033,23 @@
         }
       ],
       "outputs": [
+        {
+          "id": "1e346d06-a0d9-45d4-8d74-7df1f2c6d1dc",
+          "name": "json",
+          "type": "JSON",
+          "value": null,
+          "schema": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": {}
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
         {
           "id": "bd83c7f1-fc8d-4441-abcf-95641aa03fcb",
           "name": "text",
