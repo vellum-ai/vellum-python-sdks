@@ -907,3 +907,92 @@ def test_vellum_integration_node_500_error_feeds_back_to_model(vellum_adhoc_prom
 
     # AND the third message should be the assistant's response to the error
     assert chat_history[2].role == "ASSISTANT"
+
+
+def test_tool_calling_node_json_output(vellum_adhoc_prompt_client):
+    """
+    Tests that ToolCallingNode exposes a json output when the LLM returns valid JSON.
+    """
+
+    # GIVEN a ToolCallingNode with a simple function
+    class TestToolCallingNode(ToolCallingNode):
+        ml_model = "gpt-4o-mini"
+        blocks = []
+        functions = [first_function]
+        max_prompt_iterations = 1
+
+    # AND the LLM returns a JSON response
+    expected_json = {"items": ["apple", "banana", "cherry"], "count": 3}
+
+    def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[ExecutePromptEvent]:
+        execution_id = str(uuid4())
+        events: List[ExecutePromptEvent] = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            FulfilledExecutePromptEvent(
+                execution_id=execution_id,
+                outputs=[StringVellumValue(value=json.dumps(expected_json))],
+            ),
+        ]
+        yield from events
+
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
+
+    # WHEN the ToolCallingNode runs
+    state = BaseState()
+    node = TestToolCallingNode(state=state)
+    node_outputs = {}
+    for output in node.run():
+        if output.is_fulfilled:
+            node_outputs[output.name] = output.value
+
+    # THEN the json output should contain the parsed JSON
+    assert "json" in node_outputs
+    assert node_outputs["json"] == expected_json
+
+    # AND the text output should contain the raw JSON string
+    assert "text" in node_outputs
+    assert node_outputs["text"] == json.dumps(expected_json)
+
+
+def test_tool_calling_node_json_output_not_present_for_non_json(vellum_adhoc_prompt_client):
+    """
+    Tests that ToolCallingNode does not expose a json output when the LLM returns non-JSON text.
+    """
+
+    # GIVEN a ToolCallingNode with a simple function
+    class TestToolCallingNode(ToolCallingNode):
+        ml_model = "gpt-4o-mini"
+        blocks = []
+        functions = [first_function]
+        max_prompt_iterations = 1
+
+    # AND the LLM returns a plain text response (not JSON)
+    plain_text_response = "Hello! I can help you with that."
+
+    def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[ExecutePromptEvent]:
+        execution_id = str(uuid4())
+        events: List[ExecutePromptEvent] = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            FulfilledExecutePromptEvent(
+                execution_id=execution_id,
+                outputs=[StringVellumValue(value=plain_text_response)],
+            ),
+        ]
+        yield from events
+
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
+
+    # WHEN the ToolCallingNode runs
+    state = BaseState()
+    node = TestToolCallingNode(state=state)
+    node_outputs = {}
+    for output in node.run():
+        if output.is_fulfilled:
+            node_outputs[output.name] = output.value
+
+    # THEN the json output should not be present
+    assert "json" not in node_outputs
+
+    # AND the text output should contain the plain text
+    assert "text" in node_outputs
+    assert node_outputs["text"] == plain_text_response

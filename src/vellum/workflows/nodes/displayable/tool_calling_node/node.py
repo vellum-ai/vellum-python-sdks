@@ -1,10 +1,11 @@
-from typing import Any, ClassVar, Dict, Generic, Iterator, List, Optional, Set, Union, cast
+from typing import Any, ClassVar, Dict, Generic, Iterator, List, Optional, Set, Type, Union, cast
 
 from vellum import ChatMessage, PromptBlock, PromptOutput
 from vellum.client.types.prompt_parameters import PromptParameters
 from vellum.client.types.prompt_settings import PromptSettings
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
 from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
+from vellum.workflows.constants import undefined
 from vellum.workflows.context import execution_context, get_parent_context
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.errors.types import WorkflowErrorCode
@@ -73,10 +74,12 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
         The outputs of the ToolCallingNode.
 
         text: The final text response after tool calling
+        json: The result of the Prompt Execution in JSON format (if parseable)
         chat_history: The complete chat history including tool calls
         """
 
         text: str
+        json: Union[Dict[Any, Any], Type[undefined]] = undefined
         chat_history: List[ChatMessage]
 
     def run(self) -> Iterator[BaseOutput]:
@@ -99,6 +102,7 @@ class ToolCallingNode(BaseNode[StateType], Generic[StateType]):
 
                 class Outputs(BaseWorkflow.Outputs):
                     text: str = self.tool_prompt_node.Outputs.text
+                    json: Any = self.tool_prompt_node.Outputs.json
                     chat_history: List[ChatMessage] = ToolCallingState.chat_history
                     results: List[PromptOutput] = self.tool_prompt_node.Outputs.results
 

@@ -165,6 +165,16 @@
         ],
         "outputs": [
           {
+            "id": "7d2fbde6-62d2-40a8-b1d3-9655b3b4178e",
+            "name": "json",
+            "type": "JSON",
+            "value": null,
+            "schema": {
+              "type": "object",
+              "additionalProperties": {}
+            }
+          },
+          {
             "id": "41e22c3b-980c-47a0-a1c7-a472d2ed604b",
             "name": "text",
             "type": "STRING",

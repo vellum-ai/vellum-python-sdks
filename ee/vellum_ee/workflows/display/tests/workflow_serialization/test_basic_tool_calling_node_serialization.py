@@ -214,6 +214,13 @@ def test_serialize_workflow():
         ],
         "outputs": [
             {
+                "id": "a7ed5e04-2ddd-45f3-bb08-462068f17ad8",
+                "name": "json",
+                "type": "JSON",
+                "value": None,
+                "schema": {"type": "object", "additionalProperties": {}},
+            },
+            {
                 "id": "d0d0cd85-8546-4d90-bdc1-86c751ba04e5",
                 "name": "text",
                 "type": "STRING",
