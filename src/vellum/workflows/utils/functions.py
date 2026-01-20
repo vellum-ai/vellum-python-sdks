@@ -96,6 +96,10 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
             if not (get_origin(a) is type and get_args(a) and get_args(a)[0] is undefined)
         ]
 
+        if len(filtered_args) == 0:
+            # Edge case: all union members were Type[undefined], return empty schema
+            return {}
+
         if len(filtered_args) == 1:
             return compile_annotation(filtered_args[0], defs)
 
