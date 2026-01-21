@@ -114,31 +114,41 @@ def test_serialize_workflow(vellum_client):
     }
 
 
+class ConstantApiKeyNode(APINode):
+    method = APIRequestMethod.POST
+    url = "https://api.example.com"
+    authorization_type = AuthorizationType.API_KEY
+    api_key_header_value = "hardcoded-secret-value"
+
+
+class ConstantApiKeyWorkflow(BaseWorkflow):
+    graph = ConstantApiKeyNode
+
+
+class ConstantBearerTokenNode(APINode):
+    method = APIRequestMethod.POST
+    url = "https://api.example.com"
+    authorization_type = AuthorizationType.BEARER_TOKEN
+    bearer_token_value = "hardcoded-secret-value"
+
+
+class ConstantBearerTokenWorkflow(BaseWorkflow):
+    graph = ConstantBearerTokenNode
+
+
 @pytest.mark.parametrize(
-    "secret_field",
-    ["api_key_header_value", "bearer_token_value"],
+    "workflow_class",
+    [ConstantApiKeyWorkflow, ConstantBearerTokenWorkflow],
     ids=["api_key_header_value", "bearer_token_value"],
 )
-def test_serialize_workflow__constant_secret_value__raises_error(secret_field):
+def test_serialize_workflow__constant_secret_value__raises_error(workflow_class):
     """
     Tests that API nodes reject constant values for secret inputs.
     """
 
-    # GIVEN an API node with a constant value for a secret input
-    class ConstantSecretAPINode(APINode):
-        method = APIRequestMethod.POST
-        url = "https://api.example.com"
-        authorization_type = (
-            AuthorizationType.API_KEY if secret_field == "api_key_header_value" else AuthorizationType.BEARER_TOKEN
-        )  # noqa: E501
-
-    setattr(ConstantSecretAPINode, secret_field, "hardcoded-secret-value")
-
-    class ConstantSecretWorkflow(BaseWorkflow):
-        graph = ConstantSecretAPINode
-
+    # GIVEN a workflow with an API node that has a constant value for a secret input
     # WHEN we try to serialize the workflow
-    workflow_display = get_workflow_display(workflow_class=ConstantSecretWorkflow)
+    workflow_display = get_workflow_display(workflow_class=workflow_class)
 
     # THEN it should raise a UserFacingException
     with pytest.raises(UserFacingException) as exc_info:
