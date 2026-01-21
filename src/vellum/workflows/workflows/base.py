@@ -686,7 +686,9 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
                 )
             except (ValueError, ModuleNotFoundError, AttributeError):
                 for node in candidate_nodes:
-                    if f"{node.__module__}.{node.__name__}" == node_ref:
+                    full_path = f"{node.__module__}.{node.__name__}"
+                    # Check exact match OR suffix match (for dynamically loaded workflows with namespace prefix)
+                    if full_path == node_ref or full_path.endswith(f".{node_ref}"):
                         return node
                 raise WorkflowInitializationException(
                     message=f"Node '{node_ref}' not found in workflow",
