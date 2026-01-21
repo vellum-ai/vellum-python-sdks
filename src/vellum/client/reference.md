@@ -1497,9 +1497,9 @@ client = Vellum(
     api_key="YOUR_API_KEY",
 )
 client.integrations.execute_integration_tool(
-    integration_name_="integration_name",
+    integration_name="integration_name",
     integration_provider="integration_provider",
-    tool_name_="tool_name",
+    tool_name="tool_name",
     arguments={"arguments": {"key": "value"}},
 )
 

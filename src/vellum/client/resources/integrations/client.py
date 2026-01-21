@@ -90,39 +90,33 @@ class IntegrationsClient:
 
     def execute_integration_tool(
         self,
-        integration_name_: str,
+        integration_name: str,
         integration_provider: str,
-        tool_name_: str,
+        tool_name: str,
         *,
         arguments: typing.Dict[str, typing.Optional[typing.Any]],
         toolkit_version: typing.Optional[str] = OMIT,
-        integration_name: typing.Optional[str] = OMIT,
         integration: typing.Optional[str] = OMIT,
-        tool_name: typing.Optional[str] = OMIT,
         tool: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ComponentsSchemasComposioExecuteToolResponse:
         """
         Parameters
         ----------
-        integration_name_ : str
+        integration_name : str
             The integration name
 
         integration_provider : str
             The integration provider name
 
-        tool_name_ : str
+        tool_name : str
             The tool's unique name, as specified by the integration provider
 
         arguments : typing.Dict[str, typing.Optional[typing.Any]]
 
         toolkit_version : typing.Optional[str]
 
-        integration_name : typing.Optional[str]
-
         integration : typing.Optional[str]
-
-        tool_name : typing.Optional[str]
 
         tool : typing.Optional[str]
 
@@ -143,21 +137,19 @@ class IntegrationsClient:
             api_key="YOUR_API_KEY",
         )
         client.integrations.execute_integration_tool(
-            integration_name_="integration_name",
+            integration_name="integration_name",
             integration_provider="integration_provider",
-            tool_name_="tool_name",
+            tool_name="tool_name",
             arguments={"arguments": {"key": "value"}},
         )
         """
         _response = self._raw_client.execute_integration_tool(
-            integration_name_,
+            integration_name,
             integration_provider,
-            tool_name_,
+            tool_name,
             arguments=arguments,
             toolkit_version=toolkit_version,
-            integration_name=integration_name,
             integration=integration,
-            tool_name=tool_name,
             tool=tool,
             request_options=request_options,
         )
@@ -338,39 +330,33 @@ class AsyncIntegrationsClient:
 
     async def execute_integration_tool(
         self,
-        integration_name_: str,
+        integration_name: str,
         integration_provider: str,
-        tool_name_: str,
+        tool_name: str,
         *,
         arguments: typing.Dict[str, typing.Optional[typing.Any]],
         toolkit_version: typing.Optional[str] = OMIT,
-        integration_name: typing.Optional[str] = OMIT,
         integration: typing.Optional[str] = OMIT,
-        tool_name: typing.Optional[str] = OMIT,
         tool: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ComponentsSchemasComposioExecuteToolResponse:
         """
         Parameters
         ----------
-        integration_name_ : str
+        integration_name : str
             The integration name
 
         integration_provider : str
             The integration provider name
 
-        tool_name_ : str
+        tool_name : str
             The tool's unique name, as specified by the integration provider
 
         arguments : typing.Dict[str, typing.Optional[typing.Any]]
 
         toolkit_version : typing.Optional[str]
 
-        integration_name : typing.Optional[str]
-
         integration : typing.Optional[str]
-
-        tool_name : typing.Optional[str]
 
         tool : typing.Optional[str]
 
@@ -396,9 +382,9 @@ class AsyncIntegrationsClient:
 
         async def main() -> None:
             await client.integrations.execute_integration_tool(
-                integration_name_="integration_name",
+                integration_name="integration_name",
                 integration_provider="integration_provider",
-                tool_name_="tool_name",
+                tool_name="tool_name",
                 arguments={"arguments": {"key": "value"}},
             )
 
@@ -406,14 +392,12 @@ class AsyncIntegrationsClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.execute_integration_tool(
-            integration_name_,
+            integration_name,
             integration_provider,
-            tool_name_,
+            tool_name,
             arguments=arguments,
             toolkit_version=toolkit_version,
-            integration_name=integration_name,
             integration=integration,
-            tool_name=tool_name,
             tool=tool,
             request_options=request_options,
         )

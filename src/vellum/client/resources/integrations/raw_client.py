@@ -95,39 +95,33 @@ class RawIntegrationsClient:
 
     def execute_integration_tool(
         self,
-        integration_name_: str,
+        integration_name: str,
         integration_provider: str,
-        tool_name_: str,
+        tool_name: str,
         *,
         arguments: typing.Dict[str, typing.Optional[typing.Any]],
         toolkit_version: typing.Optional[str] = OMIT,
-        integration_name: typing.Optional[str] = OMIT,
         integration: typing.Optional[str] = OMIT,
-        tool_name: typing.Optional[str] = OMIT,
         tool: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[ComponentsSchemasComposioExecuteToolResponse]:
         """
         Parameters
         ----------
-        integration_name_ : str
+        integration_name : str
             The integration name
 
         integration_provider : str
             The integration provider name
 
-        tool_name_ : str
+        tool_name : str
             The tool's unique name, as specified by the integration provider
 
         arguments : typing.Dict[str, typing.Optional[typing.Any]]
 
         toolkit_version : typing.Optional[str]
 
-        integration_name : typing.Optional[str]
-
         integration : typing.Optional[str]
-
-        tool_name : typing.Optional[str]
 
         tool : typing.Optional[str]
 
@@ -140,15 +134,13 @@ class RawIntegrationsClient:
 
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"integrations/v1/providers/{jsonable_encoder(integration_provider)}/integrations/{jsonable_encoder(integration_name_)}/tools/{jsonable_encoder(tool_name_)}/execute",
+            f"integrations/v1/providers/{jsonable_encoder(integration_provider)}/integrations/{jsonable_encoder(integration_name)}/tools/{jsonable_encoder(tool_name)}/execute",
             base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
                 "arguments": arguments,
                 "toolkit_version": toolkit_version,
-                "integration_name": integration_name,
                 "integration": integration,
-                "tool_name": tool_name,
                 "tool": tool,
                 "provider": "COMPOSIO",
             },
@@ -401,39 +393,33 @@ class AsyncRawIntegrationsClient:
 
     async def execute_integration_tool(
         self,
-        integration_name_: str,
+        integration_name: str,
         integration_provider: str,
-        tool_name_: str,
+        tool_name: str,
         *,
         arguments: typing.Dict[str, typing.Optional[typing.Any]],
         toolkit_version: typing.Optional[str] = OMIT,
-        integration_name: typing.Optional[str] = OMIT,
         integration: typing.Optional[str] = OMIT,
-        tool_name: typing.Optional[str] = OMIT,
         tool: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[ComponentsSchemasComposioExecuteToolResponse]:
         """
         Parameters
         ----------
-        integration_name_ : str
+        integration_name : str
             The integration name
 
         integration_provider : str
             The integration provider name
 
-        tool_name_ : str
+        tool_name : str
             The tool's unique name, as specified by the integration provider
 
         arguments : typing.Dict[str, typing.Optional[typing.Any]]
 
         toolkit_version : typing.Optional[str]
 
-        integration_name : typing.Optional[str]
-
         integration : typing.Optional[str]
-
-        tool_name : typing.Optional[str]
 
         tool : typing.Optional[str]
 
@@ -446,15 +432,13 @@ class AsyncRawIntegrationsClient:
 
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"integrations/v1/providers/{jsonable_encoder(integration_provider)}/integrations/{jsonable_encoder(integration_name_)}/tools/{jsonable_encoder(tool_name_)}/execute",
+            f"integrations/v1/providers/{jsonable_encoder(integration_provider)}/integrations/{jsonable_encoder(integration_name)}/tools/{jsonable_encoder(tool_name)}/execute",
             base_url=self._client_wrapper.get_environment().default,
             method="POST",
             json={
                 "arguments": arguments,
                 "toolkit_version": toolkit_version,
-                "integration_name": integration_name,
                 "integration": integration,
-                "tool_name": tool_name,
                 "tool": tool,
                 "provider": "COMPOSIO",
             },
