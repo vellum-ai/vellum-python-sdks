@@ -1,9 +1,14 @@
+import pytest
 from datetime import datetime
 from uuid import uuid4
 
 from deepdiff import DeepDiff
 
 from vellum import WorkspaceSecretRead
+from vellum.workflows import BaseWorkflow
+from vellum.workflows.constants import APIRequestMethod, AuthorizationType
+from vellum.workflows.nodes.displayable import APINode
+from vellum_ee.workflows.display.utils.exceptions import UserFacingException
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 from tests.workflows.basic_api_node.workflow import SimpleAPIWorkflow
@@ -107,3 +112,38 @@ def test_serialize_workflow(vellum_client):
             "workflow",
         ],
     }
+
+
+@pytest.mark.parametrize(
+    "secret_field",
+    ["api_key_header_value", "bearer_token_value"],
+    ids=["api_key_header_value", "bearer_token_value"],
+)
+def test_serialize_workflow__constant_secret_value__raises_error(secret_field):
+    """
+    Tests that API nodes reject constant values for secret inputs.
+    """
+
+    # GIVEN an API node with a constant value for a secret input
+    class ConstantSecretAPINode(APINode):
+        method = APIRequestMethod.POST
+        url = "https://api.example.com"
+        authorization_type = (
+            AuthorizationType.API_KEY if secret_field == "api_key_header_value" else AuthorizationType.BEARER_TOKEN
+        )  # noqa: E501
+
+    setattr(ConstantSecretAPINode, secret_field, "hardcoded-secret-value")
+
+    class ConstantSecretWorkflow(BaseWorkflow):
+        graph = ConstantSecretAPINode
+
+    # WHEN we try to serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=ConstantSecretWorkflow)
+
+    # THEN it should raise a UserFacingException
+    with pytest.raises(UserFacingException) as exc_info:
+        workflow_display.serialize()
+
+    # AND the error message should explain the issue
+    assert "Secret inputs cannot be set to constant values" in str(exc_info.value)
+    assert "VellumSecretReference or EnvironmentVariableReference" in str(exc_info.value)
