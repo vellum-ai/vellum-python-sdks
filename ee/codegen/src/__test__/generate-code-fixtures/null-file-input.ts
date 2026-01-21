@@ -162,5 +162,5 @@ export default {
   ],
   state_variables: [],
   triggers: [],
-  assertions: ["sandbox.py"],
+  assertions: ["sandbox.py", "workflow.py", "inputs.py"],
 };

@@ -287,6 +287,18 @@ if __name__ == "__main__":
 "
 `;
 
+exports[`generateCode > should generate code for %1 null-file-input.ts > inputs.py 1`] = `
+"from typing import Optional
+
+from vellum import VellumDocument
+from vellum.workflows.inputs import BaseInputs
+
+
+class Inputs(BaseInputs):
+    document: Optional[VellumDocument] = None
+"
+`;
+
 exports[`generateCode > should generate code for %1 null-file-input.ts > sandbox.py 1`] = `
 "from vellum.workflows.inputs import DatasetRow
 from vellum.workflows.sandbox import WorkflowSandboxRunner
@@ -302,6 +314,23 @@ runner = WorkflowSandboxRunner(workflow=Workflow(), dataset=dataset)
 
 if __name__ == "__main__":
     runner.run()
+"
+`;
+
+exports[`generateCode > should generate code for %1 null-file-input.ts > workflow.py 1`] = `
+"from vellum.workflows import BaseWorkflow
+from vellum.workflows.state import BaseState
+
+from .inputs import Inputs
+from .nodes.final_output import FinalOutput
+from .nodes.templating import Templating
+
+
+class Workflow(BaseWorkflow[Inputs, BaseState]):
+    graph = Templating >> FinalOutput
+
+    class Outputs(BaseWorkflow.Outputs):
+        final_output = FinalOutput.Outputs.value
 "
 `;
 
