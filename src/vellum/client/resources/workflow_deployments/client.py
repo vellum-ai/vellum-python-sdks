@@ -177,7 +177,8 @@ class WorkflowDeploymentsClient:
             api_key="YOUR_API_KEY",
         )
         response = client.workflow_deployments.execute_stream(
-            id="id",
+            id="my-workflow",
+            inputs={"question": "What is the capital of France?"},
         )
         for chunk in response:
             yield chunk
@@ -727,7 +728,8 @@ class AsyncWorkflowDeploymentsClient:
 
         async def main() -> None:
             response = await client.workflow_deployments.execute_stream(
-                id="id",
+                id="my-workflow",
+                inputs={"question": "What is the capital of France?"},
             )
             async for chunk in response:
                 yield chunk

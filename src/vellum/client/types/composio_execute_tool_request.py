@@ -14,6 +14,10 @@ class ComposioExecuteToolRequest(UniversalBaseModel):
     provider: typing.Literal["COMPOSIO"] = "COMPOSIO"
     arguments: typing.Dict[str, typing.Optional[typing.Any]]
     toolkit_version: typing.Optional[str] = None
+    integration_name: typing.Optional[str] = None
+    integration: typing.Optional[str] = None
+    tool_name: typing.Optional[str] = None
+    tool: typing.Optional[str] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

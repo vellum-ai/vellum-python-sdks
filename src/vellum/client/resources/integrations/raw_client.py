@@ -101,6 +101,8 @@ class RawIntegrationsClient:
         *,
         arguments: typing.Dict[str, typing.Optional[typing.Any]],
         toolkit_version: typing.Optional[str] = OMIT,
+        integration: typing.Optional[str] = OMIT,
+        tool: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[ComponentsSchemasComposioExecuteToolResponse]:
         """
@@ -119,6 +121,10 @@ class RawIntegrationsClient:
 
         toolkit_version : typing.Optional[str]
 
+        integration : typing.Optional[str]
+
+        tool : typing.Optional[str]
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -134,6 +140,8 @@ class RawIntegrationsClient:
             json={
                 "arguments": arguments,
                 "toolkit_version": toolkit_version,
+                "integration": integration,
+                "tool": tool,
                 "provider": "COMPOSIO",
             },
             headers={
@@ -391,6 +399,8 @@ class AsyncRawIntegrationsClient:
         *,
         arguments: typing.Dict[str, typing.Optional[typing.Any]],
         toolkit_version: typing.Optional[str] = OMIT,
+        integration: typing.Optional[str] = OMIT,
+        tool: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[ComponentsSchemasComposioExecuteToolResponse]:
         """
@@ -409,6 +419,10 @@ class AsyncRawIntegrationsClient:
 
         toolkit_version : typing.Optional[str]
 
+        integration : typing.Optional[str]
+
+        tool : typing.Optional[str]
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -424,6 +438,8 @@ class AsyncRawIntegrationsClient:
             json={
                 "arguments": arguments,
                 "toolkit_version": toolkit_version,
+                "integration": integration,
+                "tool": tool,
                 "provider": "COMPOSIO",
             },
             headers={

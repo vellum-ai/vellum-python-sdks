@@ -96,6 +96,8 @@ class IntegrationsClient:
         *,
         arguments: typing.Dict[str, typing.Optional[typing.Any]],
         toolkit_version: typing.Optional[str] = OMIT,
+        integration: typing.Optional[str] = OMIT,
+        tool: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ComponentsSchemasComposioExecuteToolResponse:
         """
@@ -113,6 +115,10 @@ class IntegrationsClient:
         arguments : typing.Dict[str, typing.Optional[typing.Any]]
 
         toolkit_version : typing.Optional[str]
+
+        integration : typing.Optional[str]
+
+        tool : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -143,6 +149,8 @@ class IntegrationsClient:
             tool_name,
             arguments=arguments,
             toolkit_version=toolkit_version,
+            integration=integration,
+            tool=tool,
             request_options=request_options,
         )
         return _response.data
@@ -328,6 +336,8 @@ class AsyncIntegrationsClient:
         *,
         arguments: typing.Dict[str, typing.Optional[typing.Any]],
         toolkit_version: typing.Optional[str] = OMIT,
+        integration: typing.Optional[str] = OMIT,
+        tool: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ComponentsSchemasComposioExecuteToolResponse:
         """
@@ -345,6 +355,10 @@ class AsyncIntegrationsClient:
         arguments : typing.Dict[str, typing.Optional[typing.Any]]
 
         toolkit_version : typing.Optional[str]
+
+        integration : typing.Optional[str]
+
+        tool : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -383,6 +397,8 @@ class AsyncIntegrationsClient:
             tool_name,
             arguments=arguments,
             toolkit_version=toolkit_version,
+            integration=integration,
+            tool=tool,
             request_options=request_options,
         )
         return _response.data

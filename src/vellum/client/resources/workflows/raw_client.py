@@ -18,6 +18,7 @@ from ...errors.not_found_error import NotFoundError
 from ...types.check_workflow_execution_status_response import CheckWorkflowExecutionStatusResponse
 from ...types.dataset_row_push_request import DatasetRowPushRequest
 from ...types.runner_config_request import RunnerConfigRequest
+from ...types.type_checker_enum import TypeCheckerEnum
 from ...types.workflow_push_deployment_config_request import WorkflowPushDeploymentConfigRequest
 from ...types.workflow_push_exec_config import WorkflowPushExecConfig
 from ...types.workflow_push_response import WorkflowPushResponse
@@ -392,6 +393,7 @@ class RawWorkflowsClient:
         files: typing.Dict[str, typing.Optional[typing.Any]],
         module: typing.Optional[str] = OMIT,
         runner_config: typing.Optional[RunnerConfigRequest] = OMIT,
+        type_checker: typing.Optional[TypeCheckerEnum] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[typing.Dict[str, typing.Optional[typing.Any]]]:
         """
@@ -404,6 +406,13 @@ class RawWorkflowsClient:
         module : typing.Optional[str]
 
         runner_config : typing.Optional[RunnerConfigRequest]
+
+        type_checker : typing.Optional[TypeCheckerEnum]
+            Optional type checker to run during serialization. Supported values: mypy, zuban, default.
+
+            * `mypy` - Mypy
+            * `zuban` - Zuban
+            * `default` - Default
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -423,6 +432,7 @@ class RawWorkflowsClient:
                 "runner_config": convert_and_respect_annotation_metadata(
                     object_=runner_config, annotation=typing.Optional[RunnerConfigRequest], direction="write"
                 ),
+                "type_checker": type_checker,
             },
             headers={
                 "content-type": "application/json",
@@ -811,6 +821,7 @@ class AsyncRawWorkflowsClient:
         files: typing.Dict[str, typing.Optional[typing.Any]],
         module: typing.Optional[str] = OMIT,
         runner_config: typing.Optional[RunnerConfigRequest] = OMIT,
+        type_checker: typing.Optional[TypeCheckerEnum] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[typing.Dict[str, typing.Optional[typing.Any]]]:
         """
@@ -823,6 +834,13 @@ class AsyncRawWorkflowsClient:
         module : typing.Optional[str]
 
         runner_config : typing.Optional[RunnerConfigRequest]
+
+        type_checker : typing.Optional[TypeCheckerEnum]
+            Optional type checker to run during serialization. Supported values: mypy, zuban, default.
+
+            * `mypy` - Mypy
+            * `zuban` - Zuban
+            * `default` - Default
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -842,6 +860,7 @@ class AsyncRawWorkflowsClient:
                 "runner_config": convert_and_respect_annotation_metadata(
                     object_=runner_config, annotation=typing.Optional[RunnerConfigRequest], direction="write"
                 ),
+                "type_checker": type_checker,
             },
             headers={
                 "content-type": "application/json",

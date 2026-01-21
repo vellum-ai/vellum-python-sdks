@@ -1517,7 +1517,7 @@ client.integrations.execute_integration_tool(
 <dl>
 <dd>
 
-**integration_name:** `str` — The integration name
+**integration_name_:** `str` — The integration name
     
 </dd>
 </dl>
@@ -1533,7 +1533,7 @@ client.integrations.execute_integration_tool(
 <dl>
 <dd>
 
-**tool_name:** `str` — The tool's unique name, as specified by the integration provider
+**tool_name_:** `str` — The tool's unique name, as specified by the integration provider
     
 </dd>
 </dl>
@@ -1550,6 +1550,38 @@ client.integrations.execute_integration_tool(
 <dd>
 
 **toolkit_version:** `typing.Optional[str]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**integration_name:** `typing.Optional[str]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**integration:** `typing.Optional[str]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**tool_name:** `typing.Optional[str]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**tool:** `typing.Optional[str]` 
     
 </dd>
 </dl>
@@ -6848,7 +6880,10 @@ client = Vellum(
     api_key="YOUR_API_KEY",
 )
 response = client.workflow_deployments.execute_stream(
-    id="id",
+    id="my-chat-workflow",
+    trigger="chat",
+    previous_execution_id="550e8400-e29b-41d4-a716-446655440099",
+    inputs={"message": "What is machine learning?"},
 )
 for chunk in response.data:
     yield chunk
@@ -8170,6 +8205,20 @@ client.workflows.serialize_workflow_files(
 <dd>
 
 **runner_config:** `typing.Optional[RunnerConfigRequest]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**type_checker:** `typing.Optional[TypeCheckerEnum]` 
+
+Optional type checker to run during serialization. Supported values: mypy, zuban, default.
+
+* `mypy` - Mypy
+* `zuban` - Zuban
+* `default` - Default
     
 </dd>
 </dl>

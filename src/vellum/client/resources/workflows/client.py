@@ -8,6 +8,7 @@ from ...core.request_options import RequestOptions
 from ...types.check_workflow_execution_status_response import CheckWorkflowExecutionStatusResponse
 from ...types.dataset_row_push_request import DatasetRowPushRequest
 from ...types.runner_config_request import RunnerConfigRequest
+from ...types.type_checker_enum import TypeCheckerEnum
 from ...types.workflow_push_deployment_config_request import WorkflowPushDeploymentConfigRequest
 from ...types.workflow_push_exec_config import WorkflowPushExecConfig
 from ...types.workflow_push_response import WorkflowPushResponse
@@ -265,6 +266,7 @@ class WorkflowsClient:
         files: typing.Dict[str, typing.Optional[typing.Any]],
         module: typing.Optional[str] = OMIT,
         runner_config: typing.Optional[RunnerConfigRequest] = OMIT,
+        type_checker: typing.Optional[TypeCheckerEnum] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Dict[str, typing.Optional[typing.Any]]:
         """
@@ -277,6 +279,13 @@ class WorkflowsClient:
         module : typing.Optional[str]
 
         runner_config : typing.Optional[RunnerConfigRequest]
+
+        type_checker : typing.Optional[TypeCheckerEnum]
+            Optional type checker to run during serialization. Supported values: mypy, zuban, default.
+
+            * `mypy` - Mypy
+            * `zuban` - Zuban
+            * `default` - Default
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -299,7 +308,11 @@ class WorkflowsClient:
         )
         """
         _response = self._raw_client.serialize_workflow_files(
-            files=files, module=module, runner_config=runner_config, request_options=request_options
+            files=files,
+            module=module,
+            runner_config=runner_config,
+            type_checker=type_checker,
+            request_options=request_options,
         )
         return _response.data
 
@@ -571,6 +584,7 @@ class AsyncWorkflowsClient:
         files: typing.Dict[str, typing.Optional[typing.Any]],
         module: typing.Optional[str] = OMIT,
         runner_config: typing.Optional[RunnerConfigRequest] = OMIT,
+        type_checker: typing.Optional[TypeCheckerEnum] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Dict[str, typing.Optional[typing.Any]]:
         """
@@ -583,6 +597,13 @@ class AsyncWorkflowsClient:
         module : typing.Optional[str]
 
         runner_config : typing.Optional[RunnerConfigRequest]
+
+        type_checker : typing.Optional[TypeCheckerEnum]
+            Optional type checker to run during serialization. Supported values: mypy, zuban, default.
+
+            * `mypy` - Mypy
+            * `zuban` - Zuban
+            * `default` - Default
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -613,6 +634,10 @@ class AsyncWorkflowsClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.serialize_workflow_files(
-            files=files, module=module, runner_config=runner_config, request_options=request_options
+            files=files,
+            module=module,
+            runner_config=runner_config,
+            type_checker=type_checker,
+            request_options=request_options,
         )
         return _response.data
