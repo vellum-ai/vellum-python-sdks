@@ -7,6 +7,7 @@ import {
   ChatMessageRequest,
   ChatMessageRole,
   FunctionDefinition,
+  NamedTestCaseVariableValueRequest,
   PromptBlockState,
   PromptParameters,
   SearchResult,
@@ -14,7 +15,6 @@ import {
   VellumValue,
   VellumVariable,
   VellumVariableType,
-  WorkflowInput,
 } from "vellum-ai/api/types";
 
 import { Reference } from "src/generators/extensions/reference";
@@ -892,7 +892,7 @@ export interface WorkflowVersionExecConfig {
   triggers?: WorkflowTrigger[];
 }
 
-export type WorkflowSandboxInputs = WorkflowInput[];
+export type WorkflowSandboxInputs = NamedTestCaseVariableValueRequest[];
 export interface WorkflowSandboxDatasetRowMock {
   node_id: string;
   when_condition?: WorkflowValueDescriptor;

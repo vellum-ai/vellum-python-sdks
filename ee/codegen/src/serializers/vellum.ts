@@ -20,12 +20,12 @@ import {
 import {
   ChatMessageRole as ChatMessageRoleSerializer,
   LogicalOperator as LogicalOperatorSerializer,
+  NamedTestCaseVariableValueRequest as NamedTestCaseVariableValueRequestSerializer,
   PromptBlockState as PromptBlockStateSerializer,
   PromptParameters as PromptParametersSerializer,
   VellumValue as VellumValueSerializer,
   VellumVariable as VellumVariableSerializer,
   VellumVariableType as VellumVariableTypeSerializer,
-  WorkflowInput as WorkflowInputSerializer,
 } from "vellum-ai/serialization";
 import { ConditionCombinator as ConditionCombinatorSerializer } from "vellum-ai/serialization/types/ConditionCombinator";
 
@@ -118,8 +118,8 @@ import {
   WorkflowEdgeDisplayData,
   WorkflowInputWorkflowReference,
   WorkflowNode,
-  WorkflowOutputWorkflowReference,
   WorkflowOutputValue,
+  WorkflowOutputWorkflowReference,
   WorkflowRawData,
   WorkflowSandboxDatasetRowMock,
   WorkflowSandboxRoutingConfig,
@@ -2646,7 +2646,7 @@ export declare namespace WorkflowDisplayDataSerializer {
 }
 
 export const WorkflowSandboxInputsSerializer = listSchema(
-  WorkflowInputSerializer
+  NamedTestCaseVariableValueRequestSerializer
 );
 
 export declare namespace WorkflowSandboxDatasetRowMockSerializer {
