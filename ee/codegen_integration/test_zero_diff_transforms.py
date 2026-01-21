@@ -66,8 +66,9 @@ def _compute_diff(
 @pytest.mark.parametrize(
     "module_name",
     [
-        "trivial",
         "builtin_list_str",
+        "tool_calling_node_with_custom_run_subworkflow",
+        "trivial",
     ],
 )
 def test_zero_diff_transforms(module_name: str):
