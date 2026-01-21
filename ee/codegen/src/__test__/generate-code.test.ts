@@ -42,7 +42,7 @@ describe("generateCode", () => {
     fs.mkdirSync(fixtureDir, { recursive: true });
 
     async function expectProjectFileToMatchSnapshot(filePath: string[]) {
-      const moduleRoot = join(tempDir, moduleName);
+      const moduleRoot = join(fixtureDir, moduleName);
       const completeFilePath = join(moduleRoot, ...filePath);
       const snapshotName = filePath.join("/");
 
@@ -58,7 +58,7 @@ describe("generateCode", () => {
     }
 
     const project = new WorkflowProjectGenerator({
-      absolutePathToOutputDirectory: tempDir,
+      absolutePathToOutputDirectory: fixtureDir,
       workflowVersionExecConfigData,
       moduleName,
       vellumApiKey,
