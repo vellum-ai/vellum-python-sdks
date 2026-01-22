@@ -32,7 +32,7 @@ from vellum_ee.workflows.display.utils.events import event_enricher
                                 "label": "Entrypoint Node",
                                 "source_handle_id": "d1fe8f4c-53d7-43a0-b210-73ebdc60bf57",
                             },
-                            "display_data": {"position": {"x": 0.0, "y": -50.0}},
+                            "display_data": {"position": {"x": 0.0, "y": 0.0}},
                             "base": None,
                             "definition": None,
                         }
