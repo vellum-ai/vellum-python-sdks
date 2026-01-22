@@ -85,7 +85,7 @@ def test_serialize_workflow():
             "source_handle_id": "c344fdee-282b-40c9-8c97-6dd08830948c",
         },
         "display_data": {
-            "position": {"x": 0.0, "y": -50.0},
+            "position": {"x": 0.0, "y": 0.0},
         },
     }
 
@@ -131,7 +131,7 @@ def test_serialize_workflow():
                     {"id": "fad5dd9f-3328-4e70-ad55-65a5325a4a82", "key": "reasoning", "type": "STRING"},
                 ],
             },
-            "display_data": {"position": {"x": 200.0, "y": -50.0}},
+            "display_data": {"position": {"x": 0.0, "y": 0.0}},
             "base": {
                 "name": "InlineSubworkflowNode",
                 "module": ["vellum", "workflows", "nodes", "core", "inline_subworkflow_node", "node"],
@@ -159,7 +159,7 @@ def test_serialize_workflow():
         "label": "Start Node",
         "type": "GENERIC",
         "should_file_merge": True,
-        "display_data": {"position": {"x": 200.0, "y": -50.0}},
+        "display_data": {"position": {"x": 0.0, "y": 0.0}},
         "base": {"name": "BaseNode", "module": ["vellum", "workflows", "nodes", "bases", "base"]},
         "definition": {
             "name": "StartNode",

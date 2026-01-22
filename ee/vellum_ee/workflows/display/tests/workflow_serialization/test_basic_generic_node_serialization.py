@@ -57,16 +57,14 @@ def test_serialize_workflow():
     generic_node = next(n for n in workflow_raw_data["nodes"] if (n.get("base") or {}).get("name") == "BaseNode")
     assert generic_node["id"] == "bf98371c-65d3-43c1-99a2-0f5369397847"
 
-    # AND the nodes should have been auto-positioned since they all started at (0,0)
+    # AND the nodes should remain at (0,0) since Display.layout is not set to "auto"
     nodes = workflow_raw_data["nodes"]
     positions = [node["display_data"]["position"] for node in nodes]
 
-    nodes_at_zero = sum(1 for pos in positions if pos["x"] == 0.0 and pos["y"] == 0.0)
-    assert nodes_at_zero < len(nodes), "Auto layout should have positioned nodes away from (0,0)"
-
-    x_positions = [pos["x"] for pos in positions]
-    assert all(x >= 0 for x in x_positions), "All x positions should be non-negative"
-    assert len(set(x_positions)) > 1 or len(nodes) == 1, "Nodes should be spread across different x positions"
+    # All nodes should be at (0,0) since autolayout is not applied by default
+    for pos in positions:
+        assert pos["x"] == 0.0, f"Node x position should be 0.0, got {pos['x']}"
+        assert pos["y"] == 0.0, f"Node y position should be 0.0, got {pos['y']}"
 
     # AND the definition should be what we expect
     definition = workflow_raw_data["definition"]
