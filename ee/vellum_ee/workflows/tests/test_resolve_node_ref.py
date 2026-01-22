@@ -215,13 +215,11 @@ class UserConfig:
 
     # Import the UserConfig type from the loaded module to create input
     import importlib
+
     types_module = importlib.import_module(f"{namespace}.nodes.types")
     UserConfig = types_module.UserConfig
 
-    events = list(workflow.run_node(
-        "nodes.my_node.MyNode",
-        inputs={"config": UserConfig(name="World")}
-    ))
+    events = list(workflow.run_node("nodes.my_node.MyNode", inputs={"config": UserConfig(name="World")}))
 
     # THEN the node should execute successfully using the relatively-imported type
     fulfilled_events = [e for e in events if e.name == "node.execution.fulfilled"]
