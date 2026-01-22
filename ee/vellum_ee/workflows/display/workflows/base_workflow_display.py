@@ -641,10 +641,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                 self._apply_auto_layout(nodes_dict_list, edges)
             except Exception as e:
                 self.display_context.add_error(e)
-        elif not self._has_explicit_entrypoint_node_display():
-            # If auto-layout is not being applied and no explicit entrypoint_node_display
-            # was provided, infer the entrypoint position from the other nodes
-            self._infer_entrypoint_position(nodes_dict_list)
 
         # Serialize workflow-level trigger if present
         triggers: Optional[JsonArray] = self._serialize_workflow_trigger()
@@ -1041,62 +1037,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                 if isinstance(node_id_val, str) and node_id_val == node_id and isinstance(display_data, dict):
                     display_data_dict = cast(Dict[str, Any], display_data)
                     display_data_dict["position"] = positioned_data.position.dict()
-
-    def _infer_entrypoint_position(self, nodes_dict_list: List[Dict[str, Any]]) -> None:
-        """Infer the entrypoint node position from the leftmost non-entrypoint nodes.
-
-        Only updates the entrypoint position if:
-        1. The entrypoint node exists and is at position (0, 0)
-        2. At least one non-entrypoint node has a non-zero position
-        """
-        entrypoint_node = None
-        non_entrypoint_nodes = []
-
-        for node_dict in nodes_dict_list:
-            if node_dict.get("type") == "ENTRYPOINT":
-                entrypoint_node = node_dict
-            else:
-                non_entrypoint_nodes.append(node_dict)
-
-        if entrypoint_node is None or not non_entrypoint_nodes:
-            return
-
-        entrypoint_display_data = entrypoint_node.get("display_data")
-        if not isinstance(entrypoint_display_data, dict):
-            return
-
-        entrypoint_position = entrypoint_display_data.get("position")
-        if not isinstance(entrypoint_position, dict):
-            return
-
-        entrypoint_x = entrypoint_position.get("x") or 0
-        entrypoint_y = entrypoint_position.get("y") or 0
-        if entrypoint_x != 0.0 or entrypoint_y != 0.0:
-            return
-
-        min_x = float("inf")
-        y_at_min_x = 0.0
-
-        for node_dict in non_entrypoint_nodes:
-            display_data = node_dict.get("display_data")
-            if isinstance(display_data, dict):
-                position = display_data.get("position")
-                if isinstance(position, dict):
-                    x = position.get("x")
-                    y = position.get("y")
-                    if x is not None and x < min_x:
-                        min_x = x
-                        y_at_min_x = y if y is not None else 0.0
-
-        if min_x == float("inf") or min_x == 0.0:
-            return
-
-        entrypoint_display_data["position"] = {"x": 0.0, "y": y_at_min_x}
-
-    def _has_explicit_entrypoint_node_display(self) -> bool:
-        """Check if the user provided an explicit entrypoint_node_display in their workflow_display."""
-        overrides = self.workflow_display
-        return overrides is not None and overrides.entrypoint_node_display is not None
 
     @cached_property
     def workflow_id(self) -> UUID:
