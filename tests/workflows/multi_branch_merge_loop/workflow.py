@@ -1,4 +1,4 @@
-import time
+import threading
 
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
@@ -7,13 +7,26 @@ from vellum.workflows.ports.port import Port
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.core import MergeBehavior
 
+# Signal events *after* LoopNode has fulfilled.
+iter1_complete = threading.Event()
+iter2_complete = threading.Event()
+
 
 class State(BaseState):
     counter = 0
 
 
 class StartNode(BaseNode):
-    pass
+    counter = State.counter
+
+    def run(self) -> BaseNode.Outputs:
+        if self.counter == 0:
+            iter1_complete.clear()
+            iter2_complete.clear()
+        elif self.counter == 1:
+            # LoopNode triggers the second iteration, so mark the first iteration as complete.
+            iter1_complete.set()
+        return self.Outputs()
 
 
 class TopNode(BaseNode):
@@ -24,8 +37,8 @@ class TopNode(BaseNode):
 
     def run(self) -> Outputs:
         if self.counter >= 1:
-            time.sleep(0.015)
-
+            # Iteration 2+: Wait until EndNode runs and sets the second iteration events as complete.
+            iter2_complete.wait()
         return self.Outputs()
 
 
@@ -37,8 +50,8 @@ class BottomNode(BaseNode):
 
     def run(self) -> Outputs:
         if self.counter < 1:
-            time.sleep(0.01)
-
+            # Iteration 1: Wait until StartNode runs on the second iteration.
+            iter1_complete.wait()
         return self.Outputs()
 
 
@@ -59,7 +72,9 @@ class LoopNode(BaseNode[State]):
 
 
 class EndNode(BaseNode):
-    pass
+    def run(self) -> BaseNode.Outputs:
+        iter2_complete.set()
+        return self.Outputs()
 
 
 class MultiBranchMergeLoopWorkflow(BaseWorkflow[BaseInputs, State]):
