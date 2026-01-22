@@ -8,6 +8,8 @@ from vellum import WorkspaceSecretRead
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.constants import APIRequestMethod, AuthorizationType
 from vellum.workflows.nodes.displayable import APINode
+from vellum.workflows.references.environment_variable import EnvironmentVariableReference
+from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum_ee.workflows.display.utils.exceptions import UserFacingException
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
@@ -157,3 +159,87 @@ def test_serialize_workflow__constant_secret_value__raises_error(workflow_class)
     # AND the error message should explain the issue
     assert "Secret inputs cannot be set to constant values" in str(exc_info.value)
     assert "VellumSecretReference or EnvironmentVariableReference" in str(exc_info.value)
+
+
+class SecretRefApiKeyNode(APINode):
+    method = APIRequestMethod.POST
+    url = "https://api.example.com"
+    authorization_type = AuthorizationType.API_KEY
+    api_key_header_value = VellumSecretReference("MY_SECRET")
+
+
+class SecretRefApiKeyWorkflow(BaseWorkflow):
+    graph = SecretRefApiKeyNode
+
+
+class EnvVarRefApiKeyNode(APINode):
+    method = APIRequestMethod.POST
+    url = "https://api.example.com"
+    authorization_type = AuthorizationType.API_KEY
+    api_key_header_value = EnvironmentVariableReference(name="MY_ENV_VAR")
+
+
+class EnvVarRefApiKeyWorkflow(BaseWorkflow):
+    graph = EnvVarRefApiKeyNode
+
+
+class SecretRefBearerTokenNode(APINode):
+    method = APIRequestMethod.POST
+    url = "https://api.example.com"
+    authorization_type = AuthorizationType.BEARER_TOKEN
+    bearer_token_value = VellumSecretReference("MY_SECRET")
+
+
+class SecretRefBearerTokenWorkflow(BaseWorkflow):
+    graph = SecretRefBearerTokenNode
+
+
+class EnvVarRefBearerTokenNode(APINode):
+    method = APIRequestMethod.POST
+    url = "https://api.example.com"
+    authorization_type = AuthorizationType.BEARER_TOKEN
+    bearer_token_value = EnvironmentVariableReference(name="MY_ENV_VAR")
+
+
+class EnvVarRefBearerTokenWorkflow(BaseWorkflow):
+    graph = EnvVarRefBearerTokenNode
+
+
+@pytest.mark.parametrize(
+    "workflow_class",
+    [
+        SecretRefApiKeyWorkflow,
+        EnvVarRefApiKeyWorkflow,
+        SecretRefBearerTokenWorkflow,
+        EnvVarRefBearerTokenWorkflow,
+    ],
+    ids=[
+        "api_key_with_secret_ref",
+        "api_key_with_env_var_ref",
+        "bearer_token_with_secret_ref",
+        "bearer_token_with_env_var_ref",
+    ],
+)
+def test_serialize_workflow__secret_reference_values__succeeds(workflow_class, vellum_client):
+    """
+    Tests that API nodes accept VellumSecretReference and EnvironmentVariableReference for secret inputs.
+    """
+
+    # GIVEN a workflow with an API node that uses a secret or env var reference
+    # AND stubbed out API calls
+    workspace_secret_id = str(uuid4())
+    workspace_secret = WorkspaceSecretRead(
+        id=workspace_secret_id,
+        modified=datetime.now(),
+        name="MY_SECRET",
+        label="My Secret",
+        secret_type="USER_DEFINED",
+    )
+    vellum_client.workspace_secrets.retrieve.return_value = workspace_secret
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=workflow_class)
+    serialized_workflow = workflow_display.serialize()
+
+    # THEN it should serialize successfully
+    assert "workflow_raw_data" in serialized_workflow
