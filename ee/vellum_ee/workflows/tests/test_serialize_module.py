@@ -430,3 +430,20 @@ class InvalidWorkflow(BaseWorkflow):
     assert "Invalid graph structure detected" in error_message
     assert "Nested sets or unsupported graph types are not allowed" in error_message
     assert "contact Vellum support" in error_message
+
+
+@pytest.mark.xfail(reason="We currently allow parent node output references, but shouldn't", strict=True)
+def test_serialize_module__with_invalid_parent_node_output_reference():
+    """
+    Tests that serialize_module surfaces an error for workflows with nodes
+    that reference their parent class's outputs.
+    """
+    module_path = "tests.workflows.invalid_parent_node_output_reference"
+
+    result = BaseWorkflowDisplay.serialize_module(module_path)
+
+    assert len(result.errors) == 1
+    assert result.errors[0].message == (
+        "Node ReportGeneratorNode references parent class output 'InlinePromptNode.Outputs.report_content'. "
+        "Referencing parent class outputs is not allowed."
+    )
