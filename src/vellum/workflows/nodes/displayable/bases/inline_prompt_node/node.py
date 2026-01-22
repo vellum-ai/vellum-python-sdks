@@ -59,9 +59,11 @@ from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.errors.types import vellum_error_to_workflow_error
 from vellum.workflows.events.types import default_serializer
 from vellum.workflows.exceptions import NodeException
+from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.bases.base_prompt_node import BasePromptNode
 from vellum.workflows.nodes.displayable.bases.utils import process_additional_prompt_outputs
 from vellum.workflows.outputs import BaseOutput
+from vellum.workflows.references.output import OutputReference
 from vellum.workflows.types import MergeBehavior
 from vellum.workflows.types.definition import (
     ComposioToolDefinition,
@@ -135,6 +137,25 @@ def _validate_json_schema_structure(schema: dict) -> None:
         jsonschema.exceptions.SchemaError: If the schema structure is invalid
     """
     jsonschema.Draft7Validator.check_schema(schema)
+
+
+def _validate_no_parent_output_references(node_cls: Type[BaseNode]) -> None:
+    """
+    Validates that the node does not reference parent class outputs.
+    """
+    class_outputs = vars(node_cls.Outputs)
+
+    for name, value in class_outputs.items():
+        if not isinstance(value, OutputReference):
+            continue
+
+        parent_node_class = value.outputs_class.__parent_class__
+        if parent_node_class in node_cls.__mro__:
+            raise ValueError(
+                f"Node {node_cls.__name__} references parent class output "
+                f"'{value.outputs_class.__qualname__}.{name}'. "
+                "Referencing parent class outputs is not allowed."
+            )
 
 
 class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
@@ -565,6 +586,8 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
         Raises:
             jsonschema.exceptions.SchemaError: If the JSON schema structure is invalid
         """
+        _validate_no_parent_output_references(cls)
+
         parameters_ref = getattr(cls, "parameters", None)
         if parameters_ref is None:
             return

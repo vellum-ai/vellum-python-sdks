@@ -432,7 +432,6 @@ class InvalidWorkflow(BaseWorkflow):
     assert "contact Vellum support" in error_message
 
 
-@pytest.mark.xfail(reason="We currently allow parent node output references, but shouldn't", strict=True)
 def test_serialize_module__with_invalid_parent_node_output_reference():
     """
     Tests that serialize_module surfaces an error for workflows with nodes
