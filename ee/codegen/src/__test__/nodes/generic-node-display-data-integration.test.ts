@@ -31,7 +31,6 @@ describe("GenericNode DisplayData Integration", () => {
     );
   });
 
-  // Helper function to create a minimal generic node with display data
   const createGenericNodeWithDisplayData = (
     displayData: GenericNodeDisplayData | undefined
   ): GenericNodeType => ({
@@ -50,17 +49,12 @@ describe("GenericNode DisplayData Integration", () => {
   });
 
   it("should generate icon and color in node file Display class when provided in serialized JSON", async () => {
-    /**
-     * Tests that icon and color are generated in the node file's Display class (BaseNode.Display).
-     */
-    // GIVEN a generic node with icon and color in display data
     const nodeData = createGenericNodeWithDisplayData({
       position: { x: 100, y: 200 },
       icon: "vellum:icon:star",
       color: "navy",
     });
 
-    // WHEN we generate the node file
     const nodeContext = (await createNodeContext({
       workflowContext,
       nodeData,
@@ -74,23 +68,17 @@ describe("GenericNode DisplayData Integration", () => {
     node.getNodeFile().write(writer);
     const result = await writer.toStringFormatted();
 
-    // THEN icon and color should be included in the Display class
     expect(result).toContain('icon = "vellum:icon:star"');
     expect(result).toContain('color = "navy"');
   });
 
   it("should not include icon and color in display data (NodeDisplayData) since they're in BaseNode.Display", async () => {
-    /**
-     * Tests that icon and color are not generated in NodeDisplayData since they're now generated in BaseNode.Display.
-     */
-    // GIVEN a generic node with icon and color in display data
     const nodeData = createGenericNodeWithDisplayData({
       position: { x: 100, y: 200 },
       icon: "vellum:icon:star",
       color: "navy",
     });
 
-    // WHEN we generate the node display file
     const nodeContext = (await createNodeContext({
       workflowContext,
       nodeData,
@@ -104,7 +92,6 @@ describe("GenericNode DisplayData Integration", () => {
     node.getNodeDisplayFile().write(writer);
     const result = await writer.toStringFormatted();
 
-    // THEN icon and color should not be included in the display data
     expect(result).not.toContain("icon=");
     expect(result).not.toContain("color=");
   });
@@ -147,7 +134,6 @@ describe("GenericNode DisplayData Integration", () => {
     node.getNodeDisplayFile().write(writer);
     const result = await writer.toStringFormatted();
 
-    // Should not contain any display_data field at all
     expect(result).not.toContain("display_data=");
   });
 });
