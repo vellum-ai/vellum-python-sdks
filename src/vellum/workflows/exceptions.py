@@ -59,11 +59,13 @@ class WorkflowInitializationException(Exception):
         workflow_definition: Optional[Type["BaseWorkflow"]] = None,
         code: WorkflowErrorCode = WorkflowErrorCode.INVALID_INPUTS,
         raw_data: Optional[Dict[str, Any]] = None,
+        stacktrace: Optional[str] = None,
     ):
 
         self.message = message
         self.code = code
         self.raw_data = raw_data
+        self.stacktrace = stacktrace
         self.definition = workflow_definition if workflow_definition is not None else import_workflow_class()
         super().__init__(message)
 
@@ -73,4 +75,5 @@ class WorkflowInitializationException(Exception):
             message=self.message,
             code=self.code,
             raw_data=self.raw_data,
+            stacktrace=self.stacktrace,
         )

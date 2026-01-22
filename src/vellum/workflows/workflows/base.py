@@ -5,6 +5,7 @@ import importlib
 import inspect
 import logging
 import sys
+import traceback
 from uuid import UUID, uuid4
 from typing import (
     Any,
@@ -956,7 +957,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             raise WorkflowInitializationException(message=f"Syntax Error raised while loading Workflow: {e}") from e
         except ModuleNotFoundError as e:
             error_message = f"Workflow module not found: {e}"
-            raw_data = None
+            raw_data: Optional[Dict[str, Any]] = None
             has_namespace_match = False
             for finder in sys.meta_path:
                 if isinstance(finder, BaseWorkflowFinder):
@@ -965,7 +966,21 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
                         has_namespace_match = True
             if not has_namespace_match:
                 raw_data = {"vellum_on_error_action": "CREATE_CUSTOM_IMAGE"}
-            raise WorkflowInitializationException(message=error_message, raw_data=raw_data) from e
+
+            stacktrace = traceback.format_exc()
+            tb = e.__traceback__
+            if tb is not None:
+                tb_entries = traceback.extract_tb(tb)
+                if tb_entries:
+                    last_entry = tb_entries[-1]
+                    if raw_data is None:
+                        raw_data = {}
+                    raw_data["file"] = last_entry.filename
+                    raw_data["lineno"] = last_entry.lineno
+
+            raise WorkflowInitializationException(
+                message=error_message, raw_data=raw_data, stacktrace=stacktrace
+            ) from e
         except ImportError as e:
             raise WorkflowInitializationException(message=f"Invalid import found while loading Workflow: {e}") from e
         except NameError as e:

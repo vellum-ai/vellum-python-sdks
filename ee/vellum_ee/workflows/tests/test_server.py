@@ -661,7 +661,47 @@ class Workflow(BaseWorkflow):
     error_message = str(exc_info.value)
     assert "Workflow module not found:" in error_message
 
-    assert exc_info.value.raw_data is None
+    assert exc_info.value.raw_data is not None
+    assert "vellum_on_error_action" not in exc_info.value.raw_data
+
+
+def test_load_from_module__module_not_found_error_includes_stacktrace_and_file_context():
+    """
+    Tests that ModuleNotFoundError includes stacktrace and file context in the exception.
+    """
+
+    # GIVEN a workflow module that imports a non-existent internal module
+    files = {
+        "__init__.py": "",
+        "workflow.py": """\
+from vellum.workflows import BaseWorkflow
+from .non_existent_module import SomeClass
+
+class Workflow(BaseWorkflow):
+    graph = None
+""",
+    }
+
+    namespace = str(uuid4())
+
+    # AND the virtual file loader is registered
+    finder = VirtualFileFinder(files, namespace, source_module="test")
+    sys.meta_path.append(finder)
+
+    # WHEN we attempt to load the workflow
+    # THEN it should raise WorkflowInitializationException
+    with pytest.raises(WorkflowInitializationException) as exc_info:
+        BaseWorkflow.load_from_module(namespace)
+
+    # AND the exception should include a stacktrace
+    assert exc_info.value.stacktrace is not None
+    assert "ModuleNotFoundError" in exc_info.value.stacktrace
+    assert "non_existent_module" in exc_info.value.stacktrace
+
+    # AND the exception should include file context in raw_data
+    assert exc_info.value.raw_data is not None
+    assert "file" in exc_info.value.raw_data
+    assert "lineno" in exc_info.value.raw_data
 
 
 def test_serialize_module__tool_calling_node_with_single_tool():
