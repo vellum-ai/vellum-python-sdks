@@ -5,6 +5,7 @@ import {
   GENERATED_WORKFLOW_MODULE_NAME,
   OUTPUTS_CLASS_NAME,
   PORTS_CLASS_NAME,
+  VELLUM_WORKFLOW_EDITOR_TYPES_PATH,
   VELLUM_WORKFLOWS_DISPLAY_BASE_PATH,
   VELLUM_WORKFLOWS_DISPLAY_MODULE_PATH,
 } from "src/constants";
@@ -35,6 +36,7 @@ import { GraphAttribute } from "src/generators/graph-attribute";
 import { NodeDisplayData } from "src/generators/node-display-data";
 import { WorkflowOutput } from "src/generators/workflow-output";
 import {
+  NodeDisplayData as NodeDisplayDataType,
   WorkflowDisplayData,
   WorkflowEdge,
   WorkflowNode,
@@ -194,10 +196,7 @@ export class Workflow {
 
     const entrypointNode = this.workflowContext.tryGetEntrypointNode();
     const entrypointNodeDisplayData = entrypointNode
-      ? new NodeDisplayData({
-          workflowContext: this.workflowContext,
-          nodeDisplayData: entrypointNode.displayData,
-        })
+      ? this.generateEntrypointNodeDisplayData(entrypointNode.displayData)
       : undefined;
 
     workflowDisplayClass.add(
@@ -221,8 +220,7 @@ export class Workflow {
                       entrypointNode.data.sourceHandleId
                     ),
                   }),
-                  ...(entrypointNodeDisplayData &&
-                  !entrypointNodeDisplayData.isEmpty()
+                  ...(entrypointNodeDisplayData
                     ? [
                         new MethodArgument({
                           name: "entrypoint_node_display",
@@ -756,6 +754,75 @@ export class Workflow {
 
       workflowClass.add(unusedGraphsField);
     }
+  }
+
+  /**
+   * Generates the NodeDisplayData for the entrypoint node.
+   * Unlike regular nodes which store position in BaseNode.Display,
+   * the entrypoint node stores position in WorkflowMetaDisplay.entrypoint_node_display.
+   */
+  private generateEntrypointNodeDisplayData(
+    displayData: NodeDisplayDataType | undefined
+  ): ClassInstantiation | undefined {
+    const args: MethodArgument[] = [];
+
+    // Always include position for entrypoint nodes since they don't have a BaseNode.Display class
+    args.push(
+      new MethodArgument({
+        name: "position",
+        value: new ClassInstantiation({
+          classReference: new Reference({
+            name: "NodeDisplayPosition",
+            modulePath: VELLUM_WORKFLOW_EDITOR_TYPES_PATH,
+          }),
+          arguments_: [
+            new MethodArgument({
+              name: "x",
+              value: new FloatInstantiation(displayData?.position?.x ?? 0),
+            }),
+            new MethodArgument({
+              name: "y",
+              value: new FloatInstantiation(displayData?.position?.y ?? 0),
+            }),
+          ],
+        }),
+      })
+    );
+
+    if (!isNil(displayData?.z_index)) {
+      args.push(
+        new MethodArgument({
+          name: "z_index",
+          value: new IntInstantiation(displayData.z_index),
+        })
+      );
+    }
+
+    if (!isNil(displayData?.width)) {
+      args.push(
+        new MethodArgument({
+          name: "width",
+          value: new IntInstantiation(displayData.width),
+        })
+      );
+    }
+
+    if (!isNil(displayData?.height)) {
+      args.push(
+        new MethodArgument({
+          name: "height",
+          value: new IntInstantiation(displayData.height),
+        })
+      );
+    }
+
+    return new ClassInstantiation({
+      classReference: new Reference({
+        name: "NodeDisplayData",
+        modulePath: VELLUM_WORKFLOW_EDITOR_TYPES_PATH,
+      }),
+      arguments_: args,
+    });
   }
 
   public getWorkflowFile(): WorkflowFile {

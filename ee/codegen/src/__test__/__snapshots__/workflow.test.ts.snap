@@ -79,6 +79,7 @@ exports[`Workflow > write > should generate correct display code when there are 
 "from uuid import UUID
 
 from vellum_ee.workflows.display.base import WorkflowInputsDisplay, WorkflowMetaDisplay
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
 
 from ..inputs import Inputs
@@ -89,6 +90,7 @@ class TestWorkflowDisplay(BaseWorkflowDisplay[TestWorkflow]):
     workflow_display = WorkflowMetaDisplay(
         entrypoint_node_id=UUID("entrypoint"),
         entrypoint_node_source_handle_id=UUID("<source_handle_id>"),
+        entrypoint_node_display=NodeDisplayData(position=NodeDisplayPosition(x=0, y=0)),
     )
     inputs_display = {
         Inputs.bad_input: WorkflowInputsDisplay(
