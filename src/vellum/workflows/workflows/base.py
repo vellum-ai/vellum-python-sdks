@@ -89,6 +89,7 @@ from vellum.workflows.triggers.base import BaseTrigger
 from vellum.workflows.types import CancelSignal
 from vellum.workflows.types.generics import InputsType, StateType
 from vellum.workflows.types.utils import get_original_base
+from vellum.workflows.utils.module_path import normalize_module_path
 from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum.workflows.workflows.event_filters import workflow_event_filter
 
@@ -687,7 +688,10 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
                 )
             except (ValueError, ModuleNotFoundError, AttributeError):
                 for node in candidate_nodes:
-                    if f"{node.__module__}.{node.__name__}" == node_ref:
+                    full_path = f"{node.__module__}.{node.__name__}"
+                    # Normalize the path to strip ephemeral namespace prefix from dynamically loaded workflows
+                    normalized_path = normalize_module_path(full_path)
+                    if normalized_path == node_ref:
                         return node
                 raise WorkflowInitializationException(
                     message=f"Node '{node_ref}' not found in workflow",

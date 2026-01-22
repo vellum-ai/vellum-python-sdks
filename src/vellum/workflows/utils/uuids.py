@@ -1,9 +1,8 @@
 import hashlib
-import sys
 from uuid import UUID
 from typing import TYPE_CHECKING
 
-from vellum.workflows.loaders.base import BaseWorkflowFinder
+from vellum.workflows.utils.module_path import normalize_module_path
 
 if TYPE_CHECKING:
     from vellum.workflows.inputs.base import BaseInputs
@@ -26,41 +25,6 @@ def generate_workflow_deployment_prefix(deployment_name: str, release_tag: str) 
     return f"vellum_workflow_deployment_{expected_hash}"
 
 
-def _normalize_module_path(module_path: str) -> str:
-    """
-    Normalize a module path by filtering out a leading ephemeral namespace segment.
-
-    When workflows are loaded dynamically (e.g., via VirtualFileFinder), the module path
-    may start with an ephemeral namespace that changes on each invocation. This function
-    strips that leading segment to ensure stable, deterministic ID generation.
-
-    The function checks if the first segment of the module path exactly matches the
-    namespace of any registered BaseWorkflowFinder in sys.meta_path. Only namespaces
-    that are actually registered are stripped, preventing accidental stripping of
-    legitimate module names.
-
-    Args:
-        module_path: The module path to normalize (e.g., "a1b2c3d4-e5f6-7890-abcd-ef1234567890.workflow"
-                     or "workflow_tmp_ABC123xyz.workflow")
-
-    Returns:
-        The normalized module path with the leading ephemeral segment removed if present
-        (e.g., "workflow")
-    """
-    parts = module_path.split(".")
-    if not parts:
-        return module_path
-
-    first_part = parts[0]
-
-    # Check if the first part matches the namespace of any registered workflow finder
-    for finder in sys.meta_path:
-        if isinstance(finder, BaseWorkflowFinder) and finder.namespace == first_part:
-            return ".".join(parts[1:]) if len(parts) > 1 else ""
-
-    return module_path
-
-
 def generate_entity_id_from_path(path: str) -> UUID:
     """
     Generate a deterministic entity ID from a path string.
@@ -75,7 +39,7 @@ def generate_entity_id_from_path(path: str) -> UUID:
     Returns:
         A deterministic UUID based on the normalized path
     """
-    normalized_path = _normalize_module_path(path)
+    normalized_path = normalize_module_path(path)
     return uuid4_from_hash(normalized_path)
 
 
