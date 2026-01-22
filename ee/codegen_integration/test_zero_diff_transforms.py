@@ -86,11 +86,13 @@ def test_zero_diff_transforms(module_name: str):
     # GIVEN the original workflow module
     workflow_module = f"tests.workflows.{module_name}"
 
-    # Load the module to get the actual file path (not guessing from CWD)
-    module = importlib.import_module(workflow_module)
-    module_file = module.__file__
-    assert module_file is not None, f"Module {workflow_module} has no __file__"
-    original_root = Path(module_file).parent
+    # Load the workflow submodule to get the actual file path
+    # We import the .workflow submodule because the parent package may be a namespace
+    # package (no __init__.py) which would have __file__ = None
+    workflow_submodule = importlib.import_module(f"{workflow_module}.workflow")
+    workflow_file = workflow_submodule.__file__
+    assert workflow_file is not None, f"Module {workflow_module}.workflow has no __file__"
+    original_root = Path(workflow_file).parent
 
     # Collect original files as the artifact for file merging
     original_files = _collect_file_map(original_root)
