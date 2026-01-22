@@ -5,7 +5,7 @@ from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows.nodes.displayable.tool_calling_node import ToolCallingNode
 
 from ...inputs import WorkflowInputs
-from .transform_text_tool.workflow import TransformTextToolWorkflow
+from .transform_text_tool_workflow.workflow import TransformTextToolWorkflow
 
 
 class AgentNode(ToolCallingNode):
