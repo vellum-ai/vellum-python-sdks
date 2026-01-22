@@ -445,4 +445,7 @@ def test_serialize_module__with_invalid_parent_node_output_reference():
     assert result.errors[0].message == (
         "'ReportGeneratorNode.Outputs.report_content' references parent class output 'InlinePromptNode.Outputs.text'. "
         "Referencing outputs from a node's parent class is not allowed."
+        "\n"
+        "'ReportGeneratorNode.Outputs.report_json' references parent class output 'InlinePromptNode.Outputs.json'. "
+        "Referencing outputs from a node's parent class is not allowed."
     )

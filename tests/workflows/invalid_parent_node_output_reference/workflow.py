@@ -25,6 +25,8 @@ class ReportGeneratorNode(InlinePromptNode):
         # BAD: This references the parent class's output.
         # It gets dropped during serialization AND it isn't resolved during execution.
         report_content: str = InlinePromptNode.Outputs.text
+        report_json = InlinePromptNode.Outputs.json
+        a: str = "a"
 
 
 class WorkflowWithParentOutputReference(BaseWorkflow[Inputs, BaseState]):
