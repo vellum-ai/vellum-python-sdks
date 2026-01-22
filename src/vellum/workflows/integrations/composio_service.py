@@ -119,21 +119,9 @@ class ComposioService:
         Raises:
             NodeException: If tool not found (404), unauthorized (401), or other API errors
         """
-        endpoint = f"/tools/{tool_slug}"
-
-        try:
-            response = self._make_request(endpoint, method="GET")
-            logger.info(f"Retrieved tool details for slug '{tool_slug}': {response}")
-            return response
-        except Exception as e:
-            # Enhanced error handling for specific cases
-            error_message = str(e)
-            if "404" in error_message:
-                raise NodeException(f"Tool with slug '{tool_slug}' not found in Composio")
-            elif "401" in error_message:
-                raise NodeException(f"Unauthorized access to tool '{tool_slug}'. Check your Composio API key.")
-            else:
-                raise NodeException(f"Failed to retrieve tool details for '{tool_slug}': {error_message}")
+        response = self._make_request(f"/tools/{tool_slug}")
+        logger.info(f"Retrieved tool details for slug '{tool_slug}': {response}")
+        return response
 
     def execute_tool(self, tool_name: str, arguments: Dict[str, Any], user_id: Optional[str] = None) -> Any:
         """Execute a tool using direct API request
