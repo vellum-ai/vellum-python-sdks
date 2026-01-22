@@ -200,11 +200,6 @@ ${errors.slice(0, 3).map((err) => {
   public async generateCode(
     originalArtifact?: Record<string, string>
   ): Promise<void> {
-    // Store the original artifact on the context so nested workflows can access it
-    if (originalArtifact) {
-      this.workflowContext.setOriginalArtifact(originalArtifact);
-    }
-
     const absolutePathToModuleDirectory = join(
       this.workflowContext.absolutePathToOutputDirectory,
       ...this.getModulePath()
