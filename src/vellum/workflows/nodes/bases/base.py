@@ -605,9 +605,16 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
     def __validate__(cls) -> None:
         """
         Validates the node.
+        """
+        _validate_no_parent_output_references(cls)
+        cls.__validate_node_specific__()
+
+    @classmethod
+    def __validate_node_specific__(cls) -> None:
+        """
         Subclasses can override this method to implement their specific validation logic.
         Called during serialization or explicit validation.
 
         Default implementation performs no validation.
         """
-        _validate_no_parent_output_references(cls)
+        pass
