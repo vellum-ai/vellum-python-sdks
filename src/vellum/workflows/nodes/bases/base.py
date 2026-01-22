@@ -75,17 +75,16 @@ def _validate_no_parent_output_references(node_cls: Type["BaseNode"]) -> None:
     """
     Validates that the node does not reference parent class outputs.
     """
-    class_outputs = vars(node_cls.Outputs)
-
-    for name, value in class_outputs.items():
-        if not isinstance(value, OutputReference):
+    for node_output in node_cls.Outputs:
+        node_value = node_output.instance
+        if not isinstance(node_value, OutputReference):
             continue
 
-        parent_node_class = value.outputs_class.__parent_class__
+        parent_node_class = node_value.outputs_class.__parent_class__
         if parent_node_class in node_cls.__mro__:
             raise ValueError(
-                f"'{node_cls.Outputs.__qualname__}.{name}' references parent class output "
-                f"'{value.outputs_class.__qualname__}.{value.name}'. "
+                f"'{node_cls.Outputs.__qualname__}.{node_output.name}' references parent class output "
+                f"'{node_value.outputs_class.__qualname__}.{node_value.name}'. "
                 "Referencing outputs from a node's parent class is not allowed."
             )
 
