@@ -16,9 +16,7 @@
           },
           "width": 124,
           "height": 48,
-          "z_index": 2,
-          "icon": "vellum:icon:right-to-bracket",
-          "color": "stone"
+          "z_index": 2
         },
         "base": null,
         "definition": null
@@ -59,9 +57,7 @@
           },
           "width": 418,
           "height": 92,
-          "z_index": 3,
-          "icon": "vellum:icon:circle-stop",
-          "color": "teal"
+          "z_index": 3
         },
         "base": {
           "name": "FinalOutputNode",
