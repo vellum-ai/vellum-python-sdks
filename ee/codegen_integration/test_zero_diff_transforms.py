@@ -1,5 +1,6 @@
 import pytest
 import difflib
+import importlib
 import json
 import os
 from pathlib import Path
@@ -73,26 +74,40 @@ def _compute_diff(
 )
 def test_zero_diff_transforms(module_name: str):
     """
-    Tests that serializing a workflow, running codegen, and comparing files produces no diff.
+    Tests that serializing a workflow, running codegen with file merging, and comparing
+    files produces no diff.
 
     GIVEN a workflow defined in tests.workflows.{module_name}
-    WHEN we serialize it to exec_config and run TypeScript codegen on that JSON
+    WHEN we serialize it to exec_config and run TypeScript codegen with the original
+         files as the artifact for file merging
     THEN the generated files match the original workflow files (zero diff).
     """
 
     # GIVEN the original workflow module
     workflow_module = f"tests.workflows.{module_name}"
-    original_root = Path(workflow_module.replace(".", os.path.sep))
+
+    # Load the module to get the actual file path (not guessing from CWD)
+    module = importlib.import_module(workflow_module)
+    module_file = module.__file__
+    assert module_file is not None, f"Module {workflow_module} has no __file__"
+    original_root = Path(module_file).parent
+
+    # Collect original files as the artifact for file merging
+    original_files = _collect_file_map(original_root)
 
     # WHEN we serialize the workflow to exec_config
     serialization_result = BaseWorkflowDisplay.serialize_module(workflow_module)
     original_exec_config = serialization_result.exec_config
 
-    # AND we run codegen on the serialized data
+    # AND we run codegen on the serialized data with the original artifact
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_dir_path = Path(temp_dir)
         exec_config_path = temp_dir_path / "exec_config.json"
         exec_config_path.write_text(json.dumps(original_exec_config))
+
+        # Write the original artifact for file merging
+        original_artifact_path = temp_dir_path / "original_artifact.json"
+        original_artifact_path.write_text(json.dumps(original_files))
 
         codegen_dir = Path(__file__).parent.parent / "codegen"
         output_dir = temp_dir_path / "generated"
@@ -112,6 +127,8 @@ def test_zero_diff_transforms(module_name: str):
                 str(output_dir),
                 "--module-name",
                 module_name,
+                "--original-artifact",
+                str(original_artifact_path),
             ],
             cwd=str(codegen_dir),
             capture_output=True,
@@ -130,7 +147,6 @@ def test_zero_diff_transforms(module_name: str):
         modified_paths = sorted(modified_diffs.keys())
 
         # Collect file contents for showing full diffs of added/removed files
-        original_files = _collect_file_map(original_root)
         generated_files = _collect_file_map(generated_root)
 
         # Build diff text with added/removed files shown in diff syntax

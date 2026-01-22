@@ -7,6 +7,7 @@ interface CliArgs {
   execConfigPath: string;
   outputDir: string;
   moduleName: string;
+  originalArtifactPath?: string;
 }
 
 function parseArgs(argv: string[]): CliArgs {
@@ -27,10 +28,11 @@ function parseArgs(argv: string[]): CliArgs {
   const execConfigPath = args["exec-config"];
   const outputDir = args["output-dir"];
   const moduleName = args["module-name"];
+  const originalArtifactPath = args["original-artifact"];
 
   if (!execConfigPath || !outputDir || !moduleName) {
     throw new Error(
-      "Usage: cli.ts --exec-config <path> --output-dir <dir> --module-name <module>"
+      "Usage: cli.ts --exec-config <path> --output-dir <dir> --module-name <module> [--original-artifact <path>]"
     );
   }
 
@@ -38,14 +40,14 @@ function parseArgs(argv: string[]): CliArgs {
     execConfigPath,
     outputDir,
     moduleName,
+    originalArtifactPath,
   };
 }
 
 async function main() {
   try {
-    const { execConfigPath, outputDir, moduleName } = parseArgs(
-      process.argv.slice(2)
-    );
+    const { execConfigPath, outputDir, moduleName, originalArtifactPath } =
+      parseArgs(process.argv.slice(2));
 
     const execConfigRaw = await readFile(execConfigPath, "utf-8");
     const execConfig = JSON.parse(execConfigRaw);
@@ -57,7 +59,13 @@ async function main() {
       strict: false,
     });
 
-    await generator.generateCode();
+    let originalArtifact: Record<string, string> | undefined;
+    if (originalArtifactPath) {
+      const artifactRaw = await readFile(originalArtifactPath, "utf-8");
+      originalArtifact = JSON.parse(artifactRaw);
+    }
+
+    await generator.generateCode(originalArtifact);
 
     process.exit(0);
   } catch (err) {
