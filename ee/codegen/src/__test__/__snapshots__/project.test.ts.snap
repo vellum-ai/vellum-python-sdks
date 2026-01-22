@@ -62,6 +62,10 @@ class LegacyPromptNode(InlinePromptNode):
         logit_bias=None,
         custom_parameters=None,
     )
+
+    class Display(InlinePromptNode.Display):
+        x = 300
+        y = 100
 "
 `;
 
@@ -109,6 +113,10 @@ class TestNode(TemplatingNode[BaseState, str]):
 
     template = """Hello world"""
     inputs = {}
+
+    class Display(TemplatingNode.Display):
+        x = 100
+        y = 100
 "
 `;
 
@@ -131,7 +139,6 @@ class Workflow(BaseWorkflow):
 exports[`WorkflowProjectGenerator > Nodes present but not in graph > should still generate a file for the second node > code/display/nodes/second_node.py 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 
@@ -143,7 +150,6 @@ class SecondNodeDisplay(BaseNodeDisplay[SecondNode]):
     output_display = {
         SecondNode.Outputs.output: NodeOutputDisplay(id=UUID("bd71c32b-0762-4556-a1bc-2c36b15f6428"), name="output")
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 
@@ -183,7 +189,7 @@ class FirstNode(BaseNode):
 exports[`WorkflowProjectGenerator > adornments > should correctly generate code for a prompt node with retry adornment > code/display/nodes/prompt.py 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseInlinePromptNodeDisplay, BaseRetryNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 
@@ -202,9 +208,7 @@ class PromptDisplay(BaseInlinePromptNodeDisplay[Prompt]):
         Prompt.Outputs.results: NodeOutputDisplay(id=UUID("191a66c6-3e38-45e0-b5dd-5e644fdec8b0"), name="results"),
     }
     port_displays = {Prompt.Ports.default: PortDisplayOverrides(id=UUID("c678ddd0-f646-4bd3-9557-9ad63f6d8f3c"))}
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=1971.8034185919948, y=205.60253395092258), width=480, height=175
-    )
+    display_data = NodeDisplayData(width=480, height=175)
 "
 `;
 
@@ -256,6 +260,10 @@ Summarize the following text: hello today is feb 7 bad weather
         logit_bias={},
         custom_parameters=None,
     )
+
+    class Display(InlinePromptNode.Display):
+        x = 1971.8034185919948
+        y = 205.60253395092258
 "
 `;
 
@@ -377,7 +385,6 @@ class BadNode(TemplatingNode[BaseState, str]):
 exports[`WorkflowProjectGenerator > function > should generate <function_name>.py file > code/display/nodes/tool_call/__init__.py 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 
@@ -405,7 +412,6 @@ class GetCurrentWeatherNodeDisplay(BaseNodeDisplay[GetCurrentWeatherNode]):
     port_displays = {
         GetCurrentWeatherNode.Ports.default: PortDisplayOverrides(id=UUID("7b97f998-4be5-478d-94c4-9423db5f6392"))
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 
@@ -523,7 +529,7 @@ exports[`WorkflowProjectGenerator > function > should generate inline workflow t
 "from uuid import UUID
 from .weather_function.nodes import *
 
-from vellum_ee.workflows.display.editor import NodeDisplayComment, NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayComment, NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 
@@ -552,10 +558,7 @@ class GetCurrentWeatherNodeDisplay(BaseNodeDisplay[GetCurrentWeatherNode]):
         GetCurrentWeatherNode.Ports.default: PortDisplayOverrides(id=UUID("3cd6d78c-9dad-42aa-ad38-31f67057c379"))
     }
     display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=0, y=0),
-        comment=NodeDisplayComment(
-            value="\\n    A tool calling node that calls the get_current_weather function.\\n    "
-        ),
+        comment=NodeDisplayComment(value="\\n    A tool calling node that calls the get_current_weather function.\\n    ")
     )
 "
 `;
@@ -844,7 +847,7 @@ exports[`WorkflowProjectGenerator > function > should generate inline workflow t
 "from uuid import UUID
 from .weather_function.nodes import *
 
-from vellum_ee.workflows.display.editor import NodeDisplayComment, NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayComment, NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 
@@ -873,10 +876,7 @@ class GetCurrentWeatherNodeDisplay(BaseNodeDisplay[GetCurrentWeatherNode]):
         GetCurrentWeatherNode.Ports.default: PortDisplayOverrides(id=UUID("3cd6d78c-9dad-42aa-ad38-31f67057c379"))
     }
     display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=0, y=0),
-        comment=NodeDisplayComment(
-            value="\\n    A tool calling node that calls the get_current_weather function.\\n    "
-        ),
+        comment=NodeDisplayComment(value="\\n    A tool calling node that calls the get_current_weather function.\\n    ")
     )
 "
 `;
@@ -1347,6 +1347,10 @@ class TemplatingNode(BaseTemplatingNode[BaseState, str]):
 
     template = """test template"""
     inputs = {}
+
+    class Display(BaseTemplatingNode.Display):
+        x = 300
+        y = 100
 "
 `;
 
@@ -1360,6 +1364,10 @@ class TemplatingNode(BaseTemplatingNode[BaseState, str]):
 
     template = """test template"""
     inputs = {}
+
+    class Display(BaseTemplatingNode.Display):
+        x = 300
+        y = 100
 "
 `;
 
@@ -1429,6 +1437,10 @@ exports[`WorkflowProjectGenerator > subworkflow with inner and outer generic nod
 class Outer(BaseNode):
     class Outputs(BaseNode.Outputs):
         result: str
+
+    class Display(BaseNode.Display):
+        x = 400
+        y = -50
 "
 `;
 

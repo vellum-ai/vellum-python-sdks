@@ -24,3 +24,7 @@ class PromptNode19(InlinePromptNode):
         logit_bias={},
         custom_parameters=None,
     )
+
+    class Display(InlinePromptNode.Display):
+        x = 3165.684879595973
+        y = 768.6879108547903

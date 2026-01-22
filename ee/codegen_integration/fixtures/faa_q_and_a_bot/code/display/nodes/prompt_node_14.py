@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseInlinePromptNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 
@@ -29,4 +29,4 @@ class PromptNode14Display(BaseInlinePromptNodeDisplay[PromptNode14]):
         PromptNode14.Outputs.json: NodeOutputDisplay(id=UUID("3c742327-c345-4b45-b829-778fd84de9c4"), name="json"),
     }
     port_displays = {PromptNode14.Ports.default: PortDisplayOverrides(id=UUID("23556dd8-b9f8-4cf7-9c24-291f9d0a223a"))}
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=4524, y=631), width=480, height=168)
+    display_data = NodeDisplayData(width=480, height=168)

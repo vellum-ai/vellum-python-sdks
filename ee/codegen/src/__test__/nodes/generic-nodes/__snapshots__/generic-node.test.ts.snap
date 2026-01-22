@@ -3,7 +3,6 @@
 exports[`GenericNode > basic > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
@@ -30,7 +29,6 @@ class MyCustomNodeDisplay(BaseNodeDisplay[MyCustomNode]):
             id=UUID("2544f9e4-d6e6-4475-b6a9-13393115d77c")
         )
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 
@@ -68,7 +66,6 @@ class MyCustomNode(BaseNode):
 exports[`GenericNode > basic with adornments > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import (
     BaseMapNodeDisplay,
     BaseNodeDisplay,
@@ -103,7 +100,6 @@ class MyCustomNodeDisplay(BaseNodeDisplay[MyCustomNode]):
             id=UUID("2544f9e4-d6e6-4475-b6a9-13393115d77c")
         )
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 
@@ -271,7 +267,6 @@ class TestNotBlankNode(BaseNode):
 exports[`GenericNode > basic with node output as attribute > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
@@ -295,7 +290,6 @@ class MyCustomNodeDisplay(BaseNodeDisplay[MyCustomNode]):
             id=UUID("2544f9e4-d6e6-4475-b6a9-13393115d77c")
         )
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 
@@ -375,7 +369,6 @@ class MyCustomNode(BaseNode):
 exports[`GenericNode > empty StartNode with label containing space > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import PortDisplayOverrides
 
@@ -389,7 +382,6 @@ class StartNodeDisplay(BaseNodeDisplay[StartNode]):
             id=UUID("b01956bf-e6b4-4535-9401-bee78c0157ab")
         )
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=200, y=-50))
 "
 `;
 
@@ -398,7 +390,9 @@ exports[`GenericNode > generic node with no attributes, no ports, no outputs > g
 
 
 class MyCustomNode(BaseNode):
-    pass
+    class Display(BaseNode.Display):
+        x = 200
+        y = -50
 "
 `;
 

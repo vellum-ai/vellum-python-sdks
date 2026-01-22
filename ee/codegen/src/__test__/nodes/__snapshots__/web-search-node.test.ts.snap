@@ -3,7 +3,6 @@
 exports[`WebSearchNode > basic > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import PortDisplayOverrides
 
@@ -23,7 +22,6 @@ class WebSearchNodeDisplay(BaseNodeDisplay[WebSearchNode]):
             id=UUID("web-search-port-id")
         )
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 

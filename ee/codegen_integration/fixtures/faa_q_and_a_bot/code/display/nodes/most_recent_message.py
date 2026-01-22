@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseTemplatingNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
 
@@ -22,4 +22,4 @@ class MostRecentMessageDisplay(BaseTemplatingNodeDisplay[MostRecentMessage]):
     port_displays = {
         MostRecentMessage.Ports.default: PortDisplayOverrides(id=UUID("ab8e97b4-4ee4-42bc-8f43-e2c9c457ad21"))
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=254, y=237.3190436953056), width=480, height=221)
+    display_data = NodeDisplayData(width=480, height=221)

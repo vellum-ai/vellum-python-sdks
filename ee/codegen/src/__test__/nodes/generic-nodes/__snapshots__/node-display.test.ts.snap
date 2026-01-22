@@ -70,6 +70,10 @@ exports[`NodeDisplay > 'without icon or color' 1`] = `
     class Outputs(BaseNode.Outputs):
         output = "default-value"
 
+    class Display(BaseNode.Display):
+        x = 100
+        y = 200
+
     class Trigger(BaseNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ALL
 "

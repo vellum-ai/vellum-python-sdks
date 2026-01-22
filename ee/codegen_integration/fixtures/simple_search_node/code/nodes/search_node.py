@@ -27,3 +27,7 @@ class SearchNode(BaseSearchNode):
         ),
     )
     chunk_separator = "\n\n#####\n\n"
+
+    class Display(BaseSearchNode.Display):
+        x = 1966.960664819945
+        y = 223.1684037396122

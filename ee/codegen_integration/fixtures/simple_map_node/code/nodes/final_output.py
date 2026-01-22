@@ -9,3 +9,7 @@ from .map_node import MapNode
 class FinalOutput(FinalOutputNode[BaseState, Any]):
     class Outputs(FinalOutputNode.Outputs):
         value = MapNode.Outputs.final_output
+
+    class Display(FinalOutputNode.Display):
+        x = 864
+        y = 58.5

@@ -41,7 +41,6 @@ class SearchNode(BaseSearchNode):
 exports[`TextSearchNode > basic > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseSearchNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
@@ -91,7 +90,6 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
             id=UUID("e4dedb66-0638-4f0c-9941-6420bfe353b2")
         )
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 
@@ -182,7 +180,6 @@ class SearchNode(BaseSearchNode):
 exports[`TextSearchNode > metadata filters > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseSearchNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
@@ -244,7 +241,6 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
             id=UUID("e4dedb66-0638-4f0c-9941-6420bfe353b2")
         )
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 
@@ -289,7 +285,6 @@ class SearchNode(BaseSearchNode):
 exports[`TextSearchNode > reject on error enabled > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseSearchNodeDisplay, BaseTryNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
@@ -343,7 +338,6 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
             id=UUID("e4dedb66-0638-4f0c-9941-6420bfe353b2")
         )
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 
@@ -394,7 +388,6 @@ class SearchNode(BaseSearchNode):
 exports[`TextSearchNode > should codegen successfully without document index id input > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseSearchNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
@@ -443,7 +436,6 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
             id=UUID("e4dedb66-0638-4f0c-9941-6420bfe353b2")
         )
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 
@@ -488,7 +480,6 @@ class SearchNode(BaseSearchNode):
 exports[`TextSearchNode > should codegen successfully without metadata filters mapped properly > LHS missing on getNodeDisplayClassBodyStatements 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseSearchNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
@@ -531,14 +522,12 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
             id=UUID("e4dedb66-0638-4f0c-9941-6420bfe353b2")
         )
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 
 exports[`TextSearchNode > should codegen successfully without metadata filters mapped properly > RHS missing on getNodeDisplayClassBodyStatements 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseSearchNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
@@ -581,6 +570,5 @@ class SearchNodeDisplay(BaseSearchNodeDisplay[SearchNode]):
             id=UUID("e4dedb66-0638-4f0c-9941-6420bfe353b2")
         )
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;

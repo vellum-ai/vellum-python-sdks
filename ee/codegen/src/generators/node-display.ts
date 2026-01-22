@@ -4,6 +4,8 @@ import { BaseNodeContext } from "src/context/node-context/base";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { Class } from "src/generators/extensions/class";
 import { Field } from "src/generators/extensions/field";
+import { FloatInstantiation } from "src/generators/extensions/float-instantiation";
+import { IntInstantiation } from "src/generators/extensions/int-instantiation";
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
@@ -58,6 +60,36 @@ export class NodeDisplay extends AstNode {
       baseNodeDefinition?.display_data;
 
     const fields: AstNode[] = [];
+
+    // Add position fields (x, y) only when non-zero
+    const x = nodeDisplayData?.position?.x ?? 0;
+    const y = nodeDisplayData?.position?.y ?? 0;
+    if (x !== 0) {
+      fields.push(
+        new Field({
+          name: "x",
+          initializer: new FloatInstantiation(x),
+        })
+      );
+    }
+    if (y !== 0) {
+      fields.push(
+        new Field({
+          name: "y",
+          initializer: new FloatInstantiation(y),
+        })
+      );
+    }
+
+    // Add z_index if provided
+    if (!isNil(nodeDisplayData?.z_index)) {
+      fields.push(
+        new Field({
+          name: "z_index",
+          initializer: new IntInstantiation(nodeDisplayData.z_index),
+        })
+      );
+    }
 
     if (
       !isNil(nodeDisplayData?.icon) &&

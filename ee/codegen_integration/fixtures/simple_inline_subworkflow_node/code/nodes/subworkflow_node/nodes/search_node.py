@@ -13,3 +13,7 @@ class SearchNode(BaseSearchNode):
     result_merging = SearchResultMergingRequest(enabled=True)
     filters = SearchFilters(external_ids=None, metadata=None)
     chunk_separator = "\n\n#####\n\n"
+
+    class Display(BaseSearchNode.Display):
+        x = 2053.3811695404584
+        y = 240.84267524293904

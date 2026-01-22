@@ -11,5 +11,9 @@ class TemplatingNode(BaseTemplatingNode[BaseState, str]):
         "example_var_1": Inputs.text,
     }
 
+    class Display(BaseTemplatingNode.Display):
+        x = 1934.0008032128517
+        y = 219.2219534344094
+
     class Trigger(BaseTemplatingNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ANY

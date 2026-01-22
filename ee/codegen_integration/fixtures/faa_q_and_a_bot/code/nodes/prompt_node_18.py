@@ -75,3 +75,7 @@ The flights that are on the ground are:
         logit_bias=None,
         custom_parameters=None,
     )
+
+    class Display(InlinePromptNode.Display):
+        x = 4524
+        y = 946.5

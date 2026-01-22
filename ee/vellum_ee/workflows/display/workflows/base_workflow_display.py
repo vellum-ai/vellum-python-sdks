@@ -628,8 +628,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             (
                 isinstance(node.get("display_data"), dict)
                 and isinstance(node["display_data"].get("position"), dict)
-                and node["display_data"]["position"].get("x", 0) == 0.0
-                and node["display_data"]["position"].get("y", 0) == 0.0
+                and (node["display_data"]["position"].get("x") or 0) == 0.0
+                and (node["display_data"]["position"].get("y") or 0) == 0.0
             )
             for node in nodes_dict_list
         )

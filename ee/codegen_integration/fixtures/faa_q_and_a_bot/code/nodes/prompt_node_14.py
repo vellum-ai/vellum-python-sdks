@@ -41,3 +41,7 @@ class PromptNode14(InlinePromptNode):
         logit_bias={},
         custom_parameters=None,
     )
+
+    class Display(InlinePromptNode.Display):
+        x = 4524
+        y = 631

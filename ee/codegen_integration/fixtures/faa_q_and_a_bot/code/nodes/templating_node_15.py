@@ -11,3 +11,7 @@ class TemplatingNode15(TemplatingNode[BaseState, str]):
         "airline_name": "WN",
         "arrival_airport": PromptNode16.Outputs.text,
     }
+
+    class Display(TemplatingNode.Display):
+        x = 3304
+        y = 1043

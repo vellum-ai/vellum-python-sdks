@@ -3,7 +3,6 @@
 exports[`ToolCallingNode > basic > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import PortDisplayOverrides
 
@@ -25,7 +24,6 @@ class ToolCallingNodeDisplay(BaseNodeDisplay[ToolCallingNode]):
             id=UUID("2544f9e4-d6e6-4475-b6a9-13393115d77c")
         )
     }
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 

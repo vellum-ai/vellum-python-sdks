@@ -9,6 +9,10 @@ class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
         if_1 = Port.on_if(None)
         else_1 = Port.on_else()
+
+    class Display(BaseConditionalNode.Display):
+        x = 2247.2797390213086
+        y = 30.917121251477084
 "
 `;
 
@@ -21,6 +25,10 @@ class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
         if_1 = Port.on_if(None)
         else_1 = Port.on_else()
+
+    class Display(BaseConditionalNode.Display):
+        x = 2247.2797390213086
+        y = 30.917121251477084
 "
 `;
 
@@ -36,6 +44,10 @@ class ConditionalNode(BaseConditionalNode):
             ConstantValueReference("text").equals("val-1")
             & ConstantValueReference("text").equals("val-2")
         )
+
+    class Display(BaseConditionalNode.Display):
+        x = 2247.2797390213086
+        y = 30.917121251477084
 "
 `;
 
@@ -48,6 +60,10 @@ from vellum.workflows.references.constant import ConstantValueReference
 class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
         if_port = Port.on_if(ConstantValueReference("new hello").is_null())
+
+    class Display(BaseConditionalNode.Display):
+        x = 2247.2797390213086
+        y = 30.917121251477084
 "
 `;
 
@@ -63,6 +79,10 @@ class ConditionalNode(BaseConditionalNode):
             ConstantValueReference("text").equals("val-1")
             | ConstantValueReference("text").equals("val-2")
         )
+
+    class Display(BaseConditionalNode.Display):
+        x = 2247.2797390213086
+        y = 30.917121251477084
 "
 `;
 
@@ -77,6 +97,10 @@ class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
         if_1 = Port.on_if(Inputs.class_.equals("test_value"))
         else_1 = Port.on_else()
+
+    class Display(BaseConditionalNode.Display):
+        x = 2247.2797390213086
+        y = 30.917121251477084
 "
 `;
 
@@ -89,6 +113,10 @@ from vellum.workflows.references.constant import ConstantValueReference
 class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
         if_1 = Port.on_if(ConstantValueReference("hello").between("world,hello"))
+
+    class Display(BaseConditionalNode.Display):
+        x = 2247.2797390213086
+        y = 30.917121251477084
 "
 `;
 
@@ -101,6 +129,10 @@ from vellum.workflows.references.constant import ConstantValueReference
 class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
         if_1 = Port.on_if(ConstantValueReference("hello").equals("world"))
+
+    class Display(BaseConditionalNode.Display):
+        x = 2247.2797390213086
+        y = 30.917121251477084
 "
 `;
 
@@ -115,6 +147,10 @@ class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
         if_1 = Port.on_if(Inputs.lhs.equals(200))
         else_1 = Port.on_else()
+
+    class Display(BaseConditionalNode.Display):
+        x = 2247.2797390213086
+        y = 30.917121251477084
 "
 `;
 
@@ -129,6 +165,10 @@ class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
         if_1 = Port.on_if(APINode.Outputs.status_code.equals(200))
         else_1 = Port.on_else()
+
+    class Display(BaseConditionalNode.Display):
+        x = 2247.2797390213086
+        y = 30.917121251477084
 "
 `;
 
@@ -142,6 +182,10 @@ from ..inputs import Inputs
 class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
         if_1 = Port.on_if(Inputs.rhs.greater_than(0.5))
+
+    class Display(BaseConditionalNode.Display):
+        x = 2247.2797390213086
+        y = 30.917121251477084
 "
 `;
 
@@ -160,6 +204,10 @@ class ConditionalNode(BaseConditionalNode):
             )
             | ConstantValueReference("C").equals("3")
         )
+
+    class Display(BaseConditionalNode.Display):
+        x = 2247.2797390213086
+        y = 30.917121251477084
 "
 `;
 
@@ -178,13 +226,17 @@ class ConditionalNode(BaseConditionalNode):
                 | ConstantValueReference("C").equals("4")
             )
         )
+
+    class Display(BaseConditionalNode.Display):
+        x = 2247.2797390213086
+        y = 30.917121251477084
 "
 `;
 
 exports[`ConditionalNode > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseConditionalNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.conditional_node import (
     ConditionId,
@@ -250,11 +302,7 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
         ),
     }
     port_displays = {}
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=2247.2797390213086, y=30.917121251477084),
-        width=480,
-        height=180,
-    )
+    display_data = NodeDisplayData(width=480, height=180)
 "
 `;
 
@@ -270,6 +318,10 @@ class ConditionalNode(BaseConditionalNode):
         if_1 = Port.on_if(Inputs.field.equals("testtest"))
         elif_1 = Port.on_elif(Inputs.field.is_not_null())
         else_1 = Port.on_else()
+
+    class Display(BaseConditionalNode.Display):
+        x = 2247.2797390213086
+        y = 30.917121251477084
 "
 `;
 
@@ -282,13 +334,17 @@ class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
         if_1 = Port.on_if(None)
         else_1 = Port.on_else()
+
+    class Display(BaseConditionalNode.Display):
+        x = 2247.2797390213086
+        y = 30.917121251477084
 "
 `;
 
 exports[`ConditionalNode with invalid uuid for field and value node input ids > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseConditionalNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.conditional_node import (
     ConditionId,
@@ -332,11 +388,7 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
         "b51eb7cd-3e0a-4b42-a269-d58ebc3e0b04|51315413-f47c-4d7e-bc94-bd9e7862043d": "b51eb7cd-3e0a-4b42-a269-d58ebc3e0b04|51315413-f47c-4d7e-bc94-bd9e7862043d",
     }
     port_displays = {}
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=2247.2797390213086, y=30.917121251477084),
-        width=480,
-        height=180,
-    )
+    display_data = NodeDisplayData(width=480, height=180)
 "
 `;
 
@@ -351,13 +403,17 @@ class ConditionalNode(BaseConditionalNode):
     class Ports(BaseConditionalNode.Ports):
         if_1 = Port.on_if(Inputs.field.equals(Inputs.field))
         else_1 = Port.on_else()
+
+    class Display(BaseConditionalNode.Display):
+        x = 2247.2797390213086
+        y = 30.917121251477084
 "
 `;
 
 exports[`ConditionalNode with null operator > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseConditionalNodeDisplay
 from vellum_ee.workflows.display.nodes.vellum.conditional_node import (
     ConditionId,
@@ -407,11 +463,7 @@ class ConditionalNodeDisplay(BaseConditionalNodeDisplay[ConditionalNode]):
         ),
     }
     port_displays = {}
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=2247.2797390213086, y=30.917121251477084),
-        width=480,
-        height=180,
-    )
+    display_data = NodeDisplayData(width=480, height=180)
 "
 `;
 
@@ -428,5 +480,9 @@ class ConditionalNode(BaseConditionalNode):
         if_1 = Port.on_if(
             Inputs.field.is_null() & TemplatingNode.Outputs.result.is_nil()
         )
+
+    class Display(BaseConditionalNode.Display):
+        x = 2247.2797390213086
+        y = 30.917121251477084
 "
 `;

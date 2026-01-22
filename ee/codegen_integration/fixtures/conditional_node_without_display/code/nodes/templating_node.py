@@ -9,3 +9,7 @@ class TemplatingNode(BaseTemplatingNode[BaseState, str]):
     inputs = {
         "text": Inputs.text,
     }
+
+    class Display(BaseTemplatingNode.Display):
+        x = 200
+        y = -50

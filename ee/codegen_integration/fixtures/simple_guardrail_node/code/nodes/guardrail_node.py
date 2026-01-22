@@ -10,3 +10,7 @@ class GuardrailNode(BaseGuardrailNode):
         "actual": Inputs.actual,
     }
     release_tag = "LATEST"
+
+    class Display(BaseGuardrailNode.Display):
+        x = 1985.9562846580402
+        y = 180.75743992606283

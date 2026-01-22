@@ -3,7 +3,7 @@
 exports[`FinalOutputNode > basic > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseFinalOutputNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 
@@ -22,11 +22,7 @@ class FinalOutputNodeDisplay(BaseFinalOutputNodeDisplay[FinalOutputNode]):
             id=UUID("<output-id>"), name="value"
         ),
     }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=2075.7067885117494, y=234.65663468515768),
-        width=462,
-        height=288,
-    )
+    display_data = NodeDisplayData(width=462, height=288)
 "
 `;
 
@@ -38,13 +34,17 @@ from vellum.workflows.state import BaseState
 class FinalOutputNode(BaseFinalOutputNode[BaseState, str]):
     class Outputs(BaseFinalOutputNode.Outputs):
         value = "<my-output>"
+
+    class Display(BaseFinalOutputNode.Display):
+        x = 2075.7067885117494
+        y = 234.65663468515768
 "
 `;
 
 exports[`FinalOutputNode > should codegen deduplicated output class > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseFinalOutputNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 
@@ -63,11 +63,7 @@ class FinalOutputNodeDisplay(BaseFinalOutputNodeDisplay[FinalOutputNode]):
             id=UUID("<output-id>"), name="value"
         ),
     }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=2075.7067885117494, y=234.65663468515768),
-        width=462,
-        height=288,
-    )
+    display_data = NodeDisplayData(width=462, height=288)
 "
 `;
 
@@ -79,13 +75,17 @@ from vellum.workflows.state import BaseState
 class FinalOutputNode(BaseFinalOutputNode[BaseState, str]):
     class Outputs(BaseFinalOutputNode.Outputs):
         value = "<my-output>"
+
+    class Display(BaseFinalOutputNode.Display):
+        x = 2075.7067885117494
+        y = 234.65663468515768
 "
 `;
 
 exports[`FinalOutputNode > should codegen successfully without node input > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseFinalOutputNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 
@@ -101,11 +101,7 @@ class FinalOutputNodeDisplay(BaseFinalOutputNodeDisplay[FinalOutputNode]):
             id=UUID("<output-id>"), name="value"
         ),
     }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=2075.7067885117494, y=234.65663468515768),
-        width=462,
-        height=288,
-    )
+    display_data = NodeDisplayData(width=462, height=288)
 "
 `;
 
@@ -117,13 +113,17 @@ from vellum.workflows.state import BaseState
 class FinalOutputNode(BaseFinalOutputNode[BaseState, str]):
     class Outputs(BaseFinalOutputNode.Outputs):
         pass
+
+    class Display(BaseFinalOutputNode.Display):
+        x = 2075.7067885117494
+        y = 234.65663468515768
 "
 `;
 
 exports[`FinalOutputNode > should generate unique class names when mixing defined and undefined class names > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseFinalOutputNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 
@@ -142,16 +142,12 @@ class FinalOutputDisplay(BaseFinalOutputNodeDisplay[FinalOutput]):
             id=UUID("<output-id>"), name="value"
         ),
     }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=2075.7067885117494, y=234.65663468515768),
-        width=462,
-        height=288,
-    )
+    display_data = NodeDisplayData(width=462, height=288)
 
 
 from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseFinalOutputNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 
@@ -171,16 +167,12 @@ class FinalOutput1Display(BaseFinalOutputNodeDisplay[FinalOutput1]):
             id=UUID("<output-id>"), name="value"
         ),
     }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=2075.7067885117494, y=234.65663468515768),
-        width=462,
-        height=288,
-    )
+    display_data = NodeDisplayData(width=462, height=288)
 
 
 from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BaseFinalOutputNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 
@@ -200,11 +192,7 @@ class FinalOutput2Display(BaseFinalOutputNodeDisplay[FinalOutput2]):
             id=UUID("<output-id>"), name="value"
         ),
     }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=2075.7067885117494, y=234.65663468515768),
-        width=462,
-        height=288,
-    )
+    display_data = NodeDisplayData(width=462, height=288)
 "
 `;
 
@@ -217,6 +205,10 @@ class FinalOutput(FinalOutputNode[BaseState, str]):
     class Outputs(FinalOutputNode.Outputs):
         value = "<my-output>"
 
+    class Display(FinalOutputNode.Display):
+        x = 2075.7067885117494
+        y = 234.65663468515768
+
 
 from vellum.workflows.nodes.displayable import FinalOutputNode
 from vellum.workflows.state import BaseState
@@ -226,6 +218,10 @@ class FinalOutput1(FinalOutputNode[BaseState, str]):
     class Outputs(FinalOutputNode.Outputs):
         value = "<my-output>"
 
+    class Display(FinalOutputNode.Display):
+        x = 2075.7067885117494
+        y = 234.65663468515768
+
 
 from vellum.workflows.nodes.displayable import FinalOutputNode
 from vellum.workflows.state import BaseState
@@ -234,6 +230,10 @@ from vellum.workflows.state import BaseState
 class FinalOutput2(FinalOutputNode[BaseState, str]):
     class Outputs(FinalOutputNode.Outputs):
         value = "<my-output>"
+
+    class Display(FinalOutputNode.Display):
+        x = 2075.7067885117494
+        y = 234.65663468515768
 "
 `;
 
@@ -245,5 +245,9 @@ from vellum.workflows.state import BaseState
 class FinalOutputNode(BaseFinalOutputNode[BaseState, list[str]]):
     class Outputs(BaseFinalOutputNode.Outputs):
         pass
+
+    class Display(BaseFinalOutputNode.Display):
+        x = 2075.7067885117494
+        y = 234.65663468515768
 "
 `;

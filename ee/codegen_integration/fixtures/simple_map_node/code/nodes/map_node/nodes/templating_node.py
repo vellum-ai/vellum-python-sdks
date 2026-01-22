@@ -11,3 +11,7 @@ class TemplatingNode(BaseTemplatingNode[BaseState, str]):
         "example_var": Inputs.items,
         "var_1": CodeExecutionNode.Outputs.result,
     }
+
+    class Display(BaseTemplatingNode.Display):
+        x = 1998.7584158889226
+        y = 241.3446029681764

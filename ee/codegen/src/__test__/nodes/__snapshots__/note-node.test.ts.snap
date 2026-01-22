@@ -3,7 +3,6 @@
 exports[`NoteNode > basic > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes import BaseNoteNodeDisplay
 
 from ...nodes.note_node import NoteNode
@@ -11,7 +10,6 @@ from ...nodes.note_node import NoteNode
 
 class NoteNodeDisplay(BaseNoteNodeDisplay[NoteNode]):
     node_id = UUID("<note-node-id>")
-    display_data = NodeDisplayData(position=NodeDisplayPosition(x=0, y=0))
 "
 `;
 

@@ -7,3 +7,7 @@ from .templating_node import TemplatingNode
 class FinalOutput(FinalOutputNode[BaseState, str]):
     class Outputs(FinalOutputNode.Outputs):
         value = TemplatingNode.Outputs.result
+
+    class Display(FinalOutputNode.Display):
+        x = 600
+        y = -50

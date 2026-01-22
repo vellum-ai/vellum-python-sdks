@@ -12,3 +12,7 @@ class SubworkflowDeployment(SubworkflowDeploymentNode):
 
     class Outputs(SubworkflowDeploymentNode.Outputs):
         chat_history: str
+
+    class Display(SubworkflowDeploymentNode.Display):
+        x = 1873.116343490305
+        y = 239.74958448753466

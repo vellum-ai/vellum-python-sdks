@@ -8,3 +8,6 @@ class MapNode(BaseMapNode):
     items = Inputs.items
     subworkflow = MapNodeWorkflow
     max_concurrency = 4
+
+    class Display(BaseMapNode.Display):
+        x = 254

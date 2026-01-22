@@ -96,7 +96,7 @@ describe("GenericNode DisplayData Integration", () => {
     expect(result).not.toContain("color=");
   });
 
-  it("should generate display data with z_index when provided in serialized JSON", async () => {
+  it("should generate z_index in BaseNode.Display when provided in serialized JSON", async () => {
     const nodeData = createGenericNodeWithDisplayData({
       position: { x: 25, y: 50 },
       z_index: 10,
@@ -112,10 +112,10 @@ describe("GenericNode DisplayData Integration", () => {
       nodeContext,
     });
 
-    node.getNodeDisplayFile().write(writer);
+    node.getNodeFile().write(writer);
     const result = await writer.toStringFormatted();
 
-    expect(result).toContain("z_index=10");
+    expect(result).toContain("z_index = 10");
   });
 
   it("should not generate display_data field when no display data is provided", async () => {

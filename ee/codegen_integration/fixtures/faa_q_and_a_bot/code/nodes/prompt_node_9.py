@@ -68,3 +68,7 @@ Limit your response to 250 words. Just use plain text, no special characters, no
         logit_bias={},
         custom_parameters=None,
     )
+
+    class Display(InlinePromptNode.Display):
+        x = 4528.058075069296
+        y = -39.95100525832629

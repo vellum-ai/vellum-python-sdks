@@ -3,7 +3,7 @@
 exports[`PromptDeploymentNode > basic > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BasePromptDeploymentNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
@@ -31,11 +31,7 @@ class PromptDeploymentNodeDisplay(
             id=UUID("1539a6ed-6bf9-43a5-9e4a-f82ec5615ee3")
         )
     }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=2470.8372576177285, y=219.71887984764544),
-        width=480,
-        height=170,
-    )
+    display_data = NodeDisplayData(width=480, height=170)
 "
 `;
 
@@ -48,6 +44,10 @@ exports[`PromptDeploymentNode > basic > getNodeFile 1`] = `
 class PromptDeploymentNode(BasePromptDeploymentNode):
     deployment = "some-unique-deployment-name"
     release_tag = "LATEST"
+
+    class Display(BasePromptDeploymentNode.Display):
+        x = 2470.8372576177285
+        y = 219.71887984764544
 "
 `;
 
@@ -65,6 +65,10 @@ class PromptDeploymentNode(BasePromptDeploymentNode[State]):
     prompt_inputs = {
         "text": State.text,
     }
+
+    class Display(BasePromptDeploymentNode.Display):
+        x = 2470.8372576177285
+        y = 219.71887984764544
 "
 `;
 
@@ -78,6 +82,10 @@ class PromptDeploymentNode(BasePromptDeploymentNode):
     ml_model_fallbacks = ["model1"]
     deployment = "some-unique-deployment-name"
     release_tag = "LATEST"
+
+    class Display(BasePromptDeploymentNode.Display):
+        x = 2470.8372576177285
+        y = 219.71887984764544
 "
 `;
 
@@ -92,13 +100,17 @@ from vellum.workflows.nodes.displayable import (
 class PromptDeploymentNode(BasePromptDeploymentNode):
     deployment = UUID("afd05488-7a25-4ff2-b87b-878e9552474e")
     release_tag = "LATEST"
+
+    class Display(BasePromptDeploymentNode.Display):
+        x = 2470.8372576177285
+        y = 219.71887984764544
 "
 `;
 
 exports[`PromptDeploymentNode > with json output id defined > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.editor import NodeDisplayData
 from vellum_ee.workflows.display.nodes import BasePromptDeploymentNodeDisplay
 from vellum_ee.workflows.display.nodes.types import (
     NodeOutputDisplay,
@@ -129,10 +141,6 @@ class PromptDeploymentNodeDisplay(
             id=UUID("1539a6ed-6bf9-43a5-9e4a-f82ec5615ee3")
         )
     }
-    display_data = NodeDisplayData(
-        position=NodeDisplayPosition(x=2470.8372576177285, y=219.71887984764544),
-        width=480,
-        height=170,
-    )
+    display_data = NodeDisplayData(width=480, height=170)
 "
 `;

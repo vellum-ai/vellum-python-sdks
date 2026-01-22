@@ -220,6 +220,7 @@ export class Workflow {
                     value: new NodeDisplayData({
                       workflowContext: this.workflowContext,
                       nodeDisplayData: entrypointNode.displayData,
+                      includePosition: true,
                     }),
                   }),
                 ]

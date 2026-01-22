@@ -9,3 +9,7 @@ class MostRecentMessage(TemplatingNode[BaseState, str]):
     inputs = {
         "chat_history": Inputs.chat_history,
     }
+
+    class Display(TemplatingNode.Display):
+        x = 254
+        y = 237.3190436953056

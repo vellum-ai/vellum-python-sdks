@@ -14,3 +14,7 @@ class TemplatingNode3(TemplatingNode[BaseState, str]):
         "input_a": TemplatingNode1.Outputs.result,
         "input_b": TemplatingNode2.Outputs.result,
     }
+
+    class Display(TemplatingNode.Display):
+        x = 2877.183015927978
+        y = 185.8336045706372

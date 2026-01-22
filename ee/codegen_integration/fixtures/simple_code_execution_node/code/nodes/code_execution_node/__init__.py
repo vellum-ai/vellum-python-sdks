@@ -16,3 +16,7 @@ class CodeExecutionNode(BaseCodeExecutionNode[BaseState, str]):
     packages = [
         CodeExecutionPackage(name="requests", version="2.26.0", repository="test-repo"),
     ]
+
+    class Display(BaseCodeExecutionNode.Display):
+        x = 1816.3157894736842
+        y = 213.93599376731305
