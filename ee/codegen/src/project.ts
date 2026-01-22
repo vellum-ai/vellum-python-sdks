@@ -200,6 +200,11 @@ ${errors.slice(0, 3).map((err) => {
   public async generateCode(
     originalArtifact?: Record<string, string>
   ): Promise<void> {
+    // Store the original artifact on the context so nested workflows can access it
+    if (originalArtifact) {
+      this.workflowContext.setOriginalArtifact(originalArtifact);
+    }
+
     const absolutePathToModuleDirectory = join(
       this.workflowContext.absolutePathToOutputDirectory,
       ...this.getModulePath()
@@ -260,7 +265,10 @@ ${errors.slice(0, 3).map((err) => {
     ]);
 
     // Code merge logic - copied from codegen-service
-    if (originalArtifact) {
+    // Only run file merging at the root level, not for nested workflows
+    // Nested workflows add their files to pythonCodeMergeableNodeFiles (which is shared),
+    // and the root workflow's mergeFilesWithArtifact handles all of them
+    if (originalArtifact && !this.workflowContext.parentNode) {
       await this.mergeFilesWithArtifact(originalArtifact);
     }
 

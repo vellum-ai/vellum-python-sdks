@@ -99,7 +99,6 @@ def _compute_diff(
                     "nodes/agent/__init__.py",
                     "nodes/agent/transform_text_tool_workflow/__init__.py",
                     "nodes/agent/transform_text_tool_workflow/inputs.py",
-                    "nodes/agent/transform_text_tool_workflow/nodes/transform_node.py",
                     "nodes/agent/transform_text_tool_workflow/workflow.py",
                     "workflow.py",
                 }

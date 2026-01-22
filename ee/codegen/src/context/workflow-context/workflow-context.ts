@@ -74,6 +74,7 @@ export declare namespace WorkflowContext {
     nestedWorkflowModuleName?: string;
     workflowClassDescription?: string;
     triggers?: WorkflowTrigger[];
+    originalArtifact?: Record<string, string>;
   };
 }
 
@@ -170,6 +171,9 @@ export class WorkflowContext {
 
   public readonly triggers?: WorkflowTrigger[];
 
+  // Original artifact for file merging (shared across nested workflows)
+  private _originalArtifact?: Record<string, string>;
+
   constructor({
     absolutePathToOutputDirectory,
     moduleName,
@@ -190,6 +194,7 @@ export class WorkflowContext {
     nestedWorkflowModuleName,
     pythonCodeMergeableNodeFiles,
     triggers,
+    originalArtifact,
   }: WorkflowContext.Args) {
     this.absolutePathToOutputDirectory = absolutePathToOutputDirectory;
     this.moduleName = moduleName;
@@ -252,6 +257,8 @@ export class WorkflowContext {
 
     this.pythonCodeMergeableNodeFiles =
       pythonCodeMergeableNodeFiles ?? new Set<string>();
+
+    this._originalArtifact = originalArtifact;
   }
 
   public getAbsolutePath(filePath: string): string {
@@ -296,6 +303,7 @@ export class WorkflowContext {
       classNames,
       nestedWorkflowModuleName,
       workflowClassDescription,
+      originalArtifact: this._originalArtifact,
     });
   }
 
@@ -685,6 +693,14 @@ export class WorkflowContext {
    */
   public getPythonCodeMergeableNodeFiles(): Set<string> {
     return this.pythonCodeMergeableNodeFiles;
+  }
+
+  public setOriginalArtifact(artifact: Record<string, string>): void {
+    this._originalArtifact = artifact;
+  }
+
+  public getOriginalArtifact(): Record<string, string> | undefined {
+    return this._originalArtifact;
   }
 
   public async loadWorkspaceSecret(workspaceSecretId: string): Promise<void> {

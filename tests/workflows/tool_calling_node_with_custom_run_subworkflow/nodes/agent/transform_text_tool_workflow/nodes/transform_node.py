@@ -1,5 +1,4 @@
-from vellum.workflows.nodes.bases import BaseNode
-from vellum.workflows.outputs.base import BaseOutputs
+from vellum.workflows import BaseNode
 
 from ..inputs import Inputs
 
@@ -7,7 +6,7 @@ from ..inputs import Inputs
 class TransformNode(BaseNode):
     text = Inputs.text
 
-    class Outputs(BaseOutputs):
+    class Outputs(BaseNode.Outputs):
         result: str
 
     def run(self) -> Outputs:

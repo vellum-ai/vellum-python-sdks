@@ -984,9 +984,11 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
 
   private async generateInlineWorkflowProjects(): Promise<void> {
     // Generate nested workflow projects
+    // Pass the original artifact from the parent context so file merging works for nested workflows
+    const originalArtifact = this.workflowContext.getOriginalArtifact();
     await Promise.all(
       this.inlineWorkflowsToGenerate.map(async (workflowFile) => {
-        await workflowFile.workflowProject.generateCode();
+        await workflowFile.workflowProject.generateCode(originalArtifact);
       })
     );
   }
