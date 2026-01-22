@@ -44,9 +44,9 @@ class BaseTemplatingNodeDisplay(BaseNodeDisplay[_TemplatingNodeType], Generic[_T
                 display_context.add_validation_error(
                     UnsupportedSerializationException(
                         f"Accessor expressions are not supported for Templating Node inputs. "
-                        f"Instead of using '{variable_value}' for input '{variable_name}', "
+                        f"Instead of using '{variable_value.name}' for input '{variable_name}', "
                         f"pass the full JSON output to the Templating Node and access the key "
-                        f"within the template itself using '{{{{ {variable_name}.{variable_value._field} }}}}'."
+                        f"within the template itself, e.g. '{{{{ {variable_name}.key }}}}'."
                     )
                 )
 
