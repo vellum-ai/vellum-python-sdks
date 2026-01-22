@@ -25,28 +25,27 @@ class ConnectionInfo:
 class ComposioService:
     """Composio API client for managing connections and executing tools"""
 
+    _API_KEY_ENV_VARS = ["COMPOSIO_API_KEY", "COMPOSIO_KEY"]
+
     def __init__(self, api_key: Optional[str] = None):
         # If no API key provided, look it up from environment variables
         if api_key is None:
             api_key = self._get_api_key_from_env()
 
         if not api_key:
-            common_env_var_names = ["COMPOSIO_API_KEY", "COMPOSIO_KEY"]
             raise NodeException(
                 "No Composio API key found. "
                 "Please provide an api_key parameter or set one of these environment variables: "
-                + ", ".join(common_env_var_names)
+                + ", ".join(self._API_KEY_ENV_VARS)
             )
 
         self.api_key = api_key
         self.base_url = "https://backend.composio.dev/api/v3"
 
-    @staticmethod
-    def _get_api_key_from_env() -> Optional[str]:
+    @classmethod
+    def _get_api_key_from_env(cls) -> Optional[str]:
         """Get Composio API key from environment variables"""
-        common_env_var_names = ["COMPOSIO_API_KEY", "COMPOSIO_KEY"]
-
-        for env_var_name in common_env_var_names:
+        for env_var_name in cls._API_KEY_ENV_VARS:
             value = os.environ.get(env_var_name)
             if value:
                 return value
