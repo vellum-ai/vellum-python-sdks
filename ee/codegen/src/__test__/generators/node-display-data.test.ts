@@ -8,84 +8,70 @@ describe("NodeDisplayData", () => {
     mockWorkflowContext = {} as WorkflowContext;
   });
 
-  describe("icon field generation", () => {
-    it("should include icon in generated code when icon is provided", () => {
+  describe("icon and color field generation", () => {
+    it("should not include icon in generated code even when icon is provided", () => {
+      /**
+       * Tests that icon is not generated in NodeDisplayData since it's now generated in BaseNode.Display.
+       */
+      // GIVEN a node display data with icon
       const nodeDisplayData = {
         position: { x: 0, y: 0 },
         icon: "vellum:icon:star",
       };
+
+      // WHEN we generate the code
       const generator = new NodeDisplayData({
         nodeDisplayData,
         workflowContext: mockWorkflowContext,
       });
-
       const code = generator.toString();
 
-      expect(code).toContain('icon="vellum:icon:star"');
-    });
-
-    it("should not include icon in generated code when icon is undefined", () => {
-      const nodeDisplayData = {
-        position: { x: 0, y: 0 },
-      };
-      const generator = new NodeDisplayData({
-        nodeDisplayData,
-        workflowContext: mockWorkflowContext,
-      });
-
-      const code = generator.toString();
-
+      // THEN icon should not be included
       expect(code).not.toContain("icon=");
     });
-  });
 
-  describe("color field generation", () => {
-    it("should include color in generated code when color is provided", () => {
+    it("should not include color in generated code even when color is provided", () => {
+      /**
+       * Tests that color is not generated in NodeDisplayData since it's now generated in BaseNode.Display.
+       */
+      // GIVEN a node display data with color
       const nodeDisplayData = {
         position: { x: 0, y: 0 },
         color: "navy",
       };
+
+      // WHEN we generate the code
       const generator = new NodeDisplayData({
         nodeDisplayData,
         workflowContext: mockWorkflowContext,
       });
-
       const code = generator.toString();
 
-      expect(code).toContain('color="navy"');
-    });
-
-    it("should not include color in generated code when color is undefined", () => {
-      const nodeDisplayData = {
-        position: { x: 0, y: 0 },
-      };
-      const generator = new NodeDisplayData({
-        nodeDisplayData,
-        workflowContext: mockWorkflowContext,
-      });
-
-      const code = generator.toString();
-
+      // THEN color should not be included
       expect(code).not.toContain("color=");
     });
-  });
 
-  describe("icon and color together", () => {
-    it("should include both icon and color in generated code when both are provided", () => {
+    it("should not include icon or color in generated code even when both are provided", () => {
+      /**
+       * Tests that neither icon nor color are generated in NodeDisplayData since they're now generated in BaseNode.Display.
+       */
+      // GIVEN a node display data with both icon and color
       const nodeDisplayData = {
         position: { x: 0, y: 0 },
         icon: "vellum:icon:cog",
         color: "navy",
       };
+
+      // WHEN we generate the code
       const generator = new NodeDisplayData({
         nodeDisplayData,
         workflowContext: mockWorkflowContext,
       });
-
       const code = generator.toString();
 
-      expect(code).toContain('icon="vellum:icon:cog"');
-      expect(code).toContain('color="navy"');
+      // THEN neither icon nor color should be included
+      expect(code).not.toContain("icon=");
+      expect(code).not.toContain("color=");
     });
   });
 });

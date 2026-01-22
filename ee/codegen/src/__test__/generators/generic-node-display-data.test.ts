@@ -9,68 +9,46 @@ describe("GenericNodeDisplayData", () => {
     mockWorkflowContext = {} as WorkflowContext;
   });
 
-  describe("icon field generation", () => {
-    it("should include icon in generated code when icon is provided", () => {
+  describe("icon and color field generation", () => {
+    it("should not include icon in generated code even when icon is provided", () => {
+      /**
+       * Tests that icon is not generated in GenericNodeDisplayData since it's now generated in BaseNode.Display.
+       */
+      // GIVEN a node display data with icon
       const nodeDisplayData: GenericNodeDisplayDataType = {
         position: { x: 0, y: 0 },
         icon: "vellum:icon:star",
       };
 
+      // WHEN we generate the code
       const generator = new GenericNodeDisplayData({
         nodeDisplayData,
         workflowContext: mockWorkflowContext,
       });
-
       const code = generator.toString();
 
-      expect(code).toContain('icon="vellum:icon:star"');
-    });
-
-    it("should not include icon in generated code when icon is undefined", () => {
-      const nodeDisplayData: GenericNodeDisplayDataType = {
-        position: { x: 0, y: 0 },
-      };
-
-      const generator = new GenericNodeDisplayData({
-        nodeDisplayData,
-        workflowContext: mockWorkflowContext,
-      });
-
-      const code = generator.toString();
-
+      // THEN icon should not be included
       expect(code).not.toContain("icon=");
     });
-  });
 
-  describe("color field generation", () => {
-    it("should include color in generated code when color is provided", () => {
+    it("should not include color in generated code even when color is provided", () => {
+      /**
+       * Tests that color is not generated in GenericNodeDisplayData since it's now generated in BaseNode.Display.
+       */
+      // GIVEN a node display data with color
       const nodeDisplayData: GenericNodeDisplayDataType = {
         position: { x: 0, y: 0 },
         color: "navy",
       };
 
+      // WHEN we generate the code
       const generator = new GenericNodeDisplayData({
         nodeDisplayData,
         workflowContext: mockWorkflowContext,
       });
-
       const code = generator.toString();
 
-      expect(code).toContain('color="navy"');
-    });
-
-    it("should not include color in generated code when color is undefined", () => {
-      const nodeDisplayData: GenericNodeDisplayDataType = {
-        position: { x: 0, y: 0 },
-      };
-
-      const generator = new GenericNodeDisplayData({
-        nodeDisplayData,
-        workflowContext: mockWorkflowContext,
-      });
-
-      const code = generator.toString();
-
+      // THEN color should not be included
       expect(code).not.toContain("color=");
     });
   });
@@ -108,52 +86,41 @@ describe("GenericNodeDisplayData", () => {
     });
   });
 
-  describe("icon and color together", () => {
-    it("should include both icon and color in generated code when both are provided", () => {
-      const nodeDisplayData: GenericNodeDisplayDataType = {
-        position: { x: 0, y: 0 },
-        icon: "vellum:icon:cog",
-        color: "navy",
-      };
-
-      const generator = new GenericNodeDisplayData({
-        nodeDisplayData,
-        workflowContext: mockWorkflowContext,
-      });
-
-      const code = generator.toString();
-
-      expect(code).toContain('icon="vellum:icon:cog"');
-      expect(code).toContain('color="navy"');
-    });
-  });
-
   describe("empty display data", () => {
     it("should return empty string when no display data is provided", () => {
+      /**
+       * Tests that no code is generated when display data is undefined.
+       */
+      // GIVEN no display data
+      // WHEN we generate the code
       const generator = new GenericNodeDisplayData({
         nodeDisplayData: undefined,
         workflowContext: mockWorkflowContext,
       });
-
       const code = generator.toString();
 
+      // THEN the code should be empty
       expect(code).toBe("");
     });
 
-    it("should return empty string when only null/undefined fields are provided", () => {
+    it("should return empty string when only icon and color are provided", () => {
+      /**
+       * Tests that no code is generated when only icon and color are provided since they're now generated in BaseNode.Display.
+       */
+      // GIVEN display data with only icon and color
       const nodeDisplayData: GenericNodeDisplayDataType = {
-        icon: null,
-        color: null,
-        // position and z_index undefined, should not generate any content
+        icon: "vellum:icon:cog",
+        color: "navy",
       };
 
+      // WHEN we generate the code
       const generator = new GenericNodeDisplayData({
         nodeDisplayData,
         workflowContext: mockWorkflowContext,
       });
-
       const code = generator.toString();
 
+      // THEN the code should be empty since icon and color are no longer generated here
       expect(code).toBe("");
     });
   });

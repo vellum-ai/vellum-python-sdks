@@ -87,24 +87,6 @@ export class GenericNodeDisplayData extends AstNode {
       args.push(commentArg);
     }
 
-    if (!isNil(this.sourceNodeDisplayData?.icon)) {
-      args.push(
-        new MethodArgument({
-          name: "icon",
-          value: new StrInstantiation(this.sourceNodeDisplayData.icon),
-        })
-      );
-    }
-
-    if (!isNil(this.sourceNodeDisplayData?.color)) {
-      args.push(
-        new MethodArgument({
-          name: "color",
-          value: new StrInstantiation(this.sourceNodeDisplayData.color),
-        })
-      );
-    }
-
     // Return undefined if no display data fields are provided
     if (args.length === 0) {
       return undefined;

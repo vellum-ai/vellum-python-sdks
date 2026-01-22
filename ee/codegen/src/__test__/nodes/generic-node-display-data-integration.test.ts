@@ -31,7 +31,6 @@ describe("GenericNode DisplayData Integration", () => {
     );
   });
 
-  // Helper function to create a minimal generic node with display data
   const createGenericNodeWithDisplayData = (
     displayData: GenericNodeDisplayData | undefined
   ): GenericNodeType => ({
@@ -49,7 +48,7 @@ describe("GenericNode DisplayData Integration", () => {
     outputs: [],
   });
 
-  it("should generate display data with icon and color when provided in serialized JSON", async () => {
+  it("should generate icon and color in node file Display class when provided in serialized JSON", async () => {
     const nodeData = createGenericNodeWithDisplayData({
       position: { x: 100, y: 200 },
       icon: "vellum:icon:star",
@@ -66,16 +65,18 @@ describe("GenericNode DisplayData Integration", () => {
       nodeContext,
     });
 
-    node.getNodeDisplayFile().write(writer);
+    node.getNodeFile().write(writer);
     const result = await writer.toStringFormatted();
 
-    expect(result).toContain('icon="vellum:icon:star"');
-    expect(result).toContain('color="navy"');
+    expect(result).toContain('icon = "vellum:icon:star"');
+    expect(result).toContain('color = "navy"');
   });
 
-  it("should not include icon and color when not provided in serialized JSON", async () => {
+  it("should not include icon and color in display data (NodeDisplayData) since they're in BaseNode.Display", async () => {
     const nodeData = createGenericNodeWithDisplayData({
-      position: { x: 50, y: 75 },
+      position: { x: 100, y: 200 },
+      icon: "vellum:icon:star",
+      color: "navy",
     });
 
     const nodeContext = (await createNodeContext({
@@ -133,7 +134,6 @@ describe("GenericNode DisplayData Integration", () => {
     node.getNodeDisplayFile().write(writer);
     const result = await writer.toStringFormatted();
 
-    // Should not contain any display_data field at all
     expect(result).not.toContain("display_data=");
   });
 });

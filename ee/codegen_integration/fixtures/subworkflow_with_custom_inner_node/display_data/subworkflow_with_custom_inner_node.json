@@ -16,9 +16,7 @@
           },
           "z_index": 1,
           "width": 306,
-          "height": 88,
-          "icon": "vellum:icon:play",
-          "color": "default"
+          "height": 88
         },
         "base": null,
         "definition": null
@@ -48,9 +46,7 @@
                     "x": -30.0,
                     "y": 0.0
                   },
-                  "z_index": 1,
-                  "icon": "vellum:icon:play",
-                  "color": "default"
+                  "z_index": 1
                 },
                 "base": null,
                 "definition": null
