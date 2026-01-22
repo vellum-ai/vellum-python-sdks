@@ -537,6 +537,14 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
         name = serialized_value["workflow_raw_data"]["definition"]["name"]
         description = value.__doc__ or ""
 
+        # Extract the module name from the workflow class's module path
+        # e.g., "tests.workflows.foo.nodes.agent.transform_text_tool.workflow" -> "transform_text_tool"
+        workflow_module = value.__module__
+        if workflow_module.endswith(".workflow"):
+            module_name = workflow_module.rsplit(".", 2)[-2]
+        else:
+            module_name = None
+
         # Compile the function definition (which now handles __vellum_inputs__ and __vellum_examples__)
         function_definition = compile_inline_workflow_function_definition(value)
 
@@ -562,6 +570,10 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
             "definition": function_definition_data,
             "exec_config": serialized_value,
         }
+
+        # Include the module name if available so codegen can use the correct path
+        if module_name:
+            workflow_data["module_name"] = module_name
 
         return {
             "type": "CONSTANT_VALUE",

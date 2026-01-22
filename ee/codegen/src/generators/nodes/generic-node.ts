@@ -377,6 +377,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
       name: inlineWorkflow.name,
       description: inlineWorkflow.description,
       exec_config: workflowVersionExecConfig,
+      module_name: inlineWorkflow.module_name,
     };
 
     // Generate inline workflow file directly
@@ -637,6 +638,10 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
   private getInlineWorkflowFunctionName(
     workflow: InlineWorkflowFunctionArgs
   ): string {
+    // Use the module_name if available (from serialization) to match the original module path
+    if (workflow.module_name) {
+      return workflow.module_name;
+    }
     if (workflow.name) {
       return toPythonSafeSnakeCase(workflow.name);
     }
