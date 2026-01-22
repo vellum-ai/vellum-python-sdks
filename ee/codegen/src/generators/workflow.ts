@@ -33,7 +33,6 @@ import { TupleInstantiation } from "src/generators/extensions/tuple-instantiatio
 import { TypeReference } from "src/generators/extensions/type-reference";
 import { UuidInstantiation } from "src/generators/extensions/uuid-instantiation";
 import { GraphAttribute } from "src/generators/graph-attribute";
-import { NodeDisplayData } from "src/generators/node-display-data";
 import { WorkflowOutput } from "src/generators/workflow-output";
 import {
   NodeDisplayData as NodeDisplayDataType,
