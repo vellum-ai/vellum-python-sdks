@@ -11,6 +11,7 @@ def virtual_file_loader():
     """Fixture to manage VirtualFileFinder registration and cleanup."""
     finders = []
     namespaces = []
+    file_modules = []  # Track module names derived from file paths
 
     def _register(files, namespace, source_module=None):
         finder = VirtualFileFinder(files, namespace, source_module=source_module)
@@ -18,6 +19,19 @@ def virtual_file_loader():
         sys.meta_path.insert(0, finder)
         finders.append(finder)
         namespaces.append(namespace)
+
+        # Track module names that could be created from the file paths
+        # The VirtualFileFinder can respond to imports without the namespace prefix
+        for file_path in files.keys():
+            if file_path.endswith(".py") and file_path != "__init__.py":
+                # Convert file path to module name (e.g., "nodes/my_node.py" -> "nodes.my_node")
+                module_name = file_path[:-3].replace("/", ".")
+                file_modules.append(module_name)
+                # Also track parent packages (e.g., "nodes")
+                parts = module_name.split(".")
+                for i in range(1, len(parts)):
+                    file_modules.append(".".join(parts[:i]))
+
         return finder
 
     yield _register
@@ -31,6 +45,12 @@ def virtual_file_loader():
     for namespace in namespaces:
         modules_to_remove = [key for key in sys.modules if key.startswith(namespace)]
         for mod in modules_to_remove:
+            del sys.modules[mod]
+
+    # Also clean up any modules created without the namespace prefix
+    # (due to VirtualFileFinder responding to non-prefixed imports)
+    for mod in file_modules:
+        if mod in sys.modules:
             del sys.modules[mod]
 
 
@@ -93,3 +113,54 @@ class MyNode(BaseNode):
 
     outputs = fulfilled_events[0].outputs
     assert outputs.greeting == "Hello, World!"
+
+
+def test_resolve_node_ref__node_with_relative_imports(virtual_file_loader):
+    """
+    Tests that run_node works when the node file itself has relative imports
+    to sibling modules within the same subpackage.
+    """
+    # GIVEN a workflow where the node imports from a relative module
+    files = {
+        "__init__.py": "",
+        "workflow.py": """\
+from vellum.workflows import BaseWorkflow
+from .nodes.my_node import MyNode
+
+class Workflow(BaseWorkflow):
+    graph = MyNode
+""",
+        "nodes/__init__.py": "",
+        "nodes/my_node.py": """\
+from vellum.workflows.nodes import BaseNode
+from .helpers import get_greeting
+
+class MyNode(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        greeting: str
+
+    def run(self) -> Outputs:
+        return self.Outputs(greeting=get_greeting())
+""",
+        "nodes/helpers.py": """\
+def get_greeting():
+    return "Hello from helper!"
+""",
+    }
+
+    # AND the workflow is loaded with a UUID namespace
+    namespace = str(uuid4())
+    virtual_file_loader(files, namespace)
+
+    # WHEN we load the workflow and run the node
+    Workflow = BaseWorkflow.load_from_module(namespace)
+    workflow = Workflow()
+
+    events = list(workflow.run_node("nodes.my_node.MyNode"))
+
+    # THEN the node should execute successfully using the relative import
+    fulfilled_events = [e for e in events if e.name == "node.execution.fulfilled"]
+    assert len(fulfilled_events) == 1
+
+    outputs = fulfilled_events[0].outputs
+    assert outputs.greeting == "Hello from helper!"
