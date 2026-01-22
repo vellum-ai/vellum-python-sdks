@@ -71,6 +71,25 @@ def _is_annotated(cls: Type, name: str) -> Any:
     return None
 
 
+def _validate_no_parent_output_references(node_cls: Type["BaseNode"]) -> None:
+    """
+    Validates that the node does not reference parent class outputs.
+    """
+    class_outputs = vars(node_cls.Outputs)
+
+    for name, value in class_outputs.items():
+        if not isinstance(value, OutputReference):
+            continue
+
+        parent_node_class = value.outputs_class.__parent_class__
+        if parent_node_class in node_cls.__mro__:
+            raise ValueError(
+                f"Node {node_cls.__name__} references parent class output "
+                f"'{value.outputs_class.__qualname__}.{name}'. "
+                "Referencing parent class outputs is not allowed."
+            )
+
+
 class BaseNodeMeta(ABCMeta):
     def __new__(mcs, name: str, bases: Tuple[Type, ...], dct: Dict[str, Any]) -> Any:
         if "Outputs" in dct:
@@ -591,4 +610,4 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
 
         Default implementation performs no validation.
         """
-        pass
+        _validate_no_parent_output_references(cls)

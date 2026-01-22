@@ -77,6 +77,7 @@ class FinalOutputNode(BaseNode[StateType], Generic[StateType, _OutputType], meta
 
     @classmethod
     def __validate__(cls) -> None:
+        super().__validate__()
         cls._validate_output_type_consistency()
 
     @classmethod
