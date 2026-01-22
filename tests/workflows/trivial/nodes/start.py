@@ -2,4 +2,6 @@ from vellum.workflows import BaseNode
 
 
 class StartNode(BaseNode):
-    pass
+    class Display(BaseNode.Display):
+        x = 200
+        y = -50
