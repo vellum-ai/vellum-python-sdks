@@ -94,22 +94,18 @@ def test_zero_diff_transforms(module_name: str):
     assert workflow_file is not None, f"Module {workflow_module}.workflow has no __file__"
     original_root = Path(workflow_file).parent
 
-    # Collect original files as the artifact for file merging
+    # Collect original files for diff comparison later
     original_files = _collect_file_map(original_root)
 
     # WHEN we serialize the workflow to exec_config
     serialization_result = BaseWorkflowDisplay.serialize_module(workflow_module)
     original_exec_config = serialization_result.exec_config
 
-    # AND we run codegen on the serialized data with the original artifact
+    # AND we run codegen on the serialized data with the original artifact directory
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_dir_path = Path(temp_dir)
         exec_config_path = temp_dir_path / "exec_config.json"
         exec_config_path.write_text(json.dumps(original_exec_config))
-
-        # Write the original artifact for file merging
-        original_artifact_path = temp_dir_path / "original_artifact.json"
-        original_artifact_path.write_text(json.dumps(original_files))
 
         codegen_dir = Path(__file__).parent.parent / "codegen"
         output_dir = temp_dir_path / "generated"
@@ -130,7 +126,7 @@ def test_zero_diff_transforms(module_name: str):
                 "--module-name",
                 module_name,
                 "--original-artifact",
-                str(original_artifact_path),
+                str(original_root),
             ],
             cwd=str(codegen_dir),
             capture_output=True,

@@ -1,7 +1,33 @@
-import { readFile } from "fs/promises";
+import { readdir, readFile, stat } from "fs/promises";
 import * as path from "path";
 
 import { WorkflowProjectGenerator } from "./project";
+
+async function collectPythonFiles(
+  dirPath: string,
+  rootPath: string = dirPath
+): Promise<Record<string, string>> {
+  const result: Record<string, string> = {};
+  const entries = await readdir(dirPath, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const fullPath = path.join(dirPath, entry.name);
+
+    if (entry.isDirectory()) {
+      if (entry.name === "__pycache__") {
+        continue;
+      }
+      const subFiles = await collectPythonFiles(fullPath, rootPath);
+      Object.assign(result, subFiles);
+    } else if (entry.isFile() && entry.name.endsWith(".py")) {
+      const relativePath = path.relative(rootPath, fullPath).replace(/\\/g, "/");
+      const content = await readFile(fullPath, "utf-8");
+      result[relativePath] = content;
+    }
+  }
+
+  return result;
+}
 
 interface CliArgs {
   execConfigPath: string;
@@ -61,8 +87,13 @@ async function main() {
 
     let originalArtifact: Record<string, string> | undefined;
     if (originalArtifactPath) {
-      const artifactRaw = await readFile(originalArtifactPath, "utf-8");
-      originalArtifact = JSON.parse(artifactRaw);
+      const pathStat = await stat(originalArtifactPath);
+      if (pathStat.isDirectory()) {
+        originalArtifact = await collectPythonFiles(originalArtifactPath);
+      } else {
+        const artifactRaw = await readFile(originalArtifactPath, "utf-8");
+        originalArtifact = JSON.parse(artifactRaw);
+      }
     }
 
     await generator.generateCode(originalArtifact);
