@@ -10,18 +10,28 @@ from vellum_ee.workflows.server.virtual_file_loader import VirtualFileFinder
 def virtual_file_loader():
     """Fixture to manage VirtualFileFinder registration and cleanup."""
     finders = []
+    namespaces = []
 
     def _register(files, namespace, source_module=None):
         finder = VirtualFileFinder(files, namespace, source_module=source_module)
-        sys.meta_path.append(finder)
+        # Insert at beginning to ensure our finder takes priority
+        sys.meta_path.insert(0, finder)
         finders.append(finder)
+        namespaces.append(namespace)
         return finder
 
     yield _register
 
+    # Clean up finders from sys.meta_path
     for finder in reversed(finders):
         if finder in sys.meta_path:
             sys.meta_path.remove(finder)
+
+    # Clean up loaded modules from sys.modules to avoid caching issues
+    for namespace in namespaces:
+        modules_to_remove = [key for key in sys.modules if key.startswith(namespace)]
+        for mod in modules_to_remove:
+            del sys.modules[mod]
 
 
 def test_resolve_node_ref__suffix_matching_with_namespace_prefix(virtual_file_loader):
@@ -42,7 +52,7 @@ from .nodes.my_node import MyNode
 class Workflow(BaseWorkflow):
     graph = MyNode
 """,
-        "nodes/__init__.py": "from .my_node import MyNode",
+        "nodes/__init__.py": "",
         "nodes/my_node.py": """\
 from vellum.workflows.nodes import BaseNode
 
