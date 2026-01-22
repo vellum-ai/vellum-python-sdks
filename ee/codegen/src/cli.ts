@@ -20,7 +20,9 @@ async function collectPythonFiles(
       const subFiles = await collectPythonFiles(fullPath, rootPath);
       Object.assign(result, subFiles);
     } else if (entry.isFile() && entry.name.endsWith(".py")) {
-      const relativePath = path.relative(rootPath, fullPath).replace(/\\/g, "/");
+      const relativePath = path
+        .relative(rootPath, fullPath)
+        .replace(/\\/g, "/");
       const content = await readFile(fullPath, "utf-8");
       result[relativePath] = content;
     }
