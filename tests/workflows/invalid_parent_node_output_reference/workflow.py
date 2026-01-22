@@ -1,12 +1,17 @@
 from vellum import ChatMessagePromptBlock, JinjaPromptBlock
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
-from vellum.workflows.nodes import InlinePromptNode
+from vellum.workflows.nodes import BaseNode, InlinePromptNode
 from vellum.workflows.state import BaseState
 
 
 class Inputs(BaseInputs):
     topic: str
+
+
+class StartNode(BaseNode):
+    class Outputs(BaseNode.Outputs):
+        topic: str = Inputs.topic
 
 
 class ReportGeneratorNode(InlinePromptNode):
@@ -19,18 +24,21 @@ class ReportGeneratorNode(InlinePromptNode):
             blocks=[JinjaPromptBlock(template="Write a report about {{ topic }}")],
         ),
     ]
-    prompt_inputs = {"topic": Inputs.topic}
 
     class Outputs(InlinePromptNode.Outputs):
-        # BAD: This references the parent class's output.
-        # It gets dropped during serialization AND it isn't resolved during execution.
+        # BAD: These two outputs reference the parent class's output.
+        # They get dropped during serialization AND they aren't resolved during execution.
         report_content: str = InlinePromptNode.Outputs.text
         report_json = InlinePromptNode.Outputs.json
+
+        # Valid outputs
+        topic: str = StartNode.Outputs.topic
+        sibling_topic: str = topic
         a: str = "a"
 
 
 class WorkflowWithParentOutputReference(BaseWorkflow[Inputs, BaseState]):
-    graph = ReportGeneratorNode
+    graph = StartNode >> ReportGeneratorNode
 
     class Outputs(BaseWorkflow.Outputs):
         result = ReportGeneratorNode.Outputs.report_content
