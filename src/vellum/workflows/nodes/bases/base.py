@@ -614,7 +614,5 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
         """
         Subclasses can override this method to implement their specific validation logic.
         Called during serialization or explicit validation.
-
-        Default implementation performs no validation.
         """
         pass
