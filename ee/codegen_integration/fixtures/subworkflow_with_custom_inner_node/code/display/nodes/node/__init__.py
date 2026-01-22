@@ -25,7 +25,5 @@ class MySubworkflowNodeDisplay(BaseInlineSubworkflowNodeDisplay[MySubworkflowNod
         MySubworkflowNode.Ports.default: PortDisplayOverrides(id=UUID("0cb70d33-28e5-4d90-ad50-f3b59f6ed4b1"))
     }
     display_data = NodeDisplayData(
-        width=370,
-        height=124,
-        comment=NodeDisplayComment(expanded=True, value="An inline subworkflow node."),
+        width=370, height=124, comment=NodeDisplayComment(expanded=True, value="An inline subworkflow node.")
     )
