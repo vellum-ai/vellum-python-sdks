@@ -29,6 +29,7 @@ def test_base_workflow_display__serialize_empty_workflow():
     exec_config = display.serialize()
 
     # THEN it should return the expected config
+    # Note: autolayout is not applied since Display.layout is not set to "auto"
     assert exec_config == {
         "input_variables": [],
         "state_variables": [],
@@ -45,7 +46,7 @@ def test_base_workflow_display__serialize_empty_workflow():
                     "data": {"label": "Entrypoint Node", "source_handle_id": "0af025a4-3b25-457d-a7ae-e3a7ba15c86c"},
                     "base": None,
                     "definition": None,
-                    "display_data": {"position": {"x": 0.0, "y": -50.0}},
+                    "display_data": {"position": {"x": 0.0, "y": 0.0}},
                     "id": "3c41cdd9-999a-48b8-9088-f6dfa1369bfd",
                     "inputs": [],
                     "type": "ENTRYPOINT",
@@ -700,3 +701,84 @@ def test_serialize_subworkflow_output_reference_without_display():
         f"node_output_id mismatch: expected {expected_output_id}, got {actual_output_id}. "
         "The reference to the subworkflow output is broken."
     )
+
+
+def test_serialize_workflow__auto_layout_applied_when_display_layout_is_auto():
+    """
+    Tests that autolayout is applied when Workflow.Display.layout is set to 'auto'.
+    """
+
+    # GIVEN a workflow with Display.layout = "auto" and nodes at position (0,0)
+    class StartNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result: str
+
+    class EndNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            final: str
+
+    class TestWorkflow(BaseWorkflow):
+        graph = StartNode >> EndNode
+
+        class Display(BaseWorkflow.Display):
+            layout = "auto"
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_result = EndNode.Outputs.final
+
+    # WHEN we serialize the workflow
+    display = get_workflow_display(workflow_class=TestWorkflow)
+    serialized_workflow = display.serialize()
+
+    # THEN the nodes should have non-zero positions due to autolayout
+    workflow_raw_data = cast(Dict[str, Any], serialized_workflow["workflow_raw_data"])
+    nodes = cast(List[Dict[str, Any]], workflow_raw_data["nodes"])
+
+    generic_nodes = [n for n in nodes if n.get("type") == "GENERIC"]
+    assert len(generic_nodes) == 2
+
+    # AND at least one node should have a non-zero position from autolayout
+    has_non_zero_position = any(
+        n.get("display_data", {}).get("position", {}).get("x", 0) != 0
+        or n.get("display_data", {}).get("position", {}).get("y", 0) != 0
+        for n in generic_nodes
+    )
+    assert has_non_zero_position, "Autolayout should have repositioned at least one node"
+
+
+def test_serialize_workflow__auto_layout_not_applied_when_display_layout_is_none():
+    """
+    Tests that autolayout is NOT applied when Workflow.Display.layout is None (default).
+    """
+
+    # GIVEN a workflow without Display.layout set (defaults to None)
+    class StartNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result: str
+
+    class EndNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            final: str
+
+    class TestWorkflow(BaseWorkflow):
+        graph = StartNode >> EndNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_result = EndNode.Outputs.final
+
+    # WHEN we serialize the workflow
+    display = get_workflow_display(workflow_class=TestWorkflow)
+    serialized_workflow = display.serialize()
+
+    # THEN the nodes should remain at position (0,0) since autolayout is not applied
+    workflow_raw_data = cast(Dict[str, Any], serialized_workflow["workflow_raw_data"])
+    nodes = cast(List[Dict[str, Any]], workflow_raw_data["nodes"])
+
+    generic_nodes = [n for n in nodes if n.get("type") == "GENERIC"]
+    assert len(generic_nodes) == 2
+
+    # AND all nodes should have position (0,0) since autolayout was not applied
+    for node in generic_nodes:
+        position = node.get("display_data", {}).get("position", {})
+        assert position.get("x", 0) == 0, f"Node should have x=0, got {position.get('x')}"
+        assert position.get("y", 0) == 0, f"Node should have y=0, got {position.get('y')}"

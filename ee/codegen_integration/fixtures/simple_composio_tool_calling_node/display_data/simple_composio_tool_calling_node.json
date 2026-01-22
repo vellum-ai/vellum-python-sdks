@@ -12,7 +12,7 @@
         "display_data": {
           "position": {
             "x": 0.0,
-            "y": -50.0
+            "y": 0.0
           }
         },
         "base": null,
@@ -24,8 +24,8 @@
         "type": "GENERIC",
         "display_data": {
           "position": {
-            "x": 200.0,
-            "y": -50.0
+            "x": 0.0,
+            "y": 0.0
           },
           "comment": {
             "expanded": true,

@@ -624,17 +624,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         nodes_list = list(serialized_nodes.values())
         nodes_dict_list = [cast(Dict[str, Any], node) for node in nodes_list if isinstance(node, dict)]
 
-        all_nodes_at_zero = all(
-            (
-                isinstance(node.get("display_data"), dict)
-                and isinstance(node["display_data"].get("position"), dict)
-                and (node["display_data"]["position"].get("x") or 0) == 0.0
-                and (node["display_data"]["position"].get("y") or 0) == 0.0
-            )
-            for node in nodes_dict_list
-        )
-
-        should_apply_auto_layout = all_nodes_at_zero and len(nodes_dict_list) > 0
+        should_apply_auto_layout = self._workflow.Display.layout == "auto" and len(nodes_dict_list) > 0
 
         if should_apply_auto_layout:
             try:
