@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 import subprocess
 import tempfile
-from typing import Dict, List, Tuple
+from typing import Dict, FrozenSet, List, Tuple
 
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 
@@ -26,9 +26,15 @@ def _collect_file_map(root: Path) -> Dict[str, str]:
 def _compute_diff(
     original_root: Path,
     generated_root: Path,
+    ignore_files: FrozenSet[str] = frozenset(),
 ) -> Tuple[List[str], List[str], Dict[str, str]]:
     """
     Compare files between original and generated directories.
+
+    Args:
+        original_root: Path to the original workflow directory.
+        generated_root: Path to the generated workflow directory.
+        ignore_files: Set of relative file paths to ignore from the diff comparison.
 
     Returns:
         (original_only, generated_only, modified_diffs) where
@@ -37,8 +43,8 @@ def _compute_diff(
     original_files = _collect_file_map(original_root)
     generated_files = _collect_file_map(generated_root)
 
-    orig_keys = set(original_files.keys())
-    gen_keys = set(generated_files.keys())
+    orig_keys = set(original_files.keys()) - ignore_files
+    gen_keys = set(generated_files.keys()) - ignore_files
 
     original_only = sorted(orig_keys - gen_keys)
     generated_only = sorted(gen_keys - orig_keys)
@@ -63,24 +69,47 @@ def _compute_diff(
     return original_only, generated_only, modified_diffs
 
 
-@pytest.mark.xfail(reason="Zero-diff transforms not yet implemented")
 @pytest.mark.parametrize(
-    "module_name",
+    "module_name,ignore_files",
     [
-        "builtin_list_str",
-        "tool_calling_node_with_custom_run_subworkflow",
-        "trivial",
+        pytest.param(
+            "builtin_list_str", frozenset(), marks=pytest.mark.xfail(reason="Zero-diff transforms not yet implemented")
+        ),
+        (
+            "tool_calling_node_with_custom_run_subworkflow",
+            frozenset(
+                {
+                    "__init__.py",
+                    "display/nodes/agent/__init__.py",
+                    "display/nodes/agent/transform_text_tool_workflow/__init__.py",
+                    "display/nodes/agent/transform_text_tool_workflow/nodes/transform_node.py",
+                    "display/nodes/agent/transform_text_tool_workflow/workflow.py",
+                    "display/workflow.py",
+                    "inputs.py",
+                    "nodes/agent/__init__.py",
+                    "nodes/agent/transform_text_tool_workflow/__init__.py",
+                    "nodes/agent/transform_text_tool_workflow/inputs.py",
+                    "nodes/agent/transform_text_tool_workflow/nodes/transform_node.py",
+                    "nodes/agent/transform_text_tool_workflow/workflow.py",
+                    "workflow.py",
+                }
+            ),
+        ),
+        pytest.param(
+            "trivial", frozenset(), marks=pytest.mark.xfail(reason="Zero-diff transforms not yet implemented")
+        ),
     ],
 )
-def test_zero_diff_transforms(module_name: str):
+def test_zero_diff_transforms(module_name: str, ignore_files: FrozenSet[str]):
     """
     Tests that serializing a workflow, running codegen with file merging, and comparing
-    files produces no diff.
+    files produces no diff (excluding files in the ignore list).
 
     GIVEN a workflow defined in tests.workflows.{module_name}
     WHEN we serialize it to exec_config and run TypeScript codegen with the original
          files as the artifact for file merging
-    THEN the generated files match the original workflow files (zero diff).
+    THEN the generated files match the original workflow files (zero diff), excluding
+         any files specified in ignore_files.
     """
 
     # GIVEN the original workflow module
@@ -140,6 +169,7 @@ def test_zero_diff_transforms(module_name: str):
         original_only, generated_only, modified_diffs = _compute_diff(
             original_root=original_root,
             generated_root=generated_root,
+            ignore_files=ignore_files,
         )
 
         modified_paths = sorted(modified_diffs.keys())
