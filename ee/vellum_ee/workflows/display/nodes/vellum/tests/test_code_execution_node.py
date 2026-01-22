@@ -249,7 +249,7 @@ def test_serialize_node__with_non_exist_code_input_path_with_dry_run():
                     "type": "ENTRYPOINT",
                     "inputs": [],
                     "data": {"label": "Entrypoint Node", "source_handle_id": "3e2a3f52-5047-4e2e-9a21-37bd43c63250"},
-                    "display_data": {"position": {"x": 0.0, "y": -50.0}},
+                    "display_data": {"position": {"x": 0.0, "y": 0.0}},
                     "base": None,
                     "definition": None,
                 },
@@ -288,7 +288,7 @@ def test_serialize_node__with_non_exist_code_input_path_with_dry_run():
                         "output_id": "98cae9b9-45cc-4897-a0f5-df250b56c00d",
                         "log_output_id": "66c06c97-a9d1-4abf-840f-3f6c29709612",
                     },
-                    "display_data": {"position": {"x": 200.0, "y": -50.0}},
+                    "display_data": {"position": {"x": 0.0, "y": 0.0}},
                     "base": {
                         "name": "CodeExecutionNode",
                         "module": ["vellum", "workflows", "nodes", "displayable", "code_execution_node", "node"],
