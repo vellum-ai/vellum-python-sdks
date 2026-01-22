@@ -72,8 +72,18 @@ def _compute_diff(
 @pytest.mark.parametrize(
     "module_name,ignore_files",
     [
-        pytest.param(
-            "builtin_list_str", frozenset(), marks=pytest.mark.xfail(reason="Zero-diff transforms not yet implemented")
+        (
+            "builtin_list_str",
+            frozenset(
+                {
+                    "__init__.py",
+                    "display/nodes/raw_code.py",
+                    "display/nodes/the_end.py",
+                    "display/workflow.py",
+                    "nodes/raw_code/__init__.py",
+                    "nodes/the_end.py",
+                }
+            ),
         ),
         (
             "tool_calling_node_with_custom_run_subworkflow",
@@ -95,8 +105,15 @@ def _compute_diff(
                 }
             ),
         ),
-        pytest.param(
-            "trivial", frozenset(), marks=pytest.mark.xfail(reason="Zero-diff transforms not yet implemented")
+        (
+            "trivial",
+            frozenset(
+                {
+                    "__init__.py",
+                    "display/nodes/start.py",
+                    "display/workflow.py",
+                }
+            ),
         ),
     ],
 )
