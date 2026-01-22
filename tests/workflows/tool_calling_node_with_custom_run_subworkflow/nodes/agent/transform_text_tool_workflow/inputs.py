@@ -1,5 +1,5 @@
 from vellum.workflows.inputs import BaseInputs
 
 
-class ToolInputs(BaseInputs):
+class Inputs(BaseInputs):
     text: str
