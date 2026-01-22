@@ -193,6 +193,12 @@ export class Workflow {
     workflowDisplayClass.inheritReferences(workflowClassRef);
 
     const entrypointNode = this.workflowContext.tryGetEntrypointNode();
+    const entrypointNodeDisplayData = entrypointNode
+      ? new NodeDisplayData({
+          workflowContext: this.workflowContext,
+          nodeDisplayData: entrypointNode.displayData,
+        })
+      : undefined;
 
     workflowDisplayClass.add(
       new Field({
@@ -215,14 +221,15 @@ export class Workflow {
                       entrypointNode.data.sourceHandleId
                     ),
                   }),
-                  new MethodArgument({
-                    name: "entrypoint_node_display",
-                    value: new NodeDisplayData({
-                      workflowContext: this.workflowContext,
-                      nodeDisplayData: entrypointNode.displayData,
-                      includePosition: true,
-                    }),
-                  }),
+                  ...(entrypointNodeDisplayData &&
+                  !entrypointNodeDisplayData.isEmpty()
+                    ? [
+                        new MethodArgument({
+                          name: "entrypoint_node_display",
+                          value: entrypointNodeDisplayData,
+                        }),
+                      ]
+                    : []),
                 ]
               : []),
             ...(this.displayData

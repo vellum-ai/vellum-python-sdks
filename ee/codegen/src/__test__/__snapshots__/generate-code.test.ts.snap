@@ -131,7 +131,6 @@ exports[`generateCode > should generate code for %1 final-output-node-only.ts > 
 "from uuid import UUID
 
 from vellum_ee.workflows.display.base import EdgeDisplay, EntrypointDisplay, WorkflowMetaDisplay, WorkflowOutputDisplay
-from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
 
 from ..nodes.my_final_output import MyFinalOutput
@@ -140,9 +139,7 @@ from ..workflow import Workflow
 
 class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
     workflow_display = WorkflowMetaDisplay(
-        entrypoint_node_id=UUID("entrypoint-node"),
-        entrypoint_node_source_handle_id=UUID("entrypoint-source"),
-        entrypoint_node_display=NodeDisplayData(position=NodeDisplayPosition(x=0, y=0)),
+        entrypoint_node_id=UUID("entrypoint-node"), entrypoint_node_source_handle_id=UUID("entrypoint-source")
     )
     entrypoint_displays = {
         MyFinalOutput: EntrypointDisplay(id=UUID("entrypoint-node"), edge_display=EdgeDisplay(id=UUID("edge-1")))
