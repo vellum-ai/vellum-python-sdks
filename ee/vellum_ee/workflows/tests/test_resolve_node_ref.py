@@ -164,3 +164,68 @@ def get_greeting():
 
     outputs = fulfilled_events[0].outputs
     assert outputs.greeting == "Hello from helper!"
+
+
+def test_resolve_node_ref__node_with_relative_import_input_attributes(virtual_file_loader):
+    """
+    Tests that run_node works when a node has input attributes that use types
+    defined via relative imports from sibling modules.
+    """
+    # GIVEN a workflow where the node has inputs using types from relative imports
+    files = {
+        "__init__.py": "",
+        "workflow.py": """\
+from vellum.workflows import BaseWorkflow
+from .nodes.my_node import MyNode
+
+class Workflow(BaseWorkflow):
+    graph = MyNode
+""",
+        "nodes/__init__.py": "",
+        "nodes/my_node.py": """\
+from vellum.workflows.nodes import BaseNode
+from .types import UserConfig
+
+class MyNode(BaseNode):
+    config: UserConfig
+
+    class Outputs(BaseNode.Outputs):
+        greeting: str
+
+    def run(self) -> Outputs:
+        return self.Outputs(greeting=f"Hello, {self.config.name}!")
+""",
+        "nodes/types.py": """\
+from dataclasses import dataclass
+
+@dataclass
+class UserConfig:
+    name: str
+    enabled: bool = True
+""",
+    }
+
+    # AND the workflow is loaded with a UUID namespace
+    namespace = str(uuid4())
+    virtual_file_loader(files, namespace)
+
+    # WHEN we load the workflow and run the node with inputs
+    Workflow = BaseWorkflow.load_from_module(namespace)
+    workflow = Workflow()
+
+    # Import the UserConfig type from the loaded module to create input
+    import importlib
+    types_module = importlib.import_module(f"{namespace}.nodes.types")
+    UserConfig = types_module.UserConfig
+
+    events = list(workflow.run_node(
+        "nodes.my_node.MyNode",
+        inputs={"config": UserConfig(name="World")}
+    ))
+
+    # THEN the node should execute successfully using the relatively-imported type
+    fulfilled_events = [e for e in events if e.name == "node.execution.fulfilled"]
+    assert len(fulfilled_events) == 1
+
+    outputs = fulfilled_events[0].outputs
+    assert outputs.greeting == "Hello, World!"
