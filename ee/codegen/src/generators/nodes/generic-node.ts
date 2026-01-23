@@ -627,7 +627,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
       workflowVersionExecConfig: {
         workflowRawData: workflow.exec_config.workflowRawData,
         inputVariables: workflow.exec_config.inputVariables,
-        stateVariables: [],
+        stateVariables: workflow.exec_config.stateVariables ?? [],
         outputVariables: workflow.exec_config.outputVariables,
       },
       moduleName: nestedWorkflowContext.moduleName,
