@@ -93,7 +93,7 @@ def test_serialize_workflow(vellum_client):
             "source_handle_id": "7065a943-1cab-4afd-9690-e678c5b74a2f",
         },
         "display_data": {
-            "position": {"x": 0.0, "y": -50.0},
+            "position": {"x": 0.0, "y": 0.0},
         },
     }
 
@@ -141,7 +141,7 @@ def test_serialize_workflow(vellum_client):
             "release_tag": "LATEST",
             "ml_model_fallbacks": ["gpt-4o", "gemini-1.5-pro"],
         },
-        "display_data": {"position": {"x": 200.0, "y": -50.0}},
+        "display_data": {"position": {"x": 0.0, "y": 0.0}},
         "base": {
             "name": "PromptDeploymentNode",
             "module": ["vellum", "workflows", "nodes", "displayable", "prompt_deployment_node", "node"],
@@ -254,7 +254,7 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
         "type": "ENTRYPOINT",
         "inputs": [],
         "data": {"label": "Entrypoint Node", "source_handle_id": "cc0f4028-1039-4063-971d-7dacbb01b379"},
-        "display_data": {"position": {"x": 0.0, "y": -50.0}},
+        "display_data": {"position": {"x": 0.0, "y": 0.0}},
         "base": None,
         "definition": None,
     }
@@ -303,7 +303,7 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
             "release_tag": "LATEST",
             "ml_model_fallbacks": None,
         },
-        "display_data": {"position": {"x": 200.0, "y": -50.0}},
+        "display_data": {"position": {"x": 0.0, "y": 0.0}},
         "base": {
             "name": "PromptDeploymentNode",
             "module": ["vellum", "workflows", "nodes", "displayable", "prompt_deployment_node", "node"],
@@ -402,7 +402,7 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
             "template_node_input_id": "198f6350-237a-4103-b571-311738b7743f",
             "output_type": "STRING",
         },
-        "display_data": {"position": {"x": 400.0, "y": -50.0}},
+        "display_data": {"position": {"x": 0.0, "y": 0.0}},
         "base": {
             "name": "TemplatingNode",
             "module": ["vellum", "workflows", "nodes", "core", "templating_node", "node"],

@@ -101,7 +101,7 @@ def test_serialize_workflow():
             "metric_definition_id": "example_metric_definition",
             "release_tag": "LATEST",
         },
-        "display_data": {"position": {"x": 200.0, "y": -50.0}},
+        "display_data": {"position": {"x": 0.0, "y": 0.0}},
         "base": {
             "module": ["vellum", "workflows", "nodes", "displayable", "guardrail_node", "node"],
             "name": "GuardrailNode",

@@ -92,7 +92,7 @@ def test_serialize_workflow():
         "base": None,
         "definition": None,
         "display_data": {
-            "position": {"x": 0.0, "y": -50.0},
+            "position": {"x": 0.0, "y": 0.0},
         },
     }
 

@@ -44,7 +44,7 @@ def test_serialize_workflow():
         "type": "GENERIC",
         "should_file_merge": True,
         "display_data": {
-            "position": {"x": 200.0, "y": -50.0},
+            "position": {"x": 0.0, "y": 0.0},
             "comment": {
                 "expanded": True,
                 "value": "\n    A tool calling node that calls the get_current_weather function.\n    ",

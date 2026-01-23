@@ -121,7 +121,7 @@ def test_serialize_workflow():
         "label": "Start Node",
         "type": "GENERIC",
         "should_file_merge": True,
-        "display_data": {"position": {"x": 200.0, "y": -50.0}},
+        "display_data": {"position": {"x": 0.0, "y": 0.0}},
         "base": {
             "name": "BaseNode",
             "module": ["vellum", "workflows", "nodes", "bases", "base"],

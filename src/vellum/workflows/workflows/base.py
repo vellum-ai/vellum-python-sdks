@@ -17,6 +17,7 @@ from typing import (
     Iterable,
     Iterator,
     List,
+    Literal,
     Optional,
     Set,
     Tuple,
@@ -232,6 +233,11 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
     emitters: List[BaseWorkflowEmitter]
     resolvers: List[BaseWorkflowResolver]
     is_dynamic: ClassVar[bool] = False
+
+    class Display:
+        """Optional display metadata for visual representation."""
+
+        layout: Optional[Literal["auto"]] = None
 
     class Outputs(BaseOutputs):
         __parent_class__: Type["BaseWorkflow"] = field(init=False)
