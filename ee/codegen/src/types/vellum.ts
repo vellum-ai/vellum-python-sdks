@@ -522,6 +522,7 @@ export interface InlineSubworkflowNodeData {
   workflowRawData: WorkflowRawData;
   inputVariables: VellumVariable[];
   outputVariables: VellumVariable[];
+  stateVariables?: VellumVariable[];
   label: string;
   sourceHandleId: string;
   targetHandleId: string;

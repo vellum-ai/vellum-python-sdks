@@ -128,7 +128,7 @@ export class InlineSubworkflowNode extends BaseNestedWorkflowNode<
       workflowVersionExecConfig: {
         workflowRawData: inlineSubworkflowNodeData.workflowRawData,
         inputVariables: inlineSubworkflowNodeData.inputVariables,
-        stateVariables: [],
+        stateVariables: inlineSubworkflowNodeData.stateVariables ?? [],
         outputVariables: inlineSubworkflowNodeData.outputVariables,
       },
       moduleName: nestedWorkflowContext.moduleName,
