@@ -2,11 +2,11 @@ import pytest
 from typing import Any, Dict
 
 from vellum.workflows.exceptions import NodeException
+from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.core.map_node import MapNode
 from vellum.workflows.nodes.core.templating_node import TemplatingNode
 from vellum.workflows.nodes.displayable.final_output_node import FinalOutputNode
 from vellum.workflows.nodes.displayable.inline_prompt_node import InlinePromptNode
-from vellum.workflows.references.output import OutputReference
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.core import Json
 from vellum.workflows.workflows.base import BaseWorkflow
@@ -94,16 +94,15 @@ def test_final_output_node__dict_and_Dict_should_be_compatible():
 
     # GIVEN a FinalOutputNode declared with dict output type
     # AND the value descriptor has Dict[str, Any] type
+    class SomeCustomNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            value: Dict[str, Any]
+
     class DictOutputNode(FinalOutputNode[BaseState, dict]):
         """Output with dict type."""
 
         class Outputs(FinalOutputNode.Outputs):
-            value = OutputReference(
-                name="value",
-                types=(Dict[str, Any],),
-                instance=None,
-                outputs_class=FinalOutputNode.Outputs,
-            )
+            value = SomeCustomNode.Outputs.value
 
     # WHEN attempting to validate the node class
     # THEN validation should pass without raising an exception

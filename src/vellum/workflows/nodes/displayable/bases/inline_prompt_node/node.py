@@ -558,13 +558,14 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
         return blocks
 
     @classmethod
-    def __validate__(cls) -> None:
+    def __validate_node_specific__(cls) -> None:
         """
         Validates the node configuration, including JSON schema structure in parameters.
 
         Raises:
             jsonschema.exceptions.SchemaError: If the JSON schema structure is invalid
         """
+
         parameters_ref = getattr(cls, "parameters", None)
         if parameters_ref is None:
             return

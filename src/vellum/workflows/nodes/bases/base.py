@@ -71,6 +71,28 @@ def _is_annotated(cls: Type, name: str) -> Any:
     return None
 
 
+def _validate_no_parent_output_references(node_cls: Type["BaseNode"]) -> None:
+    """
+    Validates that the node does not reference parent class outputs.
+    """
+    errors = []
+    for node_output in node_cls.Outputs:
+        node_value = node_output.instance
+        if not isinstance(node_value, OutputReference):
+            continue
+
+        parent_node_class = node_value.outputs_class.__parent_class__
+        if parent_node_class in node_cls.__mro__:
+            errors.append(
+                f"'{node_cls.Outputs.__qualname__}.{node_output.name}' references parent class output "
+                f"'{node_value.outputs_class.__qualname__}.{node_value.name}'. "
+                "Referencing outputs from a node's parent class is not allowed."
+            )
+
+    if errors:
+        raise ValueError("\n".join(errors))
+
+
 class BaseNodeMeta(ABCMeta):
     def __new__(mcs, name: str, bases: Tuple[Type, ...], dct: Dict[str, Any]) -> Any:
         if "Outputs" in dct:
@@ -586,9 +608,14 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
     def __validate__(cls) -> None:
         """
         Validates the node.
+        """
+        _validate_no_parent_output_references(cls)
+        cls.__validate_node_specific__()
+
+    @classmethod
+    def __validate_node_specific__(cls) -> None:
+        """
         Subclasses can override this method to implement their specific validation logic.
         Called during serialization or explicit validation.
-
-        Default implementation performs no validation.
         """
         pass

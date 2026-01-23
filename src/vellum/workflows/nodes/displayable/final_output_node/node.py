@@ -76,7 +76,7 @@ class FinalOutputNode(BaseNode[StateType], Generic[StateType, _OutputType], meta
     __simulates_workflow_output__ = True
 
     @classmethod
-    def __validate__(cls) -> None:
+    def __validate_node_specific__(cls) -> None:
         cls._validate_output_type_consistency()
 
     @classmethod
