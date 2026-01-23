@@ -5,7 +5,6 @@ import { WorkflowContext } from "src/context";
 import { AstNode } from "src/generators/extensions/ast-node";
 import { BoolInstantiation } from "src/generators/extensions/bool-instantiation";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
-import { FloatInstantiation } from "src/generators/extensions/float-instantiation";
 import { IntInstantiation } from "src/generators/extensions/int-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { Reference } from "src/generators/extensions/reference";
@@ -18,7 +17,6 @@ export namespace NodeDisplayData {
   export interface Args {
     workflowContext: WorkflowContext;
     nodeDisplayData: NodeDisplayDataType | undefined;
-    includePosition?: boolean;
   }
 }
 
@@ -26,17 +24,14 @@ export class NodeDisplayData extends AstNode {
   private readonly sourceNodeDisplayData: NodeDisplayDataType | undefined;
   private readonly nodeDisplayData: AstNode | undefined;
   private readonly workflowContext: WorkflowContext;
-  private readonly includePosition: boolean;
 
   public constructor({
     nodeDisplayData,
     workflowContext,
-    includePosition = false,
   }: NodeDisplayData.Args) {
     super();
     this.sourceNodeDisplayData = nodeDisplayData;
     this.workflowContext = workflowContext;
-    this.includePosition = includePosition;
     this.nodeDisplayData = this.generateNodeDisplayData();
   }
 
@@ -46,43 +41,6 @@ export class NodeDisplayData extends AstNode {
 
   private generateNodeDisplayData(): ClassInstantiation | undefined {
     const args: MethodArgument[] = [];
-
-    if (this.includePosition) {
-      args.push(
-        new MethodArgument({
-          name: "position",
-          value: new ClassInstantiation({
-            classReference: new Reference({
-              name: "NodeDisplayPosition",
-              modulePath: VELLUM_WORKFLOW_EDITOR_TYPES_PATH,
-            }),
-            arguments_: [
-              new MethodArgument({
-                name: "x",
-                value: new FloatInstantiation(
-                  this.sourceNodeDisplayData?.position?.x ?? 0
-                ),
-              }),
-              new MethodArgument({
-                name: "y",
-                value: new FloatInstantiation(
-                  this.sourceNodeDisplayData?.position?.y ?? 0
-                ),
-              }),
-            ],
-          }),
-        })
-      );
-
-      if (!isNil(this.sourceNodeDisplayData?.z_index)) {
-        args.push(
-          new MethodArgument({
-            name: "z_index",
-            value: new IntInstantiation(this.sourceNodeDisplayData.z_index),
-          })
-        );
-      }
-    }
 
     if (!isNil(this.sourceNodeDisplayData?.width)) {
       args.push(
