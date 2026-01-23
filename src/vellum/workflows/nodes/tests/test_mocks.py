@@ -20,7 +20,7 @@ def test_mocks__when_condition_true():
 
     # THEN the when_condition should be normalized to ConstantValueReference(True)
     assert isinstance(mock.when_condition, ConstantValueReference)
-    assert mock.when_condition.resolve(None) is True
+    assert mock.when_condition.resolve(None) is True  # type: ignore[arg-type]
 
 
 def test_mocks__parse_none_still_runs():

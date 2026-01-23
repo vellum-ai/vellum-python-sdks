@@ -1,5 +1,5 @@
 import logging
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Literal, Optional, Sequence, Type, Union
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Sequence, Type, Union
 
 from pydantic import ConfigDict, SerializationInfo, ValidationError, field_serializer, field_validator, model_serializer
 
@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 class MockNodeExecution(UniversalBaseModel):
-    when_condition: Union[Literal[True], BaseDescriptor]
+    when_condition: BaseDescriptor
     then_outputs: BaseOutputs
     disabled: Optional[bool] = None
 
@@ -28,7 +28,7 @@ class MockNodeExecution(UniversalBaseModel):
 
     @field_validator("when_condition", mode="before")
     @classmethod
-    def normalize_when_condition(cls, v: Union[Literal[True], BaseDescriptor]) -> BaseDescriptor:
+    def normalize_when_condition(cls, v: Any) -> BaseDescriptor:
         """Convert when_condition=True to ConstantValueReference(True)."""
         if v is True:
             return ConstantValueReference(True)
