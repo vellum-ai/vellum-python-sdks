@@ -48,8 +48,12 @@ def _serialize_body_with_enricher(
         try:
             enriched_event = context["event_enricher"](event)
             return enriched_event.body
-        except Exception as e:
-            logger.exception(f"Error in event_enricher: {e}")
+        except Exception:
+            sentry_tags: Dict[str, Any] = {}
+            sdk_version = context.get("sdk_version")
+            if sdk_version:
+                sentry_tags["sdk_version"] = sdk_version
+            logger.exception("Error in event_enricher", extra={"sentry_tags": sentry_tags} if sentry_tags else None)
             return body
     else:
         return body
