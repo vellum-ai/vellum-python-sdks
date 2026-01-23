@@ -2,4 +2,4 @@
 
 import typing
 
-AuthTypeEnum = typing.Union[typing.Literal["API_KEY", "OAUTH2"], typing.Any]
+AuthTypeEnum = typing.Union[typing.Literal["API_KEY", "GOOGLE_SERVICE_ACCOUNT", "OAUTH2"], typing.Any]

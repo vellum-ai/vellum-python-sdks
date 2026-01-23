@@ -49,15 +49,13 @@ jobs:
       - name: Install dependencies
         run: poetry install
 
-      # Needed for codegen integration tests (test_zero_diff_transforms)
-      - name: Set up Node.js
+      # Needed for codegen integration tests (test_zero_diff_transforms)      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: "18.18.0"
       - name: Install codegen dependencies
         run: npm install
         working-directory: ee/codegen
-
       - name: Test
         run: make test-ci
 
