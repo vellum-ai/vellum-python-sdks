@@ -1,26 +1,37 @@
+import pytest
+
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.mocks import MockNodeExecution
 from vellum.workflows.references.constant import ConstantValueReference
 
 
-def test_mocks__when_condition_true():
-    """Tests that MockNodeExecution accepts when_condition=True and normalizes it."""
+@pytest.mark.parametrize(
+    "when_condition,expected_value",
+    [
+        (True, True),
+        (False, False),
+        ("always", "always"),
+        (42, 42),
+    ],
+)
+def test_mocks__when_condition_constant(when_condition, expected_value):
+    """Tests that MockNodeExecution accepts constant when_condition values and normalizes them."""
 
     # GIVEN a Base Node
     class StartNode(BaseNode):
         class Outputs(BaseNode.Outputs):
             foo: str
 
-    # WHEN we create a MockNodeExecution with when_condition=True
+    # WHEN we create a MockNodeExecution with a constant when_condition
     mock = MockNodeExecution(
-        when_condition=True,
+        when_condition=when_condition,
         then_outputs=StartNode.Outputs(foo="mocked"),
     )
 
-    # THEN the when_condition should be normalized to ConstantValueReference(True)
+    # THEN the when_condition should be normalized to ConstantValueReference
     assert isinstance(mock.when_condition, ConstantValueReference)
-    assert mock.when_condition.resolve(None) is True  # type: ignore[arg-type]
+    assert mock.when_condition.resolve(None) == expected_value  # type: ignore[arg-type]
 
 
 def test_mocks__parse_none_still_runs():

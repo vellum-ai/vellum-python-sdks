@@ -29,10 +29,10 @@ class MockNodeExecution(UniversalBaseModel):
     @field_validator("when_condition", mode="before")
     @classmethod
     def normalize_when_condition(cls, v: Any) -> BaseDescriptor:
-        """Convert when_condition=True to ConstantValueReference(True)."""
-        if v is True:
-            return ConstantValueReference(True)
-        return v
+        """Wrap non-BaseDescriptor constants in ConstantValueReference."""
+        if isinstance(v, BaseDescriptor):
+            return v
+        return ConstantValueReference(v)
 
     @model_serializer(mode="wrap")
     def serialize_full_model(self, handler: Callable[[Any], Any], info: SerializationInfo) -> Dict[str, Any]:
