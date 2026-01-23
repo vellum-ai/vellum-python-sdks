@@ -33,7 +33,7 @@ def test_mocks__when_condition_constant(when_condition, expected_value):
 
     # THEN the when_condition should be normalized to ConstantValueReference
     assert isinstance(mock.when_condition, ConstantValueReference)
-    assert mock.when_condition.instance == expected_value
+    assert mock.when_condition._value == expected_value
 
 
 def test_mocks__parse_none_still_runs():

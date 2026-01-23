@@ -212,7 +212,7 @@ def test_mocks__parse_from_app__when_condition_wraps_dict_without_descriptor_val
 
     # AND the when_condition wraps the original dict in ConstantValueReference
     assert isinstance(node_output_mocks[0].when_condition, ConstantValueReference)
-    assert node_output_mocks[0].when_condition.instance == when_condition_dict
+    assert node_output_mocks[0].when_condition._value == when_condition_dict
 
 
 def test_mocks__when_condition_dict_with_type_uses_descriptor_validator():
