@@ -146,8 +146,9 @@ def create_pointer(
     if pointer_type is InputVariablePointer:
         return InputVariablePointer(type="INPUT_VARIABLE", data=InputVariableData(input_variable_id=value))
     elif pointer_type is WorkspaceSecretPointer:
-        return WorkspaceSecretPointer(
-            type="WORKSPACE_SECRET", data=WorkspaceSecretData(type="STRING", workspace_secret_id=value)
+        raise UserFacingException(
+            "Secret inputs cannot be set to constant values. "
+            "Use a VellumSecretReference or EnvironmentVariableReference instead."
         )
     elif pointer_type is ExecutionCounterPointer:
         return ExecutionCounterPointer(type="EXECUTION_COUNTER", data=ExecutionCounterData(node_id=value))
