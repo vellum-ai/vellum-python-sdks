@@ -1,3 +1,4 @@
+from importlib.metadata import version
 import json
 import logging
 from uuid import UUID
@@ -48,8 +49,12 @@ def _serialize_body_with_enricher(
         try:
             enriched_event = context["event_enricher"](event)
             return enriched_event.body
-        except Exception as e:
-            logger.exception(f"Error in event_enricher: {e}")
+        except Exception:
+            try:
+                sdk_version = version("vellum-ai")
+            except Exception:
+                sdk_version = None
+            logger.exception("Error in event_enricher", extra={"sentry_tags": {"sdk_version": sdk_version}})
             return body
     else:
         return body
