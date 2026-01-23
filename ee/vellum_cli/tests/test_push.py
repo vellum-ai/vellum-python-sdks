@@ -1534,11 +1534,8 @@ def test_push__includes_metadata_json_in_artifact(mock_module, vellum_client):
 
 def test_push__includes_sibling_directory_files_in_artifact_and_exec_config(mock_module, vellum_client):
     """
-    Tests that the push command includes sibling directory files (directories next to nodes/)
-    in both the artifact and the exec_config's module_data.additional_files.
-
-    This test verifies the fix for the bug where sibling directories next to nodes/ get dropped
-    during workflow codegen.
+    Tests that the push command includes non-node Python files under the workflow module directory
+    (including sibling directories) in both the artifact and module_data.additional_files.
     """
 
     # GIVEN a single workflow configured
@@ -1550,24 +1547,8 @@ def test_push__includes_sibling_directory_files_in_artifact_and_exec_config(mock
 
     # AND a sibling directory exists next to nodes/ with Python files
     sibling_dir = "integration_classes"
-    sibling_init_content = _ensure_file(temp_dir, module, f"{sibling_dir}/__init__.py", "")
-    sibling_file_content = _ensure_file(
-        temp_dir,
-        module,
-        f"{sibling_dir}/composio_models.py",
-        '''\
-"""Composio integration models."""
-
-from pydantic import BaseModel
-
-
-class ComposioResponse(BaseModel):
-    """Example Pydantic model in a sibling directory."""
-
-    status: str
-    data: dict
-''',
-    )
+    sibling_init_content = _ensure_file(temp_dir, module, f"{sibling_dir}/__init__.py", "# init")
+    sibling_file_content = _ensure_file(temp_dir, module, f"{sibling_dir}/models.py", "# models")
 
     # AND the push API call returns successfully
     vellum_client.workflows.push.return_value = WorkflowPushResponse(
@@ -1590,8 +1571,8 @@ class ComposioResponse(BaseModel):
     assert extracted_files["workflow.py"] == workflow_py_file_content
     assert f"{sibling_dir}/__init__.py" in extracted_files
     assert extracted_files[f"{sibling_dir}/__init__.py"] == sibling_init_content
-    assert f"{sibling_dir}/composio_models.py" in extracted_files
-    assert extracted_files[f"{sibling_dir}/composio_models.py"] == sibling_file_content
+    assert f"{sibling_dir}/models.py" in extracted_files
+    assert extracted_files[f"{sibling_dir}/models.py"] == sibling_file_content
 
     # AND the sibling directory files should be in the exec_config's module_data additional_files
     exec_config = json.loads(call_args["exec_config"])
@@ -1599,8 +1580,8 @@ class ComposioResponse(BaseModel):
     additional_files = module_data.get("additional_files") or {}
     assert f"{sibling_dir}/__init__.py" in additional_files
     assert additional_files[f"{sibling_dir}/__init__.py"] == sibling_init_content
-    assert f"{sibling_dir}/composio_models.py" in additional_files
-    assert additional_files[f"{sibling_dir}/composio_models.py"] == sibling_file_content
+    assert f"{sibling_dir}/models.py" in additional_files
+    assert additional_files[f"{sibling_dir}/models.py"] == sibling_file_content
 
 
 def test_push__workspace_option__same_module_different_workspaces_in_lockfile_uses_correct_sandbox_id(
