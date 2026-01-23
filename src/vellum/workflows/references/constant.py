@@ -15,7 +15,7 @@ class ConstantValueReference(BaseDescriptor[_T], Generic[_T]):
     ) -> None:
         self._value = value
         types = (type(self._value),)
-        super().__init__(name=str(self._value), types=types)
+        super().__init__(name=str(self._value), types=types, instance=value)
 
     def resolve(self, state: "BaseState") -> _T:
         return self._value

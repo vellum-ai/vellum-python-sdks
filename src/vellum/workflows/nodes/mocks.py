@@ -51,7 +51,6 @@ class MockNodeExecution(UniversalBaseModel):
             descriptor_validator = ctx.get("descriptor_validator")
             if callable(descriptor_validator):
                 return descriptor_validator(v)
-            return ConstantValueReference(False)
 
         return ConstantValueReference(v)
 
@@ -105,10 +104,8 @@ class MockNodeExecution(UniversalBaseModel):
                         context={
                             "workflow": workflow,
                             "node_id": raw_mock_workflow_node_config.get("node_id"),
-                            "descriptor_validator": lambda value: (
-                                descriptor_validator(value, workflow)
-                                if descriptor_validator
-                                else ConstantValueReference(False)
+                            "descriptor_validator": (
+                                (lambda value: descriptor_validator(value, workflow)) if descriptor_validator else None
                             ),
                         },
                     )
