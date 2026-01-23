@@ -1532,6 +1532,77 @@ def test_push__includes_metadata_json_in_artifact(mock_module, vellum_client):
     assert "metadata.json" not in additional_files
 
 
+def test_push__includes_sibling_directory_files_in_artifact_and_exec_config(mock_module, vellum_client):
+    """
+    Tests that the push command includes sibling directory files (directories next to nodes/)
+    in both the artifact and the exec_config's module_data.additional_files.
+
+    This test verifies the fix for the bug where sibling directories next to nodes/ get dropped
+    during workflow codegen.
+    """
+
+    # GIVEN a single workflow configured
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+
+    # AND a workflow exists in the module successfully
+    workflow_py_file_content = _ensure_workflow_py(temp_dir, module)
+
+    # AND a sibling directory exists next to nodes/ with Python files
+    sibling_dir = "integration_classes"
+    sibling_init_content = _ensure_file(temp_dir, module, f"{sibling_dir}/__init__.py", "")
+    sibling_file_content = _ensure_file(
+        temp_dir,
+        module,
+        f"{sibling_dir}/composio_models.py",
+        '''\
+"""Composio integration models."""
+
+from pydantic import BaseModel
+
+
+class ComposioResponse(BaseModel):
+    """Example Pydantic model in a sibling directory."""
+
+    status: str
+    data: dict
+''',
+    )
+
+    # AND the push API call returns successfully
+    vellum_client.workflows.push.return_value = WorkflowPushResponse(
+        workflow_sandbox_id=str(uuid4()),
+    )
+
+    # WHEN calling `vellum workflows push`
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["workflows", "push", module])
+
+    # THEN it should succeed
+    assert result.exit_code == 0
+
+    # AND we should have called the push API with the correct args
+    vellum_client.workflows.push.assert_called_once()
+    call_args = vellum_client.workflows.push.call_args.kwargs
+
+    # AND the artifact should contain the sibling directory files
+    extracted_files = _extract_tar_gz(call_args["artifact"].read())
+    assert extracted_files["workflow.py"] == workflow_py_file_content
+    assert f"{sibling_dir}/__init__.py" in extracted_files
+    assert extracted_files[f"{sibling_dir}/__init__.py"] == sibling_init_content
+    assert f"{sibling_dir}/composio_models.py" in extracted_files
+    assert extracted_files[f"{sibling_dir}/composio_models.py"] == sibling_file_content
+
+    # AND the sibling directory files should be in the exec_config's module_data additional_files
+    exec_config = json.loads(call_args["exec_config"])
+    module_data = exec_config.get("module_data") or {}
+    additional_files = module_data.get("additional_files") or {}
+    assert f"{sibling_dir}/__init__.py" in additional_files
+    assert additional_files[f"{sibling_dir}/__init__.py"] == sibling_init_content
+    assert f"{sibling_dir}/composio_models.py" in additional_files
+    assert additional_files[f"{sibling_dir}/composio_models.py"] == sibling_file_content
+
+
 def test_push__workspace_option__same_module_different_workspaces_in_lockfile_uses_correct_sandbox_id(
     mock_module, vellum_client_class
 ):
