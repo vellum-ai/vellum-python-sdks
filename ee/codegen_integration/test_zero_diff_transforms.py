@@ -115,6 +115,16 @@ def _compute_diff(
                 }
             ),
         ),
+        (
+            "sibling_directory_preservation",
+            frozenset(
+                {
+                    "__init__.py",
+                    "display/nodes/start.py",
+                    "display/workflow.py",
+                }
+            ),
+        ),
     ],
 )
 def test_zero_diff_transforms(module_name: str, ignore_files: FrozenSet[str]):
