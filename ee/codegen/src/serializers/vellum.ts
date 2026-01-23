@@ -1239,6 +1239,10 @@ export const InlineSubworkflowNodeDataSerializer: ObjectSchema<
     "output_variables",
     listSchema(VellumVariableSerializer)
   ),
+  stateVariables: propertySchema(
+    "state_variables",
+    listSchema(VellumVariableSerializer).optional()
+  ),
   label: stringSchema(),
   sourceHandleId: propertySchema("source_handle_id", stringSchema()),
   targetHandleId: propertySchema("target_handle_id", stringSchema()),
@@ -1250,6 +1254,7 @@ export declare namespace InlineSubworkflowNodeDataSerializer {
     workflow_raw_data: WorkflowRawDataSerializer.Raw;
     input_variables: VellumVariableSerializer.Raw[];
     output_variables: VellumVariableSerializer.Raw[];
+    state_variables?: VellumVariableSerializer.Raw[] | null;
     label: string;
     source_handle_id: string;
     target_handle_id: string;
