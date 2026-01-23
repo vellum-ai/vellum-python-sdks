@@ -782,3 +782,42 @@ def test_serialize_workflow__auto_layout_not_applied_when_display_layout_is_none
         position = node.get("display_data", {}).get("position", {})
         assert position.get("x", 0) == 0, f"Node should have x=0, got {position.get('x')}"
         assert position.get("y", 0) == 0, f"Node should have y=0, got {position.get('y')}"
+
+
+def test_serialize_workflow__custom_display_class_without_layout_attribute():
+    """
+    Tests that serialization works when a workflow defines a custom Display class
+    without the layout attribute (backward compatibility).
+    """
+
+    # GIVEN a workflow with a custom Display class that doesn't have layout attribute
+    class StartNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            result: str
+
+    class TestWorkflow(BaseWorkflow):
+        graph = StartNode
+
+        class Display:
+            # Custom Display class without layout attribute
+            custom_attribute = "some_value"
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_result = StartNode.Outputs.result
+
+    # WHEN we serialize the workflow
+    display = get_workflow_display(workflow_class=TestWorkflow)
+    serialized_workflow = display.serialize()
+
+    # THEN serialization should succeed without errors
+    workflow_raw_data = cast(Dict[str, Any], serialized_workflow["workflow_raw_data"])
+    nodes = cast(List[Dict[str, Any]], workflow_raw_data["nodes"])
+
+    # AND autolayout should not be applied (since layout attribute is missing)
+    generic_nodes = [n for n in nodes if n.get("type") == "GENERIC"]
+    assert len(generic_nodes) == 1
+
+    for node in generic_nodes:
+        position = node.get("display_data", {}).get("position", {})
+        assert position.get("x", 0) == 0, f"Node should have x=0, got {position.get('x')}"
+        assert position.get("y", 0) == 0, f"Node should have y=0, got {position.get('y')}"
