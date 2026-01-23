@@ -136,7 +136,7 @@ export class MapNode extends BaseNestedWorkflowNode<
       workflowVersionExecConfig: {
         workflowRawData: mapNodeData.workflowRawData,
         inputVariables: mapNodeData.inputVariables,
-        stateVariables: [],
+        stateVariables: mapNodeData.stateVariables ?? [],
         outputVariables: mapNodeData.outputVariables,
       },
       moduleName: nestedWorkflowContext.moduleName,

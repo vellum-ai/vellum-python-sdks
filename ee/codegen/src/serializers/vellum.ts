@@ -1580,6 +1580,10 @@ export const InlineMapNodeDataSerializer: ObjectSchema<
     "output_variables",
     listSchema(VellumVariableSerializer)
   ),
+  stateVariables: propertySchema(
+    "state_variables",
+    listSchema(VellumVariableSerializer).optional()
+  ),
   concurrency: numberSchema().optional(),
   label: stringSchema(),
   sourceHandleId: propertySchema("source_handle_id", stringSchema()),
@@ -1595,6 +1599,7 @@ export declare namespace InlineMapNodeDataSerializer {
     workflow_raw_data: WorkflowRawDataSerializer.Raw;
     input_variables: VellumVariableSerializer.Raw[];
     output_variables: VellumVariableSerializer.Raw[];
+    state_variables?: VellumVariableSerializer.Raw[] | null;
     concurrency?: number | null;
     label: string;
     source_handle_id: string;

@@ -555,6 +555,7 @@ export interface InlineMapNodeData {
   workflowRawData: WorkflowRawData;
   inputVariables: VellumVariable[];
   outputVariables: VellumVariable[];
+  stateVariables?: VellumVariable[];
   concurrency?: number;
   label: string;
   sourceHandleId: string;
