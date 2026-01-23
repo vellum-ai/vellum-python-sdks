@@ -1,7 +1,7 @@
 import logging
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Sequence, Type, Union
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Literal, Optional, Sequence, Type, Union
 
-from pydantic import ConfigDict, SerializationInfo, ValidationError, field_serializer, model_serializer
+from pydantic import ConfigDict, SerializationInfo, ValidationError, field_serializer, field_validator, model_serializer
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.array_vellum_value import ArrayVellumValue
@@ -20,11 +20,19 @@ logger = logging.getLogger(__name__)
 
 
 class MockNodeExecution(UniversalBaseModel):
-    when_condition: BaseDescriptor
+    when_condition: Union[Literal[True], BaseDescriptor]
     then_outputs: BaseOutputs
     disabled: Optional[bool] = None
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    @field_validator("when_condition", mode="before")
+    @classmethod
+    def normalize_when_condition(cls, v: Union[Literal[True], BaseDescriptor]) -> BaseDescriptor:
+        """Convert when_condition=True to ConstantValueReference(True)."""
+        if v is True:
+            return ConstantValueReference(True)
+        return v
 
     @model_serializer(mode="wrap")
     def serialize_full_model(self, handler: Callable[[Any], Any], info: SerializationInfo) -> Dict[str, Any]:
