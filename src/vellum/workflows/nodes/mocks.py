@@ -1,7 +1,15 @@
 import logging
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Sequence, Type, Union
 
-from pydantic import ConfigDict, SerializationInfo, ValidationError, field_serializer, field_validator, model_serializer
+from pydantic import (
+    ConfigDict,
+    SerializationInfo,
+    ValidationError,
+    ValidationInfo,
+    field_serializer,
+    field_validator,
+    model_serializer,
+)
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.array_vellum_value import ArrayVellumValue
@@ -28,10 +36,23 @@ class MockNodeExecution(UniversalBaseModel):
 
     @field_validator("when_condition", mode="before")
     @classmethod
-    def normalize_when_condition(cls, v: Any) -> BaseDescriptor:
-        """Wrap non-BaseDescriptor constants in ConstantValueReference."""
+    def normalize_when_condition(cls, v: Any, info: ValidationInfo) -> BaseDescriptor:
+        """Normalize when_condition to a BaseDescriptor.
+
+        - If already a BaseDescriptor, return unchanged
+        - If a dict with 'type' key (serialized descriptor), use descriptor_validator from context
+        - Otherwise, wrap as ConstantValueReference (for constants like True, False, strings, etc.)
+        """
         if isinstance(v, BaseDescriptor):
             return v
+
+        if isinstance(v, dict) and "type" in v:
+            ctx = info.context or {}
+            descriptor_validator = ctx.get("descriptor_validator")
+            if callable(descriptor_validator):
+                return descriptor_validator(v)
+            return ConstantValueReference(False)
+
         return ConstantValueReference(v)
 
     @model_serializer(mode="wrap")
