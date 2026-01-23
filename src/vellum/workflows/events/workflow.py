@@ -50,7 +50,10 @@ def _serialize_body_with_enricher(
             enriched_event = context["event_enricher"](event)
             return enriched_event.body
         except Exception:
-            sdk_version = version("vellum-ai")
+            try:
+                sdk_version = version("vellum-ai")
+            except Exception:
+                sdk_version = None
             logger.exception("Error in event_enricher", extra={"sentry_tags": {"sdk_version": sdk_version}})
             return body
     else:
