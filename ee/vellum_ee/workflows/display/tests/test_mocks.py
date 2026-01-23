@@ -155,11 +155,11 @@ def test_mocks__parse_from_app__descriptors():
     )
 
 
-def test_mocks__parse_from_app__when_condition_defaults_to_false_without_descriptor_validator():
+def test_mocks__parse_from_app__when_condition_wraps_dict_without_descriptor_validator():
     """
-    Tests that when_condition defaults to ConstantValueReference(False) when
+    Tests that when_condition wraps the original dict in ConstantValueReference when
     descriptor_validator is not provided. This ensures that mocks without a
-    descriptor_validator have a valid when_condition that evaluates to False.
+    descriptor_validator treat the dict as a constant value.
     """
 
     # GIVEN a Base Node
@@ -174,25 +174,26 @@ def test_mocks__parse_from_app__when_condition_defaults_to_false_without_descrip
         class Outputs(BaseWorkflow.Outputs):
             final_value = StartNode.Outputs.foo
 
-    # AND a mock workflow node execution with a valid when_condition JSON structure
+    # AND a mock workflow node execution with a when_condition JSON structure
+    when_condition_dict = {
+        "type": "BINARY_EXPRESSION",
+        "operator": ">=",
+        "lhs": {
+            "type": "EXECUTION_COUNTER",
+            "node_id": str(StartNode.__id__),
+        },
+        "rhs": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+                "type": "NUMBER",
+                "value": 1,
+            },
+        },
+    }
     raw_mock_workflow_node_executions = [
         {
             "node_id": str(StartNode.__id__),
-            "when_condition": {
-                "type": "BINARY_EXPRESSION",
-                "operator": ">=",
-                "lhs": {
-                    "type": "EXECUTION_COUNTER",
-                    "node_id": str(StartNode.__id__),
-                },
-                "rhs": {
-                    "type": "CONSTANT_VALUE",
-                    "value": {
-                        "type": "NUMBER",
-                        "value": 1,
-                    },
-                },
-            },
+            "when_condition": when_condition_dict,
             "then_outputs": {
                 "foo": "Hello foo",
             },
@@ -209,8 +210,72 @@ def test_mocks__parse_from_app__when_condition_defaults_to_false_without_descrip
     assert node_output_mocks is not None
     assert len(node_output_mocks) == 1
 
-    # AND the when_condition defaults to ConstantValueReference(False)
-    assert node_output_mocks[0].when_condition == ConstantValueReference(False)
+    # AND the when_condition wraps the original dict in ConstantValueReference
+    assert isinstance(node_output_mocks[0].when_condition, ConstantValueReference)
+    assert node_output_mocks[0].when_condition._value == when_condition_dict
+
+
+def test_mocks__when_condition_dict_with_type_uses_descriptor_validator():
+    """
+    Tests that a dict with 'type' key uses descriptor_validator from context
+    to deserialize into a proper descriptor.
+    """
+
+    # GIVEN a Base Node
+    class StartNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            foo: str
+
+    # AND a workflow class with that Node
+    class MyWorkflow(BaseWorkflow):
+        graph = StartNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            final_value = StartNode.Outputs.foo
+
+    # AND a BINARY_EXPRESSION descriptor representing "1 == 1"
+    when_condition_dict = {
+        "type": "BINARY_EXPRESSION",
+        "operator": "==",
+        "lhs": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+                "type": "NUMBER",
+                "value": 1,
+            },
+        },
+        "rhs": {
+            "type": "CONSTANT_VALUE",
+            "value": {
+                "type": "NUMBER",
+                "value": 1,
+            },
+        },
+    }
+
+    # WHEN we create a MockNodeExecution via validate_all with the real descriptor_validator
+    node_output_mocks = MockNodeExecution.validate_all(
+        [
+            {
+                "node_id": str(StartNode.__id__),
+                "when_condition": when_condition_dict,
+                "then_outputs": {
+                    "foo": "mocked",
+                },
+            },
+        ],
+        MyWorkflow,
+        descriptor_validator=base_descriptor_validator,
+    )
+
+    # THEN we get a list of MockNodeExecution objects
+    assert node_output_mocks is not None
+    assert len(node_output_mocks) == 1
+
+    # AND the when_condition is deserialized to an EqualsExpression (not ConstantValueReference)
+    from vellum.workflows.expressions.equals import EqualsExpression
+
+    assert isinstance(node_output_mocks[0].when_condition, EqualsExpression)
 
 
 def test_mocks__use_node_id_from_display():

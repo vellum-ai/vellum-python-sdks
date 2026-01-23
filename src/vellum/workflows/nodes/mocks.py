@@ -1,7 +1,15 @@
 import logging
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Sequence, Type, Union
 
-from pydantic import ConfigDict, SerializationInfo, ValidationError, field_serializer, model_serializer
+from pydantic import (
+    ConfigDict,
+    SerializationInfo,
+    ValidationError,
+    ValidationInfo,
+    field_serializer,
+    field_validator,
+    model_serializer,
+)
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.array_vellum_value import ArrayVellumValue
@@ -25,6 +33,26 @@ class MockNodeExecution(UniversalBaseModel):
     disabled: Optional[bool] = None
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    @field_validator("when_condition", mode="before")
+    @classmethod
+    def normalize_when_condition(cls, v: Any, info: ValidationInfo) -> BaseDescriptor:
+        """Normalize when_condition to a BaseDescriptor.
+
+        - If already a BaseDescriptor, return unchanged
+        - If a dict with 'type' key (serialized descriptor), use descriptor_validator from context
+        - Otherwise, wrap as ConstantValueReference (for constants like True, False, strings, etc.)
+        """
+        if isinstance(v, BaseDescriptor):
+            return v
+
+        if isinstance(v, dict) and "type" in v:
+            ctx = info.context or {}
+            descriptor_validator = ctx.get("descriptor_validator")
+            if callable(descriptor_validator):
+                return descriptor_validator(v)
+
+        return ConstantValueReference(v)
 
     @model_serializer(mode="wrap")
     def serialize_full_model(self, handler: Callable[[Any], Any], info: SerializationInfo) -> Dict[str, Any]:
@@ -76,10 +104,8 @@ class MockNodeExecution(UniversalBaseModel):
                         context={
                             "workflow": workflow,
                             "node_id": raw_mock_workflow_node_config.get("node_id"),
-                            "descriptor_validator": lambda value: (
-                                descriptor_validator(value, workflow)
-                                if descriptor_validator
-                                else ConstantValueReference(False)
+                            "descriptor_validator": (
+                                (lambda value: descriptor_validator(value, workflow)) if descriptor_validator else None
                             ),
                         },
                     )
