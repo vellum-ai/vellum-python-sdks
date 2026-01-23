@@ -1517,7 +1517,7 @@ client.integrations.execute_integration_tool(
 <dl>
 <dd>
 
-**integration_name_:** `str` — The integration name
+**integration_name:** `str` — The integration name
     
 </dd>
 </dl>
@@ -1533,7 +1533,7 @@ client.integrations.execute_integration_tool(
 <dl>
 <dd>
 
-**tool_name_:** `str` — The tool's unique name, as specified by the integration provider
+**tool_name:** `str` — The tool's unique name, as specified by the integration provider
     
 </dd>
 </dl>
@@ -1557,23 +1557,7 @@ client.integrations.execute_integration_tool(
 <dl>
 <dd>
 
-**integration_name:** `typing.Optional[str]` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
 **integration:** `typing.Optional[str]` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**tool_name:** `typing.Optional[str]` 
     
 </dd>
 </dl>

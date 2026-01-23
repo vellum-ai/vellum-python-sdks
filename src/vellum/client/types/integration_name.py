@@ -32,6 +32,7 @@ IntegrationName = typing.Union[
         "GMAIL",
         "GOOGLE_ADS",
         "GOOGLE_ANALYTICS",
+        "GOOGLE_BIGQUERY",
         "GOOGLE_DOCS",
         "GOOGLE_PHOTOS",
         "GOOGLE_SEARCH_CONSOLE",
