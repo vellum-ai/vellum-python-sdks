@@ -260,7 +260,10 @@ ${errors.slice(0, 3).map((err) => {
     ]);
 
     // Code merge logic - copied from codegen-service
-    if (originalArtifact) {
+    // Only run file merging at the root level, not for nested workflows
+    // Nested workflows add their files to pythonCodeMergeableNodeFiles (which is shared),
+    // and the root workflow's mergeFilesWithArtifact handles all of them
+    if (originalArtifact && !this.workflowContext.parentNode) {
       await this.mergeFilesWithArtifact(originalArtifact);
     }
 
