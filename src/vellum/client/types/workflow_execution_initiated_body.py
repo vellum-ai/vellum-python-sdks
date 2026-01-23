@@ -10,6 +10,7 @@ from .vellum_code_resource_definition import VellumCodeResourceDefinition
 class WorkflowExecutionInitiatedBody(UniversalBaseModel):
     workflow_definition: VellumCodeResourceDefinition
     inputs: typing.Dict[str, typing.Optional[typing.Any]]
+    trigger: typing.Optional[VellumCodeResourceDefinition] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
