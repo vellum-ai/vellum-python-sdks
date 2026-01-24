@@ -340,10 +340,10 @@ export class ConditionalNodePort extends AstNode {
     const nodeValue = nodeInput.nodeInputData.value
       .rules[0] as ConstantValuePointer;
     const stringValue = nodeValue.data.value;
-    if (typeof stringValue === "string" && stringValue.trim() === "") {
-      return undefined;
-    }
-    const castedValue = Number(stringValue);
+    const castedValue =
+      typeof stringValue === "string" && stringValue.trim() === ""
+        ? 0
+        : Number(stringValue);
     if (isNaN(castedValue)) {
       const error = new ValueGenerationError(
         `Failed to cast constant value ${stringValue} to NUMBER for attribute ${this.nodeLabel}.${nodeInput.nodeInputData.key}`
