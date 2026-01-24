@@ -110,3 +110,25 @@ def test_serialize_module__orphan_node_in_nodes_directory():
         "OrphanNodeInNodesDir" in msg and "not included in" in msg and "graph or unused_graphs" in msg
         for msg in error_messages
     ), f"Expected orphan node error in error messages, got: {error_messages}"
+
+
+def test_serialize_module__chat_message_prompt_block_invalid_child():
+    """
+    Tests that serialization returns a graceful error when a ChatMessagePromptBlock
+    has an invalid child block that cannot be serialized.
+    """
+
+    # GIVEN a workflow module with a ChatMessagePromptBlock containing an invalid child block
+    module = "tests.workflows.test_chat_message_prompt_block_invalid_child"
+
+    # WHEN we serialize the module with dry_run=True (matching production behavior)
+    result = BaseWorkflowDisplay.serialize_module(module, dry_run=True)
+
+    # THEN the result should contain an error about the invalid block type
+    assert len(result.errors) > 0
+
+    # AND the error message should mention that the object is not JSON serializable
+    error_messages = [error.message for error in result.errors]
+    assert any(
+        "not JSON serializable" in msg for msg in error_messages
+    ), f"Expected JSON serialization error in error messages, got: {error_messages}"
