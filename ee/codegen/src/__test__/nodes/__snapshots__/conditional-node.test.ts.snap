@@ -172,6 +172,23 @@ class ConditionalNode(BaseConditionalNode):
 "
 `;
 
+exports[`Conditional Node with numeric operator casts empty string rhs to 0 > getNodeFile 1`] = `
+"from vellum.workflows.nodes.displayable import ConditionalNode as BaseConditionalNode
+from vellum.workflows.ports import Port
+
+from ..inputs import Inputs
+
+
+class ConditionalNode(BaseConditionalNode):
+    class Ports(BaseConditionalNode.Ports):
+        if_1 = Port.on_if(Inputs.lhs.greater_than(0))
+
+    class Display(BaseConditionalNode.Display):
+        x = 2247.2797390213086
+        y = 30.917121251477084
+"
+`;
+
 exports[`Conditional Node with numeric operator casts rhs to NUMBER > getNodeFile 1`] = `
 "from vellum.workflows.nodes.displayable import ConditionalNode as BaseConditionalNode
 from vellum.workflows.ports import Port

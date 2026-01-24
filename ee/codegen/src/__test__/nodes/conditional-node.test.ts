@@ -464,6 +464,122 @@ describe("Conditional Node with numeric operator casts rhs to NUMBER", () => {
   });
 });
 
+describe("Conditional Node with numeric operator casts empty string rhs to 0", () => {
+  /**
+   * Tests that empty string values are cast to 0 when used with numeric operators.
+   */
+  let workflowContext: WorkflowContext;
+  let writer: Writer;
+  let node: ConditionalNode;
+
+  beforeEach(async () => {
+    // GIVEN a workflow context with a NUMBER input variable
+    workflowContext = workflowContextFactory();
+    writer = new Writer();
+
+    workflowContext.addInputVariableContext(
+      inputVariableContextFactory({
+        inputVariableData: {
+          id: "d2287fee-98fb-421c-9464-e54d8f70f046",
+          key: "lhs",
+          type: "NUMBER",
+        },
+        workflowContext,
+      })
+    );
+
+    // AND a conditional node with a numeric operator and empty string rhs
+    const nodeData: ConditionalNodeType = {
+      id: "b81a4453-7b80-41ea-bd55-c62df8878fd3",
+      type: WorkflowNodeType.CONDITIONAL,
+      data: {
+        label: "Conditional Node",
+        targetHandleId: "842b9dda-7977-47ad-a322-eb15b4c7069d",
+        conditions: [
+          {
+            id: "8d0d8b56-6c17-4684-9f16-45dd6ce23060",
+            type: "IF",
+            sourceHandleId: "63345ab5-1a4d-48a1-ad33-91bec41f92a5",
+            data: {
+              id: "fa50fb0c-8d62-40e3-bd88-080b52efd4b2",
+              rules: [
+                {
+                  id: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc",
+                  rules: [],
+                  fieldNodeInputId: "2cb6582e-c329-4952-8598-097830b766c7",
+                  operator: ">",
+                  valueNodeInputId: "cf63d0ad-5e52-4031-a29f-922e7004cdd8",
+                },
+              ],
+              combinator: "AND",
+            },
+          },
+        ],
+        version: "2",
+      },
+      inputs: [
+        {
+          id: "2cb6582e-c329-4952-8598-097830b766c7",
+          key: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.field",
+          value: {
+            rules: [
+              {
+                type: "INPUT_VARIABLE",
+                data: {
+                  inputVariableId: "d2287fee-98fb-421c-9464-e54d8f70f046",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+        {
+          id: "cf63d0ad-5e52-4031-a29f-922e7004cdd8",
+          key: "ad6bcb67-f21b-4af9-8d4b-ac8d3ba297cc.value",
+          value: {
+            rules: [
+              {
+                type: "CONSTANT_VALUE",
+                data: {
+                  type: "STRING",
+                  value: "",
+                },
+              },
+            ],
+            combinator: "OR",
+          },
+        },
+      ],
+      displayData: {
+        width: 480,
+        height: 180,
+        position: {
+          x: 2247.2797390213086,
+          y: 30.917121251477084,
+        },
+      },
+    };
+
+    const nodeContext = (await createNodeContext({
+      workflowContext,
+      nodeData,
+    })) as ConditionalNodeContext;
+
+    node = new ConditionalNode({
+      workflowContext,
+      nodeContext,
+    });
+  });
+
+  it("getNodeFile", async () => {
+    // WHEN we generate the node file
+    node.getNodeFile().write(writer);
+
+    // THEN the empty string should be cast to 0
+    expect(await writer.toStringFormatted()).toMatchSnapshot();
+  });
+});
+
 describe("Conditional Node with equals operator to numeric lhs should cast rhs to NUMBER", () => {
   const inputVariableCase = async (
     workflowContext: WorkflowContext
