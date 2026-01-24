@@ -216,7 +216,7 @@ def test_run_workflow__chat_history_as_query(vellum_client):
 
     # AND the options should be as expected
     assert json.loads(vellum_client.search.call_args.kwargs["query"]) == [
-        {"role": "USER", "text": "Hello, world!", "source": None, "content": None}
+        {"role": "USER", "text": "Hello, world!", "source": None, "content": None, "metadata": None}
     ]
 
 
