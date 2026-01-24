@@ -96,6 +96,11 @@ def test_serialize_chat_message_dict_reference_with_definition():
                                     "key": "source",
                                     "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
                                 },
+                                {
+                                    "id": "e39552e3-8bf4-4272-85d3-e4cab71155ac",
+                                    "key": "metadata",
+                                    "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                                },
                             ],
                             "definition": {
                                 "name": "ChatMessage",
