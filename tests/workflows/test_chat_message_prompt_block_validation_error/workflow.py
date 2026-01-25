@@ -31,13 +31,11 @@ class ValidationErrorBlock:
                 {
                     "type": "missing",
                     "loc": ("chat_role",),
-                    "msg": "Field required",
                     "input": {},
                 },
                 {
                     "type": "missing",
                     "loc": ("blocks",),
-                    "msg": "Field required",
                     "input": {},
                 },
             ],
