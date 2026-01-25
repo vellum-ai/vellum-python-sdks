@@ -194,6 +194,56 @@ class TestExtractModelProviderDependencies:
         assert isinstance(dependencies, list)
         assert len(dependencies) == 0
 
+    def test_extract_model_provider_dependencies__case_insensitive_deduplication(self) -> None:
+        """Tests that model deduplication is case-insensitive."""
+        # GIVEN multiple prompt nodes with the same model in different cases
+        serialized_nodes: List[JsonObject] = [
+            cast(JsonObject, {"id": "node-1", "type": "PROMPT", "data": cast(JsonObject, {"ml_model_name": "gpt-4o"})}),
+            cast(JsonObject, {"id": "node-2", "type": "PROMPT", "data": cast(JsonObject, {"ml_model_name": "GPT-4O"})}),
+            cast(JsonObject, {"id": "node-3", "type": "PROMPT", "data": cast(JsonObject, {"ml_model_name": "GpT-4o"})}),
+        ]
+
+        # WHEN we extract dependencies
+        dependencies = extract_model_provider_dependencies(serialized_nodes)
+
+        # THEN we should get only one dependency (case-insensitive deduplication)
+        assert isinstance(dependencies, list)
+        assert len(dependencies) == 1
+
+    def test_extract_model_provider_dependencies__sorted_alphabetically(self) -> None:
+        """Tests that dependencies are sorted alphabetically by (name, model_name)."""
+        # GIVEN multiple prompt nodes with different models in non-alphabetical order
+        serialized_nodes: List[JsonObject] = [
+            cast(JsonObject, {"id": "node-1", "type": "PROMPT", "data": cast(JsonObject, {"ml_model_name": "gpt-4o"})}),
+            cast(
+                JsonObject,
+                {"id": "node-2", "type": "PROMPT", "data": cast(JsonObject, {"ml_model_name": "claude-3-opus"})},
+            ),
+            cast(
+                JsonObject,
+                {"id": "node-3", "type": "PROMPT", "data": cast(JsonObject, {"ml_model_name": "gpt-3.5-turbo"})},
+            ),
+        ]
+
+        # WHEN we extract dependencies
+        dependencies = extract_model_provider_dependencies(serialized_nodes)
+
+        # THEN dependencies should be sorted by (name, model_name)
+        assert isinstance(dependencies, list)
+        assert len(dependencies) == 3
+        dep0 = dependencies[0]
+        dep1 = dependencies[1]
+        dep2 = dependencies[2]
+        assert isinstance(dep0, dict)
+        assert isinstance(dep1, dict)
+        assert isinstance(dep2, dict)
+        assert dep0["name"] == "ANTHROPIC"
+        assert dep0["model_name"] == "claude-3-opus"
+        assert dep1["name"] == "OPENAI"
+        assert dep1["model_name"] == "gpt-3.5-turbo"
+        assert dep2["name"] == "OPENAI"
+        assert dep2["model_name"] == "gpt-4o"
+
 
 class TestWorkflowSerializationWithDependencies:
     """Tests for workflow serialization including dependencies."""

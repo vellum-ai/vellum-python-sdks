@@ -61,7 +61,8 @@ def extract_model_provider_dependencies(serialized_nodes: List[JsonObject]) -> J
         serialized_nodes: List of serialized node dictionaries
 
     Returns:
-        List of WorkflowModelProviderDependency dictionaries
+        List of WorkflowModelProviderDependency dictionaries, sorted alphabetically
+        by (name, model_name) for deterministic output.
     """
     seen_models: Dict[str, JsonObject] = {}
 
@@ -81,7 +82,8 @@ def extract_model_provider_dependencies(serialized_nodes: List[JsonObject]) -> J
         if not ml_model_name or not isinstance(ml_model_name, str):
             continue
 
-        if ml_model_name in seen_models:
+        model_key = ml_model_name.lower()
+        if model_key in seen_models:
             continue
 
         hosting_info = infer_model_hosting_interface(ml_model_name)
@@ -89,11 +91,19 @@ def extract_model_provider_dependencies(serialized_nodes: List[JsonObject]) -> J
             continue
 
         hosting_interface, label = hosting_info
-        seen_models[ml_model_name] = {
+        seen_models[model_key] = {
             "type": "MODEL_PROVIDER",
             "name": hosting_interface,
             "label": label,
             "model_name": ml_model_name,
         }
 
-    return list(seen_models.values())
+    dependencies: JsonArray = list(seen_models.values())
+
+    def sort_key(d: object) -> tuple:
+        if isinstance(d, dict):
+            return (str(d.get("name", "")), str(d.get("model_name", "")))
+        return ("", "")
+
+    dependencies.sort(key=sort_key)  # type: ignore[arg-type]
+    return dependencies
