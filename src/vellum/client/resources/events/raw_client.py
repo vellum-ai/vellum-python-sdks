@@ -14,7 +14,6 @@ from ...errors.forbidden_error import ForbiddenError
 from ...errors.too_many_requests_error import TooManyRequestsError
 from ...errors.unauthorized_error import UnauthorizedError
 from ...types.create_workflow_event_request import CreateWorkflowEventRequest
-from ...types.error_detail_response import ErrorDetailResponse
 from ...types.event_create_response import EventCreateResponse
 
 # this is used as the default value for optional parameters
@@ -81,9 +80,9 @@ class RawEventsClient:
                 raise UnauthorizedError(
                     headers=dict(_response.headers),
                     body=typing.cast(
-                        ErrorDetailResponse,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=ErrorDetailResponse,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     ),
@@ -176,9 +175,9 @@ class AsyncRawEventsClient:
                 raise UnauthorizedError(
                     headers=dict(_response.headers),
                     body=typing.cast(
-                        ErrorDetailResponse,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=ErrorDetailResponse,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     ),

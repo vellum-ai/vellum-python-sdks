@@ -134,7 +134,6 @@ from .environment_enum import EnvironmentEnum
 from .environment_read import EnvironmentRead
 from .ephemeral_prompt_cache_config import EphemeralPromptCacheConfig
 from .ephemeral_prompt_cache_config_type_enum import EphemeralPromptCacheConfigTypeEnum
-from .error_detail_response import ErrorDetailResponse
 from .error_input import ErrorInput
 from .error_vellum_value import ErrorVellumValue
 from .error_vellum_value_request import ErrorVellumValueRequest
@@ -873,7 +872,6 @@ __all__ = [
     "EnvironmentRead",
     "EphemeralPromptCacheConfig",
     "EphemeralPromptCacheConfigTypeEnum",
-    "ErrorDetailResponse",
     "ErrorInput",
     "ErrorVellumValue",
     "ErrorVellumValueRequest",
