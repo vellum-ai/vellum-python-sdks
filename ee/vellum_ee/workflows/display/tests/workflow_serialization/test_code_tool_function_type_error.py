@@ -121,3 +121,15 @@ def test_serialize_workflow__compile_function_definition_raises_value_error__err
         error_messages = [str(e) for e in errors]
         assert any("my_simple_tool" in msg for msg in error_messages)
         assert any("Failed to compile type" in msg for msg in error_messages)
+
+        # AND the tool calling node's functions attribute should have an empty list
+        workflow_raw_data = serialized["workflow_raw_data"]
+        tool_calling_node = next(
+            node
+            for node in workflow_raw_data["nodes"]
+            if (node.get("definition") or {}).get("name") == "MyToolCallingNode"
+        )
+        functions_attribute = next(attr for attr in tool_calling_node["attributes"] if attr["name"] == "functions")
+        assert functions_attribute["value"]["type"] == "CONSTANT_VALUE"
+        assert functions_attribute["value"]["value"]["type"] == "JSON"
+        assert functions_attribute["value"]["value"]["value"] == []
