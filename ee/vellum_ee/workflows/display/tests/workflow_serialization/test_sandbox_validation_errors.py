@@ -132,3 +132,25 @@ def test_serialize_module__chat_message_prompt_block_invalid_child():
     assert any(
         "not JSON serializable" in msg for msg in error_messages
     ), f"Expected JSON serialization error in error messages, got: {error_messages}"
+
+
+def test_serialize_module__chat_message_prompt_block_validation_error():
+    """
+    Tests that serialization returns a graceful error when a ChatMessagePromptBlock
+    has a child block that raises a Pydantic ValidationError during serialization.
+    """
+
+    # GIVEN a workflow module with a ChatMessagePromptBlock containing a child that raises ValidationError
+    module = "tests.workflows.test_chat_message_prompt_block_validation_error"
+
+    # WHEN we serialize the module with dry_run=True (matching production behavior)
+    result = BaseWorkflowDisplay.serialize_module(module, dry_run=True)
+
+    # THEN the result should contain an error
+    assert len(result.errors) > 0
+
+    # AND the error message should indicate a serialization failure
+    error_messages = [error.message for error in result.errors]
+    assert any(
+        "not JSON serializable" in msg or "validation error" in msg.lower() for msg in error_messages
+    ), f"Expected serialization error in error messages, got: {error_messages}"

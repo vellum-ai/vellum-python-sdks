@@ -29,6 +29,7 @@ from typing import (
 )
 
 import jsonschema
+from pydantic import ValidationError
 
 from vellum.client import Vellum as VellumClient
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
@@ -396,7 +397,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                     self.display_context.add_validation_error(validation_error)
 
                 serialized_node = node_display.serialize(self.display_context)
-            except (NotImplementedError, UserFacingException, TypeError) as e:
+            except (NotImplementedError, UserFacingException, TypeError, ValidationError) as e:
                 self.display_context.add_error(e)
                 self.display_context.add_invalid_node(node)
                 continue
