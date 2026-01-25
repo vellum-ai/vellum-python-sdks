@@ -1612,17 +1612,20 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         try:
             workflow = BaseWorkflow.load_from_module(module)
         except WorkflowInitializationException as e:
-            # Handle validation errors that occur during module import (e.g., Pydantic ValidationError)
-            return WorkflowSerializationResult(
-                exec_config={},
-                errors=[
-                    WorkflowSerializationError(
-                        message=str(e),
-                        stacktrace="".join(traceback.format_exception(type(e), e, e.__traceback__)),
-                    )
-                ],
-                dataset=None,
-            )
+            # Only handle ValidationError gracefully when dry_run=True (matching production behavior)
+            # Other WorkflowInitializationExceptions (e.g., invalid graph structure) should still raise
+            if dry_run and isinstance(e.__cause__, ValidationError):
+                return WorkflowSerializationResult(
+                    exec_config={},
+                    errors=[
+                        WorkflowSerializationError(
+                            message=str(e),
+                            stacktrace="".join(traceback.format_exception(type(e), e, e.__traceback__)),
+                        )
+                    ],
+                    dataset=None,
+                )
+            raise
         workflow_display = get_workflow_display(
             workflow_class=workflow,
             client=client,
