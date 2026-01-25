@@ -1,5 +1,6 @@
 import pytest
 from unittest.mock import patch
+from typing import Any, Dict, List, cast
 
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
@@ -123,11 +124,10 @@ def test_serialize_workflow__compile_function_definition_raises_value_error__err
         assert any("Failed to compile type" in msg for msg in error_messages)
 
         # AND the tool calling node's functions attribute should have an empty list
-        workflow_raw_data = serialized["workflow_raw_data"]
+        workflow_raw_data = cast(Dict[str, Any], serialized["workflow_raw_data"])
+        nodes = cast(List[Dict[str, Any]], workflow_raw_data["nodes"])
         tool_calling_node = next(
-            node
-            for node in workflow_raw_data["nodes"]
-            if (node.get("definition") or {}).get("name") == "MyToolCallingNode"
+            node for node in nodes if (node.get("definition") or {}).get("name") == "MyToolCallingNode"
         )
         functions_attribute = next(attr for attr in tool_calling_node["attributes"] if attr["name"] == "functions")
         assert functions_attribute["value"]["type"] == "CONSTANT_VALUE"
