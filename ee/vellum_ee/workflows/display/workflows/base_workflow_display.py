@@ -29,6 +29,7 @@ from typing import (
 )
 
 import jsonschema
+from pydantic import ValidationError
 
 from vellum.client import Vellum as VellumClient
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
@@ -1608,7 +1609,23 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         Returns:
             WorkflowSerializationResult containing exec_config and errors
         """
-        workflow = BaseWorkflow.load_from_module(module)
+        try:
+            workflow = BaseWorkflow.load_from_module(module)
+        except WorkflowInitializationException as e:
+            # Only handle ValidationError gracefully when dry_run=True (matching production behavior)
+            # Other WorkflowInitializationExceptions (e.g., invalid graph structure) should still raise
+            if dry_run and isinstance(e.__cause__, ValidationError):
+                return WorkflowSerializationResult(
+                    exec_config={},
+                    errors=[
+                        WorkflowSerializationError(
+                            message=str(e),
+                            stacktrace="".join(traceback.format_exception(type(e), e, e.__traceback__)),
+                        )
+                    ],
+                    dataset=None,
+                )
+            raise
         workflow_display = get_workflow_display(
             workflow_class=workflow,
             client=client,
