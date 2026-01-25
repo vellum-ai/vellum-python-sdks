@@ -888,3 +888,119 @@ def test_tool_examples_included_in_schema():
             {"location": "New York", "units": "celsius"},
         ],
     }
+
+
+def test_compile_function_definition__simple_class():
+    """
+    Tests that a function with a simple class parameter compiles correctly.
+    """
+
+    # GIVEN a simple class with __init__ method
+    class SimpleClass:
+        def __init__(self, name: str, count: int):
+            self.name = name
+            self.count = count
+
+    # AND a function that takes the simple class as a parameter
+    def my_function(data: SimpleClass):
+        pass
+
+    # WHEN compiling the function
+    compiled_function = compile_function_definition(my_function)
+
+    # THEN it should return the compiled function definition with the class properties
+    ref_name = f"{__name__}.test_compile_function_definition__simple_class.<locals>.SimpleClass"
+    assert compiled_function == FunctionDefinition(
+        name="my_function",
+        parameters={
+            "type": "object",
+            "properties": {"data": {"$ref": f"#/$defs/{ref_name}"}},
+            "required": ["data"],
+            "$defs": {
+                ref_name: {
+                    "type": "object",
+                    "properties": {"name": {"type": "string"}, "count": {"type": "integer"}},
+                    "required": ["name", "count"],
+                }
+            },
+        },
+    )
+
+
+def test_compile_function_definition__simple_class_with_defaults():
+    """
+    Tests that a function with a simple class parameter with default values compiles correctly.
+    """
+
+    # GIVEN a simple class with __init__ method that has default values
+    class SimpleClassWithDefaults:
+        def __init__(self, name: str, count: int = 10):
+            self.name = name
+            self.count = count
+
+    # AND a function that takes the simple class as a parameter
+    def my_function(data: SimpleClassWithDefaults):
+        pass
+
+    # WHEN compiling the function
+    compiled_function = compile_function_definition(my_function)
+
+    # THEN it should return the compiled function definition with the class properties
+    ref_name = (
+        f"{__name__}.test_compile_function_definition__simple_class_with_defaults.<locals>.SimpleClassWithDefaults"
+    )
+    assert compiled_function == FunctionDefinition(
+        name="my_function",
+        parameters={
+            "type": "object",
+            "properties": {"data": {"$ref": f"#/$defs/{ref_name}"}},
+            "required": ["data"],
+            "$defs": {
+                ref_name: {
+                    "type": "object",
+                    "properties": {
+                        "name": {"type": "string"},
+                        "count": {"type": "integer", "default": 10},
+                    },
+                    "required": ["name"],
+                }
+            },
+        },
+    )
+
+
+def test_compile_function_definition__default_simple_class():
+    """
+    Tests that a function with a simple class default value compiles correctly.
+    """
+
+    # GIVEN a simple class with __init__ method
+    class SimpleClass:
+        def __init__(self, name: str, count: int):
+            self.name = name
+            self.count = count
+
+    # AND a function that takes the simple class as a parameter with a default value
+    def my_function(data: SimpleClass = SimpleClass(name="test", count=5)):
+        pass
+
+    # WHEN compiling the function
+    compiled_function = compile_function_definition(my_function)
+
+    # THEN it should return the compiled function definition with the default value
+    ref_name = f"{__name__}.test_compile_function_definition__default_simple_class.<locals>.SimpleClass"
+    assert compiled_function == FunctionDefinition(
+        name="my_function",
+        parameters={
+            "type": "object",
+            "properties": {"data": {"$ref": f"#/$defs/{ref_name}", "default": {"name": "test", "count": 5}}},
+            "required": [],
+            "$defs": {
+                ref_name: {
+                    "type": "object",
+                    "properties": {"name": {"type": "string"}, "count": {"type": "integer"}},
+                    "required": ["name", "count"],
+                }
+            },
+        },
+    )

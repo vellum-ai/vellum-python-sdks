@@ -16,7 +16,6 @@ class SimpleClass:
         self.count = count
 
 
-@pytest.mark.xfail(reason="Support for simple class types will be added in a future PR")
 def test_serialize_workflow__code_tool_with_simple_class_type__serializes_successfully():
     """
     Tests that a code tool with a simple class parameter serializes successfully.
