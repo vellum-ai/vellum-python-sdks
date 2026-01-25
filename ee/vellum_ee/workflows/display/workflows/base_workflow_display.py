@@ -84,6 +84,7 @@ from vellum_ee.workflows.display.types import (
     WorkflowOutputDisplays,
 )
 from vellum_ee.workflows.display.utils.auto_layout import auto_layout_nodes
+from vellum_ee.workflows.display.utils.dependencies import extract_model_provider_dependencies
 from vellum_ee.workflows.display.utils.exceptions import (
     StateValidationError,
     TriggerValidationError,
@@ -657,6 +658,10 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
 
         if triggers is not None:
             result["triggers"] = triggers
+
+        dependencies = extract_model_provider_dependencies(nodes_dict_list)
+        if dependencies:
+            result["dependencies"] = dependencies
 
         return result
 
