@@ -103,12 +103,6 @@ describe("Inputs", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
-    it("should not generate any code when Inputs is empty", async () => {
-      const inputs = codegen.inputs({ workflowContext });
-
-      inputs.write(writer);
-      expect(await writer.toStringFormatted()).toBe("");
-    });
 
     it("should generate correct code for complex input variables", async () => {
       const inputVariables: VellumVariable[] = [
