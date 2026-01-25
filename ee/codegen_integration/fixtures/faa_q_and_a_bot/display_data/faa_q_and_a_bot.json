@@ -3288,5 +3288,31 @@
       "type": "STRING"
     }
   ],
-  "runner_config": {}
+  "runner_config": {},
+  "dependencies": [
+    {
+      "type": "MODEL_PROVIDER",
+      "name": "ANTHROPIC",
+      "label": "Anthropic",
+      "model_name": "claude-3-5-sonnet-20241022"
+    },
+    {
+      "type": "MODEL_PROVIDER",
+      "name": "OPENAI",
+      "label": "OpenAI",
+      "model_name": "gpt-4o"
+    },
+    {
+      "type": "MODEL_PROVIDER",
+      "name": "OPENAI",
+      "label": "OpenAI",
+      "model_name": "gpt-4o-2024-05-13"
+    },
+    {
+      "type": "MODEL_PROVIDER",
+      "name": "OPENAI",
+      "label": "OpenAI",
+      "model_name": "gpt-4o-mini"
+    }
+  ]
 }

@@ -25,6 +25,7 @@ def test_serialize_workflow():
         "input_variables",
         "state_variables",
         "output_variables",
+        "dependencies",
     }
 
     # AND its input variables should be what we expect
