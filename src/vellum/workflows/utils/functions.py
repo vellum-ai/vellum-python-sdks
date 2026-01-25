@@ -233,29 +233,6 @@ def _compile_default_value(default: Any) -> Any:
             for field_name in default.__class__.model_fields.keys()
         }
 
-    # Handle regular class instances by inspecting their __init__ signature
-    if hasattr(default, "__class__") and hasattr(default.__class__, "__init__"):
-        try:
-            init_signature = inspect.signature(default.__class__.__init__)
-            init_params = list(init_signature.parameters.values())
-            # Skip 'self' parameter and *args/**kwargs
-            init_params = [
-                p
-                for p in init_params
-                if p.name != "self" and p.kind not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
-            ]
-
-            # Only process if there are typed parameters
-            if init_params and any(p.annotation is not inspect.Parameter.empty for p in init_params):
-                return {
-                    param.name: _compile_default_value(getattr(default, param.name))
-                    for param in init_params
-                    if param.annotation is not inspect.Parameter.empty and hasattr(default, param.name)
-                }
-        except (ValueError, TypeError, AttributeError):
-            # If we can't inspect the signature or get attributes, fall through
-            pass
-
     return default
 
 

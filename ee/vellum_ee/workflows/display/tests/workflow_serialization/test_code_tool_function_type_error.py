@@ -47,6 +47,31 @@ def test_serialize_workflow__code_tool_with_simple_class_type__serializes_succes
     errors = list(workflow_display.display_context.errors)
     assert len(errors) == 0
 
+    # AND the functions attribute should have the correct shape with SimpleClass properties
+    workflow_raw_data = cast(Dict[str, Any], serialized["workflow_raw_data"])
+    nodes = cast(List[Dict[str, Any]], workflow_raw_data["nodes"])
+    tool_calling_node = next(
+        node for node in nodes if (node.get("definition") or {}).get("name") == "MyToolCallingNode"
+    )
+    functions_attribute = next(attr for attr in tool_calling_node["attributes"] if attr["name"] == "functions")
+    assert functions_attribute["value"]["type"] == "CONSTANT_VALUE"
+    assert functions_attribute["value"]["value"]["type"] == "JSON"
+
+    functions_value = functions_attribute["value"]["value"]["value"]
+    assert len(functions_value) == 1
+    assert functions_value[0]["name"] == "my_tool_with_class_param"
+
+    # Verify the function definition has the correct shape with SimpleClass properties
+    definition = functions_value[0]["definition"]
+    assert definition["parameters"]["properties"]["data"]["$ref"].endswith(".SimpleClass")
+    assert "$defs" in definition["parameters"]
+    simple_class_def = next(v for k, v in definition["parameters"]["$defs"].items() if k.endswith(".SimpleClass"))
+    assert simple_class_def["type"] == "object"
+    assert "name" in simple_class_def["properties"]
+    assert "count" in simple_class_def["properties"]
+    assert simple_class_def["properties"]["name"]["type"] == "string"
+    assert simple_class_def["properties"]["count"]["type"] == "integer"
+
 
 @pytest.mark.xfail(reason="Support for WorkflowContext type will be added in a future PR")
 def test_serialize_workflow__code_tool_with_workflow_context_type__serializes_successfully():
