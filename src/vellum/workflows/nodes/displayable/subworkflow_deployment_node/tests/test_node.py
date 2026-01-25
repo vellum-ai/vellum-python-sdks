@@ -19,6 +19,7 @@ from vellum.client.types.workflow_stream_event import WorkflowStreamEvent
 from vellum.workflows.context import execution_context
 from vellum.workflows.errors import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
+from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.displayable.subworkflow_deployment_node.node import SubworkflowDeploymentNode
 
 
@@ -493,3 +494,29 @@ def test_run_workflow__missing_required_input(vellum_client):
     # AND the error should indicate the missing required input
     assert exc_info.value.code == WorkflowErrorCode.INVALID_INPUTS
     assert exc_info.value.message == "Missing required input for 'my_var_1'"
+
+
+def test_compile_subworkflow_inputs__undefined_input_filtered():
+    """Confirm that undefined values in subworkflow_inputs are filtered out when compiling inputs for API calls."""
+
+    # GIVEN an upstream node with an output that is declared but never set (resolves to undefined)
+    class UpstreamNode(BaseNode):
+        class Outputs(BaseNode.Outputs):
+            unset_output: str
+
+    # AND a Subworkflow Deployment Node that references the unset output for an optional input
+    class ExampleSubworkflowDeploymentNode(SubworkflowDeploymentNode):
+        deployment = "example_subworkflow_deployment"
+        subworkflow_inputs = {
+            "required_input": "hello",
+            "optional_input": UpstreamNode.Outputs.unset_output,
+        }
+
+    # WHEN we compile the subworkflow inputs
+    node = ExampleSubworkflowDeploymentNode()
+    compiled_inputs = node._compile_subworkflow_inputs()
+
+    # THEN only the required_input should be included (undefined values should be filtered out)
+    assert len(compiled_inputs) == 1
+    assert compiled_inputs[0].name == "required_input"
+    assert compiled_inputs[0].value == "hello"
