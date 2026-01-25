@@ -4,7 +4,7 @@ import inspect
 import json
 import os
 from uuid import UUID
-from typing import TYPE_CHECKING, Any, ClassVar, Dict, Iterator, Optional, Tuple, Type, cast, get_origin
+from typing import TYPE_CHECKING, Any, ClassVar, Dict, Iterator, Optional, Tuple, Type, Union, cast, get_origin
 
 from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.types.utils import get_class_attr_names, infer_types
@@ -434,10 +434,16 @@ class BaseTrigger(ABC, metaclass=BaseTriggerMeta):
             **kwargs: Arbitrary keyword arguments passed during trigger instantiation.
                      Subclasses may use these to populate trigger attributes.
         """
+        self._dataset_row: Optional[Union[int, str, UUID]] = kwargs.pop("dataset_row", None)
         self._event_data = kwargs
 
         for key, value in kwargs.items():
             setattr(self, key, value)
+
+    @property
+    def dataset_row(self) -> Optional[Union[int, str, UUID]]:
+        """The dataset row identifier associated with this trigger execution."""
+        return self._dataset_row
 
     @classmethod
     def attribute_references(cls) -> Dict[str, "TriggerAttributeReference[Any]"]:
