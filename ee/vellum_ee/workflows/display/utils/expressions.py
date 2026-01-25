@@ -604,7 +604,10 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
         try:
             function_definition = compile_function_definition(value)
         except ValueError as e:
-            raise UnsupportedSerializationException(f"Failed to serialize function '{value.__name__}': {e}") from e
+            display_context.add_error(
+                UnsupportedSerializationException(f"Failed to serialize function '{value.__name__}': {e}")
+            )
+            return None
 
         name = function_definition.name
         description = function_definition.description or ""

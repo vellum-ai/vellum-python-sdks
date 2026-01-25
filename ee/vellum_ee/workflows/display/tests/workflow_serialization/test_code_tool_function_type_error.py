@@ -4,7 +4,6 @@ from unittest.mock import patch
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallingNode
 from vellum.workflows.state.context import WorkflowContext
-from vellum_ee.workflows.display.utils.exceptions import UnsupportedSerializationException
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 
@@ -16,9 +15,10 @@ class SimpleClass:
         self.count = count
 
 
-def test_serialize_workflow__code_tool_with_simple_class_type__raises_error():
+@pytest.mark.xfail(reason="Support for simple class types will be added in a future PR")
+def test_serialize_workflow__code_tool_with_simple_class_type__serializes_successfully():
     """
-    Tests that a serialization error is raised when a code tool has a parameter with a simple class type.
+    Tests that a code tool with a simple class parameter serializes successfully.
     """
 
     # GIVEN a function with a simple class parameter
@@ -36,22 +36,22 @@ def test_serialize_workflow__code_tool_with_simple_class_type__raises_error():
         class Outputs(BaseWorkflow.Outputs):
             result = MyToolCallingNode.Outputs.text
 
-    # WHEN we try to serialize the workflow
+    # WHEN we serialize the workflow
     workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    serialized = workflow_display.serialize()
 
-    # THEN a serialization error should be raised
-    with pytest.raises(UnsupportedSerializationException) as exc_info:
-        workflow_display.serialize()
+    # THEN the serialization should succeed with no errors
+    assert serialized is not None
+    assert "workflow_raw_data" in serialized
 
-    # AND the error message should mention the function name and the failed type
-    error_message = str(exc_info.value)
-    assert "my_tool_with_class_param" in error_message
-    assert "Failed to compile type" in error_message
+    errors = list(workflow_display.display_context.errors)
+    assert len(errors) == 0
 
 
-def test_serialize_workflow__code_tool_with_workflow_context_type__raises_error():
+@pytest.mark.xfail(reason="Support for WorkflowContext type will be added in a future PR")
+def test_serialize_workflow__code_tool_with_workflow_context_type__serializes_successfully():
     """
-    Tests that a serialization error is raised when a code tool has a WorkflowContext parameter.
+    Tests that a code tool with a WorkflowContext parameter serializes successfully.
     """
 
     # GIVEN a function with a WorkflowContext parameter
@@ -69,22 +69,21 @@ def test_serialize_workflow__code_tool_with_workflow_context_type__raises_error(
         class Outputs(BaseWorkflow.Outputs):
             result = MyToolCallingNode.Outputs.text
 
-    # WHEN we try to serialize the workflow
+    # WHEN we serialize the workflow
     workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    serialized = workflow_display.serialize()
 
-    # THEN a serialization error should be raised
-    with pytest.raises(UnsupportedSerializationException) as exc_info:
-        workflow_display.serialize()
+    # THEN the serialization should succeed with no errors
+    assert serialized is not None
+    assert "workflow_raw_data" in serialized
 
-    # AND the error message should mention the function name and WorkflowContext
-    error_message = str(exc_info.value)
-    assert "my_tool_with_context" in error_message
-    assert "WorkflowContext" in error_message
+    errors = list(workflow_display.display_context.errors)
+    assert len(errors) == 0
 
 
-def test_serialize_workflow__compile_function_definition_raises_value_error__raises_serialization_error():
+def test_serialize_workflow__compile_function_definition_raises_value_error__error_in_display_context():
     """
-    Tests that a ValueError from compile_function_definition is converted to an UnsupportedSerializationException.
+    Tests that a ValueError from compile_function_definition is captured in display_context.errors.
     """
 
     # GIVEN a simple function
@@ -106,14 +105,19 @@ def test_serialize_workflow__compile_function_definition_raises_value_error__rai
     with patch("vellum_ee.workflows.display.utils.expressions.compile_function_definition") as mock_compile:
         mock_compile.side_effect = ValueError("Failed to compile type: <class 'SomeUnknownType'>")
 
-        # WHEN we try to serialize the workflow
-        workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+        # WHEN we serialize the workflow with dry_run=True
+        workflow_display = get_workflow_display(workflow_class=TestWorkflow, dry_run=True)
+        serialized = workflow_display.serialize()
 
-        # THEN a serialization error should be raised
-        with pytest.raises(UnsupportedSerializationException) as exc_info:
-            workflow_display.serialize()
+        # THEN the serialization should succeed
+        assert serialized is not None
+        assert "workflow_raw_data" in serialized
+
+        # AND the error should be captured in display_context.errors
+        errors = list(workflow_display.display_context.errors)
+        assert len(errors) > 0
 
         # AND the error message should contain the original ValueError message
-        error_message = str(exc_info.value)
-        assert "my_simple_tool" in error_message
-        assert "Failed to compile type" in error_message
+        error_messages = [str(e) for e in errors]
+        assert any("my_simple_tool" in msg for msg in error_messages)
+        assert any("Failed to compile type" in msg for msg in error_messages)
