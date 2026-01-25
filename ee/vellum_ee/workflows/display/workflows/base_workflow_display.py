@@ -397,7 +397,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                     self.display_context.add_validation_error(validation_error)
 
                 serialized_node = node_display.serialize(self.display_context)
-            except (NotImplementedError, UserFacingException, TypeError, ValidationError) as e:
+            except (NotImplementedError, UserFacingException, ValidationError) as e:
                 self.display_context.add_error(e)
                 self.display_context.add_invalid_node(node)
                 continue
@@ -1609,7 +1609,20 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         Returns:
             WorkflowSerializationResult containing exec_config and errors
         """
-        workflow = BaseWorkflow.load_from_module(module)
+        try:
+            workflow = BaseWorkflow.load_from_module(module)
+        except WorkflowInitializationException as e:
+            # Handle validation errors that occur during module import (e.g., Pydantic ValidationError)
+            return WorkflowSerializationResult(
+                exec_config={},
+                errors=[
+                    WorkflowSerializationError(
+                        message=str(e),
+                        stacktrace="".join(traceback.format_exception(type(e), e, e.__traceback__)),
+                    )
+                ],
+                dataset=None,
+            )
         workflow_display = get_workflow_display(
             workflow_class=workflow,
             client=client,

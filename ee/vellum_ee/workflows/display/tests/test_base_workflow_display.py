@@ -821,3 +821,25 @@ def test_serialize_workflow__custom_display_class_without_layout_attribute():
         position = node.get("display_data", {}).get("position", {})
         assert position.get("x", 0) == 0, f"Node should have x=0, got {position.get('x')}"
         assert position.get("y", 0) == 0, f"Node should have y=0, got {position.get('y')}"
+
+
+def test_serialize_module__chat_message_prompt_block_validation_error():
+    """
+    Tests that serialization returns a graceful error when a ChatMessagePromptBlock
+    has a child block that raises a Pydantic ValidationError during serialization.
+    """
+
+    # GIVEN a workflow module with a ChatMessagePromptBlock containing an invalid child block
+    module = "tests.workflows.test_chat_message_prompt_block_validation_error"
+
+    # WHEN we serialize the module with dry_run=True (matching production behavior)
+    result = BaseWorkflowDisplay.serialize_module(module, dry_run=True)
+
+    # THEN the result should contain an error
+    assert len(result.errors) > 0
+
+    # AND the error message should indicate a validation error
+    error_messages = [error.message for error in result.errors]
+    assert any(
+        "validation error" in msg.lower() for msg in error_messages
+    ), f"Expected validation error in error messages, got: {error_messages}"
