@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import patch
+from unittest.mock import ANY, patch
 from typing import Any, Dict, List, cast
 
 from vellum.workflows import BaseWorkflow
@@ -58,19 +58,41 @@ def test_serialize_workflow__code_tool_with_simple_class_type__serializes_succes
     assert functions_attribute["value"]["value"]["type"] == "JSON"
 
     functions_value = functions_attribute["value"]["value"]["value"]
-    assert len(functions_value) == 1
-    assert functions_value[0]["name"] == "my_tool_with_class_param"
 
-    # Verify the function definition has the correct shape with SimpleClass properties
-    definition = functions_value[0]["definition"]
-    assert definition["parameters"]["properties"]["data"]["$ref"].endswith(".SimpleClass")
-    assert "$defs" in definition["parameters"]
-    simple_class_def = next(v for k, v in definition["parameters"]["$defs"].items() if k.endswith(".SimpleClass"))
-    assert simple_class_def["type"] == "object"
-    assert "name" in simple_class_def["properties"]
-    assert "count" in simple_class_def["properties"]
-    assert simple_class_def["properties"]["name"]["type"] == "string"
-    assert simple_class_def["properties"]["count"]["type"] == "integer"
+    # AND the functions attribute should have the correct shape with SimpleClass properties
+    simple_class_ref = (
+        "vellum_ee.workflows.display.tests.workflow_serialization.test_code_tool_function_type_error.SimpleClass"
+    )
+    expected = [
+        {
+            "type": "CODE_EXECUTION",
+            "name": "my_tool_with_class_param",
+            "description": "",
+            "definition": {
+                "state": None,
+                "cache_config": None,
+                "name": "my_tool_with_class_param",
+                "description": None,
+                "parameters": {
+                    "type": "object",
+                    "properties": {"data": {"$ref": f"#/$defs/{simple_class_ref}"}},
+                    "required": ["data"],
+                    "$defs": {
+                        simple_class_ref: {
+                            "type": "object",
+                            "properties": {"name": {"type": "string"}, "count": {"type": "integer"}},
+                            "required": ["name", "count"],
+                        }
+                    },
+                },
+                "inputs": None,
+                "forced": None,
+                "strict": None,
+            },
+            "src": ANY,
+        }
+    ]
+    assert expected == functions_value
 
 
 @pytest.mark.xfail(reason="Support for WorkflowContext type will be added in a future PR")
