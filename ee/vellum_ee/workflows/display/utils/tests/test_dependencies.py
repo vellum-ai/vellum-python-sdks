@@ -1,10 +1,12 @@
 import pytest
+from typing import Any, Dict, List, cast
 
 from vellum import ChatMessagePromptBlock, JinjaPromptBlock
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
-from vellum.workflows.nodes import InlinePromptNode
+from vellum.workflows.nodes import InlinePromptNode, TemplatingNode
 from vellum.workflows.state import BaseState
+from vellum.workflows.types.core import JsonObject
 from vellum_ee.workflows.display.utils.dependencies import (
     extract_model_provider_dependencies,
     infer_model_hosting_interface,
@@ -38,7 +40,7 @@ class TestInferModelHostingInterface:
     )
     def test_infer_model_hosting_interface__known_models(
         self, model_name: str, expected_interface: str, expected_label: str
-    ):
+    ) -> None:
         """Tests that known model prefixes are correctly mapped to hosting interfaces."""
         # WHEN we infer the hosting interface for a known model
         result = infer_model_hosting_interface(model_name)
@@ -48,7 +50,7 @@ class TestInferModelHostingInterface:
         assert result[0] == expected_interface
         assert result[1] == expected_label
 
-    def test_infer_model_hosting_interface__unknown_model(self):
+    def test_infer_model_hosting_interface__unknown_model(self) -> None:
         """Tests that unknown models return None."""
         # WHEN we infer the hosting interface for an unknown model
         result = infer_model_hosting_interface("unknown-model-xyz")
@@ -56,7 +58,7 @@ class TestInferModelHostingInterface:
         # THEN we should get None
         assert result is None
 
-    def test_infer_model_hosting_interface__case_insensitive(self):
+    def test_infer_model_hosting_interface__case_insensitive(self) -> None:
         """Tests that model name matching is case-insensitive."""
         # WHEN we infer the hosting interface with different cases
         result_lower = infer_model_hosting_interface("gpt-4o")
@@ -70,89 +72,107 @@ class TestInferModelHostingInterface:
 class TestExtractModelProviderDependencies:
     """Tests for the extract_model_provider_dependencies function."""
 
-    def test_extract_model_provider_dependencies__single_prompt_node(self):
+    def test_extract_model_provider_dependencies__single_prompt_node(self) -> None:
         """Tests extraction from a single prompt node."""
         # GIVEN a list of serialized nodes with one prompt node
-        serialized_nodes = [
-            {
-                "id": "node-1",
-                "type": "PROMPT",
-                "data": {"ml_model_name": "gpt-4o"},
-            }
+        serialized_nodes: List[JsonObject] = [
+            cast(
+                JsonObject,
+                {
+                    "id": "node-1",
+                    "type": "PROMPT",
+                    "data": cast(JsonObject, {"ml_model_name": "gpt-4o"}),
+                },
+            )
         ]
 
         # WHEN we extract dependencies
         dependencies = extract_model_provider_dependencies(serialized_nodes)
 
         # THEN we should get one dependency
+        assert isinstance(dependencies, list)
         assert len(dependencies) == 1
-        assert dependencies[0] == {
+        dep = dependencies[0]
+        assert isinstance(dep, dict)
+        assert dep == {
             "type": "MODEL_PROVIDER",
             "name": "OPENAI",
             "label": "OpenAI",
             "model_name": "gpt-4o",
         }
 
-    def test_extract_model_provider_dependencies__multiple_prompt_nodes_same_model(self):
+    def test_extract_model_provider_dependencies__multiple_prompt_nodes_same_model(self) -> None:
         """Tests that duplicate models are deduplicated."""
         # GIVEN multiple prompt nodes with the same model
-        serialized_nodes = [
-            {"id": "node-1", "type": "PROMPT", "data": {"ml_model_name": "gpt-4o"}},
-            {"id": "node-2", "type": "PROMPT", "data": {"ml_model_name": "gpt-4o"}},
+        serialized_nodes: List[JsonObject] = [
+            cast(JsonObject, {"id": "node-1", "type": "PROMPT", "data": cast(JsonObject, {"ml_model_name": "gpt-4o"})}),
+            cast(JsonObject, {"id": "node-2", "type": "PROMPT", "data": cast(JsonObject, {"ml_model_name": "gpt-4o"})}),
         ]
 
         # WHEN we extract dependencies
         dependencies = extract_model_provider_dependencies(serialized_nodes)
 
         # THEN we should get only one dependency (deduplicated)
+        assert isinstance(dependencies, list)
         assert len(dependencies) == 1
 
-    def test_extract_model_provider_dependencies__multiple_different_models(self):
+    def test_extract_model_provider_dependencies__multiple_different_models(self) -> None:
         """Tests extraction from multiple prompt nodes with different models."""
         # GIVEN multiple prompt nodes with different models
-        serialized_nodes = [
-            {"id": "node-1", "type": "PROMPT", "data": {"ml_model_name": "gpt-4o"}},
-            {"id": "node-2", "type": "PROMPT", "data": {"ml_model_name": "claude-3-opus"}},
+        serialized_nodes: List[JsonObject] = [
+            cast(JsonObject, {"id": "node-1", "type": "PROMPT", "data": cast(JsonObject, {"ml_model_name": "gpt-4o"})}),
+            cast(
+                JsonObject,
+                {"id": "node-2", "type": "PROMPT", "data": cast(JsonObject, {"ml_model_name": "claude-3-opus"})},
+            ),
         ]
 
         # WHEN we extract dependencies
         dependencies = extract_model_provider_dependencies(serialized_nodes)
 
         # THEN we should get two dependencies
+        assert isinstance(dependencies, list)
         assert len(dependencies) == 2
-        model_names = {dep["model_name"] for dep in dependencies}
+        model_names = {cast(Dict[str, Any], dep)["model_name"] for dep in dependencies}
         assert model_names == {"gpt-4o", "claude-3-opus"}
 
-    def test_extract_model_provider_dependencies__non_prompt_nodes_ignored(self):
+    def test_extract_model_provider_dependencies__non_prompt_nodes_ignored(self) -> None:
         """Tests that non-prompt nodes are ignored."""
         # GIVEN a mix of node types
-        serialized_nodes = [
-            {"id": "node-1", "type": "ENTRYPOINT", "data": {}},
-            {"id": "node-2", "type": "PROMPT", "data": {"ml_model_name": "gpt-4o"}},
-            {"id": "node-3", "type": "TEMPLATING", "data": {}},
+        serialized_nodes: List[JsonObject] = [
+            cast(JsonObject, {"id": "node-1", "type": "ENTRYPOINT", "data": cast(JsonObject, {})}),
+            cast(JsonObject, {"id": "node-2", "type": "PROMPT", "data": cast(JsonObject, {"ml_model_name": "gpt-4o"})}),
+            cast(JsonObject, {"id": "node-3", "type": "TEMPLATING", "data": cast(JsonObject, {})}),
         ]
 
         # WHEN we extract dependencies
         dependencies = extract_model_provider_dependencies(serialized_nodes)
 
         # THEN we should only get the prompt node dependency
+        assert isinstance(dependencies, list)
         assert len(dependencies) == 1
-        assert dependencies[0]["model_name"] == "gpt-4o"
+        dep = dependencies[0]
+        assert isinstance(dep, dict)
+        assert dep["model_name"] == "gpt-4o"
 
-    def test_extract_model_provider_dependencies__unknown_model_skipped(self):
+    def test_extract_model_provider_dependencies__unknown_model_skipped(self) -> None:
         """Tests that unknown models are skipped."""
         # GIVEN a prompt node with an unknown model
-        serialized_nodes = [
-            {"id": "node-1", "type": "PROMPT", "data": {"ml_model_name": "unknown-model"}},
+        serialized_nodes: List[JsonObject] = [
+            cast(
+                JsonObject,
+                {"id": "node-1", "type": "PROMPT", "data": cast(JsonObject, {"ml_model_name": "unknown-model"})},
+            ),
         ]
 
         # WHEN we extract dependencies
         dependencies = extract_model_provider_dependencies(serialized_nodes)
 
         # THEN we should get no dependencies
+        assert isinstance(dependencies, list)
         assert len(dependencies) == 0
 
-    def test_extract_model_provider_dependencies__empty_list(self):
+    def test_extract_model_provider_dependencies__empty_list(self) -> None:
         """Tests extraction from an empty list."""
         # WHEN we extract dependencies from an empty list
         dependencies = extract_model_provider_dependencies([])
@@ -160,24 +180,25 @@ class TestExtractModelProviderDependencies:
         # THEN we should get an empty list
         assert dependencies == []
 
-    def test_extract_model_provider_dependencies__missing_ml_model_name(self):
+    def test_extract_model_provider_dependencies__missing_ml_model_name(self) -> None:
         """Tests that nodes without ml_model_name are skipped."""
         # GIVEN a prompt node without ml_model_name
-        serialized_nodes = [
-            {"id": "node-1", "type": "PROMPT", "data": {}},
+        serialized_nodes: List[JsonObject] = [
+            cast(JsonObject, {"id": "node-1", "type": "PROMPT", "data": cast(JsonObject, {})}),
         ]
 
         # WHEN we extract dependencies
         dependencies = extract_model_provider_dependencies(serialized_nodes)
 
         # THEN we should get no dependencies
+        assert isinstance(dependencies, list)
         assert len(dependencies) == 0
 
 
 class TestWorkflowSerializationWithDependencies:
     """Tests for workflow serialization including dependencies."""
 
-    def test_serialize_workflow__includes_dependencies(self):
+    def test_serialize_workflow__includes_dependencies(self) -> None:
         """Tests that workflow serialization includes dependencies from prompt nodes."""
 
         # GIVEN a workflow with an inline prompt node
@@ -207,15 +228,18 @@ class TestWorkflowSerializationWithDependencies:
         # THEN the serialized workflow should include dependencies
         assert "dependencies" in serialized
         dependencies = serialized["dependencies"]
+        assert isinstance(dependencies, list)
         assert len(dependencies) == 1
-        assert dependencies[0] == {
+        dep = dependencies[0]
+        assert isinstance(dep, dict)
+        assert dep == {
             "type": "MODEL_PROVIDER",
             "name": "OPENAI",
             "label": "OpenAI",
             "model_name": "gpt-4o",
         }
 
-    def test_serialize_workflow__multiple_prompt_nodes_different_models(self):
+    def test_serialize_workflow__multiple_prompt_nodes_different_models(self) -> None:
         """Tests that multiple prompt nodes with different models produce multiple dependencies."""
 
         # GIVEN a workflow with multiple prompt nodes using different models
@@ -255,18 +279,17 @@ class TestWorkflowSerializationWithDependencies:
         # THEN the serialized workflow should include both dependencies
         assert "dependencies" in serialized
         dependencies = serialized["dependencies"]
+        assert isinstance(dependencies, list)
         assert len(dependencies) == 2
-        model_names = {dep["model_name"] for dep in dependencies}
+        model_names = {cast(Dict[str, Any], dep)["model_name"] for dep in dependencies}
         assert model_names == {"gpt-4o", "claude-3-opus"}
 
-    def test_serialize_workflow__no_prompt_nodes_no_dependencies(self):
+    def test_serialize_workflow__no_prompt_nodes_no_dependencies(self) -> None:
         """Tests that workflows without prompt nodes don't include dependencies key."""
 
         # GIVEN a workflow without prompt nodes
         class TestInputs(BaseInputs):
             query: str
-
-        from vellum.workflows.nodes import TemplatingNode
 
         class TestTemplatingNode(TemplatingNode):
             template = "Hello {{query}}"
