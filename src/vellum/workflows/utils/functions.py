@@ -184,6 +184,37 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
         if args and args[0] is undefined:
             return {}
 
+    # Handle regular classes with __init__ methods by inspecting their constructor signature
+    if inspect.isclass(annotation) and hasattr(annotation, "__init__"):
+        try:
+            init_signature = inspect.signature(annotation.__init__)
+            init_params = list(init_signature.parameters.values())
+            # Skip 'self' parameter and *args/**kwargs
+            init_params = [
+                p
+                for p in init_params
+                if p.name != "self" and p.kind not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
+            ]
+
+            # Only process if there are typed parameters
+            if init_params and any(p.annotation is not inspect.Parameter.empty for p in init_params):
+                def_name = _get_def_name(annotation)
+                if def_name not in defs:
+                    properties = {}
+                    required = []
+                    for param in init_params:
+                        if param.annotation is not inspect.Parameter.empty:
+                            properties[param.name] = compile_annotation(param.annotation, defs)
+                            if param.default is inspect.Parameter.empty:
+                                required.append(param.name)
+                            else:
+                                properties[param.name]["default"] = _compile_default_value(param.default)
+                    defs[def_name] = {"type": "object", "properties": properties, "required": required}
+                return {"$ref": f"#/$defs/{def_name}"}
+        except (ValueError, TypeError):
+            # If we can't inspect the signature, fall through to the error
+            pass
+
     if annotation not in type_map:
         raise ValueError(f"Failed to compile type: {annotation}")
 
