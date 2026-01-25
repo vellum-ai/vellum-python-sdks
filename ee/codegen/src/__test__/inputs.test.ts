@@ -103,7 +103,6 @@ describe("Inputs", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
 
-
     it("should generate correct code for complex input variables", async () => {
       const inputVariables: VellumVariable[] = [
         { id: "1", key: "query", type: "STRING", required: true },
