@@ -189,8 +189,12 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
         try:
             init_signature = inspect.signature(annotation.__init__)
             init_params = list(init_signature.parameters.values())
-            # Skip 'self' parameter
-            init_params = [p for p in init_params if p.name != "self"]
+            # Skip 'self' parameter and *args/**kwargs
+            init_params = [
+                p
+                for p in init_params
+                if p.name != "self" and p.kind not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
+            ]
 
             # Only process if there are typed parameters
             if init_params and any(p.annotation is not inspect.Parameter.empty for p in init_params):
@@ -234,8 +238,12 @@ def _compile_default_value(default: Any) -> Any:
         try:
             init_signature = inspect.signature(default.__class__.__init__)
             init_params = list(init_signature.parameters.values())
-            # Skip 'self' parameter
-            init_params = [p for p in init_params if p.name != "self"]
+            # Skip 'self' parameter and *args/**kwargs
+            init_params = [
+                p
+                for p in init_params
+                if p.name != "self" and p.kind not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
+            ]
 
             # Only process if there are typed parameters
             if init_params and any(p.annotation is not inspect.Parameter.empty for p in init_params):
