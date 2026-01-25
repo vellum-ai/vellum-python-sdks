@@ -862,7 +862,10 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
 
     @classmethod
     def deserialize_trigger(
-        cls, trigger_id: Optional[Union[str, UUID]], inputs: dict
+        cls,
+        trigger_id: Optional[Union[str, UUID]],
+        inputs: dict,
+        dataset_row: Optional[Union[int, str, UUID]] = None,
     ) -> Union[InputsType, BaseTrigger]:
         """
         Deserialize a trigger from a trigger_id and inputs dict.
@@ -881,6 +884,9 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
 
         inputs: dict
             The inputs to pass to the trigger or Inputs constructor.
+
+        dataset_row: Optional[Union[int, str, UUID]]
+            Optional dataset row identifier to pass to the trigger.
 
         Returns
         -------
@@ -914,7 +920,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
                 # Match by UUID
                 if resolved_trigger_id is not None and trigger_class.__id__ == resolved_trigger_id:
                     try:
-                        return trigger_class(**inputs)
+                        return trigger_class(**inputs, dataset_row=dataset_row)
                     except Exception as e:
                         raise WorkflowInitializationException(
                             message=f"Failed to instantiate trigger {trigger_class.__name__}: {e}",
@@ -924,7 +930,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
                 # Match by name
                 if trigger_name is not None and trigger_class.__trigger_name__ == trigger_name:
                     try:
-                        return trigger_class(**inputs)
+                        return trigger_class(**inputs, dataset_row=dataset_row)
                     except Exception as e:
                         raise WorkflowInitializationException(
                             message=f"Failed to instantiate trigger {trigger_class.__name__}: {e}",
