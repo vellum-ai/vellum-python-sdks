@@ -169,8 +169,7 @@ class IntegrationTrigger(BaseTrigger, ABC, metaclass=IntegrationTriggerMeta):
         super().__init__(**kwargs)
 
         for key, value in kwargs.items():
-            if key != "dataset_row":
-                setattr(self, key, value)
+            setattr(self, key, value)
 
     def to_trigger_attribute_values(self) -> Dict["TriggerAttributeReference[Any]", Any]:
         """

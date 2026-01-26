@@ -917,14 +917,10 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         trigger_classes = []
         for subgraph in cls.get_subgraphs():
             for trigger_class in subgraph.triggers:
-                trigger_kwargs = {**inputs}
-                if dataset_row is not None:
-                    trigger_kwargs["dataset_row"] = dataset_row
-
                 # Match by UUID
                 if resolved_trigger_id is not None and trigger_class.__id__ == resolved_trigger_id:
                     try:
-                        return trigger_class(**trigger_kwargs)
+                        return trigger_class(**inputs)
                     except Exception as e:
                         raise WorkflowInitializationException(
                             message=f"Failed to instantiate trigger {trigger_class.__name__}: {e}",
@@ -934,7 +930,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
                 # Match by name
                 if trigger_name is not None and trigger_class.__trigger_name__ == trigger_name:
                     try:
-                        return trigger_class(**trigger_kwargs)
+                        return trigger_class(**inputs)
                     except Exception as e:
                         raise WorkflowInitializationException(
                             message=f"Failed to instantiate trigger {trigger_class.__name__}: {e}",

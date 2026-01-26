@@ -434,34 +434,3 @@ def test_deserialize_trigger__raises_error_when_trigger_name_not_found():
 
     # AND the error message should list available trigger names
     assert "Available trigger names" in str(exc_info.value)
-
-
-@pytest.mark.parametrize(
-    "dataset_row",
-    [
-        pytest.param(123, id="int"),
-        pytest.param("row-abc", id="str"),
-        pytest.param(uuid4(), id="uuid"),
-        pytest.param(None, id="none"),
-    ],
-)
-def test_deserialize_trigger__passes_dataset_row_to_trigger(dataset_row):
-    """
-    Tests that deserialize_trigger passes the dataset_row parameter to the trigger constructor.
-    """
-
-    # GIVEN a workflow with a Slack trigger
-    trigger_id = TestSlackTrigger.__id__
-
-    # WHEN we call deserialize_trigger with a dataset_row parameter
-    result = WorkflowWithSlackTrigger.deserialize_trigger(
-        trigger_id=trigger_id,
-        inputs={"message": "Hello", "channel": "#general"},
-        dataset_row=dataset_row,
-    )
-
-    # THEN it should return the correct trigger instance
-    assert isinstance(result, TestSlackTrigger)
-
-    # AND the trigger should have the dataset_row attribute set
-    assert result.dataset_row == dataset_row
