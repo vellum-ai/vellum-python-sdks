@@ -129,17 +129,10 @@ def _compute_diff(
             "tool_calling_node_with_workflow_context",
             frozenset(
                 {
-                    "__init__.py",
+                    # These __init__.py files are needed for Python imports but codegen doesn't generate them
+                    "display/__init__.py",
                     "display/nodes/__init__.py",
-                    "display/nodes/context_aware_tool_node.py",
-                    "display/nodes/workflow/__init__.py",
-                    "display/workflow.py",
-                    "inputs.py",
                     "nodes/__init__.py",
-                    "nodes/context_aware_tool_node/__init__.py",
-                    "nodes/workflow/__init__.py",
-                    "nodes/workflow/process_with_context.py",
-                    "workflow.py",
                 }
             ),
         ),
