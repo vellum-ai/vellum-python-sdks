@@ -24,9 +24,9 @@ class OptionalTrigger(BaseTrigger):
 
 
 class ChatTrigger(ChatMessageTrigger):
-    """A chat trigger for testing trigger attribute expressions."""
+    """A chat trigger for testing trigger attribute expressions with string message."""
 
-    pass
+    message: str  # type: ignore[assignment]
 
 
 class ChatSearchNode(BaseNode):
