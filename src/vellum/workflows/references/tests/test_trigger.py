@@ -3,10 +3,12 @@ from typing import Optional
 
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.exceptions import NodeException
+from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.state.base import BaseState, StateMeta
 from vellum.workflows.triggers.base import BaseTrigger
+from vellum.workflows.triggers.chat_message import ChatMessageTrigger
 
 
 class TestTrigger(BaseTrigger):
@@ -21,10 +23,16 @@ class OptionalTrigger(BaseTrigger):
     optional_message: Optional[str]
 
 
-class SearchNode(BaseNode):
-    """Node that uses trigger attribute in an expression."""
+class ChatTrigger(ChatMessageTrigger):
+    """A chat trigger for testing trigger attribute expressions."""
 
-    query = TestTrigger.message + " additional search terms"
+    pass
+
+
+class ChatSearchNode(BaseNode):
+    """Node that uses chat trigger message attribute in an expression."""
+
+    query = ChatTrigger.message + " home trade-in value market data"
 
     class Outputs(BaseNode.Outputs):
         result: str
@@ -33,13 +41,19 @@ class SearchNode(BaseNode):
         return self.Outputs(result=f"Searched for: {self.query}")
 
 
-class TriggerExpressionWorkflow(BaseWorkflow):
-    """Workflow with a node that uses trigger attribute in an expression."""
+class ChatInputs(BaseInputs):
+    """Inputs for the chat workflow."""
 
-    graph = TestTrigger >> SearchNode
+    message: str
+
+
+class ChatTriggerExpressionWorkflow(BaseWorkflow[ChatInputs, BaseState]):
+    """Workflow with a node that uses chat trigger attribute in an expression."""
+
+    graph = ChatTrigger >> ChatSearchNode
 
     class Outputs(BaseWorkflow.Outputs):
-        result = SearchNode.Outputs.result
+        result = ChatSearchNode.Outputs.result
 
 
 def test_trigger_attribute_reference__resolve_with_none_trigger_attributes():
@@ -86,26 +100,29 @@ def test_trigger_attribute_reference__resolve_with_none_trigger_attributes_optio
     assert result is None
 
 
-def test_workflow_with_trigger_attribute_in_expression():
+def test_workflow_with_chat_trigger_attribute_in_expression():
     """
-    Tests that a workflow with a node using trigger attribute in an expression executes successfully.
+    Tests that a workflow with a node using ChatMessageTrigger attribute in an expression
+    gives a proper error message instead of TypeError when trigger_attributes is None.
 
     This reproduces a production bug where a node like:
         class SearchMarketData(WebSearchNode[State]):
             query = Chat.message + " home trade-in value market data"
-    would fail with TypeError when initializing because trigger_attributes was None.
+    would fail with TypeError when initializing because trigger_attributes was None
+    when the workflow was run with inputs= instead of trigger=.
+
+    After the fix, we get a proper error message instead of TypeError.
     """
-    # GIVEN a workflow with a node that uses trigger attribute in an AddExpression
-    workflow = TriggerExpressionWorkflow()
+    # GIVEN a workflow with a node that uses chat trigger attribute in an AddExpression
+    workflow = ChatTriggerExpressionWorkflow()
 
-    # AND a trigger instance with the message attribute
-    trigger = TestTrigger(message="test query")
+    # WHEN we run the workflow with inputs (which previously caused TypeError)
+    result = workflow.run(inputs=ChatInputs(message="test query"))
 
-    # WHEN we run the workflow with the trigger
-    result = workflow.run(trigger=trigger)
+    # THEN the workflow should be rejected with a proper error message (not TypeError)
+    assert result.name == "workflow.execution.rejected"
 
-    # THEN it should execute successfully
-    assert result.name == "workflow.execution.fulfilled"
-
-    # AND the node should have concatenated the trigger attribute with the suffix
-    assert result.outputs.result == "Searched for: test query additional search terms"
+    # AND the error message should be helpful (not "argument of type 'NoneType' is not iterable")
+    assert "Missing trigger attribute" in result.error.message
+    assert "message" in result.error.message
+    assert "ChatTrigger" in result.error.message
