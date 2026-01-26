@@ -16,6 +16,7 @@ from typing import (
     get_args,
     get_origin,
 )
+from typing_extensions import TypeGuard
 
 from pydantic import BaseModel
 from pydantic_core import PydanticUndefined
@@ -39,6 +40,7 @@ from vellum.workflows.types.definition import (
 from vellum.workflows.utils.vellum_variables import vellum_variable_type_to_openapi_type
 
 if TYPE_CHECKING:
+    from vellum.workflows.state.context import WorkflowContext
     from vellum.workflows.workflows.base import BaseWorkflow
 
 type_map: dict[Any, str] = {
@@ -61,6 +63,27 @@ for k, v in list(type_map.items()):
 
 def _get_def_name(annotation: Type) -> str:
     return f"{annotation.__module__}.{annotation.__qualname__}"
+
+
+def is_workflow_context_type(annotation: Any) -> TypeGuard["WorkflowContext"]:
+    """Check if the annotation is a WorkflowContext type.
+
+    We check by module and class name to avoid circular imports.
+    """
+    if annotation is None:
+        return False
+
+    # Handle Annotated types by extracting the actual type
+    if get_origin(annotation) is Annotated:
+        args = get_args(annotation)
+        if args:
+            annotation = args[0]
+
+    # Check by module and class name to avoid circular imports
+    if hasattr(annotation, "__module__") and hasattr(annotation, "__name__"):
+        return annotation.__module__ == "vellum.workflows.state.context" and annotation.__name__ == "WorkflowContext"
+
+    return False
 
 
 recorded_unions = {
@@ -273,6 +296,10 @@ def compile_function_definition(function: Callable) -> FunctionDefinition:
     for param in signature.parameters.values():
         # Skip parameters that are in the exclude_params set
         if exclude_params and param.name in exclude_params:
+            continue
+
+        # Skip WorkflowContext parameters - they are provided by the runtime, not the LLM
+        if is_workflow_context_type(param.annotation):
             continue
 
         # Check if parameter uses Annotated type hint
