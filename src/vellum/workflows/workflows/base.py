@@ -903,7 +903,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
 
         try:
             sandbox_module = importlib.import_module(sandbox_module_path)
-        except ModuleNotFoundError as e:
+        except Exception as e:
             raise WorkflowInitializationException(
                 message=f"Could not load sandbox module '{sandbox_module_path}': {e}",
                 workflow_definition=cls,

@@ -530,3 +530,17 @@ def test_deserialize_trigger__raises_error_when_dataset_row_uuid_not_found():
 
     # AND the error message should mention the UUID was not found
     assert "No dataset row found with id" in str(exc_info.value)
+
+
+def test_deserialize_trigger__resolves_dataset_row_by_default_label():
+    """
+    Tests that deserialize_trigger resolves dataset_row by default label for BaseInputs rows.
+    """
+
+    # GIVEN a workflow with a sandbox.py containing a dataset with a BaseInputs row (not DatasetRow)
+    # WHEN we call deserialize_trigger with the default label "Scenario 4"
+    result = TestDatasetRowResolutionWorkflow.deserialize_trigger(trigger_id=None, inputs={}, dataset_row="Scenario 4")
+
+    # THEN it should return the Inputs class with values from the BaseInputs row
+    assert isinstance(result, DatasetRowInputs)
+    assert result.message == "BaseInputs Row"
