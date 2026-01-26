@@ -425,13 +425,5 @@
       "type": "STRING"
     }
   ],
-  "runner_config": {},
-  "dependencies": [
-    {
-      "type": "MODEL_PROVIDER",
-      "name": "OPENAI",
-      "label": "OpenAI",
-      "model_name": "gpt-4o-mini"
-    }
-  ]
+  "runner_config": {}
 }
