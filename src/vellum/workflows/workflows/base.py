@@ -1018,28 +1018,27 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             If trigger_id is provided but no matching trigger class is found in the workflow,
             or if dataset_row is provided but cannot be resolved.
         """
-        # Resolve dataset row if provided and early return
+        # Resolve dataset row if provided
+        resolved_inputs = inputs
         if dataset_row is not None:
             resolved_row = cls._resolve_dataset_row(dataset_row)
 
-            # If the dataset row has a workflow_trigger, return it
+            # If the dataset row has a workflow_trigger, return it immediately
             if resolved_row.workflow_trigger is not None:
                 return resolved_row.workflow_trigger
 
-            # Otherwise, return the inputs class with the resolved row's inputs
-            inputs_class = cls.get_inputs_class()
+            # Otherwise, use the resolved row's inputs for trigger/inputs instantiation
             if isinstance(resolved_row.inputs, dict):
-                return inputs_class(**resolved_row.inputs)
+                resolved_inputs = resolved_row.inputs
             else:
                 # Convert BaseInputs to dict
                 resolved_inputs = {
                     desc.name: value for desc, value in resolved_row.inputs if not desc.name.startswith("__")
                 }
-                return inputs_class(**resolved_inputs)
 
         if trigger_id is None:
             inputs_class = cls.get_inputs_class()
-            return inputs_class(**inputs)
+            return inputs_class(**resolved_inputs)
 
         # Determine if trigger_id is a UUID or a name string
         resolved_trigger_id: Optional[UUID] = None
@@ -1058,7 +1057,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
                 # Match by UUID
                 if resolved_trigger_id is not None and trigger_class.__id__ == resolved_trigger_id:
                     try:
-                        return trigger_class(**inputs)
+                        return trigger_class(**resolved_inputs)
                     except Exception as e:
                         raise WorkflowInitializationException(
                             message=f"Failed to instantiate trigger {trigger_class.__name__}: {e}",
@@ -1068,7 +1067,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
                 # Match by name
                 if trigger_name is not None and trigger_class.__trigger_name__ == trigger_name:
                     try:
-                        return trigger_class(**inputs)
+                        return trigger_class(**resolved_inputs)
                     except Exception as e:
                         raise WorkflowInitializationException(
                             message=f"Failed to instantiate trigger {trigger_class.__name__}: {e}",
