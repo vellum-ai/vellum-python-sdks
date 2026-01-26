@@ -80,6 +80,7 @@ def _compute_diff(
                     "display/nodes/raw_code.py",
                     "display/nodes/the_end.py",
                     "display/workflow.py",
+                    "inputs.py",
                     "nodes/raw_code/__init__.py",
                     "nodes/the_end.py",
                 }
@@ -112,6 +113,7 @@ def _compute_diff(
                     "__init__.py",
                     "display/nodes/start.py",
                     "display/workflow.py",
+                    "inputs.py",
                 }
             ),
         ),

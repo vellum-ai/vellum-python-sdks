@@ -17,7 +17,7 @@ export declare namespace Inputs {
 
 export class Inputs extends BasePersistedFile {
   public readonly baseInputsClassReference: Reference;
-  public readonly inputsClass: Class | undefined;
+  public readonly inputsClass: Class;
 
   constructor({ name, workflowContext }: Inputs.Args) {
     super({ workflowContext: workflowContext });
@@ -36,17 +36,10 @@ export class Inputs extends BasePersistedFile {
   }
 
   public getFileStatements() {
-    if (!this.inputsClass) {
-      return;
-    }
     return [this.inputsClass];
   }
 
-  private generateInputsClass({
-    name,
-  }: {
-    name: string | undefined;
-  }): Class | undefined {
+  private generateInputsClass({ name }: { name: string | undefined }): Class {
     const inputVariableContextsById =
       this.workflowContext.inputVariableContextsById;
 
@@ -59,10 +52,6 @@ export class Inputs extends BasePersistedFile {
         );
       })
     );
-
-    if (inputVariables.length === 0) {
-      return;
-    }
 
     const inputsClassName = name ?? "Inputs";
     const inputsClass = new Class({
@@ -95,9 +84,6 @@ export class Inputs extends BasePersistedFile {
   }
 
   public async persist(): Promise<void> {
-    if (!this.inputsClass) {
-      return;
-    }
     await super.persist();
   }
 }
