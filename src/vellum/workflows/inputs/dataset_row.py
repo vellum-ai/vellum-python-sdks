@@ -1,5 +1,4 @@
 from datetime import datetime
-from uuid import UUID
 import warnings
 from typing import Any, Callable, Dict, List, Optional, Sequence, Union
 
@@ -185,52 +184,3 @@ class DatasetRow(UniversalBaseModel):
             result.append(mock_exec.model_dump(context=info.context))
 
         return result
-
-
-def resolve_dataset_row(
-    dataset: Sequence[Union[BaseInputs, "DatasetRow"]],
-    selector: Union[int, str, UUID],
-) -> "DatasetRow":
-    """
-    Resolve a dataset row selector to an actual DatasetRow from the dataset.
-
-    The selector can be:
-    - int: Index into the dataset array
-    - str: Match against the dataset row's label
-    - UUID: Match against the dataset row's id
-
-    Args:
-        dataset: Sequence of BaseInputs or DatasetRow objects
-        selector: The selector to resolve (int index, string label, or UUID id)
-
-    Returns:
-        The resolved DatasetRow
-
-    Raises:
-        ValueError: If the selector doesn't match any dataset row
-        IndexError: If the int selector is out of bounds
-    """
-    if isinstance(selector, int):
-        if selector < 0 or selector >= len(dataset):
-            raise IndexError(f"Dataset row index {selector} is out of bounds (dataset has {len(dataset)} rows)")
-        row = dataset[selector]
-        if isinstance(row, DatasetRow):
-            return row
-        return DatasetRow(label=f"Scenario {selector + 1}", inputs=row)
-
-    selector_str = str(selector) if isinstance(selector, UUID) else selector
-
-    for i, row in enumerate(dataset):
-        if isinstance(row, DatasetRow):
-            if isinstance(selector, UUID) and row.id == selector_str:
-                return row
-            if isinstance(selector, str) and row.label == selector:
-                return row
-        elif isinstance(row, BaseInputs):
-            default_label = f"Scenario {i + 1}"
-            if isinstance(selector, str) and default_label == selector:
-                return DatasetRow(label=default_label, inputs=row)
-
-    if isinstance(selector, UUID):
-        raise ValueError(f"No dataset row found with id '{selector_str}'")
-    raise ValueError(f"No dataset row found with label '{selector}'")

@@ -1,5 +1,5 @@
 import pytest
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.errors.types import WorkflowErrorCode
@@ -13,6 +13,8 @@ from vellum.workflows.state.base import BaseState
 from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.triggers.manual import ManualTrigger
 from vellum.workflows.workflows.base import BaseWorkflow
+
+from tests.workflows.test_dataset_row_resolution.workflow import TestDatasetRowResolutionWorkflow
 
 
 class FailingResolver(BaseWorkflowResolver):
@@ -434,3 +436,91 @@ def test_deserialize_trigger__raises_error_when_trigger_name_not_found():
 
     # AND the error message should list available trigger names
     assert "Available trigger names" in str(exc_info.value)
+
+
+def test_deserialize_trigger__resolves_dataset_row_by_int_index():
+    """
+    Tests that deserialize_trigger resolves dataset_row by int index from sandbox.py.
+    """
+
+    # GIVEN a workflow with a sandbox.py containing a dataset
+    # WHEN we call deserialize_trigger with an int dataset_row selector
+    result = TestDatasetRowResolutionWorkflow.deserialize_trigger(trigger_id=None, inputs={}, dataset_row=0)
+
+    # THEN it should return the Inputs class with values from the first dataset row
+    assert result.message == "Hello"
+
+
+def test_deserialize_trigger__resolves_dataset_row_by_string_label():
+    """
+    Tests that deserialize_trigger resolves dataset_row by string label from sandbox.py.
+    """
+
+    # GIVEN a workflow with a sandbox.py containing a dataset
+    # WHEN we call deserialize_trigger with a string dataset_row selector
+    result = TestDatasetRowResolutionWorkflow.deserialize_trigger(trigger_id=None, inputs={}, dataset_row="Second Row")
+
+    # THEN it should return the Inputs class with values from the matching dataset row
+    assert result.message == "World"
+
+
+def test_deserialize_trigger__resolves_dataset_row_by_uuid():
+    """
+    Tests that deserialize_trigger resolves dataset_row by UUID from sandbox.py.
+    """
+
+    # GIVEN a workflow with a sandbox.py containing a dataset
+    row_uuid = UUID("12345678-1234-5678-1234-567812345678")
+
+    # WHEN we call deserialize_trigger with a UUID dataset_row selector
+    result = TestDatasetRowResolutionWorkflow.deserialize_trigger(trigger_id=None, inputs={}, dataset_row=row_uuid)
+
+    # THEN it should return the Inputs class with values from the matching dataset row
+    assert result.message == "UUID Test"
+
+
+def test_deserialize_trigger__raises_error_when_dataset_row_index_out_of_bounds():
+    """
+    Tests that deserialize_trigger raises WorkflowInitializationException when dataset_row index is out of bounds.
+    """
+
+    # GIVEN a workflow with a sandbox.py containing a dataset
+    # WHEN we call deserialize_trigger with an out-of-bounds index
+    # THEN it should raise WorkflowInitializationException
+    with pytest.raises(WorkflowInitializationException) as exc_info:
+        TestDatasetRowResolutionWorkflow.deserialize_trigger(trigger_id=None, inputs={}, dataset_row=100)
+
+    # AND the error message should mention the index is out of bounds
+    assert "out of bounds" in str(exc_info.value)
+
+
+def test_deserialize_trigger__raises_error_when_dataset_row_label_not_found():
+    """
+    Tests that deserialize_trigger raises WorkflowInitializationException when dataset_row label is not found.
+    """
+
+    # GIVEN a workflow with a sandbox.py containing a dataset
+    # WHEN we call deserialize_trigger with a non-existent label
+    # THEN it should raise WorkflowInitializationException
+    with pytest.raises(WorkflowInitializationException) as exc_info:
+        TestDatasetRowResolutionWorkflow.deserialize_trigger(trigger_id=None, inputs={}, dataset_row="Non-existent Row")
+
+    # AND the error message should mention the label was not found
+    assert "No dataset row found with label" in str(exc_info.value)
+
+
+def test_deserialize_trigger__raises_error_when_dataset_row_uuid_not_found():
+    """
+    Tests that deserialize_trigger raises WorkflowInitializationException when dataset_row UUID is not found.
+    """
+
+    # GIVEN a workflow with a sandbox.py containing a dataset
+    non_existent_uuid = UUID("99999999-9999-9999-9999-999999999999")
+
+    # WHEN we call deserialize_trigger with a non-existent UUID
+    # THEN it should raise WorkflowInitializationException
+    with pytest.raises(WorkflowInitializationException) as exc_info:
+        TestDatasetRowResolutionWorkflow.deserialize_trigger(trigger_id=None, inputs={}, dataset_row=non_existent_uuid)
+
+    # AND the error message should mention the UUID was not found
+    assert "No dataset row found with id" in str(exc_info.value)
