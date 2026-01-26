@@ -886,7 +886,9 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
             The inputs to pass to the trigger or Inputs constructor.
 
         dataset_row: Optional[Union[int, str, UUID]]
-            Optional dataset row identifier to pass to the trigger.
+            Optional dataset row selector. Can be an int (index), str (label), or UUID (id).
+            This parameter is accepted for API compatibility but resolution is handled
+            by the caller using resolve_dataset_row() with the actual dataset.
 
         Returns
         -------
