@@ -15,8 +15,8 @@ from .workflow_execution_usage_result import WorkflowExecutionUsageResult
 
 class WorkflowExecutionDetail(UniversalBaseModel):
     span_id: str
-    parent_context: typing.Optional["ParentContext"] = None
-    start: dt.datetime
+    parent_context: typing.Optional[ParentContext] = None
+    start: typing.Optional[dt.datetime] = None
     end: typing.Optional[dt.datetime] = None
     inputs: typing.List[ExecutionVellumValue]
     outputs: typing.List[ExecutionVellumValue]
