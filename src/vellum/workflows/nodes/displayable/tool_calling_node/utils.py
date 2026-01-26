@@ -115,6 +115,10 @@ class ToolPromptNode(InlinePromptNode[ToolCallingState]):
             self.state.current_prompt_output_index = 0
             self.state.current_function_calls_processed = 0
             self.state.prompt_iterations += 1
+
+        chat_message_metadata: Optional[Dict[str, Any]] = None
+        pending_chat_message: Optional[ChatMessage] = None
+
         for output in generator:
             if output.name == InlinePromptNode.Outputs.results.name and output.value:
                 prompt_outputs = cast(List[PromptOutput], output.value)
@@ -134,15 +138,29 @@ class ToolPromptNode(InlinePromptNode[ToolCallingState]):
 
                 if len(chat_contents) == 1:
                     if chat_contents[0].type == "STRING":
-                        self.state.chat_history.append(ChatMessage(role="ASSISTANT", text=chat_contents[0].value))
+                        pending_chat_message = ChatMessage(role="ASSISTANT", text=chat_contents[0].value)
                     else:
-                        self.state.chat_history.append(ChatMessage(role="ASSISTANT", content=chat_contents[0]))
+                        pending_chat_message = ChatMessage(role="ASSISTANT", content=chat_contents[0])
                 else:
-                    self.state.chat_history.append(
-                        ChatMessage(role="ASSISTANT", content=ArrayChatMessageContent(value=chat_contents))
+                    pending_chat_message = ChatMessage(
+                        role="ASSISTANT", content=ArrayChatMessageContent(value=chat_contents)
                     )
 
+            elif output.name == "chat_message_metadata" and output.value:
+                chat_message_metadata = cast(Dict[str, Any], output.value)
+
             yield output
+
+        if pending_chat_message is not None:
+            if chat_message_metadata is not None:
+                pending_chat_message = ChatMessage(
+                    role=pending_chat_message.role,
+                    text=pending_chat_message.text,
+                    content=pending_chat_message.content,
+                    source=pending_chat_message.source,
+                    metadata=chat_message_metadata,
+                )
+            self.state.chat_history.append(pending_chat_message)
 
 
 class RouterNode(BaseNode[ToolCallingState]):

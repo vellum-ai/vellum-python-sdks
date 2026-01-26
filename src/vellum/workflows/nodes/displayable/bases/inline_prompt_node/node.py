@@ -360,6 +360,10 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
 
                 outputs = event.outputs
                 yield BaseOutput(name="results", value=event.outputs)
+
+                event_metadata = getattr(event, "metadata", None)
+                if event_metadata is not None:
+                    yield BaseOutput(name="chat_message_metadata", value=event_metadata)
             elif event.state == "REJECTED":
                 workflow_error = vellum_error_to_workflow_error(event.error)
                 raise NodeException.of(workflow_error)
