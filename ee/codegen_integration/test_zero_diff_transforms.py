@@ -133,6 +133,8 @@ def _compute_diff(
                     "display/__init__.py",
                     "display/nodes/__init__.py",
                     "nodes/__init__.py",
+                    # Import order differs from isort expectations due to codegen placing local imports first
+                    "nodes/workflow/__init__.py",
                 }
             ),
         ),
