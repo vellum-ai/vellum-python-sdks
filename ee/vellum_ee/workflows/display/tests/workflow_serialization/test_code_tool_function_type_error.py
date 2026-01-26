@@ -1,4 +1,4 @@
-import pytest
+from unittest import mock
 from unittest.mock import ANY, patch
 from typing import Any, Dict, List, cast
 
@@ -95,10 +95,10 @@ def test_serialize_workflow__code_tool_with_simple_class_type__serializes_succes
     assert expected == functions_value
 
 
-@pytest.mark.xfail(reason="Support for WorkflowContext type will be added in a future PR")
 def test_serialize_workflow__code_tool_with_workflow_context_type__serializes_successfully():
     """
     Tests that a code tool with a WorkflowContext parameter serializes successfully.
+    The WorkflowContext parameter should be excluded from the function schema.
     """
 
     # GIVEN a function with a WorkflowContext parameter
@@ -126,6 +126,44 @@ def test_serialize_workflow__code_tool_with_workflow_context_type__serializes_su
 
     errors = list(workflow_display.display_context.errors)
     assert len(errors) == 0
+
+    # AND the functions attribute should contain the function definition with WorkflowContext excluded
+    workflow_raw_data = cast(Dict[str, Any], serialized["workflow_raw_data"])
+    nodes = cast(List[Dict[str, Any]], workflow_raw_data["nodes"])
+    tool_calling_node = next(
+        node for node in nodes if (node.get("definition") or {}).get("name") == "MyToolCallingNode"
+    )
+    functions_attribute = next(attr for attr in tool_calling_node["attributes"] if attr["name"] == "functions")
+    functions_value = functions_attribute["value"]["value"]["value"]
+
+    # AND the full functions_value should match the expected structure
+    # Note: 'src' field is dynamic (contains the source file content), so we use mock.ANY
+    assert functions_value == [
+        {
+            "type": "CODE_EXECUTION",
+            "name": "my_tool_with_context",
+            "description": "",
+            "definition": {
+                "state": None,
+                "cache_config": None,
+                "name": "my_tool_with_context",
+                "description": None,
+                "parameters": {
+                    "type": "object",
+                    "properties": {"query": {"type": "string"}},
+                    "required": ["query"],
+                },
+                "inputs": None,
+                "forced": None,
+                "strict": None,
+            },
+            "src": mock.ANY,
+        }
+    ]
+
+    # AND specifically verify the WorkflowContext parameter 'ctx' is NOT in the parameters
+    definition = functions_value[0]["definition"]
+    assert "ctx" not in definition["parameters"]["properties"]
 
 
 def test_serialize_workflow__compile_function_definition_raises_value_error__error_in_display_context():

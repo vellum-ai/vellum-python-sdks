@@ -1,3 +1,4 @@
+import inspect
 import json
 import logging
 from typing import Any, Callable, Dict, Iterator, List, Optional, Type, Union, cast
@@ -40,7 +41,7 @@ from vellum.workflows.types.definition import (
     VellumIntegrationToolDefinition,
 )
 from vellum.workflows.types.generics import is_workflow_class
-from vellum.workflows.utils.functions import get_mcp_tool_name
+from vellum.workflows.utils.functions import get_mcp_tool_name, is_workflow_context_type
 
 CHAT_HISTORY_VARIABLE = "chat_history"
 
@@ -570,6 +571,15 @@ def create_function_node(
                         else:
                             resolved_value = param_ref
                         merged_kwargs[param_name] = resolved_value
+
+                # Pass WorkflowContext to parameters that expect it
+                try:
+                    sig = inspect.signature(func)
+                    for param in sig.parameters.values():
+                        if is_workflow_context_type(param.annotation):
+                            merged_kwargs[param.name] = self._context
+                except (ValueError, TypeError):
+                    pass
 
                 return func(**merged_kwargs)
 
