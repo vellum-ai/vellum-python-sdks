@@ -14,7 +14,10 @@ from vellum.workflows.triggers.integration import IntegrationTrigger
 from vellum.workflows.triggers.manual import ManualTrigger
 from vellum.workflows.workflows.base import BaseWorkflow
 
-from tests.workflows.test_dataset_row_resolution.workflow import TestDatasetRowResolutionWorkflow
+from tests.workflows.test_dataset_row_resolution.workflow import (
+    Inputs as DatasetRowInputs,
+    TestDatasetRowResolutionWorkflow,
+)
 
 
 class FailingResolver(BaseWorkflowResolver):
@@ -448,6 +451,7 @@ def test_deserialize_trigger__resolves_dataset_row_by_int_index():
     result = TestDatasetRowResolutionWorkflow.deserialize_trigger(trigger_id=None, inputs={}, dataset_row=0)
 
     # THEN it should return the Inputs class with values from the first dataset row
+    assert isinstance(result, DatasetRowInputs)
     assert result.message == "Hello"
 
 
@@ -461,6 +465,7 @@ def test_deserialize_trigger__resolves_dataset_row_by_string_label():
     result = TestDatasetRowResolutionWorkflow.deserialize_trigger(trigger_id=None, inputs={}, dataset_row="Second Row")
 
     # THEN it should return the Inputs class with values from the matching dataset row
+    assert isinstance(result, DatasetRowInputs)
     assert result.message == "World"
 
 
@@ -476,6 +481,7 @@ def test_deserialize_trigger__resolves_dataset_row_by_uuid():
     result = TestDatasetRowResolutionWorkflow.deserialize_trigger(trigger_id=None, inputs={}, dataset_row=row_uuid)
 
     # THEN it should return the Inputs class with values from the matching dataset row
+    assert isinstance(result, DatasetRowInputs)
     assert result.message == "UUID Test"
 
 
