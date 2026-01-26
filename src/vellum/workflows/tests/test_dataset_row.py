@@ -327,4 +327,5 @@ def test_resolve_dataset_row__base_inputs_converted_to_dataset_row():
     # THEN it should return a DatasetRow with a default label
     assert isinstance(result, DatasetRow)
     assert result.label == "Scenario 1"
+    assert isinstance(result.inputs, TestInputs)
     assert result.inputs.message == "Hello"
