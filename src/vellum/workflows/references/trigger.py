@@ -49,7 +49,7 @@ class TriggerAttributeReference(BaseDescriptor[_T], Generic[_T]):
         return self._trigger_class.get_attribute_id(self.name)
 
     def resolve(self, state: BaseState) -> _T:
-        trigger_attributes = getattr(state.meta, "trigger_attributes", None) or {}
+        trigger_attributes = state.meta.trigger_attributes or {}
         if self in trigger_attributes:
             return cast(_T, trigger_attributes[self])
 
