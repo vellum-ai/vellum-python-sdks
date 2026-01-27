@@ -168,9 +168,6 @@ class IntegrationTrigger(BaseTrigger, ABC, metaclass=IntegrationTriggerMeta):
         """
         super().__init__(**kwargs)
 
-        # Dynamically populate instance attributes from kwargs.
-        # This allows any key in kwargs to become an accessible attribute:
-        # kwargs={"message": "Hi"} → trigger.message == "Hi"
         for key, value in kwargs.items():
             setattr(self, key, value)
 

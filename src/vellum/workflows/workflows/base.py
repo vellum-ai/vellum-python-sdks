@@ -8,6 +8,7 @@ import sys
 import traceback
 from uuid import UUID, uuid4
 from typing import (
+    TYPE_CHECKING,
     Any,
     Callable,
     ClassVar,
@@ -28,6 +29,9 @@ from typing import (
     get_args,
     overload,
 )
+
+if TYPE_CHECKING:
+    from vellum.workflows.inputs.dataset_row import DatasetRow
 
 from pydantic import ValidationError
 
@@ -861,14 +865,129 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         return state_class(**state)
 
     @classmethod
+    def _resolve_dataset_row(
+        cls,
+        dataset_row: Union[int, str, UUID],
+    ) -> "DatasetRow":
+        """
+        Resolve a dataset row selector by loading the sandbox module and finding the matching row.
+
+        Parameters
+        ----------
+        dataset_row: Union[int, str, UUID]
+            The dataset row selector. Can be an int (index), str (label), or UUID (id).
+
+        Returns
+        -------
+        DatasetRow
+            The resolved dataset row.
+
+        Raises
+        ------
+        WorkflowInitializationException
+            If the sandbox module cannot be loaded, dataset is not found, or selector doesn't match.
+        """
+        # Import here to avoid circular imports
+        from vellum.workflows.inputs.dataset_row import DatasetRow
+
+        # Derive sandbox module path from workflow class module
+        # cls.__module__ is like "tests.workflows.test_dataset_row_resolution.workflow"
+        # We need "tests.workflows.test_dataset_row_resolution.sandbox"
+        workflow_module = cls.__module__
+        if workflow_module.endswith(".workflow"):
+            sandbox_module_path = workflow_module[:-9] + ".sandbox"  # Replace ".workflow" with ".sandbox"
+        else:
+            # Fallback: assume sandbox is a sibling module
+            parts = workflow_module.rsplit(".", 1)
+            sandbox_module_path = parts[0] + ".sandbox" if len(parts) > 1 else "sandbox"
+
+        try:
+            sandbox_module = importlib.import_module(sandbox_module_path)
+        except Exception as e:
+            raise WorkflowInitializationException(
+                message=f"Could not load sandbox module '{sandbox_module_path}': {e}",
+                workflow_definition=cls,
+            ) from e
+
+        dataset = getattr(sandbox_module, "dataset", None)
+        if dataset is None:
+            raise WorkflowInitializationException(
+                message=f"Sandbox module '{sandbox_module_path}' does not have a 'dataset' variable",
+                workflow_definition=cls,
+            )
+
+        # Validate that dataset is a list
+        if not isinstance(dataset, list):
+            raise WorkflowInitializationException(
+                message=f"Sandbox module '{sandbox_module_path}' dataset must be a list, got {type(dataset).__name__}",
+                workflow_definition=cls,
+            )
+
+        # Get the workflow's inputs class for validation
+        inputs_class = cls.get_inputs_class()
+
+        # Resolve the dataset row
+        if isinstance(dataset_row, int):
+            if dataset_row < 0 or dataset_row >= len(dataset):
+                raise WorkflowInitializationException(
+                    message=f"Dataset row index {dataset_row} is out of bounds (dataset has {len(dataset)} rows)",
+                    workflow_definition=cls,
+                )
+            row = dataset[dataset_row]
+            if isinstance(row, DatasetRow):
+                return row
+            elif isinstance(row, inputs_class):
+                return DatasetRow(label=f"Scenario {dataset_row + 1}", inputs=row)
+            else:
+                raise WorkflowInitializationException(
+                    message=f"Dataset row at index {dataset_row} must be a DatasetRow or {inputs_class.__name__}, "
+                    f"got {type(row).__name__}",
+                    workflow_definition=cls,
+                )
+
+        # For string selectors, check if it's a valid UUID first
+        if isinstance(dataset_row, str) and is_valid_uuid(dataset_row):
+            dataset_row = UUID(dataset_row)
+
+        selector_str = str(dataset_row) if isinstance(dataset_row, UUID) else dataset_row
+
+        for i, row in enumerate(dataset):
+            if isinstance(row, DatasetRow):
+                if isinstance(dataset_row, UUID) and row.id == selector_str:
+                    return row
+                if isinstance(dataset_row, str) and row.label == dataset_row:
+                    return row
+            elif isinstance(row, inputs_class):
+                # BaseInputs case - match by default label
+                default_label = f"Scenario {i + 1}"
+                if isinstance(dataset_row, str) and default_label == dataset_row:
+                    return DatasetRow(label=default_label, inputs=row)
+
+        if isinstance(dataset_row, UUID):
+            raise WorkflowInitializationException(
+                message=f"No dataset row found with id '{selector_str}'",
+                workflow_definition=cls,
+            )
+        raise WorkflowInitializationException(
+            message=f"No dataset row found with label '{dataset_row}'",
+            workflow_definition=cls,
+        )
+
+    @classmethod
     def deserialize_trigger(
-        cls, trigger_id: Optional[Union[str, UUID]], inputs: dict
+        cls,
+        trigger_id: Optional[Union[str, UUID]],
+        inputs: dict,
+        dataset_row: Optional[Union[int, str, UUID]] = None,
     ) -> Union[InputsType, BaseTrigger]:
         """
         Deserialize a trigger from a trigger_id and inputs dict.
 
         If trigger_id is None, returns an instance of the workflow's Inputs class.
         Otherwise, finds a trigger class that matches the trigger_id and creates an instance of that.
+
+        When dataset_row is provided, the method loads the sandbox module, resolves the dataset row,
+        and uses the row's inputs for instantiation.
 
         Parameters
         ----------
@@ -882,6 +1001,11 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         inputs: dict
             The inputs to pass to the trigger or Inputs constructor.
 
+        dataset_row: Optional[Union[int, str, UUID]]
+            Optional dataset row selector. Can be an int (index), str (label), or UUID (id).
+            When provided, the sandbox module is loaded and the matching dataset row's inputs
+            are used for instantiation.
+
         Returns
         -------
         Union[InputsType, BaseTrigger]
@@ -891,11 +1015,30 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         Raises
         ------
         WorkflowInitializationException
-            If trigger_id is provided but no matching trigger class is found in the workflow.
+            If trigger_id is provided but no matching trigger class is found in the workflow,
+            or if dataset_row is provided but cannot be resolved.
         """
+        # Resolve dataset row if provided
+        resolved_inputs = inputs
+        if dataset_row is not None:
+            resolved_row = cls._resolve_dataset_row(dataset_row)
+
+            # If the dataset row has a workflow_trigger, return it immediately
+            if resolved_row.workflow_trigger is not None:
+                return resolved_row.workflow_trigger
+
+            # Otherwise, use the resolved row's inputs for trigger/inputs instantiation
+            if isinstance(resolved_row.inputs, dict):
+                resolved_inputs = resolved_row.inputs
+            else:
+                # Convert BaseInputs to dict
+                resolved_inputs = {
+                    desc.name: value for desc, value in resolved_row.inputs if not desc.name.startswith("__")
+                }
+
         if trigger_id is None:
             inputs_class = cls.get_inputs_class()
-            return inputs_class(**inputs)
+            return inputs_class(**resolved_inputs)
 
         # Determine if trigger_id is a UUID or a name string
         resolved_trigger_id: Optional[UUID] = None
@@ -914,7 +1057,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
                 # Match by UUID
                 if resolved_trigger_id is not None and trigger_class.__id__ == resolved_trigger_id:
                     try:
-                        return trigger_class(**inputs)
+                        return trigger_class(**resolved_inputs)
                     except Exception as e:
                         raise WorkflowInitializationException(
                             message=f"Failed to instantiate trigger {trigger_class.__name__}: {e}",
@@ -924,7 +1067,7 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
                 # Match by name
                 if trigger_name is not None and trigger_class.__trigger_name__ == trigger_name:
                     try:
-                        return trigger_class(**inputs)
+                        return trigger_class(**resolved_inputs)
                     except Exception as e:
                         raise WorkflowInitializationException(
                             message=f"Failed to instantiate trigger {trigger_class.__name__}: {e}",
