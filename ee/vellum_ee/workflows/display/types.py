@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from functools import cached_property
 from typing import TYPE_CHECKING, Dict, Iterator, List, Optional, Tuple, Type
 
 from vellum.client import Vellum as VellumClient
@@ -7,6 +8,7 @@ from vellum.workflows.events.workflow import WorkflowEventDisplayContext  # noqa
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, StateValueReference, WorkflowInputReference
+from vellum.workflows.types.core import JsonObject
 from vellum.workflows.vellum_client import create_vellum_client
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.base import (
@@ -19,6 +21,7 @@ from vellum_ee.workflows.display.base import (
 )
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay
+from vellum_ee.workflows.display.utils.dependencies import MLModel
 from vellum_ee.workflows.display.utils.registry import get_default_workflow_display_class
 
 if TYPE_CHECKING:
@@ -52,8 +55,26 @@ class WorkflowDisplayContext:
     edge_displays: EdgeDisplays = field(default_factory=dict)
     port_displays: PortDisplays = field(default_factory=dict)
     dry_run: bool = False
+    ml_models: List[MLModel] = field(default_factory=list)
+    _dependencies: Dict[str, JsonObject] = field(default_factory=dict)
     _errors: List[Exception] = field(default_factory=list)
     _invalid_nodes: List[Type[BaseNode]] = field(default_factory=list)
+
+    def add_dependency(self, model_name: str, dependency: JsonObject) -> None:
+        """Register a model provider dependency. Deduplicates by model_name."""
+        if model_name not in self._dependencies:
+            self._dependencies[model_name] = dependency
+
+    def get_dependencies(self) -> List[JsonObject]:
+        """Get all registered dependencies, sorted alphabetically by (name, model_name)."""
+        dependencies = list(self._dependencies.values())
+        dependencies.sort(key=lambda d: (str(d.get("name", "")), str(d.get("model_name", ""))))
+        return dependencies
+
+    @cached_property
+    def ml_models_map(self) -> Dict[str, MLModel]:
+        """Get a map of model names to MLModel instances for O(1) lookup."""
+        return {model.name: model for model in self.ml_models}
 
     def add_error(self, error: Exception, node: Optional[Type[BaseNode]] = None) -> None:
         if self.dry_run:
