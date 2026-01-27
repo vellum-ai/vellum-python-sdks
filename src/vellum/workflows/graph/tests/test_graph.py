@@ -510,6 +510,39 @@ def test_graph__set_to_graph():
     assert len(list(graph.edges)) == 2
 
 
+def test_graph__set_to_port_to_node():
+    """
+    Tests that parallel nodes can converge to a port and then continue to another node.
+    This is the pattern: {A, B} >> C.Ports.c >> D
+    """
+
+    # GIVEN four nodes, where one has a custom port
+    class NodeA(BaseNode):
+        pass
+
+    class NodeB(BaseNode):
+        pass
+
+    class NodeC(BaseNode):
+        class Ports(BaseNode.Ports):
+            c = Port.on_else()
+
+    class NodeD(BaseNode):
+        pass
+
+    # WHEN we create a graph from a set to a port to a node
+    graph = {NodeA, NodeB} >> NodeC.Ports.c >> NodeD
+
+    # THEN the graph has both NodeA and NodeB as the entrypoints
+    assert set(graph.entrypoints) == {NodeA, NodeB}
+
+    # AND four nodes
+    assert len(list(graph.nodes)) == 4
+
+    # AND three edges (A->C, B->C, C->D)
+    assert len(list(graph.edges)) == 3
+
+
 def test_graph__str_simple_linear():
     # GIVEN a simple linear graph: A -> B -> C
     class NodeA(BaseNode):

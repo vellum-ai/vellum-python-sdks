@@ -90,6 +90,11 @@ class Port:
 
         return Graph.from_edge(edge)
 
+    def __rrshift__(self, other: GraphTarget) -> Graph:
+        if not isinstance(other, set):
+            other = {other}
+        return Graph.from_set(other) >> self
+
     @staticmethod
     def on_if(condition: Optional[BaseDescriptor] = None, fork_state: bool = False):
         return Port(condition=condition, condition_type=ConditionType.IF, fork_state=fork_state)
