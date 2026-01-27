@@ -343,6 +343,7 @@ def test_vellum_integration_service_execute_tool_structured_403_with_integration
 
     # AND raw_data should contain integration details nested under "integration" key
     assert exc_info.value.raw_data is not None
+    assert isinstance(exc_info.value.raw_data, dict)
     assert exc_info.value.raw_data["integration"]["id"] == "550e8400-e29b-41d4-a716-446655440000"
     assert exc_info.value.raw_data["integration"]["name"] == "GITHUB"
     assert exc_info.value.raw_data["integration"]["provider"] == "COMPOSIO"

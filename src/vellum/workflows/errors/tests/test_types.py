@@ -1,3 +1,5 @@
+from typing import Any, Dict, Optional
+
 from vellum.workflows.errors.types import WorkflowError, WorkflowErrorCode, workflow_error_to_vellum_error
 
 
@@ -6,7 +8,7 @@ def test_workflow_error_to_vellum_error__preserves_raw_data():
     Tests that raw_data is preserved when converting WorkflowError to VellumError.
     """
     # GIVEN a WorkflowError with raw_data containing integration details
-    raw_data = {
+    raw_data: Dict[str, Optional[Any]] = {
         "integration": {
             "id": "550e8400-e29b-41d4-a716-446655440000",
             "provider": "COMPOSIO",

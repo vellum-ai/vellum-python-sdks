@@ -1,6 +1,7 @@
-from typing import TYPE_CHECKING, Any, Dict, Optional, Type
+from typing import TYPE_CHECKING, Optional, Type
 
 from vellum.workflows.errors import WorkflowError, WorkflowErrorCode
+from vellum.workflows.errors.types import RawData
 
 if TYPE_CHECKING:
     from vellum.workflows.workflows.base import BaseWorkflow
@@ -24,7 +25,7 @@ class NodeException(Exception):
         self,
         message: str,
         code: WorkflowErrorCode = WorkflowErrorCode.INTERNAL_ERROR,
-        raw_data: Optional[Dict[str, Any]] = None,
+        raw_data: Optional[RawData] = None,
         stacktrace: Optional[str] = None,
     ):
         self.message = message
@@ -58,7 +59,7 @@ class WorkflowInitializationException(Exception):
         message: str,
         workflow_definition: Optional[Type["BaseWorkflow"]] = None,
         code: WorkflowErrorCode = WorkflowErrorCode.INVALID_INPUTS,
-        raw_data: Optional[Dict[str, Any]] = None,
+        raw_data: Optional[RawData] = None,
         stacktrace: Optional[str] = None,
     ):
 

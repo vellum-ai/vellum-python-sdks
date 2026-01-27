@@ -625,6 +625,7 @@ class Workflow(BaseWorkflow):
     assert "some_external_package" in error_message
 
     assert exc_info.value.raw_data is not None
+    assert isinstance(exc_info.value.raw_data, dict)
     assert exc_info.value.raw_data["vellum_on_error_action"] == "CREATE_CUSTOM_IMAGE"
 
 

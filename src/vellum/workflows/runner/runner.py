@@ -662,10 +662,12 @@ class WorkflowRunner(Generic[StateType]):
             try:
                 invoked_ports = ports(outputs, node.state)
             except NodeException as e:
+                # Handle case where raw_data could be a string (not a dict)
+                base_raw_data = e.raw_data if isinstance(e.raw_data, dict) else {}
                 raise NodeException(
                     message=e.message,
                     code=e.code,
-                    raw_data={**(e.raw_data or {}), "outputs": outputs.__vellum_encode__()},
+                    raw_data={**base_raw_data, "outputs": outputs.__vellum_encode__()},
                     stacktrace=e.stacktrace,
                 ) from e
             yield NodeExecutionFulfilledEvent(

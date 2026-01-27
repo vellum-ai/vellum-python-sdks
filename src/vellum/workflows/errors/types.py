@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 
 from vellum.client.types.vellum_error import VellumError
 from vellum.client.types.vellum_error_code_enum import VellumErrorCodeEnum
@@ -9,6 +9,10 @@ from vellum.client.types.workflow_event_error import WorkflowEventError
 from vellum.client.types.workflow_execution_event_error_code import WorkflowExecutionEventErrorCode
 
 logger = logging.getLogger(__name__)
+
+# Type alias for raw_data that can be either a dict or a string
+# This matches the WorkflowEventErrorRawData type from the SDK
+RawData = Union[Dict[str, Optional[Any]], str]
 
 
 class WorkflowErrorCode(Enum):
@@ -34,7 +38,7 @@ class WorkflowErrorCode(Enum):
 class WorkflowError:
     message: str
     code: WorkflowErrorCode
-    raw_data: Optional[Dict[str, Any]] = None
+    raw_data: Optional[RawData] = None
     stacktrace: Optional[str] = None
 
     def __contains__(self, item: Any) -> bool:
@@ -112,8 +116,10 @@ _WORKFLOW_ERROR_CODE_TO_VELLUM_ERROR_CODE: Dict[WorkflowErrorCode, VellumErrorCo
 
 
 def workflow_error_to_vellum_error(error: WorkflowError) -> VellumError:
+    # VellumError only accepts dict for raw_data, so convert string to None
+    raw_data = error.raw_data if isinstance(error.raw_data, dict) else None
     return VellumError(
         message=error.message,
         code=_WORKFLOW_ERROR_CODE_TO_VELLUM_ERROR_CODE.get(error.code, "INTERNAL_SERVER_ERROR"),
-        raw_data=error.raw_data,
+        raw_data=raw_data,
     )
