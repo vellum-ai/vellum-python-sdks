@@ -5,7 +5,7 @@ from json import JSONEncoder
 from queue import Queue
 import types
 from uuid import UUID
-from typing import Any, Callable, Dict, Generator, Protocol, Type
+from typing import Any, Callable, Dict, Protocol, Type
 
 from pydantic import BaseModel
 from pydantic.fields import FieldInfo
@@ -77,7 +77,7 @@ class VellumJsonEncoder(JSONEncoder):
             return str(obj)
 
         # Handle generator objects - convert to string representation to prevent serialization errors
-        if isinstance(obj, (Generator, types.GeneratorType)):
+        if isinstance(obj, types.GeneratorType):
             return "<generator object>"
 
         # Handle Pydantic FieldInfo objects

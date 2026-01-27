@@ -696,3 +696,44 @@ def test_event_max_size__outputs_preserved_when_under_limit():
 
     # AND the serialized workflow event should be parseable by the client library
     ClientWorkflowExecutionFulfilledEvent.model_validate(workflow_serialized)
+
+
+def test_node_execution_initiated_event__generator_input_serializes_gracefully():
+    """
+    Tests that NodeExecutionInitiatedEvent with a generator input serializes without error.
+
+    This prevents PydanticSerializationError when workflow events contain generator
+    objects that cannot be JSON serialized. The generator should be converted to
+    a string representation.
+    """
+
+    # GIVEN a generator object
+    def my_generator():
+        yield 1
+        yield 2
+
+    gen = my_generator()
+
+    # AND a NodeExecutionInitiatedEvent with the generator as an input value
+    event = NodeExecutionInitiatedEvent(
+        id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+        timestamp=datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
+        trace_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+        span_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+        body=NodeExecutionInitiatedBody(
+            node_definition=MockNode,
+            inputs={
+                MockNode.node_foo: gen,
+            },
+        ),
+    )
+
+    # WHEN we serialize the event using model_dump (the same path used by workflow server)
+    serialized = event.model_dump(mode="json")
+
+    # THEN the serialization succeeds and the generator is converted to a string
+    assert serialized["body"]["inputs"]["node_foo"] == "<generator object>"
+
+    # AND the span_id is preserved correctly
+    assert serialized["span_id"] == "123e4567-e89b-12d3-a456-426614174000"
+    assert serialized["trace_id"] == "123e4567-e89b-12d3-a456-426614174000"
