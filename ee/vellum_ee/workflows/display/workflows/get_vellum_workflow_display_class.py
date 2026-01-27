@@ -63,6 +63,7 @@ def get_workflow_display(
     parent_display_context: Optional[WorkflowDisplayContext] = None,
     client: Optional[VellumClient] = None,
     dry_run: bool = False,
+    ml_models: Optional[list] = None,
     # DEPRECATED: The following arguments will be removed in 0.15.0
     root_workflow_class: Optional[Type[WorkflowType]] = None,
     base_display_class: Optional[Type["BaseWorkflowDisplay"]] = None,
@@ -72,4 +73,5 @@ def get_workflow_display(
         parent_display_context=parent_display_context,
         client=client,
         dry_run=dry_run,
+        ml_models=ml_models,
     )

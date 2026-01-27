@@ -84,7 +84,6 @@ from vellum_ee.workflows.display.types import (
     WorkflowOutputDisplays,
 )
 from vellum_ee.workflows.display.utils.auto_layout import auto_layout_nodes
-from vellum_ee.workflows.display.utils.dependencies import extract_model_provider_dependencies
 from vellum_ee.workflows.display.utils.exceptions import (
     StateValidationError,
     TriggerValidationError,
@@ -195,6 +194,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         parent_display_context: Optional[WorkflowDisplayContext] = None,
         client: Optional[VellumClient] = None,
         dry_run: bool = False,
+        ml_models: Optional[list] = None,
     ):
         self._parent_display_context = parent_display_context
         self._client = client or (
@@ -205,6 +205,22 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         )
         self._serialized_files = []
         self._dry_run = dry_run
+        self._ml_models = self._parse_ml_models(ml_models) if ml_models else []
+
+    def _parse_ml_models(self, ml_models_raw: list) -> list:
+        """Parse raw list of dicts into MLModel instances."""
+        from vellum_ee.workflows.display.utils.dependencies import MLModel, MLModelHostingInterface
+
+        parsed = []
+        for item in ml_models_raw:
+            if isinstance(item, MLModel):
+                parsed.append(item)
+            elif isinstance(item, dict):
+                hosted_by = item.get("hosted_by")
+                if isinstance(hosted_by, str):
+                    hosted_by = MLModelHostingInterface(hosted_by)
+                parsed.append(MLModel(name=item["name"], hosted_by=hosted_by))
+        return parsed
 
     def serialize(self) -> JsonObject:
         try:
@@ -659,10 +675,10 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         if triggers is not None:
             result["triggers"] = triggers
 
-        # Pass empty list for now - the ml_models list will come from the client in the future
-        dependencies = extract_model_provider_dependencies(nodes_dict_list, [])
+        # Get dependencies that were registered during node serialization
+        dependencies = self.display_context.get_dependencies()
         if dependencies:
-            result["dependencies"] = dependencies
+            result["dependencies"] = cast(JsonArray, dependencies)
 
         return result
 
@@ -1189,6 +1205,12 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                 workflow_output_display or self._generate_workflow_output_display(workflow_output)
             )
 
+        # For ml_models and dependencies, inherit from parent context if available (for nested workflows)
+        # Otherwise use the ml_models parsed from __init__
+        ml_models = self._parent_display_context.ml_models if self._parent_display_context else self._ml_models
+        # Share the same dependencies accumulator across nested workflows for proper propagation
+        dependencies = self._parent_display_context._dependencies if self._parent_display_context else {}
+
         return WorkflowDisplayContext(
             client=self._client,
             workflow_display=workflow_meta_display,
@@ -1205,6 +1227,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             port_displays=port_displays,
             workflow_display_class=self.__class__,
             dry_run=self._dry_run,
+            ml_models=ml_models,
+            _dependencies=dependencies,
             _errors=errors,
         )
 
@@ -1603,6 +1627,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         *,
         client: Optional[VellumClient] = None,
         dry_run: bool = False,
+        ml_models: Optional[list] = None,
     ) -> WorkflowSerializationResult:
         """
         Load a workflow from a module and serialize it to JSON.
@@ -1611,6 +1636,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             module: The module path to load the workflow from
             client: Optional Vellum client to use for serialization
             dry_run: Whether to run in dry-run mode
+            ml_models: Optional list of ML model definitions for dependency extraction
 
         Returns:
             WorkflowSerializationResult containing exec_config and errors
@@ -1636,6 +1662,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             workflow_class=workflow,
             client=client,
             dry_run=dry_run,
+            ml_models=ml_models,
         )
 
         orphan_nodes = BaseWorkflowDisplay._find_orphan_nodes(module, workflow)
