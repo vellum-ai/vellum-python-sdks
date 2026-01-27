@@ -629,6 +629,7 @@ from .vellum_image_request import VellumImageRequest
 from .vellum_node_execution_event import VellumNodeExecutionEvent
 from .vellum_sdk_error import VellumSdkError
 from .vellum_sdk_error_code_enum import VellumSdkErrorCodeEnum
+from .vellum_sdk_error_raw_data import VellumSdkErrorRawData
 from .vellum_secret import VellumSecret
 from .vellum_span import VellumSpan
 from .vellum_value import VellumValue
@@ -661,6 +662,7 @@ from .workflow_display_icon import WorkflowDisplayIcon
 from .workflow_error import WorkflowError
 from .workflow_event import WorkflowEvent
 from .workflow_event_error import WorkflowEventError
+from .workflow_event_error_raw_data import WorkflowEventErrorRawData
 from .workflow_event_execution_read import WorkflowEventExecutionRead
 from .workflow_execution_actual import WorkflowExecutionActual
 from .workflow_execution_actual_chat_history_request import WorkflowExecutionActualChatHistoryRequest
@@ -1347,6 +1349,7 @@ __all__ = [
     "VellumNodeExecutionEvent",
     "VellumSdkError",
     "VellumSdkErrorCodeEnum",
+    "VellumSdkErrorRawData",
     "VellumSecret",
     "VellumSpan",
     "VellumValue",
@@ -1379,6 +1382,7 @@ __all__ = [
     "WorkflowError",
     "WorkflowEvent",
     "WorkflowEventError",
+    "WorkflowEventErrorRawData",
     "WorkflowEventExecutionRead",
     "WorkflowExecutionActual",
     "WorkflowExecutionActualChatHistoryRequest",

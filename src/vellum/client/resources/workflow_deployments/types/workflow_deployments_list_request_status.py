@@ -2,4 +2,6 @@
 
 import typing
 
-WorkflowDeploymentsListRequestStatus = typing.Union[typing.Literal["ACTIVE", "ARCHIVED"], typing.Any]
+WorkflowDeploymentsListRequestStatus = typing.Union[
+    typing.Literal["ACTIVE", "ARCHIVED", "PENDING_DELETION"], typing.Any
+]

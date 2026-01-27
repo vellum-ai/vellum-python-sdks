@@ -56,6 +56,7 @@ class RawDocumentIndexesClient:
 
             * `ACTIVE` - Active
             * `ARCHIVED` - Archived
+            * `PENDING_DELETION` - Pending Deletion
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -121,6 +122,7 @@ class RawDocumentIndexesClient:
 
             * `ACTIVE` - Active
             * `ARCHIVED` - Archived
+            * `PENDING_DELETION` - Pending Deletion
 
         copy_documents_from_index_id : typing.Optional[str]
             Optionally specify the id of a document index from which you'd like to copy and re-index its documents into this newly created index
@@ -241,6 +243,7 @@ class RawDocumentIndexesClient:
 
             * `ACTIVE` - Active
             * `ARCHIVED` - Archived
+            * `PENDING_DELETION` - Pending Deletion
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -333,6 +336,7 @@ class RawDocumentIndexesClient:
 
             * `ACTIVE` - Active
             * `ARCHIVED` - Archived
+            * `PENDING_DELETION` - Pending Deletion
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -478,6 +482,7 @@ class AsyncRawDocumentIndexesClient:
 
             * `ACTIVE` - Active
             * `ARCHIVED` - Archived
+            * `PENDING_DELETION` - Pending Deletion
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -543,6 +548,7 @@ class AsyncRawDocumentIndexesClient:
 
             * `ACTIVE` - Active
             * `ARCHIVED` - Archived
+            * `PENDING_DELETION` - Pending Deletion
 
         copy_documents_from_index_id : typing.Optional[str]
             Optionally specify the id of a document index from which you'd like to copy and re-index its documents into this newly created index
@@ -663,6 +669,7 @@ class AsyncRawDocumentIndexesClient:
 
             * `ACTIVE` - Active
             * `ARCHIVED` - Archived
+            * `PENDING_DELETION` - Pending Deletion
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -757,6 +764,7 @@ class AsyncRawDocumentIndexesClient:
 
             * `ACTIVE` - Active
             * `ARCHIVED` - Archived
+            * `PENDING_DELETION` - Pending Deletion
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.

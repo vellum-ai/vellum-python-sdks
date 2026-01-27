@@ -3517,6 +3517,7 @@ Filter down to only document indices that have a status matching the status spec
 
 * `ACTIVE` - Active
 * `ARCHIVED` - Archived
+* `PENDING_DELETION` - Pending Deletion
     
 </dd>
 </dl>
@@ -3628,6 +3629,7 @@ The current status of the document index
 
 * `ACTIVE` - Active
 * `ARCHIVED` - Archived
+* `PENDING_DELETION` - Pending Deletion
     
 </dd>
 </dl>
@@ -3808,6 +3810,7 @@ The current status of the document index
 
 * `ACTIVE` - Active
 * `ARCHIVED` - Archived
+* `PENDING_DELETION` - Pending Deletion
     
 </dd>
 </dl>
@@ -3971,6 +3974,7 @@ The current status of the document index
 
 * `ACTIVE` - Active
 * `ARCHIVED` - Archived
+* `PENDING_DELETION` - Pending Deletion
     
 </dd>
 </dl>
@@ -4638,6 +4642,7 @@ Filter down to only those objects whose entities have a status matching the stat
 
 * `ACTIVE` - Active
 * `ARCHIVED` - Archived
+* `PENDING_DELETION` - Pending Deletion
     
 </dd>
 </dl>

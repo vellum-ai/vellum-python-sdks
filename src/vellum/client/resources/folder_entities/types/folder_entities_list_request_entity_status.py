@@ -2,4 +2,6 @@
 
 import typing
 
-FolderEntitiesListRequestEntityStatus = typing.Union[typing.Literal["ACTIVE", "ARCHIVED"], typing.Any]
+FolderEntitiesListRequestEntityStatus = typing.Union[
+    typing.Literal["ACTIVE", "ARCHIVED", "PENDING_DELETION"], typing.Any
+]

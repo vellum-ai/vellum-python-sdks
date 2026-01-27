@@ -35,6 +35,7 @@ class SlimDeploymentRead(UniversalBaseModel):
     
     * `ACTIVE` - Active
     * `ARCHIVED` - Archived
+    * `PENDING_DELETION` - Pending Deletion
     """
 
     environment: typing.Optional[EnvironmentEnum] = pydantic.Field(default=None)

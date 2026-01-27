@@ -4,13 +4,14 @@ import typing
 
 import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
+from .workflow_event_error_raw_data import WorkflowEventErrorRawData
 from .workflow_execution_event_error_code import WorkflowExecutionEventErrorCode
 
 
 class WorkflowEventError(UniversalBaseModel):
     message: str
+    raw_data: typing.Optional[WorkflowEventErrorRawData] = None
     code: WorkflowExecutionEventErrorCode
-    raw_data: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = None
     stacktrace: typing.Optional[str] = None
 
     if IS_PYDANTIC_V2:

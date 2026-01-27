@@ -2,4 +2,4 @@
 
 import typing
 
-EntityStatus = typing.Union[typing.Literal["ACTIVE", "ARCHIVED"], typing.Any]
+EntityStatus = typing.Union[typing.Literal["ACTIVE", "ARCHIVED", "PENDING_DELETION"], typing.Any]

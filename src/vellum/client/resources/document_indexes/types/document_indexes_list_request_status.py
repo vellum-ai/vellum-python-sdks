@@ -2,4 +2,4 @@
 
 import typing
 
-DocumentIndexesListRequestStatus = typing.Union[typing.Literal["ACTIVE", "ARCHIVED"], typing.Any]
+DocumentIndexesListRequestStatus = typing.Union[typing.Literal["ACTIVE", "ARCHIVED", "PENDING_DELETION"], typing.Any]

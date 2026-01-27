@@ -87,6 +87,7 @@ IntegrationName = typing.Union[
         "SUPABASE",
         "TAVILY",
         "TELEGRAM",
+        "TIKTOK",
         "TODOIST",
         "WEBFLOW",
         "YOUSEARCH",

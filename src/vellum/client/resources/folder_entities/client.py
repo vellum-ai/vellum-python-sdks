@@ -61,6 +61,7 @@ class FolderEntitiesClient:
 
             * `ACTIVE` - Active
             * `ARCHIVED` - Archived
+            * `PENDING_DELETION` - Pending Deletion
 
         limit : typing.Optional[int]
             Number of results to return per page.
@@ -193,6 +194,7 @@ class AsyncFolderEntitiesClient:
 
             * `ACTIVE` - Active
             * `ARCHIVED` - Archived
+            * `PENDING_DELETION` - Pending Deletion
 
         limit : typing.Optional[int]
             Number of results to return per page.

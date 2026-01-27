@@ -2,4 +2,4 @@
 
 import typing
 
-DeploymentsListRequestStatus = typing.Union[typing.Literal["ACTIVE", "ARCHIVED"], typing.Any]
+DeploymentsListRequestStatus = typing.Union[typing.Literal["ACTIVE", "ARCHIVED", "PENDING_DELETION"], typing.Any]

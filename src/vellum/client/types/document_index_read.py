@@ -28,6 +28,7 @@ class DocumentIndexRead(UniversalBaseModel):
     
     * `ACTIVE` - Active
     * `ARCHIVED` - Archived
+    * `PENDING_DELETION` - Pending Deletion
     """
 
     indexing_config: DocumentIndexIndexingConfig
