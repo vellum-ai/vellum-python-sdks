@@ -63,6 +63,13 @@ class DictWrapper(dict):
     """
 
     def __getitem__(self, key):
+        if not isinstance(key, str):
+            if key not in self:
+                return undefined
+            item = super().__getitem__(key)
+            if not isinstance(item, DictWrapper) and not isinstance(item, ListWrapper):
+                self[key] = clean_for_dict_wrapper(item)
+            return super().__getitem__(key)
         return self.__getattr__(key)
 
     def __getattr__(self, attr):
