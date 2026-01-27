@@ -510,3 +510,67 @@ def test_templating_node__dict_wrapper_nonexistent_attribute_is_none():
 
     # THEN it should recognize the non-existent attribute as ""
     assert outputs.result == ""
+
+
+def test_templating_node__dict_with_int_key_access():
+    """Test that DictWrapper handles integer key access correctly when key exists."""
+
+    # GIVEN a templating node that accesses a dict with integer keys using bracket notation
+    class TemplateNode(TemplatingNode[BaseState, str]):
+        template = "{{ data[0] }}"
+        inputs = {"data": {0: "zero", 1: "one", 2: "two"}}
+
+    # WHEN the node is run
+    node = TemplateNode()
+    outputs = node.run()
+
+    # THEN the integer key access should work correctly
+    assert outputs.result == "zero"
+
+
+def test_templating_node__dict_with_nonexistent_int_key_access():
+    """Test that DictWrapper handles integer key access correctly when key doesn't exist."""
+
+    # GIVEN a templating node that accesses a dict with an integer key that doesn't exist
+    class TemplateNode(TemplatingNode[BaseState, str]):
+        template = "{% if data[99] %}found{% else %}not found{% endif %}"
+        inputs = {"data": {"name": "test"}}
+
+    # WHEN the node is run
+    node = TemplateNode()
+    outputs = node.run()
+
+    # THEN the nonexistent integer key should return undefined (falsy) without error
+    assert outputs.result == "not found"
+
+
+def test_templating_node__list_access_with_computed_index():
+    """Test that list access with computed integer index works in templates."""
+
+    # GIVEN a templating node that accesses list items using computed indices
+    class TemplateNode(TemplatingNode[BaseState, str]):
+        template = """{% set index = 1 %}{{ items[index] }}"""
+        inputs = {"items": ["apple", "banana", "cherry"]}
+
+    # WHEN the node is run
+    node = TemplateNode()
+    outputs = node.run()
+
+    # THEN the computed index access should work correctly
+    assert outputs.result == "banana"
+
+
+def test_templating_node__nested_list_in_dict_with_computed_index():
+    """Test accessing nested list items in a dict using computed indices."""
+
+    # GIVEN a templating node with nested list access using computed indices
+    class TemplateNode(TemplatingNode[BaseState, str]):
+        template = """{% for i in range(3) %}{{ topics[i].name }}{% if not loop.last %},{% endif %}{% endfor %}"""
+        inputs = {"topics": [{"name": "topic1"}, {"name": "topic2"}, {"name": "topic3"}]}
+
+    # WHEN the node is run
+    node = TemplateNode()
+    outputs = node.run()
+
+    # THEN the nested access with computed indices should work correctly
+    assert outputs.result == "topic1,topic2,topic3"
