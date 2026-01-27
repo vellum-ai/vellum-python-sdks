@@ -268,6 +268,7 @@ def test_mcp_service_call_tool_includes_stacktrace_and_raw_data_on_error():
 
         # AND the exception should have raw_data with operation details
         assert exc_info.value.raw_data is not None
+        assert isinstance(exc_info.value.raw_data, dict)
         assert exc_info.value.raw_data["operation"] == "call_tool"
         assert exc_info.value.raw_data["error_type"] == "RuntimeError"
         assert exc_info.value.raw_data["error_message"] == "Tool execution failed"

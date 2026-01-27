@@ -46,6 +46,7 @@ def test_integration_credentials_error__node_rejected_event_contains_raw_data(ve
 
     # AND the raw_data should contain integration details for the UI to render the error
     assert node_rejected_event.error.raw_data is not None
+    assert isinstance(node_rejected_event.error.raw_data, dict)
     assert "integration" in node_rejected_event.error.raw_data
 
     # AND the integration details should be accessible

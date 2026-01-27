@@ -1,6 +1,7 @@
-from .types import WorkflowError, WorkflowErrorCode
+from .types import RawData, WorkflowError, WorkflowErrorCode
 
 __all__ = [
+    "RawData",
     "WorkflowError",
     "WorkflowErrorCode",
 ]
