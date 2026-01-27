@@ -90,3 +90,50 @@ class TestVellumJsonEncoder:
         deserialized = json.loads(result)
         assert deserialized["settings"] == {"key1": "value1", "key2": "value2"}
         assert deserialized["name"] == "test"
+
+    def test_encode_generator_object(self):
+        """
+        Tests that generator objects are serialized to a string representation.
+
+        This prevents PydanticSerializationError when workflow events contain
+        generator objects that cannot be JSON serialized.
+        """
+
+        # GIVEN a generator object
+        def my_generator():
+            yield 1
+            yield 2
+            yield 3
+
+        gen = my_generator()
+
+        # WHEN we serialize a dict containing the generator
+        result = json.dumps({"data": gen}, cls=VellumJsonEncoder)
+
+        # THEN the generator is serialized to a string representation
+        deserialized = json.loads(result)
+        assert deserialized["data"] == "<generator object>"
+
+    def test_encode_nested_generator_object(self):
+        """
+        Tests that nested generator objects are serialized correctly.
+        """
+
+        # GIVEN a nested structure containing a generator
+        def my_generator():
+            yield "item"
+
+        data = {
+            "outer": {
+                "inner": my_generator(),
+                "normal": "value",
+            }
+        }
+
+        # WHEN we serialize the nested structure
+        result = json.dumps(data, cls=VellumJsonEncoder)
+
+        # THEN the generator is serialized to a string representation
+        deserialized = json.loads(result)
+        assert deserialized["outer"]["inner"] == "<generator object>"
+        assert deserialized["outer"]["normal"] == "value"

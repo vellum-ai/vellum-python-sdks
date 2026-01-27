@@ -3,6 +3,7 @@ from datetime import datetime
 import enum
 from json import JSONEncoder
 from queue import Queue
+import types
 from uuid import UUID
 from typing import Any, Callable, Dict, Protocol, Type
 
@@ -74,6 +75,10 @@ class VellumJsonEncoder(JSONEncoder):
 
         if isinstance(obj, Exception):
             return str(obj)
+
+        # Handle generator objects - convert to string representation to prevent serialization errors
+        if isinstance(obj, types.GeneratorType):
+            return "<generator object>"
 
         # Handle Pydantic FieldInfo objects
         if isinstance(obj, FieldInfo):
