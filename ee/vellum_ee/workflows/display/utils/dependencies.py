@@ -1,45 +1,64 @@
-from typing import Dict, List, Optional, Tuple
+from enum import Enum
+from typing import Dict, List, Optional
 
+from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.types.core import JsonArray, JsonObject
 
-# Type alias for the model prefix to hosting interface mapping
-# Maps model name prefixes to (hosting_interface, label) tuples
-ModelPrefixMapping = Dict[str, Tuple[str, str]]
 
-
-def infer_model_hosting_interface(model_name: str, prefix_map: ModelPrefixMapping) -> Optional[Tuple[str, str]]:
+class MLModelHostingInterface(str, Enum):
     """
-    Infer the hosting interface and label from a model name using the provided mapping.
+    Enum representing the hosting interface for ML models.
+    This will be replaced by a generated enum from the client in the future.
+    """
+
+    OPENAI = "OPENAI"
+    ANTHROPIC = "ANTHROPIC"
+    GOOGLE = "GOOGLE"
+    AZURE_OPENAI = "AZURE_OPENAI"
+    AWS_BEDROCK = "AWS_BEDROCK"
+    FIREWORKS = "FIREWORKS"
+    GROQ = "GROQ"
+    MISTRAL = "MISTRAL"
+    COHERE = "COHERE"
+
+
+class MLModel(UniversalBaseModel):
+    """
+    Represents an ML model with its name and hosting interface.
+    """
+
+    name: str
+    hosted_by: MLModelHostingInterface
+
+
+def get_model_hosting_interface(model_name: str, ml_models: List[MLModel]) -> Optional[MLModelHostingInterface]:
+    """
+    Get the hosting interface for a model by exact name match.
 
     Args:
         model_name: The name of the ML model (e.g., "gpt-4o", "claude-3-opus")
-        prefix_map: Mapping of model name prefixes to (hosting_interface, label) tuples
+        ml_models: List of MLModel objects containing name to hosting interface mappings
 
     Returns:
-        A tuple of (hosting_interface, label) if the model can be mapped,
-        None otherwise.
+        The MLModelHostingInterface if the model is found, None otherwise.
     """
-    model_name_lower = model_name.lower()
-    for prefix, (hosting_interface, label) in prefix_map.items():
-        if model_name_lower.startswith(prefix):
-            return (hosting_interface, label)
-    return None
+    model_lookup: Dict[str, MLModelHostingInterface] = {model.name: model.hosted_by for model in ml_models}
+    return model_lookup.get(model_name)
 
 
-def extract_model_provider_dependencies(
-    serialized_nodes: List[JsonObject], prefix_map: ModelPrefixMapping
-) -> JsonArray:
+def extract_model_provider_dependencies(serialized_nodes: List[JsonObject], ml_models: List[MLModel]) -> JsonArray:
     """
     Extract model provider dependencies from serialized workflow nodes.
 
     Args:
         serialized_nodes: List of serialized node dictionaries
-        prefix_map: Mapping of model name prefixes to (hosting_interface, label) tuples
+        ml_models: List of MLModel objects containing name to hosting interface mappings
 
     Returns:
         List of WorkflowModelProviderDependency dictionaries, sorted alphabetically
         by (name, model_name) for deterministic output.
     """
+    model_lookup: Dict[str, MLModelHostingInterface] = {model.name: model.hosted_by for model in ml_models}
     seen_models: Dict[str, JsonObject] = {}
 
     for node in serialized_nodes:
@@ -58,19 +77,16 @@ def extract_model_provider_dependencies(
         if not ml_model_name or not isinstance(ml_model_name, str):
             continue
 
-        model_key = ml_model_name.lower()
-        if model_key in seen_models:
+        if ml_model_name in seen_models:
             continue
 
-        hosting_info = infer_model_hosting_interface(ml_model_name, prefix_map)
-        if hosting_info is None:
+        hosting_interface = model_lookup.get(ml_model_name)
+        if hosting_interface is None:
             continue
 
-        hosting_interface, label = hosting_info
-        seen_models[model_key] = {
+        seen_models[ml_model_name] = {
             "type": "MODEL_PROVIDER",
-            "name": hosting_interface,
-            "label": label,
+            "name": hosting_interface.value,
             "model_name": ml_model_name,
         }
 

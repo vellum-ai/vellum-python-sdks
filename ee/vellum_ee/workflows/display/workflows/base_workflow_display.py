@@ -659,8 +659,8 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         if triggers is not None:
             result["triggers"] = triggers
 
-        # Pass empty mapping for now - the mapping will come from the client in the future
-        dependencies = extract_model_provider_dependencies(nodes_dict_list, {})
+        # Pass empty list for now - the ml_models list will come from the client in the future
+        dependencies = extract_model_provider_dependencies(nodes_dict_list, [])
         if dependencies:
             result["dependencies"] = dependencies
 
