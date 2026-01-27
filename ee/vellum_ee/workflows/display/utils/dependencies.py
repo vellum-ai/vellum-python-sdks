@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.workflows.types.core import JsonArray, JsonObject
@@ -29,21 +29,6 @@ class MLModel(UniversalBaseModel):
 
     name: str
     hosted_by: MLModelHostingInterface
-
-
-def get_model_hosting_interface(model_name: str, ml_models: List[MLModel]) -> Optional[MLModelHostingInterface]:
-    """
-    Get the hosting interface for a model by exact name match.
-
-    Args:
-        model_name: The name of the ML model (e.g., "gpt-4o", "claude-3-opus")
-        ml_models: List of MLModel objects containing name to hosting interface mappings
-
-    Returns:
-        The MLModelHostingInterface if the model is found, None otherwise.
-    """
-    model_lookup: Dict[str, MLModelHostingInterface] = {model.name: model.hosted_by for model in ml_models}
-    return model_lookup.get(model_name)
 
 
 def extract_model_provider_dependencies(serialized_nodes: List[JsonObject], ml_models: List[MLModel]) -> JsonArray:
