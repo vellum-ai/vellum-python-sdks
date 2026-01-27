@@ -84,6 +84,7 @@ from vellum_ee.workflows.display.types import (
     WorkflowOutputDisplays,
 )
 from vellum_ee.workflows.display.utils.auto_layout import auto_layout_nodes
+from vellum_ee.workflows.display.utils.dependencies import MLModel
 from vellum_ee.workflows.display.utils.exceptions import (
     StateValidationError,
     TriggerValidationError,
@@ -207,20 +208,9 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         self._dry_run = dry_run
         self._ml_models = self._parse_ml_models(ml_models) if ml_models else []
 
-    def _parse_ml_models(self, ml_models_raw: list) -> list:
-        """Parse raw list of dicts into MLModel instances."""
-        from vellum_ee.workflows.display.utils.dependencies import MLModel, MLModelHostingInterface
-
-        parsed = []
-        for item in ml_models_raw:
-            if isinstance(item, MLModel):
-                parsed.append(item)
-            elif isinstance(item, dict):
-                hosted_by = item.get("hosted_by")
-                if isinstance(hosted_by, str):
-                    hosted_by = MLModelHostingInterface(hosted_by)
-                parsed.append(MLModel(name=item["name"], hosted_by=hosted_by))
-        return parsed
+    def _parse_ml_models(self, ml_models_raw: list) -> List[MLModel]:
+        """Parse raw list of dicts into MLModel instances using pydantic deserialization."""
+        return [MLModel.model_validate(item) for item in ml_models_raw]
 
     def serialize(self) -> JsonObject:
         try:
@@ -1205,11 +1195,9 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                 workflow_output_display or self._generate_workflow_output_display(workflow_output)
             )
 
-        # For ml_models and dependencies, inherit from parent context if available (for nested workflows)
+        # For ml_models, inherit from parent context if available (for nested workflows)
         # Otherwise use the ml_models parsed from __init__
         ml_models = self._parent_display_context.ml_models if self._parent_display_context else self._ml_models
-        # Share the same dependencies accumulator across nested workflows for proper propagation
-        dependencies = self._parent_display_context._dependencies if self._parent_display_context else {}
 
         return WorkflowDisplayContext(
             client=self._client,
@@ -1228,7 +1216,6 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             workflow_display_class=self.__class__,
             dry_run=self._dry_run,
             ml_models=ml_models,
-            _dependencies=dependencies,
             _errors=errors,
         )
 

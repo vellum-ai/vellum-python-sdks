@@ -69,16 +69,15 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
 
         ml_model = str(raise_if_descriptor(node.ml_model))
 
-        # Register model provider dependency if ml_model is found in display_context.ml_models
-        for model in display_context.ml_models:
-            if model.name == ml_model:
-                dependency = {
-                    "type": "MODEL_PROVIDER",
-                    "name": model.hosted_by.value,
-                    "model_name": ml_model,
-                }
-                display_context.add_dependency(ml_model, dependency)
-                break
+        # Register model provider dependency if ml_model is found in display_context.ml_models_map
+        model = display_context.ml_models_map.get(ml_model)
+        if model:
+            dependency = {
+                "type": "MODEL_PROVIDER",
+                "name": model.hosted_by.value,
+                "model_name": ml_model,
+            }
+            display_context.add_dependency(ml_model, dependency)
 
         has_descriptors = _contains_descriptors(node_blocks)
 

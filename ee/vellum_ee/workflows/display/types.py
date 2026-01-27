@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from functools import cached_property
 from typing import TYPE_CHECKING, Dict, Iterator, List, Optional, Tuple, Type
 
 from vellum.client import Vellum as VellumClient
@@ -69,6 +70,11 @@ class WorkflowDisplayContext:
         dependencies = list(self._dependencies.values())
         dependencies.sort(key=lambda d: (str(d.get("name", "")), str(d.get("model_name", ""))))
         return dependencies
+
+    @cached_property
+    def ml_models_map(self) -> Dict[str, MLModel]:
+        """Get a map of model names to MLModel instances for O(1) lookup."""
+        return {model.name: model for model in self.ml_models}
 
     def add_error(self, error: Exception, node: Optional[Type[BaseNode]] = None) -> None:
         if self.dry_run:
