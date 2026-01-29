@@ -31,99 +31,62 @@ export class SpyMocks {
         WorkflowReleaseClient.prototype,
         "retrieveWorkflowDeploymentRelease"
       )
-      .mockResolvedValue({
-        id: "mocked-workflow-deployment-history-item-id",
-        created: new Date(),
-        environment: {
-          id: "mocked-environment-id",
-          name: "mocked-environment-name",
-          label: "mocked-environment-label",
-        },
-        createdBy: {
-          id: "mocked-created-by-id",
-          email: "mocked-created-by-email",
-        },
-        workflowVersion: {
-          id: "mocked-workflow-release-id",
-          inputVariables: [],
-          outputVariables: [
-            {
-              id: "53970e88-0bf6-4364-86b3-840d78a2afe5",
-              key: "chat_history",
-              type: "STRING",
-            },
-          ],
-        },
-        deployment: {
-          name: "mocked-workflow-deployment-release-name",
-        },
-        releaseTags: [
-          {
-            name: "mocked-release-tag-name",
-            source: "USER",
-          },
-        ],
-        reviews: [
-          {
-            id: "mocked-release-review-id",
-            created: new Date(),
-            reviewer: {
-              id: "mocked-reviewer-id",
-            },
-            state: "APPROVED",
-          },
-        ],
-      });
-  }
+      .mockImplementation(async (deploymentId: string) => {
+        // Return different output variables based on the deployment ID
+        const outputVariables =
+          deploymentId === "test-workflow-deployment-id"
+            ? [
+                {
+                  id: "deployed-output-feedback-id",
+                  key: "feedback",
+                  type: "STRING" as const,
+                },
+              ]
+            : [
+                {
+                  id: "53970e88-0bf6-4364-86b3-840d78a2afe5",
+                  key: "chat_history",
+                  type: "STRING" as const,
+                },
+              ];
 
-  static createWorkflowDeploymentsWithFeedbackMock(): MockInstance {
-    return vi
-      .spyOn(
-        WorkflowReleaseClient.prototype,
-        "retrieveWorkflowDeploymentRelease"
-      )
-      .mockResolvedValue({
-        id: "mocked-workflow-deployment-history-item-id",
-        created: new Date(),
-        environment: {
-          id: "mocked-environment-id",
-          name: "mocked-environment-name",
-          label: "mocked-environment-label",
-        },
-        createdBy: {
-          id: "mocked-created-by-id",
-          email: "mocked-created-by-email",
-        },
-        workflowVersion: {
-          id: "mocked-workflow-release-id",
-          inputVariables: [],
-          outputVariables: [
+        return {
+          id: "mocked-workflow-deployment-history-item-id",
+          created: new Date(),
+          environment: {
+            id: "mocked-environment-id",
+            name: "mocked-environment-name",
+            label: "mocked-environment-label",
+          },
+          createdBy: {
+            id: "mocked-created-by-id",
+            email: "mocked-created-by-email",
+          },
+          workflowVersion: {
+            id: "mocked-workflow-release-id",
+            inputVariables: [],
+            outputVariables,
+          },
+          deployment: {
+            name: "mocked-workflow-deployment-release-name",
+          },
+          releaseTags: [
             {
-              id: "deployed-output-feedback-id",
-              key: "feedback",
-              type: "STRING",
+              name: "mocked-release-tag-name",
+              source: "USER",
             },
           ],
-        },
-        deployment: {
-          name: "mocked-workflow-deployment-release-name",
-        },
-        releaseTags: [
-          {
-            name: "mocked-release-tag-name",
-            source: "USER",
-          },
-        ],
-        reviews: [
-          {
-            id: "mocked-release-review-id",
-            created: new Date(),
-            reviewer: {
-              id: "mocked-reviewer-id",
+          reviews: [
+            {
+              id: "mocked-release-review-id",
+              created: new Date(),
+              reviewer: {
+                id: "mocked-reviewer-id",
+              },
+              state: "APPROVED",
             },
-            state: "APPROVED",
-          },
-        ],
+          ],
+        };
       });
   }
 }

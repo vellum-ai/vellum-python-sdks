@@ -322,7 +322,7 @@ describe("WorkflowProjectGenerator", () => {
       simple_subworkflow_deployment_node:
         SpyMocks.createWorkflowDeploymentsMock(),
       subworkflow_deployment_with_terminal_reference:
-        SpyMocks.createWorkflowDeploymentsWithFeedbackMock(),
+        SpyMocks.createWorkflowDeploymentsMock(),
     };
     vi.spyOn(WorkspaceSecrets.prototype, "retrieve").mockImplementation(
       // @ts-ignore
