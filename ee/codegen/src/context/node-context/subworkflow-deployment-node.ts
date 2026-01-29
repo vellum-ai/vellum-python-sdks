@@ -21,15 +21,41 @@ export class SubworkflowDeploymentNodeContext extends BaseNodeContext<Subworkflo
     }
 
     const errorOutputId = this.getErrorOutputId();
-    return this.workflowDeploymentRelease.workflowVersion.outputVariables.reduce<
-      Record<string, string>
-    >(
+    const deployedOutputVariables =
+      this.workflowDeploymentRelease.workflowVersion.outputVariables;
+
+    // Build a mapping from deployed workflow output variable IDs to their names
+    const result = deployedOutputVariables.reduce<Record<string, string>>(
       (acc, output) => {
         acc[output.id] = toValidPythonIdentifier(output.key, "output");
         return acc;
       },
       { ...(errorOutputId ? { [errorOutputId]: "error" } : {}) }
     );
+
+    // Also map workflow output variable IDs to deployed workflow output variable names
+    // This handles the case where a TERMINAL node references a SUBWORKFLOW deployment node's
+    // output using the workflow's output variable ID instead of the deployed workflow's output variable ID
+    const deployedOutputsByKey = new Map(
+      deployedOutputVariables.map((output) => [
+        output.key,
+        toValidPythonIdentifier(output.key, "output"),
+      ])
+    );
+
+    for (const outputVariableContext of this.workflowContext.outputVariableContextsById.values()) {
+      const workflowOutputKey = outputVariableContext.getRawName();
+      const deployedOutputName = deployedOutputsByKey.get(workflowOutputKey);
+      if (deployedOutputName) {
+        const workflowOutputId = outputVariableContext.getOutputVariableId();
+        // Only add if not already present (deployed workflow's ID takes precedence)
+        if (!result[workflowOutputId]) {
+          result[workflowOutputId] = deployedOutputName;
+        }
+      }
+    }
+
+    return result;
   }
 
   getNodeOutputTypesById(): Record<string, VellumVariableType> {
@@ -37,11 +63,35 @@ export class SubworkflowDeploymentNodeContext extends BaseNodeContext<Subworkflo
       return {};
     }
 
-    return Object.fromEntries(
-      this.workflowDeploymentRelease.workflowVersion.outputVariables.map(
-        (variable) => [variable.id, variable.type]
-      )
+    const deployedOutputVariables =
+      this.workflowDeploymentRelease.workflowVersion.outputVariables;
+
+    // Build a mapping from deployed workflow output variable IDs to their types
+    const result = Object.fromEntries(
+      deployedOutputVariables.map((variable) => [variable.id, variable.type])
     );
+
+    // Also map workflow output variable IDs to deployed workflow output variable types
+    // This handles the case where a TERMINAL node references a SUBWORKFLOW deployment node's
+    // output using the workflow's output variable ID instead of the deployed workflow's output variable ID
+    const deployedOutputTypesByKey = new Map(
+      deployedOutputVariables.map((output) => [output.key, output.type])
+    );
+
+    for (const outputVariableContext of this.workflowContext.outputVariableContextsById.values()) {
+      const workflowOutputKey = outputVariableContext.getRawName();
+      const deployedOutputType =
+        deployedOutputTypesByKey.get(workflowOutputKey);
+      if (deployedOutputType) {
+        const workflowOutputId = outputVariableContext.getOutputVariableId();
+        // Only add if not already present (deployed workflow's ID takes precedence)
+        if (!result[workflowOutputId]) {
+          result[workflowOutputId] = deployedOutputType;
+        }
+      }
+    }
+
+    return result;
   }
 
   createPortContexts(): PortContext[] {
