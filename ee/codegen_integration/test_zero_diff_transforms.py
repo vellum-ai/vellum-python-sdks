@@ -139,6 +139,17 @@ def _compute_diff(
                 }
             ),
         ),
+        (
+            "basic_tool_calling_node_mcp_url_env_var",
+            frozenset(
+                {
+                    "__init__.py",
+                    "nodes/__init__.py",
+                    "display/nodes/mcp_server_url_env_var_node/__init__.py",
+                    "display/workflow.py",
+                }
+            ),
+        ),
     ],
 )
 def test_zero_diff_transforms(module_name: str, ignore_files: FrozenSet[str]):
