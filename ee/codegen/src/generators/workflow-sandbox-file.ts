@@ -1,14 +1,17 @@
 import { isNil } from "lodash";
+import { VellumVariableType } from "vellum-ai/api/types";
 
 import { vellumValue } from "src/codegen";
 import { VELLUM_WORKFLOW_ROOT_MODULE_PATH } from "src/constants";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
 import { NodeNotFoundError } from "src/generators/errors";
-import { AstNode } from "src/generators/extensions/ast-node";
+import { AstNode, Instantiation } from "src/generators/extensions/ast-node";
 import { BoolInstantiation } from "src/generators/extensions/bool-instantiation";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { CodeBlock } from "src/generators/extensions/code-block";
+import { DictInstantiation } from "src/generators/extensions/dict-instantiation";
 import { Field } from "src/generators/extensions/field";
+import { IntInstantiation } from "src/generators/extensions/int-instantiation";
 import { ListInstantiation } from "src/generators/extensions/list-instantiation";
 import { MethodArgument } from "src/generators/extensions/method-argument";
 import { NoneInstantiation } from "src/generators/extensions/none-instantiation";
@@ -148,43 +151,82 @@ if __name__ == "__main__":
         )
       : [];
 
-    // Add workflow inputs (excluding trigger attribute inputs)
-    if (workflowInputs.length > 0) {
-      const inputsInstance = new ClassInstantiation({
-        classReference: new Reference({
-          name: "Inputs",
-          modulePath: getGeneratedInputsModulePath(this.workflowContext),
-        }),
-        arguments_: workflowInputs
-          .map((input) => {
-            if (isNil(input.value)) {
-              return null;
-            }
+    // Build a set of input variable names that already have values
+    const providedInputNames = new Set(
+      workflowInputs.map((input) => removeEscapeCharacters(input.name))
+    );
 
-            const rawName = removeEscapeCharacters(input.name);
-            const inputVariableContext =
-              this.workflowContext.findInputVariableContextByRawName(rawName);
-
-            if (isNil(inputVariableContext)) {
-              return null;
-            }
-
-            return new MethodArgument({
-              name: inputVariableContext.name,
-              value: vellumValue({
-                vellumValue: input,
-              }),
-            });
+    // Get all required input variables that don't have values and don't have a trigger
+    const requiredInputsWithoutValues =
+      isNil(workflowTriggerId) && workflowInputs.length === 0
+        ? Array.from(
+            this.workflowContext.inputVariableContextsById.values()
+          ).filter((inputContext) => {
+            const inputData = inputContext.getInputVariableData();
+            return (
+              inputData.required === true &&
+              !providedInputNames.has(inputContext.getRawName())
+            );
           })
-          .filter((argument): argument is MethodArgument => !isNil(argument)),
+        : [];
+
+    // Add workflow inputs (excluding trigger attribute inputs)
+    // Also add placeholder values for required inputs without values when there's no trigger
+    if (workflowInputs.length > 0 || requiredInputsWithoutValues.length > 0) {
+      const inputArguments: MethodArgument[] = [];
+
+      // Add existing workflow inputs
+      workflowInputs.forEach((input) => {
+        if (isNil(input.value)) {
+          return;
+        }
+
+        const rawName = removeEscapeCharacters(input.name);
+        const inputVariableContext =
+          this.workflowContext.findInputVariableContextByRawName(rawName);
+
+        if (isNil(inputVariableContext)) {
+          return;
+        }
+
+        inputArguments.push(
+          new MethodArgument({
+            name: inputVariableContext.name,
+            value: vellumValue({
+              vellumValue: input,
+            }),
+          })
+        );
       });
 
-      arguments_.push(
-        new MethodArgument({
-          name: "inputs",
-          value: inputsInstance,
-        })
-      );
+      // Add placeholder values for required inputs without values
+      requiredInputsWithoutValues.forEach((inputContext) => {
+        inputArguments.push(
+          new MethodArgument({
+            name: inputContext.name,
+            value: this.getDefaultValueForType(
+              inputContext.getInputVariableData().type
+            ),
+          })
+        );
+      });
+
+      if (inputArguments.length > 0) {
+        const inputsInstance = new ClassInstantiation({
+          classReference: new Reference({
+            name: "Inputs",
+            modulePath: getGeneratedInputsModulePath(this.workflowContext),
+          }),
+          arguments_: inputArguments,
+        });
+
+        arguments_.push(
+          new MethodArgument({
+            name: "inputs",
+            value: inputsInstance,
+          })
+        );
+      }
     }
 
     if (!isNil(workflowTriggerId)) {
@@ -388,5 +430,24 @@ if __name__ == "__main__":
       }),
       arguments_,
     });
+  }
+
+  private getDefaultValueForType(type: VellumVariableType): Instantiation {
+    switch (type) {
+      case VellumVariableType.String:
+        return new StrInstantiation("");
+      case VellumVariableType.Number:
+        return new IntInstantiation(0);
+      case VellumVariableType.Json:
+        return new DictInstantiation([]);
+      case VellumVariableType.Array:
+        return new ListInstantiation([]);
+      case VellumVariableType.ChatHistory:
+        return new ListInstantiation([]);
+      case VellumVariableType.SearchResults:
+        return new ListInstantiation([]);
+      default:
+        return new NoneInstantiation();
+    }
   }
 }
