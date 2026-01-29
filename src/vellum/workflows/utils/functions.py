@@ -397,16 +397,27 @@ def compile_workflow_deployment_function_definition(
     description = release_info["description"]
     input_variables = release_info["input_variables"]
 
+    # Get inputs from the decorator if present (to exclude from schema)
+    inputs = getattr(deployment_definition, "__vellum_inputs__", {})
+    examples = getattr(deployment_definition, "__vellum_examples__", None)
+    exclude_params = set(inputs.keys())
+
     properties = {}
     required = []
 
     for input_var in input_variables:
+        # Skip parameters that are in the exclude_params set
+        if exclude_params and input_var.key in exclude_params:
+            continue
+
         properties[input_var.key] = _compile_workflow_deployment_input(input_var)
 
         if input_var.required and input_var.default is None:
             required.append(input_var.key)
 
     parameters = {"type": "object", "properties": properties, "required": required}
+    if examples is not None:
+        parameters["examples"] = examples
 
     return FunctionDefinition(
         name=name.replace("-", ""),
@@ -499,16 +510,21 @@ def compile_vellum_integration_tool_definition(
         return FunctionDefinition(name=tool_def.name, description=tool_def.description, parameters={})
 
 
-ToolType = Union[Callable[..., Any], Type["BaseWorkflow"]]
+ToolT = TypeVar(
+    "ToolT",
+    Callable[..., Any],
+    Type["BaseWorkflow[Any, Any]"],
+    DeploymentDefinition,
+)
 
 
 def tool(
     *,
     inputs: Optional[dict[str, Any]] = None,
     examples: Optional[List[dict[str, Any]]] = None,
-) -> Callable[[ToolType], ToolType]:
+) -> Callable[[ToolT], ToolT]:
     """
-    Decorator to configure a tool function or inline workflow.
+    Decorator to configure a tool function, inline workflow, or workflow deployment.
 
     Currently supports specifying which parameters should come from parent workflow inputs
     via the `inputs` mapping. Also supports providing `examples` which will be hoisted
@@ -534,13 +550,18 @@ def tool(
 
             class Outputs(BaseWorkflow.Outputs):
                 result = MyNode.Outputs.result
+
+    Example with workflow deployment:
+        tool(inputs={
+            "context": ParentInputs.context,
+        })(DeploymentDefinition(deployment="my-workflow-deployment"))
     """
 
-    def decorator(func: ToolType) -> ToolType:
-        # Store the inputs mapping on the function/workflow for later use
+    def decorator(func: ToolT) -> ToolT:
+        # Store the inputs mapping on the function/workflow/deployment for later use
         if inputs is not None:
             setattr(func, "__vellum_inputs__", inputs)
-        # Store the examples on the function/workflow for later use
+        # Store the examples on the function/workflow/deployment for later use
         if examples is not None:
             setattr(func, "__vellum_examples__", examples)
         return func
@@ -548,7 +569,7 @@ def tool(
     return decorator
 
 
-def use_tool_inputs(**inputs: Any) -> Callable[[Callable], Callable]:
+def use_tool_inputs(**inputs: Any) -> Callable[[ToolT], ToolT]:
     """
     Decorator to specify which parameters of a tool function should be provided
     from the parent workflow inputs rather than from the LLM.
