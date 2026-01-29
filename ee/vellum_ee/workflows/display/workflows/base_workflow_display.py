@@ -1699,8 +1699,13 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                         row_inputs = row_data.get("inputs", {})
                         has_trigger = row_data.get("workflow_trigger_id") is not None
                         if not has_trigger and not row_inputs:
-                            input_variables = exec_config.get("input_variables", [])
-                            required_inputs = [var["key"] for var in input_variables if var.get("required", False)]
+                            input_variables = cast(JsonArray, exec_config.get("input_variables", []))
+                            required_inputs: List[str] = []
+                            for var in input_variables:
+                                if isinstance(var, dict) and var.get("required", False):
+                                    key = var.get("key")
+                                    if isinstance(key, str):
+                                        required_inputs.append(key)
                             if required_inputs:
                                 row_label = row_data.get("label", f"Scenario {i + 1}")
                                 workflow_display.display_context.add_validation_error(
