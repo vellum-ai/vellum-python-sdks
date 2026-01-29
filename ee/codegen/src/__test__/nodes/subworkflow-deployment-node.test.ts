@@ -5,16 +5,13 @@ import { beforeEach, vi } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
 import { inputVariableContextFactory } from "src/__test__/helpers/input-variable-context-factory";
-import {
-  nodeInputFactory,
-  subworkflowDeploymentNodeDataFactory,
-} from "src/__test__/helpers/node-data-factories";
+import { subworkflowDeploymentNodeDataFactory } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { SubworkflowDeploymentNodeContext } from "src/context/node-context/subworkflow-deployment-node";
 import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { Writer } from "src/generators/extensions/writer";
 import { SubworkflowDeploymentNode } from "src/generators/nodes/subworkflow-deployment-node";
-import { ConstantValuePointer } from "src/types/vellum";
+import { DictionaryWorkflowReference } from "src/types/vellum";
 
 describe("SubworkflowDeploymentNode", () => {
   let workflowContext: WorkflowContext;
@@ -226,32 +223,41 @@ describe("SubworkflowDeploymentNode", () => {
         reviews: [],
       } as unknown as WorkflowDeploymentRelease);
 
-      const accessorExpressionInput: ConstantValuePointer = {
-        type: "CONSTANT_VALUE",
-        data: {
-          type: "JSON",
-          value: {
-            type: "BINARY_EXPRESSION",
-            operator: "accessField",
-            lhs: {
-              type: "WORKFLOW_INPUT",
-              inputVariableId: "test-input-variable-id",
-            },
-            rhs: {
-              type: "CONSTANT_VALUE",
-              value: {
-                type: "STRING",
-                value: "name",
+      // Use DICTIONARY_REFERENCE for subworkflow_inputs attribute with nested expressions
+      const subworkflowInputsAttr: DictionaryWorkflowReference = {
+        type: "DICTIONARY_REFERENCE",
+        entries: [
+          {
+            id: "entry-id-1",
+            key: "user_name",
+            value: {
+              type: "BINARY_EXPRESSION",
+              operator: "accessField",
+              lhs: {
+                type: "WORKFLOW_INPUT",
+                inputVariableId: "test-input-variable-id",
+              },
+              rhs: {
+                type: "CONSTANT_VALUE",
+                value: {
+                  type: "STRING",
+                  value: "name",
+                },
               },
             },
           },
-        },
+        ],
       };
 
-      const nodeData = subworkflowDeploymentNodeDataFactory().build();
-      nodeData.inputs = [
-        nodeInputFactory({ key: "user_name", value: accessorExpressionInput }),
-      ];
+      const nodeData = subworkflowDeploymentNodeDataFactory({
+        attributes: [
+          {
+            id: "subworkflow-inputs-attr-id",
+            name: "subworkflow_inputs",
+            value: subworkflowInputsAttr,
+          },
+        ],
+      }).build();
 
       workflowContext = workflowContextFactory();
       workflowContext.addInputVariableContext(

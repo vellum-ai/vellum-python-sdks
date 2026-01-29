@@ -49,6 +49,25 @@
             }
           }
         ],
+        "attributes": [
+          {
+            "id": "663a3640-219f-4b7e-86a1-b38960bb6610",
+            "name": "subworkflow_inputs",
+            "value": {
+              "type": "DICTIONARY_REFERENCE",
+              "entries": [
+                {
+                  "id": "84757ef6-496d-4c15-a758-5e1085518fb7",
+                  "key": "test",
+                  "value": {
+                    "type": "WORKFLOW_INPUT",
+                    "input_variable_id": "93b9d3fb-251c-4a53-a1d5-4bd8e61947c5"
+                  }
+                }
+              ]
+            }
+          }
+        ],
         "outputs": [
           {
             "id": "53970e88-0bf6-4364-86b3-840d78a2afe5",

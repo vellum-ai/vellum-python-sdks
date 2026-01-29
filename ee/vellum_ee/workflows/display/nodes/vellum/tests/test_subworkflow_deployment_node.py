@@ -124,7 +124,7 @@ def test_serialize_node__subworkflow_inputs(GetDisplayClass, expected_input_id, 
 
 def test_serialize_node__subworkflow_inputs_with_accessor_expression(mock_fetch_deployment):
     """
-    Tests that accessor expressions in subworkflow_inputs are serialized correctly.
+    Tests that accessor expressions in subworkflow_inputs are serialized as a DICTIONARY_REFERENCE attribute.
     """
 
     # GIVEN a deployment subworkflow node with an accessor expression input
@@ -140,28 +140,30 @@ def test_serialize_node__subworkflow_inputs_with_accessor_expression(mock_fetch_
     workflow_display = get_workflow_display(workflow_class=Workflow)
     serialized_workflow: dict = workflow_display.serialize()
 
-    # THEN the subworkflow node should have the accessor expression input serialized
+    # THEN the subworkflow node should have the accessor expression in attributes
     subworkflow_node = next(
         node
         for node in serialized_workflow["workflow_raw_data"]["nodes"]
         if node["id"] == str(MySubworkflowDeploymentNode.__id__)
     )
 
-    # AND the subworkflow_inputs should be serialized with the accessor expression
-    assert len(subworkflow_node["inputs"]) == 1
-    assert subworkflow_node["inputs"][0]["key"] == "user_name"
+    # AND the subworkflow_inputs should be serialized as a DICTIONARY_REFERENCE attribute
+    assert "attributes" in subworkflow_node
+    subworkflow_inputs_attr = next(
+        attr for attr in subworkflow_node["attributes"] if attr["name"] == "subworkflow_inputs"
+    )
 
-    input_value = subworkflow_node["inputs"][0]["value"]
-    assert input_value["combinator"] == "OR"
-    assert len(input_value["rules"]) == 1
+    # AND the attribute value should be a DICTIONARY_REFERENCE with the accessor expression
+    attr_value = subworkflow_inputs_attr["value"]
+    assert attr_value["type"] == "DICTIONARY_REFERENCE"
+    assert len(attr_value["entries"]) == 1
 
-    rule = input_value["rules"][0]
-    assert rule["type"] == "CONSTANT_VALUE"
-    assert rule["data"]["type"] == "JSON"
+    entry = attr_value["entries"][0]
+    assert entry["key"] == "user_name"
 
-    expression_value = rule["data"]["value"]
-    assert expression_value["type"] == "BINARY_EXPRESSION"
-    assert expression_value["operator"] == "accessField"
-    assert expression_value["lhs"]["type"] == "WORKFLOW_INPUT"
-    assert expression_value["rhs"]["type"] == "CONSTANT_VALUE"
-    assert expression_value["rhs"]["value"]["value"] == "name"
+    entry_value = entry["value"]
+    assert entry_value["type"] == "BINARY_EXPRESSION"
+    assert entry_value["operator"] == "accessField"
+    assert entry_value["lhs"]["type"] == "WORKFLOW_INPUT"
+    assert entry_value["rhs"]["type"] == "CONSTANT_VALUE"
+    assert entry_value["rhs"]["value"]["value"] == "name"

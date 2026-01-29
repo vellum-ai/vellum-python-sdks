@@ -16,29 +16,9 @@ import { UuidInstantiation } from "src/generators/extensions/uuid-instantiation"
 import { BaseNode } from "src/generators/nodes/bases/base";
 import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { codegen } from "src/index";
-import {
-  SubworkflowNode as SubworkflowNodeType,
-  WorkflowValueDescriptor as WorkflowValueDescriptorType,
-} from "src/types/vellum";
-import { isExpression, isReference } from "src/utils/workflow-value-descriptor";
+import { SubworkflowNode as SubworkflowNodeType } from "src/types/vellum";
 
 const INPUTS_PREFIX = "subworkflow_inputs";
-
-function isWorkflowValueDescriptor(
-  value: unknown
-): value is WorkflowValueDescriptorType {
-  if (typeof value !== "object" || value === null) {
-    return false;
-  }
-  const obj = value as Record<string, unknown>;
-  if (typeof obj.type !== "string") {
-    return false;
-  }
-  return (
-    isExpression(obj as unknown as WorkflowValueDescriptorType) ||
-    isReference(obj as unknown as WorkflowValueDescriptorType)
-  );
-}
 
 export class SubworkflowDeploymentNode extends BaseNode<
   SubworkflowNodeType,
@@ -49,51 +29,38 @@ export class SubworkflowDeploymentNode extends BaseNode<
     return `${INPUTS_PREFIX}.${nodeInputKey}`;
   }
 
-  private getSubworkflowInputEntries(): Array<{
-    key: AstNode;
-    value: AstNode;
-  }> {
-    const entries: Array<{ key: AstNode; value: AstNode }> = [];
+  private getSubworkflowInputsField(): Field {
+    // Check for subworkflow_inputs attribute first (supports accessor patterns)
+    const subworkflowInputsAttr = this.nodeData.attributes?.find(
+      (attr) => attr.name === INPUTS_PREFIX
+    );
 
-    const nodeInputs = this.nodeData.inputs ?? [];
-    for (const nodeInput of nodeInputs) {
-      // First, check if this is an expression-valued JSON input
-      const rules = nodeInput.value?.rules ?? [];
-      let foundExpression = false;
-      for (const rule of rules) {
-        if (rule.type === "CONSTANT_VALUE" && rule.data.type === "JSON") {
-          const jsonValue = rule.data.value;
-          if (isWorkflowValueDescriptor(jsonValue)) {
-            entries.push({
-              key: new StrInstantiation(nodeInput.key),
-              value: new WorkflowValueDescriptor({
-                nodeContext: this.nodeContext,
-                workflowContext: this.workflowContext,
-                workflowValueDescriptor: jsonValue,
-                iterableConfig: { endWithComma: true },
-              }),
-            });
-            foundExpression = true;
-            break;
-          }
-        }
-      }
-
-      if (foundExpression) {
-        continue;
-      }
-
-      // Otherwise, use the existing node input if available
-      const existingNodeInput = this.nodeInputsByKey.get(nodeInput.key);
-      if (existingNodeInput) {
-        entries.push({
-          key: new StrInstantiation(nodeInput.key),
-          value: existingNodeInput,
-        });
-      }
+    if (subworkflowInputsAttr) {
+      return new Field({
+        name: INPUTS_PREFIX,
+        initializer: new WorkflowValueDescriptor({
+          nodeContext: this.nodeContext,
+          workflowContext: this.workflowContext,
+          workflowValueDescriptor: subworkflowInputsAttr.value,
+        }),
+      });
     }
 
-    return entries;
+    // Fall back to legacy input-based subworkflow_inputs
+    const entries: Array<{ key: AstNode; value: AstNode }> = [];
+    for (const [key, nodeInput] of this.nodeInputsByKey.entries()) {
+      entries.push({
+        key: new StrInstantiation(key),
+        value: nodeInput,
+      });
+    }
+
+    return new Field({
+      name: INPUTS_PREFIX,
+      initializer: new DictInstantiation(entries, {
+        endWithComma: true,
+      }),
+    });
   }
 
   getNodeClassBodyStatements(): AstNode[] {
@@ -130,14 +97,7 @@ export class SubworkflowDeploymentNode extends BaseNode<
       })
     );
 
-    statements.push(
-      new Field({
-        name: INPUTS_PREFIX,
-        initializer: new DictInstantiation(this.getSubworkflowInputEntries(), {
-          endWithComma: true,
-        }),
-      })
-    );
+    statements.push(this.getSubworkflowInputsField());
 
     const outputsClass = this.generateOutputsClass();
     if (outputsClass) {
