@@ -31,6 +31,7 @@ export class SpyMocks {
         WorkflowReleaseClient.prototype,
         "retrieveWorkflowDeploymentRelease"
       )
+      // @ts-ignore - mockImplementation type doesn't match HttpResponsePromise
       .mockImplementation(async (deploymentId: string) => {
         // Return different output variables based on the deployment ID
         const outputVariables =
