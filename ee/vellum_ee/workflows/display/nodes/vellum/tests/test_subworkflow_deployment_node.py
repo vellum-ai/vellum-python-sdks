@@ -10,7 +10,9 @@ from vellum import (
     WorkflowDeploymentReleaseWorkflowVersion,
 )
 from vellum.workflows import BaseWorkflow
+from vellum.workflows.nodes import MapNode
 from vellum.workflows.nodes.displayable.subworkflow_deployment_node.node import SubworkflowDeploymentNode
+from vellum.workflows.state.base import BaseState
 from vellum_ee.workflows.display.nodes.vellum.subworkflow_deployment_node import BaseSubworkflowDeploymentNodeDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
@@ -118,3 +120,58 @@ def test_serialize_node__subworkflow_inputs(GetDisplayClass, expected_input_id, 
             },
         }
     ]
+
+
+def test_serialize_node__subworkflow_inputs_with_accessor_expression(mock_fetch_deployment):
+    """
+    Tests that accessor expressions in subworkflow deployment node inputs are serialized correctly.
+    """
+
+    # GIVEN a deployment subworkflow node with an accessor expression input using MapNode.SubworkflowInputs.item
+    class MySubworkflowDeploymentNode(SubworkflowDeploymentNode):
+        deployment = "DEPLOYMENT"
+        subworkflow_inputs = {"user_name": MapNode.SubworkflowInputs.item["name"]}
+
+    # AND a subworkflow containing the deployment node
+    class InnerWorkflow(BaseWorkflow[MapNode.SubworkflowInputs, BaseState]):
+        graph = MySubworkflowDeploymentNode
+
+    # AND a map node that uses this subworkflow
+    class MyMapNode(MapNode):
+        items = [{"name": "Alice"}, {"name": "Bob"}]
+        subworkflow = InnerWorkflow
+
+    # AND a workflow with the map node
+    class Workflow(BaseWorkflow):
+        graph = MyMapNode
+
+    # WHEN the workflow is serialized
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the inner workflow should have the subworkflow node with accessor expression input
+    map_node = next(
+        node for node in serialized_workflow["workflow_raw_data"]["nodes"] if node["id"] == str(MyMapNode.__id__)
+    )
+
+    inner_workflow_data = map_node["data"]["workflow_raw_data"]
+    subworkflow_node = next(
+        node for node in inner_workflow_data["nodes"] if node["id"] == str(MySubworkflowDeploymentNode.__id__)
+    )
+
+    # AND the input should be serialized as a BINARY_EXPRESSION with accessField operator
+    assert len(subworkflow_node["inputs"]) == 1
+    input_value = subworkflow_node["inputs"][0]["value"]
+    assert input_value["combinator"] == "OR"
+    assert len(input_value["rules"]) == 1
+
+    rule = input_value["rules"][0]
+    assert rule["type"] == "CONSTANT_VALUE"
+    assert rule["data"]["type"] == "JSON"
+
+    expression_value = rule["data"]["value"]
+    assert expression_value["type"] == "BINARY_EXPRESSION"
+    assert expression_value["operator"] == "accessField"
+    assert expression_value["lhs"]["type"] == "WORKFLOW_INPUT"
+    assert expression_value["rhs"]["type"] == "CONSTANT_VALUE"
+    assert expression_value["rhs"]["value"]["value"] == "name"
