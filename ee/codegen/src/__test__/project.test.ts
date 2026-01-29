@@ -7508,7 +7508,11 @@ baz = foo + bar
 
       expectProjectFileToExist(["code", "workflow.py"]);
       expectProjectFileToExist(["code", "integration_models", "__init__.py"]);
-      expectProjectFileToExist(["code", "integration_models", "slack_input.py"]);
+      expectProjectFileToExist([
+        "code",
+        "integration_models",
+        "slack_input.py",
+      ]);
       expectProjectFileToExist([
         "code",
         "integration_models",
