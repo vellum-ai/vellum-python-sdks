@@ -2,23 +2,6 @@
   "workflow_raw_data": {
     "nodes": [
       {
-        "id": "b3c8ab56-001f-4157-bbc2-4a7fe5ebf8c6",
-        "type": "ENTRYPOINT",
-        "inputs": [],
-        "data": {
-          "label": "Entrypoint Node",
-          "source_handle_id": "eba8fd73-57ab-4d7b-8f75-b54dbe5fc8ba"
-        },
-        "display_data": {
-          "position": {
-            "x": 0.0,
-            "y": 0.0
-          }
-        },
-        "base": null,
-        "definition": null
-      },
-      {
         "id": "67c2abb9-6c61-47d6-b222-49fd5442ba8f",
         "label": "Simple Node",
         "type": "GENERIC",
@@ -230,7 +213,18 @@
       "id": "b3c8ab56-001f-4157-bbc2-4a7fe5ebf8c6",
       "type": "MANUAL",
       "name": "manual",
-      "attributes": []
+      "attributes": [],
+      "display_data": {
+        "label": "Manual",
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "z_index": 0,
+        "icon": null,
+        "color": null,
+        "comment": null
+      }
     }
   ],
   "runner_config": {}

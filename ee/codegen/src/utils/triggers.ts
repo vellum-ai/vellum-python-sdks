@@ -1,9 +1,6 @@
 import { createPythonClassName, toPythonSafeSnakeCase } from "./casing";
 
-import {
-  GENERATED_TRIGGERS_MODULE_NAME,
-  VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH,
-} from "src/constants";
+import { GENERATED_TRIGGERS_MODULE_NAME } from "src/constants";
 import { WorkflowContext } from "src/context/workflow-context/workflow-context";
 import { WorkflowTrigger, WorkflowTriggerType } from "src/types/vellum";
 
@@ -26,11 +23,17 @@ export function getTriggerClassInfo(
   }
 
   switch (trigger.type) {
-    case WorkflowTriggerType.MANUAL:
+    case WorkflowTriggerType.MANUAL: {
+      const label = trigger.displayData?.label || "ManualTrigger";
       return {
-        className: "ManualTrigger",
-        modulePath: [...VELLUM_WORKFLOW_TRIGGERS_MODULE_PATH, "manual"],
+        className: createPythonClassName(label, { force: true }),
+        modulePath: [
+          ...workflowContext.modulePath.slice(0, -1),
+          GENERATED_TRIGGERS_MODULE_NAME,
+          toPythonSafeSnakeCase(trigger.displayData?.label || "manual"),
+        ],
       };
+    }
     case WorkflowTriggerType.SCHEDULED: {
       const label = trigger.displayData?.label || "ScheduleTrigger";
       return {

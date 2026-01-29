@@ -20,7 +20,7 @@ describe("getTriggerClassInfo", () => {
 
     expect(result).toEqual({
       className: "ManualTrigger",
-      modulePath: ["vellum", "workflows", "triggers", "manual"],
+      modulePath: ["code", "triggers", "manual"],
     });
   });
 
