@@ -265,6 +265,7 @@ ${errors.slice(0, 3).map((err) => {
     // and the root workflow's mergeFilesWithArtifact handles all of them
     if (originalArtifact && !this.workflowContext.parentNode) {
       await this.mergeFilesWithArtifact(originalArtifact);
+      await this.writeUnmanagedArtifactFiles(originalArtifact);
     }
 
     // error.log - this gets generated separately from the other files because it
@@ -980,6 +981,37 @@ ${errors.slice(0, 3).map((err) => {
           await writeFile(fullPath, content);
         }
       )
+    );
+  }
+
+  /**
+   * Writes files from the original artifact that are not managed by codegen.
+   * This preserves user-created files like integration_models/ that exist in the
+   * artifact but are not generated or merged by the standard codegen process.
+   */
+  private async writeUnmanagedArtifactFiles(
+    originalArtifact: Record<string, string>
+  ): Promise<void> {
+    const absolutePathToModuleDirectory = join(
+      this.workflowContext.absolutePathToOutputDirectory,
+      ...this.getModulePath()
+    );
+
+    const generatedFiles = await getAllFilesInDir(
+      absolutePathToModuleDirectory
+    );
+    const generatedFilePaths = new Set(Object.keys(generatedFiles));
+
+    const unmanagedFiles = Object.entries(originalArtifact).filter(
+      ([filePath]) => !generatedFilePaths.has(filePath)
+    );
+
+    await Promise.all(
+      unmanagedFiles.map(async ([relativePath, content]) => {
+        const fullPath = join(absolutePathToModuleDirectory, relativePath);
+        await mkdir(path.dirname(fullPath), { recursive: true });
+        await writeFile(fullPath, content);
+      })
     );
   }
 
