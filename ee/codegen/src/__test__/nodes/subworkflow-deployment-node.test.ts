@@ -5,13 +5,9 @@ import { beforeEach, vi } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
 import { inputVariableContextFactory } from "src/__test__/helpers/input-variable-context-factory";
-import {
-  entrypointNodeDataFactory,
-  subworkflowDeploymentNodeDataFactory,
-} from "src/__test__/helpers/node-data-factories";
+import { subworkflowDeploymentNodeDataFactory } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { SubworkflowDeploymentNodeContext } from "src/context/node-context/subworkflow-deployment-node";
-import { OutputVariableContext } from "src/context/output-variable-context";
 import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { Writer } from "src/generators/extensions/writer";
 import { SubworkflowDeploymentNode } from "src/generators/nodes/subworkflow-deployment-node";
@@ -344,115 +340,6 @@ describe("SubworkflowDeploymentNode", () => {
 
       const outputName = nodeContext.getNodeOutputNameById("test-output-id");
       expect(outputName).toBe("fooBAR");
-    });
-  });
-
-  describe("workflow output variable ID lookup", () => {
-    it("should resolve output by workflow output variable ID when key matches deployed workflow output", async () => {
-      /**
-       * Tests that when a TERMINAL node references a SUBWORKFLOW deployment node's output
-       * using the workflow's output variable ID (not the deployed workflow's output variable ID),
-       * the output name is correctly resolved by matching keys.
-       */
-
-      // GIVEN a workflow context with an output variable that has a different ID than the deployed workflow
-      const workflowOutputVariableId = "workflow-output-feedback-id";
-      const deployedOutputVariableId = "deployed-output-feedback-id";
-      const sharedOutputKey = "feedback";
-
-      const workflowContextWithOutputVar = workflowContextFactory({
-        workflowRawData: {
-          nodes: [entrypointNodeDataFactory()],
-          edges: [],
-        },
-      });
-
-      // AND the workflow has an output variable with the shared key
-      const outputVariableContext = new OutputVariableContext({
-        outputVariableData: {
-          id: workflowOutputVariableId,
-          key: sharedOutputKey,
-          type: "STRING",
-        },
-        workflowContext: workflowContextWithOutputVar,
-      });
-      workflowContextWithOutputVar.addOutputVariableContext(
-        outputVariableContext
-      );
-
-      // AND the deployed workflow has an output variable with the same key but different ID
-      vi.spyOn(
-        WorkflowReleaseClient.prototype,
-        "retrieveWorkflowDeploymentRelease"
-      ).mockResolvedValue({
-        id: "mocked-workflow-deployment-history-item-id",
-        created: new Date(),
-        environment: {
-          id: "mocked-environment-id",
-          name: "mocked-environment-name",
-          label: "mocked-environment-label",
-        },
-        createdBy: {
-          id: "mocked-created-by-id",
-          email: "mocked-created-by-email",
-        },
-        workflowVersion: {
-          id: "mocked-workflow-release-id",
-          inputVariables: [],
-          outputVariables: [
-            {
-              id: deployedOutputVariableId,
-              key: sharedOutputKey,
-              type: "STRING",
-            },
-          ],
-        },
-        deployment: {
-          name: "test-deployment",
-        },
-        releaseTags: [
-          {
-            name: "mocked-release-tag-name",
-            source: "USER",
-          },
-        ],
-        reviews: [
-          {
-            id: "mocked-release-review-id",
-            created: new Date(),
-            reviewer: {
-              id: "mocked-reviewer-id",
-            },
-            state: "APPROVED",
-          },
-        ],
-      } as unknown as WorkflowDeploymentRelease);
-
-      const nodeData = subworkflowDeploymentNodeDataFactory().build();
-
-      // WHEN we create the node context
-      const nodeContext = (await createNodeContext({
-        workflowContext: workflowContextWithOutputVar,
-        nodeData,
-      })) as SubworkflowDeploymentNodeContext;
-
-      // THEN we should be able to look up the output by the deployed workflow's output variable ID
-      const outputNameByDeployedId = nodeContext.getNodeOutputNameById(
-        deployedOutputVariableId
-      );
-      expect(outputNameByDeployedId).toBe(sharedOutputKey);
-
-      // AND we should also be able to look up the output by the workflow's output variable ID
-      const outputNameByWorkflowId = nodeContext.getNodeOutputNameById(
-        workflowOutputVariableId
-      );
-      expect(outputNameByWorkflowId).toBe(sharedOutputKey);
-
-      // AND we should be able to look up the type by the workflow's output variable ID
-      const outputTypeByWorkflowId = nodeContext.getNodeOutputTypeById(
-        workflowOutputVariableId
-      );
-      expect(outputTypeByWorkflowId).toBe("STRING");
     });
   });
 });

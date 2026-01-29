@@ -75,4 +75,55 @@ export class SpyMocks {
         ],
       });
   }
+
+  static createWorkflowDeploymentsWithFeedbackMock(): MockInstance {
+    return vi
+      .spyOn(
+        WorkflowReleaseClient.prototype,
+        "retrieveWorkflowDeploymentRelease"
+      )
+      .mockResolvedValue({
+        id: "mocked-workflow-deployment-history-item-id",
+        created: new Date(),
+        environment: {
+          id: "mocked-environment-id",
+          name: "mocked-environment-name",
+          label: "mocked-environment-label",
+        },
+        createdBy: {
+          id: "mocked-created-by-id",
+          email: "mocked-created-by-email",
+        },
+        workflowVersion: {
+          id: "mocked-workflow-release-id",
+          inputVariables: [],
+          outputVariables: [
+            {
+              id: "deployed-output-feedback-id",
+              key: "feedback",
+              type: "STRING",
+            },
+          ],
+        },
+        deployment: {
+          name: "mocked-workflow-deployment-release-name",
+        },
+        releaseTags: [
+          {
+            name: "mocked-release-tag-name",
+            source: "USER",
+          },
+        ],
+        reviews: [
+          {
+            id: "mocked-release-review-id",
+            created: new Date(),
+            reviewer: {
+              id: "mocked-reviewer-id",
+            },
+            state: "APPROVED",
+          },
+        ],
+      });
+  }
 }

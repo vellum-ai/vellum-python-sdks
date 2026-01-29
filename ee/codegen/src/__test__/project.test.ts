@@ -317,10 +317,12 @@ describe("WorkflowProjectGenerator", () => {
     const excludeFilesAtPaths: RegExp[] = [/\.pyc$/, /metadata\.json$/];
     const ignoreContentsOfFilesAtPaths: RegExp[] = [];
     const fixtureMocks = {
-      simple_guard_rail_node: SpyMocks.createMetricDefinitionMock(),
       faa_q_and_a_bot: SpyMocks.createWorkflowDeploymentsMock(),
+      simple_guard_rail_node: SpyMocks.createMetricDefinitionMock(),
       simple_subworkflow_deployment_node:
         SpyMocks.createWorkflowDeploymentsMock(),
+      subworkflow_deployment_with_terminal_reference:
+        SpyMocks.createWorkflowDeploymentsWithFeedbackMock(),
     };
     vi.spyOn(WorkspaceSecrets.prototype, "retrieve").mockImplementation(
       // @ts-ignore
@@ -338,22 +340,23 @@ describe("WorkflowProjectGenerator", () => {
     it.each(
       getFixturesForProjectTest({
         includeFixtures: [
-          "simple_search_node",
-          "simple_inline_subworkflow_node",
-          "simple_guardrail_node",
-          "simple_prompt_node",
-          "simple_map_node",
+          "faa_q_and_a_bot",
+          "simple_api_node",
           "simple_code_execution_node",
           "simple_conditional_node",
-          "simple_templating_node",
           "simple_error_node",
+          "simple_guardrail_node",
+          "simple_inline_subworkflow_node",
+          "simple_map_node",
           "simple_merge_node",
-          "simple_api_node",
           "simple_node_with_try_wrap",
-          "simple_subworkflow_deployment_node",
-          "simple_workflow_node_with_output_values",
-          "faa_q_and_a_bot",
+          "simple_prompt_node",
           "simple_scheduled_trigger",
+          "simple_search_node",
+          "simple_subworkflow_deployment_node",
+          "simple_templating_node",
+          "simple_workflow_node_with_output_values",
+          "subworkflow_deployment_with_terminal_reference",
           "subworkflow_with_custom_inner_node",
         ],
         fixtureMocks: fixtureMocks,

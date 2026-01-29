@@ -1,0 +1,234 @@
+{
+  "workflow_raw_data": {
+    "nodes": [
+      {
+        "id": "entrypoint-node-id",
+        "type": "ENTRYPOINT",
+        "data": {
+          "label": "Entrypoint Node",
+          "source_handle_id": "entrypoint-source-handle"
+        },
+        "inputs": [],
+        "display_data": {
+          "position": {
+            "x": 100,
+            "y": 200
+          },
+          "width": 124,
+          "height": 48
+        },
+        "base": null,
+        "definition": null
+      },
+      {
+        "id": "subworkflow-deployment-node-id",
+        "type": "SUBWORKFLOW",
+        "data": {
+          "label": "Subworkflow Deployment",
+          "source_handle_id": "subworkflow-source-handle",
+          "target_handle_id": "subworkflow-target-handle",
+          "error_output_id": null,
+          "variant": "DEPLOYMENT",
+          "workflow_deployment_id": "test-workflow-deployment-id",
+          "release_tag": "LATEST"
+        },
+        "inputs": [],
+        "attributes": [
+          {
+            "id": "subworkflow-inputs-attr-id",
+            "name": "subworkflow_inputs",
+            "value": {
+              "type": "DICTIONARY_REFERENCE",
+              "entries": []
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "id": "subworkflow-output-feedback-id",
+            "name": "feedback",
+            "type": "STRING",
+            "value": null,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "display_data": {
+          "position": {
+            "x": 400,
+            "y": 200
+          }
+        },
+        "base": {
+          "name": "SubworkflowDeploymentNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "subworkflow_deployment_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "subworkflow_deployment_with_terminal_reference",
+            "code",
+            "nodes",
+            "subworkflow_deployment"
+          ],
+          "name": "SubworkflowDeployment"
+        },
+        "trigger": {
+          "id": "subworkflow-target-handle",
+          "merge_behavior": "AWAIT_ANY"
+        },
+        "ports": [
+          {
+            "id": "subworkflow-source-handle",
+            "name": "default",
+            "type": "DEFAULT"
+          }
+        ]
+      },
+      {
+        "id": "terminal-node-id",
+        "type": "TERMINAL",
+        "data": {
+          "label": "Final Output",
+          "name": "feedback",
+          "target_handle_id": "terminal-target-handle",
+          "output_id": "workflow-output-feedback-id",
+          "output_type": "STRING",
+          "node_input_id": "terminal-node-input-id"
+        },
+        "inputs": [
+          {
+            "id": "terminal-node-input-id",
+            "key": "node_input",
+            "value": {
+              "rules": [
+                {
+                  "type": "NODE_OUTPUT",
+                  "data": {
+                    "node_id": "subworkflow-deployment-node-id",
+                    "output_id": "workflow-output-feedback-id"
+                  }
+                }
+              ],
+              "combinator": "OR"
+            }
+          }
+        ],
+        "display_data": {
+          "position": {
+            "x": 800,
+            "y": 200
+          },
+          "width": 471,
+          "height": 234
+        },
+        "base": {
+          "name": "FinalOutputNode",
+          "module": [
+            "vellum",
+            "workflows",
+            "nodes",
+            "displayable",
+            "final_output_node",
+            "node"
+          ]
+        },
+        "definition": {
+          "module": [
+            "codegen_integration",
+            "fixtures",
+            "subworkflow_deployment_with_terminal_reference",
+            "code",
+            "nodes",
+            "final_output"
+          ],
+          "name": "FinalOutput"
+        },
+        "trigger": {
+          "id": "terminal-target-handle",
+          "merge_behavior": "AWAIT_ANY"
+        },
+        "ports": [],
+        "outputs": [
+          {
+            "id": "workflow-output-feedback-id",
+            "name": "value",
+            "type": "STRING",
+            "value": {
+              "type": "NODE_OUTPUT",
+              "node_id": "subworkflow-deployment-node-id",
+              "node_output_id": "workflow-output-feedback-id"
+            },
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "type": "DEFAULT",
+        "id": "edge-1",
+        "source_node_id": "entrypoint-node-id",
+        "source_handle_id": "entrypoint-source-handle",
+        "target_node_id": "subworkflow-deployment-node-id",
+        "target_handle_id": "subworkflow-target-handle"
+      },
+      {
+        "type": "DEFAULT",
+        "id": "edge-2",
+        "source_node_id": "subworkflow-deployment-node-id",
+        "source_handle_id": "subworkflow-source-handle",
+        "target_node_id": "terminal-node-id",
+        "target_handle_id": "terminal-target-handle"
+      }
+    ],
+    "display_data": {
+      "viewport": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1
+      }
+    },
+    "definition": {
+      "name": "Workflow",
+      "module": [
+        "codegen_integration",
+        "fixtures",
+        "subworkflow_deployment_with_terminal_reference",
+        "code",
+        "workflow"
+      ]
+    },
+    "output_values": [
+      {
+        "output_variable_id": "workflow-output-feedback-id",
+        "value": {
+          "type": "NODE_OUTPUT",
+          "node_id": "subworkflow-deployment-node-id",
+          "node_output_id": "workflow-output-feedback-id"
+        }
+      }
+    ]
+  },
+  "input_variables": [],
+  "state_variables": [],
+  "output_variables": [
+    {
+      "id": "workflow-output-feedback-id",
+      "key": "feedback",
+      "type": "STRING"
+    }
+  ],
+  "runner_config": {}
+}
