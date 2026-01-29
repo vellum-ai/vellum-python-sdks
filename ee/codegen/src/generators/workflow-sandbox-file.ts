@@ -211,22 +211,20 @@ if __name__ == "__main__":
         );
       });
 
-      if (inputArguments.length > 0) {
-        const inputsInstance = new ClassInstantiation({
-          classReference: new Reference({
-            name: "Inputs",
-            modulePath: getGeneratedInputsModulePath(this.workflowContext),
-          }),
-          arguments_: inputArguments,
-        });
+      const inputsInstance = new ClassInstantiation({
+        classReference: new Reference({
+          name: "Inputs",
+          modulePath: getGeneratedInputsModulePath(this.workflowContext),
+        }),
+        arguments_: inputArguments,
+      });
 
-        arguments_.push(
-          new MethodArgument({
-            name: "inputs",
-            value: inputsInstance,
-          })
-        );
-      }
+      arguments_.push(
+        new MethodArgument({
+          name: "inputs",
+          value: inputsInstance,
+        })
+      );
     }
 
     if (!isNil(workflowTriggerId)) {
