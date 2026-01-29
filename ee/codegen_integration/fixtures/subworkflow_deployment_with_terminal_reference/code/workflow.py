@@ -8,5 +8,4 @@ class Workflow(BaseWorkflow):
     graph = SubworkflowDeployment >> FinalOutput
 
     class Outputs(BaseWorkflow.Outputs):
-        feedback = SubworkflowDeployment.Outputs.feedback
         feedback = FinalOutput.Outputs.value
