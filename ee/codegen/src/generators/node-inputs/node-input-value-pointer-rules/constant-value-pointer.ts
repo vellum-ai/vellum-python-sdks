@@ -10,7 +10,6 @@ import {
   WorkflowDataNode,
   WorkflowValueDescriptor as WorkflowValueDescriptorType,
 } from "src/types/vellum";
-import { isExpression, isReference } from "src/utils/workflow-value-descriptor";
 
 export declare namespace ConstantValuePointerRule {
   interface Args {
@@ -19,6 +18,26 @@ export declare namespace ConstantValuePointerRule {
     iterableConfig?: IterableConfig;
   }
 }
+
+const EXPRESSION_TYPES = new Set([
+  "UNARY_EXPRESSION",
+  "BINARY_EXPRESSION",
+  "TERNARY_EXPRESSION",
+]);
+
+const REFERENCE_TYPES = new Set([
+  "NODE_OUTPUT",
+  "WORKFLOW_INPUT",
+  "WORKFLOW_OUTPUT",
+  "WORKFLOW_STATE",
+  "CONSTANT_VALUE",
+  "VELLUM_SECRET",
+  "ENVIRONMENT_VARIABLE",
+  "EXECUTION_COUNTER",
+  "DICTIONARY_REFERENCE",
+  "ARRAY_REFERENCE",
+  "TRIGGER_ATTRIBUTE",
+]);
 
 function isWorkflowValueDescriptor(
   value: unknown
@@ -30,10 +49,7 @@ function isWorkflowValueDescriptor(
   if (typeof obj.type !== "string") {
     return false;
   }
-  return (
-    isExpression(obj as WorkflowValueDescriptorType) ||
-    isReference(obj as WorkflowValueDescriptorType)
-  );
+  return EXPRESSION_TYPES.has(obj.type) || REFERENCE_TYPES.has(obj.type);
 }
 
 export class ConstantValuePointerRule extends BaseNodeInputValuePointerRule<ConstantValuePointer> {
