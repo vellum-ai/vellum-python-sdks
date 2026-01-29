@@ -77,7 +77,11 @@ class WorkflowDisplayContext:
             }
 
     def get_dependencies(self) -> List[JsonObject]:
-        """Get all registered dependencies, sorted alphabetically by type then by relevant fields."""
+        """Get all registered dependencies.
+
+        Returns integration dependencies first (sorted by integration_name, then provider),
+        followed by model dependencies (sorted by model_name, then name).
+        """
         integration_deps = list(self._integration_dependencies.values())
         integration_deps.sort(key=lambda d: (str(d.get("integration_name", "")), str(d.get("provider", ""))))
 
