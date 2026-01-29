@@ -5,7 +5,7 @@ import { vellumValue } from "src/codegen";
 import { VELLUM_WORKFLOW_ROOT_MODULE_PATH } from "src/constants";
 import { BasePersistedFile } from "src/generators/base-persisted-file";
 import { NodeNotFoundError } from "src/generators/errors";
-import { AstNode, Instantiation } from "src/generators/extensions/ast-node";
+import { AstNode } from "src/generators/extensions/ast-node";
 import { BoolInstantiation } from "src/generators/extensions/bool-instantiation";
 import { ClassInstantiation } from "src/generators/extensions/class-instantiation";
 import { CodeBlock } from "src/generators/extensions/code-block";
@@ -432,7 +432,7 @@ if __name__ == "__main__":
     });
   }
 
-  private getDefaultValueForType(type: VellumVariableType): Instantiation {
+  private getDefaultValueForType(type: VellumVariableType): AstNode {
     switch (type) {
       case VellumVariableType.String:
         return new StrInstantiation("");
