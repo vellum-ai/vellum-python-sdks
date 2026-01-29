@@ -35,8 +35,8 @@ function isWorkflowValueDescriptor(
     return false;
   }
   return (
-    isExpression(obj as WorkflowValueDescriptorType) ||
-    isReference(obj as WorkflowValueDescriptorType)
+    isExpression(obj as unknown as WorkflowValueDescriptorType) ||
+    isReference(obj as unknown as WorkflowValueDescriptorType)
   );
 }
 
