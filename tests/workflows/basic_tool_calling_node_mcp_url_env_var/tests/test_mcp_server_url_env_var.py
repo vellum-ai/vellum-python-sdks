@@ -5,7 +5,7 @@ from vellum.workflows.references import EnvironmentVariableReference
 from vellum.workflows.types.definition import MCPServer
 
 
-def test_mcp_server_url_env_var__mcp_service_receives_url(monkeypatch):
+def test_mcp_server_url_env_var__mcp_service_receives_url():
     """
     Tests that when the MCP service is called with an MCPServer using an EnvironmentVariableReference
     for the URL, the URL is correctly passed to the MCP HTTP client.
