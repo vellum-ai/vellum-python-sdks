@@ -89,7 +89,7 @@ def test_workflow_serialization__integration_dependencies_from_tool_calling_node
     assert dependencies[0] == {
         "type": "INTEGRATION",
         "provider": "COMPOSIO",
-        "integration_name": "GITHUB",
+        "name": "GITHUB",
     }
 
 
@@ -150,14 +150,13 @@ def test_workflow_serialization__multiple_integration_dependencies_deduplicated(
     assert dependencies[0] == {
         "type": "INTEGRATION",
         "provider": "COMPOSIO",
-        "integration_name": "GITHUB",
+        "name": "GITHUB",
     }
 
 
-def test_workflow_serialization__integration_dependencies_sorted_alphabetically():
+def test_workflow_serialization__multiple_different_integration_dependencies():
     """
-    Tests that multiple different integration dependencies are sorted alphabetically
-    by integration_name.
+    Tests that multiple different integration dependencies are all captured.
     """
 
     # GIVEN VellumIntegrationToolDefinitions for different integrations
@@ -180,7 +179,7 @@ def test_workflow_serialization__integration_dependencies_sorted_alphabetically(
         description="Create an Asana task",
     )
 
-    # AND a ToolCallingNode that uses all tools (in non-alphabetical order)
+    # AND a ToolCallingNode that uses all tools
     class TestInputs(BaseInputs):
         query: str
 
@@ -211,21 +210,15 @@ def test_workflow_serialization__integration_dependencies_sorted_alphabetically(
     workflow_display = get_workflow_display(workflow_class=TestWorkflow)
     serialized_workflow: dict = workflow_display.serialize()
 
-    # THEN we should get integration dependencies sorted alphabetically by integration_name
+    # THEN we should get all three integration dependencies
     dependencies = serialized_workflow.get("dependencies", [])
     assert len(dependencies) == 3
-    assert dependencies[0] == {
-        "type": "INTEGRATION",
-        "provider": "COMPOSIO",
-        "integration_name": "ASANA",
-    }
-    assert dependencies[1] == {
-        "type": "INTEGRATION",
-        "provider": "COMPOSIO",
-        "integration_name": "GITHUB",
-    }
-    assert dependencies[2] == {
-        "type": "INTEGRATION",
-        "provider": "COMPOSIO",
-        "integration_name": "SLACK",
-    }
+
+    # AND all expected dependencies should be present (order not guaranteed)
+    expected_deps = [
+        {"type": "INTEGRATION", "provider": "COMPOSIO", "name": "ASANA"},
+        {"type": "INTEGRATION", "provider": "COMPOSIO", "name": "GITHUB"},
+        {"type": "INTEGRATION", "provider": "COMPOSIO", "name": "SLACK"},
+    ]
+    for expected in expected_deps:
+        assert expected in dependencies

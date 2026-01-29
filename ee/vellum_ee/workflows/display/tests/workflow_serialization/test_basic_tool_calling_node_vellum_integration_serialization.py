@@ -34,7 +34,7 @@ def test_serialize_workflow():
     assert len(dependencies) == 1
     assert dependencies[0]["type"] == "INTEGRATION"
     assert dependencies[0]["provider"] == "COMPOSIO"
-    assert dependencies[0]["integration_name"] == "GITHUB"
+    assert dependencies[0]["name"] == "GITHUB"
 
     # AND its input variables should be what we expect
     input_variables = serialized_workflow["input_variables"]
