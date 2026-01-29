@@ -14,10 +14,31 @@ import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { UuidInstantiation } from "src/generators/extensions/uuid-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
+import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { codegen } from "src/index";
-import { SubworkflowNode as SubworkflowNodeType } from "src/types/vellum";
+import {
+  SubworkflowNode as SubworkflowNodeType,
+  WorkflowValueDescriptor as WorkflowValueDescriptorType,
+} from "src/types/vellum";
+import { isExpression, isReference } from "src/utils/workflow-value-descriptor";
 
 const INPUTS_PREFIX = "subworkflow_inputs";
+
+function isWorkflowValueDescriptor(
+  value: unknown
+): value is WorkflowValueDescriptorType {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+  const obj = value as Record<string, unknown>;
+  if (typeof obj.type !== "string") {
+    return false;
+  }
+  return (
+    isExpression(obj as WorkflowValueDescriptorType) ||
+    isReference(obj as WorkflowValueDescriptorType)
+  );
+}
 
 export class SubworkflowDeploymentNode extends BaseNode<
   SubworkflowNodeType,
@@ -26,6 +47,53 @@ export class SubworkflowDeploymentNode extends BaseNode<
   protected DEFAULT_TRIGGER = "AWAIT_ANY";
   protected getNodeAttributeNameByNodeInputKey(nodeInputKey: string): string {
     return `${INPUTS_PREFIX}.${nodeInputKey}`;
+  }
+
+  private getSubworkflowInputEntries(): Array<{
+    key: AstNode;
+    value: AstNode;
+  }> {
+    const entries: Array<{ key: AstNode; value: AstNode }> = [];
+
+    const nodeInputs = this.nodeData.inputs ?? [];
+    for (const nodeInput of nodeInputs) {
+      // First, check if this is an expression-valued JSON input
+      const rules = nodeInput.value?.rules ?? [];
+      let foundExpression = false;
+      for (const rule of rules) {
+        if (rule.type === "CONSTANT_VALUE" && rule.data.type === "JSON") {
+          const jsonValue = rule.data.value;
+          if (isWorkflowValueDescriptor(jsonValue)) {
+            entries.push({
+              key: new StrInstantiation(nodeInput.key),
+              value: new WorkflowValueDescriptor({
+                nodeContext: this.nodeContext,
+                workflowContext: this.workflowContext,
+                workflowValueDescriptor: jsonValue,
+                iterableConfig: { endWithComma: true },
+              }),
+            });
+            foundExpression = true;
+            break;
+          }
+        }
+      }
+
+      if (foundExpression) {
+        continue;
+      }
+
+      // Otherwise, use the existing node input if available
+      const existingNodeInput = this.nodeInputsByKey.get(nodeInput.key);
+      if (existingNodeInput) {
+        entries.push({
+          key: new StrInstantiation(nodeInput.key),
+          value: existingNodeInput,
+        });
+      }
+    }
+
+    return entries;
   }
 
   getNodeClassBodyStatements(): AstNode[] {
@@ -65,15 +133,9 @@ export class SubworkflowDeploymentNode extends BaseNode<
     statements.push(
       new Field({
         name: INPUTS_PREFIX,
-        initializer: new DictInstantiation(
-          Array.from(this.nodeInputsByKey.entries()).map(([key, value]) => ({
-            key: new StrInstantiation(key),
-            value: value,
-          })),
-          {
-            endWithComma: true,
-          }
-        ),
+        initializer: new DictInstantiation(this.getSubworkflowInputEntries(), {
+          endWithComma: true,
+        }),
       })
     );
 

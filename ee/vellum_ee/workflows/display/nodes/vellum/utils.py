@@ -110,8 +110,7 @@ def create_node_input_value_pointer_rules(
             try:
                 rule = create_node_input_value_pointer_rule(value, display_context)
             except UnsupportedSerializationException:
-                serialized = serialize_value(node_id, display_context, value)
-                rule = ConstantValuePointer(data=JsonVellumValue(value=serialized))
+                return node_input_value_pointer_rules
 
             node_input_value_pointer_rules.append(rule)
     elif isinstance(value, (dict, list)) and _contains_descriptor(value):

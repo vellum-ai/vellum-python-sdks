@@ -124,43 +124,33 @@ def test_serialize_node__subworkflow_inputs(GetDisplayClass, expected_input_id, 
 
 def test_serialize_node__subworkflow_inputs_with_accessor_expression(mock_fetch_deployment):
     """
-    Tests that accessor expressions in subworkflow deployment node inputs are serialized correctly.
+    Tests that accessor expressions in subworkflow_inputs are serialized correctly.
     """
 
-    # GIVEN a deployment subworkflow node with an accessor expression input using MapNode.SubworkflowInputs.item
+    # GIVEN a deployment subworkflow node with an accessor expression input
     class MySubworkflowDeploymentNode(SubworkflowDeploymentNode):
         deployment = "DEPLOYMENT"
         subworkflow_inputs = {"user_name": MapNode.SubworkflowInputs.item["name"]}
 
-    # AND a subworkflow containing the deployment node
-    class InnerWorkflow(BaseWorkflow[MapNode.SubworkflowInputs, BaseState]):
+    # AND a workflow with the subworkflow node parameterized with MapNode.SubworkflowInputs
+    class Workflow(BaseWorkflow[MapNode.SubworkflowInputs, BaseState]):
         graph = MySubworkflowDeploymentNode
-
-    # AND a map node that uses this subworkflow
-    class MyMapNode(MapNode):
-        items = [{"name": "Alice"}, {"name": "Bob"}]
-        subworkflow = InnerWorkflow
-
-    # AND a workflow with the map node
-    class Workflow(BaseWorkflow):
-        graph = MyMapNode
 
     # WHEN the workflow is serialized
     workflow_display = get_workflow_display(workflow_class=Workflow)
     serialized_workflow: dict = workflow_display.serialize()
 
-    # THEN the inner workflow should have the subworkflow node with accessor expression input
-    map_node = next(
-        node for node in serialized_workflow["workflow_raw_data"]["nodes"] if node["id"] == str(MyMapNode.__id__)
-    )
-
-    inner_workflow_data = map_node["data"]["workflow_raw_data"]
+    # THEN the subworkflow node should have the accessor expression input serialized
     subworkflow_node = next(
-        node for node in inner_workflow_data["nodes"] if node["id"] == str(MySubworkflowDeploymentNode.__id__)
+        node
+        for node in serialized_workflow["workflow_raw_data"]["nodes"]
+        if node["id"] == str(MySubworkflowDeploymentNode.__id__)
     )
 
-    # AND the input should be serialized as a BINARY_EXPRESSION with accessField operator
+    # AND the subworkflow_inputs should be serialized with the accessor expression
     assert len(subworkflow_node["inputs"]) == 1
+    assert subworkflow_node["inputs"][0]["key"] == "user_name"
+
     input_value = subworkflow_node["inputs"][0]["value"]
     assert input_value["combinator"] == "OR"
     assert len(input_value["rules"]) == 1

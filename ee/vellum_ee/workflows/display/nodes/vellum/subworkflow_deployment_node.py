@@ -1,16 +1,22 @@
 from uuid import UUID
-from typing import Generic, Optional, TypeVar
+from typing import Any, Generic, List, Optional, TypeVar
 
 from vellum.client import Vellum as VellumClient
+from vellum.client.types.json_vellum_value import JsonVellumValue
 from vellum.utils.uuid import is_valid_uuid
+from vellum.workflows.expressions.accessor import AccessorExpression
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes import SubworkflowDeploymentNode
 from vellum.workflows.types.core import JsonObject
+from vellum.workflows.utils.uuids import uuid4_from_hash
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
 from vellum_ee.workflows.display.nodes.utils import raise_if_descriptor
 from vellum_ee.workflows.display.nodes.vellum.utils import create_node_input
 from vellum_ee.workflows.display.types import WorkflowDisplayContext
+from vellum_ee.workflows.display.utils.expressions import serialize_value
+from vellum_ee.workflows.display.utils.vellum import ConstantValuePointer
+from vellum_ee.workflows.display.vellum import NodeInput, NodeInputValuePointer
 
 _SubworkflowDeploymentNodeType = TypeVar("_SubworkflowDeploymentNodeType", bound=SubworkflowDeploymentNode)
 
@@ -51,6 +57,38 @@ class BaseSubworkflowDeploymentNodeDisplay(
             )
             self._node.__output_ids__[output.name] = output_id
 
+    def _create_subworkflow_input(
+        self,
+        node_id: UUID,
+        input_name: str,
+        value: Any,
+        display_context: WorkflowDisplayContext,
+    ) -> NodeInput:
+        input_id = self.node_input_ids_by_name.get(
+            f"{SubworkflowDeploymentNode.subworkflow_inputs.name}.{input_name}"
+        ) or self.node_input_ids_by_name.get(input_name)
+        input_id_str = str(input_id) if input_id else str(uuid4_from_hash(f"{node_id}|{input_name}"))
+
+        if isinstance(value, AccessorExpression):
+            serialized = serialize_value(node_id, display_context, value)
+            rule = ConstantValuePointer(data=JsonVellumValue(value=serialized))
+            return NodeInput(
+                id=input_id_str,
+                key=input_name,
+                value=NodeInputValuePointer(
+                    rules=[rule],
+                    combinator="OR",
+                ),
+            )
+
+        return create_node_input(
+            node_id=node_id,
+            input_name=input_name,
+            value=value,
+            display_context=display_context,
+            input_id=input_id,
+        )
+
     def serialize(
         self, display_context: WorkflowDisplayContext, error_output_id: Optional[UUID] = None, **_kwargs
     ) -> JsonObject:
@@ -64,16 +102,12 @@ class BaseSubworkflowDeploymentNodeDisplay(
         else:
             input_items = list(subworkflow_inputs.items())
 
-        node_inputs = [
-            create_node_input(
+        node_inputs: List[NodeInput] = [
+            self._create_subworkflow_input(
                 node_id=node_id,
                 input_name=variable_name,
                 value=variable_value,
                 display_context=display_context,
-                input_id=self.node_input_ids_by_name.get(
-                    f"{SubworkflowDeploymentNode.subworkflow_inputs.name}.{variable_name}"
-                )
-                or self.node_input_ids_by_name.get(variable_name),
             )
             for variable_name, variable_value in input_items
         ]
