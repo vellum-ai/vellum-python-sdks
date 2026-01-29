@@ -1,7 +1,6 @@
 import asyncio
 import json
 import logging
-import os
 import traceback
 from typing import Any, Dict, List, Optional
 
@@ -178,19 +177,6 @@ class MCPHttpClient:
 
 
 class MCPService:
-    def _resolve_server_url(self, server: MCPServer) -> str:
-        """Resolve the server URL, handling EnvironmentVariableReference if needed."""
-        url = server.url
-        if isinstance(url, str):
-            return url
-        env_value = os.environ.get(url.name)
-        if env_value is None:
-            raise NodeException(
-                f"Environment variable '{url.name}' is not set for MCP server URL",
-                code=WorkflowErrorCode.INVALID_INPUTS,
-            )
-        return env_value
-
     def _get_auth_headers(self, server: MCPServer) -> Dict[str, str]:
         headers = {}
         if server.authorization_type == AuthorizationType.BEARER_TOKEN:
@@ -221,10 +207,9 @@ class MCPService:
     async def _execute_mcp_call(self, server: MCPServer, operation: str, **kwargs) -> Any:
         """Execute an MCP operation using direct HTTP calls."""
         headers = self._get_auth_headers(server)
-        server_url = self._resolve_server_url(server)
 
         try:
-            async with MCPHttpClient(server_url, headers) as client:
+            async with MCPHttpClient(server.url, headers) as client:
                 await client.initialize()
 
                 if operation == "list_tools":
