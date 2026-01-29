@@ -57,6 +57,7 @@ class WorkflowDisplayContext:
     dry_run: bool = False
     ml_models: List[MLModel] = field(default_factory=list)
     _dependencies: Dict[str, JsonObject] = field(default_factory=dict)
+    _integration_dependencies: Dict[str, JsonObject] = field(default_factory=dict)
     _errors: List[Exception] = field(default_factory=list)
     _invalid_nodes: List[Type[BaseNode]] = field(default_factory=list)
 
@@ -65,11 +66,25 @@ class WorkflowDisplayContext:
         if model_name not in self._dependencies:
             self._dependencies[model_name] = dependency
 
+    def add_integration_dependency(self, provider: str, integration_name: str) -> None:
+        """Register an integration dependency. Deduplicates by provider:integration_name."""
+        key = f"{provider}:{integration_name}"
+        if key not in self._integration_dependencies:
+            self._integration_dependencies[key] = {
+                "type": "INTEGRATION",
+                "provider": provider,
+                "integration_name": integration_name,
+            }
+
     def get_dependencies(self) -> List[JsonObject]:
-        """Get all registered dependencies, sorted alphabetically by (name, model_name)."""
-        dependencies = list(self._dependencies.values())
-        dependencies.sort(key=lambda d: (str(d.get("name", "")), str(d.get("model_name", ""))))
-        return dependencies
+        """Get all registered dependencies, sorted alphabetically by type then by relevant fields."""
+        integration_deps = list(self._integration_dependencies.values())
+        integration_deps.sort(key=lambda d: (str(d.get("integration_name", "")), str(d.get("provider", ""))))
+
+        model_deps = list(self._dependencies.values())
+        model_deps.sort(key=lambda d: (str(d.get("model_name", "")), str(d.get("name", ""))))
+
+        return integration_deps + model_deps
 
     @cached_property
     def ml_models_map(self) -> Dict[str, MLModel]:

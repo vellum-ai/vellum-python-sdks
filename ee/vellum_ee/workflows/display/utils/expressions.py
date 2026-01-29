@@ -59,6 +59,7 @@ from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.references.workflow_input import WorkflowInputReference
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.core import JsonArray, JsonObject
+from vellum.workflows.types.definition import VellumIntegrationToolDefinition
 from vellum.workflows.types.generics import is_workflow_class
 from vellum.workflows.utils.files import virtual_open
 from vellum.workflows.utils.functions import compile_function_definition, compile_inline_workflow_function_definition
@@ -582,6 +583,15 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
                 "value": workflow_data,
             },
         }
+
+    if isinstance(value, VellumIntegrationToolDefinition):
+        display_context.add_integration_dependency(value.provider.value, value.integration_name)
+        context = {"executable_id": executable_id, "client": display_context.client}
+        dict_value = value.model_dump(context=context)
+        dict_ref = serialize_value(executable_id, display_context, dict_value)
+        if dict_ref is not None and dict_ref.get("type") == "DICTIONARY_REFERENCE":
+            dict_ref["definition"] = _get_pydantic_model_definition(value.__class__)
+        return dict_ref
 
     if isinstance(value, BaseModel):
         context = {"executable_id": executable_id, "client": display_context.client}

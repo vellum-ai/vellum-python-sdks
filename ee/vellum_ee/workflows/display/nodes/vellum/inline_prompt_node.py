@@ -187,6 +187,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
             normalized_functions = compile_workflow_deployment_function_definition(function, display_context.client)
         elif isinstance(function, VellumIntegrationToolDefinition):
             normalized_functions = compile_vellum_integration_tool_definition(function, display_context.client)
+            display_context.add_integration_dependency(function.provider.value, function.integration_name)
         else:
             raise ValueError(f"Unsupported function type: {type(function)}")
         return {
