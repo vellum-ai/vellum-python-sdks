@@ -1,0 +1,8 @@
+{
+  "trigger_path_to_id_mapping": {
+    ".triggers.manual.Manual": "b3c8ab56-001f-4157-bbc2-4a7fe5ebf8c6"
+  },
+  "edges_to_id_mapping": {
+    "codegen_integration.fixtures.simple_manual_trigger_workflow.code.triggers.manual.Manual|codegen_integration.fixtures.simple_manual_trigger_workflow.code.nodes.simple_node.SimpleNode.Trigger": "3f69f314-b59e-462e-8d55-f75bf2f955dc"
+  }
+}
