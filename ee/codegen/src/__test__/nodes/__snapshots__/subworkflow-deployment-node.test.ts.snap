@@ -1,5 +1,27 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`SubworkflowDeploymentNode > accessor expression inputs > should generate code for accessor expression inputs 1`] = `
+"from vellum.workflows.nodes.displayable import SubworkflowDeploymentNode
+
+from ..inputs import Inputs
+
+
+class SubworkflowNode(SubworkflowDeploymentNode):
+    deployment = "test-deployment"
+    release_tag = "LATEST"
+    subworkflow_inputs = {
+        "user_name": Inputs.item["name"],
+    }
+
+    class Outputs(SubworkflowDeploymentNode.Outputs):
+        pass
+
+    class Display(SubworkflowDeploymentNode.Display):
+        x = 2239.986322714681
+        y = 484.74458968144046
+"
+`;
+
 exports[`SubworkflowDeploymentNode > basic > getNodeDisplayFile 1`] = `
 "from uuid import UUID
 

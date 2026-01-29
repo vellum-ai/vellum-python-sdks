@@ -163,6 +163,33 @@ def test_serialize_workflow(vellum_client):
             "workflow_deployment_id": deployment_id,
             "release_tag": "LATEST",
         },
+        "attributes": [
+            {
+                "id": "1453965b-dc73-4afc-956b-6cf9cc83b951",
+                "name": "subworkflow_inputs",
+                "value": {
+                    "type": "DICTIONARY_REFERENCE",
+                    "entries": [
+                        {
+                            "id": "a6927bc5-ceff-48dc-93ba-488b0b339658",
+                            "key": "city",
+                            "value": {
+                                "type": "WORKFLOW_INPUT",
+                                "input_variable_id": "693cc9a5-8d74-4a58-bdcf-2b4989cdf250",
+                            },
+                        },
+                        {
+                            "id": "298283f8-75d2-4632-b74e-79b777170d3d",
+                            "key": "date",
+                            "value": {
+                                "type": "WORKFLOW_INPUT",
+                                "input_variable_id": "19a78824-9a98-4ae8-a1fc-61f81a422a17",
+                            },
+                        },
+                    ],
+                },
+            }
+        ],
         "display_data": {"position": {"x": 0.0, "y": 0.0}},
         "base": {
             "module": ["vellum", "workflows", "nodes", "displayable", "subworkflow_deployment_node", "node"],

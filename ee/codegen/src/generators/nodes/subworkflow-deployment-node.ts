@@ -14,6 +14,7 @@ import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { UuidInstantiation } from "src/generators/extensions/uuid-instantiation";
 import { BaseNode } from "src/generators/nodes/bases/base";
+import { WorkflowValueDescriptor } from "src/generators/workflow-value-descriptor";
 import { codegen } from "src/index";
 import { SubworkflowNode as SubworkflowNodeType } from "src/types/vellum";
 
@@ -26,6 +27,40 @@ export class SubworkflowDeploymentNode extends BaseNode<
   protected DEFAULT_TRIGGER = "AWAIT_ANY";
   protected getNodeAttributeNameByNodeInputKey(nodeInputKey: string): string {
     return `${INPUTS_PREFIX}.${nodeInputKey}`;
+  }
+
+  private getSubworkflowInputsField(): Field {
+    // Check for subworkflow_inputs attribute first (supports accessor patterns)
+    const subworkflowInputsAttr = this.nodeData.attributes?.find(
+      (attr) => attr.name === INPUTS_PREFIX
+    );
+
+    if (subworkflowInputsAttr) {
+      return new Field({
+        name: INPUTS_PREFIX,
+        initializer: new WorkflowValueDescriptor({
+          nodeContext: this.nodeContext,
+          workflowContext: this.workflowContext,
+          workflowValueDescriptor: subworkflowInputsAttr.value,
+        }),
+      });
+    }
+
+    // Fall back to legacy input-based subworkflow_inputs
+    const entries: Array<{ key: AstNode; value: AstNode }> = [];
+    for (const [key, nodeInput] of this.nodeInputsByKey.entries()) {
+      entries.push({
+        key: new StrInstantiation(key),
+        value: nodeInput,
+      });
+    }
+
+    return new Field({
+      name: INPUTS_PREFIX,
+      initializer: new DictInstantiation(entries, {
+        endWithComma: true,
+      }),
+    });
   }
 
   getNodeClassBodyStatements(): AstNode[] {
@@ -62,20 +97,7 @@ export class SubworkflowDeploymentNode extends BaseNode<
       })
     );
 
-    statements.push(
-      new Field({
-        name: INPUTS_PREFIX,
-        initializer: new DictInstantiation(
-          Array.from(this.nodeInputsByKey.entries()).map(([key, value]) => ({
-            key: new StrInstantiation(key),
-            value: value,
-          })),
-          {
-            endWithComma: true,
-          }
-        ),
-      })
-    );
+    statements.push(this.getSubworkflowInputsField());
 
     const outputsClass = this.generateOutputsClass();
     if (outputsClass) {

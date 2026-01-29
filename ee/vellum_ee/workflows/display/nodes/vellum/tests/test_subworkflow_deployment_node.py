@@ -10,7 +10,9 @@ from vellum import (
     WorkflowDeploymentReleaseWorkflowVersion,
 )
 from vellum.workflows import BaseWorkflow
+from vellum.workflows.nodes import MapNode
 from vellum.workflows.nodes.displayable.subworkflow_deployment_node.node import SubworkflowDeploymentNode
+from vellum.workflows.state.base import BaseState
 from vellum_ee.workflows.display.nodes.vellum.subworkflow_deployment_node import BaseSubworkflowDeploymentNodeDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
@@ -118,3 +120,50 @@ def test_serialize_node__subworkflow_inputs(GetDisplayClass, expected_input_id, 
             },
         }
     ]
+
+
+def test_serialize_node__subworkflow_inputs_with_accessor_expression(mock_fetch_deployment):
+    """
+    Tests that accessor expressions in subworkflow_inputs are serialized as a DICTIONARY_REFERENCE attribute.
+    """
+
+    # GIVEN a deployment subworkflow node with an accessor expression input
+    class MySubworkflowDeploymentNode(SubworkflowDeploymentNode):
+        deployment = "DEPLOYMENT"
+        subworkflow_inputs = {"user_name": MapNode.SubworkflowInputs.item["name"]}
+
+    # AND a workflow with the subworkflow node parameterized with MapNode.SubworkflowInputs
+    class Workflow(BaseWorkflow[MapNode.SubworkflowInputs, BaseState]):
+        graph = MySubworkflowDeploymentNode
+
+    # WHEN the workflow is serialized
+    workflow_display = get_workflow_display(workflow_class=Workflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN the subworkflow node should have the accessor expression in attributes
+    subworkflow_node = next(
+        node
+        for node in serialized_workflow["workflow_raw_data"]["nodes"]
+        if node["id"] == str(MySubworkflowDeploymentNode.__id__)
+    )
+
+    # AND the subworkflow_inputs should be serialized as a DICTIONARY_REFERENCE attribute
+    assert "attributes" in subworkflow_node
+    subworkflow_inputs_attr = next(
+        attr for attr in subworkflow_node["attributes"] if attr["name"] == "subworkflow_inputs"
+    )
+
+    # AND the attribute value should be a DICTIONARY_REFERENCE with the accessor expression
+    attr_value = subworkflow_inputs_attr["value"]
+    assert attr_value["type"] == "DICTIONARY_REFERENCE"
+    assert len(attr_value["entries"]) == 1
+
+    entry = attr_value["entries"][0]
+    assert entry["key"] == "user_name"
+
+    entry_value = entry["value"]
+    assert entry_value["type"] == "BINARY_EXPRESSION"
+    assert entry_value["operator"] == "accessField"
+    assert entry_value["lhs"]["type"] == "WORKFLOW_INPUT"
+    assert entry_value["rhs"]["type"] == "CONSTANT_VALUE"
+    assert entry_value["rhs"]["value"]["value"] == "name"

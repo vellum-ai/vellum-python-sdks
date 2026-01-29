@@ -4,12 +4,14 @@ import { VellumError } from "vellum-ai/errors";
 import { beforeEach, vi } from "vitest";
 
 import { workflowContextFactory } from "src/__test__/helpers";
+import { inputVariableContextFactory } from "src/__test__/helpers/input-variable-context-factory";
 import { subworkflowDeploymentNodeDataFactory } from "src/__test__/helpers/node-data-factories";
 import { createNodeContext, WorkflowContext } from "src/context";
 import { SubworkflowDeploymentNodeContext } from "src/context/node-context/subworkflow-deployment-node";
 import { NodeDefinitionGenerationError } from "src/generators/errors";
 import { Writer } from "src/generators/extensions/writer";
 import { SubworkflowDeploymentNode } from "src/generators/nodes/subworkflow-deployment-node";
+import { DictionaryWorkflowReference } from "src/types/vellum";
 
 describe("SubworkflowDeploymentNode", () => {
   let workflowContext: WorkflowContext;
@@ -189,6 +191,98 @@ describe("SubworkflowDeploymentNode", () => {
         "Failed to generate `output_display` for Subworkflow Node"
       );
       expect(errors[1]?.severity).toBe("WARNING");
+    });
+  });
+
+  describe("accessor expression inputs", () => {
+    it("should generate code for accessor expression inputs", async () => {
+      vi.spyOn(
+        WorkflowReleaseClient.prototype,
+        "retrieveWorkflowDeploymentRelease"
+      ).mockResolvedValue({
+        id: "mocked-workflow-deployment-history-item-id",
+        created: new Date(),
+        environment: {
+          id: "mocked-environment-id",
+          name: "mocked-environment-name",
+          label: "mocked-environment-label",
+        },
+        createdBy: {
+          id: "mocked-created-by-id",
+          email: "mocked-created-by-email",
+        },
+        workflowVersion: {
+          id: "mocked-workflow-release-id",
+          inputVariables: [],
+          outputVariables: [],
+        },
+        deployment: {
+          name: "test-deployment",
+        },
+        releaseTags: [],
+        reviews: [],
+      } as unknown as WorkflowDeploymentRelease);
+
+      // Use DICTIONARY_REFERENCE for subworkflow_inputs attribute with nested expressions
+      const subworkflowInputsAttr: DictionaryWorkflowReference = {
+        type: "DICTIONARY_REFERENCE",
+        entries: [
+          {
+            id: "entry-id-1",
+            key: "user_name",
+            value: {
+              type: "BINARY_EXPRESSION",
+              operator: "accessField",
+              lhs: {
+                type: "WORKFLOW_INPUT",
+                inputVariableId: "test-input-variable-id",
+              },
+              rhs: {
+                type: "CONSTANT_VALUE",
+                value: {
+                  type: "STRING",
+                  value: "name",
+                },
+              },
+            },
+          },
+        ],
+      };
+
+      const nodeData = subworkflowDeploymentNodeDataFactory({
+        attributes: [
+          {
+            id: "subworkflow-inputs-attr-id",
+            name: "subworkflow_inputs",
+            value: subworkflowInputsAttr,
+          },
+        ],
+      }).build();
+
+      workflowContext = workflowContextFactory();
+      workflowContext.addInputVariableContext(
+        inputVariableContextFactory({
+          inputVariableData: {
+            id: "test-input-variable-id",
+            key: "item",
+            type: "JSON",
+          },
+          workflowContext,
+        })
+      );
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as SubworkflowDeploymentNodeContext;
+
+      node = new SubworkflowDeploymentNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
     });
   });
 

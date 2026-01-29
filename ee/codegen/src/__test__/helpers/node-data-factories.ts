@@ -733,7 +733,11 @@ export function templatingNodeFactory({
   return new NodeDataFactoryBuilder<TemplatingNode>(nodeData);
 }
 
-export function subworkflowDeploymentNodeDataFactory(): NodeDataFactoryBuilder<SubworkflowNode> {
+export function subworkflowDeploymentNodeDataFactory({
+  attributes,
+}: {
+  attributes?: NodeAttribute[];
+} = {}): NodeDataFactoryBuilder<SubworkflowNode> {
   const nodeData: SubworkflowNode = {
     id: "c8f2964c-09b8-44e0-a06d-606319fe5e2a",
     type: "SUBWORKFLOW",
@@ -746,16 +750,19 @@ export function subworkflowDeploymentNodeDataFactory(): NodeDataFactoryBuilder<S
       workflowDeploymentId: "58171df8-cdf9-4d10-a9ed-22eaf545b22a",
       releaseTag: "LATEST",
     },
-    inputs: [
-      {
-        id: "f62b7511-dd69-4dff-a4fc-718a9db3ceba",
-        key: "input",
-        value: {
-          rules: [],
-          combinator: "OR",
-        },
-      },
-    ],
+    inputs: attributes
+      ? []
+      : [
+          {
+            id: "f62b7511-dd69-4dff-a4fc-718a9db3ceba",
+            key: "input",
+            value: {
+              rules: [],
+              combinator: "OR",
+            },
+          },
+        ],
+    attributes,
     displayData: {
       position: {
         x: 2239.986322714681,

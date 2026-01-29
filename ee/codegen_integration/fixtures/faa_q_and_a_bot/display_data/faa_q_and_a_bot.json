@@ -2655,6 +2655,25 @@
           "workflow_deployment_id": "e68d6033-f3e6-4681-a7b9-6bfd2828a237",
           "release_tag": "LATEST"
         },
+        "attributes": [
+          {
+            "id": "b1fd3c55-db8e-476c-abdf-f6200068a78d",
+            "name": "subworkflow_inputs",
+            "value": {
+              "type": "DICTIONARY_REFERENCE",
+              "entries": [
+                {
+                  "id": "36503a36-1fd1-4038-abf7-91e0dda96048",
+                  "key": "chat_history",
+                  "value": {
+                    "type": "WORKFLOW_INPUT",
+                    "input_variable_id": "d4663e15-8871-42d8-8ef7-59baff2cd436"
+                  }
+                }
+              ]
+            }
+          }
+        ],
         "display_data": {
           "position": {
             "x": 3914.0,
