@@ -60,16 +60,21 @@ class WorkflowDisplayContext:
     _errors: List[Exception] = field(default_factory=list)
     _invalid_nodes: List[Type[BaseNode]] = field(default_factory=list)
 
-    def add_dependency(self, model_name: str, dependency: JsonObject) -> None:
-        """Register a model provider dependency. Deduplicates by model_name."""
-        if model_name not in self._dependencies:
-            self._dependencies[model_name] = dependency
+    def add_dependency(self, dependency: JsonObject) -> None:
+        """Register a dependency. Deduplicates by type and relevant identifying fields."""
+        dep_type = dependency.get("type")
+        if dep_type == "MODEL_PROVIDER":
+            key = f"MODEL_PROVIDER:{dependency.get('model_name')}"
+        elif dep_type == "INTEGRATION":
+            key = f"INTEGRATION:{dependency.get('provider')}:{dependency.get('name')}"
+        else:
+            key = f"{dep_type}:{dependency.get('name')}"
+        if key not in self._dependencies:
+            self._dependencies[key] = dependency
 
     def get_dependencies(self) -> List[JsonObject]:
-        """Get all registered dependencies, sorted alphabetically by (name, model_name)."""
-        dependencies = list(self._dependencies.values())
-        dependencies.sort(key=lambda d: (str(d.get("name", "")), str(d.get("model_name", ""))))
-        return dependencies
+        """Get all registered dependencies."""
+        return list(self._dependencies.values())
 
     @cached_property
     def ml_models_map(self) -> Dict[str, MLModel]:

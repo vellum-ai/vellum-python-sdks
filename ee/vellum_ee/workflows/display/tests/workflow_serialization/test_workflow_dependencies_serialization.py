@@ -1,4 +1,13 @@
+from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
+from vellum.client.types.rich_text_prompt_block import RichTextPromptBlock
+from vellum.client.types.variable_prompt_block import VariablePromptBlock
+from vellum.workflows.constants import VellumIntegrationProviderType
+from vellum.workflows.nodes.displayable.tool_calling_node import ToolCallingNode
+from vellum.workflows.state.base import BaseState
+from vellum.workflows.types.definition import VellumIntegrationToolDefinition
+from vellum.workflows.workflows.base import BaseInputs, BaseWorkflow
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
+from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 
 def test_workflow_serialization__dependencies_from_ml_models():
@@ -27,3 +36,189 @@ def test_workflow_serialization__dependencies_from_ml_models():
         "name": "OPENAI",
         "model_name": "gpt-4o-mini",
     }
+
+
+def test_workflow_serialization__integration_dependencies_from_tool_calling_node():
+    """
+    Tests that integration dependencies are extracted from tool calling nodes
+    that use VellumIntegrationToolDefinition.
+    """
+
+    # GIVEN a VellumIntegrationToolDefinition for GitHub
+    github_tool = VellumIntegrationToolDefinition(
+        provider=VellumIntegrationProviderType.COMPOSIO,
+        integration_name="GITHUB",
+        name="create_issue",
+        description="Create a new issue in a GitHub repository",
+    )
+
+    # AND a ToolCallingNode that uses this tool
+    class TestInputs(BaseInputs):
+        query: str
+
+    class TestToolCallingNode(ToolCallingNode):
+        ml_model = "gpt-4o-mini"
+        blocks = [
+            ChatMessagePromptBlock(
+                chat_role="USER",
+                blocks=[
+                    RichTextPromptBlock(
+                        blocks=[
+                            VariablePromptBlock(input_variable="question"),
+                        ],
+                    ),
+                ],
+            ),
+        ]
+        functions = [github_tool]
+        prompt_inputs = {"question": TestInputs.query}
+
+    class TestWorkflow(BaseWorkflow[TestInputs, BaseState]):
+        graph = TestToolCallingNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            text = TestToolCallingNode.Outputs.text
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN we should get the expected integration dependency
+    dependencies = serialized_workflow.get("dependencies", [])
+    assert len(dependencies) == 1
+    assert dependencies[0] == {
+        "type": "INTEGRATION",
+        "provider": "COMPOSIO",
+        "name": "GITHUB",
+    }
+
+
+def test_workflow_serialization__multiple_integration_dependencies_deduplicated():
+    """
+    Tests that multiple tool calling nodes using the same integration
+    result in a single deduplicated dependency.
+    """
+
+    # GIVEN two VellumIntegrationToolDefinitions for the same integration
+    github_tool_1 = VellumIntegrationToolDefinition(
+        provider=VellumIntegrationProviderType.COMPOSIO,
+        integration_name="GITHUB",
+        name="create_issue",
+        description="Create a new issue",
+    )
+    github_tool_2 = VellumIntegrationToolDefinition(
+        provider=VellumIntegrationProviderType.COMPOSIO,
+        integration_name="GITHUB",
+        name="list_issues",
+        description="List issues",
+    )
+
+    # AND a ToolCallingNode that uses both tools
+    class TestInputs(BaseInputs):
+        query: str
+
+    class TestToolCallingNode(ToolCallingNode):
+        ml_model = "gpt-4o-mini"
+        blocks = [
+            ChatMessagePromptBlock(
+                chat_role="USER",
+                blocks=[
+                    RichTextPromptBlock(
+                        blocks=[
+                            VariablePromptBlock(input_variable="question"),
+                        ],
+                    ),
+                ],
+            ),
+        ]
+        functions = [github_tool_1, github_tool_2]
+        prompt_inputs = {"question": TestInputs.query}
+
+    class TestWorkflow(BaseWorkflow[TestInputs, BaseState]):
+        graph = TestToolCallingNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            text = TestToolCallingNode.Outputs.text
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN we should get only one integration dependency (deduplicated)
+    dependencies = serialized_workflow.get("dependencies", [])
+    assert len(dependencies) == 1
+    assert dependencies[0] == {
+        "type": "INTEGRATION",
+        "provider": "COMPOSIO",
+        "name": "GITHUB",
+    }
+
+
+def test_workflow_serialization__multiple_different_integration_dependencies():
+    """
+    Tests that multiple different integration dependencies are all captured.
+    """
+
+    # GIVEN VellumIntegrationToolDefinitions for different integrations
+    github_tool = VellumIntegrationToolDefinition(
+        provider=VellumIntegrationProviderType.COMPOSIO,
+        integration_name="GITHUB",
+        name="create_issue",
+        description="Create a GitHub issue",
+    )
+    slack_tool = VellumIntegrationToolDefinition(
+        provider=VellumIntegrationProviderType.COMPOSIO,
+        integration_name="SLACK",
+        name="send_message",
+        description="Send a Slack message",
+    )
+    asana_tool = VellumIntegrationToolDefinition(
+        provider=VellumIntegrationProviderType.COMPOSIO,
+        integration_name="ASANA",
+        name="create_task",
+        description="Create an Asana task",
+    )
+
+    # AND a ToolCallingNode that uses all tools
+    class TestInputs(BaseInputs):
+        query: str
+
+    class TestToolCallingNode(ToolCallingNode):
+        ml_model = "gpt-4o-mini"
+        blocks = [
+            ChatMessagePromptBlock(
+                chat_role="USER",
+                blocks=[
+                    RichTextPromptBlock(
+                        blocks=[
+                            VariablePromptBlock(input_variable="question"),
+                        ],
+                    ),
+                ],
+            ),
+        ]
+        functions = [slack_tool, github_tool, asana_tool]
+        prompt_inputs = {"question": TestInputs.query}
+
+    class TestWorkflow(BaseWorkflow[TestInputs, BaseState]):
+        graph = TestToolCallingNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            text = TestToolCallingNode.Outputs.text
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN we should get all three integration dependencies
+    dependencies = serialized_workflow.get("dependencies", [])
+    assert len(dependencies) == 3
+
+    # AND all expected dependencies should be present (order not guaranteed)
+    expected_deps = [
+        {"type": "INTEGRATION", "provider": "COMPOSIO", "name": "ASANA"},
+        {"type": "INTEGRATION", "provider": "COMPOSIO", "name": "GITHUB"},
+        {"type": "INTEGRATION", "provider": "COMPOSIO", "name": "SLACK"},
+    ]
+    for expected in expected_deps:
+        assert expected in dependencies

@@ -72,12 +72,13 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
         # Register model provider dependency if ml_model is found in display_context.ml_models_map
         model = display_context.ml_models_map.get(ml_model)
         if model:
-            dependency = {
-                "type": "MODEL_PROVIDER",
-                "name": model.hosted_by.value,
-                "model_name": ml_model,
-            }
-            display_context.add_dependency(ml_model, dependency)
+            display_context.add_dependency(
+                {
+                    "type": "MODEL_PROVIDER",
+                    "name": model.hosted_by.value,
+                    "model_name": ml_model,
+                }
+            )
 
         has_descriptors = _contains_descriptors(node_blocks)
 
@@ -187,6 +188,13 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
             normalized_functions = compile_workflow_deployment_function_definition(function, display_context.client)
         elif isinstance(function, VellumIntegrationToolDefinition):
             normalized_functions = compile_vellum_integration_tool_definition(function, display_context.client)
+            display_context.add_dependency(
+                {
+                    "type": "INTEGRATION",
+                    "provider": function.provider.value,
+                    "name": function.integration_name,
+                }
+            )
         else:
             raise ValueError(f"Unsupported function type: {type(function)}")
         return {
