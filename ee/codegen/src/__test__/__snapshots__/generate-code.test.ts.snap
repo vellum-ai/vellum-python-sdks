@@ -1,5 +1,346 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`generateCode > should generate code for %1 agent-node-inline-subworkflow-with-state-variables.ts > nodes/agent_with_subworkflow_tool/subworkflow_with_state/state.py 1`] = `
+"from typing import Optional, Union
+
+from vellum.workflows.state import BaseState
+
+
+class State(BaseState):
+    inner_counter: Optional[Union[float, int]] = 0
+"
+`;
+
+exports[`generateCode > should generate code for %1 agent-node-inline-subworkflow-with-state-variables.ts > state.py 1`] = `
+"from typing import Optional, Union
+
+from vellum.workflows.state import BaseState
+
+
+class State(BaseState):
+    parent_counter: Optional[Union[float, int]] = 0
+"
+`;
+
+exports[`generateCode > should generate code for %1 api-node-with-secret.ts > nodes/api_with_secret.py 1`] = `
+"from vellum.workflows.constants import APIRequestMethod, AuthorizationType
+from vellum.workflows.nodes.displayable import APINode
+from vellum.workflows.references import VellumSecretReference
+
+
+class ApiWithSecret(APINode):
+    url = "https://api.example.com/v1/test"
+    method = APIRequestMethod.POST
+    json = {
+        "input": "test-data",
+    }
+    headers = {
+        "Content-Type": "application/json",
+    }
+    api_key_header_key = "Authorization"
+    authorization_type = AuthorizationType.BEARER_TOKEN
+    api_key_header_value = ""
+    bearer_token_value = VellumSecretReference("test-workspace-secret-id")
+    timeout = 60
+
+    class Display(APINode.Display):
+        x = 500
+        y = 200
+        z_index = 1
+"
+`;
+
+exports[`generateCode > should generate code for %1 api-node-with-secret.ts > nodes/use_api_with_secret.py 1`] = `
+"from typing import Any
+
+from vellum.workflows.nodes.displayable import FinalOutputNode
+from vellum.workflows.state import BaseState
+
+from .api_with_secret import ApiWithSecret
+
+
+class UseApiWithSecret(FinalOutputNode[BaseState, Any]):
+    class Outputs(FinalOutputNode.Outputs):
+        value = ApiWithSecret.Outputs.json
+
+    class Display(FinalOutputNode.Display):
+        x = 1000
+        y = 200
+        z_index = 2
+"
+`;
+
+exports[`generateCode > should generate code for %1 chat-message-trigger.ts > triggers/chat_message.py 1`] = `
+"from vellum.workflows.references import LazyReference
+from vellum.workflows.triggers import ChatMessageTrigger
+
+
+class ChatMessage(ChatMessageTrigger):
+    class Config(ChatMessageTrigger.Config):
+        output = LazyReference("Workflow.Outputs.result")
+
+    class Display(ChatMessageTrigger.Display):
+        label = "Chat Message"
+        x = 100
+        y = 200
+        z_index = 1
+        icon = "vellum:icon:message-dots"
+        color = "blue"
+"
+`;
+
+exports[`generateCode > should generate code for %1 chat-message-trigger.ts > workflow.py 1`] = `
+"from vellum.workflows import BaseWorkflow
+
+from .nodes.some_node import SomeNode
+from .triggers.chat_message import ChatMessage
+
+
+class Workflow(BaseWorkflow):
+    graph = ChatMessage >> SomeNode
+
+    class Outputs(BaseWorkflow.Outputs):
+        result = SomeNode.Outputs.result
+"
+`;
+
+exports[`generateCode > should generate code for %1 code-execution-node-with-await-all.ts > nodes/code_execution_with_await_all/__init__.py 1`] = `
+"from vellum.workflows.nodes.displayable import CodeExecutionNode
+from vellum.workflows.state import BaseState
+from vellum.workflows.types.core import MergeBehavior
+
+
+class CodeExecutionWithAwaitAll(CodeExecutionNode[BaseState, str]):
+    filepath = "./script.py"
+    code_inputs = {}
+    runtime = "PYTHON_3_11_6"
+    packages = None
+
+    class Display(CodeExecutionNode.Display):
+        x = 500
+        y = 200
+        z_index = 1
+
+    class Trigger(CodeExecutionNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ALL
+"
+`;
+
+exports[`generateCode > should generate code for %1 final-output-node-only.ts > display/nodes/my_final_output.py 1`] = `
+"from uuid import UUID
+
+from vellum_ee.workflows.display.editor import NodeDisplayData
+from vellum_ee.workflows.display.nodes import BaseFinalOutputNodeDisplay
+from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay
+
+from ...nodes.my_final_output import MyFinalOutput
+
+
+class MyFinalOutputDisplay(BaseFinalOutputNodeDisplay[MyFinalOutput]):
+    label = "Final Output"
+    node_id = UUID("terminal-node")
+    target_handle_id = UUID("terminal-target")
+    output_name = "result"
+    node_input_ids_by_name = {"node_input": "terminal-node-input-id"}
+    output_display = {
+        MyFinalOutput.Outputs.value: NodeOutputDisplay(id=UUID("terminal-node-output-id"), name="value"),
+    }
+    display_data = NodeDisplayData(width=330, height=96)
+"
+`;
+
+exports[`generateCode > should generate code for %1 final-output-node-only.ts > display/workflow.py 1`] = `
+"from uuid import UUID
+
+from vellum_ee.workflows.display.base import EdgeDisplay, EntrypointDisplay, WorkflowMetaDisplay, WorkflowOutputDisplay
+from vellum_ee.workflows.display.editor import NodeDisplayData, NodeDisplayPosition
+from vellum_ee.workflows.display.workflows import BaseWorkflowDisplay
+
+from ..nodes.my_final_output import MyFinalOutput
+from ..workflow import Workflow
+
+
+class WorkflowDisplay(BaseWorkflowDisplay[Workflow]):
+    workflow_display = WorkflowMetaDisplay(
+        entrypoint_node_id=UUID("entrypoint-node"),
+        entrypoint_node_source_handle_id=UUID("entrypoint-source"),
+        entrypoint_node_display=NodeDisplayData(position=NodeDisplayPosition(x=0, y=0)),
+    )
+    entrypoint_displays = {
+        MyFinalOutput: EntrypointDisplay(id=UUID("entrypoint-node"), edge_display=EdgeDisplay(id=UUID("edge-1")))
+    }
+    output_displays = {
+        Workflow.Outputs.result: WorkflowOutputDisplay(id=UUID("workflow-output-variable-id"), name="result")
+    }
+"
+`;
+
+exports[`generateCode > should generate code for %1 inline-map-node-with-state-variables.ts > nodes/map_with_state/state.py 1`] = `
+"from typing import Optional, Union
+
+from vellum.workflows.state import BaseState
+
+
+class State(BaseState):
+    inner_counter: Optional[Union[float, int]] = 0
+"
+`;
+
+exports[`generateCode > should generate code for %1 inline-map-node-with-state-variables.ts > state.py 1`] = `
+"from typing import Optional, Union
+
+from vellum.workflows.state import BaseState
+
+
+class State(BaseState):
+    parent_counter: Optional[Union[float, int]] = 0
+"
+`;
+
+exports[`generateCode > should generate code for %1 inline-subworkflow-with-state-variables.ts > nodes/subworkflow_with_state/state.py 1`] = `
+"from typing import Optional, Union
+
+from vellum.workflows.state import BaseState
+
+
+class State(BaseState):
+    inner_counter: Optional[Union[float, int]] = 0
+"
+`;
+
+exports[`generateCode > should generate code for %1 inline-subworkflow-with-state-variables.ts > state.py 1`] = `
+"from typing import Optional, Union
+
+from vellum.workflows.state import BaseState
+
+
+class State(BaseState):
+    parent_counter: Optional[Union[float, int]] = 0
+"
+`;
+
+exports[`generateCode > should generate code for %1 integration-trigger-with-entrypoint-and-outgoing-edges.ts > triggers/slack_message_trigger.py 1`] = `
+"from vellum.workflows.triggers import IntegrationTrigger
+
+
+class SlackMessageTrigger(IntegrationTrigger):
+    message: str
+
+    class Config(IntegrationTrigger.Config):
+        provider = "COMPOSIO"
+        integration_name = "slack"
+        slug = "SLACK_MESSAGE_TRIGGER"
+
+    class Display(IntegrationTrigger.Display):
+        label = "Slack Message Trigger"
+        x = 0
+        y = 0
+        z_index = 0
+        icon = "slack"
+        color = "#4A154B"
+"
+`;
+
+exports[`generateCode > should generate code for %1 integration-trigger-with-entrypoint-and-outgoing-edges.ts > workflow.py 1`] = `
+"from vellum.workflows import BaseWorkflow
+
+from .nodes.custom_node import CustomNode
+from .nodes.final_output import FinalOutput
+from .triggers.slack_message_trigger import SlackMessageTrigger
+
+
+class Workflow(BaseWorkflow):
+    graph = {
+        CustomNode >> FinalOutput,
+        SlackMessageTrigger >> CustomNode,
+    }
+
+    class Outputs(BaseWorkflow.Outputs):
+        result = FinalOutput.Outputs.value
+"
+`;
+
+exports[`generateCode > should generate code for %1 integration-trigger-with-number-setup-attribute.ts > triggers/gmail_new_gmail_message.py 1`] = `
+"from vellum.workflows.triggers import IntegrationTrigger
+
+
+class GmailNewMessageTrigger(IntegrationTrigger):
+    message: str
+
+    class Config(IntegrationTrigger.Config):
+        provider = "COMPOSIO"
+        integration_name = "GMAIL"
+        slug = "GMAIL_NEW_GMAIL_MESSAGE"
+        setup_attributes = {"interval": 1, "user_id": "me"}
+
+    class Display(IntegrationTrigger.Display):
+        label = "Gmail New Message Trigger"
+        x = 100
+        y = 200
+        z_index = 1
+        icon = "gmail"
+        color = "#EA4335"
+"
+`;
+
+exports[`generateCode > should generate code for %1 linear-integration-trigger.ts > triggers/linear_comment_event_trigger.py 1`] = `
+"from vellum.workflows.triggers import IntegrationTrigger
+
+
+class LinearCommentEventTrigger(IntegrationTrigger):
+    action: str
+    data: str
+    type: str
+    url: str
+
+    class Config(IntegrationTrigger.Config):
+        provider = "COMPOSIO"
+        integration_name = "LINEAR"
+        slug = "LINEAR_COMMENT_EVENT_TRIGGER"
+        setup_attributes = {"team_id": "dfasadf"}
+
+    class Display(IntegrationTrigger.Display):
+        label = "Linear Comment Event Trigger"
+        x = 100
+        y = 200
+        z_index = 1
+        icon = "linear"
+        color = "#4A154B"
+"
+`;
+
+exports[`generateCode > should generate code for %1 linear-integration-trigger.ts > workflow.py 1`] = `
+"from vellum.workflows import BaseWorkflow
+
+from .nodes.bottom_node import BottomNode
+from .nodes.top_node import TopNode
+from .triggers.linear_comment_event_trigger import LinearCommentEventTrigger
+
+
+class Workflow(BaseWorkflow):
+    graph = {
+        TopNode,
+        LinearCommentEventTrigger >> BottomNode,
+    }
+"
+`;
+
+exports[`generateCode > should generate code for %1 map-node-output-disappear.ts > nodes/outer_map_workflow/nodes/inner_map_workflow/__init__.py 1`] = `
+"from vellum.workflows.nodes.displayable import MapNode
+
+from .workflow import InnerMapWorkflow
+
+
+class InnerMapNode(MapNode):
+    items = [
+        "a",
+        "b",
+    ]
+    subworkflow = InnerMapWorkflow
+    max_concurrency = 1
+"
+`;
+
 exports[`generateCode > should generate code for %1 map-node-with-accessor-expression.ts > display/nodes/map_node/__init__.py 1`] = `
 "# flake8: noqa: F401, F403
 
@@ -15,16 +356,16 @@ from .nodes import *
 
 class MapNodeNodeDisplay(BaseMapNodeDisplay[MapNodeNode]):
     label = "Map Node"
-    node_id = UUID("73dbae4c-ba83-4a94-9d66-50e30c3a0a8c")
-    target_handle_id = UUID("acb98924-6843-4de2-9045-ed1c6c5c98e3")
-    node_input_ids_by_name = {"items": UUID("dbb1e63e-4210-4fb0-880f-3f3baf69196c")}
-    attribute_ids_by_name = {"items": UUID("11dcc62a-58ef-4d1e-ac8f-a2ca3dbab87a")}
+    node_id = UUID("c5a554d7-8aac-452a-8e2d-3bfeebff2052")
+    target_handle_id = UUID("c30fa745-c7f6-43ea-a80e-c8a5cb219673")
+    node_input_ids_by_name = {"items": UUID("b8219ebc-f049-4360-98de-a6f7dc1be776")}
+    attribute_ids_by_name = {"items": UUID("10fc6d59-f828-450e-8b59-307d76923b79")}
     output_display = {
         MapNodeNode.Outputs.map_result: NodeOutputDisplay(
-            id=UUID("d88d0187-945b-4a22-a31d-110a26f577c4"), name="map_result"
+            id=UUID("c1e4698d-4aea-4f0c-b98d-9b33d9661687"), name="map_result"
         )
     }
-    port_displays = {MapNodeNode.Ports.default: PortDisplayOverrides(id=UUID("c2a37fd6-aab3-4016-9bd6-9e37607dbe38"))}
+    port_displays = {MapNodeNode.Ports.default: PortDisplayOverrides(id=UUID("e9b1945c-7318-4483-9278-18006d233ec7"))}
 "
 `;
 
@@ -42,6 +383,143 @@ class MapNodeNode(MapNode):
 "
 `;
 
+exports[`generateCode > should generate code for %1 node-mock.ts > sandbox.py 1`] = `
+"from vellum.workflows import MockNodeExecution
+from vellum.workflows.inputs import DatasetRow
+from vellum.workflows.sandbox import WorkflowSandboxRunner
+
+from .nodes.start_node import StartNode
+from .workflow import Workflow
+
+dataset = [
+    DatasetRow(
+        label="First Scenario",
+        mocks=[
+            MockNodeExecution(
+                when_condition=StartNode.Execution.count.greater_than_or_equal_to("Hello, World!"),
+                then_outputs=StartNode.Outputs(result="Hello, World!"),
+            ),
+        ],
+    ),
+]
+
+runner = WorkflowSandboxRunner(workflow=Workflow(), dataset=dataset)
+
+if __name__ == "__main__":
+    runner.run()
+"
+`;
+
+exports[`generateCode > should generate code for %1 scheduled-trigger.ts > triggers/scheduled.py 1`] = `
+"from vellum_ee.workflows.display.editor import NodeDisplayComment
+from vellum.workflows.triggers import ScheduleTrigger
+
+
+class ScheduledTrigger(ScheduleTrigger):
+    class Config(ScheduleTrigger.Config):
+        cron = "* * * * *"
+        timezone = "UTC"
+
+    class Display(ScheduleTrigger.Display):
+        label = "Scheduled Trigger"
+        x = 0
+        y = 0
+        z_index = 0
+        comment = NodeDisplayComment(value="This is a scheduled trigger")
+"
+`;
+
+exports[`generateCode > should generate code for %1 scheduled-trigger.ts > workflow.py 1`] = `
+"from vellum.workflows import BaseWorkflow
+
+from .nodes.bottom_node import BottomNode
+from .nodes.top_node import TopNode
+from .triggers.scheduled import ScheduledTrigger
+
+
+class Workflow(BaseWorkflow):
+    graph = {
+        TopNode,
+        ScheduledTrigger >> BottomNode,
+    }
+"
+`;
+
+exports[`generateCode > should generate code for %1 scheduled-trigger-with-entrypoint-same-node.ts > triggers/scheduled.py 1`] = `
+"from vellum.workflows.triggers import ScheduleTrigger
+
+
+class DailySchedule(ScheduleTrigger):
+    class Config(ScheduleTrigger.Config):
+        cron = "0 9 * * *"
+        timezone = "UTC"
+
+    class Display(ScheduleTrigger.Display):
+        label = "Daily Schedule"
+        x = 0
+        y = 0
+        z_index = 0
+"
+`;
+
+exports[`generateCode > should generate code for %1 scheduled-trigger-with-entrypoint-same-node.ts > workflow.py 1`] = `
+"from vellum.workflows import BaseWorkflow
+
+from .nodes.final_output import FinalOutput
+from .triggers.scheduled import DailySchedule
+
+
+class Workflow(BaseWorkflow):
+    graph = {
+        FinalOutput,
+        DailySchedule >> FinalOutput,
+    }
+
+    class Outputs(BaseWorkflow.Outputs):
+        result = FinalOutput.Outputs.value
+"
+`;
+
+exports[`generateCode > should generate code for %1 slack-message-trigger.ts > triggers/slack_message_trigger.py 1`] = `
+"from vellum.workflows.triggers import IntegrationTrigger
+
+
+class SlackMessageTrigger(IntegrationTrigger):
+    message: str
+    channel: str
+    timestamp: str
+
+    class Config(IntegrationTrigger.Config):
+        provider = "COMPOSIO"
+        integration_name = "slack"
+        slug = "SLACK_MESSAGE_TRIGGER"
+
+    class Display(IntegrationTrigger.Display):
+        label = "Slack Message Trigger"
+        x = 100
+        y = 200
+        z_index = 1
+        icon = "slack"
+        color = "#4A154B"
+"
+`;
+
+exports[`generateCode > should generate code for %1 slack-message-trigger.ts > workflow.py 1`] = `
+"from vellum.workflows import BaseWorkflow
+
+from .nodes.bottom_node import BottomNode
+from .nodes.top_node import TopNode
+from .triggers.slack_message_trigger import SlackMessageTrigger
+
+
+class Workflow(BaseWorkflow):
+    graph = {
+        TopNode,
+        SlackMessageTrigger >> BottomNode,
+    }
+"
+`;
+
 exports[`generateCode > should generate code for %1 subworkflow-deployment-node-with-accessor-expression.ts > display/nodes/subworkflow_deployment_node.py 1`] = `
 "from uuid import UUID
 
@@ -53,14 +531,14 @@ from ...nodes.subworkflow_deployment_node import SubworkflowDeploymentNodeNode
 
 class SubworkflowDeploymentNodeNodeDisplay(BaseSubworkflowDeploymentNodeDisplay[SubworkflowDeploymentNodeNode]):
     label = "Subworkflow Deployment Node"
-    node_id = UUID("19644497-55d5-4108-b979-389638aac1ea")
-    target_handle_id = UUID("7915ddad-9e56-4593-b97a-e1691a27832e")
-    node_input_ids_by_name = {"subworkflow_inputs.user_name": UUID("815eba8d-8073-4a9f-a4c6-6f0fdadaaebd")}
-    attribute_ids_by_name = {"subworkflow_inputs": UUID("d9ba5ea0-c23b-4847-a0cf-df2c93ce6b15")}
+    node_id = UUID("988da8f1-accf-4c41-a9f8-fbc898fa3d33")
+    target_handle_id = UUID("174a2ee1-38bc-455a-af16-15a144437807")
+    node_input_ids_by_name = {"subworkflow_inputs.user_name": UUID("afddf6d4-9427-4bc0-8482-e310467d34fd")}
+    attribute_ids_by_name = {"subworkflow_inputs": UUID("b80d26cd-f012-48bc-8ae5-1201b8bc077d")}
     output_display = {}
     port_displays = {
         SubworkflowDeploymentNodeNode.Ports.default: PortDisplayOverrides(
-            id=UUID("4c603f2b-bbc0-4baf-8870-6046bb686367")
+            id=UUID("569b2e14-57ef-4fd7-b40b-c25e2e517454")
         )
     }
 "
@@ -81,5 +559,115 @@ class SubworkflowDeploymentNodeNode(SubworkflowDeploymentNode):
 
     class Trigger(SubworkflowDeploymentNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
+"
+`;
+
+exports[`generateCode > should generate code for %1 two-generic-nodes-with-same-base-coalesce.ts > nodes/final_output_node.py 1`] = `
+"from vellum.workflows.nodes.displayable import FinalOutputNode as BaseFinalOutputNode
+from vellum.workflows.state import BaseState
+
+from .first_generic_node import FirstGenericNode
+from .first_generic_node_1 import FirstGenericNode as FirstGenericNode1FirstGenericNode
+
+
+class FinalOutputNode(BaseFinalOutputNode[BaseState, str]):
+    class Outputs(BaseFinalOutputNode.Outputs):
+        value = FirstGenericNode.Outputs.value.coalesce(FirstGenericNode1FirstGenericNode.Outputs.value)
+
+    class Display(BaseFinalOutputNode.Display):
+        x = 1000
+        y = 300
+        z_index = 2
+"
+`;
+
+exports[`generateCode > should generate code for %1 two-generic-nodes-with-same-base-coalesce.ts > workflow.py 1`] = `
+"from vellum.workflows import BaseWorkflow
+
+from .nodes.final_output_node import FinalOutputNode
+from .nodes.first_generic_node import FirstGenericNode
+from .nodes.first_generic_node_1 import FirstGenericNode as FirstGenericNode1FirstGenericNode
+
+
+class Workflow(BaseWorkflow):
+    graph = {
+        FirstGenericNode,
+        FirstGenericNode1FirstGenericNode,
+    } >> FinalOutputNode
+
+    class Outputs(BaseWorkflow.Outputs):
+        result = FinalOutputNode.Outputs.value
+"
+`;
+
+exports[`generateCode > should generate code for %1 two-integration-trigger.ts > triggers/linear_comment_event_trigger.py 1`] = `
+"from vellum.workflows.triggers import IntegrationTrigger
+
+
+class LinearIntegrationTrigger(IntegrationTrigger):
+    action: str
+    data: str
+    type: str
+    url: str
+
+    class Config(IntegrationTrigger.Config):
+        provider = "COMPOSIO"
+        integration_name = "LINEAR"
+        slug = "LINEAR_COMMENT_EVENT_TRIGGER"
+        setup_attributes = {"team_id": "dfasadf"}
+
+    class Display(IntegrationTrigger.Display):
+        label = "Linear Integration Trigger"
+        x = 100
+        y = 200
+        z_index = 1
+        icon = "linear"
+        color = "#4A154B"
+"
+`;
+
+exports[`generateCode > should generate code for %1 two-integration-trigger.ts > triggers/linear_comment_event_trigger_1.py 1`] = `
+"from vellum.workflows.triggers import IntegrationTrigger
+
+
+class LinearIntegrationTrigger2(IntegrationTrigger):
+    action: str
+    data: str
+    type: str
+    url: str
+
+    class Config(IntegrationTrigger.Config):
+        provider = "COMPOSIO"
+        integration_name = "LINEAR"
+        slug = "LINEAR_COMMENT_EVENT_TRIGGER"
+        setup_attributes = {"team_id": "dfasadf"}
+
+    class Display(IntegrationTrigger.Display):
+        label = "Linear Integration Trigger 2"
+        x = 300
+        y = 200
+        z_index = 1
+        icon = "linear"
+        color = "#4A154B"
+"
+`;
+
+exports[`generateCode > should generate code for %1 two-integration-trigger.ts > workflow.py 1`] = `
+"from vellum.workflows import BaseWorkflow
+
+from .nodes.my_final_output import MyFinalOutput
+from .triggers.linear_comment_event_trigger import LinearIntegrationTrigger
+from .triggers.linear_comment_event_trigger_1 import LinearIntegrationTrigger2
+
+
+class Workflow(BaseWorkflow):
+    graph = {
+        MyFinalOutput,
+        LinearIntegrationTrigger >> MyFinalOutput,
+        LinearIntegrationTrigger2 >> MyFinalOutput,
+    }
+
+    class Outputs(BaseWorkflow.Outputs):
+        result = MyFinalOutput.Outputs.value
 "
 `;
