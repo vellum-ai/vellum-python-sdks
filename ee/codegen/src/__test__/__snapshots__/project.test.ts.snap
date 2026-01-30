@@ -1434,10 +1434,25 @@ exports[`WorkflowProjectGenerator > subworkflow deployment with terminal referen
 "from vellum.workflows.nodes.displayable import FinalOutputNode
 from vellum.workflows.state import BaseState
 
+from .subworkflow_deployment import SubworkflowDeployment
+
 
 class FinalOutput(FinalOutputNode[BaseState, str]):
     class Outputs(FinalOutputNode.Outputs):
-        pass
+        value = SubworkflowDeployment.Outputs.feedback.coalesce("fallback value")
+"
+`;
+
+exports[`WorkflowProjectGenerator > subworkflow deployment with terminal reference > should resolve terminal node output reference using workflow output variable ID > code/nodes/subworkflow_deployment.py 1`] = `
+"from vellum.workflows.nodes.displayable import SubworkflowDeploymentNode
+
+
+class SubworkflowDeployment(SubworkflowDeploymentNode):
+    deployment = "test-deployment"
+    release_tag = "LATEST"
+
+    class Outputs(SubworkflowDeploymentNode.Outputs):
+        feedback: str
 "
 `;
 

@@ -8753,10 +8753,7 @@ baz = foo + bar
     it("should resolve terminal node output reference using workflow output variable ID", async () => {
       /**
        * Tests that a terminal node referencing a subworkflow deployment node's output
-       * correctly resolves the output when the workflow's output variable ID differs
-       * from the deployed workflow's output variable ID but they share the same key.
-       *
-       * Related Slack thread: https://vellumai.slack.com/archives/C09TYUG7RJ9/p1769700694140789
+       * correctly generates
        */
 
       // GIVEN a mock workflow deployment release with output variable ID different from workflow's output variable ID
@@ -8870,6 +8867,13 @@ baz = foo + bar
                           output_id: "workflow-output-feedback-id",
                         },
                       },
+                      {
+                        type: "CONSTANT_VALUE",
+                        data: {
+                          type: "STRING",
+                          value: "fallback value",
+                        },
+                      },
                     ],
                   },
                 },
@@ -8916,12 +8920,18 @@ baz = foo + bar
 
       await project.generateCode();
 
-      // THEN the workflow.py file should show the bug - feedback = None
-      // because the lookup by workflow output variable ID fails
+      // THEN the workflow.py file should correctly reference the subworkflow output
       expectProjectFileToMatchSnapshot(["code", "workflow.py"]);
 
-      // AND the final_output.py node file should show value = None
+      // AND the final_output.py node file should correctly reference the subworkflow output with coalesce
       expectProjectFileToMatchSnapshot(["code", "nodes", "final_output.py"]);
+
+      // AND the subworkflow_deployment.py node file should be generated correctly
+      expectProjectFileToMatchSnapshot([
+        "code",
+        "nodes",
+        "subworkflow_deployment.py",
+      ]);
     });
   });
 });
