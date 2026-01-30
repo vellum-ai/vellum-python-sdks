@@ -350,6 +350,18 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                 )
             )
 
+        # Validate that trigger-based workflows (non-ManualTrigger) don't have workflow inputs
+        has_workflow_inputs = len(self.display_context.workflow_input_displays) > 0
+        if has_triggers and not has_manual_trigger and has_workflow_inputs:
+            self.display_context.add_validation_error(
+                WorkflowValidationError(
+                    message="Trigger-based workflows cannot have workflow inputs. "
+                    "Trigger workflows receive data from the trigger, not from inputs. "
+                    "Remove the inputs.py file or use ManualTrigger instead.",
+                    workflow_class_name=self._workflow.__name__,
+                )
+            )
+
         entrypoint_node_id: Optional[UUID] = None
         entrypoint_node_source_handle_id: Optional[UUID] = None
         entrypoint_node_display = self.display_context.workflow_display.entrypoint_node_display
