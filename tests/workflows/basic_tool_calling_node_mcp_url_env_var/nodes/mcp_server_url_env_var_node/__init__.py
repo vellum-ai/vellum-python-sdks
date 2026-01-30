@@ -9,6 +9,8 @@ from vellum.workflows.nodes.displayable.tool_calling_node.node import ToolCallin
 from vellum.workflows.references import EnvironmentVariableReference
 from vellum.workflows.types.definition import MCPServer
 
+from ...inputs import Inputs
+
 
 class MCPServerUrlEnvVarNode(ToolCallingNode):
     ml_model = "gpt-4o-mini"
@@ -18,10 +20,7 @@ class MCPServerUrlEnvVarNode(ToolCallingNode):
             blocks=[RichTextPromptBlock(blocks=[PlainTextPromptBlock(text="""You are a helpful assistant""")])],
         ),
         ChatMessagePromptBlock(
-            chat_role="USER",
-            blocks=[
-                RichTextPromptBlock(blocks=[VariablePromptBlock(input_variable="e76ccfad-f4fc-4fae-a77c-814fdf3d6bcd")])
-            ],
+            chat_role="USER", blocks=[RichTextPromptBlock(blocks=[VariablePromptBlock(input_variable="question")])]
         ),
     ]
     functions = [
@@ -33,7 +32,7 @@ class MCPServerUrlEnvVarNode(ToolCallingNode):
         )
     ]
     prompt_inputs = {
-        "question": "What can you help me with?",
+        "question": Inputs.query,
     }
     parameters = PromptParameters(
         stop=[],

@@ -144,6 +144,7 @@ def _compute_diff(
             frozenset(
                 {
                     "__init__.py",
+                    "inputs.py",
                     "nodes/__init__.py",
                     "display/nodes/mcp_server_url_env_var_node/__init__.py",
                     "display/workflow.py",
