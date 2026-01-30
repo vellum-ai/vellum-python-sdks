@@ -4,9 +4,10 @@ import { join } from "path";
 
 import { difference } from "lodash";
 import { v4 as uuidv4 } from "uuid";
-import { DocumentIndexRead } from "vellum-ai/api";
+import { DocumentIndexRead, WorkflowDeploymentRelease } from "vellum-ai/api";
 import { DocumentIndexes as DocumentIndexesClient } from "vellum-ai/api/resources/documentIndexes/client/Client";
 import { MlModels } from "vellum-ai/api/resources/mlModels/client/Client";
+import { WorkflowDeployments as WorkflowReleaseClient } from "vellum-ai/api/resources/workflowDeployments/client/Client";
 import { WorkspaceSecrets } from "vellum-ai/api/resources/workspaceSecrets/client/Client";
 import { expect, vi } from "vitest";
 
@@ -317,11 +318,9 @@ describe("WorkflowProjectGenerator", () => {
     const excludeFilesAtPaths: RegExp[] = [/\.pyc$/, /metadata\.json$/];
     const ignoreContentsOfFilesAtPaths: RegExp[] = [];
     const fixtureMocks = {
-      faa_q_and_a_bot: SpyMocks.createWorkflowDeploymentsMock(),
       simple_guard_rail_node: SpyMocks.createMetricDefinitionMock(),
+      faa_q_and_a_bot: SpyMocks.createWorkflowDeploymentsMock(),
       simple_subworkflow_deployment_node:
-        SpyMocks.createWorkflowDeploymentsMock(),
-      subworkflow_deployment_with_terminal_reference:
         SpyMocks.createWorkflowDeploymentsMock(),
     };
     vi.spyOn(WorkspaceSecrets.prototype, "retrieve").mockImplementation(
@@ -340,23 +339,22 @@ describe("WorkflowProjectGenerator", () => {
     it.each(
       getFixturesForProjectTest({
         includeFixtures: [
-          "faa_q_and_a_bot",
-          "simple_api_node",
+          "simple_search_node",
+          "simple_inline_subworkflow_node",
+          "simple_guardrail_node",
+          "simple_prompt_node",
+          "simple_map_node",
           "simple_code_execution_node",
           "simple_conditional_node",
-          "simple_error_node",
-          "simple_guardrail_node",
-          "simple_inline_subworkflow_node",
-          "simple_map_node",
-          "simple_merge_node",
-          "simple_node_with_try_wrap",
-          "simple_prompt_node",
-          "simple_scheduled_trigger",
-          "simple_search_node",
-          "simple_subworkflow_deployment_node",
           "simple_templating_node",
+          "simple_error_node",
+          "simple_merge_node",
+          "simple_api_node",
+          "simple_node_with_try_wrap",
+          "simple_subworkflow_deployment_node",
           "simple_workflow_node_with_output_values",
-          "subworkflow_deployment_with_terminal_reference",
+          "faa_q_and_a_bot",
+          "simple_scheduled_trigger",
           "subworkflow_with_custom_inner_node",
         ],
         fixtureMocks: fixtureMocks,
@@ -8748,6 +8746,182 @@ baz = foo + bar
       await project.generateCode();
 
       expectProjectFileToMatchSnapshot(["code", "nodes", "test_node.py"]);
+    });
+  });
+
+  describe("subworkflow deployment with terminal reference", () => {
+    it("should resolve terminal node output reference using workflow output variable ID", async () => {
+      /**
+       * Tests that a terminal node referencing a subworkflow deployment node's output
+       * correctly resolves the output when the workflow's output variable ID differs
+       * from the deployed workflow's output variable ID but they share the same key.
+       *
+       * Related Slack thread: https://vellumai.slack.com/archives/C09TYUG7RJ9/p1769700694140789
+       */
+
+      // GIVEN a mock workflow deployment release with output variable ID different from workflow's output variable ID
+      vi.spyOn(
+        WorkflowReleaseClient.prototype,
+        "retrieveWorkflowDeploymentRelease"
+      ).mockResolvedValue({
+        id: "mocked-workflow-deployment-history-item-id",
+        created: new Date(),
+        environment: {
+          id: "mocked-environment-id",
+          name: "mocked-environment-name",
+          label: "mocked-environment-label",
+        },
+        createdBy: {
+          id: "mocked-created-by-id",
+          email: "mocked-created-by-email",
+        },
+        workflowVersion: {
+          id: "mocked-workflow-release-id",
+          inputVariables: [],
+          outputVariables: [
+            {
+              // This ID is different from the workflow's output variable ID
+              id: "deployed-output-feedback-id",
+              key: "feedback",
+              type: "STRING",
+            },
+          ],
+        },
+        deployment: {
+          name: "test-deployment",
+        },
+        releaseTags: [
+          {
+            name: "mocked-release-tag-name",
+            source: "USER",
+          },
+        ],
+        reviews: [],
+      } as WorkflowDeploymentRelease);
+
+      // AND a workflow with a subworkflow deployment node and terminal node referencing its output
+      const displayData = {
+        workflow_raw_data: {
+          nodes: [
+            {
+              id: "entrypoint-node-id",
+              type: "ENTRYPOINT",
+              data: {
+                label: "Entrypoint",
+                source_handle_id: "entrypoint-source-handle",
+              },
+              inputs: [],
+            },
+            {
+              id: "subworkflow-deployment-node-id",
+              type: "SUBWORKFLOW",
+              data: {
+                label: "Subworkflow Deployment",
+                variant: "DEPLOYMENT",
+                workflow_deployment_id: "test-workflow-deployment-id",
+                release_tag: "LATEST",
+                source_handle_id: "subworkflow-source-handle",
+                target_handle_id: "subworkflow-target-handle",
+                error_output_id: null,
+              },
+              inputs: [],
+              attributes: [
+                {
+                  id: "subworkflow-inputs-attr-id",
+                  name: "subworkflow_inputs",
+                  value: {
+                    type: "DICTIONARY_REFERENCE",
+                    entries: [],
+                  },
+                },
+              ],
+              outputs: [
+                {
+                  // This is the workflow's output variable ID - different from deployed workflow's output ID
+                  id: "workflow-output-feedback-id",
+                  name: "feedback",
+                  type: "STRING",
+                },
+              ],
+            },
+            {
+              id: "terminal-node-id",
+              type: "TERMINAL",
+              data: {
+                label: "Final Output",
+                name: "feedback",
+                target_handle_id: "terminal-target-handle",
+                output_id: "terminal-output-id",
+                output_type: "STRING",
+                node_input_id: "terminal-input-id",
+              },
+              inputs: [
+                {
+                  id: "terminal-input-id",
+                  key: "node_input",
+                  value: {
+                    combinator: "OR",
+                    rules: [
+                      {
+                        type: "NODE_OUTPUT",
+                        data: {
+                          node_id: "subworkflow-deployment-node-id",
+                          // References the workflow's output variable ID, not the deployed workflow's output ID
+                          output_id: "workflow-output-feedback-id",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          ],
+          edges: [
+            {
+              id: "edge-1",
+              type: "DEFAULT",
+              source_node_id: "entrypoint-node-id",
+              source_handle_id: "entrypoint-source-handle",
+              target_node_id: "subworkflow-deployment-node-id",
+              target_handle_id: "subworkflow-target-handle",
+            },
+            {
+              id: "edge-2",
+              type: "DEFAULT",
+              source_node_id: "subworkflow-deployment-node-id",
+              source_handle_id: "subworkflow-source-handle",
+              target_node_id: "terminal-node-id",
+              target_handle_id: "terminal-target-handle",
+            },
+          ],
+        },
+        input_variables: [],
+        state_variables: [],
+        output_variables: [
+          {
+            id: "terminal-output-id",
+            key: "feedback",
+            type: "STRING",
+          },
+        ],
+      };
+
+      // WHEN we generate code
+      const project = new WorkflowProjectGenerator({
+        absolutePathToOutputDirectory: tempDir,
+        workflowVersionExecConfigData: displayData,
+        moduleName: "code",
+        vellumApiKey: "<TEST_API_KEY>",
+      });
+
+      await project.generateCode();
+
+      // THEN the workflow.py file should show the bug - feedback = None
+      // because the lookup by workflow output variable ID fails
+      expectProjectFileToMatchSnapshot(["code", "workflow.py"]);
+
+      // AND the final_output.py node file should show value = None
+      expectProjectFileToMatchSnapshot(["code", "nodes", "final_output.py"]);
     });
   });
 });
