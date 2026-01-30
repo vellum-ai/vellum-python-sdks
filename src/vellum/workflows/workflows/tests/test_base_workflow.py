@@ -105,6 +105,48 @@ def test_workflow__single_node():
     assert nodes == {NodeA}
 
 
+def test_workflow__single_port():
+    """
+    Tests that a workflow can be defined with a single port as its graph.
+    """
+
+    # GIVEN a node with a custom port
+    class NodeA(BaseNode):
+        class Ports(BaseNode.Ports):
+            custom_port = BaseNode.Ports.default.copy()
+
+    # WHEN we define a workflow with a single port as its graph
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = NodeA.Ports.custom_port
+
+    # THEN the workflow should correctly identify the node
+    nodes = set(TestWorkflow.get_nodes())
+    assert nodes == {NodeA}
+
+
+def test_workflow__multiple_ports():
+    """
+    Tests that a workflow can be defined with multiple ports as its graph.
+    """
+
+    # GIVEN two nodes with custom ports
+    class NodeA(BaseNode):
+        class Ports(BaseNode.Ports):
+            custom_port = BaseNode.Ports.default.copy()
+
+    class NodeB(BaseNode):
+        class Ports(BaseNode.Ports):
+            custom_port = BaseNode.Ports.default.copy()
+
+    # WHEN we define a workflow with multiple ports as its graph
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = {NodeA.Ports.custom_port, NodeB.Ports.custom_port}
+
+    # THEN the workflow should correctly identify both nodes
+    nodes = set(TestWorkflow.get_nodes())
+    assert nodes == {NodeA, NodeB}
+
+
 def test_workflow__multiple_nodes():
     class NodeA(BaseNode):
         pass
