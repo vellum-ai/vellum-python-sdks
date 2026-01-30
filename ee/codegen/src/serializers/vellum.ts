@@ -1522,6 +1522,7 @@ export const SubworkflowNodeSerializer: ObjectSchema<
   adornments: listSchema(AdornmentNodeSerializer).optional(),
   ports: listSchema(NodePortSerializer).optional(),
   trigger: NodeTriggerSerializer.optional(),
+  attributes: listSchema(NodeAttributeSerializer).optional(),
 });
 
 export declare namespace SubworkflowNodeSerializer {
@@ -1641,6 +1642,7 @@ export const MapNodeSerializer: ObjectSchema<
   adornments: listSchema(AdornmentNodeSerializer).optional(),
   ports: listSchema(NodePortSerializer).optional(),
   trigger: NodeTriggerSerializer.optional(),
+  attributes: listSchema(NodeAttributeSerializer).optional(),
 });
 
 export declare namespace MapNodeSerializer {
