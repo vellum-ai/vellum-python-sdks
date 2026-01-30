@@ -17,6 +17,7 @@ class FulfilledAdHocExecutePromptEvent(UniversalBaseModel):
     outputs: typing.List[PromptOutput]
     execution_id: str
     meta: typing.Optional[AdHocFulfilledPromptExecutionMeta] = None
+    chat_message_metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
