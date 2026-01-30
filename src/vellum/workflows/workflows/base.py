@@ -83,6 +83,7 @@ from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.mocks import MockNodeExecutionArg
 from vellum.workflows.nodes.utils import get_unadorned_node
 from vellum.workflows.outputs import BaseOutputs
+from vellum.workflows.ports import Port
 from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.resolvers.base import BaseWorkflowResolver
 from vellum.workflows.runner import WorkflowRunner
@@ -135,10 +136,14 @@ class _BaseWorkflowMeta(type):
             nodes: Set[Type[BaseNode]] = set()
             if isinstance(graph_item, Graph):
                 nodes.update(node for node in graph_item.nodes)
+            elif isinstance(graph_item, Port):
+                nodes.add(graph_item.node_class)
             elif isinstance(graph_item, set):
                 for item in graph_item:
                     if isinstance(item, Graph):
                         nodes.update(node for node in item.nodes)
+                    elif isinstance(item, Port):
+                        nodes.add(item.node_class)
                     elif inspect.isclass(item) and issubclass(item, BaseNode):
                         nodes.add(item)
             elif inspect.isclass(graph_item) and issubclass(graph_item, BaseNode):
@@ -164,9 +169,14 @@ class _BaseWorkflowMeta(type):
                         for node in non_overlapping_nodes:
                             filtered_graphs.add(node)
 
+                elif isinstance(item, Port):
+                    if item.node_class not in overlapping_nodes:
+                        filtered_graphs.add(item)
+
                 elif isinstance(item, set):
                     filtered_nodes: Set[Type[BaseNode]] = set()
                     filtered_graphs_in_set: Set[Graph] = set()
+                    filtered_ports_in_set: Set[Port] = set()
 
                     for subitem in item:
                         if isinstance(subitem, Graph):
@@ -178,6 +188,9 @@ class _BaseWorkflowMeta(type):
                             else:
                                 non_overlapping_nodes = graph_nodes - overlapping_nodes
                                 filtered_nodes.update(non_overlapping_nodes)
+                        elif isinstance(subitem, Port):
+                            if subitem.node_class not in overlapping_nodes:
+                                filtered_ports_in_set.add(subitem)
                         elif isinstance(subitem, type) and issubclass(subitem, BaseNode):
                             if subitem not in overlapping_nodes:
                                 filtered_nodes.add(subitem)
@@ -189,6 +202,8 @@ class _BaseWorkflowMeta(type):
                         filtered_graphs.add(filtered_nodes)
                     if filtered_graphs_in_set:
                         filtered_graphs.add(filtered_graphs_in_set)
+                    if filtered_ports_in_set:
+                        filtered_graphs.add(filtered_ports_in_set)
 
                 elif isinstance(item, type) and issubclass(item, BaseNode):
                     if item not in overlapping_nodes:
@@ -228,7 +243,7 @@ class _BaseWorkflowMeta(type):
         return workflow_class
 
 
-GraphAttribute = Union[Type[BaseNode], Graph, Set[Type[BaseNode]], Set[Graph]]
+GraphAttribute = Union[Type[BaseNode], Graph, Port, Set[Type[BaseNode]], Set[Graph], Set[Port]]
 
 
 class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_BaseWorkflowMeta):
@@ -298,11 +313,15 @@ class BaseWorkflow(Generic[InputsType, StateType], BaseExecutable, metaclass=_Ba
         """
         if isinstance(graph, Graph):
             return [graph]
+        if isinstance(graph, Port):
+            return [Graph.from_port(graph)]
         if isinstance(graph, set):
             graphs = []
             for item in graph:
                 if isinstance(item, Graph):
                     graphs.append(item)
+                elif isinstance(item, Port):
+                    graphs.append(Graph.from_port(item))
                 elif inspect.isclass(item) and issubclass(item, BaseNode):
                     graphs.append(Graph.from_node(item))
                 else:

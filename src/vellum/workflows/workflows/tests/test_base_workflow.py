@@ -8,6 +8,8 @@ from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubworkflowNode
 from vellum.workflows.outputs.base import BaseOutputs
+from vellum.workflows.ports import Port
+from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.stack import Stack
 from vellum.workflows.workflows.base import BaseWorkflow
@@ -103,6 +105,48 @@ def test_workflow__single_node():
 
     nodes = set(TestWorkflow.get_nodes())
     assert nodes == {NodeA}
+
+
+def test_workflow__single_port():
+    """
+    Tests that a workflow can be defined with a single port as its graph.
+    """
+
+    # GIVEN a node with a custom port
+    class NodeA(BaseNode):
+        class Ports(BaseNode.Ports):
+            custom_port = Port.on_if(ConstantValueReference(True))
+
+    # WHEN we define a workflow with a single port as its graph
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = NodeA.Ports.custom_port
+
+    # THEN the workflow should correctly identify the node
+    nodes = set(TestWorkflow.get_nodes())
+    assert nodes == {NodeA}
+
+
+def test_workflow__multiple_ports():
+    """
+    Tests that a workflow can be defined with multiple ports as its graph.
+    """
+
+    # GIVEN two nodes with custom ports
+    class NodeA(BaseNode):
+        class Ports(BaseNode.Ports):
+            custom_port = Port.on_if(ConstantValueReference(True))
+
+    class NodeB(BaseNode):
+        class Ports(BaseNode.Ports):
+            custom_port = Port.on_if(ConstantValueReference(True))
+
+    # WHEN we define a workflow with multiple ports as its graph
+    class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
+        graph = {NodeA.Ports.custom_port, NodeB.Ports.custom_port}
+
+    # THEN the workflow should correctly identify both nodes
+    nodes = set(TestWorkflow.get_nodes())
+    assert nodes == {NodeA, NodeB}
 
 
 def test_workflow__multiple_nodes():
