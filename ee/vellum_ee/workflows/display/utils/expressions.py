@@ -586,7 +586,13 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
 
     if isinstance(value, BaseModel):
         if isinstance(value, VellumIntegrationToolDefinition):
-            display_context.add_integration_dependency(value.provider.value, value.integration_name)
+            display_context.add_dependency(
+                {
+                    "type": "INTEGRATION",
+                    "provider": value.provider.value,
+                    "name": value.integration_name,
+                }
+            )
         context = {"executable_id": executable_id, "client": display_context.client}
         dict_value = value.model_dump(context=context)
         dict_ref = serialize_value(executable_id, display_context, dict_value)

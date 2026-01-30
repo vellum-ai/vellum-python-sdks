@@ -60,21 +60,17 @@ class WorkflowDisplayContext:
     _errors: List[Exception] = field(default_factory=list)
     _invalid_nodes: List[Type[BaseNode]] = field(default_factory=list)
 
-    def add_dependency(self, model_name: str, dependency: JsonObject) -> None:
-        """Register a model provider dependency. Deduplicates by model_name."""
-        key = f"MODEL_PROVIDER:{model_name}"
+    def add_dependency(self, dependency: JsonObject) -> None:
+        """Register a dependency. Deduplicates by type and relevant identifying fields."""
+        dep_type = dependency.get("type")
+        if dep_type == "MODEL_PROVIDER":
+            key = f"MODEL_PROVIDER:{dependency.get('model_name')}"
+        elif dep_type == "INTEGRATION":
+            key = f"INTEGRATION:{dependency.get('provider')}:{dependency.get('name')}"
+        else:
+            key = f"{dep_type}:{dependency.get('name')}"
         if key not in self._dependencies:
             self._dependencies[key] = dependency
-
-    def add_integration_dependency(self, provider: str, integration_name: str) -> None:
-        """Register an integration dependency. Deduplicates by provider:integration_name."""
-        key = f"INTEGRATION:{provider}:{integration_name}"
-        if key not in self._dependencies:
-            self._dependencies[key] = {
-                "type": "INTEGRATION",
-                "provider": provider,
-                "name": integration_name,
-            }
 
     def get_dependencies(self) -> List[JsonObject]:
         """Get all registered dependencies."""
