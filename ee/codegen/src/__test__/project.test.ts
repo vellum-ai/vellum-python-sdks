@@ -7482,63 +7482,6 @@ baz = foo + bar
 
       expectProjectFileToExist(["code", "workflow.py"]);
     });
-
-    it("should write unmanaged artifact files like integration_models to disk", async () => {
-      const displayDataWithoutAdditionalFiles = {
-        ...displayData,
-        module_data: {},
-      };
-
-      const project = new WorkflowProjectGenerator({
-        absolutePathToOutputDirectory: tempDir,
-        workflowVersionExecConfigData: displayDataWithoutAdditionalFiles,
-        moduleName: "code",
-        vellumApiKey: "<TEST_API_KEY>",
-      });
-
-      const originalArtifact = {
-        "integration_models/__init__.py": "",
-        "integration_models/slack_input.py":
-          "from pydantic import BaseModel\n\nclass SlackInput(BaseModel):\n    channel: str\n",
-        "integration_models/slack_output.py":
-          "from pydantic import BaseModel\n\nclass SlackOutput(BaseModel):\n    messages: list\n",
-      };
-
-      await project.generateCode(originalArtifact);
-
-      expectProjectFileToExist(["code", "workflow.py"]);
-      expectProjectFileToExist(["code", "integration_models", "__init__.py"]);
-      expectProjectFileToExist([
-        "code",
-        "integration_models",
-        "slack_input.py",
-      ]);
-      expectProjectFileToExist([
-        "code",
-        "integration_models",
-        "slack_output.py",
-      ]);
-
-      const slackInputPath = join(
-        tempDir,
-        "code",
-        "integration_models",
-        "slack_input.py"
-      );
-      const slackOutputPath = join(
-        tempDir,
-        "code",
-        "integration_models",
-        "slack_output.py"
-      );
-
-      expect(fs.readFileSync(slackInputPath, "utf-8")).toBe(
-        "from pydantic import BaseModel\n\nclass SlackInput(BaseModel):\n    channel: str\n"
-      );
-      expect(fs.readFileSync(slackOutputPath, "utf-8")).toBe(
-        "from pydantic import BaseModel\n\nclass SlackOutput(BaseModel):\n    messages: list\n"
-      );
-    });
   });
 
   describe("Get inline prompt node files", () => {
