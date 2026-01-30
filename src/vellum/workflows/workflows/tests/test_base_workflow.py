@@ -9,6 +9,7 @@ from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.nodes.core.inline_subworkflow_node.node import InlineSubworkflowNode
 from vellum.workflows.outputs.base import BaseOutputs
 from vellum.workflows.ports import Port
+from vellum.workflows.references.constant import ConstantValueReference
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.stack import Stack
 from vellum.workflows.workflows.base import BaseWorkflow
@@ -114,7 +115,7 @@ def test_workflow__single_port():
     # GIVEN a node with a custom port
     class NodeA(BaseNode):
         class Ports(BaseNode.Ports):
-            custom_port = Port.on_if(True)
+            custom_port = Port.on_if(ConstantValueReference(True))
 
     # WHEN we define a workflow with a single port as its graph
     class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
@@ -133,11 +134,11 @@ def test_workflow__multiple_ports():
     # GIVEN two nodes with custom ports
     class NodeA(BaseNode):
         class Ports(BaseNode.Ports):
-            custom_port = Port.on_if(True)
+            custom_port = Port.on_if(ConstantValueReference(True))
 
     class NodeB(BaseNode):
         class Ports(BaseNode.Ports):
-            custom_port = Port.on_if(True)
+            custom_port = Port.on_if(ConstantValueReference(True))
 
     # WHEN we define a workflow with multiple ports as its graph
     class TestWorkflow(BaseWorkflow[BaseInputs, BaseState]):
