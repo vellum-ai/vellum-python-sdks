@@ -1,25 +1,7 @@
-import { v4 as uuidv4 } from "uuid";
-
-const outputVariableId = uuidv4();
-const outputNodeId = uuidv4();
-const outputInputId = uuidv4();
-const outputHandleId = uuidv4();
-const entrypointNodeId = uuidv4();
-const entrypointHandleId = uuidv4();
-
-const subworkflowNodeId = uuidv4();
-const subworkflowSourceHandleId = uuidv4();
-const subworkflowTargetHandleId = uuidv4();
-const subworkflowOutputId = uuidv4();
-const subworkflowInputsAttributeId = uuidv4();
-const subworkflowInputId = uuidv4();
-
-const workflowInputVariableId = uuidv4();
-
 export default {
   input_variables: [
     {
-      id: workflowInputVariableId,
+      id: "workflow-input-user-data-id",
       key: "user_data",
       type: "JSON",
       required: true,
@@ -29,7 +11,7 @@ export default {
   ],
   output_variables: [
     {
-      id: outputVariableId,
+      id: "workflow-output-result-id",
       key: "result",
       type: "STRING",
     },
@@ -41,19 +23,19 @@ export default {
     },
     edges: [
       {
-        id: uuidv4(),
-        source_handle_id: entrypointHandleId,
-        source_node_id: entrypointNodeId,
-        target_handle_id: subworkflowTargetHandleId,
-        target_node_id: subworkflowNodeId,
+        id: "edge-entrypoint-to-subworkflow",
+        source_handle_id: "entrypoint-source-handle",
+        source_node_id: "entrypoint-node-id",
+        target_handle_id: "subworkflow-target-handle",
+        target_node_id: "subworkflow-node-id",
         type: "DEFAULT",
       },
       {
-        id: uuidv4(),
-        source_handle_id: subworkflowSourceHandleId,
-        source_node_id: subworkflowNodeId,
-        target_handle_id: outputHandleId,
-        target_node_id: outputNodeId,
+        id: "edge-subworkflow-to-output",
+        source_handle_id: "subworkflow-source-handle",
+        source_node_id: "subworkflow-node-id",
+        target_handle_id: "output-target-handle",
+        target_node_id: "output-node-id",
         type: "DEFAULT",
       },
     ],
@@ -62,10 +44,10 @@ export default {
         base: null,
         data: {
           label: "Entrypoint Node",
-          source_handle_id: entrypointHandleId,
+          source_handle_id: "entrypoint-source-handle",
         },
         definition: null,
-        id: entrypointNodeId,
+        id: "entrypoint-node-id",
         inputs: [],
         type: "ENTRYPOINT",
       },
@@ -83,8 +65,8 @@ export default {
         },
         data: {
           label: "Subworkflow Deployment Node",
-          source_handle_id: subworkflowSourceHandleId,
-          target_handle_id: subworkflowTargetHandleId,
+          source_handle_id: "subworkflow-source-handle",
+          target_handle_id: "subworkflow-target-handle",
           error_output_id: null,
           workflow_deployment_id: "test-deployment-id",
           release_tag: "LATEST",
@@ -94,10 +76,10 @@ export default {
           module: ["test", "workflow", "subworkflow_deployment_node"],
           name: "SubworkflowDeploymentNodeNode",
         },
-        id: subworkflowNodeId,
+        id: "subworkflow-node-id",
         inputs: [
           {
-            id: subworkflowInputId,
+            id: "subworkflow-input-user-name-id",
             key: "user_name",
             value: {
               combinator: "OR",
@@ -115,7 +97,7 @@ export default {
         ],
         attributes: [
           {
-            id: subworkflowInputsAttributeId,
+            id: "subworkflow-inputs-attribute-id",
             name: "subworkflow_inputs",
             value: {
               type: "DICTIONARY_REFERENCE",
@@ -127,7 +109,7 @@ export default {
                     operator: "accessField",
                     lhs: {
                       type: "WORKFLOW_INPUT",
-                      input_variable_id: workflowInputVariableId,
+                      input_variable_id: "workflow-input-user-data-id",
                     },
                     rhs: {
                       type: "CONSTANT_VALUE",
@@ -144,20 +126,20 @@ export default {
         ],
         outputs: [
           {
-            id: subworkflowOutputId,
+            id: "subworkflow-output-result-id",
             name: "result",
             type: "STRING",
           },
         ],
         ports: [
           {
-            id: subworkflowSourceHandleId,
+            id: "subworkflow-source-handle",
             name: "default",
             type: "DEFAULT",
           },
         ],
         trigger: {
-          id: subworkflowTargetHandleId,
+          id: "subworkflow-target-handle",
           merge_behavior: "AWAIT_ATTRIBUTES",
         },
         type: "SUBWORKFLOW",
@@ -177,27 +159,27 @@ export default {
         data: {
           label: "Workflow Output",
           name: "result",
-          node_input_id: outputInputId,
-          output_id: outputVariableId,
+          node_input_id: "output-input-id",
+          output_id: "workflow-output-result-id",
           output_type: "STRING",
-          target_handle_id: outputHandleId,
+          target_handle_id: "output-target-handle",
         },
         definition: {
           module: ["test", "workflow", "final_output"],
           name: "WorkflowFinalOutput",
         },
-        id: outputNodeId,
+        id: "output-node-id",
         inputs: [
           {
-            id: outputInputId,
+            id: "output-input-id",
             key: "node_input",
             value: {
               combinator: "OR",
               rules: [
                 {
                   data: {
-                    node_id: subworkflowNodeId,
-                    output_id: subworkflowOutputId,
+                    node_id: "subworkflow-node-id",
+                    output_id: "subworkflow-output-result-id",
                   },
                   type: "NODE_OUTPUT",
                 },
@@ -207,19 +189,19 @@ export default {
         ],
         outputs: [
           {
-            id: outputVariableId,
+            id: "workflow-output-result-id",
             name: "value",
             type: "STRING",
             value: {
-              node_id: subworkflowNodeId,
-              node_output_id: subworkflowOutputId,
+              node_id: "subworkflow-node-id",
+              node_output_id: "subworkflow-output-result-id",
               type: "NODE_OUTPUT",
             },
           },
         ],
         ports: [],
         trigger: {
-          id: outputHandleId,
+          id: "output-target-handle",
           merge_behavior: "AWAIT_ANY",
         },
         type: "TERMINAL",
@@ -227,10 +209,10 @@ export default {
     ],
     output_values: [
       {
-        output_variable_id: outputVariableId,
+        output_variable_id: "workflow-output-result-id",
         value: {
-          node_id: outputNodeId,
-          node_output_id: outputVariableId,
+          node_id: "output-node-id",
+          node_output_id: "workflow-output-result-id",
           type: "NODE_OUTPUT",
         },
       },

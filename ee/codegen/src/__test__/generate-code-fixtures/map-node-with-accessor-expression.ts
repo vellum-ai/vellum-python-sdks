@@ -1,28 +1,7 @@
-import { v4 as uuidv4 } from "uuid";
-
-const outputVariableId = uuidv4();
-const outputNodeId = uuidv4();
-const outputInputId = uuidv4();
-const outputHandleId = uuidv4();
-const entrypointNodeId = uuidv4();
-const entrypointHandleId = uuidv4();
-
-const workflowInputVariableId = uuidv4();
-
-const mapNodeId = uuidv4();
-const mapSourceHandleId = uuidv4();
-const mapTargetHandleId = uuidv4();
-const mapOutputNodeId = uuidv4();
-const mapOutputId = uuidv4();
-const mapItemsInputId = uuidv4();
-const mapItemInputId = uuidv4();
-const mapIndexInputId = uuidv4();
-const mapItemsAttributeId = uuidv4();
-
 export default {
   input_variables: [
     {
-      id: workflowInputVariableId,
+      id: "workflow-input-data-id",
       key: "data",
       type: "JSON",
       required: true,
@@ -32,7 +11,7 @@ export default {
   ],
   output_variables: [
     {
-      id: outputVariableId,
+      id: "workflow-output-result-id",
       key: "result",
       type: "ARRAY",
     },
@@ -44,19 +23,19 @@ export default {
     },
     edges: [
       {
-        id: uuidv4(),
-        source_handle_id: entrypointHandleId,
-        source_node_id: entrypointNodeId,
-        target_handle_id: mapTargetHandleId,
-        target_node_id: mapNodeId,
+        id: "edge-entrypoint-to-map",
+        source_handle_id: "entrypoint-source-handle",
+        source_node_id: "entrypoint-node-id",
+        target_handle_id: "map-target-handle",
+        target_node_id: "map-node-id",
         type: "DEFAULT",
       },
       {
-        id: uuidv4(),
-        source_handle_id: mapSourceHandleId,
-        source_node_id: mapNodeId,
-        target_handle_id: outputHandleId,
-        target_node_id: outputNodeId,
+        id: "edge-map-to-output",
+        source_handle_id: "map-source-handle",
+        source_node_id: "map-node-id",
+        target_handle_id: "output-target-handle",
+        target_node_id: "output-node-id",
         type: "DEFAULT",
       },
     ],
@@ -65,10 +44,10 @@ export default {
         base: null,
         data: {
           label: "Entrypoint Node",
-          source_handle_id: entrypointHandleId,
+          source_handle_id: "entrypoint-source-handle",
         },
         definition: null,
-        id: entrypointNodeId,
+        id: "entrypoint-node-id",
         inputs: [],
         type: "ENTRYPOINT",
       },
@@ -81,10 +60,10 @@ export default {
           label: "Map Node",
           concurrency: 1,
           error_output_id: null,
-          index_input_id: mapIndexInputId,
+          index_input_id: "map-index-input-id",
           input_variables: [
             {
-              id: mapItemsInputId,
+              id: "map-items-input-id",
               key: "items",
               type: "ARRAY",
               required: true,
@@ -92,7 +71,7 @@ export default {
               extensions: {},
             },
             {
-              id: mapItemInputId,
+              id: "map-item-input-id",
               key: "item",
               type: "JSON",
               required: true,
@@ -100,7 +79,7 @@ export default {
               extensions: {},
             },
             {
-              id: mapIndexInputId,
+              id: "map-index-input-id",
               key: "index",
               type: "NUMBER",
               required: true,
@@ -108,17 +87,17 @@ export default {
               extensions: {},
             },
           ],
-          item_input_id: mapItemInputId,
-          items_input_id: mapItemsInputId,
+          item_input_id: "map-item-input-id",
+          items_input_id: "map-items-input-id",
           output_variables: [
             {
-              id: mapOutputId,
+              id: "map-output-id",
               key: "map_result",
               type: "ARRAY",
             },
           ],
-          source_handle_id: mapSourceHandleId,
-          target_handle_id: mapTargetHandleId,
+          source_handle_id: "map-source-handle",
+          target_handle_id: "map-target-handle",
           variant: "INLINE",
           workflow_raw_data: {
             definition: {
@@ -127,11 +106,11 @@ export default {
             },
             edges: [
               {
-                id: uuidv4(),
-                source_handle_id: "inner-entry-src",
-                source_node_id: "inner-entry-id",
+                id: "inner-edge-entrypoint-to-final",
+                source_handle_id: "inner-entrypoint-source",
+                source_node_id: "inner-entrypoint-id",
                 target_handle_id: "inner-final-handle",
-                target_node_id: mapOutputNodeId,
+                target_node_id: "inner-final-output-id",
                 type: "DEFAULT",
               },
             ],
@@ -140,10 +119,10 @@ export default {
                 base: null,
                 data: {
                   label: "Entrypoint Node",
-                  source_handle_id: "inner-entry-src",
+                  source_handle_id: "inner-entrypoint-source",
                 },
                 definition: null,
-                id: "inner-entry-id",
+                id: "inner-entrypoint-id",
                 inputs: [],
                 type: "ENTRYPOINT",
               },
@@ -163,7 +142,7 @@ export default {
                   label: "Final Output",
                   name: "map_result",
                   node_input_id: "inner-output-input-id",
-                  output_id: mapOutputId,
+                  output_id: "map-output-id",
                   output_type: "STRING",
                   target_handle_id: "inner-final-handle",
                 },
@@ -171,7 +150,7 @@ export default {
                   module: ["test", "workflow", "map_node", "final_output"],
                   name: "MapFinalOutput",
                 },
-                id: mapOutputNodeId,
+                id: "inner-final-output-id",
                 inputs: [
                   {
                     id: "inner-output-input-id",
@@ -192,7 +171,7 @@ export default {
                 ],
                 outputs: [
                   {
-                    id: mapOutputId,
+                    id: "map-output-id",
                     name: "value",
                     type: "STRING",
                     value: {
@@ -214,10 +193,10 @@ export default {
             ],
             output_values: [
               {
-                output_variable_id: mapOutputId,
+                output_variable_id: "map-output-id",
                 value: {
-                  node_id: mapOutputNodeId,
-                  node_output_id: mapOutputId,
+                  node_id: "inner-final-output-id",
+                  node_output_id: "map-output-id",
                   type: "NODE_OUTPUT",
                 },
               },
@@ -228,10 +207,10 @@ export default {
           module: ["test", "workflow", "map_node"],
           name: "MapNodeNode",
         },
-        id: mapNodeId,
+        id: "map-node-id",
         inputs: [
           {
-            id: mapItemsInputId,
+            id: "map-items-input-id",
             key: "items",
             value: {
               combinator: "OR",
@@ -249,14 +228,14 @@ export default {
         ],
         attributes: [
           {
-            id: mapItemsAttributeId,
+            id: "map-items-attribute-id",
             name: "items",
             value: {
               type: "BINARY_EXPRESSION",
               operator: "accessField",
               lhs: {
                 type: "WORKFLOW_INPUT",
-                input_variable_id: workflowInputVariableId,
+                input_variable_id: "workflow-input-data-id",
               },
               rhs: {
                 type: "CONSTANT_VALUE",
@@ -270,13 +249,13 @@ export default {
         ],
         ports: [
           {
-            id: mapSourceHandleId,
+            id: "map-source-handle",
             name: "default",
             type: "DEFAULT",
           },
         ],
         trigger: {
-          id: mapTargetHandleId,
+          id: "map-target-handle",
           merge_behavior: "AWAIT_ATTRIBUTES",
         },
         type: "MAP",
@@ -296,27 +275,27 @@ export default {
         data: {
           label: "Workflow Output",
           name: "result",
-          node_input_id: outputInputId,
-          output_id: outputVariableId,
+          node_input_id: "output-input-id",
+          output_id: "workflow-output-result-id",
           output_type: "ARRAY",
-          target_handle_id: outputHandleId,
+          target_handle_id: "output-target-handle",
         },
         definition: {
           module: ["test", "workflow", "final_output"],
           name: "WorkflowFinalOutput",
         },
-        id: outputNodeId,
+        id: "output-node-id",
         inputs: [
           {
-            id: outputInputId,
+            id: "output-input-id",
             key: "node_input",
             value: {
               combinator: "OR",
               rules: [
                 {
                   data: {
-                    node_id: mapNodeId,
-                    output_id: mapOutputId,
+                    node_id: "map-node-id",
+                    output_id: "map-output-id",
                   },
                   type: "NODE_OUTPUT",
                 },
@@ -326,19 +305,19 @@ export default {
         ],
         outputs: [
           {
-            id: outputVariableId,
+            id: "workflow-output-result-id",
             name: "value",
             type: "ARRAY",
             value: {
-              node_id: mapNodeId,
-              node_output_id: mapOutputId,
+              node_id: "map-node-id",
+              node_output_id: "map-output-id",
               type: "NODE_OUTPUT",
             },
           },
         ],
         ports: [],
         trigger: {
-          id: outputHandleId,
+          id: "output-target-handle",
           merge_behavior: "AWAIT_ANY",
         },
         type: "TERMINAL",
@@ -346,10 +325,10 @@ export default {
     ],
     output_values: [
       {
-        output_variable_id: outputVariableId,
+        output_variable_id: "workflow-output-result-id",
         value: {
-          node_id: outputNodeId,
-          node_output_id: outputVariableId,
+          node_id: "output-node-id",
+          node_output_id: "workflow-output-result-id",
           type: "NODE_OUTPUT",
         },
       },

@@ -356,16 +356,12 @@ from .nodes import *
 
 class MapNodeNodeDisplay(BaseMapNodeDisplay[MapNodeNode]):
     label = "Map Node"
-    node_id = UUID("c5a554d7-8aac-452a-8e2d-3bfeebff2052")
-    target_handle_id = UUID("c30fa745-c7f6-43ea-a80e-c8a5cb219673")
-    node_input_ids_by_name = {"items": UUID("b8219ebc-f049-4360-98de-a6f7dc1be776")}
-    attribute_ids_by_name = {"items": UUID("10fc6d59-f828-450e-8b59-307d76923b79")}
-    output_display = {
-        MapNodeNode.Outputs.map_result: NodeOutputDisplay(
-            id=UUID("c1e4698d-4aea-4f0c-b98d-9b33d9661687"), name="map_result"
-        )
-    }
-    port_displays = {MapNodeNode.Ports.default: PortDisplayOverrides(id=UUID("e9b1945c-7318-4483-9278-18006d233ec7"))}
+    node_id = UUID("map-node-id")
+    target_handle_id = UUID("map-target-handle")
+    node_input_ids_by_name = {"items": "map-items-input-id"}
+    attribute_ids_by_name = {"items": UUID("map-items-attribute-id")}
+    output_display = {MapNodeNode.Outputs.map_result: NodeOutputDisplay(id=UUID("map-output-id"), name="map_result")}
+    port_displays = {MapNodeNode.Ports.default: PortDisplayOverrides(id=UUID("map-source-handle"))}
 "
 `;
 
@@ -531,15 +527,13 @@ from ...nodes.subworkflow_deployment_node import SubworkflowDeploymentNodeNode
 
 class SubworkflowDeploymentNodeNodeDisplay(BaseSubworkflowDeploymentNodeDisplay[SubworkflowDeploymentNodeNode]):
     label = "Subworkflow Deployment Node"
-    node_id = UUID("988da8f1-accf-4c41-a9f8-fbc898fa3d33")
-    target_handle_id = UUID("174a2ee1-38bc-455a-af16-15a144437807")
-    node_input_ids_by_name = {"subworkflow_inputs.user_name": UUID("afddf6d4-9427-4bc0-8482-e310467d34fd")}
-    attribute_ids_by_name = {"subworkflow_inputs": UUID("b80d26cd-f012-48bc-8ae5-1201b8bc077d")}
+    node_id = UUID("subworkflow-node-id")
+    target_handle_id = UUID("subworkflow-target-handle")
+    node_input_ids_by_name = {"subworkflow_inputs.user_name": "subworkflow-input-user-name-id"}
+    attribute_ids_by_name = {"subworkflow_inputs": UUID("subworkflow-inputs-attribute-id")}
     output_display = {}
     port_displays = {
-        SubworkflowDeploymentNodeNode.Ports.default: PortDisplayOverrides(
-            id=UUID("569b2e14-57ef-4fd7-b40b-c25e2e517454")
-        )
+        SubworkflowDeploymentNodeNode.Ports.default: PortDisplayOverrides(id=UUID("subworkflow-source-handle"))
     }
 "
 `;
