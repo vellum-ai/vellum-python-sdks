@@ -1,4 +1,4 @@
-"""Tests for validation that trigger-based workflows cannot have workflow inputs."""
+"""Tests for validation that workflows with non-manual triggers cannot have workflow inputs."""
 
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs.base import BaseInputs
@@ -45,7 +45,7 @@ def test_trigger_workflow_with_inputs__validation_error():
 
     # AND the error message should indicate trigger workflows cannot have inputs
     error = validation_errors[0]
-    assert "Trigger-based workflows cannot have workflow inputs" in str(error)
+    assert "non-manual triggers cannot have workflow inputs" in str(error)
 
 
 def test_scheduled_trigger_workflow_with_inputs__validation_error():
@@ -78,12 +78,52 @@ def test_scheduled_trigger_workflow_with_inputs__validation_error():
 
     # AND the error message should indicate trigger workflows cannot have inputs
     error = validation_errors[0]
-    assert "Trigger-based workflows cannot have workflow inputs" in str(error)
+    assert "non-manual triggers cannot have workflow inputs" in str(error)
+
+
+def test_mixed_trigger_workflow_with_inputs__validation_error():
+    """
+    Tests that mixed-trigger workflows (ManualTrigger + IntegrationTrigger) with inputs get a validation error.
+    """
+
+    # GIVEN a workflow with both ManualTrigger and IntegrationTrigger, and inputs defined
+    class MyInputs(BaseInputs):
+        query: str
+
+    class SlackTrigger(IntegrationTrigger):
+        message: str
+
+        class Config:
+            provider = "COMPOSIO"
+            integration_name = "SLACK"
+            slug = "slack_new_message"
+
+    class ProcessNodeA(BaseNode):
+        pass
+
+    class ProcessNodeB(BaseNode):
+        pass
+
+    class MixedTriggerWorkflowWithInputs(BaseWorkflow[MyInputs, BaseState]):
+        graph = {ManualTrigger >> ProcessNodeA, SlackTrigger >> ProcessNodeB}
+
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=MixedTriggerWorkflowWithInputs)
+    workflow_display.serialize()
+
+    # THEN the display_context should contain a WorkflowValidationError
+    errors = list(workflow_display.display_context.errors)
+    validation_errors = [e for e in errors if isinstance(e, WorkflowValidationError)]
+    assert len(validation_errors) == 1
+
+    # AND the error message should indicate trigger workflows cannot have inputs
+    error = validation_errors[0]
+    assert "non-manual triggers cannot have workflow inputs" in str(error)
 
 
 def test_manual_trigger_workflow_with_inputs__no_error():
     """
-    Tests that ManualTrigger workflows can have workflow inputs without validation errors.
+    Tests that ManualTrigger-only workflows can have workflow inputs without validation errors.
     """
 
     # GIVEN a ManualTrigger workflow with inputs defined
