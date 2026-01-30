@@ -341,6 +341,20 @@ class InnerMapNode(MapNode):
 "
 `;
 
+exports[`generateCode > should generate code for %1 map-node-with-accessor-expression.ts > nodes/map_node/__init__.py 1`] = `
+"from vellum.workflows.nodes.displayable import MapNode
+
+from ...inputs import Inputs
+from .workflow import MapNodeWorkflow
+
+
+class MapNodeNode(MapNode):
+    items = Inputs.data["items"]
+    subworkflow = MapNodeWorkflow
+    max_concurrency = 1
+"
+`;
+
 exports[`generateCode > should generate code for %1 node-mock.ts > sandbox.py 1`] = `
 "from vellum.workflows import MockNodeExecution
 from vellum.workflows.inputs import DatasetRow
@@ -475,6 +489,24 @@ class Workflow(BaseWorkflow):
         TopNode,
         SlackMessageTrigger >> BottomNode,
     }
+"
+`;
+
+exports[`generateCode > should generate code for %1 subworkflow-deployment-node-with-accessor-expression.ts > nodes/subworkflow_deployment_node.py 1`] = `
+"from vellum.workflows.nodes.displayable import SubworkflowDeploymentNode
+from vellum.workflows.types.core import MergeBehavior
+
+from ..inputs import Inputs
+
+
+class SubworkflowDeploymentNodeNode(SubworkflowDeploymentNode):
+    release_tag = "LATEST"
+    subworkflow_inputs = {
+        "user_name": Inputs.user_data["name"],
+    }
+
+    class Trigger(SubworkflowDeploymentNode.Trigger):
+        merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
 "
 `;
 
