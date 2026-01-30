@@ -40,9 +40,12 @@ class RawWorkflowDeploymentsClient:
     def list(
         self,
         *,
+        has_story_config: typing.Optional[str] = None,
+        is_public: typing.Optional[str] = None,
         limit: typing.Optional[int] = None,
         offset: typing.Optional[int] = None,
         ordering: typing.Optional[str] = None,
+        owned_by: typing.Optional[str] = None,
         status: typing.Optional[WorkflowDeploymentsListRequestStatus] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[PaginatedSlimWorkflowDeploymentList]:
@@ -51,6 +54,12 @@ class RawWorkflowDeploymentsClient:
 
         Parameters
         ----------
+        has_story_config : typing.Optional[str]
+            has_story_config
+
+        is_public : typing.Optional[str]
+            is_public
+
         limit : typing.Optional[int]
             Number of results to return per page.
 
@@ -59,6 +68,9 @@ class RawWorkflowDeploymentsClient:
 
         ordering : typing.Optional[str]
             Which field to use when ordering the results.
+
+        owned_by : typing.Optional[str]
+            owned_by
 
         status : typing.Optional[WorkflowDeploymentsListRequestStatus]
             status
@@ -76,9 +88,12 @@ class RawWorkflowDeploymentsClient:
             base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
+                "has_story_config": has_story_config,
+                "is_public": is_public,
                 "limit": limit,
                 "offset": offset,
                 "ordering": ordering,
+                "owned_by": owned_by,
                 "status": status,
             },
             request_options=request_options,
@@ -720,9 +735,12 @@ class AsyncRawWorkflowDeploymentsClient:
     async def list(
         self,
         *,
+        has_story_config: typing.Optional[str] = None,
+        is_public: typing.Optional[str] = None,
         limit: typing.Optional[int] = None,
         offset: typing.Optional[int] = None,
         ordering: typing.Optional[str] = None,
+        owned_by: typing.Optional[str] = None,
         status: typing.Optional[WorkflowDeploymentsListRequestStatus] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[PaginatedSlimWorkflowDeploymentList]:
@@ -731,6 +749,12 @@ class AsyncRawWorkflowDeploymentsClient:
 
         Parameters
         ----------
+        has_story_config : typing.Optional[str]
+            has_story_config
+
+        is_public : typing.Optional[str]
+            is_public
+
         limit : typing.Optional[int]
             Number of results to return per page.
 
@@ -739,6 +763,9 @@ class AsyncRawWorkflowDeploymentsClient:
 
         ordering : typing.Optional[str]
             Which field to use when ordering the results.
+
+        owned_by : typing.Optional[str]
+            owned_by
 
         status : typing.Optional[WorkflowDeploymentsListRequestStatus]
             status
@@ -756,9 +783,12 @@ class AsyncRawWorkflowDeploymentsClient:
             base_url=self._client_wrapper.get_environment().default,
             method="GET",
             params={
+                "has_story_config": has_story_config,
+                "is_public": is_public,
                 "limit": limit,
                 "offset": offset,
                 "ordering": ordering,
+                "owned_by": owned_by,
                 "status": status,
             },
             request_options=request_options,

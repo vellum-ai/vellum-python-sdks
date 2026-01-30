@@ -1549,6 +1549,14 @@ client.integrations.execute_integration_tool(
 <dl>
 <dd>
 
+**expand:** `typing.Optional[typing.Union[str, typing.Sequence[str]]]` — The response fields to expand for more information. Supported values: 'logs' - includes execution logs from Composio
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **toolkit_version:** `typing.Optional[str]` 
     
 </dd>
@@ -6720,6 +6728,22 @@ client.workflow_deployments.list()
 <dl>
 <dd>
 
+**has_story_config:** `typing.Optional[str]` — has_story_config
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**is_public:** `typing.Optional[str]` — is_public
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **limit:** `typing.Optional[int]` — Number of results to return per page.
     
 </dd>
@@ -6737,6 +6761,14 @@ client.workflow_deployments.list()
 <dd>
 
 **ordering:** `typing.Optional[str]` — Which field to use when ordering the results.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**owned_by:** `typing.Optional[str]` — owned_by
     
 </dd>
 </dl>

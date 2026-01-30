@@ -95,6 +95,7 @@ class IntegrationsClient:
         tool_name: str,
         *,
         arguments: typing.Dict[str, typing.Optional[typing.Any]],
+        expand: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         toolkit_version: typing.Optional[str] = OMIT,
         integration: typing.Optional[str] = OMIT,
         tool: typing.Optional[str] = OMIT,
@@ -113,6 +114,9 @@ class IntegrationsClient:
             The tool's unique name, as specified by the integration provider
 
         arguments : typing.Dict[str, typing.Optional[typing.Any]]
+
+        expand : typing.Optional[typing.Union[str, typing.Sequence[str]]]
+            The response fields to expand for more information. Supported values: 'logs' - includes execution logs from Composio
 
         toolkit_version : typing.Optional[str]
 
@@ -148,6 +152,7 @@ class IntegrationsClient:
             integration_provider,
             tool_name,
             arguments=arguments,
+            expand=expand,
             toolkit_version=toolkit_version,
             integration=integration,
             tool=tool,
@@ -335,6 +340,7 @@ class AsyncIntegrationsClient:
         tool_name: str,
         *,
         arguments: typing.Dict[str, typing.Optional[typing.Any]],
+        expand: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         toolkit_version: typing.Optional[str] = OMIT,
         integration: typing.Optional[str] = OMIT,
         tool: typing.Optional[str] = OMIT,
@@ -353,6 +359,9 @@ class AsyncIntegrationsClient:
             The tool's unique name, as specified by the integration provider
 
         arguments : typing.Dict[str, typing.Optional[typing.Any]]
+
+        expand : typing.Optional[typing.Union[str, typing.Sequence[str]]]
+            The response fields to expand for more information. Supported values: 'logs' - includes execution logs from Composio
 
         toolkit_version : typing.Optional[str]
 
@@ -396,6 +405,7 @@ class AsyncIntegrationsClient:
             integration_provider,
             tool_name,
             arguments=arguments,
+            expand=expand,
             toolkit_version=toolkit_version,
             integration=integration,
             tool=tool,

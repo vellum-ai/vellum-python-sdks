@@ -106,6 +106,7 @@ class RawIntegrationsClient:
         tool_name: str,
         *,
         arguments: typing.Dict[str, typing.Optional[typing.Any]],
+        expand: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         toolkit_version: typing.Optional[str] = OMIT,
         integration: typing.Optional[str] = OMIT,
         tool: typing.Optional[str] = OMIT,
@@ -125,6 +126,9 @@ class RawIntegrationsClient:
 
         arguments : typing.Dict[str, typing.Optional[typing.Any]]
 
+        expand : typing.Optional[typing.Union[str, typing.Sequence[str]]]
+            The response fields to expand for more information. Supported values: 'logs' - includes execution logs from Composio
+
         toolkit_version : typing.Optional[str]
 
         integration : typing.Optional[str]
@@ -143,6 +147,9 @@ class RawIntegrationsClient:
             f"integrations/v1/providers/{jsonable_encoder(integration_provider)}/integrations/{jsonable_encoder(integration_name)}/tools/{jsonable_encoder(tool_name)}/execute",
             base_url=self._client_wrapper.get_environment().default,
             method="POST",
+            params={
+                "expand": expand,
+            },
             json={
                 "arguments": arguments,
                 "toolkit_version": toolkit_version,
@@ -470,6 +477,7 @@ class AsyncRawIntegrationsClient:
         tool_name: str,
         *,
         arguments: typing.Dict[str, typing.Optional[typing.Any]],
+        expand: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         toolkit_version: typing.Optional[str] = OMIT,
         integration: typing.Optional[str] = OMIT,
         tool: typing.Optional[str] = OMIT,
@@ -489,6 +497,9 @@ class AsyncRawIntegrationsClient:
 
         arguments : typing.Dict[str, typing.Optional[typing.Any]]
 
+        expand : typing.Optional[typing.Union[str, typing.Sequence[str]]]
+            The response fields to expand for more information. Supported values: 'logs' - includes execution logs from Composio
+
         toolkit_version : typing.Optional[str]
 
         integration : typing.Optional[str]
@@ -507,6 +518,9 @@ class AsyncRawIntegrationsClient:
             f"integrations/v1/providers/{jsonable_encoder(integration_provider)}/integrations/{jsonable_encoder(integration_name)}/tools/{jsonable_encoder(tool_name)}/execute",
             base_url=self._client_wrapper.get_environment().default,
             method="POST",
+            params={
+                "expand": expand,
+            },
             json={
                 "arguments": arguments,
                 "toolkit_version": toolkit_version,
