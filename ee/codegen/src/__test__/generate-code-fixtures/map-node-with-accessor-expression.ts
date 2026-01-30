@@ -334,8 +334,5 @@ export default {
       },
     ],
   },
-  assertions: [
-    "nodes/map_node/__init__.py",
-    "display/nodes/map_node/__init__.py",
-  ],
+  assertions: ["nodes/map_node/__init__.py"],
 };

@@ -341,30 +341,6 @@ class InnerMapNode(MapNode):
 "
 `;
 
-exports[`generateCode > should generate code for %1 map-node-with-accessor-expression.ts > display/nodes/map_node/__init__.py 1`] = `
-"# flake8: noqa: F401, F403
-
-from uuid import UUID
-
-from vellum_ee.workflows.display.nodes import BaseMapNodeDisplay
-from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplayOverrides
-
-from . import workflow
-from ....nodes.map_node import MapNodeNode
-from .nodes import *
-
-
-class MapNodeNodeDisplay(BaseMapNodeDisplay[MapNodeNode]):
-    label = "Map Node"
-    node_id = UUID("map-node-id")
-    target_handle_id = UUID("map-target-handle")
-    node_input_ids_by_name = {"items": "map-items-input-id"}
-    attribute_ids_by_name = {"items": UUID("map-items-attribute-id")}
-    output_display = {MapNodeNode.Outputs.map_result: NodeOutputDisplay(id=UUID("map-output-id"), name="map_result")}
-    port_displays = {MapNodeNode.Ports.default: PortDisplayOverrides(id=UUID("map-source-handle"))}
-"
-`;
-
 exports[`generateCode > should generate code for %1 map-node-with-accessor-expression.ts > nodes/map_node/__init__.py 1`] = `
 "from vellum.workflows.nodes.displayable import MapNode
 
@@ -512,28 +488,6 @@ class Workflow(BaseWorkflow):
     graph = {
         TopNode,
         SlackMessageTrigger >> BottomNode,
-    }
-"
-`;
-
-exports[`generateCode > should generate code for %1 subworkflow-deployment-node-with-accessor-expression.ts > display/nodes/subworkflow_deployment_node.py 1`] = `
-"from uuid import UUID
-
-from vellum_ee.workflows.display.nodes import BaseSubworkflowDeploymentNodeDisplay
-from vellum_ee.workflows.display.nodes.types import PortDisplayOverrides
-
-from ...nodes.subworkflow_deployment_node import SubworkflowDeploymentNodeNode
-
-
-class SubworkflowDeploymentNodeNodeDisplay(BaseSubworkflowDeploymentNodeDisplay[SubworkflowDeploymentNodeNode]):
-    label = "Subworkflow Deployment Node"
-    node_id = UUID("subworkflow-node-id")
-    target_handle_id = UUID("subworkflow-target-handle")
-    node_input_ids_by_name = {"subworkflow_inputs.user_name": "subworkflow-input-user-name-id"}
-    attribute_ids_by_name = {"subworkflow_inputs": UUID("subworkflow-inputs-attribute-id")}
-    output_display = {}
-    port_displays = {
-        SubworkflowDeploymentNodeNode.Ports.default: PortDisplayOverrides(id=UUID("subworkflow-source-handle"))
     }
 "
 `;

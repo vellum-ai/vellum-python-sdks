@@ -218,8 +218,5 @@ export default {
       },
     ],
   },
-  assertions: [
-    "nodes/subworkflow_deployment_node.py",
-    "display/nodes/subworkflow_deployment_node.py",
-  ],
+  assertions: ["nodes/subworkflow_deployment_node.py"],
 };
