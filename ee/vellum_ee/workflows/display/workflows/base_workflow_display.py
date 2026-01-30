@@ -8,6 +8,7 @@ import logging
 import os
 import pkgutil
 import re
+import sys
 import traceback
 from uuid import UUID
 from typing import (
@@ -42,6 +43,7 @@ from vellum.workflows.events.workflow import NodeEventDisplayContext, WorkflowEv
 from vellum.workflows.exceptions import WorkflowInitializationException
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.inputs.dataset_row import DatasetRow
+from vellum.workflows.loaders.base import BaseWorkflowFinder
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.displayable.bases.utils import primitive_to_vellum_value
 from vellum.workflows.nodes.displayable.final_output_node.node import FinalOutputNode
@@ -1750,7 +1752,61 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             return {}
 
         module_dir = os.path.dirname(workflow_file_path)
-        additional_files = {}
+        additional_files: Dict[str, str] = {}
+
+        virtual_finder = self._find_virtual_finder_for_module(module_path)
+        if virtual_finder is not None:
+            additional_files = self._gather_virtual_files(virtual_finder)
+        else:
+            additional_files = self._gather_disk_files(module_dir)
+
+        return additional_files
+
+    def _find_virtual_finder_for_module(self, module_path: str) -> Optional[BaseWorkflowFinder]:
+        for finder in sys.meta_path:
+            if isinstance(finder, BaseWorkflowFinder) and finder.namespace == module_path:
+                return finder
+        return None
+
+    def _gather_virtual_files(self, finder: BaseWorkflowFinder) -> Dict[str, str]:
+        additional_files: Dict[str, str] = {}
+        if not hasattr(finder, "loader") or not hasattr(finder.loader, "files"):
+            return additional_files
+
+        for relative_path, content in finder.loader.files.items():
+            filename = os.path.basename(relative_path)
+
+            if not self.should_include_file(filename):
+                continue
+
+            should_ignore = False
+            for ignore_pattern in IGNORE_PATTERNS:
+                if fnmatch.fnmatch(filename, ignore_pattern) or fnmatch.fnmatch(relative_path, ignore_pattern):
+                    should_ignore = True
+                    break
+
+            if not should_ignore:
+                for serialized_pattern in self._serialized_files:
+                    if "*" in serialized_pattern:
+                        if fnmatch.fnmatch(relative_path, serialized_pattern) or fnmatch.fnmatch(
+                            filename, serialized_pattern
+                        ):
+                            should_ignore = True
+                            break
+                    else:
+                        if relative_path == serialized_pattern:
+                            should_ignore = True
+                            break
+
+            if should_ignore:
+                continue
+
+            additional_files[relative_path] = content
+
+        return additional_files
+
+    def _gather_disk_files(self, module_dir: str) -> Dict[str, str]:
+        additional_files: Dict[str, str] = {}
 
         for root, _, filenames in os.walk(module_dir):
             for filename in filenames:

@@ -10,6 +10,7 @@ from pytest_mock import MockerFixture
 
 from vellum.workflows.exceptions import WorkflowInitializationException
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
+from vellum_ee.workflows.server.virtual_file_loader import VirtualFileFinder
 
 from tests.workflows.test_node_output_mock_when_conditions.workflow import ProcessNode
 
@@ -449,3 +450,92 @@ def test_serialize_module__with_invalid_parent_node_output_reference():
         "'ReportGeneratorNode.Outputs.report_json' references parent class output 'InlinePromptNode.Outputs.json'. "
         "Referencing outputs from a node's parent class is not allowed."
     )
+
+
+def test_serialize_module__virtual_files_include_integration_models():
+    """
+    Tests that serialize_module includes integration_models files in additional_files
+    when the workflow is loaded from virtual files.
+    """
+    # GIVEN a workflow loaded from virtual files with integration_models directory
+    files = {
+        "__init__.py": "",
+        "inputs.py": """from vellum.workflows.inputs import BaseInputs
+
+class Inputs(BaseInputs):
+    channel_id: str = "C0123456789"
+""",
+        "workflow.py": """from vellum.workflows import BaseWorkflow
+from vellum.workflows.state import BaseState
+
+from .inputs import Inputs
+from .nodes.test_node import TestNode
+
+
+class Workflow(BaseWorkflow[Inputs, BaseState]):
+    graph = TestNode
+
+    class Outputs(BaseWorkflow.Outputs):
+        result = TestNode.Outputs.result
+""",
+        "nodes/__init__.py": "",
+        "nodes/test_node.py": """from vellum.workflows.nodes.bases import BaseNode
+
+from ..inputs import Inputs
+from ..integration_models.slack_input import SlackInput
+
+
+class TestNode(BaseNode):
+    channel_id = Inputs.channel_id
+
+    class Outputs(BaseNode.Outputs):
+        result: str
+
+    def run(self) -> Outputs:
+        request = SlackInput(channel=self.channel_id)
+        return self.Outputs(result=request.channel)
+""",
+        "integration_models/__init__.py": "",
+        "integration_models/slack_input.py": """from pydantic import BaseModel
+
+
+class SlackInput(BaseModel):
+    channel: str
+""",
+        "integration_models/slack_output.py": """from pydantic import BaseModel
+
+
+class SlackOutput(BaseModel):
+    messages: list
+""",
+    }
+
+    namespace = str(uuid.uuid4())
+    finder = VirtualFileFinder(files, namespace)
+    sys.meta_path.insert(0, finder)
+
+    try:
+        # WHEN we serialize the module
+        result = BaseWorkflowDisplay.serialize_module(namespace)
+
+        # THEN the result should have module_data with additional_files
+        assert "module_data" in result.exec_config
+        assert "additional_files" in result.exec_config["module_data"]
+
+        additional_files = result.exec_config["module_data"]["additional_files"]
+
+        # AND integration_models files should be included
+        assert "integration_models/__init__.py" in additional_files
+        assert "integration_models/slack_input.py" in additional_files
+        assert "integration_models/slack_output.py" in additional_files
+
+        # AND the file contents should be correct
+        assert "class SlackInput" in additional_files["integration_models/slack_input.py"]
+        assert "class SlackOutput" in additional_files["integration_models/slack_output.py"]
+
+        # AND serialized workflow files should NOT be included
+        assert "workflow.py" not in additional_files
+        assert "__init__.py" not in additional_files
+        assert "nodes/test_node.py" not in additional_files
+    finally:
+        sys.meta_path.remove(finder)
