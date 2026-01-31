@@ -85,6 +85,7 @@ class ToolCallingNodeParallelExecution(ToolCallingNode):
     prompt_inputs = {
         "question": "Execute all three slow tools and summarize the results.",
     }
+    parallel_tool_calls = True
 
 
 class ToolCallingNodeParallelExecutionWorkflow(BaseWorkflow):
