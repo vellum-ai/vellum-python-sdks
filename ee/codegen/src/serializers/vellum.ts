@@ -2369,7 +2369,6 @@ export const WorkflowOutputValueSerializer: ObjectSchema<
 
 const ManualTriggerSerializer = objectSchema({
   id: stringSchema(),
-  type: stringLiteralSchema("MANUAL"),
   attributes: listSchema(VellumVariableSerializer),
   definition: CodeResourceDefinitionSerializer.optional(),
   displayData: propertySchema(
