@@ -110,3 +110,25 @@ def test_serialize_module__orphan_node_in_nodes_directory():
         "OrphanNodeInNodesDir" in msg and "not included in" in msg and "graph or unused_graphs" in msg
         for msg in error_messages
     ), f"Expected orphan node error in error messages, got: {error_messages}"
+
+
+def test_serialize_module__runner_run_called_during_serialization():
+    """
+    Tests that serialization returns an error when runner.run() is called outside
+    of 'if __name__ == "__main__"' block in sandbox.py.
+    """
+
+    # GIVEN a workflow module with a sandbox.py that calls runner.run() at module level
+    module = "tests.workflows.test_sandbox_runner_run_during_serialization"
+
+    # WHEN we serialize the module
+    result = BaseWorkflowDisplay.serialize_module(module)
+
+    # THEN the result should contain an error about runner.run() being called during serialization
+    assert len(result.errors) > 0
+
+    # AND the error message should mention that runner.run() should not be called during serialization
+    error_messages = [error.message for error in result.errors]
+    assert any(
+        "runner.run()" in msg and "serialization" in msg.lower() for msg in error_messages
+    ), f"Expected runner.run() serialization error in error messages, got: {error_messages}"

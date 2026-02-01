@@ -1,3 +1,4 @@
+from contextvars import ContextVar
 from typing import Any, Dict, Generic, Optional, Sequence, Union
 
 import dotenv
@@ -9,6 +10,18 @@ from vellum.workflows.logging import load_logger
 from vellum.workflows.triggers.base import BaseTrigger
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.workflows.event_filters import root_workflow_event_filter
+
+_serialization_context: ContextVar[bool] = ContextVar("_serialization_context", default=False)
+
+
+def is_in_serialization_context() -> bool:
+    """Check if we're currently in a serialization context."""
+    return _serialization_context.get()
+
+
+def set_serialization_context(value: bool) -> None:
+    """Set the serialization context flag."""
+    _serialization_context.set(value)
 
 
 class WorkflowSandboxRunner(Generic[WorkflowType]):
@@ -43,6 +56,12 @@ class WorkflowSandboxRunner(Generic[WorkflowType]):
         self._inputs = actual_inputs
 
     def run(self, index: int = 0):
+        if is_in_serialization_context():
+            raise RuntimeError(
+                "runner.run() should not be called during serialization. "
+                "Move the runner.run() call inside an 'if __name__ == \"__main__\":' block."
+            )
+
         if index < 0:
             self._logger.warning("Index is less than 0, running first input")
             index = 0

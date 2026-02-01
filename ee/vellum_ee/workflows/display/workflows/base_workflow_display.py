@@ -50,6 +50,7 @@ from vellum.workflows.nodes.displayable.final_output_node.node import FinalOutpu
 from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port, get_wrapped_node
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, StateValueReference, WorkflowInputReference
+from vellum.workflows.sandbox import set_serialization_context
 from vellum.workflows.triggers.base import BaseTrigger
 from vellum.workflows.triggers.chat_message import ChatMessageTrigger
 from vellum.workflows.triggers.integration import IntegrationTrigger
@@ -1675,7 +1676,11 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         dataset = None
         try:
             sandbox_module_path = f"{module}.sandbox"
-            sandbox_module = importlib.import_module(sandbox_module_path)
+            set_serialization_context(True)
+            try:
+                sandbox_module = importlib.import_module(sandbox_module_path)
+            finally:
+                set_serialization_context(False)
             if hasattr(sandbox_module, "dataset"):
                 dataset_attr = getattr(sandbox_module, "dataset")
                 if dataset_attr and isinstance(dataset_attr, list):
