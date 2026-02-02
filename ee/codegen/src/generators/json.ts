@@ -23,9 +23,7 @@ interface VellumIntegrationToolData {
   toolkit_version?: string | null | undefined;
 }
 
-function isVellumIntegrationToolData(
-  value: Record<string, unknown>
-): boolean {
+function isVellumIntegrationToolData(value: Record<string, unknown>): boolean {
   return (
     value.type === "VELLUM_INTEGRATION" &&
     (typeof value.provider === "string" ||
