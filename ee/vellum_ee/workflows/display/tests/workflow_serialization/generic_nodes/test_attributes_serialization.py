@@ -7,6 +7,7 @@ from deepdiff import DeepDiff
 from pydantic import BaseModel
 
 from vellum.client.types.chat_message import ChatMessage
+from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.references.constant import ConstantValueReference
@@ -14,6 +15,7 @@ from vellum.workflows.references.environment_variable import EnvironmentVariable
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.references.vellum_secret import VellumSecretReference
 from vellum.workflows.state.base import BaseState
+from vellum.workflows.types.definition import VellumIntegrationToolDefinition
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.base import WorkflowInputsDisplay
 from vellum_ee.workflows.display.nodes.base_node_display import BaseNodeDisplay
@@ -816,3 +818,29 @@ def test_serialize_node__attribute_with_type_annotation_no_default(serialize_nod
 
     # THEN the attribute should serialize as None
     assert serialized_node["attributes"][0]["value"] is None
+
+
+def test_serialize_node__vellum_integration_tool_definition_includes_schema(serialize_node):
+    """Tests that VellumIntegrationToolDefinition attributes include schema in serialization."""
+
+    # GIVEN a node with a VellumIntegrationToolDefinition attribute
+    class NodeWithIntegrationTool(BaseNode):
+        tool: VellumIntegrationToolDefinition = VellumIntegrationToolDefinition(
+            provider=VellumIntegrationProviderType.COMPOSIO,
+            integration_name="GITHUB",
+            name="create_issue",
+            description="Create a GitHub issue",
+        )
+
+    # WHEN the node is serialized
+    serialized_node = serialize_node(NodeWithIntegrationTool)
+
+    # THEN the attribute should include a schema
+    attribute = serialized_node["attributes"][0]
+    assert attribute["name"] == "tool"
+    assert "schema" in attribute
+
+    # AND the schema should reference VellumIntegrationToolDefinition
+    schema = attribute["schema"]
+    assert "$ref" in schema
+    assert "VellumIntegrationToolDefinition" in schema["$ref"]

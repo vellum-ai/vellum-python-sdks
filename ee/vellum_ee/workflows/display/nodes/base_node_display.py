@@ -29,6 +29,7 @@ from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference
 from vellum.workflows.references.node import NodeReference
 from vellum.workflows.types.core import JsonArray, JsonObject
+from vellum.workflows.types.definition import VellumIntegrationToolDefinition
 from vellum.workflows.types.generics import NodeType
 from vellum.workflows.types.utils import get_original_base
 from vellum.workflows.utils.functions import compile_annotation
@@ -165,14 +166,22 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 if self.attribute_ids_by_name.get(attribute.name)
                 else str(uuid4_from_hash(f"{node_id}|{attribute.name}"))
             )
+            schema = None
             try:
-                attributes.append(
-                    {
-                        "id": id,
-                        "name": attribute.name,
-                        "value": serialize_value(node_id, display_context, attribute.instance),
-                    }
-                )
+                if self._should_include_attribute_schema(attribute.normalized_type):
+                    schema = compile_annotation(attribute.normalized_type, {})
+            except Exception:
+                pass
+
+            try:
+                attribute_dict: JsonObject = {
+                    "id": id,
+                    "name": attribute.name,
+                    "value": serialize_value(node_id, display_context, attribute.instance),
+                }
+                if schema is not None:
+                    attribute_dict["schema"] = schema
+                attributes.append(attribute_dict)
             except ValueError as e:
                 raise ValueError(f"Failed to serialize attribute '{attribute.name}': {e}")
 
@@ -256,12 +265,21 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 if self.attribute_ids_by_name.get(attribute.name)
                 else str(uuid4_from_hash(f"{node_id}|{attribute.name}"))
             )
+            schema = None
+            try:
+                if self._should_include_attribute_schema(attribute.normalized_type):
+                    schema = compile_annotation(attribute.normalized_type, {})
+            except Exception:
+                pass
+
             try:
                 attribute_dict: JsonObject = {
                     "id": id,
                     "name": attribute.name,
                     "value": serialize_value(node_id, display_context, attribute.instance),
                 }
+                if schema is not None:
+                    attribute_dict["schema"] = schema
                 attributes.append(attribute_dict)
             except ValueError as e:
                 raise ValueError(f"Failed to serialize attribute '{attribute.name}': {e}")
@@ -308,6 +326,16 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             )
 
         return outputs
+
+    def _should_include_attribute_schema(self, attribute_type: Any) -> bool:
+        """Determine if an attribute type should have its schema included in serialization.
+
+        Only specific types that need schema information for codegen decisions should return True.
+        Currently, this includes VellumIntegrationToolDefinition to enable type-driven codegen.
+        """
+        if inspect.isclass(attribute_type) and issubclass(attribute_type, VellumIntegrationToolDefinition):
+            return True
+        return False
 
     def serialize_generic_fields(
         self, display_context: "WorkflowDisplayContext", exclude: Optional[List[str]] = None
