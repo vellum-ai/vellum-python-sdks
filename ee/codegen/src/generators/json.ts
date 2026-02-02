@@ -13,7 +13,48 @@ import { NoneInstantiation } from "src/generators/extensions/none-instantiation"
 import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
-import { VellumIntegrationToolFunctionArgs } from "src/types/vellum";
+
+interface VellumIntegrationToolData {
+  type: "VELLUM_INTEGRATION";
+  provider: string | null | undefined;
+  integration_name: string | null | undefined;
+  name: string | null | undefined;
+  description: string | null | undefined;
+  toolkit_version?: string | null | undefined;
+}
+
+function isVellumIntegrationToolData(
+  value: Record<string, unknown>
+): boolean {
+  return (
+    value.type === "VELLUM_INTEGRATION" &&
+    (typeof value.provider === "string" ||
+      value.provider === null ||
+      value.provider === undefined) &&
+    (typeof value.integration_name === "string" ||
+      value.integration_name === null ||
+      value.integration_name === undefined) &&
+    (typeof value.name === "string" ||
+      value.name === null ||
+      value.name === undefined) &&
+    (typeof value.description === "string" ||
+      value.description === null ||
+      value.description === undefined)
+  );
+}
+
+function toVellumIntegrationToolData(
+  value: Record<string, unknown>
+): VellumIntegrationToolData {
+  return {
+    type: "VELLUM_INTEGRATION",
+    provider: value.provider as string | null | undefined,
+    integration_name: value.integration_name as string | null | undefined,
+    name: value.name as string | null | undefined,
+    description: value.description as string | null | undefined,
+    toolkit_version: value.toolkit_version as string | null | undefined,
+  };
+}
 
 export class Json extends AstNode {
   private readonly astNode: AstNode;
@@ -68,9 +109,9 @@ export class Json extends AstNode {
     if (typeof value === "object") {
       // Check if this is a VellumIntegrationToolDefinition
       const objValue = value as Record<string, unknown>;
-      if (objValue.type === "VELLUM_INTEGRATION") {
+      if (isVellumIntegrationToolData(objValue)) {
         return this.generateVellumIntegrationToolDefinition(
-          objValue as unknown as VellumIntegrationToolFunctionArgs
+          toVellumIntegrationToolData(objValue)
         );
       }
 
@@ -94,26 +135,26 @@ export class Json extends AstNode {
   }
 
   private generateVellumIntegrationToolDefinition(
-    integrationTool: VellumIntegrationToolFunctionArgs
+    integrationTool: VellumIntegrationToolData
   ): AstNode {
     const args: MethodArgument[] = [
       new MethodArgument({
         name: "provider",
-        value: new StrInstantiation(integrationTool.provider || "COMPOSIO"),
+        value: new StrInstantiation(integrationTool.provider ?? "COMPOSIO"),
       }),
       new MethodArgument({
         name: "integration_name",
         value: new StrInstantiation(
-          integrationTool.integration_name || "UNKNOWN"
+          integrationTool.integration_name ?? "UNKNOWN"
         ),
       }),
       new MethodArgument({
         name: "name",
-        value: new StrInstantiation(integrationTool.name || "UNKNOWN"),
+        value: new StrInstantiation(integrationTool.name ?? "UNKNOWN"),
       }),
       new MethodArgument({
         name: "description",
-        value: new StrInstantiation(integrationTool.description || ""),
+        value: new StrInstantiation(integrationTool.description ?? ""),
       }),
     ];
 
