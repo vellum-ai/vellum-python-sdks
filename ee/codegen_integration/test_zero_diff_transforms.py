@@ -86,6 +86,18 @@ def _compute_diff(
             ),
         ),
         (
+            "custom_node_with_vellum_integration_tool",
+            frozenset(
+                {
+                    "__init__.py",
+                    "display/__init__.py",
+                    "display/nodes/__init__.py",
+                    "display/workflow.py",
+                    "nodes/__init__.py",
+                }
+            ),
+        ),
+        (
             "tool_calling_node_with_custom_run_subworkflow",
             frozenset(
                 {
