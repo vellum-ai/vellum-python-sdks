@@ -403,7 +403,7 @@ def test_workflow_serialization__dependencies_from_inline_subworkflow_deduplicat
         subworkflow_inputs = {"query": ParentInputs.query}
 
     class ParentWorkflow(BaseWorkflow[ParentInputs, BaseState]):
-        graph = {SubworkflowNode1, SubworkflowNode2}
+        graph = SubworkflowNode1 >> SubworkflowNode2
 
         class Outputs(BaseWorkflow.Outputs):
             text1 = SubworkflowNode1.Outputs.text
