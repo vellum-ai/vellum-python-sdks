@@ -50,6 +50,7 @@ from vellum.workflows.nodes.displayable.final_output_node.node import FinalOutpu
 from vellum.workflows.nodes.utils import get_unadorned_node, get_unadorned_port, get_wrapped_node
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, StateValueReference, WorkflowInputReference
+from vellum.workflows.sandbox import enter_serialization_context, exit_serialization_context
 from vellum.workflows.triggers.base import BaseTrigger
 from vellum.workflows.triggers.chat_message import ChatMessageTrigger
 from vellum.workflows.triggers.integration import IntegrationTrigger
@@ -1673,9 +1674,14 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         exec_config["runner_config"] = load_runner_config(module)
 
         dataset = None
+        serialization_errors = []
         try:
             sandbox_module_path = f"{module}.sandbox"
-            sandbox_module = importlib.import_module(sandbox_module_path)
+            context_token, errors_token = enter_serialization_context()
+            try:
+                sandbox_module = importlib.import_module(sandbox_module_path)
+            finally:
+                serialization_errors = exit_serialization_context(context_token, errors_token)
             if hasattr(sandbox_module, "dataset"):
                 dataset_attr = getattr(sandbox_module, "dataset")
                 if dataset_attr and isinstance(dataset_attr, list):
@@ -1714,15 +1720,28 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
             workflow_display.display_context.add_validation_error(e)
 
         all_errors = list(workflow_display.display_context.errors)
-        return WorkflowSerializationResult(
-            exec_config=exec_config,
-            errors=[
+
+        # Build error list from display context errors
+        error_list = [
+            WorkflowSerializationError(
+                message=str(error),
+                stacktrace="".join(traceback.format_exception(type(error), error, error.__traceback__)),
+            )
+            for error in all_errors
+        ]
+
+        # Add serialization errors (runner.run() called during serialization)
+        for error, stacktrace in serialization_errors:
+            error_list.append(
                 WorkflowSerializationError(
                     message=str(error),
-                    stacktrace="".join(traceback.format_exception(type(error), error, error.__traceback__)),
+                    stacktrace=stacktrace,
                 )
-                for error in all_errors
-            ],
+            )
+
+        return WorkflowSerializationResult(
+            exec_config=exec_config,
+            errors=error_list,
             dataset=dataset,
         )
 

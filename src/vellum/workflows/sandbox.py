@@ -1,4 +1,6 @@
-from typing import Any, Dict, Generic, Optional, Sequence, Union
+from contextvars import ContextVar, Token
+import traceback
+from typing import Any, Dict, Generic, List, Optional, Sequence, Tuple, Union
 
 import dotenv
 
@@ -9,6 +11,40 @@ from vellum.workflows.logging import load_logger
 from vellum.workflows.triggers.base import BaseTrigger
 from vellum.workflows.types.generics import WorkflowType
 from vellum.workflows.workflows.event_filters import root_workflow_event_filter
+
+_serialization_context: ContextVar[bool] = ContextVar("_serialization_context", default=False)
+_serialization_errors: ContextVar[Optional[List[Tuple[Exception, str]]]] = ContextVar(
+    "_serialization_errors", default=None
+)
+
+
+def is_in_serialization_context() -> bool:
+    """Check if we're currently in a serialization context."""
+    return _serialization_context.get()
+
+
+def enter_serialization_context() -> Tuple[Token[bool], Token[Optional[List[Tuple[Exception, str]]]]]:
+    """Enter serialization context and return tokens for cleanup."""
+    context_token = _serialization_context.set(True)
+    errors_token = _serialization_errors.set([])
+    return context_token, errors_token
+
+
+def exit_serialization_context(
+    context_token: Token[bool], errors_token: Token[Optional[List[Tuple[Exception, str]]]]
+) -> List[Tuple[Exception, str]]:
+    """Exit serialization context and return any recorded errors."""
+    errors = _serialization_errors.get() or []
+    _serialization_context.reset(context_token)
+    _serialization_errors.reset(errors_token)
+    return list(errors)
+
+
+def _record_serialization_error(error: Exception, stacktrace: str) -> None:
+    """Record an error that occurred during serialization."""
+    errors = _serialization_errors.get()
+    if errors is not None:
+        errors.append((error, stacktrace))
 
 
 class WorkflowSandboxRunner(Generic[WorkflowType]):
@@ -43,6 +79,15 @@ class WorkflowSandboxRunner(Generic[WorkflowType]):
         self._inputs = actual_inputs
 
     def run(self, index: int = 0):
+        if is_in_serialization_context():
+            error = RuntimeError(
+                "runner.run() should not be called during serialization. "
+                "Move the runner.run() call inside an 'if __name__ == \"__main__\":' block."
+            )
+            stacktrace = "".join(traceback.format_stack())
+            _record_serialization_error(error, stacktrace)
+            return
+
         if index < 0:
             self._logger.warning("Index is less than 0, running first input")
             index = 0

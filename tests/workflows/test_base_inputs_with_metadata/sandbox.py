@@ -6,9 +6,6 @@ from vellum.workflows.sandbox import WorkflowSandboxRunner
 
 from .workflow import Inputs, TestBaseInputsWithMetadataWorkflow
 
-if __name__ == "__main__":
-    raise Exception("This file is not meant to be imported")
-
 dataset: List[Union[BaseInputs, DatasetRow]] = [
     Inputs(message="World"),
     Inputs(message="Test"),
@@ -16,4 +13,5 @@ dataset: List[Union[BaseInputs, DatasetRow]] = [
 
 runner = WorkflowSandboxRunner(workflow=TestBaseInputsWithMetadataWorkflow(), dataset=dataset)
 
-runner.run()
+if __name__ == "__main__":
+    runner.run()

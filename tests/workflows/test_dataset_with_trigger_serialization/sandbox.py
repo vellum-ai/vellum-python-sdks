@@ -6,9 +6,6 @@ from vellum.workflows.sandbox import WorkflowSandboxRunner
 
 from .workflow import MySchedule, TestDatasetWithTriggerSerializationWorkflow
 
-if __name__ == "__main__":
-    raise Exception("This file is not meant to be imported")
-
 dataset: List[DatasetRow] = [
     DatasetRow(
         label="Scenario 1",
@@ -19,4 +16,5 @@ dataset: List[DatasetRow] = [
 
 runner = WorkflowSandboxRunner(workflow=TestDatasetWithTriggerSerializationWorkflow(), dataset=dataset)
 
-runner.run()
+if __name__ == "__main__":
+    runner.run()
