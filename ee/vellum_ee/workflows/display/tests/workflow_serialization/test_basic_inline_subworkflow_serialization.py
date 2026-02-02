@@ -154,7 +154,7 @@ def test_serialize_workflow():
     nested_start_node = next(
         node for node in nested_workflow_data["nodes"] if node["type"] == "GENERIC" and node["label"] == "Start Node"
     )
-    assert nested_start_node == {
+    expected_nested_start_node = {
         "id": "45ba1e29-611f-4a6f-9f51-7cf6fe47141e",
         "label": "Start Node",
         "type": "GENERIC",
@@ -206,6 +206,14 @@ def test_serialize_workflow():
             },
         ],
     }
+    # Use DeepDiff to compare, excluding schema field from attributes (tested separately)
+    diff = DeepDiff(
+        expected_nested_start_node,
+        nested_start_node,
+        ignore_order=True,
+        exclude_regex_paths=[r"root\['attributes'\]\[\d+\]\['schema'\]"],
+    )
+    assert not diff, f"Differences found: {diff}"
 
     assert nested_workflow_data["display_data"] == {"viewport": {"x": 0.0, "y": 0.0, "zoom": 1.0}}
     assert nested_workflow_data["definition"] == {

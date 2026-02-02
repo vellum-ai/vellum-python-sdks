@@ -51,36 +51,36 @@ def test_serialize_workflow():
         attribute for attribute in set_state_node["attributes"] if attribute["name"] == "operations"
     )
 
-    assert operations_attribute == {
-        "id": "933beba4-7455-4563-a447-b0d06e3d2589",
-        "name": "operations",
-        "value": {
-            "type": "DICTIONARY_REFERENCE",
-            "entries": [
-                {
-                    "id": "6caeb2fb-c634-4cad-a97c-fc444cbaa6fb",
-                    "key": "chat_history",
-                    "value": {
-                        "type": "BINARY_EXPRESSION",
-                        "lhs": {"type": "WORKFLOW_STATE", "state_variable_id": "948a902d-248d-4b00-8bf4-cdd202302f20"},
-                        "operator": "concat",
-                        "rhs": {
-                            "type": "NODE_OUTPUT",
-                            "node_id": "32f69de2-53e8-4151-b036-4e831669cf1d",
-                            "node_output_id": "611ad55f-6c6d-420b-b5a2-b50a06812254",
-                        },
+    # Only check id, name, and value - schema is tested separately
+    assert operations_attribute["id"] == "933beba4-7455-4563-a447-b0d06e3d2589"
+    assert operations_attribute["name"] == "operations"
+    assert operations_attribute["value"] == {
+        "type": "DICTIONARY_REFERENCE",
+        "entries": [
+            {
+                "id": "6caeb2fb-c634-4cad-a97c-fc444cbaa6fb",
+                "key": "chat_history",
+                "value": {
+                    "type": "BINARY_EXPRESSION",
+                    "lhs": {"type": "WORKFLOW_STATE", "state_variable_id": "948a902d-248d-4b00-8bf4-cdd202302f20"},
+                    "operator": "concat",
+                    "rhs": {
+                        "type": "NODE_OUTPUT",
+                        "node_id": "32f69de2-53e8-4151-b036-4e831669cf1d",
+                        "node_output_id": "611ad55f-6c6d-420b-b5a2-b50a06812254",
                     },
                 },
-                {
-                    "id": "04964b4f-65bc-436e-943d-fef8b5d0dc60",
-                    "key": "counter",
-                    "value": {
-                        "type": "BINARY_EXPRESSION",
-                        "lhs": {"type": "WORKFLOW_STATE", "state_variable_id": "396a06f5-21da-4769-831a-d4fd613029ae"},
-                        "operator": "+",
-                        "rhs": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 1.0}},
-                    },
+            },
+            {
+                "id": "04964b4f-65bc-436e-943d-fef8b5d0dc60",
+                "key": "counter",
+                "value": {
+                    "type": "BINARY_EXPRESSION",
+                    "lhs": {"type": "WORKFLOW_STATE", "state_variable_id": "396a06f5-21da-4769-831a-d4fd613029ae"},
+                    "operator": "+",
+                    "rhs": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 1.0}},
                 },
-            ],
-        },
+            },
+        ],
     }
+    assert "schema" in operations_attribute

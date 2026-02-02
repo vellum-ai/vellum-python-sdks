@@ -31,6 +31,11 @@ def test_code_to_display_data(code_to_display_fixture_paths, mock_trigger_metada
             r"root\['workflow_raw_data'\]\['edges'\]\[\d+\]\['target_handle_id'\]",
             # This is for output values since this currently isn't serialized yet
             r"root\['workflow_raw_data'\]\['nodes'\]\[\d+\]\['data'\]\['workflow_raw_data'\]\['output_values'\]",
+            # Exclude schema field from attributes - schema serialization is tested separately
+            r"root\['workflow_raw_data'\]\['nodes'\]\[\d+\]\['attributes'\]\[\d+\]\['schema'\]",
+            # Exclude schema field from nested workflow attributes
+            r"root\['workflow_raw_data'\]\['nodes'\]\[\d+\]\['data'\]\['workflow_raw_data'\]"
+            r"\['nodes'\]\[\d+\]\['attributes'\]\[\d+\]\['schema'\]",
         ],
     )
     assert not diff

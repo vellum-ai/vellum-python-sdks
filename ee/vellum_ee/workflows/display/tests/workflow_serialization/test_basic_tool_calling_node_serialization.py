@@ -38,7 +38,7 @@ def test_serialize_workflow():
     # AND its raw data should be what we expect
     workflow_raw_data = serialized_workflow["workflow_raw_data"]
     tool_calling_node = workflow_raw_data["nodes"][1]
-    assert tool_calling_node == {
+    expected_tool_calling_node = {
         "id": "649a81cf-ce93-47c1-aa0f-e7a58a0cba8c",
         "label": "Get Current Weather Node",
         "type": "GENERIC",
@@ -236,3 +236,11 @@ def test_serialize_workflow():
             },
         ],
     }
+    # Use DeepDiff to compare, excluding schema field from attributes (tested separately)
+    diff = DeepDiff(
+        expected_tool_calling_node,
+        tool_calling_node,
+        ignore_order=True,
+        exclude_regex_paths=[r"root\['attributes'\]\[\d+\]\['schema'\]"],
+    )
+    assert not diff, f"Differences found: {diff}"

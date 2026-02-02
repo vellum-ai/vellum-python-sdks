@@ -56,11 +56,14 @@ def test_serialize_node__prompt_inputs__constant_value():
         attribute for attribute in my_prompt_node["attributes"] if attribute["name"] == "prompt_inputs"
     )
 
-    assert prompt_inputs_attribute == {
-        "id": "fb85d86d-f291-4a0d-b867-f7545df7af59",
-        "name": "prompt_inputs",
-        "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": {"foo": "bar"}}},
+    # Only check id, name, and value - schema is tested separately
+    assert prompt_inputs_attribute["id"] == "fb85d86d-f291-4a0d-b867-f7545df7af59"
+    assert prompt_inputs_attribute["name"] == "prompt_inputs"
+    assert prompt_inputs_attribute["value"] == {
+        "type": "CONSTANT_VALUE",
+        "value": {"type": "JSON", "value": {"foo": "bar"}},
     }
+    assert "schema" in prompt_inputs_attribute
 
 
 def test_serialize_node__prompt_inputs__input_reference():
@@ -89,20 +92,20 @@ def test_serialize_node__prompt_inputs__input_reference():
         attribute for attribute in my_prompt_node["attributes"] if attribute["name"] == "prompt_inputs"
     )
 
-    assert prompt_inputs_attribute == {
-        "id": "80ed13f9-64d2-47ee-bb91-3378de7ad2c0",
-        "name": "prompt_inputs",
-        "value": {
-            "type": "DICTIONARY_REFERENCE",
-            "entries": [
-                {
-                    "id": "981b8cdf-c08d-42a1-a226-76de8acf192f",
-                    "key": "foo",
-                    "value": {"type": "WORKFLOW_INPUT", "input_variable_id": "e3657390-fd3c-4fea-8cdd-fc5ea79f3278"},
-                }
-            ],
-        },
+    # Only check id, name, and value - schema is tested separately
+    assert prompt_inputs_attribute["id"] == "80ed13f9-64d2-47ee-bb91-3378de7ad2c0"
+    assert prompt_inputs_attribute["name"] == "prompt_inputs"
+    assert prompt_inputs_attribute["value"] == {
+        "type": "DICTIONARY_REFERENCE",
+        "entries": [
+            {
+                "id": "981b8cdf-c08d-42a1-a226-76de8acf192f",
+                "key": "foo",
+                "value": {"type": "WORKFLOW_INPUT", "input_variable_id": "e3657390-fd3c-4fea-8cdd-fc5ea79f3278"},
+            }
+        ],
     }
+    assert "schema" in prompt_inputs_attribute
 
 
 def test_serialize_node__prompt_inputs__mixed_values():
@@ -131,25 +134,25 @@ def test_serialize_node__prompt_inputs__mixed_values():
         attribute for attribute in my_prompt_node["attributes"] if attribute["name"] == "prompt_inputs"
     )
 
-    assert prompt_inputs_attribute == {
-        "id": "7352d310-204c-4291-8757-a84a6e68591a",
-        "name": "prompt_inputs",
-        "value": {
-            "type": "DICTIONARY_REFERENCE",
-            "entries": [
-                {
-                    "id": "05c092c7-4031-43b7-8c3d-b1a317ca271d",
-                    "key": "foo",
-                    "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "bar"}},
-                },
-                {
-                    "id": "b0de6603-fcdd-44a3-b33a-56f05bd03bb4",
-                    "key": "baz",
-                    "value": {"type": "WORKFLOW_INPUT", "input_variable_id": "8d57cf1d-147c-427b-9a5e-e5f6ab76e2eb"},
-                },
-            ],
-        },
+    # Only check id, name, and value - schema is tested separately
+    assert prompt_inputs_attribute["id"] == "7352d310-204c-4291-8757-a84a6e68591a"
+    assert prompt_inputs_attribute["name"] == "prompt_inputs"
+    assert prompt_inputs_attribute["value"] == {
+        "type": "DICTIONARY_REFERENCE",
+        "entries": [
+            {
+                "id": "05c092c7-4031-43b7-8c3d-b1a317ca271d",
+                "key": "foo",
+                "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "bar"}},
+            },
+            {
+                "id": "b0de6603-fcdd-44a3-b33a-56f05bd03bb4",
+                "key": "baz",
+                "value": {"type": "WORKFLOW_INPUT", "input_variable_id": "8d57cf1d-147c-427b-9a5e-e5f6ab76e2eb"},
+            },
+        ],
     }
+    assert "schema" in prompt_inputs_attribute
 
 
 def test_serialize_node__tool_calling_node__mcp_server_api_key():
@@ -343,7 +346,7 @@ def test_serialize_tool_router_node():
     serialized_router_node = router_node_display.serialize(display_context)
 
     # THEN the router node should serialize to the exact expected structure
-    assert serialized_router_node == {
+    expected = {
         "adornments": None,
         "attributes": [
             {
@@ -455,6 +458,16 @@ def test_serialize_tool_router_node():
         "trigger": {"id": "9055a5d0-68a1-40cf-bc05-a8c65bd19abe", "merge_behavior": "AWAIT_ATTRIBUTES"},
         "type": "GENERIC",
     }
+    # Use DeepDiff to compare, excluding schema field from attributes (tested separately)
+    from deepdiff import DeepDiff
+
+    diff = DeepDiff(
+        expected,
+        serialized_router_node,
+        ignore_order=True,
+        exclude_regex_paths=[r"root\['attributes'\]\[\d+\]\['schema'\]"],
+    )
+    assert not diff, f"Differences found: {diff}"
 
 
 def test_serialize_function_node():

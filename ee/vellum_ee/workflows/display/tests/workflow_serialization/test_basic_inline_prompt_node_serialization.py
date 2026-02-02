@@ -64,6 +64,7 @@ def test_serialize_workflow():
     # AND each node should be serialized correctly
 
     prompt_node = next(n for n in workflow_raw_data["nodes"] if (n.get("base") or {}).get("name") == "InlinePromptNode")
+    # Use DeepDiff to compare, excluding schema field from attributes (tested separately)
     assert not DeepDiff(
         {
             "id": "f800ecab-fe14-498f-88cf-8f67b3f04338",
@@ -269,6 +270,7 @@ def test_serialize_workflow():
         },
         prompt_node,
         ignore_order=True,
+        exclude_regex_paths=[r"root\['attributes'\]\[\d+\]\['schema'\]"],
     )
 
     # AND the definition should be what we expect
