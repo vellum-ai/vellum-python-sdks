@@ -115,7 +115,7 @@ def test_serialize_module__orphan_node_in_nodes_directory():
 def test_serialize_module__runner_run_called_during_serialization():
     """
     Tests that serialization returns an error when runner.run() is called outside
-    of 'if __name__ == "__main__"' block in sandbox.py.
+    of 'if __name__ == "__main__"' block in sandbox.py, but still extracts the dataset.
     """
 
     # GIVEN a workflow module with a sandbox.py that calls runner.run() at module level
@@ -132,3 +132,8 @@ def test_serialize_module__runner_run_called_during_serialization():
     assert any(
         "runner.run()" in msg and "serialization" in msg.lower() for msg in error_messages
     ), f"Expected runner.run() serialization error in error messages, got: {error_messages}"
+
+    # AND the dataset should still be serialized despite the error
+    assert result.dataset is not None
+    assert len(result.dataset) == 1
+    assert result.dataset[0]["label"] == "Scenario 1"
