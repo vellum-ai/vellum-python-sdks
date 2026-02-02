@@ -1,5 +1,6 @@
 import dataclasses
 from datetime import datetime
+from enum import Enum
 import inspect
 from typing import (
     TYPE_CHECKING,
@@ -130,6 +131,18 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
 
     if get_origin(annotation) is Literal:
         values = list(get_args(annotation))
+        types = {type(value) for value in values}
+        if len(types) == 1:
+            value_type = types.pop()
+            if value_type in type_map:
+                return {"type": type_map[value_type], "enum": values}
+            else:
+                return {"enum": values}
+        else:
+            return {"enum": values}
+
+    if inspect.isclass(annotation) and issubclass(annotation, Enum):
+        values = [member.value for member in annotation]
         types = {type(value) for value in values}
         if len(types) == 1:
             value_type = types.pop()
