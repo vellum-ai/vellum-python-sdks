@@ -18,7 +18,7 @@ class CustomNodeWithIntegrationTool(BaseNode):
     def run(self) -> Outputs:
         response = self._context.vellum_client.integrations.execute_integration_tool(
             integration_name=self.tool.integration_name,
-            integration_provider=self.tool.provider,
+            integration_provider=self.tool.provider.value,
             tool_name=self.tool.name,
             arguments={},
         )
