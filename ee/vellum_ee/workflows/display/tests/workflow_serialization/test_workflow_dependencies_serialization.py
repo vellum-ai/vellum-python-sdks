@@ -2,7 +2,7 @@ from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
 from vellum.client.types.rich_text_prompt_block import RichTextPromptBlock
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows.constants import VellumIntegrationProviderType
-from vellum.workflows.nodes import InlineSubworkflowNode
+from vellum.workflows.nodes import InlineSubworkflowNode, MapNode
 from vellum.workflows.nodes.displayable.inline_prompt_node import InlinePromptNode
 from vellum.workflows.nodes.displayable.tool_calling_node import ToolCallingNode
 from vellum.workflows.state.base import BaseState
@@ -408,6 +408,198 @@ def test_workflow_serialization__dependencies_from_inline_subworkflow_deduplicat
         class Outputs(BaseWorkflow.Outputs):
             text1 = SubworkflowNode1.Outputs.text
             text2 = SubworkflowNode2.Outputs.text
+
+    # WHEN we serialize the parent workflow with ml_models provided
+    ml_models = [
+        {"name": "gpt-4o-mini", "hosted_by": "OPENAI"},
+    ]
+    workflow_display = get_workflow_display(workflow_class=ParentWorkflow, ml_models=ml_models)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN we should get only one model provider dependency (deduplicated)
+    dependencies = serialized_workflow.get("dependencies", [])
+    assert len(dependencies) == 1
+    assert dependencies[0] == {
+        "type": "MODEL_PROVIDER",
+        "name": "OPENAI",
+        "model_name": "gpt-4o-mini",
+    }
+
+
+def test_workflow_serialization__dependencies_from_map_node():
+    """
+    Tests that dependencies are extracted from map node subworkflows
+    and included in the parent workflow's dependencies.
+    """
+
+    # GIVEN a subworkflow with a prompt node that uses gpt-4o-mini
+    class SubworkflowPromptNode(InlinePromptNode):
+        ml_model = "gpt-4o-mini"
+        blocks = [
+            ChatMessagePromptBlock(
+                chat_role="USER",
+                blocks=[
+                    RichTextPromptBlock(
+                        blocks=[
+                            VariablePromptBlock(input_variable="item"),
+                        ],
+                    ),
+                ],
+            ),
+        ]
+        prompt_inputs = {"item": MapNode.SubworkflowInputs.item}
+
+    class MapSubWorkflow(BaseWorkflow[MapNode.SubworkflowInputs, BaseState]):
+        graph = SubworkflowPromptNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            text = SubworkflowPromptNode.Outputs.text
+
+    # AND a parent workflow with a map node
+    class ParentInputs(BaseInputs):
+        items: list
+
+    class MapNodeWithDependency(MapNode):
+        items = ParentInputs.items
+        subworkflow = MapSubWorkflow
+
+    class ParentWorkflow(BaseWorkflow[ParentInputs, BaseState]):
+        graph = MapNodeWithDependency
+
+        class Outputs(BaseWorkflow.Outputs):
+            text = MapNodeWithDependency.Outputs.text
+
+    # WHEN we serialize the parent workflow with ml_models provided
+    ml_models = [
+        {"name": "gpt-4o-mini", "hosted_by": "OPENAI"},
+    ]
+    workflow_display = get_workflow_display(workflow_class=ParentWorkflow, ml_models=ml_models)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN we should get the model provider dependency from the map node's subworkflow
+    dependencies = serialized_workflow.get("dependencies", [])
+    assert len(dependencies) == 1
+    assert dependencies[0] == {
+        "type": "MODEL_PROVIDER",
+        "name": "OPENAI",
+        "model_name": "gpt-4o-mini",
+    }
+
+
+def test_workflow_serialization__dependencies_from_map_node_with_integration():
+    """
+    Tests that integration dependencies are extracted from map node subworkflows
+    that contain tool calling nodes with integrations.
+    """
+
+    # GIVEN a VellumIntegrationToolDefinition for GitHub
+    github_tool = VellumIntegrationToolDefinition(
+        provider=VellumIntegrationProviderType.COMPOSIO,
+        integration_name="GITHUB",
+        name="create_issue",
+        description="Create a new issue in a GitHub repository",
+    )
+
+    # AND a subworkflow with a tool calling node that uses this tool
+    class SubworkflowToolCallingNode(ToolCallingNode):
+        ml_model = "gpt-4o-mini"
+        blocks = [
+            ChatMessagePromptBlock(
+                chat_role="USER",
+                blocks=[
+                    RichTextPromptBlock(
+                        blocks=[
+                            VariablePromptBlock(input_variable="question"),
+                        ],
+                    ),
+                ],
+            ),
+        ]
+        functions = [github_tool]
+        prompt_inputs = {"question": MapNode.SubworkflowInputs.item}
+
+    class MapSubWorkflow(BaseWorkflow[MapNode.SubworkflowInputs, BaseState]):
+        graph = SubworkflowToolCallingNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            text = SubworkflowToolCallingNode.Outputs.text
+
+    # AND a parent workflow with a map node
+    class ParentInputs(BaseInputs):
+        items: list
+
+    class MapNodeWithIntegration(MapNode):
+        items = ParentInputs.items
+        subworkflow = MapSubWorkflow
+
+    class ParentWorkflow(BaseWorkflow[ParentInputs, BaseState]):
+        graph = MapNodeWithIntegration
+
+        class Outputs(BaseWorkflow.Outputs):
+            text = MapNodeWithIntegration.Outputs.text
+
+    # WHEN we serialize the parent workflow
+    workflow_display = get_workflow_display(workflow_class=ParentWorkflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN we should get the integration dependency from the map node's subworkflow
+    dependencies = serialized_workflow.get("dependencies", [])
+    assert len(dependencies) == 1
+    assert dependencies[0] == {
+        "type": "INTEGRATION",
+        "provider": "COMPOSIO",
+        "name": "GITHUB",
+    }
+
+
+def test_workflow_serialization__dependencies_from_map_node_deduplicated():
+    """
+    Tests that dependencies from map node subworkflows are deduplicated
+    when multiple map nodes use the same subworkflow.
+    """
+
+    # GIVEN a subworkflow with a prompt node that uses gpt-4o-mini
+    class SubworkflowPromptNode(InlinePromptNode):
+        ml_model = "gpt-4o-mini"
+        blocks = [
+            ChatMessagePromptBlock(
+                chat_role="USER",
+                blocks=[
+                    RichTextPromptBlock(
+                        blocks=[
+                            VariablePromptBlock(input_variable="item"),
+                        ],
+                    ),
+                ],
+            ),
+        ]
+        prompt_inputs = {"item": MapNode.SubworkflowInputs.item}
+
+    class MapSubWorkflow(BaseWorkflow[MapNode.SubworkflowInputs, BaseState]):
+        graph = SubworkflowPromptNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            text = SubworkflowPromptNode.Outputs.text
+
+    # AND a parent workflow with two map nodes using the same subworkflow
+    class ParentInputs(BaseInputs):
+        items1: list
+        items2: list
+
+    class MapNode1(MapNode):
+        items = ParentInputs.items1
+        subworkflow = MapSubWorkflow
+
+    class MapNode2(MapNode):
+        items = ParentInputs.items2
+        subworkflow = MapSubWorkflow
+
+    class ParentWorkflow(BaseWorkflow[ParentInputs, BaseState]):
+        graph = MapNode1 >> MapNode2
+
+        class Outputs(BaseWorkflow.Outputs):
+            text1 = MapNode1.Outputs.text
+            text2 = MapNode2.Outputs.text
 
     # WHEN we serialize the parent workflow with ml_models provided
     ml_models = [
