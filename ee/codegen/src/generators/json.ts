@@ -12,8 +12,9 @@ import { Writer } from "src/generators/extensions/writer";
 
 export class Json extends AstNode {
   private readonly astNode: AstNode;
+  private readonly schema?: Record<string, unknown>;
 
-  constructor(value: unknown) {
+  constructor(value: unknown, schema?: Record<string, unknown>) {
     super();
 
     // Validate that value is JSON serializable
@@ -23,6 +24,7 @@ export class Json extends AstNode {
       throw new ValueGenerationError("Value is not JSON serializable");
     }
 
+    this.schema = schema;
     this.astNode = this.generateAstNode(value);
     this.inheritReferences(this.astNode);
   }

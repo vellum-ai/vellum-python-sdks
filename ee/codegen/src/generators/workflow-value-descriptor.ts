@@ -26,6 +26,7 @@ export namespace WorkflowValueDescriptor {
     workflowContext: WorkflowContext;
     iterableConfig?: IterableConfig;
     attributeConfig?: AttributeConfig;
+    schema?: Record<string, unknown>;
   }
 }
 
@@ -34,6 +35,7 @@ export class WorkflowValueDescriptor extends AstNode {
   private workflowContext: WorkflowContext;
   private iterableConfig?: IterableConfig;
   private attributeConfig?: AttributeConfig;
+  private schema?: Record<string, unknown>;
   private astNode: AstNode;
 
   public constructor(args: WorkflowValueDescriptor.Args) {
@@ -43,6 +45,7 @@ export class WorkflowValueDescriptor extends AstNode {
     this.workflowContext = args.workflowContext;
     this.iterableConfig = args.iterableConfig;
     this.attributeConfig = args.attributeConfig;
+    this.schema = args.schema;
     this.astNode = this.generateWorkflowValueDescriptor(
       args.workflowValueDescriptor
     );

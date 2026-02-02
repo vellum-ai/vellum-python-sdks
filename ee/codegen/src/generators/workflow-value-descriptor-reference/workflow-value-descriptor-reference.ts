@@ -30,6 +30,7 @@ export declare namespace WorkflowValueDescriptorReference {
     workflowValueReferencePointer: WorkflowValueDescriptorReferenceType;
     iterableConfig?: IterableConfig;
     attributeConfig?: AttributeConfig;
+    schema?: Record<string, unknown>;
   }
 }
 
@@ -39,6 +40,7 @@ export class WorkflowValueDescriptorReference extends AstNode {
   public readonly workflowValueReferencePointer: WorkflowValueDescriptorReferenceType["type"];
   private iterableConfig?: IterableConfig;
   private attributeConfig?: AttributeConfig;
+  private schema?: Record<string, unknown>;
   public astNode:
     | BaseNodeInputWorkflowReference<WorkflowValueDescriptorReferenceType>
     | undefined;
@@ -53,6 +55,7 @@ export class WorkflowValueDescriptorReference extends AstNode {
       args.workflowValueReferencePointer.type;
     this.iterableConfig = args.iterableConfig;
     this.attributeConfig = args.attributeConfig;
+    this.schema = args.schema;
 
     this.astNode = this.getAstNode(args.workflowValueReferencePointer);
 
@@ -106,6 +109,7 @@ export class WorkflowValueDescriptorReference extends AstNode {
           nodeInputWorkflowReferencePointer: workflowValueReferencePointer,
           iterableConfig: this.iterableConfig,
           attributeConfig: this.attributeConfig,
+          schema: this.schema,
         });
       case "VELLUM_SECRET":
         return new VellumSecretWorkflowReference({

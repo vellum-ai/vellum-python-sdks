@@ -17,6 +17,7 @@ export declare namespace ConstantValueReference {
     nodeInputWorkflowReferencePointer: ConstantValueWorkflowReferenceType;
     iterableConfig?: IterableConfig;
     attributeConfig?: AttributeConfig;
+    schema?: Record<string, unknown>;
   }
 }
 
@@ -33,6 +34,7 @@ export class ConstantValueReference extends BaseNodeInputWorkflowReference<Const
       vellumValue: constantValueReferencePointer,
       iterableConfig: this.iterableConfig,
       attributeConfig: this.attributeConfig,
+      schema: this.schema,
     });
   }
 }

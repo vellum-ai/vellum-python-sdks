@@ -16,6 +16,7 @@ export declare namespace BaseNodeInputWorkflowReference {
     nodeInputWorkflowReferencePointer: T;
     iterableConfig?: IterableConfig;
     attributeConfig?: AttributeConfig;
+    schema?: Record<string, unknown>;
   }
 }
 
@@ -27,6 +28,7 @@ export abstract class BaseNodeInputWorkflowReference<
   public readonly nodeInputWorkflowReferencePointer: T;
   public readonly iterableConfig?: IterableConfig;
   public readonly attributeConfig?: AttributeConfig;
+  public readonly schema?: Record<string, unknown>;
   private astNode: AstNode | undefined;
 
   constructor({
@@ -35,6 +37,7 @@ export abstract class BaseNodeInputWorkflowReference<
     nodeInputWorkflowReferencePointer,
     iterableConfig,
     attributeConfig,
+    schema,
   }: BaseNodeInputWorkflowReference.Args<T>) {
     super();
 
@@ -42,6 +45,7 @@ export abstract class BaseNodeInputWorkflowReference<
     this.workflowContext = workflowContext;
     this.iterableConfig = iterableConfig;
     this.attributeConfig = attributeConfig;
+    this.schema = schema;
     this.nodeInputWorkflowReferencePointer = nodeInputWorkflowReferencePointer;
 
     this.astNode = this.getAstNode();

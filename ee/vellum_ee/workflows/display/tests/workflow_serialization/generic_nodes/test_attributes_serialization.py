@@ -816,3 +816,43 @@ def test_serialize_node__attribute_with_type_annotation_no_default(serialize_nod
 
     # THEN the attribute should serialize as None
     assert serialized_node["attributes"][0]["value"] is None
+
+
+def test_serialize_node__attribute_with_schema(serialize_node):
+    """
+    Tests that attributes include schema information when serialized.
+    """
+
+    # GIVEN a node with a typed attribute
+    class NodeWithTypedAttribute(BaseNode):
+        attr: str = "hello"
+
+    # WHEN the node is serialized
+    serialized_node = serialize_node(NodeWithTypedAttribute)
+
+    # THEN the attribute should include schema information
+    attribute = serialized_node["attributes"][0]
+    assert attribute["name"] == "attr"
+    assert attribute["value"]["type"] == "CONSTANT_VALUE"
+    assert "schema" in attribute
+    assert attribute["schema"]["type"] == "string"
+
+
+def test_serialize_node__attribute_with_complex_schema(serialize_node):
+    """
+    Tests that attributes with complex types include proper schema information.
+    """
+
+    # GIVEN a node with a complex typed attribute
+    class NodeWithComplexAttribute(BaseNode):
+        items: List[str] = ["a", "b", "c"]
+
+    # WHEN the node is serialized
+    serialized_node = serialize_node(NodeWithComplexAttribute)
+
+    # THEN the attribute should include schema information for the list type
+    attribute = serialized_node["attributes"][0]
+    assert attribute["name"] == "items"
+    assert "schema" in attribute
+    assert attribute["schema"]["type"] == "array"
+    assert attribute["schema"]["items"]["type"] == "string"

@@ -304,6 +304,7 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                 nodeContext: this.nodeContext,
                 workflowValueDescriptor: attribute.value,
                 workflowContext: this.workflowContext,
+                schema: attribute.schema,
               }),
             })
           );
