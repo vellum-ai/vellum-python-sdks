@@ -37,7 +37,10 @@ function isVellumIntegrationToolData(value: Record<string, unknown>): boolean {
       value.name === undefined) &&
     (typeof value.description === "string" ||
       value.description === null ||
-      value.description === undefined)
+      value.description === undefined) &&
+    (typeof value.toolkit_version === "string" ||
+      value.toolkit_version === null ||
+      value.toolkit_version === undefined)
   );
 }
 
