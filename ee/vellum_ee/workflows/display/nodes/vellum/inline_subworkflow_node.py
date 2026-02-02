@@ -55,6 +55,12 @@ class BaseInlineSubworkflowNodeDisplay(
         workflow_outputs = self._generate_workflow_outputs(node, subworkflow_display.display_context, subworkflow_class)
         serialized_subworkflow = subworkflow_display.serialize()
 
+        subworkflow_dependencies = serialized_subworkflow.get("dependencies", [])
+        if isinstance(subworkflow_dependencies, list):
+            for dependency in subworkflow_dependencies:
+                if isinstance(dependency, dict):
+                    display_context.add_dependency(dependency)
+
         return {
             "id": str(node_id),
             "type": "SUBWORKFLOW",
