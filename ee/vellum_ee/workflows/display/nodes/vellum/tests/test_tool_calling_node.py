@@ -723,6 +723,7 @@ def test_serialize_tool_prompt_node_with_inline_workflow():
                 }
             ],
         },
+        "schema": {"anyOf": [{"type": "object", "additionalProperties": {}}, {"type": "null"}]},
     }
 
 

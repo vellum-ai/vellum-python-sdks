@@ -64,6 +64,7 @@ def test_serialize_node__constant_value(serialize_node):
                             "value": "hello",
                         },
                     },
+                    "schema": {"type": "string"},
                 }
             ],
             "outputs": [],
@@ -128,6 +129,7 @@ def test_serialize_node__constant_value_reference(serialize_node):
                     "id": "35885b7e-bca5-4053-96c1-a2bcf5530348",
                     "name": "attr",
                     "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "hello"}},
+                    "schema": {"type": "string"},
                 }
             ],
             "outputs": [],
@@ -149,6 +151,7 @@ def test_serialize_node__lazy_reference(serialize_node):
             "id": "7d98966d-8ef0-4fc4-ac90-2f1d46da0ba4",
             "name": "attr",
             "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "hello"}},
+            "schema": {"type": "string"},
         }
     ]
 
@@ -339,6 +342,7 @@ def test_serialize_node__workflow_input(serialize_node):
                         "type": "WORKFLOW_INPUT",
                         "input_variable_id": str(input_id),
                     },
+                    "schema": {"type": "string"},
                 }
             ],
             "outputs": [],
@@ -411,6 +415,7 @@ def test_serialize_node__workflow_input_as_nested_chat_history():
                             }
                         ],
                     },
+                    "schema": {"type": "object"},
                 }
             ],
             "outputs": [],
@@ -474,6 +479,7 @@ def test_serialize_node__node_output(serialize_node):
                         "node_id": "e253523d-da42-405f-b44f-24999a1ea2b0",
                         "node_output_id": str(node_output_id),
                     },
+                    "schema": {"type": "string"},
                 }
             ],
             "outputs": [],
@@ -520,6 +526,7 @@ def test_serialize_node__vellum_secret(serialize_node):
                     "id": "2cc1113c-69db-42f1-a378-d09414a3cb2c",
                     "name": "attr",
                     "value": {"type": "VELLUM_SECRET", "vellum_secret_name": "hello"},
+                    "schema": {"$ref": "#/$defs/vellum.workflows.types.core.VellumSecret"},
                 }
             ],
             "outputs": [],
@@ -576,6 +583,7 @@ def test_serialize_node__node_execution(serialize_node):
                         "type": "EXECUTION_COUNTER",
                         "node_id": "d1edee11-6fa1-4ccf-a62c-9f7ca3d446da",
                     },
+                    "schema": {"type": "integer"},
                 }
             ],
             "outputs": [],
@@ -678,6 +686,7 @@ def test_serialize_node__coalesce(serialize_node):
                             "node_output_id": str(coalesce_node_b_output_id),
                         },
                     },
+                    "schema": {"type": "string"},
                 }
             ],
             "outputs": [],

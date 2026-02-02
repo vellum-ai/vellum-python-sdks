@@ -102,6 +102,7 @@ def test_serialize_node__retry(serialize_node):
                     "id": "016fa09c-3b6f-49c3-a177-5f1bb1afbeb2",
                     "name": "input",
                     "value": {"type": "WORKFLOW_INPUT", "input_variable_id": str(input_id)},
+                    "schema": {"type": "string"},
                 }
             ],
             "outputs": [
@@ -200,6 +201,7 @@ def test_serialize_node__try(serialize_node):
                     "id": "66a1a015-948e-4b9d-8746-f766fa70a445",
                     "name": "input",
                     "value": {"type": "WORKFLOW_INPUT", "input_variable_id": str(input_id)},
+                    "schema": {"type": "string"},
                 }
             ],
             "outputs": [
