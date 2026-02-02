@@ -28,10 +28,10 @@ class ErrorNode(BaseNode[StateType], Generic[StateType]):
         if isinstance(self.error, str):
             raise NodeException(message=self.error, code=WorkflowErrorCode.USER_DEFINED_ERROR)
         elif isinstance(self.error, WorkflowError):
-            raise NodeException(message=self.error.message, code=self.error.code)
+            raise NodeException.of(self.error)
         elif isinstance(self.error, VellumError):
             workflow_error = vellum_error_to_workflow_error(self.error)
-            raise NodeException(message=workflow_error.message, code=workflow_error.code)
+            raise NodeException.of(workflow_error)
         else:
             raise NodeException(
                 message=f"Error node received an unexpected input type: {self.error.__class__}",
