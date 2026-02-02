@@ -1076,6 +1076,7 @@ export interface IterableConfig {
 
 export interface AttributeConfig {
   lhs: Reference;
+  schema?: Record<string, unknown>;
 }
 
 interface NameDescription {

@@ -68,13 +68,16 @@ class NumberVellumValue extends AstNode {
 class JsonVellumValue extends AstNode {
   private astNode: AstNode;
 
-  public constructor(value: unknown) {
+  public constructor(value: unknown, schema?: Record<string, unknown>) {
     super();
-    this.astNode = this.generateAstNode(value);
+    this.astNode = this.generateAstNode(value, schema);
   }
 
-  private generateAstNode(value: unknown): AstNode {
-    const astNode = new Json(value);
+  private generateAstNode(
+    value: unknown,
+    schema?: Record<string, unknown>
+  ): AstNode {
+    const astNode = new Json(value, schema);
     this.inheritReferences(astNode);
     return astNode;
   }
@@ -607,7 +610,7 @@ export class VellumValue extends AstNode {
         this.astNode = new NumberVellumValue(vellumValue.value);
         break;
       case "JSON":
-        this.astNode = new JsonVellumValue(vellumValue.value);
+        this.astNode = new JsonVellumValue(vellumValue.value, attributeConfig?.schema);
         break;
       case "CHAT_HISTORY":
         this.astNode = new ChatHistoryVellumValue({

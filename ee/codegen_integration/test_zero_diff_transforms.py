@@ -90,10 +90,9 @@ def _compute_diff(
             frozenset(
                 {
                     "__init__.py",
-                    "display/__init__.py",
-                    "display/nodes/__init__.py",
+                    "display/nodes/custom_node_with_integration_tool.py",
                     "display/workflow.py",
-                    "nodes/__init__.py",
+                    "nodes/custom_node_with_integration_tool.py",
                 }
             ),
         ),

@@ -23,25 +23,17 @@ interface VellumIntegrationToolData {
   toolkit_version?: string | null | undefined;
 }
 
-function isVellumIntegrationToolData(value: Record<string, unknown>): boolean {
-  return (
-    value.type === "VELLUM_INTEGRATION" &&
-    (typeof value.provider === "string" ||
-      value.provider === null ||
-      value.provider === undefined) &&
-    (typeof value.integration_name === "string" ||
-      value.integration_name === null ||
-      value.integration_name === undefined) &&
-    (typeof value.name === "string" ||
-      value.name === null ||
-      value.name === undefined) &&
-    (typeof value.description === "string" ||
-      value.description === null ||
-      value.description === undefined) &&
-    (typeof value.toolkit_version === "string" ||
-      value.toolkit_version === null ||
-      value.toolkit_version === undefined)
-  );
+function isVellumIntegrationToolDefinitionSchema(
+  schema: Record<string, unknown> | undefined
+): boolean {
+  if (!schema) {
+    return false;
+  }
+  const ref = schema["$ref"];
+  if (typeof ref !== "string") {
+    return false;
+  }
+  return ref.includes("VellumIntegrationToolDefinition");
 }
 
 function toVellumIntegrationToolData(
@@ -59,8 +51,9 @@ function toVellumIntegrationToolData(
 
 export class Json extends AstNode {
   private readonly astNode: AstNode;
+  private readonly schema?: Record<string, unknown>;
 
-  constructor(value: unknown) {
+  constructor(value: unknown, schema?: Record<string, unknown>) {
     super();
 
     // Validate that value is JSON serializable
@@ -70,6 +63,7 @@ export class Json extends AstNode {
       throw new ValueGenerationError("Value is not JSON serializable");
     }
 
+    this.schema = schema;
     this.astNode = this.generateAstNode(value);
     this.inheritReferences(this.astNode);
   }
@@ -107,10 +101,11 @@ export class Json extends AstNode {
       );
     }
 
-    if (typeof value === "object") {
-      // Check if this is a VellumIntegrationToolDefinition
+    if (typeof value === "object" && value) {
       const objValue = value as Record<string, unknown>;
-      if (isVellumIntegrationToolData(objValue)) {
+
+      // Use schema to determine if this should be rendered as a pydantic model
+      if (isVellumIntegrationToolDefinitionSchema(this.schema)) {
         return this.generateVellumIntegrationToolDefinition(
           toVellumIntegrationToolData(objValue)
         );
