@@ -2,6 +2,8 @@ from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
 from vellum.client.types.rich_text_prompt_block import RichTextPromptBlock
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows.constants import VellumIntegrationProviderType
+from vellum.workflows.nodes import InlineSubworkflowNode
+from vellum.workflows.nodes.displayable.inline_prompt_node import InlinePromptNode
 from vellum.workflows.nodes.displayable.tool_calling_node import ToolCallingNode
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.definition import VellumIntegrationToolDefinition
@@ -222,3 +224,203 @@ def test_workflow_serialization__multiple_different_integration_dependencies():
     ]
     for expected in expected_deps:
         assert expected in dependencies
+
+
+def test_workflow_serialization__dependencies_from_inline_subworkflow():
+    """
+    Tests that dependencies are extracted from inline subworkflow nodes
+    and included in the parent workflow's dependencies.
+    """
+
+    # GIVEN a subworkflow with a prompt node that uses gpt-4o-mini
+    class SubworkflowInputs(BaseInputs):
+        query: str
+
+    class SubworkflowPromptNode(InlinePromptNode):
+        ml_model = "gpt-4o-mini"
+        blocks = [
+            ChatMessagePromptBlock(
+                chat_role="USER",
+                blocks=[
+                    RichTextPromptBlock(
+                        blocks=[
+                            VariablePromptBlock(input_variable="question"),
+                        ],
+                    ),
+                ],
+            ),
+        ]
+        prompt_inputs = {"question": SubworkflowInputs.query}
+
+    class SubWorkflow(BaseWorkflow[SubworkflowInputs, BaseState]):
+        graph = SubworkflowPromptNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            text = SubworkflowPromptNode.Outputs.text
+
+    # AND a parent workflow with an inline subworkflow node
+    class ParentInputs(BaseInputs):
+        query: str
+
+    class SubworkflowNode(InlineSubworkflowNode):
+        subworkflow = SubWorkflow
+        subworkflow_inputs = {"query": ParentInputs.query}
+
+    class ParentWorkflow(BaseWorkflow[ParentInputs, BaseState]):
+        graph = SubworkflowNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            text = SubworkflowNode.Outputs.text
+
+    # WHEN we serialize the parent workflow with ml_models provided
+    ml_models = [
+        {"name": "gpt-4o-mini", "hosted_by": "OPENAI"},
+    ]
+    workflow_display = get_workflow_display(workflow_class=ParentWorkflow, ml_models=ml_models)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN we should get the model provider dependency from the subworkflow
+    dependencies = serialized_workflow.get("dependencies", [])
+    assert len(dependencies) == 1
+    assert dependencies[0] == {
+        "type": "MODEL_PROVIDER",
+        "name": "OPENAI",
+        "model_name": "gpt-4o-mini",
+    }
+
+
+def test_workflow_serialization__dependencies_from_inline_subworkflow_with_integration():
+    """
+    Tests that integration dependencies are extracted from inline subworkflow nodes
+    that contain tool calling nodes with integrations.
+    """
+
+    # GIVEN a VellumIntegrationToolDefinition for GitHub
+    github_tool = VellumIntegrationToolDefinition(
+        provider=VellumIntegrationProviderType.COMPOSIO,
+        integration_name="GITHUB",
+        name="create_issue",
+        description="Create a new issue in a GitHub repository",
+    )
+
+    # AND a subworkflow with a tool calling node that uses this tool
+    class SubworkflowInputs(BaseInputs):
+        query: str
+
+    class SubworkflowToolCallingNode(ToolCallingNode):
+        ml_model = "gpt-4o-mini"
+        blocks = [
+            ChatMessagePromptBlock(
+                chat_role="USER",
+                blocks=[
+                    RichTextPromptBlock(
+                        blocks=[
+                            VariablePromptBlock(input_variable="question"),
+                        ],
+                    ),
+                ],
+            ),
+        ]
+        functions = [github_tool]
+        prompt_inputs = {"question": SubworkflowInputs.query}
+
+    class SubWorkflow(BaseWorkflow[SubworkflowInputs, BaseState]):
+        graph = SubworkflowToolCallingNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            text = SubworkflowToolCallingNode.Outputs.text
+
+    # AND a parent workflow with an inline subworkflow node
+    class ParentInputs(BaseInputs):
+        query: str
+
+    class SubworkflowNode(InlineSubworkflowNode):
+        subworkflow = SubWorkflow
+        subworkflow_inputs = {"query": ParentInputs.query}
+
+    class ParentWorkflow(BaseWorkflow[ParentInputs, BaseState]):
+        graph = SubworkflowNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            text = SubworkflowNode.Outputs.text
+
+    # WHEN we serialize the parent workflow
+    workflow_display = get_workflow_display(workflow_class=ParentWorkflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN we should get the integration dependency from the subworkflow
+    dependencies = serialized_workflow.get("dependencies", [])
+    assert len(dependencies) == 1
+    assert dependencies[0] == {
+        "type": "INTEGRATION",
+        "provider": "COMPOSIO",
+        "name": "GITHUB",
+    }
+
+
+def test_workflow_serialization__dependencies_from_inline_subworkflow_deduplicated():
+    """
+    Tests that dependencies from inline subworkflows are deduplicated
+    when multiple subworkflows use the same dependency.
+    """
+
+    # GIVEN a subworkflow with a prompt node that uses gpt-4o-mini
+    class SubworkflowInputs(BaseInputs):
+        query: str
+
+    class SubworkflowPromptNode(InlinePromptNode):
+        ml_model = "gpt-4o-mini"
+        blocks = [
+            ChatMessagePromptBlock(
+                chat_role="USER",
+                blocks=[
+                    RichTextPromptBlock(
+                        blocks=[
+                            VariablePromptBlock(input_variable="question"),
+                        ],
+                    ),
+                ],
+            ),
+        ]
+        prompt_inputs = {"question": SubworkflowInputs.query}
+
+    class SubWorkflow(BaseWorkflow[SubworkflowInputs, BaseState]):
+        graph = SubworkflowPromptNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            text = SubworkflowPromptNode.Outputs.text
+
+    # AND a parent workflow with two inline subworkflow nodes using the same subworkflow
+    class ParentInputs(BaseInputs):
+        query: str
+
+    class SubworkflowNode1(InlineSubworkflowNode):
+        subworkflow = SubWorkflow
+        subworkflow_inputs = {"query": ParentInputs.query}
+
+    class SubworkflowNode2(InlineSubworkflowNode):
+        subworkflow = SubWorkflow
+        subworkflow_inputs = {"query": ParentInputs.query}
+
+    class ParentWorkflow(BaseWorkflow[ParentInputs, BaseState]):
+        graph = SubworkflowNode1 >> SubworkflowNode2
+
+        class Outputs(BaseWorkflow.Outputs):
+            text1 = SubworkflowNode1.Outputs.text
+            text2 = SubworkflowNode2.Outputs.text
+
+    # WHEN we serialize the parent workflow with ml_models provided
+    ml_models = [
+        {"name": "gpt-4o-mini", "hosted_by": "OPENAI"},
+    ]
+    workflow_display = get_workflow_display(workflow_class=ParentWorkflow, ml_models=ml_models)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN we should get only one model provider dependency (deduplicated)
+    dependencies = serialized_workflow.get("dependencies", [])
+    assert len(dependencies) == 1
+    assert dependencies[0] == {
+        "type": "MODEL_PROVIDER",
+        "name": "OPENAI",
+        "model_name": "gpt-4o-mini",
+    }

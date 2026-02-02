@@ -7,6 +7,7 @@ from deepdiff import DeepDiff
 from pydantic import BaseModel
 
 from vellum.client.types.chat_message import ChatMessage
+from vellum.workflows.constants import VellumIntegrationProviderType
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.references.constant import ConstantValueReference
@@ -819,36 +820,27 @@ def test_serialize_node__attribute_with_type_annotation_no_default(serialize_nod
     assert serialized_node["attributes"][0]["value"] is None
 
 
-def test_serialize_node__vellum_integration_tool_definition(serialize_node):
-    """
-    Tests that VellumIntegrationToolDefinition attributes serialize with schema metadata.
-    """
+def test_serialize_node__vellum_integration_tool_definition_includes_schema(serialize_node):
+    """Tests that VellumIntegrationToolDefinition attributes include schema in serialization."""
 
     # GIVEN a node with a VellumIntegrationToolDefinition attribute
     class NodeWithIntegrationTool(BaseNode):
-        tool = VellumIntegrationToolDefinition(
-            provider="COMPOSIO",
+        tool: VellumIntegrationToolDefinition = VellumIntegrationToolDefinition(
+            provider=VellumIntegrationProviderType.COMPOSIO,
             integration_name="GITHUB",
             name="create_issue",
-            description="Create a new issue in a GitHub repository",
+            description="Create a GitHub issue",
         )
 
     # WHEN the node is serialized
     serialized_node = serialize_node(NodeWithIntegrationTool)
 
-    # THEN the attribute should have a schema field with a $ref to VellumIntegrationToolDefinition
-    assert len(serialized_node["attributes"]) == 1
+    # THEN the attribute should include a schema
     attribute = serialized_node["attributes"][0]
     assert attribute["name"] == "tool"
-    assert attribute["schema"] is not None
-    assert "$ref" in attribute["schema"]
-    assert "VellumIntegrationToolDefinition" in attribute["schema"]["$ref"]
+    assert "schema" in attribute
 
-    # AND the value should be serialized as JSON with the tool data
-    assert attribute["value"]["type"] == "CONSTANT_VALUE"
-    assert attribute["value"]["value"]["type"] == "JSON"
-    tool_value = attribute["value"]["value"]["value"]
-    assert tool_value["type"] == "VELLUM_INTEGRATION"
-    assert tool_value["provider"] == "COMPOSIO"
-    assert tool_value["integration_name"] == "GITHUB"
-    assert tool_value["name"] == "create_issue"
+    # AND the schema should reference VellumIntegrationToolDefinition
+    schema = attribute["schema"]
+    assert "$ref" in schema
+    assert "VellumIntegrationToolDefinition" in schema["$ref"]

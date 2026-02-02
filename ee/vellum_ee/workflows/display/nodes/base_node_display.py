@@ -39,7 +39,7 @@ from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_var
 from vellum_ee.workflows.display.editor.types import NodeDisplayComment, NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
-from vellum_ee.workflows.display.utils.exceptions import UnsupportedSerializationException
+from vellum_ee.workflows.display.utils.exceptions import NodeValidationError, UnsupportedSerializationException
 from vellum_ee.workflows.display.utils.expressions import serialize_value
 from vellum_ee.workflows.display.utils.registry import register_node_display_class
 
@@ -166,14 +166,11 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 if self.attribute_ids_by_name.get(attribute.name)
                 else str(uuid4_from_hash(f"{node_id}|{attribute.name}"))
             )
-            # Only compile schema for types that need it for codegen (e.g., VellumIntegrationToolDefinition)
-            # We use best-effort schema compilation - failures are silently ignored
             schema = None
             try:
                 if self._should_include_attribute_schema(attribute.normalized_type):
                     schema = compile_annotation(attribute.normalized_type, {})
             except Exception:
-                # Schema compilation is best-effort metadata, not required for serialization
                 pass
 
             try:
@@ -268,14 +265,11 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 if self.attribute_ids_by_name.get(attribute.name)
                 else str(uuid4_from_hash(f"{node_id}|{attribute.name}"))
             )
-            # Only compile schema for types that need it for codegen (e.g., VellumIntegrationToolDefinition)
-            # We use best-effort schema compilation - failures are silently ignored
             schema = None
             try:
                 if self._should_include_attribute_schema(attribute.normalized_type):
                     schema = compile_annotation(attribute.normalized_type, {})
             except Exception:
-                # Schema compilation is best-effort metadata, not required for serialization
                 pass
 
             try:
@@ -310,13 +304,16 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 if output in self.output_display
                 else str(uuid4_from_hash(f"{self.node_id}|{output.name}"))
             )
-
-            # Best-effort schema compilation for outputs - failures are silently ignored
-            schema = None
             try:
                 schema = compile_annotation(output.normalized_type, {})
-            except Exception:
-                pass
+            except Exception as e:
+                display_context.add_error(
+                    NodeValidationError(
+                        message=f"Failed to compile output schema for output '{output.name}': {e}",
+                        node_class_name=self._node.__name__,
+                    )
+                )
+                schema = None
 
             outputs.append(
                 {
@@ -336,7 +333,6 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
         Only specific types that need schema information for codegen decisions should return True.
         Currently, this includes VellumIntegrationToolDefinition to enable type-driven codegen.
         """
-        # Check if the type is VellumIntegrationToolDefinition or a subclass
         if inspect.isclass(attribute_type) and issubclass(attribute_type, VellumIntegrationToolDefinition):
             return True
         return False

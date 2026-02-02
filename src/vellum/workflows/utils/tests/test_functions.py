@@ -967,3 +967,41 @@ def test_compile_function_definition__simple_class_with_defaults():
             },
         },
     )
+
+
+class StringEnum(Enum):
+    FOO = "foo"
+    BAR = "bar"
+
+
+class IntEnum(Enum):
+    ONE = 1
+    TWO = 2
+
+
+class MixedEnum(Enum):
+    FOO = "foo"
+    ONE = 1
+
+
+@pytest.mark.parametrize(
+    "enum_class,expected_schema",
+    [
+        (StringEnum, {"type": "string", "enum": ["foo", "bar"]}),
+        (IntEnum, {"type": "integer", "enum": [1, 2]}),
+        (MixedEnum, {"enum": ["foo", 1]}),
+    ],
+)
+def test_compile_function_definition__enum_type(enum_class, expected_schema):
+    """Tests that Enum class types are compiled to JSON schema with enum values."""
+
+    # GIVEN a function with an Enum type parameter
+    def my_function(a: enum_class):  # type: ignore[valid-type]
+        pass
+
+    # WHEN compiling the function
+    compiled_function = compile_function_definition(my_function)
+
+    # THEN the parameter should have the expected enum schema
+    assert isinstance(compiled_function.parameters, dict)
+    assert compiled_function.parameters["properties"]["a"] == expected_schema
