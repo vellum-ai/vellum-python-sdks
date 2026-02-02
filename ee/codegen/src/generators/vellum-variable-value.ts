@@ -610,7 +610,10 @@ export class VellumValue extends AstNode {
         this.astNode = new NumberVellumValue(vellumValue.value);
         break;
       case "JSON":
-        this.astNode = new JsonVellumValue(vellumValue.value, attributeConfig?.schema);
+        this.astNode = new JsonVellumValue(
+          vellumValue.value,
+          attributeConfig?.schema
+        );
         break;
       case "CHAT_HISTORY":
         this.astNode = new ChatHistoryVellumValue({

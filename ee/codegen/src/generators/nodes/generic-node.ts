@@ -305,7 +305,10 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
                 workflowValueDescriptor: attribute.value,
                 workflowContext: this.workflowContext,
                 attributeConfig: attribute.schema
-                  ? { lhs: new Reference({ name: "", modulePath: [] }), schema: attribute.schema }
+                  ? {
+                      lhs: new Reference({ name: "", modulePath: [] }),
+                      schema: attribute.schema,
+                    }
                   : undefined,
               }),
             })
