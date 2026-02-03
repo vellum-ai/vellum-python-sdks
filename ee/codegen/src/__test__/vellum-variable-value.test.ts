@@ -1,5 +1,6 @@
 import * as codegen from "src/codegen";
 import { Writer } from "src/generators/extensions/writer";
+import { StringVellumValue } from "src/types/vellum";
 
 describe("VellumValue", () => {
   let writer: Writer;
@@ -22,12 +23,13 @@ describe("VellumValue", () => {
     });
 
     it("should write a STRING value with block_string as multiline", async () => {
+      const vellumValue: StringVellumValue = {
+        type: "STRING",
+        value: "Hello,\nWorld!",
+        block_string: true,
+      };
       const stringValue = codegen.vellumValue({
-        vellumValue: {
-          type: "STRING",
-          value: "Hello,\nWorld!",
-          block_string: true,
-        },
+        vellumValue,
       });
       stringValue.write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
