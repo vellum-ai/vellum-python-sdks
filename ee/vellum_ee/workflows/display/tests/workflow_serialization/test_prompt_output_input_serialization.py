@@ -3,7 +3,6 @@ from vellum.workflows import BaseWorkflow
 from vellum.workflows.inputs import BaseInputs
 from vellum.workflows.nodes import FinalOutputNode
 from vellum.workflows.state import BaseState
-from vellum.workflows.utils.functions import compile_annotation
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 
@@ -42,6 +41,12 @@ def test_serialize_workflow__prompt_output_input_schema():
     assert input_var["type"] == "JSON"
 
     # AND the schema should be the PromptOutput union type
-    # rather than enumerating all individual options
-    expected_schema = compile_annotation(PromptOutput, {})
-    assert input_var["schema"] == expected_schema
+    assert input_var["schema"] == {
+        "anyOf": [
+            {"$ref": "#/$defs/vellum.client.types.string_vellum_value.StringVellumValue"},
+            {"$ref": "#/$defs/vellum.client.types.json_vellum_value.JsonVellumValue"},
+            {"$ref": "#/$defs/vellum.client.types.error_vellum_value.ErrorVellumValue"},
+            {"$ref": "#/$defs/vellum.client.types.function_call_vellum_value.FunctionCallVellumValue"},
+            {"$ref": "#/$defs/vellum.client.types.thinking_vellum_value.ThinkingVellumValue"},
+        ]
+    }
