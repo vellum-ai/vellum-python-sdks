@@ -70,13 +70,14 @@ class TriggerAttributeReference(BaseDescriptor[_T], Generic[_T]):
         """
         Coerce the resolved value to match expected types when possible.
 
-        If the value is a list with a single StringChatMessageContent and the expected type is str,
-        extract and return the string value.
+        If the value is a list with a single StringChatMessageContent and the expected type is
+        exactly str (and nothing else), extract and return the string value.
         """
         if expected_types is None:
             return value
 
-        if str in expected_types and list not in expected_types:
+        # Only coerce if str is the ONLY expected type
+        if expected_types == (str,):
             if isinstance(value, list) and len(value) == 1:
                 item = value[0]
                 if isinstance(item, StringChatMessageContent):
