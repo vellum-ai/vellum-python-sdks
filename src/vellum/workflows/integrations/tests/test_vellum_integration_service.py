@@ -3,8 +3,10 @@ from unittest import mock
 from uuid import uuid4
 
 from vellum import Integration
+from vellum.client.core.api_error import ApiError
 from vellum.client.types.components_schemas_composio_tool_definition import ComponentsSchemasComposioToolDefinition
 from vellum.workflows.constants import VellumIntegrationProviderType
+from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.integrations.vellum_integration_service import VellumIntegrationService
 from vellum.workflows.types.definition import VellumIntegrationToolDetails
@@ -303,9 +305,6 @@ def test_vellum_integration_service_multiple_tool_executions(vellum_client):
 
 def test_vellum_integration_service_execute_tool_structured_403_with_integration(vellum_client):
     """Test structured 403 responses with integration field (current backend format)"""
-    from vellum.client.core.api_error import ApiError
-    from vellum.workflows.errors.types import WorkflowErrorCode
-
     # GIVEN a mock client configured to raise a structured 403 error with integration
     mock_client = vellum_client
     mock_client.integrations = mock.MagicMock()
@@ -350,10 +349,7 @@ def test_vellum_integration_service_execute_tool_structured_403_with_integration
 
 
 def test_vellum_integration_service_execute_tool_legacy_403_error(vellum_client):
-    """Test backward compatibility with legacy 403 responses (before PR #14857)"""
-    from vellum.client.core.api_error import ApiError
-    from vellum.workflows.errors.types import WorkflowErrorCode
-
+    """Test backward compatibility with legacy 403 responses"""
     # GIVEN a mock client configured to raise a legacy 403 error
     mock_client = vellum_client
     mock_client.integrations = mock.MagicMock()
@@ -382,3 +378,102 @@ def test_vellum_integration_service_execute_tool_legacy_403_error(vellum_client)
 
     # AND raw_data should be None (no integration details available)
     assert exc_info.value.raw_data is None
+
+
+def test_vellum_integration_service_execute_tool_400_error_extracts_detail(vellum_client):
+    """Test that 400 errors extract the detail message instead of showing verbose HTTP response"""
+    # GIVEN a mock client configured to raise a 400 error with a detail field
+    mock_client = vellum_client
+    mock_client.integrations = mock.MagicMock()
+
+    # AND the error body contains a detail field with a meaningful error message
+    error_body = {
+        "detail": 'Notion API HTTP error 400: {"object":"error","status":400,"code":"validation_error",'
+        '"message":"Could not find property with name or id: Name"}'
+    }
+    mock_client.integrations.execute_integration_tool.side_effect = ApiError(
+        status_code=400,
+        headers={"server": "gunicorn", "content-type": "application/json"},
+        body=error_body,
+    )
+
+    # WHEN we attempt to execute a tool that returns a 400 error
+    service = VellumIntegrationService(client=mock_client)
+    with pytest.raises(NodeException) as exc_info:
+        service.execute_tool(
+            integration="NOTION",
+            provider="COMPOSIO",
+            tool_name="NOTION_QUERY_DATABASE",
+            arguments={"database_id": "test-db"},
+        )
+
+    # THEN the error message should contain the detail, not the full HTTP response
+    assert "Notion API HTTP error 400" in exc_info.value.message
+    assert "Could not find property with name or id: Name" in exc_info.value.message
+
+    # AND the message should NOT contain HTTP headers
+    assert "headers:" not in exc_info.value.message
+    assert "gunicorn" not in exc_info.value.message
+
+    # AND the error code should be INTERNAL_ERROR
+    assert exc_info.value.code == WorkflowErrorCode.INTERNAL_ERROR
+
+
+def test_vellum_integration_service_execute_tool_api_error_without_detail_uses_fallback(vellum_client):
+    """Test that API errors without a detail field use a fallback message"""
+    # GIVEN a mock client configured to raise an API error without a detail field
+    mock_client = vellum_client
+    mock_client.integrations = mock.MagicMock()
+
+    # AND the error body does not contain a detail field
+    error_body = {"error": "some_error_code"}
+    mock_client.integrations.execute_integration_tool.side_effect = ApiError(
+        status_code=422,
+        headers={"server": "gunicorn"},
+        body=error_body,
+    )
+
+    # WHEN we attempt to execute a tool that returns an error without detail
+    service = VellumIntegrationService(client=mock_client)
+    with pytest.raises(NodeException) as exc_info:
+        service.execute_tool(
+            integration="GITHUB",
+            provider="COMPOSIO",
+            tool_name="GITHUB_CREATE_ISSUE",
+            arguments={"repo": "test/repo"},
+        )
+
+    # THEN the error message should use the fallback format
+    assert "Failed to execute tool GITHUB_CREATE_ISSUE" in exc_info.value.message
+
+    # AND the message should NOT contain HTTP headers
+    assert "headers:" not in exc_info.value.message
+
+
+def test_vellum_integration_service_get_tool_definition_api_error_extracts_detail(vellum_client):
+    """Test that get_tool_definition extracts detail from API errors"""
+    # GIVEN a mock client configured to raise an API error with a detail field
+    mock_client = vellum_client
+    mock_client.integrations = mock.MagicMock()
+
+    error_body = {"detail": "Tool definition not found for the specified integration"}
+    mock_client.integrations.retrieve_integration_tool_definition.side_effect = ApiError(
+        status_code=404,
+        headers={"server": "gunicorn"},
+        body=error_body,
+    )
+
+    # WHEN we attempt to get a tool definition that returns an API error
+    service = VellumIntegrationService(client=mock_client)
+    with pytest.raises(NodeException) as exc_info:
+        service.get_tool_definition(
+            integration="NOTION",
+            provider="COMPOSIO",
+            tool_name="INVALID_TOOL",
+        )
+
+    # THEN the error message should contain the detail
+    assert "Tool definition not found" in exc_info.value.message
+
+    # AND the message should NOT contain HTTP headers
+    assert "headers:" not in exc_info.value.message

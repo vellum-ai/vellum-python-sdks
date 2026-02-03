@@ -8,6 +8,27 @@ from vellum.workflows.types.definition import VellumIntegrationToolDetails
 from vellum.workflows.vellum_client import Vellum
 
 
+def _extract_api_error_message(error: ApiError, fallback_message: str) -> str:
+    """Extract a user-friendly error message from an ApiError.
+
+    The ApiError.__str__ method returns verbose output including HTTP headers,
+    status code, and body. This function extracts just the meaningful error
+    message from the body's 'detail' field when available.
+
+    Args:
+        error: The ApiError to extract a message from
+        fallback_message: Message to use if no meaningful message can be extracted
+
+    Returns:
+        A user-friendly error message
+    """
+    if isinstance(error.body, dict):
+        detail = error.body.get("detail")
+        if detail:
+            return str(detail)
+    return fallback_message
+
+
 class VellumIntegrationService:
     """Vellum Integration Service for retrieving tool definitions and executing tools.
 
@@ -59,6 +80,13 @@ class VellumIntegrationService:
                 parameters=response.input_parameters,
                 toolkit_version=response.toolkit_version,
             )
+        except ApiError as e:
+            fallback_message = f"Failed to retrieve tool definition for {tool_name}"
+            error_message = _extract_api_error_message(e, fallback_message)
+            raise NodeException(
+                message=error_message,
+                code=WorkflowErrorCode.INVALID_OUTPUTS,
+            ) from e
         except Exception as e:
             error_message = f"Failed to retrieve tool definition for {tool_name}: {str(e)}"
             raise NodeException(
@@ -133,9 +161,11 @@ class VellumIntegrationService:
                     message=error_message,
                     code=WorkflowErrorCode.PROVIDER_ERROR,
                 ) from e
-            # Generic server error
+            # Generic API error - extract meaningful message from body if available
+            fallback_message = f"Failed to execute tool {tool_name}"
+            error_message = _extract_api_error_message(e, fallback_message)
             raise NodeException(
-                message=f"Failed to execute tool {tool_name}: {str(e)}",
+                message=error_message,
                 code=WorkflowErrorCode.INTERNAL_ERROR,
             ) from e
         except Exception as e:
