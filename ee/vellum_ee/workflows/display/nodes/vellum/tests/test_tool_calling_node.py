@@ -357,6 +357,18 @@ def test_serialize_tool_router_node():
                     "node_output_id": "baef5c93-612a-453d-b739-223041ef0429",
                     "type": "NODE_OUTPUT",
                 },
+                "schema": {
+                    "type": "array",
+                    "items": {
+                        "anyOf": [
+                            {"$ref": "#/$defs/vellum.client.types.string_vellum_value.StringVellumValue"},
+                            {"$ref": "#/$defs/vellum.client.types.json_vellum_value.JsonVellumValue"},
+                            {"$ref": "#/$defs/vellum.client.types.error_vellum_value.ErrorVellumValue"},
+                            {"$ref": "#/$defs/vellum.client.types.function_call_vellum_value.FunctionCallVellumValue"},
+                            {"$ref": "#/$defs/vellum.client.types.thinking_vellum_value.ThinkingVellumValue"},
+                        ]
+                    },
+                },
             }
         ],
         "base": {
@@ -458,16 +470,7 @@ def test_serialize_tool_router_node():
         "trigger": {"id": "9055a5d0-68a1-40cf-bc05-a8c65bd19abe", "merge_behavior": "AWAIT_ATTRIBUTES"},
         "type": "GENERIC",
     }
-    # Use DeepDiff to compare, excluding schema field from attributes (tested separately)
-    from deepdiff import DeepDiff
-
-    diff = DeepDiff(
-        expected,
-        serialized_router_node,
-        ignore_order=True,
-        exclude_regex_paths=[r"root\['attributes'\]\[\d+\]\['schema'\]"],
-    )
-    assert not diff, f"Differences found: {diff}"
+    assert expected == serialized_router_node
 
 
 def test_serialize_function_node():

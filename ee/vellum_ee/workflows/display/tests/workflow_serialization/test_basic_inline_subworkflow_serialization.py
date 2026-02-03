@@ -179,6 +179,7 @@ def test_serialize_workflow():
                     "type": "WORKFLOW_INPUT",
                     "input_variable_id": "f2f5da15-026d-4905-bfe7-7d16bda20eed",
                 },
+                "schema": {"type": "string"},
             },
             {
                 "id": "6d933d5e-84a2-434a-baf8-25315c9469af",
@@ -187,6 +188,7 @@ def test_serialize_workflow():
                     "type": "WORKFLOW_INPUT",
                     "input_variable_id": "aba1e6e0-dfa7-4c15-a4e6-aec6feebfaca",
                 },
+                "schema": {"type": "string"},
             },
         ],
         "outputs": [
@@ -206,14 +208,7 @@ def test_serialize_workflow():
             },
         ],
     }
-    # Use DeepDiff to compare, excluding schema field from attributes (tested separately)
-    diff = DeepDiff(
-        expected_nested_start_node,
-        nested_start_node,
-        ignore_order=True,
-        exclude_regex_paths=[r"root\['attributes'\]\[\d+\]\['schema'\]"],
-    )
-    assert not diff, f"Differences found: {diff}"
+    assert expected_nested_start_node == nested_start_node
 
     assert nested_workflow_data["display_data"] == {"viewport": {"x": 0.0, "y": 0.0, "zoom": 1.0}}
     assert nested_workflow_data["definition"] == {

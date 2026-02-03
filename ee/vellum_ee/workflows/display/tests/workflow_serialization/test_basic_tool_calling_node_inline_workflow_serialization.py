@@ -155,6 +155,7 @@ def test_serialize_workflow():
                     "type": "WORKFLOW_INPUT",
                     "input_variable_id": "fa73da37-34c3-47a9-be58-69cc6cdbfca5",
                 },
+                "schema": {"type": "string"},
             },
             {
                 "id": "5b3ed6d0-8cd6-41b6-ad55-d380b41f943b",
@@ -163,6 +164,7 @@ def test_serialize_workflow():
                     "type": "WORKFLOW_INPUT",
                     "input_variable_id": "aba1e6e0-dfa7-4c15-a4e6-aec6feebfaca",
                 },
+                "schema": {"type": "string"},
             },
         ],
         "outputs": [
@@ -182,11 +184,4 @@ def test_serialize_workflow():
             },
         ],
     }
-    # Use DeepDiff to compare, excluding schema field from attributes (tested separately)
-    diff = DeepDiff(
-        expected_inner_start_node,
-        inner_start_node,
-        ignore_order=True,
-        exclude_regex_paths=[r"root\['attributes'\]\[\d+\]\['schema'\]"],
-    )
-    assert not diff, f"Differences found: {diff}"
+    assert expected_inner_start_node == inner_start_node

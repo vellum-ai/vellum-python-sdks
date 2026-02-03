@@ -182,34 +182,35 @@ def test_serialize_node__prompt_inputs__state_reference():
     prompt_inputs_attribute = next(
         attribute for attribute in my_prompt_node["attributes"] if attribute["name"] == "prompt_inputs"
     )
-    # Only check id, name, and value - schema is tested separately
-    assert prompt_inputs_attribute["id"] == "768704cc-812b-4a06-8348-ed46160a48f9"
-    assert prompt_inputs_attribute["name"] == "prompt_inputs"
-    assert prompt_inputs_attribute["value"] == {
-        "type": "DICTIONARY_REFERENCE",
-        "entries": [
-            {
-                "id": "4a601d66-dc7d-4e48-a933-52a13fdc8d80",
-                "key": "foo",
-                "value": {
-                    "type": "WORKFLOW_STATE",
-                    "state_variable_id": "dd3391bf-c818-4eba-aac5-912618ba412f",
-                },
-            },
-            {
-                "id": "341f8329-5d5f-417b-a20d-e88234a17c49",
-                "key": "bar",
-                "value": {
-                    "type": "CONSTANT_VALUE",
+    assert prompt_inputs_attribute == {
+        "id": "768704cc-812b-4a06-8348-ed46160a48f9",
+        "name": "prompt_inputs",
+        "value": {
+            "type": "DICTIONARY_REFERENCE",
+            "entries": [
+                {
+                    "id": "4a601d66-dc7d-4e48-a933-52a13fdc8d80",
+                    "key": "foo",
                     "value": {
-                        "type": "STRING",
-                        "value": "baz",
+                        "type": "WORKFLOW_STATE",
+                        "state_variable_id": "dd3391bf-c818-4eba-aac5-912618ba412f",
                     },
                 },
-            },
-        ],
+                {
+                    "id": "341f8329-5d5f-417b-a20d-e88234a17c49",
+                    "key": "bar",
+                    "value": {
+                        "type": "CONSTANT_VALUE",
+                        "value": {
+                            "type": "STRING",
+                            "value": "baz",
+                        },
+                    },
+                },
+            ],
+        },
+        "schema": {"anyOf": [{"additionalProperties": {}, "type": "object"}, {"type": "null"}]},
     }
-    assert "schema" in prompt_inputs_attribute
 
 
 def test_serialize_node__unreferenced_variable_block__still_serializes():

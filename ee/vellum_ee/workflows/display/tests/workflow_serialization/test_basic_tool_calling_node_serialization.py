@@ -66,6 +66,7 @@ def test_serialize_workflow():
                 "id": "6991a1bf-6a1d-4b0a-8e67-39505b324216",
                 "name": "ml_model",
                 "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "gpt-4o-mini"}},
+                "schema": {"type": "string"},
             },
             {
                 "id": "74ce80ae-4f12-48fd-a9b7-412532e383ec",
@@ -124,6 +125,7 @@ def test_serialize_workflow():
                         ],
                     },
                 },
+                "schema": None,
             },
             {
                 "id": "1e3cd0b3-5657-42bd-8a71-48bdf9e9b835",
@@ -162,6 +164,7 @@ def test_serialize_workflow():
                         ],
                     },
                 },
+                "schema": None,
             },
             {
                 "id": "e554e8c1-a270-4fbf-951f-fd4aca4afe9b",
@@ -179,6 +182,7 @@ def test_serialize_workflow():
                         }
                     ],
                 },
+                "schema": {"anyOf": [{"type": "object", "additionalProperties": {}}, {"type": "null"}]},
             },
             {
                 "id": "ef504b60-5b94-43d0-b31d-534309a52ff2",
@@ -200,16 +204,25 @@ def test_serialize_workflow():
                         },
                     },
                 },
+                "schema": {"$ref": "#/$defs/vellum.client.types.prompt_parameters.PromptParameters"},
             },
             {
                 "id": "83546f2d-f531-4773-b87b-aeb104b9218d",
                 "name": "max_prompt_iterations",
                 "value": {"type": "CONSTANT_VALUE", "value": {"type": "NUMBER", "value": 25.0}},
+                "schema": {"anyOf": [{"type": "integer"}, {"type": "null"}]},
             },
             {
                 "id": "bb8b8427-db2c-4115-b26b-c30dc705787a",
                 "name": "settings",
                 "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                "schema": {
+                    "anyOf": [
+                        {"$ref": "#/$defs/vellum.client.types.prompt_settings.PromptSettings"},
+                        {"type": "object", "additionalProperties": {}},
+                        {"type": "null"},
+                    ]
+                },
             },
         ],
         "outputs": [
@@ -236,11 +249,4 @@ def test_serialize_workflow():
             },
         ],
     }
-    # Use DeepDiff to compare, excluding schema field from attributes (tested separately)
-    diff = DeepDiff(
-        expected_tool_calling_node,
-        tool_calling_node,
-        ignore_order=True,
-        exclude_regex_paths=[r"root\['attributes'\]\[\d+\]\['schema'\]"],
-    )
-    assert not diff, f"Differences found: {diff}"
+    assert expected_tool_calling_node == tool_calling_node

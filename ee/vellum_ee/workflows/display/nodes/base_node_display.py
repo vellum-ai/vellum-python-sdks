@@ -237,21 +237,26 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
                 else str(uuid4_from_hash(f"{node_id}|{attribute.name}"))
             )
 
-            schema = None
             try:
                 schema = compile_annotation(attribute.normalized_type, {})
-            except Exception:
-                pass
+            except Exception as e:
+                display_context.add_validation_error(
+                    NodeValidationError(
+                        message=f"Failed to compile attribute schema for attribute '{attribute.name}': {e}",
+                        node_class_name=self._node.__name__,
+                    )
+                )
+                schema = None
 
             try:
-                attribute_dict: JsonObject = {
-                    "id": id,
-                    "name": attribute.name,
-                    "value": serialize_value(node_id, display_context, attribute.instance),
-                }
-                if schema is not None:
-                    attribute_dict["schema"] = schema
-                attributes.append(attribute_dict)
+                attributes.append(
+                    {
+                        "id": id,
+                        "name": attribute.name,
+                        "value": serialize_value(node_id, display_context, attribute.instance),
+                        "schema": schema,
+                    }
+                )
             except ValueError as e:
                 raise ValueError(f"Failed to serialize attribute '{attribute.name}': {e}")
 

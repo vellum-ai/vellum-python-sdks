@@ -64,7 +64,6 @@ def test_serialize_workflow():
     # AND each node should be serialized correctly
 
     prompt_node = next(n for n in workflow_raw_data["nodes"] if (n.get("base") or {}).get("name") == "InlinePromptNode")
-    # Use DeepDiff to compare, excluding schema field from attributes (tested separately)
     assert not DeepDiff(
         {
             "id": "f800ecab-fe14-498f-88cf-8f67b3f04338",
@@ -177,6 +176,7 @@ def test_serialize_workflow():
                     "id": "7d5ff6a6-ff5f-4ed5-8ac6-d8138bf5f013",
                     "name": "ml_model",
                     "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "gpt-4o"}},
+                    "schema": {"type": "string"},
                 },
                 {
                     "id": "5fa00fe1-1b5d-4152-becf-88dec77d9225",
@@ -205,6 +205,7 @@ def test_serialize_workflow():
                             ],
                         },
                     },
+                    "schema": None,
                 },
                 {
                     "id": "51aceca7-ce5a-46c4-a52c-7a809b06cdd4",
@@ -222,6 +223,7 @@ def test_serialize_workflow():
                             }
                         ],
                     },
+                    "schema": {"anyOf": [{"type": "object", "additionalProperties": {}}, {"type": "null"}]},
                 },
                 {
                     "id": "4ae711ff-fdac-4896-bba9-9a957a5d0329",
@@ -244,6 +246,7 @@ def test_serialize_workflow():
                             ],
                         },
                     },
+                    "schema": None,
                 },
                 {
                     "id": "36fee5be-69e0-48cb-8aff-db1fe22aed6f",
@@ -265,12 +268,12 @@ def test_serialize_workflow():
                             },
                         },
                     },
+                    "schema": {"$ref": "#/$defs/vellum.client.types.prompt_parameters.PromptParameters"},
                 },
             ],
         },
         prompt_node,
         ignore_order=True,
-        exclude_regex_paths=[r"root\['attributes'\]\[\d+\]\['schema'\]"],
     )
 
     # AND the definition should be what we expect
