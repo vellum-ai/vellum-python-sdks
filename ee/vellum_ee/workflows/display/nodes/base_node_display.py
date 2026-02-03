@@ -38,6 +38,7 @@ from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_var
 from vellum_ee.workflows.display.editor.types import NodeDisplayComment, NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
+from vellum_ee.workflows.display.utils.dependencies import extract_integration_dependencies_from_node
 from vellum_ee.workflows.display.utils.exceptions import NodeValidationError, UnsupportedSerializationException
 from vellum_ee.workflows.display.utils.expressions import serialize_value
 from vellum_ee.workflows.display.utils.registry import register_node_display_class
@@ -335,6 +336,17 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
             if has_custom_methods:
                 result["should_file_merge"] = True
+
+            # Extract integration dependencies from the node's run method
+            integration_deps = extract_integration_dependencies_from_node(node_class)
+            for dep in integration_deps:
+                display_context.add_dependency(
+                    {
+                        "type": "INTEGRATION",
+                        "provider": dep.provider,
+                        "name": dep.integration_name,
+                    }
+                )
         except Exception:
             pass
 

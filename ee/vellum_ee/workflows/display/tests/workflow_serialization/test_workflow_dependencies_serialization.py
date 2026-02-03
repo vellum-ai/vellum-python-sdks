@@ -2,12 +2,13 @@ from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
 from vellum.client.types.rich_text_prompt_block import RichTextPromptBlock
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows.constants import VellumIntegrationProviderType
+from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes import InlineSubworkflowNode, MapNode
 from vellum.workflows.nodes.displayable.inline_prompt_node import InlinePromptNode
 from vellum.workflows.nodes.displayable.tool_calling_node import ToolCallingNode
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.definition import VellumIntegrationToolDefinition
-from vellum.workflows.workflows.base import BaseInputs, BaseWorkflow
+from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
@@ -616,3 +617,56 @@ def test_workflow_serialization__dependencies_from_map_node_deduplicated():
         "name": "OPENAI",
         "model_name": "gpt-4o-mini",
     }
+
+
+def test_workflow_serialization__integration_dependencies_from_custom_node_run_method():
+    """
+    Tests that integration dependencies are extracted from custom nodes
+    that call execute_integration_tool in their run method.
+    """
+    # Import from file-based fixture to allow inspect.getsource() to work
+    from vellum_ee.workflows.display.tests.workflow_serialization.test_integration_dependencies_custom_node.workflow import (  # noqa: E501
+        SingleIntegrationWorkflow,
+    )
+
+    # GIVEN a workflow with a custom node that calls execute_integration_tool in its run method
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=SingleIntegrationWorkflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN we should get the expected integration dependency
+    dependencies = serialized_workflow.get("dependencies", [])
+    assert len(dependencies) == 1
+    assert dependencies[0] == {
+        "type": "INTEGRATION",
+        "provider": "COMPOSIO",
+        "name": "NOTION",
+    }
+
+
+def test_workflow_serialization__integration_dependencies_from_custom_node_multiple_integrations():
+    """
+    Tests that multiple integration dependencies are extracted from a custom node
+    that calls execute_integration_tool multiple times with different integrations.
+    """
+    # Import from file-based fixture to allow inspect.getsource() to work
+    from vellum_ee.workflows.display.tests.workflow_serialization.test_integration_dependencies_custom_node.workflow import (  # noqa: E501
+        MultiIntegrationWorkflow,
+    )
+
+    # GIVEN a workflow with a custom node that calls execute_integration_tool multiple times
+    # WHEN we serialize the workflow
+    workflow_display = get_workflow_display(workflow_class=MultiIntegrationWorkflow)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN we should get both integration dependencies
+    dependencies = serialized_workflow.get("dependencies", [])
+    assert len(dependencies) == 2
+
+    # AND all expected dependencies should be present (order not guaranteed)
+    expected_deps = [
+        {"type": "INTEGRATION", "provider": "COMPOSIO", "name": "GITHUB"},
+        {"type": "INTEGRATION", "provider": "COMPOSIO", "name": "SLACK"},
+    ]
+    for expected in expected_deps:
+        assert expected in dependencies
