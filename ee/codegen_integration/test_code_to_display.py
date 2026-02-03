@@ -1,6 +1,6 @@
 import pytest
 import json
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 from deepdiff import DeepDiff
 
@@ -21,8 +21,6 @@ def test_code_to_display_data(code_to_display_fixture_paths, mock_trigger_metada
     with open(expected_display_data_file_path) as file:
         expected_serialized_workflow = json.load(file, object_hook=_custom_obj_hook)  # noqa: F841
 
-    _copy_schema_fields(expected_serialized_workflow, actual_serialized_workflow)
-
     diff = DeepDiff(
         expected_serialized_workflow,
         actual_serialized_workflow,
@@ -36,36 +34,6 @@ def test_code_to_display_data(code_to_display_fixture_paths, mock_trigger_metada
         ],
     )
     assert not diff
-
-
-def _copy_schema_fields(expected: Dict[str, Any], actual: Dict[str, Any]) -> None:
-    """
-    Copies schema fields from actual serialized workflow to expected.
-    This allows fixtures to not include schema values while still comparing the rest of the structure.
-    """
-
-    def process_nodes(expected_nodes: List[Dict[str, Any]], actual_nodes: List[Dict[str, Any]]) -> None:
-        actual_nodes_by_id = {node["id"]: node for node in actual_nodes}
-        for expected_node in expected_nodes:
-            actual_node = actual_nodes_by_id.get(expected_node["id"])
-            if not actual_node:
-                continue
-
-            actual_attrs_by_name = {attr.get("name"): attr for attr in actual_node.get("attributes", [])}
-            for expected_attr in expected_node.get("attributes", []):
-                actual_attr = actual_attrs_by_name.get(expected_attr.get("name"))
-                if actual_attr and "schema" in actual_attr:
-                    expected_attr["schema"] = actual_attr["schema"]
-
-            if "data" in expected_node and "workflow_raw_data" in expected_node.get("data", {}):
-                nested_expected = expected_node["data"]["workflow_raw_data"].get("nodes", [])
-                nested_actual = actual_node.get("data", {}).get("workflow_raw_data", {}).get("nodes", [])
-                if nested_expected and nested_actual:
-                    process_nodes(nested_expected, nested_actual)
-
-    expected_nodes = expected.get("workflow_raw_data", {}).get("nodes", [])
-    actual_nodes = actual.get("workflow_raw_data", {}).get("nodes", [])
-    process_nodes(expected_nodes, actual_nodes)
 
 
 def _process_position_hook(key, value) -> None:

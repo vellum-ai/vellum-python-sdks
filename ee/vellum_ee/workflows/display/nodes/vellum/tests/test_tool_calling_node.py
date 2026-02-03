@@ -56,14 +56,12 @@ def test_serialize_node__prompt_inputs__constant_value():
         attribute for attribute in my_prompt_node["attributes"] if attribute["name"] == "prompt_inputs"
     )
 
-    # Only check id, name, and value - schema is tested separately
-    assert prompt_inputs_attribute["id"] == "fb85d86d-f291-4a0d-b867-f7545df7af59"
-    assert prompt_inputs_attribute["name"] == "prompt_inputs"
-    assert prompt_inputs_attribute["value"] == {
-        "type": "CONSTANT_VALUE",
-        "value": {"type": "JSON", "value": {"foo": "bar"}},
+    assert prompt_inputs_attribute == {
+        "id": "fb85d86d-f291-4a0d-b867-f7545df7af59",
+        "name": "prompt_inputs",
+        "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": {"foo": "bar"}}},
+        "schema": {"anyOf": [{"type": "object", "additionalProperties": {}}, {"type": "null"}]},
     }
-    assert "schema" in prompt_inputs_attribute
 
 
 def test_serialize_node__prompt_inputs__input_reference():
@@ -92,20 +90,21 @@ def test_serialize_node__prompt_inputs__input_reference():
         attribute for attribute in my_prompt_node["attributes"] if attribute["name"] == "prompt_inputs"
     )
 
-    # Only check id, name, and value - schema is tested separately
-    assert prompt_inputs_attribute["id"] == "80ed13f9-64d2-47ee-bb91-3378de7ad2c0"
-    assert prompt_inputs_attribute["name"] == "prompt_inputs"
-    assert prompt_inputs_attribute["value"] == {
-        "type": "DICTIONARY_REFERENCE",
-        "entries": [
-            {
-                "id": "981b8cdf-c08d-42a1-a226-76de8acf192f",
-                "key": "foo",
-                "value": {"type": "WORKFLOW_INPUT", "input_variable_id": "e3657390-fd3c-4fea-8cdd-fc5ea79f3278"},
-            }
-        ],
+    assert prompt_inputs_attribute == {
+        "id": "80ed13f9-64d2-47ee-bb91-3378de7ad2c0",
+        "name": "prompt_inputs",
+        "value": {
+            "type": "DICTIONARY_REFERENCE",
+            "entries": [
+                {
+                    "id": "981b8cdf-c08d-42a1-a226-76de8acf192f",
+                    "key": "foo",
+                    "value": {"type": "WORKFLOW_INPUT", "input_variable_id": "e3657390-fd3c-4fea-8cdd-fc5ea79f3278"},
+                }
+            ],
+        },
+        "schema": {"anyOf": [{"type": "object", "additionalProperties": {}}, {"type": "null"}]},
     }
-    assert "schema" in prompt_inputs_attribute
 
 
 def test_serialize_node__prompt_inputs__mixed_values():
@@ -134,25 +133,26 @@ def test_serialize_node__prompt_inputs__mixed_values():
         attribute for attribute in my_prompt_node["attributes"] if attribute["name"] == "prompt_inputs"
     )
 
-    # Only check id, name, and value - schema is tested separately
-    assert prompt_inputs_attribute["id"] == "7352d310-204c-4291-8757-a84a6e68591a"
-    assert prompt_inputs_attribute["name"] == "prompt_inputs"
-    assert prompt_inputs_attribute["value"] == {
-        "type": "DICTIONARY_REFERENCE",
-        "entries": [
-            {
-                "id": "05c092c7-4031-43b7-8c3d-b1a317ca271d",
-                "key": "foo",
-                "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "bar"}},
-            },
-            {
-                "id": "b0de6603-fcdd-44a3-b33a-56f05bd03bb4",
-                "key": "baz",
-                "value": {"type": "WORKFLOW_INPUT", "input_variable_id": "8d57cf1d-147c-427b-9a5e-e5f6ab76e2eb"},
-            },
-        ],
+    assert prompt_inputs_attribute == {
+        "id": "7352d310-204c-4291-8757-a84a6e68591a",
+        "name": "prompt_inputs",
+        "value": {
+            "type": "DICTIONARY_REFERENCE",
+            "entries": [
+                {
+                    "id": "05c092c7-4031-43b7-8c3d-b1a317ca271d",
+                    "key": "foo",
+                    "value": {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "bar"}},
+                },
+                {
+                    "id": "b0de6603-fcdd-44a3-b33a-56f05bd03bb4",
+                    "key": "baz",
+                    "value": {"type": "WORKFLOW_INPUT", "input_variable_id": "8d57cf1d-147c-427b-9a5e-e5f6ab76e2eb"},
+                },
+            ],
+        },
+        "schema": {"anyOf": [{"type": "object", "additionalProperties": {}}, {"type": "null"}]},
     }
-    assert "schema" in prompt_inputs_attribute
 
 
 def test_serialize_node__tool_calling_node__mcp_server_api_key():

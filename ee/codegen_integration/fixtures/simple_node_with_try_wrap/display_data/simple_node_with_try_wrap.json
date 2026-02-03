@@ -133,6 +133,9 @@
                 "type": "STRING",
                 "value": "gpt-4o-mini"
               }
+            },
+            "schema": {
+              "type": "string"
             }
           },
           {
@@ -174,7 +177,8 @@
                   }
                 ]
               }
-            }
+            },
+            "schema": null
           },
           {
             "id": "91448235-24d7-4ee1-bba4-3bbce03ebdcb",
@@ -187,6 +191,17 @@
                   "text": "Hello, World!"
                 }
               }
+            },
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": {}
+                },
+                {
+                  "type": "null"
+                }
+              ]
             }
           },
           {
@@ -198,7 +213,8 @@
                 "type": "JSON",
                 "value": null
               }
-            }
+            },
+            "schema": null
           },
           {
             "id": "29391062-4d86-4e67-ac46-f8a71237384b",
@@ -219,6 +235,9 @@
                   "custom_parameters": null
                 }
               }
+            },
+            "schema": {
+              "$ref": "#/$defs/vellum.client.types.prompt_parameters.PromptParameters"
             }
           }
         ],

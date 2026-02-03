@@ -293,12 +293,14 @@ def test_serialize_node__lazy_reference_with_string__class_not_found():
     workflow_display = get_workflow_display(workflow_class=TestWorkflow)
     workflow_display.serialize()
 
-    # THEN the errors should be added to the display context
+    # THEN the error should be added to the display context
     errors = list(workflow_display.display_context.errors)
+    assert len(errors) == 1
 
-    # AND one of the errors should mention the class that could not be found
-    error_messages = [str(e) for e in errors]
-    assert any("NonExistentClass" in msg and "Could not find node or workflow class" in msg for msg in error_messages)
+    # AND the error message should mention the class that could not be found
+    error_message = str(errors[0])
+    assert "NonExistentClass" in error_message
+    assert "Could not find node or workflow class" in error_message
 
 
 def test_serialize_node__workflow_input(serialize_node):
@@ -841,9 +843,8 @@ def test_serialize_node__attribute_with_schema(serialize_node):
     # THEN the attribute should include schema information
     attribute = serialized_node["attributes"][0]
     assert attribute["name"] == "attr"
-    assert attribute["value"]["type"] == "CONSTANT_VALUE"
-    assert "schema" in attribute
-    assert attribute["schema"]["type"] == "string"
+    assert attribute["value"] == {"type": "CONSTANT_VALUE", "value": {"type": "STRING", "value": "hello"}}
+    assert attribute["schema"] == {"type": "string"}
 
 
 def test_serialize_node__attribute_with_complex_schema(serialize_node):
@@ -861,6 +862,5 @@ def test_serialize_node__attribute_with_complex_schema(serialize_node):
     # THEN the attribute should include schema information for the list type
     attribute = serialized_node["attributes"][0]
     assert attribute["name"] == "items"
-    assert "schema" in attribute
-    assert attribute["schema"]["type"] == "array"
-    assert attribute["schema"]["items"]["type"] == "string"
+    assert attribute["value"] == {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": ["a", "b", "c"]}}
+    assert attribute["schema"] == {"type": "array", "items": {"type": "string"}}

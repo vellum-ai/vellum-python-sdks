@@ -151,7 +151,9 @@
                   "name": "Classification",
                   "schema": {
                     "type": "object",
-                    "required": ["classification"],
+                    "required": [
+                      "classification"
+                    ],
                     "properties": {
                       "classification": {
                         "type": "string",
@@ -256,6 +258,9 @@
                 "type": "STRING",
                 "value": "gpt-4o"
               }
+            },
+            "schema": {
+              "type": "string"
             }
           },
           {
@@ -314,7 +319,8 @@
                   }
                 ]
               }
-            }
+            },
+            "schema": null
           },
           {
             "id": "b35a446c-1e59-4119-b7e0-529b7628b561",
@@ -332,6 +338,17 @@
                   }
                 }
               ]
+            },
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": {}
+                },
+                {
+                  "type": "null"
+                }
+              ]
             }
           },
           {
@@ -343,7 +360,8 @@
                 "type": "JSON",
                 "value": null
               }
-            }
+            },
+            "schema": null
           },
           {
             "id": "3bce1d14-9bff-4721-affa-e93add4185bb",
@@ -367,7 +385,9 @@
                       "name": "Classification",
                       "schema": {
                         "type": "object",
-                        "required": ["classification"],
+                        "required": [
+                          "classification"
+                        ],
                         "properties": {
                           "classification": {
                             "type": "string",
@@ -379,6 +399,9 @@
                   }
                 }
               }
+            },
+            "schema": {
+              "$ref": "#/$defs/vellum.client.types.prompt_parameters.PromptParameters"
             }
           }
         ],
@@ -1249,6 +1272,9 @@
                 "type": "STRING",
                 "value": "gpt-4o-mini"
               }
+            },
+            "schema": {
+              "type": "string"
             }
           },
           {
@@ -1315,7 +1341,8 @@
                   }
                 ]
               }
-            }
+            },
+            "schema": null
           },
           {
             "id": "8036c42e-206f-4185-ad09-2f7abdddc125",
@@ -1342,6 +1369,17 @@
                   }
                 }
               ]
+            },
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": {}
+                },
+                {
+                  "type": "null"
+                }
+              ]
             }
           },
           {
@@ -1353,7 +1391,8 @@
                 "type": "JSON",
                 "value": null
               }
-            }
+            },
+            "schema": null
           },
           {
             "id": "6d7092ef-35f8-46a3-babf-de70f22b86e4",
@@ -1374,6 +1413,9 @@
                   "custom_parameters": null
                 }
               }
+            },
+            "schema": {
+              "$ref": "#/$defs/vellum.client.types.prompt_parameters.PromptParameters"
             }
           }
         ],
@@ -1536,6 +1578,9 @@
                 "type": "STRING",
                 "value": "gpt-4o"
               }
+            },
+            "schema": {
+              "type": "string"
             }
           },
           {
@@ -1577,7 +1622,8 @@
                   }
                 ]
               }
-            }
+            },
+            "schema": null
           },
           {
             "id": "35ae3ecc-030b-479d-b6c8-c2ccdd7ae984",
@@ -1595,6 +1641,17 @@
                   }
                 }
               ]
+            },
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": {}
+                },
+                {
+                  "type": "null"
+                }
+              ]
             }
           },
           {
@@ -1606,7 +1663,8 @@
                 "type": "JSON",
                 "value": null
               }
-            }
+            },
+            "schema": null
           },
           {
             "id": "fb2b621f-f975-4e58-ad3b-d074c2a03d3d",
@@ -1627,6 +1685,9 @@
                   "custom_parameters": null
                 }
               }
+            },
+            "schema": {
+              "$ref": "#/$defs/vellum.client.types.prompt_parameters.PromptParameters"
             }
           }
         ],
@@ -1997,6 +2058,16 @@
                 "type": "JSON",
                 "value": null
               }
+            },
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             }
           }
         ],
@@ -2211,6 +2282,9 @@
                 "type": "STRING",
                 "value": "claude-3-5-sonnet-20241022"
               }
+            },
+            "schema": {
+              "type": "string"
             }
           },
           {
@@ -2298,7 +2372,8 @@
                   }
                 ]
               }
-            }
+            },
+            "schema": null
           },
           {
             "id": "92d646e7-8288-4b3e-bd50-b10dbe8c782e",
@@ -2316,6 +2391,17 @@
                   }
                 }
               ]
+            },
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": {}
+                },
+                {
+                  "type": "null"
+                }
+              ]
             }
           },
           {
@@ -2327,7 +2413,8 @@
                 "type": "JSON",
                 "value": null
               }
-            }
+            },
+            "schema": null
           },
           {
             "id": "0884a164-7fdc-49c9-aab0-426169290650",
@@ -2348,6 +2435,9 @@
                   "custom_parameters": null
                 }
               }
+            },
+            "schema": {
+              "$ref": "#/$defs/vellum.client.types.prompt_parameters.PromptParameters"
             }
           }
         ],
@@ -2472,6 +2562,9 @@
                 "type": "STRING",
                 "value": "gpt-4o-2024-05-13"
               }
+            },
+            "schema": {
+              "type": "string"
             }
           },
           {
@@ -2507,7 +2600,8 @@
                   }
                 ]
               }
-            }
+            },
+            "schema": null
           },
           {
             "id": "091ee33c-abc5-461a-9d95-c15cccbcaf39",
@@ -2518,6 +2612,17 @@
                 "type": "JSON",
                 "value": {}
               }
+            },
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": {}
+                },
+                {
+                  "type": "null"
+                }
+              ]
             }
           },
           {
@@ -2529,7 +2634,8 @@
                 "type": "JSON",
                 "value": null
               }
-            }
+            },
+            "schema": null
           },
           {
             "id": "899c301a-c6db-4fc6-acfe-f3011277bcbd",
@@ -2550,6 +2656,9 @@
                   "custom_parameters": null
                 }
               }
+            },
+            "schema": {
+              "$ref": "#/$defs/vellum.client.types.prompt_parameters.PromptParameters"
             }
           }
         ],
@@ -2815,6 +2924,9 @@
                 "type": "STRING",
                 "value": "gpt-4o-mini"
               }
+            },
+            "schema": {
+              "type": "string"
             }
           },
           {
@@ -2856,7 +2968,8 @@
                   }
                 ]
               }
-            }
+            },
+            "schema": null
           },
           {
             "id": "5736796a-5529-4cbe-a930-9b2067e21aca",
@@ -2874,6 +2987,17 @@
                   }
                 }
               ]
+            },
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": {}
+                },
+                {
+                  "type": "null"
+                }
+              ]
             }
           },
           {
@@ -2885,7 +3009,8 @@
                 "type": "JSON",
                 "value": null
               }
-            }
+            },
+            "schema": null
           },
           {
             "id": "2236093c-ea33-404e-b218-79d7852d508d",
@@ -2906,6 +3031,9 @@
                   "custom_parameters": null
                 }
               }
+            },
+            "schema": {
+              "$ref": "#/$defs/vellum.client.types.prompt_parameters.PromptParameters"
             }
           }
         ],

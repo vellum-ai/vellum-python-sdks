@@ -75,6 +75,9 @@
                 "type": "STRING",
                 "value": "gpt-4o-mini"
               }
+            },
+            "schema": {
+              "type": "string"
             }
           },
           {
@@ -95,7 +98,8 @@
                   }
                 ]
               }
-            }
+            },
+            "schema": null
           },
           {
             "id": "536da46f-9431-417c-8156-1296a2f2b08a",
@@ -106,7 +110,8 @@
                 "type": "JSON",
                 "value": []
               }
-            }
+            },
+            "schema": null
           },
           {
             "id": "8696d605-c4ad-4f1b-8d35-a76e21f71a92",
@@ -117,6 +122,17 @@
                 "type": "JSON",
                 "value": null
               }
+            },
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": {}
+                },
+                {
+                  "type": "null"
+                }
+              ]
             }
           },
           {
@@ -138,6 +154,9 @@
                   "custom_parameters": null
                 }
               }
+            },
+            "schema": {
+              "$ref": "#/$defs/vellum.client.types.prompt_parameters.PromptParameters"
             }
           },
           {
@@ -149,6 +168,16 @@
                 "type": "NUMBER",
                 "value": 25.0
               }
+            },
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             }
           },
           {
@@ -160,6 +189,20 @@
                 "type": "JSON",
                 "value": null
               }
+            },
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/vellum.client.types.prompt_settings.PromptSettings"
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {}
+                },
+                {
+                  "type": "null"
+                }
+              ]
             }
           }
         ],

@@ -239,13 +239,9 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
 
             try:
                 schema = compile_annotation(attribute.normalized_type, {})
-            except Exception as e:
-                display_context.add_validation_error(
-                    NodeValidationError(
-                        message=f"Failed to compile attribute schema for attribute '{attribute.name}': {e}",
-                        node_class_name=self._node.__name__,
-                    )
-                )
+            except Exception:
+                # Schema compilation can fail for complex types like Callable or recursive structures.
+                # This is expected and we gracefully set schema to None.
                 schema = None
 
             try:

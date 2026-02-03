@@ -324,6 +324,16 @@
                 "type": "JSON",
                 "value": null
               }
+            },
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             }
           }
         ]

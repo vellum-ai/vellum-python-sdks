@@ -688,6 +688,10 @@
             "value": {
               "type": "WORKFLOW_INPUT",
               "input_variable_id": "cdc4468f-45e7-46ce-bbe7-d1aa9ad86514"
+            },
+            "schema": {
+              "type": "array",
+              "items": {}
             }
           }
         ],
