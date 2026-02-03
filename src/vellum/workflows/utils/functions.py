@@ -26,6 +26,7 @@ from pydash import snake_case
 from vellum import Vellum
 from vellum.client.types.array_chat_message_content_item import ArrayChatMessageContentItem
 from vellum.client.types.function_definition import FunctionDefinition
+from vellum.client.types.prompt_output import PromptOutput
 from vellum.workflows.constants import undefined
 from vellum.workflows.integrations.composio_service import ComposioService
 from vellum.workflows.integrations.mcp_service import MCPService
@@ -89,6 +90,7 @@ def is_workflow_context_type(annotation: Any) -> TypeGuard["WorkflowContext"]:
 
 recorded_unions = {
     ArrayChatMessageContentItem: "vellum.client.types.array_chat_message_content_item.ArrayChatMessageContentItem",
+    PromptOutput: "vellum.client.types.prompt_output.PromptOutput",
 }
 
 

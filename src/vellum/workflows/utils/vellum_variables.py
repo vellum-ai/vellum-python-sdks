@@ -63,6 +63,10 @@ def primitive_type_to_vellum_variable_type(type_: Union[Type, BaseDescriptor]) -
             if _is_string_and_array_chat_message_content_union(types):
                 return "ARRAY"
 
+            # Handle unions of VellumValue subtypes (e.g., PromptOutput)
+            if all(_is_vellum_value_subtype(t) for t in types):
+                return "JSON"
+
             raise ValueError(f"Expected Descriptor to only have one type, got {types}")
 
         type_ = type_.types[0]
