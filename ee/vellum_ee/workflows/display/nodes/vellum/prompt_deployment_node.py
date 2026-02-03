@@ -45,6 +45,7 @@ class BasePromptDeploymentNodeDisplay(BaseNodeDisplay[_PromptDeploymentNodeType]
         json_display = self.output_display[node.Outputs.json]
 
         deployment_descriptor_id = str(raise_if_descriptor(node.deployment))
+        release_tag = raise_if_descriptor(node.release_tag)
         try:
             deployment = display_context.client.deployments.retrieve(
                 id=deployment_descriptor_id,
@@ -53,6 +54,39 @@ class BasePromptDeploymentNodeDisplay(BaseNodeDisplay[_PromptDeploymentNodeType]
         except Exception as e:
             display_context.add_error(e)
             deployment_id = str(uuid4_from_hash(deployment_descriptor_id))
+
+        try:
+            deployment_release = display_context.client.deployments.retrieve_prompt_deployment_release(
+                id=deployment_descriptor_id,
+                release_id_or_release_tag=release_tag,
+            )
+            # Check if the prompt version has ml_model_to_workspace_id
+            if hasattr(deployment_release, "prompt_version") and deployment_release.prompt_version:
+                prompt_version = deployment_release.prompt_version
+                ml_model_to_workspace_id = getattr(prompt_version, "ml_model_to_workspace_id", None)
+
+                if ml_model_to_workspace_id:
+                    try:
+                        ml_model = display_context.client.ml_models.retrieve(id=str(ml_model_to_workspace_id))
+                        ml_model_name = ml_model.name
+
+                        # Register model provider dependency if ml_model is found in display_context.ml_models_map
+                        model = display_context.ml_models_map.get(ml_model_name)
+                        if model:
+                            display_context.add_dependency(
+                                {
+                                    "type": "MODEL_PROVIDER",
+                                    "name": model.hosted_by.value,
+                                    "model_name": ml_model_name,
+                                }
+                            )
+                    except Exception as e:
+                        if not display_context.dry_run:
+                            display_context.add_error(e)
+        except Exception as e:
+            if not display_context.dry_run:
+                display_context.add_error(e)
+
         ml_model_fallbacks = raise_if_descriptor(node.ml_model_fallbacks)
 
         return {
