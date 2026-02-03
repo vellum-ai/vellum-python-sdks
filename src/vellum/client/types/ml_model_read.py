@@ -18,6 +18,11 @@ class MlModelRead(UniversalBaseModel):
     The unique name of the ML Model.
     """
 
+    hosted_by: str = pydantic.Field()
+    """
+    The hosting provider for the ML Model.
+    """
+
     introduced_on: dt.datetime
 
     if IS_PYDANTIC_V2:
