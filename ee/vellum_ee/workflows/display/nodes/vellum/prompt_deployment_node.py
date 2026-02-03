@@ -65,7 +65,7 @@ class BasePromptDeploymentNodeDisplay(BaseNodeDisplay[_PromptDeploymentNodeType]
                 prompt_version = deployment_release.prompt_version
                 ml_model_to_workspace_id = getattr(prompt_version, "ml_model_to_workspace_id", None)
 
-                if ml_model_to_workspace_id:
+                if ml_model_to_workspace_id and display_context.ml_models_map:
                     try:
                         ml_model = display_context.client.ml_models.retrieve(id=str(ml_model_to_workspace_id))
                         ml_model_name = ml_model.name
