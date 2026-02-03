@@ -104,4 +104,5 @@ def test_serialize_workflow(vellum_client):
                 ],
             },
         },
+        "schema": None,
     }

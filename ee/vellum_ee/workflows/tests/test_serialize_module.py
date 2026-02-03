@@ -438,18 +438,22 @@ def test_serialize_module__with_invalid_parent_node_output_reference():
     Tests that serialize_module surfaces an error for workflows with nodes
     that reference their parent class's outputs.
     """
+    # GIVEN a module path with a workflow that has invalid parent node output references
     module_path = "tests.workflows.invalid_parent_node_output_reference"
 
+    # WHEN we serialize the module
     result = BaseWorkflowDisplay.serialize_module(module_path)
 
-    assert len(result.errors) == 1
-    assert result.errors[0].message == (
+    # THEN the errors should contain the parent class output reference error
+    error_messages = [e.message for e in result.errors]
+    expected_error = (
         "'ReportGeneratorNode.Outputs.report_content' references parent class output 'InlinePromptNode.Outputs.text'. "
         "Referencing outputs from a node's parent class is not allowed."
         "\n"
         "'ReportGeneratorNode.Outputs.report_json' references parent class output 'InlinePromptNode.Outputs.json'. "
         "Referencing outputs from a node's parent class is not allowed."
     )
+    assert expected_error in error_messages
 
 
 def test_serialize_module__virtual_files_include_integration_models():

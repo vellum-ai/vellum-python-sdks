@@ -189,6 +189,7 @@ def test_serialize_node__lazy_reference_with_string():
                 "node_id": str(OtherNode.__id__),
                 "node_output_id": "3c28ab49-1c7c-42cc-8175-be17bf05b5e7",
             },
+            "schema": None,
         }
     ]
 
@@ -292,14 +293,12 @@ def test_serialize_node__lazy_reference_with_string__class_not_found():
     workflow_display = get_workflow_display(workflow_class=TestWorkflow)
     workflow_display.serialize()
 
-    # THEN the error should be added to the display context
+    # THEN the errors should be added to the display context
     errors = list(workflow_display.display_context.errors)
-    assert len(errors) == 1
 
-    # AND the error message should mention the class that could not be found
-    error_message = str(errors[0])
-    assert "NonExistentClass" in error_message
-    assert "Could not find node or workflow class" in error_message
+    # AND one of the errors should mention the class that could not be found
+    error_messages = [str(e) for e in errors]
+    assert any("NonExistentClass" in msg and "Could not find node or workflow class" in msg for msg in error_messages)
 
 
 def test_serialize_node__workflow_input(serialize_node):

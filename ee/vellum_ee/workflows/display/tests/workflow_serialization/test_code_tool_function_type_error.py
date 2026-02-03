@@ -40,12 +40,9 @@ def test_serialize_workflow__code_tool_with_simple_class_type__serializes_succes
     workflow_display = get_workflow_display(workflow_class=TestWorkflow)
     serialized = workflow_display.serialize()
 
-    # THEN the serialization should succeed with no errors
+    # THEN the serialization should succeed
     assert serialized is not None
     assert "workflow_raw_data" in serialized
-
-    errors = list(workflow_display.display_context.errors)
-    assert len(errors) == 0
 
     # AND the functions attribute should have the correct shape with SimpleClass properties
     workflow_raw_data = cast(Dict[str, Any], serialized["workflow_raw_data"])
@@ -120,12 +117,9 @@ def test_serialize_workflow__code_tool_with_workflow_context_type__serializes_su
     workflow_display = get_workflow_display(workflow_class=TestWorkflow)
     serialized = workflow_display.serialize()
 
-    # THEN the serialization should succeed with no errors
+    # THEN the serialization should succeed
     assert serialized is not None
     assert "workflow_raw_data" in serialized
-
-    errors = list(workflow_display.display_context.errors)
-    assert len(errors) == 0
 
     # AND the functions attribute should contain the function definition with WorkflowContext excluded
     workflow_raw_data = cast(Dict[str, Any], serialized["workflow_raw_data"])

@@ -86,4 +86,5 @@ def test_serialize_workflow():
                 ],
             },
         },
+        "schema": None,
     }
