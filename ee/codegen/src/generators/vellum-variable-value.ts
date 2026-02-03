@@ -27,11 +27,7 @@ import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 import { Json } from "src/generators/json";
-import {
-  AttributeConfig,
-  IterableConfig,
-  StringVellumValue as StringVellumValueData,
-} from "src/types/vellum";
+import { AttributeConfig, IterableConfig } from "src/types/vellum";
 import { removeEscapeCharacters } from "src/utils/casing";
 import { assertUnreachable } from "src/utils/typing";
 
@@ -598,10 +594,11 @@ export class VellumValue extends AstNode {
     }
     switch (vellumValue.type) {
       case "STRING": {
-        const stringData = vellumValue as StringVellumValueData;
+        const blockString =
+          "block_string" in vellumValue ? vellumValue.block_string : undefined;
         this.astNode = new StringVellumValue(
           vellumValue.value,
-          stringData.block_string
+          blockString as boolean | undefined
         );
         if (attributeConfig) {
           this.astNode = new AccessAttribute({
