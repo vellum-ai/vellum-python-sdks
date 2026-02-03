@@ -559,7 +559,7 @@ def test_run_node__run_inline__vellum_client(vellum_client):
     vellum_client.ml_models.retrieve.return_value = MlModelRead(
         id="test-ml-model-id",
         name="Test ML Model",
-        description="Test ML Model Description",
+        hosted_by="OPENAI",
         introduced_on=datetime(2025, 1, 2),
     )
 
