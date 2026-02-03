@@ -9,9 +9,8 @@ from vellum.client.types.prompt_deployment_release_prompt_version import PromptD
 from vellum.client.types.release_environment import ReleaseEnvironment as ReleaseEnvironmentType
 from vellum.client.types.rich_text_prompt_block import RichTextPromptBlock
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
-from vellum.client.types.workflow_deployment_release_workflow_version import WorkflowDeploymentReleaseWorkflowVersion
 from vellum.workflows.constants import VellumIntegrationProviderType
-from vellum.workflows.nodes import InlineSubworkflowNode, MapNode, PromptDeploymentNode, SubworkflowDeploymentNode
+from vellum.workflows.nodes import InlineSubworkflowNode, MapNode, PromptDeploymentNode
 from vellum.workflows.nodes.displayable.inline_prompt_node import InlinePromptNode
 from vellum.workflows.nodes.displayable.tool_calling_node import ToolCallingNode
 from vellum.workflows.state.base import BaseState
