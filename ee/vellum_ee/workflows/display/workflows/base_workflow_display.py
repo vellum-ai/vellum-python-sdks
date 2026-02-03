@@ -212,8 +212,18 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         self._ml_models = self._parse_ml_models(ml_models) if ml_models else []
 
     def _parse_ml_models(self, ml_models_raw: list) -> List[MLModel]:
-        """Parse raw list of dicts into MLModel instances using pydantic deserialization."""
-        return [MLModel.model_validate(item) for item in ml_models_raw]
+        """Parse raw list of dicts into MLModel instances using pydantic deserialization.
+
+        Models that fail validation are skipped and a warning is logged.
+        """
+        parsed_models: List[MLModel] = []
+        for item in ml_models_raw:
+            try:
+                parsed_models.append(MLModel.model_validate(item))
+            except Exception as e:
+                model_name = item.get("name") if isinstance(item, dict) else None
+                logger.warning(f"Skipping ML model '{model_name}' due to validation error: {type(e).__name__}")
+        return parsed_models
 
     def serialize(self) -> JsonObject:
         try:
