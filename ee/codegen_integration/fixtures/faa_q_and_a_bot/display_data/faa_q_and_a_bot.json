@@ -151,7 +151,9 @@
                   "name": "Classification",
                   "schema": {
                     "type": "object",
-                    "required": ["classification"],
+                    "required": [
+                      "classification"
+                    ],
                     "properties": {
                       "classification": {
                         "type": "string",
@@ -367,7 +369,9 @@
                       "name": "Classification",
                       "schema": {
                         "type": "object",
-                        "required": ["classification"],
+                        "required": [
+                          "classification"
+                        ],
                         "properties": {
                           "classification": {
                             "type": "string",
@@ -892,7 +896,8 @@
                   "type": "CONSTANT_VALUE",
                   "data": {
                     "type": "STRING",
-                    "value": "\n\n#####\n\n"
+                    "value": "\n\n#####\n\n",
+                    "block_string": true
                   }
                 }
               ],
@@ -1019,7 +1024,8 @@
                   "type": "CONSTANT_VALUE",
                   "data": {
                     "type": "STRING",
-                    "value": "{% for result in results -%}\nPolicy {{ result.document.label }}:\n------\n{{ result.text }}\n{% if not loop.last %}\n\n#####\n\n{% endif %}\n{% endfor %}"
+                    "value": "{% for result in results -%}\nPolicy {{ result.document.label }}:\n------\n{{ result.text }}\n{% if not loop.last %}\n\n#####\n\n{% endif %}\n{% endfor %}",
+                    "block_string": true
                   }
                 }
               ],

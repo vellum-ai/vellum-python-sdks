@@ -124,7 +124,8 @@
                   "type": "CONSTANT_VALUE",
                   "data": {
                     "type": "STRING",
-                    "value": "\n\n#####\n\n"
+                    "value": "\n\n#####\n\n",
+                    "block_string": true
                   }
                 }
               ],
