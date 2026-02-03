@@ -293,14 +293,18 @@ def test_serialize_node__lazy_reference_with_string__class_not_found():
     workflow_display = get_workflow_display(workflow_class=TestWorkflow)
     workflow_display.serialize()
 
-    # THEN the error should be added to the display context
+    # THEN errors should be added to the display context
     errors = list(workflow_display.display_context.errors)
-    assert len(errors) == 1
+    assert len(errors) == 2
 
-    # AND the error message should mention the class that could not be found
-    error_message = str(errors[0])
-    assert "NonExistentClass" in error_message
-    assert "Could not find node or workflow class" in error_message
+    # AND one error should be about schema compilation failure
+    schema_error = next((e for e in errors if "Failed to compile attribute schema" in str(e)), None)
+    assert schema_error is not None
+
+    # AND one error should mention the class that could not be found
+    reference_error = next((e for e in errors if "Could not find node or workflow class" in str(e)), None)
+    assert reference_error is not None
+    assert "NonExistentClass" in str(reference_error)
 
 
 def test_serialize_node__workflow_input(serialize_node):

@@ -38,7 +38,7 @@ from vellum.workflows.utils.vellum_variables import primitive_type_to_vellum_var
 from vellum_ee.workflows.display.editor.types import NodeDisplayComment, NodeDisplayData, NodeDisplayPosition
 from vellum_ee.workflows.display.nodes.get_node_display_class import get_node_display_class
 from vellum_ee.workflows.display.nodes.types import NodeOutputDisplay, PortDisplay, PortDisplayOverrides
-from vellum_ee.workflows.display.utils.exceptions import UnsupportedSerializationException
+from vellum_ee.workflows.display.utils.exceptions import NodeValidationError, UnsupportedSerializationException
 from vellum_ee.workflows.display.utils.expressions import serialize_value
 from vellum_ee.workflows.display.utils.registry import register_node_display_class
 
@@ -238,8 +238,15 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             )
 
             try:
-                schema = compile_annotation(attribute.normalized_type, {})
-            except Exception:
+                normalized_type = attribute.normalized_type
+                schema = compile_annotation(normalized_type, {})
+            except Exception as e:
+                display_context.add_validation_error(
+                    NodeValidationError(
+                        message=f"Failed to compile attribute schema for attribute '{attribute.name}': {e}",
+                        node_class_name=node.__name__,
+                    )
+                )
                 schema = None
 
             try:
@@ -276,7 +283,13 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
             )
             try:
                 schema = compile_annotation(output.normalized_type, {})
-            except Exception:
+            except Exception as e:
+                display_context.add_validation_error(
+                    NodeValidationError(
+                        message=f"Failed to compile output schema for output '{output.name}': {e}",
+                        node_class_name=node.__name__,
+                    )
+                )
                 schema = None
 
             outputs.append(
