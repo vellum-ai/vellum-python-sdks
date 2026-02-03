@@ -17,6 +17,7 @@ def test_serialize_web_search_workflow():
         "input_variables",
         "state_variables",
         "output_variables",
+        "dependencies",
     }
 
     # AND it should have input variables
