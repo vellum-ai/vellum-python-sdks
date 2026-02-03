@@ -40,13 +40,5 @@ def test_serialize_workflow__prompt_output_input_schema():
     assert input_var["key"] == "prompt_result"
     assert input_var["type"] == "JSON"
 
-    # AND the schema should be the PromptOutput union type
-    assert input_var["schema"] == {
-        "anyOf": [
-            {"$ref": "#/$defs/vellum.client.types.string_vellum_value.StringVellumValue"},
-            {"$ref": "#/$defs/vellum.client.types.json_vellum_value.JsonVellumValue"},
-            {"$ref": "#/$defs/vellum.client.types.error_vellum_value.ErrorVellumValue"},
-            {"$ref": "#/$defs/vellum.client.types.function_call_vellum_value.FunctionCallVellumValue"},
-            {"$ref": "#/$defs/vellum.client.types.thinking_vellum_value.ThinkingVellumValue"},
-        ]
-    }
+    # AND the schema should reference the PromptOutput union type
+    assert input_var["schema"] == {"$ref": "#/$defs/vellum.client.types.prompt_output.PromptOutput"}
