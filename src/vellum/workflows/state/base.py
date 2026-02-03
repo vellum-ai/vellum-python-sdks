@@ -6,6 +6,7 @@ from datetime import datetime
 import logging
 from queue import Queue
 from threading import RLock
+import types
 from uuid import UUID, uuid4
 from typing import (
     TYPE_CHECKING,
@@ -537,11 +538,14 @@ class StateMeta(UniversalBaseModel):
         if not memo:
             memo = {}
 
+        def _should_skip_deepcopy(value: Any) -> bool:
+            return isinstance(value, (Queue, types.GeneratorType))
+
         node_output_keys = list(self.node_outputs.keys())
         new_node_outputs = {
             descriptor: (
                 self.node_outputs[descriptor]
-                if isinstance(self.node_outputs[descriptor], Queue)
+                if _should_skip_deepcopy(self.node_outputs[descriptor])
                 else deepcopy(self.node_outputs[descriptor], memo)
             )
             for descriptor in node_output_keys
@@ -551,7 +555,7 @@ class StateMeta(UniversalBaseModel):
         new_external_inputs = {
             descriptor: (
                 self.external_inputs[descriptor]
-                if isinstance(self.external_inputs[descriptor], Queue)
+                if _should_skip_deepcopy(self.external_inputs[descriptor])
                 else deepcopy(self.external_inputs[descriptor], memo)
             )
             for descriptor in external_input_keys
@@ -621,6 +625,7 @@ class BaseState(metaclass=_BaseStateMeta):
             self,
             exclusions={
                 "__lock__": RLock(),
+                "__deltas__": [],
             },
             memo=memo,
         )
