@@ -361,15 +361,7 @@ def test_serialize_tool_router_node():
                 },
                 "schema": {
                     "type": "array",
-                    "items": {
-                        "anyOf": [
-                            {"$ref": "#/$defs/vellum.client.types.string_vellum_value.StringVellumValue"},
-                            {"$ref": "#/$defs/vellum.client.types.json_vellum_value.JsonVellumValue"},
-                            {"$ref": "#/$defs/vellum.client.types.error_vellum_value.ErrorVellumValue"},
-                            {"$ref": "#/$defs/vellum.client.types.function_call_vellum_value.FunctionCallVellumValue"},
-                            {"$ref": "#/$defs/vellum.client.types.thinking_vellum_value.ThinkingVellumValue"},
-                        ]
-                    },
+                    "items": {"$ref": "#/$defs/vellum.client.types.prompt_output.PromptOutput"},
                 },
             }
         ],
