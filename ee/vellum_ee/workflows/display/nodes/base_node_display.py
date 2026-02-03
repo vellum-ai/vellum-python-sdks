@@ -151,30 +151,7 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
         node = self._node
         node_id = self.node_id
 
-        attributes: JsonArray = []
-        for attribute in node:
-            if inspect.isclass(attribute.instance) and issubclass(attribute.instance, BaseWorkflow):
-                # We don't need to serialize generic node attributes containing a subworkflow
-                continue
-
-            if attribute in self.__unserializable_attributes__:
-                continue
-
-            id = (
-                str(self.attribute_ids_by_name[attribute.name])
-                if self.attribute_ids_by_name.get(attribute.name)
-                else str(uuid4_from_hash(f"{node_id}|{attribute.name}"))
-            )
-            try:
-                attributes.append(
-                    {
-                        "id": id,
-                        "name": attribute.name,
-                        "value": serialize_value(node_id, display_context, attribute.instance),
-                    }
-                )
-            except ValueError as e:
-                raise ValueError(f"Failed to serialize attribute '{attribute.name}': {e}")
+        attributes = self._serialize_attributes(display_context)
 
         adornments = kwargs.get("adornments", None)
         wrapped_node = get_wrapped_node(node)
@@ -243,11 +220,14 @@ class BaseNodeDisplay(Generic[NodeType], metaclass=BaseNodeDisplayMeta):
         }
 
     def _serialize_attributes(self, display_context: "WorkflowDisplayContext") -> JsonArray:
-        """Serialize node attributes, skipping unserializable ones."""
+        """Serialize node attributes, skipping unserializable ones and subworkflow classes."""
         node = self._node
         node_id = self.node_id
         attributes: JsonArray = []
         for attribute in node:
+            if inspect.isclass(attribute.instance) and issubclass(attribute.instance, BaseWorkflow):
+                continue
+
             if attribute in self.__unserializable_attributes__:
                 continue
 
