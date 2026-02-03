@@ -1093,6 +1093,7 @@ export type InlineWorkflowFunctionArgs = {
   type: "INLINE_WORKFLOW";
   exec_config: WorkflowVersionExecConfig;
   module_name?: string;
+  definition?: FunctionDefinition;
 } & NameDescription;
 
 export type WorkflowDeploymentFunctionArgs = {
