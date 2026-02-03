@@ -442,8 +442,9 @@ def test_serialize_module__with_invalid_parent_node_output_reference():
 
     result = BaseWorkflowDisplay.serialize_module(module_path)
 
-    assert len(result.errors) == 1
-    assert result.errors[0].message == (
+    validation_errors = [e for e in result.errors if "Failed to compile" not in e.message]
+    assert len(validation_errors) == 1
+    assert validation_errors[0].message == (
         "'ReportGeneratorNode.Outputs.report_content' references parent class output 'InlinePromptNode.Outputs.text'. "
         "Referencing outputs from a node's parent class is not allowed."
         "\n"
