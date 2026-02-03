@@ -20,6 +20,31 @@ describe("VellumValue", () => {
       expect(await writer.toStringFormatted()).toMatchSnapshot();
       expect(stringValue.getReferences()).toHaveLength(0);
     });
+
+    it("should write a STRING value with block_string as multiline", async () => {
+      const stringValue = codegen.vellumValue({
+        vellumValue: {
+          type: "STRING",
+          value: "Hello,\nWorld!",
+          block_string: true,
+        },
+      });
+      stringValue.write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+      expect(stringValue.getReferences()).toHaveLength(0);
+    });
+
+    it("should write a STRING value without block_string as single line", async () => {
+      const stringValue = codegen.vellumValue({
+        vellumValue: {
+          type: "STRING",
+          value: "Hello,\nWorld!",
+        },
+      });
+      stringValue.write(writer);
+      expect(await writer.toStringFormatted()).toMatchSnapshot();
+      expect(stringValue.getReferences()).toHaveLength(0);
+    });
   });
 
   describe("NUMBER", () => {

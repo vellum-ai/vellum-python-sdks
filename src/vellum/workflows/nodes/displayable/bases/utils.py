@@ -54,8 +54,12 @@ def primitive_to_vellum_value(value: Any) -> VellumValue:
     """Converts a python primitive to a VellumValue"""
 
     if isinstance(value, str):
+        if "\n" in value:
+            return StringVellumValue(value=value, block_string=True)
         return StringVellumValue(value=value)
     elif isinstance(value, enum.Enum):
+        if "\n" in value.value:
+            return StringVellumValue(value=value.value, block_string=True)
         return StringVellumValue(value=value.value)
     elif isinstance(value, bool):
         return JsonVellumValue(value=value)

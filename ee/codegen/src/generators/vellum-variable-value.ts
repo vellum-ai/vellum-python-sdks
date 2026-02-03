@@ -27,20 +27,26 @@ import { Reference } from "src/generators/extensions/reference";
 import { StrInstantiation } from "src/generators/extensions/str-instantiation";
 import { Writer } from "src/generators/extensions/writer";
 import { Json } from "src/generators/json";
-import { AttributeConfig, IterableConfig } from "src/types/vellum";
+import {
+  AttributeConfig,
+  IterableConfig,
+  StringVellumValue as StringVellumValueData,
+} from "src/types/vellum";
 import { removeEscapeCharacters } from "src/utils/casing";
 import { assertUnreachable } from "src/utils/typing";
 
 class StringVellumValue extends AstNode {
   private astNode: AstNode;
 
-  public constructor(value: string) {
+  public constructor(value: string, blockString?: boolean) {
     super();
-    this.astNode = this.generateAstNode(value);
+    this.astNode = this.generateAstNode(value, blockString);
   }
 
-  private generateAstNode(value: string): AstNode {
-    return new StrInstantiation(removeEscapeCharacters(value));
+  private generateAstNode(value: string, blockString?: boolean): AstNode {
+    return new StrInstantiation(removeEscapeCharacters(value), {
+      multiline: blockString,
+    });
   }
 
   public write(writer: Writer): void {
@@ -591,8 +597,12 @@ export class VellumValue extends AstNode {
       return;
     }
     switch (vellumValue.type) {
-      case "STRING":
-        this.astNode = new StringVellumValue(vellumValue.value);
+      case "STRING": {
+        const stringData = vellumValue as StringVellumValueData;
+        this.astNode = new StringVellumValue(
+          vellumValue.value,
+          stringData.block_string
+        );
         if (attributeConfig) {
           this.astNode = new AccessAttribute({
             lhs: attributeConfig.lhs,
@@ -603,6 +613,7 @@ export class VellumValue extends AstNode {
           });
         }
         break;
+      }
       case "NUMBER":
         this.astNode = new NumberVellumValue(vellumValue.value);
         break;
