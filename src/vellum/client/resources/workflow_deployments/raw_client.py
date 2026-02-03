@@ -67,7 +67,13 @@ class RawWorkflowDeploymentsClient:
             The initial index from which to return the results.
 
         ordering : typing.Optional[str]
-            Which field to use when ordering the results.
+            Specifies the ordering of the returned Workflow Deployments. Valid values are:
+            - `created` - Orders by creation time in ascending order.
+            - `-created` - Orders by creation time in descending order. (default)
+            - `name` - Orders by name in ascending order.
+            - `-name` - Orders by name in descending order.
+
+            Compound orderings are supported by separating fields with commas, e.g., `-created,name`.
 
         owned_by : typing.Optional[str]
             owned_by
@@ -762,7 +768,13 @@ class AsyncRawWorkflowDeploymentsClient:
             The initial index from which to return the results.
 
         ordering : typing.Optional[str]
-            Which field to use when ordering the results.
+            Specifies the ordering of the returned Workflow Deployments. Valid values are:
+            - `created` - Orders by creation time in ascending order.
+            - `-created` - Orders by creation time in descending order. (default)
+            - `name` - Orders by name in ascending order.
+            - `-name` - Orders by name in descending order.
+
+            Compound orderings are supported by separating fields with commas, e.g., `-created,name`.
 
         owned_by : typing.Optional[str]
             owned_by

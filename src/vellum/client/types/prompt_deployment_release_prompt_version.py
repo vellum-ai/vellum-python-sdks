@@ -9,6 +9,7 @@ from .components_schemas_prompt_version_build_config_sandbox import ComponentsSc
 
 class PromptDeploymentReleasePromptVersion(UniversalBaseModel):
     id: str
+    ml_model_to_workspace_id: str
     build_config: ComponentsSchemasPromptVersionBuildConfigSandbox = pydantic.Field()
     """
     Configuration used to build this prompt version.

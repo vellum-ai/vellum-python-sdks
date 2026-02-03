@@ -5,6 +5,7 @@ import typing
 
 import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
+from .ml_model_hosting_interface import MlModelHostingInterface
 
 
 class MlModelRead(UniversalBaseModel):
@@ -18,9 +19,40 @@ class MlModelRead(UniversalBaseModel):
     The unique name of the ML Model.
     """
 
-    hosted_by: str = pydantic.Field()
+    hosted_by: MlModelHostingInterface = pydantic.Field()
     """
-    The hosting provider for the ML Model.
+    The organization hosting the ML Model.
+    
+    * `ANTHROPIC` - Anthropic
+    * `AWS_BEDROCK` - AWS Bedrock
+    * `AZURE_AI_FOUNDRY` - Azure AI Foundry
+    * `AZURE_OPENAI` - Azure OpenAI
+    * `BASETEN` - BaseTen
+    * `CEREBRAS` - Cerebras
+    * `COHERE` - Cohere
+    * `CUSTOM` - Custom
+    * `DEEP_SEEK` - DeepSeek
+    * `FIREWORKS_AI` - Fireworks AI
+    * `GOOGLE` - Google
+    * `GOOGLE_VERTEX_AI` - Google Vertex AI
+    * `GROQ` - Groq
+    * `HUGGINGFACE` - HuggingFace
+    * `IBM_WATSONX` - IBM WatsonX
+    * `MISTRAL_AI` - Mistral AI
+    * `MOSAICML` - MosaicML
+    * `MYSTIC` - Mystic
+    * `NVIDIA` - NVIDIA
+    * `OPENAI` - OpenAI
+    * `OPEN_ROUTER` - Open Router
+    * `OPENPIPE` - OpenPipe
+    * `PERPLEXITY` - Perplexity
+    * `PYQ` - Pyq
+    * `REPLICATE` - Replicate
+    * `SAMBANOVA` - SambaNova
+    * `TOGETHER_AI` - Together AI
+    * `X_AI` - xAI
+    * `FASTWEB` - Fastweb
+    * `SWISSCOM` - Swisscom
     """
 
     introduced_on: dt.datetime

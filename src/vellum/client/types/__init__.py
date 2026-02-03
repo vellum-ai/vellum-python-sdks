@@ -268,6 +268,7 @@ from .metric_definition_execution import MetricDefinitionExecution
 from .metric_definition_history_item import MetricDefinitionHistoryItem
 from .metric_definition_input import MetricDefinitionInput
 from .metric_node_result import MetricNodeResult
+from .ml_model_hosting_interface import MlModelHostingInterface
 from .ml_model_read import MlModelRead
 from .ml_model_usage import MlModelUsage
 from .ml_model_usage_wrapper import MlModelUsageWrapper
@@ -1004,6 +1005,7 @@ __all__ = [
     "MetricDefinitionHistoryItem",
     "MetricDefinitionInput",
     "MetricNodeResult",
+    "MlModelHostingInterface",
     "MlModelRead",
     "MlModelUsage",
     "MlModelUsageWrapper",
