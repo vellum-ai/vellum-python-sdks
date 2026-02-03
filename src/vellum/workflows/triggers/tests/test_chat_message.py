@@ -257,7 +257,7 @@ def test_chat_message_trigger__string_operations_on_message():
 
     # GIVEN a workflow with a node that uses ChatMessage.message and performs string operations
     class StringOperationNode(BaseNode):
-        some_message: str = ChatMessageTrigger.message
+        some_message: str = ChatMessageTrigger.message  # type: ignore[assignment]
 
         class Outputs(BaseOutputs):
             result: str
