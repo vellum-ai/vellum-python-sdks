@@ -156,7 +156,7 @@ def test_chat_message_trigger__converts_dict_format():
 
 
 def test_chat_message_trigger__converts_string_message():
-    """Tests that ChatMessageTrigger converts string messages to ChatMessageContent list."""
+    """Tests that ChatMessageTrigger handles string messages correctly."""
 
     # GIVEN a message as a string
     string_message = "Hello, world!"
@@ -164,10 +164,9 @@ def test_chat_message_trigger__converts_string_message():
     # WHEN a ChatMessageTrigger is created with a string message
     trigger = ChatMessageTrigger(message=string_message)
 
-    # THEN the message is converted to a list with a single StringChatMessageContent
-    assert len(trigger.message) == 1
-    assert isinstance(trigger.message[0], StringChatMessageContent)
-    assert trigger.message[0].value == "Hello, world!"
+    # THEN the message is kept as a string (not converted to list)
+    assert isinstance(trigger.message, str)
+    assert trigger.message == "Hello, world!"
 
     # AND the trigger works correctly with state
     state = ChatState()
@@ -175,9 +174,7 @@ def test_chat_message_trigger__converts_string_message():
 
     assert len(state.chat_history) == 1
     assert state.chat_history[0].role == "USER"
-    assert state.chat_history[0].content == ArrayChatMessageContent(
-        value=[StringChatMessageContent(value="Hello, world!")]
-    )
+    assert state.chat_history[0].text == "Hello, world!"
 
 
 def test_chat_message_trigger__raw_string_array__workflow_stream():
@@ -252,6 +249,38 @@ def test_chat_message_trigger__chat_history_defaulted_to_none():
     assert final_state.chat_history is not None
     assert len(final_state.chat_history) == 1
     assert final_state.chat_history[0].role == "USER"
-    assert final_state.chat_history[0].content == ArrayChatMessageContent(
-        value=[StringChatMessageContent(value="Hello")]
-    )
+    assert final_state.chat_history[0].text == "Hello"
+
+
+def test_chat_message_trigger__string_operations_on_message():
+    """Tests that string operations like replace() work on ChatMessage.message in nodes."""
+
+    # GIVEN a workflow with a node that uses ChatMessage.message and performs string operations
+    class StringOperationNode(BaseNode):
+        some_message: str = ChatMessageTrigger.message
+
+        class Outputs(BaseOutputs):
+            result: str
+
+        def run(self) -> Outputs:
+            # Perform string operation - this should work because message resolves to string
+            formatted_message = self.some_message.replace(" ", "-")
+            return self.Outputs(result=formatted_message)
+
+    class TestWorkflow(BaseWorkflow[BaseInputs, ChatState]):
+        graph = ChatMessageTrigger >> StringOperationNode
+
+    # WHEN we run the workflow with a string message
+    trigger = ChatMessageTrigger(message="hello world")
+    workflow = TestWorkflow()
+    terminal_event = workflow.run(trigger=trigger)
+
+    # THEN the workflow completes successfully
+    assert terminal_event.name == "workflow.execution.fulfilled"
+
+    # AND the node output shows the string operation worked
+    final_state = terminal_event.final_state
+    assert final_state is not None
+    # Access node outputs via state.meta.node_outputs
+    node_output = final_state.meta.node_outputs.get(StringOperationNode.Outputs.result)
+    assert node_output == "hello-world"
