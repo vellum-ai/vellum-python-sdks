@@ -254,6 +254,7 @@ def test_serialize_node__tool_calling_node__mcp_server_api_key():
                 }
             ],
         },
+        "schema": None,
     }
 
 
@@ -307,6 +308,7 @@ def test_serialize_node__tool_calling_node__mcp_server_no_authorization():
                 ],
             },
         },
+        "schema": None,
     }
 
 
@@ -831,4 +833,5 @@ def test_serialize_tool_prompt_node_with_workflow_deployment(vellum_client):
                 ],
             },
         },
+        "schema": None,
     }
