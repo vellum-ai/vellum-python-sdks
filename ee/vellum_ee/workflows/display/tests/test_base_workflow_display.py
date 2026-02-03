@@ -845,7 +845,7 @@ def test_serialize_module__chat_message_prompt_block_validation_error():
     ), f"Expected validation error in error messages, got: {error_messages}"
 
 
-def test_parse_ml_models__skips_invalid_models_and_returns_valid_ones():
+def test_parse_ml_models__skips_invalid_models_and_returns_valid_ones(caplog):
     """
     Tests that _parse_ml_models skips models with validation errors and returns valid ones.
     """
@@ -879,8 +879,14 @@ def test_parse_ml_models__skips_invalid_models_and_returns_valid_ones():
     assert "invalid-model" not in model_names
     assert "missing-hosted-by" not in model_names
 
+    # AND warnings should be logged for the invalid models
+    warning_messages = [record.message for record in caplog.records if record.levelname == "WARNING"]
+    assert len(warning_messages) == 2
+    assert any("invalid-model" in msg for msg in warning_messages)
+    assert any("missing-hosted-by" in msg for msg in warning_messages)
 
-def test_parse_ml_models__returns_empty_list_when_all_models_invalid():
+
+def test_parse_ml_models__returns_empty_list_when_all_models_invalid(caplog):
     """
     Tests that _parse_ml_models returns an empty list when all models fail validation.
     """
@@ -902,8 +908,12 @@ def test_parse_ml_models__returns_empty_list_when_all_models_invalid():
     # THEN no models should be parsed
     assert len(display._ml_models) == 0
 
+    # AND warnings should be logged for all invalid models
+    warning_messages = [record.message for record in caplog.records if record.levelname == "WARNING"]
+    assert len(warning_messages) == 3
 
-def test_parse_ml_models__returns_all_models_when_all_valid():
+
+def test_parse_ml_models__returns_all_models_when_all_valid(caplog):
     """
     Tests that _parse_ml_models returns all models when all are valid.
     """
@@ -930,3 +940,7 @@ def test_parse_ml_models__returns_all_models_when_all_valid():
     assert ("gpt-4", "OPENAI") in model_data
     assert ("claude-3", "ANTHROPIC") in model_data
     assert ("gemini", "GOOGLE") in model_data
+
+    # AND no warnings should be logged
+    warning_messages = [record.message for record in caplog.records if record.levelname == "WARNING"]
+    assert len(warning_messages) == 0

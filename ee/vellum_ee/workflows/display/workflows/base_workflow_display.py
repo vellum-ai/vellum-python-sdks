@@ -220,8 +220,9 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         for item in ml_models_raw:
             try:
                 parsed_models.append(MLModel.model_validate(item))
-            except ValidationError as e:
-                logger.warning(f"Skipping ML model due to validation error: {item}. Error: {e}")
+            except Exception as e:
+                model_name = item.get("name") if isinstance(item, dict) else None
+                logger.warning(f"Skipping ML model '{model_name}' due to validation error: {type(e).__name__}")
         return parsed_models
 
     def serialize(self) -> JsonObject:
