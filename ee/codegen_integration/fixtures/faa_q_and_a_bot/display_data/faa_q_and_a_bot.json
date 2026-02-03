@@ -896,8 +896,7 @@
                   "type": "CONSTANT_VALUE",
                   "data": {
                     "type": "STRING",
-                    "value": "\n\n#####\n\n",
-                    "block_string": true
+                    "value": "\n\n#####\n\n"
                   }
                 }
               ],
@@ -1024,8 +1023,7 @@
                   "type": "CONSTANT_VALUE",
                   "data": {
                     "type": "STRING",
-                    "value": "{% for result in results -%}\nPolicy {{ result.document.label }}:\n------\n{{ result.text }}\n{% if not loop.last %}\n\n#####\n\n{% endif %}\n{% endfor %}",
-                    "block_string": true
+                    "value": "{% for result in results -%}\nPolicy {{ result.document.label }}:\n------\n{{ result.text }}\n{% if not loop.last %}\n\n#####\n\n{% endif %}\n{% endfor %}"
                   }
                 }
               ],

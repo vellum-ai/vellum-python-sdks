@@ -57,11 +57,7 @@ def test_serialize_workflow_with_filepath():
                     "rules": [
                         {
                             "type": "CONSTANT_VALUE",
-                            "data": {
-                                "type": "STRING",
-                                "value": "# flake8: noqa\ndef main():\n    return 0\n",
-                                "block_string": True,
-                            },
+                            "data": {"type": "STRING", "value": "# flake8: noqa\ndef main():\n    return 0\n"},
                         }
                     ],
                     "combinator": "OR",
@@ -189,11 +185,7 @@ def test_serialize_workflow_with_code():
                     "rules": [
                         {
                             "type": "CONSTANT_VALUE",
-                            "data": {
-                                "type": "STRING",
-                                "value": 'def main() -> str:\n    return "Hello, World!"\n',
-                                "block_string": True,
-                            },
+                            "data": {"type": "STRING", "value": 'def main() -> str:\n    return "Hello, World!"\n'},
                         }
                     ],
                     "combinator": "OR",
@@ -309,11 +301,7 @@ def test_serialize_workflow__try_wrapped():
                     "rules": [
                         {
                             "type": "CONSTANT_VALUE",
-                            "data": {
-                                "type": "STRING",
-                                "value": "# flake8: noqa\ndef main():\n    return 0\n",
-                                "block_string": True,
-                            },
+                            "data": {"type": "STRING", "value": "# flake8: noqa\ndef main():\n    return 0\n"},
                         }
                     ],
                     "combinator": "OR",

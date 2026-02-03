@@ -34,14 +34,17 @@ import { assertUnreachable } from "src/utils/typing";
 class StringVellumValue extends AstNode {
   private astNode: AstNode;
 
-  public constructor(value: string, blockString?: boolean) {
+  public constructor(value: string) {
     super();
-    this.astNode = this.generateAstNode(value, blockString);
+    this.astNode = this.generateAstNode(value);
   }
 
-  private generateAstNode(value: string, blockString?: boolean): AstNode {
-    return new StrInstantiation(removeEscapeCharacters(value), {
-      multiline: blockString,
+  private generateAstNode(value: string): AstNode {
+    const processedValue = removeEscapeCharacters(value);
+    const useMultiline =
+      processedValue.includes("\n") && processedValue.length > 80;
+    return new StrInstantiation(processedValue, {
+      multiline: useMultiline,
     });
   }
 
@@ -594,12 +597,7 @@ export class VellumValue extends AstNode {
     }
     switch (vellumValue.type) {
       case "STRING": {
-        const blockString =
-          "block_string" in vellumValue ? vellumValue.block_string : undefined;
-        this.astNode = new StringVellumValue(
-          vellumValue.value,
-          blockString as boolean | undefined
-        );
+        this.astNode = new StringVellumValue(vellumValue.value);
         if (attributeConfig) {
           this.astNode = new AccessAttribute({
             lhs: attributeConfig.lhs,

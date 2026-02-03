@@ -15,6 +15,10 @@ import { PromptDeploymentNodeContext } from "src/context/node-context/prompt-dep
 import { Writer } from "src/generators/extensions/writer";
 import { PromptDeploymentNode } from "src/generators/nodes/prompt-deployment-node";
 import { NodeOutput as NodeOutputType } from "src/types/vellum";
+
+const LONG_MULTILINE_STRING =
+  "This is a long multiline string that exceeds 80 characters.\nIt should be rendered as a block string in the generated Python code.";
+
 describe("PromptDeploymentNode", () => {
   let workflowContext: WorkflowContext;
   let node: PromptDeploymentNode;
@@ -318,6 +322,83 @@ describe("PromptDeploymentNode", () => {
       });
       node.getNodeFile().write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
+    });
+  });
+
+  describe("with long multiline string input", () => {
+    it("should render long multiline strings as block strings", async () => {
+      vi.spyOn(
+        PromptDeploymentReleaseClient.prototype,
+        "retrievePromptDeploymentRelease"
+      ).mockResolvedValue({
+        id: "947cc337-9a53-4c12-9a38-4f65c04c6317",
+        created: new Date(),
+        environment: {
+          id: "mocked-environment-id",
+          name: "mocked-environment-name",
+          label: "mocked-environment-label",
+        },
+        createdBy: {
+          id: "mocked-created-by-id",
+          email: "mocked-created-by-email",
+        },
+        promptVersion: {
+          id: "mocked-prompt-release-id",
+        },
+        deployment: {
+          name: "some-unique-deployment-name",
+        },
+        releaseTags: [
+          {
+            name: "mocked-release-tag-name",
+            source: "USER",
+          },
+        ],
+        reviews: [
+          {
+            id: "mocked-release-review-id",
+            created: new Date(),
+            reviewer: {
+              id: "mocked-reviewer-id",
+            },
+            state: "APPROVED",
+          },
+        ],
+      } as unknown as PromptDeploymentRelease);
+
+      const workflowContext = workflowContextFactory();
+      const writer = new Writer();
+
+      const nodeData = promptDeploymentNodeDataFactory({
+        inputs: [
+          nodeInputFactory({
+            id: uuidv4(),
+            key: "long_text",
+            value: {
+              type: "CONSTANT_VALUE",
+              data: {
+                type: "STRING",
+                value: LONG_MULTILINE_STRING,
+              },
+            },
+          }),
+        ],
+      }).build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as PromptDeploymentNodeContext;
+
+      const node = new PromptDeploymentNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      const output = await writer.toStringFormatted();
+      expect(output).toMatchSnapshot();
+      expect(output).toContain('"""');
     });
   });
 });

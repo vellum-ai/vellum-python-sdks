@@ -173,8 +173,7 @@
                   "type": "CONSTANT_VALUE",
                   "data": {
                     "type": "STRING",
-                    "value": "{{ input_a }}\n{{ input_b }}",
-                    "block_string": true
+                    "value": "{{ input_a }}\n{{ input_b }}"
                   }
                 }
               ],

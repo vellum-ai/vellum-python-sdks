@@ -105,12 +105,7 @@ def test_serialize_workflow():
                 "id": "e1822f91-ca9c-46c9-8dcd-cce83fe331ce",
                 "key": "separator",
                 "value": {
-                    "rules": [
-                        {
-                            "type": "CONSTANT_VALUE",
-                            "data": {"type": "STRING", "value": "\n\n#####\n\n", "block_string": True},
-                        }
-                    ],
+                    "rules": [{"type": "CONSTANT_VALUE", "data": {"type": "STRING", "value": "\n\n#####\n\n"}}],
                     "combinator": "OR",
                 },
             },

@@ -45,7 +45,6 @@ export enum ConditionalCombinator {
 export interface StringVellumValue {
   type: "STRING";
   value: string;
-  block_string?: boolean;
 }
 
 export interface NumberVellumValue {

@@ -1,6 +1,5 @@
 import * as codegen from "src/codegen";
 import { Writer } from "src/generators/extensions/writer";
-import { StringVellumValue } from "src/types/vellum";
 
 describe("VellumValue", () => {
   let writer: Writer;
@@ -22,21 +21,21 @@ describe("VellumValue", () => {
       expect(stringValue.getReferences()).toHaveLength(0);
     });
 
-    it("should write a STRING value with block_string as multiline", async () => {
-      const vellumValue: StringVellumValue = {
-        type: "STRING",
-        value: "Hello,\nWorld!",
-        block_string: true,
-      };
+    it("should write a long STRING value with newlines as multiline", async () => {
+      const longMultilineValue =
+        "This is a long string that has newlines and is over 80 characters.\nIt should be rendered as a multiline block string.";
       const stringValue = codegen.vellumValue({
-        vellumValue,
+        vellumValue: {
+          type: "STRING",
+          value: longMultilineValue,
+        },
       });
       stringValue.write(writer);
       expect(await writer.toStringFormatted()).toMatchSnapshot();
       expect(stringValue.getReferences()).toHaveLength(0);
     });
 
-    it("should write a STRING value without block_string as single line", async () => {
+    it("should write a short STRING value with newlines as single line", async () => {
       const stringValue = codegen.vellumValue({
         vellumValue: {
           type: "STRING",

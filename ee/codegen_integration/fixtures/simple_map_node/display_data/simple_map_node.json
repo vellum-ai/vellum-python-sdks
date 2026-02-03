@@ -60,8 +60,7 @@
                   "type": "CONSTANT_VALUE",
                   "data": {
                     "type": "STRING",
-                    "value": "def main(arg1: str) -> str:\n    return arg1\n",
-                    "block_string": true
+                    "value": "def main(arg1: str) -> str:\n    return arg1\n"
                   }
                 }
               ],
@@ -373,8 +372,7 @@
                           "type": "CONSTANT_VALUE",
                           "data": {
                             "type": "STRING",
-                            "value": "\n\n#####\n\n",
-                            "block_string": true
+                            "value": "\n\n#####\n\n"
                           }
                         }
                       ],
