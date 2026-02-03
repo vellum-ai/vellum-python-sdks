@@ -81,11 +81,9 @@ class BasePromptDeploymentNodeDisplay(BaseNodeDisplay[_PromptDeploymentNodeType]
                                 }
                             )
                     except Exception as e:
-                        if not display_context.dry_run:
-                            display_context.add_error(e)
+                        display_context.add_error(e)
         except Exception as e:
-            if not display_context.dry_run:
-                display_context.add_error(e)
+            display_context.add_error(e)
 
         ml_model_fallbacks = raise_if_descriptor(node.ml_model_fallbacks)
 
