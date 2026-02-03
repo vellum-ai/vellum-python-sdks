@@ -257,7 +257,6 @@ def test_chat_message_trigger__chat_history_defaulted_to_none():
     )
 
 
-@pytest.mark.xfail(reason="String operations on ChatMessageTrigger.message not yet supported - see APO-2918")
 def test_chat_message_trigger__string_operations_on_message():
     """Tests that string operations like replace() work on ChatMessage.message in nodes."""
 
