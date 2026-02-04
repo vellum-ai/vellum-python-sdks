@@ -1,6 +1,8 @@
 import pytest
 from dataclasses import dataclass
 from enum import Enum
+import sys
+import types
 from unittest.mock import Mock
 from typing import Annotated, Dict, List, Literal, Optional, Tuple, Union
 
@@ -15,6 +17,7 @@ from vellum.workflows.nodes.bases.base import BaseNode
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.types.definition import DeploymentDefinition
 from vellum.workflows.utils.functions import (
+    compile_annotation,
     compile_function_definition,
     compile_inline_workflow_function_definition,
     compile_workflow_deployment_function_definition,
@@ -1005,3 +1008,33 @@ def test_compile_function_definition__enum_type(enum_class, expected_schema):
     # THEN the parameter should have the expected enum schema
     assert isinstance(compiled_function.parameters, dict)
     assert compiled_function.parameters["properties"]["a"] == expected_schema
+
+
+@pytest.mark.skipif(sys.version_info < (3, 10), reason="PEP 604 union types are only available on Python 3.10+")
+def test_compile_function_definition__pep604_union():
+    """Tests that PEP 604 union types (str | None) are compiled correctly on Python 3.10+."""
+
+    # GIVEN a PEP 604 union type (only available as runtime object on Python 3.10+)
+    pep604_union = eval("str | None")
+    assert isinstance(pep604_union, types.UnionType)  # type: ignore[attr-defined]
+
+    # WHEN compiling the annotation
+    result = compile_annotation(pep604_union, {})
+
+    # THEN it should return the correct schema with anyOf
+    assert result == {"anyOf": [{"type": "string"}, {"type": "null"}]}
+
+
+@pytest.mark.skipif(sys.version_info < (3, 10), reason="PEP 604 union types are only available on Python 3.10+")
+def test_compile_function_definition__pep604_union_multiple_types():
+    """Tests that PEP 604 union types with multiple types are compiled correctly."""
+
+    # GIVEN a PEP 604 union type with multiple types
+    pep604_union = eval("str | int | None")
+    assert isinstance(pep604_union, types.UnionType)  # type: ignore[attr-defined]
+
+    # WHEN compiling the annotation
+    result = compile_annotation(pep604_union, {})
+
+    # THEN it should return the correct schema with anyOf
+    assert result == {"anyOf": [{"type": "string"}, {"type": "integer"}, {"type": "null"}]}
