@@ -86,9 +86,10 @@ def test_parallel_tool_calls_parallel(vellum_adhoc_prompt_client, mock_uuid4_gen
     uuid4_generator = mock_uuid4_generator("vellum.workflows.nodes.displayable.bases.inline_prompt_node.node.uuid4")
     first_call_input_id = uuid4_generator()
     first_call_input_id_2 = uuid4_generator()
-    # Generate additional UUIDs for parallel execution nodes
-    for _ in range(20):
-        uuid4_generator()
+    uuid4_generator()
+    uuid4_generator()
+    uuid4_generator()
+    uuid4_generator()
 
     # GIVEN a parallel tool execution workflow
     workflow = ToolCallingNodeParallelExecutionWorkflow()
