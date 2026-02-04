@@ -1,4 +1,5 @@
 import pytest
+from datetime import datetime
 import io
 import json
 import os
@@ -11,8 +12,7 @@ from click.testing import CliRunner
 from httpx import Response
 from pydantic import ValidationError
 
-from datetime import datetime
-
+from vellum import DeploymentRead
 from vellum.client.core.api_error import ApiError
 from vellum.client.types.ml_model_read import MlModelRead
 from vellum.client.types.prompt_deployment_release import PromptDeploymentRelease
@@ -21,7 +21,6 @@ from vellum.client.types.prompt_deployment_release_prompt_version import PromptD
 from vellum.client.types.release_environment import ReleaseEnvironment
 from vellum.client.types.workflow_push_response import WorkflowPushResponse
 from vellum.utils.uuid import is_valid_uuid
-from vellum import DeploymentRead
 from vellum_cli import main as cli_main
 from vellum_ee.workflows.display.nodes.utils import to_kebab_case
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay, WorkflowSerializationResult
