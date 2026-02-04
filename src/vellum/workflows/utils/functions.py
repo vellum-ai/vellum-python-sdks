@@ -2,6 +2,8 @@ import dataclasses
 from datetime import datetime
 from enum import Enum
 import inspect
+import sys
+import types
 from typing import (
     TYPE_CHECKING,
     Annotated,
@@ -108,7 +110,12 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
     if annotation is datetime:
         return {"type": "string", "format": "date-time"}
 
-    if get_origin(annotation) is Union:
+    # Handle both typing.Union and PEP 604 union types (str | None on Python 3.10+)
+    # On Python 3.10+, get_origin(str | None) returns types.UnionType, not typing.Union
+    is_typing_union = get_origin(annotation) is Union
+    is_pep604_union = sys.version_info >= (3, 10) and isinstance(annotation, types.UnionType)
+
+    if is_typing_union or is_pep604_union:
         if is_json_type(get_args(annotation)):
             return {"$ref": "#/$defs/vellum.workflows.types.core.Json"}
 
@@ -133,9 +140,9 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
 
     if get_origin(annotation) is Literal:
         values = list(get_args(annotation))
-        types = {type(value) for value in values}
-        if len(types) == 1:
-            value_type = types.pop()
+        value_types = {type(value) for value in values}
+        if len(value_types) == 1:
+            value_type = value_types.pop()
             if value_type in type_map:
                 return {"type": type_map[value_type], "enum": values}
             else:
@@ -145,9 +152,9 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
 
     if inspect.isclass(annotation) and issubclass(annotation, Enum):
         values = [member.value for member in annotation]
-        types = {type(value) for value in values}
-        if len(types) == 1:
-            value_type = types.pop()
+        value_types = {type(value) for value in values}
+        if len(value_types) == 1:
+            value_type = value_types.pop()
             if value_type in type_map:
                 return {"type": type_map[value_type], "enum": values}
             else:
