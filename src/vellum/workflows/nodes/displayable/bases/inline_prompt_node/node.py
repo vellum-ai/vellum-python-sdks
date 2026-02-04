@@ -374,9 +374,24 @@ class BaseInlinePromptNode(BasePromptNode[StateType], Generic[StateType]):
             return input_variables, input_values
 
         for input_name, input_value in self.prompt_inputs.items():
-            # Exclude inputs that resolved to be null. This ensure that we don't pass input values
-            # to optional prompt inputs whose values were unresolved.
+            # Handle inputs that resolved to be null by marking them as not required.
+            # This allows state variables that are None in the first iteration to be
+            # included in the input_variables list so the backend can match VariablePromptBlocks.
             if input_value is None:
+                input_variables.append(
+                    VellumVariable(
+                        id=str(uuid4()),
+                        key=input_name,
+                        type="JSON",
+                        required=False,
+                    )
+                )
+                input_values.append(
+                    PromptRequestJsonInput(
+                        key=input_name,
+                        value=None,
+                    )
+                )
                 continue
             if isinstance(input_value, str):
                 input_variables.append(
