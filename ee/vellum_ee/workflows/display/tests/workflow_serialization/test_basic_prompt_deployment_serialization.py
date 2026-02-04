@@ -36,6 +36,7 @@ def test_serialize_workflow(vellum_client):
         "input_variables",
         "state_variables",
         "output_variables",
+        "dependencies",
     }
 
     # AND its input variables should be what we expect
@@ -209,6 +210,7 @@ def test_serialize_workflow_with_prompt_and_templating(vellum_client):
         "input_variables",
         "state_variables",
         "output_variables",
+        "dependencies",
     }
 
     # AND its input variables should be what we expect

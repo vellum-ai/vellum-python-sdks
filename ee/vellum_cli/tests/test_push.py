@@ -11,9 +11,17 @@ from click.testing import CliRunner
 from httpx import Response
 from pydantic import ValidationError
 
+from datetime import datetime
+
 from vellum.client.core.api_error import ApiError
+from vellum.client.types.ml_model_read import MlModelRead
+from vellum.client.types.prompt_deployment_release import PromptDeploymentRelease
+from vellum.client.types.prompt_deployment_release_prompt_deployment import PromptDeploymentReleasePromptDeployment
+from vellum.client.types.prompt_deployment_release_prompt_version import PromptDeploymentReleasePromptVersion
+from vellum.client.types.release_environment import ReleaseEnvironment
 from vellum.client.types.workflow_push_response import WorkflowPushResponse
 from vellum.utils.uuid import is_valid_uuid
+from vellum import DeploymentRead
 from vellum_cli import main as cli_main
 from vellum_ee.workflows.display.nodes.utils import to_kebab_case
 from vellum_ee.workflows.display.workflows.base_workflow_display import BaseWorkflowDisplay, WorkflowSerializationResult
@@ -880,6 +888,57 @@ MY_OTHER_VELLUM_API_KEY=aaabbbcccddd
     vellum_client_class.return_value.workflows.push.return_value = WorkflowPushResponse(
         workflow_sandbox_id=new_workflow_sandbox_id,
     )
+    
+    # AND mock deployment retrieval APIs for prompt deployment node serialization
+    deployment_id = str(uuid4())
+    deployment = DeploymentRead(
+        id=deployment_id,
+        created=datetime.now(),
+        label="Test Deployment",
+        name="my-deployment",
+        last_deployed_on=datetime.now(),
+        input_variables=[],
+        active_model_version_ids=[],
+        last_deployed_history_item_id=str(uuid4()),
+    )
+    vellum_client_class.return_value.deployments.retrieve.return_value = deployment
+    
+    # Mock prompt deployment release
+    ml_model_to_workspace_id = str(uuid4())
+    prompt_version = PromptDeploymentReleasePromptVersion.model_validate(
+        {
+            "id": str(uuid4()),
+            "build_config": {
+                "source": "SANDBOX",
+                "sandbox_id": str(uuid4()),
+                "sandbox_snapshot_id": str(uuid4()),
+                "prompt_id": str(uuid4()),
+            },
+            "ml_model_to_workspace_id": ml_model_to_workspace_id,
+        }
+    )
+    deployment_release = PromptDeploymentRelease(
+        id=str(uuid4()),
+        created=datetime.now(),
+        environment=ReleaseEnvironment(id=str(uuid4()), name="DEVELOPMENT", label="Development"),
+        prompt_version=prompt_version,
+        deployment=PromptDeploymentReleasePromptDeployment(
+            id=deployment_id,
+            name="my-deployment",
+        ),
+        release_tags=[],
+        reviews=[],
+    )
+    vellum_client_class.return_value.deployments.retrieve_prompt_deployment_release.return_value = deployment_release
+    
+    # Mock ml_model retrieval
+    ml_model = MlModelRead(
+        id=ml_model_to_workspace_id,
+        name="gpt-4o",
+        hosted_by="OPENAI",
+        introduced_on=datetime.now(),
+    )
+    vellum_client_class.return_value.ml_models.retrieve.return_value = ml_model
 
     # WHEN calling `vellum push` on strict mode
     runner = CliRunner()
