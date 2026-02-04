@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import Any, Generic, List, Optional, TypeVar
+from typing import Any, Generic, List, Optional, TypeVar, cast
 
 from vellum.client import Vellum as VellumClient
 from vellum.utils.uuid import is_valid_uuid
@@ -25,6 +25,7 @@ class BaseSubworkflowDeploymentNodeDisplay(
 
     _deployment_id: Optional[str] = None
     _release_tag: Optional[str] = None
+    _dependencies: List[JsonObject] = []
 
     def build(self, client: VellumClient) -> None:
         node = self._node
@@ -37,6 +38,11 @@ class BaseSubworkflowDeploymentNodeDisplay(
         )
         self._deployment_id = str(deployment_release.deployment.id)
         output_variables_by_key = {var.key: var for var in deployment_release.workflow_version.output_variables}
+
+        workflow_version = deployment_release.workflow_version
+        dependencies = getattr(workflow_version, "dependencies", None)
+        if dependencies is not None:
+            self._dependencies = [dep.dict() if hasattr(dep, "dict") else dep for dep in dependencies]
 
         for output in node.Outputs:
             original_output_display = self.output_display.get(output)
@@ -122,6 +128,10 @@ class BaseSubworkflowDeploymentNodeDisplay(
 
         attributes: JsonArray = [self._serialize_subworkflow_inputs_attribute(node_id, display_context)]
 
+        for dependency in self._dependencies:
+            if isinstance(dependency, dict):
+                display_context.add_dependency(dependency)
+
         return {
             "id": str(node_id),
             "type": "SUBWORKFLOW",
@@ -134,6 +144,7 @@ class BaseSubworkflowDeploymentNodeDisplay(
                 "variant": "DEPLOYMENT",
                 "workflow_deployment_id": self._deployment_id,
                 "release_tag": self._release_tag,
+                "dependencies": cast(JsonArray, self._dependencies),
             },
             "attributes": attributes,
             **self.serialize_generic_fields(display_context),
