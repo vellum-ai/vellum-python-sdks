@@ -2,7 +2,7 @@ import pytest
 import json
 from unittest import mock
 from uuid import uuid4
-from typing import Any, Iterator, List, cast
+from typing import Any, Iterator, List, Optional, cast
 
 from vellum import ChatMessage
 from vellum.client.core.api_error import ApiError
@@ -996,3 +996,65 @@ def test_tool_calling_node_json_output_not_present_for_non_json(vellum_adhoc_pro
     # AND the text output should contain the plain text
     assert "text" in node_outputs
     assert node_outputs["text"] == plain_text_response
+
+
+def test_tool_calling_node_none_input_included_with_required_false(vellum_adhoc_prompt_client):
+    """
+    Tests that None values in prompt_inputs are included in input_variables
+    with required=False, allowing the backend to match VariablePromptBlocks.
+    """
+
+    # GIVEN a State class with a nullable field
+    class MyState(BaseState):
+        state_value: Optional[str] = None
+
+    # AND a ToolCallingNode that references the state variable
+    class TestToolCallingNode(ToolCallingNode[MyState]):
+        ml_model = "gpt-4o-mini"
+        blocks = []
+        functions = [first_function]
+        prompt_inputs = {
+            "from_state": MyState.state_value,
+        }
+        max_prompt_iterations = 1
+
+    def generate_prompt_events(*args: Any, **kwargs: Any) -> Iterator[Any]:
+        execution_id = str(uuid4())
+        events = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            FulfilledExecutePromptEvent(
+                execution_id=execution_id,
+                outputs=[StringVellumValue(value="Hello!")],
+            ),
+        ]
+        yield from events
+
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
+
+    # WHEN the ToolCallingNode runs with the state value being None
+    node = TestToolCallingNode(
+        state=MyState(
+            meta=StateMeta(workflow_inputs=BaseInputs()),
+        )
+    )
+    list(node.run())
+
+    # THEN the API should be called
+    mock_api = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream
+    assert mock_api.call_count >= 1
+
+    # AND the input_variables should include the state variable with required=False
+    call_kwargs = mock_api.call_args.kwargs
+    input_variables = call_kwargs["input_variables"]
+    state_vars = [var for var in input_variables if var.key == "from_state"]
+    assert len(state_vars) == 1
+    assert state_vars[0].required is False
+    assert state_vars[0].type == "JSON"
+
+    # AND the input_values should include the state variable with None value
+    input_values = call_kwargs["input_values"]
+    state_inputs = [
+        input_val for input_val in input_values if hasattr(input_val, "key") and input_val.key == "from_state"
+    ]
+    assert len(state_inputs) == 1
+    assert state_inputs[0].value is None
