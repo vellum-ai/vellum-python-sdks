@@ -887,7 +887,7 @@ MY_OTHER_VELLUM_API_KEY=aaabbbcccddd
     vellum_client_class.return_value.workflows.push.return_value = WorkflowPushResponse(
         workflow_sandbox_id=new_workflow_sandbox_id,
     )
-    
+
     # AND mock deployment retrieval APIs for prompt deployment node serialization
     deployment_id = str(uuid4())
     deployment = DeploymentRead(
@@ -901,7 +901,7 @@ MY_OTHER_VELLUM_API_KEY=aaabbbcccddd
         last_deployed_history_item_id=str(uuid4()),
     )
     vellum_client_class.return_value.deployments.retrieve.return_value = deployment
-    
+
     # Mock prompt deployment release
     ml_model_to_workspace_id = str(uuid4())
     prompt_version = PromptDeploymentReleasePromptVersion.model_validate(
@@ -929,7 +929,7 @@ MY_OTHER_VELLUM_API_KEY=aaabbbcccddd
         reviews=[],
     )
     vellum_client_class.return_value.deployments.retrieve_prompt_deployment_release.return_value = deployment_release
-    
+
     # Mock ml_model retrieval
     ml_model = MlModelRead(
         id=ml_model_to_workspace_id,
