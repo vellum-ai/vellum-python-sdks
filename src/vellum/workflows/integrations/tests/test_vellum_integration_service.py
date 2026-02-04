@@ -477,3 +477,35 @@ def test_vellum_integration_service_get_tool_definition_api_error_extracts_detai
 
     # AND the message should NOT contain HTTP headers
     assert "headers:" not in exc_info.value.message
+
+
+def test_vellum_integration_service_execute_tool_api_error_with_string_body(vellum_client):
+    """Test that API errors with string bodies (e.g., plain-text error pages) preserve the error text"""
+    # GIVEN a mock client configured to raise an API error with a string body
+    mock_client = vellum_client
+    mock_client.integrations = mock.MagicMock()
+
+    # AND the error body is a plain string (e.g., from a timeout, proxy, or 502/503 upstream error)
+    string_error_body = "Service temporarily unavailable. Please try again later."
+    mock_client.integrations.execute_integration_tool.side_effect = ApiError(
+        status_code=503,
+        headers={"server": "nginx"},
+        body=string_error_body,
+    )
+
+    # WHEN we attempt to execute a tool that returns a string error body
+    service = VellumIntegrationService(client=mock_client)
+    with pytest.raises(NodeException) as exc_info:
+        service.execute_tool(
+            integration="SLACK",
+            provider="COMPOSIO",
+            tool_name="SLACK_SEND_MESSAGE",
+            arguments={"channel": "general", "text": "Hello"},
+        )
+
+    # THEN the error message should contain the string body content
+    assert "Service temporarily unavailable" in exc_info.value.message
+
+    # AND the message should NOT contain HTTP headers
+    assert "headers:" not in exc_info.value.message
+    assert "nginx" not in exc_info.value.message

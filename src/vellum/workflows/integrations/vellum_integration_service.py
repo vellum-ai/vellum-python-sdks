@@ -13,7 +13,8 @@ def _extract_api_error_message(error: ApiError, fallback_message: str) -> str:
 
     The ApiError.__str__ method returns verbose output including HTTP headers,
     status code, and body. This function extracts just the meaningful error
-    message from the body's 'detail' field when available.
+    message from the body's 'detail' field when available, or uses the body
+    directly if it's a string (e.g., plain-text error pages, timeouts, 502/503).
 
     Args:
         error: The ApiError to extract a message from
@@ -26,6 +27,8 @@ def _extract_api_error_message(error: ApiError, fallback_message: str) -> str:
         detail = error.body.get("detail")
         if detail:
             return str(detail)
+    elif isinstance(error.body, str) and error.body:
+        return error.body
     return fallback_message
 
 
