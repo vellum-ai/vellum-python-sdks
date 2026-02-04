@@ -60,28 +60,21 @@ class BasePromptDeploymentNodeDisplay(BaseNodeDisplay[_PromptDeploymentNodeType]
                 id=deployment_descriptor_id,
                 release_id_or_release_tag=release_tag,
             )
-            # Check if the prompt version has ml_model_to_workspace_id
-            if hasattr(deployment_release, "prompt_version") and deployment_release.prompt_version:
-                prompt_version = deployment_release.prompt_version
-                ml_model_to_workspace_id = getattr(prompt_version, "ml_model_to_workspace_id", None)
+            # Register model provider dependency from the prompt version's ml_model
+            prompt_version = deployment_release.prompt_version
+            ml_model_to_workspace_id = prompt_version.ml_model_to_workspace_id
 
-                if ml_model_to_workspace_id and display_context.ml_models_map:
-                    try:
-                        ml_model = display_context.client.ml_models.retrieve(id=str(ml_model_to_workspace_id))
-                        ml_model_name = ml_model.name
-
-                        # Register model provider dependency if ml_model is found in display_context.ml_models_map
-                        model = display_context.ml_models_map.get(ml_model_name)
-                        if model:
-                            display_context.add_dependency(
-                                {
-                                    "type": "MODEL_PROVIDER",
-                                    "name": model.hosted_by.value,
-                                    "model_name": ml_model_name,
-                                }
-                            )
-                    except Exception as e:
-                        display_context.add_error(e)
+            try:
+                ml_model = display_context.client.ml_models.retrieve(id=str(ml_model_to_workspace_id))
+                display_context.add_dependency(
+                    {
+                        "type": "MODEL_PROVIDER",
+                        "name": str(ml_model.hosted_by),
+                        "model_name": ml_model.name,
+                    }
+                )
+            except Exception as e:
+                display_context.add_error(e)
         except Exception as e:
             display_context.add_error(e)
 
