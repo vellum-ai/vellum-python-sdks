@@ -1,7 +1,7 @@
 import inspect
 import json
 import logging
-from typing import Any, Callable, Dict, Iterator, List, Optional, Type, Union, cast
+from typing import Any, Callable, Dict, Generator, Iterator, List, Optional, Type, Union, cast
 
 from pydash import snake_case
 
@@ -94,9 +94,24 @@ class FunctionCallNodeMixin:
 
 class ToolPromptNode(InlinePromptNode[ToolCallingState]):
     max_prompt_iterations: Optional[int] = 25
+    _chat_message_metadata: Optional[Dict[str, Optional[Any]]] = None
 
     class Trigger(InlinePromptNode.Trigger):
         merge_behavior = MergeBehavior.AWAIT_ATTRIBUTES
+
+    def _process_prompt_event_stream(self) -> Generator[BaseOutput, None, Optional[List[PromptOutput]]]:
+        """Override to capture chat_message_metadata from the fulfilled event."""
+        outputs = yield from super()._process_prompt_event_stream()
+
+        return outputs
+
+    def _get_prompt_event_stream(self) -> Iterator[Any]:
+        """Override to capture chat_message_metadata from fulfilled events."""
+        event_stream = super()._get_prompt_event_stream()
+        for event in event_stream:
+            if event.state == "FULFILLED":
+                self._chat_message_metadata = getattr(event, "chat_message_metadata", None)
+            yield event
 
     def run(self) -> Iterator[BaseOutput]:
         if self.max_prompt_iterations is not None and self.state.prompt_iterations >= self.max_prompt_iterations:
@@ -110,6 +125,7 @@ class ToolPromptNode(InlinePromptNode[ToolCallingState]):
                 },
             )
 
+        self._chat_message_metadata = None
         generator = super().run()
         with self.state.__quiet__():
             self.state.current_prompt_output_index = 0
@@ -132,14 +148,22 @@ class ToolPromptNode(InlinePromptNode[ToolCallingState]):
                             )
                         )
 
+                metadata = self._chat_message_metadata
+
                 if len(chat_contents) == 1:
                     if chat_contents[0].type == "STRING":
-                        self.state.chat_history.append(ChatMessage(role="ASSISTANT", text=chat_contents[0].value))
+                        self.state.chat_history.append(
+                            ChatMessage(role="ASSISTANT", text=chat_contents[0].value, metadata=metadata)
+                        )
                     else:
-                        self.state.chat_history.append(ChatMessage(role="ASSISTANT", content=chat_contents[0]))
+                        self.state.chat_history.append(
+                            ChatMessage(role="ASSISTANT", content=chat_contents[0], metadata=metadata)
+                        )
                 else:
                     self.state.chat_history.append(
-                        ChatMessage(role="ASSISTANT", content=ArrayChatMessageContent(value=chat_contents))
+                        ChatMessage(
+                            role="ASSISTANT", content=ArrayChatMessageContent(value=chat_contents), metadata=metadata
+                        )
                     )
 
             yield output
