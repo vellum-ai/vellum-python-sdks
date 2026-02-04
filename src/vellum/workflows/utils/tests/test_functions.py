@@ -1011,7 +1011,7 @@ def test_compile_function_definition__enum_type(enum_class, expected_schema):
 
 
 @pytest.mark.skipif(sys.version_info < (3, 10), reason="PEP 604 union types are only available on Python 3.10+")
-def test_compile_function_definition__pep604_union():
+def test_compile_annotation__pep604_union():
     """Tests that PEP 604 union types (str | None) are compiled correctly on Python 3.10+."""
 
     # GIVEN a PEP 604 union type (only available as runtime object on Python 3.10+)
@@ -1026,7 +1026,7 @@ def test_compile_function_definition__pep604_union():
 
 
 @pytest.mark.skipif(sys.version_info < (3, 10), reason="PEP 604 union types are only available on Python 3.10+")
-def test_compile_function_definition__pep604_union_multiple_types():
+def test_compile_annotation__pep604_union_multiple_types():
     """Tests that PEP 604 union types with multiple types are compiled correctly."""
 
     # GIVEN a PEP 604 union type with multiple types
