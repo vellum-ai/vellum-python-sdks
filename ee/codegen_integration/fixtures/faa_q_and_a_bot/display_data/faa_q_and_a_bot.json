@@ -2653,7 +2653,8 @@
           "target_handle_id": "d96bb2c2-1c6f-4e7d-9163-c6b16a67e1f2",
           "variant": "DEPLOYMENT",
           "workflow_deployment_id": "e68d6033-f3e6-4681-a7b9-6bfd2828a237",
-          "release_tag": "LATEST"
+          "release_tag": "LATEST",
+          "dependencies": []
         },
         "attributes": [
           {

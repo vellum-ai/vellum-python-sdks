@@ -162,6 +162,7 @@ def test_serialize_workflow(vellum_client):
             "variant": "DEPLOYMENT",
             "workflow_deployment_id": deployment_id,
             "release_tag": "LATEST",
+            "dependencies": [],
         },
         "attributes": [
             {
