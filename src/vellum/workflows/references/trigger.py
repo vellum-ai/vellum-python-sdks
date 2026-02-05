@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, Any, Generic, Optional, Tuple, Type, TypeVar, 
 from pydantic import GetCoreSchemaHandler
 from pydantic_core import core_schema
 
-from vellum.client.types import StringChatMessageContent
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.errors.types import WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
@@ -49,14 +48,13 @@ class TriggerAttributeReference(BaseDescriptor[_T], Generic[_T]):
         """
         return self._trigger_class.get_attribute_id(self.name)
 
-    def resolve(self, state: BaseState, expected_types: Optional[Tuple[Type[Any], ...]] = None) -> _T:
+    def resolve(self, state: BaseState) -> _T:
         trigger_attributes = state.meta.trigger_attributes or {}
         if self in trigger_attributes:
-            value = trigger_attributes[self]
-            return cast(_T, self._coerce_value(value, expected_types))
+            return cast(_T, trigger_attributes[self])
 
         if state.meta.parent:
-            return self.resolve(state.meta.parent, expected_types)
+            return self.resolve(state.meta.parent)
 
         if type(None) in self.types:
             return cast(_T, None)
@@ -65,25 +63,6 @@ class TriggerAttributeReference(BaseDescriptor[_T], Generic[_T]):
             message=f"Missing trigger attribute '{self.name}' for {self._trigger_class.__name__}",
             code=WorkflowErrorCode.INVALID_INPUTS,
         )
-
-    def _coerce_value(self, value: Any, expected_types: Optional[Tuple[Type[Any], ...]] = None) -> Any:
-        """
-        Coerce the resolved value to match expected types when possible.
-
-        If the value is a list with a single StringChatMessageContent and the expected type is
-        exactly str (and nothing else), extract and return the string value.
-        """
-        if expected_types is None:
-            return value
-
-        # Only coerce if str is the ONLY expected type
-        if expected_types == (str,):
-            if isinstance(value, list) and len(value) == 1:
-                item = value[0]
-                if isinstance(item, StringChatMessageContent):
-                    return item.value
-
-        return value
 
     def __repr__(self) -> str:
         return f"{self._trigger_class.__qualname__}.{self.name}"

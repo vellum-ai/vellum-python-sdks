@@ -156,7 +156,7 @@ def test_chat_message_trigger__converts_dict_format():
 
 
 def test_chat_message_trigger__converts_string_message():
-    """Tests that ChatMessageTrigger converts string messages to ChatMessageContent list."""
+    """Tests that ChatMessageTrigger preserves string messages as-is."""
 
     # GIVEN a message as a string
     string_message = "Hello, world!"
@@ -164,10 +164,9 @@ def test_chat_message_trigger__converts_string_message():
     # WHEN a ChatMessageTrigger is created with a string message
     trigger = ChatMessageTrigger(message=string_message)
 
-    # THEN the message is converted to a list with a single StringChatMessageContent
-    assert len(trigger.message) == 1
-    assert isinstance(trigger.message[0], StringChatMessageContent)
-    assert trigger.message[0].value == "Hello, world!"
+    # THEN the message is preserved as a string
+    assert isinstance(trigger.message, str)
+    assert trigger.message == "Hello, world!"
 
     # AND the trigger works correctly with state
     state = ChatState()
@@ -175,9 +174,7 @@ def test_chat_message_trigger__converts_string_message():
 
     assert len(state.chat_history) == 1
     assert state.chat_history[0].role == "USER"
-    assert state.chat_history[0].content == ArrayChatMessageContent(
-        value=[StringChatMessageContent(value="Hello, world!")]
-    )
+    assert state.chat_history[0].text == "Hello, world!"
 
 
 def test_chat_message_trigger__raw_string_array__workflow_stream():
@@ -252,9 +249,7 @@ def test_chat_message_trigger__chat_history_defaulted_to_none():
     assert final_state.chat_history is not None
     assert len(final_state.chat_history) == 1
     assert final_state.chat_history[0].role == "USER"
-    assert final_state.chat_history[0].content == ArrayChatMessageContent(
-        value=[StringChatMessageContent(value="Hello")]
-    )
+    assert final_state.chat_history[0].text == "Hello"
 
 
 def test_chat_message_trigger__string_operations_on_message():

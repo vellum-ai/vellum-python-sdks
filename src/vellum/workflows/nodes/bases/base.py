@@ -562,13 +562,7 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
                 # We don't want to resolve attributes that are _meant_ to be descriptors
                 continue
 
-            resolved_value = resolve_value(
-                descriptor.instance,
-                self.state,
-                path=descriptor.name,
-                memo=inputs_memo,
-                expected_types=descriptor.types,
-            )
+            resolved_value = resolve_value(descriptor.instance, self.state, path=descriptor.name, memo=inputs_memo)
             setattr(self, descriptor.name, resolved_value)
 
         # We only want to store the attributes that were actually set as inputs, not every attribute that exists.

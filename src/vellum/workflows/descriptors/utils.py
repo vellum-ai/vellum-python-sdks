@@ -1,7 +1,7 @@
 from collections.abc import Mapping
 import dataclasses
 import inspect
-from typing import Any, Dict, Optional, Sequence, Set, Tuple, Type, TypeVar, Union, cast, overload
+from typing import Any, Dict, Optional, Sequence, Set, Type, TypeVar, Union, cast, overload
 from typing_extensions import TypeGuard
 
 from pydantic import BaseModel
@@ -15,45 +15,22 @@ _T = TypeVar("_T")
 
 @overload
 def resolve_value(
-    value: BaseDescriptor[_T],
-    state: BaseState,
-    path: str = "",
-    memo: Optional[Dict[str, Any]] = None,
-    expected_types: Optional[Tuple[Type, ...]] = None,
+    value: BaseDescriptor[_T], state: BaseState, path: str = "", memo: Optional[Dict[str, Any]] = None
 ) -> _T: ...
 
 
 @overload
-def resolve_value(
-    value: _T,
-    state: BaseState,
-    path: str = "",
-    memo: Optional[Dict[str, Any]] = None,
-    expected_types: Optional[Tuple[Type, ...]] = None,
-) -> _T: ...
+def resolve_value(value: _T, state: BaseState, path: str = "", memo: Optional[Dict[str, Any]] = None) -> _T: ...
 
 
 def resolve_value(
-    value: Union[BaseDescriptor[_T], _T],
-    state: BaseState,
-    path: str = "",
-    memo: Optional[Dict[str, Any]] = None,
-    expected_types: Optional[Tuple[Type, ...]] = None,
+    value: Union[BaseDescriptor[_T], _T], state: BaseState, path: str = "", memo: Optional[Dict[str, Any]] = None
 ) -> _T:
     """
     Recursively resolves Descriptor's until we have a constant value, using BaseState.
 
     The nonideal casts in this method are due to the `isinstance` calls detaching types
     from the `_T` generic.
-
-    Args:
-        value: The value to resolve, which may be a descriptor or a constant value.
-        state: The workflow state used for resolution.
-        path: The path to the value, used for memoization.
-        memo: A dictionary for memoizing resolved values.
-        expected_types: Optional tuple of expected types for the resolved value.
-            Used by TriggerAttributeReference to coerce values (e.g., extracting
-            a string from a list with a single StringChatMessageContent).
     """
 
     if memo is not None and path in memo:
@@ -63,12 +40,7 @@ def resolve_value(
         return cast(_T, value)
 
     if isinstance(value, BaseDescriptor):
-        from vellum.workflows.references.trigger import TriggerAttributeReference
-
-        if isinstance(value, TriggerAttributeReference):
-            resolved_value = value.resolve(state, expected_types)
-        else:
-            resolved_value = value.resolve(state)
+        resolved_value = value.resolve(state)
         if memo is not None:
             if value.is_sensitive:
                 memo[path] = value
