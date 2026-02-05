@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Type, Union, c
 from pydantic import BaseModel
 
 from vellum.client.types.logical_operator import LogicalOperator
+from vellum.client.types.workflow_integration_dependency import WorkflowIntegrationDependency
 from vellum.utils.uuid import is_valid_uuid
 from vellum.workflows.constants import undefined
 from vellum.workflows.descriptors.base import BaseDescriptor
@@ -587,11 +588,10 @@ def serialize_value(executable_id: UUID, display_context: "WorkflowDisplayContex
     if isinstance(value, BaseModel):
         if isinstance(value, VellumIntegrationToolDefinition):
             display_context.add_dependency(
-                {
-                    "type": "INTEGRATION",
-                    "provider": value.provider.value,
-                    "name": value.integration_name,
-                }
+                WorkflowIntegrationDependency(
+                    provider=value.provider.value,
+                    name=value.integration_name,
+                )
             )
         context = {"executable_id": executable_id, "client": display_context.client}
         dict_value = value.model_dump(context=context)

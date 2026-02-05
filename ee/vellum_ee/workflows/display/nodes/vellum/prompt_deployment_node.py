@@ -1,6 +1,7 @@
 from uuid import UUID
 from typing import Generic, Optional, TypeVar
 
+from vellum.client.types.workflow_model_provider_dependency import WorkflowModelProviderDependency
 from vellum.workflows.nodes.displayable.prompt_deployment_node import PromptDeploymentNode
 from vellum.workflows.types.core import JsonObject
 from vellum.workflows.utils.uuids import uuid4_from_hash
@@ -67,11 +68,10 @@ class BasePromptDeploymentNodeDisplay(BaseNodeDisplay[_PromptDeploymentNodeType]
             try:
                 ml_model = display_context.client.ml_models.retrieve(id=str(ml_model_to_workspace_id))
                 display_context.add_dependency(
-                    {
-                        "type": "MODEL_PROVIDER",
-                        "name": str(ml_model.hosted_by),
-                        "model_name": ml_model.name,
-                    }
+                    WorkflowModelProviderDependency(
+                        name=str(ml_model.hosted_by),
+                        model_name=str(ml_model.name),
+                    )
                 )
             except Exception as e:
                 display_context.add_error(e)

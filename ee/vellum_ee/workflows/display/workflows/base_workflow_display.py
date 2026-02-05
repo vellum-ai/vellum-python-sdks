@@ -681,7 +681,7 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
         # Get dependencies that were registered during node serialization
         dependencies = self.display_context.get_dependencies()
         if dependencies:
-            result["dependencies"] = cast(JsonArray, dependencies)
+            result["dependencies"] = [dep.model_dump() for dep in dependencies]
 
         return result
 
