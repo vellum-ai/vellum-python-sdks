@@ -4,7 +4,7 @@ from vellum.workflows.exceptions import NodeException
 from vellum.workflows.nodes.displayable.code_execution_node.utils import run_code_inline
 
 
-def test_run_code_inline__error_handling():
+def test_run_code_inline__error_handling(vellum_client):
     """
     Tests that run_code_inline properly handles exceptions in user code
     and formats the traceback correctly.
@@ -32,7 +32,7 @@ def main(data):
             inputs=inputs,
             output_type=str,
             filepath="test_script.py",
-            vellum_client=None,
+            vellum_client=vellum_client,
         )
 
     # AND the error message should contain the traceback information
