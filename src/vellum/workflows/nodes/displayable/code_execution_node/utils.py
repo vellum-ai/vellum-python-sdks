@@ -77,8 +77,12 @@ __arg__out = main({", ".join(run_args)})
         filtered_stack = traceback.StackSummary.from_list([frame for frame in stack if frame.filename == filepath][1:])
         for frame in filtered_stack:
             if not frame.line and frame.lineno and frame.lineno <= len(lines):
-                # Mypy doesn't like us setting private attributes
-                frame._line = lines[frame.lineno - 1]  # type: ignore[attr-defined]
+                line_content = lines[frame.lineno - 1]
+                # Python 3.13+ uses _lines (plural) instead of _line (singular)
+                if sys.version_info >= (3, 13):
+                    frame._lines = line_content  # type: ignore[attr-defined]
+                else:
+                    frame._line = line_content  # type: ignore[attr-defined]
 
         error_message = f"""\
 Traceback (most recent call last):
