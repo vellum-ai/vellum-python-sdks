@@ -7,12 +7,18 @@ import typing
 import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel, update_forward_refs
 from .vellum_variable import VellumVariable
+from .workflow_dependency import WorkflowDependency
 
 
 class WorkflowDeploymentReleaseWorkflowVersion(UniversalBaseModel):
+    """
+    The workflow version associated with a workflow deployment release.
+    """
+
     id: str
     input_variables: typing.List[VellumVariable]
     output_variables: typing.List[VellumVariable]
+    dependencies: typing.Optional[typing.List[WorkflowDependency]] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

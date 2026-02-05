@@ -32,6 +32,7 @@ class IntegrationAuthConfigsClient:
         *,
         expand: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         integration_name: typing.Optional[str] = None,
+        integration_names: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         integration_provider: typing.Optional[str] = None,
         limit: typing.Optional[int] = None,
         offset: typing.Optional[int] = None,
@@ -50,6 +51,9 @@ class IntegrationAuthConfigsClient:
             - 'additional_parameters' (retrieve only) fetches additional parameter requirements for the auth config.
 
         integration_name : typing.Optional[str]
+
+        integration_names : typing.Optional[typing.Union[str, typing.Sequence[str]]]
+            Multiple values may be separated by commas.
 
         integration_provider : typing.Optional[str]
 
@@ -86,6 +90,7 @@ class IntegrationAuthConfigsClient:
         _response = self._raw_client.list_integration_auth_configs(
             expand=expand,
             integration_name=integration_name,
+            integration_names=integration_names,
             integration_provider=integration_provider,
             limit=limit,
             offset=offset,
@@ -116,6 +121,7 @@ class AsyncIntegrationAuthConfigsClient:
         *,
         expand: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         integration_name: typing.Optional[str] = None,
+        integration_names: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         integration_provider: typing.Optional[str] = None,
         limit: typing.Optional[int] = None,
         offset: typing.Optional[int] = None,
@@ -134,6 +140,9 @@ class AsyncIntegrationAuthConfigsClient:
             - 'additional_parameters' (retrieve only) fetches additional parameter requirements for the auth config.
 
         integration_name : typing.Optional[str]
+
+        integration_names : typing.Optional[typing.Union[str, typing.Sequence[str]]]
+            Multiple values may be separated by commas.
 
         integration_provider : typing.Optional[str]
 
@@ -178,6 +187,7 @@ class AsyncIntegrationAuthConfigsClient:
         _response = await self._raw_client.list_integration_auth_configs(
             expand=expand,
             integration_name=integration_name,
+            integration_names=integration_names,
             integration_provider=integration_provider,
             limit=limit,
             offset=offset,

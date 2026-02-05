@@ -4853,6 +4853,14 @@ The response fields to expand for more information.
 <dl>
 <dd>
 
+**integration_names:** `typing.Optional[typing.Union[str, typing.Sequence[str]]]` — Multiple values may be separated by commas.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **integration_provider:** `typing.Optional[str]` 
     
 </dd>

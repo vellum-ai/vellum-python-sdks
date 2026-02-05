@@ -651,6 +651,7 @@ from .video_input_request import VideoInputRequest
 from .video_prompt_block import VideoPromptBlock
 from .video_vellum_value import VideoVellumValue
 from .video_vellum_value_request import VideoVellumValueRequest
+from .workflow_dependency import WorkflowDependency
 from .workflow_deployment_display_data import WorkflowDeploymentDisplayData
 from .workflow_deployment_event_executions_response import WorkflowDeploymentEventExecutionsResponse
 from .workflow_deployment_history_item import WorkflowDeploymentHistoryItem
@@ -698,6 +699,8 @@ from .workflow_execution_workflow_result_event import WorkflowExecutionWorkflowR
 from .workflow_expand_meta_request import WorkflowExpandMetaRequest
 from .workflow_initialization_error import WorkflowInitializationError
 from .workflow_input import WorkflowInput
+from .workflow_integration_dependency import WorkflowIntegrationDependency
+from .workflow_model_provider_dependency import WorkflowModelProviderDependency
 from .workflow_node_result_data import WorkflowNodeResultData
 from .workflow_node_result_event import WorkflowNodeResultEvent
 from .workflow_node_result_event_state import WorkflowNodeResultEventState
@@ -1372,6 +1375,7 @@ __all__ = [
     "VideoPromptBlock",
     "VideoVellumValue",
     "VideoVellumValueRequest",
+    "WorkflowDependency",
     "WorkflowDeploymentDisplayData",
     "WorkflowDeploymentEventExecutionsResponse",
     "WorkflowDeploymentHistoryItem",
@@ -1419,6 +1423,8 @@ __all__ = [
     "WorkflowExpandMetaRequest",
     "WorkflowInitializationError",
     "WorkflowInput",
+    "WorkflowIntegrationDependency",
+    "WorkflowModelProviderDependency",
     "WorkflowNodeResultData",
     "WorkflowNodeResultEvent",
     "WorkflowNodeResultEventState",

@@ -20,6 +20,7 @@ class RawIntegrationAuthConfigsClient:
         *,
         expand: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         integration_name: typing.Optional[str] = None,
+        integration_names: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         integration_provider: typing.Optional[str] = None,
         limit: typing.Optional[int] = None,
         offset: typing.Optional[int] = None,
@@ -38,6 +39,9 @@ class RawIntegrationAuthConfigsClient:
             - 'additional_parameters' (retrieve only) fetches additional parameter requirements for the auth config.
 
         integration_name : typing.Optional[str]
+
+        integration_names : typing.Optional[typing.Union[str, typing.Sequence[str]]]
+            Multiple values may be separated by commas.
 
         integration_provider : typing.Optional[str]
 
@@ -68,6 +72,7 @@ class RawIntegrationAuthConfigsClient:
             params={
                 "expand": expand,
                 "integration_name": integration_name,
+                "integration_names": integration_names,
                 "integration_provider": integration_provider,
                 "limit": limit,
                 "offset": offset,
@@ -101,6 +106,7 @@ class AsyncRawIntegrationAuthConfigsClient:
         *,
         expand: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         integration_name: typing.Optional[str] = None,
+        integration_names: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         integration_provider: typing.Optional[str] = None,
         limit: typing.Optional[int] = None,
         offset: typing.Optional[int] = None,
@@ -119,6 +125,9 @@ class AsyncRawIntegrationAuthConfigsClient:
             - 'additional_parameters' (retrieve only) fetches additional parameter requirements for the auth config.
 
         integration_name : typing.Optional[str]
+
+        integration_names : typing.Optional[typing.Union[str, typing.Sequence[str]]]
+            Multiple values may be separated by commas.
 
         integration_provider : typing.Optional[str]
 
@@ -149,6 +158,7 @@ class AsyncRawIntegrationAuthConfigsClient:
             params={
                 "expand": expand,
                 "integration_name": integration_name,
+                "integration_names": integration_names,
                 "integration_provider": integration_provider,
                 "limit": limit,
                 "offset": offset,
