@@ -242,6 +242,49 @@ class ToolCallingNode(BaseToolCallingNode):
 "
 `;
 
+exports[`ToolCallingNode > inline workflow with tool decorator > should generate tool decorator for inline workflow with inputs and examples 1`] = `
+"from .weather_workflow.workflow import WeatherWorkflow
+
+from vellum.workflows.nodes.displayable.tool_calling_node import (
+    ToolCallingNode as BaseToolCallingNode,
+)
+from vellum.workflows.utils.functions import tool
+
+from ..inputs import Inputs
+
+
+class ToolCallingNode(BaseToolCallingNode):
+    functions = [
+        tool(
+            inputs={
+                "context": Inputs.location,
+            },
+            examples=[
+                {
+                    "location": "San Francisco",
+                },
+                {
+                    "location": "New York",
+                },
+            ],
+        )(WeatherWorkflow)
+    ]
+"
+`;
+
+exports[`ToolCallingNode > inline workflow with tool decorator > should not generate tool decorator for inline workflow without inputs or examples 1`] = `
+"from .simple_workflow.workflow import SimpleWorkflow
+
+from vellum.workflows.nodes.displayable.tool_calling_node import (
+    ToolCallingNode as BaseToolCallingNode,
+)
+
+
+class ToolCallingNode(BaseToolCallingNode):
+    functions = [SimpleWorkflow]
+"
+`;
+
 exports[`ToolCallingNode > input variables > should generate input variables 1`] = `
 "from vellum import (
     ChatMessagePromptBlock,

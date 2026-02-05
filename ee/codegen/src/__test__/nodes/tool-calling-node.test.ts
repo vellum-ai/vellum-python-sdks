@@ -1578,6 +1578,221 @@ describe("ToolCallingNode", () => {
     });
   });
 
+  describe("inline workflow with tool decorator", () => {
+    it("should generate tool decorator for inline workflow with inputs and examples", async () => {
+      /**
+       * Tests that an INLINE_WORKFLOW function with both inputs and examples
+       * generates a tool decorator wrapping the workflow reference.
+       */
+
+      // GIVEN an inline workflow function with both inputs and examples
+      const inlineWorkflowWithToolFunction = {
+        type: "INLINE_WORKFLOW",
+        name: "WeatherWorkflow",
+        description: "Get weather for a location",
+        exec_config: {
+          runner_config: {},
+          input_variables: [
+            {
+              id: "input-location",
+              key: "location",
+              type: "STRING",
+              default: null,
+              required: true,
+              extensions: { color: null },
+            },
+            {
+              id: "input-context",
+              key: "context",
+              type: "STRING",
+              default: null,
+              required: true,
+              extensions: { color: null },
+            },
+          ],
+          state_variables: [],
+          output_variables: [
+            {
+              id: "output-result",
+              key: "result",
+              type: "STRING",
+            },
+          ],
+          workflow_raw_data: {
+            edges: [],
+            nodes: [
+              {
+                id: "entrypoint",
+                type: "ENTRYPOINT",
+                data: {
+                  label: "Entrypoint Node",
+                  source_handle_id: "entry-source",
+                },
+                inputs: [],
+              },
+            ],
+            definition: {
+              name: "WeatherWorkflow",
+              module: ["workflows", "weather"],
+            },
+            output_values: [],
+          },
+        },
+        definition: {
+          name: "weather_workflow",
+          parameters: {
+            type: "object",
+            properties: {
+              location: { type: "string" },
+            },
+            required: ["location"],
+            examples: [{ location: "San Francisco" }, { location: "New York" }],
+          },
+          inputs: {
+            context: {
+              type: "WORKFLOW_INPUT",
+              input_variable_id: "input-1",
+            },
+          },
+        },
+      };
+
+      const nodePortData: NodePort[] = [
+        nodePortFactory({
+          id: "port-id",
+        }),
+      ];
+
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [inlineWorkflowWithToolFunction],
+          },
+        }
+      );
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [functionsAttribute],
+      });
+
+      // WHEN we create the node and generate the node file
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      const output = await writer.toStringFormatted();
+
+      // THEN the generated code should include the tool decorator wrapping the workflow
+      expect(output).toMatchSnapshot();
+    });
+
+    it("should not generate tool decorator for inline workflow without inputs or examples", async () => {
+      /**
+       * Tests that an INLINE_WORKFLOW function without inputs or examples
+       * does not generate a tool decorator.
+       */
+
+      // GIVEN an inline workflow function without inputs or examples
+      const inlineWorkflowWithoutToolFunction = {
+        type: "INLINE_WORKFLOW",
+        name: "SimpleWorkflow",
+        description: "A simple workflow",
+        exec_config: {
+          runner_config: {},
+          input_variables: [
+            {
+              id: "input-query",
+              key: "query",
+              type: "STRING",
+              default: null,
+              required: true,
+              extensions: { color: null },
+            },
+          ],
+          state_variables: [],
+          output_variables: [
+            {
+              id: "output-result",
+              key: "result",
+              type: "STRING",
+            },
+          ],
+          workflow_raw_data: {
+            edges: [],
+            nodes: [
+              {
+                id: "entrypoint",
+                type: "ENTRYPOINT",
+                data: {
+                  label: "Entrypoint Node",
+                  source_handle_id: "entry-source",
+                },
+                inputs: [],
+              },
+            ],
+            definition: {
+              name: "SimpleWorkflow",
+              module: ["workflows", "simple"],
+            },
+            output_values: [],
+          },
+        },
+      };
+
+      const nodePortData: NodePort[] = [
+        nodePortFactory({
+          id: "port-id",
+        }),
+      ];
+
+      const functionsAttribute = nodeAttributeFactory(
+        "functions-attr-id",
+        "functions",
+        {
+          type: "CONSTANT_VALUE",
+          value: {
+            type: "JSON",
+            value: [inlineWorkflowWithoutToolFunction],
+          },
+        }
+      );
+
+      const nodeData = toolCallingNodeFactory({
+        nodePorts: nodePortData,
+        nodeAttributes: [functionsAttribute],
+      });
+
+      // WHEN we create the node and generate the node file
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as GenericNodeContext;
+
+      const node = new GenericNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      node.getNodeFile().write(writer);
+      const output = await writer.toStringFormatted();
+
+      // THEN the generated code should not include the tool decorator
+      expect(output).toMatchSnapshot();
+    });
+  });
+
   describe("examples", () => {
     it("should generate tool decorator with both inputs and examples", async () => {
       /**
