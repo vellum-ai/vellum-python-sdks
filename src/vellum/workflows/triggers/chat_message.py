@@ -42,13 +42,16 @@ class ChatMessageTrigger(BaseTrigger):
 
     def __init__(self, **kwargs: Any):
         """Initialize ChatMessageTrigger, converting VellumValue objects to ChatMessageContent if needed."""
+        # Convert message from VellumValue format to ChatMessageContent format if needed
         if "message" in kwargs:
             message = kwargs["message"]
+            # Handle string messages by converting to a list with a single StringChatMessageContent
             if isinstance(message, str):
                 kwargs["message"] = [StringChatMessageContent(value=message)]
             elif isinstance(message, list):
                 converted_message = []
                 for item in message:
+                    # If it's already a ChatMessageContent type, keep it as-is
                     if isinstance(
                         item,
                         (
@@ -61,9 +64,13 @@ class ChatMessageTrigger(BaseTrigger):
                         ),
                     ):
                         converted_message.append(item)
+                    # Handle raw strings in the array by wrapping them in StringChatMessageContent
                     elif isinstance(item, str):
                         converted_message.append(StringChatMessageContent(value=item))
+                    # Convert VellumValue objects or dicts to ChatMessageContent
+                    # Use discriminated union validation
                     else:
+                        # Get the dict representation (either from Pydantic model or already a dict)
                         item_dict = item.model_dump() if hasattr(item, "model_dump") else item
                         converted_message.append(
                             validate_obj_as(ArrayChatMessageContentItem, item_dict)  # type: ignore[arg-type]
