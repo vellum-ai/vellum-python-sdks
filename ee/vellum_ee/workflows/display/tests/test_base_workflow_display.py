@@ -936,7 +936,7 @@ def test_parse_ml_models__returns_all_models_when_all_valid(caplog):
     assert len(display._ml_models) == 3
 
     # AND the models should have the correct names and hosted_by values
-    model_data = [(model.name, model.hosted_by.value) for model in display._ml_models]
+    model_data = [(model.name, model.hosted_by) for model in display._ml_models]
     assert ("gpt-4", "OPENAI") in model_data
     assert ("claude-3", "ANTHROPIC") in model_data
     assert ("gemini", "GOOGLE") in model_data

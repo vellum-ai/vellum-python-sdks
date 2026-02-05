@@ -45,6 +45,7 @@ def test_workflow_serialization__dependencies_from_ml_models():
         "type": "MODEL_PROVIDER",
         "name": "OPENAI",
         "model_name": "gpt-4o-mini",
+        "label": None,
     }
 
 
@@ -100,6 +101,7 @@ def test_workflow_serialization__integration_dependencies_from_tool_calling_node
         "type": "INTEGRATION",
         "provider": "COMPOSIO",
         "name": "GITHUB",
+        "label": None,
     }
 
 
@@ -161,6 +163,7 @@ def test_workflow_serialization__multiple_integration_dependencies_deduplicated(
         "type": "INTEGRATION",
         "provider": "COMPOSIO",
         "name": "GITHUB",
+        "label": None,
     }
 
 
@@ -226,9 +229,9 @@ def test_workflow_serialization__multiple_different_integration_dependencies():
 
     # AND all expected dependencies should be present (order not guaranteed)
     expected_deps = [
-        {"type": "INTEGRATION", "provider": "COMPOSIO", "name": "ASANA"},
-        {"type": "INTEGRATION", "provider": "COMPOSIO", "name": "GITHUB"},
-        {"type": "INTEGRATION", "provider": "COMPOSIO", "name": "SLACK"},
+        {"type": "INTEGRATION", "provider": "COMPOSIO", "name": "ASANA", "label": None},
+        {"type": "INTEGRATION", "provider": "COMPOSIO", "name": "GITHUB", "label": None},
+        {"type": "INTEGRATION", "provider": "COMPOSIO", "name": "SLACK", "label": None},
     ]
     for expected in expected_deps:
         assert expected in dependencies
@@ -294,6 +297,7 @@ def test_workflow_serialization__dependencies_from_inline_subworkflow():
         "type": "MODEL_PROVIDER",
         "name": "OPENAI",
         "model_name": "gpt-4o-mini",
+        "label": None,
     }
 
 
@@ -363,6 +367,7 @@ def test_workflow_serialization__dependencies_from_inline_subworkflow_with_integ
         "type": "INTEGRATION",
         "provider": "COMPOSIO",
         "name": "GITHUB",
+        "label": None,
     }
 
 
@@ -431,6 +436,7 @@ def test_workflow_serialization__dependencies_from_inline_subworkflow_deduplicat
         "type": "MODEL_PROVIDER",
         "name": "OPENAI",
         "model_name": "gpt-4o-mini",
+        "label": None,
     }
 
 
@@ -491,6 +497,7 @@ def test_workflow_serialization__dependencies_from_map_node():
         "type": "MODEL_PROVIDER",
         "name": "OPENAI",
         "model_name": "gpt-4o-mini",
+        "label": None,
     }
 
 
@@ -557,6 +564,7 @@ def test_workflow_serialization__dependencies_from_map_node_with_integration():
         "type": "INTEGRATION",
         "provider": "COMPOSIO",
         "name": "GITHUB",
+        "label": None,
     }
 
 
@@ -623,6 +631,7 @@ def test_workflow_serialization__dependencies_from_map_node_deduplicated():
         "type": "MODEL_PROVIDER",
         "name": "OPENAI",
         "model_name": "gpt-4o-mini",
+        "label": None,
     }
 
 
@@ -715,6 +724,7 @@ def test_workflow_serialization__dependencies_from_prompt_deployment_node():
         "type": "MODEL_PROVIDER",
         "name": "OPENAI",
         "model_name": "gpt-4o-mini",
+        "label": None,
     }
 
     # AND the ml_models.retrieve should have been called with ml_model_to_workspace_id

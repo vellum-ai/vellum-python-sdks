@@ -41,11 +41,9 @@ class BaseMapNodeDisplay(BaseAdornmentNodeDisplay[_MapNodeType], Generic[_MapNod
         )
         serialized_subworkflow = subworkflow_display.serialize()
 
-        subworkflow_dependencies = serialized_subworkflow.get("dependencies", [])
-        if isinstance(subworkflow_dependencies, list):
-            for dependency in subworkflow_dependencies:
-                if isinstance(dependency, dict):
-                    display_context.add_dependency(dependency)
+        subworkflow_dependencies = subworkflow_display.display_context.get_dependencies()
+        for dependency in subworkflow_dependencies:
+            display_context.add_dependency(dependency)
 
         if not isinstance(serialized_subworkflow["input_variables"], list):
             raise ValueError("input_variables must be a list")

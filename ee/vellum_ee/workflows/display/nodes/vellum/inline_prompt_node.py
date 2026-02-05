@@ -2,6 +2,8 @@ from uuid import UUID
 from typing import TYPE_CHECKING, Callable, Dict, Generic, List, Optional, Tuple, Type, TypeVar, Union
 
 from vellum import FunctionDefinition, PromptBlock, RichTextChildBlock, VellumVariable
+from vellum.client.types.workflow_integration_dependency import WorkflowIntegrationDependency
+from vellum.client.types.workflow_model_provider_dependency import WorkflowModelProviderDependency
 from vellum.workflows import MCPServer
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.nodes import InlinePromptNode
@@ -73,11 +75,10 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
         model = display_context.ml_models_map.get(ml_model)
         if model:
             display_context.add_dependency(
-                {
-                    "type": "MODEL_PROVIDER",
-                    "name": model.hosted_by.value,
-                    "model_name": ml_model,
-                }
+                WorkflowModelProviderDependency(
+                    name=model.hosted_by,
+                    model_name=ml_model,
+                )
             )
 
         has_descriptors = _contains_descriptors(node_blocks)
@@ -189,11 +190,10 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
         elif isinstance(function, VellumIntegrationToolDefinition):
             normalized_functions = compile_vellum_integration_tool_definition(function, display_context.client)
             display_context.add_dependency(
-                {
-                    "type": "INTEGRATION",
-                    "provider": function.provider.value,
-                    "name": function.integration_name,
-                }
+                WorkflowIntegrationDependency(
+                    provider=function.provider.value,
+                    name=function.integration_name,
+                )
             )
         else:
             raise ValueError(f"Unsupported function type: {type(function)}")

@@ -3,12 +3,14 @@ from functools import cached_property
 from typing import TYPE_CHECKING, Dict, Iterator, List, Optional, Tuple, Type
 
 from vellum.client import Vellum as VellumClient
+from vellum.client.types.workflow_dependency import WorkflowDependency
+from vellum.client.types.workflow_integration_dependency import WorkflowIntegrationDependency
+from vellum.client.types.workflow_model_provider_dependency import WorkflowModelProviderDependency
 from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.events.workflow import WorkflowEventDisplayContext  # noqa: F401
 from vellum.workflows.nodes import BaseNode
 from vellum.workflows.ports import Port
 from vellum.workflows.references import OutputReference, StateValueReference, WorkflowInputReference
-from vellum.workflows.types.core import JsonObject
 from vellum.workflows.vellum_client import create_vellum_client
 from vellum.workflows.workflows.base import BaseWorkflow
 from vellum_ee.workflows.display.base import (
@@ -56,23 +58,22 @@ class WorkflowDisplayContext:
     port_displays: PortDisplays = field(default_factory=dict)
     dry_run: bool = False
     ml_models: List[MLModel] = field(default_factory=list)
-    _dependencies: Dict[str, JsonObject] = field(default_factory=dict)
+    _dependencies: Dict[str, WorkflowDependency] = field(default_factory=dict)
     _errors: List[Exception] = field(default_factory=list)
     _invalid_nodes: List[Type[BaseNode]] = field(default_factory=list)
 
-    def add_dependency(self, dependency: JsonObject) -> None:
+    def add_dependency(self, dependency: WorkflowDependency) -> None:
         """Register a dependency. Deduplicates by type and relevant identifying fields."""
-        dep_type = dependency.get("type")
-        if dep_type == "MODEL_PROVIDER":
-            key = f"MODEL_PROVIDER:{dependency.get('model_name')}"
-        elif dep_type == "INTEGRATION":
-            key = f"INTEGRATION:{dependency.get('provider')}:{dependency.get('name')}"
-        else:
-            key = f"{dep_type}:{dependency.get('name')}"
+        # Generate deduplication key
+        if isinstance(dependency, WorkflowModelProviderDependency):
+            key = f"MODEL_PROVIDER:{dependency.model_name}"
+        elif isinstance(dependency, WorkflowIntegrationDependency):
+            key = f"INTEGRATION:{dependency.provider}:{dependency.name}"
+
         if key not in self._dependencies:
             self._dependencies[key] = dependency
 
-    def get_dependencies(self) -> List[JsonObject]:
+    def get_dependencies(self) -> List[WorkflowDependency]:
         """Get all registered dependencies."""
         return list(self._dependencies.values())
 
