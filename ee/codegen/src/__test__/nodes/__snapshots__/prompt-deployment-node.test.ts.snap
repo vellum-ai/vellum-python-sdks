@@ -144,3 +144,23 @@ class PromptDeploymentNodeDisplay(
     display_data = NodeDisplayData(width=480, height=170)
 "
 `;
+
+exports[`PromptDeploymentNode > with long multiline string input > should render long multiline strings as block strings 1`] = `
+"from vellum.workflows.nodes.displayable import (
+    PromptDeploymentNode as BasePromptDeploymentNode,
+)
+
+
+class PromptDeploymentNode(BasePromptDeploymentNode):
+    deployment = "some-unique-deployment-name"
+    release_tag = "LATEST"
+    prompt_inputs = {
+        "long_text": """This is a long multiline string that exceeds 80 characters.
+It should be rendered as a block string in the generated Python code.""",
+    }
+
+    class Display(BasePromptDeploymentNode.Display):
+        x = 2470.8372576177285
+        y = 219.71887984764544
+"
+`;

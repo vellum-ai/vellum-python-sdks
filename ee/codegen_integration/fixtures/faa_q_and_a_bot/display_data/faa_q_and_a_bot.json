@@ -151,7 +151,9 @@
                   "name": "Classification",
                   "schema": {
                     "type": "object",
-                    "required": ["classification"],
+                    "required": [
+                      "classification"
+                    ],
                     "properties": {
                       "classification": {
                         "type": "string",
@@ -367,7 +369,9 @@
                       "name": "Classification",
                       "schema": {
                         "type": "object",
-                        "required": ["classification"],
+                        "required": [
+                          "classification"
+                        ],
                         "properties": {
                           "classification": {
                             "type": "string",

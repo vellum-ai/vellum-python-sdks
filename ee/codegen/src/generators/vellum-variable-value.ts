@@ -40,7 +40,12 @@ class StringVellumValue extends AstNode {
   }
 
   private generateAstNode(value: string): AstNode {
-    return new StrInstantiation(removeEscapeCharacters(value));
+    const processedValue = removeEscapeCharacters(value);
+    const useMultiline =
+      processedValue.includes("\n") && processedValue.length > 80;
+    return new StrInstantiation(processedValue, {
+      multiline: useMultiline,
+    });
   }
 
   public write(writer: Writer): void {
@@ -591,7 +596,7 @@ export class VellumValue extends AstNode {
       return;
     }
     switch (vellumValue.type) {
-      case "STRING":
+      case "STRING": {
         this.astNode = new StringVellumValue(vellumValue.value);
         if (attributeConfig) {
           this.astNode = new AccessAttribute({
@@ -603,6 +608,7 @@ export class VellumValue extends AstNode {
           });
         }
         break;
+      }
       case "NUMBER":
         this.astNode = new NumberVellumValue(vellumValue.value);
         break;
