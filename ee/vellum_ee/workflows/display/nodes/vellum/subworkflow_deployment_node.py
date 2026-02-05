@@ -2,7 +2,6 @@ from uuid import UUID
 from typing import Any, Generic, List, Optional, TypeVar
 
 from vellum.client import Vellum as VellumClient
-from vellum.client.types.workflow_dependency import WorkflowDependency
 from vellum.utils.uuid import is_valid_uuid
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes import SubworkflowDeploymentNode
@@ -26,7 +25,6 @@ class BaseSubworkflowDeploymentNodeDisplay(
 
     _deployment_id: Optional[str] = None
     _release_tag: Optional[str] = None
-    _dependencies: List[WorkflowDependency] = []
 
     def build(self, client: VellumClient) -> None:
         node = self._node
@@ -41,10 +39,7 @@ class BaseSubworkflowDeploymentNodeDisplay(
         output_variables_by_key = {var.key: var for var in deployment_release.workflow_version.output_variables}
 
         workflow_version = deployment_release.workflow_version
-        dependencies = workflow_version.dependencies
-
-        if dependencies is not None:
-            self._dependencies = dependencies
+        self._dependencies = workflow_version.dependencies or []
 
         for output in node.Outputs:
             original_output_display = self.output_display.get(output)
