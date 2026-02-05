@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import Any, Generic, List, Optional, Sequence, TypeVar
+from typing import Any, Generic, List, Optional, TypeVar
 
 from vellum.client import Vellum as VellumClient
 from vellum.client.types.workflow_dependency import WorkflowDependency
@@ -26,7 +26,7 @@ class BaseSubworkflowDeploymentNodeDisplay(
 
     _deployment_id: Optional[str] = None
     _release_tag: Optional[str] = None
-    _dependencies: Optional[Sequence[WorkflowDependency]] = None
+    _dependencies: List[WorkflowDependency] = []
 
     def build(self, client: VellumClient) -> None:
         node = self._node
@@ -108,7 +108,7 @@ class BaseSubworkflowDeploymentNodeDisplay(
         node = self._node
         node_id = self.node_id
 
-        for dependency in self._dependencies or []:
+        for dependency in self._dependencies:
             display_context.add_dependency(dependency)
 
         subworkflow_inputs = raise_if_descriptor(node.subworkflow_inputs)
