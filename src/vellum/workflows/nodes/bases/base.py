@@ -565,7 +565,11 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
 
             resolved_value = resolve_value(descriptor.instance, self.state, path=descriptor.name, memo=inputs_memo)
             if isinstance(descriptor.instance, TriggerAttributeReference) and descriptor.types:
-                resolved_value = descriptor.instance.coerce_resolved_value(resolved_value, descriptor.types)
+                coerced_value = descriptor.instance.coerce_resolved_value(resolved_value, descriptor.types)
+                if coerced_value is not resolved_value:
+                    resolved_value = coerced_value
+                    if descriptor.name in inputs_memo:
+                        inputs_memo[descriptor.name] = resolved_value
             setattr(self, descriptor.name, resolved_value)
 
         # We only want to store the attributes that were actually set as inputs, not every attribute that exists.
