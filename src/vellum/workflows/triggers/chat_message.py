@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, ClassVar, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, List, Optional, Tuple, Type, Union
 
 from vellum.client.types import (
     ArrayChatMessageContent,
@@ -16,7 +16,6 @@ from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.utils import resolve_value
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.references.output import OutputReference
-from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.triggers.base import BaseTrigger
 from vellum.workflows.utils.pydantic_schema import validate_obj_as
 
@@ -45,10 +44,11 @@ class ChatMessageTrigger(BaseTrigger):
         """Initialize ChatMessageTrigger, converting VellumValue objects to ChatMessageContent if needed."""
         if "message" in kwargs:
             message = kwargs["message"]
-            if isinstance(message, list):
+            if isinstance(message, str):
+                kwargs["message"] = [StringChatMessageContent(value=message)]
+            elif isinstance(message, list):
                 converted_message = []
                 for item in message:
-                    # If it's already a ChatMessageContent type, keep it as-is
                     if isinstance(
                         item,
                         (
@@ -61,13 +61,9 @@ class ChatMessageTrigger(BaseTrigger):
                         ),
                     ):
                         converted_message.append(item)
-                    # Handle raw strings in the array by wrapping them in StringChatMessageContent
                     elif isinstance(item, str):
                         converted_message.append(StringChatMessageContent(value=item))
-                    # Convert VellumValue objects or dicts to ChatMessageContent
-                    # Use discriminated union validation
                     else:
-                        # Get the dict representation (either from Pydantic model or already a dict)
                         item_dict = item.model_dump() if hasattr(item, "model_dump") else item
                         converted_message.append(
                             validate_obj_as(ArrayChatMessageContentItem, item_dict)  # type: ignore[arg-type]
@@ -77,19 +73,14 @@ class ChatMessageTrigger(BaseTrigger):
 
         super().__init__(**kwargs)
 
-    def to_trigger_attribute_values(self) -> Dict["TriggerAttributeReference[Any]", Any]:
-        """Returns trigger attribute values with string messages normalized to array format for serialization."""
-        values = super().to_trigger_attribute_values()
-        for ref, value in values.items():
-            if ref.name == "message" and isinstance(value, str):
-                values[ref] = [StringChatMessageContent(value=value)]
-        return values
-
-    def bind_to_state(self, state: "BaseState") -> None:
-        """Persist raw trigger values onto state, preserving string types for runtime use."""
-        if state.meta.trigger_attributes is None:
-            state.meta.trigger_attributes = {}
-        state.meta.trigger_attributes.update(super().to_trigger_attribute_values())
+    @classmethod
+    def coerce_trigger_value(cls, attr_name: str, value: Any, expected_types: Tuple[Type[Any], ...]) -> Any:
+        if attr_name == "message" and expected_types == (str,):
+            if isinstance(value, list) and len(value) == 1:
+                item = value[0]
+                if isinstance(item, StringChatMessageContent):
+                    return item.value
+        return value
 
     def __on_workflow_initiated__(self, state: "BaseState") -> None:
         """Appends user message to state.chat_history at workflow start."""
@@ -99,16 +90,10 @@ class ChatMessageTrigger(BaseTrigger):
         if state.chat_history is None:
             state.chat_history = []
 
-        if isinstance(self.message, str):
-            user_message = ChatMessage(
-                role="USER",
-                text=self.message,
-            )
-        else:
-            user_message = ChatMessage(
-                role="USER",
-                content=ArrayChatMessageContent(value=self.message),
-            )
+        user_message = ChatMessage(
+            role="USER",
+            content=ArrayChatMessageContent(value=self.message),
+        )
         state.chat_history.append(user_message)
 
     def __on_workflow_fulfilled__(self, state: "BaseState") -> None:

@@ -41,6 +41,7 @@ from vellum.workflows.references import ExternalInputReference
 from vellum.workflows.references.execution_count import ExecutionCountReference
 from vellum.workflows.references.node import NodeReference
 from vellum.workflows.references.output import OutputReference
+from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.state.base import BaseState
 from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.core import MergeBehavior
@@ -563,6 +564,8 @@ class BaseNode(Generic[StateType], ABC, BaseExecutable, metaclass=BaseNodeMeta):
                 continue
 
             resolved_value = resolve_value(descriptor.instance, self.state, path=descriptor.name, memo=inputs_memo)
+            if isinstance(descriptor.instance, TriggerAttributeReference) and descriptor.types:
+                resolved_value = descriptor.instance.coerce_resolved_value(resolved_value, descriptor.types)
             setattr(self, descriptor.name, resolved_value)
 
         # We only want to store the attributes that were actually set as inputs, not every attribute that exists.

@@ -64,6 +64,9 @@ class TriggerAttributeReference(BaseDescriptor[_T], Generic[_T]):
             code=WorkflowErrorCode.INVALID_INPUTS,
         )
 
+    def coerce_resolved_value(self, value: Any, expected_types: Tuple[Type[Any], ...]) -> Any:
+        return self._trigger_class.coerce_trigger_value(self.name, value, expected_types)
+
     def __repr__(self) -> str:
         return f"{self._trigger_class.__qualname__}.{self.name}"
 

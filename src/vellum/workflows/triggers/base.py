@@ -493,6 +493,10 @@ class BaseTrigger(ABC, metaclass=BaseTriggerMeta):
         # Fall back to deterministic hash-based ID
         return get_trigger_attribute_id(cls, attribute_name)
 
+    @classmethod
+    def coerce_trigger_value(cls, attr_name: str, value: Any, expected_types: Tuple[Type[Any], ...]) -> Any:
+        return value
+
     class Config:
         """Configuration for trigger behavior. Subclasses can override."""
 
