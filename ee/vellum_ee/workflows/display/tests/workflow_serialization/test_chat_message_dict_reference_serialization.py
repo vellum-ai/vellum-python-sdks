@@ -127,8 +127,8 @@ def test_serialize_chat_message_trigger_with_message_parameter():
     assert isinstance(result.dataset, list)
     assert len(result.dataset) == 1
 
-    # AND the message should be serialized in the inputs as a string
+    # AND the message should be serialized in the inputs as array format
     dataset_row = result.dataset[0]
     assert dataset_row["label"] == "New conversation"
     assert "inputs" in dataset_row
-    assert dataset_row["inputs"]["message"] == "I want to tweet about AI agents"
+    assert dataset_row["inputs"]["message"] == [{"type": "STRING", "value": "I want to tweet about AI agents"}]

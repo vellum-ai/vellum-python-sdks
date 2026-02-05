@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, ClassVar, List, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Dict, List, Optional, Union
 
 from vellum.client.types import (
     ArrayChatMessageContent,
@@ -16,6 +16,7 @@ from vellum.workflows.descriptors.base import BaseDescriptor
 from vellum.workflows.descriptors.utils import resolve_value
 from vellum.workflows.references.lazy import LazyReference
 from vellum.workflows.references.output import OutputReference
+from vellum.workflows.references.trigger import TriggerAttributeReference
 from vellum.workflows.triggers.base import BaseTrigger
 from vellum.workflows.utils.pydantic_schema import validate_obj_as
 
@@ -75,6 +76,20 @@ class ChatMessageTrigger(BaseTrigger):
                 kwargs["message"] = converted_message
 
         super().__init__(**kwargs)
+
+    def to_trigger_attribute_values(self) -> Dict["TriggerAttributeReference[Any]", Any]:
+        """Returns trigger attribute values with string messages normalized to array format for serialization."""
+        values = super().to_trigger_attribute_values()
+        for ref, value in values.items():
+            if ref.name == "message" and isinstance(value, str):
+                values[ref] = [StringChatMessageContent(value=value)]
+        return values
+
+    def bind_to_state(self, state: "BaseState") -> None:
+        """Persist raw trigger values onto state, preserving string types for runtime use."""
+        if state.meta.trigger_attributes is None:
+            state.meta.trigger_attributes = {}
+        state.meta.trigger_attributes.update(super().to_trigger_attribute_values())
 
     def __on_workflow_initiated__(self, state: "BaseState") -> None:
         """Appends user message to state.chat_history at workflow start."""
