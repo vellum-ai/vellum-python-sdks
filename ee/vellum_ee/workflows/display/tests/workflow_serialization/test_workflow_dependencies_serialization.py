@@ -1,8 +1,16 @@
+from datetime import datetime
+from unittest.mock import MagicMock
+from uuid import uuid4
+
+from vellum import DeploymentRead, MlModelRead, PromptDeploymentRelease
 from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
+from vellum.client.types.prompt_deployment_release_prompt_deployment import PromptDeploymentReleasePromptDeployment
+from vellum.client.types.prompt_deployment_release_prompt_version import PromptDeploymentReleasePromptVersion
+from vellum.client.types.release_environment import ReleaseEnvironment as ReleaseEnvironmentType
 from vellum.client.types.rich_text_prompt_block import RichTextPromptBlock
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.workflows.constants import VellumIntegrationProviderType
-from vellum.workflows.nodes import InlineSubworkflowNode, MapNode
+from vellum.workflows.nodes import InlineSubworkflowNode, MapNode, PromptDeploymentNode
 from vellum.workflows.nodes.displayable.inline_prompt_node import InlinePromptNode
 from vellum.workflows.nodes.displayable.tool_calling_node import ToolCallingNode
 from vellum.workflows.state.base import BaseState
@@ -616,3 +624,98 @@ def test_workflow_serialization__dependencies_from_map_node_deduplicated():
         "name": "OPENAI",
         "model_name": "gpt-4o-mini",
     }
+
+
+def test_workflow_serialization__dependencies_from_prompt_deployment_node():
+    """
+    Tests that model provider dependencies are extracted from prompt deployment nodes
+    when the prompt version has ml_model_to_workspace_id and ml_models are provided.
+    """
+
+    # GIVEN a prompt deployment node
+    class TestInputs(BaseInputs):
+        query: str
+
+    class TestPromptDeploymentNode(PromptDeploymentNode):
+        deployment = "test_prompt_deployment"
+        prompt_inputs = {"query": TestInputs.query}
+        ml_model_fallbacks = ["gpt-4o-mini", "claude-3-opus"]
+
+    class TestWorkflow(BaseWorkflow[TestInputs, BaseState]):
+        graph = TestPromptDeploymentNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            text = TestPromptDeploymentNode.Outputs.text
+
+    # AND mock the deployment retrieval
+    deployment = DeploymentRead(
+        id=str(uuid4()),
+        created=datetime.now(),
+        label="Test Prompt Deployment",
+        name="test_prompt_deployment",
+        last_deployed_on=datetime.now(),
+        input_variables=[],
+        active_model_version_ids=[],
+        last_deployed_history_item_id=str(uuid4()),
+    )
+
+    # AND mock the prompt deployment release with ml_model_to_workspace_id
+    ml_model_to_workspace_id = str(uuid4())
+    prompt_version = PromptDeploymentReleasePromptVersion.model_validate(
+        {
+            "id": str(uuid4()),
+            "build_config": {
+                "source": "SANDBOX",
+                "sandbox_id": str(uuid4()),
+                "sandbox_snapshot_id": str(uuid4()),
+                "prompt_id": str(uuid4()),
+            },
+            "ml_model_to_workspace_id": ml_model_to_workspace_id,
+        }
+    )
+
+    deployment_release = PromptDeploymentRelease(
+        id=str(uuid4()),
+        created=datetime.now(),
+        environment=ReleaseEnvironmentType(id=str(uuid4()), name="DEVELOPMENT", label="Development"),
+        prompt_version=prompt_version,
+        deployment=PromptDeploymentReleasePromptDeployment(
+            id=deployment.id,
+            name="test_prompt_deployment",
+        ),
+        release_tags=[],
+        reviews=[],
+    )
+
+    ml_model = MlModelRead(
+        id=str(uuid4()),
+        name="gpt-4o-mini",
+        hosted_by="OPENAI",
+        introduced_on=datetime.now(),
+    )
+
+    mock_client = MagicMock()
+    mock_client.deployments.retrieve.return_value = deployment
+    mock_client.deployments.retrieve_prompt_deployment_release.return_value = deployment_release
+    mock_client.ml_models.retrieve.return_value = ml_model
+
+    # AND provide ml_models for dependency extraction
+    ml_models = [
+        {"name": "gpt-4o-mini", "hosted_by": "OPENAI"},
+    ]
+
+    # WHEN we serialize the workflow with ml_models provided
+    workflow_display = get_workflow_display(workflow_class=TestWorkflow, client=mock_client, ml_models=ml_models)
+    serialized_workflow: dict = workflow_display.serialize()
+
+    # THEN we should get the model provider dependency from the prompt deployment
+    dependencies = serialized_workflow.get("dependencies", [])
+    assert len(dependencies) == 1
+    assert dependencies[0] == {
+        "type": "MODEL_PROVIDER",
+        "name": "OPENAI",
+        "model_name": "gpt-4o-mini",
+    }
+
+    # AND the ml_models.retrieve should have been called with ml_model_to_workspace_id
+    mock_client.ml_models.retrieve.assert_called_once_with(id=ml_model_to_workspace_id)

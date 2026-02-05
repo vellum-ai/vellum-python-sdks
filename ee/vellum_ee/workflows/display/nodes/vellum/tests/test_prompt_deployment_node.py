@@ -1,12 +1,15 @@
 import pytest
 from datetime import datetime
+from unittest.mock import MagicMock
 from uuid import UUID, uuid4
 from typing import Type
 
 from vellum import (
     AudioInputRequest,
+    DeploymentRead,
     DocumentInputRequest,
     ImageInputRequest,
+    PromptDeploymentRelease,
     VellumAudio,
     VellumAudioRequest,
     VellumDocument,
@@ -17,6 +20,9 @@ from vellum import (
     VellumVideoRequest,
     VideoInputRequest,
 )
+from vellum.client.types.prompt_deployment_release_prompt_deployment import PromptDeploymentReleasePromptDeployment
+from vellum.client.types.prompt_deployment_release_prompt_version import PromptDeploymentReleasePromptVersion
+from vellum.client.types.release_environment import ReleaseEnvironment as ReleaseEnvironmentType
 from vellum.workflows import BaseWorkflow
 from vellum.workflows.nodes import PromptDeploymentNode
 from vellum_ee.workflows.display.nodes.vellum.prompt_deployment_node import BasePromptDeploymentNodeDisplay
@@ -42,25 +48,53 @@ def _display_class_with_node_input_ids_by_name_with_inputs_prefix(Node: Type[Pro
 
 
 @pytest.fixture
-def mock_fetch_deployment(mocker):
+def mock_client():
+    """Create a mock Vellum client with mocked deployment methods."""
     # Create a mock deployment response
-    mock_deployment = mocker.Mock(
-        id="test-id",
-        name="test-deployment",
-        label="Test Deployment",
-        status="ACTIVE",
-        environment="DEVELOPMENT",
+    mock_deployment = DeploymentRead(
+        id=str(uuid4()),
         created=datetime.now(),
+        label="Test Deployment",
+        name="test-deployment",
         last_deployed_on=datetime.now(),
-        last_deployed_history_item_id=str(uuid4()),
+        active_model_version_ids=[],
         input_variables=[],
-        output_variables=[],
-        description="Test deployment description",
+        last_deployed_history_item_id=str(uuid4()),
     )
 
-    # Patch the create_vellum_client function to return our mock client
-    mocker.patch("vellum.client.resources.deployments.client.DeploymentsClient.retrieve", return_value=mock_deployment)
-    return mock_deployment
+    # Create a mock prompt deployment release
+    prompt_version = PromptDeploymentReleasePromptVersion.model_validate(
+        {
+            "id": str(uuid4()),
+            "ml_model_to_workspace_id": str(uuid4()),
+            "build_config": {
+                "source": "SANDBOX",
+                "sandbox_id": str(uuid4()),
+                "sandbox_snapshot_id": str(uuid4()),
+                "prompt_id": str(uuid4()),
+            },
+        }
+    )
+
+    deployment_release = PromptDeploymentRelease(
+        id=str(uuid4()),
+        created=datetime.now(),
+        environment=ReleaseEnvironmentType(id=str(uuid4()), name="DEVELOPMENT", label="Development"),
+        prompt_version=prompt_version,
+        deployment=PromptDeploymentReleasePromptDeployment(
+            id=mock_deployment.id,
+            name="test-deployment",
+        ),
+        release_tags=[],
+        reviews=[],
+    )
+
+    # Create a mock client
+    mock_client = MagicMock()
+    mock_client.deployments.retrieve.return_value = mock_deployment
+    mock_client.deployments.retrieve_prompt_deployment_release.return_value = deployment_release
+
+    return mock_client
 
 
 @pytest.mark.parametrize(
@@ -76,7 +110,7 @@ def mock_fetch_deployment(mocker):
         "display_class_with_node_input_ids_by_name_with_inputs_prefix",
     ],
 )
-def test_serialize_node__prompt_inputs(GetDisplayClass, expected_input_id, mock_fetch_deployment):
+def test_serialize_node__prompt_inputs(GetDisplayClass, expected_input_id, mock_client):
     # GIVEN a prompt node with inputs
     class MyPromptDeploymentNode(PromptDeploymentNode):
         deployment = "DEPLOYMENT"
@@ -91,7 +125,7 @@ def test_serialize_node__prompt_inputs(GetDisplayClass, expected_input_id, mock_
     GetDisplayClass(MyPromptDeploymentNode)
 
     # WHEN the workflow is serialized
-    workflow_display = get_workflow_display(workflow_class=Workflow)
+    workflow_display = get_workflow_display(workflow_class=Workflow, client=mock_client)
     serialized_workflow: dict = workflow_display.serialize()
 
     # THEN the node should properly serialize the inputs

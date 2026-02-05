@@ -45,6 +45,7 @@ class BasePromptDeploymentNodeDisplay(BaseNodeDisplay[_PromptDeploymentNodeType]
         json_display = self.output_display[node.Outputs.json]
 
         deployment_descriptor_id = str(raise_if_descriptor(node.deployment))
+        release_tag = raise_if_descriptor(node.release_tag)
         try:
             deployment = display_context.client.deployments.retrieve(
                 id=deployment_descriptor_id,
@@ -53,6 +54,30 @@ class BasePromptDeploymentNodeDisplay(BaseNodeDisplay[_PromptDeploymentNodeType]
         except Exception as e:
             display_context.add_error(e)
             deployment_id = str(uuid4_from_hash(deployment_descriptor_id))
+
+        try:
+            deployment_release = display_context.client.deployments.retrieve_prompt_deployment_release(
+                id=deployment_descriptor_id,
+                release_id_or_release_tag=release_tag,
+            )
+            # Register model provider dependency from the prompt version's ml_model
+            prompt_version = deployment_release.prompt_version
+            ml_model_to_workspace_id = prompt_version.ml_model_to_workspace_id
+
+            try:
+                ml_model = display_context.client.ml_models.retrieve(id=str(ml_model_to_workspace_id))
+                display_context.add_dependency(
+                    {
+                        "type": "MODEL_PROVIDER",
+                        "name": str(ml_model.hosted_by),
+                        "model_name": ml_model.name,
+                    }
+                )
+            except Exception as e:
+                display_context.add_error(e)
+        except Exception as e:
+            display_context.add_error(e)
+
         ml_model_fallbacks = raise_if_descriptor(node.ml_model_fallbacks)
 
         return {
