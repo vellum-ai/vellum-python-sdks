@@ -249,6 +249,48 @@ def test_state_deepcopy_handles_undefined_values():
     assert deepcopied_state.meta.node_outputs[MockNode.Outputs.baz] == {"foo": undefined}
 
 
+def test_state_deepcopy_handles_generator_in_node_outputs():
+    """
+    Tests that deepcopy handles generator objects in node outputs without raising TypeError.
+    """
+
+    def sample_generator():
+        yield 1
+        yield 2
+
+    # GIVEN a state with a generator in node outputs
+    state = MockState(foo="bar")
+    gen = sample_generator()
+    state.meta.node_outputs[MockNode.Outputs.baz] = gen
+
+    # WHEN we deepcopy the state
+    deepcopied_state = deepcopy(state)
+
+    # THEN the deepcopy succeeds and the generator is preserved by reference
+    assert deepcopied_state.meta.node_outputs[MockNode.Outputs.baz] is gen
+
+
+def test_state_deepcopy_handles_generator_in_external_inputs():
+    """
+    Tests that deepcopy handles generator objects in external inputs without raising TypeError.
+    """
+
+    def sample_generator():
+        yield "a"
+        yield "b"
+
+    # GIVEN a state with a generator in external inputs
+    state = MockState(foo="bar")
+    gen = sample_generator()
+    state.meta.external_inputs[MockNode.ExternalInputs.message] = gen
+
+    # WHEN we deepcopy the state
+    deepcopied_state = deepcopy(state)
+
+    # THEN the deepcopy succeeds and the generator is preserved by reference
+    assert deepcopied_state.meta.external_inputs[MockNode.ExternalInputs.message] is gen
+
+
 def test_base_state_initializes_field_with_default_factory():
     """Test that BaseState properly initializes fields with Field(default_factory=...)."""
 

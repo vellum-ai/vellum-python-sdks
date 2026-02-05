@@ -2,6 +2,7 @@ import builtins
 from copy import deepcopy
 from datetime import datetime
 import importlib
+import types
 from types import GenericAlias
 from typing import (
     Any,
@@ -189,7 +190,10 @@ def deepcopy_with_exclusions(
     for key, value in obj.__dict__.items():
         if key in exclusions:
             continue
-        new_instance.__dict__[key] = deepcopy(value, memo)
+        if isinstance(value, types.GeneratorType):
+            new_instance.__dict__[key] = value
+        else:
+            new_instance.__dict__[key] = deepcopy(value, memo)
 
     for key, value in exclusions.items():
         new_instance.__dict__[key] = value
