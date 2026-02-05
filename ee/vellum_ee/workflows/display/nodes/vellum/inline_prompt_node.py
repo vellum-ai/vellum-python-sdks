@@ -76,7 +76,7 @@ class BaseInlinePromptNodeDisplay(BaseNodeDisplay[_InlinePromptNodeType], Generi
         if model:
             display_context.add_dependency(
                 WorkflowModelProviderDependency(
-                    name=model.hosted_by.value,
+                    name=model.hosted_by,
                     model_name=ml_model,
                 )
             )
