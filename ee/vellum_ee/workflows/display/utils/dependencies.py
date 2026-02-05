@@ -6,7 +6,7 @@ from vellum.client.core.pydantic_utilities import UniversalBaseModel
 from vellum.client.types.ml_model_hosting_interface import MlModelHostingInterface
 
 
-def _extract_literal_values(union_type: type) -> set[str]:
+def _extract_literal_values(union_type: typing.Any) -> set[str]:
     """Extract literal values from a Union[Literal[...], typing.Any] type."""
     valid_values: set[str] = set()
     args = typing.get_args(union_type)
