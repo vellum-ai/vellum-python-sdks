@@ -574,13 +574,14 @@ class VellumMypyPlugin(Plugin):
 
         new_fulfilled_event = fulfilled_event.copy_modified(args=(Instance(outputs_node, []),))
         return TypeAliasType(
-            alias=MypyTypeAlias(
+            alias=_create_type_alias(
                 target=UnionType(
                     items=[new_fulfilled_event] + alias_target.items[1:],
                 ),
                 fullname=alias.fullname,
                 line=alias.line,
                 column=alias.column,
+                module=getattr(alias, "module", None),
             ),
             args=ctx.default_return_type.args,
             line=ctx.default_return_type.line,
