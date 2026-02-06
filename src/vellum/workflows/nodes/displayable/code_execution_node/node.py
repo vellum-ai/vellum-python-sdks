@@ -130,11 +130,12 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
                     message=f"Expected an output of type '{expected_output_type}', received '{actual_type}'",
                 )
 
-            outputs = self.Outputs(result=code_execution_result.output.value, log=code_execution_result.log)
+            logs = code_execution_result.log
+            outputs = self.Outputs(result=code_execution_result.output.value, log=logs)
 
         self._context.emit_log_event(
             severity="INFO",
-            message=outputs.log,
+            message=logs,
         )
         return outputs
 
