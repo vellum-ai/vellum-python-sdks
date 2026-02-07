@@ -5,6 +5,7 @@ import re
 from typing import Any, List, Union
 
 from pydantic import BaseModel
+import pytest_mock
 
 from vellum import ArrayInput, CodeExecutorResponse, MlModelRead, NumberVellumValue, StringInput, StringVellumValue
 from vellum.client.errors.bad_request_error import BadRequestError
@@ -28,7 +29,7 @@ from vellum.workflows.state.context import WorkflowContext
 from vellum.workflows.types.core import Json
 
 
-def test_run_node__happy_path(vellum_client):
+def test_run_node__happy_path(vellum_client, mocker: pytest_mock.MockerFixture):
     """Confirm that CodeExecutionNodes output the expected text and results when run."""
 
     # GIVEN a node that subclasses CodeExecutionNode
@@ -61,6 +62,9 @@ def test_run_node__happy_path(vellum_client):
     )
     vellum_client.execute_code.return_value = mock_code_execution
 
+    # AND we mock the emit_log_event method
+    mock_emit_log_event = mocker.patch.object(WorkflowContext, "emit_log_event", create=False)
+
     # WHEN we run the node
     node = ExampleCodeExecutionNode(
         state=State(
@@ -91,6 +95,12 @@ def main(word: str) -> int:
             )
         ],
         request_options=None,
+    )
+
+    # AND emit_log_event should have been called with the log output
+    mock_emit_log_event.assert_called_once_with(
+        severity="INFO",
+        message="hello",
     )
 
 
@@ -366,7 +376,7 @@ def test_run_node__int_input(vellum_client):
     ]
 
 
-def test_run_node__run_inline(vellum_client):
+def test_run_node__run_inline(vellum_client, mocker: pytest_mock.MockerFixture):
     """Confirm that CodeExecutionNodes run the code inline instead of through Vellum under certain conditions."""
 
     # GIVEN a node that subclasses CodeExecutionNode
@@ -382,6 +392,9 @@ def main(word: str) -> int:
             "word": "hello",
         }
 
+    # AND we mock the emit_log_event method
+    mock_emit_log_event = mocker.patch.object(WorkflowContext, "emit_log_event", create=False)
+
     # WHEN we run the node
     node = ExampleCodeExecutionNode()
     outputs = node.run()
@@ -391,6 +404,12 @@ def main(word: str) -> int:
 
     # AND we should have not invoked the Code via Vellum
     vellum_client.execute_code.assert_not_called()
+
+    # AND emit_log_event should have been called with the log output
+    mock_emit_log_event.assert_called_once_with(
+        severity="INFO",
+        message="hello\n",
+    )
 
 
 def test_run_node__run_inline__incorrect_output_type():

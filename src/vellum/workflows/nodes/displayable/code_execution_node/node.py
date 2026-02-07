@@ -105,7 +105,7 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
         code, filepath = self._resolve_code()
         if not self.packages and self.runtime == "PYTHON_3_11_6" and not self._has_secrets_in_code_inputs():
             logs, result = run_code_inline(code, self.code_inputs, output_type, filepath, self._context.vellum_client)
-            return self.Outputs(result=result, log=logs)
+            outputs = self.Outputs(result=result, log=logs)
 
         else:
             input_values = self._compile_code_inputs()
@@ -130,7 +130,14 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
                     message=f"Expected an output of type '{expected_output_type}', received '{actual_type}'",
                 )
 
-            return self.Outputs(result=code_execution_result.output.value, log=code_execution_result.log)
+            logs = code_execution_result.log
+            outputs = self.Outputs(result=code_execution_result.output.value, log=logs)
+
+        self._context.emit_log_event(
+            severity="INFO",
+            message=logs,
+        )
+        return outputs
 
     def _handle_api_error(self, e: ApiError) -> None:
         body = e.body if isinstance(e.body, dict) else {}
