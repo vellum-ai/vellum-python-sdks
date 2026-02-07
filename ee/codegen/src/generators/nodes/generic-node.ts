@@ -297,6 +297,13 @@ export class GenericNode extends BaseNode<GenericNodeType, GenericNodeContext> {
           break;
         }
         default:
+          // Skip generating attributes that match their default value
+          if (
+            attributeConfig &&
+            this.isAttributeDefault(attribute.value, attributeConfig)
+          ) {
+            break;
+          }
           nodeAttributesStatements.push(
             new Field({
               name: toPythonSafeSnakeCase(attribute.name),

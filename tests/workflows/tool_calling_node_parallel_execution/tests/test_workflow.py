@@ -20,6 +20,7 @@ from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
 from vellum.client.types.vellum_variable import VellumVariable
 from vellum.prompts.constants import DEFAULT_PROMPT_PARAMETERS
+from vellum.workflows.workflows.event_filters import all_workflow_event_filter
 
 from tests.workflows.tool_calling_node_parallel_execution.workflow import ToolCallingNodeParallelExecutionWorkflow
 
@@ -87,6 +88,8 @@ def test_parallel_tool_calls_parallel(vellum_adhoc_prompt_client, mock_uuid4_gen
     first_call_input_id_2 = uuid4_generator()
     uuid4_generator()
     uuid4_generator()
+    uuid4_generator()
+    uuid4_generator()
 
     # GIVEN a parallel tool execution workflow
     workflow = ToolCallingNodeParallelExecutionWorkflow()
@@ -101,10 +104,13 @@ def test_parallel_tool_calls_parallel(vellum_adhoc_prompt_client, mock_uuid4_gen
     assert terminal_event.name == "workflow.execution.fulfilled"
     assert terminal_event.outputs.text == "All three slow tools executed successfully."
 
-    # AND the execution took approximately 0.5 seconds (parallel: max(0.5, 0.5, 0.5))
-    assert total_time >= 1.5
+    # AND the execution took less than 1 second (parallel: ~0.5s, sequential would be ~1.5s)
+    assert total_time < 1, (
+        f"Expected parallel execution to complete in < 1s, but took {total_time:.2f}s. "
+        "This suggests tools are running sequentially instead of in parallel."
+    )
 
-    # AND the chat history shows all three tools were executed (order may vary in parallel mode)
+    # AND the chat history shows all three tools were executed
     chat_history = terminal_event.outputs.chat_history
     assert len(chat_history) == 5  # 1 function calls message + 3 function results + 1 final response
 
@@ -239,3 +245,89 @@ def test_parallel_tool_calls_parallel(vellum_adhoc_prompt_client, mock_uuid4_gen
         "expand_meta": AdHocExpandMeta(cost=None, model_name=None, usage=None, finish_reason=True),
         "request_options": mock.ANY,
     }
+
+
+def test_parallel_stream(vellum_adhoc_prompt_client, vellum_client):
+    """
+    Test that parallel_tool_calls=True executes tools in parallel and only routes to called tools.
+    """
+
+    def generate_prompt_events(*_args, **_kwargs) -> Iterator[ExecutePromptEvent]:
+        execution_id = str(uuid4())
+
+        call_count = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count
+        expected_outputs: List[PromptOutput]
+        if call_count == 1:
+            # First call returns function calls for 3 tools (not 4)
+            expected_outputs = [
+                FunctionCallVellumValue(
+                    value=FunctionCall(
+                        name="slow_tool_one",
+                        arguments={},
+                        id="call_1",
+                    ),
+                ),
+                FunctionCallVellumValue(
+                    value=FunctionCall(
+                        name="slow_tool_two",
+                        arguments={},
+                        id="call_2",
+                    ),
+                ),
+                FunctionCallVellumValue(
+                    value=FunctionCall(
+                        name="slow_tool_three_workflow",
+                        arguments={},
+                        id="call_3",
+                    ),
+                ),
+            ]
+        else:
+            # Second call returns final text
+            expected_outputs = [
+                StringVellumValue(
+                    value="All tools executed successfully.",
+                )
+            ]
+
+        events: List[ExecutePromptEvent] = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            FulfilledExecutePromptEvent(
+                execution_id=execution_id,
+                outputs=expected_outputs,
+            ),
+        ]
+        yield from events
+
+    # GIVEN a workflow with parallel_tool_calls=True
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
+    workflow = ToolCallingNodeParallelExecutionWorkflow()
+
+    # WHEN the workflow is streamed and we measure time
+    start_time = time.time()
+    all_events = list(workflow.stream(event_filter=all_workflow_event_filter))
+    end_time = time.time()
+    execution_time = end_time - start_time
+
+    # THEN the workflow completes successfully
+    terminal_event = all_events[-1]
+    assert terminal_event.name == "workflow.execution.fulfilled"
+
+    # AND only the 3 called tools have node events (not slow_tool_four)
+    node_initiated = [e for e in all_events if e.name == "node.execution.initiated"]
+    node_names = [e.node_definition.__name__ for e in node_initiated]  # type: ignore[union-attr]
+
+    called_tool_patterns = ["FunctionNode_slow_tool_one", "FunctionNode_slow_tool_two", "SlowToolThreeWorkflow"]
+    for pattern in called_tool_patterns:
+        matching = [name for name in node_names if pattern in name]
+        assert len(matching) > 0, f"Expected to find node with pattern {pattern} in events"
+
+    # AND slow_tool_four should NOT have events
+    for node_name in node_names:
+        assert "slow_tool_four" not in node_name, f"slow_tool_four should not have events, found {node_name}"
+
+    # AND execution completes in < 1s (parallel: ~0.5s, sequential would be ~1.5s)
+    assert execution_time < 1, (
+        f"Expected parallel execution to complete in < 1s, but took {execution_time:.2f}s. "
+        "This suggests tools are running sequentially instead of in parallel."
+    )
