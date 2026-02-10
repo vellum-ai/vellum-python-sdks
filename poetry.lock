@@ -1106,17 +1106,17 @@ files = [
 
 [[package]]
 name = "parso"
-version = "0.8.5"
+version = "0.8.6"
 description = "A Python Parser"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "parso-0.8.5-py2.py3-none-any.whl", hash = "sha256:646204b5ee239c396d040b90f9e272e9a8017c630092bf59980beb62fd033887"},
-    {file = "parso-0.8.5.tar.gz", hash = "sha256:034d7354a9a018bdce352f48b2a8a450f05e9d6ee85db84764e9b6bd96dafe5a"},
+    {file = "parso-0.8.6-py2.py3-none-any.whl", hash = "sha256:2c549f800b70a5c4952197248825584cb00f033b29c692671d3bf08bf380baff"},
+    {file = "parso-0.8.6.tar.gz", hash = "sha256:2b9a0332696df97d454fa67b81618fd69c35a7b90327cbe6ba5c92d2c68a7bfd"},
 ]
 
 [package.extras]
-qa = ["flake8 (==5.0.4)", "mypy (==0.971)", "types-setuptools (==67.2.0.1)"]
+qa = ["flake8 (==5.0.4)", "types-setuptools (==67.2.0.1)", "zuban (==0.5.1)"]
 testing = ["docopt", "pytest"]
 
 [[package]]
@@ -2226,34 +2226,34 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 
 [[package]]
 name = "wcwidth"
-version = "0.5.3"
+version = "0.6.0"
 description = "Measures the displayed width of unicode strings in a terminal"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "wcwidth-0.5.3-py3-none-any.whl", hash = "sha256:d584eff31cd4753e1e5ff6c12e1edfdb324c995713f75d26c29807bb84bf649e"},
-    {file = "wcwidth-0.5.3.tar.gz", hash = "sha256:53123b7af053c74e9fe2e92ac810301f6139e64379031f7124574212fb3b4091"},
+    {file = "wcwidth-0.6.0-py3-none-any.whl", hash = "sha256:1a3a1e510b553315f8e146c54764f4fb6264ffad731b3d78088cdb1478ffbdad"},
+    {file = "wcwidth-0.6.0.tar.gz", hash = "sha256:cdc4e4262d6ef9a1a57e018384cbeb1208d8abbc64176027e2c2455c81313159"},
 ]
 
 [[package]]
 name = "zuban"
-version = "0.4.2"
+version = "0.5.1"
 description = "Zuban - The Zuban Language Server"
 optional = true
 python-versions = ">=3.7"
 files = [
-    {file = "zuban-0.4.2-py3-none-macosx_10_12_x86_64.whl", hash = "sha256:18971e9d64607f77a72ddbc54a99c481d9efa006acf1de7bfab84f21259533df"},
-    {file = "zuban-0.4.2-py3-none-macosx_11_0_arm64.whl", hash = "sha256:4eed0d6f08ce02dd7d6dc6245cd1eb4f618fcd12c7249e45c165d538e0687cc9"},
-    {file = "zuban-0.4.2-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:3ea8fec37858450ab7e0011e9ad76e35bc6976569ea386947c75f3eb5cf09a8a"},
-    {file = "zuban-0.4.2-py3-none-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:53c3c8a242df60d2bf17f43861ef899738abea448bbe728737522b8f46e46ad5"},
-    {file = "zuban-0.4.2-py3-none-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:4ccdba3efe378db5496913f562ee6548bf8e20b433337e87efc144b07ccfdb17"},
-    {file = "zuban-0.4.2-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:d95f9640435b26bd6499ad8d4d66081718dd5dd7d3c6a276c3949103da7f1011"},
-    {file = "zuban-0.4.2-py3-none-musllinux_1_2_aarch64.whl", hash = "sha256:29ce85194e1c2cc9e5fc4ac98ea83e95d7a250d149088712536f6df430327ec5"},
-    {file = "zuban-0.4.2-py3-none-musllinux_1_2_armv7l.whl", hash = "sha256:be20f8953f3e9db65948aa4b7c4d59f1d71df2abde5eb6de9048c5486bbce95d"},
-    {file = "zuban-0.4.2-py3-none-musllinux_1_2_i686.whl", hash = "sha256:8cb04b5e9a9bbc4729438dc43318ea9e8a2ef7e721fe41c685d8434679632b8c"},
-    {file = "zuban-0.4.2-py3-none-musllinux_1_2_x86_64.whl", hash = "sha256:6d4ba3de90d77dcaa125ac8eeae327df5128bf39325f9254c481c7b18cbac5cd"},
-    {file = "zuban-0.4.2-py3-none-win32.whl", hash = "sha256:3174271a4c93458b264cfefb97929622431ca218e53d2324fac971e2f1a443b2"},
-    {file = "zuban-0.4.2-py3-none-win_amd64.whl", hash = "sha256:ec58f2eb4c4ae4af4992ffe71ef95017a2a41d6afd584f686429ff65a8200ea1"},
+    {file = "zuban-0.5.1-py3-none-macosx_10_12_x86_64.whl", hash = "sha256:e55bc6ac8660dc9707994f69480a63ee7040bb7e95ff4bc26a941043a742f9d3"},
+    {file = "zuban-0.5.1-py3-none-macosx_11_0_arm64.whl", hash = "sha256:ab0f89c6246d670e632740a6400908431d919254e09ee0e600fc5067e6c0befb"},
+    {file = "zuban-0.5.1-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:a92e678e8e3836b460346b7cd13d6d93f999852d8eaa9047b1c513dc26e6748d"},
+    {file = "zuban-0.5.1-py3-none-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:35a705afa70b095aa7316e8b2996c8ee49fade80d84f756c27829c170fa091e0"},
+    {file = "zuban-0.5.1-py3-none-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:cd373ea244709b39b9ea4f5513ed326c692a18ed2407b10ca92670b16acde52d"},
+    {file = "zuban-0.5.1-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:2a116cda142b43d2b1c6dfed2ff5f425f22d439fa9d687ba6cacb6082859cc84"},
+    {file = "zuban-0.5.1-py3-none-musllinux_1_2_aarch64.whl", hash = "sha256:711c4e92568f73b86006c72a9113b1a43ffcc7a6ca0c8f1c91150c17d649a69b"},
+    {file = "zuban-0.5.1-py3-none-musllinux_1_2_armv7l.whl", hash = "sha256:67d39d43e5f7dcd6d8e67c554c99df9ce11168f0cbf7268339f2b452dd56fa9e"},
+    {file = "zuban-0.5.1-py3-none-musllinux_1_2_i686.whl", hash = "sha256:f5cff5f46b26e120cca525453f4cb54e5f353105b82a7ca2a0d2aaeb9f2eb15f"},
+    {file = "zuban-0.5.1-py3-none-musllinux_1_2_x86_64.whl", hash = "sha256:a1fefed7de39bbe16d55f99b95ea8e806a651e35e9dd5bc436fa4493853d759f"},
+    {file = "zuban-0.5.1-py3-none-win32.whl", hash = "sha256:b3069efea4b81535ff73f2d3f537bc6a4ed3314af973d1256187835eaaa8439b"},
+    {file = "zuban-0.5.1-py3-none-win_amd64.whl", hash = "sha256:d7335cb71a913bba9fe216389e04b6f9c364b945a86aef613244cf5452a0bcd9"},
 ]
 
 [extras]
