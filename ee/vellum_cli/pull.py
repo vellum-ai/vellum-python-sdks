@@ -323,8 +323,6 @@ def pull_command(
                     if file_name == ERROR_LOG_FILE_NAME:
                         error_content = content
                         continue
-                    if file_name == METADATA_FILE_NAME:
-                        continue
 
                     target_file = os.path.join(target_dir, file_name)
                     os.makedirs(os.path.dirname(target_file), exist_ok=True)

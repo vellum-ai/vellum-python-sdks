@@ -707,6 +707,49 @@ def test_pull__include_sandbox(vellum_client, mock_module):
         assert lock_data["workflows"][0]["ignore"] == "sandbox.py"
 
 
+def test_pull__writes_metadata_json_with_dataset_row_index_to_id_mapping(vellum_client, mock_module):
+    """Tests that metadata.json (including dataset_row_index_to_id_mapping) is written to the workflow directory."""
+    # GIVEN a module on the user's filesystem
+    temp_dir = mock_module.temp_dir
+    module = mock_module.module
+
+    # AND the pull API returns a zip with metadata.json containing dataset_row_index_to_id_mapping
+    metadata_content = {
+        "label": "My Workflow",
+        "dataset_row_index_to_id_mapping": {"0": "row-uuid-1", "1": "row-uuid-2"},
+    }
+    vellum_client.workflows.pull.return_value = iter(
+        [
+            zip_file_map(
+                {
+                    "workflow.py": "print('hello')",
+                    "metadata.json": json.dumps(metadata_content),
+                }
+            )
+        ]
+    )
+
+    # WHEN the user runs the pull command
+    runner = CliRunner()
+    result = runner.invoke(cli_main, ["pull", module])
+
+    # THEN the command returns successfully
+    assert result.exit_code == 0, result.output
+
+    # AND metadata.json is written to the workflow module directory
+    metadata_path = os.path.join(temp_dir, *module.split("."), "metadata.json")
+    assert os.path.exists(metadata_path), f"metadata.json not found at {metadata_path}"
+
+    # AND the written metadata.json contains dataset_row_index_to_id_mapping
+    with open(metadata_path) as f:
+        written_metadata = json.load(f)
+    assert written_metadata["dataset_row_index_to_id_mapping"] == {
+        "0": "row-uuid-1",
+        "1": "row-uuid-2",
+    }
+    assert written_metadata["label"] == "My Workflow"
+
+
 def test_pull__same_pull_twice__one_entry_in_lockfile(vellum_client, mock_module):
     # GIVEN a module on the user's filesystem
     module = mock_module.module
