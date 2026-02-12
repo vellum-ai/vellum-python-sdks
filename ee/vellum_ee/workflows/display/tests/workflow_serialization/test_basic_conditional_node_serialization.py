@@ -1,4 +1,5 @@
 import pytest
+from typing import Any, cast
 
 from deepdiff import DeepDiff
 
@@ -936,7 +937,7 @@ def test_conditional_node_serialize_or_combinator_preserves_or():
     workflow_cls = create_simple_workflow(or_condition)
 
     workflow_display = get_workflow_display(workflow_class=workflow_cls)
-    serialized_workflow = workflow_display.serialize()
+    serialized_workflow = cast(dict[str, Any], workflow_display.serialize())
 
     # WHEN we extract the conditional node's IF condition
     conditional_node = next(
