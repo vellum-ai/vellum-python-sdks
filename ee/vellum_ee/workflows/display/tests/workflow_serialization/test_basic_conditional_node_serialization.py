@@ -23,7 +23,10 @@ from vellum.workflows.expressions.not_in import NotInExpression
 from vellum_ee.workflows.display.workflows.get_vellum_workflow_display_class import get_workflow_display
 
 from tests.workflows.basic_conditional_node.workflow import CategoryWorkflow
-from tests.workflows.basic_conditional_node.workflow_with_only_one_conditional_node import create_simple_workflow
+from tests.workflows.basic_conditional_node.workflow_with_only_one_conditional_node import (
+    Inputs as SimpleInputs,
+    create_simple_workflow,
+)
 
 
 def test_serialize_workflow():
@@ -924,3 +927,26 @@ def test_conditional_node_serialize_all_operators_with_value_and_start_and_end(d
         conditional_node,
         ignore_order=True,
     )
+
+
+def test_conditional_node_serialize_or_combinator_preserves_or():
+    """Regression test: OR conditions (A | B) must serialize with combinator 'OR', not 'AND'."""
+    # GIVEN a conditional node with an OR condition: text == "foo" OR text == "bar"
+    or_condition = SimpleInputs.text.equals("foo") | SimpleInputs.text.equals("bar")
+    workflow_cls = create_simple_workflow(or_condition)
+
+    workflow_display = get_workflow_display(workflow_class=workflow_cls)
+    serialized_workflow = workflow_display.serialize()
+
+    # WHEN we extract the conditional node's IF condition
+    conditional_node = next(
+        n
+        for n in serialized_workflow["workflow_raw_data"]["nodes"]
+        if (n.get("base") or {}).get("name") == "ConditionalNode"
+    )
+    if_condition = next(c for c in conditional_node["data"]["conditions"] if c["type"] == "IF")
+
+    # THEN the combinator must be "OR" (not "AND")
+    assert (
+        if_condition["data"]["combinator"] == "OR"
+    ), "OR conditions were incorrectly serialized as AND - top-level OrExpression must produce combinator 'OR'"

@@ -188,6 +188,7 @@ but the defined conditions have length {len(condition_ids)}"""
                 rule_ids = self._get_rule_ids()
                 condition_rule = serialize_rule(port._condition, [idx], rule_ids[idx] if len(rule_ids) > idx else None)
                 rules = condition_rule["rules"] if condition_rule["rules"] else [condition_rule]
+                combinator = condition_rule.get("combinator") or "AND"
                 if port._condition_type is None:
                     raise ValueError("Condition type is None, but a valid ConditionType is expected.")
                 conditions.append(
@@ -198,7 +199,7 @@ but the defined conditions have length {len(condition_ids)}"""
                         "data": {
                             "id": rule_group_id,
                             "rules": rules,
-                            "combinator": "AND",
+                            "combinator": combinator,
                             "negated": False,
                             "field_node_input_id": None,
                             "operator": None,
