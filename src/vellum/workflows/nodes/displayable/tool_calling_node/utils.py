@@ -115,6 +115,7 @@ class ToolPromptNode(InlinePromptNode[ToolCallingState]):
             self.state.current_prompt_output_index = 0
             self.state.current_function_calls_processed = 0
             self.state.prompt_iterations += 1
+            self.state.function_calls_by_name = {}
         for output in generator:
             if output.name == InlinePromptNode.Outputs.results.name and output.value:
                 prompt_outputs = cast(List[PromptOutput], output.value)
@@ -131,6 +132,13 @@ class ToolPromptNode(InlinePromptNode[ToolCallingState]):
                                 value=FunctionCallChatMessageContentValue.model_validate(raw_function_call)
                             )
                         )
+                        # Populate function_calls_by_name for parallel execution
+                        function_name = prompt_output.value.name
+                        if function_name:
+                            self.state.function_calls_by_name[function_name] = {
+                                "arguments": prompt_output.value.arguments or {},
+                                "function_call_id": prompt_output.value.id,
+                            }
 
                 if len(chat_contents) == 1:
                     if chat_contents[0].type == "STRING":
@@ -424,11 +432,49 @@ def _create_function_call_expressions(
     return arguments_expr, function_call_id_expr
 
 
+def _create_function_call_expressions_from_state(
+    function_name: str,
+) -> tuple[BaseDescriptor[dict], BaseDescriptor[Optional[str]]]:
+    """
+    Create expressions to extract arguments and function_call_id from state.function_calls_by_name.
+
+    This is used for parallel execution where function calls are looked up by name
+    rather than by index.
+
+    Returns:
+        A tuple of (arguments_expression, function_call_id_expression)
+    """
+    function_call_data = ToolCallingState.function_calls_by_name[function_name]
+    arguments_expr: BaseDescriptor[dict] = function_call_data["arguments"].coalesce({})
+    function_call_id_expr: BaseDescriptor[Optional[str]] = function_call_data["function_call_id"].coalesce(None)
+    return arguments_expr, function_call_id_expr
+
+
+def _build_function_exists_condition_from_state(
+    function_name: str,
+) -> BaseDescriptor[bool]:
+    """Build a condition that checks if a function name exists in state.function_calls_by_name.
+
+    This uses the precomputed function_calls_by_name dict in state, which is populated
+    by ToolPromptNode.run when processing FUNCTION_CALL outputs. This approach has no
+    arbitrary limit on the number of function calls.
+    """
+    return ToolCallingState.function_calls_by_name.contains(function_name)
+
+
 def create_router_node(
     functions: List[Union[ToolBase, MCPToolDefinition]],
     tool_prompt_node: Type[InlinePromptNode[ToolCallingState]],
+    parallel_tool_calls: bool = False,
 ) -> Type[RouterNode]:
-    """Create a RouterNode with dynamic ports that route based on tool_prompt_node outputs."""
+    """Create a RouterNode with dynamic ports that route based on tool_prompt_node outputs.
+
+    Args:
+        functions: List of tool functions to create ports for
+        tool_prompt_node: The tool prompt node class
+        parallel_tool_calls: If True, routes to all matching functions in parallel.
+            Only routes to tools that are included in the function calls.
+    """
 
     if functions and len(functions) > 0:
         # Create dynamic ports and convert functions in a single loop
@@ -437,25 +483,34 @@ def create_router_node(
         # Collect all tool names
         tool_names: List[str] = [get_function_name(function) for function in functions]
 
-        # Build conditions for each tool name
-        conditions = [
-            (
-                name,
-                ToolCallingState.current_prompt_output_index.less_than(tool_prompt_node.Outputs.results.length())
-                & tool_prompt_node.Outputs.results[ToolCallingState.current_prompt_output_index]["type"].equals(
-                    "FUNCTION_CALL"
+        if parallel_tool_calls:
+            # For parallel execution, each port checks if its function name exists
+            # in state.function_calls_by_name (populated by ToolPromptNode.run)
+            # All matching ports can activate simultaneously
+            for name in tool_names:
+                condition = _build_function_exists_condition_from_state(name)
+                port = Port.on_if(condition)
+                setattr(Ports, name, port)
+        else:
+            # Sequential execution: Build conditions for each tool name
+            conditions = [
+                (
+                    name,
+                    ToolCallingState.current_prompt_output_index.less_than(tool_prompt_node.Outputs.results.length())
+                    & tool_prompt_node.Outputs.results[ToolCallingState.current_prompt_output_index]["type"].equals(
+                        "FUNCTION_CALL"
+                    )
+                    & tool_prompt_node.Outputs.results[ToolCallingState.current_prompt_output_index]["value"][
+                        "name"
+                    ].equals(name),
                 )
-                & tool_prompt_node.Outputs.results[ToolCallingState.current_prompt_output_index]["value"][
-                    "name"
-                ].equals(name),
-            )
-            for name in tool_names
-        ]
+                for name in tool_names
+            ]
 
-        # Assign ports: first condition uses on_if, subsequent ones use on_elif
-        for idx, (name, condition) in enumerate(conditions):
-            port = Port.on_if(condition) if idx == 0 else Port.on_elif(condition)
-            setattr(Ports, name, port)
+            # Assign ports: first condition uses on_if, subsequent ones use on_elif
+            for idx, (name, condition) in enumerate(conditions):
+                port = Port.on_if(condition) if idx == 0 else Port.on_elif(condition)
+                setattr(Ports, name, port)
 
         # Add the else port for when no function conditions match
         setattr(Ports, "default", Port.on_else())
@@ -481,6 +536,7 @@ def create_router_node(
 def create_function_node(
     function: Union[ToolBase, MCPToolDefinition],
     tool_prompt_node: Type[ToolPromptNode],
+    parallel_tool_calls: bool = False,
 ) -> Type[BaseNode]:
     """
     Create a FunctionNode class for a given function.
@@ -492,11 +548,18 @@ def create_function_node(
     Args:
         function: The function to create a node for
         tool_prompt_node: The tool prompt node class
+        parallel_tool_calls: If True, uses state-based argument lookup by function name
     """
     if isinstance(function, MCPToolDefinition):
-        return create_mcp_tool_node(function, tool_prompt_node)
+        return create_mcp_tool_node(function, tool_prompt_node, parallel_tool_calls)
 
-    arguments_expr, function_call_id_expr = _create_function_call_expressions(tool_prompt_node)
+    function_name = get_function_name(function)
+
+    # Choose expression source based on parallel mode
+    if parallel_tool_calls:
+        arguments_expr, function_call_id_expr = _create_function_call_expressions_from_state(function_name)
+    else:
+        arguments_expr, function_call_id_expr = _create_function_call_expressions(tool_prompt_node)
 
     if isinstance(function, DeploymentDefinition):
         deployment = function.deployment_id or function.deployment_name
@@ -610,8 +673,16 @@ def create_function_node(
 def create_mcp_tool_node(
     tool_def: MCPToolDefinition,
     tool_prompt_node: Type[ToolPromptNode],
+    parallel_tool_calls: bool = False,
 ) -> Type[BaseNode]:
-    arguments_expr, function_call_id_expr = _create_function_call_expressions(tool_prompt_node)
+    function_name = get_mcp_tool_name(tool_def)
+
+    # Choose expression source based on parallel mode
+    if parallel_tool_calls:
+        arguments_expr, function_call_id_expr = _create_function_call_expressions_from_state(function_name)
+    else:
+        arguments_expr, function_call_id_expr = _create_function_call_expressions(tool_prompt_node)
+
     node = type(
         f"MCPNode_{tool_def.name}",
         (MCPNode,),
@@ -627,13 +698,34 @@ def create_mcp_tool_node(
 
 def create_else_node(
     tool_prompt_node: Type[ToolPromptNode],
+    parallel_tool_calls: bool = False,
 ) -> Type[ElseNode]:
-    class Ports(ElseNode.Ports):
-        loop_to_router = Port.on_if(
-            ToolCallingState.current_prompt_output_index.less_than(tool_prompt_node.Outputs.results.length())
-        )
-        loop_to_prompt = Port.on_elif(ToolCallingState.current_function_calls_processed.greater_than(0))
-        end = Port.on_else()
+    if parallel_tool_calls:
+        # In parallel mode, we need to wait for ALL function calls to be processed
+        # before triggering loop_to_prompt. The condition checks that:
+        # 1. At least one function call was made (function_calls_by_name is not empty)
+        # 2. All function calls have been processed (current_function_calls_processed >= len(function_calls_by_name))
+        # Note: loop_to_router is not used in parallel mode (no sequential processing)
+        class Ports(ElseNode.Ports):
+            loop_to_router = Port.on_if(
+                ToolCallingState.current_prompt_output_index.less_than(tool_prompt_node.Outputs.results.length())
+            )
+            loop_to_prompt = Port.on_elif(
+                ToolCallingState.function_calls_by_name.length().greater_than(0)
+                & ToolCallingState.current_function_calls_processed.greater_than_or_equal_to(
+                    ToolCallingState.function_calls_by_name.length()
+                )
+            )
+            end = Port.on_else()
+
+    else:
+
+        class Ports(ElseNode.Ports):  # type: ignore[no-redef]
+            loop_to_router = Port.on_if(
+                ToolCallingState.current_prompt_output_index.less_than(tool_prompt_node.Outputs.results.length())
+            )
+            loop_to_prompt = Port.on_elif(ToolCallingState.current_function_calls_processed.greater_than(0))
+            end = Port.on_else()
 
     node = cast(
         Type[ElseNode],

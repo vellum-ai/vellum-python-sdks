@@ -46,6 +46,9 @@ export const NODE_ATTRIBUTES: Record<
       defaultValue: null,
       type: AttributeType.Parameters,
     },
+    parallel_tool_calls: {
+      defaultValue: false,
+    },
   },
   WebSearchNode: {
     query: {

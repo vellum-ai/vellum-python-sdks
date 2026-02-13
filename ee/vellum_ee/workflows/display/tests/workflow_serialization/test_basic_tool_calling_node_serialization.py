@@ -211,6 +211,11 @@ def test_serialize_workflow():
                 "name": "settings",
                 "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
             },
+            {
+                "id": "c099e004-3cfb-4a84-9051-6ef8e2a2c709",
+                "name": "parallel_tool_calls",
+                "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": False}},
+            },
         ],
         "outputs": [
             {
