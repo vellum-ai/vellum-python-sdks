@@ -272,3 +272,125 @@ def test_mcp_service_call_tool_includes_stacktrace_and_raw_data_on_error():
         assert exc_info.value.raw_data["operation"] == "call_tool"
         assert exc_info.value.raw_data["error_type"] == "RuntimeError"
         assert exc_info.value.raw_data["error_message"] == "Tool execution failed"
+
+
+def test_mcp_service_hydrate_tool_definitions__include_tools_filters_to_whitelist():
+    """
+    Tests that include_tools acts as a whitelist, only including specified tools.
+    """
+    # GIVEN an MCP server with include_tools specified
+    sample_mcp_server = MCPServer(
+        name="test-server",
+        url="https://test.mcp.server.com/mcp",
+        include_tools=["tool-a", "tool-c"],
+    )
+
+    # AND a mock MCP service that returns multiple tools
+    with mock.patch("vellum.workflows.integrations.mcp_service.asyncio.run") as mock_run:
+        mock_run.return_value = [
+            {"name": "tool-a", "description": "Tool A", "inputSchema": {}},
+            {"name": "tool-b", "description": "Tool B", "inputSchema": {}},
+            {"name": "tool-c", "description": "Tool C", "inputSchema": {}},
+        ]
+
+        # WHEN we hydrate tool definitions
+        service = MCPService()
+        tool_definitions = service.hydrate_tool_definitions(sample_mcp_server)
+
+        # THEN only the tools in include_tools should be returned
+        assert len(tool_definitions) == 2
+        tool_names = [t.name for t in tool_definitions]
+        assert "tool-a" in tool_names
+        assert "tool-c" in tool_names
+        assert "tool-b" not in tool_names
+
+
+def test_mcp_service_hydrate_tool_definitions__exclude_tools_filters_out_blacklist():
+    """
+    Tests that exclude_tools acts as a blacklist, filtering out specified tools.
+    """
+    # GIVEN an MCP server with exclude_tools specified
+    sample_mcp_server = MCPServer(
+        name="test-server",
+        url="https://test.mcp.server.com/mcp",
+        exclude_tools=["tool-b"],
+    )
+
+    # AND a mock MCP service that returns multiple tools
+    with mock.patch("vellum.workflows.integrations.mcp_service.asyncio.run") as mock_run:
+        mock_run.return_value = [
+            {"name": "tool-a", "description": "Tool A", "inputSchema": {}},
+            {"name": "tool-b", "description": "Tool B", "inputSchema": {}},
+            {"name": "tool-c", "description": "Tool C", "inputSchema": {}},
+        ]
+
+        # WHEN we hydrate tool definitions
+        service = MCPService()
+        tool_definitions = service.hydrate_tool_definitions(sample_mcp_server)
+
+        # THEN all tools except the excluded one should be returned
+        assert len(tool_definitions) == 2
+        tool_names = [t.name for t in tool_definitions]
+        assert "tool-a" in tool_names
+        assert "tool-c" in tool_names
+        assert "tool-b" not in tool_names
+
+
+def test_mcp_service_hydrate_tool_definitions__exclude_takes_precedence_over_include():
+    """
+    Tests that exclude_tools takes precedence when a tool appears in both lists.
+    """
+    # GIVEN an MCP server with both include_tools and exclude_tools
+    # AND tool-a appears in both lists
+    sample_mcp_server = MCPServer(
+        name="test-server",
+        url="https://test.mcp.server.com/mcp",
+        include_tools=["tool-a", "tool-b"],
+        exclude_tools=["tool-a"],
+    )
+
+    # AND a mock MCP service that returns multiple tools
+    with mock.patch("vellum.workflows.integrations.mcp_service.asyncio.run") as mock_run:
+        mock_run.return_value = [
+            {"name": "tool-a", "description": "Tool A", "inputSchema": {}},
+            {"name": "tool-b", "description": "Tool B", "inputSchema": {}},
+            {"name": "tool-c", "description": "Tool C", "inputSchema": {}},
+        ]
+
+        # WHEN we hydrate tool definitions
+        service = MCPService()
+        tool_definitions = service.hydrate_tool_definitions(sample_mcp_server)
+
+        # THEN tool-a should be excluded even though it's in include_tools
+        assert len(tool_definitions) == 1
+        assert tool_definitions[0].name == "tool-b"
+
+
+def test_mcp_service_hydrate_tool_definitions__no_filtering_when_both_none():
+    """
+    Tests that all tools are returned when neither include_tools nor exclude_tools is specified.
+    """
+    # GIVEN an MCP server with no filtering configured
+    sample_mcp_server = MCPServer(
+        name="test-server",
+        url="https://test.mcp.server.com/mcp",
+    )
+
+    # AND a mock MCP service that returns multiple tools
+    with mock.patch("vellum.workflows.integrations.mcp_service.asyncio.run") as mock_run:
+        mock_run.return_value = [
+            {"name": "tool-a", "description": "Tool A", "inputSchema": {}},
+            {"name": "tool-b", "description": "Tool B", "inputSchema": {}},
+            {"name": "tool-c", "description": "Tool C", "inputSchema": {}},
+        ]
+
+        # WHEN we hydrate tool definitions
+        service = MCPService()
+        tool_definitions = service.hydrate_tool_definitions(sample_mcp_server)
+
+        # THEN all tools should be returned
+        assert len(tool_definitions) == 3
+        tool_names = [t.name for t in tool_definitions]
+        assert "tool-a" in tool_names
+        assert "tool-b" in tool_names
+        assert "tool-c" in tool_names

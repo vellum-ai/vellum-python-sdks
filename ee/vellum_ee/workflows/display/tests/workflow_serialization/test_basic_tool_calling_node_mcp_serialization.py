@@ -96,6 +96,16 @@ def test_serialize_workflow():
                             "key": "api_key_header_value",
                             "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
                         },
+                        {
+                            "id": "90981dfe-9dc8-4f40-a5d6-b8b42edfc075",
+                            "key": "include_tools",
+                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                        },
+                        {
+                            "id": "d48a1658-0d94-49fc-9499-5f400079eebd",
+                            "key": "exclude_tools",
+                            "value": {"type": "CONSTANT_VALUE", "value": {"type": "JSON", "value": None}},
+                        },
                     ],
                     "definition": {"name": "MCPServer", "module": ["vellum", "workflows", "types", "definition"]},
                 }
