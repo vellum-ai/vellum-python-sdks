@@ -4,6 +4,7 @@ from enum import Enum
 import inspect
 import sys
 import types
+import uuid
 from typing import (
     TYPE_CHECKING,
     Annotated,
@@ -19,7 +20,7 @@ from typing import (
     get_args,
     get_origin,
 )
-from typing_extensions import TypeGuard
+from typing_extensions import NotRequired, Required, TypeGuard, is_typeddict
 
 from pydantic import BaseModel
 from pydantic_core import PydanticUndefined
@@ -218,6 +219,25 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
             defs[def_name] = {"type": "object", "properties": properties, "required": required}
 
         return {"$ref": f"#/$defs/{def_name}"}
+
+    if is_typeddict(annotation):
+        def_name = _get_def_name(annotation)
+        if def_name not in defs:
+            properties = {}
+            required_keys = annotation.__required_keys__
+            required = []
+            for field_name, field_type in annotation.__annotations__.items():
+                if get_origin(field_type) in (Required, NotRequired):
+                    field_type = get_args(field_type)[0]
+                properties[field_name] = compile_annotation(field_type, defs)
+                if field_name in required_keys:
+                    required.append(field_name)
+            defs[def_name] = {"type": "object", "properties": properties, "required": required}
+
+        return {"$ref": f"#/$defs/{def_name}"}
+
+    if annotation is uuid.UUID:
+        return {"type": "string", "format": "uuid"}
 
     if type(annotation) is ForwardRef:
         # Ignore forward references for now
