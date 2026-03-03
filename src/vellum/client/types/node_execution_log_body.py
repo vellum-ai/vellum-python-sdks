@@ -10,9 +10,9 @@ from .vellum_code_resource_definition import VellumCodeResourceDefinition
 
 class NodeExecutionLogBody(UniversalBaseModel):
     node_definition: VellumCodeResourceDefinition
+    message: str
     attributes: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = None
     severity: SeverityEnum
-    message: str
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
