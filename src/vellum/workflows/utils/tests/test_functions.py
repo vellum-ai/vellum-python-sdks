@@ -5,7 +5,7 @@ import sys
 import types
 from unittest.mock import Mock
 import uuid
-from typing import Annotated, Dict, List, Literal, Optional, Tuple, Union
+from typing import Annotated, Dict, FrozenSet, List, Literal, Mapping, Optional, Sequence, Set, Tuple, Union
 from typing_extensions import NotRequired, TypedDict
 
 from pydantic import BaseModel, Field
@@ -1129,3 +1129,40 @@ def test_compile_annotation__pep604_union_multiple_types():
 
     # THEN it should return the correct schema with anyOf
     assert result == {"anyOf": [{"type": "string"}, {"type": "integer"}, {"type": "null"}]}
+
+
+@pytest.mark.parametrize(
+    "annotation,expected_schema",
+    [
+        (Sequence[str], {"type": "array", "items": {"type": "string"}}),
+        (Sequence[int], {"type": "array", "items": {"type": "integer"}}),
+        (Mapping[str, int], {"type": "object", "additionalProperties": {"type": "integer"}}),
+        (Mapping[str, str], {"type": "object", "additionalProperties": {"type": "string"}}),
+        (Set[str], {"type": "array", "uniqueItems": True, "items": {"type": "string"}}),
+        (Set[int], {"type": "array", "uniqueItems": True, "items": {"type": "integer"}}),
+        (FrozenSet[str], {"type": "array", "uniqueItems": True, "items": {"type": "string"}}),
+        (set[str], {"type": "array", "uniqueItems": True, "items": {"type": "string"}}),
+        (frozenset[int], {"type": "array", "uniqueItems": True, "items": {"type": "integer"}}),
+    ],
+    ids=[
+        "Sequence[str]",
+        "Sequence[int]",
+        "Mapping[str, int]",
+        "Mapping[str, str]",
+        "Set[str]",
+        "Set[int]",
+        "FrozenSet[str]",
+        "set[str]",
+        "frozenset[int]",
+    ],
+)
+def test_compile_annotation__collection_abc_types(annotation, expected_schema):
+    """Tests that Sequence, Mapping, set, and frozenset types compile to correct JSON schemas."""
+
+    # GIVEN the annotation type
+
+    # WHEN compiling the annotation
+    result = compile_annotation(annotation, {})
+
+    # THEN it should return the expected schema
+    assert result == expected_schema
