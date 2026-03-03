@@ -1,3 +1,4 @@
+import collections.abc
 import dataclasses
 from datetime import datetime
 from enum import Enum
@@ -163,13 +164,26 @@ def compile_annotation(annotation: Optional[Any], defs: dict[str, Any]) -> dict:
         else:
             return {"enum": values}
 
-    if get_origin(annotation) is dict:
-        _, value_type = get_args(annotation)
-        return {"type": "object", "additionalProperties": compile_annotation(value_type, defs)}
+    if get_origin(annotation) in (dict, collections.abc.Mapping):
+        args = get_args(annotation)
+        if args:
+            _, value_type = args
+            return {"type": "object", "additionalProperties": compile_annotation(value_type, defs)}
+        return {"type": "object"}
 
-    if get_origin(annotation) is list:
-        item_type = get_args(annotation)[0]
-        return {"type": "array", "items": compile_annotation(item_type, defs)}
+    if get_origin(annotation) in (list, collections.abc.Sequence):
+        args = get_args(annotation)
+        if args:
+            item_type = args[0]
+            return {"type": "array", "items": compile_annotation(item_type, defs)}
+        return {"type": "array"}
+
+    if get_origin(annotation) in (set, frozenset):
+        args = get_args(annotation)
+        if args:
+            item_type = args[0]
+            return {"type": "array", "uniqueItems": True, "items": compile_annotation(item_type, defs)}
+        return {"type": "array", "uniqueItems": True}
 
     if get_origin(annotation) is tuple:
         args = get_args(annotation)
