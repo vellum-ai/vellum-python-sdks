@@ -51,7 +51,7 @@ class ImportSortedPythonFile extends PythonFile {
         lastPriority = priority;
       }
 
-      if (refModulePath[0] === this.path[0]) {
+      if (this.shouldRelativize(refModulePath)) {
         // Relativize the import
         // Calculate the common prefix length
         let commonPrefixLength = 0;
@@ -126,7 +126,7 @@ class ImportSortedPythonFile extends PythonFile {
       return 0;
     }
 
-    if (modulePath[0] === this.path[0]) {
+    if (this.shouldRelativize(modulePath)) {
       return 1;
     }
 
@@ -172,6 +172,7 @@ export abstract class BasePersistedFile extends AstNode {
       statements: fileStatements,
       imports: this.getFileImports(),
       comments: this.getComments(),
+      rootModulePath: this.workflowContext.getRootModulePath(),
     });
 
     file.inheritReferences(this);

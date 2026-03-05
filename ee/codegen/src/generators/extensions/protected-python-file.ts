@@ -31,12 +31,15 @@ export declare namespace PythonFile {
     comments?: Comment[];
     /* Any explicit imports that should be included */
     imports?: (StarImport | Reference)[];
+    /* The root module path prefix; only imports starting with this prefix will be relativized */
+    rootModulePath?: ModulePath;
   }
 }
 
 export class PythonFile extends AstNode {
   public readonly path: ModulePath;
   public readonly isInitFile: boolean;
+  public readonly rootModulePath: ModulePath | undefined;
   private readonly statements: AstNode[] = [];
   private readonly comments: Comment[];
 
@@ -46,10 +49,12 @@ export class PythonFile extends AstNode {
     isInitFile = false,
     comments,
     imports,
+    rootModulePath,
   }: PythonFile.Args) {
     super();
     this.path = path;
     this.isInitFile = isInitFile;
+    this.rootModulePath = rootModulePath;
 
     statements?.forEach((statement) => this.addStatement(statement));
 
@@ -251,7 +256,7 @@ export class PythonFile extends AstNode {
         continue;
       }
 
-      if (refModulePath[0] === this.path[0]) {
+      if (this.shouldRelativize(refModulePath)) {
         // Relativize the import
         // Calculate the common prefix length
         let commonPrefixLength = 0;
@@ -296,6 +301,20 @@ export class PythonFile extends AstNode {
     if (Object.keys(uniqueReferences).length > 0) {
       writer.newLine();
     }
+  }
+
+  protected shouldRelativize(refModulePath: ModulePath): boolean {
+    if (refModulePath[0] !== this.path[0]) {
+      return false;
+    }
+    if (!this.rootModulePath || this.rootModulePath.length === 0) {
+      return true;
+    }
+    const rootPrefix = this.rootModulePath.slice(0, -1);
+    if (refModulePath.length < rootPrefix.length) {
+      return false;
+    }
+    return rootPrefix.every((part, idx) => refModulePath[idx] === part);
   }
 
   protected isDefinedInFile(modulePath: readonly string[]): boolean {
