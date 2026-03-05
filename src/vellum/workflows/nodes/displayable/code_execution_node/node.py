@@ -213,6 +213,13 @@ class CodeExecutionNode(BaseNode[StateType], Generic[StateType, _OutputType], me
                         value=cast(Dict[str, Any], input_value),
                     )
                 )
+            elif isinstance(input_value, bool):
+                compiled_inputs.append(
+                    JsonInput(
+                        name=input_name,
+                        value=input_value,
+                    )
+                )
             elif isinstance(input_value, (float, int)):
                 compiled_inputs.append(
                     NumberInput(
