@@ -325,6 +325,32 @@ class Workflow(BaseWorkflow):
 "
 `;
 
+exports[`generateCode > should generate code for %1 manual-trigger.ts > triggers/manual_trigger.py 1`] = `
+"from vellum.workflows.triggers import ManualTrigger
+
+
+class ManualTrigger(ManualTrigger):
+    class Display(ManualTrigger.Display):
+        label = "Manual Trigger"
+        x = 0
+        y = 0
+        z_index = 0
+"
+`;
+
+exports[`generateCode > should generate code for %1 manual-trigger.ts > workflow.py 1`] = `
+"from vellum.workflows import BaseWorkflow
+
+from .nodes.final_output import FinalOutput
+from .nodes.simple_node import SimpleNode
+from .triggers.manual_trigger import ManualTrigger
+class Workflow(BaseWorkflow):
+    graph = ManualTrigger >> SimpleNode >> FinalOutput
+    class Outputs(BaseWorkflow.Outputs):
+
+"
+`;
+
 exports[`generateCode > should generate code for %1 map-node-output-disappear.ts > nodes/outer_map_workflow/nodes/inner_map_workflow/__init__.py 1`] = `
 "from vellum.workflows.nodes.displayable import MapNode
 
