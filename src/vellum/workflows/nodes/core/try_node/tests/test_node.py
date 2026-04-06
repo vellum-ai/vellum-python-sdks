@@ -202,11 +202,15 @@ def test_try_node__prompt_node_non_streaming_provider_error__workflow_completes(
     # THEN the workflow completes successfully (does not hang)
     assert terminal_event.name == "workflow.execution.fulfilled"
 
+    # AND the non-streaming API was called
+    vellum_adhoc_prompt_client.adhoc_execute_prompt.assert_called_once()
+
     # AND the error output contains the provider error
     assert terminal_event.outputs.error == WorkflowError(
         message="Provider Error: OpenAI error: ('Connection aborted.', "
         "ConnectionResetError(104, 'Connection reset by peer'))",
         code=WorkflowErrorCode.PROVIDER_ERROR,
+        raw_data={},
     )
 
 
@@ -240,5 +244,10 @@ def test_try_node__prompt_node_non_streaming_connection_error__workflow_complete
     # THEN the workflow completes (does not hang)
     assert terminal_event.name == "workflow.execution.fulfilled"
 
-    # AND the error output is present
+    # AND the non-streaming API was called
+    vellum_adhoc_prompt_client.adhoc_execute_prompt.assert_called_once()
+
+    # AND the error output contains the connection error
     assert terminal_event.outputs.error is not None
+    assert terminal_event.outputs.error.code == WorkflowErrorCode.NODE_EXECUTION
+    assert "Connection reset by peer" in terminal_event.outputs.error.message
