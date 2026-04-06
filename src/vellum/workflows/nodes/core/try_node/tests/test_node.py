@@ -1,11 +1,16 @@
 import pytest
+from uuid import uuid4
 
 from vellum.client import Vellum
+from vellum.client.types.prompt_settings import PromptSettings
+from vellum.client.types.rejected_ad_hoc_execute_prompt_event import RejectedAdHocExecutePromptEvent
+from vellum.client.types.vellum_error import VellumError as VellumApiError
 from vellum.workflows.errors.types import WorkflowError, WorkflowErrorCode
 from vellum.workflows.exceptions import NodeException
 from vellum.workflows.inputs.base import BaseInputs
 from vellum.workflows.nodes.bases import BaseNode
 from vellum.workflows.nodes.core.try_node.node import TryNode
+from vellum.workflows.nodes.displayable.inline_prompt_node.node import InlinePromptNode
 from vellum.workflows.outputs import BaseOutputs
 from vellum.workflows.outputs.base import BaseOutput
 from vellum.workflows.state.base import BaseState, StateMeta
@@ -158,3 +163,82 @@ def test_try_node__nested_try():
     # THEN we only have the outer node's outputs
     valid_events = [e for e in events if e.name == "bar"]
     assert len(valid_events) == len(events)
+
+
+@pytest.mark.timeout(5)
+def test_try_node__prompt_node_non_streaming_provider_error__workflow_completes(vellum_adhoc_prompt_client):
+    """Ensure a TryNode wrapping a non-streaming InlinePromptNode that receives a
+    PROVIDER_ERROR does not hang and properly catches the error."""
+
+    # GIVEN an InlinePromptNode with streaming disabled, wrapped in a TryNode
+    @TryNode.wrap()
+    class MyPromptNode(InlinePromptNode):
+        ml_model = "gpt-4o"
+        blocks = []
+        prompt_inputs = {}
+        settings = PromptSettings(stream_enabled=False)
+
+    # AND a mocked non-streaming API that returns a REJECTED event with PROVIDER_ERROR
+    vellum_adhoc_prompt_client.adhoc_execute_prompt.return_value = RejectedAdHocExecutePromptEvent(
+        error=VellumApiError(
+            message="Provider Error: OpenAI error: ('Connection aborted.', "
+            "ConnectionResetError(104, 'Connection reset by peer'))",
+            code="PROVIDER_ERROR",
+        ),
+        execution_id=str(uuid4()),
+    )
+
+    # AND a workflow that uses this try-wrapped prompt node
+    class MyWorkflow(BaseWorkflow):
+        graph = MyPromptNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            results = MyPromptNode.Outputs.results
+            error = MyPromptNode.Outputs.error
+
+    # WHEN the workflow is run
+    terminal_event = MyWorkflow().run()
+
+    # THEN the workflow completes successfully (does not hang)
+    assert terminal_event.name == "workflow.execution.fulfilled"
+
+    # AND the error output contains the provider error
+    assert terminal_event.outputs.error == WorkflowError(
+        message="Provider Error: OpenAI error: ('Connection aborted.', "
+        "ConnectionResetError(104, 'Connection reset by peer'))",
+        code=WorkflowErrorCode.PROVIDER_ERROR,
+    )
+
+
+@pytest.mark.timeout(5)
+def test_try_node__prompt_node_non_streaming_connection_error__workflow_completes(vellum_adhoc_prompt_client):
+    """Ensure a TryNode wrapping a non-streaming InlinePromptNode that encounters a
+    ConnectionResetError during the API call does not hang and properly catches the error."""
+
+    # GIVEN an InlinePromptNode with streaming disabled, wrapped in a TryNode
+    @TryNode.wrap()
+    class MyPromptNode(InlinePromptNode):
+        ml_model = "gpt-4o"
+        blocks = []
+        prompt_inputs = {}
+        settings = PromptSettings(stream_enabled=False)
+
+    # AND a mocked non-streaming API that raises a ConnectionResetError
+    vellum_adhoc_prompt_client.adhoc_execute_prompt.side_effect = ConnectionResetError(104, "Connection reset by peer")
+
+    # AND a workflow that uses this try-wrapped prompt node
+    class MyWorkflow(BaseWorkflow):
+        graph = MyPromptNode
+
+        class Outputs(BaseWorkflow.Outputs):
+            results = MyPromptNode.Outputs.results
+            error = MyPromptNode.Outputs.error
+
+    # WHEN the workflow is run
+    terminal_event = MyWorkflow().run()
+
+    # THEN the workflow completes (does not hang)
+    assert terminal_event.name == "workflow.execution.fulfilled"
+
+    # AND the error output is present
+    assert terminal_event.outputs.error is not None
