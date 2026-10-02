@@ -103,11 +103,18 @@ def mock_trigger_metadata():
     _get_trigger_path_to_id_mapping.cache_clear()
     _get_trigger_attribute_id_mapping.cache_clear()
 
-    metadata_content = {
+    scheduled_trigger_metadata = {
         "trigger_path_to_id_mapping": {".triggers.scheduled.Scheduled": "c484ce55-a392-4a1b-8c10-1233b81c4539"},
         "edges_to_id_mapping": {
             "vellum.workflows.triggers.manual.Manual|.nodes.output.Output.Trigger": "42a1cc56-f544-4864-afa5-33d399d4e7eb",  # noqa: E501
             ".triggers.scheduled.Scheduled|.nodes.output.Output.Trigger": "43083a12-5c4a-4839-ad92-8221f54ddfd3",  # noqa: E501
+        },
+    }
+
+    manual_trigger_metadata = {
+        "trigger_path_to_id_mapping": {".triggers.manual.Manual": "b3c8ab56-001f-4157-bbc2-4a7fe5ebf8c6"},
+        "edges_to_id_mapping": {
+            ".triggers.manual.Manual|.nodes.simple_node.SimpleNode.Trigger": "3f69f314-b59e-462e-8d55-f75bf2f955dc",  # noqa: E501
         },
     }
 
@@ -118,7 +125,10 @@ def mock_trigger_metadata():
         normalized_path = file_path.replace(os.path.sep, "/")
 
         if normalized_path.endswith("codegen_integration/fixtures/simple_scheduled_trigger/code/metadata.json"):
-            return StringIO(json.dumps(metadata_content))
+            return StringIO(json.dumps(scheduled_trigger_metadata))
+
+        if normalized_path.endswith("codegen_integration/fixtures/simple_manual_trigger_workflow/code/metadata.json"):
+            return StringIO(json.dumps(manual_trigger_metadata))
 
         # Fall back to original implementation
         return original_virtual_open(file_path)

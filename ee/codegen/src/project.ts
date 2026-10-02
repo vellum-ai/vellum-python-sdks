@@ -63,6 +63,7 @@ import { SubworkflowDeploymentNode } from "src/generators/nodes/subworkflow-depl
 import { TemplatingNode } from "src/generators/nodes/templating-node";
 import { ChatMessageTrigger } from "src/generators/triggers/chat-message-trigger";
 import { IntegrationTrigger } from "src/generators/triggers/integration-trigger";
+import { ManualTrigger } from "src/generators/triggers/manual-trigger";
 import { ScheduledTrigger } from "src/generators/triggers/scheduled-trigger";
 import { WorkflowSandboxFile } from "src/generators/workflow-sandbox-file";
 import {
@@ -938,6 +939,12 @@ ${errors.slice(0, 3).map((err) => {
           trigger,
         });
         triggerPromises.push(chatMessageTrigger.persist());
+      } else if (trigger.type === "MANUAL") {
+        const manualTrigger = new ManualTrigger({
+          workflowContext: this.workflowContext,
+          trigger,
+        });
+        triggerPromises.push(manualTrigger.persist());
       }
     });
 
