@@ -17,3 +17,6 @@ src/vellum/client/tests
 scripts
 tests/workflows
 conftest.py
+.fern/replay.lock
+.fern/replay.yml
+.gitattributes
