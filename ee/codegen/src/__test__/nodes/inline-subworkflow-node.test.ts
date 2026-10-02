@@ -226,6 +226,73 @@ describe("InlineSubworkflowNode", () => {
     });
   });
 
+  describe("nested workflow class name collision", () => {
+    /**
+     * Tests that when an internal node has the same name as what the nested workflow
+     * class would be named, the nested workflow class gets a unique name.
+     * This is the APO-2207 scenario where:
+     * - Outer inline subworkflow node labeled "My Node" → nested workflow class "MyNodeWorkflow"
+     * - Internal node labeled "My Node Workflow" → would also be "MyNodeWorkflow"
+     * The fix ensures the nested workflow class gets renamed to avoid collision.
+     */
+    beforeEach(async () => {
+      const workflowContext = workflowContextFactory({
+        absolutePathToOutputDirectory: tempDir,
+        moduleName: "code",
+      });
+
+      // GIVEN an inline subworkflow node labeled "My Node"
+      // AND an internal node labeled "My Node Workflow" (same as what the nested workflow class would be named)
+      const nodeData = inlineSubworkflowNodeDataFactory({
+        label: "My Node",
+        nodes: [templatingNodeFactory({ label: "My Node Workflow" }).build()],
+      }).build();
+
+      const nodeContext = (await createNodeContext({
+        workflowContext,
+        nodeData,
+      })) as InlineSubworkflowNodeContext;
+
+      const node = new InlineSubworkflowNode({
+        workflowContext,
+        nodeContext,
+      });
+
+      // WHEN we generate the code
+      await node.persist();
+    });
+
+    it(`should generate unique nested workflow class name when internal node has same name`, async () => {
+      // THEN the outer node file should reference a unique workflow class name
+      const outerNodeContent = await readFile(
+        join(tempDir, "code", "nodes", "my_node", "__init__.py"),
+        "utf-8"
+      );
+      expect(outerNodeContent).toMatchSnapshot();
+
+      // AND the nested workflow file should have the unique class name
+      const workflowContent = await readFile(
+        join(tempDir, "code", "nodes", "my_node", "workflow.py"),
+        "utf-8"
+      );
+      expect(workflowContent).toMatchSnapshot();
+
+      // AND the internal node should keep its original class name
+      const internalNodeContent = await readFile(
+        join(
+          tempDir,
+          "code",
+          "nodes",
+          "my_node",
+          "nodes",
+          "my_node_workflow.py"
+        ),
+        "utf-8"
+      );
+      expect(internalNodeContent).toMatchSnapshot();
+    });
+  });
+
   describe("with state", () => {
     beforeEach(async () => {
       const workflowContext = workflowContextFactory({
