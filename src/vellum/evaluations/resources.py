@@ -175,7 +175,11 @@ class VellumTestSuiteRunResults:
         output_values = self.get_numeric_metric_output_values(
             metric_identifier=metric_identifier, output_identifier=output_identifier
         )
-        return sum(cast(Iterable[float], filter(lambda o: isinstance(o, float), output_values))) / len(output_values)
+        populated_values = [output_value for output_value in output_values if output_value is not None]
+        if not populated_values:
+            raise TestSuiteRunResultsException("Cannot compute the mean of zero populated metric outputs.")
+
+        return sum(populated_values) / len(populated_values)
 
     def get_min_metric_output(
         self, metric_identifier: str | None = None, output_identifier: str | None = None
