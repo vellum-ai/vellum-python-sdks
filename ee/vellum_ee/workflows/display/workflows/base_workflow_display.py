@@ -361,6 +361,21 @@ class BaseWorkflowDisplay(Generic[WorkflowType], metaclass=_BaseWorkflowDisplayM
                 )
             )
 
+        # Validate that workflows with non-manual triggers don't have workflow inputs.
+        # This includes mixed-trigger workflows (ManualTrigger + IntegrationTrigger) because
+        # when executed via the non-manual trigger, inputs won't be populated and can fail at runtime.
+        has_workflow_inputs = len(self.display_context.workflow_input_displays) > 0
+        has_non_manual_trigger = any(not issubclass(edge.trigger_class, ManualTrigger) for edge in trigger_edges)
+        if has_non_manual_trigger and has_workflow_inputs:
+            self.display_context.add_validation_error(
+                WorkflowValidationError(
+                    message="Workflows with non-manual triggers cannot have workflow inputs. "
+                    "Trigger workflows receive data from the trigger, not from inputs. "
+                    "Remove the inputs.py file or remove the non-manual triggers.",
+                    workflow_class_name=self._workflow.__name__,
+                )
+            )
+
         entrypoint_node_id: Optional[UUID] = None
         entrypoint_node_source_handle_id: Optional[UUID] = None
         entrypoint_node_display = self.display_context.workflow_display.entrypoint_node_display
