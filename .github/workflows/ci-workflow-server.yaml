@@ -1,0 +1,46 @@
+name: ci-workflow-server
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "*"
+
+jobs:
+  publish:
+    permissions:
+      contents: "read"
+      id-token: "write"
+
+    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.18.0"
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ee/automation
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          token_format: "access_token"
+          create_credentials_file: true
+          workload_identity_provider: "projects/585775334980/locations/global/workloadIdentityPools/github-pool/providers/github-actions-provider"
+          service_account: "github-gcr-service-account@vocify-prod.iam.gserviceaccount.com"
+          access_token_lifetime: "1200s"
+
+      - name: Bump Workflow Server
+        env:
+          VELLUM_AUTOMATION_APP_ID: ${{ secrets.VELLUM_AUTOMATION_APP_ID }}
+          VELLUM_AUTOMATION_PRIVATE_KEY: ${{ secrets.VELLUM_AUTOMATION_PRIVATE_KEY }}
+          VELLUM_AUTOMATION_INSTALLATION_ID: ${{ secrets.VELLUM_AUTOMATION_INSTALLATION_ID }}
+        run: npm run upgrade-workflow-server
+        working-directory: ee/automation
