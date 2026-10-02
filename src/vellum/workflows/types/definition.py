@@ -208,6 +208,8 @@ class MCPServer(UniversalBaseModel):
     bearer_token_value: Optional[Union[str, EnvironmentVariableReference]] = None
     api_key_header_key: Optional[str] = None
     api_key_header_value: Optional[Union[str, EnvironmentVariableReference]] = None
+    include_tools: Optional[List[str]] = None
+    exclude_tools: Optional[List[str]] = None
 
     model_config = {"arbitrary_types_allowed": True}
 

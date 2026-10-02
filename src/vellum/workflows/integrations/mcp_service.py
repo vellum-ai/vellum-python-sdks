@@ -264,9 +264,27 @@ class MCPService:
             )
 
     def hydrate_tool_definitions(self, server_def: MCPServer) -> List[MCPToolDefinition]:
-        """Hydrate an MCPToolDefinition with detailed information from the MCP server."""
+        """Hydrate an MCPToolDefinition with detailed information from the MCP server.
+
+        Tool filtering is applied based on include_tools and exclude_tools:
+        - include_tools acts as a whitelist: only tools in this list are included
+        - exclude_tools acts as a blacklist: tools in this list are filtered out
+        - exclude_tools takes precedence: if a tool appears in both lists, it is excluded
+        """
         try:
             tools = self.list_tools(server_def)
+
+            filtered_tools = []
+            for tool in tools:
+                tool_name = tool["name"]
+
+                if server_def.include_tools is not None and tool_name not in server_def.include_tools:
+                    continue
+
+                if server_def.exclude_tools is not None and tool_name in server_def.exclude_tools:
+                    continue
+
+                filtered_tools.append(tool)
 
             return [
                 MCPToolDefinition(
@@ -275,7 +293,7 @@ class MCPService:
                     description=tool["description"],
                     parameters=tool["inputSchema"],
                 )
-                for tool in tools
+                for tool in filtered_tools
             ]
         except Exception as e:
             logger.warning(f"Failed to hydrate MCP server '{server_def.name}': {e}")
