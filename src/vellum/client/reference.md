@@ -5474,7 +5474,7 @@ client.prompts.pull(
 <dl>
 <dd>
 
-**id:** `str` — The ID of the Prompt to pull from. Prompt Sandbox IDs are currently supported.
+**id:** `str` — The ID of the Prompt to pull from. Prompt Deployment IDs or names, Prompt Sandbox IDs, and Prompt Version IDs are currently supported.
     
 </dd>
 </dl>
@@ -5483,6 +5483,14 @@ client.prompts.pull(
 <dd>
 
 **prompt_variant_id:** `typing.Optional[str]` — The ID of the Prompt Variant within a Prompt Sandbox to pull. Must be included if providing the ID of a Prompt Sandbox.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**release_tag:** `typing.Optional[str]` — The Release Tag to pull when providing a Prompt Deployment ID or name. Defaults to LATEST.
     
 </dd>
 </dl>

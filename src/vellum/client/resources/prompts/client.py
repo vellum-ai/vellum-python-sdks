@@ -36,6 +36,7 @@ class PromptsClient:
         id: str,
         *,
         prompt_variant_id: typing.Optional[str] = None,
+        release_tag: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> PromptExecConfig:
         """
@@ -44,10 +45,13 @@ class PromptsClient:
         Parameters
         ----------
         id : str
-            The ID of the Prompt to pull from. Prompt Sandbox IDs are currently supported.
+            The ID of the Prompt to pull from. Prompt Deployment IDs or names, Prompt Sandbox IDs, and Prompt Version IDs are currently supported.
 
         prompt_variant_id : typing.Optional[str]
             The ID of the Prompt Variant within a Prompt Sandbox to pull. Must be included if providing the ID of a Prompt Sandbox.
+
+        release_tag : typing.Optional[str]
+            The Release Tag to pull when providing a Prompt Deployment ID or name. Defaults to LATEST.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -69,7 +73,9 @@ class PromptsClient:
             id="id",
         )
         """
-        _response = self._raw_client.pull(id, prompt_variant_id=prompt_variant_id, request_options=request_options)
+        _response = self._raw_client.pull(
+            id, prompt_variant_id=prompt_variant_id, release_tag=release_tag, request_options=request_options
+        )
         return _response.data
 
     def push(
@@ -175,6 +181,7 @@ class AsyncPromptsClient:
         id: str,
         *,
         prompt_variant_id: typing.Optional[str] = None,
+        release_tag: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> PromptExecConfig:
         """
@@ -183,10 +190,13 @@ class AsyncPromptsClient:
         Parameters
         ----------
         id : str
-            The ID of the Prompt to pull from. Prompt Sandbox IDs are currently supported.
+            The ID of the Prompt to pull from. Prompt Deployment IDs or names, Prompt Sandbox IDs, and Prompt Version IDs are currently supported.
 
         prompt_variant_id : typing.Optional[str]
             The ID of the Prompt Variant within a Prompt Sandbox to pull. Must be included if providing the ID of a Prompt Sandbox.
+
+        release_tag : typing.Optional[str]
+            The Release Tag to pull when providing a Prompt Deployment ID or name. Defaults to LATEST.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -217,7 +227,7 @@ class AsyncPromptsClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.pull(
-            id, prompt_variant_id=prompt_variant_id, request_options=request_options
+            id, prompt_variant_id=prompt_variant_id, release_tag=release_tag, request_options=request_options
         )
         return _response.data
 

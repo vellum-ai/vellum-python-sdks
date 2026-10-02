@@ -28,6 +28,7 @@ class RawPromptsClient:
         id: str,
         *,
         prompt_variant_id: typing.Optional[str] = None,
+        release_tag: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[PromptExecConfig]:
         """
@@ -36,10 +37,13 @@ class RawPromptsClient:
         Parameters
         ----------
         id : str
-            The ID of the Prompt to pull from. Prompt Sandbox IDs are currently supported.
+            The ID of the Prompt to pull from. Prompt Deployment IDs or names, Prompt Sandbox IDs, and Prompt Version IDs are currently supported.
 
         prompt_variant_id : typing.Optional[str]
             The ID of the Prompt Variant within a Prompt Sandbox to pull. Must be included if providing the ID of a Prompt Sandbox.
+
+        release_tag : typing.Optional[str]
+            The Release Tag to pull when providing a Prompt Deployment ID or name. Defaults to LATEST.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -55,6 +59,7 @@ class RawPromptsClient:
             method="GET",
             params={
                 "prompt_variant_id": prompt_variant_id,
+                "release_tag": release_tag,
             },
             headers={
                 "Accept": "application/json",
@@ -195,6 +200,7 @@ class AsyncRawPromptsClient:
         id: str,
         *,
         prompt_variant_id: typing.Optional[str] = None,
+        release_tag: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[PromptExecConfig]:
         """
@@ -203,10 +209,13 @@ class AsyncRawPromptsClient:
         Parameters
         ----------
         id : str
-            The ID of the Prompt to pull from. Prompt Sandbox IDs are currently supported.
+            The ID of the Prompt to pull from. Prompt Deployment IDs or names, Prompt Sandbox IDs, and Prompt Version IDs are currently supported.
 
         prompt_variant_id : typing.Optional[str]
             The ID of the Prompt Variant within a Prompt Sandbox to pull. Must be included if providing the ID of a Prompt Sandbox.
+
+        release_tag : typing.Optional[str]
+            The Release Tag to pull when providing a Prompt Deployment ID or name. Defaults to LATEST.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -222,6 +231,7 @@ class AsyncRawPromptsClient:
             method="GET",
             params={
                 "prompt_variant_id": prompt_variant_id,
+                "release_tag": release_tag,
             },
             headers={
                 "Accept": "application/json",

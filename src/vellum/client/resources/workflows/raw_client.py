@@ -48,23 +48,30 @@ class RawWorkflowsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Iterator[HttpResponse[typing.Iterator[bytes]]]:
         """
+        Used to pull the definition of a Workflow from Vellum. Returns a zip archive of the Workflow's code by default, or a flattened plain-text representation if the Accept header is set to 'text/plain'.
+
         Parameters
         ----------
         id : str
-            The ID of the Workflow to pull from
+            The ID or name of the Workflow Deployment, or the ID of the Workflow Sandbox, to pull from.
 
         exclude_code : typing.Optional[bool]
+            If true, omit the Workflow's code from the response.
 
         exclude_display : typing.Optional[bool]
+            If true, omit UI display metadata files when pulling from a Workflow Sandbox.
 
         include_json : typing.Optional[bool]
+            If true, include a JSON representation of the Workflow's definition alongside its code.
 
         include_sandbox : typing.Optional[bool]
+            If true, include the Workflow Sandbox's scenarios as sandbox inputs when pulling from a Workflow Sandbox.
 
         release_tag : typing.Optional[str]
             Release tag to use when pulling from deployment (implies deployment-only lookup)
 
         strict : typing.Optional[bool]
+            If true, fail on any code generation error instead of returning best-effort code.
 
         version : typing.Optional[str]
             Semantic version range to validate against the Workflow SDK version (e.g., '>=1.0.0,<1.2.3')
@@ -475,23 +482,30 @@ class AsyncRawWorkflowsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[bytes]]]:
         """
+        Used to pull the definition of a Workflow from Vellum. Returns a zip archive of the Workflow's code by default, or a flattened plain-text representation if the Accept header is set to 'text/plain'.
+
         Parameters
         ----------
         id : str
-            The ID of the Workflow to pull from
+            The ID or name of the Workflow Deployment, or the ID of the Workflow Sandbox, to pull from.
 
         exclude_code : typing.Optional[bool]
+            If true, omit the Workflow's code from the response.
 
         exclude_display : typing.Optional[bool]
+            If true, omit UI display metadata files when pulling from a Workflow Sandbox.
 
         include_json : typing.Optional[bool]
+            If true, include a JSON representation of the Workflow's definition alongside its code.
 
         include_sandbox : typing.Optional[bool]
+            If true, include the Workflow Sandbox's scenarios as sandbox inputs when pulling from a Workflow Sandbox.
 
         release_tag : typing.Optional[str]
             Release tag to use when pulling from deployment (implies deployment-only lookup)
 
         strict : typing.Optional[bool]
+            If true, fail on any code generation error instead of returning best-effort code.
 
         version : typing.Optional[str]
             Semantic version range to validate against the Workflow SDK version (e.g., '>=1.0.0,<1.2.3')

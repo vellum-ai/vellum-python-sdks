@@ -5,6 +5,7 @@ import typing
 import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 from .indexing_state_enum import IndexingStateEnum
+from .processing_failure_reason_enum import ProcessingFailureReasonEnum
 
 
 class DocumentDocumentToDocumentIndex(UniversalBaseModel):
@@ -40,6 +41,14 @@ class DocumentDocumentToDocumentIndex(UniversalBaseModel):
 
     extracted_text_file_url: typing.Optional[str] = None
     processing_state: typing.Optional[str] = None
+    processing_failure_reason: typing.Optional[ProcessingFailureReasonEnum] = pydantic.Field(default=None)
+    """
+    An enum value representing why the document could not be processed for this index. Is null unless processing_state is FAILED.
+    
+    * `EXCEEDED_CHARACTER_LIMIT` - Exceeded Character Limit
+    * `INVALID_FILE` - Invalid File
+    * `INVALID_CREDENTIALS` - Invalid Credentials
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
