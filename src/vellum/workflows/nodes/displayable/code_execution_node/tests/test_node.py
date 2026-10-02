@@ -1442,6 +1442,60 @@ def main(secret: str) -> str:
     )
 
 
+def test_run_node__bool_input(vellum_client):
+    """Confirm that CodeExecutionNodes handle boolean inputs correctly via the API path.
+
+    In Python, bool is a subclass of int, so isinstance(True, int) returns True.
+    This test ensures that boolean values are compiled as JsonInput rather than
+    NumberInput, which would incorrectly convert True to 1.0 and False to 0.0.
+    """
+
+    # GIVEN a node that subclasses CodeExecutionNode with a boolean input
+    class State(BaseState):
+        pass
+
+    fixture = os.path.abspath(os.path.join(__file__, "../fixtures/main.py"))
+
+    class ExampleCodeExecutionNode(CodeExecutionNode[State, int]):
+        filepath = fixture
+        runtime = "PYTHON_3_11_6"
+        packages = [
+            CodeExecutionPackage(
+                name="openai",
+                version="1.0.0",
+            )
+        ]
+
+        code_inputs = {
+            "flag": True,
+        }
+
+    # AND we know what the Code Execution Node will respond with
+    mock_code_execution = CodeExecutorResponse(
+        log="",
+        output=NumberVellumValue(value=1),
+    )
+    vellum_client.execute_code.return_value = mock_code_execution
+
+    # WHEN we run the node
+    node = ExampleCodeExecutionNode(state=State())
+    outputs = node.run()
+
+    # THEN the node should have produced the outputs we expect
+    assert outputs == {"result": 1, "log": ""}
+
+    # AND we should have invoked the Code with a JsonInput for the boolean value,
+    # not a NumberInput which would incorrectly convert True to 1.0
+    from vellum import JsonInput
+
+    assert vellum_client.execute_code.call_args_list[0].kwargs["input_values"] == [
+        JsonInput(
+            name="flag",
+            value=True,
+        )
+    ]
+
+
 def test_run_node__undefined_input_skipped():
     """
     Confirm that when an undefined value is passed as an input, it is skipped rather than raising an error.
