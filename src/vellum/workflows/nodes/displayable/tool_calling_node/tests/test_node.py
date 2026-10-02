@@ -2,16 +2,19 @@ import pytest
 import json
 from unittest import mock
 from uuid import uuid4
-from typing import Any, Iterator, List, Optional, cast
+from typing import Annotated, Any, Iterator, List, Optional, cast
 
 from vellum import ChatMessage
 from vellum.client.core.api_error import ApiError
+from vellum.client.types.chat_message_prompt_block import ChatMessagePromptBlock
 from vellum.client.types.execute_prompt_event import ExecutePromptEvent
 from vellum.client.types.fulfilled_execute_prompt_event import FulfilledExecutePromptEvent
 from vellum.client.types.function_call import FunctionCall
 from vellum.client.types.function_call_vellum_value import FunctionCallVellumValue
 from vellum.client.types.initiated_execute_prompt_event import InitiatedExecutePromptEvent
+from vellum.client.types.plain_text_prompt_block import PlainTextPromptBlock
 from vellum.client.types.prompt_output import PromptOutput
+from vellum.client.types.rich_text_prompt_block import RichTextPromptBlock
 from vellum.client.types.string_chat_message_content import StringChatMessageContent
 from vellum.client.types.string_vellum_value import StringVellumValue
 from vellum.client.types.variable_prompt_block import VariablePromptBlock
@@ -1058,3 +1061,99 @@ def test_tool_calling_node_none_input_included_with_required_false(vellum_adhoc_
     ]
     assert len(state_inputs) == 1
     assert state_inputs[0].value is None
+
+
+def test_tool_calling_node__metadata_fed_back_in_subsequent_turns(vellum_adhoc_prompt_client, vellum_client):
+    """
+    Tests that metadata from execute prompt calls is preserved in chat history and fed back in subsequent turns.
+    """
+
+    def simple_tool(query: Annotated[str, "The query to process"]) -> str:
+        """
+        A simple tool that returns a response.
+        """
+        return "Tool executed successfully"
+
+    # GIVEN a workflow with a tool calling node
+    class MetadataToolCallingNode(ToolCallingNode):
+        ml_model = "gemini-2.0-flash"
+        blocks = [
+            ChatMessagePromptBlock(
+                block_type="CHAT_MESSAGE",
+                chat_role="USER",
+                blocks=[
+                    RichTextPromptBlock(
+                        block_type="RICH_TEXT",
+                        blocks=[
+                            PlainTextPromptBlock(block_type="PLAIN_TEXT", text="Process this query"),
+                        ],
+                    ),
+                ],
+            ),
+        ]
+        functions = [simple_tool]
+
+    class MetadataWorkflow(BaseWorkflow):
+        graph = MetadataToolCallingNode
+
+    # AND the mock returns outputs with metadata (simulating thought signatures from Gemini)
+    thought_signature_metadata = {
+        "gemini_parts": [{"part_index": 0, "thought_signature": "test-thought-signature-abc123"}]
+    }
+
+    def generate_prompt_events(*_args, **_kwargs) -> Iterator[ExecutePromptEvent]:
+        execution_id = str(uuid4())
+
+        call_count = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count
+        expected_outputs: List[PromptOutput]
+        if call_count == 1:
+            expected_outputs = [
+                FunctionCallVellumValue(
+                    value=FunctionCall(
+                        arguments={"query": "test query"},
+                        id="call_metadata_test",
+                        name="simple_tool",
+                        state="FULFILLED",
+                    ),
+                ),
+            ]
+        else:
+            expected_outputs = [StringVellumValue(value="Final response after tool execution.")]
+
+        events: List[ExecutePromptEvent] = [
+            InitiatedExecutePromptEvent(execution_id=execution_id),
+            FulfilledExecutePromptEvent(
+                execution_id=execution_id,
+                outputs=expected_outputs,
+                chat_message_metadata=thought_signature_metadata if call_count == 1 else None,
+            ),
+        ]
+        yield from events
+
+    vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.side_effect = generate_prompt_events
+
+    workflow = MetadataWorkflow()
+
+    # WHEN the workflow is executed
+    workflow.run()
+
+    # THEN the adhoc_execute_prompt_stream should be called twice
+    assert vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_count == 2
+
+    # AND the second call should have the metadata preserved in the chat_history
+    second_call = vellum_adhoc_prompt_client.adhoc_execute_prompt_stream.call_args_list[1]
+    chat_history_input = next(
+        (
+            input_val
+            for input_val in second_call.kwargs["input_values"]
+            if hasattr(input_val, "key") and input_val.key == "chat_history"
+        ),
+        None,
+    )
+
+    assert chat_history_input is not None
+    assert len(chat_history_input.value) >= 1
+
+    # AND the first message in chat_history should have the metadata preserved
+    first_chat_message = chat_history_input.value[0]
+    assert first_chat_message.metadata == thought_signature_metadata
